@@ -18,6 +18,9 @@ coverage/
 e2e/auth/*.json
 qa-*.json
 qa_tokens.json
+lighthouse-*.json
+qa-report-*.json
+
 
 # Tool caches
 .cache/

@@ -699,18 +699,26 @@ onMounted(() => {
         </div>
 
         <!-- Data Table -->
-        <div v-else class="overflow-x-auto">
-          <table class="w-full text-left border-collapse">
+        <div v-else class="w-full max-w-full overflow-hidden">
+          <table class="w-full max-w-full text-left border-collapse table-fixed">
+            <colgroup>
+              <col class="w-[27%]" />
+              <col class="w-[21%]" />
+              <col class="w-[14%]" />
+              <col class="w-[10%]" />
+              <col class="w-[20%]" />
+              <col class="w-[8%]" />
+            </colgroup>
             <thead>
               <tr
-                class="border-b border-[#E2E8F0] bg-[#F8FAFC] text-[11px] font-semibold text-[#64748B] uppercase tracking-wider select-none"
+                class="border-b border-[#E2E8F0] bg-[#F8FAFC] text-[11px] font-semibold text-[#64748B] uppercase tracking-wider select-none whitespace-nowrap"
               >
-                <th class="py-3 pl-5 pr-4">Karyawan</th>
-                <th class="py-3 px-4">Departemen & Lokasi</th>
-                <th class="py-3 px-4">Kategori Aset</th>
-                <th class="py-3 px-4 text-center">Total Aset</th>
-                <th class="py-3 px-4">Penugasan Terakhir</th>
-                <th class="py-3 pr-5 pl-4 text-right">Detail</th>
+                <th class="py-3 pl-4 pr-3 text-left whitespace-nowrap">Karyawan</th>
+                <th class="py-3 px-3 text-left whitespace-nowrap">Departemen & Lokasi</th>
+                <th class="py-3 px-3 text-left whitespace-nowrap">Kategori Aset</th>
+                <th class="py-3 px-2 text-center whitespace-nowrap">Total Aset</th>
+                <th class="py-3 px-3 text-center whitespace-nowrap">Penugasan Terakhir</th>
+                <th class="py-3 pr-4 pl-2 text-center whitespace-nowrap">Detail</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-[#F1F5F9] text-xs">
@@ -721,21 +729,24 @@ onMounted(() => {
                 class="group hover:bg-[#F8FAFC] transition-colors duration-150 cursor-pointer select-none"
               >
                 <!-- Avatar & Employee Info -->
-                <td class="py-3.5 pl-5 pr-4 min-w-[200px]">
-                  <div class="flex items-center gap-3">
+                <td class="py-3.5 pl-4 pr-3 overflow-hidden">
+                  <div class="flex items-center gap-2.5 min-w-0">
                     <div
-                      class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br text-[11px] font-bold text-white shadow-2xs"
+                      class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br text-[11px] font-bold text-white shadow-2xs"
                       :class="getAvatarGradient(idx)"
                     >
                       {{ getInitials(employee.nama_karyawan) }}
                     </div>
                     <div class="flex flex-col min-w-0">
                       <span
-                        class="text-xs font-semibold text-[#0F172A] group-hover:text-[#2563EB] transition-colors truncate"
+                        class="text-xs font-semibold text-[#0F172A] group-hover:text-[#2563EB] transition-colors truncate block"
+                        :title="employee.nama_karyawan"
                       >
                         {{ employee.nama_karyawan }}
                       </span>
-                      <span class="font-mono text-[11px] text-[#64748B] truncate"
+                      <span
+                        class="font-mono text-[11px] text-[#64748B] truncate block"
+                        :title="`NIK: ${employee.nik}`"
                         >NIK: {{ employee.nik }}</span
                       >
                     </div>
@@ -743,67 +754,72 @@ onMounted(() => {
                 </td>
 
                 <!-- Departemen & Lokasi -->
-                <td class="py-3.5 px-4 min-w-[160px]">
-                  <div class="flex flex-col">
-                    <span class="font-semibold text-[#1E293B] truncate">{{
-                      employee.departemen || '—'
-                    }}</span>
+                <td class="py-3.5 px-3 overflow-hidden">
+                  <div class="flex flex-col min-w-0">
+                    <span
+                      class="font-semibold text-[#1E293B] truncate block"
+                      :title="employee.departemen || '—'"
+                      >{{ employee.departemen || '—' }}</span
+                    >
                     <span
                       class="text-[11px] text-[#64748B] flex items-center gap-1 truncate mt-0.5"
+                      :title="normalizeLocation(employee.lokasi_kerja) || '—'"
                     >
-                      <span class="material-symbols-outlined text-[13px] text-[#94A3B8]"
+                      <span class="material-symbols-outlined text-[13px] text-[#94A3B8] shrink-0"
                         >location_on</span
                       >
-                      {{ normalizeLocation(employee.lokasi_kerja) || '—' }}
+                      <span class="truncate block">{{ normalizeLocation(employee.lokasi_kerja) || '—' }}</span>
                     </span>
                   </div>
                 </td>
 
                 <!-- Asset Type Chips -->
-                <td class="py-3.5 px-4 min-w-[170px]">
-                  <div class="flex flex-wrap items-center gap-1.5">
+                <td class="py-3.5 px-3 overflow-hidden">
+                  <div class="flex items-center gap-1 min-w-0 overflow-hidden">
                     <template v-if="employee.asset_types && employee.asset_types.length > 0">
                       <span
-                        v-for="tipe in employee.asset_types.slice(0, 3)"
+                        v-for="tipe in employee.asset_types.slice(0, 2)"
                         :key="tipe"
-                        class="inline-flex items-center gap-1 rounded-md bg-[#F1F5F9] px-2 py-0.5 text-[10.5px] font-medium text-[#475569] border border-[#E2E8F0]"
+                        class="inline-flex items-center gap-1 rounded-md bg-[#F1F5F9] px-1.5 py-0.5 text-[10px] font-medium text-[#475569] border border-[#E2E8F0] shrink min-w-0 overflow-hidden"
                       >
-                        <span class="material-symbols-outlined text-[12px] text-[#2563EB]">{{
+                        <span class="material-symbols-outlined text-[12px] text-[#2563EB] shrink-0">{{
                           getDeviceIcon(tipe)
                         }}</span>
-                        {{ tipe }}
+                        <span class="truncate">{{ tipe }}</span>
                       </span>
                       <span
-                        v-if="employee.asset_types.length > 3"
-                        class="text-[10px] font-semibold text-[#94A3B8]"
+                        v-if="employee.asset_types.length > 2"
+                        class="text-[10px] font-semibold text-[#94A3B8] shrink-0"
                       >
-                        +{{ employee.asset_types.length - 3 }}
+                        +{{ employee.asset_types.length - 2 }}
                       </span>
                     </template>
-                    <span v-else class="text-[11px] text-[#94A3B8]">Aset IT</span>
+                    <span v-else class="text-[11px] text-[#94A3B8] truncate">Aset IT</span>
                   </div>
                 </td>
 
                 <!-- Total Aset Badge -->
-                <td class="py-3.5 px-4 text-center min-w-[110px]">
+                <td class="py-3.5 px-2 text-center overflow-hidden">
                   <span
-                    class="inline-flex items-center justify-center rounded-full bg-[#EFF6FF] px-2.5 py-0.5 text-[11px] font-bold text-[#2563EB] border border-[#BFDBFE]/60"
+                    class="inline-flex items-center justify-center rounded-full bg-[#EFF6FF] px-2 py-0.5 text-[11px] font-bold text-[#2563EB] border border-[#BFDBFE]/60 whitespace-nowrap"
                   >
                     {{ employee.jumlah_aset || 0 }} Aset
                   </span>
                 </td>
 
                 <!-- Last Assignment Date -->
-                <td class="py-3.5 px-4 text-[#64748B] min-w-[140px]">
-                  <span class="text-xs font-medium">{{
-                    formatDate(employee.last_assignment_date)
-                  }}</span>
+                <td class="py-3.5 px-4 text-[#64748B] overflow-hidden text-center">
+                  <span
+                    class="text-xs font-medium truncate block"
+                    :title="formatDate(employee.last_assignment_date)"
+                    >{{ formatDate(employee.last_assignment_date) }}</span
+                  >
                 </td>
 
                 <!-- Action Chevron -->
-                <td class="py-3.5 pr-5 pl-4 text-right min-w-[50px]">
+                <td class="py-3.5 pr-5 pl-4 text-center overflow-hidden">
                   <span
-                    class="material-symbols-outlined text-[18px] text-[#94A3B8] group-hover:text-[#2563EB] group-hover:translate-x-0.5 transition-all"
+                    class="material-symbols-outlined text-[18px] text-[#94A3B8] group-hover:text-[#2563EB] group-hover:translate-x-0.5 transition-all inline-block"
                     >chevron_right</span
                   >
                 </td>

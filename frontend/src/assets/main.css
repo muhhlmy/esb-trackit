@@ -447,13 +447,20 @@ label > span:first-child,
 }
 
 /* SearchableSelect Modern Styling */
-div.relative > button.text-left.h-8.w-full,
-div.relative > button.text-left.h-10.w-full {
+div.relative > button.text-left.h-8.w-full {
   background: #ffffff;
   border: 1px solid #dfe5ef;
   color: #2a3547;
   border-radius: 0.5rem;
   height: 2.125rem !important;
+}
+
+div.relative > button.text-left.h-10.w-full {
+  background: #ffffff;
+  border: 1px solid #dfe5ef;
+  color: #2a3547;
+  border-radius: 0.5rem;
+  height: 2.5rem !important;
 }
 
 div.relative > button.text-left:focus {

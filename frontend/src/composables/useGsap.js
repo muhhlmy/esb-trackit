@@ -317,7 +317,7 @@ export function animateCounter(targetRef, endValue, duration = 0.8) {
         if (targetRef) targetRef.value = Math.round(obj.val)
       },
     })
-  } catch (err) {
+  } catch {
     if (targetRef) targetRef.value = endValue
   }
 }

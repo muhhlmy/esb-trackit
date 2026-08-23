@@ -571,7 +571,12 @@ export async function listAssets(req, res) {
       )
     }
 
-    setPaginationHeaders(res, totalCount, 1, totalCount)
+    if (fetchAll) {
+      setPaginationHeaders(res, totalCount, 1, totalCount)
+    } else {
+      const { page, limit } = parsePaginationQuery(req.query)
+      setPaginationHeaders(res, totalCount, page, limit)
+    }
     res.json(results.rows)
   } catch (error) {
     if (error.statusCode === 400) {

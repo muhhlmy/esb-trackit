@@ -165,6 +165,7 @@ const isSubmitting = ref(false)
 const searchQuery = ref('')
 const filterStatus = ref('')
 const filterPrioritas = ref('')
+const filterKategori = ref('')
 const pageError = ref('')
 const notification = ref(null)
 const isClaiming = ref(null) // ticket id yang sedang di-claim
@@ -175,6 +176,26 @@ const showDetailModal = ref(false)
 const modalMode = ref('add')
 const selectedTicket = ref(null)
 const modalError = ref('')
+const activeFormTab = ref('kendala')
+
+function nextTicketStep() {
+  if (activeFormTab.value === 'kendala') {
+    if (!form.value.judul || !form.value.judul.trim()) {
+      modalError.value = 'Judul kendala wajib diisi.'
+      return
+    }
+    activeFormTab.value = 'penanganan'
+  } else if (activeFormTab.value === 'penanganan') {
+    if (!form.value.queue_id) {
+      modalError.value = 'Unit tujuan wajib dipilih.'
+      return
+    }
+    activeFormTab.value = 'lampiran'
+  }
+  modalError.value = ''
+}
+
+
 
 const activeDetailTab = ref('detail')
 const ticketHistory = ref([])
@@ -202,6 +223,102 @@ const emptyForm = () => ({
 })
 
 const form = ref(emptyForm())
+
+const hasTicketValidationErrors = computed(() => {
+  if (activeFormTab.value === 'kendala') {
+    return !form.value.judul || !form.value.judul.trim()
+  }
+  if (activeFormTab.value === 'penanganan') {
+    return !form.value.queue_id
+  }
+  if (activeFormTab.value === 'lampiran') {
+    return !form.value.judul || !form.value.judul.trim() || !form.value.queue_id
+  }
+  return false
+})
+
+const selectedSupportUnit = ref('IT')
+
+const itQueue = computed(
+  () =>
+    queues.value.find(
+      (q) =>
+        (q.kode || '').toUpperCase().includes('IT') ||
+        (q.nama || '').toUpperCase().includes('IT'),
+    ) || queues.value[0],
+)
+
+const hrQueue = computed(
+  () =>
+    queues.value.find(
+      (q) =>
+        (q.kode || '').toUpperCase().includes('HR') ||
+        (q.nama || '').toUpperCase().includes('HR') ||
+        (q.nama || '').toUpperCase().includes('HUMAN'),
+    ),
+)
+
+function setSupportUnit(unit) {
+  selectedSupportUnit.value = unit
+  const targetQueue = unit === 'HR' ? hrQueue.value : itQueue.value
+  if (targetQueue) {
+    form.value.queue_id = targetQueue.id
+  } else if (queues.value.length > 0) {
+    form.value.queue_id = queues.value[0].id
+  }
+}
+
+const availableCategories = computed(() => {
+  if (selectedSupportUnit.value === 'HR') {
+    return [
+      {
+        value: 'Request',
+        title: 'Request',
+        desc: 'Permintaan Layanan & Surat HR',
+      },
+      {
+        value: 'Support',
+        title: 'Support',
+        desc: 'Kendala & Masalah Kepegawaian',
+      },
+      {
+        value: 'QNA',
+        title: 'QNA',
+        desc: 'Pertanyaan & Informasi HR',
+      },
+    ]
+  }
+
+  return [
+    {
+      value: 'Request',
+      title: 'Request',
+      desc: 'Permintaan Akses, Hardware & Software',
+    },
+    {
+      value: 'Support',
+      title: 'Support',
+      desc: 'Kendala Teknis, PC/Laptop & Wi-Fi',
+    },
+    {
+      value: 'Incident',
+      title: 'Incident',
+      desc: 'Insiden Critical System / Network Down',
+    },
+  ]
+})
+
+watch(
+  () => selectedSupportUnit.value,
+  () => {
+    if (!form.value) return
+    const validValues = availableCategories.value.map((c) => c.value)
+    if (!validValues.includes(form.value.kategori)) {
+      form.value.kategori = validValues[0] || 'Support'
+    }
+  },
+  { immediate: true },
+)
 
 function handleFileChange(event) {
   const file = event.target.files?.[0]
@@ -247,6 +364,8 @@ function removeCommentAttachment() {
   commentAttachment.value = null
 }
 
+
+
 const filteredTickets = computed(() => {
   return tickets.value.filter((t) => {
     const q = searchQuery.value.trim().toLowerCase()
@@ -258,17 +377,22 @@ const filteredTickets = computed(() => {
       (t.pelapor_nama || '').toLowerCase().includes(q) ||
       (t.assigned_to || '').toLowerCase().includes(q) ||
       (t.assigned_to_nama || '').toLowerCase().includes(q) ||
-      (t.queue_kode || '').toLowerCase().includes(q)
+      (t.queue_kode || '').toLowerCase().includes(q) ||
+      (t.queue_nama || '').toLowerCase().includes(q) ||
+      (t.kategori || '').toLowerCase().includes(q)
     const matchStatus = !filterStatus.value || t.status_tiket === filterStatus.value
     const matchPrioritas = !filterPrioritas.value || t.prioritas === filterPrioritas.value
-    return matchQuery && matchStatus && matchPrioritas
+    const matchQueue = !filterQueue.value || t.queue_id === Number(filterQueue.value)
+    const matchKategori =
+      !filterKategori.value || (t.kategori || '').toLowerCase() === filterKategori.value.toLowerCase()
+    return matchQuery && matchStatus && matchPrioritas && matchQueue && matchKategori
   })
 })
 
 const currentPage = ref(1)
 const itemsPerPage = ref(10)
 
-watch([searchQuery, filterStatus, filterPrioritas, activeTab], () => {
+watch([searchQuery, filterStatus, filterPrioritas, filterQueue, filterKategori, activeTab], () => {
   currentPage.value = 1
 })
 
@@ -522,6 +646,8 @@ function openAdd() {
   modalMode.value = 'add'
   selectedTicket.value = null
   form.value = emptyForm()
+  setSupportUnit('IT')
+  activeFormTab.value = 'kendala'
   attachmentChanged.value = false
   ticketAttachmentError.value = ''
   modalError.value = ''
@@ -541,6 +667,14 @@ function openEdit(ticket) {
     assigned_to_user_id: ticket.assigned_to_user_id || null,
     attachment: null,
   }
+  const queueCode = (ticket.queue_kode || '').toUpperCase()
+  const queueName = (ticket.queue_nama || '').toUpperCase()
+  if (queueCode.includes('HR') || queueName.includes('HR') || queueName.includes('HUMAN')) {
+    selectedSupportUnit.value = 'HR'
+  } else {
+    selectedSupportUnit.value = 'IT'
+  }
+  activeFormTab.value = 'kendala'
   attachmentChanged.value = false
   ticketAttachmentError.value = ''
   modalError.value = ''
@@ -599,8 +733,19 @@ function openDelete(ticket) {
 }
 
 const isUpdatingStatus = ref(false)
+const showStatusDropdown = ref(false)
+
+function toggleStatusDropdown() {
+  showStatusDropdown.value = !showStatusDropdown.value
+}
+
+function selectStatus(ticket, status) {
+  showStatusDropdown.value = false
+  updateTicketStatus(ticket, status)
+}
 
 function closeModal() {
+  showStatusDropdown.value = false
   ticketAttachmentRequestVersion += 1
   isTicketAttachmentLoading.value = false
   ticketAttachmentError.value = ''
@@ -608,6 +753,7 @@ function closeModal() {
   showDeleteModal.value = false
   showDetailModal.value = false
   selectedTicket.value = null
+  activeFormTab.value = 'kendala'
   modalError.value = ''
   stopChatPoll()
   document.body.style.overflow = ''
@@ -1105,6 +1251,18 @@ function toast(message, type = 'success') {
               {{ q.kode }} — {{ q.nama }}
             </option>
           </select>
+
+          <select
+            v-model="filterKategori"
+            @change="fetchTickets"
+            class="h-9 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-semibold text-[#334155] focus:border-[#2563EB] focus:outline-none cursor-pointer"
+          >
+            <option value="">Kategori: Semua</option>
+            <option value="Request">Request</option>
+            <option value="Support">Support</option>
+            <option value="Incident">Incident</option>
+            <option value="QNA">QNA</option>
+          </select>
         </div>
       </div>
     </div>
@@ -1185,16 +1343,25 @@ function toast(message, type = 'success') {
 
               <!-- Single Muted Sub-metadata Line -->
               <div class="flex items-center gap-2 text-[12px] text-[#94A3B8] flex-wrap mt-0.5">
-                <span class="font-mono text-[#64748B]">{{
+                <span class="font-mono text-[#64748B] font-semibold">{{
                   ticket.nomor_tiket || `TCK-${ticket.id}`
                 }}</span>
                 <span>·</span>
-                <span>{{ ticket.queue_kode || 'IT' }}</span>
+                <span class="text-[#334155] font-semibold flex items-center gap-1">
+                  <span class="material-symbols-outlined text-[13.5px] text-[#5D87FF]">
+                    {{ (ticket.queue_kode || '').toUpperCase().includes('HR') || (ticket.queue_nama || '').toUpperCase().includes('HR') ? 'badge' : 'computer' }}
+                  </span>
+                  {{ ticket.queue_nama || (ticket.queue_kode ? `${ticket.queue_kode} Support` : 'IT Support') }}
+                </span>
+                <span>·</span>
+                <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10.5px] font-bold bg-[#ECF2FF] text-[#5D87FF]">
+                  {{ ticket.kategori || 'Support' }}
+                </span>
                 <span>·</span>
                 <span>{{ getPriorityInfo(ticket.prioritas).label }}</span>
                 <span>·</span>
                 <span>{{ formatRelativeTime(ticket.diperbarui_pada || ticket.dibuat_pada) }}</span>
-                <span v-if="ticket.total_komentar > 0">· {{ ticket.total_komentar }} comments</span>
+                <span v-if="ticket.total_komentar > 0">· {{ ticket.total_komentar }} komentar</span>
                 <span v-if="ticket.has_attachment" class="flex items-center gap-0.5"
                   ><span class="material-symbols-outlined text-[13px]">attach_file</span></span
                 >
@@ -1252,15 +1419,24 @@ function toast(message, type = 'success') {
 
               <!-- Single Muted Sub-metadata Line -->
               <div class="flex items-center gap-2 text-[12px] text-[#94A3B8] flex-wrap mt-0.5">
-                <span class="font-mono text-[#64748B]">{{
+                <span class="font-mono text-[#64748B] font-semibold">{{
                   ticket.nomor_tiket || `TCK-${ticket.id}`
                 }}</span>
                 <span>·</span>
-                <span class="text-[#334155] font-medium">{{
+                <span class="text-[#334155] font-semibold">{{
                   ticket.pelapor_nama || ticket.pelapor || 'User'
                 }}</span>
                 <span>·</span>
-                <span>{{ ticket.queue_kode || 'IT' }}</span>
+                <span class="text-[#334155] font-semibold flex items-center gap-1">
+                  <span class="material-symbols-outlined text-[13.5px] text-[#5D87FF]">
+                    {{ (ticket.queue_kode || '').toUpperCase().includes('HR') || (ticket.queue_nama || '').toUpperCase().includes('HR') ? 'badge' : 'computer' }}
+                  </span>
+                  {{ ticket.queue_nama || (ticket.queue_kode ? `${ticket.queue_kode} Support` : 'IT Support') }}
+                </span>
+                <span>·</span>
+                <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10.5px] font-bold bg-[#ECF2FF] text-[#5D87FF]">
+                  {{ ticket.kategori || 'Support' }}
+                </span>
                 <span>·</span>
                 <span>{{ getPriorityInfo(ticket.prioritas).label }}</span>
                 <span>·</span>
@@ -1269,7 +1445,7 @@ function toast(message, type = 'success') {
                 <span>{{ getAssigneeName(ticket.assigned_to_nama || ticket.assigned_to) }}</span>
                 <span>·</span>
                 <span>{{ formatRelativeTime(ticket.diperbarui_pada || ticket.dibuat_pada) }}</span>
-                <span v-if="ticket.total_komentar > 0">· {{ ticket.total_komentar }} comments</span>
+                <span v-if="ticket.total_komentar > 0">· {{ ticket.total_komentar }} komentar</span>
                 <span v-if="ticket.has_attachment" class="flex items-center gap-0.5"
                   ><span class="material-symbols-outlined text-[13px]">attach_file</span></span
                 >
@@ -1379,117 +1555,248 @@ function toast(message, type = 'success') {
       size="lg"
       @close="closeModal"
     >
-      <form class="space-y-6 p-1" @submit.prevent="saveTicket">
+      <!-- Step Indicator Navigation Header -->
+      <div class="mb-5 border-b border-[#E5EAEF] pb-4">
+        <div class="flex items-center justify-between max-w-md mx-auto">
+          <!-- Step 1 -->
+          <button
+            type="button"
+            @click="activeFormTab = 'kendala'"
+            class="flex items-center gap-1.5 transition-colors cursor-pointer select-none"
+            :class="
+              activeFormTab === 'kendala' ? 'text-[#5D87FF]' : 'text-[#7C8BAC] hover:text-[#2A3547]'
+            "
+          >
+            <span
+              class="flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-extrabold"
+              :class="
+                activeFormTab === 'kendala'
+                  ? 'bg-[#5D87FF] text-white'
+                  : 'bg-[#E5EAEF] text-[#7C8BAC]'
+              "
+            >
+              1
+            </span>
+            <span>Kendala</span>
+          </button>
+
+          <div class="flex-1 h-px bg-[#E5EAEF] mx-3"></div>
+
+          <!-- Step 2 -->
+          <button
+            type="button"
+            @click="activeFormTab = 'penanganan'"
+            class="flex items-center gap-1.5 transition-colors cursor-pointer select-none"
+            :class="
+              activeFormTab === 'penanganan'
+                ? 'text-[#5D87FF]'
+                : 'text-[#7C8BAC] hover:text-[#2A3547]'
+            "
+          >
+            <span
+              class="flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-extrabold"
+              :class="
+                activeFormTab === 'penanganan'
+                  ? 'bg-[#5D87FF] text-white'
+                  : 'bg-[#E5EAEF] text-[#7C8BAC]'
+              "
+            >
+              2
+            </span>
+            <span>Penanganan</span>
+          </button>
+
+          <div class="flex-1 h-px bg-[#E5EAEF] mx-3"></div>
+
+          <!-- Step 3 -->
+          <button
+            type="button"
+            @click="activeFormTab = 'lampiran'"
+            class="flex items-center gap-1.5 transition-colors cursor-pointer select-none"
+            :class="
+              activeFormTab === 'lampiran' ? 'text-[#5D87FF]' : 'text-[#7C8BAC] hover:text-[#2A3547]'
+            "
+          >
+            <span
+              class="flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-extrabold"
+              :class="
+                activeFormTab === 'lampiran'
+                  ? 'bg-[#5D87FF] text-white'
+                  : 'bg-[#E5EAEF] text-[#7C8BAC]'
+              "
+            >
+              3
+            </span>
+            <span>Lampiran</span>
+          </button>
+        </div>
+      </div>
+
+      <form class="flex flex-col" @submit.prevent="saveTicket">
         <!-- Error Banner -->
         <div
           v-if="modalError"
-          class="flex items-center gap-2.5 rounded-xl bg-rose-50 p-3.5 text-xs font-semibold text-rose-600 border border-rose-100"
+          role="alert"
+          class="mb-3.5 rounded-lg bg-rose-50 border border-rose-200 px-3.5 py-2 text-[11.5px] font-semibold text-rose-600 shadow-2xs flex items-center gap-2"
         >
-          <span class="material-symbols-outlined text-[18px] shrink-0">error</span>
+          <span class="material-symbols-outlined text-[16px] shrink-0">error</span>
           <span>{{ modalError }}</span>
         </div>
 
-        <!-- SECTION 1: KENDALA -->
-        <div class="space-y-4">
-          <div class="border-b border-[#F1F5F9] pb-1.5">
-            <span class="text-[11px] font-bold uppercase tracking-wider text-[#94A3B8]"
-              >1. Kendala</span
+        <!-- STEP 1: INFORMASI KENDALA -->
+        <div v-show="activeFormTab === 'kendala'" class="space-y-3.5">
+          <div class="flex items-center gap-2 border-b border-[#F1F5F9] pb-1.5">
+            <span class="text-[10px] font-extrabold uppercase tracking-wider text-[#7C8BAC]"
+              >Informasi Kendala</span
             >
           </div>
 
-          <!-- Judul Kendala -->
-          <div class="flex flex-col gap-1.5">
-            <label class="text-xs font-bold text-[#0F172A] flex items-center gap-1">
-              <span>Judul Kendala</span>
-              <span class="text-rose-500">*</span>
+          <fieldset class="space-y-3">
+            <!-- Judul Kendala -->
+            <label class="flex flex-col gap-1.5">
+              <span class="text-[12px] font-semibold text-[#2A3547]"
+                >Judul Kendala <span class="text-[#FA896B]">*</span></span
+              >
+              <input
+                v-model="form.judul"
+                type="text"
+                required
+                maxlength="150"
+                placeholder="Contoh: Laptop tidak dapat terhubung ke Wi-Fi"
+                class="h-10 w-full rounded-lg border border-[#E5EAEF] bg-white px-3 text-[12px] font-medium text-[#2A3547] placeholder-[#94A3B8] focus:border-[#5D87FF] focus:outline-none transition-all shadow-2xs"
+              />
             </label>
-            <input
-              v-model="form.judul"
-              type="text"
-              required
-              placeholder="Contoh: Laptop tidak dapat terhubung ke Wi-Fi"
-              class="h-11 w-full rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3.5 text-xs font-medium text-[#0F172A] placeholder-[#94A3B8] transition-all focus:bg-white focus:border-[#2563EB] focus:outline-none focus:ring-2 focus:ring-[#2563EB]/10"
-            />
-          </div>
 
-          <!-- Deskripsi -->
-          <div class="flex flex-col gap-1.5">
-            <label class="text-xs font-bold text-[#0F172A]">Deskripsi</label>
-            <textarea
-              v-model="form.deskripsi"
-              rows="3"
-              placeholder="Jelaskan kendala secara singkat dan detail agar tim dapat membantu..."
-              class="w-full rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] p-3 text-xs font-medium text-[#0F172A] placeholder-[#94A3B8] transition-all focus:bg-white focus:border-[#2563EB] focus:outline-none focus:ring-2 focus:ring-[#2563EB]/10 resize-y min-h-[96px] max-h-[160px]"
-            ></textarea>
-            <p class="text-[11px] font-normal text-[#94A3B8]">
-              Sertakan pesan error, kondisi perangkat, atau langkah yang sudah dicoba.
-            </p>
-          </div>
+            <!-- Deskripsi -->
+            <label class="flex flex-col gap-1.5">
+              <span class="text-[12px] font-semibold text-[#2A3547]">Deskripsi Kendala</span>
+              <textarea
+                v-model="form.deskripsi"
+                rows="3"
+                placeholder="Jelaskan kendala secara singkat dan detail agar tim dapat membantu..."
+                class="min-h-[80px] max-h-[140px] w-full rounded-lg border border-[#E5EAEF] bg-white p-2.5 text-[12px] font-medium text-[#2A3547] placeholder-[#94A3B8] focus:border-[#5D87FF] focus:outline-none transition-all resize-y shadow-2xs"
+              ></textarea>
+              <span class="text-[10.5px] font-normal text-[#7C8BAC]">
+                Sertakan pesan error, kondisi perangkat, atau langkah yang sudah dicoba.
+              </span>
+            </label>
+          </fieldset>
         </div>
 
-        <!-- SECTION 2: PENANGANAN -->
-        <div class="space-y-4">
-          <div class="border-b border-[#F1F5F9] pb-1.5">
-            <span class="text-[11px] font-bold uppercase tracking-wider text-[#94A3B8]"
-              >2. Kategori & Penanganan</span
-            >
+        <!-- STEP 2: PENANGANAN & KATEGORI -->
+        <div v-show="activeFormTab === 'penanganan'" class="space-y-4">
+          <!-- 1. Support Unit Target (IT Support / HR Support) -->
+          <div class="space-y-2">
+            <div class="flex items-center gap-2 border-b border-[#F1F5F9] pb-1.5">
+              <span class="text-[10px] font-extrabold uppercase tracking-wider text-[#7C8BAC]"
+                >1. Pilih Unit Support Target <span class="text-[#FA896B]">*</span></span
+              >
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                @click="setSupportUnit('IT')"
+                class="flex h-[60px] items-center gap-3 rounded-xl border p-3 text-left transition-all cursor-pointer select-none"
+                :class="
+                  selectedSupportUnit === 'IT'
+                    ? 'border-[#5D87FF] bg-[#ECF2FF] text-[#5D87FF] ring-2 ring-[#5D87FF]/20 shadow-xs'
+                    : 'border-[#E5EAEF] bg-white text-[#2A3547] hover:bg-[#F8FAFC] hover:border-[#CBD5E1]'
+                "
+              >
+                <div
+                  class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg"
+                  :class="selectedSupportUnit === 'IT' ? 'bg-[#5D87FF] text-white' : 'bg-[#F1F5F9] text-[#7C8BAC]'"
+                >
+                  <span class="material-symbols-outlined text-[18px]">computer</span>
+                </div>
+                <div>
+                  <p class="text-[12.5px] font-bold">IT Support</p>
+                  <p class="text-[10.5px] text-[#7C8BAC] leading-tight">Perangkat, Network & Software</p>
+                </div>
+              </button>
+
+              <button
+                type="button"
+                @click="setSupportUnit('HR')"
+                class="flex h-[60px] items-center gap-3 rounded-xl border p-3 text-left transition-all cursor-pointer select-none"
+                :class="
+                  selectedSupportUnit === 'HR'
+                    ? 'border-[#5D87FF] bg-[#ECF2FF] text-[#5D87FF] ring-2 ring-[#5D87FF]/20 shadow-xs'
+                    : 'border-[#E5EAEF] bg-white text-[#2A3547] hover:bg-[#F8FAFC] hover:border-[#CBD5E1]'
+                "
+              >
+                <div
+                  class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg"
+                  :class="selectedSupportUnit === 'HR' ? 'bg-[#5D87FF] text-white' : 'bg-[#F1F5F9] text-[#7C8BAC]'"
+                >
+                  <span class="material-symbols-outlined text-[18px]">badge</span>
+                </div>
+                <div>
+                  <p class="text-[12.5px] font-bold">HR Support</p>
+                  <p class="text-[10.5px] text-[#7C8BAC] leading-tight">Kepegawaian, Dokumen & QNA</p>
+                </div>
+              </button>
+            </div>
           </div>
 
-          <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
-            <!-- Kategori Tiket -->
-            <div class="flex flex-col gap-1.5">
-              <label class="text-xs font-bold text-[#0F172A] flex items-center gap-1">
-                <span>Kategori Tiket</span>
-                <span class="text-rose-500">*</span>
-              </label>
-              <select
-                v-model="form.kategori"
-                required
-                class="h-11 w-full rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3.5 text-xs font-medium text-[#0F172A] transition-all focus:bg-white focus:border-[#2563EB] focus:outline-none focus:ring-2 focus:ring-[#2563EB]/10 cursor-pointer"
+          <!-- 2. Kategori Tiket (IT: Request / Support / Incident; HR: Request / Support / QNA) -->
+          <div class="space-y-2">
+            <div class="flex items-center gap-2 border-b border-[#F1F5F9] pb-1.5">
+              <span class="text-[10px] font-extrabold uppercase tracking-wider text-[#7C8BAC]"
+                >2. Pilih Kategori Tiket {{ selectedSupportUnit }} <span class="text-[#FA896B]">*</span></span
               >
-                <option value="Request">Request (Permintaan)</option>
-                <option value="Support">Support (Kendala)</option>
-              </select>
             </div>
-
-            <!-- Unit Tujuan -->
-            <div class="flex flex-col gap-1.5">
-              <label class="text-xs font-bold text-[#0F172A] flex items-center gap-1">
-                <span>Unit Tujuan</span>
-                <span class="text-rose-500">*</span>
-              </label>
-              <select
-                v-model="form.queue_id"
-                required
-                class="h-11 w-full rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3.5 text-xs font-medium text-[#0F172A] transition-all focus:bg-white focus:border-[#2563EB] focus:outline-none focus:ring-2 focus:ring-[#2563EB]/10 cursor-pointer"
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+              <button
+                v-for="cat in availableCategories"
+                :key="cat.value"
+                type="button"
+                @click="form.kategori = cat.value"
+                class="flex h-[68px] flex-col justify-between rounded-xl border p-2.5 text-left transition-all cursor-pointer select-none"
+                :class="
+                  form.kategori === cat.value
+                    ? 'border-[#5D87FF] bg-[#ECF2FF] text-[#5D87FF] ring-2 ring-[#5D87FF]/20 shadow-xs'
+                    : 'border-[#E5EAEF] bg-white text-[#2A3547] hover:bg-[#F8FAFC] hover:border-[#CBD5E1]'
+                "
               >
-                <option value="" disabled>-- Pilih Unit Tujuan --</option>
-                <option v-for="q in queues" :key="q.id" :value="q.id">
-                  {{ q.kode }} — {{ q.nama }}
-                </option>
-              </select>
+                <div class="flex items-center justify-between">
+                  <span class="text-[12px] font-bold">{{ cat.title }}</span>
+                  <span
+                    v-if="form.kategori === cat.value"
+                    class="material-symbols-outlined text-[15px] text-[#5D87FF]"
+                    >check_circle</span
+                  >
+                </div>
+                <span class="text-[10px] text-[#7C8BAC] leading-tight">{{ cat.desc }}</span>
+              </button>
             </div>
+          </div>
 
+          <!-- Prioritas & Status -->
+          <fieldset
+            class="grid gap-3 pt-1"
+            :class="modalMode === 'edit' ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1'"
+          >
             <!-- Prioritas SLA -->
-            <div class="flex flex-col gap-1.5">
-              <label class="text-xs font-bold text-[#0F172A]">Prioritas SLA</label>
+            <label class="flex flex-col gap-1.5 w-full">
+              <span class="text-[12px] font-semibold text-[#2A3547]">Prioritas SLA</span>
               <select
                 v-model="form.prioritas"
-                class="h-11 w-full rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3.5 text-xs font-medium text-[#0F172A] transition-all focus:bg-white focus:border-[#2563EB] focus:outline-none focus:ring-2 focus:ring-[#2563EB]/10 cursor-pointer"
+                class="h-10 w-full rounded-lg border border-[#E5EAEF] bg-white px-3 text-[12px] font-medium text-[#2A3547] focus:border-[#5D87FF] focus:outline-none transition-all appearance-none cursor-pointer shadow-2xs"
               >
                 <option value="Low (7d)">Low · Target 7 hari</option>
                 <option value="Medium (3d)">Medium · Target 3 hari</option>
                 <option value="High (1day)">High · Target 1 hari</option>
                 <option value="Urgent (4h)">Critical · Target 4 jam</option>
               </select>
-            </div>
+            </label>
 
             <!-- Status Tiket (Edit Mode Only) -->
-            <div v-if="modalMode === 'edit'" class="flex flex-col gap-1.5 sm:col-span-3">
-              <label class="text-xs font-bold text-[#0F172A]">Status Tiket</label>
+            <label v-if="modalMode === 'edit'" class="flex flex-col gap-1.5 w-full">
+              <span class="text-[12px] font-semibold text-[#2A3547]">Status Tiket</span>
               <select
                 v-model="form.status_tiket"
-                class="h-11 w-full rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3.5 text-xs font-medium text-[#0F172A] transition-all focus:bg-white focus:border-[#2563EB] focus:outline-none focus:ring-2 focus:ring-[#2563EB]/10 cursor-pointer"
+                class="h-10 w-full rounded-lg border border-[#E5EAEF] bg-white px-3 text-[12px] font-medium text-[#2A3547] focus:border-[#5D87FF] focus:outline-none transition-all appearance-none cursor-pointer shadow-2xs"
               >
                 <option value="Open">Open</option>
                 <option value="In Progress">In Progress</option>
@@ -1497,27 +1804,27 @@ function toast(message, type = 'success') {
                 <option value="Resolved">Resolved</option>
                 <option value="Closed">Closed</option>
               </select>
-            </div>
-          </div>
+            </label>
+          </fieldset>
         </div>
 
-        <!-- SECTION 3: LAMPIRAN -->
-        <div class="space-y-3">
-          <div class="border-b border-[#F1F5F9] pb-1.5">
-            <span class="text-[11px] font-bold uppercase tracking-wider text-[#94A3B8]"
-              >3. Lampiran</span
+        <!-- STEP 3: LAMPIRAN -->
+        <div v-show="activeFormTab === 'lampiran'" class="space-y-3.5">
+          <div class="flex items-center gap-2 border-b border-[#F1F5F9] pb-1.5">
+            <span class="text-[10px] font-extrabold uppercase tracking-wider text-[#7C8BAC]"
+              >Lampiran Bukti Kendala (Opsional)</span
             >
           </div>
 
-          <div class="flex flex-col gap-2">
+          <div class="space-y-3">
             <div class="flex items-center gap-3 flex-wrap">
               <label
-                class="inline-flex h-10 items-center gap-2 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-4 text-xs font-semibold text-[#334155] hover:bg-[#F1F5F9] hover:border-[#CBD5E1] transition-all cursor-pointer select-none"
+                class="inline-flex h-10 items-center gap-2 rounded-lg border border-[#E5EAEF] bg-white px-3.5 text-[12px] font-bold text-[#2A3547] hover:bg-[#F8FAFC] hover:border-[#5D87FF] transition-all cursor-pointer select-none shadow-2xs"
               >
-                <span class="material-symbols-outlined text-[18px] text-[#64748B]"
+                <span class="material-symbols-outlined text-[18px] text-[#5D87FF]"
                   >attach_file</span
                 >
-                <span>+ Tambah File</span>
+                <span>Pilih File Lampiran</span>
                 <input
                   type="file"
                   accept="image/png,image/jpeg,image/gif,image/webp"
@@ -1525,10 +1832,10 @@ function toast(message, type = 'success') {
                   @change="handleFileChange"
                 />
               </label>
-              <span class="text-[11.5px] font-normal text-[#94A3B8]">PNG, JPG hingga 5 MB</span>
+              <span class="text-[11px] font-normal text-[#7C8BAC]">PNG, JPG hingga 5 MB</span>
               <span
                 v-if="isTicketAttachmentLoading"
-                class="text-[11.5px] font-medium text-[#2563EB] flex items-center gap-1"
+                class="text-[11px] font-medium text-[#5D87FF] flex items-center gap-1"
               >
                 <span class="material-symbols-outlined text-[14px] animate-spin"
                   >progress_activity</span
@@ -1537,18 +1844,18 @@ function toast(message, type = 'success') {
               </span>
             </div>
 
-            <p v-if="ticketAttachmentError" class="text-[11px] font-medium text-rose-600 mt-1">
+            <p v-if="ticketAttachmentError" class="text-[11px] font-medium text-rose-600">
               {{ ticketAttachmentError }}
             </p>
 
             <!-- Attachment Item Card / Preview -->
             <div
               v-if="form.attachment"
-              class="relative mt-2 flex items-center justify-between gap-3 rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC] p-3 max-w-md"
+              class="relative mt-2 flex items-center justify-between gap-3 rounded-lg border border-[#E5EAEF] bg-[#F8FAFC] p-3 max-w-md"
             >
               <div class="flex items-center gap-3 min-w-0">
                 <div
-                  class="h-12 w-12 shrink-0 overflow-hidden rounded-xl border border-[#E2E8F0] bg-white"
+                  class="h-12 w-12 shrink-0 overflow-hidden rounded-lg border border-[#E5EAEF] bg-white"
                 >
                   <img
                     :src="form.attachment"
@@ -1557,8 +1864,8 @@ function toast(message, type = 'success') {
                   />
                 </div>
                 <div class="min-w-0">
-                  <p class="text-xs font-bold text-[#0F172A] truncate">Gambar kendala terlampir</p>
-                  <p class="text-[10.5px] text-[#64748B] truncate mt-0.5">
+                  <p class="text-[12px] font-bold text-[#2A3547] truncate">Gambar kendala terlampir</p>
+                  <p class="text-[10.5px] text-[#7C8BAC] truncate mt-0.5">
                     Siap diunggah bersama tiket
                   </p>
                 </div>
@@ -1566,7 +1873,7 @@ function toast(message, type = 'success') {
               <button
                 type="button"
                 @click="removeAttachment"
-                class="flex h-7 w-7 items-center justify-center rounded-xl text-[#94A3B8] hover:bg-rose-50 hover:text-rose-600 transition-colors shrink-0 cursor-pointer"
+                class="flex h-7 w-7 items-center justify-center rounded-lg text-[#7C8BAC] hover:bg-rose-50 hover:text-rose-600 transition-colors shrink-0 cursor-pointer"
                 title="Hapus Lampiran"
               >
                 <span class="material-symbols-outlined text-[18px]">close</span>
@@ -1575,34 +1882,60 @@ function toast(message, type = 'success') {
           </div>
         </div>
 
-        <!-- FOOTER ACTIONS -->
-        <div class="flex items-center justify-end gap-2.5 border-t border-[#F1F5F9] pt-4 mt-6">
+        <!-- Footer Action Bar -->
+        <div class="flex items-center justify-between pt-4 mt-5 border-t border-[#E5EAEF]">
           <button
             type="button"
             :disabled="isSubmitting"
             @click="closeModal"
-            class="h-10 rounded-xl border border-[#E2E8F0] px-4 py-2 text-xs font-semibold text-[#64748B] hover:bg-[#F8FAFC] hover:text-[#0F172A] transition-colors cursor-pointer"
+            class="h-9 rounded-lg border border-[#E5EAEF] px-3.5 text-[12px] font-bold text-[#7C8BAC] hover:bg-[#F8FAFC] hover:text-[#2A3547] transition-all cursor-pointer"
           >
             Batal
           </button>
-          <button
-            type="submit"
-            :disabled="isSubmitting"
-            class="h-10 rounded-xl bg-[#2563EB] px-5 py-2 text-xs font-semibold text-white shadow-xs hover:bg-[#1D4ED8] transition-all cursor-pointer disabled:opacity-50 flex items-center gap-1.5"
-          >
-            <span v-if="isSubmitting" class="material-symbols-outlined text-[16px] animate-spin"
-              >progress_activity</span
+
+          <div class="flex items-center gap-2">
+            <button
+              v-if="activeFormTab !== 'kendala'"
+              type="button"
+              @click="activeFormTab = activeFormTab === 'lampiran' ? 'penanganan' : 'kendala'"
+              class="h-9 rounded-lg border border-[#E5EAEF] bg-white px-3.5 text-[12px] font-bold text-[#2A3547] hover:bg-[#F8FAFC] transition-all flex items-center gap-1 cursor-pointer"
             >
-            <span>{{
-              isSubmitting
-                ? 'Menyimpan...'
-                : modalMode === 'add'
-                  ? isAdmin || isSuperAdmin
-                    ? 'Buat Tiket'
-                    : 'Submit Request'
-                  : 'Simpan Perubahan'
-            }}</span>
-          </button>
+              <span class="material-symbols-outlined text-[15px]">arrow_back</span>
+              <span>Kembali</span>
+            </button>
+
+            <button
+              v-if="activeFormTab !== 'lampiran'"
+              type="button"
+              @click="nextTicketStep"
+              :disabled="isSubmitting || hasTicketValidationErrors"
+              class="h-9 rounded-lg bg-[#5D87FF] px-4 text-[12px] font-bold text-white shadow-sm hover:bg-[#4570EA] disabled:opacity-50 transition-all flex items-center gap-1 cursor-pointer"
+            >
+              <span>Lanjutkan</span>
+              <span class="material-symbols-outlined text-[15px]">arrow_forward</span>
+            </button>
+
+            <button
+              v-else
+              type="submit"
+              :disabled="isSubmitting || hasTicketValidationErrors"
+              class="h-9 rounded-lg bg-[#5D87FF] px-4 text-[12px] font-bold text-white shadow-sm hover:bg-[#4570EA] disabled:opacity-50 transition-all flex items-center gap-1.5 cursor-pointer"
+            >
+              <span
+                v-if="isSubmitting"
+                class="animate-spin h-3.5 w-3.5 border-2 border-white border-t-transparent rounded-full"
+              ></span>
+              <span>{{
+                isSubmitting
+                  ? 'Menyimpan...'
+                  : modalMode === 'add'
+                    ? isAdmin || isSuperAdmin
+                      ? 'Buat Tiket'
+                      : 'Submit Request'
+                    : 'Simpan Perubahan'
+              }}</span>
+            </button>
+          </div>
         </div>
       </form>
     </AppModal>
@@ -2022,20 +2355,58 @@ function toast(message, type = 'success') {
           class="flex items-center justify-between gap-4 border-t border-[#F1F5F9] pt-4 mt-6"
         >
           <div class="flex items-center gap-2">
-            <!-- Compact Status Selector -->
-            <select
+            <!-- Custom Modern & Minimalist Status Selector Dropdown -->
+            <div
               v-if="!['Closed', 'Resolved', 'Cancelled'].includes(selectedTicket.status_tiket)"
-              :value="selectedTicket.status_tiket"
-              :disabled="isUpdatingStatus"
-              @change="updateTicketStatus(selectedTicket, $event.target.value)"
-              class="h-9 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-bold text-[#0F172A] focus:border-[#2563EB] focus:outline-none cursor-pointer disabled:opacity-50"
+              class="relative inline-block text-left"
             >
-              <option value="Open">● Open</option>
-              <option value="In Progress">● In Progress</option>
-              <option value="Pending">● Pending</option>
-              <option value="Resolved">● Resolved</option>
-              <option value="Closed">● Closed</option>
-            </select>
+              <button
+                type="button"
+                :disabled="isUpdatingStatus"
+                @click="toggleStatusDropdown"
+                class="inline-flex h-9 items-center gap-2 rounded-xl border border-[#E5EAEF] bg-white px-3.5 text-xs font-bold text-[#2A3547] shadow-2xs hover:bg-[#F8FAFC] hover:border-[#5D87FF] transition-all cursor-pointer disabled:opacity-50"
+              >
+                <span
+                  class="h-2 w-2 rounded-full shrink-0"
+                  :class="getStatusDotInfo(selectedTicket.status_tiket).dotClass"
+                ></span>
+                <span>{{ getStatusDotInfo(selectedTicket.status_tiket).label }}</span>
+                <span class="material-symbols-outlined text-[16px] text-[#7C8BAC]">expand_more</span>
+              </button>
+
+              <!-- Dropdown Menu Popover -->
+              <Transition name="fade">
+                <div
+                  v-if="showStatusDropdown"
+                  class="absolute bottom-full left-0 mb-1.5 w-44 rounded-xl border border-[#E5EAEF] bg-white p-1.5 shadow-lg z-50 focus:outline-none"
+                >
+                  <button
+                    v-for="st in [
+                      { value: 'Open', label: 'Open', dot: 'bg-emerald-500' },
+                      { value: 'In Progress', label: 'In Progress', dot: 'bg-blue-500' },
+                      { value: 'Pending', label: 'Pending', dot: 'bg-amber-500' },
+                      { value: 'Resolved', label: 'Resolved', dot: 'bg-teal-500' },
+                      { value: 'Closed', label: 'Closed', dot: 'bg-slate-400' },
+                    ]"
+                    :key="st.value"
+                    type="button"
+                    @click="selectStatus(selectedTicket, st.value)"
+                    class="flex h-8 w-full items-center justify-between rounded-lg px-2.5 text-xs font-medium text-[#2A3547] hover:bg-[#F8FAFC] transition-colors cursor-pointer"
+                    :class="selectedTicket.status_tiket === st.value ? 'bg-[#ECF2FF] font-bold text-[#5D87FF]' : ''"
+                  >
+                    <div class="flex items-center gap-2">
+                      <span class="h-2 w-2 rounded-full" :class="st.dot"></span>
+                      <span>{{ st.label }}</span>
+                    </div>
+                    <span
+                      v-if="selectedTicket.status_tiket === st.value"
+                      class="material-symbols-outlined text-[15px] text-[#5D87FF]"
+                      >check</span
+                    >
+                  </button>
+                </div>
+              </Transition>
+            </div>
 
             <!-- Claim Button -->
             <button
@@ -2046,11 +2417,11 @@ function toast(message, type = 'success') {
               type="button"
               @click="claimTicket(selectedTicket)"
               :disabled="isClaiming === selectedTicket.id"
-              class="h-9 inline-flex items-center gap-1.5 rounded-xl bg-[#2563EB] px-3 text-xs font-bold text-white hover:bg-[#1D4ED8] disabled:opacity-50 transition-all cursor-pointer"
+              class="h-9 inline-flex items-center gap-1.5 rounded-xl bg-[#5D87FF] px-3.5 text-xs font-bold text-white shadow-2xs hover:bg-[#4570EA] disabled:opacity-50 transition-all cursor-pointer"
             >
               <span class="material-symbols-outlined text-[16px]">person_add</span>
               <span>{{
-                isClaiming === selectedTicket.id ? 'Mengambil...' : 'Ambil Ticket Ini'
+                isClaiming === selectedTicket.id ? 'Mengambil...' : 'Ambil Tiket Ini'
               }}</span>
             </button>
           </div>
@@ -2060,7 +2431,7 @@ function toast(message, type = 'success') {
             <button
               type="button"
               @click="closeModal"
-              class="h-9 rounded-xl border border-[#E2E8F0] px-4 text-xs font-semibold text-[#64748B] hover:bg-[#F8FAFC] hover:text-[#0F172A] transition-colors cursor-pointer"
+              class="h-9 rounded-xl border border-[#E5EAEF] px-4 text-xs font-bold text-[#7C8BAC] hover:bg-[#F8FAFC] hover:text-[#2A3547] transition-colors cursor-pointer"
             >
               Tutup
             </button>

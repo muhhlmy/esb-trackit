@@ -15,6 +15,8 @@ const props = defineProps({
   customLabelPrefix: { type: String, default: '+ Gunakan' },
   ariaLabel: { type: String, default: '' },
   loading: { type: Boolean, default: false },
+  heightClass: { type: String, default: 'h-10' },
+  triggerClass: { type: String, default: '' },
 })
 
 const emit = defineEmits(['update:modelValue'])
@@ -224,21 +226,25 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside))
       aria-haspopup="listbox"
       :aria-expanded="isOpen"
       :aria-controls="listboxId"
-      class="flex h-8 w-full items-center justify-between rounded-lg border border-[#DCE3EC] bg-white px-2.5 text-left text-[11px] font-medium text-[#334155] focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand/20"
-      :class="{ 'border-brand ring-1 ring-brand/20': isOpen, 'pr-14': clearable && selectedOption }"
+      class="flex h-10 w-full items-center justify-between rounded-lg border border-[#E5EAEF] bg-white px-3 text-left text-[12px] font-medium text-[#2A3547] shadow-2xs focus:border-[#5D87FF] focus:outline-none focus:ring-1 focus:ring-[#5D87FF]/20 transition-all cursor-pointer"
+      :class="[
+        heightClass,
+        { 'border-[#5D87FF] ring-1 ring-[#5D87FF]/20': isOpen, 'pr-14': clearable && selectedOption },
+        triggerClass
+      ]"
       @click="toggleDropdown"
       @keydown="handleTriggerKeydown"
     >
-      <span v-if="selectedOption" class="truncate text-[11px]">
+      <span v-if="selectedOption" class="truncate text-[12px]">
         {{ selectedOption[labelKey] }}
-        <span v-if="secondaryLabelKey" class="font-mono text-[9px] text-[#475569]">
+        <span v-if="secondaryLabelKey" class="font-mono text-[10px] text-[#7C8BAC]">
           ({{ selectedOption[secondaryLabelKey] }})
         </span>
       </span>
-      <span v-else class="truncate text-[11px] text-[#475569]">{{ placeholder }}</span>
+      <span v-else class="truncate text-[12px] text-[#94A3B8]">{{ placeholder }}</span>
       <span
         aria-hidden="true"
-        class="material-symbols-outlined shrink-0 text-[16px] text-[#475569] transition-transform duration-200"
+        class="material-symbols-outlined shrink-0 text-[18px] text-[#7C8BAC] transition-transform duration-200"
         :class="{ 'rotate-180': isOpen }"
         >keyboard_arrow_down</span
       >

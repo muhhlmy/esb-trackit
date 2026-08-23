@@ -15,29 +15,33 @@ defineProps({
 
 <template>
   <div
-    class="shadow-card shadow-card-hover group relative flex min-h-[76px] items-center gap-3 overflow-hidden rounded-xl border p-3.5 transition-all duration-200"
-    :class="{
-      'bg-[#EFF6FF] border-[#BFDBFE] text-[#1E40AF]': color === 'primary' || color === 'purple',
-      'bg-[#ECFDF5] border-[#A7F3D0] text-[#047857]': color === 'success',
-      'bg-[#FFFBEB] border-[#FDE68A] text-[#B45309]': color === 'warning',
-      'bg-[#FEF2F2] border-[#FECACA] text-[#B91C1C]': color === 'danger',
-      'bg-[#F0F9FF] border-[#BAE6FD] text-[#0369A1]': color === 'cyan',
-    }"
+    class="bg-white border border-[#E2E8F0] rounded-xl p-3.5 sm:p-4 shadow-2xs hover:border-[#CBD5E1] transition-all flex flex-col justify-between"
   >
-    <div
-      class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white/90 shadow-xs backdrop-blur-sm"
-    >
-      <span aria-hidden="true" class="material-symbols-outlined text-[18px]">{{ icon }}</span>
-    </div>
-    <div class="min-w-0 flex-1">
-      <span
-        class="font-num block text-[20px] font-extrabold leading-none tracking-tight text-[#0F172A]"
-        >{{ value }}</span
-      >
-      <span class="mt-0.5 block text-[10px] font-bold uppercase tracking-wider text-[#475569]">{{
+    <div class="flex items-center justify-between gap-2">
+      <span class="text-[11px] font-semibold text-[#64748B] uppercase tracking-wider truncate">{{
         title
       }}</span>
-      <span v-if="subtitle" class="mt-0.5 block truncate text-[9px] font-medium text-[#475569]">{{
+      <div
+        class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg"
+        :class="{
+          'bg-[#EFF6FF] text-[#2563EB]': color === 'primary',
+          'bg-[#ECFDF5] text-[#059669]': color === 'success',
+          'bg-[#FFFBEB] text-[#D97706]': color === 'warning',
+          'bg-[#FEF2F2] text-[#DC2626]': color === 'danger',
+          'bg-[#F0F9FF] text-[#0284C7]': color === 'cyan',
+          'bg-[#F8FAFC] text-[#475569]': color === 'purple',
+        }"
+      >
+        <span aria-hidden="true" class="material-symbols-outlined text-[17px]">{{ icon }}</span>
+      </div>
+    </div>
+
+    <div class="mt-2.5">
+      <span
+        class="font-num block text-[24px] sm:text-[26px] font-bold leading-none tracking-tight text-[#0F172A]"
+        >{{ value }}</span
+      >
+      <span v-if="subtitle" class="mt-1 block truncate text-[10px] font-medium text-[#94A3B8]">{{
         subtitle
       }}</span>
     </div>

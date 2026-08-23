@@ -33,40 +33,48 @@ defineProps({
        ═══════════════════════════════════════════════════════════════════════ -->
   <div
     v-if="preset === 'users'"
-    class="w-full overflow-x-auto rounded-2xl border border-[#E2E8F0]/80 bg-white shadow-2xs"
+    class="w-full max-w-full overflow-hidden rounded-2xl border border-[#E2E8F0]/80 bg-white shadow-2xs"
   >
-    <table class="w-full text-left border-collapse">
+    <table class="w-full max-w-full text-left border-collapse table-fixed">
+      <colgroup>
+        <col class="w-[31%]" />
+        <col class="w-[12%]" />
+        <col class="w-[22%]" />
+        <col class="w-[15%]" />
+        <col class="w-[12%]" />
+        <col class="w-[8%]" />
+      </colgroup>
       <thead
-        class="sticky top-0 z-10 border-b border-[#E2E8F0]/80 bg-[#F8FAFC]/80 backdrop-blur-xs select-none"
+        class="sticky top-0 z-10 border-b border-[#E2E8F0]/80 bg-[#F8FAFC]/80 backdrop-blur-xs select-none whitespace-nowrap"
       >
         <tr>
           <th
-            class="py-3 pl-5 pr-4 text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B] min-w-[200px]"
+            class="py-3 pl-5 pr-4 text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B] text-left whitespace-nowrap"
           >
             Pengguna
           </th>
           <th
-            class="py-3 px-4 text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B] min-w-[110px]"
+            class="py-3 px-4 text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B] text-left whitespace-nowrap"
           >
             Role Akses
           </th>
           <th
-            class="py-3 px-4 text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B] min-w-[160px]"
+            class="py-3 px-4 text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B] text-left whitespace-nowrap"
           >
             Sub Role / Unit Ditangani
           </th>
           <th
-            class="py-3 px-4 text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B] min-w-[140px]"
+            class="py-3 px-4 text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B] text-left whitespace-nowrap"
           >
             Hak Akses Fitur
           </th>
           <th
-            class="py-3 px-4 text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B] min-w-[110px]"
+            class="py-3 px-4 text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B] text-left whitespace-nowrap"
           >
             Status
           </th>
           <th
-            class="py-3 pr-5 pl-4 text-right text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B]"
+            class="py-3 pr-5 pl-4 text-right text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B] whitespace-nowrap"
           >
             Aksi
           </th>
@@ -75,33 +83,33 @@ defineProps({
       <tbody class="divide-y divide-[#F1F5F9]">
         <tr v-for="r in rows" :key="'user-row-' + r" class="hover:bg-[#F8FAFC] transition-colors">
           <!-- Col 1: Pengguna (Name + Email) -->
-          <td class="py-4 pl-5 pr-4 min-w-[200px]">
-            <div class="flex flex-col gap-1.5">
+          <td class="py-4 pl-5 pr-4 overflow-hidden">
+            <div class="flex flex-col gap-1.5 min-w-0">
               <BaseSkeleton width="130px" height="14px" radius="md" />
               <BaseSkeleton width="160px" height="12px" radius="sm" />
             </div>
           </td>
           <!-- Col 2: Role Akses Badge -->
-          <td class="py-4 px-4 min-w-[110px]">
+          <td class="py-4 px-4 overflow-hidden">
             <BaseSkeleton width="75px" height="22px" radius="full" />
           </td>
           <!-- Col 3: Sub Role / Unit Ditangani -->
-          <td class="py-4 px-4 min-w-[160px]">
-            <div class="flex gap-1">
+          <td class="py-4 px-4 overflow-hidden">
+            <div class="flex gap-1 min-w-0">
               <BaseSkeleton width="50px" height="20px" radius="md" />
               <BaseSkeleton width="45px" height="20px" radius="md" />
             </div>
           </td>
           <!-- Col 4: Hak Akses Fitur Badge -->
-          <td class="py-4 px-4 min-w-[140px]">
+          <td class="py-4 px-4 overflow-hidden">
             <BaseSkeleton width="85px" height="22px" radius="full" />
           </td>
           <!-- Col 5: Status Badge -->
-          <td class="py-4 px-4 min-w-[110px]">
+          <td class="py-4 px-4 overflow-hidden">
             <BaseSkeleton width="60px" height="22px" radius="full" />
           </td>
           <!-- Col 6: Aksi -->
-          <td class="py-4 pr-5 pl-4 text-right">
+          <td class="py-4 pr-5 pl-4 text-right overflow-hidden">
             <div class="flex items-center justify-end gap-1">
               <BaseSkeleton width="28px" height="28px" radius="md" />
               <BaseSkeleton width="28px" height="28px" radius="md" />
@@ -117,38 +125,52 @@ defineProps({
        ═══════════════════════════════════════════════════════════════════════ -->
   <div
     v-else-if="preset === 'employees'"
-    class="w-full overflow-x-auto rounded-2xl border border-[#E2E8F0]/80 bg-white shadow-2xs"
+    class="w-full max-w-full overflow-hidden rounded-2xl border border-[#E2E8F0]/80 bg-white shadow-2xs"
   >
-    <table class="w-full text-left border-collapse">
-      <thead class="border-b border-[#E2E8F0]/80 bg-[#F8FAFC]/80 select-none">
+    <table class="w-full max-w-full text-left border-collapse table-fixed">
+      <colgroup>
+        <col class="w-[22%]" />
+        <col class="w-[11%]" />
+        <col class="w-[18%]" />
+        <col class="w-[22%]" />
+        <col class="w-[10%]" />
+        <col class="w-[11%]" />
+        <col class="w-[6%]" />
+      </colgroup>
+      <thead class="border-b border-[#E2E8F0]/80 bg-[#F8FAFC]/80 select-none whitespace-nowrap">
         <tr>
           <th
-            class="py-3 pl-5 pr-4 text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B] min-w-[210px]"
+            class="py-3 pl-5 pr-4 text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B] text-left whitespace-nowrap"
           >
             Karyawan
           </th>
           <th
-            class="py-3 px-4 text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B] min-w-[170px]"
+            class="py-3 px-4 text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B] text-left whitespace-nowrap"
           >
-            Email &amp; No. HP
+            NIK
           </th>
           <th
-            class="py-3 px-4 text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B] min-w-[160px]"
+            class="py-3 px-4 text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B] text-left whitespace-nowrap"
           >
-            Departemen &amp; Jabatan
+            Title / Jabatan
           </th>
           <th
-            class="py-3 px-4 text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B] min-w-[130px]"
+            class="py-3 px-4 text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B] text-left whitespace-nowrap"
+          >
+            Departemen / Direktorat
+          </th>
+          <th
+            class="py-3 px-4 text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B] text-left whitespace-nowrap"
+          >
+            Status
+          </th>
+          <th
+            class="py-3 px-4 text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B] text-left whitespace-nowrap"
           >
             Lokasi Kerja
           </th>
           <th
-            class="py-3 px-4 text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B] min-w-[120px]"
-          >
-            Status &amp; Role
-          </th>
-          <th
-            class="py-3 pr-5 pl-4 text-right text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B]"
+            class="py-3 pr-5 pl-4 text-right text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B] whitespace-nowrap"
           >
             Aksi
           </th>
@@ -156,40 +178,38 @@ defineProps({
       </thead>
       <tbody class="divide-y divide-[#F1F5F9]">
         <tr v-for="r in rows" :key="'emp-row-' + r" class="hover:bg-[#F8FAFC] transition-colors">
-          <!-- Col 1: Avatar + Name + NIK -->
-          <td class="py-4 pl-5 pr-4 min-w-[210px]">
-            <div class="flex items-center gap-3">
-              <SkeletonAvatar size="36px" shape="circle" class="shrink-0" />
-              <div class="flex flex-col gap-1.5 min-w-0">
-                <BaseSkeleton width="120px" height="14px" radius="md" />
-                <BaseSkeleton width="80px" height="11px" radius="sm" />
-              </div>
+          <!-- Col 1: Name + Email -->
+          <td class="py-4 pl-5 pr-4 overflow-hidden">
+            <div class="flex flex-col gap-1.5 min-w-0">
+              <BaseSkeleton width="120px" height="14px" radius="md" />
+              <BaseSkeleton width="140px" height="11px" radius="sm" />
             </div>
           </td>
-          <!-- Col 2: Email & Phone -->
-          <td class="py-4 px-4 min-w-[170px]">
-            <div class="flex flex-col gap-1.5">
-              <BaseSkeleton width="140px" height="13px" radius="sm" />
-              <BaseSkeleton width="100px" height="11px" radius="sm" />
-            </div>
+          <!-- Col 2: NIK -->
+          <td class="py-4 px-4 overflow-hidden">
+            <BaseSkeleton width="75px" height="13px" radius="sm" />
           </td>
-          <!-- Col 3: Dept & Position -->
-          <td class="py-4 px-4 min-w-[160px]">
-            <div class="flex flex-col gap-1.5">
-              <BaseSkeleton width="110px" height="13px" radius="sm" />
+          <!-- Col 3: Title / Jabatan -->
+          <td class="py-4 px-4 overflow-hidden">
+            <BaseSkeleton width="110px" height="13px" radius="sm" />
+          </td>
+          <!-- Col 4: Departemen / Direktorat -->
+          <td class="py-4 px-4 overflow-hidden">
+            <div class="flex flex-col gap-1.5 min-w-0">
+              <BaseSkeleton width="120px" height="13px" radius="sm" />
               <BaseSkeleton width="90px" height="11px" radius="sm" />
             </div>
           </td>
-          <!-- Col 4: Location -->
-          <td class="py-4 px-4 min-w-[130px]">
+          <!-- Col 5: Status -->
+          <td class="py-4 px-4 overflow-hidden">
+            <BaseSkeleton width="65px" height="22px" radius="full" />
+          </td>
+          <!-- Col 6: Lokasi Kerja -->
+          <td class="py-4 px-4 overflow-hidden">
             <BaseSkeleton width="85px" height="13px" radius="sm" />
           </td>
-          <!-- Col 5: Status & Role Badge -->
-          <td class="py-4 px-4 min-w-[120px]">
-            <BaseSkeleton width="70px" height="22px" radius="full" />
-          </td>
-          <!-- Col 6: Actions -->
-          <td class="py-4 pr-5 pl-4 text-right">
+          <!-- Col 7: Actions -->
+          <td class="py-4 pr-5 pl-4 text-right overflow-hidden">
             <div class="flex items-center justify-end gap-1">
               <BaseSkeleton width="28px" height="28px" radius="md" />
               <BaseSkeleton width="28px" height="28px" radius="md" />

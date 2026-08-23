@@ -353,7 +353,6 @@ function formatDate(dateStr) {
         <div>
           <div class="flex items-center gap-2">
             <h2 class="text-lg font-bold text-[#0F172A] tracking-tight">Aset OPS</h2>
-            <AppBadge type="neutral" :text="`${filteredAssets.length} Total Unit`" class="text-[11px] font-bold" />
           </div>
           <p class="text-xs text-[#64748B] mt-0.5 leading-normal">
             Kelola perangkat & mesin operasional outlet / store (POS, KIOSK, Payment, Display).

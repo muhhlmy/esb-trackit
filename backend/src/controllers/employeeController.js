@@ -1,4 +1,5 @@
 import { pool, withTransaction } from "../config/database.js";
+import { env } from "../config/env.js";
 import { hashPassword } from "../security/passwordService.js";
 import { normalizeLocation } from "../utils/locationNormalizer.js";
 import { parsePaginationQuery, setPaginationHeaders } from "../security/requestValidation.js";
@@ -25,6 +26,19 @@ function cleanText(value) {
 
 export async function listEmployees(req, res) {
   try {
+    if (req.query.all === 'true' || req.query.all === '1') {
+      const result = await pool.query(
+        `SELECT id, id AS id_karyawan, nik, nama_karyawan, status, status AS status_karyawan,
+                title, title AS jabatan, job_level, job_level AS tingkat_jabatan, departemen,
+                directorate, directorate AS direktorat, tanggal_mulai_bekerja, employeement_status,
+                employeement_status AS status_kepegawaian, nik_atasan_langsung, email_kantor, lokasi_kerja
+         FROM karyawan
+         ORDER BY nama_karyawan ASC, id ASC`
+      );
+      setPaginationHeaders(res, result.rows.length, 1, result.rows.length || 1);
+      return res.json(result.rows);
+    }
+
     const { page, limit, offset } = parsePaginationQuery(req.query)
 
     const countRes = await pool.query(`SELECT COUNT(*)::int AS count FROM karyawan`)
@@ -244,7 +258,8 @@ export async function storeEmployee(req, res) {
       );
 
       if (existingUser.rowCount === 0) {
-        const defaultPasswordHash = await hashPassword("Password123!");
+              const defaultPassword = env.auth?.defaultUserPassword || process.env.DEFAULT_USER_PASSWORD || 'Esb123456!';
+              const defaultPasswordHash = await hashPassword(defaultPassword);
         const defaultPermissions = JSON.stringify({
           dashboard: "none",
           assets: "none",

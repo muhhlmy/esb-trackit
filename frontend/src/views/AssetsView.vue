@@ -180,6 +180,32 @@ const filteredAssets = computed(() => {
   })
 })
 
+const hasValidationErrors = computed(() => {
+  if (activeTab.value === 'info') {
+    return (
+      !form.value.hostname ||
+      !form.value.hostname.trim() ||
+      !form.value.serial_number ||
+      !form.value.serial_number.trim() ||
+      !form.value.tipe_perangkat
+    )
+  }
+  if (activeTab.value === 'placement') {
+    return !form.value.lokasi_asset
+  }
+  if (activeTab.value === 'specifications') {
+    return (
+      !form.value.hostname ||
+      !form.value.hostname.trim() ||
+      !form.value.serial_number ||
+      !form.value.serial_number.trim() ||
+      !form.value.tipe_perangkat ||
+      !form.value.lokasi_asset
+    )
+  }
+  return false
+})
+
 watch([searchQuery, filterStatus, filterTipe], () => {
   currentPage.value = 1
 })
@@ -214,7 +240,7 @@ async function fetchData() {
   try {
     const [assetData, employeeData, locationData] = await Promise.all([
       get('/api/assets?all=true'),
-      get('/api/karyawan'),
+      get('/api/karyawan?all=true'),
       get('/api/karyawan/locations'),
     ])
     if (!Array.isArray(assetData) || !Array.isArray(employeeData)) {
@@ -1083,7 +1109,6 @@ onMounted(async () => {
               <input
                 v-model="form.hostname"
                 required
-                autofocus
                 maxlength="100"
                 placeholder="Laptop-HR-01 atau SN-ABC123"
                 class="h-10 w-full rounded-lg border border-[#E5EAEF] bg-white px-3 text-[12px] font-medium text-[#2A3547] placeholder-[#94A3B8] focus:border-[#5D87FF] focus:outline-none transition-all shadow-2xs"

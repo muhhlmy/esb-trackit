@@ -274,8 +274,8 @@ async function initGlobalSearchData() {
   isFetchingSearch.value = true
   try {
     const promises = [
-      get('/api/assets').catch(() => []),
-      get('/api/karyawan').catch(() => []),
+      get('/api/assets?all=true').catch(() => []),
+      get('/api/karyawan?all=true').catch(() => []),
       get('/api/tickets').catch(() => []),
     ]
     if (hasPermission('users')) {

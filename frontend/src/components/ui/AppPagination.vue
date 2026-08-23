@@ -50,7 +50,7 @@ function goToPage(page) {
 
 <template>
   <div
-    class="flex flex-col sm:flex-row items-center justify-between gap-3 mt-4 pt-1 px-1 text-[11.5px] text-[#475569] select-none"
+    class="flex flex-col sm:flex-row items-center justify-between gap-3 px-5 py-4 border-t border-[#F1F5F9] text-[11.5px] text-[#475569] select-none"
   >
     <div class="flex items-center gap-1 font-medium">
       <span>Menampilkan</span>

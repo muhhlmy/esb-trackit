@@ -47,7 +47,7 @@ const TICKET_UPDATE_FIELDS = new Set([
   'queue_id',
   'attachment',
 ])
-const TICKET_CATEGORIES = new Set(['Request', 'Support', 'request', 'support'])
+const TICKET_CATEGORIES = new Set(['Request', 'Support', 'Incident', 'QNA', 'request', 'support', 'incident', 'qna'])
 const TICKET_PRIORITIES = new Set(['Urgent (4h)', 'High (1day)', 'Medium (3d)', 'Low (7d)'])
 const TICKET_STATUSES = new Set([
   'Open',
@@ -289,9 +289,14 @@ function validateTicketCreateBody(body) {
   let kategori = 'Support'
   if (body.kategori !== undefined && body.kategori !== null && body.kategori !== '') {
     if (typeof body.kategori !== 'string' || !TICKET_CATEGORIES.has(body.kategori)) {
-      throw createHttpError(400, 'Kategori tiket tidak valid. Harus Request atau Support.')
+      throw createHttpError(400, 'Kategori tiket tidak valid. Harus Request, Support, Incident, atau QNA.')
     }
-    kategori = body.kategori.toLowerCase() === 'request' ? 'Request' : 'Support'
+    const lowerCat = body.kategori.trim().toLowerCase()
+    if (lowerCat === 'request') kategori = 'Request'
+    else if (lowerCat === 'support') kategori = 'Support'
+    else if (lowerCat === 'incident') kategori = 'Incident'
+    else if (lowerCat === 'qna') kategori = 'QNA'
+    else kategori = body.kategori.trim()
   }
 
   return {
@@ -345,9 +350,14 @@ function validateTicketUpdateBody(body) {
 
   if (hasField('kategori')) {
     if (typeof body.kategori !== 'string' || !TICKET_CATEGORIES.has(body.kategori)) {
-      throw createHttpError(400, 'Kategori tiket tidak valid. Harus Request atau Support.')
+      throw createHttpError(400, 'Kategori tiket tidak valid. Harus Request, Support, Incident, atau QNA.')
     }
-    normalized.kategori = body.kategori.toLowerCase() === 'request' ? 'Request' : 'Support'
+    const lowerCat = body.kategori.trim().toLowerCase()
+    if (lowerCat === 'request') normalized.kategori = 'Request'
+    else if (lowerCat === 'support') normalized.kategori = 'Support'
+    else if (lowerCat === 'incident') normalized.kategori = 'Incident'
+    else if (lowerCat === 'qna') normalized.kategori = 'QNA'
+    else normalized.kategori = body.kategori.trim()
   }
 
   if (hasField('prioritas')) {

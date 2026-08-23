@@ -129,7 +129,7 @@ export function parseQueueIds(value, { required = false } = {}) {
 }
 
 export const DEFAULT_PAGE_LIMIT = 20
-export const MAX_PAGE_LIMIT = 100
+export const MAX_PAGE_LIMIT = 500
 
 export function parsePaginationQuery(query = {}, defaultLimit = DEFAULT_PAGE_LIMIT, maxLimit = MAX_PAGE_LIMIT) {
   let page = 1

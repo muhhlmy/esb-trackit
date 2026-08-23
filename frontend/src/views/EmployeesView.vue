@@ -405,15 +405,15 @@ onMounted(() => {
       </div>
     </Transition>
 
-    <!-- Simplified SaaS Header & Toolbar Container -->
+    <!-- Modern SaaS Header & Control Bar Container -->
     <div
-      class="flex flex-col gap-3.5 bg-white p-4.5 rounded-2xl border border-[#E2E8F0]/80 shadow-2xs"
+      class="flex flex-col gap-4 bg-white p-5 rounded-2xl border border-[#E2E8F0] shadow-2xs"
     >
-      <!-- Row 1: Page Title & Primary CTA -->
+      <!-- Row 1: Page Title & Primary/Secondary Action Bar -->
       <div class="flex items-center justify-between gap-3">
         <div>
-          <h2 class="text-lg font-bold text-[#0F172A] tracking-tight">Data Karyawan</h2>
-          <p class="text-xs text-[#64748B] mt-0.5 leading-normal">
+          <h2 class="text-xl font-bold text-[#0F172A] tracking-tight">Data Karyawan</h2>
+          <p class="text-[13px] text-[#64748B] mt-0.5 leading-normal">
             Pengelolaan dan integrasi data karyawan perusahaan
           </p>
         </div>
@@ -422,7 +422,7 @@ onMounted(() => {
           <button
             type="button"
             @click="showImportModal = true"
-            class="h-9 shrink-0 whitespace-nowrap rounded-lg border border-[#E2E8F0] bg-white px-3 text-xs font-medium text-[#475569] hover:bg-[#F8FAFC] hover:text-[#0F172A] transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs"
+            class="h-9 shrink-0 whitespace-nowrap rounded-lg border border-[#CBD5E1] bg-white px-3.5 text-xs font-semibold text-[#334155] hover:bg-[#F8FAFC] hover:text-[#0F172A] transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs"
             title="Import data karyawan dari Excel"
           >
             <span class="material-symbols-outlined text-[16px] text-[#64748B]">file_upload</span>
@@ -432,7 +432,7 @@ onMounted(() => {
           <button
             type="button"
             @click="openAdd"
-            class="h-9 shrink-0 whitespace-nowrap rounded-lg bg-[#2563EB] px-3.5 text-xs font-semibold text-white shadow-2xs hover:bg-[#1D4ED8] transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+            class="h-9 shrink-0 whitespace-nowrap rounded-lg bg-[#2563EB] px-4 text-xs font-semibold text-white shadow-2xs hover:bg-[#1D4ED8] transition-all flex items-center justify-center gap-1.5 cursor-pointer"
             title="Tambah karyawan baru"
           >
             <span class="material-symbols-outlined text-[16px]">person_add</span>
@@ -441,24 +441,24 @@ onMounted(() => {
         </div>
       </div>
 
-      <!-- Row 2: Search Input & Filters -->
-      <div class="flex flex-wrap items-center gap-2 w-full min-w-0 pt-2 border-t border-[#F1F5F9]">
-        <div class="relative flex-1 min-w-[200px]">
+      <!-- Row 2: Search Input & Filters Control Bar -->
+      <div class="flex flex-wrap items-center gap-2.5 w-full min-w-0 pt-3 border-t border-[#F1F5F9]">
+        <div class="relative flex-1 min-w-[220px]">
           <span
-            class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-[17px] text-[#94A3B8] pointer-events-none"
+            class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[18px] text-[#94A3B8] pointer-events-none"
             >search</span
           >
           <input
             v-model="searchQuery"
             type="text"
             placeholder="Cari NIK, nama, email, jabatan, atau departemen..."
-            class="h-9 w-full rounded-lg border border-[#E2E8F0] bg-white pl-8 pr-2.5 text-xs text-[#0F172A] placeholder-[#94A3B8] focus:border-[#2563EB] focus:outline-none transition-all shadow-2xs"
+            class="h-10 w-full rounded-xl border border-[#E2E8F0] bg-white pl-9.5 pr-3 text-xs text-[#0F172A] placeholder-[#94A3B8] focus:border-[#2563EB] focus:outline-none transition-all shadow-2xs"
           />
         </div>
 
         <select
           v-model="filterDepartemen" aria-label="Filter departemen"
-          class="h-9 w-[140px] shrink-0 rounded-lg border border-[#E2E8F0] bg-white px-2.5 text-xs text-[#0F172A] focus:border-[#2563EB] focus:outline-none transition-all cursor-pointer shadow-2xs"
+          class="h-10 w-[155px] shrink-0 rounded-xl border border-[#E2E8F0] bg-white px-3 text-xs text-[#0F172A] focus:border-[#2563EB] focus:outline-none transition-all cursor-pointer shadow-2xs"
         >
           <option value="">Semua Departemen</option>
           <option v-for="dep in availableDepartemenOptions" :key="dep" :value="dep">
@@ -468,7 +468,7 @@ onMounted(() => {
 
         <select
           v-model="filterLokasi" aria-label="Filter lokasi"
-          class="h-9 w-[130px] shrink-0 rounded-lg border border-[#E2E8F0] bg-white px-2.5 text-xs text-[#0F172A] focus:border-[#2563EB] focus:outline-none transition-all cursor-pointer shadow-2xs"
+          class="h-10 w-[135px] shrink-0 rounded-xl border border-[#E2E8F0] bg-white px-3 text-xs text-[#0F172A] focus:border-[#2563EB] focus:outline-none transition-all cursor-pointer shadow-2xs"
         >
           <option value="">Semua Lokasi</option>
           <option v-for="loc in availableLokasiOptions" :key="loc" :value="loc">{{ loc }}</option>
@@ -476,7 +476,7 @@ onMounted(() => {
 
         <select
           v-model="filterStatus" aria-label="Filter status"
-          class="h-9 w-[125px] shrink-0 rounded-lg border border-[#E2E8F0] bg-white px-2.5 text-xs text-[#0F172A] focus:border-[#2563EB] focus:outline-none transition-all cursor-pointer shadow-2xs"
+          class="h-10 w-[130px] shrink-0 rounded-xl border border-[#E2E8F0] bg-white px-3 text-xs text-[#0F172A] focus:border-[#2563EB] focus:outline-none transition-all cursor-pointer shadow-2xs"
         >
           <option value="">Semua Status</option>
           <option value="Active">Active</option>
@@ -552,45 +552,54 @@ onMounted(() => {
         </p>
       </div>
 
-      <div v-else class="overflow-x-auto">
-        <table class="w-full text-left border-collapse">
+      <div v-else class="w-full max-w-full overflow-hidden">
+        <table class="w-full max-w-full text-left border-collapse table-fixed">
+          <colgroup>
+            <col :class="canWriteKaryawan ? 'w-[22%]' : 'w-[24%]'" />
+            <col :class="canWriteKaryawan ? 'w-[11%]' : 'w-[12%]'" />
+            <col :class="canWriteKaryawan ? 'w-[18%]' : 'w-[20%]'" />
+            <col :class="canWriteKaryawan ? 'w-[22%]' : 'w-[23%]'" />
+            <col :class="canWriteKaryawan ? 'w-[10%]' : 'w-[10%]'" />
+            <col :class="canWriteKaryawan ? 'w-[11%]' : 'w-[11%]'" />
+            <col v-if="canWriteKaryawan" class="w-[6%]" />
+          </colgroup>
           <thead
-            class="sticky top-0 z-10 border-b border-[#E2E8F0]/80 bg-[#F8FAFC]/80 backdrop-blur-xs select-none"
+            class="sticky top-0 z-10 border-b border-[#E2E8F0]/80 bg-[#F8FAFC]/80 backdrop-blur-xs select-none whitespace-nowrap"
           >
             <tr>
               <th
-                class="py-3 pl-5 pr-4 text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B]"
+                class="py-3 pl-5 pr-4 text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B] text-left whitespace-nowrap"
               >
                 Karyawan
               </th>
               <th
-                class="py-3 px-4 text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B]"
+                class="py-3 px-4 text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B] text-left whitespace-nowrap"
               >
                 NIK
               </th>
               <th
-                class="py-3 px-4 text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B]"
+                class="py-3 px-4 text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B] text-left whitespace-nowrap"
               >
                 Title / Jabatan
               </th>
               <th
-                class="py-3 px-4 text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B]"
+                class="py-3 px-4 text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B] text-left whitespace-nowrap"
               >
                 Departemen / Direktorat
               </th>
               <th
-                class="py-3 px-4 text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B]"
+                class="py-3 px-4 text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B] text-left whitespace-nowrap"
               >
                 Status
               </th>
               <th
-                class="py-3 px-4 text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B]"
+                class="py-3 px-4 text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B] text-left whitespace-nowrap"
               >
                 Lokasi Kerja
               </th>
               <th
                 v-if="canWriteKaryawan"
-                class="py-3 pr-5 pl-4 text-right text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B]"
+                class="py-3 pr-5 pl-4 text-right text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B] whitespace-nowrap"
               >
                 Aksi
               </th>
@@ -602,43 +611,55 @@ onMounted(() => {
               :key="emp.id_karyawan || emp.nik"
               class="group hover:bg-[#F8FAFC] transition-colors duration-150"
             >
-              <td class="py-4 pl-5 pr-4 min-w-[180px]">
-                <div class="flex flex-col">
+              <td class="py-4 pl-5 pr-4 overflow-hidden">
+                <div class="flex flex-col min-w-0">
                   <span
-                    class="text-[13.5px] font-bold text-[#0F172A] leading-snug truncate group-hover:text-[#2563EB] transition-colors"
+                    class="text-[13.5px] font-bold text-[#0F172A] leading-snug truncate group-hover:text-[#2563EB] transition-colors block"
+                    :title="emp.nama_karyawan"
                   >
                     {{ emp.nama_karyawan }}
                   </span>
-                  <span class="text-[11.5px] font-normal text-[#64748B] mt-0.5 truncate">
+                  <span
+                    class="text-[11.5px] font-normal text-[#64748B] mt-0.5 truncate block"
+                    :title="emp.email_kantor || '—'"
+                  >
                     {{ emp.email_kantor || '—' }}
                   </span>
                 </div>
               </td>
 
               <td
-                class="py-4 px-4 font-mono text-[11.5px] font-semibold text-[#0F172A] min-w-[110px]"
+                class="py-4 px-4 font-mono text-[11.5px] font-semibold text-[#0F172A] overflow-hidden"
               >
-                {{ emp.nik }}
+                <span class="truncate block" :title="emp.nik">{{ emp.nik }}</span>
               </td>
 
-              <td class="py-4 px-4 min-w-[160px]">
-                <span class="text-[12.5px] font-medium text-[#1E293B]">{{
-                  emp.jabatan || emp.title || '—'
-                }}</span>
+              <td class="py-4 px-4 overflow-hidden">
+                <span
+                  class="text-[12.5px] font-medium text-[#1E293B] truncate block"
+                  :title="emp.jabatan || emp.title || '—'"
+                  >{{ emp.jabatan || emp.title || '—' }}</span
+                >
               </td>
 
-              <td class="py-4 px-4 min-w-[170px]">
-                <div class="flex flex-col">
-                  <span class="text-[12.5px] font-medium text-[#1E293B] leading-snug truncate">
+              <td class="py-4 px-4 overflow-hidden">
+                <div class="flex flex-col min-w-0">
+                  <span
+                    class="text-[12.5px] font-medium text-[#1E293B] leading-snug truncate block"
+                    :title="emp.departemen || '—'"
+                  >
                     {{ emp.departemen || '—' }}
                   </span>
-                  <span class="text-[11.5px] font-normal text-[#64748B] mt-0.5 truncate">
+                  <span
+                    class="text-[11.5px] font-normal text-[#64748B] mt-0.5 truncate block"
+                    :title="emp.direktorat || emp.directorate || '—'"
+                  >
                     {{ emp.direktorat || emp.directorate || '—' }}
                   </span>
                 </div>
               </td>
 
-              <td class="py-4 px-4 min-w-[110px]">
+              <td class="py-4 px-4 overflow-hidden">
                 <AppBadge
                   :type="
                     (emp.status_karyawan || emp.status) === 'Active'
@@ -650,10 +671,14 @@ onMounted(() => {
                   :text="emp.status_karyawan || emp.status || 'Active'"
                 />
               </td>
-              <td class="py-4 px-4 text-[12.5px] font-normal text-[#1E293B] min-w-[130px]">
-                {{ normalizeLocation(emp.lokasi_kerja || emp.work_location) || '—' }}
+              <td class="py-4 px-4 text-[12.5px] font-normal text-[#1E293B] overflow-hidden">
+                <span
+                  class="truncate block"
+                  :title="normalizeLocation(emp.lokasi_kerja || emp.work_location) || '—'"
+                  >{{ normalizeLocation(emp.lokasi_kerja || emp.work_location) || '—' }}</span
+                >
               </td>
-              <td v-if="canWriteKaryawan" class="py-4 pr-5 pl-4 text-right" @click.stop>
+              <td v-if="canWriteKaryawan" class="py-4 pr-5 pl-4 text-right overflow-hidden" @click.stop>
                 <AppRowActions :actions="getEmployeeActions(emp)" />
               </td>
             </tr>

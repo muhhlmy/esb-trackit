@@ -1,5 +1,6 @@
 import crypto from 'node:crypto';
 import { pool, withTransaction } from "../config/database.js";
+import { env } from "../config/env.js";
 import { hashPassword } from "../security/passwordService.js";
 import { normalizeLocation } from "../utils/locationNormalizer.js";
 
@@ -233,12 +234,14 @@ export async function importExcelData(req, res) {
     let importedKaryawanCount = 0;
     let updatedKaryawanCount = 0;
     let createdUserCount = 0;
+    let existingUserCount = 0;
+    let failedUserCount = 0;
     let importedAssetCount = 0;
     let updatedAssetCount = 0;
     const warnings = [];
     const errors = [];
 
-    // ── Phase 1: Parse semua row karyawan, validasi NIK, kumpulkan data ──
+    // ── Phase 1: Parse semua row karyawan, validasi NIK & Nama, kumpulkan data ──
     const parsedKaryawan = [];
     for (let i = 0; i < karyawanRows.length; i++) {
       const row = karyawanRows[i];
@@ -291,11 +294,20 @@ export async function importExcelData(req, res) {
       });
     }
 
-    // ── Phase 2: Insert/Update semua karyawan TANPA nik_atasan_langsung dulu ──
-    // Ini menghindari FK violation saat NIK atasan ada di row berikutnya
-    for (const emp of parsedKaryawan) {
-      try {
-        await withTransaction(async (client) => {
+    // ── Phase 2: Hash Default Password HANYA SEKALI sebelum loop ──
+    const defaultPassword = env.auth?.defaultUserPassword || process.env.DEFAULT_USER_PASSWORD || 'Esb123456!';
+    const defaultPasswordHash = await hashPassword(defaultPassword);
+
+    // ── Phase 3: Proses Karyawan, User & Aset dalam SATU Database Transaction ──
+    await withTransaction(async (client) => {
+      // Pre-fetch semua user email existing di DB untuk pengecekan unik yang sangat cepat & efisien
+      const dbUsersRes = await client.query(`SELECT LOWER(TRIM(email)) AS email FROM users WHERE email IS NOT NULL AND deleted_at IS NULL`);
+      const dbUserEmailsSet = new Set(dbUsersRes.rows.map(r => r.email));
+      const processedImportEmailsSet = new Set();
+
+      for (const emp of parsedKaryawan) {
+        try {
+          // 1. Upsert Karyawan
           const existingEmpRes = await client.query(`SELECT id FROM karyawan WHERE nik = $1`, [emp.nik]);
 
           if (existingEmpRes.rows.length > 0) {
@@ -321,99 +333,113 @@ export async function importExcelData(req, res) {
             importedKaryawanCount++;
           }
 
-          // Auto-create user account if not exists
-          if (emp.email) {
-            const existingUserRes = await client.query(
-              `SELECT id FROM users WHERE LOWER(TRIM(email)) = LOWER(TRIM($1))`,
-              [emp.email]
-            );
-            if (existingUserRes.rows.length === 0) {
-              const randomTempPassword = crypto.randomBytes(16).toString('hex');
-              const defaultPasswordHash = await hashPassword(randomTempPassword);
-              await client.query(
-                `INSERT INTO users (nama, email, password_hash, role, permissions, is_active)
-                 VALUES ($1, $2, $3, 'user', '{}'::jsonb, true)`,
-                [emp.nama, emp.email, defaultPasswordHash]
-              );
-              createdUserCount++;
+          // 2. Sinkronisasi Akun User (1 Karyawan Valid = 1 User)
+          if (!emp.email) {
+            failedUserCount++;
+            errors.push({ row: emp.rowNum, type: 'user', reason: `Karyawan ${emp.nik} (${emp.nama}) tidak memiliki email valid` });
+          } else {
+            const normEmail = emp.email.trim().toLowerCase();
+            if (dbUserEmailsSet.has(normEmail)) {
+              existingUserCount++;
+            } else if (processedImportEmailsSet.has(normEmail)) {
+              existingUserCount++;
+            } else {
+              try {
+                const DEFAULT_IMPORT_PERMISSIONS = JSON.stringify({
+                            dashboard: 'read_only',
+                            assets: 'none',
+                            my_assets: 'read_only',
+                            tickets: 'read_only',
+                            submissions: 'none',
+                            users: 'none',
+                            logs: 'none',
+                            karyawan: 'none',
+                          });
+
+                          await client.query(
+                            `INSERT INTO users (nama, email, password_hash, role, permissions, is_active)
+                             VALUES ($1, $2, $3, 'user', $4::jsonb, true)`,
+                            [emp.nama, emp.email, defaultPasswordHash, DEFAULT_IMPORT_PERMISSIONS]
+                );
+                createdUserCount++;
+                dbUserEmailsSet.add(normEmail);
+                processedImportEmailsSet.add(normEmail);
+              } catch (userErr) {
+                failedUserCount++;
+                errors.push({ row: emp.rowNum, type: 'user', reason: `Gagal membuat user untuk ${emp.email}: ${userErr.message}` });
+              }
             }
           }
-        });
-      } catch (err) {
-        errors.push({ row: emp.rowNum, type: 'karyawan', reason: `${emp.nik} (${emp.nama}): ${err.message}` });
+        } catch (err) {
+          errors.push({ row: emp.rowNum, type: 'karyawan', reason: `${emp.nik} (${emp.nama}): ${err.message}` });
+        }
       }
-    }
 
-    // ── Phase 3: Update nik_atasan_langsung setelah semua NIK tersedia ──
-    for (const emp of parsedKaryawan) {
-      if (!emp.nikAtasan) continue; // null berarti memang tidak ada atasan
+      // Update nik_atasan_langsung setelah semua NIK di-insert/update
+      for (const emp of parsedKaryawan) {
+        if (!emp.nikAtasan) continue;
 
-      try {
-        await withTransaction(async (client) => {
-          // Validasi: pastikan NIK atasan ada di tabel karyawan
+        try {
           const atasanRes = await client.query(`SELECT nik FROM karyawan WHERE nik = $1`, [emp.nikAtasan]);
           if (atasanRes.rows.length === 0) {
-            throw new Error(`NIK Atasan "${emp.nikAtasan}" tidak ditemukan di database`);
+            warnings.push(`Row ${emp.rowNum}: NIK Atasan "${emp.nikAtasan}" tidak ditemukan di database`);
+            continue;
           }
           await client.query(
             `UPDATE karyawan SET nik_atasan_langsung = $1, updated_at = CURRENT_TIMESTAMP WHERE nik = $2`,
             [emp.nikAtasan, emp.nik]
           );
-        });
-      } catch (err) {
-        errors.push({ row: emp.rowNum, type: 'karyawan', reason: `Atasan untuk ${emp.nik}: ${err.message}` });
-      }
-    }
-
-    // ── Process Asset Rows ──
-    for (let i = 0; i < assetRows.length; i++) {
-      const row = assetRows[i];
-      const rawHostname = getPropCaseInsensitive(row, ['Hostname', 'Label Aset', 'Label', 'hostname', 'label_aset']);
-      const rawSerialNumber = getPropCaseInsensitive(row, ['Serial Number', 'Serial', 'SN', 'serial_number', 'nomor_seri']);
-      const spesifikasi = dashIfNull(getPropCaseInsensitive(row, ['Spesifikasi', 'Spec', 'spesifikasi']));
-
-      const nikPemegangRaw = getPropCaseInsensitive(row, ['NIK Pemegang', 'NIK Pemegang Asset', 'NIK', 'nik_pemegang_asset', 'nik']);
-      const nikPemegang = extractNik(nikPemegangRaw);
-
-      const namaPemegangRaw = getPropCaseInsensitive(row, ['Nama Karyawan Pemegang', 'Nama Karyawan', 'nama_karyawan_pemegang_asset', 'nama_karyawan']);
-      const namaPemegang = extractName(namaPemegangRaw);
-      const deptPemegang = dashIfNull(getPropCaseInsensitive(row, ['Departemen Pemegang', 'Departemen', 'departemen_pemegang_asset', 'departemen']));
-      const lokasiAsetRaw = getPropCaseInsensitive(row, ['Lokasi Aset', 'Lokasi', 'lokasi_asset', 'lokasi_kerja']);
-      const lokasiAset = dashIfNull(normalizeLocation(lokasiAsetRaw));
-      const tipePerangkat = getPropCaseInsensitive(row, ['Tipe Perangkat', 'Tipe', 'tipe_perangkat']) || 'Laptop';
-      const brandMerek = dashIfNull(getPropCaseInsensitive(row, ['Brand/Merek', 'Merek', 'Brand', 'brand_merek']));
-      const model = dashIfNull(getPropCaseInsensitive(row, ['Model', 'model']));
-
-      const statusRaw = getPropCaseInsensitive(row, ['Status', 'status']);
-      const status = normalizeAssetStatus(statusRaw);
-
-      const kondisiRaw = getPropCaseInsensitive(row, ['Kondisi', 'kondisi']);
-      const kondisi = normalizeAssetKondisi(kondisiRaw);
-
-      const noteAsset = dashIfNull(getPropCaseInsensitive(row, ['Note Asset', 'Catatan', 'note_asset']));
-
-      const rowNum = i + 1;
-      const rowSuffix = String(rowNum).padStart(4, '0');
-
-      let hostnameFinal = rawHostname;
-      let serialFinal = rawSerialNumber;
-
-      // Ensure NON-NULL fallback values to satisfy NOT NULL constraints in DB schema
-      if (!hostnameFinal && !serialFinal) {
-        hostnameFinal = `AST-${rowSuffix}`;
-        serialFinal = `SN-${rowSuffix}`;
-      } else if (!hostnameFinal) {
-        hostnameFinal = `HOST-${serialFinal}`;
-      } else if (!serialFinal) {
-        serialFinal = `SN-${hostnameFinal}`;
+        } catch (err) {
+          errors.push({ row: emp.rowNum, type: 'karyawan_atasan', reason: `Atasan untuk ${emp.nik}: ${err.message}` });
+        }
       }
 
-      const targetHostname = safeTruncate(hostnameFinal, 50);
-      const targetSerial = safeTruncate(serialFinal, 50);
+      // ── Process Asset Rows ──
+      for (let i = 0; i < assetRows.length; i++) {
+        const row = assetRows[i];
+        const rawHostname = getPropCaseInsensitive(row, ['Hostname', 'Label Aset', 'Label', 'hostname', 'label_aset']);
+        const rawSerialNumber = getPropCaseInsensitive(row, ['Serial Number', 'Serial', 'SN', 'serial_number', 'nomor_seri']);
+        const spesifikasi = dashIfNull(getPropCaseInsensitive(row, ['Spesifikasi', 'Spec', 'spesifikasi']));
 
-      try {
-        await withTransaction(async (client) => {
-          // Verify employee info if NIK provided
+        const nikPemegangRaw = getPropCaseInsensitive(row, ['NIK Pemegang', 'NIK Pemegang Asset', 'NIK', 'nik_pemegang_asset', 'nik']);
+        const nikPemegang = extractNik(nikPemegangRaw);
+
+        const namaPemegangRaw = getPropCaseInsensitive(row, ['Nama Karyawan Pemegang', 'Nama Karyawan', 'nama_karyawan_pemegang_asset', 'nama_karyawan']);
+        const namaPemegang = extractName(namaPemegangRaw);
+        const deptPemegang = dashIfNull(getPropCaseInsensitive(row, ['Departemen Pemegang', 'Departemen', 'departemen_pemegang_asset', 'departemen']));
+        const lokasiAsetRaw = getPropCaseInsensitive(row, ['Lokasi Aset', 'Lokasi', 'lokasi_asset', 'lokasi_kerja']);
+        const lokasiAset = dashIfNull(normalizeLocation(lokasiAsetRaw));
+        const tipePerangkat = getPropCaseInsensitive(row, ['Tipe Perangkat', 'Tipe', 'tipe_perangkat']) || 'Laptop';
+        const brandMerek = dashIfNull(getPropCaseInsensitive(row, ['Brand/Merek', 'Merek', 'Brand', 'brand_merek']));
+        const model = dashIfNull(getPropCaseInsensitive(row, ['Model', 'model']));
+
+        const statusRaw = getPropCaseInsensitive(row, ['Status', 'status']);
+        const status = normalizeAssetStatus(statusRaw);
+
+        const kondisiRaw = getPropCaseInsensitive(row, ['Kondisi', 'kondisi']);
+        const kondisi = normalizeAssetKondisi(kondisiRaw);
+
+        const noteAsset = dashIfNull(getPropCaseInsensitive(row, ['Note Asset', 'Catatan', 'note_asset']));
+
+        const rowNum = i + 1;
+        const rowSuffix = String(rowNum).padStart(4, '0');
+
+        let hostnameFinal = rawHostname;
+        let serialFinal = rawSerialNumber;
+
+        if (!hostnameFinal && !serialFinal) {
+          hostnameFinal = `AST-${rowSuffix}`;
+          serialFinal = `SN-${rowSuffix}`;
+        } else if (!hostnameFinal) {
+          hostnameFinal = `HOST-${serialFinal}`;
+        } else if (!serialFinal) {
+          serialFinal = `SN-${hostnameFinal}`;
+        }
+
+        const targetHostname = safeTruncate(hostnameFinal, 50);
+        const targetSerial = safeTruncate(serialFinal, 50);
+
+        try {
           let resolvedNik = null;
           let resolvedNama = safeTruncate(namaPemegang, 150);
           let resolvedDept = safeTruncate(deptPemegang, 100);
@@ -444,31 +470,39 @@ export async function importExcelData(req, res) {
              status, kondisi, safeNote]
           );
           importedAssetCount++;
-        });
-      } catch (err) {
-        errors.push({ row: rowNum, type: 'asset', reason: err.message });
+        } catch (err) {
+          errors.push({ row: rowNum, type: 'asset', reason: err.message });
+        }
       }
-    }
+    });
 
-    const totalKaryawan = importedKaryawanCount + updatedKaryawanCount;
-    const totalAssets = importedAssetCount + updatedAssetCount;
-    const skippedKaryawan = totalKaryawanRows - totalKaryawan;
-    const skippedAssets = totalAssetRows - totalAssets;
+    const totalKaryawanProcessed = importedKaryawanCount + updatedKaryawanCount;
+    const skippedKaryawan = totalKaryawanRows - parsedKaryawan.length;
+    const totalAssetsProcessed = importedAssetCount + updatedAssetCount;
+    const skippedAssets = totalAssetRows - totalAssetsProcessed;
+
+    const totalUsersAccounted = createdUserCount + existingUserCount;
+    if (parsedKaryawan.length > 0 && totalUsersAccounted < parsedKaryawan.length) {
+      warnings.push(`Peringatan Rekonsiliasi: ${parsedKaryawan.length} karyawan diproses, tetapi hanya ${totalUsersAccounted} user terproses (${failedUserCount} gagal/invalid email).`);
+    }
 
     res.json({
       success: true,
-      message: `Proses import sukses! ${totalKaryawan} Karyawan dan ${totalAssets} Aset IT berhasil diproses.`,
+      message: `Proses import sukses! ${totalKaryawanProcessed} Karyawan (${createdUserCount} Akun User baru, ${existingUserCount} User existing) dan ${totalAssetsProcessed} Aset IT berhasil diproses.`,
       details: {
         totalKaryawanRows,
         totalAssetRows,
+        processedKaryawan: parsedKaryawan.length,
         importedKaryawanCount,
         updatedKaryawanCount,
         skippedKaryawan,
         createdUserCount,
+        existingUserCount,
+        failedUserCount,
         importedAssetCount,
         updatedAssetCount,
         skippedAssets,
-        warnings: errors.map(e => `Row ${e.row} (${e.type}): ${e.reason}`),
+        warnings: warnings.concat(errors.map(e => `Row ${e.row} (${e.type}): ${e.reason}`)),
         errors,
       },
     });

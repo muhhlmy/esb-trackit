@@ -96,7 +96,7 @@ function readCorsOrigins() {
   let text = process.env.CORS_ORIGINS;
 
   if (!text) {
-    text = "http://localhost:5173,http://127.0.0.1:5173";
+    text = "http://localhost:5173,http://127.0.0.1:5173,http://0.0.0.0:5173";
   }
 
   const originParts = text.split(",");
@@ -159,6 +159,9 @@ export const env = {
   password: {
     bcryptRounds: readBoundedInteger("PASSWORD_BCRYPT_ROUNDS", 12, 10, 14),
     legacyMode: readLegacyPasswordMode(),
+  },
+  auth: {
+    defaultUserPassword: process.env.DEFAULT_USER_PASSWORD || "Esb123456!",
   },
   rateLimit: {
     windowMs: readNumber("API_RATE_LIMIT_WINDOW_MS", 60_000),

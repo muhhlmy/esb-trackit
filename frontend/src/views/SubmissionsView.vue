@@ -38,7 +38,7 @@ async function fetchData() {
   isLoading.value = true
   pageError.value = ''
   try {
-    const [employeeData, assetData] = await Promise.all([get('/api/karyawan'), get('/api/assets')])
+    const [employeeData, assetData] = await Promise.all([get('/api/karyawan?all=true'), get('/api/assets?all=true')])
     employees.value = Array.isArray(employeeData) ? employeeData : []
     assets.value = (Array.isArray(assetData) ? assetData : []).map((a) => {
       const hostname = a.hostname || a.label_aset || ''

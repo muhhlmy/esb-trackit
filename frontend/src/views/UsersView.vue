@@ -254,7 +254,7 @@ async function fetchUsers() {
   isLoading.value = true
   pageError.value = ''
   try {
-    const response = await get('/api/users')
+    const response = await get('/api/users?limit=500')
     const data = Array.isArray(response) ? response : (response?.data || [])
     if (!Array.isArray(data)) throw new Error('Format data pengguna dari server tidak valid.')
     users.value = data
@@ -270,7 +270,7 @@ async function fetchUsers() {
 
 async function fetchEmployees() {
   try {
-    const data = await get('/api/karyawan')
+    const data = await get('/api/karyawan?all=true')
     if (Array.isArray(data)) employees.value = data
   } catch (err) {
     void err
@@ -612,42 +612,50 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
       </div>
 
       <!-- Tabel -->
-      <div v-else class="overflow-x-auto" tabindex="0" aria-label="Tabel pengguna">
-        <table class="w-full text-left border-collapse">
+      <div v-else class="w-full max-w-full overflow-hidden" tabindex="0" aria-label="Tabel pengguna">
+        <table class="w-full max-w-full text-left border-collapse table-fixed">
           <caption class="sr-only">
             Daftar pengguna sistem
           </caption>
+          <colgroup>
+            <col class="w-[31%]" />
+            <col class="w-[12%]" />
+            <col class="w-[22%]" />
+            <col class="w-[15%]" />
+            <col class="w-[12%]" />
+            <col class="w-[8%]" />
+          </colgroup>
           <thead
-            class="sticky top-0 z-10 border-b border-[#E2E8F0]/80 bg-[#F8FAFC]/80 backdrop-blur-xs select-none"
+            class="sticky top-0 z-10 border-b border-[#E2E8F0]/80 bg-[#F8FAFC]/80 backdrop-blur-xs select-none whitespace-nowrap"
           >
             <tr>
               <th
-                class="py-3 pl-5 pr-4 text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B]"
+                class="py-3 pl-5 pr-4 text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B] text-left whitespace-nowrap"
               >
                 Pengguna
               </th>
               <th
-                class="py-3 px-4 text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B]"
+                class="py-3 px-4 text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B] text-left whitespace-nowrap"
               >
                 Role Akses
               </th>
               <th
-                class="py-3 px-4 text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B]"
+                class="py-3 px-4 text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B] text-left whitespace-nowrap"
               >
                 Sub Role / Unit Ditangani
               </th>
               <th
-                class="py-3 px-4 text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B]"
+                class="py-3 px-4 text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B] text-left whitespace-nowrap"
               >
                 Hak Akses Fitur
               </th>
               <th
-                class="py-3 px-4 text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B]"
+                class="py-3 px-4 text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B] text-left whitespace-nowrap"
               >
                 Status
               </th>
               <th
-                class="py-3 pr-5 pl-4 text-right text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B]"
+                class="py-3 pr-5 pl-4 text-right text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B] whitespace-nowrap"
               >
                 Aksi
               </th>
@@ -660,21 +668,25 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
               class="group hover:bg-[#F8FAFC] transition-colors duration-150"
             >
               <!-- Kolom Pengguna (nama + email) -->
-              <td class="py-4 pl-5 pr-4 min-w-[200px]">
-                <div class="flex flex-col">
+              <td class="py-4 pl-5 pr-4 overflow-hidden">
+                <div class="flex flex-col min-w-0">
                   <span
-                    class="text-[13.5px] font-bold text-[#0F172A] leading-snug truncate group-hover:text-[#2563EB] transition-colors"
+                    class="text-[13.5px] font-bold text-[#0F172A] leading-snug truncate group-hover:text-[#2563EB] transition-colors block"
+                    :title="user.nama"
                   >
                     {{ user.nama }}
                   </span>
-                  <span class="text-[11.5px] font-normal text-[#64748B] mt-0.5 truncate">
+                  <span
+                    class="text-[11.5px] font-normal text-[#64748B] mt-0.5 truncate block"
+                    :title="user.email"
+                  >
                     {{ user.email }}
                   </span>
                 </div>
               </td>
 
               <!-- Role Badge -->
-              <td class="py-4 px-4 min-w-[110px]">
+              <td class="py-4 px-4 overflow-hidden">
                 <AppBadge
                   :type="getRoleBadgeType(user.role)"
                   :text="(user.role || 'user').toUpperCase()"
@@ -682,26 +694,26 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
               </td>
 
               <!-- Unit Tiket (Queue) Badge -->
-              <td class="py-4 px-4 min-w-[160px]">
+              <td class="py-4 px-4 overflow-hidden">
                 <div
                   v-if="isRoleSuperAdmin(user.role)"
-                  class="text-[11.5px] font-semibold text-[#2563EB]"
+                  class="text-[11.5px] font-semibold text-[#2563EB] truncate block"
                 >
                   Semua Unit (Superadmin)
                 </div>
-                <div v-else-if="user.queues && user.queues.length > 0" class="flex flex-wrap gap-1">
+                <div v-else-if="user.queues && user.queues.length > 0" class="flex flex-wrap gap-1 min-w-0">
                   <span
                     v-for="q in user.queues"
                     :key="q.id"
-                    class="inline-flex items-center rounded-md bg-[#EFF6FF] px-2 py-0.5 text-[10.5px] font-semibold text-[#2563EB]"
+                    class="inline-flex items-center rounded-md bg-[#EFF6FF] px-2 py-0.5 text-[10.5px] font-semibold text-[#2563EB] shrink-0"
                     >{{ q.kode }}</span
                   >
                 </div>
-                <span v-else class="text-[11.5px] text-[#94A3B8] italic">Tidak ada unit</span>
+                <span v-else class="text-[11.5px] text-[#94A3B8] italic truncate block">Tidak ada unit</span>
               </td>
 
               <!-- Hak Akses Fitur Count Badge -->
-              <td class="py-4 px-4 min-w-[140px]">
+              <td class="py-4 px-4 overflow-hidden">
                 <AppBadge
                   :type="getPermissionBadge(user).type"
                   :text="getPermissionBadge(user).text"
@@ -709,7 +721,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
               </td>
 
               <!-- Status Akun -->
-              <td class="py-4 px-4 min-w-[110px]">
+              <td class="py-4 px-4 overflow-hidden">
                 <AppBadge
                   :type="user.is_active === false ? 'danger' : 'success'"
                   :text="user.is_active === false ? 'NONAKTIF' : 'AKTIF'"
@@ -717,7 +729,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
               </td>
 
               <!-- Aksi -->
-              <td class="py-4 pr-5 pl-4 text-right" @click.stop>
+              <td class="py-4 pr-5 pl-4 text-right overflow-hidden" @click.stop>
                 <AppRowActions :actions="getUserActions(user)" />
               </td>
             </tr>

@@ -27,8 +27,24 @@ function getTicketIdentity(req) {
   return req.ticketIdentity || createTicketIdentity(req.user)
 }
 
+async function ensureDefaultQueuesExist() {
+  try {
+    const checkHr = await pool.query(
+      `SELECT id FROM ticket_queues WHERE UPPER(kode) LIKE '%HR%' OR UPPER(nama) LIKE '%HR%' LIMIT 1`
+    )
+    if (checkHr.rowCount === 0) {
+      await pool.query(
+        `INSERT INTO ticket_queues (kode, nama, deskripsi) VALUES ('HR', 'HR Support', 'Human Resources support & services')`
+      )
+    }
+  } catch (_err) {
+    // Ignore seed race conditions
+  }
+}
+
 // GET /api/ticket-queues
 export async function listQueues(req, res) {
+  await ensureDefaultQueuesExist()
   const result = await pool.query(`SELECT id, kode, nama, deskripsi, is_active FROM ticket_queues WHERE is_active = true ORDER BY kode`)
   const rows = result.rows.map((row) => ({ ...row, id: Number(row.id) }))
   res.json(rows)
@@ -36,6 +52,7 @@ export async function listQueues(req, res) {
 
 // GET /api/ticket-queues/my
 export async function listMyQueues(req, res) {
+  await ensureDefaultQueuesExist()
   if (isSuperAdmin(req.user.role)) {
     const result = await pool.query(`SELECT id, kode, nama, deskripsi FROM ticket_queues WHERE is_active = true ORDER BY kode`)
     return res.json(result.rows.map((row) => ({ ...row, id: Number(row.id) })))

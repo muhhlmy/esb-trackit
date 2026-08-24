@@ -1521,7 +1521,7 @@ function toast(message, type = 'success') {
     </div>
 
     <!-- ── 3. Ticket Inbox / Issue List Surface ───────────── -->
-    <div class="rounded-2xl border border-slate-200/80 bg-slate-50/40 p-3 sm:p-4 shadow-2xs">
+    <div class="flex flex-col gap-3">
       <!-- Loading Skeleton (Matches refined compact card layout) -->
       <div v-if="isLoading" aria-busy="true" class="flex flex-col gap-2.5">
         <div
@@ -1781,7 +1781,7 @@ function toast(message, type = 'success') {
         </template>
 
         <!-- ── EMPTY STATES ── -->
-        <div v-if="filteredTickets.length === 0" class="py-16 text-center">
+        <div v-if="filteredTickets.length === 0" class="py-16 text-center bg-white rounded-2xl border border-slate-200/80 shadow-2xs">
           <div class="mx-auto flex max-w-sm flex-col items-center justify-center text-center">
             <div
               class="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#F1F5F9] text-[#94A3B8] mb-3"

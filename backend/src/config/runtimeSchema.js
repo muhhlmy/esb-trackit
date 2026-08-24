@@ -138,6 +138,7 @@ const REQUIRED_RUNTIME_SCHEMA = Object.freeze({
     id_tiket: nn('int4'),
     pesan: nn('text'),
     attachment_data: optional('text'),
+    attachment_name: optional('varchar'),
     user_id: nn('int4'),
     created_at: nn('timestamp'),
   },

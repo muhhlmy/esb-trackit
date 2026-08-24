@@ -31,13 +31,13 @@ function createHttpError(statusCode, message) {
 
 const MAX_COMMENT_LENGTH = 4000
 const MAX_COMMENT_ATTACHMENT_LENGTH = 7_000_000
-const COMMENT_BODY_FIELDS = new Set(['pesan', 'attachment'])
-const RASTER_DATA_URL_PATTERN = /^data:image\/(png|jpeg|gif|webp);base64,([a-z0-9+/]+={0,2})$/i
+const COMMENT_BODY_FIELDS = new Set(['pesan', 'attachment', 'attachment_name'])
+const ATTACHMENT_DATA_URL_PATTERN = /^data:([a-z0-9-]+\/[a-z0-9-+.]+);base64,([a-z0-9+/]+={0,2})$/i
 const MAX_RASTER_ATTACHMENT_BYTES = 5 * 1024 * 1024
 const MAX_TICKET_TITLE_LENGTH = 255
 const MAX_TICKET_DESCRIPTION_LENGTH = 20_000
 const MAX_TICKET_ATTACHMENT_LENGTH = 7_000_000
-const TICKET_CREATE_FIELDS = new Set(['judul', 'deskripsi', 'kategori', 'prioritas', 'queue_id', 'attachment'])
+const TICKET_CREATE_FIELDS = new Set(['judul', 'deskripsi', 'kategori', 'prioritas', 'queue_id', 'attachment', 'attachments', 'pelapor_user_id'])
 const TICKET_UPDATE_FIELDS = new Set([
   'judul',
   'deskripsi',
@@ -46,9 +46,10 @@ const TICKET_UPDATE_FIELDS = new Set([
   'status_tiket',
   'queue_id',
   'attachment',
+  'attachments',
 ])
 const TICKET_CATEGORIES = new Set(['Request', 'Support', 'Incident', 'QNA', 'request', 'support', 'incident', 'qna'])
-const TICKET_PRIORITIES = new Set(['Urgent (4h)', 'High (1day)', 'Medium (3d)', 'Low (7d)'])
+const TICKET_PRIORITIES = new Set(['Low', 'Medium', 'High', 'Critical'])
 const TICKET_STATUSES = new Set([
   'Open',
   'In Progress',
@@ -65,6 +66,7 @@ const TICKET_LIST_QUERY_FIELDS = new Set([
   'tab',
   'page',
   'limit',
+  'sort',
 ])
 const TICKET_LIST_TABS = new Set([
   '',
@@ -137,19 +139,25 @@ function validateTicketListQuery(query) {
 
   // Validasi ENUM prioritas tiket
   const prioritas = normalizeOptionalText(query.prioritas, 'Prioritas tiket');
-  const VALID_PRIORITIES = ["Urgent (4h)", "High (1day)", "Medium (3d)", "Low (7d)"];
-  if (prioritas && !VALID_PRIORITIES.includes(prioritas)) {
-    throw createHttpError(400, `Prioritas tidak valid. Harus salah satu dari: ${VALID_PRIORITIES.join(", ")}`);
+  if (prioritas && !TICKET_PRIORITIES.has(prioritas)) {
+    throw createHttpError(400, `Prioritas tidak valid. Harus salah satu dari: ${[...TICKET_PRIORITIES].join(', ')}`);
   }
 
   const tab = normalizeOptionalText(query.tab, 'Tab tiket').toLowerCase()
   if (!TICKET_LIST_TABS.has(tab)) throw createHttpError(400, 'Tab tiket tidak valid.')
+
+  const sortRaw = normalizeOptionalText(query.sort, 'Urutan tiket').toLowerCase()
+  const sort = sortRaw === '' ? 'terbaru' : sortRaw
+  if (sort !== 'terbaru' && sort !== 'terlama') {
+    throw createHttpError(400, 'Urutan tiket harus terbaru atau terlama.')
+  }
 
   return {
     search,
     status,
     prioritas,
     tab,
+    sort,
     queueId:
       query.queue_id === undefined || query.queue_id === ''
         ? null
@@ -182,7 +190,7 @@ function hasRasterMagicBytes(mimeSubtype, bytes) {
       bytes.subarray(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]))
     )
   }
-  if (mimeSubtype === 'jpeg') {
+  if (mimeSubtype === 'jpeg' || mimeSubtype === 'jpg') {
     return bytes.length >= 3 && bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff
   }
   if (mimeSubtype === 'gif') {
@@ -198,7 +206,7 @@ function hasRasterMagicBytes(mimeSubtype, bytes) {
   )
 }
 
-function normalizeRasterAttachment(attachment, label, maxLength) {
+function normalizeFileAttachment(attachment, label, maxLength) {
   if (attachment !== null && attachment !== undefined && typeof attachment !== 'string') {
     throw createHttpError(400, `Attachment ${label} tidak valid.`)
   }
@@ -209,26 +217,65 @@ function normalizeRasterAttachment(attachment, label, maxLength) {
   const normalized = typeof attachment === 'string' && attachment.trim() ? attachment.trim() : null
   if (!normalized) return null
 
-  const match = RASTER_DATA_URL_PATTERN.exec(normalized)
+  const match = ATTACHMENT_DATA_URL_PATTERN.exec(normalized)
   if (!match || match[2].length % 4 !== 0) {
-    throw createHttpError(400, `Attachment ${label} harus berupa data gambar yang didukung.`)
+    throw createHttpError(400, `Attachment ${label} tidak valid.`)
   }
 
-  const mimeSubtype = match[1].toLowerCase()
+  const mimeType = match[1].toLowerCase()
   const encoded = match[2]
   const bytes = Buffer.from(encoded, 'base64')
   if (bytes.length > MAX_RASTER_ATTACHMENT_BYTES) {
     throw createHttpError(413, `Attachment ${label} terlalu besar.`)
   }
-  if (bytes.toString('base64') !== encoded || !hasRasterMagicBytes(mimeSubtype, bytes)) {
-    throw createHttpError(400, `Attachment ${label} tidak cocok dengan format gambar.`)
+
+  if (mimeType.startsWith('image/')) {
+    const mimeSubtype = mimeType.replace('image/', '')
+    if (bytes.toString('base64') !== encoded || !hasRasterMagicBytes(mimeSubtype, bytes)) {
+      throw createHttpError(400, `Attachment ${label} tidak cocok dengan format gambar.`)
+    }
   }
 
   return normalized
 }
 
-function normalizeTicketAttachment(attachment) {
-  return normalizeRasterAttachment(attachment, 'tiket', MAX_TICKET_ATTACHMENT_LENGTH)
+// Accepts either a single attachment (legacy `attachment` field) or an array of
+// attachments (`attachments` field). Each item may be a plain data-URL string
+// (legacy) or an object `{ name, data }`. Returns a deduplicated, normalized
+// array of `{ name, data }`.
+function normalizeTicketAttachments(value) {
+  if (value === undefined || value === null) return []
+
+  const list = Array.isArray(value) ? value : [value]
+  const normalized = []
+  for (const item of list) {
+    let name = null
+    let data = item
+
+    if (item && typeof item === 'object' && !Array.isArray(item)) {
+      name = item.name ?? null
+      data = item.data ?? item.attachment ?? null
+    }
+
+    const normalizedData = normalizeFileAttachment(data, 'tiket', MAX_TICKET_ATTACHMENT_LENGTH)
+    if (!normalizedData) continue
+
+    const normalizedName = normalizeAttachmentName(name)
+    normalized.push({ name: normalizedName, data: normalizedData })
+  }
+  return normalized
+}
+
+// Sanitize the original file name for storage: strip path separators and
+// control characters, cap length, and fall back to a stable default.
+function normalizeAttachmentName(name) {
+  if (typeof name !== 'string') return null
+  const cleaned = name
+    .replace(/[\\/]/g, '')
+    .replace(/[\u0000-\u001f\u007f]/g, '')
+    .trim()
+  if (!cleaned) return null
+  return cleaned.slice(0, 255)
 }
 
 function withoutInlineAttachment(record) {
@@ -304,8 +351,12 @@ function validateTicketCreateBody(body) {
     deskripsi,
     kategori,
     queue_id: body.queue_id,
-    prioritas: body.prioritas ?? 'Medium (3d)',
-    attachment: normalizeTicketAttachment(body.attachment),
+    prioritas: body.prioritas ?? 'Medium',
+    pelapor_user_id:
+      body.pelapor_user_id === undefined || body.pelapor_user_id === null || body.pelapor_user_id === ''
+        ? null
+        : parsePositiveId(body.pelapor_user_id, 'Pelapor tidak valid.'),
+    attachments: normalizeTicketAttachments(body.attachments ?? body.attachment),
   }
 }
 
@@ -386,7 +437,10 @@ function validateTicketUpdateBody(body) {
   }
 
   if (hasField('attachment')) {
-    normalized.attachment = normalizeTicketAttachment(body.attachment)
+    normalized.attachments = normalizeTicketAttachments(body.attachment)
+  }
+  if (hasField('attachments')) {
+    normalized.attachments = normalizeTicketAttachments(body.attachments)
   }
 
   return normalized
@@ -449,13 +503,33 @@ async function addTicketLog(queryable, id_tiket, nomor_tiket, aksi, perubahan, o
   )
 }
 
+// ── LIST TICKET REPORTERS (dropdown pelapor untuk admin) ─────
+// Daftar user aktif minimal untuk dipilih sebagai pelapor saat admin
+// membuat tiket atas nama user lain. Di-gate oleh requireTicketIdentity.
+export async function listTicketReporters(req, res) {
+  assertCanonicalTicketIdentity(req)
+  const result = await pool.query(
+    `SELECT u.id, u.nama, u.email
+     FROM users u
+     WHERE u.deleted_at IS NULL
+       AND u.is_active = true
+     ORDER BY u.nama ASC, u.id ASC`,
+  )
+  const reporters = result.rows.map((row) => ({
+    id: Number(row.id),
+    nama: row.nama || row.email || `User #${row.id}`,
+  }))
+  res.json({ reporters })
+}
+
 // ── LIST TICKETS (queue-aware) ────────────────────────────────
 export async function listTickets(req, res) {
   const identity = assertCanonicalTicketIdentity(req)
-  const { search, status, prioritas, queueId, tab, page, limit } = validateTicketListQuery(req.query)
+  const { search, status, prioritas, queueId, tab, sort, page, limit } = validateTicketListQuery(req.query)
   const ticketScope = buildTicketScopeQuery(identity, { tab })
   const params = [...ticketScope.params]
   const conditions = [...ticketScope.conditions]
+  const sortDirection = sort === 'terlama' ? 'ASC' : 'DESC'
 
   if (tab === 'open') {
     conditions.push(`t.status_tiket IN ('Open', 'In Progress')`)
@@ -526,14 +600,14 @@ export async function listTickets(req, res) {
     ${whereClause}
     ORDER BY
       CASE t.prioritas
-        WHEN 'Urgent (4h)'  THEN 1
-        WHEN 'High (1day)'  THEN 2
-        WHEN 'Medium (3d)'  THEN 3
-        WHEN 'Low (7d)'     THEN 4
+        WHEN 'Critical'  THEN 1
+        WHEN 'High'      THEN 2
+        WHEN 'Medium'    THEN 3
+        WHEN 'Low'       THEN 4
         ELSE 5
       END,
-      t.created_at DESC,
-      t.id DESC
+      t.created_at ${sortDirection},
+      t.id ${sortDirection}
     LIMIT $${params.length + 1}
     OFFSET $${params.length + 2}
   `
@@ -599,6 +673,16 @@ export async function getTicketStats(req, res) {
     params,
   )
 
+  // Jumlah tiket yang sedang ditangani oleh user ini (assigned to me & belum selesai)
+  const assignedResult = await pool.query(
+    `SELECT COUNT(*)::int AS "assignedTickets"
+     FROM tickets t
+     WHERE t.deleted_at IS NULL
+       AND t.assigned_to_user_id = $1
+       AND t.status_tiket NOT IN ('Closed', 'Resolved', 'Cancelled')`,
+    [identity.id],
+  )
+
   const stats = countsResult.rows[0] || {
     totalTickets: 0,
     openTickets: 0,
@@ -606,6 +690,7 @@ export async function getTicketStats(req, res) {
     closedTickets: 0,
     unassignedTickets: 0,
   }
+  stats.assignedTickets = assignedResult.rows[0]?.assignedTickets || 0
   stats.recentTickets = recentResult.rows
   res.json(stats)
 }
@@ -773,6 +858,8 @@ export async function getTicketComments(req, res) {
 }
 
 // Attachment payloads are fetched only for one authorized ticket at a time.
+// Returns the FULL list of attachments (one per comment that has one), so the
+// detail view can render them as a download-only list.
 export async function getTicketAttachment(req, res) {
   const id = parsePositiveId(req.params.id)
   const identity = assertCanonicalTicketIdentity(req)
@@ -780,21 +867,32 @@ export async function getTicketAttachment(req, res) {
   assertTicketRead(identity, ticket)
 
   const result = await pool.query(
-    `SELECT attachment_data AS attachment
-     FROM komentar_tiket
-     WHERE id_tiket = $1
-       AND attachment_data IS NOT NULL
-       AND attachment_data != ''
-     ORDER BY id ASC
-     LIMIT 1`,
+    `SELECT
+       k.id,
+       k.attachment_data AS attachment,
+       k.attachment_name AS name,
+       k.created_at AS dibuat_pada,
+       u.nama AS nama_pengguna,
+       u.role AS role_pengguna
+     FROM komentar_tiket k
+     JOIN users u ON u.id = k.user_id
+     WHERE k.id_tiket = $1
+       AND k.attachment_data IS NOT NULL
+       AND k.attachment_data != ''
+     ORDER BY k.id ASC`,
     [id],
   )
-  const attachment = result.rows[0]?.attachment
-  if (typeof attachment !== 'string' || !attachment.trim()) {
-    throw createHttpError(404, 'Lampiran tiket tidak ditemukan.')
-  }
 
-  res.json({ attachment })
+  const attachments = result.rows.map((row) => ({
+    id: row.id,
+    attachment: row.attachment,
+    name: row.name,
+    dibuat_pada: row.dibuat_pada,
+    nama_pengguna: row.nama_pengguna,
+    role_pengguna: row.role_pengguna,
+  }))
+
+  res.json({ attachments })
 }
 
 // A comment attachment is scoped through its parent ticket before the blob is queried.
@@ -806,7 +904,7 @@ export async function getTicketCommentAttachment(req, res) {
   assertTicketRead(identity, ticket)
 
   const result = await pool.query(
-    `SELECT attachment_data AS attachment
+    `SELECT attachment_data AS attachment, attachment_name AS name
      FROM komentar_tiket
      WHERE id_tiket = $1
        AND id = $2`,
@@ -817,7 +915,7 @@ export async function getTicketCommentAttachment(req, res) {
     throw createHttpError(404, 'Lampiran komentar tidak ditemukan.')
   }
 
-  res.json({ attachment })
+  res.json({ attachment, name: result.rows[0]?.name ?? null })
 }
 
 // ── CREATE TICKET COMMENT ─────────────────────────────────────
@@ -834,17 +932,18 @@ export async function createTicketComment(req, res) {
     throw createHttpError(400, 'Payload komentar hanya boleh berisi pesan dan attachment.')
   }
 
-  const { pesan, attachment } = req.body
+  const { pesan, attachment, attachment_name } = req.body
   const normalizedMessage = typeof pesan === 'string' ? pesan.trim() : ''
   if (!normalizedMessage) throw createHttpError(400, 'Pesan komentar wajib diisi.')
   if (normalizedMessage.length > MAX_COMMENT_LENGTH) {
     throw createHttpError(400, `Pesan komentar maksimal ${MAX_COMMENT_LENGTH} karakter.`)
   }
-  const normalizedAttachment = normalizeRasterAttachment(
+  const normalizedAttachment = normalizeFileAttachment(
     attachment,
     'komentar',
     MAX_COMMENT_ATTACHMENT_LENGTH,
   )
+  const normalizedName = normalizeAttachmentName(attachment_name)
 
   const client = await pool.connect()
   let newComment
@@ -861,10 +960,10 @@ export async function createTicketComment(req, res) {
 
     const actorRole = identity.role === TICKET_ROLES.REPORTER ? 'user' : identity.role
     const result = await client.query(
-      `INSERT INTO komentar_tiket (id_tiket, user_id, pesan, attachment_data)
-       VALUES ($1, $2, $3, $4)
+      `INSERT INTO komentar_tiket (id_tiket, user_id, pesan, attachment_data, attachment_name)
+       VALUES ($1, $2, $3, $4, $5)
        RETURNING id, id_tiket, pesan, created_at AS dibuat_pada`,
-      [id, identity.id, normalizedMessage, normalizedAttachment],
+      [id, identity.id, normalizedMessage, normalizedAttachment, normalizedName],
     )
     newComment = {
       ...result.rows[0],
@@ -929,11 +1028,37 @@ export async function createTicket(req, res) {
     throw createHttpError(403, 'Anda tidak memiliki akses untuk membuat tiket.')
   }
   if (!identity.name) throw createHttpError(403, 'Identitas pelapor tidak lengkap.')
-  const { judul, deskripsi, kategori, queue_id, prioritas, attachment } = validateTicketCreateBody(req.body)
-  const pelaporNama = identity.name
-  const pelaporId = identity.id
+  const {
+    judul,
+    deskripsi,
+    kategori,
+    queue_id,
+    prioritas,
+    pelapor_user_id,
+    attachments,
+  } = validateTicketCreateBody(req.body)
+
+  // Reporter biasa selalu menjadi pelapor dirinya sendiri; hanya admin/superadmin
+  // yang boleh membuat tiket atas nama user lain.
+  const isAdminActor = identity.role === TICKET_ROLES.ADMIN || identity.role === TICKET_ROLES.SUPERADMIN
+  const requestedReporterId = isAdminActor && pelapor_user_id != null ? pelapor_user_id : null
 
   const newTicket = await withTransaction(async (client) => {
+    let pelaporId = identity.id
+    let pelaporNama = identity.name
+
+    if (requestedReporterId != null && requestedReporterId !== identity.id) {
+      const reporterCheck = await client.query(
+        'SELECT id, nama FROM users WHERE id = $1 AND is_active = true AND deleted_at IS NULL',
+        [requestedReporterId],
+      )
+      if (reporterCheck.rowCount === 0) {
+        throw createHttpError(400, 'Pelapor yang dipilih tidak valid atau tidak aktif.')
+      }
+      pelaporId = reporterCheck.rows[0].id
+      pelaporNama = reporterCheck.rows[0].nama
+    }
+
     const queueCheck = await client.query(
       'SELECT id, kode, nama FROM ticket_queues WHERE id = $1 AND is_active = true',
       [queue_id],
@@ -961,16 +1086,16 @@ export async function createTicket(req, res) {
         queue.id,
         pelaporId,
         null,
-        attachment ? 1 : 0,
+        attachments.length,
       ],
     )
 
     const insertedTicket = result.rows[0]
-    if (attachment) {
+    for (const att of attachments) {
       await client.query(
-        `INSERT INTO komentar_tiket (id_tiket, user_id, pesan, attachment_data)
-         VALUES ($1, $2, $3, $4)`,
-        [insertedTicket.id, pelaporId, 'Lampiran Kendala', attachment],
+        `INSERT INTO komentar_tiket (id_tiket, user_id, pesan, attachment_data, attachment_name)
+         VALUES ($1, $2, $3, $4, $5)`,
+        [insertedTicket.id, pelaporId, 'Lampiran Kendala', att.data, att.name],
       )
     }
 
@@ -1047,7 +1172,7 @@ export async function updateTicket(req, res) {
     if (check.rowCount === 0) throw createHttpError(404, 'Tiket tidak ditemukan.')
     const oldTicket = check.rows[0]
 
-    const { judul, deskripsi, prioritas, status_tiket, queue_id, attachment } = update
+    const { judul, deskripsi, prioritas, status_tiket, queue_id, attachments } = update
 
     if (
       status_tiket !== undefined &&
@@ -1098,15 +1223,17 @@ export async function updateTicket(req, res) {
       }
     }
 
-    if (attachment) {
+    if (attachments && attachments.length > 0) {
+      for (const att of attachments) {
+        await client.query(
+          `INSERT INTO komentar_tiket (id_tiket, user_id, pesan, attachment_data, attachment_name)
+           VALUES ($1, $2, $3, $4, $5)`,
+          [id, identity.id, 'Lampiran Kendala (Perubahan)', att.data, att.name],
+        )
+      }
       await client.query(
-        `INSERT INTO komentar_tiket (id_tiket, user_id, pesan, attachment_data)
-         VALUES ($1, $2, $3, $4)`,
-        [id, identity.id, 'Lampiran Kendala (Perubahan)', attachment],
-      )
-      await client.query(
-        `UPDATE tickets SET attachment_count = COALESCE(attachment_count, 0) + 1 WHERE id = $1`,
-        [id],
+        `UPDATE tickets SET attachment_count = COALESCE(attachment_count, 0) + $2 WHERE id = $1`,
+        [id, attachments.length],
       )
     }
 

@@ -305,5 +305,5 @@ test('ticket attachments are loaded individually and never through list or comme
   assert.doesNotMatch(pollingSection, /loadCommentAttachment/)
   assert.match(editSection, /loadSelectedTicketAttachment\(ticket\.id, 'edit'\)/)
   assert.match(detailSection, /loadSelectedTicketAttachment\(ticket\.id, 'detail'\)/)
-  assert.match(saveSection, /if \(attachmentChanged\.value\) payload\.attachment/)
+  assert.match(saveSection, /if \(attachmentChanged\.value\) payload\.attachments/)
 })

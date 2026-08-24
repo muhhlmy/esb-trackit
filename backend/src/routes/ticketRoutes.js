@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import {
   listTickets,
+  listTicketReporters,
   getTicketStats,
   getTicketCaspStats,
   getCaspTrend,
@@ -31,6 +32,7 @@ ticketRouter.get('/events',         streamTicketEvents)
 ticketRouter.get('/stats',          getTicketStats)
 ticketRouter.get('/casp/stats',     getTicketCaspStats)
 ticketRouter.get('/casp/trend',     getCaspTrend)
+ticketRouter.get('/reporters',      listTicketReporters)
 ticketRouter.get('/',               listTickets)
 ticketRouter.get('/:id/attachment', getTicketAttachment)
 ticketRouter.get('/:id/history',    getTicketHistory)

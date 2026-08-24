@@ -254,10 +254,9 @@ CREATE TABLE ticket_queues (
 
 -- Seed default queues
 INSERT INTO ticket_queues (kode, nama, deskripsi) VALUES
-    ('IT-Help', 'IT Helpdesk', 'General IT support requests'),
-    ('IT-Network', 'Network Team', 'Network infrastructure issues'),
-    ('IT-Software', 'Software Support', 'Software licensing and installation'),
-    ('IT-Hardware', 'Hardware Support', 'Hardware repair and replacement');
+    ('IT', 'IT Support', 'IT support & services'),
+    ('HR', 'HR Support', 'Human Resources support & services'),
+    ('GA', 'GA Support', 'General Affairs support & facilities');
 
 -- =====================================================================
 -- TABEL 5: Tickets (Helpdesk System)
@@ -268,7 +267,7 @@ CREATE TABLE tickets (
     judul                       VARCHAR(255)    NOT NULL,
     deskripsi                   TEXT,
     kategori                    VARCHAR(100),
-    prioritas                   VARCHAR(50)     NOT NULL DEFAULT 'Medium (3d)',
+    prioritas                   VARCHAR(50)     NOT NULL DEFAULT 'Medium',
     status_tiket                VARCHAR(50)     NOT NULL DEFAULT 'Open',
     queue_id                    INTEGER,
     assigned_to_user_id         INTEGER,
@@ -284,7 +283,7 @@ CREATE TABLE tickets (
 
     -- Constraints for status & priority
     CONSTRAINT chk_tickets_prioritas
-        CHECK (prioritas IN ('Urgent (4h)', 'High (1day)', 'Medium (3d)', 'Low (7d)')),
+        CHECK (prioritas IN ('Low', 'Medium', 'High', 'Critical')),
     
     CONSTRAINT chk_tickets_status
         CHECK (status_tiket IN ('Open', 'In Progress', 'Pending', 'Resolved', 'Closed', 'Cancelled')),

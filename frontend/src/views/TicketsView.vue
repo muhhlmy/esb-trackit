@@ -8,6 +8,7 @@ import { validateAttachmentFile } from '../utils/attachmentPolicy.js'
 import AppModal from '../components/ui/AppModal.vue'
 import AppRowActions from '../components/ui/AppRowActions.vue'
 import AppPagination from '../components/ui/AppPagination.vue'
+import SearchableSelect from '../components/ui/SearchableSelect.vue'
 import TicketCaspRating from '../components/tickets/TicketCaspRating.vue'
 import { animateStagger } from '../composables/useGsap.js'
 import BaseSkeleton from '../components/ui/skeleton/BaseSkeleton.vue'
@@ -102,6 +103,7 @@ const handleCommentCreated = (data) => {
 
 // Debounced stats refresh untuk menghindari burst request saat banyak event
 let statsRefreshTimer = null
+let searchDebounceTimer = null
 function scheduleStatsRefresh() {
   if (statsRefreshTimer) clearTimeout(statsRefreshTimer)
   statsRefreshTimer = setTimeout(async () => {
@@ -127,6 +129,11 @@ onMounted(async () => {
   await fetchQueues()
   await fetchTickets()
 
+  // Muat daftar user untuk dropdown "Pelapor" (hanya dipakai admin/superadmin)
+  if (isAdmin.value || isSuperAdmin.value) {
+    fetchReporters()
+  }
+
   // Subscribe ke SSE events (koneksi global dikelola di App.vue)
   unsubTicketCreated = onTicketEvent('TICKET_CREATED', handleTicketCreated)
   unsubTicketUpdated = onTicketEvent('TICKET_UPDATED', handleTicketUpdated)
@@ -140,6 +147,7 @@ let unsubCommentCreated = null
 onUnmounted(() => {
   if (tickerInterval) clearInterval(tickerInterval)
   if (statsRefreshTimer) clearTimeout(statsRefreshTimer)
+  if (searchDebounceTimer) clearTimeout(searchDebounceTimer)
   stopChatPoll()
   unsubTicketCreated?.()
   unsubTicketUpdated?.()
@@ -148,6 +156,7 @@ onUnmounted(() => {
 
 // ── Queue / Tab state ─────────────────────────────────────────
 const queues = ref([]) // list queue (HR, IT, GA, OPS)
+const reporters = ref([]) // list user untuk dropdown pelapor (admin)
 const activeTab = ref('all') // 'all' | 'unassigned' | 'mine'
 const filterQueue = ref('') // queue_id filter
 
@@ -159,6 +168,7 @@ const stats = ref({
   openTickets: 0,
   closedTickets: 0,
   unassignedTickets: 0,
+  assignedTickets: 0,
 })
 const isLoading = ref(true)
 const isSubmitting = ref(false)
@@ -166,6 +176,7 @@ const searchQuery = ref('')
 const filterStatus = ref('')
 const filterPrioritas = ref('')
 const filterKategori = ref('')
+const sortOrder = ref('terbaru') // 'terbaru' | 'terlama'
 const pageError = ref('')
 const notification = ref(null)
 const isClaiming = ref(null) // ticket id yang sedang di-claim
@@ -205,6 +216,7 @@ const ticketComments = ref([])
 const isCommentsLoading = ref(false)
 const newCommentText = ref('')
 const commentAttachment = ref(null)
+const commentAttachmentName = ref(null)
 const isSubmittingComment = ref(false)
 const isTicketAttachmentLoading = ref(false)
 const ticketAttachmentError = ref('')
@@ -216,10 +228,11 @@ const emptyForm = () => ({
   deskripsi: '',
   kategori: 'Support',
   queue_id: queues.value[0]?.id || '',
-  prioritas: 'Medium (3d)',
+  prioritas: 'Medium',
   status_tiket: 'Open',
   assigned_to_user_id: null,
-  attachment: null,
+  pelapor_user_id: null,
+  attachments: [],
 })
 
 const form = ref(emptyForm())
@@ -367,27 +380,73 @@ watch(
 )
 
 function handleFileChange(event) {
-  const file = event.target.files?.[0]
-  if (!file) return
+  const files = Array.from(event.target.files || [])
+  if (!files.length) return
 
-  const validationError = validateAttachmentFile(file)
-  if (validationError) {
-    modalError.value = validationError
-    return
+  for (const file of files) {
+    const validationError = validateAttachmentFile(file)
+    if (validationError) {
+      modalError.value = validationError
+      continue
+    }
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      form.value.attachments.push({ name: file.name, data: e.target.result })
+      attachmentChanged.value = true
+    }
+    reader.readAsDataURL(file)
   }
 
   modalError.value = ''
-  const reader = new FileReader()
-  reader.onload = (e) => {
-    form.value.attachment = e.target.result
-    attachmentChanged.value = true
-  }
-  reader.readAsDataURL(file)
+  // Reset input value so selecting the same file again re-triggers change.
+  event.target.value = ''
 }
 
-function removeAttachment() {
-  form.value.attachment = null
+function removeAttachment(index) {
+  form.value.attachments.splice(index, 1)
   attachmentChanged.value = true
+}
+
+function getAttachmentIcon(dataUrl) {
+  if (!dataUrl || typeof dataUrl !== 'string') return 'attach_file'
+  const lower = dataUrl.toLowerCase()
+  if (lower.includes('pdf')) return 'picture_as_pdf'
+  if (
+    lower.includes('presentation') ||
+    lower.includes('powerpoint') ||
+    lower.includes('mspowerpoint')
+  ) {
+    return 'slideshow'
+  }
+  if (lower.includes('word') || lower.includes('msword') || lower.includes('docx')) return 'description'
+  if (lower.includes('excel') || lower.includes('sheet') || lower.includes('csv')) return 'table_chart'
+  if (lower.includes('zip') || lower.includes('rar') || lower.includes('compressed')) return 'folder_zip'
+  if (lower.includes('image')) return 'image'
+  return 'attach_file'
+}
+
+function downloadAttachment(dataUrl, defaultFilename = 'lampiran-tiket') {
+  if (!dataUrl || typeof dataUrl !== 'string') return
+  let filename = defaultFilename
+  if (dataUrl.startsWith('data:')) {
+    const mimeHeader = dataUrl.split(';')[0] || ''
+    const mime = (mimeHeader.split(':')[1] || '').toLowerCase()
+    if (mime.includes('pdf') && !filename.endsWith('.pdf')) filename += '.pdf'
+    else if (mime.includes('word') && !filename.endsWith('.docx')) filename += '.docx'
+    else if (mime.includes('excel') && !filename.endsWith('.xlsx')) filename += '.xlsx'
+    else if (mime.includes('csv') && !filename.endsWith('.csv')) filename += '.csv'
+    else if (mime.includes('zip') && !filename.endsWith('.zip')) filename += '.zip'
+    else if (mime.includes('png') && !filename.endsWith('.png')) filename += '.png'
+    else if (mime.includes('jpeg') && !filename.endsWith('.jpg')) filename += '.jpg'
+    else if (mime.includes('gif') && !filename.endsWith('.gif')) filename += '.gif'
+    else if (mime.includes('webp') && !filename.endsWith('.webp')) filename += '.webp'
+  }
+  const link = document.createElement('a')
+  link.href = dataUrl
+  link.download = filename
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
 }
 
 function handleCommentFileChange(event) {
@@ -402,12 +461,14 @@ function handleCommentFileChange(event) {
   const reader = new FileReader()
   reader.onload = (e) => {
     commentAttachment.value = e.target.result
+    commentAttachmentName.value = file.name
   }
   reader.readAsDataURL(file)
 }
 
 function removeCommentAttachment() {
   commentAttachment.value = null
+  commentAttachmentName.value = null
 }
 
 
@@ -440,6 +501,25 @@ const itemsPerPage = ref(10)
 
 watch([searchQuery, filterStatus, filterPrioritas, filterQueue, filterKategori, activeTab], () => {
   currentPage.value = 1
+})
+
+// Live search dengan debounce: fetch ulang ke server setiap kali keyword
+// berubah (termasuk saat dihapus), tanpa perlu menekan Enter.
+// Saat keyword dikosongkan, langsung fetch tanpa debounce agar list penuh
+// segera muncul (tidak sempat tampil "kosong").
+watch(searchQuery, (value) => {
+  if (searchDebounceTimer) clearTimeout(searchDebounceTimer)
+
+  if (!value.trim()) {
+    searchDebounceTimer = null
+    fetchTickets(true)
+    return
+  }
+
+  searchDebounceTimer = setTimeout(() => {
+    searchDebounceTimer = null
+    fetchTickets(true)
+  }, 300)
 })
 
 watch(
@@ -499,6 +579,17 @@ async function fetchQueues() {
   }
 }
 
+async function fetchReporters() {
+  try {
+    const data = await get('/api/tickets/reporters')
+    const rows = Array.isArray(data?.reporters) ? data.reporters : []
+    reporters.value = rows.map((u) => ({ id: Number(u.id), nama: u.nama }))
+  } catch (err) {
+    reporters.value = []
+    void err
+  }
+}
+
 async function fetchTickets(silent = false) {
   if (!silent) isLoading.value = true
   pageError.value = ''
@@ -509,6 +600,7 @@ async function fetchTickets(silent = false) {
     if (filterStatus.value) params.set('status', filterStatus.value)
     if (filterPrioritas.value) params.set('prioritas', filterPrioritas.value)
     if (searchQuery.value.trim()) params.set('search', searchQuery.value.trim())
+    if (sortOrder.value && sortOrder.value !== 'terbaru') params.set('sort', sortOrder.value)
 
     const qs = params.toString()
     const [data, statsData] = await Promise.all([
@@ -522,6 +614,7 @@ async function fetchTickets(silent = false) {
       openTickets: 0,
       closedTickets: 0,
       unassignedTickets: 0,
+      assignedTickets: 0,
     }
   } catch (err) {
     if (!silent) {
@@ -603,6 +696,7 @@ async function loadCommentAttachment(comment) {
     const currentComment = ticketComments.value.find((item) => item.id === comment.id)
     if (currentComment && typeof result?.attachment === 'string') {
       currentComment.attachment = result.attachment
+      currentComment.attachment_name = result.name || null
     }
   } catch (err) {
     if (selectedTicket.value?.id !== ticketId) return
@@ -622,6 +716,12 @@ function scrollChatToBottom() {
   if (el) el.scrollTop = el.scrollHeight
 }
 
+async function openCommentsTab() {
+  activeDetailTab.value = 'comments'
+  await nextTick()
+  scrollChatToBottom()
+}
+
 // Realtime chat comments are delivered via SSE (COMMENT_CREATED events)
 function startChatPoll(_ticketId) {
   // Realtime updates handled via SSE
@@ -637,11 +737,13 @@ async function sendComment() {
   isSubmittingComment.value = true
   try {
     await post(`/api/tickets/${selectedTicket.value.id}/comments`, {
-      pesan: newCommentText.value.trim() || 'Melampirkan gambar',
+      pesan: newCommentText.value.trim() || 'Melampirkan file',
       attachment: commentAttachment.value,
+      attachment_name: commentAttachmentName.value,
     })
     newCommentText.value = ''
     commentAttachment.value = null
+    commentAttachmentName.value = null
     await fetchTicketComments(selectedTicket.value.id)
     await nextTick()
     scrollChatToBottom()
@@ -688,6 +790,42 @@ async function claimTicket(ticket) {
   }
 }
 
+async function assignTicket(ticket, targetUserId) {
+  if (!ticket || !targetUserId) return
+  showReassignDropdown.value = false
+  isReassigning.value = true
+  const idx = tickets.value.findIndex((t) => t.id === ticket.id)
+  const oldTicket = idx >= 0 ? { ...tickets.value[idx] } : null
+  try {
+    await post(`/api/tickets/${ticket.id}/reassign`, { target_user_id: targetUserId })
+    toast(`Tiket '${ticket.judul}' berhasil dialihkan.`)
+    // Optimistic: update assignee di list & detail
+    if (idx >= 0) {
+      tickets.value[idx] = {
+        ...tickets.value[idx],
+        assigned_to_user_id: targetUserId,
+        assigned_to: null,
+        assigned_to_nama: getAdminsForQueue(ticket.queue_id).find((a) => a.id === targetUserId)?.nama || '',
+      }
+    }
+    if (selectedTicket.value?.id === ticket.id) {
+      selectedTicket.value = {
+        ...selectedTicket.value,
+        assigned_to_user_id: targetUserId,
+        assigned_to_nama:
+          getAdminsForQueue(ticket.queue_id).find((a) => a.id === targetUserId)?.nama || '',
+      }
+    }
+    await fetchTickets(true)
+    scheduleStatsRefresh()
+  } catch (err) {
+    if (idx >= 0 && oldTicket) tickets.value[idx] = oldTicket
+    toast(err.message || 'Gagal mengalihkan tiket.', 'error')
+  } finally {
+    isReassigning.value = false
+  }
+}
+
 function openAdd() {
   modalMode.value = 'add'
   selectedTicket.value = null
@@ -702,16 +840,16 @@ function openAdd() {
 
 function openEdit(ticket) {
   modalMode.value = 'edit'
-  selectedTicket.value = { ...ticket, attachment: null }
+  selectedTicket.value = { ...ticket, attachments: null }
   form.value = {
     judul: ticket.judul || '',
     deskripsi: ticket.deskripsi || '',
     kategori: ticket.kategori || 'Support',
     queue_id: ticket.queue_id || '',
-    prioritas: ticket.prioritas || 'Medium (3d)',
+    prioritas: ticket.prioritas || 'Medium',
     status_tiket: ticket.status_tiket || 'Open',
     assigned_to_user_id: ticket.assigned_to_user_id || null,
-    attachment: null,
+    attachments: [],
   }
   const queueCode = (ticket.queue_kode || '').toUpperCase()
   const queueName = (ticket.queue_nama || '').toUpperCase()
@@ -731,7 +869,7 @@ function openEdit(ticket) {
 }
 
 function openDetail(ticket) {
-  selectedTicket.value = { ...ticket, attachment: null }
+  selectedTicket.value = { ...ticket, attachments: null }
   activeDetailTab.value = 'detail'
   ticketAttachmentError.value = ''
   showDetailModal.value = true
@@ -750,15 +888,22 @@ async function loadSelectedTicketAttachment(ticketId, target) {
     if (
       requestVersion !== ticketAttachmentRequestVersion ||
       selectedTicket.value?.id !== ticketId ||
-      typeof result?.attachment !== 'string'
+      !Array.isArray(result?.attachments)
     ) {
       return
     }
 
     if (target === 'edit') {
-      if (!attachmentChanged.value) form.value.attachment = result.attachment
+      // Preload existing attachments into the form list unless the user has
+      // already modified them.
+      if (!attachmentChanged.value) {
+        form.value.attachments = result.attachments.map((a) => ({
+          name: a.name || null,
+          data: a.attachment,
+        }))
+      }
     } else {
-      selectedTicket.value = { ...selectedTicket.value, attachment: result.attachment }
+      selectedTicket.value = { ...selectedTicket.value, attachments: result.attachments }
     }
   } catch (err) {
     if (
@@ -782,9 +927,15 @@ function openDelete(ticket) {
 
 const isUpdatingStatus = ref(false)
 const showStatusDropdown = ref(false)
+const showReassignDropdown = ref(false)
+const isReassigning = ref(false)
 
 function toggleStatusDropdown() {
   showStatusDropdown.value = !showStatusDropdown.value
+}
+
+function toggleReassignDropdown() {
+  showReassignDropdown.value = !showReassignDropdown.value
 }
 
 function selectStatus(ticket, status) {
@@ -794,6 +945,7 @@ function selectStatus(ticket, status) {
 
 function closeModal() {
   showStatusDropdown.value = false
+  showReassignDropdown.value = false
   ticketAttachmentRequestVersion += 1
   isTicketAttachmentLoading.value = false
   ticketAttachmentError.value = ''
@@ -879,13 +1031,17 @@ async function saveTicket() {
     }
 
     if (modalMode.value === 'add') {
-      payload.attachment = form.value.attachment || null
+      payload.attachments = form.value.attachments || []
+      if (isAdmin.value || isSuperAdmin.value) {
+        const reporterId = form.value.pelapor_user_id
+        payload.pelapor_user_id = reporterId === '' || reporterId == null ? null : Number(reporterId)
+      }
       await post('/api/tickets', payload)
       toast('Tiket baru berhasil dibuat.')
       // Refetch untuk mendapatkan tiket baru dengan nomor_tiket final
       await fetchTickets()
     } else {
-      if (attachmentChanged.value) payload.attachment = form.value.attachment || null
+      if (attachmentChanged.value) payload.attachments = form.value.attachments || []
       // Optimistic update untuk edit mode
       const ticketId = selectedTicket.value.id
       const idx = tickets.value.findIndex((t) => t.id === ticketId)
@@ -939,7 +1095,7 @@ async function confirmDeleteTicket() {
 
 function getSlaHours(prioritas) {
   const p = (prioritas || '').toLowerCase()
-  if (p.includes('urgent') || p.includes('4h')) return 4
+  if (p.includes('critical') || p.includes('urgent') || p.includes('4h')) return 4
   if (p.includes('high') || p.includes('1day')) return 24
   if (p.includes('medium') || p.includes('3d')) return 72
   if (p.includes('low') || p.includes('7d')) return 168
@@ -1054,7 +1210,7 @@ function getStatusDotInfo(status) {
 
 function getPriorityInfo(prioritas) {
   const p = (prioritas || '').toLowerCase()
-  if (p.includes('urgent') || p.includes('4h')) {
+  if (p.includes('critical') || p.includes('urgent') || p.includes('4h')) {
     return { label: 'Critical', class: 'text-rose-600 font-bold bg-rose-50 border-rose-200' }
   }
   if (p.includes('high') || p.includes('1day')) {
@@ -1191,7 +1347,7 @@ function toast(message, type = 'success') {
               : [
                   { key: 'all', label: 'Inbox', count: stats.totalTickets },
                   { key: 'unassigned', label: 'Belum Diambil', count: stats.unassignedTickets },
-                  { key: 'assigned', label: 'Ditangani Saya', count: stats.openTickets },
+                  { key: 'assigned', label: 'Ditangani Saya', count: stats.assignedTickets },
                   { key: 'closed', label: 'Selesai', count: stats.closedTickets },
                 ]"
             :key="tab.key"
@@ -1258,7 +1414,6 @@ function toast(message, type = 'success') {
             type="search"
             placeholder="Cari ticket, judul, nomor, pelapor..."
             class="h-9 w-full rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] pl-9 pr-3 text-xs font-medium text-[#0F172A] placeholder-[#94A3B8] focus:border-[#2563EB] focus:bg-white focus:outline-none transition-all"
-            @keyup.enter="fetchTickets"
           />
         </div>
 
@@ -1283,10 +1438,10 @@ function toast(message, type = 'success') {
             class="h-9 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-semibold text-[#334155] focus:border-[#2563EB] focus:outline-none cursor-pointer"
           >
             <option value="">Priority: Semua</option>
-            <option value="Urgent (4h)">Critical</option>
-            <option value="High (1day)">High</option>
-            <option value="Medium (3d)">Medium</option>
-            <option value="Low (7d)">Low</option>
+            <option value="Critical">Critical</option>
+            <option value="High">High</option>
+            <option value="Medium">Medium</option>
+            <option value="Low">Low</option>
           </select>
 
           <select
@@ -1310,6 +1465,16 @@ function toast(message, type = 'success') {
             <option value="Support">Support</option>
             <option value="Incident">Incident</option>
             <option value="QNA">QNA</option>
+          </select>
+
+          <select
+            v-model="sortOrder"
+            aria-label="Urutkan tiket"
+            @change="fetchTickets"
+            class="h-9 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-semibold text-[#334155] focus:border-[#2563EB] focus:outline-none cursor-pointer"
+          >
+            <option value="terbaru">Terbaru</option>
+            <option value="terlama">Terlama</option>
           </select>
         </div>
       </div>
@@ -1582,7 +1747,7 @@ function toast(message, type = 'success') {
       />
     </div>
 
-    <!-- ── Create / Edit Ticket Modal ─────────────────────── -->
+    <!-- ── Create / Edit Ticket Modal (Unified Single Page Form) ─────── -->
     <AppModal
       :is-open="showFormModal"
       :title="
@@ -1595,151 +1760,80 @@ function toast(message, type = 'success') {
       :subtitle="
         modalMode === 'add'
           ? isAdmin || isSuperAdmin
-            ? 'Buat dan kelola tiket penanganan masalah IT'
-            : 'Ajukan permintaan bantuan IT kepada tim support'
+            ? 'Isi rincian kendala, unit support, dan lampiran di bawah ini'
+            : 'Isi pengajuan permintaan bantuan IT kepada tim support'
           : 'Perbarui rincian kendala atau status tiket'
       "
       icon="confirmation_number"
       size="lg"
       @close="closeModal"
     >
-      <!-- Step Indicator Navigation Header -->
-      <div class="mb-5 border-b border-[#E5EAEF] pb-4">
-        <div class="flex items-center justify-between max-w-md mx-auto">
-          <!-- Step 1 -->
-          <button
-            type="button"
-            @click="activeFormTab = 'kendala'"
-            class="flex items-center gap-1.5 transition-colors cursor-pointer select-none"
-            :class="
-              activeFormTab === 'kendala' ? 'text-[#5D87FF]' : 'text-[#7C8BAC] hover:text-[#2A3547]'
-            "
-          >
-            <span
-              class="flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-extrabold"
-              :class="
-                activeFormTab === 'kendala'
-                  ? 'bg-[#5D87FF] text-white'
-                  : 'bg-[#E5EAEF] text-[#7C8BAC]'
-              "
-            >
-              1
-            </span>
-            <span>Kendala</span>
-          </button>
-
-          <div class="flex-1 h-px bg-[#E5EAEF] mx-3"></div>
-
-          <!-- Step 2 -->
-          <button
-            type="button"
-            @click="activeFormTab = 'penanganan'"
-            class="flex items-center gap-1.5 transition-colors cursor-pointer select-none"
-            :class="
-              activeFormTab === 'penanganan'
-                ? 'text-[#5D87FF]'
-                : 'text-[#7C8BAC] hover:text-[#2A3547]'
-            "
-          >
-            <span
-              class="flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-extrabold"
-              :class="
-                activeFormTab === 'penanganan'
-                  ? 'bg-[#5D87FF] text-white'
-                  : 'bg-[#E5EAEF] text-[#7C8BAC]'
-              "
-            >
-              2
-            </span>
-            <span>Penanganan</span>
-          </button>
-
-          <div class="flex-1 h-px bg-[#E5EAEF] mx-3"></div>
-
-          <!-- Step 3 -->
-          <button
-            type="button"
-            @click="activeFormTab = 'lampiran'"
-            class="flex items-center gap-1.5 transition-colors cursor-pointer select-none"
-            :class="
-              activeFormTab === 'lampiran' ? 'text-[#5D87FF]' : 'text-[#7C8BAC] hover:text-[#2A3547]'
-            "
-          >
-            <span
-              class="flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-extrabold"
-              :class="
-                activeFormTab === 'lampiran'
-                  ? 'bg-[#5D87FF] text-white'
-                  : 'bg-[#E5EAEF] text-[#7C8BAC]'
-              "
-            >
-              3
-            </span>
-            <span>Lampiran</span>
-          </button>
-        </div>
-      </div>
-
-      <form class="flex flex-col" @submit.prevent="saveTicket">
+      <form class="flex flex-col space-y-5" @submit.prevent="saveTicket">
         <!-- Error Banner -->
         <div
           v-if="modalError"
           role="alert"
-          class="mb-3.5 rounded-lg bg-rose-50 border border-rose-200 px-3.5 py-2 text-[11.5px] font-semibold text-rose-600 shadow-2xs flex items-center gap-2"
+          class="rounded-lg bg-rose-50 border border-rose-200 px-3.5 py-2 text-[11.5px] font-semibold text-rose-600 shadow-2xs flex items-center gap-2"
         >
           <span class="material-symbols-outlined text-[16px] shrink-0">error</span>
           <span>{{ modalError }}</span>
         </div>
 
-        <!-- STEP 1: INFORMASI KENDALA -->
-        <div v-show="activeFormTab === 'kendala'" class="space-y-3.5">
-          <div class="flex items-center gap-2 border-b border-[#F1F5F9] pb-1.5">
-            <span class="text-[10px] font-extrabold uppercase tracking-wider text-[#7C8BAC]"
-              >Informasi Kendala</span
+        <!-- All inputs in a single flat list (no per-category grouping) -->
+        <div class="space-y-4">
+          <!-- Pelapor (hanya untuk admin/superadmin saat buat tiket baru) -->
+          <label
+            v-if="modalMode === 'add' && (isAdmin || isSuperAdmin)"
+            class="flex flex-col gap-1.5"
+          >
+            <span class="text-[12px] font-semibold text-[#2A3547]">Pelapor</span>
+            <SearchableSelect
+              v-model="form.pelapor_user_id"
+              :options="reporters"
+              value-key="id"
+              label-key="nama"
+              placeholder="Diri sendiri (Kosongkan)"
+              search-placeholder="Cari nama user..."
+              clearable
+              aria-label="Pilih pelapor tiket"
+              class="w-full"
+            />
+            <span class="text-[10.5px] text-[#7C8BAC]"
+              >Kosongkan untuk membuat tiket atas nama sendiri ({{ user?.nama || 'Anda' }}), atau pilih user lain.</span
             >
-          </div>
+          </label>
 
-          <fieldset class="space-y-3">
-            <!-- Judul Kendala -->
-            <label class="flex flex-col gap-1.5">
-              <span class="text-[12px] font-semibold text-[#2A3547]"
-                >Judul Kendala <span class="text-[#FA896B]">*</span></span
-              >
-              <input
-                v-model="form.judul"
-                type="text"
-                required
-                maxlength="150"
-                placeholder="Contoh: Laptop tidak dapat terhubung ke Wi-Fi"
-                class="h-10 w-full rounded-lg border border-[#E5EAEF] bg-white px-3 text-[12px] font-medium text-[#2A3547] placeholder-[#94A3B8] focus:border-[#5D87FF] focus:outline-none transition-all shadow-2xs"
-              />
-            </label>
+          <!-- Judul Kendala -->
+          <label class="flex flex-col gap-1.5">
+            <span class="text-[12px] font-semibold text-[#2A3547]"
+              >Judul Kendala <span class="text-[#FA896B]">*</span></span
+            >
+            <input
+              v-model="form.judul"
+              type="text"
+              required
+              maxlength="150"
+              placeholder="Contoh: Laptop tidak dapat terhubung ke Wi-Fi"
+              class="h-10 w-full rounded-lg border border-[#E5EAEF] bg-white px-3 text-[12px] font-medium text-[#2A3547] placeholder-[#94A3B8] focus:border-[#5D87FF] focus:outline-none transition-all shadow-2xs"
+            />
+          </label>
 
-            <!-- Deskripsi -->
-            <label class="flex flex-col gap-1.5">
-              <span class="text-[12px] font-semibold text-[#2A3547]">Deskripsi Kendala</span>
-              <textarea
-                v-model="form.deskripsi"
-                rows="3"
-                placeholder="Jelaskan kendala secara singkat dan detail agar tim dapat membantu..."
-                class="min-h-[80px] max-h-[140px] w-full rounded-lg border border-[#E5EAEF] bg-white p-2.5 text-[12px] font-medium text-[#2A3547] placeholder-[#94A3B8] focus:border-[#5D87FF] focus:outline-none transition-all resize-y shadow-2xs"
-              ></textarea>
-              <span class="text-[10.5px] font-normal text-[#7C8BAC]">
-                Sertakan pesan error, kondisi perangkat, atau langkah yang sudah dicoba.
-              </span>
-            </label>
-          </fieldset>
-        </div>
+          <!-- Deskripsi -->
+          <label class="flex flex-col gap-1.5">
+            <span class="text-[12px] font-semibold text-[#2A3547]">Deskripsi Kendala</span>
+            <textarea
+              v-model="form.deskripsi"
+              rows="3"
+              placeholder="Jelaskan kendala secara singkat dan detail agar tim dapat membantu..."
+              class="min-h-[80px] max-h-[140px] w-full rounded-lg border border-[#E5EAEF] bg-white p-2.5 text-[12px] font-medium text-[#2A3547] placeholder-[#94A3B8] focus:border-[#5D87FF] focus:outline-none transition-all resize-y shadow-2xs"
+            ></textarea>
+          </label>
 
-        <!-- STEP 2: PENANGANAN & KATEGORI -->
-        <div v-show="activeFormTab === 'penanganan'" class="space-y-4">
-          <!-- 1. Support Unit Target (IT Support / HR Support) -->
-          <div class="space-y-2">
-            <div class="flex items-center gap-2 border-b border-[#F1F5F9] pb-1.5">
-              <span class="text-[10px] font-extrabold uppercase tracking-wider text-[#7C8BAC]"
-                >1. Pilih Unit Support Target <span class="text-[#FA896B]">*</span></span
-              >
-            </div>
+          <!-- Unit Support Target -->
+          <div class="flex flex-col gap-1.5">
+            <span class="text-[12px] font-semibold text-[#2A3547]"
+              >Unit Support Target <span class="text-[#FA896B]">*</span></span
+            >
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <button
                 type="button"
@@ -1809,13 +1903,11 @@ function toast(message, type = 'success') {
             </div>
           </div>
 
-          <!-- 2. Kategori Tiket (IT: Request / Support / Incident; HR: Request / Support / QNA) -->
-          <div class="space-y-2">
-            <div class="flex items-center gap-2 border-b border-[#F1F5F9] pb-1.5">
-              <span class="text-[10px] font-extrabold uppercase tracking-wider text-[#7C8BAC]"
-                >2. Pilih Kategori Tiket {{ selectedSupportUnit }} <span class="text-[#FA896B]">*</span></span
-              >
-            </div>
+          <!-- Kategori Tiket -->
+          <div class="flex flex-col gap-1.5">
+            <span class="text-[12px] font-semibold text-[#2A3547]"
+              >Kategori Tiket {{ selectedSupportUnit }} <span class="text-[#FA896B]">*</span></span
+            >
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
               <button
                 v-for="cat in availableCategories"
@@ -1842,9 +1934,9 @@ function toast(message, type = 'success') {
             </div>
           </div>
 
-          <!-- Prioritas & Status -->
-          <fieldset
-            class="grid gap-3 pt-1"
+          <!-- Prioritas SLA & Status -->
+          <div
+            class="grid gap-3"
             :class="modalMode === 'edit' ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1'"
           >
             <!-- Prioritas SLA -->
@@ -1854,10 +1946,10 @@ function toast(message, type = 'success') {
                 v-model="form.prioritas"
                 class="h-10 w-full rounded-lg border border-[#E5EAEF] bg-white px-3 text-[12px] font-medium text-[#2A3547] focus:border-[#5D87FF] focus:outline-none transition-all appearance-none cursor-pointer shadow-2xs"
               >
-                <option value="Low (7d)">Low · Target 7 hari</option>
-                <option value="Medium (3d)">Medium · Target 3 hari</option>
-                <option value="High (1day)">High · Target 1 hari</option>
-                <option value="Urgent (4h)">Critical · Target 4 jam</option>
+                <option value="Low">Low</option>
+                <option value="Medium">Medium</option>
+                <option value="High">High</option>
+                <option value="Critical">Critical</option>
               </select>
             </label>
 
@@ -1875,18 +1967,11 @@ function toast(message, type = 'success') {
                 <option value="Closed">Closed</option>
               </select>
             </label>
-          </fieldset>
-        </div>
-
-        <!-- STEP 3: LAMPIRAN -->
-        <div v-show="activeFormTab === 'lampiran'" class="space-y-3.5">
-          <div class="flex items-center gap-2 border-b border-[#F1F5F9] pb-1.5">
-            <span class="text-[10px] font-extrabold uppercase tracking-wider text-[#7C8BAC]"
-              >Lampiran Bukti Kendala (Opsional)</span
-            >
           </div>
 
-          <div class="space-y-3">
+          <!-- Lampiran -->
+          <div class="flex flex-col gap-1.5">
+            <span class="text-[12px] font-semibold text-[#2A3547]">Lampiran (Opsional)</span>
             <div class="flex items-center gap-3 flex-wrap">
               <label
                 class="inline-flex h-10 items-center gap-2 rounded-lg border border-[#E5EAEF] bg-white px-3.5 text-[12px] font-bold text-[#2A3547] hover:bg-[#F8FAFC] hover:border-[#5D87FF] transition-all cursor-pointer select-none shadow-2xs"
@@ -1897,12 +1982,15 @@ function toast(message, type = 'success') {
                 <span>Pilih File Lampiran</span>
                 <input
                   type="file"
-                  accept="image/png,image/jpeg,image/gif,image/webp"
+                  multiple
+                  accept="image/png,image/jpeg,image/gif,image/webp,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation"
                   class="hidden"
                   @change="handleFileChange"
                 />
               </label>
-              <span class="text-[11px] font-normal text-[#7C8BAC]">PNG, JPG hingga 5 MB</span>
+              <span class="text-[11px] font-normal text-[#7C8BAC]"
+                >PNG, JPG, GIF, WEBP, PDF, Word, Excel, PowerPoint hingga 5 MB per file</span
+              >
               <span
                 v-if="isTicketAttachmentLoading"
                 class="text-[11px] font-medium text-[#5D87FF] flex items-center gap-1"
@@ -1918,37 +2006,36 @@ function toast(message, type = 'success') {
               {{ ticketAttachmentError }}
             </p>
 
-            <!-- Attachment Item Card / Preview -->
-            <div
-              v-if="form.attachment"
-              class="relative mt-2 flex items-center justify-between gap-3 rounded-lg border border-[#E5EAEF] bg-[#F8FAFC] p-3 max-w-md"
-            >
-              <div class="flex items-center gap-3 min-w-0">
-                <div
-                  class="h-12 w-12 shrink-0 overflow-hidden rounded-lg border border-[#E5EAEF] bg-white"
-                >
-                  <img
-                    :src="form.attachment"
-                    alt="Preview Attachment"
-                    class="h-full w-full object-cover"
-                  />
-                </div>
-                <div class="min-w-0">
-                  <p class="text-[12px] font-bold text-[#2A3547] truncate">Gambar kendala terlampir</p>
-                  <p class="text-[10.5px] text-[#7C8BAC] truncate mt-0.5">
-                    Siap diunggah bersama tiket
-                  </p>
-                </div>
-              </div>
-              <button
-                type="button"
-                @click="removeAttachment"
-                class="flex h-7 w-7 items-center justify-center rounded-lg text-[#7C8BAC] hover:bg-rose-50 hover:text-rose-600 transition-colors shrink-0 cursor-pointer"
-                title="Hapus Lampiran"
+            <!-- Attachment List -->
+            <ul v-if="form.attachments.length" class="space-y-2">
+              <li
+                v-for="(att, i) in form.attachments"
+                :key="i"
+                class="relative mt-2 flex items-center justify-between gap-3 rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] p-3"
               >
-                <span class="material-symbols-outlined text-[18px]">close</span>
-              </button>
-            </div>
+                <div class="flex items-center gap-3 min-w-0">
+                  <div
+                    class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#ECF2FF] text-[#2563EB]"
+                  >
+                    <span class="material-symbols-outlined text-[20px]">{{ getAttachmentIcon(att.data) }}</span>
+                  </div>
+                  <div class="min-w-0">
+                    <p class="text-[12px] font-bold text-[#2A3547] truncate">{{ att.name || 'Lampiran' }}</p>
+                    <p class="text-[10.5px] text-[#7C8BAC] truncate mt-0.5">
+                      Siap diunggah bersama tiket
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  @click="removeAttachment(i)"
+                  class="flex h-7 w-7 items-center justify-center rounded-lg text-[#7C8BAC] hover:bg-rose-50 hover:text-rose-600 transition-colors shrink-0 cursor-pointer"
+                  title="Hapus Lampiran"
+                >
+                  <span class="material-symbols-outlined text-[18px]">close</span>
+                </button>
+              </li>
+            </ul>
           </div>
         </div>
 
@@ -1963,49 +2050,22 @@ function toast(message, type = 'success') {
             Batal
           </button>
 
-          <div class="flex items-center gap-2">
-            <button
-              v-if="activeFormTab !== 'kendala'"
-              type="button"
-              @click="activeFormTab = activeFormTab === 'lampiran' ? 'penanganan' : 'kendala'"
-              class="h-9 rounded-lg border border-[#E5EAEF] bg-white px-3.5 text-[12px] font-bold text-[#2A3547] hover:bg-[#F8FAFC] transition-all flex items-center gap-1 cursor-pointer"
-            >
-              <span class="material-symbols-outlined text-[15px]">arrow_back</span>
-              <span>Kembali</span>
-            </button>
-
-            <button
-              v-if="activeFormTab !== 'lampiran'"
-              type="button"
-              @click="nextTicketStep"
-              :disabled="isSubmitting || hasTicketValidationErrors"
-              class="h-9 rounded-lg bg-[#5D87FF] px-4 text-[12px] font-bold text-white shadow-sm hover:bg-[#4570EA] disabled:opacity-50 transition-all flex items-center gap-1 cursor-pointer"
-            >
-              <span>Lanjutkan</span>
-              <span class="material-symbols-outlined text-[15px]">arrow_forward</span>
-            </button>
-
-            <button
-              v-else
-              type="submit"
-              :disabled="isSubmitting || hasTicketValidationErrors"
-              class="h-9 rounded-lg bg-[#5D87FF] px-4 text-[12px] font-bold text-white shadow-sm hover:bg-[#4570EA] disabled:opacity-50 transition-all flex items-center gap-1.5 cursor-pointer"
-            >
-              <span
-                v-if="isSubmitting"
-                class="animate-spin h-3.5 w-3.5 border-2 border-white border-t-transparent rounded-full"
-              ></span>
-              <span>{{
-                isSubmitting
-                  ? 'Menyimpan...'
-                  : modalMode === 'add'
-                    ? isAdmin || isSuperAdmin
-                      ? 'Buat Tiket'
-                      : 'Submit Request'
-                    : 'Simpan Perubahan'
-              }}</span>
-            </button>
-          </div>
+          <button
+            type="submit"
+            :disabled="isSubmitting"
+            class="inline-flex h-9 items-center gap-1.5 rounded-lg bg-[#5D87FF] px-4 text-[12px] font-bold text-white hover:bg-[#4A73E0] transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            <span v-if="isSubmitting" class="material-symbols-outlined text-[14px] animate-spin">progress_activity</span>
+            <span>{{
+              isSubmitting
+                ? 'Menyimpan...'
+                : modalMode === 'add'
+                  ? isAdmin || isSuperAdmin
+                    ? 'Buat Tiket'
+                    : 'Submit Request'
+                  : 'Simpan Perubahan'
+            }}</span>
+          </button>
         </div>
       </form>
     </AppModal>
@@ -2042,36 +2102,37 @@ function toast(message, type = 'success') {
           </div>
         </div>
 
-        <!-- NAVIGATION TABS (Clean Segmented Bar) -->
+        <!-- NAVIGATION TABS (Clean Segmented Bar with Hover Effects) -->
         <div class="flex items-center gap-1 border-b border-[#F1F5F9] pb-3 mb-5">
           <button
             type="button"
             @click="activeDetailTab = 'detail'"
-            class="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all cursor-pointer select-none"
+            class="group flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all duration-200 cursor-pointer select-none"
             :class="
               activeDetailTab === 'detail'
-                ? 'bg-[#F1F5F9] text-[#0F172A]'
-                : 'text-[#64748B] hover:bg-[#F8FAFC] hover:text-[#0F172A]'
+                ? 'bg-[#EFF6FF] text-[#2563EB] shadow-xs ring-1 ring-[#2563EB]/20'
+                : 'text-[#64748B] hover:bg-[#DBEAFE] hover:text-[#1D4ED8] hover:shadow-sm hover:ring-1 hover:ring-[#2563EB]/30 hover:-translate-y-px'
             "
           >
-            <span class="material-symbols-outlined text-[16px] text-[#64748B]">info</span>
+            <span class="material-symbols-outlined text-[16px] transition-colors duration-200" :class="activeDetailTab === 'detail' ? 'text-[#2563EB]' : 'text-[#64748B] group-hover:text-[#1D4ED8]'">info</span>
             <span>Overview</span>
           </button>
 
           <button
             type="button"
             @click="activeDetailTab = 'history'"
-            class="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all cursor-pointer select-none"
+            class="group flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all duration-200 cursor-pointer select-none"
             :class="
               activeDetailTab === 'history'
-                ? 'bg-[#F1F5F9] text-[#0F172A]'
-                : 'text-[#64748B] hover:bg-[#F8FAFC] hover:text-[#0F172A]'
+                ? 'bg-[#EFF6FF] text-[#2563EB] shadow-xs ring-1 ring-[#2563EB]/20'
+                : 'text-[#64748B] hover:bg-[#DBEAFE] hover:text-[#1D4ED8] hover:shadow-sm hover:ring-1 hover:ring-[#2563EB]/30 hover:-translate-y-px'
             "
           >
-            <span class="material-symbols-outlined text-[16px] text-[#64748B]">history</span>
+            <span class="material-symbols-outlined text-[16px] transition-colors duration-200" :class="activeDetailTab === 'history' ? 'text-[#2563EB]' : 'text-[#64748B] group-hover:text-[#1D4ED8]'">history</span>
             <span>Activity</span>
             <span
-              class="ml-0.5 rounded-full bg-[#E2E8F0]/70 px-1.5 py-0.2 text-[10px] font-medium text-[#475569]"
+              class="ml-0.5 rounded-full px-1.5 py-0.2 text-[10px] font-medium"
+              :class="activeDetailTab === 'history' ? 'bg-[#2563EB]/10 text-[#2563EB]' : 'bg-[#E2E8F0]/70 text-[#475569]'"
             >
               {{ ticketHistory.length }}
             </span>
@@ -2079,18 +2140,19 @@ function toast(message, type = 'success') {
 
           <button
             type="button"
-            @click="activeDetailTab = 'comments'"
-            class="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all cursor-pointer select-none"
+            @click="openCommentsTab"
+            class="group flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all duration-200 cursor-pointer select-none"
             :class="
               activeDetailTab === 'comments'
-                ? 'bg-[#F1F5F9] text-[#0F172A]'
-                : 'text-[#64748B] hover:bg-[#F8FAFC] hover:text-[#0F172A]'
+                ? 'bg-[#EFF6FF] text-[#2563EB] shadow-xs ring-1 ring-[#2563EB]/20'
+                : 'text-[#64748B] hover:bg-[#DBEAFE] hover:text-[#1D4ED8] hover:shadow-sm hover:ring-1 hover:ring-[#2563EB]/30 hover:-translate-y-px'
             "
           >
-            <span class="material-symbols-outlined text-[16px] text-[#64748B]">forum</span>
+            <span class="material-symbols-outlined text-[16px] transition-colors duration-200" :class="activeDetailTab === 'comments' ? 'text-[#2563EB]' : 'text-[#64748B] group-hover:text-[#1D4ED8]'">forum</span>
             <span>Discussion</span>
             <span
-              class="ml-0.5 rounded-full bg-[#E2E8F0]/70 px-1.5 py-0.2 text-[10px] font-medium text-[#475569]"
+              class="ml-0.5 rounded-full px-1.5 py-0.2 text-[10px] font-medium"
+              :class="activeDetailTab === 'comments' ? 'bg-[#2563EB]/10 text-[#2563EB]' : 'bg-[#E2E8F0]/70 text-[#475569]'"
             >
               {{ ticketComments.length }}
             </span>
@@ -2189,27 +2251,52 @@ function toast(message, type = 'success') {
               </div>
             </div>
 
-            <!-- Attachment Display -->
+            <!-- Attachment Display (Download-only List) -->
             <div v-if="isTicketAttachmentLoading" class="text-xs text-[#94A3B8] py-2">
               Memuat lampiran tiket...
             </div>
             <div
-              v-else-if="selectedTicket.attachment"
+              v-else-if="selectedTicket.attachments && selectedTicket.attachments.length"
               class="pt-4 border-t border-[#F1F5F9] space-y-2"
             >
               <h3
                 class="text-[11px] font-semibold uppercase tracking-wider text-[#94A3B8] flex items-center gap-1"
               >
                 <span class="material-symbols-outlined text-[15px]">attach_file</span> Lampiran
-                Gambar
+                <span class="text-[#CBD5E1] font-normal">({{ selectedTicket.attachments.length }})</span>
               </h3>
-              <div class="overflow-hidden rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] p-2">
-                <img
-                  :src="selectedTicket.attachment"
-                  alt="Attachment Kendala"
-                  class="max-h-64 w-full object-contain rounded-lg"
-                />
-              </div>
+              <ul class="space-y-2 max-h-[240px] overflow-y-auto pr-1">
+                <li
+                  v-for="(att, i) in selectedTicket.attachments"
+                  :key="att.id"
+                  class="flex items-center justify-between gap-3 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] p-3"
+                >
+                  <div class="flex items-center gap-3 min-w-0">
+                    <div
+                      class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#ECF2FF] text-[#2563EB]"
+                    >
+                      <span class="material-symbols-outlined text-[20px]">{{ getAttachmentIcon(att.attachment) }}</span>
+                    </div>
+                    <div class="min-w-0">
+                      <p class="text-[12px] font-bold text-[#2A3547] truncate">
+                        {{ att.name || 'Lampiran' }}
+                      </p>
+                      <p class="text-[10.5px] text-[#7C8BAC] truncate mt-0.5">
+                        {{ att.nama_pengguna || 'Pengguna' }}
+                        <template v-if="att.dibuat_pada"> · {{ formatDateTime(att.dibuat_pada) }}</template>
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    @click="downloadAttachment(att.attachment, att.name || 'lampiran-' + selectedTicket.nomor_tiket + '-' + (i + 1))"
+                    class="flex h-8 items-center gap-1.5 rounded-lg border border-[#E2E8F0] bg-white px-3 text-[11px] font-bold text-[#2563EB] hover:bg-[#EFF6FF] hover:border-[#2563EB] transition-all cursor-pointer shadow-2xs shrink-0"
+                  >
+                    <span class="material-symbols-outlined text-[16px]">download</span>
+                    <span>Unduh</span>
+                  </button>
+                </li>
+              </ul>
             </div>
 
             <!-- Dedicated CASP Section -->
@@ -2274,9 +2361,15 @@ function toast(message, type = 'success') {
           </div>
 
           <!-- TAB 3: DISCUSSION THREAD -->
-          <div v-else-if="activeDetailTab === 'comments'" class="flex flex-col gap-4">
-            <!-- Messages Container (No nested scrollbar, natural main scroll) -->
-            <div class="flex flex-col gap-3 min-h-[160px]">
+          <div
+            v-else-if="activeDetailTab === 'comments'"
+            class="flex max-h-[60vh] min-h-0 flex-col gap-3"
+          >
+            <!-- Messages Container (scrollable inside the chat area) -->
+            <div
+              ref="chatContainer"
+              class="flex min-h-[120px] flex-1 flex-col gap-3 overflow-y-auto pr-1"
+            >
               <div
                 v-if="isCommentsLoading"
                 class="flex flex-col items-center justify-center py-10 gap-2 text-[#94A3B8]"
@@ -2331,19 +2424,28 @@ function toast(message, type = 'success') {
                     class="mt-2 flex items-center gap-1 rounded-lg border border-current/20 px-2 py-1 text-[10px] font-bold disabled:opacity-60 cursor-pointer"
                     @click="loadCommentAttachment(c)"
                   >
-                    <span class="material-symbols-outlined text-[14px]">image</span>
-                    {{ c.is_attachment_loading ? 'Memuat...' : 'Tampilkan lampiran' }}
+                    <span class="material-symbols-outlined text-[14px]">attach_file</span>
+                    {{ c.is_attachment_loading ? 'Memuat...' : 'Muat lampiran' }}
                   </button>
 
                   <div
                     v-if="c.attachment"
-                    class="mt-2 overflow-hidden rounded-xl border border-white/20"
+                    class="mt-2 flex items-center justify-between gap-2 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] p-2"
                   >
-                    <img
-                      :src="c.attachment"
-                      alt="Attachment Komentar"
-                      class="max-h-40 w-full object-cover"
-                    />
+                    <div class="flex items-center gap-2 min-w-0">
+                      <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-[#ECF2FF] text-[#2563EB]">
+                        <span class="material-symbols-outlined text-[16px]">{{ getAttachmentIcon(c.attachment) }}</span>
+                      </div>
+                      <span class="text-[11px] font-semibold text-[#334155] truncate">{{ c.attachment_name || 'Lampiran diskusi' }}</span>
+                    </div>
+                    <button
+                      type="button"
+                      @click="downloadAttachment(c.attachment, c.attachment_name || 'lampiran-diskusi-' + c.id)"
+                      class="flex h-7 items-center gap-1 rounded-md border border-[#E2E8F0] bg-white px-2 text-[10px] font-bold text-[#2563EB] hover:bg-[#EFF6FF] hover:border-[#2563EB] transition-all cursor-pointer shrink-0"
+                    >
+                      <span class="material-symbols-outlined text-[14px]">download</span>
+                      <span>Unduh</span>
+                    </button>
                   </div>
                 </div>
               </div>
@@ -2352,7 +2454,7 @@ function toast(message, type = 'success') {
             <!-- Comment Composer or Locked Notice -->
             <div
               v-if="['Resolved', 'Closed', 'Cancelled'].includes(selectedTicket.status_tiket)"
-              class="flex items-center gap-2 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] p-3 text-xs font-medium text-[#64748B]"
+              class="flex shrink-0 items-center gap-2 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] p-3 text-xs font-medium text-[#64748B]"
             >
               <span class="material-symbols-outlined text-[16px] text-[#94A3B8]">lock</span>
               <span
@@ -2361,19 +2463,17 @@ function toast(message, type = 'success') {
               >
             </div>
 
-            <div v-else class="flex flex-col gap-2 rounded-xl border border-[#E2E8F0] bg-white p-3">
+            <div v-else class="flex shrink-0 flex-col gap-2 rounded-xl border border-[#E2E8F0] bg-white p-3">
               <div
                 v-if="commentAttachment"
                 class="flex items-center justify-between gap-2 rounded-lg bg-[#F8FAFC] p-2 border border-[#E2E8F0]"
               >
                 <div class="flex items-center gap-2 min-w-0">
-                  <img
-                    :src="commentAttachment"
-                    alt="Preview Attachment"
-                    class="h-9 w-9 rounded-lg object-cover"
-                  />
+                  <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#ECF2FF] text-[#2563EB]">
+                    <span class="material-symbols-outlined text-[16px]">{{ getAttachmentIcon(commentAttachment) }}</span>
+                  </div>
                   <span class="text-xs font-bold text-[#0F172A] truncate"
-                    >Gambar lampiran siap dikirim</span
+                    >{{ commentAttachmentName || 'File lampiran siap dikirim' }}</span
                   >
                 </div>
                 <button
@@ -2387,13 +2487,13 @@ function toast(message, type = 'success') {
 
               <form class="flex items-center gap-2" @submit.prevent="sendComment">
                 <label
-                  title="Tambah Lampiran Gambar"
+                  title="Tambah Lampiran (Gambar / Dokumen)"
                   class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-[#64748B] hover:bg-[#F8FAFC] hover:text-[#2563EB] transition-all cursor-pointer"
                 >
-                  <span class="material-symbols-outlined text-[18px]">add_a_photo</span>
+                  <span class="material-symbols-outlined text-[18px]">attach_file</span>
                   <input
                     type="file"
-                    accept="image/png,image/jpeg,image/gif,image/webp"
+                    accept="image/png,image/jpeg,image/gif,image/webp,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation"
                     class="hidden"
                     @change="handleCommentFileChange"
                   />
@@ -2494,6 +2594,53 @@ function toast(message, type = 'success') {
                 isClaiming === selectedTicket.id ? 'Mengambil...' : 'Ambil Tiket Ini'
               }}</span>
             </button>
+          </div>
+
+          <!-- Assign to Admin (Superadmin only) -->
+          <div v-if="isSuperAdmin" class="relative inline-block text-left">
+            <button
+              type="button"
+              :disabled="isReassigning || ['Closed', 'Resolved', 'Cancelled'].includes(selectedTicket.status_tiket)"
+              @click="toggleReassignDropdown"
+              class="inline-flex h-9 items-center gap-1.5 rounded-xl border border-[#E5EAEF] bg-white px-3.5 text-xs font-bold text-[#2A3547] shadow-2xs hover:bg-[#F8FAFC] hover:border-[#5D87FF] transition-all cursor-pointer disabled:opacity-50"
+            >
+              <span class="material-symbols-outlined text-[16px] text-[#2563EB]">assignment_ind</span>
+              <span>Assign ke Admin</span>
+              <span class="material-symbols-outlined text-[16px] text-[#7C8BAC]">expand_more</span>
+            </button>
+
+            <Transition name="fade">
+              <div
+                v-if="showReassignDropdown"
+                class="absolute bottom-full left-0 mb-1.5 w-64 rounded-xl border border-[#E5EAEF] bg-white p-1.5 shadow-lg z-50"
+              >
+                <p class="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-[#94A3B8]">
+                  Admin unit {{ selectedTicket.queue_nama || selectedTicket.queue_kode || '—' }}
+                </p>
+                <button
+                  v-for="admin in getAdminsForQueue(selectedTicket.queue_id)"
+                  :key="admin.id"
+                  type="button"
+                  :disabled="isReassigning"
+                  @click="assignTicket(selectedTicket, admin.id)"
+                  class="flex h-8 w-full items-center justify-between rounded-lg px-2.5 text-xs font-medium text-[#2A3547] hover:bg-[#F8FAFC] transition-colors cursor-pointer disabled:opacity-50"
+                  :class="selectedTicket.assigned_to_user_id === admin.id ? 'bg-[#ECF2FF] font-bold text-[#5D87FF]' : ''"
+                >
+                  <span class="truncate">{{ admin.nama }}</span>
+                  <span
+                    v-if="selectedTicket.assigned_to_user_id === admin.id"
+                    class="material-symbols-outlined text-[15px] text-[#5D87FF]"
+                    >check</span
+                  >
+                </button>
+                <p
+                  v-if="getAdminsForQueue(selectedTicket.queue_id).length === 0"
+                  class="px-2 py-3 text-center text-[11px] text-[#94A3B8]"
+                >
+                  Tidak ada admin terdaftar di unit ini.
+                </p>
+              </div>
+            </Transition>
           </div>
 
           <!-- Default Close Button -->

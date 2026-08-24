@@ -65,7 +65,7 @@ app.use(
 );
 app.use(requireSafeOrigin);
 app.use(requireJsonRequest);
-app.use(express.json({ limit: "8mb" }));
+app.use(express.json({ limit: "50mb" }));
 app.use(router);
 
 // Unknown route & global error handlers (must be registered last)

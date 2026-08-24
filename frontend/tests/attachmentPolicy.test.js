@@ -13,11 +13,11 @@ test('frontend attachment policy memakai MIME allowlist yang sempit', () => {
 
   assert.match(
     validateAttachmentFile({ type: 'image/svg+xml', size: 100 }),
-    /PNG, JPEG, GIF, atau WebP/,
+    /gambar \(PNG, JPG, GIF, WEBP\)/,
   )
   assert.match(
     validateAttachmentFile({ type: 'text/html', size: 100 }),
-    /PNG, JPEG, GIF, atau WebP/,
+    /gambar \(PNG, JPG, GIF, WEBP\)/,
   )
 })
 

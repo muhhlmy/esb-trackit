@@ -29,6 +29,14 @@ function getTicketIdentity(req) {
 
 async function ensureDefaultQueuesExist() {
   try {
+    const checkIt = await pool.query(
+      `SELECT id FROM ticket_queues WHERE UPPER(kode) = 'IT' OR UPPER(nama) LIKE '%IT SUPPORT%' LIMIT 1`
+    )
+    if (checkIt.rowCount === 0) {
+      await pool.query(
+        `INSERT INTO ticket_queues (kode, nama, deskripsi) VALUES ('IT', 'IT Support', 'IT support & services')`
+      )
+    }
     const checkHr = await pool.query(
       `SELECT id FROM ticket_queues WHERE UPPER(kode) LIKE '%HR%' OR UPPER(nama) LIKE '%HR%' LIMIT 1`
     )

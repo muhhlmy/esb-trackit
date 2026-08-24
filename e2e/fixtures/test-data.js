@@ -25,7 +25,7 @@ export function generateTestTicket(override = {}) {
   return {
     judul: `E2E Ticket Issue ${id}`,
     deskripsi: `Deskripsi tiket pengujian E2E otomatis untuk ${id}`,
-    prioritas: 'Medium (3d)',
+    prioritas: 'Medium',
     kategori: 'IT Helpdesk',
     ...override,
   }

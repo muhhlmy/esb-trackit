@@ -131,7 +131,9 @@ export function storeAuthSession({ token, user, remember = false } = {}) {
     throw new TypeError('Data sesi autentikasi tidak valid.')
   }
 
-  const storage = getStorage(remember ? 'localStorage' : 'sessionStorage')
+  // Selalu simpan ke localStorage (persistent) agar sesi dibagikan antar tab,
+  // termasuk saat user membuka submenu di tab baru.
+  const storage = getStorage('localStorage')
   if (!storage) {
     throw new Error('Penyimpanan sesi tidak tersedia pada browser ini.')
   }

@@ -21,6 +21,7 @@ const { connect: connectSSE, disconnect: disconnectSSE, on: onSSE, off: offSSE }
 // Search & UI State
 const searchQuery = ref('')
 const searchInputRef = ref(null)
+const searchContainerRef = ref(null)
 const isSearchOpen = ref(false)
 const isFetchingSearch = ref(false)
 const searchTabFilter = ref('ALL') // ALL, ASSETS, KARYAWAN, TICKETS, USERS
@@ -352,6 +353,16 @@ function closeSearch() {
   isSearchOpen.value = false
 }
 
+// Click-outside: tutup panel search jika klik terjadi di luar area search
+// (input + result card). Tidak menutup jika klik di dalam container search.
+function handleClickOutside(event) {
+  if (!isSearchOpen.value) return
+  const container = searchContainerRef.value
+  if (container && !container.contains(event.target)) {
+    closeSearch()
+  }
+}
+
 function clearSearch() {
   searchQuery.value = ''
   if (searchInputRef.value) searchInputRef.value.focus()
@@ -562,6 +573,7 @@ function handleSseCommentCreated(data) {
 
 onMounted(() => {
   window.addEventListener('keydown', handleGlobalKeydown)
+  document.addEventListener('click', handleClickOutside)
   if (!hasPermission('tickets')) return
   loadNotifications()
   fetchTickets()
@@ -574,6 +586,7 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   window.removeEventListener('keydown', handleGlobalKeydown)
+  document.removeEventListener('click', handleClickOutside)
   offSSE('TICKET_CREATED', handleSseTicketCreated)
   offSSE('TICKET_UPDATED', handleSseTicketUpdated)
   offSSE('COMMENT_CREATED', handleSseCommentCreated)
@@ -610,7 +623,7 @@ onBeforeUnmount(() => {
 
     <!-- 2. CENTER: Main Global Search Bar -->
     <div class="flex-1 max-w-lg mx-2 sm:mx-4 relative flex justify-center z-40">
-      <div class="relative w-full max-w-sm sm:max-w-md">
+      <div ref="searchContainerRef" class="relative w-full max-w-sm sm:max-w-md">
         <form
           role="search"
           @submit.prevent="submitSearch"

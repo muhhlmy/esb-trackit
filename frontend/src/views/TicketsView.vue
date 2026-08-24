@@ -1198,25 +1198,48 @@ function getStatusDotInfo(status) {
     return {
       dotClass: 'bg-emerald-500',
       textClass: 'text-emerald-700 font-semibold',
+      badgeClass: 'bg-emerald-50/90 text-emerald-700 border-emerald-200/80',
       label: 'Open',
     }
   if (s === 'in progress')
     return {
       dotClass: 'bg-blue-500',
       textClass: 'text-blue-700 font-semibold',
+      badgeClass: 'bg-blue-50/90 text-blue-700 border-blue-200/80',
       label: 'In Progress',
     }
   if (s === 'pending')
-    return { dotClass: 'bg-amber-500', textClass: 'text-amber-700 font-semibold', label: 'Pending' }
+    return {
+      dotClass: 'bg-amber-500',
+      textClass: 'text-amber-700 font-semibold',
+      badgeClass: 'bg-amber-50/90 text-amber-700 border-amber-200/80',
+      label: 'Pending',
+    }
   if (s === 'resolved')
-    return { dotClass: 'bg-teal-500', textClass: 'text-teal-700 font-semibold', label: 'Resolved' }
+    return {
+      dotClass: 'bg-teal-500',
+      textClass: 'text-teal-700 font-semibold',
+      badgeClass: 'bg-teal-50/90 text-teal-700 border-teal-200/80',
+      label: 'Resolved',
+    }
   if (s === 'closed')
-    return { dotClass: 'bg-slate-400', textClass: 'text-slate-600 font-medium', label: 'Closed' }
+    return {
+      dotClass: 'bg-slate-400',
+      textClass: 'text-slate-600 font-medium',
+      badgeClass: 'bg-slate-100 text-slate-600 border-slate-200/80',
+      label: 'Closed',
+    }
   if (s === 'cancelled')
-    return { dotClass: 'bg-rose-500', textClass: 'text-rose-600 font-medium', label: 'Cancelled' }
+    return {
+      dotClass: 'bg-rose-500',
+      textClass: 'text-rose-600 font-medium',
+      badgeClass: 'bg-rose-50/90 text-rose-700 border-rose-200/80',
+      label: 'Cancelled',
+    }
   return {
     dotClass: 'bg-slate-400',
     textClass: 'text-slate-600 font-medium',
+    badgeClass: 'bg-slate-100 text-slate-600 border-slate-200/80',
     label: status || 'Open',
   }
 }
@@ -1224,22 +1247,22 @@ function getStatusDotInfo(status) {
 function getPriorityInfo(prioritas) {
   const p = (prioritas || '').toLowerCase()
   if (p.includes('critical') || p.includes('urgent') || p.includes('4h')) {
-    return { label: 'Critical', class: 'text-rose-600 font-bold bg-rose-50 border-rose-200' }
+    return { label: 'Critical', class: 'text-rose-700 font-bold bg-rose-50 border-rose-200/80', icon: 'warning' }
   }
   if (p.includes('high') || p.includes('1day')) {
-    return { label: 'High', class: 'text-amber-700 font-semibold bg-amber-50 border-amber-200' }
+    return { label: 'High', class: 'text-amber-800 font-semibold bg-amber-50 border-amber-200/80', icon: 'priority_high' }
   }
   if (p.includes('medium') || p.includes('3d')) {
-    return { label: 'Medium', class: 'text-slate-700 font-medium bg-slate-100 border-slate-200' }
+    return { label: 'Medium', class: 'text-slate-700 font-medium bg-slate-100/90 border-slate-200/80', icon: 'remove' }
   }
-  return { label: 'Low', class: 'text-slate-500 font-medium bg-slate-50 border-slate-200' }
+  return { label: 'Low', class: 'text-slate-600 font-medium bg-slate-50 border-slate-200/60', icon: 'arrow_downward' }
 }
 
 function getSlaInfo(ticket) {
   const sla = getSlaCountdownInfo(ticket)
-  if (sla.isClosed) return { text: '✓ Selesai', class: 'text-slate-400 font-medium' }
-  if (sla.isOverdue) return { text: sla.text, class: 'text-rose-600 font-semibold' }
-  return { text: sla.text, class: 'text-slate-500 font-medium' }
+  if (sla.isClosed) return { text: '✓ Selesai', class: 'bg-slate-50 text-slate-500 border-slate-200', icon: 'check_circle' }
+  if (sla.isOverdue) return { text: sla.text, class: 'bg-rose-50 text-rose-700 border-rose-200/80 font-semibold', icon: 'timer_off' }
+  return { text: sla.text, class: 'bg-slate-50 text-slate-600 border-slate-200/70', icon: 'schedule' }
 }
 
 function getTicketActions(ticket) {
@@ -1498,208 +1521,260 @@ function toast(message, type = 'success') {
     </div>
 
     <!-- ── 3. Ticket Inbox / Issue List Surface ───────────── -->
-    <div class="rounded-2xl border border-[#E2E8F0]/80 bg-white shadow-2xs overflow-hidden">
-      <!-- Loading Skeleton (Matches real ticket row layout 100%) -->
-      <div v-if="isLoading" aria-busy="true" class="divide-y divide-[#F1F5F9]">
+    <div class="rounded-2xl border border-slate-200/80 bg-slate-50/40 p-3 sm:p-4 shadow-2xs">
+      <!-- Loading Skeleton (Matches refined compact card layout) -->
+      <div v-if="isLoading" aria-busy="true" class="flex flex-col gap-2.5">
         <div
-          v-for="r in 5"
+          v-for="r in 4"
           :key="'tck-skel-' + r"
-          class="flex items-center justify-between gap-4 px-6 py-4 min-h-[76px] select-none"
+          class="flex flex-col gap-2.5 p-3.5 sm:p-4 rounded-xl border border-slate-200/80 bg-white select-none shadow-2xs"
         >
-          <!-- Left Zone: Ticket Identity & Metadata Stack -->
-          <div class="flex flex-col gap-1.5 min-w-0 flex-1">
-            <!-- Title -->
-            <BaseSkeleton :width="r % 2 === 0 ? '60%' : '75%'" height="16px" radius="md" />
-
-            <!-- Description Snippet -->
-            <BaseSkeleton :width="r % 2 === 0 ? '80%' : '65%'" height="13.5px" radius="sm" />
-
-            <!-- Sub-metadata Line -->
-            <div class="flex items-center gap-2 mt-0.5 flex-wrap">
-              <BaseSkeleton width="110px" height="12px" radius="sm" />
-              <span class="text-[#CBD5E1]">·</span>
-              <BaseSkeleton width="80px" height="12px" radius="sm" />
-              <span class="text-[#CBD5E1]">·</span>
-              <BaseSkeleton width="60px" height="12px" radius="sm" />
-              <span class="text-[#CBD5E1]">·</span>
-              <BaseSkeleton width="50px" height="12px" radius="sm" />
-              <span class="text-[#CBD5E1]">·</span>
-              <BaseSkeleton width="70px" height="12px" radius="sm" />
-            </div>
+          <div class="flex items-center justify-between">
+            <BaseSkeleton width="90px" height="14px" radius="sm" />
+            <BaseSkeleton width="80px" height="22px" radius="full" />
           </div>
 
-          <!-- Right Zone: Status Indicator & Chevron -->
-          <div class="flex items-center gap-3 shrink-0">
-            <div class="flex items-center gap-1.5 min-w-[95px] justify-end">
-              <BaseSkeleton width="8px" height="8px" radius="full" />
-              <BaseSkeleton width="55px" height="14px" radius="md" />
-            </div>
-            <BaseSkeleton width="18px" height="18px" radius="md" />
+          <div class="flex flex-col gap-1">
+            <BaseSkeleton :width="r % 2 === 0 ? '55%' : '70%'" height="16px" radius="md" />
+            <BaseSkeleton :width="r % 2 === 0 ? '80%' : '60%'" height="13px" radius="sm" />
+          </div>
+
+          <div class="flex items-center gap-4 pt-1">
+            <BaseSkeleton width="90px" height="14px" radius="sm" />
+            <BaseSkeleton width="80px" height="14px" radius="sm" />
+            <BaseSkeleton width="70px" height="20px" radius="md" />
           </div>
         </div>
       </div>
 
       <!-- Error State -->
-      <div v-else-if="pageError" class="bg-[#FDEDE8] p-5 text-[13px] font-semibold text-[#FA896B]">
+      <div v-else-if="pageError" class="rounded-xl bg-rose-50 p-5 text-[13px] font-semibold text-rose-600 border border-rose-200">
         {{ pageError }}
       </div>
 
-      <!-- Content Surface (Horizontal Flex Issue Items) -->
-      <div v-else class="divide-y divide-[#F1F5F9]">
-        <!-- ── USER ROLE ISSUE LIST ITEMS ── -->
+      <!-- Content Surface (Refined Compact Ticket Cards) -->
+      <div v-else class="flex flex-col gap-2.5">
+        <!-- ── USER ROLE TICKET CARDS ── -->
         <template v-if="!isAdmin && !isSuperAdmin">
           <div
             v-for="ticket in paginatedTickets"
             :key="ticket.id"
             @click="openDetail(ticket)"
-            class="tck-list-item group flex items-center justify-between gap-4 px-6 py-4 hover:bg-[#F8FAFC] transition-colors duration-150 cursor-pointer select-none min-h-[76px]"
+            class="tck-list-item group relative flex flex-col bg-white rounded-xl border border-slate-200/80 hover:border-slate-300 hover:shadow-xs p-3.5 sm:p-4 transition-all duration-200 cursor-pointer select-none gap-2"
           >
-            <!-- Left Zone: Ticket Identity & Metadata Stack -->
-            <div class="flex flex-col gap-1 min-w-0 flex-1">
-              <!-- Title (16px semibold/bold focal point) -->
-              <h3
-                class="text-[16px] font-semibold text-[#0F172A] group-hover:text-[#2563EB] transition-colors line-clamp-1"
-              >
-                {{ ticket.judul }}
-              </h3>
+            <!-- TOP ROW: Subtle Ticket ID (Left) | Status Badge & Chevron (Right) -->
+            <div class="flex items-center justify-between gap-3 min-w-0">
+              <span class="text-[11.5px] font-mono font-medium text-slate-400 tracking-wide">
+                {{ ticket.nomor_tiket || `TCK-${ticket.id}` }}
+              </span>
 
-              <!-- Description Snippet (13.5px muted) -->
-              <p
-                v-if="ticket.deskripsi"
-                class="text-[13.5px] font-normal text-[#64748B] line-clamp-1"
-              >
-                {{ ticket.deskripsi }}
-              </p>
-
-              <!-- Single Muted Sub-metadata Line -->
-              <div class="flex items-center gap-2 text-[12px] text-[#94A3B8] flex-wrap mt-0.5">
-                <span class="font-mono text-[#64748B] font-semibold">{{
-                  ticket.nomor_tiket || `TCK-${ticket.id}`
-                }}</span>
-                <span>·</span>
-                <span class="text-[#334155] font-semibold flex items-center gap-1">
-                  <span class="material-symbols-outlined text-[13.5px] text-[#5D87FF]">
-                    {{ getQueueIcon(ticket) }}
-                  </span>
-                  {{ ticket.queue_nama || (ticket.queue_kode ? `${ticket.queue_kode} Support` : 'IT Support') }}
-                </span>
-                <span>·</span>
-                <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10.5px] font-bold bg-[#ECF2FF] text-[#5D87FF]">
-                  {{ ticket.kategori || 'Support' }}
-                </span>
-                <span>·</span>
-                <span>{{ getPriorityInfo(ticket.prioritas).label }}</span>
-                <span>·</span>
-                <span>{{ formatRelativeTime(ticket.diperbarui_pada || ticket.dibuat_pada) }}</span>
-                <span v-if="ticket.total_komentar > 0">· {{ ticket.total_komentar }} komentar</span>
-                <span v-if="ticket.has_attachment" class="flex items-center gap-0.5"
-                  ><span class="material-symbols-outlined text-[13px]">attach_file</span></span
+              <div class="flex items-center gap-2 shrink-0">
+                <span
+                  class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11.5px] font-semibold border transition-all"
+                  :class="getStatusDotInfo(ticket.status_tiket).badgeClass"
                 >
+                  <span
+                    class="h-1.5 w-1.5 rounded-full shrink-0"
+                    :class="getStatusDotInfo(ticket.status_tiket).dotClass"
+                  ></span>
+                  <span>{{ getStatusDotInfo(ticket.status_tiket).label }}</span>
+                </span>
+
+                <span
+                  class="material-symbols-outlined text-[18px] text-slate-300 group-hover:text-blue-600 group-hover:translate-x-0.5 transition-all"
+                >
+                  chevron_right
+                </span>
               </div>
             </div>
 
-            <!-- Right Zone: Status Indicator & Chevron -->
-            <div class="flex items-center gap-3 shrink-0">
-              <div class="flex items-center gap-1.5 min-w-[95px] justify-end">
+            <!-- MAIN CONTENT: Prominent Title & Short Description -->
+            <div class="flex flex-col gap-0.5 min-w-0">
+              <h3 class="text-[15px] font-bold text-slate-900 group-hover:text-blue-600 transition-colors leading-snug line-clamp-1">
+                {{ ticket.judul }}
+              </h3>
+              <p v-if="ticket.deskripsi" class="text-[12.5px] font-normal text-slate-500 line-clamp-1 leading-relaxed">
+                {{ ticket.deskripsi }}
+              </p>
+            </div>
+
+            <!-- METADATA & FOOTER ROW: Unit, Category, Priority, SLA, & Timestamp -->
+            <div class="flex items-center justify-between gap-3 text-[12px] pt-1.5 border-t border-slate-100 flex-wrap sm:flex-nowrap">
+              <div class="flex items-center gap-x-4 gap-y-1 flex-wrap text-slate-600">
+                <!-- Unit / Queue -->
+                <span class="flex items-center gap-1.5 font-medium text-slate-700" title="Unit Tujuan">
+                  <span class="material-symbols-outlined text-[15px] text-slate-400">
+                    {{ getQueueIcon(ticket) }}
+                  </span>
+                  <span>{{ ticket.queue_nama || (ticket.queue_kode ? `${ticket.queue_kode} Support` : 'IT Support') }}</span>
+                </span>
+
+                <!-- Category -->
+                <span class="flex items-center gap-1.5 text-slate-500" title="Kategori Ticket">
+                  <span class="material-symbols-outlined text-[15px] text-slate-400">label</span>
+                  <span>{{ ticket.kategori || 'Support' }}</span>
+                </span>
+
+                <!-- Priority (Subtle Badge) -->
                 <span
-                  class="h-2 w-2 rounded-full shrink-0"
-                  :class="getStatusDotInfo(ticket.status_tiket).dotClass"
-                ></span>
-                <span
-                  class="text-[13.5px] font-semibold"
-                  :class="getStatusDotInfo(ticket.status_tiket).textClass"
+                  class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] border"
+                  :class="getPriorityInfo(ticket.prioritas).class"
+                  title="Prioritas"
                 >
-                  {{ getStatusDotInfo(ticket.status_tiket).label }}
+                  <span class="material-symbols-outlined text-[13px]">
+                    {{ getPriorityInfo(ticket.prioritas).icon }}
+                  </span>
+                  <span>Priority: {{ getPriorityInfo(ticket.prioritas).label }}</span>
+                </span>
+
+                <!-- SLA Countdown -->
+                <span class="flex items-center gap-1 font-medium" :class="getSlaInfo(ticket).isOverdue ? 'text-rose-600' : 'text-slate-600'" title="SLA Ticket">
+                  <span class="material-symbols-outlined text-[15px]" :class="getSlaInfo(ticket).isOverdue ? 'text-rose-500' : 'text-slate-400'">
+                    {{ getSlaInfo(ticket).icon }}
+                  </span>
+                  <span>SLA {{ getSlaInfo(ticket).text }}</span>
                 </span>
               </div>
 
-              <span
-                class="material-symbols-outlined text-[18px] text-[#CBD5E1] group-hover:text-[#2563EB] group-hover:translate-x-0.5 transition-all"
-              >
-                chevron_right
-              </span>
+              <!-- Secondary Information (Timestamp, Comments, Attachments) -->
+              <div class="flex items-center gap-3 text-[11.5px] text-slate-400 shrink-0 font-normal ml-auto sm:ml-0">
+                <span class="flex items-center gap-1">
+                  <span class="material-symbols-outlined text-[13.5px]">schedule</span>
+                  <span>{{ formatRelativeTime(ticket.diperbarui_pada || ticket.dibuat_pada) }}</span>
+                </span>
+
+                <span v-if="ticket.total_komentar > 0" class="flex items-center gap-1" title="Komentar">
+                  <span class="material-symbols-outlined text-[13.5px]">chat_bubble_outline</span>
+                  <span>{{ ticket.total_komentar }}</span>
+                </span>
+
+                <span v-if="ticket.has_attachment" class="flex items-center gap-1" title="Lampiran">
+                  <span class="material-symbols-outlined text-[13.5px]">attach_file</span>
+                </span>
+              </div>
             </div>
           </div>
         </template>
 
-        <!-- ── ADMIN / SUPERADMIN ROLE ISSUE LIST ITEMS ── -->
+        <!-- ── ADMIN / SUPERADMIN ROLE TICKET CARDS ── -->
         <template v-else>
           <div
             v-for="ticket in paginatedTickets"
             :key="ticket.id"
             @click="openDetail(ticket)"
-            class="tck-list-item group flex items-center justify-between gap-4 px-6 py-4 hover:bg-[#F8FAFC] transition-colors duration-150 cursor-pointer select-none min-h-[76px]"
+            class="tck-list-item group relative flex flex-col bg-white rounded-xl border border-slate-200/80 hover:border-slate-300 hover:shadow-xs p-3.5 sm:p-4 transition-all duration-200 cursor-pointer select-none gap-2"
           >
-            <!-- Left Zone: Ticket Identity & Metadata Stack -->
-            <div class="flex flex-col gap-1 min-w-0 flex-1">
-              <!-- Title (16px semibold/bold focal point) -->
-              <h3
-                class="text-[16px] font-semibold text-[#0F172A] group-hover:text-[#2563EB] transition-colors line-clamp-1"
-              >
-                {{ ticket.judul }}
-              </h3>
+            <!-- TOP ROW: Subtle Ticket ID (Left) | Status Badge & Row Action Menu (Right) -->
+            <div class="flex items-center justify-between gap-3 min-w-0">
+              <span class="text-[11.5px] font-mono font-medium text-slate-400 tracking-wide">
+                {{ ticket.nomor_tiket || `TCK-${ticket.id}` }}
+              </span>
 
-              <!-- Description Snippet (13.5px muted) -->
-              <p
-                v-if="ticket.deskripsi"
-                class="text-[13.5px] font-normal text-[#64748B] line-clamp-1"
-              >
-                {{ ticket.deskripsi }}
-              </p>
-
-              <!-- Single Muted Sub-metadata Line -->
-              <div class="flex items-center gap-2 text-[12px] text-[#94A3B8] flex-wrap mt-0.5">
-                <span class="font-mono text-[#64748B] font-semibold">{{
-                  ticket.nomor_tiket || `TCK-${ticket.id}`
-                }}</span>
-                <span>·</span>
-                <span class="text-[#334155] font-semibold">{{
-                  ticket.pelapor_nama || ticket.pelapor || 'User'
-                }}</span>
-                <span>·</span>
-                <span class="text-[#334155] font-semibold flex items-center gap-1">
-                  <span class="material-symbols-outlined text-[13.5px] text-[#5D87FF]">
-                    {{ getQueueIcon(ticket) }}
-                  </span>
-                  {{ ticket.queue_nama || (ticket.queue_kode ? `${ticket.queue_kode} Support` : 'IT Support') }}
-                </span>
-                <span>·</span>
-                <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10.5px] font-bold bg-[#ECF2FF] text-[#5D87FF]">
-                  {{ ticket.kategori || 'Support' }}
-                </span>
-                <span>·</span>
-                <span>{{ getPriorityInfo(ticket.prioritas).label }}</span>
-                <span>·</span>
-                <span>SLA {{ getSlaInfo(ticket).text }}</span>
-                <span>·</span>
-                <span>{{ getAssigneeName(ticket.assigned_to_nama || ticket.assigned_to) }}</span>
-                <span>·</span>
-                <span>{{ formatRelativeTime(ticket.diperbarui_pada || ticket.dibuat_pada) }}</span>
-                <span v-if="ticket.total_komentar > 0">· {{ ticket.total_komentar }} komentar</span>
-                <span v-if="ticket.has_attachment" class="flex items-center gap-0.5"
-                  ><span class="material-symbols-outlined text-[13px]">attach_file</span></span
+              <div class="flex items-center gap-2 shrink-0">
+                <span
+                  class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11.5px] font-semibold border transition-all"
+                  :class="getStatusDotInfo(ticket.status_tiket).badgeClass"
                 >
+                  <span
+                    class="h-1.5 w-1.5 rounded-full shrink-0"
+                    :class="getStatusDotInfo(ticket.status_tiket).dotClass"
+                  ></span>
+                  <span>{{ getStatusDotInfo(ticket.status_tiket).label }}</span>
+                </span>
+
+                <div @click.stop class="shrink-0">
+                  <AppRowActions :actions="getTicketActions(ticket)" />
+                </div>
               </div>
             </div>
 
-            <!-- Right Zone: Status Indicator & Actions -->
-            <div class="flex items-center gap-3 shrink-0">
-              <div class="flex items-center gap-1.5 min-w-[100px] justify-end">
+            <!-- MAIN CONTENT: Prominent Title & Short Description -->
+            <div class="flex flex-col gap-0.5 min-w-0">
+              <h3 class="text-[15px] font-bold text-slate-900 group-hover:text-blue-600 transition-colors leading-snug line-clamp-1">
+                {{ ticket.judul }}
+              </h3>
+              <p v-if="ticket.deskripsi" class="text-[12.5px] font-normal text-slate-500 line-clamp-1 leading-relaxed">
+                {{ ticket.deskripsi }}
+              </p>
+            </div>
+
+            <!-- METADATA ROW 1: Requester, Unit, Category (Plain Text + Icons) -->
+            <div class="flex items-center gap-x-4 gap-y-1 flex-wrap text-[12px] text-slate-600">
+              <!-- Requester / Pelapor -->
+              <span class="flex items-center gap-1.5 font-medium text-slate-700" title="Pelapor / Requester">
+                <span class="material-symbols-outlined text-[15px] text-slate-400">person</span>
+                <span>{{ ticket.pelapor_nama || ticket.pelapor || 'User' }}</span>
+              </span>
+
+              <!-- Support Unit / Queue -->
+              <span class="flex items-center gap-1.5 font-medium text-slate-700" title="Unit Tujuan">
+                <span class="material-symbols-outlined text-[15px] text-slate-400">
+                  {{ getQueueIcon(ticket) }}
+                </span>
+                <span>{{ ticket.queue_nama || (ticket.queue_kode ? `${ticket.queue_kode} Support` : 'IT Support') }}</span>
+              </span>
+
+              <!-- Category -->
+              <span class="flex items-center gap-1.5 text-slate-500" title="Kategori Ticket">
+                <span class="material-symbols-outlined text-[15px] text-slate-400">label</span>
+                <span>{{ ticket.kategori || 'Support' }}</span>
+              </span>
+            </div>
+
+            <!-- METADATA ROW 2 & FOOTER: Priority Badge, SLA, Assignee, & Timestamp -->
+            <div class="flex items-center justify-between gap-3 text-[12px] pt-1.5 border-t border-slate-100 flex-wrap sm:flex-nowrap">
+              <div class="flex items-center gap-x-4 gap-y-1 flex-wrap text-slate-600">
+                <!-- Priority (Subtle Badge) -->
                 <span
-                  class="h-2 w-2 rounded-full shrink-0"
-                  :class="getStatusDotInfo(ticket.status_tiket).dotClass"
-                ></span>
-                <span
-                  class="text-[13.5px] font-semibold"
-                  :class="getStatusDotInfo(ticket.status_tiket).textClass"
+                  class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] border"
+                  :class="getPriorityInfo(ticket.prioritas).class"
+                  title="Prioritas"
                 >
-                  {{ getStatusDotInfo(ticket.status_tiket).label }}
+                  <span class="material-symbols-outlined text-[13px]">
+                    {{ getPriorityInfo(ticket.prioritas).icon }}
+                  </span>
+                  <span>Priority: {{ getPriorityInfo(ticket.prioritas).label }}</span>
+                </span>
+
+                <!-- SLA Countdown -->
+                <span class="flex items-center gap-1 font-medium" :class="getSlaInfo(ticket).isOverdue ? 'text-rose-600' : 'text-slate-600'" title="SLA Ticket">
+                  <span class="material-symbols-outlined text-[15px]" :class="getSlaInfo(ticket).isOverdue ? 'text-rose-500' : 'text-slate-400'">
+                    {{ getSlaInfo(ticket).icon }}
+                  </span>
+                  <span>SLA {{ getSlaInfo(ticket).text }}</span>
+                </span>
+
+                <!-- Assignee -->
+                <span
+                  class="flex items-center gap-1 font-medium"
+                  :class="ticket.assigned_to_nama || ticket.assigned_to ? 'text-slate-700' : 'text-amber-700 font-semibold'"
+                  title="Penanggung Jawab / Assignee"
+                >
+                  <span
+                    class="material-symbols-outlined text-[15px]"
+                    :class="ticket.assigned_to_nama || ticket.assigned_to ? 'text-slate-400' : 'text-amber-500'"
+                  >
+                    {{ ticket.assigned_to_nama || ticket.assigned_to ? 'person_pin' : 'warning' }}
+                  </span>
+                  <span>{{ ticket.assigned_to_nama || ticket.assigned_to ? getAssigneeName(ticket.assigned_to_nama || ticket.assigned_to) : 'Unassigned' }}</span>
                 </span>
               </div>
 
-              <!-- Row Action Kebab Menu -->
-              <div @click.stop class="shrink-0">
-                <AppRowActions :actions="getTicketActions(ticket)" />
+              <!-- Secondary Information (Timestamp, Comments, Attachments) -->
+              <div class="flex items-center gap-3 text-[11.5px] text-slate-400 shrink-0 font-normal ml-auto sm:ml-0">
+                <span class="flex items-center gap-1">
+                  <span class="material-symbols-outlined text-[13.5px]">schedule</span>
+                  <span>{{ formatRelativeTime(ticket.diperbarui_pada || ticket.dibuat_pada) }}</span>
+                </span>
+
+                <span v-if="ticket.total_komentar > 0" class="flex items-center gap-1" title="Komentar">
+                  <span class="material-symbols-outlined text-[13.5px]">chat_bubble_outline</span>
+                  <span>{{ ticket.total_komentar }}</span>
+                </span>
+
+                <span v-if="ticket.has_attachment" class="flex items-center gap-1" title="Lampiran">
+                  <span class="material-symbols-outlined text-[13.5px]">attach_file</span>
+                </span>
               </div>
             </div>
           </div>
@@ -2504,10 +2579,25 @@ function toast(message, type = 'success') {
 
               <form class="flex items-center gap-2" @submit.prevent="sendComment">
                 <label
-                  title="Tambah Lampiran (Gambar / Dokumen)"
-                  class="flex shrink-0 items-center justify-center rounded-lg p-1.5 text-[#64748B] hover:text-[#2563EB] transition-all cursor-pointer"
+                  title="Lampirkan file (Gambar / Dokumen)"
+                  aria-label="Lampirkan file"
+                  class="group/btn flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-100/80 hover:bg-slate-200/80 text-slate-500 hover:text-blue-600 transition-all cursor-pointer select-none"
                 >
-                  <span class="material-symbols-outlined text-[30px] leading-none">attach_file</span>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="w-[18px] h-[18px] min-w-[18px] min-h-[18px] shrink-0 text-slate-500 group-hover/btn:text-blue-600 transition-colors"
+                    aria-hidden="true"
+                  >
+                    <path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/>
+                  </svg>
                   <input
                     type="file"
                     accept="image/png,image/jpeg,image/gif,image/webp,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation"
@@ -2520,13 +2610,13 @@ function toast(message, type = 'success') {
                   v-model="newCommentText"
                   type="text"
                   placeholder="Tulis komentar atau catatan perbaikan..."
-                  class="h-9 flex-1 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3.5 text-xs font-medium text-[#0F172A] outline-none transition-all focus:bg-white focus:border-[#2563EB]"
+                  class="h-10 flex-1 min-w-0 rounded-xl border border-slate-200 bg-slate-50/70 px-3.5 text-xs font-medium text-slate-900 placeholder-slate-400 outline-none transition-all focus:bg-white focus:border-blue-600 focus:ring-1 focus:ring-blue-600/20"
                 />
 
                 <button
                   type="submit"
                   :disabled="isSubmittingComment || (!newCommentText.trim() && !commentAttachment)"
-                  class="flex h-9 px-4 items-center justify-center gap-1.5 rounded-xl bg-[#2563EB] text-xs font-bold text-white shadow-2xs hover:bg-[#1D4ED8] disabled:opacity-40 transition-all cursor-pointer"
+                  class="flex h-10 px-4 items-center justify-center gap-1.5 rounded-xl bg-[#2563EB] text-xs font-bold text-white shadow-2xs hover:bg-[#1D4ED8] disabled:opacity-40 transition-all cursor-pointer shrink-0"
                 >
                   <span class="material-symbols-outlined text-[16px]">send</span>
                   <span>Kirim</span>

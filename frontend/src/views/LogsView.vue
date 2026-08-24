@@ -288,7 +288,7 @@ function parsePerubahan(perubahan, aksi) {
       <!-- Filter + Refresh grouped (kept together) -->
       <div class="flex items-center gap-2">
         <!-- Action Filter (Asset Tab only) -->
-        <div v-if="activeTab === 'assets'" class="w-44">
+        <div v-if="activeTab === 'assets'" class="w-36">
           <CustomSelect
             v-model="filterAction"
             :options="[
@@ -303,7 +303,7 @@ function parsePerubahan(perubahan, aksi) {
         </div>
 
         <!-- Activity Filter (Audit Tab only) -->
-        <div v-if="activeTab === 'audit'" class="w-44">
+        <div v-if="activeTab === 'audit'" class="w-36">
           <CustomSelect
             v-model="filterActivity"
             :options="[

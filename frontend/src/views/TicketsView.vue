@@ -415,21 +415,68 @@ function removeAttachment(index) {
   attachmentChanged.value = true
 }
 
-function getAttachmentIcon(dataUrl) {
-  if (!dataUrl || typeof dataUrl !== 'string') return 'attach_file'
-  const lower = dataUrl.toLowerCase()
-  if (lower.includes('pdf')) return 'picture_as_pdf'
-  if (
-    lower.includes('presentation') ||
-    lower.includes('powerpoint') ||
-    lower.includes('mspowerpoint')
-  ) {
+function getAttachmentIcon(attachment, fileNameHint = '') {
+  let name = ''
+  let mimeOrData = ''
+
+  if (typeof attachment === 'object' && attachment !== null) {
+    name = attachment.name || attachment.nama || attachment.filename || attachment.attachment_name || ''
+    mimeOrData = attachment.data || attachment.attachment || ''
+  } else if (typeof attachment === 'string') {
+    if (attachment.startsWith('data:')) {
+      mimeOrData = attachment
+    } else {
+      name = attachment
+    }
+  }
+
+  if (fileNameHint && typeof fileNameHint === 'string') {
+    name = name || fileNameHint
+  }
+
+  // 1. Extract file extension from filename (most accurate)
+  let ext = ''
+  if (name) {
+    const parts = name.trim().toLowerCase().split('.')
+    if (parts.length > 1) {
+      ext = parts.pop()
+    }
+  }
+
+  if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'bmp', 'ico', 'heic', 'tiff'].includes(ext)) {
+    return 'image'
+  }
+  if (ext === 'pdf') {
+    return 'picture_as_pdf'
+  }
+  if (['doc', 'docx', 'rtf', 'odt'].includes(ext)) {
+    return 'description'
+  }
+  if (['xls', 'xlsx', 'csv', 'ods'].includes(ext)) {
+    return 'table_chart'
+  }
+  if (['ppt', 'pptx', 'odp'].includes(ext)) {
     return 'slideshow'
   }
-  if (lower.includes('word') || lower.includes('msword') || lower.includes('docx')) return 'description'
-  if (lower.includes('excel') || lower.includes('sheet') || lower.includes('csv')) return 'table_chart'
-  if (lower.includes('zip') || lower.includes('rar') || lower.includes('compressed')) return 'folder_zip'
-  if (lower.includes('image')) return 'image'
+  if (['zip', 'rar', '7z', 'tar', 'gz', 'bz2'].includes(ext)) {
+    return 'folder_zip'
+  }
+  if (['txt', 'log', 'md', 'json', 'xml'].includes(ext)) {
+    return 'article'
+  }
+
+  // 2. Fallback to MIME type header ONLY (e.g. data:image/png;base64,...)
+  if (mimeOrData.startsWith('data:')) {
+    const mimeHeader = (mimeOrData.split(';')[0] || '').toLowerCase()
+    if (mimeHeader.includes('image')) return 'image'
+    if (mimeHeader.includes('pdf')) return 'picture_as_pdf'
+    if (mimeHeader.includes('word') || mimeHeader.includes('wordprocessingml')) return 'description'
+    if (mimeHeader.includes('excel') || mimeHeader.includes('spreadsheet') || mimeHeader.includes('csv')) return 'table_chart'
+    if (mimeHeader.includes('presentation') || mimeHeader.includes('powerpoint')) return 'slideshow'
+    if (mimeHeader.includes('zip') || mimeHeader.includes('compressed') || mimeHeader.includes('rar')) return 'folder_zip'
+    if (mimeHeader.includes('text/plain')) return 'article'
+  }
+
   return 'attach_file'
 }
 
@@ -2109,7 +2156,7 @@ function toast(message, type = 'success') {
                   <div
                     class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#ECF2FF] text-[#2563EB]"
                   >
-                    <span class="material-symbols-outlined text-[20px]">{{ getAttachmentIcon(att.data) }}</span>
+                    <span class="material-symbols-outlined text-[20px]">{{ getAttachmentIcon(att.data, att.name) }}</span>
                   </div>
                   <div class="min-w-0">
                     <p class="text-[12px] font-bold text-[#2A3547] truncate">{{ att.name || 'Lampiran' }}</p>
@@ -2367,7 +2414,7 @@ function toast(message, type = 'success') {
                     <div
                       class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#ECF2FF] text-[#2563EB]"
                     >
-                      <span class="material-symbols-outlined text-[20px]">{{ getAttachmentIcon(att.attachment) }}</span>
+                      <span class="material-symbols-outlined text-[20px]">{{ getAttachmentIcon(att.attachment, att.name) }}</span>
                     </div>
                     <div class="min-w-0">
                       <p class="text-[12px] font-bold text-[#2A3547] truncate">
@@ -2526,7 +2573,7 @@ function toast(message, type = 'success') {
                   >
                     <div class="flex items-center gap-2 min-w-0">
                       <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-[#ECF2FF] text-[#2563EB]">
-                        <span class="material-symbols-outlined text-[16px]">{{ getAttachmentIcon(c.attachment) }}</span>
+                        <span class="material-symbols-outlined text-[16px]">{{ getAttachmentIcon(c.attachment, c.attachment_name) }}</span>
                       </div>
                       <span class="text-[11px] font-semibold text-[#334155] truncate">{{ c.attachment_name || 'Lampiran diskusi' }}</span>
                     </div>
@@ -2562,7 +2609,7 @@ function toast(message, type = 'success') {
               >
                 <div class="flex items-center gap-2 min-w-0">
                   <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#ECF2FF] text-[#2563EB]">
-                    <span class="material-symbols-outlined text-[16px]">{{ getAttachmentIcon(commentAttachment) }}</span>
+                    <span class="material-symbols-outlined text-[16px]">{{ getAttachmentIcon(commentAttachment, commentAttachmentName) }}</span>
                   </div>
                   <span class="text-xs font-bold text-[#0F172A] truncate"
                     >{{ commentAttachmentName || 'File lampiran siap dikirim' }}</span

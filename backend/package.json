@@ -19,7 +19,7 @@
   },
   "scripts": {
     "start": "node src/server.js",
-    "dev": "nodemon src/server.js",
+    "dev": "nodemon --watch .env --watch src src/server.js",
     "db:setup": "node src/config/setupDatabase.js",
     "db:check": "node src/config/checkSchema.js",
     "test": "node --test",

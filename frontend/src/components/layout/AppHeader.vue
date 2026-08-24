@@ -302,44 +302,44 @@ const searchResults = computed(() => {
   const assets = allAssets.value
     .filter(
       (a) =>
-        (a.label_aset || '').toLowerCase().includes(q) ||
-        (a.hostname || '').toLowerCase().includes(q) ||
-        (a.nomor_seri || '').toLowerCase().includes(q) ||
-        (a.spesifikasi || '').toLowerCase().includes(q) ||
-        (a.catatan_aset || '').toLowerCase().includes(q) ||
-        (a.tipe_perangkat || '').toLowerCase().includes(q) ||
-        (a.merek || '').toLowerCase().includes(q) ||
-        (a.model || '').toLowerCase().includes(q) ||
-        (a.lokasi_aset || '').toLowerCase().includes(q),
+        String(a.label_aset || '').toLowerCase().includes(q) ||
+        String(a.hostname || '').toLowerCase().includes(q) ||
+        String(a.nomor_seri || '').toLowerCase().includes(q) ||
+        String(a.spesifikasi || '').toLowerCase().includes(q) ||
+        String(a.catatan_aset || '').toLowerCase().includes(q) ||
+        String(a.tipe_perangkat || '').toLowerCase().includes(q) ||
+        String(a.merek || '').toLowerCase().includes(q) ||
+        String(a.model || '').toLowerCase().includes(q) ||
+        String(a.lokasi_aset || '').toLowerCase().includes(q),
     )
     .slice(0, 6)
 
   const karyawan = allKaryawan.value
     .filter(
       (k) =>
-        (k.nama_karyawan || '').toLowerCase().includes(q) ||
-        (k.nik || '').toLowerCase().includes(q) ||
-        (k.departemen || '').toLowerCase().includes(q) ||
-        (k.email_kantor || '').toLowerCase().includes(q),
+        String(k.nama_karyawan || '').toLowerCase().includes(q) ||
+        String(k.nik || '').toLowerCase().includes(q) ||
+        String(k.departemen || '').toLowerCase().includes(q) ||
+        String(k.email_kantor || '').toLowerCase().includes(q),
     )
     .slice(0, 6)
 
   const tickets = allTickets.value
     .filter(
       (t) =>
-        (t.nomor_tiket || '').toLowerCase().includes(q) ||
-        (t.judul || '').toLowerCase().includes(q) ||
-        (t.deskripsi || '').toLowerCase().includes(q) ||
-        (t.pelapor || '').toLowerCase().includes(q),
+        String(t.nomor_tiket || '').toLowerCase().includes(q) ||
+        String(t.judul || '').toLowerCase().includes(q) ||
+        String(t.deskripsi || '').toLowerCase().includes(q) ||
+        String(t.pelapor || t.pelapor_nama || '').toLowerCase().includes(q),
     )
     .slice(0, 6)
 
   const users = allUsers.value
     .filter(
       (u) =>
-        (u.nama || '').toLowerCase().includes(q) ||
-        (u.email || '').toLowerCase().includes(q) ||
-        (u.role || '').toLowerCase().includes(q),
+        String(u.nama || '').toLowerCase().includes(q) ||
+        String(u.email || '').toLowerCase().includes(q) ||
+        String(u.role || '').toLowerCase().includes(q),
     )
     .slice(0, 6)
 

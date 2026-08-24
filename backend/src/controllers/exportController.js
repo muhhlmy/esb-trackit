@@ -895,7 +895,9 @@ export async function resetDatabaseHandler(req, res, next) {
         ('IT-Help', 'IT Helpdesk', 'General IT support requests'),
         ('IT-Network', 'Network Team', 'Network infrastructure issues'),
         ('IT-Software', 'Software Support', 'Software licensing and installation'),
-        ('IT-Hardware', 'Hardware Support', 'Hardware repair and replacement')
+        ('IT-Hardware', 'Hardware Support', 'Hardware repair and replacement'),
+        ('HR', 'HR Support', 'Human Resources support & services'),
+        ('GA', 'GA Support', 'General Affairs support & facilities')
     `)
 
     await client.query('COMMIT')

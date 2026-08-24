@@ -13,6 +13,7 @@ import { router } from "./routes/index.js";
 import { isCorsOriginAllowed } from "./security/corsPolicy.js";
 
 export const app = express();
+// Express App Initialization
 
 app.set("trust proxy", env.trustProxy);
 app.disable("x-powered-by");

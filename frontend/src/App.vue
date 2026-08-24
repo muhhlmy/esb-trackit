@@ -40,14 +40,26 @@ watch(
 // ── Global SSE Lifecycle ──────────────────────────────────────
 // Koneksi SSE di-init sekali saat app mount (jika sudah login),
 // tetap hidup selama navigasi antar view, dan disconnect saat unmount.
+function handleResize() {
+  if (typeof window !== 'undefined' && window.innerWidth >= 1024) {
+    isMobileNavigationOpen.value = false
+  }
+}
+
 onMounted(() => {
   if (!isLoginPage.value) {
     initTicketRealtime()
+  }
+  if (typeof window !== 'undefined') {
+    window.addEventListener('resize', handleResize)
   }
 })
 
 onUnmounted(() => {
   stopTicketRealtime()
+  if (typeof window !== 'undefined') {
+    window.removeEventListener('resize', handleResize)
+  }
 })
 
 // Saat user login/logout, connect/disconnect SSE sesuai status auth.

@@ -258,14 +258,40 @@ const hrQueue = computed(
     ),
 )
 
+const gaQueue = computed(
+  () =>
+    queues.value.find(
+      (q) =>
+        (q.kode || '').toUpperCase().includes('GA') ||
+        (q.nama || '').toUpperCase().includes('GA') ||
+        (q.nama || '').toUpperCase().includes('GENERAL'),
+    ),
+)
+
 function setSupportUnit(unit) {
   selectedSupportUnit.value = unit
-  const targetQueue = unit === 'HR' ? hrQueue.value : itQueue.value
+  let targetQueue
+  if (unit === 'HR') {
+    targetQueue = hrQueue.value
+  } else if (unit === 'GA') {
+    targetQueue = gaQueue.value
+  } else {
+    targetQueue = itQueue.value
+  }
+
   if (targetQueue) {
     form.value.queue_id = targetQueue.id
   } else if (queues.value.length > 0) {
     form.value.queue_id = queues.value[0].id
   }
+}
+
+function getQueueIcon(ticket) {
+  const code = (ticket?.queue_kode || '').toUpperCase()
+  const name = (ticket?.queue_nama || '').toUpperCase()
+  if (code.includes('HR') || name.includes('HR') || name.includes('HUMAN')) return 'badge'
+  if (code.includes('GA') || name.includes('GA') || name.includes('GENERAL')) return 'corporate_fare'
+  return 'computer'
 }
 
 const availableCategories = computed(() => {
@@ -285,6 +311,26 @@ const availableCategories = computed(() => {
         value: 'QNA',
         title: 'QNA',
         desc: 'Pertanyaan & Informasi HR',
+      },
+    ]
+  }
+
+  if (selectedSupportUnit.value === 'GA') {
+    return [
+      {
+        value: 'Request',
+        title: 'Request',
+        desc: 'Permintaan Fasilitas, Perbaikan & Perlengkapan GA',
+      },
+      {
+        value: 'Support',
+        title: 'Support',
+        desc: 'Kendala Fasilitas, Ruangan & AC / Maintenance',
+      },
+      {
+        value: 'Incident',
+        title: 'Incident',
+        desc: 'Insiden Darurat & Damage Gedung/Fasilitas',
       },
     ]
   }
@@ -671,6 +717,8 @@ function openEdit(ticket) {
   const queueName = (ticket.queue_nama || '').toUpperCase()
   if (queueCode.includes('HR') || queueName.includes('HR') || queueName.includes('HUMAN')) {
     selectedSupportUnit.value = 'HR'
+  } else if (queueCode.includes('GA') || queueName.includes('GA') || queueName.includes('GENERAL')) {
+    selectedSupportUnit.value = 'GA'
   } else {
     selectedSupportUnit.value = 'IT'
   }
@@ -1349,7 +1397,7 @@ function toast(message, type = 'success') {
                 <span>·</span>
                 <span class="text-[#334155] font-semibold flex items-center gap-1">
                   <span class="material-symbols-outlined text-[13.5px] text-[#5D87FF]">
-                    {{ (ticket.queue_kode || '').toUpperCase().includes('HR') || (ticket.queue_nama || '').toUpperCase().includes('HR') ? 'badge' : 'computer' }}
+                    {{ getQueueIcon(ticket) }}
                   </span>
                   {{ ticket.queue_nama || (ticket.queue_kode ? `${ticket.queue_kode} Support` : 'IT Support') }}
                 </span>
@@ -1429,7 +1477,7 @@ function toast(message, type = 'success') {
                 <span>·</span>
                 <span class="text-[#334155] font-semibold flex items-center gap-1">
                   <span class="material-symbols-outlined text-[13.5px] text-[#5D87FF]">
-                    {{ (ticket.queue_kode || '').toUpperCase().includes('HR') || (ticket.queue_nama || '').toUpperCase().includes('HR') ? 'badge' : 'computer' }}
+                    {{ getQueueIcon(ticket) }}
                   </span>
                   {{ ticket.queue_nama || (ticket.queue_kode ? `${ticket.queue_kode} Support` : 'IT Support') }}
                 </span>
@@ -1692,7 +1740,7 @@ function toast(message, type = 'success') {
                 >1. Pilih Unit Support Target <span class="text-[#FA896B]">*</span></span
               >
             </div>
-            <div class="grid grid-cols-2 gap-3">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <button
                 type="button"
                 @click="setSupportUnit('IT')"
@@ -1734,6 +1782,28 @@ function toast(message, type = 'success') {
                 <div>
                   <p class="text-[12.5px] font-bold">HR Support</p>
                   <p class="text-[10.5px] text-[#7C8BAC] leading-tight">Kepegawaian, Dokumen & QNA</p>
+                </div>
+              </button>
+
+              <button
+                type="button"
+                @click="setSupportUnit('GA')"
+                class="flex h-[60px] items-center gap-3 rounded-xl border p-3 text-left transition-all cursor-pointer select-none"
+                :class="
+                  selectedSupportUnit === 'GA'
+                    ? 'border-[#5D87FF] bg-[#ECF2FF] text-[#5D87FF] ring-2 ring-[#5D87FF]/20 shadow-xs'
+                    : 'border-[#E5EAEF] bg-white text-[#2A3547] hover:bg-[#F8FAFC] hover:border-[#CBD5E1]'
+                "
+              >
+                <div
+                  class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg"
+                  :class="selectedSupportUnit === 'GA' ? 'bg-[#5D87FF] text-white' : 'bg-[#F1F5F9] text-[#7C8BAC]'"
+                >
+                  <span class="material-symbols-outlined text-[18px]">corporate_fare</span>
+                </div>
+                <div>
+                  <p class="text-[12.5px] font-bold">GA Support</p>
+                  <p class="text-[10.5px] text-[#7C8BAC] leading-tight">Fasilitas, Gedung & Logistik</p>
                 </div>
               </button>
             </div>

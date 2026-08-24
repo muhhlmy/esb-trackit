@@ -96,8 +96,10 @@ const popoverPlacement = ref('up')
 
 let closeFlyoutTimer = null
 
+const isEffectiveCollapsed = computed(() => props.isCollapsed && !props.isMobileOpen)
+
 function handleParentClick(parent, event) {
-  if (props.isCollapsed) {
+  if (isEffectiveCollapsed.value) {
     if (activeFlyoutParent.value?.key === parent.key) {
       activeFlyoutParent.value = null
     } else {
@@ -109,13 +111,13 @@ function handleParentClick(parent, event) {
 }
 
 function handleParentMouseEnter(parent, event) {
-  if (!props.isCollapsed) return
+  if (!isEffectiveCollapsed.value) return
   if (closeFlyoutTimer) clearTimeout(closeFlyoutTimer)
   openFlyout(parent, event)
 }
 
 function handleParentMouseLeave() {
-  if (!props.isCollapsed) return
+  if (!isEffectiveCollapsed.value) return
   closeFlyoutTimer = setTimeout(() => {
     activeFlyoutParent.value = null
   }, 200)
@@ -137,7 +139,7 @@ function openFlyout(parent, event) {
 }
 
 function handleDirectMouseEnter(item, event) {
-  if (!props.isCollapsed) return
+  if (!isEffectiveCollapsed.value) return
   const btn = event.currentTarget
   if (!btn) return
   const rect = btn.getBoundingClientRect()
@@ -492,20 +494,20 @@ function handlePopoverLogout() {
       isMobileOpen
         ? 'w-[250px] translate-x-0 visible opacity-100'
         : '-translate-x-full lg:translate-x-0',
-      isCollapsed ? 'lg:w-[74px]' : 'lg:w-[245px]',
+      isEffectiveCollapsed ? 'lg:w-[74px]' : 'lg:w-[245px]',
     ]"
   >
     <!-- ── Brand Logo Top Header Area ── -->
     <div
       class="relative flex h-[56px] shrink-0 items-center border-b border-[#F1F5F9] transition-all"
       :class="
-        isCollapsed ? 'justify-center flex-col gap-1 px-0 py-1' : 'justify-between gap-2 px-3.5'
+        isEffectiveCollapsed ? 'justify-center flex-col gap-1 px-0 py-1' : 'justify-between gap-2 px-3.5'
       "
     >
       <!-- Logo saat Expanded -->
       <RouterLink
-        v-if="!isCollapsed"
-        to="/dashboard"
+        v-if="!isEffectiveCollapsed"
+        to="/"
         title="Kembali ke Dashboard"
         class="flex items-center justify-center shrink-0 hover:opacity-80 transition-opacity cursor-pointer"
       >
@@ -520,7 +522,7 @@ function handlePopoverLogout() {
       <template v-else>
         <div class="flex items-center justify-center gap-1.5 w-full px-1">
           <RouterLink
-            to="/dashboard"
+            to="/"
             title="Kembali ke Dashboard"
             class="flex h-7 w-7 items-center justify-center rounded-lg hover:bg-[#ECF2FF] transition-all cursor-pointer shrink-0"
           >
@@ -547,7 +549,7 @@ function handlePopoverLogout() {
 
       <!-- Toggle Button Desktop (Saat Expanded) -->
       <button
-        v-if="!isCollapsed"
+        v-if="!isEffectiveCollapsed"
         ref="closeButtonRef"
         type="button"
         aria-label="Ciutkan Sidepanel"
@@ -573,29 +575,29 @@ function handlePopoverLogout() {
     <!-- ── Sidebar Scrollable Menu / Navigation Rail Container ── -->
     <div
       class="relative flex-1 overflow-y-auto py-3 transition-all"
-      :class="isCollapsed ? 'px-0 space-y-3' : 'px-2.5 space-y-4'"
+      :class="isEffectiveCollapsed ? 'px-0 space-y-3' : 'px-2.5 space-y-4'"
     >
       <div
         v-for="group in menuGroups"
         :key="group.title"
-        :class="isCollapsed ? 'space-y-2' : 'space-y-1'"
+        :class="isEffectiveCollapsed ? 'space-y-2' : 'space-y-1'"
       >
         <!-- Category Title (Hanya di Expanded Mode) -->
         <p
-          v-if="!isCollapsed"
+          v-if="!isEffectiveCollapsed"
           class="px-2 text-[10.5px] font-extrabold uppercase tracking-wider text-[#475569] transition-all"
         >
           {{ group.title }}
         </p>
 
-        <nav :class="isCollapsed ? 'flex flex-col items-center gap-1.5' : 'space-y-0.5'">
+        <nav :class="isEffectiveCollapsed ? 'flex flex-col items-center gap-1.5' : 'space-y-0.5'">
           <!-- 1. Direct Items (e.g. Dashboard) -->
           <template v-if="group.items && group.items.length">
             <div
               v-for="item in group.items"
               :key="item.to"
               class="relative"
-              :class="isCollapsed ? 'flex justify-center w-full' : ''"
+              :class="isEffectiveCollapsed ? 'flex justify-center w-full' : ''"
               @mouseenter="handleDirectMouseEnter(item, $event)"
               @mouseleave="handleDirectMouseLeave"
             >
@@ -603,7 +605,7 @@ function handlePopoverLogout() {
                 :to="item.to"
                 class="group flex items-center transition-all duration-150 relative cursor-pointer"
                 :class="[
-                  isCollapsed
+                  isEffectiveCollapsed
                     ? 'h-10 w-10 justify-center rounded-xl'
                     : 'w-full gap-2.5 rounded-lg px-2.5 py-2 text-[12.5px]',
                   route.path === item.to
@@ -616,7 +618,7 @@ function handlePopoverLogout() {
                   aria-hidden="true"
                   class="material-symbols-outlined transition-colors shrink-0"
                   :class="[
-                    isCollapsed ? 'text-[20px]' : 'text-[18px]',
+                    isEffectiveCollapsed ? 'text-[20px]' : 'text-[18px]',
                     route.path === item.to
                       ? 'text-white'
                       : 'text-[#7C8BAC] group-hover:text-[#5D87FF]',
@@ -625,12 +627,12 @@ function handlePopoverLogout() {
                   {{ item.icon }}
                 </span>
 
-                <span v-if="!isCollapsed" class="min-w-0 flex-1 leading-none whitespace-nowrap">
+                <span v-if="!isEffectiveCollapsed" class="min-w-0 flex-1 leading-none whitespace-nowrap">
                   {{ item.label }}
                 </span>
 
                 <span
-                  v-if="item.badge && !isCollapsed"
+                  v-if="item.badge && !isEffectiveCollapsed"
                   class="rounded-full px-1.5 py-0.2 text-[9px] font-bold shrink-0"
                   :class="
                     route.path === item.to
@@ -650,7 +652,7 @@ function handlePopoverLogout() {
               v-for="parent in group.parents"
               :key="parent.key"
               class="relative"
-              :class="isCollapsed ? 'flex justify-center w-full' : 'space-y-0.5'"
+              :class="isEffectiveCollapsed ? 'flex justify-center w-full' : 'space-y-0.5'"
               @mouseenter="handleParentMouseEnter(parent, $event)"
               @mouseleave="handleParentMouseLeave"
             >
@@ -659,11 +661,11 @@ function handlePopoverLogout() {
                 type="button"
                 class="group flex items-center transition-all duration-150 cursor-pointer select-none"
                 :class="[
-                  isCollapsed
+                  isEffectiveCollapsed
                     ? 'h-10 w-10 justify-center rounded-xl'
                     : 'w-full gap-2.5 rounded-lg px-2.5 py-2 text-[12.5px] font-semibold justify-between',
                   parent.items.some((child) => route.path === child.to)
-                    ? isCollapsed
+                    ? isEffectiveCollapsed
                       ? 'bg-[#ECF2FF] text-[#5D87FF]'
                       : 'text-[#2A3547] bg-[#F8FAFC]'
                     : 'text-[#2A3547] hover:bg-[#F8FAFC] hover:text-[#5D87FF]',
@@ -672,13 +674,13 @@ function handlePopoverLogout() {
               >
                 <div
                   class="flex items-center gap-2.5 min-w-0"
-                  :class="isCollapsed ? 'justify-center' : ''"
+                  :class="isEffectiveCollapsed ? 'justify-center' : ''"
                 >
                   <span
                     aria-hidden="true"
                     class="material-symbols-outlined transition-colors shrink-0"
                     :class="[
-                      isCollapsed ? 'text-[20px]' : 'text-[18px]',
+                      isEffectiveCollapsed ? 'text-[20px]' : 'text-[18px]',
                       parent.items.some((child) => route.path === child.to)
                         ? 'text-[#5D87FF]'
                         : 'text-[#7C8BAC] group-hover:text-[#5D87FF]',
@@ -688,7 +690,7 @@ function handlePopoverLogout() {
                   </span>
 
                   <span
-                    v-if="!isCollapsed"
+                    v-if="!isEffectiveCollapsed"
                     class="min-w-0 flex-1 leading-none whitespace-nowrap text-left"
                   >
                     {{ parent.label }}
@@ -696,7 +698,7 @@ function handlePopoverLogout() {
                 </div>
 
                 <span
-                  v-if="!isCollapsed"
+                  v-if="!isEffectiveCollapsed"
                   aria-hidden="true"
                   class="material-symbols-outlined text-[16px] text-[#7C8BAC] transition-transform duration-200 shrink-0"
                   :class="{ 'rotate-180': isParentExpanded(parent.key) }"
@@ -707,7 +709,7 @@ function handlePopoverLogout() {
 
               <!-- Expanded Mode Submenu Items -->
               <div
-                v-if="!isCollapsed"
+                v-if="!isEffectiveCollapsed"
                 v-show="isParentExpanded(parent.key)"
                 class="pl-5 space-y-0.5 mt-0.5 transition-all"
               >
@@ -749,7 +751,7 @@ function handlePopoverLogout() {
     <!-- ── Bottom User Profile Section ── -->
     <div class="relative p-2 border-t border-[#F1F5F9]">
       <!-- Expanded Mode User Profile Compact Control -->
-      <div v-if="!isCollapsed">
+      <div v-if="!isEffectiveCollapsed">
         <button
           ref="profileBtnRef"
           type="button"
@@ -797,7 +799,7 @@ function handlePopoverLogout() {
   <Teleport to="body">
     <!-- Parent Menu Flyout Popover -->
     <div
-      v-if="isCollapsed && activeFlyoutParent"
+      v-if="isEffectiveCollapsed && activeFlyoutParent"
       class="fixed z-[9999] w-[195px] rounded-xl border border-[#E2E8F0] bg-white p-2 shadow-2xl transition-all select-none animate-in fade-in zoom-in-95 duration-150"
       :style="{ top: `${flyoutPos.top}px`, left: `${flyoutPos.left}px` }"
       @mouseenter="cancelCloseFlyout"
@@ -837,7 +839,7 @@ function handlePopoverLogout() {
 
     <!-- Direct Item Tooltip -->
     <div
-      v-if="isCollapsed && hoveredTooltipLabel"
+      v-if="isEffectiveCollapsed && hoveredTooltipLabel"
       class="fixed z-[9999] -translate-y-1/2 whitespace-nowrap rounded-md bg-[#1E293B] px-2.5 py-1 text-[11px] font-bold text-white shadow-md pointer-events-none"
       :style="{ top: `${tooltipPos.top}px`, left: `${tooltipPos.left}px` }"
     >

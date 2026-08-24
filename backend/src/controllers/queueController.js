@@ -37,6 +37,14 @@ async function ensureDefaultQueuesExist() {
         `INSERT INTO ticket_queues (kode, nama, deskripsi) VALUES ('HR', 'HR Support', 'Human Resources support & services')`
       )
     }
+    const checkGa = await pool.query(
+      `SELECT id FROM ticket_queues WHERE UPPER(kode) LIKE '%GA%' OR UPPER(nama) LIKE '%GA%' OR UPPER(nama) LIKE '%GENERAL%' LIMIT 1`
+    )
+    if (checkGa.rowCount === 0) {
+      await pool.query(
+        `INSERT INTO ticket_queues (kode, nama, deskripsi) VALUES ('GA', 'GA Support', 'General Affairs support & facilities')`
+      )
+    }
   } catch (_err) {
     // Ignore seed race conditions
   }

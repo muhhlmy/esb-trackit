@@ -121,7 +121,7 @@ export async function listUsers(req, res) {
          LEFT JOIN ticket_queues q ON q.id = utq.queue_id AND q.is_active = true
         WHERE u.deleted_at IS NULL
         GROUP BY u.id
-        ORDER BY u.id DESC
+        ORDER BY u.id ASC
         LIMIT $1 OFFSET $2`,
       [limit, offset]
     );

@@ -250,6 +250,80 @@ async function fetchQueues() {
   }
 }
 
+const unitOptions = computed(() => {
+  const itQueues = queues.value.filter(
+    (q) =>
+      (q.kode || '').toUpperCase().includes('IT') ||
+      (q.nama || '').toUpperCase().includes('IT'),
+  )
+  const hrQueues = queues.value.filter(
+    (q) =>
+      (q.kode || '').toUpperCase().includes('HR') ||
+      (q.nama || '').toUpperCase().includes('HR') ||
+      (q.nama || '').toUpperCase().includes('HUMAN'),
+  )
+  const gaQueues = queues.value.filter(
+    (q) =>
+      (q.kode || '').toUpperCase().includes('GA') ||
+      (q.nama || '').toUpperCase().includes('GA') ||
+      (q.nama || '').toUpperCase().includes('GENERAL'),
+  )
+  const otherQueues = queues.value.filter(
+    (q) => !itQueues.includes(q) && !hrQueues.includes(q) && !gaQueues.includes(q),
+  )
+
+  const items = [
+    {
+      key: 'IT',
+      kode: 'IT Support',
+      nama: 'Perangkat, Network & Software',
+      icon: 'computer',
+      queueIds: itQueues.map((q) => Number(q.id)),
+    },
+    {
+      key: 'HR',
+      kode: 'HR Support',
+      nama: 'Kepegawaian, Dokumen & QNA',
+      icon: 'badge',
+      queueIds: hrQueues.map((q) => Number(q.id)),
+    },
+    {
+      key: 'GA',
+      kode: 'GA Support',
+      nama: 'Fasilitas, Gedung & Logistik',
+      icon: 'corporate_fare',
+      queueIds: gaQueues.map((q) => Number(q.id)),
+    },
+  ]
+
+  otherQueues.forEach((q) => {
+    items.push({
+      key: `OTHER_${q.id}`,
+      kode: q.kode,
+      nama: q.nama,
+      icon: 'confirmation_number',
+      queueIds: [Number(q.id)],
+    })
+  })
+
+  return items
+})
+
+function isUnitSelected(unit) {
+  if (!unit.queueIds || unit.queueIds.length === 0) return false
+  return unit.queueIds.some((id) => form.value.queue_ids.includes(id))
+}
+
+function toggleUnit(unit) {
+  const selected = isUnitSelected(unit)
+  if (selected) {
+    form.value.queue_ids = form.value.queue_ids.filter((id) => !unit.queueIds.includes(id))
+  } else {
+    const toAdd = unit.queueIds.filter((id) => !form.value.queue_ids.includes(id))
+    form.value.queue_ids = [...form.value.queue_ids, ...toAdd]
+  }
+}
+
 async function fetchUsers() {
   isLoading.value = true
   pageError.value = ''
@@ -929,28 +1003,36 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
           >
             ⚡ Superadmin memiliki akses otomatis ke seluruh unit (HR, IT, GA, OPS).
           </div>
-          <div v-else class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-            <label
-              v-for="q in queues"
-              :key="q.id"
-              class="flex items-center gap-2 p-2.5 rounded-xl border bg-white cursor-pointer transition-all shadow-2xs select-none"
+          <div v-else class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+            <div
+              v-for="unit in unitOptions"
+              :key="unit.key"
+              @click="toggleUnit(unit)"
+              class="flex items-center gap-3 p-3 rounded-xl border bg-white cursor-pointer transition-all shadow-2xs select-none"
               :class="
-                form.queue_ids.includes(Number(q.id))
-                  ? 'border-[#2563EB] bg-[#EFF6FF]/50 text-[#2563EB]'
+                isUnitSelected(unit)
+                  ? 'border-[#2563EB] bg-[#EFF6FF]/50 text-[#2563EB] ring-1 ring-[#2563EB]/30'
                   : 'border-[#E2E8F0] text-[#0F172A] hover:bg-[#F8FAFC]'
               "
             >
               <input
                 type="checkbox"
-                :value="Number(q.id)"
-                v-model="form.queue_ids"
-                class="h-4 w-4 rounded border-gray-300 text-[#2563EB] focus:ring-[#2563EB]"
+                :checked="isUnitSelected(unit)"
+                @click.stop="toggleUnit(unit)"
+                class="h-4 w-4 rounded border-gray-300 text-[#2563EB] focus:ring-[#2563EB] cursor-pointer shrink-0"
               />
-              <div class="min-w-0">
-                <p class="text-xs font-bold leading-tight">{{ q.kode }}</p>
-                <p class="text-[10.5px] text-[#64748B] leading-tight truncate">{{ q.nama }}</p>
+              <div class="flex items-center gap-2 min-w-0">
+                <span
+                  class="material-symbols-outlined text-[20px] shrink-0"
+                  :class="isUnitSelected(unit) ? 'text-[#2563EB]' : 'text-[#64748B]'"
+                  >{{ unit.icon }}</span
+                >
+                <div class="min-w-0">
+                  <p class="text-xs font-bold leading-tight truncate">{{ unit.kode }}</p>
+                  <p class="text-[10.5px] text-[#64748B] leading-tight truncate">{{ unit.nama }}</p>
+                </div>
               </div>
-            </label>
+            </div>
           </div>
         </div>
 

@@ -1203,6 +1203,7 @@ onMounted(async () => {
                 search-placeholder="Cari atau ketik lokasi baru..."
                 allow-custom
                 custom-label-prefix="+ Gunakan lokasi baru"
+                drop-direction="up"
                 class="w-full"
               />
             </label>

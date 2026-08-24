@@ -17,6 +17,7 @@ const props = defineProps({
   loading: { type: Boolean, default: false },
   heightClass: { type: String, default: 'h-10' },
   triggerClass: { type: String, default: '' },
+  dropDirection: { type: String, default: 'down' }, // 'down' | 'up'
 })
 
 const emit = defineEmits(['update:modelValue'])
@@ -262,7 +263,8 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside))
 
     <div
       v-if="isOpen"
-      class="absolute left-0 right-0 z-50 mt-1 flex flex-col rounded-lg border border-[#E8EDF3] bg-white shadow-xl animate-fade-in"
+      class="absolute left-0 right-0 z-50 flex flex-col rounded-lg border border-[#E8EDF3] bg-white shadow-xl animate-fade-in"
+      :class="dropDirection === 'up' ? 'bottom-full mb-1' : 'top-full mt-1'"
     >
       <div class="relative border-b border-[#F1F5F9] p-1.5">
         <span

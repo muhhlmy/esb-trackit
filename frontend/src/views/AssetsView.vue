@@ -11,6 +11,7 @@ import { normalizeLocation } from '../utils/locationNormalizer.js'
 import AppModal from '../components/ui/AppModal.vue'
 import AppBadge from '../components/ui/AppBadge.vue'
 import SearchableSelect from '../components/ui/SearchableSelect.vue'
+import CustomSelect from '../components/ui/CustomSelect.vue'
 import AppRowActions from '../components/ui/AppRowActions.vue'
 import AppImportModal from '../components/ui/AppImportModal.vue'
 import AppPagination from '../components/ui/AppPagination.vue'
@@ -149,6 +150,11 @@ const locationOptions = computed(() =>
     ].map(normalizeLocation),
   ).map((loc) => ({ value: loc, label: loc })),
 )
+
+const filterStatusOptions = computed(() => [
+  { value: '', label: 'Semua Status' },
+  ...ASSET_STATUSES.map((s) => ({ value: s.value, label: s.label })),
+])
 
 const filteredAssets = computed(() => {
   const query = searchQuery.value.trim().toLocaleLowerCase('id-ID')
@@ -733,14 +739,13 @@ onMounted(async () => {
         </div>
 
         <!-- Filter Status -->
-        <select
+        <CustomSelect
           v-model="filterStatus"
+          :options="filterStatusOptions"
           aria-label="Filter status"
-          class="h-9 w-[135px] shrink-0 rounded-lg border border-[#E2E8F0] bg-white px-2.5 text-xs text-[#0F172A] focus:border-[#2563EB] focus:outline-none transition-all cursor-pointer shadow-2xs"
-        >
-          <option value="">Semua Status</option>
-          <option v-for="s in ASSET_STATUSES" :key="s.value" :value="s.value">{{ s.label }}</option>
-        </select>
+          :width-class="'w-[135px]'"
+          @change="fetchData"
+        />
 
         <!-- Reset Filter Button -->
         <button

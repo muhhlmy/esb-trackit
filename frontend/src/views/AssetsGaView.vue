@@ -7,6 +7,7 @@ import { normalizeLocation } from '../utils/locationNormalizer.js'
 import AppModal from '../components/ui/AppModal.vue'
 import AppBadge from '../components/ui/AppBadge.vue'
 import SearchableSelect from '../components/ui/SearchableSelect.vue'
+import CustomSelect from '../components/ui/CustomSelect.vue'
 import AppRowActions from '../components/ui/AppRowActions.vue'
 import AppPagination from '../components/ui/AppPagination.vue'
 import BaseSkeleton from '../components/ui/skeleton/BaseSkeleton.vue'
@@ -83,6 +84,22 @@ const tipeOptions = computed(() =>
     [...assets.value.map((a) => a.tipe_fasilitas), form.value.tipe_fasilitas],
   ).map((t) => ({ value: t, label: t })),
 )
+
+// Filter option lists (include an empty "all" entry for CustomSelect)
+const locationFilterOptions = computed(() => [
+  { value: '', label: 'Semua Lokasi' },
+  ...locationOptions.value,
+])
+
+const tipeFilterOptions = computed(() => [
+  { value: '', label: 'Semua Fasilitas' },
+  ...tipeOptions.value,
+])
+
+const kondisiFilterOptions = [
+  { value: '', label: 'Semua Kondisi' },
+  ...kondisiOptions.map((k) => ({ value: k, label: k })),
+]
 
 // Form State
 const emptyForm = () => ({
@@ -377,33 +394,34 @@ function formatKondisiPill(kondisi) {
         </div>
 
         <!-- Filter Lokasi -->
-        <select
-          v-model="selectedLocation" aria-label="Filter lokasi"
-          class="h-9 w-[140px] shrink-0 rounded-lg border border-[#E2E8F0] bg-white px-2.5 text-xs text-[#0F172A] focus:border-[#2563EB] focus:outline-none transition-all cursor-pointer shadow-2xs"
-        >
-          <option value="">Semua Lokasi</option>
-          <option v-for="loc in locationOptions" :key="loc.value" :value="loc.value">
-            {{ loc.label }}
-          </option>
-        </select>
+        <CustomSelect
+          v-model="selectedLocation"
+          :options="locationFilterOptions"
+          aria-label="Filter lokasi"
+          placeholder="Semua Lokasi"
+          width-class="w-[140px]"
+          height-class="h-9"
+        />
 
         <!-- Filter Tipe Fasilitas -->
-        <select
-          v-model="selectedTipe" aria-label="Filter tipe fasilitas"
-          class="h-9 w-[145px] shrink-0 rounded-lg border border-[#E2E8F0] bg-white px-2.5 text-xs text-[#0F172A] focus:border-[#2563EB] focus:outline-none transition-all cursor-pointer shadow-2xs"
-        >
-          <option value="">Semua Fasilitas</option>
-          <option v-for="t in tipeFasilitasOptions" :key="t" :value="t">{{ t }}</option>
-        </select>
+        <CustomSelect
+          v-model="selectedTipe"
+          :options="tipeFilterOptions"
+          aria-label="Filter tipe fasilitas"
+          placeholder="Semua Fasilitas"
+          width-class="w-[145px]"
+          height-class="h-9"
+        />
 
         <!-- Filter Kondisi -->
-        <select
-          v-model="selectedKondisi" aria-label="Filter kondisi"
-          class="h-9 w-[135px] shrink-0 rounded-lg border border-[#E2E8F0] bg-white px-2.5 text-xs text-[#0F172A] focus:border-[#2563EB] focus:outline-none transition-all cursor-pointer shadow-2xs"
-        >
-          <option value="">Semua Kondisi</option>
-          <option v-for="k in kondisiOptions" :key="k" :value="k">{{ k }}</option>
-        </select>
+        <CustomSelect
+          v-model="selectedKondisi"
+          :options="kondisiFilterOptions"
+          aria-label="Filter kondisi"
+          placeholder="Semua Kondisi"
+          width-class="w-[135px]"
+          height-class="h-9"
+        />
 
         <!-- Reset Filter Button -->
         <button

@@ -11,6 +11,7 @@ import AppImportModal from '../components/ui/AppImportModal.vue'
 import AppPagination from '../components/ui/AppPagination.vue'
 import StatCard from '../components/ui/StatCard.vue'
 import SkeletonTable from '../components/ui/skeleton/SkeletonTable.vue'
+import CustomSelect from '../components/ui/CustomSelect.vue'
 
 const { get, post, put, del } = useApi()
 const { isAdmin, isSuperAdmin, hasWritePermission } = useAuth()
@@ -456,33 +457,40 @@ onMounted(() => {
           />
         </div>
 
-        <select
-          v-model="filterDepartemen" aria-label="Filter departemen"
-          class="h-10 w-[155px] shrink-0 rounded-xl border border-[#E2E8F0] bg-white px-3 text-xs text-[#0F172A] focus:border-[#2563EB] focus:outline-none transition-all cursor-pointer shadow-2xs"
-        >
-          <option value="">Semua Departemen</option>
-          <option v-for="dep in availableDepartemenOptions" :key="dep" :value="dep">
-            {{ dep }}
-          </option>
-        </select>
+        <CustomSelect
+          v-model="filterDepartemen"
+          aria-label="Filter departemen"
+          :options="[{ value: '', label: 'Semua Departemen' }, ...availableDepartemenOptions.map((dep) => ({ value: dep, label: dep }))]"
+          placeholder="Semua Departemen"
+          width-class="w-[155px]"
+          height-class="h-10"
+          @change="currentPage = 1"
+        />
 
-        <select
-          v-model="filterLokasi" aria-label="Filter lokasi"
-          class="h-10 w-[135px] shrink-0 rounded-xl border border-[#E2E8F0] bg-white px-3 text-xs text-[#0F172A] focus:border-[#2563EB] focus:outline-none transition-all cursor-pointer shadow-2xs"
-        >
-          <option value="">Semua Lokasi</option>
-          <option v-for="loc in availableLokasiOptions" :key="loc" :value="loc">{{ loc }}</option>
-        </select>
+        <CustomSelect
+          v-model="filterLokasi"
+          aria-label="Filter lokasi"
+          :options="[{ value: '', label: 'Semua Lokasi' }, ...availableLokasiOptions.map((loc) => ({ value: loc, label: loc }))]"
+          placeholder="Semua Lokasi"
+          width-class="w-[135px]"
+          height-class="h-10"
+          @change="currentPage = 1"
+        />
 
-        <select
-          v-model="filterStatus" aria-label="Filter status"
-          class="h-10 w-[130px] shrink-0 rounded-xl border border-[#E2E8F0] bg-white px-3 text-xs text-[#0F172A] focus:border-[#2563EB] focus:outline-none transition-all cursor-pointer shadow-2xs"
-        >
-          <option value="">Semua Status</option>
-          <option value="Active">Active</option>
-          <option value="Outsource">Outsource</option>
-          <option value="Resigned">Resigned</option>
-        </select>
+        <CustomSelect
+          v-model="filterStatus"
+          aria-label="Filter status"
+          :options="[
+            { value: '', label: 'Semua Status' },
+            { value: 'Active', label: 'Active' },
+            { value: 'Outsource', label: 'Outsource' },
+            { value: 'Resigned', label: 'Resigned' },
+          ]"
+          placeholder="Semua Status"
+          width-class="w-[130px]"
+          height-class="h-10"
+          @change="currentPage = 1"
+        />
       </div>
     </div>
 

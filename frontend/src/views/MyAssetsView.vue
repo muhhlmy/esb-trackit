@@ -7,6 +7,7 @@ import { normalizeLocation } from '../utils/locationNormalizer.js'
 import AppModal from '../components/ui/AppModal.vue'
 import AppBadge from '../components/ui/AppBadge.vue'
 import AppPagination from '../components/ui/AppPagination.vue'
+import CustomSelect from '../components/ui/CustomSelect.vue'
 import SkeletonTable from '../components/ui/skeleton/SkeletonTable.vue'
 
 const { get } = useApi()
@@ -78,6 +79,16 @@ const lokasiOptions = computed(() => {
   const locs = [...new Set(employeesWithAssets.value.map((e) => normalizeLocation(e.lokasi_kerja)).filter(Boolean))]
   return locs.sort()
 })
+
+const departemenFilterOptions = computed(() => [
+  { value: '', label: 'Semua Departemen' },
+  ...departemenOptions.value.map((dep) => ({ value: dep, label: dep })),
+])
+
+const lokasiFilterOptions = computed(() => [
+  { value: '', label: 'Semua Lokasi' },
+  ...lokasiOptions.value.map((loc) => ({ value: loc, label: loc })),
+])
 
 const currentPageEmployees = ref(1)
 const currentPageAssets = ref(1)
@@ -639,23 +650,19 @@ onMounted(() => {
         </div>
 
         <div class="flex items-center gap-2 flex-wrap">
-          <select
+          <CustomSelect
             v-model="filterDepartemen"
+            :options="departemenFilterOptions"
             aria-label="Filter departemen"
-            class="h-9 w-[150px] rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-2.5 text-xs text-[#0F172A] focus:border-[#2563EB] focus:bg-white focus:outline-none transition-all cursor-pointer"
-          >
-            <option value="">Semua Departemen</option>
-            <option v-for="dep in departemenOptions" :key="dep" :value="dep">{{ dep }}</option>
-          </select>
+            width-class="w-[150px]"
+          />
 
-          <select
+          <CustomSelect
             v-model="filterLokasi"
+            :options="lokasiFilterOptions"
             aria-label="Filter lokasi"
-            class="h-9 w-[140px] rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-2.5 text-xs text-[#0F172A] focus:border-[#2563EB] focus:bg-white focus:outline-none transition-all cursor-pointer"
-          >
-            <option value="">Semua Lokasi</option>
-            <option v-for="loc in lokasiOptions" :key="loc" :value="loc">{{ loc }}</option>
-          </select>
+            width-class="w-[140px]"
+          />
 
           <button
             v-if="employeeSearch || filterDepartemen || filterLokasi"

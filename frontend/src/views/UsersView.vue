@@ -14,6 +14,7 @@ import AppBadge from '../components/ui/AppBadge.vue'
 import AppRowActions from '../components/ui/AppRowActions.vue'
 import AppPagination from '../components/ui/AppPagination.vue'
 import SearchableSelect from '../components/ui/SearchableSelect.vue'
+import CustomSelect from '../components/ui/CustomSelect.vue'
 import SkeletonTable from '../components/ui/skeleton/SkeletonTable.vue'
 
 const route = useRoute()
@@ -643,16 +644,17 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
           />
         </div>
 
-        <select
-          id="user-role-filter" aria-label="Filter by role"
+        <CustomSelect
           v-model="filterRole"
-          class="h-9 w-[135px] shrink-0 rounded-lg border border-[#E2E8F0] bg-white px-2.5 text-xs text-[#0F172A] focus:border-[#2563EB] focus:outline-none transition-all cursor-pointer shadow-2xs"
-        >
-          <option value="">Semua Role</option>
-          <option value="admin">ADMIN</option>
-          <option value="superadmin">SUPERADMIN</option>
-          <option value="user">USER</option>
-        </select>
+          :options="[
+            { value: '', label: 'Semua Role' },
+            { value: 'admin', label: 'ADMIN' },
+            { value: 'superadmin', label: 'SUPERADMIN' },
+            { value: 'user', label: 'USER' },
+          ]"
+          aria-label="Filter by role"
+          width-class="w-[135px]"
+        />
 
         <button
           v-if="searchQuery || filterRole"

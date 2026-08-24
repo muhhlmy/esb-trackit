@@ -9,6 +9,7 @@ import { useAuth } from '../composables/useAuth.js'
 import { animateStagger } from '../composables/useGsap.js'
 import AppBadge from '../components/ui/AppBadge.vue'
 import AppPagination from '../components/ui/AppPagination.vue'
+import CustomSelect from '../components/ui/CustomSelect.vue'
 import SkeletonTable from '../components/ui/skeleton/SkeletonTable.vue'
 
 const { get } = useApi()
@@ -286,21 +287,29 @@ function parsePerubahan(perubahan, aksi) {
 
       <!-- Action Filter (Asset Tab only) -->
       <div v-if="activeTab === 'assets'" class="w-full sm:w-44">
-        <select v-model="filterAction" aria-label="Filter aksi" class="form-control w-full">
-          <option value="">Semua Aksi</option>
-          <option value="TAMBAH">Tambah Aset</option>
-          <option value="UBAH">Ubah Aset</option>
-          <option value="HAPUS">Hapus Aset</option>
-        </select>
+        <CustomSelect
+          v-model="filterAction"
+          :options="[
+            { value: '', label: 'Semua Aksi' },
+            { value: 'TAMBAH', label: 'Tambah Aset' },
+            { value: 'UBAH', label: 'Ubah Aset' },
+            { value: 'HAPUS', label: 'Hapus Aset' },
+          ]"
+          aria-label="Filter aksi"
+        />
       </div>
 
       <!-- Activity Filter (Audit Tab only) -->
       <div v-if="activeTab === 'audit'" class="w-full sm:w-44">
-        <select v-model="filterActivity" aria-label="Filter aktivitas" class="form-control w-full">
-          <option value="">Semua Aktifitas</option>
-          <option value="LOGIN">Berhasil Login</option>
-          <option value="GAGAL_LOGIN">Gagal Login</option>
-        </select>
+        <CustomSelect
+          v-model="filterActivity"
+          :options="[
+            { value: '', label: 'Semua Aktifitas' },
+            { value: 'LOGIN', label: 'Berhasil Login' },
+            { value: 'GAGAL_LOGIN', label: 'Gagal Login' },
+          ]"
+          aria-label="Filter aktivitas"
+        />
       </div>
 
       <!-- Refresh button -->

@@ -9,6 +9,7 @@ import AppModal from '../components/ui/AppModal.vue'
 import AppRowActions from '../components/ui/AppRowActions.vue'
 import AppPagination from '../components/ui/AppPagination.vue'
 import SearchableSelect from '../components/ui/SearchableSelect.vue'
+import CustomSelect from '../components/ui/CustomSelect.vue'
 import TicketCaspRating from '../components/tickets/TicketCaspRating.vue'
 import { animateStagger } from '../composables/useGsap.js'
 import BaseSkeleton from '../components/ui/skeleton/BaseSkeleton.vue'
@@ -180,6 +181,13 @@ const sortOrder = ref('terbaru') // 'terbaru' | 'terlama'
 const pageError = ref('')
 const notification = ref(null)
 const isClaiming = ref(null) // ticket id yang sedang di-claim
+
+// Cache list default (tanpa search) agar saat search di-clear, list penuh
+// langsung tampil tanpa menunggu fetch (menghindari flash "Inbox kosong").
+let cachedDefaultTickets = []
+// Token untuk mengabaikan response fetch yang sudah stale (race condition saat
+// search berubah cepat); hanya response terbaru yang diterapkan.
+let fetchRequestId = 0
 
 const showFormModal = ref(false)
 const showDeleteModal = ref(false)
@@ -475,24 +483,12 @@ function removeCommentAttachment() {
 
 const filteredTickets = computed(() => {
   return tickets.value.filter((t) => {
-    const q = searchQuery.value.trim().toLowerCase()
-    const matchQuery =
-      !q ||
-      (t.judul || '').toLowerCase().includes(q) ||
-      (t.nomor_tiket || '').toLowerCase().includes(q) ||
-      (t.pelapor || '').toLowerCase().includes(q) ||
-      (t.pelapor_nama || '').toLowerCase().includes(q) ||
-      (t.assigned_to || '').toLowerCase().includes(q) ||
-      (t.assigned_to_nama || '').toLowerCase().includes(q) ||
-      (t.queue_kode || '').toLowerCase().includes(q) ||
-      (t.queue_nama || '').toLowerCase().includes(q) ||
-      (t.kategori || '').toLowerCase().includes(q)
     const matchStatus = !filterStatus.value || t.status_tiket === filterStatus.value
     const matchPrioritas = !filterPrioritas.value || t.prioritas === filterPrioritas.value
     const matchQueue = !filterQueue.value || t.queue_id === Number(filterQueue.value)
     const matchKategori =
       !filterKategori.value || (t.kategori || '').toLowerCase() === filterKategori.value.toLowerCase()
-    return matchQuery && matchStatus && matchPrioritas && matchQueue && matchKategori
+    return matchStatus && matchPrioritas && matchQueue && matchKategori
   })
 })
 
@@ -503,15 +499,21 @@ watch([searchQuery, filterStatus, filterPrioritas, filterQueue, filterKategori, 
   currentPage.value = 1
 })
 
-// Live search dengan debounce: fetch ulang ke server setiap kali keyword
-// berubah (termasuk saat dihapus), tanpa perlu menekan Enter.
-// Saat keyword dikosongkan, langsung fetch tanpa debounce agar list penuh
-// segera muncul (tidak sempat tampil "kosong").
+// Live search: fetch ulang ke server saat keyword berubah (debounced singkat).
+// Search dilakukan server-side; saat keyword dikosongkan langsung fetch (dengan
+// loading state) agar list penuh segera muncul tanpa sempat tampil "kosong".
 watch(searchQuery, (value) => {
   if (searchDebounceTimer) clearTimeout(searchDebounceTimer)
 
   if (!value.trim()) {
     searchDebounceTimer = null
+    // Restore list default dari cache secara instan (tanpa menunggu fetch),
+    // sehingga tidak muncul flash "Inbox kosong".
+    if (cachedDefaultTickets.length) {
+      tickets.value = [...cachedDefaultTickets]
+      isLoading.value = false
+    }
+    // Tetap refetch di background untuk memastikan data terkini.
     fetchTickets(true)
     return
   }
@@ -519,7 +521,7 @@ watch(searchQuery, (value) => {
   searchDebounceTimer = setTimeout(() => {
     searchDebounceTimer = null
     fetchTickets(true)
-  }, 300)
+  }, 150)
 })
 
 watch(
@@ -591,6 +593,7 @@ async function fetchReporters() {
 }
 
 async function fetchTickets(silent = false) {
+  const requestId = ++fetchRequestId
   if (!silent) isLoading.value = true
   pageError.value = ''
   try {
@@ -607,7 +610,14 @@ async function fetchTickets(silent = false) {
       get(`/api/tickets${qs ? '?' + qs : ''}`),
       get('/api/tickets/stats'),
     ])
+    // Abaikan response stale (ada request lebih baru yang sudah dimulai).
+    if (requestId !== fetchRequestId) return
+
     tickets.value = Array.isArray(data) ? data : []
+    // Simpan cache list default (tanpa search) untuk restore instan saat clear.
+    if (!searchQuery.value.trim()) {
+      cachedDefaultTickets = [...tickets.value]
+    }
     stats.value = statsData || {
       totalTickets: 0,
       pendingTickets: 0,
@@ -617,12 +627,15 @@ async function fetchTickets(silent = false) {
       assignedTickets: 0,
     }
   } catch (err) {
+    if (requestId !== fetchRequestId) return
     if (!silent) {
       console.error('Gagal memuat tiket:', err)
       pageError.value = err.message || 'Gagal memuat data tiket.'
     }
   } finally {
-    isLoading.value = false
+    if (requestId === fetchRequestId) {
+      isLoading.value = false
+    }
     await nextTick()
     animateStagger('.tck-list-item')
   }
@@ -1419,63 +1432,67 @@ function toast(message, type = 'success') {
 
         <!-- Filter Options -->
         <div class="flex items-center gap-2 flex-wrap">
-          <select
-            v-model="filterStatus" aria-label="Filter status"
+          <CustomSelect
+            v-model="filterStatus"
+            :options="[
+              { value: '', label: 'Status: Semua' },
+              { value: 'Open', label: 'Open' },
+              { value: 'In Progress', label: 'In Progress' },
+              { value: 'Pending', label: 'Pending' },
+              { value: 'Resolved', label: 'Resolved' },
+              { value: 'Closed', label: 'Closed' },
+            ]"
+            aria-label="Filter status"
             @change="fetchTickets"
-            class="h-9 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-semibold text-[#334155] focus:border-[#2563EB] focus:outline-none cursor-pointer"
-          >
-            <option value="">Status: Semua</option>
-            <option value="Open">Open</option>
-            <option value="In Progress">In Progress</option>
-            <option value="Pending">Pending</option>
-            <option value="Resolved">Resolved</option>
-            <option value="Closed">Closed</option>
-          </select>
+          />
 
-          <select
-            v-model="filterPrioritas" aria-label="Filter priority"
+          <CustomSelect
+            v-model="filterPrioritas"
+            :options="[
+              { value: '', label: 'Priority: Semua' },
+              { value: 'Critical', label: 'Critical' },
+              { value: 'High', label: 'High' },
+              { value: 'Medium', label: 'Medium' },
+              { value: 'Low', label: 'Low' },
+            ]"
+            aria-label="Filter priority"
             @change="fetchTickets"
-            class="h-9 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-semibold text-[#334155] focus:border-[#2563EB] focus:outline-none cursor-pointer"
-          >
-            <option value="">Priority: Semua</option>
-            <option value="Critical">Critical</option>
-            <option value="High">High</option>
-            <option value="Medium">Medium</option>
-            <option value="Low">Low</option>
-          </select>
+          />
 
-          <select
+          <CustomSelect
             v-model="filterQueue"
+            :options="[
+              { value: '', label: 'Unit: Semua' },
+              ...queues.map((q) => ({ value: q.id, label: `${q.kode} — ${q.nama}` })),
+            ]"
+            aria-label="Filter unit"
             @change="fetchTickets"
-            class="h-9 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-semibold text-[#334155] focus:border-[#2563EB] focus:outline-none cursor-pointer"
-          >
-            <option value="">Unit: Semua</option>
-            <option v-for="q in queues" :key="q.id" :value="q.id">
-              {{ q.kode }} — {{ q.nama }}
-            </option>
-          </select>
+          />
 
-          <select
+          <CustomSelect
             v-model="filterKategori"
+            :options="[
+              { value: '', label: 'Kategori: Semua' },
+              { value: 'Request', label: 'Request' },
+              { value: 'Support', label: 'Support' },
+              { value: 'Incident', label: 'Incident' },
+              { value: 'QNA', label: 'QNA' },
+            ]"
+            aria-label="Filter kategori"
             @change="fetchTickets"
-            class="h-9 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-semibold text-[#334155] focus:border-[#2563EB] focus:outline-none cursor-pointer"
-          >
-            <option value="">Kategori: Semua</option>
-            <option value="Request">Request</option>
-            <option value="Support">Support</option>
-            <option value="Incident">Incident</option>
-            <option value="QNA">QNA</option>
-          </select>
+          />
 
-          <select
+          <CustomSelect
             v-model="sortOrder"
+            :options="[
+              { value: 'terbaru', label: 'Terbaru' },
+              { value: 'terlama', label: 'Terlama' },
+            ]"
             aria-label="Urutkan tiket"
+            width-class="w-32"
+            align="right"
             @change="fetchTickets"
-            class="h-9 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-semibold text-[#334155] focus:border-[#2563EB] focus:outline-none cursor-pointer"
-          >
-            <option value="terbaru">Terbaru</option>
-            <option value="terlama">Terlama</option>
-          </select>
+          />
         </div>
       </div>
     </div>

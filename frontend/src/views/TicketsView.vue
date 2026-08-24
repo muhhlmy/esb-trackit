@@ -2505,9 +2505,9 @@ function toast(message, type = 'success') {
               <form class="flex items-center gap-2" @submit.prevent="sendComment">
                 <label
                   title="Tambah Lampiran (Gambar / Dokumen)"
-                  class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] text-[#64748B] hover:border-[#2563EB]/40 hover:bg-[#EFF6FF] hover:text-[#2563EB] transition-all cursor-pointer"
+                  class="flex shrink-0 items-center justify-center rounded-lg p-1.5 text-[#64748B] hover:text-[#2563EB] transition-all cursor-pointer"
                 >
-                  <span class="material-symbols-outlined text-[24px] leading-none">attach_file</span>
+                  <span class="material-symbols-outlined text-[30px] leading-none">attach_file</span>
                   <input
                     type="file"
                     accept="image/png,image/jpeg,image/gif,image/webp,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation"

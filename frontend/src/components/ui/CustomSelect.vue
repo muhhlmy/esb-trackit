@@ -16,6 +16,7 @@ const props = defineProps({
   widthClass: { type: String, default: 'w-full' },
   heightClass: { type: String, default: 'h-9' },
   align: { type: String, default: 'left' },
+  block: { type: Boolean, default: false },
 })
 
 const emit = defineEmits(['update:modelValue', 'change'])
@@ -70,7 +71,7 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside))
 </script>
 
 <template>
-  <div ref="containerRef" class="relative inline-block text-left">
+  <div ref="containerRef" class="relative text-left" :class="block ? 'block w-full' : 'inline-block'">
     <button
       type="button"
       :disabled="disabled"
@@ -86,7 +87,7 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside))
         class="h-2 w-2 rounded-full shrink-0"
         :class="selectedOption.dot"
       ></span>
-      <span class="truncate">{{ selectedOption ? selectedOption.label : placeholder }}</span>
+      <span class="min-w-0 flex-1 truncate">{{ selectedOption ? selectedOption.label : placeholder }}</span>
       <span class="material-symbols-outlined text-[16px] text-[#7C8BAC] shrink-0">expand_more</span>
     </button>
 

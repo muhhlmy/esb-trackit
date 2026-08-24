@@ -267,7 +267,7 @@ function parsePerubahan(perubahan, aksi) {
 
     <!-- Filters Bar Card -->
     <div
-      class="shadow-card grid min-w-0 grid-cols-1 items-center gap-3 rounded-2xl border border-[#E8EDF3] bg-white p-3 sm:flex sm:flex-wrap"
+      class="shadow-card flex min-w-0 flex-wrap items-center gap-3 rounded-2xl border border-[#E8EDF3] bg-white p-3"
     >
       <!-- Search -->
       <div class="relative flex-1 min-w-[200px]">
@@ -285,45 +285,50 @@ function parsePerubahan(perubahan, aksi) {
         />
       </div>
 
-      <!-- Action Filter (Asset Tab only) -->
-      <div v-if="activeTab === 'assets'" class="w-full sm:w-44">
-        <CustomSelect
-          v-model="filterAction"
-          :options="[
-            { value: '', label: 'Semua Aksi' },
-            { value: 'TAMBAH', label: 'Tambah Aset' },
-            { value: 'UBAH', label: 'Ubah Aset' },
-            { value: 'HAPUS', label: 'Hapus Aset' },
-          ]"
-          aria-label="Filter aksi"
-        />
-      </div>
+      <!-- Filter + Refresh grouped (kept together) -->
+      <div class="flex items-center gap-2">
+        <!-- Action Filter (Asset Tab only) -->
+        <div v-if="activeTab === 'assets'" class="w-44">
+          <CustomSelect
+            v-model="filterAction"
+            :options="[
+              { value: '', label: 'Semua Aksi' },
+              { value: 'TAMBAH', label: 'Tambah Aset' },
+              { value: 'UBAH', label: 'Ubah Aset' },
+              { value: 'HAPUS', label: 'Hapus Aset' },
+            ]"
+            aria-label="Filter aksi"
+            block
+          />
+        </div>
 
-      <!-- Activity Filter (Audit Tab only) -->
-      <div v-if="activeTab === 'audit'" class="w-full sm:w-44">
-        <CustomSelect
-          v-model="filterActivity"
-          :options="[
-            { value: '', label: 'Semua Aktifitas' },
-            { value: 'LOGIN', label: 'Berhasil Login' },
-            { value: 'GAGAL_LOGIN', label: 'Gagal Login' },
-          ]"
-          aria-label="Filter aktivitas"
-        />
-      </div>
+        <!-- Activity Filter (Audit Tab only) -->
+        <div v-if="activeTab === 'audit'" class="w-44">
+          <CustomSelect
+            v-model="filterActivity"
+            :options="[
+              { value: '', label: 'Semua Aktifitas' },
+              { value: 'LOGIN', label: 'Berhasil Login' },
+              { value: 'GAGAL_LOGIN', label: 'Gagal Login' },
+            ]"
+            aria-label="Filter aktivitas"
+            block
+          />
+        </div>
 
-      <!-- Refresh button -->
-      <button
-        type="button"
-        @click="fetchLogs"
-        :disabled="isLoading"
-        class="flex h-10 w-full items-center justify-center gap-2 rounded-xl border border-[#DCE3EC] bg-white/50 px-4 text-[12px] font-bold text-[#334155] shadow-sm hover:bg-[#F8FAFC] disabled:opacity-50 sm:w-auto"
-      >
-        <span class="material-symbols-outlined text-[18px]" :class="{ 'animate-spin': isLoading }"
-          >refresh</span
+        <!-- Refresh button -->
+        <button
+          type="button"
+          @click="fetchLogs"
+          :disabled="isLoading"
+          class="flex h-10 items-center justify-center gap-2 rounded-xl border border-[#DCE3EC] bg-white/50 px-4 text-[12px] font-bold text-[#334155] shadow-sm hover:bg-[#F8FAFC] disabled:opacity-50"
         >
-        Segarkan
-      </button>
+          <span class="material-symbols-outlined text-[18px]" :class="{ 'animate-spin': isLoading }"
+            >refresh</span
+          >
+          Segarkan
+        </button>
+      </div>
     </div>
 
     <!-- Content Container -->

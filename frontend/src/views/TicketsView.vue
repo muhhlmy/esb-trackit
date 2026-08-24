@@ -2213,18 +2213,18 @@ function toast(message, type = 'success') {
     <AppModal :is-open="showDetailModal" title="" size="xl" @close="closeModal">
       <div v-if="selectedTicket" class="flex flex-col text-[#0F172A]">
         <!-- HEADER AREA (Compact SaaS Title Block) -->
-        <div class="flex items-center justify-between gap-4 border-b border-[#F1F5F9] pb-4 mb-4">
+        <div class="flex items-center justify-between gap-4 border-b border-[#F1F5F9] pb-3 mb-3">
           <div class="flex flex-col gap-1 min-w-0 flex-1">
             <div class="flex items-center gap-2 flex-wrap">
               <span
-                class="font-mono text-xs font-semibold text-[#64748B] bg-[#F1F5F9] px-2 py-0.5 rounded-md"
+                class="font-mono text-[11.5px] font-medium text-[#64748B] bg-[#F1F5F9] px-2 py-0.5 rounded-md"
               >
                 {{ selectedTicket.nomor_tiket }}
               </span>
               <span class="text-xs text-[#CBD5E1]">·</span>
               <div class="flex items-center gap-1.5">
                 <span
-                  class="h-2 w-2 rounded-full shrink-0"
+                  class="h-1.5 w-1.5 rounded-full shrink-0"
                   :class="getStatusDotInfo(selectedTicket.status_tiket).dotClass"
                 ></span>
                 <span
@@ -2235,39 +2235,39 @@ function toast(message, type = 'success') {
                 </span>
               </div>
             </div>
-            <h2 class="text-[17px] font-bold text-[#0F172A] leading-snug line-clamp-2">
+            <h2 class="text-base sm:text-[17px] font-bold text-[#0F172A] leading-snug line-clamp-2">
               {{ selectedTicket.judul }}
             </h2>
           </div>
         </div>
 
         <!-- NAVIGATION TABS (Clean Segmented Bar with Hover Effects) -->
-        <div class="flex items-center gap-1 border-b border-[#F1F5F9] pb-3 mb-5">
+        <div class="flex items-center gap-1 border-b border-[#F1F5F9] pb-2.5 mb-4">
           <button
             type="button"
             @click="activeDetailTab = 'detail'"
-            class="group flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all duration-200 cursor-pointer select-none"
+            class="group flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-[11.5px] sm:text-xs font-semibold transition-all duration-200 cursor-pointer select-none"
             :class="
               activeDetailTab === 'detail'
                 ? 'bg-[#EFF6FF] text-[#2563EB] shadow-xs ring-1 ring-[#2563EB]/20'
                 : 'text-[#64748B] hover:bg-[#DBEAFE] hover:text-[#1D4ED8] hover:shadow-sm hover:ring-1 hover:ring-[#2563EB]/30 hover:-translate-y-px'
             "
           >
-            <span class="material-symbols-outlined text-[16px] transition-colors duration-200" :class="activeDetailTab === 'detail' ? 'text-[#2563EB]' : 'text-[#64748B] group-hover:text-[#1D4ED8]'">info</span>
+            <span class="material-symbols-outlined text-[15px] transition-colors duration-200" :class="activeDetailTab === 'detail' ? 'text-[#2563EB]' : 'text-[#64748B] group-hover:text-[#1D4ED8]'">info</span>
             <span>Overview</span>
           </button>
 
           <button
             type="button"
             @click="activeDetailTab = 'history'"
-            class="group flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all duration-200 cursor-pointer select-none"
+            class="group flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-[11.5px] sm:text-xs font-semibold transition-all duration-200 cursor-pointer select-none"
             :class="
               activeDetailTab === 'history'
                 ? 'bg-[#EFF6FF] text-[#2563EB] shadow-xs ring-1 ring-[#2563EB]/20'
                 : 'text-[#64748B] hover:bg-[#DBEAFE] hover:text-[#1D4ED8] hover:shadow-sm hover:ring-1 hover:ring-[#2563EB]/30 hover:-translate-y-px'
             "
           >
-            <span class="material-symbols-outlined text-[16px] transition-colors duration-200" :class="activeDetailTab === 'history' ? 'text-[#2563EB]' : 'text-[#64748B] group-hover:text-[#1D4ED8]'">history</span>
+            <span class="material-symbols-outlined text-[15px] transition-colors duration-200" :class="activeDetailTab === 'history' ? 'text-[#2563EB]' : 'text-[#64748B] group-hover:text-[#1D4ED8]'">history</span>
             <span>Activity</span>
             <span
               class="ml-0.5 rounded-full px-1.5 py-0.2 text-[10px] font-medium"
@@ -2280,14 +2280,14 @@ function toast(message, type = 'success') {
           <button
             type="button"
             @click="openCommentsTab"
-            class="group flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all duration-200 cursor-pointer select-none"
+            class="group flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-[11.5px] sm:text-xs font-semibold transition-all duration-200 cursor-pointer select-none"
             :class="
               activeDetailTab === 'comments'
                 ? 'bg-[#EFF6FF] text-[#2563EB] shadow-xs ring-1 ring-[#2563EB]/20'
                 : 'text-[#64748B] hover:bg-[#DBEAFE] hover:text-[#1D4ED8] hover:shadow-sm hover:ring-1 hover:ring-[#2563EB]/30 hover:-translate-y-px'
             "
           >
-            <span class="material-symbols-outlined text-[16px] transition-colors duration-200" :class="activeDetailTab === 'comments' ? 'text-[#2563EB]' : 'text-[#64748B] group-hover:text-[#1D4ED8]'">forum</span>
+            <span class="material-symbols-outlined text-[15px] transition-colors duration-200" :class="activeDetailTab === 'comments' ? 'text-[#2563EB]' : 'text-[#64748B] group-hover:text-[#1D4ED8]'">forum</span>
             <span>Discussion</span>
             <span
               class="ml-0.5 rounded-full px-1.5 py-0.2 text-[10px] font-medium"
@@ -2299,11 +2299,11 @@ function toast(message, type = 'success') {
         </div>
 
         <!-- MAIN SCROLL CONTENT AREA -->
-        <div class="space-y-6">
+        <div class="space-y-4">
           <!-- TAB 1: OVERVIEW -->
-          <div v-if="activeDetailTab === 'detail'" class="space-y-6">
+          <div v-if="activeDetailTab === 'detail'" class="space-y-4">
             <!-- Deskripsi Kendala -->
-            <div class="space-y-1.5">
+            <div class="space-y-1">
               <h3 class="text-[11px] font-semibold uppercase tracking-wider text-[#94A3B8]">
                 Deskripsi
               </h3>
@@ -2313,11 +2313,11 @@ function toast(message, type = 'success') {
             </div>
 
             <!-- Detail Tiket Grid (2-Column Desktop, 1-Column Mobile) -->
-            <div class="pt-4 border-t border-[#F1F5F9] space-y-3">
+            <div class="pt-3 border-t border-[#F1F5F9] space-y-2.5">
               <h3 class="text-[11px] font-semibold uppercase tracking-wider text-[#94A3B8]">
                 Detail Tiket
               </h3>
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4 text-xs">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-3 text-xs">
                 <!-- Pelapor -->
                 <div class="flex flex-col gap-0.5">
                   <span class="text-[11px] font-medium text-[#94A3B8]">Pelapor</span>
@@ -2502,16 +2502,16 @@ function toast(message, type = 'success') {
           <!-- TAB 3: DISCUSSION THREAD -->
           <div
             v-else-if="activeDetailTab === 'comments'"
-            class="flex max-h-[60vh] min-h-0 flex-col gap-3"
+            class="flex flex-col gap-3 min-h-0"
           >
             <!-- Messages Container (scrollable inside the chat area) -->
             <div
               ref="chatContainer"
-              class="flex min-h-[120px] flex-1 flex-col gap-3 overflow-y-auto pr-1"
+              class="flex max-h-[340px] min-h-[100px] flex-1 flex-col gap-2.5 overflow-y-auto pr-1"
             >
               <div
                 v-if="isCommentsLoading"
-                class="flex flex-col items-center justify-center py-10 gap-2 text-[#94A3B8]"
+                class="flex flex-col items-center justify-center py-6 gap-2 text-[#94A3B8]"
               >
                 <span class="material-symbols-outlined text-[24px] animate-spin text-[#2563EB]"
                   >progress_activity</span
@@ -2521,13 +2521,13 @@ function toast(message, type = 'success') {
 
               <div
                 v-else-if="ticketComments.length === 0"
-                class="flex flex-col items-center justify-center py-10 gap-2 text-center text-[#94A3B8]"
+                class="flex flex-col items-center justify-center py-6 gap-1.5 text-center text-[#94A3B8] my-auto"
               >
-                <span class="material-symbols-outlined text-[28px]">chat_bubble_outline</span>
+                <span class="material-symbols-outlined text-[24px] text-[#94A3B8]">chat_bubble_outline</span>
                 <p class="text-xs font-semibold text-[#334155]">
                   Belum ada diskusi pada ticket ini.
                 </p>
-                <p class="text-[11px]">Tulis komentar melalui form di bawah.</p>
+                <p class="text-[11px] text-[#64748B]">Tulis komentar melalui form di bawah.</p>
               </div>
 
               <!-- Conversation Bubbles -->

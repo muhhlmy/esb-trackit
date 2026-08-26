@@ -8,17 +8,23 @@ document.addEventListener('DOMContentLoaded', () => {
   let casesData = [...customCases, ...INITIAL_CASES];
   let bookmarks = JSON.parse(localStorage.getItem('intern_cases_bookmarks') || '[]');
   
-  let currentView = 'all'; // 'all', 'bookmarks', 'templates'
+  let currentView = 'home'; // 'home', 'all', 'bookmarks', 'templates'
   let currentCategory = 'all'; // 'all', 'hardware', 'git', etc.
   let currentSeverity = 'all';
   let currentSearchQuery = '';
   let selectedCaseId = casesData.length > 0 ? casesData[0].id : null;
+  let recentSearches = JSON.parse(localStorage.getItem('intern_cases_recent') || '[]');
 
   // --------------------------------------------------
   // DOM Elements
   // --------------------------------------------------
   const paneCases = document.getElementById('pane-cases');
   const paneTemplates = document.getElementById('pane-templates');
+  const paneHome = document.getElementById('pane-home');
+
+  const appHeader = document.getElementById('app-header');
+  const filterBar = document.getElementById('filter-bar');
+  const mobileBottomNav = document.getElementById('mobile-bottom-nav');
 
   const masterListContainer = document.getElementById('case-list-master');
   const readerContainer = document.getElementById('detail-pane-reader');
@@ -27,9 +33,20 @@ document.addEventListener('DOMContentLoaded', () => {
   const navTabs = document.querySelectorAll('.nav-tab');
   const catTabs = document.querySelectorAll('.cat-tab');
   const severitySelect = document.getElementById('severity-select');
+  const bottomNavItems = document.querySelectorAll('.bottom-nav-item');
 
   const searchInput = document.getElementById('search-input');
   const searchClearBtn = document.getElementById('search-clear');
+
+  // Home / Landing elements
+  const homeSearchInput = document.getElementById('home-search-input');
+  const homeSearchForm = document.getElementById('home-search-form');
+  const homeSearchClear = document.getElementById('home-search-clear');
+  const homeSuggestions = document.getElementById('home-suggestions');
+  const homeBrowseButton = document.getElementById('home-browse-button');
+  const homeRecent = document.getElementById('home-recent');
+  const homeRecentChips = document.getElementById('home-recent-chips');
+  const homeCatChips = document.querySelectorAll('.home-cat-chip');
 
   const countAllEl = document.getElementById('count-all');
   const countBookmarksEl = document.getElementById('count-bookmarks');
@@ -52,7 +69,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // --------------------------------------------------
   initTheme();
   updateCounts();
-  renderApp();
+  renderRecentSearches();
+  initHashRoute();
   renderTemplates();
 
   // --------------------------------------------------
@@ -85,13 +103,34 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function renderApp() {
+    // HOME / LANDING VIEW — minimal, centered, search-first
+    if (currentView === 'home') {
+      paneCases.classList.remove('active');
+      paneTemplates.classList.remove('active');
+      paneHome.classList.add('active');
+
+      // Minimal header: hide nav tabs, search, new-case; keep brand + theme
+      appHeader.classList.add('header-home');
+      filterBar.classList.add('hidden');
+      mobileBottomNav.classList.add('hidden');
+      mobileBackToList();
+      return;
+    }
+
+    // NON-HOME VIEWS — full application chrome returns
+    appHeader.classList.remove('header-home');
+    filterBar.classList.remove('hidden');
+    mobileBottomNav.classList.remove('hidden');
+
     if (currentView === 'templates') {
+      paneHome.classList.remove('active');
       paneCases.classList.remove('active');
       paneTemplates.classList.add('active');
       mobileBackToList();
       return;
     }
 
+    paneHome.classList.remove('active');
     paneTemplates.classList.remove('active');
     paneCases.classList.add('active');
 
@@ -301,6 +340,178 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // --------------------------------------------------
+  // Home / Landing: Search, Suggestions, Recent, Categories
+  // --------------------------------------------------
+
+  function getHomeMatches(query) {
+    const q = query.trim().toLowerCase();
+    if (!q) return [];
+    return casesData.filter(item => {
+      return item.title.toLowerCase().includes(q) ||
+        item.summary.toLowerCase().includes(q) ||
+        item.tags.some(t => t.toLowerCase().includes(q));
+    }).slice(0, 5);
+  }
+
+  function renderSuggestions(query) {
+    const matches = getHomeMatches(query);
+    if (matches.length === 0) {
+      homeSuggestions.innerHTML = '';
+      homeSuggestions.hidden = true;
+      return;
+    }
+    homeSuggestions.innerHTML = matches.map(item => `
+      <button type="button" class="home-suggestion" data-case-id="${escapeHtml(item.id)}">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <span class="home-suggestion-title">${escapeHtml(item.title)}</span>
+        <span class="home-suggestion-cat">${getCategoryLabel(item.category)}</span>
+      </button>
+    `).join('');
+    homeSuggestions.hidden = false;
+
+    homeSuggestions.querySelectorAll('.home-suggestion').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const caseId = btn.dataset.caseId;
+        recordRecentSearch(query);
+        goToCases();
+        selectCase(caseId);
+        homeSearchInput.value = '';
+        homeSearchInput.blur();
+        hideSuggestions();
+      });
+    });
+  }
+
+  function hideSuggestions() {
+    homeSuggestions.innerHTML = '';
+    homeSuggestions.hidden = true;
+  }
+
+  function recordRecentSearch(query) {
+    const q = query.trim();
+    if (!q) return;
+    recentSearches = recentSearches.filter(s => s.toLowerCase() !== q.toLowerCase());
+    recentSearches.unshift(q);
+    if (recentSearches.length > 5) recentSearches = recentSearches.slice(0, 5);
+    localStorage.setItem('intern_cases_recent', JSON.stringify(recentSearches));
+    renderRecentSearches();
+  }
+
+  function renderRecentSearches() {
+    if (!recentSearches || recentSearches.length === 0) {
+      homeRecent.hidden = true;
+      homeRecentChips.innerHTML = '';
+      return;
+    }
+    homeRecent.hidden = false;
+    homeRecentChips.innerHTML = recentSearches.map(q => `
+      <button type="button" class="home-recent-chip" data-query="${escapeHtml(q)}">
+        <i class="fa-solid fa-clock-rotate-left"></i> ${escapeHtml(q)}
+      </button>
+    `).join('');
+
+    homeRecentChips.querySelectorAll('.home-recent-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        const query = chip.dataset.query;
+        runHomeSearch(query);
+      });
+    });
+  }
+
+  // Execute a search from the home page: navigate to Cases with the query applied
+  function runHomeSearch(rawQuery) {
+    const query = (rawQuery || '').trim();
+    if (query) {
+      currentSearchQuery = query.toLowerCase();
+      searchInput.value = query;
+      searchClearBtn.style.display = 'inline-block';
+      if (mobileSearchInput) {
+        mobileSearchInput.value = query;
+        mobileSearchClearBtn.classList.toggle('visible', true);
+      }
+      recordRecentSearch(query);
+    } else {
+      currentSearchQuery = '';
+      searchInput.value = '';
+      searchClearBtn.style.display = 'none';
+      if (mobileSearchInput) { mobileSearchInput.value = ''; mobileSearchClearBtn.classList.remove('visible'); }
+    }
+    currentView = 'all';
+    currentCategory = 'all';
+    setNavActive('all');
+    syncCategoryTabs('all');
+    homeSearchInput.value = '';
+    hideSuggestions();
+    setHash('cases');
+    renderApp();
+  }
+
+  // Navigate to Cases view without changing search/filters
+  function goToCases() {
+    currentView = 'all';
+    setNavActive('all');
+    setHash('cases');
+    renderApp();
+  }
+
+  function setNavActive(view) {
+    navTabs.forEach(t => t.classList.toggle('active', t.dataset.view === view));
+    bottomNavItems.forEach(n => n.classList.toggle('active', n.dataset.view === view));
+  }
+
+  function syncCategoryTabs(category) {
+    catTabs.forEach(t => t.classList.toggle('active', t.dataset.category === category));
+  }
+
+  // --------------------------------------------------
+  // Hash Routing (vanilla, no router library)
+  // --------------------------------------------------
+  function parseHash() {
+    const h = (window.location.hash || '').replace(/^#\/?/, '');
+    return h.trim();
+  }
+
+  function setHash(view) {
+    const target = view === 'home' ? '#/' : '#/' + view;
+    if (window.location.hash !== target) {
+      window.location.hash = target;
+    }
+  }
+
+  function initHashRoute() {
+    // Determine initial view from hash (defaults to home)
+    const route = parseHash();
+    if (route === 'cases' || route === 'all') {
+      currentView = 'all';
+      setNavActive('all');
+    } else if (route === 'bookmarks') {
+      currentView = 'bookmarks';
+      setNavActive('bookmarks');
+    } else if (route === 'templates') {
+      currentView = 'templates';
+      setNavActive('templates');
+    } else {
+      currentView = 'home';
+      setHash('home');
+    }
+    renderApp();
+
+    window.addEventListener('hashchange', () => {
+      const r = parseHash();
+      if (r === 'cases' || r === 'all') {
+        if (currentView !== 'all') { currentView = 'all'; setNavActive('all'); }
+      } else if (r === 'bookmarks') {
+        if (currentView !== 'bookmarks') { currentView = 'bookmarks'; setNavActive('bookmarks'); }
+      } else if (r === 'templates') {
+        if (currentView !== 'templates') { currentView = 'templates'; setNavActive('templates'); }
+      } else {
+        if (currentView !== 'home') { currentView = 'home'; }
+      }
+      renderApp();
+    });
+  }
+
+  // --------------------------------------------------
   // Event Handlers & Global Helpers
   // --------------------------------------------------
 
@@ -318,12 +529,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-  window.mobileBackToList = function() {
+  function mobileBackToList() {
     const workspaceSplit = document.querySelector('.workspace-split');
     if (workspaceSplit) {
       workspaceSplit.classList.remove('show-detail');
     }
-  };
+  }
+  window.mobileBackToList = mobileBackToList;
 
   window.toggleBookmark = function(caseId) {
     if (bookmarks.includes(caseId)) {
@@ -354,9 +566,10 @@ document.addEventListener('DOMContentLoaded', () => {
   // View Navigation Tabs
   navTabs.forEach(tab => {
     tab.addEventListener('click', () => {
-      navTabs.forEach(t => t.classList.remove('active'));
-      tab.classList.add('active');
-      currentView = tab.dataset.view;
+      const view = tab.dataset.view;
+      currentView = view;
+      setNavActive(view);
+      setHash(view);
       renderApp();
     });
   });
@@ -430,24 +643,101 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // --------------------------------------------------
+  // Home Search & Landing Interactions
+  // --------------------------------------------------
+  if (homeSearchForm) {
+    homeSearchForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      runHomeSearch(homeSearchInput.value);
+    });
+  }
+
+  if (homeSearchInput) {
+    homeSearchInput.addEventListener('input', (e) => {
+      const q = e.target.value;
+      homeSearchClear.style.display = q ? 'inline-flex' : 'none';
+      renderSuggestions(q);
+    });
+
+    homeSearchInput.addEventListener('focus', () => {
+      if (homeSearchInput.value.trim()) {
+        renderSuggestions(homeSearchInput.value);
+      }
+    });
+  }
+
+  if (homeSearchClear) {
+    homeSearchClear.addEventListener('click', () => {
+      homeSearchInput.value = '';
+      homeSearchClear.style.display = 'none';
+      hideSuggestions();
+      homeSearchInput.focus();
+    });
+  }
+
+  // Hide suggestions when clicking outside
+  document.addEventListener('click', (e) => {
+    if (homeSuggestions && !homeSuggestions.hidden) {
+      if (!homeSearchForm.contains(e.target)) {
+        hideSuggestions();
+      }
+    }
+  });
+
+  // Browse Cases CTA
+  if (homeBrowseButton) {
+    homeBrowseButton.addEventListener('click', () => {
+      goToCases();
+    });
+  }
+
+  // Quick Category chips → open Cases with category filter
+  homeCatChips.forEach(chip => {
+    chip.addEventListener('click', () => {
+      const category = chip.dataset.category;
+      currentCategory = category;
+      syncCategoryTabs(category);
+      currentView = 'all';
+      setNavActive('all');
+      setHash('cases');
+      renderApp();
+    });
+  });
+
+  // Brand / logo click → go home
+  const logoHome = document.getElementById('logo-home');
+  if (logoHome) {
+    logoHome.addEventListener('click', (e) => {
+      e.preventDefault();
+      currentView = 'home';
+      setNavActive('home');
+      setHash('home');
+      renderApp();
+    });
+  }
+
+  // --------------------------------------------------
   // Mobile Bottom Navigation
   // --------------------------------------------------
-  const bottomNavItems = document.querySelectorAll('.bottom-nav-item');
 
   bottomNavItems.forEach(item => {
     item.addEventListener('click', () => {
-      // Update bottom nav active state
-      bottomNavItems.forEach(n => n.classList.remove('active'));
-      item.classList.add('active');
-
       const view = item.dataset.view;
+
+      if (view === 'home') {
+        currentView = 'home';
+        setNavActive('home');
+        setHash('home');
+        mobileBackToList();
+        renderApp();
+        return;
+      }
 
       if (view === 'search') {
         // Switch to cases view and focus mobile search
         currentView = 'all';
-        navTabs.forEach(t => t.classList.remove('active'));
-        const tabAll = document.getElementById('tab-all');
-        if (tabAll) tabAll.classList.add('active');
+        setNavActive('all');
+        setHash('cases');
         mobileBackToList();
         renderApp();
         // Focus the mobile search input after rendering
@@ -460,9 +750,8 @@ document.addEventListener('DOMContentLoaded', () => {
       // Map bottom nav views to desktop view system
       if (view === 'all' || view === 'bookmarks' || view === 'templates') {
         currentView = view;
-        navTabs.forEach(t => t.classList.remove('active'));
-        const targetTab = document.querySelector(`.nav-tab[data-view="${view}"]`);
-        if (targetTab) targetTab.classList.add('active');
+        setNavActive(view);
+        setHash(view);
         mobileBackToList();
         renderApp();
       }
@@ -471,19 +760,39 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Global Keyboard Shortcuts
   document.addEventListener('keydown', (e) => {
-    if (e.key === '/' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+    const activeTag = document.activeElement.tagName;
+    const isTyping = activeTag === 'INPUT' || activeTag === 'TEXTAREA';
+
+    // '/' focuses the active search field (home search when on home)
+    if (e.key === '/' && !isTyping) {
       e.preventDefault();
-      searchInput.focus();
+      if (currentView === 'home') {
+        homeSearchInput.focus();
+      } else {
+        searchInput.focus();
+      }
     }
+
+    // Ctrl/Cmd + K focuses the active search field
     if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
       e.preventDefault();
-      searchInput.focus();
+      if (currentView === 'home') {
+        homeSearchInput.focus();
+      } else {
+        searchInput.focus();
+      }
     }
+
     if (e.key === 'Escape') {
       if (createDrawerBackdrop.classList.contains('active')) {
         createDrawerBackdrop.classList.remove('active');
       } else if (document.activeElement === searchInput) {
         searchInput.blur();
+      } else if (document.activeElement === homeSearchInput) {
+        // Clear & blur home search, hide suggestions
+        homeSearchInput.value = '';
+        homeSearchInput.blur();
+        hideSuggestions();
       }
     }
   });

@@ -18,18 +18,18 @@
 <body>
 
   <!-- App Header Bar -->
-  <header class="app-header">
+  <header class="app-header" id="app-header">
     <div class="header-container">
       
       <!-- Brand Logo & Main View Nav -->
       <div class="header-left">
-        <a href="#" class="brand" id="logo-home">
+        <a href="#/" class="brand" id="logo-home">
           <img src="./ESB Case.svg" alt="ESB Case Logo" class="brand-logo-img">
           <span class="brand-name">ESB Case</span>
         </a>
 
         <nav class="view-nav" aria-label="Main View Navigation">
-          <button class="nav-tab active" data-view="all" id="tab-all">Cases <span class="tab-count" id="count-all">0</span></button>
+          <button class="nav-tab" data-view="all" id="tab-all">Cases <span class="tab-count" id="count-all">0</span></button>
           <button class="nav-tab" data-view="bookmarks" id="tab-bookmarks">Bookmarks <span class="tab-count" id="count-bookmarks">0</span></button>
           <button class="nav-tab" data-view="templates" id="tab-templates">Templates</button>
         </nav>
@@ -59,7 +59,7 @@
   </header>
 
   <!-- Category & Sub-Filter Bar -->
-  <div class="filter-bar">
+  <div class="filter-bar" id="filter-bar">
     <div class="filter-container">
 
       <!-- Mobile-only full-width search input -->
@@ -93,8 +93,61 @@
   <!-- Main Workspace Body -->
   <main class="main-workspace">
     
+    <!-- VIEW 0: Home / Landing (Google-inspired search-first entry point) -->
+    <section class="pane-view active" id="pane-home">
+      <div class="home-container">
+        <div class="home-brand">
+          <img src="./ESB Case.svg" alt="ESB Case Logo" class="home-brand-logo">
+          <h1 class="home-title">ESB Case</h1>
+          <p class="home-tagline">Knowledge Base &amp; Incident Hub</p>
+        </div>
+
+        <form id="home-search-form" class="home-search-form" role="search">
+          <div class="home-search">
+            <i class="fa-solid fa-magnifying-glass home-search-icon"></i>
+            <input
+              id="home-search-input"
+              type="search"
+              class="home-search-input"
+              placeholder="Search cases, errors, commands..."
+              autocomplete="off"
+              aria-label="Search cases, errors, and commands"
+            >
+            <kbd class="shortcut-kbd home-search-kbd">/</kbd>
+            <button type="button" id="home-search-clear" class="home-search-clear" aria-label="Clear search">&times;</button>
+          </div>
+
+          <!-- Live Suggestions (only when query non-empty) -->
+          <div class="home-suggestions" id="home-suggestions" hidden></div>
+        </form>
+
+        <div class="home-actions">
+          <button type="submit" form="home-search-form" id="home-search-button" class="home-btn home-btn-primary">
+            <i class="fa-solid fa-magnifying-glass"></i> Search
+          </button>
+          <button type="button" id="home-browse-button" class="home-btn home-btn-secondary">
+            Browse Cases
+          </button>
+        </div>
+
+        <!-- Recent Searches -->
+        <div class="home-recent" id="home-recent" hidden>
+          <span class="home-recent-label">Recent searches</span>
+          <div class="home-recent-chips" id="home-recent-chips"></div>
+        </div>
+
+        <!-- Quick Categories -->
+        <div class="home-categories">
+          <button type="button" class="home-cat-chip" data-category="hardware">Hardware</button>
+          <button type="button" class="home-cat-chip" data-category="git">Git</button>
+          <button type="button" class="home-cat-chip" data-category="backend">Backend</button>
+          <button type="button" class="home-cat-chip" data-category="devops">DevOps</button>
+        </div>
+      </div>
+    </section>
+
     <!-- VIEW 1: Master-Detail Split Workspace (Knowledge Directory & Reader) -->
-    <section class="pane-view active" id="pane-cases">
+    <section class="pane-view" id="pane-cases">
       <div class="workspace-split">
         
         <!-- Master List Sidebar Pane -->
@@ -195,7 +248,11 @@
 
   <!-- Mobile Bottom Navigation -->
   <nav class="mobile-bottom-nav" id="mobile-bottom-nav">
-    <button class="bottom-nav-item active" data-view="all" id="bnav-cases">
+    <button class="bottom-nav-item" data-view="home" id="bnav-home">
+      <i class="fa-solid fa-house"></i>
+      <span>Home</span>
+    </button>
+    <button class="bottom-nav-item" data-view="all" id="bnav-cases">
       <i class="fa-solid fa-folder-open"></i>
       <span>Cases</span>
     </button>

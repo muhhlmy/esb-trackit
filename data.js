@@ -1,4 +1,4 @@
-// Data Seed untuk Website Intern Case Playbook & FAQ Hub
+// Data Seed untuk Website ESB Case Playbook & FAQ Hub
 
 const INITIAL_CASES = [
   {
@@ -18,7 +18,7 @@ const INITIAL_CASES = [
       'Lakukan pengubahan nama perangkat (**Rename This PC**) sesuai standar penamaan label inventaris laptop perusahaan (contoh: `LAPTOP-IT-01` atau `ESB-DEPT-NAME`).',
       'Buka menu **Settings > Windows Update**, jalankan pembaruan sistem hingga selesai, dan aktifkan opsi **"Get the latest updates as soon as they\'re available"**.',
       'Matikan enkripsi perangkat melalui menu **Settings > Privacy & Security > Device Encryption** (setel status menjadi *Off*).',
-      'Hubungkan flashdisk instalasi IT, kemudian jalankan installer **Ninite** dan **Microsoft Office**.',
+      'Hubungkan flashdisk instalasi IT, kemudian jalankan installer **Ninite**.',
       'Verifikasi bahwa perangkat telah terpasang aplikasi wajib perusahaan: **Google Chrome**, **AnyDesk**, dan **Microsoft Office suite**.',
       'Setelah seluruh proses setup selesai, buat dan lengkapi [Form Serah Terima Laptop](https://docs.google.com/document/d/1uDDbC77cmnm1J4yBDSQLW23pDkv4Y2R7h0myL_lkdbM/edit?usp=drive_link).',
       'Proses setup selesai dan unit laptop siap diserahkan kepada *User*.'

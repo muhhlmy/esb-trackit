@@ -1,100 +1,403 @@
-// Main Application Logic for Intern Case Playbook & FAQ Hub
+// ESB Case — Quiet Modern SaaS App Logic & Markdown Renderer
 
 document.addEventListener('DOMContentLoaded', () => {
+  // --------------------------------------------------
   // Application State
-  let casesData = [...INITIAL_CASES];
-  let bookmarks = JSON.parse(localStorage.getItem('intern_cases_bookmarks') || '[]');
+  // --------------------------------------------------
   let customCases = JSON.parse(localStorage.getItem('intern_cases_custom') || '[]');
+  let casesData = [...customCases, ...INITIAL_CASES];
+  let bookmarks = JSON.parse(localStorage.getItem('intern_cases_bookmarks') || '[]');
   
-  // Combine Initial and Custom Cases
-  casesData = [...customCases, ...INITIAL_CASES];
-
-  let currentCategory = 'all';
+  let currentView = 'all'; // 'all', 'bookmarks', 'templates'
+  let currentCategory = 'all'; // 'all', 'hardware', 'git', etc.
   let currentSeverity = 'all';
   let currentSearchQuery = '';
-  let showOnlyBookmarks = false;
+  let selectedCaseId = casesData.length > 0 ? casesData[0].id : null;
 
+  // --------------------------------------------------
   // DOM Elements
-  const casesContainer = document.getElementById('cases-list-container');
-  const templatesContainer = document.getElementById('templates-list-container');
+  // --------------------------------------------------
+  const paneCases = document.getElementById('pane-cases');
+  const paneTemplates = document.getElementById('pane-templates');
+
+  const masterListContainer = document.getElementById('case-list-master');
+  const readerContainer = document.getElementById('detail-pane-reader');
+  const templatesGridContainer = document.getElementById('templates-grid-container');
+
+  const navTabs = document.querySelectorAll('.nav-tab');
+  const catTabs = document.querySelectorAll('.cat-tab');
+  const severitySelect = document.getElementById('severity-select');
+
   const searchInput = document.getElementById('search-input');
-  const searchClear = document.getElementById('search-clear');
-  const totalCountEl = document.getElementById('total-cases-count');
-  const bookmarkCountBadge = document.getElementById('bookmark-count-badge');
-  const categoryPills = document.querySelectorAll('.pill-btn');
-  const severityChips = document.querySelectorAll('.severity-chip');
-  const btnToggleBookmarks = document.getElementById('btn-toggle-bookmarks');
+  const searchClearBtn = document.getElementById('search-clear');
+
+  const countAllEl = document.getElementById('count-all');
+  const countBookmarksEl = document.getElementById('count-bookmarks');
+  const masterTitleEl = document.getElementById('master-list-title');
+  const filteredCountEl = document.getElementById('filtered-count');
+
+  // Theme Toggle
   const btnToggleTheme = document.getElementById('btn-toggle-theme');
   const themeIcon = document.getElementById('theme-icon');
 
-  // Modal Elements
-  const addCaseModal = document.getElementById('add-case-modal');
-  const btnOpenAddModal = document.getElementById('btn-open-add-modal');
-  const btnCloseModal = document.getElementById('btn-close-modal');
-  const btnCancelModal = document.getElementById('btn-cancel-modal');
+  // Drawer Elements
+  const createDrawerBackdrop = document.getElementById('create-drawer-backdrop');
+  const btnOpenCreate = document.getElementById('btn-open-create');
+  const btnCloseDrawer = document.getElementById('btn-close-drawer');
+  const btnCancelDrawer = document.getElementById('btn-cancel-drawer');
   const addCaseForm = document.getElementById('add-case-form');
 
-  // Initialize App Theme
+  // --------------------------------------------------
+  // Initialization
+  // --------------------------------------------------
   initTheme();
-
-  // Render Initial Data
-  renderCases();
+  updateCounts();
+  renderApp();
   renderTemplates();
-  updateBookmarkBadge();
 
-  // Event Listeners
-  // 1. Live Search
+  // --------------------------------------------------
+  // Filtering & Logic
+  // --------------------------------------------------
+
+  function getFilteredCases() {
+    return casesData.filter(item => {
+      // Search Query
+      const matchSearch = !currentSearchQuery || 
+        item.title.toLowerCase().includes(currentSearchQuery) ||
+        item.summary.toLowerCase().includes(currentSearchQuery) ||
+        item.tags.some(t => t.toLowerCase().includes(currentSearchQuery)) ||
+        item.actionSteps.some(s => s.toLowerCase().includes(currentSearchQuery));
+
+      // View
+      let matchView = true;
+      if (currentView === 'bookmarks') {
+        matchView = bookmarks.includes(item.id);
+      }
+
+      // Category
+      const matchCategory = currentCategory === 'all' || item.category === currentCategory;
+
+      // Severity
+      const matchSeverity = currentSeverity === 'all' || item.severity === currentSeverity;
+
+      return matchSearch && matchView && matchCategory && matchSeverity;
+    });
+  }
+
+  function renderApp() {
+    if (currentView === 'templates') {
+      paneCases.classList.remove('active');
+      paneTemplates.classList.add('active');
+      return;
+    }
+
+    paneTemplates.classList.remove('active');
+    paneCases.classList.add('active');
+
+    // Update List Title
+    if (currentView === 'bookmarks') {
+      masterTitleEl.textContent = 'Bookmarks';
+    } else if (currentCategory !== 'all') {
+      masterTitleEl.textContent = getCategoryLabel(currentCategory);
+    } else {
+      masterTitleEl.textContent = 'All Cases';
+    }
+
+    renderMasterList();
+    renderReader();
+  }
+
+  function renderMasterList() {
+    const filtered = getFilteredCases();
+    filteredCountEl.textContent = filtered.length;
+
+    // Ensure selectedCaseId remains valid
+    if (filtered.length > 0) {
+      if (!filtered.some(c => c.id === selectedCaseId)) {
+        selectedCaseId = filtered[0].id;
+      }
+    } else {
+      selectedCaseId = null;
+    }
+
+    if (filtered.length === 0) {
+      masterListContainer.innerHTML = `
+        <div style="padding: 24px 16px; text-align: center; color: var(--text-sub);">
+          <p style="font-size: 0.825rem; font-weight: 500; color: var(--text-muted);">No cases found</p>
+          <p style="font-size: 0.75rem; margin-top: 4px;">Try adjusting your search or filters.</p>
+        </div>
+      `;
+      return;
+    }
+
+    masterListContainer.innerHTML = filtered.map(item => {
+      const isSelected = item.id === selectedCaseId;
+      const isBookmarked = bookmarks.includes(item.id);
+
+      return `
+        <div class="case-row ${isSelected ? 'active' : ''}" onclick="selectCase('${item.id}')">
+          <div class="row-top">
+            <span class="row-dot ${item.severity}"></span>
+            <span class="row-category">${getCategoryLabel(item.category)}</span>
+            ${isBookmarked ? '<i class="fa-solid fa-star row-star"></i>' : ''}
+          </div>
+          <h4 class="row-title">${escapeHtml(item.title)}</h4>
+          <p class="row-snippet">${stripMarkdown(item.summary)}</p>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function renderReader() {
+    if (!selectedCaseId) {
+      readerContainer.innerHTML = `
+        <div style="height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-sub);">
+          <p style="font-size: 0.9rem; font-weight: 500;">Select a case to view documentation</p>
+        </div>
+      `;
+      return;
+    }
+
+    const item = casesData.find(c => c.id === selectedCaseId);
+    if (!item) return;
+
+    const isBookmarked = bookmarks.includes(item.id);
+    const categoryLabel = getCategoryLabel(item.category);
+    const severityLabel = item.severity === 'high' ? 'High' : (item.severity === 'medium' ? 'Medium' : 'Low');
+
+    // SOP Steps
+    const stepsHtml = item.actionSteps.map((step, idx) => `
+      <li class="sop-item">
+        <span class="sop-index">${(idx + 1).toString().padStart(2, '0')}</span>
+        <div class="sop-content">${formatMarkdownText(step)}</div>
+      </li>
+    `).join('');
+
+    // Code Snippets
+    const snippetsHtml = item.snippets && item.snippets.length > 0 ? item.snippets.map(snip => `
+      <div class="code-box">
+        <div class="code-box-header">
+          <span>${escapeHtml(snip.label)}</span>
+          <button class="btn-copy-snippet" data-code="${escapeHtml(snip.code)}">
+            <i class="fa-regular fa-copy"></i> Copy Snippet
+          </button>
+        </div>
+        <pre><code>${escapeHtml(snip.code)}</code></pre>
+      </div>
+    `).join('') : '';
+
+    // Guidelines
+    const dosHtml = item.dosAndDonts?.dos ? item.dosAndDonts.dos.map(d => `<li>${formatMarkdownText(d)}</li>`).join('') : '';
+    const dontsHtml = item.dosAndDonts?.donts ? item.dosAndDonts.donts.map(d => `<li>${formatMarkdownText(d)}</li>`).join('') : '';
+
+    readerContainer.innerHTML = `
+      <article class="doc-article">
+        <!-- Article Header -->
+        <header class="doc-header">
+          <div class="doc-meta-line">
+            <span class="doc-meta-item">${categoryLabel}</span>
+            <span>·</span>
+            <span class="doc-meta-item">${severityLabel} Severity</span>
+          </div>
+
+          <h1 class="doc-title">${escapeHtml(item.title)}</h1>
+          <p class="doc-summary">${formatMarkdownText(item.summary)}</p>
+
+          <div class="doc-toolbar">
+            <button class="btn-doc-action ${isBookmarked ? 'active' : ''}" onclick="toggleBookmark('${item.id}')">
+              <i class="${isBookmarked ? 'fa-solid' : 'fa-regular'} fa-bookmark"></i>
+              <span>${isBookmarked ? 'Bookmarked' : 'Save to Bookmarks'}</span>
+            </button>
+            <button class="btn-doc-action" onclick="copyTitle('${item.id}')">
+              <i class="fa-regular fa-copy"></i>
+              <span>Copy Title</span>
+            </button>
+          </div>
+        </header>
+
+        <!-- Section 1: Context -->
+        <section class="doc-section">
+          <h2 class="doc-section-heading">Context</h2>
+          <p class="doc-text">${formatMarkdownText(item.problemContext || item.summary)}</p>
+        </section>
+
+        <!-- Section 2: Resolution SOP -->
+        <section class="doc-section">
+          <h2 class="doc-section-heading">Resolution</h2>
+          <ul class="sop-list">
+            ${stepsHtml}
+          </ul>
+        </section>
+
+        <!-- Section 3: Commands -->
+        ${snippetsHtml ? `
+          <section class="doc-section">
+            <h2 class="doc-section-heading">Commands</h2>
+            ${snippetsHtml}
+          </section>
+        ` : ''}
+
+        <!-- Section 4: Guidelines -->
+        ${dosHtml || dontsHtml ? `
+          <section class="doc-section">
+            <h2 class="doc-section-heading">Guidelines</h2>
+            <div class="guidelines-grid">
+              ${dosHtml ? `
+                <div>
+                  <div class="guidelines-col-title do">Do</div>
+                  <ul class="guideline-list">${dosHtml}</ul>
+                </div>
+              ` : ''}
+              ${dontsHtml ? `
+                <div>
+                  <div class="guidelines-col-title avoid">Avoid</div>
+                  <ul class="guideline-list">${dontsHtml}</ul>
+                </div>
+              ` : ''}
+            </div>
+          </section>
+        ` : ''}
+      </article>
+    `;
+
+    // Code copy listener
+    readerContainer.querySelectorAll('.btn-copy-snippet').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const code = btn.getAttribute('data-code');
+        navigator.clipboard.writeText(code);
+        showToast('Snippet copied to clipboard');
+      });
+    });
+  }
+
+  function renderTemplates() {
+    if (!templatesGridContainer) return;
+    templatesGridContainer.innerHTML = COMMUNICATION_TEMPLATES.map(tpl => `
+      <div class="tpl-card">
+        <div class="tpl-header">
+          <h3 class="tpl-title">${escapeHtml(tpl.title)}</h3>
+          <button class="btn-tpl-copy" data-template="${escapeHtml(tpl.content)}">
+            <i class="fa-regular fa-copy"></i> Copy
+          </button>
+        </div>
+        <div class="tpl-body">${escapeHtml(tpl.content)}</div>
+      </div>
+    `).join('');
+
+    templatesGridContainer.querySelectorAll('.btn-tpl-copy').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const text = btn.getAttribute('data-template');
+        navigator.clipboard.writeText(text);
+        showToast('Template copied to clipboard');
+      });
+    });
+  }
+
+  // --------------------------------------------------
+  // Event Handlers & Global Helpers
+  // --------------------------------------------------
+
+  window.selectCase = function(caseId) {
+    selectedCaseId = caseId;
+    renderMasterList();
+    renderReader();
+  };
+
+  window.toggleBookmark = function(caseId) {
+    if (bookmarks.includes(caseId)) {
+      bookmarks = bookmarks.filter(id => id !== caseId);
+      showToast('Removed from bookmarks');
+    } else {
+      bookmarks.push(caseId);
+      showToast('Saved to bookmarks');
+    }
+    localStorage.setItem('intern_cases_bookmarks', JSON.stringify(bookmarks));
+    updateCounts();
+    renderApp();
+  };
+
+  window.copyTitle = function(caseId) {
+    const item = casesData.find(c => c.id === caseId);
+    if (item) {
+      navigator.clipboard.writeText(item.title);
+      showToast('Title copied');
+    }
+  };
+
+  function updateCounts() {
+    countAllEl.textContent = casesData.length;
+    countBookmarksEl.textContent = bookmarks.length;
+  }
+
+  // View Navigation Tabs
+  navTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      navTabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      currentView = tab.dataset.view;
+      renderApp();
+    });
+  });
+
+  // Category Tabs
+  catTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      catTabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      currentCategory = tab.dataset.category;
+      renderApp();
+    });
+  });
+
+  // Severity Select
+  severitySelect.addEventListener('change', (e) => {
+    currentSeverity = e.target.value;
+    renderApp();
+  });
+
+  // Search Input
   searchInput.addEventListener('input', (e) => {
     currentSearchQuery = e.target.value.trim().toLowerCase();
-    searchClear.style.display = currentSearchQuery ? 'block' : 'none';
-    renderCases();
+    searchClearBtn.style.display = currentSearchQuery ? 'inline-block' : 'none';
+    renderApp();
   });
 
-  searchClear.addEventListener('click', () => {
+  searchClearBtn.addEventListener('click', () => {
     searchInput.value = '';
     currentSearchQuery = '';
-    searchClear.style.display = 'none';
+    searchClearBtn.style.display = 'none';
     searchInput.focus();
-    renderCases();
+    renderApp();
   });
 
-  // 2. Category Filter Pills
-  categoryPills.forEach(pill => {
-    pill.addEventListener('click', () => {
-      categoryPills.forEach(p => p.classList.remove('active'));
-      pill.classList.add('active');
-      currentCategory = pill.dataset.category;
-      renderCases();
-    });
+  // Global Keyboard Shortcuts
+  document.addEventListener('keydown', (e) => {
+    if (e.key === '/' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+      e.preventDefault();
+      searchInput.focus();
+    }
+    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+      e.preventDefault();
+      searchInput.focus();
+    }
+    if (e.key === 'Escape') {
+      if (createDrawerBackdrop.classList.contains('active')) {
+        createDrawerBackdrop.classList.remove('active');
+      } else if (document.activeElement === searchInput) {
+        searchInput.blur();
+      }
+    }
   });
 
-  // 3. Severity Filter Chips
-  severityChips.forEach(chip => {
-    chip.addEventListener('click', () => {
-      severityChips.forEach(c => c.classList.remove('active'));
-      chip.classList.add('active');
-      currentSeverity = chip.dataset.severity;
-      renderCases();
-    });
+  // Drawer Handlers
+  btnOpenCreate.addEventListener('click', () => createDrawerBackdrop.classList.add('active'));
+  btnCloseDrawer.addEventListener('click', () => createDrawerBackdrop.classList.remove('active'));
+  btnCancelDrawer.addEventListener('click', () => createDrawerBackdrop.classList.remove('active'));
+  createDrawerBackdrop.addEventListener('click', (e) => {
+    if (e.target === createDrawerBackdrop) createDrawerBackdrop.classList.remove('active');
   });
 
-  // 4. Bookmark Toggle Filter
-  btnToggleBookmarks.addEventListener('click', () => {
-    showOnlyBookmarks = !showOnlyBookmarks;
-    btnToggleBookmarks.classList.toggle('btn-primary', showOnlyBookmarks);
-    btnToggleBookmarks.classList.toggle('btn-secondary', !showOnlyBookmarks);
-    renderCases();
-  });
-
-  // 5. Modal Handlers
-  btnOpenAddModal.addEventListener('click', () => addCaseModal.classList.add('active'));
-  btnCloseModal.addEventListener('click', () => addCaseModal.classList.remove('active'));
-  btnCancelModal.addEventListener('click', () => addCaseModal.classList.remove('active'));
-  addCaseModal.addEventListener('click', (e) => {
-    if (e.target === addCaseModal) addCaseModal.classList.remove('active');
-  });
-
-  // 6. Submit Add Case Form
+  // Add Case Form
   addCaseForm.addEventListener('submit', (e) => {
     e.preventDefault();
     const title = document.getElementById('case-title').value.trim();
@@ -116,8 +419,8 @@ document.addEventListener('DOMContentLoaded', () => {
       problemContext: summary,
       actionSteps,
       dosAndDonts: {
-        dos: ['Selalu konfirmasi perbaikan dengan mentor.'],
-        donts: ['Jangan ragu bertanya jika masih terkendala.']
+        dos: ['Confirm fixes with senior engineer or IT team.'],
+        donts: ['Do not hesitate to ask if still blocked.']
       },
       snippets: snippetCode ? [{ label: 'Command / Code Snippet', code: snippetCode }] : []
     };
@@ -125,14 +428,17 @@ document.addEventListener('DOMContentLoaded', () => {
     customCases.unshift(newCase);
     localStorage.setItem('intern_cases_custom', JSON.stringify(customCases));
     casesData = [...customCases, ...INITIAL_CASES];
+    selectedCaseId = newCase.id;
 
     addCaseForm.reset();
-    addCaseModal.classList.remove('active');
-    showToast('Case magang baru berhasil disimpan!');
-    renderCases();
+    createDrawerBackdrop.classList.remove('active');
+    showToast('New case saved');
+    
+    updateCounts();
+    renderApp();
   });
 
-  // 7. Theme Toggle
+  // Theme Toggle
   btnToggleTheme.addEventListener('click', () => {
     const currentTheme = document.documentElement.getAttribute('data-theme');
     const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
@@ -155,214 +461,26 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Core Render Functions
-  function renderCases() {
-    const filtered = casesData.filter(item => {
-      // Search filter
-      const matchSearch = !currentSearchQuery || 
-        item.title.toLowerCase().includes(currentSearchQuery) ||
-        item.summary.toLowerCase().includes(currentSearchQuery) ||
-        item.tags.some(t => t.toLowerCase().includes(currentSearchQuery)) ||
-        item.actionSteps.some(s => s.toLowerCase().includes(currentSearchQuery));
-
-      // Category filter
-      const matchCategory = currentCategory === 'all' || item.category === currentCategory;
-
-      // Severity filter
-      const matchSeverity = currentSeverity === 'all' || item.severity === currentSeverity;
-
-      // Bookmark filter
-      const matchBookmark = !showOnlyBookmarks || bookmarks.includes(item.id);
-
-      return matchSearch && matchCategory && matchSeverity && matchBookmark;
-    });
-
-    totalCountEl.textContent = filtered.length;
-
-    if (filtered.length === 0) {
-      casesContainer.innerHTML = `
-        <div style="text-align: center; padding: 48px 24px; background: var(--bg-card); border: 1px dashed var(--border-color); border-radius: var(--radius-lg);">
-          <i class="fa-solid fa-folder-open" style="font-size: 3rem; color: var(--text-sub); margin-bottom: 16px;"></i>
-          <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Tidak Ada Case Yang Ditemukan</h3>
-          <p style="color: var(--text-muted); font-size: 0.9rem; max-width: 400px; margin: 0 auto;">
-            Coba ganti kata kunci pencarian atau reset filter kategori & severity yang sedang aktif.
-          </p>
-        </div>
-      `;
-      return;
-    }
-
-    casesContainer.innerHTML = filtered.map(item => {
-      const isBookmarked = bookmarks.includes(item.id);
-      const severityClass = `chip-${item.severity}`;
-      const severityLabel = item.severity === 'high' ? 'High / Blocker' : (item.severity === 'medium' ? 'Medium' : 'Low / Tip');
-      const categoryLabel = getCategoryLabel(item.category);
-
-      const stepsHtml = item.actionSteps.map((step, idx) => `
-        <li class="step-item">
-          <span class="step-num">${idx + 1}</span>
-          <span class="step-text">${formatMarkdownText(step)}</span>
-        </li>
-      `).join('');
-
-      const dosHtml = item.dosAndDonts?.dos ? item.dosAndDonts.dos.map(d => `<li>${formatMarkdownText(d)}</li>`).join('') : '';
-      const dontsHtml = item.dosAndDonts?.donts ? item.dosAndDonts.donts.map(d => `<li>${formatMarkdownText(d)}</li>`).join('') : '';
-
-      const snippetsHtml = item.snippets && item.snippets.length > 0 ? item.snippets.map(snip => `
-        <div class="code-block" style="margin-top: 12px;">
-          <div class="code-header">
-            <span><i class="fa-solid fa-terminal"></i> ${escapeHtml(snip.label)}</span>
-            <button class="btn-copy-code" data-code="${escapeHtml(snip.code)}">
-              <i class="fa-solid fa-copy"></i> Copy Snippet
-            </button>
-          </div>
-          <pre><code>${escapeHtml(snip.code)}</code></pre>
-        </div>
-      `).join('') : '';
-
-      return `
-        <article class="case-card" id="card-${item.id}">
-          <div class="case-header" onclick="toggleAccordion('${item.id}')">
-            <div class="case-header-content">
-              <div class="case-badges">
-                <span class="badge-category">${categoryLabel}</span>
-                <span class="badge-severity ${severityClass}">${severityLabel}</span>
-              </div>
-              <h3 class="case-title">${escapeHtml(item.title)}</h3>
-              <p class="case-summary">${formatMarkdownText(item.summary)}</p>
-            </div>
-            
-            <div class="case-actions-right">
-              <button class="btn-bookmark ${isBookmarked ? 'bookmarked' : ''}" 
-                      onclick="event.stopPropagation(); toggleBookmark('${item.id}')" 
-                      title="${isBookmarked ? 'Hapus Bookmark' : 'Simpan ke Favorit'}">
-                <i class="${isBookmarked ? 'fa-solid' : 'fa-regular'} fa-bookmark"></i>
-              </button>
-              <i class="fa-solid fa-chevron-down accordion-chevron"></i>
-            </div>
-          </div>
-
-          <div class="case-detail">
-            <div class="case-detail-inner">
-              
-              <!-- Context Box -->
-              <div class="section-box">
-                <div class="section-label"><i class="fa-solid fa-circle-info"></i> Konteks Masalah</div>
-                <p style="font-size: 0.925rem; color: var(--text-main);">${formatMarkdownText(item.problemContext || item.summary)}</p>
-              </div>
-
-              <!-- Steps Box -->
-              <div class="section-box">
-                <div class="section-label"><i class="fa-solid fa-list-check"></i> Langkah Penanganan Bertahap (SOP)</div>
-                <ul class="steps-list">
-                  ${stepsHtml}
-                </ul>
-              </div>
-
-              <!-- Code Snippets if any -->
-              ${snippetsHtml}
-
-              <!-- Dos and Donts -->
-              ${dosHtml || dontsHtml ? `
-                <div class="dos-donts-grid">
-                  ${dosHtml ? `
-                    <div class="dos-box">
-                      <div class="box-title"><i class="fa-solid fa-circle-check"></i> Yang SEBAIKNYA Dilakukan (Do's)</div>
-                      <ul class="box-list">${dosHtml}</ul>
-                    </div>
-                  ` : ''}
-
-                  ${dontsHtml ? `
-                    <div class="donts-box">
-                      <div class="box-title"><i class="fa-solid fa-circle-xmark"></i> Yang HINDARI (Don'ts)</div>
-                      <ul class="box-list">${dontsHtml}</ul>
-                    </div>
-                  ` : ''}
-                </div>
-              ` : ''}
-
-            </div>
-          </div>
-        </article>
-      `;
-    }).join('');
-
-    // Attach copy snippet event listeners
-    document.querySelectorAll('.btn-copy-code').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const code = btn.getAttribute('data-code');
-        navigator.clipboard.writeText(code);
-        showToast('Snippet kode berhasil di-copy!');
-      });
-    });
-  }
-
-  function renderTemplates() {
-    templatesContainer.innerHTML = COMMUNICATION_TEMPLATES.map(tpl => `
-      <div class="template-item">
-        <div class="template-item-title">
-          <span>${escapeHtml(tpl.title)}</span>
-          <button class="btn-copy-code" data-template="${escapeHtml(tpl.content)}" title="Copy template">
-            <i class="fa-solid fa-copy"></i>
-          </button>
-        </div>
-        <div class="template-preview">${escapeHtml(tpl.content)}</div>
-      </div>
-    `).join('');
-
-    // Copy template listeners
-    templatesContainer.querySelectorAll('.btn-copy-code').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const text = btn.getAttribute('data-template');
-        navigator.clipboard.writeText(text);
-        showToast('Template chat berhasil di-copy!');
-      });
-    });
-  }
-
-  // Global Helpers attached to window for inline onclick handlers
-  window.toggleAccordion = function(caseId) {
-    const card = document.getElementById(`card-${caseId}`);
-    if (card) {
-      card.classList.toggle('expanded');
-    }
-  };
-
-  window.toggleBookmark = function(caseId) {
-    if (bookmarks.includes(caseId)) {
-      bookmarks = bookmarks.filter(id => id !== caseId);
-      showToast('Dihapus dari Favorit');
-    } else {
-      bookmarks.push(caseId);
-      showToast('Disimpan ke Favorit');
-    }
-    localStorage.setItem('intern_cases_bookmarks', JSON.stringify(bookmarks));
-    updateBookmarkBadge();
-    renderCases();
-  };
-
-  function updateBookmarkBadge() {
-    bookmarkCountBadge.textContent = bookmarks.length;
-  }
-
+  // Utilities
   function getCategoryLabel(cat) {
     switch (cat) {
-      case 'hardware': return 'Hardware & Laptop Setup';
-      case 'git': return 'Git & Version Control';
-      case 'backend': return 'Backend & API';
-      case 'environment': return 'Environment Setup';
-      case 'workplace': return 'Workplace SOP';
-      case 'devops': return 'CI/CD & Deploy';
+      case 'all': return 'All';
+      case 'hardware': return 'Hardware';
+      case 'git': return 'Git';
+      case 'backend': return 'Backend';
+      case 'environment': return 'Environment';
+      case 'workplace': return 'Workplace';
+      case 'devops': return 'DevOps';
       default: return cat;
     }
   }
 
   function showToast(message) {
     const toastContainer = document.getElementById('toast-container');
+    if (!toastContainer) return;
     const toast = document.createElement('div');
     toast.className = 'toast';
-    toast.innerHTML = `<i class="fa-solid fa-circle-check"></i> <span>${escapeHtml(message)}</span>`;
+    toast.innerHTML = `<i class="fa-solid fa-check"></i> <span>${escapeHtml(message)}</span>`;
     toastContainer.appendChild(toast);
 
     setTimeout(() => {
@@ -382,13 +500,43 @@ document.addEventListener('DOMContentLoaded', () => {
       .replace(/'/g, "&#039;");
   }
 
+  /**
+   * Safe Markdown Text Formatter
+   * Converts markdown links [Text](URL), bold **text**, italic *text*, and inline code `code`
+   * safely without raw markdown syntax artifacts remaining.
+   */
   function formatMarkdownText(text) {
     if (!text) return '';
-    let escaped = escapeHtml(text);
-    // Inline code `code`
-    escaped = escaped.replace(/`([^`]+)`/g, '<code style="background: rgba(99, 102, 241, 0.15); color: #a5b4fc; padding: 2px 6px; border-radius: 4px; font-family: monospace; font-size: 0.85em;">$1</code>');
-    // Bold **text**
-    escaped = escaped.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
-    return escaped;
+    
+    // 1. Escape unsafe HTML characters
+    let html = escapeHtml(text);
+
+    // 2. Parse Links: [Text](URL)
+    html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (match, linkText, url) => {
+      return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="doc-link">${linkText}</a>`;
+    });
+
+    // 3. Parse Bold: **text**
+    html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+
+    // 4. Parse Italic: *text*
+    html = html.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+
+    // 5. Parse Inline Code: `code`
+    html = html.replace(/`([^`]+)`/g, '<code class="inline-code">$1</code>');
+
+    return html;
+  }
+
+  /**
+   * Helper to strip markdown formatting for plain snippet previews
+   */
+  function stripMarkdown(text) {
+    if (!text) return '';
+    return text
+      .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // Links -> link text
+      .replace(/\*\*([^*]+)\*\*/g, '$1')       // Bold -> text
+      .replace(/\*([^*]+)\*/g, '$1')           // Italic -> text
+      .replace(/`([^`]+)`/g, '$1');            // Inline code -> text
   }
 });

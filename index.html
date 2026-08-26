@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Intern Case Playbook & FAQ Hub - Pengalaman Magang</title>
+  <meta name="description" content="Panduan dan Solusi FAQ Praktis Penanganan Case Teknis, Git, API, dan SOP Komunikasi Berdasarkan Pengalaman Magang Developer.">
+  
+  <!-- CSS Stylesheet -->
+  <link rel="stylesheet" href="styles.css">
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+  <!-- Top Navbar Header -->
+  <header class="navbar">
+    <div class="container nav-container">
+      <a href="#" class="logo-brand" id="logo-home">
+        <i class="fa-solid fa-laptop-code" style="color: var(--accent-primary);"></i>
+        <span>InternCase<span style="color: var(--accent-primary);">.FAQ</span></span>
+        <span class="logo-badge">Playbook</span>
+      </a>
+
+      <div class="nav-controls">
+        <button class="btn btn-secondary" id="btn-toggle-bookmarks" title="Filter Bookmark Saya">
+          <i class="fa-solid fa-bookmark" style="color: #f59e0b;"></i>
+          <span>Favorit Saya</span>
+          <span id="bookmark-count-badge" style="background: rgba(245,158,11,0.2); color: #f59e0b; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem;">0</span>
+        </button>
+
+        <button class="btn btn-primary" id="btn-open-add-modal">
+          <i class="fa-solid fa-plus"></i>
+          <span>Tambah Case Magang</span>
+        </button>
+
+        <button class="btn-icon" id="btn-toggle-theme" title="Ganti Mode Gelap/Terang">
+          <i class="fa-solid fa-moon" id="theme-icon"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero & Search Section -->
+  <section class="hero-section">
+    <div class="container">
+      <h1 class="hero-title">Apa yang Harus Dilakukan Saat Ada <span class="hero-gradient">Case Magang?</span></h1>
+      <p class="hero-subtitle">Kumpulan SOP, troubleshooting bug, workflow Git, dan panduan komunikasi berdasarkan pengalaman magang nyata.</p>
+
+      <!-- Live Search Box -->
+      <div class="search-wrapper">
+        <div class="search-input-box">
+          <i class="fa-solid fa-magnifying-glass search-icon"></i>
+          <input type="text" id="search-input" class="search-input" placeholder="Cari masalah (misal: Merge conflict, 500 error, Port 3000, Daily standup)..." autocomplete="off">
+          <button id="search-clear" class="search-clear" title="Clear search"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+      </div>
+
+      <!-- Category Filter Pills -->
+      <div class="filter-bar" id="category-filters">
+        <button class="pill-btn active" data-category="all">Semua Case</button>
+        <button class="pill-btn" data-category="hardware"><i class="fa-solid fa-laptop"></i> Hardware & Laptop Setup</button>
+        <button class="pill-btn" data-category="git"><i class="fa-solid fa-code-branch"></i> Git & Version Control</button>
+        <button class="pill-btn" data-category="backend"><i class="fa-solid fa-server"></i> Backend & API</button>
+        <button class="pill-btn" data-category="environment"><i class="fa-solid fa-terminal"></i> Setup & Dev Environment</button>
+        <button class="pill-btn" data-category="workplace"><i class="fa-solid fa-comments"></i> Workplace & SOP Chat</button>
+        <button class="pill-btn" data-category="devops"><i class="fa-solid fa-cloud-arrow-up"></i> CI/CD & Deploy</button>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Main Grid Content -->
+  <main class="container">
+
+    <!-- Sub filter row & results counter -->
+    <div class="sub-filter-row">
+      <div class="result-count">
+        Menampilkan <strong id="total-cases-count">0</strong> Case Magang
+      </div>
+
+      <div class="severity-selectors">
+        <span style="font-size: 0.8rem; color: var(--text-muted); margin-right: 6px;">Filter Severity:</span>
+        <span class="severity-chip chip-high active" data-severity="all">Semua</span>
+        <span class="severity-chip chip-high" data-severity="high">High / Blocker</span>
+        <span class="severity-chip chip-medium" data-severity="medium">Medium</span>
+        <span class="severity-chip chip-low" data-severity="low">Tip / Low</span>
+      </div>
+    </div>
+
+    <div class="main-layout">
+      
+      <!-- Cases Accordion Grid -->
+      <section class="cases-grid" id="cases-list-container">
+        <!-- Dynamic Case Cards rendered by app.js -->
+      </section>
+
+      <!-- Sidebar Communication Templates Panel -->
+      <aside class="sidebar-panel">
+        <div class="panel-card">
+          <h3 class="panel-title">
+            <i class="fa-solid fa-message" style="color: var(--accent-primary);"></i>
+            Template Chat Magang
+          </h3>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">
+            Copy langsung format pesan standar profesional untuk Slack, Teams, atau WA grup kantor.
+          </p>
+
+          <div id="templates-list-container">
+            <!-- Dynamic Templates rendered by app.js -->
+          </div>
+        </div>
+      </aside>
+
+    </div>
+  </main>
+
+  <!-- Modal Form: Add Custom Case -->
+  <div class="modal-overlay" id="add-case-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2 class="modal-title">Tambah Case Pengalaman Magang</h2>
+        <button class="btn-close-modal" id="btn-close-modal">&times;</button>
+      </div>
+
+      <form id="add-case-form">
+        <div class="form-group">
+          <label class="form-label" for="case-title">Judul Case / Masalah *</label>
+          <input type="text" id="case-title" class="form-input" placeholder="Contoh: Error 404 pada API Authentication" required>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+          <div class="form-group">
+            <label class="form-label" for="case-category">Kategori *</label>
+            <select id="case-category" class="form-select" required>
+              <option value="hardware" selected>Hardware & Laptop Setup</option>
+              <option value="git">Git & Version Control</option>
+              <option value="backend">Backend & API</option>
+              <option value="environment">Setup & Dev Environment</option>
+              <option value="workplace">Workplace & SOP Chat</option>
+              <option value="devops">CI/CD & Deploy</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="case-severity">Tingkat Keparahan (Severity) *</label>
+            <select id="case-severity" class="form-select" required>
+              <option value="high">High (Blocker / Urgent)</option>
+              <option value="medium" selected>Medium (Standard Case)</option>
+              <option value="low">Low (Tips / Best Practice)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="case-summary">Ringkasan Konteks Masalah *</label>
+          <textarea id="case-summary" class="form-textarea" rows="2" placeholder="Apa yang terjadi dan kapan masalah ini biasanya muncul?" required></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="case-steps">Langkah Penanganan (SOP) * (pisahkan tiap langkah dengan baris baru)</label>
+          <textarea id="case-steps" class="form-textarea" rows="4" placeholder="1. Periksa terminal&#10;2. Jalankan perintah git status&#10;3. Hubungi mentor" required></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="case-snippet">Code Snippet / Command Terminal (Opsional)</label>
+          <textarea id="case-snippet" class="form-textarea" rows="3" placeholder="git pull origin main" style="font-family: monospace;"></textarea>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px;">
+          <button type="button" class="btn btn-secondary" id="btn-cancel-modal">Batal</button>
+          <button type="submit" class="btn btn-primary"><i class="fa-solid fa-floppy-disk"></i> Simpan Case</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Floating Toast Notification -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- JavaScript Modules -->
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

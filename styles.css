@@ -30,6 +30,10 @@
   --radius-sm: 4px;
   --radius-md: 6px;
   --radius-lg: 10px;
+
+  /* Mobile bottom navigation metrics */
+  --mobile-bottom-nav-height: 56px;
+  --safe-area-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 [data-theme="light"] {
@@ -129,6 +133,12 @@ html, body {
   height: 100%;
   width: 100%;
   overflow: hidden;
+}
+
+/* iOS Safari dynamic viewport — prevents chrome bar overlap issues */
+html {
+  height: 100%;
+  height: 100dvh;
 }
 
 body {
@@ -492,6 +502,9 @@ body {
   cursor: pointer;
   transition: background 0.12s ease;
   border-left: 2px solid transparent;
+  height: auto;
+  min-height: 0;
+  flex-shrink: 0;
 }
 
 .case-row:hover {
@@ -540,6 +553,8 @@ body {
   color: var(--text-main);
   line-height: 1.35;
   margin-bottom: 3px;
+  overflow-wrap: anywhere;
+  word-break: normal;
 }
 
 .row-snippet {
@@ -549,6 +564,7 @@ body {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  overflow-wrap: anywhere;
 }
 
 /* Detail Reader Pane (Notion-like Editorial Layout & Generous Breathing Room) */
@@ -1059,14 +1075,16 @@ pre code {
 
   .header-left {
     flex: 1;
+    min-width: 0;
     display: flex;
     align-items: center;
     gap: 8px;
+    overflow: hidden;
   }
 
-  .brand { gap: 8px; flex-shrink: 0; }
-  .brand-logo-img { height: 22px; }
-  .brand-name { font-size: 1rem; font-weight: 700; }
+  .brand { gap: 8px; flex-shrink: 1; min-width: 0; }
+  .brand-logo-img { height: 22px; flex-shrink: 0; }
+  .brand-name { font-size: 1rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
   /* Hide desktop nav tabs — replaced by bottom nav */
   .view-nav { display: none; }
@@ -1114,6 +1132,8 @@ pre code {
     display: flex !important;
     align-items: center;
     gap: 10px;
+    width: 100%;
+    box-sizing: border-box;
     background: var(--bg-surface);
     border: 1px solid var(--border-subtle);
     border-radius: 10px;
@@ -1163,14 +1183,23 @@ pre code {
 
   /* Categories: horizontal scrollable chip pills */
   .category-tabs {
-    display: flex; align-items: center; gap: 8px;
-    overflow-x: auto; -webkit-overflow-scrolling: touch;
-    scrollbar-width: none; padding-bottom: 2px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 2px;
   }
   .category-tabs::-webkit-scrollbar { display: none; }
 
   .cat-tab {
-    flex-shrink: 0; white-space: nowrap;
+    flex: 0 0 auto;
+    flex-shrink: 0;
+    white-space: nowrap;
     font-size: 0.85rem; font-weight: 500;
     padding: 7px 14px;
     border: 1px solid var(--border-subtle);
@@ -1193,8 +1222,10 @@ pre code {
   /* Hide severity on mobile for cleanliness */
   .severity-filter { display: none; }
 
-  /* ── 3. WORKSPACE — full-screen stack ── */
-  .main-workspace { padding-bottom: 56px; }
+  /* ── 3. WORKSPACE — full-screen stack ──
+     (pane-view is absolutely positioned, so bottom spacing for the
+     fixed bottom-nav is applied per scroll container: .case-rows
+     and .reader-pane / .templates-view-container) */
 
   .pane-view.active {
     display: flex;
@@ -1222,7 +1253,8 @@ pre code {
   .list-count { font-size: 0.8rem; }
 
   .case-rows {
-    padding: 0 8px 16px; gap: 4px;
+    padding: 0 12px calc(24px + var(--mobile-bottom-nav-height) + var(--safe-area-bottom));
+    gap: 10px;
     flex: 1;
     min-height: 0;
     overflow-y: auto;
@@ -1230,10 +1262,17 @@ pre code {
   }
 
   .case-row {
-    padding: 16px; min-height: 72px;
-    border-radius: 8px; border-left: none;
+    padding: 14px 14px;
+    min-height: 0;
+    height: auto;
+    border-radius: 10px;
+    border-left: none;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    overflow: hidden;
+    flex-shrink: 0;
   }
-  .case-row.active { border-left: none; background: var(--bg-surface); }
+  .case-row.active { border-left: none; background: var(--bg-surface-hover); }
 
   .row-top { margin-bottom: 6px; gap: 8px; }
   .row-dot { width: 7px; height: 7px; }
@@ -1242,8 +1281,9 @@ pre code {
   .row-title {
     font-size: 0.975rem; font-weight: 600; line-height: 1.4;
     margin-bottom: 4px;
-    display: -webkit-box; -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical; overflow: hidden;
+    display: block;
+    overflow-wrap: anywhere;
+    word-break: normal;
   }
 
   .row-snippet {
@@ -1251,6 +1291,8 @@ pre code {
     white-space: normal;
     display: -webkit-box; -webkit-line-clamp: 2;
     -webkit-box-orient: vertical; overflow: hidden;
+    overflow-wrap: anywhere;
+    max-height: calc(1.45em * 2);
   }
 
   /* Screen B: Full-Screen Article */
@@ -1258,7 +1300,8 @@ pre code {
     position: absolute; top: 0; left: 0; right: 0; bottom: 0;
     width: 100%; height: 100%; z-index: 30;
     display: none; overflow-y: auto;
-    background: var(--bg-page); padding: 20px 16px 64px;
+    background: var(--bg-page);
+    padding: 20px 16px calc(64px + var(--mobile-bottom-nav-height) + var(--safe-area-bottom));
   }
   .workspace-split.show-detail .master-list-pane { display: none; }
   .workspace-split.show-detail .reader-pane { display: block; }
@@ -1298,7 +1341,7 @@ pre code {
   .guideline-list { font-size: 0.9rem; }
 
   /* ── 4. TEMPLATES ── */
-  .templates-view-container { padding: 20px 16px 72px; }
+  .templates-view-container { padding: 20px 16px calc(72px + var(--mobile-bottom-nav-height) + var(--safe-area-bottom)); }
   .page-heading { font-size: 1.5rem; }
   .page-subheading { font-size: 0.9rem; }
   .templates-grid { grid-template-columns: 1fr; gap: 14px; }
@@ -1327,11 +1370,13 @@ pre code {
   /* ── 6. BOTTOM NAV ── */
   .mobile-bottom-nav {
     position: fixed; bottom: 0; left: 0; right: 0;
-    height: 56px; background: var(--bg-page);
+    height: calc(var(--mobile-bottom-nav-height) + var(--safe-area-bottom));
+    background: var(--bg-page);
     border-top: 1px solid var(--border-subtle);
     display: flex; align-items: center; justify-content: space-around;
-    padding: 0; padding-bottom: env(safe-area-inset-bottom, 0px);
+    padding: 0; padding-bottom: var(--safe-area-bottom);
     z-index: 50;
+    box-sizing: border-box;
   }
   .bottom-nav-item {
     display: flex; flex-direction: column; align-items: center; justify-content: center;

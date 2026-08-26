@@ -6,6 +6,9 @@
   <title>ESB Case — Knowledge Base & Incident Playbook</title>
   <meta name="description" content="A modern, minimalist knowledge base for internship engineering SOPs, troubleshooting, and workflows.">
   
+  <!-- Favicon / Website Icon -->
+  <link rel="icon" type="image/svg+xml" href="./ESB Case.svg">
+  
   <!-- CSS Stylesheet -->
   <link rel="stylesheet" href="styles.css">
   
@@ -21,6 +24,7 @@
       <!-- Brand Logo & Main View Nav -->
       <div class="header-left">
         <a href="#" class="brand" id="logo-home">
+          <img src="./ESB Case.svg" alt="ESB Case Logo" class="brand-logo-img">
           <span class="brand-name">ESB Case</span>
         </a>
 
@@ -57,6 +61,14 @@
   <!-- Category & Sub-Filter Bar -->
   <div class="filter-bar">
     <div class="filter-container">
+
+      <!-- Mobile-only full-width search input -->
+      <div class="mobile-search-wrapper" id="mobile-search-wrapper">
+        <i class="fa-solid fa-magnifying-glass mobile-search-icon"></i>
+        <input type="text" id="mobile-search-input" class="mobile-search-input" placeholder="Search cases, errors, commands..." autocomplete="off">
+        <button id="mobile-search-clear" class="mobile-search-clear" aria-label="Clear search">&times;</button>
+      </div>
+
       <div class="category-tabs" id="category-filters">
         <button class="cat-tab active" data-category="all">All</button>
         <button class="cat-tab" data-category="hardware">Hardware</button>
@@ -181,8 +193,29 @@
     </div>
   </div>
 
+  <!-- Mobile Bottom Navigation -->
+  <nav class="mobile-bottom-nav" id="mobile-bottom-nav">
+    <button class="bottom-nav-item active" data-view="all" id="bnav-cases">
+      <i class="fa-solid fa-folder-open"></i>
+      <span>Cases</span>
+    </button>
+    <button class="bottom-nav-item" data-view="search" id="bnav-search">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <span>Search</span>
+    </button>
+    <button class="bottom-nav-item" data-view="bookmarks" id="bnav-bookmarks">
+      <i class="fa-regular fa-bookmark"></i>
+      <span>Bookmarks</span>
+    </button>
+    <button class="bottom-nav-item" data-view="templates" id="bnav-templates">
+      <i class="fa-solid fa-file-lines"></i>
+      <span>Templates</span>
+    </button>
+  </nav>
+
   <!-- Toast Notification Container -->
   <div class="toast-container" id="toast-container"></div>
+
 
   <!-- JavaScript Modules -->
   <script src="data.js"></script>

@@ -87,6 +87,75 @@ pause`
         code: `powershell -Command "Set-LocalUser -Name 'ESB-User' -PasswordNeverExpires $true"`
       }
     ]
+  },
+  {
+    id: 'google-workspace-01',
+    title: 'SOP Permintaan Kode Backup 2-Step Verification (2SV) Google Workspace',
+    category: 'workplace',
+    severity: 'medium',
+    tags: ['google-workspace', '2sv', 'backup-codes', 'security', 'admin-console', 'pbx'],
+    summary: 'Panduan Operasional Standar (SOP) penanganan permintaan kode cadangan verifikasi 2 langkah (*2-Step Verification*) akun Google Workspace atas permintaan PBX / People & Culture.',
+    problemContext: 'Tim People & Culture (PBX) atau atasan memohon kode verifikasi cadangan (*Backup Verification Codes*) untuk membantu akses masuk (*login*) akun Google Workspace milik anggota tim/subordinat yang mengalami kendala otentikasi.',
+    actionSteps: [
+      'Buka dan login ke portal [Google Admin Console](https://admin.google.com/) menggunakan akun Administrator berwenang.',
+      'Cari nama atau alamat email pengguna (*User*) yang bersangkutan melalui kolom pencarian utama atau navigasi **Directory > Users**.',
+      'Klik profil akun pengguna tersebut, lalu pilih tab **Security** pada panel detail.',
+      'Pilih dan buka bagian **2-Step Verification**.',
+      'Klik opsi **"Get Backup Verification Codes"** untuk menampilkan daftar kode cadangan otentikasi.',
+      'Salin minimal **2 (dua) kode verifikasi cadangan** dari daftar yang tersedia.',
+      'Kirimkan kedua kode verifikasi cadangan tersebut secara aman kepada pihak PBX / pemohon berwenang.'
+    ],
+    dosAndDonts: {
+      dos: [
+        'Pastikan untuk selalu memverifikasi keabsahan permintaan dari pihak PBX / atasan sebelum menyerahkan kode cadangan.',
+        'Sertakan minimal 2 kode verifikasi cadangan agar user memiliki opsi cadangan jika satu kode gagal digunakan.'
+      ],
+      donts: [
+        'Jangan membagikan seluruh daftar kode backup sekaligus demi menjaga standar keamanan akun Google Workspace perusahaan.',
+        'Jangan memberikan kode backup ke pihak yang tidak dikenal tanpa konfirmasi resmi dari People & Culture (PBX).'
+      ]
+    },
+    snippets: [
+      {
+        label: 'Link Direct Google Admin Console',
+        code: 'https://admin.google.com/'
+      }
+    ]
+  },
+  {
+    id: 'google-workspace-02',
+    title: 'SOP Permintaan Reset Password Akun Google Workspace Karyawan',
+    category: 'workplace',
+    severity: 'medium',
+    tags: ['google-workspace', 'reset-password', 'security', 'admin-console', 'pbx', 'default-password'],
+    summary: 'Panduan Operasional Standar (SOP) penanganan permintaan reset kata sandi (*reset password*) akun Google Workspace karyawan yang mengalami lupa password atau atas permintaan PBX.',
+    problemContext: 'Perwakilan People & Culture (PBX) atau atasan mengajukan permohonan reset kata sandi (*password reset*) untuk anggota tim/subordinat yang lupa password atau tidak bisa mengakses akun Google Workspace perusahaan.',
+    actionSteps: [
+      'Buka dan login ke portal [Google Admin Console](https://admin.google.com/) menggunakan akun Administrator berwenang.',
+      'Cari nama atau alamat email pengguna (*User*) yang akan di-reset pada kolom pencarian utama atau navigasi **Directory > Users**.',
+      'Klik tombol **Reset Password** pada panel profil akun pengguna tersebut.',
+      'Pilih metode **Create Password** (buat kata sandi secara manual).',
+      'Masukkan kata sandi default resmi perusahaan yaitu `Essensians@2026` pada kolom password baru.',
+      'Pastikan untuk mencentang opsi **"Ask user to change their password when they sign in"** agar pengguna wajib memperbarui kata sandi saat pertama kali login kembali.',
+      'Klik tombol **Reset** untuk mengeksekusi perbaikan, kemudian kabarkan password sementara tersebut secara aman kepada pihak PBX / pemohon berwenang.'
+    ],
+    dosAndDonts: {
+      dos: [
+        'Wajib mencentang opsi *Ask user to change their password when they sign in* agar kata sandi baru segera diubah oleh pemilik akun.',
+        'Gunakan password default resmi perusahaan (`Essensians@2026`) untuk konsistensi prosedur IT Support.'
+      ],
+      donts: [
+        'Jangan membagikan kata sandi baru pada grup obrolan publik; selalu kirimkan secara privat (*Direct Message*) kepada pihak PBX.',
+        'Jangan mengabaikan verifikasi pemohon; pastikan permintaan reset berasal dari saluran resmi PBX / People & Culture.'
+      ]
+    },
+    snippets: [
+      {
+        label: 'Default Password Reset & Console Link',
+        code: `Portal: https://admin.google.com/
+Default Temp Password: Essensians@2026`
+      }
+    ]
   }
 ];
 

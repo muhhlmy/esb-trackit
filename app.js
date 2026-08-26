@@ -88,6 +88,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (currentView === 'templates') {
       paneCases.classList.remove('active');
       paneTemplates.classList.add('active');
+      mobileBackToList();
       return;
     }
 
@@ -192,6 +193,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     readerContainer.innerHTML = `
       <article class="doc-article">
+        <!-- Mobile Back Navigation Button -->
+        <button class="btn-mobile-back" onclick="mobileBackToList()" aria-label="Back to Cases List">
+          <i class="fa-solid fa-arrow-left"></i>
+          <span>Back to Cases</span>
+        </button>
+
         <!-- Article Header -->
         <header class="doc-header">
           <div class="doc-meta-line">
@@ -301,6 +308,21 @@ document.addEventListener('DOMContentLoaded', () => {
     selectedCaseId = caseId;
     renderMasterList();
     renderReader();
+
+    // Mobile screen stack transition
+    const workspaceSplit = document.querySelector('.workspace-split');
+    if (workspaceSplit) {
+      workspaceSplit.classList.add('show-detail');
+      const readerPane = document.getElementById('detail-pane-reader');
+      if (readerPane) readerPane.scrollTop = 0;
+    }
+  };
+
+  window.mobileBackToList = function() {
+    const workspaceSplit = document.querySelector('.workspace-split');
+    if (workspaceSplit) {
+      workspaceSplit.classList.remove('show-detail');
+    }
   };
 
   window.toggleBookmark = function(caseId) {
@@ -359,6 +381,11 @@ document.addEventListener('DOMContentLoaded', () => {
   searchInput.addEventListener('input', (e) => {
     currentSearchQuery = e.target.value.trim().toLowerCase();
     searchClearBtn.style.display = currentSearchQuery ? 'inline-block' : 'none';
+    // Sync mobile search
+    if (mobileSearchInput && mobileSearchInput.value !== e.target.value) {
+      mobileSearchInput.value = e.target.value;
+      mobileSearchClearBtn.classList.toggle('visible', !!currentSearchQuery);
+    }
     renderApp();
   });
 
@@ -367,7 +394,79 @@ document.addEventListener('DOMContentLoaded', () => {
     currentSearchQuery = '';
     searchClearBtn.style.display = 'none';
     searchInput.focus();
+    if (mobileSearchInput) { mobileSearchInput.value = ''; mobileSearchClearBtn.classList.remove('visible'); }
     renderApp();
+  });
+
+  // --------------------------------------------------
+  // Mobile Search Input
+  // --------------------------------------------------
+  const mobileSearchInput = document.getElementById('mobile-search-input');
+  const mobileSearchClearBtn = document.getElementById('mobile-search-clear');
+
+  if (mobileSearchInput) {
+    mobileSearchInput.addEventListener('input', (e) => {
+      currentSearchQuery = e.target.value.trim().toLowerCase();
+      mobileSearchClearBtn.classList.toggle('visible', !!currentSearchQuery);
+      // Sync desktop search
+      if (searchInput.value !== e.target.value) {
+        searchInput.value = e.target.value;
+        searchClearBtn.style.display = currentSearchQuery ? 'inline-block' : 'none';
+      }
+      renderApp();
+    });
+  }
+
+  if (mobileSearchClearBtn) {
+    mobileSearchClearBtn.addEventListener('click', () => {
+      mobileSearchInput.value = '';
+      currentSearchQuery = '';
+      mobileSearchClearBtn.classList.remove('visible');
+      searchInput.value = '';
+      searchClearBtn.style.display = 'none';
+      mobileSearchInput.focus();
+      renderApp();
+    });
+  }
+
+  // --------------------------------------------------
+  // Mobile Bottom Navigation
+  // --------------------------------------------------
+  const bottomNavItems = document.querySelectorAll('.bottom-nav-item');
+
+  bottomNavItems.forEach(item => {
+    item.addEventListener('click', () => {
+      // Update bottom nav active state
+      bottomNavItems.forEach(n => n.classList.remove('active'));
+      item.classList.add('active');
+
+      const view = item.dataset.view;
+
+      if (view === 'search') {
+        // Switch to cases view and focus mobile search
+        currentView = 'all';
+        navTabs.forEach(t => t.classList.remove('active'));
+        const tabAll = document.getElementById('tab-all');
+        if (tabAll) tabAll.classList.add('active');
+        mobileBackToList();
+        renderApp();
+        // Focus the mobile search input after rendering
+        setTimeout(() => {
+          if (mobileSearchInput) mobileSearchInput.focus();
+        }, 100);
+        return;
+      }
+
+      // Map bottom nav views to desktop view system
+      if (view === 'all' || view === 'bookmarks' || view === 'templates') {
+        currentView = view;
+        navTabs.forEach(t => t.classList.remove('active'));
+        const targetTab = document.querySelector(`.nav-tab[data-view="${view}"]`);
+        if (targetTab) targetTab.classList.add('active');
+        mobileBackToList();
+        renderApp();
+      }
+    });
   });
 
   // Global Keyboard Shortcuts

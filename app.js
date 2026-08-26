@@ -170,12 +170,13 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    masterListContainer.innerHTML = filtered.map(item => {
+    masterListContainer.innerHTML = filtered.map((item, index) => {
       const isSelected = item.id === selectedCaseId;
       const isBookmarked = bookmarks.includes(item.id);
+      const staggerDelay = prefersReducedMotion() ? 0 : Math.min(index * 30, 150);
 
       return `
-        <div class="case-row ${isSelected ? 'active' : ''}" onclick="selectCase('${item.id}')">
+        <div class="case-row is-entering ${isSelected ? 'active' : ''}" style="animation-delay: ${staggerDelay}ms" onclick="selectCase('${item.id}')">
           <div class="row-top">
             <span class="row-dot ${item.severity}"></span>
             <span class="row-category">${getCategoryLabel(item.category)}</span>
@@ -312,6 +313,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const code = btn.getAttribute('data-code');
         navigator.clipboard.writeText(code);
         showToast('Snippet copied to clipboard');
+        flashCopied(btn, 'Copy Snippet');
       });
     });
   }
@@ -335,6 +337,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const text = btn.getAttribute('data-template');
         navigator.clipboard.writeText(text);
         showToast('Template copied to clipboard');
+        flashCopied(btn, 'Copy');
       });
     });
   }
@@ -538,6 +541,7 @@ document.addEventListener('DOMContentLoaded', () => {
   window.mobileBackToList = mobileBackToList;
 
   window.toggleBookmark = function(caseId) {
+    const isNowBookmarked = !bookmarks.includes(caseId);
     if (bookmarks.includes(caseId)) {
       bookmarks = bookmarks.filter(id => id !== caseId);
       showToast('Removed from bookmarks');
@@ -548,6 +552,15 @@ document.addEventListener('DOMContentLoaded', () => {
     localStorage.setItem('intern_cases_bookmarks', JSON.stringify(bookmarks));
     updateCounts();
     renderApp();
+
+    // Bookmark icon micro-animation (pop on save)
+    if (isNowBookmarked && !prefersReducedMotion()) {
+      const icon = document.querySelector('.btn-doc-action .fa-bookmark');
+      if (icon) {
+        icon.classList.add('anim-pop');
+        icon.addEventListener('animationend', () => icon.classList.remove('anim-pop'), { once: true });
+      }
+    }
   };
 
   window.copyTitle = function(caseId) {
@@ -555,6 +568,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (item) {
       navigator.clipboard.writeText(item.title);
       showToast('Title copied');
+      const btn = document.querySelector('.btn-doc-action[onclick^="copyTitle"]');
+      if (btn) flashCopied(btn, 'Copy Title');
     }
   };
 
@@ -891,11 +906,38 @@ document.addEventListener('DOMContentLoaded', () => {
     toast.innerHTML = `<i class="fa-solid fa-check"></i> <span>${escapeHtml(message)}</span>`;
     toastContainer.appendChild(toast);
 
+    // Exit animation: fade/slide out before removal
     setTimeout(() => {
-      if (toast.parentNode) {
-        toast.parentNode.removeChild(toast);
-      }
-    }, 3000);
+      if (!toast.parentNode) return;
+      toast.classList.add('leaving');
+      toast.addEventListener('animationend', () => {
+        if (toast.parentNode) toast.parentNode.removeChild(toast);
+      }, { once: true });
+      // Fallback removal in case animationend doesn't fire
+      setTimeout(() => {
+        if (toast.parentNode) toast.parentNode.removeChild(toast);
+      }, 260);
+    }, 2740);
+  }
+
+  /**
+   * Swap a copy button's label to "Copied" briefly, then restore it.
+   * Adds a `.copied` class for a subtle color/border accent.
+   */
+  function flashCopied(btn, originalLabel) {
+    if (!btn) return;
+    btn.classList.add('copied');
+    const icon = btn.querySelector('i');
+    const originalHtml = btn.innerHTML;
+    btn.innerHTML = (icon ? '<i class="fa-solid fa-check"></i> ' : '') + 'Copied';
+    setTimeout(() => {
+      btn.classList.remove('copied');
+      btn.innerHTML = originalHtml;
+    }, 1200);
+  }
+
+  function prefersReducedMotion() {
+    return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   }
 
   function escapeHtml(str) {

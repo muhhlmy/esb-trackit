@@ -31,6 +31,13 @@
   --radius-md: 6px;
   --radius-lg: 10px;
 
+  /* Motion System — subtle, smooth, professional */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --dur-fast: 150ms;
+  --dur-base: 200ms;
+  --dur-slow: 300ms;
+
   /* Mobile bottom navigation metrics */
   --mobile-bottom-nav-height: 56px;
   --safe-area-bottom: env(safe-area-inset-bottom, 0px);
@@ -501,6 +508,131 @@ body {
 .app-header.header-home .search-field { display: none; }
 .app-header.header-home .btn-new-case { display: none; }
 
+/* ─────────────────────────────────────────────────────────
+   Motion System — keyframes & helpers
+   Subtle, fast, natural. Transform + opacity only.
+   ───────────────────────────────────────────────────────── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes popBounce {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.12); }
+  100% { transform: scale(1); }
+}
+
+/* Landing page entrance — staged: Logo → Subtitle → Search → Buttons */
+.home-brand-logo { animation: fadeUp 200ms var(--ease-out) both; }
+.home-title      { animation: fadeUp 250ms var(--ease-out) 30ms both; }
+.home-tagline    { animation: fadeUp 250ms var(--ease-out) 60ms both; }
+.home-search     { animation: fadeUp 300ms var(--ease-out) 90ms both; }
+.home-actions    { animation: fadeUp 350ms var(--ease-out) 120ms both; }
+
+/* Workspace (Cases/Templates) first-paint entrance — staged */
+.app-header        { animation: fadeUp var(--dur-base) var(--ease-out) both; }
+.filter-bar        { animation: fadeUp 220ms var(--ease-out) 30ms both; }
+.master-list-pane  { animation: fadeUp var(--dur-slow) var(--ease-out) 60ms both; }
+.reader-pane       { animation: fadeIn 240ms var(--ease-out) 80ms both; }
+
+/* View switch transition (Home ↔ Cases ↔ Templates) — subtle fade + lift */
+.pane-view.active {
+  animation: paneIn 240ms var(--ease-out) both;
+}
+@keyframes paneIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Case row hover + active — desktop micro-interaction */
+.case-row {
+  transition: background-color 180ms var(--ease-out),
+              transform 180ms var(--ease-out),
+              border-color 180ms var(--ease-out);
+}
+.case-row:hover { transform: translateY(-1px); }
+
+/* Reader content transition when a new case is selected */
+.doc-article { animation: docSwapIn 220ms var(--ease-out) both; }
+@keyframes docSwapIn {
+  from { opacity: 0.65; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Case list stagger (used via inline animation-delay set in JS) */
+.case-row.is-entering {
+  animation: fadeUp 220ms var(--ease-out) both;
+}
+
+/* Toast entrance / exit */
+.toast {
+  animation: toastIn 220ms var(--ease-out) both;
+}
+.toast.leaving {
+  animation: toastOut 200ms var(--ease-standard) forwards;
+}
+@keyframes toastIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes toastOut {
+  from { opacity: 1; transform: translateY(0); }
+  to   { opacity: 0; transform: translateY(4px); }
+}
+
+/* Bookmark icon micro-animation */
+.btn-doc-action i.fa-bookmark.anim-pop {
+  animation: popBounce 200ms var(--ease-out);
+}
+
+/* Copy / button feedback micro-animation (label swap is in JS) */
+.btn-doc-action.copied,
+.btn-copy-snippet.copied,
+.btn-tpl-copy.copied {
+  color: var(--severity-low);
+  border-color: var(--severity-low);
+}
+
+/* Theme transition — smooth color/background swap */
+body,
+.app-header,
+.filter-bar,
+.master-list-pane,
+.reader-pane,
+.case-row,
+.search-field,
+.mobile-search-wrapper,
+.nav-tab,
+.cat-tab,
+.btn-new-case,
+.btn-icon-theme,
+.btn-doc-action,
+.tpl-card,
+.drawer-panel,
+.drawer-backdrop,
+.toast,
+.bottom-nav-item,
+.templates-view-container {
+  transition: background-color 200ms var(--ease-standard),
+              border-color 200ms var(--ease-standard),
+              color 200ms var(--ease-standard),
+              box-shadow 200ms var(--ease-standard);
+}
+
+/* Respect reduced motion — mandatory */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 
 /* App Header Bar */
 .app-header {
@@ -600,12 +732,23 @@ body {
   padding: 0 10px;
   height: 30px;
   width: 210px;
-  transition: all 0.15s ease;
+  transition: border-color 180ms var(--ease-out),
+              box-shadow 180ms var(--ease-out),
+              transform 180ms var(--ease-out),
+              width 200ms var(--ease-out);
+}
+
+.search-field:hover {
+  transform: translateY(-1px);
+  border-color: var(--border-focus);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
 }
 
 .search-field:focus-within {
   border-color: var(--border-focus);
   width: 270px;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
 }
 
 .search-icon {
@@ -659,7 +802,7 @@ body {
   align-items: center;
   justify-content: center;
   gap: 5px;
-  transition: background 0.15s ease, opacity 0.15s ease, transform 0.1s ease;
+  transition: background 0.15s ease, opacity 0.15s ease, transform 150ms var(--ease-out);
   white-space: nowrap;
   user-select: none;
 }
@@ -670,10 +813,11 @@ body {
 
 .btn-new-case:hover {
   opacity: 0.9;
+  transform: translateY(-1px);
 }
 
 .btn-new-case:active {
-  transform: translateY(1px);
+  transform: translateY(0);
 }
 
 .btn-new-case:focus-visible {
@@ -741,7 +885,7 @@ body {
   font-weight: 500;
   font-family: inherit;
   cursor: pointer;
-  transition: color 0.12s ease, border-color 0.12s ease;
+  transition: color 180ms var(--ease-out), border-color 180ms var(--ease-out), background-color 180ms var(--ease-out);
 }
 
 .cat-tab:hover {
@@ -974,12 +1118,17 @@ body {
   display: flex;
   align-items: center;
   gap: 6px;
-  transition: all 0.12s ease;
+  transition: color 150ms var(--ease-out), border-color 150ms var(--ease-out), background-color 150ms var(--ease-out), transform 150ms var(--ease-out);
 }
 
 .btn-doc-action:hover {
   color: var(--text-main);
   border-color: var(--border-focus);
+  transform: translateY(-1px);
+}
+
+.btn-doc-action:active {
+  transform: translateY(0);
 }
 
 .btn-doc-action.active {
@@ -1076,6 +1225,7 @@ body {
   display: flex;
   align-items: center;
   gap: 5px;
+  transition: color 150ms var(--ease-out), opacity 150ms var(--ease-out);
 }
 
 .btn-copy-snippet:hover {
@@ -1177,6 +1327,13 @@ pre code {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  transition: transform 180ms var(--ease-out), border-color 180ms var(--ease-out), box-shadow 180ms var(--ease-out), background-color 200ms var(--ease-standard);
+}
+
+.tpl-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--border-focus);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
 }
 
 .tpl-header {
@@ -1199,6 +1356,7 @@ pre code {
   border-radius: var(--radius-sm);
   font-size: 0.75rem;
   cursor: pointer;
+  transition: color 150ms var(--ease-out), border-color 150ms var(--ease-out), opacity 150ms var(--ease-out);
 }
 
 .btn-tpl-copy:hover {
@@ -1227,7 +1385,7 @@ pre code {
   z-index: 200;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.15s ease;
+  transition: opacity 280ms var(--ease-standard);
 }
 
 .drawer-backdrop.active {
@@ -1246,7 +1404,7 @@ pre code {
   display: flex;
   flex-direction: column;
   transform: translateX(100%);
-  transition: transform 0.2s ease;
+  transition: transform 280ms var(--ease-out);
 }
 
 .drawer-backdrop.active .drawer-panel {
@@ -1373,20 +1531,10 @@ pre code {
   align-items: center;
   gap: 8px;
   box-shadow: 0 4px 16px rgba(0,0,0,0.2);
-  animation: slideInRight 0.15s forwards, fadeOut 0.15s 2.75s forwards;
+  /* Entrance animation defined in the motion system section */
 }
 
 .toast i { color: var(--severity-low); }
-
-@keyframes slideInRight {
-  from { transform: translateX(100%); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
-}
-
-@keyframes fadeOut {
-  from { opacity: 1; }
-  to { opacity: 0; }
-}
 
 /* Mobile Back Button (Hidden on Desktop) */
 .btn-mobile-back {
@@ -1761,10 +1909,12 @@ pre code {
     font-size: 0.7rem; font-weight: 500;
     cursor: pointer; padding: 6px 12px;
     min-height: 48px; min-width: 60px;
-    transition: color 0.12s ease; user-select: none;
+    transition: color 160ms var(--ease-out), transform 160ms var(--ease-out), opacity 160ms var(--ease-out);
+    user-select: none;
   }
-  .bottom-nav-item i { font-size: 1.15rem; }
+  .bottom-nav-item i { font-size: 1.15rem; transition: transform 160ms var(--ease-out); }
   .bottom-nav-item.active { color: var(--text-main); font-weight: 600; }
+  .bottom-nav-item.active i { transform: scale(1.05); }
   .bottom-nav-item:active { color: var(--text-main); }
 
   /* ── 7. TOAST ── */

@@ -14,6 +14,9 @@
   
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Supabase JS SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
@@ -239,8 +242,9 @@
         </div>
 
         <div class="drawer-footer">
+          <button type="button" class="btn-delete-drawer" id="btn-delete-case" hidden>Delete</button>
           <button type="button" class="btn-cancel" id="btn-cancel-drawer">Cancel</button>
-          <button type="submit" class="btn-save">Save Case</button>
+          <button type="submit" class="btn-save" id="btn-save-case">Save Case</button>
         </div>
       </form>
     </div>
@@ -275,6 +279,7 @@
 
 
   <!-- JavaScript Modules -->
+  <script src="config.js"></script>
   <script src="data.js"></script>
   <script src="app.js"></script>
 </body>

@@ -2,11 +2,26 @@
 
 document.addEventListener('DOMContentLoaded', () => {
   // --------------------------------------------------
+  // Supabase Client (shared cross-device storage)
+  // --------------------------------------------------
+  const SB_CONFIG = window.SUPABASE_CONFIG || {};
+  const sbUrl = (SB_CONFIG.url || '').trim();
+  const sbAnonKey = (SB_CONFIG.anonKey || '').trim();
+  const supabase = (sbUrl && sbAnonKey && window.supabase)
+    ? window.supabase.createClient(sbUrl, sbAnonKey)
+    : null;
+
+  // --------------------------------------------------
   // Application State
   // --------------------------------------------------
   let customCases = JSON.parse(localStorage.getItem('intern_cases_custom') || '[]');
   let casesData = [...customCases, ...INITIAL_CASES];
   let bookmarks = JSON.parse(localStorage.getItem('intern_cases_bookmarks') || '[]');
+
+  // CRUD unlock state (revealed after tapping the logo 5x)
+  let crudUnlocked = false;
+  let editMode = false;
+  let editingCaseId = null;
   
   let currentView = 'home'; // 'home', 'all', 'bookmarks', 'templates'
   let currentCategory = 'all'; // 'all', 'hardware', 'git', etc.
@@ -63,6 +78,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnCloseDrawer = document.getElementById('btn-close-drawer');
   const btnCancelDrawer = document.getElementById('btn-cancel-drawer');
   const addCaseForm = document.getElementById('add-case-form');
+  const drawerTitle = document.getElementById('drawer-title');
+  const btnSaveCase = document.getElementById('btn-save-case');
+  const btnDeleteCase = document.getElementById('btn-delete-case');
 
   // --------------------------------------------------
   // Initialization
@@ -72,6 +90,112 @@ document.addEventListener('DOMContentLoaded', () => {
   renderRecentSearches();
   initHashRoute();
   renderTemplates();
+  initCrudUnlock();
+  loadCasesFromBackend();
+
+  // --------------------------------------------------
+  // Data Layer — Supabase (cross-device) with localStorage fallback
+  // --------------------------------------------------
+
+  // Map a Supabase row (snake_case) back to the app's camelCase case object
+  function mapRowToCase(row) {
+    return {
+      id: row.id,
+      title: row.title,
+      category: row.category,
+      severity: row.severity,
+      tags: Array.isArray(row.tags) ? row.tags : [],
+      summary: row.summary || '',
+      problemContext: row.problem_context || row.summary || '',
+      actionSteps: Array.isArray(row.action_steps) ? row.action_steps : [],
+      dosAndDonts: {
+        dos: (row.dos_and_donts && Array.isArray(row.dos_and_donts.dos)) ? row.dos_and_donts.dos : [],
+        donts: (row.dos_and_donts && Array.isArray(row.dos_and_donts.donts)) ? row.dos_and_donts.donts : []
+      },
+      snippets: Array.isArray(row.snippets) ? row.snippets : [],
+      isCustom: !!row.is_custom
+    };
+  }
+
+  // Map the app case object to a Supabase row
+  function mapCaseToRow(c) {
+    return {
+      id: c.id,
+      title: c.title,
+      category: c.category,
+      severity: c.severity,
+      tags: c.tags || [],
+      summary: c.summary || '',
+      problem_context: c.problemContext || c.summary || '',
+      action_steps: c.actionSteps || [],
+      dos_and_donts: {
+        dos: (c.dosAndDonts && c.dosAndDonts.dos) || [],
+        donts: (c.dosAndDonts && c.dosAndDonts.donts) || []
+      },
+      snippets: c.snippets || [],
+      is_custom: !!c.isCustom
+    };
+  }
+
+  async function loadCasesFromBackend() {
+    if (!supabase) {
+      // No Supabase configured — keep using localStorage + seed data
+      refreshCasesFromLocal();
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('cases')
+        .select('*')
+        .order('created_at', { ascending: true });
+
+      if (error) throw error;
+
+      if (data && data.length > 0) {
+        casesData = data.map(mapRowToCase);
+      } else {
+        // Empty table — fall back to seed data + any local custom cases
+        casesData = [...customCases, ...INITIAL_CASES];
+      }
+    } catch (err) {
+      console.warn('[ESB Case] Failed to load from Supabase, using local data:', err);
+      refreshCasesFromLocal();
+    }
+
+    updateCounts();
+    renderApp();
+  }
+
+  function refreshCasesFromLocal() {
+    casesData = [...customCases, ...INITIAL_CASES];
+  }
+
+  // --------------------------------------------------
+  // CRUD Unlock — tap the logo 5x to reveal Create/Edit/Delete
+  // --------------------------------------------------
+  function initCrudUnlock() {
+    let tapCount = 0;
+    let tapTimer = null;
+
+    // Shared tap handler: counts taps, unlocks CRUD on the 5th tap
+    function handleLogoTap() {
+      tapCount += 1;
+      clearTimeout(tapTimer);
+      tapTimer = setTimeout(() => { tapCount = 0; }, 1200);
+
+      if (tapCount >= 5) {
+        tapCount = 0;
+        crudUnlocked = true;
+        document.body.classList.add('crud-unlocked');
+        showToast('CRUD mode unlocked ✏️');
+        renderApp();
+      }
+    }
+
+    // Expose so the existing logo click handler can call it too
+    window._handleLogoTap = handleLogoTap;
+  }
 
   // --------------------------------------------------
   // Filtering & Logic
@@ -257,6 +381,14 @@ document.addEventListener('DOMContentLoaded', () => {
             <button class="btn-doc-action" onclick="copyTitle('${item.id}')">
               <i class="fa-regular fa-copy"></i>
               <span>Copy Title</span>
+            </button>
+            <button class="btn-doc-action btn-edit-case" onclick="editCase('${item.id}')">
+              <i class="fa-solid fa-pen"></i>
+              <span>Edit</span>
+            </button>
+            <button class="btn-doc-action btn-delete-case" onclick="deleteCase('${item.id}')">
+              <i class="fa-solid fa-trash"></i>
+              <span>Delete</span>
             </button>
           </div>
         </header>
@@ -704,15 +836,26 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Brand / logo click → go home
+  // Brand / logo click → go home (also counts toward CRUD unlock)
   const logoHome = document.getElementById('logo-home');
   if (logoHome) {
     logoHome.addEventListener('click', (e) => {
       e.preventDefault();
+      if (window._handleLogoTap) window._handleLogoTap();
       currentView = 'home';
       setNavActive('home');
       setHash('home');
       renderApp();
+    });
+  }
+
+  // Home brand logo image → also counts toward CRUD unlock
+  const homeBrandLogo = document.querySelector('.home-brand-logo');
+  if (homeBrandLogo) {
+    homeBrandLogo.style.cursor = 'pointer';
+    homeBrandLogo.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (window._handleLogoTap) window._handleLogoTap();
     });
   }
 
@@ -798,16 +941,53 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Drawer Handlers
-  btnOpenCreate.addEventListener('click', () => createDrawerBackdrop.classList.add('active'));
-  btnCloseDrawer.addEventListener('click', () => createDrawerBackdrop.classList.remove('active'));
-  btnCancelDrawer.addEventListener('click', () => createDrawerBackdrop.classList.remove('active'));
+  btnOpenCreate.addEventListener('click', () => openCreateDrawer());
+  btnCloseDrawer.addEventListener('click', () => closeDrawer());
+  btnCancelDrawer.addEventListener('click', () => closeDrawer());
   createDrawerBackdrop.addEventListener('click', (e) => {
-    if (e.target === createDrawerBackdrop) createDrawerBackdrop.classList.remove('active');
+    if (e.target === createDrawerBackdrop) closeDrawer();
   });
 
-  // Add Case Form
-  addCaseForm.addEventListener('submit', (e) => {
-    e.preventDefault();
+  function openCreateDrawer() {
+    editMode = false;
+    editingCaseId = null;
+    drawerTitle.textContent = 'Create Case';
+    btnSaveCase.textContent = 'Save Case';
+    btnDeleteCase.hidden = true;
+    addCaseForm.reset();
+    createDrawerBackdrop.classList.add('active');
+  }
+
+  function openEditDrawer(caseId) {
+    const item = casesData.find(c => c.id === caseId);
+    if (!item) return;
+
+    editMode = true;
+    editingCaseId = caseId;
+    drawerTitle.textContent = 'Edit Case';
+    btnSaveCase.textContent = 'Update Case';
+    btnDeleteCase.hidden = false;
+
+    // Populate the form
+    document.getElementById('case-title').value = item.title || '';
+    document.getElementById('case-category').value = item.category || 'hardware';
+    document.getElementById('case-severity').value = item.severity || 'medium';
+    document.getElementById('case-summary').value = item.summary || '';
+    document.getElementById('case-steps').value = (item.actionSteps || []).join('\n');
+    const snip = (item.snippets && item.snippets[0]) ? item.snippets[0].code : '';
+    document.getElementById('case-snippet').value = snip;
+
+    createDrawerBackdrop.classList.add('active');
+  }
+
+  function closeDrawer() {
+    createDrawerBackdrop.classList.remove('active');
+    editMode = false;
+    editingCaseId = null;
+  }
+
+  // Read the current form values into a case payload object
+  function readFormPayload(id) {
     const title = document.getElementById('case-title').value.trim();
     const category = document.getElementById('case-category').value;
     const severity = document.getElementById('case-severity').value;
@@ -817,8 +997,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const actionSteps = stepsRaw.split('\n').filter(s => s.trim().length > 0);
 
-    const newCase = {
-      id: 'custom-' + Date.now(),
+    return {
+      id,
       title,
       category,
       severity,
@@ -832,18 +1012,93 @@ document.addEventListener('DOMContentLoaded', () => {
       },
       snippets: snippetCode ? [{ label: 'Command / Code Snippet', code: snippetCode }] : []
     };
+  }
 
-    customCases.unshift(newCase);
+  async function persistCase(theCase) {
+    // If Supabase is configured, write to the shared backend
+    if (supabase) {
+      const row = mapCaseToRow(theCase);
+      const { error } = await supabase.from('cases').upsert(row);
+      if (error) {
+        console.error('[ESB Case] Supabase upsert failed:', error);
+        showToast('Failed to save to cloud — saved locally');
+      }
+    }
+    // Always mirror custom cases to localStorage as an offline fallback
+    customCases = customCases.filter(c => c.id !== theCase.id);
+    customCases.unshift(theCase);
     localStorage.setItem('intern_cases_custom', JSON.stringify(customCases));
-    casesData = [...customCases, ...INITIAL_CASES];
-    selectedCaseId = newCase.id;
+  }
 
-    addCaseForm.reset();
-    createDrawerBackdrop.classList.remove('active');
-    showToast('New case saved');
-    
+  async function removeCase(caseId) {
+    if (supabase) {
+      const { error } = await supabase.from('cases').delete().eq('id', caseId);
+      if (error) {
+        console.error('[ESB Case] Supabase delete failed:', error);
+        showToast('Failed to delete from cloud — removed locally');
+      }
+    }
+    customCases = customCases.filter(c => c.id !== caseId);
+    localStorage.setItem('intern_cases_custom', JSON.stringify(customCases));
+  }
+
+  // Create / Update Case Form Submit
+  addCaseForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    if (editMode) {
+      const updatedCase = readFormPayload(editingCaseId);
+      await persistCase(updatedCase);
+
+      // Update in-memory list
+      casesData = casesData.map(c => c.id === updatedCase.id ? updatedCase : c);
+      selectedCaseId = updatedCase.id;
+      closeDrawer();
+      showToast('Case updated');
+    } else {
+      const newCase = readFormPayload('custom-' + Date.now());
+      newCase.isCustom = true;
+      await persistCase(newCase);
+
+      // Update in-memory list (prepend)
+      casesData = [newCase, ...casesData.filter(c => c.id !== newCase.id)];
+      selectedCaseId = newCase.id;
+      closeDrawer();
+      showToast('New case saved');
+    }
+
     updateCounts();
     renderApp();
+  });
+
+  // Delete Case (from reader toolbar)
+  window.deleteCase = async function(caseId) {
+    const item = casesData.find(c => c.id === caseId);
+    if (!item) return;
+    if (!confirm('Delete this case permanently?')) return;
+
+    await removeCase(caseId);
+    casesData = casesData.filter(c => c.id !== caseId);
+    if (selectedCaseId === caseId) {
+      selectedCaseId = casesData.length > 0 ? casesData[0].id : null;
+    }
+    updateCounts();
+    renderApp();
+    showToast('Case deleted');
+  };
+
+  // Edit Case (from reader toolbar)
+  window.editCase = function(caseId) {
+    openEditDrawer(caseId);
+  };
+
+  // Delete from inside the edit drawer
+  btnDeleteCase.addEventListener('click', async () => {
+    if (!editingCaseId) return;
+    if (!confirm('Delete this case permanently?')) return;
+    const caseId = editingCaseId;
+    closeDrawer();
+    await window.deleteCase(caseId);
   });
 
   // Theme Toggle

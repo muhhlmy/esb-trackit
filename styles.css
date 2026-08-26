@@ -1352,6 +1352,55 @@ pre code {
   cursor: pointer;
 }
 
+.btn-delete-drawer {
+  background: transparent;
+  border: 1px solid #ef4444;
+  color: #ef4444;
+  padding: 6px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+  cursor: pointer;
+  margin-right: auto; /* push to the left of the footer */
+}
+
+.btn-delete-drawer:hover {
+  background: #ef4444;
+  color: #fff;
+}
+
+/* ------------------------------------------------------------------
+   CRUD MODE (hidden by default; revealed after tapping the logo 5x)
+   ------------------------------------------------------------------ */
+
+/* The "New Case" button is hidden until CRUD is unlocked */
+.btn-new-case {
+  display: none !important;
+}
+body.crud-unlocked .btn-new-case {
+  display: inline-flex !important;
+}
+
+/* Edit / Delete actions in the reader toolbar are hidden until unlocked */
+.btn-doc-action.btn-edit-case,
+.btn-doc-action.btn-delete-case {
+  display: none !important;
+}
+body.crud-unlocked .btn-doc-action.btn-edit-case,
+body.crud-unlocked .btn-doc-action.btn-delete-case {
+  display: flex !important;
+}
+
+/* Delete action styling (danger) inside the reader toolbar */
+.btn-doc-action.btn-delete-case {
+  color: #ef4444;
+  border-color: #ef4444;
+}
+.btn-doc-action.btn-delete-case:hover {
+  color: #fff;
+  background: #ef4444;
+  border-color: #ef4444;
+}
+
 /* TOAST NOTIFICATION */
 .toast-container {
   position: fixed;

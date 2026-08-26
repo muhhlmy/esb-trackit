@@ -433,7 +433,8 @@ body {
 }
 
 .pane-view.active {
-  display: block;
+  display: flex;
+  flex-direction: column;
 }
 
 /* MASTER-DETAIL WORKSPACE */
@@ -1195,24 +1196,38 @@ pre code {
   /* ── 3. WORKSPACE — full-screen stack ── */
   .main-workspace { padding-bottom: 56px; }
 
+  .pane-view.active {
+    display: flex;
+    flex-direction: column;
+  }
+
   .workspace-split {
-    position: relative; display: block;
+    position: relative; display: flex; flex-direction: column;
     width: 100%; height: 100%; overflow: hidden;
+    flex: 1; min-height: 0;
   }
 
   /* Screen A: Case List */
   .master-list-pane {
-    width: 100%; height: 100%;
+    width: 100%;
+    flex: 1;
+    min-height: 0;
     border-right: none;
     display: flex; flex-direction: column;
-    overflow-y: auto;
+    overflow: hidden;
   }
 
   .list-meta-header { padding: 16px 16px 8px; }
   .list-title { font-size: 0.8rem; letter-spacing: 0.3px; }
   .list-count { font-size: 0.8rem; }
 
-  .case-rows { padding: 0 8px 16px; gap: 4px; }
+  .case-rows {
+    padding: 0 8px 16px; gap: 4px;
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
 
   .case-row {
     padding: 16px; min-height: 72px;
@@ -1335,9 +1350,12 @@ pre code {
   .toast-container { bottom: 72px; right: 16px; left: 16px; }
   .toast { font-size: 0.875rem; }
 
-  /* ── 8. HIDE CUSTOM SCROLLBARS — native touch ── */
-  * { scrollbar-width: none; }
-  *::-webkit-scrollbar { display: none; }
+  /* ── 8. HIDE CUSTOM SCROLLBARS — native touch (but keep scroll functional) ── */
+  * {
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  *::-webkit-scrollbar { width: 0; height: 0; }
 }
 
 /* ── TABLET (769–1023px) ── */

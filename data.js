@@ -89,6 +89,75 @@ pause`
     ]
   },
   {
+    id: 'hp-01',
+    title: 'SOP Setup HP Baru untuk New Joiner / Replacement',
+    category: 'hardware',
+    severity: 'high',
+    tags: ['hp-baru', 'handphone', 'smartphone', 'setup-device', 'new-joiner', 'it-support'],
+    summary: 'Panduan Operasional Standar (SOP) penyiapan unit handphone (HP) baru bagi karyawan baru (*new joiner*) atau fasilitas penggantian unit kerja.',
+    problemContext: 'Saat menyiapkan unit HP baru dari distributor/vendor, diperlukan proses konfigurasi awal hingga halaman utama, pengecekan fungsi perangkat keras (layar, kamera, microphone, speaker), serta pencatatan penyerahan perangkat dan pembaruan data aset perusahaan.',
+    actionSteps: [
+      'Buka kemasan HP baru, keluarkan unit perangkat, lalu **nyalakan** HP dengan menekan tombol power hingga menyala.',
+      'Lakukan **konfigurasi awal** (bahasa, koneksi Wi-Fi, akun, dsb.) hingga masuk ke **halaman awal** (*home screen*).',
+      'Cek fungsi perangkat keras: **Layar**, **Kamera**, **Microphone**, dan **Speaker** untuk memastikan seluruhnya berfungsi normal.',
+      'Setelah seluruh proses setup selesai, buat dan lengkapi [Form Serah Terima HP](https://docs.google.com/document/d/1uDDbC77cmnm1J4yBDSQLW23pDkv4Y2R7h0myL_lkdbM/).',
+      'Berikan **Label** pada **Box HP** dan **belakang HP** sesuai standar penamaan inventaris perusahaan.',
+      'Update **Master Data Aset Management** dengan informasi unit HP yang telah disiapkan.',
+      'Proses setup selesai dan unit HP siap diserahkan kepada *User*.'
+    ],
+    dosAndDonts: {
+      dos: [
+        'Pastikan seluruh fungsi perangkat keras (layar, kamera, mic, speaker) telah diuji sebelum diserahkan.',
+        'Catat Serial Number, IMEI, dan label perangkat pada Form Serah Terima dan Master Data Aset Management.'
+      ],
+      donts: [
+        'Jangan menyerahkan HP yang masih memiliki kendala pada layar, kamera, microphone, atau speaker tanpa perbaikan terlebih dahulu.',
+        'Jangan melewatkan pelabelan pada box dan belakang HP serta pembaruan Master Data Aset Management.'
+      ]
+    },
+    snippets: [
+      {
+        label: 'Link Form Serah Terima HP',
+        code: 'https://docs.google.com/document/d/1uDDbC77cmnm1J4yBDSQLW23pDkv4Y2R7h0myL_lkdbM/'
+      }
+    ]
+  },
+  {
+    id: 'hp-02',
+    title: 'SOP Setup HP Stock untuk New Joiner / Replacement',
+    category: 'hardware',
+    severity: 'high',
+    tags: ['hp-stock', 'handphone', 'smartphone', 'factory-reset', 'setup-device', 'new-joiner', 'it-support'],
+    summary: 'Panduan Operasional Standar (SOP) penyiapan unit handphone (HP) stok untuk dialokasikan kepada karyawan baru (*new joiner*) atau penggantian unit kerja.',
+    problemContext: 'Perangkat HP stok perlu melalui tahapan pengecekan kondisi perangkat keras (layar, kamera, microphone, speaker), proses factory reset untuk membersihkan data lama, serta konfigurasi ulang hingga halaman utama sebelum diserahterimakan dan dicatat pada data aset perusahaan.',
+    actionSteps: [
+      'Nyalakan HP dengan menekan tombol power hingga menyala.',
+      'Cek fungsi perangkat keras: **Layar**, **Kamera**, **Microphone**, dan **Speaker** untuk memastikan seluruhnya berfungsi normal.',
+      'Lakukan **Factory Reset** pada HP tersebut untuk membersihkan seluruh data dan pengaturan lama.',
+      'Lakukan **konfigurasi** awal (bahasa, koneksi Wi-Fi, akun, dsb.) hingga masuk ke **halaman awal** (*home screen*).',
+      'Setelah seluruh proses setup selesai, buat dan lengkapi [Form Serah Terima HP](https://docs.google.com/document/d/1uDDbC77cmnm1J4yBDSQLW23pDkv4Y2R7h0myL_lkdbM/).',
+      'Berikan **Label** pada **Box HP** dan **belakang HP** sesuai standar penamaan inventaris perusahaan.',
+      'Update **Master Data Aset Management** dengan informasi unit HP yang telah disiapkan.',
+      'Proses setup selesai dan unit HP siap diserahkan kepada *User*.'
+    ],
+    dosAndDonts: {
+      dos: [
+        'Wajib melakukan pengujian fungsionalitas hardware (layar, kamera, mic, speaker) sebelum melangkah ke proses reset dan konfigurasi.',
+        'Pastikan seluruh data dari pengguna/pemakaian sebelumnya telah terhapus bersih melalui Factory Reset.'
+      ],
+      donts: [
+        'Jangan melewatkan proses Factory Reset sebelum melakukan konfigurasi ulang pada HP stok.',
+        'Jangan menyerahkan HP yang memiliki kendala fisik/hardware tanpa pemberitahuan atau perbaikan terlebih dahulu.'
+      ]
+    },
+    snippets: [
+      {
+        label: 'Link Form Serah Terima HP',
+        code: 'https://docs.google.com/document/d/1uDDbC77cmnm1J4yBDSQLW23pDkv4Y2R7h0myL_lkdbM/'
+      }
+    ]
+  },
+  {
     id: 'google-workspace-01',
     title: 'SOP Permintaan Kode Backup 2-Step Verification (2SV) Google Workspace',
     category: 'workplace',

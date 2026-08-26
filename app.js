@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Application State
   // --------------------------------------------------
   let customCases = JSON.parse(localStorage.getItem('intern_cases_custom') || '[]');
-  let casesData = [...customCases, ...INITIAL_CASES];
+  let casesData = [...customCases, ...SEED_CASES];
   let bookmarks = JSON.parse(localStorage.getItem('intern_cases_bookmarks') || '[]');
 
   // CRUD unlock state (revealed after tapping the logo 5x)
@@ -139,13 +139,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
   async function loadCasesFromBackend() {
     if (!supabase) {
-      // No Supabase configured — keep using localStorage + seed data
+      // No Supabase configured — keep using localStorage + seed data locally
       refreshCasesFromLocal();
       return;
     }
 
     try {
-      const { data, error } = await supabase
+      let { data, error } = await supabase
         .from('cases')
         .select('*')
         .order('created_at', { ascending: true });
@@ -155,8 +155,14 @@ document.addEventListener('DOMContentLoaded', () => {
       if (data && data.length > 0) {
         casesData = data.map(mapRowToCase);
       } else {
-        // Empty table — fall back to seed data + any local custom cases
-        casesData = [...customCases, ...INITIAL_CASES];
+        // Empty table — seed the 6 built-in cases into Supabase (first load)
+        await seedCasesToSupabase();
+        ({ data, error } = await supabase
+          .from('cases')
+          .select('*')
+          .order('created_at', { ascending: true }));
+        if (error) throw error;
+        casesData = (data || []).map(mapRowToCase);
       }
     } catch (err) {
       console.warn('[ESB Case] Failed to load from Supabase, using local data:', err);
@@ -167,8 +173,22 @@ document.addEventListener('DOMContentLoaded', () => {
     renderApp();
   }
 
+  // Insert the built-in seed cases into Supabase (idempotent via upsert)
+  async function seedCasesToSupabase() {
+    if (!supabase) return;
+    try {
+      const rows = SEED_CASES.map(mapCaseToRow);
+      const { error } = await supabase.from('cases').upsert(rows);
+      if (error) {
+        console.warn('[ESB Case] Seed upsert failed:', error);
+      }
+    } catch (err) {
+      console.warn('[ESB Case] Seed failed:', err);
+    }
+  }
+
   function refreshCasesFromLocal() {
-    casesData = [...customCases, ...INITIAL_CASES];
+    casesData = [...customCases, ...SEED_CASES];
   }
 
   // --------------------------------------------------

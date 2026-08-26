@@ -26,10 +26,11 @@ Setelah itu akan muncul:
 3. Catat **Project URL** dan **anon public key** dari menu
    **Project Settings → API**.
 
-### Langkah 2 — Buat tabel & seed data
+### Langkah 2 — Buat tabel
 1. Buka **SQL Editor** di dashboard Supabase.
 2. Tempel seluruh isi file [`supabase/schema.sql`](supabase/schema.sql) lalu klik **Run**.
-   - Ini membuat tabel `cases`, Row Level Security, dan mengisi 6 SOP bawaan.
+   - Ini membuat tabel `cases` + Row Level Security + trigger `updated_at`.
+   - **6 SOP bawaan akan di-seed otomatis oleh app** saat pertama kali dibuka (lihat `seed.js`), jadi tidak perlu insert manual.
 
 ### Langkah 3 — Isi kredensial di `config.js`
 Buka `config.js` lalu isi:
@@ -46,7 +47,7 @@ Buka `index.html` (langsung, atau via static host seperti GitHub Pages / Netlify
 Case sekarang tersimpan bersama di Supabase.
 
 > **Tanpa Supabase** (config kosong), app tetap berjalan dengan `localStorage`
-> (hanya perangkat lokal), persis seperti sebelumnya.
+> (hanya perangkat lokal) dan memakai `seed.js` sebagai sumber data lokal.
 
 ---
 
@@ -56,10 +57,21 @@ Case sekarang tersimpan bersama di Supabase.
 |------|------------|
 | `index.html` | Markup & struktur aplikasi |
 | `styles.css` | Styling (termasuk aturan hidden CRUD) |
-| `app.js` | Logika aplikasi, render, CRUD, sync Supabase |
-| `data.js` | Seed data SOP & template komunikasi (fallback) |
+| `app.js` | Logika aplikasi, render, CRUD, sync Supabase + auto-seed |
+| `seed.js` | 6 SOP bawaan (sumber data case; di-insert otomatis ke Supabase saat tabel kosong) |
+| `data.js` | Template komunikasi (`COMMUNICATION_TEMPLATES`) |
 | `config.js` | Kredensial Supabase (isi sendiri) |
-| `supabase/schema.sql` | SQL pembuatan tabel + seed data |
+| `supabase/schema.sql` | SQL pembuatan tabel + RLS + trigger |
+
+---
+
+## Cara Kerja Auto-Seed
+
+- Saat app dibuka dan Supabase terhubung, app membaca tabel `cases`.
+- Jika tabel **kosong**, app otomatis `upsert` 6 SOP dari `seed.js` ke Supabase,
+  lalu menampilkannya. Dengan begitu semua device melihat data yang sama.
+- `data.js` **tidak lagi** menyimpan case bawaan — hanya template komunikasi.
+
 
 ---
 

@@ -53,6 +53,10 @@ try {
     );
     CREATE INDEX IF NOT EXISTS idx_log_riwayat_aset_id ON log_riwayat_aset(id_aset, dibuat_pada DESC);
     ALTER TABLE riwayat_pemakaian_aset ALTER COLUMN nik_pemegang DROP NOT NULL;
+    ALTER TABLE komentar_tiket ADD COLUMN IF NOT EXISTS attachment_name VARCHAR(255);
+    ALTER TABLE aset_ti ALTER COLUMN hostname DROP NOT NULL;
+    ALTER TABLE aset_ti ALTER COLUMN serial_number DROP NOT NULL;
+    ALTER TABLE log_audit_login ADD COLUMN IF NOT EXISTS status_login VARCHAR(50) DEFAULT 'LOGIN_SUCCESS';
   `);
   // Create backup tables if they don't exist yet
   await query(`
@@ -86,6 +90,20 @@ try {
     CREATE INDEX IF NOT EXISTS idx_backup_audit_created ON backup_audit_log(created_at DESC);
     CREATE INDEX IF NOT EXISTS idx_backup_audit_operation ON backup_audit_log(operation);
     CREATE INDEX IF NOT EXISTS idx_backup_audit_user ON backup_audit_log(user_id);
+    CREATE TABLE IF NOT EXISTS password_reset_otps (
+      id              SERIAL PRIMARY KEY,
+      user_id         INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      email           VARCHAR(150) NOT NULL,
+      otp_hash        TEXT NOT NULL,
+      reset_token     VARCHAR(255) NULL,
+      attempts        INTEGER NOT NULL DEFAULT 0,
+      max_attempts    INTEGER NOT NULL DEFAULT 5,
+      expires_at      TIMESTAMPTZ NOT NULL,
+      used_at         TIMESTAMPTZ NULL,
+      created_at      TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );
+    CREATE INDEX IF NOT EXISTS idx_reset_otps_email ON password_reset_otps(email, expires_at);
+    CREATE INDEX IF NOT EXISTS idx_reset_token ON password_reset_otps(reset_token);
   `);
   await verifyRuntimeSchema(pool);
 } catch (error) {

@@ -1329,7 +1329,7 @@ export async function updateTicket(req, res) {
     if (prioritas && prioritas !== oldTicket.prioritas)
       changes.push(`Prioritas: '${oldTicket.prioritas}' → '${prioritas}'`)
     if (queueChanged) changes.push('Unit tujuan diubah dan assignment lama dikosongkan')
-    if (attachment) changes.push('Lampiran diperbarui')
+    if (attachments && attachments.length > 0) changes.push('Lampiran diperbarui')
 
     const aksi =
       status_tiket && status_tiket !== oldTicket.status_tiket

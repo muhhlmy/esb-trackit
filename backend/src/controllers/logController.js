@@ -116,7 +116,14 @@ export async function listLoginLogs(req, res) {
       `SELECT l.id,
               COALESCE(u.nama, l.email, 'Pengguna') AS nama_pengguna,
               l.email,
-              'LOGIN' AS aktifitas,
+              COALESCE(l.status_login, 'LOGIN_SUCCESS') AS status_login,
+              CASE 
+                WHEN l.status_login = 'LOGIN_FAILED' THEN 'GAGAL_LOGIN'
+                WHEN l.status_login = 'LOGOUT' THEN 'LOGOUT'
+                WHEN l.status_login = 'PASSWORD_CHANGE' THEN 'UBAH_PASSWORD'
+                WHEN l.status_login = 'PASSWORD_RESET_OTP' THEN 'RESET_PASSWORD'
+                ELSE 'LOGIN'
+              END AS aktifitas,
               COALESCE(l.ip_address, '—') AS ip_address,
               COALESCE(l.user_agent, '—') AS browser,
               COALESCE(l.login_time, l.created_at) AS dibuat_pada

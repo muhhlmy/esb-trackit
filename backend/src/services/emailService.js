@@ -20,10 +20,7 @@ export function getTransporter() {
       host,
       port,
       secure,
-      auth: {
-        user,
-        pass,
-      },
+      auth: { user, pass },
     })
   }
 
@@ -38,24 +35,18 @@ export async function sendEmail({ to, subject, html, text }) {
 
   const activeTransporter = getTransporter()
   if (!activeTransporter) {
-    console.log(`[emailService] Skip sending email to <${to}> (SMTP disabled or missing credentials). Subject: "${subject}"`)
+    console.log(`[emailService] Skip: EMAIL_ENABLED=false atau SMTP belum dikonfigurasi. Subject: "${subject}"`)
     return false
   }
 
-  const from = process.env.EMAIL_FROM || '"IT Support" <no-reply@it-monitoring.local>'
+  const from = process.env.EMAIL_FROM || '"People Technology" <people.technology@esb.co.id>'
 
   try {
-    const info = await activeTransporter.sendMail({
-      from,
-      to,
-      subject,
-      text,
-      html,
-    })
-    console.log(`[emailService] Email sent successfully to <${to}>: ${info.messageId}`)
+    const info = await activeTransporter.sendMail({ from, to, subject, text, html })
+    console.log(`[emailService] ✅ Email terkirim ke <${to}>: ${info.messageId}`)
     return true
   } catch (error) {
-    console.error(`[emailService] Failed to send email to <${to}>:`, error.message)
+    console.error(`[emailService] ❌ Gagal kirim ke <${to}>:`, error.message)
     return false
   }
 }
@@ -179,4 +170,89 @@ export function renderTicketEmailHtml({
 </body>
 </html>
   `
+}
+
+/**
+ * Helper to render HTML email for OTP Password Reset
+ */
+export function renderPasswordResetOtpEmailHtml({
+  recipientName,
+  otpCode,
+  expiresMinutes = 5,
+}) {
+  // Split OTP digits into individual boxes
+  const digits = String(otpCode).split('')
+  const digitBoxes = digits
+    .map(
+      (d) =>
+        `<td style="padding: 0 5px;"><div style="width:44px;height:54px;line-height:54px;text-align:center;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:10px;font-size:28px;font-weight:700;color:#111827;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">${d}</div></td>`,
+    )
+    .join('')
+
+  return `<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Verifikasi Kata Sandi – ESB TrackIT</title>
+</head>
+<body style="margin:0;padding:0;background-color:#f4f6f9;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f6f9;padding:40px 16px;">
+    <tr>
+      <td align="center">
+        <table role="presentation" width="100%" style="max-width:480px;background:#ffffff;border-radius:16px;overflow:hidden;border:1px solid #e8edf3;" cellpadding="0" cellspacing="0">
+
+          <!-- Top accent bar -->
+          <tr>
+            <td style="background:#1d4ed8;height:4px;font-size:0;line-height:0;">&nbsp;</td>
+          </tr>
+
+          <!-- Header -->
+          <tr>
+            <td style="padding:32px 40px 0 40px;">
+              <div style="font-size:13px;font-weight:700;letter-spacing:1px;color:#1d4ed8;text-transform:uppercase;margin-bottom:16px;">ESB TrackIT</div>
+              <h1 style="margin:0;font-size:22px;font-weight:700;color:#111827;letter-spacing:-0.3px;">Verifikasi Kata Sandi</h1>
+              <p style="margin:8px 0 0 0;font-size:14px;color:#6b7280;line-height:1.6;">
+                Halo <strong style="color:#111827;">${recipientName || 'Pengguna'}</strong>, gunakan kode di bawah ini untuk mereset kata sandi Anda.
+              </p>
+            </td>
+          </tr>
+
+          <!-- OTP Box -->
+          <tr>
+            <td style="padding:28px 40px;">
+              <div style="background:#f8fafc;border-radius:12px;padding:24px 20px;text-align:center;border:1px solid #e8edf3;">
+                <p style="margin:0 0 16px 0;font-size:12px;font-weight:600;color:#9ca3af;letter-spacing:0.8px;text-transform:uppercase;">Kode Verifikasi</p>
+                <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 auto;">
+                  <tr>${digitBoxes}</tr>
+                </table>
+                <p style="margin:16px 0 0 0;font-size:12px;color:#9ca3af;">
+                  Berlaku selama <strong style="color:#ef4444;">${expiresMinutes} menit</strong> &nbsp;·&nbsp; Satu kali pakai
+                </p>
+              </div>
+            </td>
+          </tr>
+
+          <!-- Security note -->
+          <tr>
+            <td style="padding:0 40px 32px 40px;">
+              <p style="margin:0;font-size:13px;color:#9ca3af;line-height:1.7;border-top:1px solid #f1f5f9;padding-top:20px;">
+                Jika Anda tidak merasa melakukan permintaan ini, abaikan email ini. Jangan bagikan kode ini kepada siapapun.
+              </p>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="padding:18px 40px;background:#f8fafc;border-top:1px solid #f1f5f9;text-align:center;">
+              <span style="font-size:12px;color:#d1d5db;">&copy; 2026 ESB TrackIT &nbsp;&middot;&nbsp; People Technology</span>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`
 }

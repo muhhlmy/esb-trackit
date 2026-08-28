@@ -92,7 +92,7 @@ async function fetchReporterUser(queryable, ticket) {
       if (resUser.rows[0] && resUser.rows[0].email) return resUser.rows[0];
 
       const resKaryawan = await queryable.query(
-        `SELECT id_karyawan AS id, nama_karyawan AS nama, email_kantor AS email, 'user' AS role
+        `SELECT id, nama_karyawan AS nama, email_kantor AS email, 'user' AS role
          FROM karyawan
          WHERE LOWER(TRIM(nama_karyawan)) = LOWER(TRIM($1)) AND email_kantor IS NOT NULL AND BTRIM(email_kantor) <> '' LIMIT 1`,
         [ticket.pelapor],

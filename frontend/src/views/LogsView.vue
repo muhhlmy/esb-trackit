@@ -141,10 +141,21 @@ function getActionColor(action) {
 }
 
 function getActivityBadgeType(activity) {
-  if (activity === 'LOGIN') return 'success'
-  if (activity === 'LOGOUT') return 'default'
+  if (activity === 'LOGIN' || activity === 'BERHASIL_LOGIN') return 'success'
   if (activity === 'GAGAL_LOGIN') return 'danger'
+  if (activity === 'LOGOUT') return 'default'
+  if (activity === 'RESET_PASSWORD') return 'cyan'
+  if (activity === 'UBAH_PASSWORD') return 'purple'
   return 'default'
+}
+
+function getActivityBadgeText(activity) {
+  if (activity === 'LOGIN' || activity === 'BERHASIL_LOGIN') return 'Berhasil Login'
+  if (activity === 'GAGAL_LOGIN') return 'Gagal Login'
+  if (activity === 'LOGOUT') return 'Logout'
+  if (activity === 'RESET_PASSWORD') return 'Reset Sandi (OTP)'
+  if (activity === 'UBAH_PASSWORD') return 'Ubah Kata Sandi'
+  return activity || '—'
 }
 
 // Format Tanggal
@@ -303,13 +314,16 @@ function parsePerubahan(perubahan, aksi) {
         </div>
 
         <!-- Activity Filter (Audit Tab only) -->
-        <div v-if="activeTab === 'audit'" class="w-36">
+        <div v-if="activeTab === 'audit'" class="w-44">
           <CustomSelect
             v-model="filterActivity"
             :options="[
               { value: '', label: 'Semua Aktifitas' },
               { value: 'LOGIN', label: 'Berhasil Login' },
               { value: 'GAGAL_LOGIN', label: 'Gagal Login' },
+              { value: 'RESET_PASSWORD', label: 'Reset Sandi (OTP)' },
+              { value: 'UBAH_PASSWORD', label: 'Ubah Kata Sandi' },
+              { value: 'LOGOUT', label: 'Logout' },
             ]"
             aria-label="Filter aktivitas"
             block
@@ -516,7 +530,7 @@ function parsePerubahan(perubahan, aksi) {
                   {{ log.email }}
                 </td>
                 <td class="px-5 py-3.5">
-                  <AppBadge :type="getActivityBadgeType(log.aktifitas)" :text="log.aktifitas" />
+                  <AppBadge :type="getActivityBadgeType(log.aktifitas)" :text="getActivityBadgeText(log.aktifitas)" />
                 </td>
               </tr>
               <tr v-if="filteredAuditLogs.length === 0">

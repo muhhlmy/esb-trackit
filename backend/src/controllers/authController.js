@@ -19,6 +19,15 @@ import {
   resetFailedLogin,
   DUMMY_BCRYPT_HASH,
 } from '../services/accountSecurityService.js';
+import {
+  createPasswordResetOtp,
+  verifyPasswordResetOtp,
+  consumePasswordResetToken,
+} from '../services/otpService.js';
+import {
+  sendEmail,
+  renderPasswordResetOtpEmailHtml,
+} from '../services/emailService.js';
 
 const MAX_LOGIN_EMAIL_LENGTH = 150
 const MAX_LOGIN_PASSWORD_LENGTH = 255
@@ -100,12 +109,10 @@ export async function login(req, res) {
 
     if (!userRow || !isPasswordValid) {
       const failedState = await recordFailedLogin(email)
-      if (userRow) {
-        await pool.query(
-          'INSERT INTO log_audit_login (user_id, email, login_time, ip_address, user_agent) VALUES ($1, $2, CURRENT_TIMESTAMP, $3, $4)',
-          [userRow.id, userRow.email, req.ip, req.headers['user-agent']],
-        ).catch(() => {})
-      }
+      await pool.query(
+        'INSERT INTO log_audit_login (user_id, email, login_time, ip_address, user_agent, status_login) VALUES ($1, $2, CURRENT_TIMESTAMP, $3, $4, $5)',
+        [userRow ? userRow.id : null, email, req.ip, req.headers['user-agent'], 'LOGIN_FAILED'],
+      ).catch(() => {})
 
       if (failedState.lockedUntil && failedState.retryAfterSeconds > 0) {
         res.setHeader('Retry-After', String(failedState.retryAfterSeconds))
@@ -187,8 +194,8 @@ export async function login(req, res) {
 
     // Catat log sukses
     await pool.query(
-      'INSERT INTO log_audit_login (user_id, email, login_time, ip_address, user_agent) VALUES ($1, $2, CURRENT_TIMESTAMP, $3, $4)',
-      [userRow.id, userRow.email, req.ip, req.headers['user-agent']],
+      'INSERT INTO log_audit_login (user_id, email, login_time, ip_address, user_agent, status_login) VALUES ($1, $2, CURRENT_TIMESTAMP, $3, $4, $5)',
+      [userRow.id, userRow.email, req.ip, req.headers['user-agent'], 'LOGIN_SUCCESS'],
     )
 
     res.json({
@@ -213,8 +220,8 @@ export async function logout(req, res) {
 
     if (userId) {
       await pool.query(
-        'INSERT INTO log_audit_login (user_id, email, login_time, ip_address, user_agent) VALUES ($1, $2, CURRENT_TIMESTAMP, $3, $4)',
-        [userId, req.user?.email || '', req.ip, req.headers['user-agent']],
+        'INSERT INTO log_audit_login (user_id, email, login_time, ip_address, user_agent, status_login) VALUES ($1, $2, CURRENT_TIMESTAMP, $3, $4, $5)',
+        [userId, req.user?.email || '', req.ip, req.headers['user-agent'], 'LOGOUT'],
       ).catch(() => {})
     }
 
@@ -350,8 +357,8 @@ export async function changePassword(req, res) {
     await revokeAllUserSessions(userId);
 
     await pool.query(
-      `INSERT INTO log_audit_login (user_id, email, login_time, ip_address, user_agent) VALUES ($1, $2, CURRENT_TIMESTAMP, $3, $4)`,
-      [user.id, user.email, req.ip, req.headers['user-agent']],
+      `INSERT INTO log_audit_login (user_id, email, login_time, ip_address, user_agent, status_login) VALUES ($1, $2, CURRENT_TIMESTAMP, $3, $4, $5)`,
+      [user.id, user.email, req.ip, req.headers['user-agent'], 'PASSWORD_CHANGE'],
     );
 
     res.json({ message: 'Password berhasil diperbarui.' });
@@ -360,3 +367,162 @@ export async function changePassword(req, res) {
     res.status(500).json({ message: 'Terjadi kesalahan pada server.' });
   }
 }
+
+/**
+ * Permintaan OTP untuk Lupa Password
+ */
+export async function forgotPassword(req, res) {
+  try {
+    const { email } = req.body || {}
+    let parsedEmail
+    try {
+      parsedEmail = parseRequiredEmail(email)
+    } catch {
+      return res.status(400).json({ message: 'Format alamat email tidak valid.' })
+    }
+
+    // 1. Cari data user berdasarkan email
+    const userResult = await pool.query(
+      `
+      SELECT id, nama, email, is_active
+      FROM users
+      WHERE LOWER(email) = LOWER($1) AND deleted_at IS NULL
+    `,
+      [parsedEmail],
+    )
+
+    if (userResult.rowCount === 0) {
+      return res.status(404).json({
+        message: 'Alamat email tidak terdaftar dalam sistem.',
+      })
+    }
+
+    const user = userResult.rows[0]
+
+    if (!user.is_active) {
+      return res.status(403).json({
+        message: 'Akun Anda sedang dinonaktifkan. Silakan hubungi Administrator.',
+      })
+    }
+
+    // 2. Buat OTP 6 digit dan simpan ke database (berlaku 5 menit)
+    const { otpCode, expiresMinutes } = await createPasswordResetOtp(user.id, user.email)
+
+    // 3. Kirim email berisi OTP
+    const htmlEmail = renderPasswordResetOtpEmailHtml({
+      recipientName: user.nama,
+      otpCode,
+      expiresMinutes,
+    })
+
+    const isSent = await sendEmail({
+      to: user.email,
+      subject: `[ESB TrackIT] Verifikasi Reset Kata Sandi`,
+      html: htmlEmail,
+      text: `Halo ${user.nama}, kode verifikasi OTP Anda untuk reset kata sandi adalah: ${otpCode}. Kode ini berlaku selama ${expiresMinutes} menit.`,
+    })
+
+    console.log(`[forgotPassword] OTP generated for <${user.email}>: ${otpCode} (Email sent status: ${isSent})`)
+
+    res.json({
+      message: `Kode verifikasi OTP (5 menit) telah dikirim ke email ${user.email}.`,
+      email: user.email,
+      expiresMinutes,
+    })
+  } catch (error) {
+    if (error.statusCode) {
+      if (error.retryAfter) {
+        res.setHeader('Retry-After', String(error.retryAfter))
+      }
+      return res.status(error.statusCode).json({ message: error.message })
+    }
+    console.error('Error forgotPassword:', error)
+    res.status(500).json({ message: 'Terjadi kesalahan pada server saat mengirim OTP.' })
+  }
+}
+
+/**
+ * Verifikasi Kode OTP yang dimasukkan user
+ */
+export async function verifyResetOtp(req, res) {
+  try {
+    const { email, otp } = req.body || {}
+    if (!email || typeof email !== 'string') {
+      return res.status(400).json({ message: 'Email wajib diisi.' })
+    }
+    if (!otp || typeof otp !== 'string') {
+      return res.status(400).json({ message: 'Kode OTP wajib diisi.' })
+    }
+
+    const result = await verifyPasswordResetOtp(email, otp)
+
+    res.json({
+      message: 'Kode OTP valid. Silakan atur kata sandi baru Anda.',
+      resetToken: result.resetToken,
+    })
+  } catch (error) {
+    if (error.statusCode) {
+      return res.status(error.statusCode).json({ message: error.message })
+    }
+    console.error('Error verifyResetOtp:', error)
+    res.status(500).json({ message: 'Terjadi kesalahan saat memverifikasi kode OTP.' })
+  }
+}
+
+/**
+ * Eksekusi Perubahan Password menggunakan Token Reset
+ */
+export async function resetPassword(req, res) {
+  try {
+    const { email, resetToken, newPassword } = req.body || {}
+
+    if (!email || typeof email !== 'string') {
+      return res.status(400).json({ message: 'Email wajib diisi.' })
+    }
+    if (!resetToken || typeof resetToken !== 'string') {
+      return res.status(400).json({ message: 'Token reset wajib disertakan.' })
+    }
+    if (!newPassword || typeof newPassword !== 'string' || Array.from(newPassword).length < 8) {
+      return res.status(400).json({ message: 'Kata sandi baru minimal harus 8 karakter.' })
+    }
+
+    // 1. Validasi token dan ambil userId
+    const { userId } = await consumePasswordResetToken(email, resetToken)
+
+    // 2. Hash kata sandi baru
+    const newHashedPassword = await hashPassword(newPassword)
+
+    // 3. Update database
+    await pool.query(
+      `
+      UPDATE users 
+      SET password_hash = $1, updated_at = CURRENT_TIMESTAMP 
+      WHERE id = $2
+    `,
+      [newHashedPassword, userId],
+    )
+
+    // 4. Revoke semua sesi lama pengguna demi keamanan
+    await revokeAllUserSessions(userId)
+
+    // 5. Catat ke audit log
+    await pool.query(
+      `
+      INSERT INTO log_audit_login (user_id, email, login_time, ip_address, user_agent, status_login)
+      VALUES ($1, $2, CURRENT_TIMESTAMP, $3, $4, $5)
+    `,
+      [userId, email, req.ip, req.headers['user-agent'] || '', 'PASSWORD_RESET_OTP'],
+    ).catch(() => {})
+
+    res.json({
+      message: 'Kata sandi Anda berhasil diperbarui. Silakan masuk kembali dengan kata sandi baru.',
+    })
+  } catch (error) {
+    if (error.statusCode) {
+      return res.status(error.statusCode).json({ message: error.message })
+    }
+    console.error('Error resetPassword:', error)
+    res.status(500).json({ message: 'Terjadi kesalahan pada server saat memperbarui kata sandi.' })
+  }
+}
+

@@ -1,0 +1,2 @@
+# Enforce consistent LF line endings across Windows, macOS, and Linux
+* text=auto eol=lf

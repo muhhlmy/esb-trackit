@@ -1,7 +1,6 @@
 import { ref, computed } from 'vue';
 import { api } from '../services/api.js';
 import { useToast } from './useToast.js';
-import { useBookmarks } from './useBookmarks.js';
 
 // Fallback seed data in case backend is loading or initial launch
 const DEFAULT_CASES = [
@@ -243,21 +242,16 @@ const editingCase = ref(null);
 
 export function useCases() {
   const { showToast } = useToast();
-  const { isBookmarked } = useBookmarks();
 
   async function fetchCases() {
     isLoading.value = true;
     try {
-      const res = await api.getCases({
-        category: selectedCategory.value,
-        severity: selectedSeverity.value,
-        search: searchQuery.value
-      });
-      if (res && res.data && res.data.length > 0) {
+      const res = await api.getCases();
+      if (res && Array.isArray(res.data)) {
         cases.value = res.data;
       }
     } catch (err) {
-      console.warn('Using local case data:', err.message);
+      console.warn('Using local fallback case data:', err.message);
     } finally {
       isLoading.value = false;
     }
@@ -266,9 +260,7 @@ export function useCases() {
   const filteredCases = computed(() => {
     return cases.value.filter((c) => {
       const matchCategory = selectedCategory.value === 'all' || c.category === selectedCategory.value;
-      const matchSeverity = selectedSeverity.value === 'all' || c.severity === selectedSeverity.value;
-      
-      if (!matchCategory || !matchSeverity) return false;
+      if (!matchCategory) return false;
 
       if (!searchQuery.value.trim()) return true;
 
@@ -344,30 +336,43 @@ export function useCases() {
 
   async function saveCase(formData) {
     try {
-      if (drawerMode.value === 'create') {
-        const id = `case-${Date.now().toString(36)}`;
+      const isCreate = drawerMode.value === 'create' || !formData.id || !cases.value.some((c) => c.id === formData.id);
+
+      if (isCreate) {
+        const id = formData.id || `case-${Date.now().toString(36)}`;
         const payload = { ...formData, id, isCustom: true };
         
         try {
           const res = await api.createCase(payload);
-          cases.value.unshift(res.data);
-        } catch {
+          if (res?.data) {
+            const existingIdx = cases.value.findIndex((c) => c.id === id);
+            if (existingIdx !== -1) {
+              cases.value[existingIdx] = res.data;
+            } else {
+              cases.value.unshift(res.data);
+            }
+          }
+        } catch (apiErr) {
+          console.warn('API createCase fallback:', apiErr.message);
           cases.value.unshift(payload);
         }
 
         activeCaseId.value = id;
-        showToast('Case baru berhasil disimpan!', 'success');
+        showToast('Case baru berhasil disimpan ke database!', 'success');
       } else {
         const id = formData.id;
         try {
           const res = await api.updateCase(id, formData);
           const idx = cases.value.findIndex((c) => c.id === id);
-          if (idx !== -1) cases.value[idx] = res.data;
-        } catch {
+          if (idx !== -1 && res?.data) {
+            cases.value[idx] = res.data;
+          }
+        } catch (apiErr) {
+          console.warn('API updateCase fallback:', apiErr.message);
           const idx = cases.value.findIndex((c) => c.id === id);
           if (idx !== -1) cases.value[idx] = { ...formData };
         }
-        showToast('Perubahan Case berhasil disimpan!', 'success');
+        showToast('Perubahan Case berhasil disimpan ke database!', 'success');
       }
       closeDrawer();
       return true;

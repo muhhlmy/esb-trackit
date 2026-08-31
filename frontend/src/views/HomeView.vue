@@ -1,8 +1,10 @@
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useCases } from '@/composables/useCases';
 import { useAuth } from '@/composables/useAuth';
+import { useToast } from '@/composables/useToast';
+import { api } from '@/services/api';
 import {
   Search,
   Laptop,
@@ -20,16 +22,82 @@ import {
   Lock,
   FileCode,
   HelpCircle,
-  ArrowRight
+  ArrowRight,
+  Flame,
+  ThumbsUp,
+  ThumbsDown,
+  CheckCircle2,
+  BookOpen,
+  Terminal,
+  Copy,
+  Check
 } from 'lucide-vue-next';
 
 const router = useRouter();
-const { cases, setSearch, setCategory, openCreateDrawer } = useCases();
+const { cases, setSearch, setCategory, selectCase, fetchCases } = useCases();
 const { isCrudUnlocked } = useAuth();
+const { showToast } = useToast();
 
 const localSearch = ref('');
 const isInputFocused = ref(false);
-const openFaqId = ref('faq-1');
+const openFaqId = ref(null);
+const viewedFaqs = ref(new Set());
+const copiedSnippetIdx = ref(null);
+
+// Category Filter for Homepage FAQ Section
+const faqSelectedCategory = ref('all');
+
+const faqCategories = [
+  { value: 'all', label: 'Semua Kategori' },
+  { value: 'hardware', label: 'Hardware & Devices' },
+  { value: 'security', label: 'Security & Access' },
+  { value: 'network', label: 'Network & Wi-Fi' },
+  { value: 'software', label: 'Software & Apps' },
+  { value: 'operations', label: 'Operations & Policies' }
+];
+
+// Dynamic Data
+const popularFaqs = ref([]);
+const featuredFaqs = ref([]);
+
+// Track feedback per user via localStorage
+const userFeedbacks = ref({});
+
+function loadFeedbacksFromStorage() {
+  try {
+    const raw = localStorage.getItem('esb_faq_feedbacks');
+    if (raw) userFeedbacks.value = JSON.parse(raw);
+  } catch (e) {
+    userFeedbacks.value = {};
+  }
+}
+
+async function loadFaqsData() {
+  try {
+    const [popularRes, featuredRes] = await Promise.all([
+      api.getPopularCases(5),
+      api.getCases({ featured: true })
+    ]);
+
+    if (popularRes?.data && Array.isArray(popularRes.data)) {
+      popularFaqs.value = popularRes.data;
+    }
+    if (featuredRes?.data && Array.isArray(featuredRes.data)) {
+      featuredFaqs.value = featuredRes.data;
+      if (featuredFaqs.value.length > 0 && !openFaqId.value) {
+        openFaqId.value = featuredFaqs.value[0].id;
+      }
+    }
+  } catch (err) {
+    console.warn('Failed to load dynamic FAQs, using fallback:', err.message);
+  }
+}
+
+onMounted(() => {
+  fetchCases();
+  loadFeedbacksFromStorage();
+  loadFaqsData();
+});
 
 const liveSuggestions = computed(() => {
   if (!localSearch.value.trim()) return [];
@@ -39,6 +107,14 @@ const liveSuggestions = computed(() => {
     .slice(0, 5);
 });
 
+// Filtered FAQs based on chosen category
+const filteredFeaturedFaqs = computed(() => {
+  if (faqSelectedCategory.value === 'all') {
+    return featuredFaqs.value;
+  }
+  return featuredFaqs.value.filter((f) => f.category === faqSelectedCategory.value);
+});
+
 function handleSearchSubmit() {
   if (localSearch.value.trim()) {
     setSearch(localSearch.value.trim());
@@ -46,9 +122,23 @@ function handleSearchSubmit() {
   router.push('/cases');
 }
 
-function handlePopularClick(query) {
-  setSearch(query);
-  router.push('/cases');
+// Click Quick Action Popular Pill
+async function handlePopularChipClick(faq) {
+  // 1. Record Click event to backend
+  try {
+    await api.recordCaseInteraction(faq.id, 'click');
+  } catch (e) {
+    console.warn('Click track error:', e.message);
+  }
+
+  // 2. Open accordion if featured or route to cases view
+  openFaqId.value = faq.id;
+
+  // 3. Smooth scroll to FAQ section
+  const section = document.getElementById('faqs-section');
+  if (section) {
+    section.scrollIntoView({ behavior: 'smooth' });
+  }
 }
 
 function handleCategoryNavigate(categoryKey) {
@@ -56,286 +146,443 @@ function handleCategoryNavigate(categoryKey) {
   router.push('/cases');
 }
 
-function toggleFaq(id) {
-  openFaqId.value = openFaqId.value === id ? null : id;
+async function toggleFaq(id) {
+  if (openFaqId.value === id) {
+    openFaqId.value = null;
+  } else {
+    openFaqId.value = id;
+    
+    // Auto record view interaction once per session
+    if (!viewedFaqs.value.has(id)) {
+      viewedFaqs.value.add(id);
+      try {
+        await api.recordCaseInteraction(id, 'view');
+      } catch (e) {
+        console.warn('View track error:', e.message);
+      }
+    }
+  }
 }
 
-const topicCards = [
-  {
-    id: 'hardware',
-    title: 'Hardware',
-    description: 'Request new equipment, report physical damage, or troubleshoot laptop & accessories.',
-    icon: Laptop,
-    badge: 'Hardware'
-  },
-  {
-    id: 'software',
-    title: 'Software',
-    description: 'Install applications, request licenses, PR standardization, or resolve runtime errors.',
-    icon: AppWindow,
-    badge: 'Software'
-  },
-  {
-    id: 'workplace',
-    title: 'Access & Security',
-    description: 'Password resets, 2FA/2SV setup, Google Workspace accounts, and system permissions.',
-    icon: ShieldCheck,
-    badge: 'Security'
-  },
-  {
-    id: 'environment',
-    title: 'Network & Wi-Fi',
-    description: 'VPN configuration, OOBE network bypass, office connectivity, and proxy setup.',
-    icon: Wifi,
-    badge: 'Network'
-  },
-  {
-    id: 'workplace',
-    title: 'HR Systems',
-    description: 'Payroll portal access, PBX communication, employee onboarding, and asset tracking.',
-    icon: Building2,
-    badge: 'HR / Workplace'
-  },
-  {
-    id: 'backend',
-    title: 'Workplace & IT',
-    description: 'Meeting room tech, printer setup, desk equipment relocation, and database maintenance.',
-    icon: Server,
-    badge: 'Infrastructure'
+// User Feedback: "Was this resource helpful?"
+async function handleHelpfulFeedback(faq, isHelpful) {
+  const currentVote = userFeedbacks.value[faq.id];
+  if (currentVote) {
+    showToast('Anda sudah memberikan feedback untuk FAQ ini.', 'info');
+    return;
   }
-];
 
-const faqs = [
-  {
-    id: 'faq-1',
-    question: 'How do I reset my password?',
-    type: 'steps',
-    summary: 'You can reset your employee Google Workspace password using the Admin Console self-service SOP:',
-    steps: [
-      'Navigate to the Google Admin Console (admin.google.com).',
-      'Search for the employee ID or email address under Directory > Users.',
-      'Click "Reset Password" and choose "Create Password" manually.',
-      'Set the standard default password: Essensians@2026.',
-      'Ensure "Ask user to change their password when they sign in" is checked before clicking Reset.'
-    ],
-    actionText: 'Go to Admin Portal',
-    actionLink: 'https://admin.google.com/'
-  },
-  {
-    id: 'faq-2',
-    question: 'How to bypass Microsoft account during Windows Laptop OOBE?',
-    type: 'command',
-    summary: 'To set up a local user account without an online Microsoft account during "Let\'s connect you to a network":',
-    steps: [
-      'Press Shift + F10 (or Fn + Shift + F10) on the keyboard to open Command Prompt (CMD).',
-      'Type the command oobe\\bypassnro and press Enter.',
-      'The laptop will restart automatically and allow offline Local Account setup.'
-    ],
-    code: 'oobe\\bypassnro'
-  },
-  {
-    id: 'faq-3',
-    question: 'How to request 2-Step Verification (2SV) backup codes?',
-    type: 'steps',
-    summary: 'Upon official request from PBX / People & Culture for team authentication support:',
-    steps: [
-      'Open Google Admin Console and find the user profile.',
-      'Navigate to Security > 2-Step Verification > Get Backup Verification Codes.',
-      'Copy at least 2 (two) backup verification codes.',
-      'Send the codes securely via Direct Message to authorized PBX personnel.'
-    ]
-  },
-  {
-    id: 'faq-4',
-    question: 'What to do if my laptop or HP is stolen or lost?',
-    type: 'emergency',
-    isEmergency: true,
-    emergencyTitle: 'Immediate action required.',
-    emergencyText: 'If your company device is lost or stolen, report it to the IT Support & Security Operations Center (SOC) immediately.',
-    details: 'IT will issue an immediate remote wipe command via Endpoint Management to safeguard confidential company data.'
+  const type = isHelpful ? 'helpful' : 'unhelpful';
+  userFeedbacks.value[faq.id] = type;
+  localStorage.setItem('esb_faq_feedbacks', JSON.stringify(userFeedbacks.value));
+
+  // Update local stats
+  if (!faq.stats) {
+    faq.stats = { views: 0, clicks: 0, helpful: 0, unhelpful: 0, score: 0 };
   }
-];
+  if (isHelpful) {
+    faq.stats.helpful = (faq.stats.helpful || 0) + 1;
+  } else {
+    faq.stats.unhelpful = (faq.stats.unhelpful || 0) + 1;
+  }
+
+  try {
+    await api.recordCaseInteraction(faq.id, type);
+    showToast(isHelpful ? 'Terima kasih! Feedback Anda sangat membantu kami.' : 'Terima kasih atas feedback Anda, kami akan memperbarui informasi ini.', 'success');
+  } catch (e) {
+    console.warn('Feedback API error:', e.message);
+  }
+}
+
+function copySnippet(code, index) {
+  navigator.clipboard.writeText(code);
+  copiedSnippetIdx.value = index;
+  showToast('Snippet / Perintah disalin ke clipboard!', 'success');
+  setTimeout(() => {
+    copiedSnippetIdx.value = null;
+  }, 2000);
+}
+
+function goToFaqDetail(id) {
+  selectCase(id);
+  router.push('/cases');
+}
 </script>
 
 <template>
-  <main class="w-full max-w-6xl mx-auto px-4 sm:px-6 py-12 md:py-20 flex flex-col gap-16 md:gap-24 transition-colors">
+  <main class="min-h-screen bg-[#f9f9fb] dark:bg-slate-950 text-[#1a1c1d] dark:text-slate-100 flex flex-col font-sans transition-colors duration-200">
     
     <!-- Hero Section -->
-    <section class="flex flex-col items-center text-center gap-6 max-w-3xl mx-auto w-full">
-      <h1 class="text-3xl sm:text-5xl font-bold text-[#1a1c1d] dark:text-slate-100 tracking-tight leading-tight">
-        How can we help you today?
-      </h1>
+    <section class="relative pt-16 pb-14 sm:pt-24 sm:pb-20 px-4 sm:px-6 max-w-5xl mx-auto w-full text-center">
+      
+      <!-- Brand & Badge -->
+      <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#f2f1ff] dark:bg-indigo-950/50 border border-[#c4c5d9] dark:border-indigo-800/40 text-xs font-semibold text-[#002eac] dark:text-indigo-300 mb-6 shadow-2xs">
+        <span class="w-2 h-2 rounded-full bg-[#0040e5] dark:bg-indigo-400 animate-pulse"></span>
+        <span>ESB IT Support &amp; Knowledge Base</span>
+      </div>
 
-      <!-- Big Search Box -->
-      <div class="w-full relative group max-w-2xl mt-2">
-        <form @submit.prevent="handleSearchSubmit" class="relative">
-          <Search class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#575d7a] dark:text-slate-400 pointer-events-none" />
+      <!-- Main Headline -->
+      <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight text-[#1a1c1d] dark:text-white max-w-3xl mx-auto leading-tight sm:leading-tight">
+        Bagaimana kami dapat membantu operasional kerja Anda?
+      </h1>
+      
+      <p class="mt-4 text-sm sm:text-base text-[#575d7a] dark:text-slate-400 max-w-2xl mx-auto">
+        Cari solusi cepat kendala teknis, SOP perangkat, akses akun, konfigurasi jaringan, hingga prosedur eskalasi helpdesk.
+      </p>
+
+      <!-- Global Search Bar with Live Suggestions Dropdown -->
+      <div class="mt-8 max-w-2xl mx-auto relative z-30">
+        <form @submit.prevent="handleSearchSubmit" class="relative flex items-center">
+          <Search class="absolute left-4.5 w-5 h-5 text-[#575d7a] dark:text-slate-400 pointer-events-none" />
           <input
             v-model="localSearch"
-            @focus="isInputFocused = true"
             type="text"
-            class="w-full h-14 pl-12 pr-12 bg-white dark:bg-slate-900 border border-[#c4c5d9] dark:border-slate-800 rounded-lg text-sm text-[#1a1c1d] dark:text-slate-100 placeholder:text-[#64748b] dark:placeholder:text-slate-500 focus:border-[#0040e5] focus:ring-1 focus:ring-[#0040e5] focus:outline-none transition-shadow shadow-xs focus:shadow-md"
-            placeholder="Search knowledge base, articles, and solutions..."
-            autocomplete="off"
+            placeholder="Ketik pertanyaan, masalah laptop, password, wifi... (Tekan Enter)"
+            @focus="isInputFocused = true"
+            @blur="setTimeout(() => isInputFocused = false, 200)"
+            class="w-full bg-white dark:bg-slate-900 border border-[#c4c5d9] dark:border-slate-800 rounded-2xl pl-12 pr-28 py-4 text-sm text-[#1a1c1d] dark:text-slate-100 placeholder-[#64748b] dark:placeholder-slate-500 shadow-md shadow-slate-200/50 dark:shadow-none focus:outline-none focus:border-[#0040e5] focus:ring-2 focus:ring-[#0040e5]/20 transition-all"
           />
           <button
-            v-if="localSearch"
-            type="button"
-            @click="localSearch = ''"
-            class="absolute right-4 top-1/2 -translate-y-1/2 p-1.5 text-[#575d7a] hover:text-[#1a1c1d] dark:text-slate-400 dark:hover:text-white rounded-lg"
+            type="submit"
+            class="absolute right-2 px-4 py-2 bg-[#0040e5] hover:bg-[#0034bf] text-white text-xs font-semibold rounded-xl shadow-xs transition-colors cursor-pointer"
           >
-            <X class="w-4 h-4" />
+            Cari Solusi
           </button>
         </form>
 
-        <!-- Live Suggestions Dropdown -->
+        <!-- Live Instant Suggestions Dropdown -->
         <div
-          v-if="liveSuggestions.length > 0 && isInputFocused"
-          class="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-slate-900 border border-[#c4c5d9] dark:border-slate-800 rounded-lg shadow-xl overflow-hidden z-30 text-left divide-y divide-[#e2e2e4] dark:divide-slate-800"
+          v-if="isInputFocused && liveSuggestions.length > 0"
+          class="absolute left-0 right-0 top-full mt-2 bg-white dark:bg-slate-900 border border-[#c4c5d9] dark:border-slate-800 rounded-2xl p-2 shadow-xl z-50 text-left"
         >
+          <div class="px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider text-[#575d7a] dark:text-slate-400">
+            Saran Jawaban Terkait
+          </div>
           <button
             v-for="sug in liveSuggestions"
             :key="sug.id"
-            @mousedown="setSearch(sug.title); router.push('/cases')"
-            class="w-full p-3.5 hover:bg-[#f3f3f5] dark:hover:bg-slate-800 flex items-center justify-between text-xs text-[#1a1c1d] dark:text-slate-200 transition-colors cursor-pointer"
+            @mousedown="goToFaqDetail(sug.id)"
+            class="w-full text-left px-3 py-2.5 rounded-xl hover:bg-[#f3f3f5] dark:hover:bg-slate-800 flex items-start justify-between gap-3 transition-colors cursor-pointer"
           >
-            <div class="flex items-center gap-2.5 truncate mr-3">
-              <Search class="w-3.5 h-3.5 text-[#0040e5] shrink-0" />
-              <span class="font-medium truncate">{{ sug.title }}</span>
+            <div>
+              <p class="text-xs font-semibold text-[#1a1c1d] dark:text-slate-200">{{ sug.title }}</p>
+              <p class="text-[11px] text-[#575d7a] dark:text-slate-400 line-clamp-1 mt-0.5">{{ sug.summary }}</p>
             </div>
-            <span class="px-2 py-0.5 rounded text-[10px] bg-[#edeef0] dark:bg-slate-800 text-[#575d7a] dark:text-slate-400 uppercase font-semibold shrink-0">
+            <span class="text-[10px] px-2 py-0.5 rounded bg-[#edeef0] dark:bg-slate-800 text-[#575d7a] dark:text-slate-400 capitalize shrink-0 font-medium">
               {{ sug.category }}
             </span>
           </button>
         </div>
       </div>
 
-      <!-- Popular Tags Links -->
-      <div class="flex flex-wrap justify-center items-center gap-3 text-xs">
-        <span class="text-[#575d7a] dark:text-slate-400">Popular:</span>
+      <!-- Quick Action Popular Pills -->
+      <div v-if="popularFaqs.length > 0" class="mt-6 flex flex-wrap items-center justify-center gap-2 max-w-3xl mx-auto">
+        <span class="text-xs font-medium text-[#575d7a] dark:text-slate-400 flex items-center gap-1.5 mr-1">
+          <Flame class="w-3.5 h-3.5 text-amber-500" />
+          <span>Popular:</span>
+        </span>
         <button
-          @click="handlePopularClick('Password Reset')"
-          class="text-[#0040e5] dark:text-indigo-400 hover:underline font-medium cursor-pointer"
+          v-for="p in popularFaqs"
+          :key="p.id"
+          @click="handlePopularChipClick(p)"
+          class="text-xs px-3 py-1.5 rounded-full bg-white dark:bg-slate-900 border border-[#c4c5d9] dark:border-slate-800 text-[#1a1c1d] dark:text-slate-300 hover:border-[#0040e5] hover:text-[#0040e5] dark:hover:border-indigo-400 dark:hover:text-indigo-400 transition-all shadow-2xs cursor-pointer flex items-center gap-1.5 group"
         >
-          Password Reset
-        </button>
-        <button
-          @click="handlePopularClick('VPN Setup')"
-          class="text-[#0040e5] dark:text-indigo-400 hover:underline font-medium cursor-pointer"
-        >
-          VPN Setup
-        </button>
-        <button
-          @click="handlePopularClick('Setup Laptop')"
-          class="text-[#0040e5] dark:text-indigo-400 hover:underline font-medium cursor-pointer"
-        >
-          Hardware Request
+          <span>{{ p.title }}</span>
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 opacity-60 group-hover:opacity-100"></span>
         </button>
       </div>
+
     </section>
 
-    <!-- Topic Grid (6 Cards) -->
-    <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      <div
-        v-for="card in topicCards"
-        :key="card.title"
-        @click="handleCategoryNavigate(card.id)"
-        class="bg-white dark:bg-slate-900 border border-[#c4c5d9] dark:border-slate-800 rounded-lg p-6 flex flex-col gap-4 hover:shadow-[0_4px_12px_rgba(12,19,44,0.06)] hover:border-[#0040e5] dark:hover:border-indigo-500 transition-all group cursor-pointer"
-      >
-        <div class="w-12 h-12 rounded-lg bg-[#f3f3f5] dark:bg-slate-800 flex items-center justify-center text-[#0040e5] dark:text-indigo-400 group-hover:bg-[#335dff] group-hover:text-white transition-colors">
-          <component :is="card.icon" class="w-6 h-6" />
-        </div>
+    <!-- Category Explore Grid -->
+    <section class="py-10 px-4 sm:px-6 max-w-5xl mx-auto w-full">
+      <div class="flex items-center justify-between mb-6">
         <div>
-          <h3 class="text-lg font-semibold text-[#1a1c1d] dark:text-slate-100 group-hover:text-[#0040e5] dark:group-hover:text-indigo-400 transition-colors">
-            {{ card.title }}
+          <h2 class="text-lg sm:text-xl font-bold text-[#1a1c1d] dark:text-white">
+            Kategori Panduan &amp; Bantuan
+          </h2>
+          <p class="text-xs text-[#575d7a] dark:text-slate-400 mt-0.5">
+            Pilih domain layanan untuk menjelajahi solusi yang terstruktur.
+          </p>
+        </div>
+        <button
+          @click="router.push('/cases')"
+          class="text-xs font-semibold text-[#0040e5] dark:text-indigo-400 hover:underline flex items-center gap-1 cursor-pointer"
+        >
+          <span>Lihat Semua</span>
+          <ArrowRight class="w-3.5 h-3.5" />
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+        <!-- 1. Hardware -->
+        <div
+          @click="handleCategoryNavigate('hardware')"
+          class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-[#c4c5d9] dark:border-slate-800 hover:border-[#0040e5] dark:hover:border-indigo-500 transition-all duration-200 cursor-pointer shadow-2xs hover:shadow-md group"
+        >
+          <div class="w-10 h-10 rounded-xl bg-[#f2f1ff] dark:bg-indigo-950/60 text-[#0040e5] dark:text-indigo-400 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+            <Laptop class="w-5 h-5" />
+          </div>
+          <h3 class="font-bold text-sm text-[#1a1c1d] dark:text-white group-hover:text-[#0040e5] dark:group-hover:text-indigo-300 transition-colors">
+            Hardware &amp; Equipment
           </h3>
-          <p class="text-sm text-[#434656] dark:text-slate-400 mt-1 leading-relaxed">
-            {{ card.description }}
+          <p class="text-xs text-[#575d7a] dark:text-slate-400 mt-1 line-clamp-2">
+            SOP setup laptop baru, bypass OOBE Windows 11, hardware test unit re-use, form serah terima.
+          </p>
+        </div>
+
+        <!-- 2. Security & Access -->
+        <div
+          @click="handleCategoryNavigate('security')"
+          class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-[#c4c5d9] dark:border-slate-800 hover:border-[#0040e5] dark:hover:border-indigo-500 transition-all duration-200 cursor-pointer shadow-2xs hover:shadow-md group"
+        >
+          <div class="w-10 h-10 rounded-xl bg-[#f2f1ff] dark:bg-indigo-950/60 text-[#0040e5] dark:text-indigo-400 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+            <ShieldCheck class="w-5 h-5" />
+          </div>
+          <h3 class="font-bold text-sm text-[#1a1c1d] dark:text-white group-hover:text-[#0040e5] dark:group-hover:text-indigo-300 transition-colors">
+            Access &amp; Security
+          </h3>
+          <p class="text-xs text-[#575d7a] dark:text-slate-400 mt-1 line-clamp-2">
+            Reset password Google Workspace, 2-Factor Authentication, akun lokal Windows, dan permission.
+          </p>
+        </div>
+
+        <!-- 3. Network & Wi-Fi -->
+        <div
+          @click="handleCategoryNavigate('network')"
+          class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-[#c4c5d9] dark:border-slate-800 hover:border-[#0040e5] dark:hover:border-indigo-500 transition-all duration-200 cursor-pointer shadow-2xs hover:shadow-md group"
+        >
+          <div class="w-10 h-10 rounded-xl bg-[#f2f1ff] dark:bg-indigo-950/60 text-[#0040e5] dark:text-indigo-400 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+            <Wifi class="w-5 h-5" />
+          </div>
+          <h3 class="font-bold text-sm text-[#1a1c1d] dark:text-white group-hover:text-[#0040e5] dark:group-hover:text-indigo-300 transition-colors">
+            Network &amp; Connectivity
+          </h3>
+          <p class="text-xs text-[#575d7a] dark:text-slate-400 mt-1 line-clamp-2">
+            Koneksi SSID kantor, konfigurasi VPN remote worker, DNS resolver, dan penanganan no internet.
+          </p>
+        </div>
+
+        <!-- 4. Software & Apps -->
+        <div
+          @click="handleCategoryNavigate('software')"
+          class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-[#c4c5d9] dark:border-slate-800 hover:border-[#0040e5] dark:hover:border-indigo-500 transition-all duration-200 cursor-pointer shadow-2xs hover:shadow-md group"
+        >
+          <div class="w-10 h-10 rounded-xl bg-[#f2f1ff] dark:bg-indigo-950/60 text-[#0040e5] dark:text-indigo-400 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+            <AppWindow class="w-5 h-5" />
+          </div>
+          <h3 class="font-bold text-sm text-[#1a1c1d] dark:text-white group-hover:text-[#0040e5] dark:group-hover:text-indigo-300 transition-colors">
+            Software &amp; Apps
+          </h3>
+          <p class="text-xs text-[#575d7a] dark:text-slate-400 mt-1 line-clamp-2">
+            Instalasi Ninite, Google Chrome, AnyDesk remote support, Microsoft Office, dan troubleshooting lisensi.
+          </p>
+        </div>
+
+        <!-- 5. Operations & Policies -->
+        <div
+          @click="handleCategoryNavigate('operations')"
+          class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-[#c4c5d9] dark:border-slate-800 hover:border-[#0040e5] dark:hover:border-indigo-500 transition-all duration-200 cursor-pointer shadow-2xs hover:shadow-md group"
+        >
+          <div class="w-10 h-10 rounded-xl bg-[#f2f1ff] dark:bg-indigo-950/60 text-[#0040e5] dark:text-indigo-400 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+            <Building2 class="w-5 h-5" />
+          </div>
+          <h3 class="font-bold text-sm text-[#1a1c1d] dark:text-white group-hover:text-[#0040e5] dark:group-hover:text-indigo-300 transition-colors">
+            Operations &amp; Policies
+          </h3>
+          <p class="text-xs text-[#575d7a] dark:text-slate-400 mt-1 line-clamp-2">
+            Form serah terima perangkat, kebijakan keamanan sandi, dan panduan eskalasi tiket helpdesk.
+          </p>
+        </div>
+
+        <!-- 6. Developer & DevOps -->
+        <div
+          @click="handleCategoryNavigate('devops')"
+          class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-[#c4c5d9] dark:border-slate-800 hover:border-[#0040e5] dark:hover:border-indigo-500 transition-all duration-200 cursor-pointer shadow-2xs hover:shadow-md group"
+        >
+          <div class="w-10 h-10 rounded-xl bg-[#f2f1ff] dark:bg-indigo-950/60 text-[#0040e5] dark:text-indigo-400 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+            <Server class="w-5 h-5" />
+          </div>
+          <h3 class="font-bold text-sm text-[#1a1c1d] dark:text-white group-hover:text-[#0040e5] dark:group-hover:text-indigo-300 transition-colors">
+            Developer &amp; Infrastructure
+          </h3>
+          <p class="text-xs text-[#575d7a] dark:text-slate-400 mt-1 line-clamp-2">
+            Git repository access, Docker staging environment, database proxy, dan incident recovery playbook.
           </p>
         </div>
       </div>
     </section>
 
-    <!-- FAQ Accordions Section -->
-    <section class="max-w-3xl mx-auto w-full flex flex-col gap-6">
-      <h2 class="text-2xl sm:text-3xl font-bold text-[#1a1c1d] dark:text-slate-100 mb-2">
-        Frequently Asked Questions
-      </h2>
+    <!-- ======================================================== -->
+    <!-- FREQUENTLY ASKED QUESTIONS (FEATURED ON HOMEPAGE)        -->
+    <!-- ======================================================== -->
+    <section id="faqs-section" class="py-12 px-4 sm:px-6 max-w-4xl mx-auto w-full">
+      <div class="text-center mb-8 space-y-2">
+        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 text-xs font-semibold">
+          <HelpCircle class="w-3.5 h-3.5" />
+          <span>Frequently Asked Questions</span>
+        </div>
+        <h2 class="text-2xl sm:text-3xl font-extrabold text-[#1a1c1d] dark:text-white tracking-tight">
+          Solusi Cepat Kendala yang Sering Terjadi
+        </h2>
+        <p class="text-xs sm:text-sm text-[#575d7a] dark:text-slate-400 max-w-xl mx-auto">
+          Daftar pertanyaan dan langkah perbaikan teknis yang telah dikurasi oleh tim IT Support.
+        </p>
+      </div>
 
+      <!-- FAQ Category Filter Tabs -->
+      <div class="flex flex-wrap items-center justify-center gap-2 mb-8">
+        <button
+          v-for="cat in faqCategories"
+          :key="cat.value"
+          @click="faqSelectedCategory = cat.value"
+          class="px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer border"
+          :class="faqSelectedCategory === cat.value
+            ? 'bg-[#0040e5] text-white border-[#0040e5] shadow-xs'
+            : 'bg-white dark:bg-slate-900 text-[#575d7a] dark:text-slate-400 border-[#c4c5d9] dark:border-slate-800 hover:border-slate-400'"
+        >
+          {{ cat.label }}
+        </button>
+      </div>
+
+      <!-- FAQ Accordion List -->
       <div class="flex flex-col gap-4">
         <div
-          v-for="faq in faqs"
+          v-for="faq in filteredFeaturedFaqs"
           :key="faq.id"
-          class="bg-white dark:bg-slate-900 border border-[#c4c5d9] dark:border-slate-800 rounded-lg overflow-hidden transition-all"
+          class="bg-white dark:bg-slate-900 border border-[#c4c5d9] dark:border-slate-800 rounded-xl overflow-hidden transition-all shadow-2xs hover:shadow-xs"
         >
           <!-- Accordion Header Button -->
           <button
             @click="toggleFaq(faq.id)"
-            class="w-full flex justify-between items-center p-6 bg-white dark:bg-slate-900 hover:bg-[#f3f3f5] dark:hover:bg-slate-800/60 transition-colors text-left cursor-pointer"
+            class="w-full flex justify-between items-center p-5 sm:p-6 bg-white dark:bg-slate-900 hover:bg-[#f3f3f5] dark:hover:bg-slate-800/60 transition-colors text-left cursor-pointer"
           >
-            <span class="text-base font-bold text-[#1a1c1d] dark:text-slate-100 pr-4">
-              {{ faq.question }}
-            </span>
-            <ChevronDown
-              class="w-5 h-5 text-[#1a1c1d] dark:text-slate-400 shrink-0 transition-transform duration-300"
-              :class="{ 'rotate-180 text-[#0040e5] dark:text-indigo-400': openFaqId === faq.id }"
-            />
+            <div class="flex items-center gap-3 pr-4">
+              <span class="text-base font-bold text-[#1a1c1d] dark:text-slate-100">
+                {{ faq.title }}
+              </span>
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+              <span class="hidden sm:inline-block px-2 py-0.5 rounded text-[10px] font-semibold bg-[#f2f1ff] dark:bg-indigo-950/40 text-[#0040e5] dark:text-indigo-400 capitalize border border-[#c4c5d9] dark:border-indigo-500/20">
+                {{ faq.category }}
+              </span>
+              <ChevronDown
+                class="w-5 h-5 text-[#1a1c1d] dark:text-slate-400 transition-transform duration-300"
+                :class="{ 'rotate-180 text-[#0040e5] dark:text-indigo-400': openFaqId === faq.id }"
+              />
+            </div>
           </button>
 
           <!-- Accordion Content -->
           <div
             v-if="openFaqId === faq.id"
-            class="px-6 pb-6 bg-white dark:bg-slate-900 text-sm text-[#434656] dark:text-slate-300 border-t border-[#e2e2e4] dark:border-slate-800 pt-4 space-y-4"
+            class="px-5 sm:px-6 pb-6 bg-white dark:bg-slate-900 text-sm text-[#434656] dark:text-slate-300 border-t border-[#e2e2e4] dark:border-slate-800 pt-4 space-y-4"
           >
-            <p v-if="faq.summary" class="leading-relaxed">
+            <!-- Summary -->
+            <p v-if="faq.summary" class="leading-relaxed text-slate-700 dark:text-slate-300">
               {{ faq.summary }}
             </p>
 
-            <!-- Steps List -->
-            <ol v-if="faq.steps" class="list-decimal pl-6 space-y-2 leading-relaxed">
-              <li v-for="(step, idx) in faq.steps" :key="idx">
-                {{ step }}
-              </li>
-            </ol>
-
-            <!-- Code Snippet -->
-            <div v-if="faq.code" class="p-3 bg-[#edeef0] dark:bg-slate-950 border border-[#c4c5d9] dark:border-slate-800 rounded font-mono text-xs text-[#0040e5] dark:text-indigo-300">
-              <code>{{ faq.code }}</code>
+            <!-- Steps List (actionSteps) -->
+            <div v-if="faq.actionSteps && faq.actionSteps.length" class="space-y-2">
+              <span class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                Langkah-Langkah Penanganan:
+              </span>
+              <ol class="list-decimal pl-6 space-y-2 leading-relaxed text-slate-700 dark:text-slate-300 text-xs sm:text-sm">
+                <li v-for="(step, idx) in faq.actionSteps" :key="idx">
+                  {{ step }}
+                </li>
+              </ol>
             </div>
 
-            <!-- Emergency Box -->
-            <div
-              v-if="faq.isEmergency"
-              class="bg-[#ffdad6] dark:bg-rose-950/40 text-[#93000a] dark:text-rose-200 p-4 rounded-lg flex flex-col gap-2"
-            >
-              <div class="flex items-center gap-2 font-bold text-xs uppercase tracking-wider">
-                <AlertTriangle class="w-4 h-4 text-[#ba1a1a] dark:text-rose-400" />
-                <span>{{ faq.emergencyTitle }}</span>
-              </div>
-              <p class="leading-relaxed font-semibold">{{ faq.emergencyText }}</p>
-              <p class="text-xs pt-1">{{ faq.details }}</p>
-            </div>
-
-            <!-- Action Button inside Accordion -->
-            <div v-if="faq.actionLink" class="mt-4 flex gap-4">
-              <a
-                :href="faq.actionLink"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="bg-[#0040e5] text-white px-4 py-2 rounded text-xs font-medium hover:bg-[#0034bf] transition-colors inline-flex items-center gap-1.5 shadow-xs"
+            <!-- Snippets / Code blocks -->
+            <div v-if="faq.snippets && faq.snippets.length" class="space-y-2 pt-2">
+              <div
+                v-for="(snip, sIdx) in faq.snippets"
+                :key="sIdx"
+                class="rounded-xl border border-[#c4c5d9] dark:border-slate-800 bg-[#edeef0] dark:bg-slate-950 overflow-hidden text-xs"
               >
-                <span>{{ faq.actionText }}</span>
-                <ExternalLink class="w-3.5 h-3.5" />
-              </a>
+                <div class="flex items-center justify-between px-3 py-1.5 bg-white dark:bg-slate-900 border-b border-[#e2e2e4] dark:border-slate-800 font-mono font-semibold text-[11px]">
+                  <span>{{ snip.label || 'Snippet' }}</span>
+                  <button
+                    @click="copySnippet(snip.code, sIdx)"
+                    class="flex items-center gap-1 px-2 py-0.5 rounded bg-[#f3f3f5] hover:bg-[#e2e2e4] dark:bg-slate-800 dark:hover:bg-slate-700 text-[#1a1c1d] dark:text-slate-200 transition-colors cursor-pointer"
+                  >
+                    <Check v-if="copiedSnippetIdx === sIdx" class="w-3 h-3 text-emerald-600" />
+                    <Copy v-else class="w-3 h-3" />
+                    <span>{{ copiedSnippetIdx === sIdx ? 'Tersalin' : 'Copy' }}</span>
+                  </button>
+                </div>
+                <pre class="p-3 font-mono text-[11px] overflow-x-auto whitespace-pre-wrap leading-relaxed">{{ snip.code }}</pre>
+              </div>
             </div>
+
+            <!-- Link to full Case/SOP Document -->
+            <div class="pt-2 flex items-center justify-between flex-wrap gap-3">
+              <button
+                @click="goToFaqDetail(faq.id)"
+                class="inline-flex items-center gap-1.5 text-xs font-semibold text-[#0040e5] dark:text-indigo-400 hover:underline cursor-pointer"
+              >
+                <BookOpen class="w-3.5 h-3.5" />
+                <span>Buka Halaman Pembaca Detail &amp; Panduan Lengkap &rarr;</span>
+              </button>
+            </div>
+
+            <!-- "Was this resource helpful?" Interactive Feedback Component -->
+            <div class="mt-4 pt-4 border-t border-[#f0f0f2] dark:border-slate-800/80 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-[#fafafc] dark:bg-slate-950/40 p-3.5 rounded-lg">
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-medium text-slate-600 dark:text-slate-400">
+                  Apakah informasi ini membantu Anda?
+                </span>
+                <span v-if="faq.stats?.helpful > 0" class="text-[11px] text-slate-600 dark:text-slate-400">
+                  ({{ faq.stats.helpful }} orang terbantu)
+                </span>
+              </div>
+
+              <!-- Feedback Buttons -->
+              <div class="flex items-center gap-2">
+                <!-- If already voted -->
+                <div v-if="userFeedbacks[faq.id]" class="inline-flex items-center gap-1.5 text-xs font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/50 px-3 py-1.5 rounded-md">
+                  <CheckCircle2 class="w-3.5 h-3.5" />
+                  <span>Feedback tercatat ({{ userFeedbacks[faq.id] === 'helpful' ? '👍 Membantu' : '👎 Kurang Membantu' }})</span>
+                </div>
+
+                <!-- Active buttons -->
+                <template v-else>
+                  <button
+                    @click="handleHelpfulFeedback(faq, true)"
+                    class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:border-emerald-500 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors shadow-2xs cursor-pointer"
+                  >
+                    <ThumbsUp class="w-3.5 h-3.5" />
+                    <span>Ya</span>
+                  </button>
+
+                  <button
+                    @click="handleHelpfulFeedback(faq, false)"
+                    class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:border-rose-500 hover:text-rose-600 dark:hover:text-rose-400 transition-colors shadow-2xs cursor-pointer"
+                  >
+                    <ThumbsDown class="w-3.5 h-3.5" />
+                    <span>Tidak</span>
+                  </button>
+                </template>
+              </div>
+            </div>
+
           </div>
+        </div>
+
+        <div v-if="filteredFeaturedFaqs.length === 0" class="text-center py-12 bg-white dark:bg-slate-900 rounded-xl border border-dashed border-slate-300 dark:border-slate-800 p-6">
+          <HelpCircle class="w-8 h-8 text-slate-400 mx-auto mb-2" />
+          <p class="text-xs text-slate-500 dark:text-slate-400">
+            Tidak ada pertanyaan FAQ pada kategori ini.
+          </p>
         </div>
       </div>
 
       <!-- Bottom Helpdesk CTA -->
       <div class="text-center mt-8 space-y-4">
         <p class="text-base text-[#434656] dark:text-slate-400">
-          Still can't find what you're looking for?
+          Masih membutuhkan bantuan terkait kendala teknis?
         </p>
         <div class="flex flex-wrap items-center justify-center gap-3">
           <button
@@ -343,16 +590,16 @@ const faqs = [
             class="bg-[#0040e5] text-white px-6 py-3 rounded-lg text-sm font-medium hover:bg-[#0034bf] transition-colors shadow-sm hover:shadow-md inline-flex items-center gap-2 cursor-pointer"
           >
             <FolderOpen class="w-4 h-4" />
-            <span>Browse All Cases</span>
+            <span>Jelajahi Semua Artikel FAQ</span>
           </button>
 
           <button
             v-if="isCrudUnlocked"
-            @click="openCreateDrawer"
+            @click="router.push('/admin')"
             class="bg-white dark:bg-slate-800 text-[#1a1c1d] dark:text-white border border-[#c4c5d9] dark:border-slate-700 px-6 py-3 rounded-lg text-sm font-medium hover:bg-[#f3f3f5] dark:hover:bg-slate-700 transition-colors shadow-xs inline-flex items-center gap-2 cursor-pointer"
           >
-            <PlusCircle class="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-            <span>Submit a Ticket / New Case</span>
+            <FileCode class="w-4 h-4 text-[#0040e5] dark:text-indigo-400" />
+            <span>FAQ Knowledge Base CMS Admin</span>
           </button>
         </div>
       </div>

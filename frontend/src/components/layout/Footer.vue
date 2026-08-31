@@ -15,9 +15,6 @@ import { RouterLink } from 'vue-router';
         <RouterLink to="/cases" class="hover:text-[#0040e5] dark:hover:text-white underline transition-colors">
           Knowledge Directory
         </RouterLink>
-        <RouterLink to="/templates" class="hover:text-[#0040e5] dark:hover:text-white underline transition-colors">
-          Communication Hub
-        </RouterLink>
         <RouterLink to="/analytics" class="hover:text-[#0040e5] dark:hover:text-white underline transition-colors">
           Portal Status &amp; Analytics
         </RouterLink>

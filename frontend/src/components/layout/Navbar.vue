@@ -2,7 +2,6 @@
 import { ref, onMounted, onUnmounted } from 'vue';
 import { RouterLink, useRouter } from 'vue-router';
 import { useCases } from '@/composables/useCases';
-import { useBookmarks } from '@/composables/useBookmarks';
 import { useAuth } from '@/composables/useAuth';
 import { useTheme } from '@/composables/useTheme';
 import { 
@@ -10,7 +9,6 @@ import {
   Plus, 
   Moon, 
   Sun, 
-  Bookmark, 
   FileText, 
   BarChart3, 
   FolderOpen, 
@@ -21,8 +19,7 @@ import {
 } from 'lucide-vue-next';
 
 const router = useRouter();
-const { cases, searchQuery, setSearch, clearSearch, openCreateDrawer } = useCases();
-const { bookmarkCount } = useBookmarks();
+const { cases, searchQuery, setSearch, clearSearch } = useCases();
 const { isCrudUnlocked, isAuthenticated, currentUser, registerLogoClick, isLoginModalOpen, logout } = useAuth();
 const { isDark, toggleTheme } = useTheme();
 
@@ -98,15 +95,6 @@ onUnmounted(() => {
             <span class="px-1.5 py-0.5 text-[10px] rounded-full bg-[#edeef0] dark:bg-slate-800 text-[#575d7a] dark:text-slate-400 border border-[#e2e2e4] dark:border-slate-700/50">
               {{ cases.length }}
             </span>
-          </RouterLink>
-
-          <RouterLink
-            to="/templates"
-            class="px-3 py-1.5 rounded-lg text-xs font-medium text-[#575d7a] dark:text-slate-300 hover:text-[#0040e5] dark:hover:text-white hover:bg-[#f3f3f5] dark:hover:bg-slate-800/60 transition-colors flex items-center gap-1.5"
-            active-class="bg-[#f2f1ff] text-[#0040e5] font-semibold dark:bg-slate-800 dark:text-indigo-400"
-          >
-            <FileText class="w-3.5 h-3.5" />
-            Templates
           </RouterLink>
 
           <RouterLink

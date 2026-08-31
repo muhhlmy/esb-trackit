@@ -1,3 +1,4 @@
+// Express Application Configuration & Entry
 import express from 'express';
 import cors from 'cors';
 import './config/env.js';

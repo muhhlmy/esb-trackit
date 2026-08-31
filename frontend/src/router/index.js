@@ -1,7 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import HomeView from '../views/HomeView.vue';
 import CasesView from '../views/CasesView.vue';
-import TemplatesView from '../views/TemplatesView.vue';
 import AnalyticsView from '../views/AnalyticsView.vue';
 import AdminDashboardView from '../views/admin/AdminDashboardView.vue';
 import DocEditorView from '../views/admin/DocEditorView.vue';
@@ -24,12 +23,6 @@ const routes = [
     name: 'case-detail',
     component: CasesView,
     meta: { title: 'SOP Detail — ESB Case' }
-  },
-  {
-    path: '/templates',
-    name: 'templates',
-    component: TemplatesView,
-    meta: { title: 'Templates Hub — ESB Case' }
   },
   {
     path: '/analytics',

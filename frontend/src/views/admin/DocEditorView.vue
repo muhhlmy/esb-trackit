@@ -1,14 +1,19 @@
 <script setup>
-import { ref, onMounted, onBeforeUnmount, watch } from 'vue';
+import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue';
 import { useRoute, useRouter, RouterLink } from 'vue-router';
 import { useCases } from '@/composables/useCases';
 import { useToast } from '@/composables/useToast';
 import DocEditorInspector from '@/components/admin/DocEditorInspector.vue';
+import CaseReader from '@/components/cases/CaseReader.vue';
 import { useEditor, EditorContent } from '@tiptap/vue-3';
 import StarterKit from '@tiptap/starter-kit';
 import Underline from '@tiptap/extension-underline';
 import Link from '@tiptap/extension-link';
 import Placeholder from '@tiptap/extension-placeholder';
+import TextAlign from '@tiptap/extension-text-align';
+import { CustomImage } from '@/components/admin/editor/imageExtension.js';
+import { Callout } from '@/components/admin/editor/calloutExtension.js';
+import { SummaryNode } from '@/components/admin/editor/summaryExtension.js';
 import {
   Undo,
   Redo,
@@ -16,6 +21,10 @@ import {
   Italic as ItalicIcon,
   Underline as UnderlineIcon,
   Link as LinkIcon,
+  AlignLeft,
+  AlignCenter,
+  AlignRight,
+  AlignJustify,
   Code,
   Info,
   AlertTriangle,
@@ -26,6 +35,8 @@ import {
   ExternalLink,
   ChevronDown,
   Save,
+  CheckCircle,
+  XCircle,
   CheckCircle2,
   X,
   PanelRight,
@@ -38,7 +49,11 @@ import {
   Quote,
   ThumbsUp,
   ThumbsDown,
-  Sparkles
+  Sparkles,
+  Image as ImageIcon,
+  Upload,
+  Globe,
+  FileText
 } from 'lucide-vue-next';
 
 const route = useRoute();
@@ -48,63 +63,80 @@ const { showToast } = useToast();
 
 const isInspectorOpen = ref(true);
 const isPreviewModalOpen = ref(false);
+const isImageModalOpen = ref(false);
+const imageUrlInput = ref('');
 const isSaving = ref(false);
-const saveStatus = ref('Saved to cloud'); // 'Saved to cloud' | 'Unsaved changes' | 'Saving...'
+const saveStatus = ref('Saved to cloud');
+const fileInputRef = ref(null);
 
 // Active Document Metadata Model
 const doc = ref({
   id: '',
-  title: 'How do I reset my domain password via Okta?',
-  category: 'workplace',
-  severity: 'medium',
-  tags: ['okta', 'password-reset', 'active-directory'],
-  summary: 'Short guide for employees to reset their Windows/Domain credentials using Okta self-service.',
-  problemContext: 'If you find yourself locked out of your workstation or need to proactively update your credentials, follow these steps to securely reset your password through our SSO provider.',
+  title: 'SOP Setup Laptop Baru untuk New Joiner',
+  category: 'hardware',
+  tags: ['laptop-baru', 'oobe', 'windows-11'],
+  summary: 'Panduan Operasional Standar (SOP) penyiapan unit laptop Windows baru bagi karyawan baru.',
+  problemContext: 'Saat menyiapkan unit laptop baru, diperlukan bypass pembuatan akun online Microsoft saat OOBE.',
   actionSteps: [
-    'Step 1: Open web browser and navigate to the company Okta portal (okta.corelogic.internal).',
-    'Step 2: Click on "Need help signing in?" at the bottom of the login widget, then select "Forgot password?".',
-    'Step 3: Enter your username or employee ID, then verify via Okta Verify app or SMS code.',
-    'Step 4: Create a new password meeting the 16-character minimum requirement and confirm.'
+    'Nyalakan unit laptop baru hingga masuk ke tampilan OOBE.',
+    'Tekan Shift + F10 untuk membuka Command Prompt (CMD).',
+    'Ketik oobe\\bypassnro lalu tekan Enter.'
   ],
   dosAndDonts: {
-    dos: [
-      'Always ensure you are connected to the corporate VPN before resetting credentials remotely.',
-      'Use a strong passphrase combining words, symbols, and numbers.'
-    ],
-    donts: [
-      'Do not share temporary OTP verification codes with anyone over chat or phone.',
-      'Do not reuse previous passwords across non-work accounts.'
-    ]
+    dos: ['Pastikan laptop terhubung daya sebelum update.'],
+    donts: ['Jangan hubungkan ke internet sebelum bypass NRO.']
   },
   snippets: [
     {
-      label: 'Direct Okta SSO Portal Link',
-      code: 'https://okta.corelogic.internal/signin/forgot-password'
+      label: 'Script Bypass OOBE',
+      code: 'oobe\\bypassnro'
     }
   ],
   isCustom: true,
-  isTrending: false,
-  isSsoRequired: true,
+  isFeaturedOnHome: false,
+  isPublished: true,
   contentHtml: ''
+});
+
+// Real-time Case Item computed for 100% actual Employee Preview
+const previewCaseItem = computed(() => {
+  const rawHtml = editor.value ? editor.value.getHTML() : doc.value.contentHtml;
+  return {
+    ...doc.value,
+    contentHtml: rawHtml
+  };
 });
 
 // Initial editor default HTML
 const initialEditorContent = `
-<p>If you find yourself locked out of your workstation or need to proactively update your credentials, follow these steps to securely reset your password through our SSO provider.</p>
+<div data-summary-block="" class="summary-block-card">
+  <p>Panduan Operasional Standar (SOP) penyiapan unit laptop Windows baru bagi karyawan baru (*new joiner*) atau fasilitas penggantian unit kerja.</p>
+</div>
 
-<blockquote>[!] Always ensure you are on the corporate VPN if working remotely before attempting a credential sync.</blockquote>
+<p>Saat menyiapkan unit laptop baru dari distributor/vendor, diperlukan proses bypass pembuatan akun online Microsoft saat OOBE, penyiapan akun lokal standar perusahaan, penyesuaian opsi keamanan, serta instalasi paket aplikasi kerja wajib.</p>
+
+<div data-callout="info" class="callout-card callout-info">
+  <p><strong>Catatan Penting:</strong> Pastikan script installer dieksekusi dengan hak akses Administrator (<em>Run as Administrator</em>).</p>
+</div>
 
 <h3>Step-by-Step Instructions</h3>
 <ol>
-  <li><strong>Step 1: Navigate to the Portal</strong><br/>Open your preferred web browser (Chrome or Edge recommended) and go to the Okta authentication gateway.</li>
-  <li><strong>Step 2: Initiate Reset</strong><br/>Click on the <em>"Need help signing in?"</em> link at the bottom of the widget, then select <em>"Forgot password?"</em>.</li>
-  <li><strong>Step 3: Verify Identity</strong><br/>Authenticate using push notification on the Okta Verify app or SMS token.</li>
-  <li><strong>Step 4: Set New Password</strong><br/>Enter a new password meeting the 16-character company security policy.</li>
+  <li><strong>Step 1:</strong> Nyalakan unit laptop baru hingga masuk ke tampilan Out-of-Box Experience (OOBE) pada tahap <em>"Let's connect you to a network"</em>.</li>
+  <li><strong>Step 2:</strong> Tekan kombinasi tombol <code>Shift + F10</code> (atau <code>Fn + Shift + F10</code>) pada keyboard untuk membuka Command Prompt.</li>
+  <li><strong>Step 3:</strong> Ketik perintah <code>oobe\\bypassnro</code> lalu tekan <strong>Enter</strong>.</li>
 </ol>
-
-<pre><code>Portal Gateway: https://okta.corelogic.internal/
-Password Rule: Min 16 chars, 1 uppercase, 1 symbol, 1 digit</code></pre>
 `;
+
+// Helper to extract summary text from TipTap DOM
+function extractSummaryFromEditor(tiptapEditor) {
+  if (!tiptapEditor) return '';
+  const dom = tiptapEditor.view.dom;
+  const summaryEl = dom.querySelector('.summary-node-wrapper [data-node-view-content]');
+  if (summaryEl) {
+    return summaryEl.innerText.trim();
+  }
+  return '';
+}
 
 // TipTap Editor Instance
 const editor = useEditor({
@@ -113,6 +145,10 @@ const editor = useEditor({
     StarterKit.configure({
       heading: {
         levels: [1, 2, 3]
+      },
+      history: {
+        depth: 300,
+        newGroupDelay: 300
       }
     }),
     Underline,
@@ -123,11 +159,26 @@ const editor = useEditor({
       }
     }),
     Placeholder.configure({
-      placeholder: 'Tulis panduan SOP, langkah resolusi, atau catatan teknis di sini...'
-    })
+      placeholder: 'Tulis panduan FAQ, langkah resolusi, atau catatan teknis di sini...'
+    }),
+    TextAlign.configure({
+      types: ['heading', 'paragraph', 'blockquote'],
+      alignments: ['left', 'center', 'right', 'justify'],
+      defaultAlignment: 'left'
+    }),
+    CustomImage.configure({
+      inline: false,
+      allowBase64: true
+    }),
+    Callout,
+    SummaryNode
   ],
   onUpdate: ({ editor }) => {
     doc.value.contentHtml = editor.getHTML();
+    const extracted = extractSummaryFromEditor(editor);
+    if (extracted) {
+      doc.value.summary = extracted;
+    }
     saveStatus.value = 'Unsaved changes';
   }
 });
@@ -150,8 +201,44 @@ function handleEditorSelection() {
   }
 }
 
+function handleGlobalKeydown(e) {
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z' && !e.shiftKey) {
+    if (editor.value && editor.value.can().undo()) {
+      if (!['INPUT'].includes(document.activeElement?.tagName)) {
+        e.preventDefault();
+        performUndo();
+      }
+    }
+  } else if (
+    ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'y') ||
+    ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 'z')
+  ) {
+    if (editor.value && editor.value.can().redo()) {
+      if (!['INPUT'].includes(document.activeElement?.tagName)) {
+        e.preventDefault();
+        performRedo();
+      }
+    }
+  }
+}
+
+// Helper to convert Markdown syntax to rich HTML elements
+function formatMarkdownToHtml(str) {
+  if (!str) return '';
+  return str
+    // bold: **text**
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    // italic: *text*
+    .replace(/(?<!\*)\*(?!\*)(.*?)(?<!\*)\*(?!\*)/g, '<em>$1</em>')
+    // inline code: `code`
+    .replace(/`([^`]+)`/g, '<code>$1</code>')
+    // markdown links: [text](url)
+    .replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-[#0040e5] underline font-semibold">$1</a>');
+}
+
 onMounted(async () => {
   document.addEventListener('selectionchange', handleEditorSelection);
+  window.addEventListener('keydown', handleGlobalKeydown);
   await fetchCases();
   const caseId = route.params.id;
 
@@ -160,25 +247,56 @@ onMounted(async () => {
     if (existing) {
       doc.value = JSON.parse(JSON.stringify(existing));
       
-      // Build HTML content from existing case structure if needed
       let htmlContent = '';
-      if (existing.problemContext) {
-        htmlContent += `<p>${existing.problemContext}</p>`;
-      }
-      if (existing.summary) {
-        htmlContent += `<blockquote>${existing.summary}</blockquote>`;
-      }
-      if (existing.actionSteps && existing.actionSteps.length) {
-        htmlContent += '<h3>Step-by-Step Instructions</h3><ol>';
-        existing.actionSteps.forEach((s) => {
-          htmlContent += `<li>${s}</li>`;
-        });
-        htmlContent += '</ol>';
-      }
-      if (existing.snippets && existing.snippets.length) {
-        existing.snippets.forEach((snip) => {
-          htmlContent += `<pre><code>${snip.label}:\n${snip.code}</code></pre>`;
-        });
+      if (existing.contentHtml && existing.contentHtml.trim()) {
+        // If contentHtml exists, ensure raw markdown symbols are formatted
+        let cleanHtml = existing.contentHtml;
+        if (cleanHtml.includes('**') || cleanHtml.includes('](')) {
+          cleanHtml = formatMarkdownToHtml(cleanHtml);
+        }
+        htmlContent = cleanHtml;
+      } else {
+        // Build rich HTML from structured fields with markdown parsing
+        if (existing.summary) {
+          htmlContent += `
+            <div data-summary-block="" class="summary-block-card">
+              <p>${formatMarkdownToHtml(existing.summary)}</p>
+            </div>
+          `;
+        }
+        if (existing.problemContext) {
+          htmlContent += `
+            <div data-callout="context" class="callout-card callout-context">
+              <p><strong>Background &amp; Skenario Kendala:</strong><br/>${formatMarkdownToHtml(existing.problemContext)}</p>
+            </div>
+          `;
+        }
+        if (existing.actionSteps && existing.actionSteps.length) {
+          htmlContent += '<h3>Langkah Penyelesaian (Action Steps)</h3><ol>';
+          existing.actionSteps.forEach((s) => {
+            htmlContent += `<li>${formatMarkdownToHtml(s)}</li>`;
+          });
+          htmlContent += '</ol>';
+        }
+        if (existing.dosAndDonts?.dos?.length) {
+          htmlContent += '<div data-callout="dos" class="callout-card callout-dos"><p><strong>Best Practices (DOs):</strong></p><ul>';
+          existing.dosAndDonts.dos.forEach((d) => {
+            htmlContent += `<li>${formatMarkdownToHtml(d)}</li>`;
+          });
+          htmlContent += '</ul></div>';
+        }
+        if (existing.dosAndDonts?.donts?.length) {
+          htmlContent += '<div data-callout="donts" class="callout-card callout-donts"><p><strong>Peringatan (DON\'Ts):</strong></p><ul>';
+          existing.dosAndDonts.donts.forEach((d) => {
+            htmlContent += `<li>${formatMarkdownToHtml(d)}</li>`;
+          });
+          htmlContent += '</ul></div>';
+        }
+        if (existing.snippets && existing.snippets.length) {
+          existing.snippets.forEach((snip) => {
+            htmlContent += `<pre><code>${snip.label || 'Commands & Code Blocks'}:\n${snip.code}</code></pre>`;
+          });
+        }
       }
 
       if (editor.value) {
@@ -189,8 +307,19 @@ onMounted(async () => {
 });
 
 onBeforeUnmount(() => {
+  document.removeEventListener('selectionchange', handleEditorSelection);
+  window.removeEventListener('keydown', handleGlobalKeydown);
   editor.value?.destroy();
 });
+
+// Undo & Redo Commands
+function performUndo() {
+  editor.value?.commands.undo();
+}
+
+function performRedo() {
+  editor.value?.commands.redo();
+}
 
 // Formatting Actions
 function setHeading(level) {
@@ -199,6 +328,14 @@ function setHeading(level) {
   } else {
     editor.value?.chain().focus().toggleHeading({ level }).run();
   }
+}
+
+function setTextAlignment(align) {
+  if (!editor.value) return;
+  if (editor.value.isActive('image')) {
+    editor.value.commands.updateAttributes('image', { alignment: align });
+  }
+  editor.value.chain().focus().setTextAlign(align).run();
 }
 
 function setLink() {
@@ -213,16 +350,66 @@ function setLink() {
   editor.value?.chain().focus().extendMarkRange('link').setLink({ href: url }).run();
 }
 
+// ---------------------------------------------
+// IMAGE ATTACHMENT LOGIC
+// ---------------------------------------------
+function triggerImagePicker() {
+  fileInputRef.value?.click();
+}
+
+function handleImageFileChange(event) {
+  const file = event.target.files?.[0];
+  if (!file) return;
+
+  if (!file.type.startsWith('image/')) {
+    showToast('Hanya file gambar (PNG, JPG, WebP, GIF) yang didukung.', 'error');
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const base64Url = e.target?.result;
+    if (base64Url && editor.value) {
+      editor.value.chain().focus().setImage({ src: base64Url, alt: file.name }).run();
+      showToast('Gambar berhasil disisipkan ke artikel!', 'success');
+    }
+  };
+  reader.readAsDataURL(file);
+  event.target.value = '';
+}
+
+function insertImageUrl() {
+  if (!imageUrlInput.value.trim()) return;
+  editor.value?.chain().focus().setImage({ src: imageUrlInput.value.trim() }).run();
+  imageUrlInput.value = '';
+  isImageModalOpen.value = false;
+  showToast('Gambar dari URL berhasil disisipkan!', 'success');
+}
+
+// ---------------------------------------------
+// CALLOUT & SUMMARY INSERTERS
+// ---------------------------------------------
+function insertSummaryBlock() {
+  editor.value?.commands.setSummaryBlock(doc.value.summary || 'Tulis ringkasan singkat FAQ / SOP ini...');
+  showToast('Kotak Executive Summary disisipkan.', 'success');
+}
+
 function insertInfoCallout() {
-  editor.value?.chain().focus().insertContent(`
-    <blockquote>ℹ️ <strong>Catatan Penting:</strong> Pastikan Anda terhubung ke jaringan VPN kantor sebelum melakukan sinkronisasi.</blockquote>
-  `).run();
+  editor.value?.commands.insertCallout({ type: 'info' }, 'Catatan Penting: Tuliskan petunjuk atau informasi penting di sini...');
 }
 
 function insertWarningCallout() {
-  editor.value?.chain().focus().insertContent(`
-    <blockquote>⚠️ <strong>Peringatan Darurat:</strong> Jika perangkat hilang atau dicuri, segera hubungi Security Operations Center (SOC) di ext. 5555.</blockquote>
-  `).run();
+  editor.value?.commands.insertCallout({ type: 'warning' }, 'Peringatan Darurat: Tuliskan peringatan kritis atau perhatian operasional di sini...');
+}
+
+function insertDosCallout() {
+  editor.value?.commands.insertCallout({ type: 'dos' }, 'Best Practices (DOs): Tuliskan hal-hal yang dianjurkan untuk dilakukan...');
+  showToast('Kotak Best Practices (DOs) disisipkan.', 'success');
+}
+
+function insertDontsCallout() {
+  editor.value?.commands.insertCallout({ type: 'donts' }, 'Peringatan (DON\'Ts): Tuliskan hal-hal yang dilarang atau harus dihindari...');
+  showToast('Kotak Peringatan (DON\'Ts) disisipkan.', 'warning');
 }
 
 function insertStep() {
@@ -236,7 +423,9 @@ async function handleSaveDraft() {
   isSaving.value = true;
   saveStatus.value = 'Saving...';
   try {
-    // Sync action steps from text if available
+    const extracted = extractSummaryFromEditor(editor.value);
+    if (extracted) doc.value.summary = extracted;
+    
     await saveCase(doc.value);
     saveStatus.value = 'Saved to cloud';
     showToast('Draft artikel berhasil disimpan ke cloud!', 'info');
@@ -252,9 +441,13 @@ async function handlePublish() {
   isSaving.value = true;
   saveStatus.value = 'Saving...';
   try {
+    const extracted = extractSummaryFromEditor(editor.value);
+    if (extracted) doc.value.summary = extracted;
+
+    doc.value.isPublished = true;
     await saveCase(doc.value);
     saveStatus.value = 'Saved to cloud';
-    showToast('🎉 Artikel SOP berhasil dipublikasikan!', 'success');
+    showToast('🎉 Artikel FAQ berhasil dipublikasikan!', 'success');
   } catch (err) {
     showToast('Gagal mempublikasikan artikel.', 'error');
   } finally {
@@ -270,6 +463,15 @@ function goToPortal() {
 <template>
   <div class="min-h-screen bg-[#F1F5F9] dark:bg-[#0B1120] text-[#1a1c1d] dark:text-slate-100 flex flex-col font-sans selection:bg-[#0040e5] selection:text-white">
     
+    <!-- Hidden Image File Input -->
+    <input
+      ref="fileInputRef"
+      type="file"
+      accept="image/*"
+      class="hidden"
+      @change="handleImageFileChange"
+    />
+
     <!-- 1. TOP APP BAR -->
     <header class="h-16 bg-white dark:bg-slate-900 border-b border-[#c4c5d9] dark:border-slate-800 px-4 sm:px-6 fixed top-0 left-0 right-0 z-50 flex items-center justify-between shadow-2xs">
       
@@ -277,9 +479,18 @@ function goToPortal() {
       <div class="flex items-center gap-3 sm:gap-4">
         <RouterLink
           to="/admin"
-          class="text-lg font-bold text-[#002eac] dark:text-indigo-400 tracking-tight hover:opacity-90 flex items-center gap-1.5"
+          class="flex items-center gap-2.5 group hover:opacity-90 transition-opacity select-none"
+          title="Ke Dashboard CMS"
         >
-          <span>DocEditor</span>
+          <div class="relative w-8 h-8 rounded-lg overflow-hidden flex items-center justify-center bg-[#f2f1ff] dark:bg-indigo-500/10 border border-[#c4c5d9] dark:border-indigo-500/20 group-hover:scale-105 transition-transform shrink-0">
+            <img src="/ESB Case.svg" alt="ESB Case" class="w-6 h-6 object-contain" />
+          </div>
+          <div class="flex items-center gap-1.5">
+            <span class="font-bold text-[#1a1c1d] dark:text-slate-100 text-base tracking-tight">ESB Case</span>
+            <span class="text-[11px] font-bold text-[#0040e5] dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/50 px-1.5 py-0.5 rounded border border-indigo-200 dark:border-indigo-800/60">
+              DocEditor
+            </span>
+          </div>
         </RouterLink>
 
         <div class="h-5 w-px bg-[#e2e2e4] dark:bg-slate-800 hidden sm:block"></div>
@@ -314,7 +525,8 @@ function goToPortal() {
         <!-- Preview as Employee -->
         <button
           @click="isPreviewModalOpen = true"
-          class="hidden sm:inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border border-[#c4c5d9] dark:border-slate-700 bg-white dark:bg-slate-800 text-[#1a1c1d] dark:text-slate-200 hover:bg-[#f3f3f5] transition-colors cursor-pointer shadow-2xs"
+          class="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border border-[#c4c5d9] dark:border-slate-700 bg-white dark:bg-slate-800 text-[#1a1c1d] dark:text-slate-200 hover:bg-[#f3f3f5] transition-colors cursor-pointer shadow-2xs"
+          title="Lihat tampilan aktual pembaca karyawan secara real-time"
         >
           <Eye class="w-3.5 h-3.5 text-[#0040e5] dark:text-indigo-400" />
           <span>Preview as Employee</span>
@@ -324,9 +536,10 @@ function goToPortal() {
         <button
           @click="handleSaveDraft"
           :disabled="isSaving"
-          class="px-3.5 py-1.5 rounded-lg text-xs font-semibold border border-[#c4c5d9] dark:border-slate-700 text-[#0040e5] dark:text-indigo-300 bg-white dark:bg-slate-800 hover:bg-[#f2f1ff] transition-colors cursor-pointer shadow-2xs"
+          class="px-3.5 py-1.5 rounded-lg text-xs font-semibold border border-[#c4c5d9] dark:border-slate-700 text-[#0040e5] dark:text-indigo-300 bg-white dark:bg-slate-800 hover:bg-[#f2f1ff] dark:hover:bg-slate-700 transition-colors cursor-pointer shadow-2xs"
+          title="Simpan perubahan tanpa mempublikasikan artikel"
         >
-          Save Draft
+          {{ isSaving ? 'Menyimpan...' : 'Save Draft' }}
         </button>
 
         <!-- Publish Article (Emerald Green #00BC84) -->
@@ -360,18 +573,18 @@ function goToPortal() {
       <!-- Undo / Redo -->
       <div class="flex items-center gap-0.5 border-r border-[#e2e2e4] dark:border-slate-800 pr-2 mr-1">
         <button
-          @click="editor.chain().focus().undo().run()"
+          @click="performUndo"
           :disabled="!editor.can().undo()"
-          class="p-1.5 text-[#575d7a] dark:text-slate-400 hover:bg-[#f3f3f5] dark:hover:bg-slate-800 rounded disabled:opacity-30"
-          title="Undo"
+          class="p-1.5 text-[#575d7a] dark:text-slate-400 hover:bg-[#f3f3f5] dark:hover:bg-slate-800 rounded disabled:opacity-30 cursor-pointer"
+          title="Undo (Ctrl+Z)"
         >
           <Undo class="w-4 h-4" />
         </button>
         <button
-          @click="editor.chain().focus().redo().run()"
+          @click="performRedo"
           :disabled="!editor.can().redo()"
-          class="p-1.5 text-[#575d7a] dark:text-slate-400 hover:bg-[#f3f3f5] dark:hover:bg-slate-800 rounded disabled:opacity-30"
-          title="Redo"
+          class="p-1.5 text-[#575d7a] dark:text-slate-400 hover:bg-[#f3f3f5] dark:hover:bg-slate-800 rounded disabled:opacity-30 cursor-pointer"
+          title="Redo (Ctrl+Y)"
         >
           <Redo class="w-4 h-4" />
         </button>
@@ -381,7 +594,7 @@ function goToPortal() {
       <div class="flex items-center gap-1 border-r border-[#e2e2e4] dark:border-slate-800 pr-2 mr-1">
         <select
           @change="setHeading(Number($event.target.value))"
-          class="bg-[#f8fafc] dark:bg-slate-800 border border-[#c4c5d9] dark:border-slate-700 rounded-md py-1 px-2 text-xs text-[#1a1c1d] dark:text-slate-100 focus:outline-none cursor-pointer"
+          class="bg-[#f8fafc] dark:bg-slate-800 border border-[#c4c5d9] dark:border-slate-700 rounded-lg px-2.5 py-1 text-xs text-[#1a1c1d] dark:text-slate-100 focus:outline-none"
         >
           <option value="0">Normal Text</option>
           <option value="1">Heading 1</option>
@@ -390,42 +603,81 @@ function goToPortal() {
         </select>
       </div>
 
-      <!-- Formatting (B, I, U) -->
+      <!-- Formatting Icons (Bold, Italic, Underline) -->
       <div class="flex items-center gap-0.5 border-r border-[#e2e2e4] dark:border-slate-800 pr-2 mr-1">
         <button
           @click="editor.chain().focus().toggleBold().run()"
-          class="w-7 h-7 flex items-center justify-center rounded transition-colors"
-          :class="editor.isActive('bold') ? 'bg-[#0040e5] text-white' : 'text-[#575d7a] dark:text-slate-400 hover:bg-[#f3f3f5] dark:hover:bg-slate-800'"
+          class="p-1.5 rounded transition-colors cursor-pointer"
+          :class="editor.isActive('bold') ? 'bg-[#0040e5] text-white' : 'text-[#575d7a] dark:text-slate-400 hover:bg-[#f3f3f5]'"
           title="Bold (Ctrl+B)"
         >
-          <BoldIcon class="w-3.5 h-3.5" />
+          <BoldIcon class="w-4 h-4" />
         </button>
 
         <button
           @click="editor.chain().focus().toggleItalic().run()"
-          class="w-7 h-7 flex items-center justify-center rounded transition-colors italic"
-          :class="editor.isActive('italic') ? 'bg-[#0040e5] text-white' : 'text-[#575d7a] dark:text-slate-400 hover:bg-[#f3f3f5] dark:hover:bg-slate-800'"
+          class="p-1.5 rounded transition-colors cursor-pointer"
+          :class="editor.isActive('italic') ? 'bg-[#0040e5] text-white' : 'text-[#575d7a] dark:text-slate-400 hover:bg-[#f3f3f5]'"
           title="Italic (Ctrl+I)"
         >
-          <ItalicIcon class="w-3.5 h-3.5" />
+          <ItalicIcon class="w-4 h-4" />
         </button>
 
         <button
           @click="editor.chain().focus().toggleUnderline().run()"
-          class="w-7 h-7 flex items-center justify-center rounded transition-colors underline"
-          :class="editor.isActive('underline') ? 'bg-[#0040e5] text-white' : 'text-[#575d7a] dark:text-slate-400 hover:bg-[#f3f3f5] dark:hover:bg-slate-800'"
+          class="p-1.5 rounded transition-colors cursor-pointer"
+          :class="editor.isActive('underline') ? 'bg-[#0040e5] text-white' : 'text-[#575d7a] dark:text-slate-400 hover:bg-[#f3f3f5]'"
           title="Underline (Ctrl+U)"
         >
-          <UnderlineIcon class="w-3.5 h-3.5" />
+          <UnderlineIcon class="w-4 h-4" />
         </button>
       </div>
 
-      <!-- Lists & Code Blocks -->
+      <!-- Text Alignment Group (Left, Center, Right, Justify) -->
+      <div class="flex items-center gap-0.5 border-r border-[#e2e2e4] dark:border-slate-800 pr-2 mr-1">
+        <button
+          @click="setTextAlignment('left')"
+          class="p-1.5 rounded transition-colors cursor-pointer"
+          :class="editor.isActive({ textAlign: 'left' }) ? 'bg-[#0040e5] text-white' : 'text-[#575d7a] dark:text-slate-400 hover:bg-[#f3f3f5] dark:hover:bg-slate-800'"
+          title="Rata Kiri (Align Left)"
+        >
+          <AlignLeft class="w-4 h-4" />
+        </button>
+
+        <button
+          @click="setTextAlignment('center')"
+          class="p-1.5 rounded transition-colors cursor-pointer"
+          :class="editor.isActive({ textAlign: 'center' }) ? 'bg-[#0040e5] text-white' : 'text-[#575d7a] dark:text-slate-400 hover:bg-[#f3f3f5] dark:hover:bg-slate-800'"
+          title="Rata Tengah (Align Center)"
+        >
+          <AlignCenter class="w-4 h-4" />
+        </button>
+
+        <button
+          @click="setTextAlignment('right')"
+          class="p-1.5 rounded transition-colors cursor-pointer"
+          :class="editor.isActive({ textAlign: 'right' }) ? 'bg-[#0040e5] text-white' : 'text-[#575d7a] dark:text-slate-400 hover:bg-[#f3f3f5] dark:hover:bg-slate-800'"
+          title="Rata Kanan (Align Right)"
+        >
+          <AlignRight class="w-4 h-4" />
+        </button>
+
+        <button
+          @click="setTextAlignment('justify')"
+          class="p-1.5 rounded transition-colors cursor-pointer"
+          :class="editor.isActive({ textAlign: 'justify' }) ? 'bg-[#0040e5] text-white' : 'text-[#575d7a] dark:text-slate-400 hover:bg-[#f3f3f5] dark:hover:bg-slate-800'"
+          title="Rata Kiri Kanan (Justify)"
+        >
+          <AlignJustify class="w-4 h-4" />
+        </button>
+      </div>
+
+      <!-- Lists & Quotes -->
       <div class="flex items-center gap-0.5 border-r border-[#e2e2e4] dark:border-slate-800 pr-2 mr-1">
         <button
           @click="editor.chain().focus().toggleBulletList().run()"
-          class="p-1.5 rounded transition-colors"
-          :class="editor.isActive('bulletList') ? 'bg-[#f2f1ff] text-[#0040e5] font-bold' : 'text-[#575d7a] dark:text-slate-400 hover:bg-[#f3f3f5]'"
+          class="p-1.5 rounded transition-colors cursor-pointer"
+          :class="editor.isActive('bulletList') ? 'bg-[#0040e5] text-white' : 'text-[#575d7a] dark:text-slate-400 hover:bg-[#f3f3f5]'"
           title="Bullet List"
         >
           <List class="w-4 h-4" />
@@ -433,8 +685,8 @@ function goToPortal() {
 
         <button
           @click="editor.chain().focus().toggleOrderedList().run()"
-          class="p-1.5 rounded transition-colors"
-          :class="editor.isActive('orderedList') ? 'bg-[#f2f1ff] text-[#0040e5] font-bold' : 'text-[#575d7a] dark:text-slate-400 hover:bg-[#f3f3f5]'"
+          class="p-1.5 rounded transition-colors cursor-pointer"
+          :class="editor.isActive('orderedList') ? 'bg-[#0040e5] text-white' : 'text-[#575d7a] dark:text-slate-400 hover:bg-[#f3f3f5]'"
           title="Numbered List"
         >
           <ListOrdered class="w-4 h-4" />
@@ -442,37 +694,59 @@ function goToPortal() {
 
         <button
           @click="editor.chain().focus().toggleBlockquote().run()"
-          class="p-1.5 rounded transition-colors"
-          :class="editor.isActive('blockquote') ? 'bg-[#f2f1ff] text-[#0040e5]' : 'text-[#575d7a] dark:text-slate-400 hover:bg-[#f3f3f5]'"
-          title="Blockquote"
+          class="p-1.5 rounded transition-colors cursor-pointer"
+          :class="editor.isActive('blockquote') ? 'bg-[#0040e5] text-white' : 'text-[#575d7a] dark:text-slate-400 hover:bg-[#f3f3f5]'"
+          title="Quote"
         >
           <Quote class="w-4 h-4" />
         </button>
 
         <button
           @click="editor.chain().focus().toggleCodeBlock().run()"
-          class="p-1.5 rounded transition-colors"
+          class="p-1.5 rounded transition-colors cursor-pointer"
           :class="editor.isActive('codeBlock') ? 'bg-[#0040e5] text-white' : 'text-[#575d7a] dark:text-slate-400 hover:bg-[#f3f3f5]'"
           title="Code Block"
         >
           <Code class="w-4 h-4" />
         </button>
+      </div>
 
+      <!-- Links & Image Attachment -->
+      <div class="flex items-center gap-1 border-r border-[#e2e2e4] dark:border-slate-800 pr-2 mr-1">
         <button
           @click="setLink"
-          class="p-1.5 rounded transition-colors"
+          class="p-1.5 rounded transition-colors cursor-pointer"
           :class="editor.isActive('link') ? 'bg-[#0040e5] text-white' : 'text-[#575d7a] dark:text-slate-400 hover:bg-[#f3f3f5]'"
           title="Insert Link"
         >
           <LinkIcon class="w-4 h-4" />
         </button>
+
+        <!-- Attach Image Button -->
+        <button
+          @click="isImageModalOpen = true"
+          class="p-1.5 rounded transition-colors text-[#575d7a] dark:text-slate-400 hover:bg-[#f3f3f5] dark:hover:bg-slate-800 flex items-center gap-1 cursor-pointer font-semibold hover:text-[#0040e5]"
+          title="Sisipkan Gambar (Upload / URL)"
+        >
+          <ImageIcon class="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+          <span class="hidden sm:inline">Attach Gambar</span>
+        </button>
       </div>
 
-      <!-- Inserter Components -->
+      <!-- Inserter Components with [X] support -->
       <div class="flex items-center gap-1.5">
         <button
+          @click="insertSummaryBlock"
+          class="flex items-center gap-1 px-2.5 py-1 rounded bg-indigo-50 text-indigo-800 dark:bg-indigo-950/40 dark:text-indigo-300 font-medium border border-indigo-200 dark:border-indigo-800 cursor-pointer shadow-2xs hover:bg-indigo-100 transition-colors"
+          title="Sisipkan kotak Ringkasan Panduan"
+        >
+          <FileText class="w-3.5 h-3.5 text-indigo-600" />
+          <span>+ Summary Box</span>
+        </button>
+
+        <button
           @click="insertInfoCallout"
-          class="flex items-center gap-1 px-2.5 py-1 rounded bg-blue-50 text-blue-800 dark:bg-blue-950/40 dark:text-blue-300 font-medium border border-blue-200 dark:border-blue-800 cursor-pointer"
+          class="flex items-center gap-1 px-2.5 py-1 rounded bg-blue-50 text-blue-800 dark:bg-blue-950/40 dark:text-blue-300 font-medium border border-blue-200 dark:border-blue-800 cursor-pointer shadow-2xs hover:bg-blue-100 transition-colors"
         >
           <Info class="w-3.5 h-3.5 text-blue-600" />
           <span>Info Callout</span>
@@ -480,17 +754,35 @@ function goToPortal() {
 
         <button
           @click="insertWarningCallout"
-          class="flex items-center gap-1 px-2.5 py-1 rounded bg-amber-50 text-amber-800 dark:bg-amber-950/40 dark:text-amber-300 font-medium border border-amber-200 dark:border-amber-800 cursor-pointer"
+          class="flex items-center gap-1 px-2.5 py-1 rounded bg-amber-50 text-amber-800 dark:bg-amber-950/40 dark:text-amber-300 font-medium border border-amber-200 dark:border-amber-800 cursor-pointer shadow-2xs hover:bg-amber-100 transition-colors"
         >
           <AlertTriangle class="w-3.5 h-3.5 text-amber-600" />
           <span>Warning Banner</span>
         </button>
 
         <button
-          @click="insertStep"
-          class="flex items-center gap-1 px-2.5 py-1 rounded bg-emerald-50 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300 font-medium border border-emerald-200 dark:border-emerald-800 cursor-pointer"
+          @click="insertDosCallout"
+          class="flex items-center gap-1 px-2.5 py-1 rounded bg-emerald-50 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300 font-medium border border-emerald-200 dark:border-emerald-800 cursor-pointer shadow-2xs hover:bg-emerald-100 transition-colors"
+          title="Sisipkan kotak Best Practices (DOs)"
         >
-          <Plus class="w-3.5 h-3.5 text-emerald-600" />
+          <CheckCircle class="w-3.5 h-3.5 text-emerald-600" />
+          <span>+ DOs (Best Practice)</span>
+        </button>
+
+        <button
+          @click="insertDontsCallout"
+          class="flex items-center gap-1 px-2.5 py-1 rounded bg-rose-50 text-rose-800 dark:bg-rose-950/40 dark:text-rose-300 font-medium border border-rose-200 dark:border-rose-800 cursor-pointer shadow-2xs hover:bg-rose-100 transition-colors"
+          title="Sisipkan kotak Peringatan / Larangan (DON'Ts)"
+        >
+          <XCircle class="w-3.5 h-3.5 text-rose-600" />
+          <span>+ DON'Ts (Peringatan)</span>
+        </button>
+
+        <button
+          @click="insertStep"
+          class="flex items-center gap-1 px-2.5 py-1 rounded bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-200 font-medium border border-slate-300 dark:border-slate-700 cursor-pointer shadow-2xs hover:bg-slate-200 transition-colors"
+        >
+          <Plus class="w-3.5 h-3.5 text-indigo-600" />
           <span>+ Step Item</span>
         </button>
       </div>
@@ -513,8 +805,9 @@ function goToPortal() {
               <span>/</span>
               <span class="capitalize font-semibold text-[#0040e5] dark:text-indigo-400">{{ doc.category }}</span>
             </div>
-            <span class="px-2 py-0.5 rounded text-[10px] uppercase font-bold bg-[#edeef0] dark:bg-slate-800 text-[#575d7a] dark:text-slate-400">
-              {{ doc.severity }} Priority
+            
+            <span class="text-[11px] text-slate-400 font-mono">
+              ID: {{ doc.id || 'new-article' }}
             </span>
           </div>
 
@@ -526,19 +819,6 @@ function goToPortal() {
             placeholder="Article Title..."
           />
 
-          <!-- Summary Box (Italic with left border) -->
-          <div class="bg-[#f8fafc] dark:bg-slate-900 border border-[#c4c5d9] dark:border-slate-700 rounded-xl p-4 shadow-2xs">
-            <label class="block text-[11px] font-bold uppercase tracking-wider text-[#575d7a] dark:text-slate-400 mb-1">
-              Ringkasan Panduan (Executive Summary):
-            </label>
-            <textarea
-              v-model="doc.summary"
-              rows="2"
-              class="w-full bg-transparent border-l-4 border-[#0040e5] dark:border-indigo-500 pl-3 text-sm italic text-[#434656] dark:text-slate-300 focus:outline-none resize-none leading-relaxed"
-              placeholder="Tulis ringkasan singkat SOP ini..."
-            ></textarea>
-          </div>
-
           <!-- TIPTAP FLOATING BUBBLE MENU -->
           <div
             v-if="isSelectionMenuOpen && editor"
@@ -547,14 +827,14 @@ function goToPortal() {
           >
             <button
               @click="editor.chain().focus().toggleBold().run()"
-              class="w-7 h-7 flex items-center justify-center rounded hover:bg-[#f3f3f5] dark:hover:bg-slate-800 text-xs font-bold"
+              class="w-7 h-7 flex items-center justify-center rounded hover:bg-[#f3f3f5] dark:hover:bg-slate-800 text-xs font-bold cursor-pointer"
               :class="{ 'text-[#0040e5] font-extrabold bg-[#f2f1ff] dark:bg-slate-800': editor.isActive('bold') }"
             >
               B
             </button>
             <button
               @click="editor.chain().focus().toggleItalic().run()"
-              class="w-7 h-7 flex items-center justify-center rounded hover:bg-[#f3f3f5] dark:hover:bg-slate-800 text-xs italic"
+              class="w-7 h-7 flex items-center justify-center rounded hover:bg-[#f3f3f5] dark:hover:bg-slate-800 text-xs italic cursor-pointer"
               :class="{ 'text-[#0040e5] font-bold bg-[#f2f1ff] dark:bg-slate-800': editor.isActive('italic') }"
             >
               I
@@ -562,22 +842,47 @@ function goToPortal() {
             <div class="w-px h-4 bg-[#e2e2e4] dark:bg-slate-700 mx-0.5"></div>
             <button
               @click="editor.chain().focus().toggleHeading({ level: 1 }).run()"
-              class="px-1.5 py-1 rounded hover:bg-[#f3f3f5] dark:hover:bg-slate-800 text-xs font-bold"
+              class="px-1.5 py-1 rounded hover:bg-[#f3f3f5] dark:hover:bg-slate-800 text-xs font-bold cursor-pointer"
               :class="{ 'text-[#0040e5] bg-[#f2f1ff] dark:bg-slate-800': editor.isActive('heading', { level: 1 }) }"
             >
               H1
             </button>
             <button
               @click="editor.chain().focus().toggleHeading({ level: 2 }).run()"
-              class="px-1.5 py-1 rounded hover:bg-[#f3f3f5] dark:hover:bg-slate-800 text-xs font-bold"
+              class="px-1.5 py-1 rounded hover:bg-[#f3f3f5] dark:hover:bg-slate-800 text-xs font-bold cursor-pointer"
               :class="{ 'text-[#0040e5] bg-[#f2f1ff] dark:bg-slate-800': editor.isActive('heading', { level: 2 }) }"
             >
               H2
             </button>
             <div class="w-px h-4 bg-[#e2e2e4] dark:bg-slate-700 mx-0.5"></div>
             <button
+              @click="setTextAlignment('left')"
+              class="p-1 rounded hover:bg-[#f3f3f5] dark:hover:bg-slate-800 text-xs cursor-pointer"
+              :class="{ 'text-[#0040e5] bg-[#f2f1ff] dark:bg-slate-800': editor.isActive({ textAlign: 'left' }) }"
+              title="Align Left"
+            >
+              <AlignLeft class="w-3.5 h-3.5" />
+            </button>
+            <button
+              @click="setTextAlignment('center')"
+              class="p-1 rounded hover:bg-[#f3f3f5] dark:hover:bg-slate-800 text-xs cursor-pointer"
+              :class="{ 'text-[#0040e5] bg-[#f2f1ff] dark:bg-slate-800': editor.isActive({ textAlign: 'center' }) }"
+              title="Align Center"
+            >
+              <AlignCenter class="w-3.5 h-3.5" />
+            </button>
+            <button
+              @click="setTextAlignment('right')"
+              class="p-1 rounded hover:bg-[#f3f3f5] dark:hover:bg-slate-800 text-xs cursor-pointer"
+              :class="{ 'text-[#0040e5] bg-[#f2f1ff] dark:bg-slate-800': editor.isActive({ textAlign: 'right' }) }"
+              title="Align Right"
+            >
+              <AlignRight class="w-3.5 h-3.5" />
+            </button>
+            <div class="w-px h-4 bg-[#e2e2e4] dark:bg-slate-700 mx-0.5"></div>
+            <button
               @click="setLink"
-              class="p-1 rounded hover:bg-[#f3f3f5] dark:hover:bg-slate-800 text-xs"
+              class="p-1 rounded hover:bg-[#f3f3f5] dark:hover:bg-slate-800 text-xs cursor-pointer"
               :class="{ 'text-[#0040e5]': editor.isActive('link') }"
             >
               <LinkIcon class="w-3.5 h-3.5" />
@@ -597,10 +902,10 @@ function goToPortal() {
             <p class="font-medium text-[#575d7a] dark:text-slate-400">Preview: Was this article helpful?</p>
             <div class="flex gap-3">
               <button class="px-5 py-1.5 border border-[#c4c5d9] dark:border-slate-700 rounded-lg text-xs font-semibold flex items-center gap-1.5 text-[#575d7a]">
-                <ThumbsUp class="w-3.5 h-3.5" /> Yes
+                <ThumbsUp class="w-3.5 h-3.5 text-emerald-600" /> Yes
               </button>
               <button class="px-5 py-1.5 border border-[#c4c5d9] dark:border-slate-700 rounded-lg text-xs font-semibold flex items-center gap-1.5 text-[#575d7a]">
-                <ThumbsDown class="w-3.5 h-3.5" /> No
+                <ThumbsDown class="w-3.5 h-3.5 text-rose-600" /> No
               </button>
             </div>
           </div>
@@ -622,27 +927,102 @@ function goToPortal() {
 
     </div>
 
-    <!-- 4. EMPLOYEE LIVE PREVIEW MODAL -->
+    <!-- ======================================================== -->
+    <!-- MODAL: ATTACH GAMBAR (UPLOAD FILE / INSERT URL)          -->
+    <!-- ======================================================== -->
     <div
-      v-if="isPreviewModalOpen"
+      v-if="isImageModalOpen"
       class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs"
     >
-      <div class="relative w-full max-w-4xl max-h-[90vh] bg-white dark:bg-slate-900 border border-[#c4c5d9] dark:border-slate-800 rounded-2xl shadow-2xl overflow-hidden flex flex-col">
-        <div class="px-6 py-4 border-b border-[#e2e2e4] dark:border-slate-800 flex items-center justify-between bg-[#f8fafc] dark:bg-slate-950">
+      <div class="bg-white dark:bg-slate-900 border border-[#c4c5d9] dark:border-slate-800 rounded-2xl w-full max-w-md shadow-2xl overflow-hidden">
+        <div class="p-4 border-b border-[#e2e2e4] dark:border-slate-800 flex items-center justify-between">
+          <div class="flex items-center gap-2 text-xs font-bold text-[#1a1c1d] dark:text-slate-100">
+            <ImageIcon class="w-4 h-4 text-[#0040e5] dark:text-indigo-400" />
+            <span>Sisipkan Gambar ke Artikel</span>
+          </div>
+          <button @click="isImageModalOpen = false" class="p-1 rounded text-slate-400 hover:text-slate-600 cursor-pointer">
+            <X class="w-4 h-4" />
+          </button>
+        </div>
+
+        <div class="p-5 space-y-4 text-xs">
+          <!-- Option 1: Upload from Computer -->
+          <div class="p-4 rounded-xl border border-dashed border-[#c4c5d9] dark:border-slate-700 bg-[#f8fafc] dark:bg-slate-800/60 text-center space-y-2">
+            <Upload class="w-6 h-6 text-[#0040e5] mx-auto opacity-80" />
+            <p class="font-semibold text-slate-800 dark:text-slate-200">Upload dari Komputer / Laptop</p>
+            <p class="text-[11px] text-slate-500">Mendukung format PNG, JPG, WebP, GIF</p>
+            <button
+              @click="triggerImagePicker(); isImageModalOpen = false;"
+              class="px-4 py-2 bg-[#0040e5] hover:bg-[#0034bf] text-white rounded-lg font-semibold shadow-xs transition-colors cursor-pointer"
+            >
+              Pilih File Gambar
+            </button>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <div class="h-px bg-slate-200 dark:bg-slate-700 flex-1"></div>
+            <span class="text-[10px] text-slate-400 uppercase font-bold">atau link web</span>
+            <div class="h-px bg-slate-200 dark:bg-slate-700 flex-1"></div>
+          </div>
+
+          <!-- Option 2: Insert from URL -->
+          <div class="space-y-2">
+            <label class="block text-[11px] font-semibold text-slate-700 dark:text-slate-300">
+              Masukkan URL Gambar:
+            </label>
+            <div class="flex gap-2">
+              <input
+                v-model="imageUrlInput"
+                type="text"
+                placeholder="https://example.com/screenshot.png"
+                class="flex-1 bg-[#f8fafc] dark:bg-slate-800 border border-[#c4c5d9] dark:border-slate-700 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-[#0040e5]"
+                @keydown.enter="insertImageUrl"
+              />
+              <button
+                @click="insertImageUrl"
+                class="px-3 py-2 bg-slate-800 dark:bg-slate-700 text-white rounded-lg font-semibold text-xs hover:bg-slate-900 transition-colors cursor-pointer"
+              >
+                Sisipkan
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-3 border-t border-[#e2e2e4] dark:border-slate-800 flex justify-end bg-[#f8fafc] dark:bg-slate-950/40">
+          <button
+            @click="isImageModalOpen = false"
+            class="px-4 py-1.5 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+          >
+            Tutup
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. EMPLOYEE LIVE PREVIEW MODAL (100% REAL CASE READER VIEW) -->
+    <div
+      v-if="isPreviewModalOpen"
+      class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-950/80 backdrop-blur-sm"
+    >
+      <div class="relative w-full max-w-5xl h-[92vh] bg-[#F1F5F9] dark:bg-[#0B1120] border border-[#c4c5d9] dark:border-slate-800 rounded-2xl shadow-2xl overflow-hidden flex flex-col">
+        <div class="px-6 py-3.5 border-b border-[#e2e2e4] dark:border-slate-800 flex items-center justify-between bg-white dark:bg-slate-900 shrink-0">
           <div class="flex items-center gap-2 text-xs font-bold text-[#0040e5] dark:text-indigo-400">
             <Eye class="w-4 h-4" />
-            <span>Employee View Preview</span>
+            <span>Employee Live View (Tampilan Aktual Pembaca SOP)</span>
           </div>
-          <button @click="isPreviewModalOpen = false" class="p-1 rounded-lg text-[#575d7a] hover:bg-[#edeef0] dark:hover:bg-slate-800">
+          <button
+            @click="isPreviewModalOpen = false"
+            class="p-1.5 rounded-lg text-[#575d7a] hover:bg-[#edeef0] dark:hover:bg-slate-800 cursor-pointer"
+            title="Tutup Preview"
+          >
             <X class="w-5 h-5" />
           </button>
         </div>
 
-        <div class="flex-1 overflow-y-auto p-8 space-y-6">
-          <h1 class="text-3xl font-extrabold text-[#1a1c1d] dark:text-slate-100">{{ doc.title }}</h1>
-          <p class="text-sm text-[#434656] dark:text-slate-300 p-4 rounded-xl bg-[#f2f1ff] dark:bg-indigo-950/30 border border-[#c4c5d9] dark:border-indigo-500/20 italic">{{ doc.summary }}</p>
-          
-          <div class="prose prose-slate dark:prose-invert max-w-none text-xs sm:text-sm" v-html="editor?.getHTML()"></div>
+        <div class="flex-1 overflow-y-auto p-4 sm:p-8 flex justify-center">
+          <div class="w-full max-w-4xl bg-white dark:bg-[#1E293B] rounded-2xl border border-[#c4c5d9] dark:border-slate-700 shadow-md min-h-full">
+            <CaseReader :case-item="previewCaseItem" />
+          </div>
         </div>
       </div>
     </div>

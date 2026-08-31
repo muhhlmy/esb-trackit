@@ -21,7 +21,7 @@ const props = defineProps({
   }
 });
 
-// Category distribution Chart
+// Category distribution Bar Chart
 const categoryChartData = computed(() => {
   const categories = props.stats.categories || {};
   const labels = Object.keys(categories);
@@ -31,7 +31,7 @@ const categoryChartData = computed(() => {
     labels: labels.map((l) => l.toUpperCase()),
     datasets: [
       {
-        label: 'Jumlah SOP',
+        label: 'Jumlah Artikel FAQ',
         backgroundColor: [
           '#6366f1', // Indigo
           '#06b6d4', // Cyan
@@ -47,22 +47,28 @@ const categoryChartData = computed(() => {
   };
 });
 
-// Severity distribution Chart
-const severityChartData = computed(() => {
-  const sev = props.stats.severities || {};
+// Category Share Doughnut Chart
+const categoryShareData = computed(() => {
+  const categories = props.stats.categories || {};
+  const labels = Object.keys(categories);
+  const data = Object.values(categories);
+
   return {
-    labels: ['High', 'Medium', 'Low'],
+    labels: labels.map((l) => l.charAt(0).toUpperCase() + l.slice(1)),
     datasets: [
       {
         backgroundColor: [
-          '#f43f5e', // Rose
-          '#f59e0b', // Amber
-          '#10b981'  // Emerald
+          '#6366f1',
+          '#06b6d4',
+          '#10b981',
+          '#f59e0b',
+          '#ec4899',
+          '#8b5cf6'
         ],
         borderColor: '#0f172a',
         borderWidth: 3,
         hoverOffset: 6,
-        data: [sev.high || 0, sev.medium || 0, sev.low || 0]
+        data
       }
     ]
   };
@@ -118,7 +124,7 @@ const doughnutOptions = {
     <!-- Top Summary KPI Cards -->
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
       <div class="p-5 rounded-2xl bg-slate-900/60 border border-slate-800">
-        <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total SOP / Cases</p>
+        <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Artikel FAQ</p>
         <p class="text-3xl font-extrabold text-slate-100 mt-2">{{ stats.summary?.totalCases || 0 }}</p>
       </div>
 
@@ -128,13 +134,13 @@ const doughnutOptions = {
       </div>
 
       <div class="p-5 rounded-2xl bg-slate-900/60 border border-slate-800">
-        <p class="text-xs font-semibold text-emerald-400 uppercase tracking-wider">Templates Hub</p>
-        <p class="text-3xl font-extrabold text-emerald-300 mt-2">{{ stats.summary?.totalTemplates || 0 }}</p>
+        <p class="text-xs font-semibold text-amber-400 uppercase tracking-wider">FAQ di Homepage</p>
+        <p class="text-3xl font-extrabold text-amber-300 mt-2">{{ stats.summary?.totalFaqs || 0 }}</p>
       </div>
 
       <div class="p-5 rounded-2xl bg-slate-900/60 border border-slate-800">
-        <p class="text-xs font-semibold text-amber-400 uppercase tracking-wider">Custom SOPs</p>
-        <p class="text-3xl font-extrabold text-amber-300 mt-2">{{ stats.summary?.customCasesCount || 0 }}</p>
+        <p class="text-xs font-semibold text-emerald-400 uppercase tracking-wider">Custom FAQ Articles</p>
+        <p class="text-3xl font-extrabold text-emerald-300 mt-2">{{ stats.summary?.customCasesCount || 0 }}</p>
       </div>
     </div>
 
@@ -143,17 +149,17 @@ const doughnutOptions = {
       
       <!-- Category Breakdown (Bar) -->
       <div class="p-6 rounded-2xl bg-slate-900/60 border border-slate-800 space-y-4">
-        <h3 class="text-sm font-bold text-slate-200">Distribusi SOP berdasarkan Kategori</h3>
+        <h3 class="text-sm font-bold text-slate-200">Distribusi Artikel per Kategori</h3>
         <div class="h-64 relative">
           <Bar :data="categoryChartData" :options="chartOptions" />
         </div>
       </div>
 
-      <!-- Severity Breakdown (Doughnut) -->
+      <!-- Category Share (Doughnut) -->
       <div class="p-6 rounded-2xl bg-slate-900/60 border border-slate-800 space-y-4">
-        <h3 class="text-sm font-bold text-slate-200">Tingkat Keparahan (Severity Breakdown)</h3>
+        <h3 class="text-sm font-bold text-slate-200">Proporsi Kategori Solusi</h3>
         <div class="h-64 relative">
-          <Doughnut :data="severityChartData" :options="doughnutOptions" />
+          <Doughnut :data="categoryShareData" :options="doughnutOptions" />
         </div>
       </div>
 

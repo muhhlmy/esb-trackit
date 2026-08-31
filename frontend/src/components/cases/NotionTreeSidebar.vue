@@ -1,8 +1,8 @@
 <script setup>
 import { ref, computed } from 'vue';
+import { RouterLink } from 'vue-router';
 import { useCases } from '@/composables/useCases';
 import { useAuth } from '@/composables/useAuth';
-import { useBookmarks } from '@/composables/useBookmarks';
 import {
   Search,
   ChevronRight,
@@ -10,8 +10,6 @@ import {
   Folder,
   FolderOpen,
   FileText,
-  Plus,
-  Bookmark,
   Laptop,
   AppWindow,
   ShieldCheck,
@@ -34,11 +32,9 @@ const emit = defineEmits(['toggleCollapse']);
 const {
   cases,
   activeCaseId,
-  selectCase,
-  openCreateDrawer
+  selectCase
 } = useCases();
 
-const { isBookmarked } = useBookmarks();
 const { isCrudUnlocked } = useAuth();
 
 const sidebarSearch = ref('');
@@ -177,34 +173,21 @@ function handleSelectCase(id) {
               />
               <span class="truncate text-xs leading-snug">{{ item.title }}</span>
             </div>
-
-            <div class="flex items-center gap-1 shrink-0">
-              <span
-                v-if="isBookmarked(item.id)"
-                class="w-1.5 h-1.5 rounded-full bg-[#0040e5] dark:bg-indigo-400"
-                title="Bookmarked"
-              ></span>
-            </div>
           </button>
         </div>
       </div>
 
     </div>
 
-    <!-- Pinned Bottom Action Button -->
-    <div class="p-3 border-t border-[#e2e2e4] dark:border-slate-800/80 bg-white dark:bg-slate-950">
-      <button
-        v-if="isCrudUnlocked"
-        @click="openCreateDrawer"
+    <!-- Pinned Bottom Action Button (When Admin is Active) -->
+    <div v-if="isCrudUnlocked" class="p-3 border-t border-[#e2e2e4] dark:border-slate-800/80 bg-white dark:bg-slate-950">
+      <RouterLink
+        to="/admin"
         class="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-xs font-semibold bg-[#0040e5] hover:bg-[#0034bf] text-white shadow-sm shadow-[#0040e5]/20 transition-all cursor-pointer"
       >
-        <Plus class="w-4 h-4" />
-        <span>New Documentation / SOP</span>
-      </button>
-
-      <div v-else class="text-[11px] text-center text-[#575d7a] dark:text-slate-500 py-1">
-        <span>Klik logo 5x untuk mode edit</span>
-      </div>
+        <FileText class="w-4 h-4" />
+        <span>Kelola Dokumen di CMS</span>
+      </RouterLink>
     </div>
   </aside>
 </template>

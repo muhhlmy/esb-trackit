@@ -236,87 +236,88 @@ pause`
   }
 ];
 
-const SEED_TEMPLATES = [
-  {
-    id: 'tpl-standup',
-    title: 'Daily Standup Report',
-    category: 'Standup & Reporting',
-    content: `📌 **Daily Update - [Nama Kamu]** (Intern Software Engineer)\nTanggal: [DD/MM/YYYY]\n\n✅ **Yesterday / Completed:**\n- Selesai slicing UI halaman Dashboard Analytics (TASK-101)\n- Integrasi API Get User Profile & test case status code 200\n\n🎯 **Today / Planned:**\n- Mengerjakan fitur Filter Date Range di Dashboard Analytics (TASK-102)\n- Unit testing pada komponen chart\n\n🚧 **Blockers / Impediments:**\n- None`
-  },
-  {
-    id: 'tpl-stuck',
-    title: 'Bertanya Saat Stuck (15-Min Rule)',
-    category: 'Question & Support',
-    content: `Selamat pagi/siang Mas/Mbak [Nama Mentor], izin bertanya terkait task [Nama Task/Tiket]:\nSaya sedang mencoba [tujuan fitur], namun saat ini mengalami kendala [ringkasan error/behavior yang salah].\n\nBeberapa hal yang sudah saya coba perbaiki:\n1. [Langkah 1 yang sudah dicoba]\n2. [Langkah 2 yang sudah dicoba]\n\nBerikut saya lampirkan screenshot log error-nya. Jika Mas/Mbak ada waktu luang nanti, boleh minta arahan sebentar? Terima kasih banyak!`
-  },
-  {
-    id: 'tpl-pr',
-    title: 'Pull Request (PR) Description',
-    category: 'Code Review',
-    content: `## 📝 Summary of Changes\n- Implemented [Nama Fitur / Tiket ID]\n- Added responsive layout for mobile viewport\n- Integrated API endpoint POST /api/v1/resource\n\n## 🧪 How Has This Been Tested?\n- [x] Tested locally on Chrome & Firefox\n- [x] Verified unit tests passing (\`npm run test\`)\n- [x] Checked console for zero warnings/errors\n\n## 📸 Screenshots / GIFs\n(Attach screenshots here)\n\n## 📌 Checklist\n- [x] Followed team code style guidelines\n- [x] Self-reviewed code before requesting review`
-  },
-  {
-    id: 'tpl-bug-report',
-    title: 'Laporan Bug ke Tim Backend / QA',
-    category: 'Bug Report',
-    content: `🚨 **Bug Report / Staging Issue**\n- **Feature / Area:** [Nama Halaman / Module]\n- **Environment:** Staging / Local Dev\n- **Endpoint / Action:** [POST /api/v1/example]\n- **Expected Behavior:** [Hasil yang seharusnya]\n- **Actual Behavior:** [Hasil error / 500 status]\n- **Payload & Response:** \n  \`\`\`json\n  { "error": "Internal Server Error", "code": 500 }\n  \`\`\`\n- **Note:** Mohon konfirmasi apakah endpoint ini sedang ada perbaikan DB. Terima kasih!`
-  }
-];
-
 async function main() {
   console.log('🌱 Starting Database Seeding with Prisma...');
 
-  // 1. Seed Cases
-  for (const caseData of SEED_CASES) {
+  // 1. Seed FAQ Articles
+  for (let i = 0; i < SEED_CASES.length; i++) {
+    const caseData = SEED_CASES[i];
     await prisma.case.upsert({
       where: { id: caseData.id },
       update: {
         title: caseData.title,
         category: caseData.category,
-        severity: caseData.severity,
         tags: caseData.tags,
         summary: caseData.summary,
         problemContext: caseData.problemContext,
         actionSteps: caseData.actionSteps,
         dosAndDonts: caseData.dosAndDonts,
         snippets: caseData.snippets,
-        isCustom: caseData.isCustom
+        isCustom: caseData.isCustom,
+        isFeaturedOnHome: i < 5, // Top 5 featured on homepage by default
+        homeOrder: i,
+        isPublished: true
       },
       create: {
         id: caseData.id,
         title: caseData.title,
         category: caseData.category,
-        severity: caseData.severity,
         tags: caseData.tags,
         summary: caseData.summary,
         problemContext: caseData.problemContext,
         actionSteps: caseData.actionSteps,
         dosAndDonts: caseData.dosAndDonts,
         snippets: caseData.snippets,
-        isCustom: caseData.isCustom
+        isCustom: caseData.isCustom,
+        isFeaturedOnHome: i < 5,
+        homeOrder: i,
+        isPublished: true
       }
     });
   }
-  console.log(`✅ Seeded ${SEED_CASES.length} Cases`);
+  console.log(`✅ Seeded ${SEED_CASES.length} FAQ Articles (Top 5 Featured on Homepage)`);
 
-  // 2. Seed Templates
-  for (const tpl of SEED_TEMPLATES) {
-    await prisma.template.upsert({
-      where: { id: tpl.id },
-      update: {
-        title: tpl.title,
-        category: tpl.category,
-        content: tpl.content
-      },
-      create: {
-        id: tpl.id,
-        title: tpl.title,
-        category: tpl.category,
-        content: tpl.content
-      }
-    });
+  // 2. Seed initial interaction logs for realistic 30-day popularity ranking
+  const now = new Date();
+  const sampleInteractions = [
+    // google-workspace-02: Password Reset (High Popularity)
+    ...Array(35).fill({ caseId: 'google-workspace-02', type: 'view' }),
+    ...Array(20).fill({ caseId: 'google-workspace-02', type: 'click' }),
+    ...Array(15).fill({ caseId: 'google-workspace-02', type: 'helpful' }),
+    // laptop-01: Laptop Setup
+    ...Array(28).fill({ caseId: 'laptop-01', type: 'view' }),
+    ...Array(16).fill({ caseId: 'laptop-01', type: 'click' }),
+    ...Array(10).fill({ caseId: 'laptop-01', type: 'helpful' }),
+    // laptop-02: Laptop Re-use
+    ...Array(22).fill({ caseId: 'laptop-02', type: 'view' }),
+    ...Array(12).fill({ caseId: 'laptop-02', type: 'click' }),
+    ...Array(8).fill({ caseId: 'laptop-02', type: 'helpful' }),
+    // hp-01: Phone Setup
+    ...Array(18).fill({ caseId: 'hp-01', type: 'view' }),
+    ...Array(9).fill({ caseId: 'hp-01', type: 'click' }),
+    ...Array(6).fill({ caseId: 'hp-01', type: 'helpful' }),
+    // google-workspace-01: Account Creation
+    ...Array(14).fill({ caseId: 'google-workspace-01', type: 'view' }),
+    ...Array(6).fill({ caseId: 'google-workspace-01', type: 'click' }),
+    ...Array(4).fill({ caseId: 'google-workspace-01', type: 'helpful' })
+  ];
+
+  // Only create sample interactions if table is empty
+  const interactionCount = await prisma.caseInteraction.count();
+  if (interactionCount === 0) {
+    for (const inter of sampleInteractions) {
+      const daysAgo = Math.floor(Math.random() * 20);
+      const createdAt = new Date(now.getTime() - daysAgo * 24 * 60 * 60 * 1000);
+      await prisma.caseInteraction.create({
+        data: {
+          caseId: inter.caseId,
+          type: inter.type,
+          createdAt
+        }
+      });
+    }
+    console.log(`✅ Seeded ${sampleInteractions.length} sample Case interactions for 30-day popularity ranking`);
   }
-  console.log(`✅ Seeded ${SEED_TEMPLATES.length} Templates`);
 
   // 3. Seed Admin User
   const adminPassword = await bcrypt.hash('admin123', 10);

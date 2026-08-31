@@ -179,3 +179,184 @@
 .dark .tiptap a {
   color: #818cf8;
 }
+
+/* Callout Cards & Dismiss Button */
+.callout-card {
+  position: relative;
+  border-radius: 0.75rem;
+  padding: 1rem 1.25rem;
+  margin: 1.25rem 0;
+  border: 1px solid;
+  transition: all 0.2s ease;
+}
+
+.callout-card .callout-close-btn {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 0.375rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.875rem;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  opacity: 0.7;
+  transition: all 0.15s ease;
+}
+
+.callout-card .callout-close-btn:hover {
+  opacity: 1;
+  background-color: rgba(244, 63, 94, 0.15);
+  color: #e11d48;
+}
+
+.callout-info {
+  background-color: #eff6ff;
+  border-color: #bfdbfe;
+  color: #1e3a8a;
+}
+.dark .callout-info {
+  background-color: rgba(30, 58, 138, 0.25);
+  border-color: rgba(59, 130, 246, 0.4);
+  color: #bfdbfe;
+}
+
+.callout-warning {
+  background-color: #fffbeb;
+  border-color: #fde68a;
+  color: #78350f;
+}
+.dark .callout-warning {
+  background-color: rgba(120, 53, 15, 0.25);
+  border-color: rgba(245, 158, 11, 0.4);
+  color: #fde68a;
+}
+
+/* DOs (Best Practices) Card - Emerald */
+.callout-dos {
+  background-color: #ecfdf5;
+  border-color: #a7f3d0;
+  color: #065f46;
+}
+.dark .callout-dos {
+  background-color: rgba(6, 95, 70, 0.25);
+  border-color: rgba(16, 185, 129, 0.4);
+  color: #a7f3d0;
+}
+
+/* DON'Ts (Peringatan/Larangan) Card - Rose */
+.callout-donts {
+  background-color: #fff1f2;
+  border-color: #fecdd3;
+  color: #9f1239;
+}
+.dark .callout-donts {
+  background-color: rgba(159, 18, 57, 0.25);
+  border-color: rgba(244, 63, 94, 0.4);
+  color: #fecdd3;
+}
+
+/* Problem Context Card - Slate */
+.callout-context {
+  background-color: #f8fafc;
+  border-color: #e2e8f0;
+  color: #334155;
+}
+.dark .callout-context {
+  background-color: rgba(30, 41, 59, 0.5);
+  border-color: rgba(71, 85, 105, 0.4);
+  color: #cbd5e1;
+}
+
+/* TipTap & Prose Ordered Steps Styling */
+.tiptap ol,
+.prose ol {
+  counter-reset: custom-step;
+  list-style: none !important;
+  padding-left: 0 !important;
+  margin: 1.25rem 0 !important;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.tiptap ol > li,
+.prose ol > li {
+  counter-increment: custom-step;
+  position: relative;
+  padding: 0.875rem 1rem 0.875rem 3.25rem;
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+  margin: 0 !important;
+  line-height: 1.6;
+}
+.dark .tiptap ol > li,
+.dark .prose ol > li {
+  background-color: #0f172a;
+  border-color: #334155;
+}
+
+.tiptap ol > li::before,
+.prose ol > li::before {
+  content: counter(custom-step);
+  position: absolute;
+  left: 0.875rem;
+  top: 0.875rem;
+  width: 1.5rem;
+  height: 1.5rem;
+  background-color: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  color: #0040e5;
+  font-weight: 700;
+  font-size: 0.75rem;
+  border-radius: 0.375rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.dark .tiptap ol > li::before,
+.dark .prose ol > li::before {
+  background-color: #1e293b;
+  border-color: #475569;
+  color: #818cf8;
+}
+
+/* TipTap Image Styling */
+.tiptap img,
+.prose img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.75rem;
+  margin: 1.25rem 0;
+  border: 1px solid #e2e2e4;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+}
+.dark .tiptap img,
+.dark .prose img {
+  border-color: #334155;
+}
+
+/* Summary Block Card Styling for Reader & Content */
+.summary-block-card {
+  position: relative;
+  background-color: #f8fafc;
+  border: 1px solid #c4c5d9;
+  border-radius: 0.75rem;
+  padding: 1rem 1.25rem;
+  margin: 1.25rem 0;
+  border-left: 4px solid #0040e5;
+  font-style: italic;
+  color: #434656;
+}
+.dark .summary-block-card {
+  background-color: #0f172a;
+  border-color: #334155;
+  border-left-color: #6366f1;
+  color: #cbd5e1;
+}

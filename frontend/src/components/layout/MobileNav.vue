@@ -28,22 +28,13 @@ const { isCrudUnlocked } = useAuth();
       <span class="text-[10px]">Cases</span>
     </RouterLink>
 
-    <button
+    <RouterLink
       v-if="isCrudUnlocked"
-      @click="openCreateDrawer"
+      to="/admin/editor"
       class="flex flex-col items-center justify-center -mt-4 w-11 h-11 rounded-full bg-indigo-600 text-white shadow-lg shadow-indigo-600/40 hover:bg-indigo-500 transition-transform active:scale-95"
-      title="Create New Case"
+      title="Create New Case in DocEditor"
     >
       <Plus class="w-5 h-5" />
-    </button>
-
-    <RouterLink
-      to="/templates"
-      class="flex flex-col items-center gap-1 p-2 rounded-xl text-slate-400 hover:text-white transition-colors"
-      active-class="text-indigo-400 font-semibold"
-    >
-      <FileText class="w-4 h-4" />
-      <span class="text-[10px]">Templates</span>
     </RouterLink>
 
     <RouterLink

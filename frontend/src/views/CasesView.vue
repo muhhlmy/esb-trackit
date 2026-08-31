@@ -1,15 +1,14 @@
 <script setup>
 import { ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 import { useCases } from '@/composables/useCases';
 import NotionTreeSidebar from '@/components/cases/NotionTreeSidebar.vue';
 import CaseReader from '@/components/cases/CaseReader.vue';
-import CaseDrawer from '@/components/cases/CaseDrawer.vue';
 import { PanelLeft, PanelLeftClose, Menu, X, ArrowLeft } from 'lucide-vue-next';
 
+const router = useRouter();
 const {
   activeCase,
-  openEditDrawer,
-  openCreateDrawer,
   fetchCases
 } = useCases();
 
@@ -18,6 +17,15 @@ const isMobileSidebarOpen = ref(false);
 
 function toggleSidebar() {
   isSidebarCollapsed.value = !isSidebarCollapsed.value;
+}
+
+function openEditInCms(item) {
+  const id = item?.id || activeCase.value?.id;
+  if (id) {
+    router.push(`/admin/editor/${id}`);
+  } else {
+    router.push('/admin/editor');
+  }
 }
 
 onMounted(() => {
@@ -90,29 +98,16 @@ onMounted(() => {
             <span>Pilih SOP</span>
           </button>
         </div>
-
-        <div class="flex items-center gap-2">
-          <button
-            @click="openCreateDrawer"
-            class="inline-flex items-center gap-1.5 py-1 px-2.5 rounded-lg bg-[#f2f1ff] dark:bg-indigo-950/40 text-[#0040e5] dark:text-indigo-300 font-semibold border border-[#c4c5d9] dark:border-indigo-500/30 hover:bg-[#edeef0] transition-colors cursor-pointer"
-          >
-            <span>+ New Doc</span>
-          </button>
-        </div>
       </div>
 
       <!-- Main Dynamic Document Reader -->
       <div class="flex-1 overflow-y-auto">
         <CaseReader
           :case-item="activeCase"
-          @edit="openEditDrawer"
-          @submit-ticket="openCreateDrawer"
+          @edit="openEditInCms"
         />
       </div>
 
     </main>
-
-    <!-- Side Drawer for Create/Edit -->
-    <CaseDrawer />
   </div>
 </template>

@@ -41,12 +41,6 @@ const categories = [
   { id: 'devops', label: 'Policies & SLAs' }
 ];
 
-const severities = [
-  { id: 'high', label: 'High Priority' },
-  { id: 'medium', label: 'Medium Priority' },
-  { id: 'low', label: 'Low Priority' }
-];
-
 function addTag() {
   const val = newTagInput.value.trim().toLowerCase();
   if (val && !props.modelValue.tags?.includes(val)) {
@@ -162,25 +156,6 @@ function toggleSwitch(key) {
           </div>
         </div>
 
-        <!-- Severity -->
-        <div class="space-y-1.5">
-          <label class="block text-[11px] font-bold uppercase tracking-wider text-[#575d7a] dark:text-slate-400">
-            Severity / Priority
-          </label>
-          <div class="relative">
-            <select
-              :value="modelValue.severity"
-              @change="$emit('update:modelValue', { ...modelValue, severity: $event.target.value })"
-              class="w-full bg-[#f8fafc] dark:bg-slate-800 border border-[#c4c5d9] dark:border-slate-700 rounded-lg py-2 pl-3 pr-8 text-xs text-[#1a1c1d] dark:text-slate-100 appearance-none focus:outline-none focus:border-[#0040e5]"
-            >
-              <option v-for="s in severities" :key="s.id" :value="s.id">
-                {{ s.label }}
-              </option>
-            </select>
-            <ChevronDown class="w-4 h-4 text-[#575d7a] absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-          </div>
-        </div>
-
         <!-- URL Slug -->
         <div class="space-y-1.5">
           <label class="block text-[11px] font-bold uppercase tracking-wider text-[#575d7a] dark:text-slate-400">
@@ -203,55 +178,55 @@ function toggleSwitch(key) {
 
       <!-- TAB 2: VISIBILITY & TOGGLES -->
       <div v-if="activeTab === 'visibility'" class="space-y-4">
-        <!-- Feature as Trending Toggle -->
-        <div class="flex items-center justify-between p-3 rounded-lg bg-[#f8fafc] dark:bg-slate-800/60 border border-[#e2e2e4] dark:border-slate-700">
+        <!-- Feature on Homepage FAQ Toggle -->
+        <div class="flex items-center justify-between p-3 rounded-lg bg-amber-50/60 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/50">
           <div>
-            <span class="text-xs font-semibold text-[#1a1c1d] dark:text-slate-100 flex items-center gap-1.5">
+            <span class="text-xs font-semibold text-amber-900 dark:text-amber-300 flex items-center gap-1.5">
               <Flame class="w-3.5 h-3.5 text-amber-500" />
-              <span>Feature as Trending</span>
+              <span>Tampil di Homepage FAQ</span>
             </span>
-            <span class="text-[10px] text-[#575d7a] dark:text-slate-400 block mt-0.5">Pin to top of category hub</span>
+            <span class="text-[10px] text-amber-700 dark:text-amber-400/80 block mt-0.5">Munculkan di accordion FAQ beranda</span>
           </div>
           <button
             type="button"
-            @click="toggleSwitch('isTrending')"
+            @click="toggleSwitch('isFeaturedOnHome')"
             class="relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none"
-            :class="modelValue.isTrending ? 'bg-[#0040e5]' : 'bg-[#c4c5d9] dark:bg-slate-700'"
+            :class="modelValue.isFeaturedOnHome ? 'bg-amber-500' : 'bg-[#c4c5d9] dark:bg-slate-700'"
           >
             <span
               class="pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow transition duration-200 ease-in-out"
-              :class="modelValue.isTrending ? 'translate-x-4' : 'translate-x-0'"
+              :class="modelValue.isFeaturedOnHome ? 'translate-x-4' : 'translate-x-0'"
             ></span>
           </button>
         </div>
 
-        <!-- SSO Required Toggle -->
+        <!-- Published Status Toggle -->
         <div class="flex items-center justify-between p-3 rounded-lg bg-[#f8fafc] dark:bg-slate-800/60 border border-[#e2e2e4] dark:border-slate-700">
           <div>
             <span class="text-xs font-semibold text-[#1a1c1d] dark:text-slate-100 flex items-center gap-1.5">
-              <Lock class="w-3.5 h-3.5 text-[#0040e5]" />
-              <span>SSO / Auth Required</span>
+              <Eye class="w-3.5 h-3.5 text-[#0040e5]" />
+              <span>Status Publikasi</span>
             </span>
-            <span class="text-[10px] text-[#575d7a] dark:text-slate-400 block mt-0.5">Restrict to internal corporate only</span>
+            <span class="text-[10px] text-[#575d7a] dark:text-slate-400 block mt-0.5">Dapat diakses oleh seluruh karyawan</span>
           </div>
           <button
             type="button"
-            @click="toggleSwitch('isSsoRequired')"
+            @click="toggleSwitch('isPublished')"
             class="relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none"
-            :class="modelValue.isSsoRequired ? 'bg-[#0040e5]' : 'bg-[#c4c5d9] dark:bg-slate-700'"
+            :class="modelValue.isPublished !== false ? 'bg-[#0040e5]' : 'bg-[#c4c5d9] dark:bg-slate-700'"
           >
             <span
               class="pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow transition duration-200 ease-in-out"
-              :class="modelValue.isSsoRequired ? 'translate-x-4' : 'translate-x-0'"
+              :class="modelValue.isPublished !== false ? 'translate-x-4' : 'translate-x-0'"
             ></span>
           </button>
         </div>
 
-        <!-- Custom SOP Indicator -->
+        <!-- Custom FAQ Indicator -->
         <div class="p-3 rounded-lg bg-[#f2f1ff] dark:bg-indigo-950/30 border border-[#c4c5d9] dark:border-indigo-500/20 text-xs">
-          <span class="font-bold text-[#0040e5] dark:text-indigo-400 block mb-1">Status Dokumen:</span>
+          <span class="font-bold text-[#0040e5] dark:text-indigo-400 block mb-1">Status Artikel:</span>
           <p class="text-[11px] text-[#575d7a] dark:text-slate-300">
-            {{ modelValue.isCustom ? 'Custom Case (Dapat diedit & dihapus bebas oleh admin).' : 'Built-in Corporate SOP (Template bawaan sistem).' }}
+            {{ modelValue.isCustom ? 'Custom FAQ (Dapat diedit & dihapus bebas oleh admin).' : 'Built-in Corporate FAQ (Artikel bawaan sistem).' }}
           </p>
         </div>
       </div>

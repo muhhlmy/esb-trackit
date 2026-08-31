@@ -1,7 +1,6 @@
 <script setup>
 import { computed } from 'vue';
-import { useBookmarks } from '@/composables/useBookmarks';
-import { AlertCircle, Tag, Bookmark, ChevronRight } from 'lucide-vue-next';
+import { Tag, ChevronRight } from 'lucide-vue-next';
 
 const props = defineProps({
   caseItem: {
@@ -15,19 +14,6 @@ const props = defineProps({
 });
 
 defineEmits(['select']);
-
-const { isBookmarked, toggleBookmark } = useBookmarks();
-
-const severityClass = computed(() => {
-  switch (props.caseItem.severity?.toLowerCase()) {
-    case 'high':
-      return 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20';
-    case 'medium':
-      return 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20';
-    default:
-      return 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20';
-  }
-});
 </script>
 
 <template>
@@ -38,29 +24,11 @@ const severityClass = computed(() => {
       ? 'bg-[#f2f1ff] dark:bg-indigo-950/40 border-[#0040e5] dark:border-indigo-500 ring-1 ring-[#0040e5] dark:ring-indigo-500/50'
       : 'bg-white dark:bg-slate-900/60 hover:bg-[#f9f9fb] dark:hover:bg-slate-900 border-[#e2e2e4] dark:border-slate-800'"
   >
-    <!-- Header: Severity, Category, Bookmark -->
+    <!-- Header: Category -->
     <div class="flex items-center justify-between gap-2 mb-2">
-      <div class="flex items-center gap-2">
-        <span
-          class="px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider border flex items-center gap-1"
-          :class="severityClass"
-        >
-          <AlertCircle class="w-2.5 h-2.5" />
-          {{ caseItem.severity }}
-        </span>
-        <span class="text-[11px] text-[#575d7a] dark:text-slate-400 capitalize font-medium">
-          {{ caseItem.category }}
-        </span>
-      </div>
-
-      <button
-        @click.stop="toggleBookmark(caseItem.id)"
-        class="p-1 rounded-lg hover:bg-[#f3f3f5] dark:hover:bg-slate-800 text-[#575d7a] dark:text-slate-500 transition-colors cursor-pointer"
-        :class="{ 'text-[#0040e5] dark:text-indigo-400': isBookmarked(caseItem.id) }"
-        title="Bookmark case"
-      >
-        <Bookmark class="w-3.5 h-3.5" :fill="isBookmarked(caseItem.id) ? 'currentColor' : 'none'" />
-      </button>
+      <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-[#f2f1ff] dark:bg-indigo-950/40 text-[#0040e5] dark:text-indigo-400 capitalize border border-[#c4c5d9] dark:border-indigo-500/20">
+        {{ caseItem.category }}
+      </span>
     </div>
 
     <!-- Title -->

@@ -98,5 +98,5 @@ esb-case/
 - **Mode Admin / CRUD Tersembunyi**:
   - Klik **Logo ESB Case sebanyak 5x** untuk membuka tombol Create/Edit/Delete secara cepat.
   - Atau klik ikon **Login Admin** di sudut kanan atas header (Default: `admin` / `admin123`).
-- **Templates Hub**: Format komunikasi harian (Daily standup, 15-min stuck rule, PR description, bug report) dengan copy 1-klik.
-- **Analytics & Metrics**: Visualisasi data insiden & SOP dengan Chart.js.
+- **Interactive FAQs & Popular Quick Actions**: FAQ interaktif dengan tracking popularitas 30 hari dan rating kepuasan solutif.
+- **Analytics & Metrics**: Visualisasi data insiden, FAQ, dan distribusi SOP dengan Chart.js.

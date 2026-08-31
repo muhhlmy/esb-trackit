@@ -10,7 +10,7 @@ const { cases } = useCases();
 const statsData = ref({
   summary: {
     totalCases: 0,
-    totalTemplates: 4,
+    totalFaqs: 5,
     customCasesCount: 0,
     builtInCasesCount: 6
   },
@@ -47,7 +47,7 @@ async function loadStats() {
   statsData.value = {
     summary: {
       totalCases: cases.value.length,
-      totalTemplates: 4,
+      totalFaqs: 5,
       customCasesCount: custom,
       builtInCasesCount: cases.value.length - custom
     },

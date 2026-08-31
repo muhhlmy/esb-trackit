@@ -13,11 +13,12 @@ import CustomSelect from '../components/ui/CustomSelect.vue'
 import TicketCaspRating from '../components/tickets/TicketCaspRating.vue'
 import { animateStagger } from '../composables/useGsap.js'
 import BaseSkeleton from '../components/ui/skeleton/BaseSkeleton.vue'
+import AuthGateCard from '../components/common/AuthGateCard.vue'
 import SkeletonList from '../components/ui/skeleton/SkeletonList.vue'
 
 const route = useRoute()
 const { get, post, put, del } = useApi()
-const { user, isSuperAdmin, isAdmin, hasWritePermission } = useAuth()
+const { user, isAuthenticated, isSuperAdmin, isAdmin, hasWritePermission } = useAuth()
 
 const nowTick = ref(Date.now())
 let tickerInterval = null
@@ -1373,7 +1374,14 @@ function toast(message, type = 'success') {
 </script>
 
 <template>
-  <div class="flex min-w-0 flex-col gap-5" :data-testid="!isLoading ? 'page-ready' : undefined">
+  <div v-if="!isAuthenticated" class="max-w-2xl mx-auto py-12 px-4">
+    <AuthGateCard
+      title="Sign in required"
+      description="Please sign in to access your support tickets and create a support request."
+      button-text="Sign In to Access Tickets"
+    />
+  </div>
+  <div v-else class="flex min-w-0 flex-col gap-5" :data-testid="!isLoading ? 'page-ready' : undefined">
     <!-- Toast Notification -->
     <Transition name="slide-right">
       <div

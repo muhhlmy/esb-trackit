@@ -38,7 +38,12 @@ async function request(endpoint, options = {}) {
 }
 
 export const api = {
-  // Cases
+  // Cases — public Help Center (published only)
+  async getPublicCases() {
+    return request('/cases/public');
+  },
+
+  // Cases — admin CMS (all)
   async getCases(params = {}) {
     const query = new URLSearchParams();
     if (params.search) query.append('search', params.search);

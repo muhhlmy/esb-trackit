@@ -12,6 +12,10 @@ import { queueRouter }    from './queueRoutes.js'
 import { exportRouter }   from './exportRoutes.js'
 import importRouter       from './importRoutes.js'
 import { backupRouter }   from './backupRoutes.js'
+import { faqRouter }      from './faqRoutes.js'
+import { listPublicFaqs } from '../controllers/faqController.js'
+import { caseRouter }      from './caseRoutes.js'
+import { listPublicCases } from '../controllers/caseController.js'
 import authRoutes from './authRoutes.js'
 import { apiRateLimiter } from '../middleware/rateLimitMiddleware.js'
 
@@ -32,6 +36,14 @@ router.use('/api/assets_ops',    authenticateToken, opsAssetRouter) // Deprecate
 router.use('/api/tickets',       authenticateToken, ticketRouter)
 router.use('/api/ticket-queues', authenticateToken, queueRouter)
 router.use('/api/export',        authenticateToken, exportRouter)
+
+// Public Help Center FAQ (read-only, published only, no auth)
+router.get('/api/faqs/public',  listPublicFaqs)
+router.use('/api/faqs',         authenticateToken, faqRouter)
+
+// Public Help Center Cases/SOP (read-only, published only, no auth)
+router.get('/api/cases/public', listPublicCases)
+router.use('/api/cases',        authenticateToken, caseRouter)
 
 const requireAdmin = authorizeRoles('admin', 'super admin', 'superadmin')
 

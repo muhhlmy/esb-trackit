@@ -346,16 +346,6 @@ const severityClass = computed(() => {
           <MessageSquare class="w-3.5 h-3.5" />
           <span>Submit a Ticket</span>
         </button>
-
-        <a
-          href="https://wa.me/"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="px-4 py-2.5 rounded-lg text-xs font-semibold border border-[#c4c5d9] dark:border-slate-700 bg-white dark:bg-slate-800 text-[#1a1c1d] dark:text-slate-200 hover:bg-[#f3f3f5] transition-all flex items-center gap-1.5"
-        >
-          <Headphones class="w-3.5 h-3.5 text-[#0040e5]" />
-          <span>Live Agent</span>
-        </a>
       </div>
     </div>
 

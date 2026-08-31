@@ -121,6 +121,12 @@ const routes = [
     meta: { title: 'Pengguna', subtitle: 'Kelola data pengguna', permission: 'users' },
   },
   {
+    path: '/faqs',
+    name: 'faqs',
+    component: () => import('../views/FaqAdminView.vue'),
+    meta: { title: 'FAQ', subtitle: 'Kelola FAQ Help Center', permission: 'users' },
+  },
+  {
     path: '/submissions',
     alias: '/pengajuan',
     name: 'submissions',
@@ -204,7 +210,7 @@ router.beforeEach((to) => {
 
   // Jika halaman terproteksi dan belum login
   if (!token) {
-    return { name: 'login' }
+    return { name: 'login', query: { redirect: to.fullPath } }
   }
 
   const ticketEligibility = getTicketEligibility(user)

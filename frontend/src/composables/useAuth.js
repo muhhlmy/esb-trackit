@@ -26,6 +26,7 @@ export function useAuth() {
       ticketEligibility.value.role === TICKET_ROLES.ADMIN ||
       ticketEligibility.value.role === TICKET_ROLES.SUPERADMIN,
   )
+  const isCrudUnlocked = computed(() => isAdmin.value)
   const isUser = computed(() => ticketEligibility.value.role === TICKET_ROLES.REPORTER)
 
   const login = async (email, password, remember = false) => {
@@ -103,6 +104,7 @@ export function useAuth() {
     isAuthenticated,
     isSuperAdmin,
     isAdmin,
+    isCrudUnlocked,
     isUser,
     hasPermission,
     hasWritePermission,

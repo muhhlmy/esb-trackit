@@ -77,13 +77,11 @@ const handleLogin = async () => {
   errorMessage.value = ''
 
   try {
-    const response = await login(email.value, password.value, rememberMe.value)
+    await login(email.value, password.value, rememberMe.value)
 
-    if (response.user.role === 'user') {
-      router.push('/my-assets')
-    } else {
-      router.push('/')
-    }
+    // Langsung lempar ke /dashboard setelah login berhasil
+    const redirectPath = (router.currentRoute.value.query.redirect) || '/dashboard'
+    router.push(redirectPath)
   } catch (error) {
     errorMessage.value = error.message || 'Login gagal. Periksa kembali kredensial Anda.'
   } finally {

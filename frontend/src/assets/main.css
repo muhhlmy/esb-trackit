@@ -1,5 +1,9 @@
 @import 'tailwindcss';
 
+/* Enable class-based dark mode (Tailwind v4 — darkMode:"class" in config is a v3 no-op).
+   Without this, dark: utilities key off prefers-color-scheme instead of the .dark class. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   --color-primary: #2563eb;
   --color-primary-hover: #1d4ed8;

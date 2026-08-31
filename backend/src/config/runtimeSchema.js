@@ -195,6 +195,34 @@ const REQUIRED_RUNTIME_SCHEMA = Object.freeze({
     user_agent: optional('text'),
     created_at: nn('timestamp'),
   },
+  faq: {
+    id: nn('int4'),
+    question: nn('varchar'),
+    answer: nn('text'),
+    category: nn('varchar'),
+    status: nn('varchar'),
+    sort_order: nn('int4'),
+    created_at: nn('timestamp'),
+    updated_at: nn('timestamp'),
+  },
+  cases: {
+    id: nn('int4'),
+    title: nn('varchar'),
+    category: nn('varchar'),
+    severity: nn('varchar'),
+    tags: nn('jsonb'),
+    summary: optional('text'),
+    problem_context: optional('text'),
+    action_steps: nn('jsonb'),
+    dos: nn('jsonb'),
+    donts: nn('jsonb'),
+    snippets: nn('jsonb'),
+    status: nn('varchar'),
+    is_custom: nn('bool'),
+    sort_order: nn('int4'),
+    created_at: nn('timestamp'),
+    updated_at: nn('timestamp'),
+  },
 })
 
 const REQUIRED_RELATION_KINDS = Object.freeze({
@@ -214,6 +242,8 @@ const REQUIRED_RELATION_KINDS = Object.freeze({
   log_riwayat_aset: 'r',
   riwayat_pemakaian_aset: 'r',
   log_audit_login: 'r',
+  faq: 'r',
+  cases: 'r',
 })
 
 const REQUIRED_INDEXES = Object.freeze([
@@ -245,6 +275,8 @@ const REQUIRED_INDEXES = Object.freeze([
   'idx_log_riwayat_tiket_id',
   'idx_rpa_active',
   'idx_log_audit_login_time',
+  'idx_faq_status',
+  'idx_cases_status',
 ])
 
 const REQUIRED_TRIGGERS = Object.freeze([]) // Triggers are optional

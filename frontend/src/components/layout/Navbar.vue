@@ -6,46 +6,49 @@ import { useAuth } from '@/composables/useAuth';
 import { useTheme } from '@/composables/useTheme';
 import {
   Search,
-  FolderOpen,
-  FileText,
-  BarChart3,
   Sun,
   Moon,
   LogIn,
   LogOut,
-  UserCheck,
-  X,
+  User,
+  ShieldCheck,
+  Ticket,
   LayoutDashboard,
-  HelpCircle,
-  ShieldCheck
+  ChevronDown
 } from 'lucide-vue-next';
 
 const router = useRouter();
 const route = useRoute();
-const { cases, searchQuery, setSearch, clearSearch } = useCases();
-const { isAuthenticated, isCrudUnlocked, currentUser, logout } = useAuth();
+const { setSearch } = useCases();
+const { isAuthenticated, user, isAdmin, isSuperAdmin, logout } = useAuth();
 const { isDark, toggleTheme } = useTheme();
 
-const searchInputRef = ref(null);
+const isProfileOpen = ref(false);
 
 function handleLogoClick() {
   router.push('/');
 }
 
-function onSearchInput(e) {
-  setSearch(e.target.value);
-  if (route.path !== '/cases' && route.path !== '/') {
-    router.push('/cases');
-  }
+function toggleProfileMenu() {
+  isProfileOpen.value = !isProfileOpen.value;
+}
+
+function closeProfileMenu() {
+  isProfileOpen.value = false;
+}
+
+function handleLogout() {
+  closeProfileMenu();
+  logout();
+  router.push('/login');
 }
 
 function handleKeydown(e) {
   if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
     e.preventDefault();
-    searchInputRef.value?.focus();
-  } else if (e.key === '/' && document.activeElement?.tagName !== 'INPUT' && document.activeElement?.tagName !== 'TEXTAREA') {
-    e.preventDefault();
-    searchInputRef.value?.focus();
+    router.push('/cases');
+  } else if (e.key === 'Escape') {
+    closeProfileMenu();
   }
 }
 
@@ -59,149 +62,157 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <header class="sticky top-0 z-40 w-full border-b border-[#E5EAEF] dark:border-slate-800 bg-white dark:bg-[#0F172A] text-[#0F172A] dark:text-white transition-colors duration-200 shadow-2xs">
-    <div class="max-w-[1400px] mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
+  <header class="sticky top-0 z-40 w-full border-b border-[#E5EAEF] dark:border-slate-800 bg-white/95 dark:bg-[#0F172A]/95 backdrop-blur-md text-[#0F172A] dark:text-white transition-colors duration-200 px-4 sm:px-6 lg:px-8 select-none">
+    <div class="max-w-[1200px] mx-auto w-full h-16 flex items-center justify-between gap-4">
       
-      <!-- Brand Logo & Main Navigation -->
-      <div class="flex items-center gap-5">
+      <!-- Left Branding: ESB TrackIT Help Center -->
+      <div class="flex items-center gap-4">
         <button
           @click="handleLogoClick"
           class="flex items-center gap-2.5 group focus:outline-none select-none text-left cursor-pointer"
         >
-          <img src="/ESB Logo Only.svg" alt="ESB Logo" class="h-7 w-auto object-contain group-hover:scale-105 transition-transform" />
+          <img src="/ESB Logo Only.svg" alt="ESB Logo" class="h-5 w-auto object-contain group-hover:scale-105 transition-transform" />
           <div class="flex items-center gap-2">
-            <span class="font-extrabold text-[#0F172A] dark:text-white tracking-tight text-sm group-hover:text-[#5D87FF] transition-colors">ESB TrackIT</span>
-            <span class="px-2 py-0.5 text-[9.5px] font-extrabold uppercase tracking-wider bg-[#ECF2FF] text-[#5D87FF] dark:bg-slate-800 dark:text-indigo-300 rounded border border-[#5D87FF]/20">
+            <span class="font-extrabold text-[#0F172A] dark:text-white tracking-tight text-xs group-hover:text-[#5D87FF] transition-colors">ESB TrackIT</span>
+            <span class="text-[10px] text-[#64748B] dark:text-slate-400 font-extrabold uppercase tracking-wider bg-[#F1F5F9] dark:bg-slate-800 px-2 py-0.5 rounded border border-[#E5EAEF] dark:border-slate-700/80">
               Help Center
             </span>
           </div>
         </button>
-
-        <!-- Desktop Navigation Tabs -->
-        <nav class="hidden lg:flex items-center gap-1 pl-4 border-l border-[#E5EAEF] dark:border-slate-800">
-          <RouterLink
-            to="/"
-            class="px-3 py-1.5 rounded-lg text-xs font-bold text-[#2A3547] dark:text-slate-300 hover:text-[#5D87FF] hover:bg-[#F8FAFC] dark:hover:bg-slate-800 transition-all flex items-center gap-1.5"
-            exact-active-class="bg-[#ECF2FF] text-[#5D87FF] dark:bg-slate-800 dark:text-indigo-400 font-extrabold"
-          >
-            <HelpCircle class="w-4 h-4 text-[#5D87FF]" />
-            <span>Beranda KB</span>
-          </RouterLink>
-
-          <RouterLink
-            to="/cases"
-            class="px-3 py-1.5 rounded-lg text-xs font-bold text-[#2A3547] dark:text-slate-300 hover:text-[#5D87FF] hover:bg-[#F8FAFC] dark:hover:bg-slate-800 transition-all flex items-center gap-1.5"
-            active-class="bg-[#ECF2FF] text-[#5D87FF] dark:bg-slate-800 dark:text-indigo-400 font-extrabold"
-          >
-            <FolderOpen class="w-4 h-4" />
-            <span>Cases & SOP</span>
-            <span class="px-1.5 py-0.2 text-[10px] font-extrabold rounded bg-[#E5EAEF] text-[#475569] dark:bg-slate-700 dark:text-slate-300">
-              {{ cases.length }}
-            </span>
-          </RouterLink>
-
-          <RouterLink
-            to="/templates"
-            class="px-3 py-1.5 rounded-lg text-xs font-bold text-[#2A3547] dark:text-slate-300 hover:text-[#5D87FF] hover:bg-[#F8FAFC] dark:hover:bg-slate-800 transition-all flex items-center gap-1.5"
-            active-class="bg-[#ECF2FF] text-[#5D87FF] dark:bg-slate-800 dark:text-indigo-400 font-extrabold"
-          >
-            <FileText class="w-4 h-4" />
-            <span>Templates Hub</span>
-          </RouterLink>
-
-          <RouterLink
-            to="/analytics"
-            class="px-3 py-1.5 rounded-lg text-xs font-bold text-[#2A3547] dark:text-slate-300 hover:text-[#5D87FF] hover:bg-[#F8FAFC] dark:hover:bg-slate-800 transition-all flex items-center gap-1.5"
-            active-class="bg-[#ECF2FF] text-[#5D87FF] dark:bg-slate-800 dark:text-indigo-400 font-extrabold"
-          >
-            <BarChart3 class="w-4 h-4" />
-            <span>Analitik KB</span>
-          </RouterLink>
-
-          <RouterLink
-            v-if="isCrudUnlocked"
-            to="/admin/cases"
-            class="px-3 py-1.5 rounded-lg text-xs font-bold text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/60 hover:bg-amber-100 transition-all flex items-center gap-1.5 border border-amber-500/20"
-            active-class="bg-amber-100 dark:bg-amber-900/50 font-extrabold"
-          >
-            <ShieldCheck class="w-4 h-4 text-amber-600" />
-            <span>Admin CMS</span>
-          </RouterLink>
-        </nav>
       </div>
 
-      <!-- Right Header Actions Bar -->
+      <!-- Right Actions: Quick Search, Auth Profile / Sign In, Theme Toggle -->
       <div class="flex items-center gap-3">
         
-        <!-- Live Search Box -->
-        <div class="relative hidden sm:block w-44 md:w-56 lg:w-64">
-          <Search class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#7C8BAC] dark:text-slate-400 pointer-events-none" />
-          <input
-            ref="searchInputRef"
-            type="text"
-            :value="searchQuery"
-            @input="onSearchInput"
-            placeholder="Search knowledge base..."
-            class="w-full bg-[#F8FAFC] dark:bg-slate-900 border border-[#E5EAEF] dark:border-slate-800 rounded-lg pl-9 pr-9 py-1.5 text-xs font-medium text-[#0F172A] dark:text-white placeholder-[#94A3B8] dark:placeholder-slate-500 focus:bg-white dark:focus:bg-slate-950 focus:border-[#5D87FF] focus:outline-none transition-all shadow-2xs"
-          />
-          <div class="absolute right-2.5 top-1/2 -translate-y-1/2 flex items-center">
-            <button
-              v-if="searchQuery"
-              @click="clearSearch"
-              class="p-0.5 text-[#7C8BAC] hover:text-[#0F172A] dark:hover:text-white rounded"
-            >
-              <X class="w-3.5 h-3.5" />
-            </button>
-            <kbd v-else class="px-1.5 py-0.5 text-[9px] font-mono text-[#7C8BAC] dark:text-slate-400 bg-white dark:bg-slate-800 border border-[#E5EAEF] dark:border-slate-700 rounded">
-              Ctrl+K
-            </kbd>
-          </div>
-        </div>
-
-        <!-- ESB TrackIT Primary Blue IT Dashboard Switch Button -->
+        <!-- Search Trigger Hint -->
         <RouterLink
-          to="/dashboard"
-          class="inline-flex items-center gap-1.5 bg-[#5D87FF] hover:bg-[#4570EA] text-white text-xs font-extrabold px-3.5 py-1.5 rounded-lg shadow-2xs transition-all cursor-pointer active:scale-95"
+          to="/cases"
+          class="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#F8FAFC] dark:bg-slate-800/80 border border-[#E5EAEF] dark:border-slate-700 text-[#64748B] dark:text-slate-400 text-xs hover:border-[#5D87FF] transition-all"
         >
-          <LayoutDashboard class="w-3.5 h-3.5" />
-          <span>IT Dashboard</span>
+          <Search class="w-3.5 h-3.5" />
+          <span>Cari panduan SOP...</span>
+          <kbd class="px-1.5 py-0.5 text-[10px] font-mono font-bold bg-white dark:bg-slate-700 rounded border border-[#E5EAEF] dark:border-slate-600 text-[#64748B] dark:text-slate-300">Ctrl K</kbd>
         </RouterLink>
 
-        <!-- User Session / Login Button -->
-        <div class="flex items-center">
-          <button
-            v-if="!isAuthenticated"
-            @click="router.push('/login')"
-            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold border border-[#E5EAEF] dark:border-slate-700 bg-white dark:bg-slate-800 text-[#2A3547] dark:text-slate-200 hover:bg-[#F8FAFC] dark:hover:bg-slate-700 transition-all cursor-pointer"
-          >
-            <LogIn class="w-3.5 h-3.5 text-[#5D87FF]" />
-            <span>Masuk</span>
-          </button>
-
-          <div v-else class="flex items-center gap-1.5">
-            <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#ECF2FF] dark:bg-indigo-950/60 text-[#5D87FF] dark:text-indigo-300 font-bold text-xs border border-[#5D87FF]/30">
-              <UserCheck class="w-3.5 h-3.5 text-[#5D87FF]" />
-              <span>{{ currentUser?.nama || currentUser?.username || 'User' }}</span>
-            </div>
-            <button
-              @click="logout"
-              class="p-1.5 rounded-lg text-[#7C8BAC] hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors cursor-pointer"
-              title="Logout"
-            >
-              <LogOut class="w-3.5 h-3.5" />
-            </button>
-          </div>
-        </div>
-
-        <!-- Theme Toggle Button -->
+        <!-- Theme Switcher -->
         <button
           @click="toggleTheme"
-          class="p-1.5 rounded-lg text-[#7C8BAC] hover:text-[#5D87FF] dark:text-slate-400 dark:hover:text-white hover:bg-[#F8FAFC] dark:hover:bg-slate-800 transition-colors cursor-pointer border border-transparent hover:border-[#E5EAEF] dark:hover:border-slate-700"
+          class="p-2 rounded-xl text-[#64748B] dark:text-slate-400 hover:bg-[#F1F5F9] dark:hover:bg-slate-800 hover:text-[#0F172A] dark:hover:text-white transition-colors cursor-pointer"
           :title="isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'"
         >
           <Sun v-if="isDark" class="w-4 h-4 text-amber-400" />
-          <Moon v-else class="w-4 h-4 text-[#5D87FF]" />
+          <Moon v-else class="w-4 h-4" />
         </button>
+
+        <!-- AUTH STATE DEPENDENT PROFILE / SIGN IN BUTTON -->
+        
+        <!-- 1. VISITOR / NOT LOGGED IN: Sign In Button -->
+        <template v-if="!isAuthenticated">
+          <RouterLink
+            :to="{ path: '/login', query: { redirect: route.fullPath } }"
+            class="px-4 py-2 rounded-xl text-xs font-extrabold bg-[#5D87FF] hover:bg-[#4570EA] text-white shadow-md shadow-[#5D87FF]/20 hover:shadow-lg transition-all flex items-center gap-1.5 cursor-pointer"
+          >
+            <LogIn class="w-3.5 h-3.5" />
+            <span>Sign In</span>
+          </RouterLink>
+        </template>
+
+        <!-- 2. AUTHENTICATED USER / ADMIN: Identity Dropdown -->
+        <template v-else>
+          <div class="relative">
+            <button
+              @click="toggleProfileMenu"
+              class="flex items-center gap-2 p-1 pl-2 rounded-xl border border-[#E5EAEF] dark:border-slate-800 bg-[#F8FAFC] dark:bg-slate-800/80 hover:bg-[#F1F5F9] dark:hover:bg-slate-800 transition-colors cursor-pointer text-xs"
+            >
+              <!-- Avatar Circle -->
+              <div class="w-6 h-6 rounded-full bg-[#5D87FF] text-white text-[11px] font-extrabold flex items-center justify-center shadow-2xs">
+                {{ user?.name ? user.name.charAt(0).toUpperCase() : 'U' }}
+              </div>
+              
+              <span class="font-bold text-[#0F172A] dark:text-slate-200 max-w-[120px] truncate hidden sm:inline-block">
+                {{ user?.name || 'User' }}
+              </span>
+
+              <!-- Admin Indicator Badge -->
+              <span v-if="isAdmin" class="hidden sm:inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-extrabold bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800">
+                <ShieldCheck class="w-2.5 h-2.5" />
+                Admin
+              </span>
+
+              <ChevronDown class="w-3.5 h-3.5 text-[#64748B] dark:text-slate-400" />
+            </button>
+
+            <!-- Profile Dropdown Menu -->
+            <div
+              v-if="isProfileOpen"
+              class="absolute right-0 mt-2 w-56 rounded-2xl bg-white dark:bg-slate-900 border border-[#E5EAEF] dark:border-slate-800 shadow-xl py-2 z-50 text-xs animate-in fade-in slide-in-from-top-2 duration-150"
+            >
+              <!-- User Identity Header -->
+              <div class="px-4 py-2.5 border-b border-[#E5EAEF] dark:border-slate-800 space-y-0.5">
+                <p class="font-extrabold text-[#0F172A] dark:text-white truncate">{{ user?.name }}</p>
+                <p class="text-[11px] text-[#64748B] dark:text-slate-400 truncate">{{ user?.email }}</p>
+                <div class="pt-1 flex items-center gap-1">
+                  <span
+                    class="px-2 py-0.5 rounded text-[10px] font-extrabold tracking-wider uppercase inline-block"
+                    :class="isAdmin ? 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300' : 'bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300'"
+                  >
+                    Role: {{ user?.role || 'User' }}
+                  </span>
+                </div>
+              </div>
+
+              <!-- Menu Items -->
+              <div class="py-1">
+                <RouterLink
+                  to="/tickets"
+                  @click="closeProfileMenu"
+                  class="flex items-center gap-2 px-4 py-2 text-[#334155] dark:text-slate-300 hover:bg-[#F8FAFC] dark:hover:bg-slate-800 hover:text-[#5D87FF] transition-colors"
+                >
+                  <Ticket class="w-4 h-4 text-[#5D87FF]" />
+                  <span>My Tickets</span>
+                </RouterLink>
+
+                <RouterLink
+                  to="/profile"
+                  @click="closeProfileMenu"
+                  class="flex items-center gap-2 px-4 py-2 text-[#334155] dark:text-slate-300 hover:bg-[#F8FAFC] dark:hover:bg-slate-800 hover:text-[#5D87FF] transition-colors"
+                >
+                  <User class="w-4 h-4 text-[#64748B]" />
+                  <span>My Profile</span>
+                </RouterLink>
+
+                <!-- Admin CMS Portal Link for Admin users -->
+                <RouterLink
+                  v-if="isAdmin"
+                  to="/admin/cases"
+                  @click="closeProfileMenu"
+                  class="flex items-center gap-2 px-4 py-2 text-amber-700 dark:text-amber-400 font-bold hover:bg-amber-50 dark:hover:bg-amber-950/40 transition-colors"
+                >
+                  <LayoutDashboard class="w-4 h-4 text-amber-600" />
+                  <span>Admin Portal</span>
+                </RouterLink>
+              </div>
+
+              <!-- Sign Out -->
+              <div class="pt-1 border-t border-[#E5EAEF] dark:border-slate-800">
+                <button
+                  @click="handleLogout"
+                  class="w-full flex items-center gap-2 px-4 py-2 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 font-semibold transition-colors text-left cursor-pointer"
+                >
+                  <LogOut class="w-4 h-4" />
+                  <span>Sign Out</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Click Outside Overlay -->
+            <div
+              v-if="isProfileOpen"
+              @click="closeProfileMenu"
+              class="fixed inset-0 z-40"
+            ></div>
+          </div>
+        </template>
 
       </div>
 

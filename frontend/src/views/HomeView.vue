@@ -13,29 +13,24 @@ import {
   Server,
   ChevronDown,
   AlertTriangle,
-  FolderOpen,
   ExternalLink,
   X,
   ArrowRight,
-  BookOpen,
-  Lock,
-  Mail,
-  Monitor,
-  Headphones,
-  Zap,
-  Boxes,
+  LogIn,
   Ticket,
-  ChevronRight,
-  ArrowUpRight
+  Plus,
+  Minus,
+  HelpCircle,
+  Send
 } from 'lucide-vue-next';
 
 const router = useRouter();
-const { cases, setSearch, setCategory } = useCases();
-const { isCrudUnlocked } = useAuth();
+const { cases, setSearch, setCategory, hasNoSearchResult } = useCases();
+const { isAuthenticated, currentUser } = useAuth();
 
 const localSearch = ref('');
 const isInputFocused = ref(false);
-const openFaqId = ref('faq-1');
+const openFaqId = ref(null);
 
 const liveSuggestions = computed(() => {
   if (!localSearch.value.trim()) return [];
@@ -45,13 +40,49 @@ const liveSuggestions = computed(() => {
     .slice(0, 5);
 });
 
-const featuredCases = computed(() => {
-  return cases.value.slice(0, 5);
-});
+const featuredSopList = [
+  {
+    num: '01',
+    id: 'sop-1',
+    title: 'SOP Setup Laptop Baru',
+    summary: 'Panduan penyiapan laptop Windows untuk karyawan baru (new joiner).',
+    category: 'Hardware',
+    readTime: '5 min read'
+  },
+  {
+    num: '02',
+    id: 'sop-2',
+    title: 'SOP Setup Laptop Re-use',
+    summary: 'Panduan deployment ulang dan pembersihan perangkat laptop bekas pakai.',
+    category: 'Hardware',
+    readTime: '4 min read'
+  },
+  {
+    num: '03',
+    id: 'sop-3',
+    title: 'SOP Setup HP Baru',
+    summary: 'Panduan pendistribusian HP unit karyawan dan pendaftaran SIM.',
+    category: 'Hardware',
+    readTime: '4 min read'
+  },
+  {
+    num: '04',
+    id: 'sop-4',
+    title: 'SOP Google Workspace 2SV',
+    summary: 'Panduan aktivasi dan verifikasi 2-Step Verification akun perusahaan.',
+    category: 'Workplace',
+    readTime: '3 min read'
+  }
+];
 
 function handleSearchSubmit() {
   if (localSearch.value.trim()) {
     setSearch(localSearch.value.trim());
+    // Tidak ada case yang cocok → arahkan ke login (atau buat tiket bila sudah login)
+    if (hasNoSearchResult.value) {
+      router.push(isAuthenticated.value ? '/tickets' : '/login');
+      return;
+    }
   }
   router.push('/cases');
 }
@@ -70,87 +101,65 @@ function toggleFaq(id) {
   openFaqId.value = openFaqId.value === id ? null : id;
 }
 
-function handleQuickLinkClick(ql) {
-  if (ql.isTicketLink) {
-    router.push('/dashboard');
+function handleSupportTicketAction() {
+  if (!isAuthenticated.value) {
+    router.push({ path: '/login', query: { redirect: '/tickets' } });
   } else {
-    setSearch(ql.query);
-    router.push('/cases');
+    router.push('/tickets');
   }
 }
 
-function getSeverityBadge(sev) {
-  const s = (sev || '').toLowerCase();
-  if (s === 'high' || s === 'critical') return { text: 'Tinggi', bg: 'bg-rose-50 text-rose-600 border-rose-200 dark:bg-rose-950/60 dark:text-rose-300 dark:border-rose-800' };
-  if (s === 'medium') return { text: 'Sedang', bg: 'bg-amber-50 text-amber-600 border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800' };
-  return { text: 'Rendah', bg: 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800' };
-}
-
-// Quick Access Items
-const quickLinks = [
-  { label: 'Reset password akun Google Workspace', icon: Lock, query: 'Password Reset' },
-  { label: 'Update email & kredensial perusahaan', icon: Mail, query: 'Google Workspace' },
-  { label: 'Bypass OOBE akun Microsoft laptop baru', icon: Monitor, query: 'Bypass OOBE' },
-  { label: 'Permintaan unit laptop & HP stock baru', icon: Laptop, query: 'Hardware Request' },
-  { label: 'Buka tiket / hubungi tim helpdesk IT', icon: Headphones, isTicketLink: true }
-];
-
-// Enterprise Categories
+// 6 Cards for Browse Topics matching mockup grid
 const topicCards = [
+  {
+    id: 'hardware',
+    title: 'Getting Started',
+    description: 'Learn the basics of setting up your IT profile, laptop requests, and connecting tools.',
+    icon: Laptop,
+    isFeatured: false
+  },
   {
     id: 'workplace',
     title: 'Account & Access',
-    description: 'Reset password, Google Workspace, verifikasi 2SV, dan otorisasi hak akses.',
+    description: 'Customize your experience with account settings, Google Workspace, 2SV, and permissions.',
     icon: ShieldCheck,
-    badge: 'Akun & Security',
-    count: 4
-  },
-  {
-    id: 'hardware',
-    title: 'Devices & Hardware',
-    description: 'Permintaan laptop baru, perbaikan PC, printer kantor, dan stok HP.',
-    icon: Laptop,
-    badge: 'Perangkat',
-    count: 3
-  },
-  {
-    id: 'environment',
-    title: 'Network & Security',
-    description: 'Konfigurasi VPN kantor, bypass OOBE Windows, Wi-Fi cabang, dan proxy.',
-    icon: Wifi,
-    badge: 'Jaringan',
-    count: 5
-  },
-  {
-    id: 'software',
-    title: 'Software & Tools',
-    description: 'Instalasi aplikasi standar, lisensi software, standarisasi PR, dan runtime fix.',
-    icon: AppWindow,
-    badge: 'Software',
-    count: 3
-  },
-  {
-    id: 'workplace',
-    title: 'HR Systems & PBX',
-    description: 'Akses portal payroll, komunikasi PBX, onboarding karyawan baru, dan aset.',
-    icon: Building2,
-    badge: 'HR & Work',
-    count: 2
+    isFeatured: true
   },
   {
     id: 'backend',
-    title: 'IT Infrastructure',
-    description: 'Perangkat ruang rapat, pemeliharaan server database, dan relokasi desk.',
-    icon: Server,
-    badge: 'Server & Infra',
-    count: 2
+    title: 'Troubleshooting',
+    description: 'Resolve common issues, network errors, printer fixes, and runtime system bugs.',
+    icon: HelpCircle,
+    isFeatured: false
+  },
+  {
+    id: 'environment',
+    title: 'Network & VPN',
+    description: 'Explore features for VPN configuration, Microsoft OOBE bypass, branch Wi-Fi, and proxy.',
+    icon: Wifi,
+    isFeatured: false
+  },
+  {
+    id: 'software',
+    title: 'Software & Apps',
+    description: 'Standard software installation, licenses, PR setup, and application troubleshooting.',
+    icon: AppWindow,
+    isFeatured: false
+  },
+  {
+    id: 'workplace',
+    title: 'Security & Compliance',
+    description: 'SOC procedures, endpoint security, remote wipe, and device protection compliance.',
+    icon: Building2,
+    isFeatured: false
   }
 ];
 
 const faqs = [
   {
+    num: '01',
     id: 'faq-1',
-    question: 'Bagaimana cara melakukan reset password akun Google Workspace karyawan?',
+    question: 'How do I reset my Google Workspace password?',
     summary: 'Anda dapat mereset kata sandi akun karyawan melalui Google Admin Console sesuai SOP resmi:',
     steps: [
       'Buka Google Admin Console di browser (admin.google.com).',
@@ -163,8 +172,9 @@ const faqs = [
     actionLink: 'https://admin.google.com/'
   },
   {
+    num: '02',
     id: 'faq-2',
-    question: 'Bagaimana cara bypass akun Microsoft saat setup laptop Windows baru (OOBE)?',
+    question: 'How do I bypass Microsoft OOBE on new laptops?',
     summary: 'Untuk membuat akun lokal tanpa login akun Microsoft online saat layar koneksi jaringan:',
     steps: [
       'Tekan kombinasi tombol Shift + F10 (atau Fn + Shift + F10) di keyboard untuk membuka Command Prompt (CMD).',
@@ -174,8 +184,9 @@ const faqs = [
     code: 'oobe\bypassnro'
   },
   {
+    num: '03',
     id: 'faq-3',
-    question: 'Bagaimana prosedur meminta kode verifikasi cadangan 2-Step Verification (2SV)?',
+    question: 'How do I request a 2SV backup code?',
     summary: 'Untuk mendukung verifikasi tim setelah konfirmasi resmi dari pihak People & Culture (PBX):',
     steps: [
       'Buka Google Admin Console dan cari profil pengguna yang bersangkutan.',
@@ -185,8 +196,9 @@ const faqs = [
     ]
   },
   {
+    num: '04',
     id: 'faq-4',
-    question: 'Apa langkah darurat jika HP atau Laptop perusahaan hilang / dicuri?',
+    question: 'What should I do if my company laptop is lost?',
     isEmergency: true,
     emergencyTitle: 'Tindakan Darurat Diperlukan',
     emergencyText: 'Jika perangkat kerja hilang atau dicuri, segera laporkan ke Tim IT Support & Security Operations Center (SOC).',
@@ -196,81 +208,69 @@ const faqs = [
 </script>
 
 <template>
-  <div class="page-home-command-center min-h-screen bg-[#F5F7FA] dark:bg-slate-950 text-[#2A3547] dark:text-slate-100 transition-colors duration-200">
+  <div class="page-home-unified-container min-h-screen bg-[#F8FAFC] dark:bg-slate-950 text-[#0F172A] dark:text-slate-100 py-10 px-4 sm:px-6 lg:px-8 transition-colors duration-200">
     
-    <main class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col gap-6">
+    <!-- SHARED UNIFIED CONTAINER SYSTEM (max-w-[1200px] mx-auto w-full) -->
+    <main class="max-w-[1200px] mx-auto w-full flex flex-col gap-14">
       
-      <!-- 1. COMPACT ENTERPRISE HERO / SEARCH AREA (100% LIGHT MODE WHITE CARD, 250-320px) -->
-      <section class="bg-white dark:bg-slate-900 border border-[#E5EAEF] dark:border-slate-800 rounded-xl p-5 sm:p-6 shadow-2xs flex flex-col gap-4">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#F1F5F9] dark:border-slate-800 pb-3">
-          <div class="flex items-center gap-2">
-            <span class="px-2.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wider bg-[#ECF2FF] text-[#5D87FF] dark:bg-indigo-950/60 dark:text-indigo-300 rounded border border-[#5D87FF]/20">
-              ESB TrackIT Help Center
-            </span>
-            <span class="text-xs text-[#7C8BAC] dark:text-slate-400 font-medium hidden sm:inline">&bull; Command Center &amp; Incident Playbook</span>
-          </div>
-
-          <div class="flex items-center gap-2 text-xs font-bold text-[#5D87FF]">
-            <RouterLink to="/cases" class="hover:underline flex items-center gap-1">
-              <span>Direktori SOP Kompleks</span>
-              <ChevronRight class="w-3.5 h-3.5" />
-            </RouterLink>
-          </div>
+      <!-- 1. HERO SECTION: FOCAL SEARCH -->
+      <section class="flex flex-col items-center text-center w-full pt-2 pb-2">
+        <div class="text-xs font-black uppercase tracking-widest text-[#5D87FF] dark:text-indigo-400 mb-2">
+          Help Center
         </div>
 
-        <div class="space-y-1">
-          <h1 class="text-xl sm:text-2xl font-extrabold text-[#0F172A] dark:text-white tracking-tight">
-            How can we help?
-          </h1>
-          <p class="text-xs text-[#64748B] dark:text-slate-400 font-medium">
-            Cari panduan operasional standar (SOP), verifikasi akun, konfigurasi jaringan, dan penanganan insiden IT.
-          </p>
-        </div>
+        <h1 class="text-3xl sm:text-4xl lg:text-5xl font-black text-[#0F172A] dark:text-white tracking-tight leading-tight max-w-2xl">
+          What can we help you find?
+        </h1>
+        
+        <p class="text-xs sm:text-sm text-[#64748B] dark:text-slate-400 font-medium leading-relaxed mt-2.5 max-w-md">
+          Search our SOPs, troubleshooting guides, and IT knowledge base.
+        </p>
 
-        <!-- Prominent Search Bar (Compact h-11 Enterprise Input) -->
-        <div class="w-full relative">
-          <form @submit.prevent="handleSearchSubmit" class="flex items-center gap-2">
-            <div class="relative flex-1 flex items-center">
-              <Search class="absolute left-3.5 w-4 h-4 text-[#5D87FF] pointer-events-none" />
-              <input
-                v-model="localSearch"
-                @focus="isInputFocused = true"
-                type="text"
-                class="w-full h-11 pl-10 pr-10 bg-[#F8FAFC] dark:bg-slate-950 border border-[#E5EAEF] dark:border-slate-800 rounded-lg text-xs font-bold text-[#0F172A] dark:text-white placeholder-[#94A3B8] dark:placeholder-slate-500 focus:bg-white dark:focus:bg-slate-900 focus:border-[#5D87FF] focus:outline-none transition-all shadow-2xs"
-                placeholder="Cari panduan, SOP, atau solusi untuk masalah IT Anda..."
-                autocomplete="off"
-              />
+        <!-- Focal Search Input Bar -->
+        <div class="w-full relative mt-6 max-w-2xl">
+          <form @submit.prevent="handleSearchSubmit" class="relative flex items-center">
+            <Search class="absolute left-4 w-5 h-5 text-[#5D87FF] pointer-events-none" />
+            <input
+              v-model="localSearch"
+              @focus="isInputFocused = true"
+              type="text"
+              class="w-full h-14 pl-12 pr-28 bg-white dark:bg-slate-900 border border-[#E5EAEF] dark:border-slate-800 rounded-xl text-sm font-bold text-[#0F172A] dark:text-white placeholder-[#94A3B8] focus:border-[#5D87FF] focus:ring-2 focus:ring-[#5D87FF]/15 focus:outline-none transition-all shadow-sm"
+              placeholder="Search the knowledge base..."
+              autocomplete="off"
+            />
+            <div class="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
               <button
                 v-if="localSearch"
                 type="button"
                 @click="localSearch = ''"
-                class="absolute right-3 p-1 text-[#7C8BAC] hover:text-[#0F172A] dark:hover:text-white"
+                class="p-1 text-[#7C8BAC] hover:text-[#0F172A] dark:hover:text-white rounded"
               >
-                <X class="w-3.5 h-3.5" />
+                <X class="w-4 h-4" />
+              </button>
+              <button
+                type="submit"
+                class="h-9 px-5 bg-[#5D87FF] hover:bg-[#4570EA] text-white font-extrabold text-xs rounded-lg transition-colors cursor-pointer shadow-2xs"
+              >
+                Search
               </button>
             </div>
-            <button
-              type="submit"
-              class="h-11 px-5 bg-[#5D87FF] hover:bg-[#4570EA] text-white font-extrabold text-xs rounded-lg transition-all cursor-pointer shrink-0 shadow-2xs flex items-center gap-1.5"
-            >
-              <span>Search</span>
-            </button>
           </form>
 
-          <!-- Live Autocomplete Suggestions -->
+          <!-- Live Command Autocomplete Dropdown -->
           <div
             v-if="liveSuggestions.length > 0 && isInputFocused"
-            class="absolute top-full left-0 right-0 mt-1.5 bg-white dark:bg-slate-900 text-[#0F172A] dark:text-white rounded-xl shadow-lg overflow-hidden z-30 text-left divide-y divide-[#F1F5F9] dark:divide-slate-800 border border-[#E5EAEF] dark:border-slate-800"
+            class="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-slate-900 text-[#0F172A] dark:text-white rounded-xl shadow-xl overflow-hidden z-30 text-left divide-y divide-[#F1F5F9] dark:divide-slate-800 border border-[#E5EAEF] dark:border-slate-800"
           >
             <button
               v-for="sug in liveSuggestions"
               :key="sug.id"
               @mousedown="setSearch(sug.title); router.push('/cases')"
-              class="w-full p-3 hover:bg-[#ECF2FF] dark:hover:bg-slate-800 flex items-center justify-between text-xs transition-colors cursor-pointer"
+              class="w-full p-3.5 hover:bg-[#ECF2FF] dark:hover:bg-slate-800 flex items-center justify-between text-xs transition-colors cursor-pointer"
             >
               <div class="flex items-center gap-2.5 truncate mr-3">
-                <Search class="w-3.5 h-3.5 text-[#5D87FF] shrink-0" />
-                <span class="font-bold truncate">{{ sug.title }}</span>
+                <Search class="w-4 h-4 text-[#5D87FF] shrink-0" />
+                <span class="font-extrabold truncate">{{ sug.title }}</span>
               </div>
               <span class="px-2 py-0.5 rounded text-[9.5px] bg-[#ECF2FF] text-[#5D87FF] dark:bg-slate-800 dark:text-indigo-300 font-extrabold uppercase shrink-0">
                 {{ sug.category }}
@@ -279,309 +279,219 @@ const faqs = [
           </div>
         </div>
 
-        <!-- Popular Tag Chips -->
-        <div class="flex flex-wrap items-center gap-2 text-xs pt-0.5">
-          <span class="text-[#7C8BAC] dark:text-slate-400 font-bold text-[11px]">Pencarian Populer:</span>
+        <!-- Popular Searches Clean Chips (No Bullets) -->
+        <div class="flex flex-wrap justify-center items-center gap-2 text-xs mt-4">
+          <span class="text-[#7C8BAC] dark:text-slate-400 font-bold text-xs">Popular searches</span>
           <button
             @click="handlePopularClick('Password Reset')"
-            class="px-2.5 py-0.5 rounded bg-[#ECF2FF] text-[#5D87FF] dark:bg-slate-800 dark:text-indigo-300 font-bold text-[11px] hover:bg-[#5D87FF] hover:text-white transition-all cursor-pointer border border-[#5D87FF]/20"
+            class="px-2.5 py-1 rounded-lg bg-white dark:bg-slate-900 border border-[#E5EAEF] dark:border-slate-800 text-[#475569] dark:text-slate-300 font-extrabold text-[11px] hover:border-[#5D87FF] hover:text-[#5D87FF] transition-all cursor-pointer shadow-2xs"
           >
             Password Reset
           </button>
           <button
             @click="handlePopularClick('VPN Setup')"
-            class="px-2.5 py-0.5 rounded bg-[#ECF2FF] text-[#5D87FF] dark:bg-slate-800 dark:text-indigo-300 font-bold text-[11px] hover:bg-[#5D87FF] hover:text-white transition-all cursor-pointer border border-[#5D87FF]/20"
+            class="px-2.5 py-1 rounded-lg bg-white dark:bg-slate-900 border border-[#E5EAEF] dark:border-slate-800 text-[#475569] dark:text-slate-300 font-extrabold text-[11px] hover:border-[#5D87FF] hover:text-[#5D87FF] transition-all cursor-pointer shadow-2xs"
           >
             VPN Setup
           </button>
           <button
             @click="handlePopularClick('Setup Laptop')"
-            class="px-2.5 py-0.5 rounded bg-[#ECF2FF] text-[#5D87FF] dark:bg-slate-800 dark:text-indigo-300 font-bold text-[11px] hover:bg-[#5D87FF] hover:text-white transition-all cursor-pointer border border-[#5D87FF]/20"
+            class="px-2.5 py-1 rounded-lg bg-white dark:bg-slate-900 border border-[#E5EAEF] dark:border-slate-800 text-[#475569] dark:text-slate-300 font-extrabold text-[11px] hover:border-[#5D87FF] hover:text-[#5D87FF] transition-all cursor-pointer shadow-2xs"
           >
             Hardware Request
           </button>
         </div>
-
       </section>
 
-      <!-- 2. QUICK LINKS / POPULAR ACCESS BAR -->
-      <section class="space-y-2">
-        <h3 class="text-xs font-extrabold uppercase tracking-wider text-[#7C8BAC] dark:text-slate-400 flex items-center gap-1.5 px-1">
-          <Zap class="w-3.5 h-3.5 text-[#5D87FF]" />
-          <span>Quick Links &amp; Solusi Cepat</span>
-        </h3>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3">
-          <div
-            v-for="ql in quickLinks"
-            :key="ql.label"
-            @click="handleQuickLinkClick(ql)"
-            class="bg-white dark:bg-slate-900 border border-[#E5EAEF] dark:border-slate-800 rounded-xl p-3 shadow-2xs hover:border-[#5D87FF] hover:bg-[#ECF2FF]/40 dark:hover:bg-slate-800 transition-all cursor-pointer flex items-center gap-2.5 group"
-          >
-            <div class="w-7 h-7 rounded-lg bg-[#ECF2FF] dark:bg-indigo-950/60 text-[#5D87FF] flex items-center justify-center shrink-0 group-hover:bg-[#5D87FF] group-hover:text-white transition-colors">
-              <component :is="ql.icon" class="w-3.5 h-3.5" />
-            </div>
-            <span class="text-xs font-bold text-[#2A3547] dark:text-slate-200 group-hover:text-[#5D87FF] transition-colors truncate">
-              {{ ql.label }}
-            </span>
-          </div>
-        </div>
-      </section>
-
-      <!-- 3. PLATFORM DESTINATIONS (ASSET MANAGEMENT & TICKETING CARDS IN WHITE & ESB BLUE) -->
-      <section class="space-y-3">
-        <div class="flex items-center justify-between px-1">
-          <div>
-            <h2 class="text-sm font-extrabold text-[#0F172A] dark:text-white uppercase tracking-wider">
-              ESB TrackIT Platform Destinations
-            </h2>
-            <p class="text-xs text-[#64748B] dark:text-slate-400 font-medium">Pilih sistem utama yang ingin Anda akses di platform ESB TrackIT</p>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          
-          <!-- Destination Card 1: Asset Management -->
-          <div
-            @click="router.push('/assets')"
-            class="bg-white dark:bg-slate-900 border border-[#E5EAEF] dark:border-slate-800 rounded-xl p-5 shadow-2xs hover:shadow-md hover:border-[#5D87FF] transition-all group cursor-pointer flex flex-col justify-between gap-4 relative overflow-hidden"
-          >
-            <div class="flex items-start justify-between">
-              <div class="flex items-center gap-3">
-                <div class="w-11 h-11 rounded-xl bg-[#ECF2FF] dark:bg-indigo-950/60 text-[#5D87FF] dark:text-indigo-400 flex items-center justify-center shadow-2xs group-hover:bg-[#5D87FF] group-hover:text-white transition-colors">
-                  <Boxes class="w-6 h-6" />
-                </div>
-                <div>
-                  <div class="flex items-center gap-1.5">
-                    <h3 class="text-base font-extrabold text-[#0F172A] dark:text-white group-hover:text-[#5D87FF] transition-colors">
-                      Asset Management System
-                    </h3>
-                  </div>
-                  <span class="text-[10px] font-bold text-[#7C8BAC] dark:text-slate-400">Modul Inventaris &amp; Perangkat</span>
-                </div>
-              </div>
-
-              <span class="px-2 py-0.5 text-[9.5px] font-extrabold uppercase bg-[#ECF2FF] text-[#5D87FF] dark:bg-indigo-950/40 dark:text-indigo-300 rounded border border-[#5D87FF]/20">
-                Active Module
-              </span>
-            </div>
-
-            <p class="text-xs text-[#64748B] dark:text-slate-400 font-medium leading-relaxed">
-              Kelola inventaris aset IT, alokasi laptop/PC, perangkat kantor, distribusi unit karyawan, dan pantau kondisi fisik perangkat.
-            </p>
-
-            <div class="pt-3 border-t border-[#F1F5F9] dark:border-slate-800 flex items-center justify-between text-xs font-bold text-[#5D87FF]">
-              <span class="flex items-center gap-1">
-                <span>Masuk ke Asset Management</span>
-                <ArrowUpRight class="w-3.5 h-3.5" />
-              </span>
-              <ChevronRight class="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-            </div>
-          </div>
-
-          <!-- Destination Card 2: Ticketing System -->
-          <div
-            @click="router.push('/tickets')"
-            class="bg-white dark:bg-slate-900 border border-[#E5EAEF] dark:border-slate-800 rounded-xl p-5 shadow-2xs hover:shadow-md hover:border-[#5D87FF] transition-all group cursor-pointer flex flex-col justify-between gap-4 relative overflow-hidden"
-          >
-            <div class="flex items-start justify-between">
-              <div class="flex items-center gap-3">
-                <div class="w-11 h-11 rounded-xl bg-[#ECF2FF] dark:bg-indigo-950/60 text-[#5D87FF] dark:text-indigo-400 flex items-center justify-center shadow-2xs group-hover:bg-[#5D87FF] group-hover:text-white transition-colors">
-                  <Ticket class="w-6 h-6" />
-                </div>
-                <div>
-                  <div class="flex items-center gap-1.5">
-                    <h3 class="text-base font-extrabold text-[#0F172A] dark:text-white group-hover:text-[#5D87FF] transition-colors">
-                      Ticketing / Helpdesk System
-                    </h3>
-                  </div>
-                  <span class="text-[10px] font-bold text-[#7C8BAC] dark:text-slate-400">Modul Pelaporan &amp; Support IT</span>
-                </div>
-              </div>
-
-              <span class="px-2 py-0.5 text-[9.5px] font-extrabold uppercase bg-[#ECF2FF] text-[#5D87FF] dark:bg-indigo-950/40 dark:text-indigo-300 rounded border border-[#5D87FF]/20">
-                Active Module
-              </span>
-            </div>
-
-            <p class="text-xs text-[#64748B] dark:text-slate-400 font-medium leading-relaxed">
-              Buat tiket keluhan baru, pantau status pengerjaan tim IT, laporkan masalah teknis insiden, dan dapatkan respon cepat.
-            </p>
-
-            <div class="pt-3 border-t border-[#F1F5F9] dark:border-slate-800 flex items-center justify-between text-xs font-bold text-[#5D87FF]">
-              <span class="flex items-center gap-1">
-                <span>Masuk ke Ticketing System</span>
-                <ArrowUpRight class="w-3.5 h-3.5" />
-              </span>
-              <ChevronRight class="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-            </div>
-          </div>
-
-        </div>
-      </section>
-
-      <!-- 4. BROWSE KNOWLEDGE BASE CATEGORIES -->
-      <section class="space-y-3">
-        <div class="flex items-center justify-between px-1">
-          <div>
-            <h2 class="text-sm font-extrabold text-[#0F172A] dark:text-white uppercase tracking-wider">
-              Browse Knowledge Base Categories
-            </h2>
-            <p class="text-xs text-[#64748B] dark:text-slate-400 font-medium">Pilih kategori panduan untuk membaca prosedur operasional standar</p>
-          </div>
+      <!-- 2. BROWSE TOPICS: 3-COLUMN CARD GRID -->
+      <section class="space-y-4 w-full">
+        <div class="flex items-center justify-between border-b border-[#E5EAEF] dark:border-slate-800 pb-3">
+          <h2 class="text-xs font-black uppercase tracking-wider text-[#7C8BAC] dark:text-slate-400">
+            Browse topics
+          </h2>
           <button
             @click="router.push('/cases')"
-            class="text-xs font-bold text-[#5D87FF] hover:underline flex items-center gap-1 cursor-pointer"
+            class="text-xs font-bold text-[#5D87FF] hover:underline flex items-center gap-1"
           >
-            <span>Semua SOP</span>
+            <span>Lihat Semua SOP</span>
             <ArrowRight class="w-3.5 h-3.5" />
           </button>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
           <div
             v-for="card in topicCards"
             :key="card.title"
             @click="handleCategoryNavigate(card.id)"
-            class="bg-white dark:bg-slate-900 border border-[#E5EAEF] dark:border-slate-800 rounded-xl p-4 sm:p-5 flex flex-col justify-between gap-3 shadow-2xs hover:shadow-md hover:border-[#5D87FF] transition-all group cursor-pointer"
+            :class="[
+              card.isFeatured
+                ? 'bg-[#5D87FF] text-white shadow-lg shadow-[#5D87FF]/25 border border-[#5D87FF]'
+                : 'bg-white dark:bg-slate-900 border border-[#E5EAEF] dark:border-slate-800 text-[#0F172A] dark:text-white shadow-2xs hover:shadow-md hover:border-[#5D87FF]',
+              'rounded-2xl p-7 text-center flex flex-col items-center justify-between gap-5 transition-all duration-200 cursor-pointer group hover:scale-[1.01]'
+            ]"
           >
-            <div class="flex items-start justify-between">
-              <div class="w-10 h-10 rounded-xl bg-[#ECF2FF] dark:bg-indigo-950/60 text-[#5D87FF] dark:text-indigo-400 flex items-center justify-center group-hover:bg-[#5D87FF] group-hover:text-white transition-colors">
-                <component :is="card.icon" class="w-5 h-5" />
-              </div>
-              <span class="px-2 py-0.5 text-[9.5px] font-extrabold uppercase bg-[#F8FAFC] dark:bg-slate-800 text-[#7C8BAC] dark:text-slate-400 rounded border border-[#E5EAEF] dark:border-slate-700">
-                {{ card.count }} SOPs
-              </span>
+            <!-- Icon Box -->
+            <div
+              :class="[
+                card.isFeatured
+                  ? 'bg-white/20 text-white'
+                  : 'bg-[#ECF2FF] dark:bg-slate-800 text-[#5D87FF] dark:text-indigo-400 group-hover:bg-[#5D87FF] group-hover:text-white',
+                'w-12 h-12 rounded-full flex items-center justify-center transition-colors'
+              ]"
+            >
+              <component :is="card.icon" class="w-6 h-6" />
             </div>
 
-            <div>
-              <h3 class="text-sm font-extrabold text-[#0F172A] dark:text-white group-hover:text-[#5D87FF] transition-colors">
+            <!-- Title & Description -->
+            <div class="space-y-1.5 max-w-xs">
+              <h3
+                :class="[
+                  card.isFeatured ? 'text-white' : 'text-[#0F172A] dark:text-white group-hover:text-[#5D87FF]',
+                  'text-base font-extrabold transition-colors'
+                ]"
+              >
                 {{ card.title }}
               </h3>
-              <p class="text-xs text-[#64748B] dark:text-slate-400 mt-1 font-medium leading-relaxed">
+              <p
+                :class="[
+                  card.isFeatured ? 'text-white/90' : 'text-[#64748B] dark:text-slate-400',
+                  'text-xs font-medium leading-relaxed'
+                ]"
+              >
                 {{ card.description }}
               </p>
             </div>
 
-            <div class="pt-2 border-t border-[#F1F5F9] dark:border-slate-800 flex items-center justify-between text-xs font-bold text-[#5D87FF]">
-              <span>Buka Dokumen</span>
-              <ChevronRight class="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            <!-- Learn More Link -->
+            <div
+              :class="[
+                card.isFeatured ? 'text-white' : 'text-[#5D87FF]',
+                'text-xs font-black inline-flex items-center gap-1.5 group-hover:translate-x-1 transition-transform'
+              ]"
+            >
+              <span>Learn More</span>
+              <ArrowRight class="w-3.5 h-3.5" />
             </div>
           </div>
         </div>
       </section>
 
-      <!-- 5. FEATURED SOPS LIST TABLE -->
-      <section class="bg-white dark:bg-slate-900 border border-[#E5EAEF] dark:border-slate-800 rounded-xl p-4 sm:p-5 shadow-2xs space-y-3 transition-colors">
-        <div class="flex items-center justify-between border-b border-[#F1F5F9] dark:border-slate-800 pb-3">
-          <div class="flex items-center gap-2">
-            <BookOpen class="w-4 h-4 text-[#5D87FF]" />
-            <h2 class="text-sm font-extrabold text-[#0F172A] dark:text-white tracking-tight">Dokumen SOP Utama (Featured SOPs)</h2>
-          </div>
+      <!-- 3. FEATURED CONTENT: NUMBERED EDITORIAL SOP LIST (CLEAN METADATA, NO BULLETS) -->
+      <section class="space-y-3 w-full">
+        <div class="flex items-center justify-between border-b border-[#E5EAEF] dark:border-slate-800 pb-3">
+          <h2 class="text-xs font-black uppercase tracking-wider text-[#7C8BAC] dark:text-slate-400">
+            Featured SOPs
+          </h2>
           <button
             @click="router.push('/cases')"
-            class="text-xs font-bold text-[#5D87FF] hover:underline"
+            class="text-xs font-bold text-[#5D87FF] hover:underline flex items-center gap-1"
           >
-            Lihat Semua SOP
+            <span>View all SOPs</span>
+            <ArrowRight class="w-3.5 h-3.5" />
           </button>
         </div>
 
-        <div class="overflow-x-auto">
-          <table class="w-full text-left text-xs">
-            <thead>
-              <tr class="border-b border-[#E5EAEF] dark:border-slate-800 text-[#7C8BAC] dark:text-slate-400 uppercase text-[10px] font-extrabold tracking-wider bg-[#F8FAFC] dark:bg-slate-800/80">
-                <th class="py-2.5 px-3">Judul SOP</th>
-                <th class="py-2.5 px-3">Kategori</th>
-                <th class="py-2.5 px-3">Prioritas</th>
-                <th class="py-2.5 px-3 text-right">Aksi</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-[#F1F5F9] dark:divide-slate-800">
-              <tr v-for="c in featuredCases" :key="c.id" class="hover:bg-[#F8FAFC] dark:hover:bg-slate-800/60 transition-colors">
-                <td class="py-3 px-3">
-                  <div class="font-extrabold text-[#0F172A] dark:text-white text-xs sm:text-sm">{{ c.title }}</div>
-                  <div class="text-[11px] text-[#64748B] dark:text-slate-400 truncate max-w-md mt-0.5 font-medium">{{ c.summary }}</div>
-                </td>
-                <td class="py-3 px-3">
-                  <span class="px-2 py-0.5 rounded text-[9.5px] font-extrabold uppercase bg-[#ECF2FF] text-[#5D87FF] dark:bg-indigo-950/60 dark:text-indigo-300">
-                    {{ c.category }}
+        <div class="bg-white dark:bg-slate-900 border border-[#E5EAEF] dark:border-slate-800 rounded-2xl divide-y divide-[#F1F5F9] dark:divide-slate-800 shadow-2xs overflow-hidden w-full">
+          <div
+            v-for="sop in featuredSopList"
+            :key="sop.id"
+            @click="setSearch(sop.title); router.push('/cases')"
+            class="p-4 sm:p-5 hover:bg-[#F8FAFC] dark:hover:bg-slate-800/60 transition-colors flex items-center justify-between gap-4 cursor-pointer group"
+          >
+            <div class="flex items-center gap-3.5">
+              <span class="text-xs font-mono font-bold text-[#94A3B8] dark:text-slate-500 shrink-0">{{ sop.num }}</span>
+              <div>
+                <h3 class="text-xs sm:text-sm font-extrabold text-[#0F172A] dark:text-white group-hover:text-[#5D87FF] transition-colors">
+                  {{ sop.title }}
+                </h3>
+                <div class="flex items-center gap-2 text-xs text-[#64748B] dark:text-slate-400 font-medium mt-1">
+                  <span class="px-1.5 py-0.2 rounded text-[10px] font-extrabold uppercase bg-[#ECF2FF] text-[#5D87FF] dark:bg-indigo-950/60 dark:text-indigo-300">
+                    {{ sop.category }}
                   </span>
-                </td>
-                <td class="py-3 px-3">
-                  <span :class="[getSeverityBadge(c.severity).bg, 'px-2 py-0.5 rounded text-[9.5px] font-extrabold border']">
-                    {{ getSeverityBadge(c.severity).text }}
-                  </span>
-                </td>
-                <td class="py-3 px-3 text-right">
-                  <button
-                    @click="setSearch(c.title); router.push('/cases')"
-                    class="px-3 py-1 rounded-lg bg-[#5D87FF] hover:bg-[#4570EA] text-white text-[11px] font-bold transition-colors cursor-pointer shadow-2xs"
-                  >
-                    Baca SOP
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+                  <span class="text-[11px] font-medium text-[#7C8BAC]">{{ sop.readTime }}</span>
+                </div>
+              </div>
+            </div>
+
+            <ArrowRight class="w-4 h-4 text-[#7C8BAC] group-hover:text-[#5D87FF] group-hover:translate-x-1 transition-all shrink-0" />
+          </div>
         </div>
       </section>
 
-      <!-- 6. FAQ ACCORDIONS -->
-      <section class="max-w-4xl mx-auto w-full flex flex-col gap-3 pt-2">
-        <div class="text-center space-y-0.5">
-          <h2 class="text-lg font-extrabold text-[#0F172A] dark:text-white tracking-tight">
-            Frequently Asked Questions
-          </h2>
-          <p class="text-xs text-[#64748B] dark:text-slate-400 font-medium">Panduan dan troubleshooting terpopuler di Help Center</p>
+      <!-- 4. FAQ: MODERN MINIMALIST SAAS-STYLE ACCORDION -->
+      <section class="space-y-4 w-full">
+        <div class="flex items-center justify-between border-b border-[#E5EAEF] dark:border-slate-800 pb-3">
+          <div>
+            <div class="text-[11px] font-black uppercase tracking-widest text-[#5D87FF] dark:text-indigo-400">
+              FREQUENTLY ASKED QUESTIONS
+            </div>
+            <h2 class="text-xl sm:text-2xl font-black text-[#0F172A] dark:text-white tracking-tight mt-0.5">
+              Pertanyaan Umum &amp; Troubleshooting
+            </h2>
+          </div>
         </div>
 
-        <div class="flex flex-col gap-2.5 mt-1">
+        <div class="bg-white dark:bg-slate-900 border border-[#E5EAEF] dark:border-slate-800 rounded-2xl p-2 sm:p-6 shadow-2xs divide-y divide-[#F1F5F9] dark:divide-slate-800 w-full">
           <div
             v-for="faq in faqs"
             :key="faq.id"
-            class="bg-white dark:bg-slate-900 border border-[#E5EAEF] dark:border-slate-800 rounded-xl overflow-hidden shadow-2xs transition-colors"
+            class="py-4 sm:py-5 px-3 sm:px-4 transition-colors"
           >
             <button
               @click="toggleFaq(faq.id)"
-              class="w-full flex justify-between items-center p-4 bg-white dark:bg-slate-900 hover:bg-[#F8FAFC] dark:hover:bg-slate-800/60 transition-colors text-left cursor-pointer"
+              class="w-full flex justify-between items-center text-left group cursor-pointer focus:outline-none"
             >
-              <span class="text-xs sm:text-sm font-extrabold text-[#0F172A] dark:text-white pr-4">
-                {{ faq.question }}
-              </span>
-              <ChevronDown
-                class="w-4 h-4 text-[#7C8BAC] dark:text-slate-400 shrink-0 transition-transform duration-300"
-                :class="{ 'rotate-180 text-[#5D87FF]': openFaqId === faq.id }"
-              />
+              <div class="flex items-center gap-3.5 pr-4">
+                <span class="w-6 h-6 rounded-lg bg-[#ECF2FF] dark:bg-slate-800 text-[#5D87FF] dark:text-indigo-300 font-mono font-extrabold text-xs flex items-center justify-center shrink-0 group-hover:bg-[#5D87FF] group-hover:text-white transition-colors">
+                  {{ faq.num }}
+                </span>
+                <span class="text-xs sm:text-sm font-extrabold text-[#0F172A] dark:text-white group-hover:text-[#5D87FF] transition-colors leading-snug">
+                  {{ faq.question }}
+                </span>
+              </div>
+
+              <div
+                :class="[
+                  openFaqId === faq.id ? 'bg-[#5D87FF] text-white rotate-180' : 'bg-[#F8FAFC] dark:bg-slate-800 text-[#7C8BAC] group-hover:bg-[#ECF2FF] group-hover:text-[#5D87FF]',
+                  'w-7 h-7 rounded-full flex items-center justify-center shrink-0 transition-all duration-200'
+                ]"
+              >
+                <ChevronDown class="w-4 h-4 transition-transform duration-200" />
+              </div>
             </button>
 
             <div
               v-if="openFaqId === faq.id"
-              class="px-4 pb-4 bg-white dark:bg-slate-900 text-xs text-[#475569] dark:text-slate-300 border-t border-[#F1F5F9] dark:border-slate-800 pt-3 space-y-2.5 font-medium"
+              class="mt-3.5 pl-10 pr-2 text-xs sm:text-sm text-[#475569] dark:text-slate-300 space-y-3 font-medium border-l-2 border-[#5D87FF]/30 ml-3.5 pt-1"
             >
-              <p v-if="faq.summary" class="leading-relaxed">
+              <p v-if="faq.summary" class="leading-relaxed font-bold text-[#0F172A] dark:text-slate-200 text-xs sm:text-sm">
                 {{ faq.summary }}
               </p>
 
-              <ol v-if="faq.steps" class="list-decimal pl-5 space-y-1 leading-relaxed">
-                <li v-for="(step, idx) in faq.steps" :key="idx">
-                  {{ step }}
+              <ol v-if="faq.steps" class="space-y-2 leading-relaxed text-xs">
+                <li v-for="(step, idx) in faq.steps" :key="idx" class="flex items-start gap-2.5">
+                  <span class="w-4 h-4 rounded-full bg-[#ECF2FF] dark:bg-slate-800 text-[#5D87FF] font-extrabold text-[10px] flex items-center justify-center shrink-0 mt-0.5">
+                    {{ idx + 1 }}
+                  </span>
+                  <span class="flex-1 text-[#334155] dark:text-slate-300 font-medium">{{ step }}</span>
                 </li>
               </ol>
 
-              <div v-if="faq.code" class="p-2.5 bg-[#0F172A] text-emerald-400 rounded-lg font-mono text-xs shadow-inner">
+              <div v-if="faq.code" class="p-3 bg-[#0F172A] text-emerald-400 rounded-xl font-mono text-xs shadow-inner flex items-center justify-between">
                 <code>{{ faq.code }}</code>
+                <span class="text-[10px] text-slate-500 font-bold uppercase">Command</span>
               </div>
 
               <div
                 v-if="faq.isEmergency"
-                class="bg-rose-50 dark:bg-rose-950/40 text-rose-800 dark:text-rose-200 p-3 rounded-lg border border-rose-200 dark:border-rose-900 flex flex-col gap-1"
+                class="bg-rose-50 dark:bg-rose-950/40 text-rose-900 dark:text-rose-200 p-4 rounded-xl border-l-4 border-rose-500 shadow-2xs space-y-1 text-xs"
               >
-                <div class="flex items-center gap-2 font-extrabold text-xs uppercase text-rose-600 dark:text-rose-400">
+                <div class="flex items-center gap-2 font-black uppercase text-rose-600 dark:text-rose-400 text-[11px] tracking-wider">
                   <AlertTriangle class="w-4 h-4" />
                   <span>{{ faq.emergencyTitle }}</span>
                 </div>
                 <p class="leading-relaxed font-bold text-xs">{{ faq.emergencyText }}</p>
-                <p class="text-[11px] opacity-90">{{ faq.details }}</p>
+                <p class="text-[11px] text-rose-700 dark:text-rose-300 font-medium opacity-90">{{ faq.details }}</p>
               </div>
 
               <div v-if="faq.actionLink" class="pt-1">
@@ -589,7 +499,7 @@ const faqs = [
                   :href="faq.actionLink"
                   target="_blank"
                   rel="noopener noreferrer"
-                  class="bg-[#5D87FF] text-white px-3.5 py-1.5 rounded-lg text-xs font-bold hover:bg-[#4570EA] transition-colors inline-flex items-center gap-1.5 shadow-2xs"
+                  class="bg-[#5D87FF] hover:bg-[#4570EA] text-white px-4 py-2 rounded-xl text-xs font-extrabold inline-flex items-center gap-1.5 shadow-2xs transition-colors"
                 >
                   <span>{{ faq.actionText }}</span>
                   <ExternalLink class="w-3.5 h-3.5" />
@@ -598,6 +508,42 @@ const faqs = [
             </div>
           </div>
         </div>
+      </section>
+
+      <!-- 5. NEED PERSONAL ASSISTANCE SECTION -->
+      <section class="bg-white dark:bg-slate-900 border border-[#E5EAEF] dark:border-slate-800 rounded-2xl p-8 sm:p-10 shadow-sm flex flex-col lg:flex-row items-center justify-between gap-8 w-full">
+        
+        <!-- Left Text & Buttons -->
+        <div class="flex-1 space-y-4 max-w-xl text-left">
+          <h2 class="text-2xl sm:text-3xl font-black text-[#0F172A] dark:text-white tracking-tight">
+            Need Personal Assistance?
+          </h2>
+          <p class="text-xs sm:text-sm text-[#64748B] dark:text-slate-400 font-medium leading-relaxed">
+            If you couldn't find the information you need, our IT support team is ready to assist you. Submit a ticket to contact support right away.
+          </p>
+
+          <div class="flex items-center pt-2">
+            <button
+              @click="handleSupportTicketAction"
+              class="bg-[#5D87FF] hover:bg-[#4570EA] text-white font-extrabold text-xs px-6 py-3 rounded-xl shadow-md shadow-[#5D87FF]/20 transition-all cursor-pointer active:scale-95 flex items-center gap-2"
+            >
+              <Ticket class="w-4 h-4" />
+              <span>{{ isAuthenticated ? 'Submit a Ticket' : 'Sign In to Submit a Ticket' }}</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Right Support Graphic Container -->
+        <div class="w-full lg:w-72 flex justify-center shrink-0">
+          <div class="relative w-64 h-44 bg-[#ECF2FF] dark:bg-indigo-950/40 rounded-2xl p-4 flex flex-col items-center justify-center border border-[#5D87FF]/20 text-center shadow-2xs">
+            <div class="w-14 h-14 rounded-full bg-[#5D87FF] text-white flex items-center justify-center shadow-lg shadow-[#5D87FF]/30 mb-2">
+              <Send class="w-7 h-7" />
+            </div>
+            <span class="text-xs font-black text-[#0F172A] dark:text-white">24/7 IT Helpdesk Support</span>
+            <span class="text-[10px] text-[#64748B] dark:text-slate-400 font-bold mt-0.5">Response Time &lt; 15 Mins</span>
+          </div>
+        </div>
+
       </section>
 
     </main>

@@ -34,8 +34,7 @@ const emit = defineEmits(['toggleCollapse']);
 const {
   cases,
   activeCaseId,
-  selectCase,
-  openCreateDrawer
+  selectCase
 } = useCases();
 
 const { isBookmarked } = useBookmarks();
@@ -189,22 +188,6 @@ function handleSelectCase(id) {
         </div>
       </div>
 
-    </div>
-
-    <!-- Pinned Bottom Action Button -->
-    <div class="p-3 border-t border-[#e2e2e4] dark:border-slate-800/80 bg-white dark:bg-slate-950">
-      <button
-        v-if="isCrudUnlocked"
-        @click="openCreateDrawer"
-        class="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-xs font-semibold bg-[#0040e5] hover:bg-[#0034bf] text-white shadow-sm shadow-[#0040e5]/20 transition-all cursor-pointer"
-      >
-        <Plus class="w-4 h-4" />
-        <span>New Documentation / SOP</span>
-      </button>
-
-      <div v-else class="text-[11px] text-center text-[#575d7a] dark:text-slate-500 py-1">
-        <span>Klik logo 5x untuk mode edit</span>
-      </div>
     </div>
   </aside>
 </template>

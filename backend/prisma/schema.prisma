@@ -1,0 +1,48 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Case {
+  id             String   @id
+  title          String
+  category       String
+  severity       String   @default("medium")
+  tags           Json     @default("[]")
+  summary        String   @default("")
+  problemContext String   @default("") @map("problem_context")
+  actionSteps    Json     @default("[]") @map("action_steps")
+  dosAndDonts    Json     @default("{\"dos\":[],\"donts\":[]}") @map("dos_and_donts")
+  snippets       Json     @default("[]")
+  isCustom       Boolean  @default(false) @map("is_custom")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  @@map("cases")
+}
+
+model Template {
+  id        String   @id
+  title     String
+  category  String
+  content   String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("templates")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  username  String   @unique
+  password  String
+  name      String   @default("Admin")
+  role      String   @default("admin")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("users")
+}

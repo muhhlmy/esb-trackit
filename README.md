@@ -1,84 +1,102 @@
 # ESB Case — Knowledge Base & Incident Playbook
 
-A modern, minimalist knowledge base for internship engineering SOPs, troubleshooting, and workflows.
-
-## Fitur Baru
-
-### 1. Case tersimpan antar device (cross-device sync)
-Sebelumnya, Case yang ditambahkan hanya tersimpan di `localStorage` (perangkat yang menambahkannya saja). Sekarang Case disimpan ke **Supabase** (database cloud), sehingga semua perangkat yang membuka app ini akan melihat Case yang sama.
-
-### 2. CRUD tersembunyi (Hidden CRUD)
-Semua tombol Create / Edit / Delete disembunyikan secara default. Untuk memunculkannya:
-
-> **Tekan logo ESB Case sebanyak 5x** (di header atau di halaman utama).
-
-Setelah itu akan muncul:
-- Tombol **New Case** di header.
-- Tombol **Edit** dan **Delete** di setiap Case yang dibuka.
+Platform Knowledge Base & Incident Playbook modern untuk Standard Operating Procedure (SOP) tim engineering, onboarding perangkat, dan workflow kerja.
 
 ---
 
-## Setup Supabase (wajib agar sync antar device berfungsi)
+## 🏗️ Struktur Monorepo & Arsitektur
 
-### Langkah 1 — Buat project Supabase
-1. Buka [supabase.com](https://supabase.com) dan daftar/login.
-2. Buat **New project** (pilih region terdekat).
-3. Catat **Project URL** dan **anon public key** dari menu
-   **Project Settings → API**.
+Proyek telah dimigrasi ke dalam 2 dedicated folder:
 
-### Langkah 2 — Buat tabel
-1. Buka **SQL Editor** di dashboard Supabase.
-2. Tempel seluruh isi file [`supabase/schema.sql`](supabase/schema.sql) lalu klik **Run**.
-   - Ini membuat tabel `cases` + Row Level Security + trigger `updated_at`.
-   - **6 SOP bawaan akan di-seed otomatis oleh app** saat pertama kali dibuka (lihat `seed.js`), jadi tidak perlu insert manual.
-
-### Langkah 3 — Isi kredensial di `config.js`
-Buka `config.js` lalu isi:
-
-```js
-window.SUPABASE_CONFIG = {
-  url: 'https://xxxxxxxxxxxx.supabase.co',   // ganti
-  anonKey: 'eyJhbGciOi...'                    // ganti
-};
+```text
+esb-case/
+├── backend/                  # REST API Server
+│   ├── prisma/               # Schema Prisma & Database Seeder
+│   │   ├── schema.prisma
+│   │   └── seed.js
+│   ├── src/
+│   │   ├── config/           # Prisma client singleton & Dotenv
+│   │   ├── controllers/      # Handlers (Cases, Auth, Templates, Stats)
+│   │   ├── middleware/       # JWT Auth & Error handler Express v5
+│   │   ├── routes/           # Express router endpoints
+│   │   └── app.js            # Express v5 entry point
+│   ├── .env.example
+│   └── package.json          # ESM ("type": "module")
+│
+└── frontend/                 # Client Application
+    ├── public/               # Static assets & SVG icons
+    ├── src/
+    │   ├── assets/           # Tailwind CSS v4 entry
+    │   ├── components/       # Reusable UI & Layout components
+    │   ├── composables/      # Reactive state management (Cases, Auth, Bookmarks, Theme)
+    │   ├── router/           # Vue Router routes
+    │   ├── services/         # API fetch client
+    │   ├── views/            # Home, Cases Master-Detail, Templates, Analytics
+    │   ├── App.vue           # Root component
+    │   └── main.js           # Vue entry point
+    ├── vite.config.js        # Vite + Tailwind v4 + Vue plugin
+    └── package.json
 ```
 
-### Langkah 4 — Deploy / buka app
-Buka `index.html` (langsung, atau via static host seperti GitHub Pages / Netlify / Vercel).
-Case sekarang tersimpan bersama di Supabase.
+---
 
-> **Tanpa Supabase** (config kosong), app tetap berjalan dengan `localStorage`
-> (hanya perangkat lokal) dan memakai `seed.js` sebagai sumber data lokal.
+## 🚀 Panduan Menjalankan Project
+
+### 1. Setup Backend
+
+1. Buka folder `backend/`:
+   ```bash
+   cd backend
+   ```
+2. Salin environment file dan sesuaikan kredensial PostgreSQL Anda:
+   ```bash
+   cp .env.example .env
+   ```
+3. Install dependencies:
+   ```bash
+   npm install
+   ```
+4. Generate Prisma Client & Push skema database:
+   ```bash
+   npx prisma generate
+   npm run prisma:push
+   ```
+5. Jalankan database seeder:
+   ```bash
+   npm run prisma:seed
+   ```
+6. Jalankan backend development server:
+   ```bash
+   npm run dev
+   ```
+   *Backend berjalan pada `http://localhost:5000`*.
 
 ---
 
-## Struktur File
+### 2. Setup Frontend
 
-| File | Keterangan |
-|------|------------|
-| `index.html` | Markup & struktur aplikasi |
-| `styles.css` | Styling (termasuk aturan hidden CRUD) |
-| `app.js` | Logika aplikasi, render, CRUD, sync Supabase + auto-seed |
-| `seed.js` | 6 SOP bawaan (sumber data case; di-insert otomatis ke Supabase saat tabel kosong) |
-| `data.js` | Template komunikasi (`COMMUNICATION_TEMPLATES`) |
-| `config.js` | Kredensial Supabase (isi sendiri) |
-| `supabase/schema.sql` | SQL pembuatan tabel + RLS + trigger |
-
----
-
-## Cara Kerja Auto-Seed
-
-- Saat app dibuka dan Supabase terhubung, app membaca tabel `cases`.
-- Jika tabel **kosong**, app otomatis `upsert` 6 SOP dari `seed.js` ke Supabase,
-  lalu menampilkannya. Dengan begitu semua device melihat data yang sama.
-- `data.js` **tidak lagi** menyimpan case bawaan — hanya template komunikasi.
-
+1. Buka folder `frontend/`:
+   ```bash
+   cd frontend
+   ```
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Jalankan Vite development server:
+   ```bash
+   npm run dev
+   ```
+   *Frontend berjalan pada `http://localhost:5173`*.
 
 ---
 
-## Cara Kerja CRUD Hidden
+## 🔑 Fitur Utama & Akses Admin
 
-- `body` diberi class `crud-unlocked` setelah logo ditekan 5x.
-- CSS menyembunyikan `.btn-new-case`, `.btn-edit-case`, `.btn-delete-case` selama
-  class tersebut belum ada.
-- Saat CRUD dibuka, operasi Create/Update/Delete ditulis ke Supabase (dan
-  di-mirror ke `localStorage` sebagai fallback offline).
+- **Pencarian Cepat**: Shortcut keyboard `/` untuk langsung fokus ke kolom pencarian.
+- **SOP Master-Detail Split**: Navigasi cepat antar panduan hardware, git, workplace, dan devops.
+- **Mode Admin / CRUD Tersembunyi**:
+  - Klik **Logo ESB Case sebanyak 5x** untuk membuka tombol Create/Edit/Delete secara cepat.
+  - Atau klik ikon **Login Admin** di sudut kanan atas header (Default: `admin` / `admin123`).
+- **Templates Hub**: Format komunikasi harian (Daily standup, 15-min stuck rule, PR description, bug report) dengan copy 1-klik.
+- **Analytics & Metrics**: Visualisasi data insiden & SOP dengan Chart.js.

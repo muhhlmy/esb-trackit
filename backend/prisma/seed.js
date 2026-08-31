@@ -1,7 +1,7 @@
-// Seed Data — 6 SOP bawaan ESB Case
-// Sumber data case bawaan. Saat Supabase aktif dan tabel `cases` kosong,
-// data ini di-insert otomatis (seed-on-first-load) oleh app.js.
-// Jika Supabase belum dikonfigurasi, data ini dipakai sebagai fallback lokal.
+import { PrismaClient } from '@prisma/client';
+import bcrypt from 'bcryptjs';
+
+const prisma = new PrismaClient();
 
 const SEED_CASES = [
   {
@@ -51,7 +51,8 @@ powershell -Command "Set-LocalUser -Name 'ESB-User' -PasswordNeverExpires $true"
 echo User ESB-User berhasil dibuat dengan password tidak pernah expired.
 pause`
       }
-    ]
+    ],
+    isCustom: false
   },
   {
     id: 'laptop-02',
@@ -89,7 +90,8 @@ pause`
         label: 'PowerShell Command - Set Password Never Expire',
         code: `powershell -Command "Set-LocalUser -Name 'ESB-User' -PasswordNeverExpires $true"`
       }
-    ]
+    ],
+    isCustom: false
   },
   {
     id: 'hp-01',
@@ -123,7 +125,8 @@ pause`
         label: 'Link Form Serah Terima HP',
         code: 'https://docs.google.com/document/d/1uDDbC77cmnm1J4yBDSQLW23pDkv4Y2R7h0myL_lkdbM/'
       }
-    ]
+    ],
+    isCustom: false
   },
   {
     id: 'hp-02',
@@ -158,7 +161,8 @@ pause`
         label: 'Link Form Serah Terima HP',
         code: 'https://docs.google.com/document/d/1uDDbC77cmnm1J4yBDSQLW23pDkv4Y2R7h0myL_lkdbM/'
       }
-    ]
+    ],
+    isCustom: false
   },
   {
     id: 'google-workspace-01',
@@ -192,7 +196,8 @@ pause`
         label: 'Link Direct Google Admin Console',
         code: 'https://admin.google.com/'
       }
-    ]
+    ],
+    isCustom: false
   },
   {
     id: 'google-workspace-02',
@@ -224,9 +229,119 @@ pause`
     snippets: [
       {
         label: 'Default Password Reset & Console Link',
-        code: `Portal: https://admin.google.com/
-Default Temp Password: Essensians@2026`
+        code: `Portal: https://admin.google.com/\nDefault Temp Password: Essensians@2026`
       }
-    ]
+    ],
+    isCustom: false
   }
 ];
+
+const SEED_TEMPLATES = [
+  {
+    id: 'tpl-standup',
+    title: 'Daily Standup Report',
+    category: 'Standup & Reporting',
+    content: `📌 **Daily Update - [Nama Kamu]** (Intern Software Engineer)\nTanggal: [DD/MM/YYYY]\n\n✅ **Yesterday / Completed:**\n- Selesai slicing UI halaman Dashboard Analytics (TASK-101)\n- Integrasi API Get User Profile & test case status code 200\n\n🎯 **Today / Planned:**\n- Mengerjakan fitur Filter Date Range di Dashboard Analytics (TASK-102)\n- Unit testing pada komponen chart\n\n🚧 **Blockers / Impediments:**\n- None`
+  },
+  {
+    id: 'tpl-stuck',
+    title: 'Bertanya Saat Stuck (15-Min Rule)',
+    category: 'Question & Support',
+    content: `Selamat pagi/siang Mas/Mbak [Nama Mentor], izin bertanya terkait task [Nama Task/Tiket]:\nSaya sedang mencoba [tujuan fitur], namun saat ini mengalami kendala [ringkasan error/behavior yang salah].\n\nBeberapa hal yang sudah saya coba perbaiki:\n1. [Langkah 1 yang sudah dicoba]\n2. [Langkah 2 yang sudah dicoba]\n\nBerikut saya lampirkan screenshot log error-nya. Jika Mas/Mbak ada waktu luang nanti, boleh minta arahan sebentar? Terima kasih banyak!`
+  },
+  {
+    id: 'tpl-pr',
+    title: 'Pull Request (PR) Description',
+    category: 'Code Review',
+    content: `## 📝 Summary of Changes\n- Implemented [Nama Fitur / Tiket ID]\n- Added responsive layout for mobile viewport\n- Integrated API endpoint POST /api/v1/resource\n\n## 🧪 How Has This Been Tested?\n- [x] Tested locally on Chrome & Firefox\n- [x] Verified unit tests passing (\`npm run test\`)\n- [x] Checked console for zero warnings/errors\n\n## 📸 Screenshots / GIFs\n(Attach screenshots here)\n\n## 📌 Checklist\n- [x] Followed team code style guidelines\n- [x] Self-reviewed code before requesting review`
+  },
+  {
+    id: 'tpl-bug-report',
+    title: 'Laporan Bug ke Tim Backend / QA',
+    category: 'Bug Report',
+    content: `🚨 **Bug Report / Staging Issue**\n- **Feature / Area:** [Nama Halaman / Module]\n- **Environment:** Staging / Local Dev\n- **Endpoint / Action:** [POST /api/v1/example]\n- **Expected Behavior:** [Hasil yang seharusnya]\n- **Actual Behavior:** [Hasil error / 500 status]\n- **Payload & Response:** \n  \`\`\`json\n  { "error": "Internal Server Error", "code": 500 }\n  \`\`\`\n- **Note:** Mohon konfirmasi apakah endpoint ini sedang ada perbaikan DB. Terima kasih!`
+  }
+];
+
+async function main() {
+  console.log('🌱 Starting Database Seeding with Prisma...');
+
+  // 1. Seed Cases
+  for (const caseData of SEED_CASES) {
+    await prisma.case.upsert({
+      where: { id: caseData.id },
+      update: {
+        title: caseData.title,
+        category: caseData.category,
+        severity: caseData.severity,
+        tags: caseData.tags,
+        summary: caseData.summary,
+        problemContext: caseData.problemContext,
+        actionSteps: caseData.actionSteps,
+        dosAndDonts: caseData.dosAndDonts,
+        snippets: caseData.snippets,
+        isCustom: caseData.isCustom
+      },
+      create: {
+        id: caseData.id,
+        title: caseData.title,
+        category: caseData.category,
+        severity: caseData.severity,
+        tags: caseData.tags,
+        summary: caseData.summary,
+        problemContext: caseData.problemContext,
+        actionSteps: caseData.actionSteps,
+        dosAndDonts: caseData.dosAndDonts,
+        snippets: caseData.snippets,
+        isCustom: caseData.isCustom
+      }
+    });
+  }
+  console.log(`✅ Seeded ${SEED_CASES.length} Cases`);
+
+  // 2. Seed Templates
+  for (const tpl of SEED_TEMPLATES) {
+    await prisma.template.upsert({
+      where: { id: tpl.id },
+      update: {
+        title: tpl.title,
+        category: tpl.category,
+        content: tpl.content
+      },
+      create: {
+        id: tpl.id,
+        title: tpl.title,
+        category: tpl.category,
+        content: tpl.content
+      }
+    });
+  }
+  console.log(`✅ Seeded ${SEED_TEMPLATES.length} Templates`);
+
+  // 3. Seed Admin User
+  const adminPassword = await bcrypt.hash('admin123', 10);
+  await prisma.user.upsert({
+    where: { username: 'admin' },
+    update: {
+      password: adminPassword
+    },
+    create: {
+      username: 'admin',
+      name: 'ESB Administrator',
+      password: adminPassword,
+      role: 'admin'
+    }
+  });
+  console.log('✅ Seeded default Admin user (username: admin, password: admin123)');
+
+  console.log('🎉 Seeding successfully completed!');
+}
+
+main()
+  .catch((e) => {
+    console.error('❌ Error during seeding:', e);
+    process.exit(1);
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
+  });

@@ -84,7 +84,7 @@ onUnmounted(() => {
 
   <!-- 2. Halaman Help Center Standalone (Tampilan Persis Branch Help-Center tanpa TrackIT Sidebar & Header) -->
   <template v-else-if="isHelpCenterView">
-    <div class="min-h-screen bg-[#f9f9fb] dark:bg-slate-950 text-[#1a1c1d] dark:text-slate-100 flex flex-col antialiased selection:bg-[#0040e5] selection:text-white pb-16 md:pb-0 transition-colors duration-200">
+    <div class="min-h-screen bg-[#F8FAFC] dark:bg-slate-950 text-[#0F172A] dark:text-slate-100 flex flex-col antialiased selection:bg-[#5D87FF] selection:text-white pb-16 md:pb-0 transition-colors duration-200">
       <Navbar />
       <div class="flex-1 flex flex-col">
         <RouterView v-slot="{ Component }">

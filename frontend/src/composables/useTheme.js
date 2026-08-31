@@ -1,7 +1,8 @@
 import { ref } from 'vue';
 
-const savedTheme = typeof localStorage !== 'undefined' ? localStorage.getItem('esb_theme') : null;
-const isDark = ref(savedTheme ? savedTheme === 'dark' : false);
+// Default ALWAYS to light mode unless explicitly set to 'dark' by user interaction
+const savedTheme = typeof localStorage !== 'undefined' ? localStorage.getItem('esb_theme') : 'light';
+const isDark = ref(savedTheme === 'dark');
 
 export function useTheme() {
   function toggleTheme() {

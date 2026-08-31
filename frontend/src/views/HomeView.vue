@@ -2,9 +2,36 @@
 import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useCases } from '@/composables/useCases';
+import { useAuth } from '@/composables/useAuth';
+import {
+  Search,
+  Laptop,
+  AppWindow,
+  ShieldCheck,
+  Wifi,
+  Building2,
+  Server,
+  ChevronDown,
+  AlertTriangle,
+  FolderOpen,
+  ExternalLink,
+  X,
+  ArrowRight,
+  BookOpen,
+  Lock,
+  Mail,
+  Monitor,
+  Headphones,
+  Zap,
+  Boxes,
+  Ticket,
+  ChevronRight,
+  ArrowUpRight
+} from 'lucide-vue-next';
 
 const router = useRouter();
 const { cases, setSearch, setCategory } = useCases();
+const { isCrudUnlocked } = useAuth();
 
 const localSearch = ref('');
 const isInputFocused = ref(false);
@@ -18,14 +45,8 @@ const liveSuggestions = computed(() => {
     .slice(0, 5);
 });
 
-const featuredCases = computed(() => cases.value.slice(0, 4));
-
-const quickStats = computed(() => {
-  const total = cases.value.length;
-  const hardware = cases.value.filter((c) => c.category === 'hardware').length;
-  const workplace = cases.value.filter((c) => c.category === 'workplace').length;
-  const highSev = cases.value.filter((c) => (c.severity || '').toLowerCase() === 'high').length;
-  return { total, hardware, workplace, highSev };
+const featuredCases = computed(() => {
+  return cases.value.slice(0, 5);
 });
 
 function handleSearchSubmit() {
@@ -49,41 +70,82 @@ function toggleFaq(id) {
   openFaqId.value = openFaqId.value === id ? null : id;
 }
 
-// Hide suggestions on blur, delayed so mousedown on a suggestion still fires first.
-function blurSuggestions() {
-  setTimeout(() => { isInputFocused.value = false; }, 150);
+function handleQuickLinkClick(ql) {
+  if (ql.isTicketLink) {
+    router.push('/dashboard');
+  } else {
+    setSearch(ql.query);
+    router.push('/cases');
+  }
 }
 
-function severityClasses(sev) {
+function getSeverityBadge(sev) {
   const s = (sev || '').toLowerCase();
-  if (s === 'high' || s === 'critical')
-    return { pill: 'bg-[#FEE2E2] text-[#B91C1C] border-[#FCA5A5] dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800', dot: 'bg-[#B91C1C] dark:bg-rose-400' };
-  if (s === 'medium')
-    return { pill: 'bg-[#FEF9C3] text-[#854D0E] border-[#FDE047] dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800', dot: 'bg-[#854D0E] dark:bg-amber-400' };
-  return { pill: 'bg-[#DCFCE7] text-[#15803D] border-[#86EFAC] dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800', dot: 'bg-[#15803D] dark:bg-emerald-400' };
+  if (s === 'high' || s === 'critical') return { text: 'Tinggi', bg: 'bg-rose-50 text-rose-600 border-rose-200 dark:bg-rose-950/60 dark:text-rose-300 dark:border-rose-800' };
+  if (s === 'medium') return { text: 'Sedang', bg: 'bg-amber-50 text-amber-600 border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800' };
+  return { text: 'Rendah', bg: 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800' };
 }
 
+// Quick Access Items
+const quickLinks = [
+  { label: 'Reset password akun Google Workspace', icon: Lock, query: 'Password Reset' },
+  { label: 'Update email & kredensial perusahaan', icon: Mail, query: 'Google Workspace' },
+  { label: 'Bypass OOBE akun Microsoft laptop baru', icon: Monitor, query: 'Bypass OOBE' },
+  { label: 'Permintaan unit laptop & HP stock baru', icon: Laptop, query: 'Hardware Request' },
+  { label: 'Buka tiket / hubungi tim helpdesk IT', icon: Headphones, isTicketLink: true }
+];
+
+// Enterprise Categories
 const topicCards = [
-  { id: 'hardware', title: 'Hardware & Perangkat', description: 'Permintaan laptop baru, perbaikan PC, laporan fisik printer, dan stok HP.', icon: 'laptop', badge: 'Hardware' },
-  { id: 'software', title: 'Software & Lisensi', description: 'Instalasi aplikasi standar, lisensi software, standarisasi PR, dan runtime fix.', icon: 'apps', badge: 'Software' },
-  { id: 'workplace', title: 'Akses & Keamanan', description: 'Reset password Google Workspace, verifikasi 2-Step (2SV), dan otorisasi hak akses.', icon: 'shield', badge: 'Security' },
-  { id: 'environment', title: 'Jaringan & Wi-Fi', description: 'Konfigurasi VPN kantor, bypass OOBE Windows, koneksi Wi-Fi cabang, dan proxy.', icon: 'wifi', badge: 'Network' },
-  { id: 'workplace', title: 'Sistem Karyawan & HR', description: 'Akses portal payroll, komunikasi PBX, onboarding karyawan baru, dan pelacakan aset.', icon: 'apartment', badge: 'HR / Workplace' },
-  { id: 'backend', title: 'Infrastruktur & Server', description: 'Perangkat ruang rapat, pemeliharaan server database, dan relokasi meja kerja.', icon: 'dns', badge: 'Infrastructure' },
+  {
+    id: 'workplace',
+    title: 'Account & Access',
+    description: 'Reset password, Google Workspace, verifikasi 2SV, dan otorisasi hak akses.',
+    icon: ShieldCheck,
+    badge: 'Akun & Security',
+    count: 4
+  },
+  {
+    id: 'hardware',
+    title: 'Devices & Hardware',
+    description: 'Permintaan laptop baru, perbaikan PC, printer kantor, dan stok HP.',
+    icon: Laptop,
+    badge: 'Perangkat',
+    count: 3
+  },
+  {
+    id: 'environment',
+    title: 'Network & Security',
+    description: 'Konfigurasi VPN kantor, bypass OOBE Windows, Wi-Fi cabang, dan proxy.',
+    icon: Wifi,
+    badge: 'Jaringan',
+    count: 5
+  },
+  {
+    id: 'software',
+    title: 'Software & Tools',
+    description: 'Instalasi aplikasi standar, lisensi software, standarisasi PR, dan runtime fix.',
+    icon: AppWindow,
+    badge: 'Software',
+    count: 3
+  },
+  {
+    id: 'workplace',
+    title: 'HR Systems & PBX',
+    description: 'Akses portal payroll, komunikasi PBX, onboarding karyawan baru, dan aset.',
+    icon: Building2,
+    badge: 'HR & Work',
+    count: 2
+  },
+  {
+    id: 'backend',
+    title: 'IT Infrastructure',
+    description: 'Perangkat ruang rapat, pemeliharaan server database, dan relokasi desk.',
+    icon: Server,
+    badge: 'Server & Infra',
+    count: 2
+  }
 ];
-
-const popularTags = [
-  { label: 'Password Reset', q: 'Password Reset' },
-  { label: 'VPN Setup', q: 'VPN Setup' },
-  { label: 'Setup Laptop', q: 'Setup Laptop' },
-];
-
-const stats = computed(() => [
-  { label: 'Total SOP', value: quickStats.value.total, icon: 'menu_book', tint: 'text-[#2563EB] dark:text-blue-400', bg: 'bg-[#EFF6FF] dark:bg-slate-800' },
-  { label: 'Hardware', value: quickStats.value.hardware, icon: 'devices', tint: 'text-[#059669] dark:text-emerald-400', bg: 'bg-[#ECFDF5] dark:bg-emerald-950/40' },
-  { label: 'Workplace', value: quickStats.value.workplace, icon: 'badge', tint: 'text-[#0284C7] dark:text-sky-400', bg: 'bg-[#F0F9FF] dark:bg-sky-950/40' },
-  { label: 'Prioritas', value: quickStats.value.highSev, icon: 'priority_high', tint: 'text-[#DC2626] dark:text-rose-400', bg: 'bg-[#FEF2F2] dark:bg-rose-950/40' },
-]);
 
 const faqs = [
   {
@@ -109,7 +171,7 @@ const faqs = [
       'Ketikkan perintah oobe\\bypassnro lalu tekan Enter.',
       'Laptop akan restart otomatis dan menampilkan opsi setup Local Account offline.'
     ],
-    code: 'oobe\\bypassnro'
+    code: 'oobe\bypassnro'
   },
   {
     id: 'faq-3',
@@ -134,407 +196,411 @@ const faqs = [
 </script>
 
 <template>
-  <main class="w-full max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 flex flex-col gap-6 sm:gap-8">
+  <div class="page-home-command-center min-h-screen bg-[#F5F7FA] dark:bg-slate-950 text-[#2A3547] dark:text-slate-100 transition-colors duration-200">
+    
+    <main class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col gap-6">
+      
+      <!-- 1. COMPACT ENTERPRISE HERO / SEARCH AREA (100% LIGHT MODE WHITE CARD, 250-320px) -->
+      <section class="bg-white dark:bg-slate-900 border border-[#E5EAEF] dark:border-slate-800 rounded-xl p-5 sm:p-6 shadow-2xs flex flex-col gap-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#F1F5F9] dark:border-slate-800 pb-3">
+          <div class="flex items-center gap-2">
+            <span class="px-2.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wider bg-[#ECF2FF] text-[#5D87FF] dark:bg-indigo-950/60 dark:text-indigo-300 rounded border border-[#5D87FF]/20">
+              ESB TrackIT Help Center
+            </span>
+            <span class="text-xs text-[#7C8BAC] dark:text-slate-400 font-medium hidden sm:inline">&bull; Command Center &amp; Incident Playbook</span>
+          </div>
 
-    <!-- ═══════════════════════════════════════════
-         HERO — Search-first, calm, enterprise
-         ═══════════════════════════════════════════ -->
-    <section
-      class="relative overflow-hidden rounded-2xl border border-[#E2E8F0] dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm"
-    >
-      <!-- Subtle ambient brand tint (barely visible) -->
-      <div aria-hidden="true" class="absolute inset-x-0 -top-24 h-64 bg-[radial-gradient(ellipse_at_top,_rgba(37,99,235,0.08),_transparent_70%)] dark:bg-[radial-gradient(ellipse_at_top,_rgba(59,130,246,0.12),_transparent_70%)] pointer-events-none"></div>
-
-      <div class="relative flex flex-col items-center text-center gap-5 max-w-2xl mx-auto px-5 py-10 sm:px-8 sm:py-14">
-        <!-- Brand badge (calm blue, tiny orange dot as ESB signature) -->
-        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#EFF6FF] dark:bg-slate-800 text-[#2563EB] dark:text-blue-400 text-[11px] font-bold border border-[#2563EB]/15 dark:border-slate-700">
-          <span class="w-1.5 h-1.5 rounded-full bg-[#FC841B]"></span>
-          <span>Pusat Bantuan &amp; Playbook Insiden IT ESB</span>
+          <div class="flex items-center gap-2 text-xs font-bold text-[#5D87FF]">
+            <RouterLink to="/cases" class="hover:underline flex items-center gap-1">
+              <span>Direktori SOP Kompleks</span>
+              <ChevronRight class="w-3.5 h-3.5" />
+            </RouterLink>
+          </div>
         </div>
 
-        <div class="space-y-2">
-          <h1 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#0F172A] dark:text-white tracking-tight leading-[1.15]">
-            Apa yang dapat kami bantu hari ini?
+        <div class="space-y-1">
+          <h1 class="text-xl sm:text-2xl font-extrabold text-[#0F172A] dark:text-white tracking-tight">
+            How can we help?
           </h1>
-          <p class="text-xs sm:text-sm text-[#64748B] dark:text-slate-400 max-w-xl mx-auto font-medium leading-relaxed">
-            Cari prosedur operasional standar (SOP), panduan jaringan, reset password, dan incident playbook secara cepat.
+          <p class="text-xs text-[#64748B] dark:text-slate-400 font-medium">
+            Cari panduan operasional standar (SOP), verifikasi akun, konfigurasi jaringan, dan penanganan insiden IT.
           </p>
         </div>
 
-        <!-- Search input — the hero focal point -->
-        <div class="w-full relative mt-1">
-          <form @submit.prevent="handleSearchSubmit" class="relative">
-            <span class="material-symbols-outlined absolute left-3.5 sm:left-4 top-1/2 -translate-y-1/2 text-[20px] sm:text-[22px] text-[#64748B] dark:text-slate-400 pointer-events-none">search</span>
-            <input
-              v-model="localSearch"
-              @focus="isInputFocused = true"
-              @blur="blurSuggestions"
-              type="text"
-              class="w-full h-12 sm:h-13 pl-11 sm:pl-12 pr-20 sm:pr-24 bg-[#F8FAFC] dark:bg-slate-950 border border-[#E2E8F0] dark:border-slate-700 rounded-xl text-sm sm:text-[15px] font-semibold text-[#0F172A] dark:text-white placeholder-[#94A3B8] dark:placeholder-slate-500 focus:bg-white dark:focus:bg-slate-900 focus:border-[#2563EB] dark:focus:border-blue-500 focus:ring-4 focus:ring-[#2563EB]/10 dark:focus:ring-blue-500/20 focus:outline-none transition-all shadow-sm"
-              placeholder="Ketik kata kunci pencarian SOP, artikel, atau kode insiden..."
-              autocomplete="off"
-              aria-label="Cari SOP dan artikel bantuan"
-            />
-            <div class="absolute right-3 sm:right-3.5 top-1/2 -translate-y-1/2 flex items-center gap-1">
+        <!-- Prominent Search Bar (Compact h-11 Enterprise Input) -->
+        <div class="w-full relative">
+          <form @submit.prevent="handleSearchSubmit" class="flex items-center gap-2">
+            <div class="relative flex-1 flex items-center">
+              <Search class="absolute left-3.5 w-4 h-4 text-[#5D87FF] pointer-events-none" />
+              <input
+                v-model="localSearch"
+                @focus="isInputFocused = true"
+                type="text"
+                class="w-full h-11 pl-10 pr-10 bg-[#F8FAFC] dark:bg-slate-950 border border-[#E5EAEF] dark:border-slate-800 rounded-lg text-xs font-bold text-[#0F172A] dark:text-white placeholder-[#94A3B8] dark:placeholder-slate-500 focus:bg-white dark:focus:bg-slate-900 focus:border-[#5D87FF] focus:outline-none transition-all shadow-2xs"
+                placeholder="Cari panduan, SOP, atau solusi untuk masalah IT Anda..."
+                autocomplete="off"
+              />
               <button
                 v-if="localSearch"
                 type="button"
                 @click="localSearch = ''"
-                class="p-1 text-[#64748B] dark:text-slate-400 hover:text-[#0F172A] dark:hover:text-white rounded transition-colors"
-                aria-label="Bersihkan pencarian"
+                class="absolute right-3 p-1 text-[#7C8BAC] hover:text-[#0F172A] dark:hover:text-white"
               >
-                <span class="material-symbols-outlined text-[18px]">close</span>
+                <X class="w-3.5 h-3.5" />
               </button>
-              <kbd
-                v-else
-                class="hidden sm:inline-block px-2 py-0.5 text-[10px] font-mono font-semibold text-[#475569] dark:text-slate-400 bg-white dark:bg-slate-800 border border-[#E2E8F0] dark:border-slate-700 rounded shadow-2xs"
-              >
-                Ctrl K
-              </kbd>
             </div>
+            <button
+              type="submit"
+              class="h-11 px-5 bg-[#5D87FF] hover:bg-[#4570EA] text-white font-extrabold text-xs rounded-lg transition-all cursor-pointer shrink-0 shadow-2xs flex items-center gap-1.5"
+            >
+              <span>Search</span>
+            </button>
           </form>
 
-          <!-- Live autocomplete -->
+          <!-- Live Autocomplete Suggestions -->
           <div
             v-if="liveSuggestions.length > 0 && isInputFocused"
-            class="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-700 rounded-xl shadow-2xl overflow-hidden z-30 text-left divide-y divide-[#F1F5F9] dark:divide-slate-800"
+            class="absolute top-full left-0 right-0 mt-1.5 bg-white dark:bg-slate-900 text-[#0F172A] dark:text-white rounded-xl shadow-lg overflow-hidden z-30 text-left divide-y divide-[#F1F5F9] dark:divide-slate-800 border border-[#E5EAEF] dark:border-slate-800"
           >
             <button
               v-for="sug in liveSuggestions"
               :key="sug.id"
-              type="button"
-              @mousedown.prevent="setSearch(sug.title); router.push('/cases')"
-              class="w-full px-4 py-3 hover:bg-[#EFF6FF] dark:hover:bg-slate-800 flex items-center justify-between gap-3 text-xs text-[#0F172A] dark:text-slate-100 transition-colors cursor-pointer"
+              @mousedown="setSearch(sug.title); router.push('/cases')"
+              class="w-full p-3 hover:bg-[#ECF2FF] dark:hover:bg-slate-800 flex items-center justify-between text-xs transition-colors cursor-pointer"
             >
-              <div class="flex items-center gap-2.5 truncate min-w-0">
-                <span class="material-symbols-outlined text-[18px] text-[#2563EB] dark:text-blue-400 shrink-0">search</span>
-                <span class="font-semibold truncate">{{ sug.title }}</span>
+              <div class="flex items-center gap-2.5 truncate mr-3">
+                <Search class="w-3.5 h-3.5 text-[#5D87FF] shrink-0" />
+                <span class="font-bold truncate">{{ sug.title }}</span>
               </div>
-              <span class="px-2 py-0.5 rounded text-[9.5px] bg-[#F1F5F9] dark:bg-slate-800 text-[#475569] dark:text-slate-400 uppercase font-bold shrink-0">
+              <span class="px-2 py-0.5 rounded text-[9.5px] bg-[#ECF2FF] text-[#5D87FF] dark:bg-slate-800 dark:text-indigo-300 font-extrabold uppercase shrink-0">
                 {{ sug.category }}
               </span>
             </button>
           </div>
         </div>
 
-        <!-- Popular tags -->
-        <div class="flex flex-wrap justify-center items-center gap-2 pt-1">
-          <span class="font-semibold text-[#64748B] dark:text-slate-400 text-[11px]">Pencarian Populer:</span>
+        <!-- Popular Tag Chips -->
+        <div class="flex flex-wrap items-center gap-2 text-xs pt-0.5">
+          <span class="text-[#7C8BAC] dark:text-slate-400 font-bold text-[11px]">Pencarian Populer:</span>
           <button
-            v-for="tag in popularTags"
-            :key="tag.q"
-            type="button"
-            @click="handlePopularClick(tag.q)"
-            class="px-2.5 py-1 rounded-lg bg-[#EFF6FF] dark:bg-slate-800 text-[#2563EB] dark:text-blue-400 font-semibold text-[11px] hover:bg-[#2563EB] hover:text-white dark:hover:bg-blue-600 dark:hover:text-white transition-all cursor-pointer border border-[#2563EB]/15 dark:border-slate-700"
+            @click="handlePopularClick('Password Reset')"
+            class="px-2.5 py-0.5 rounded bg-[#ECF2FF] text-[#5D87FF] dark:bg-slate-800 dark:text-indigo-300 font-bold text-[11px] hover:bg-[#5D87FF] hover:text-white transition-all cursor-pointer border border-[#5D87FF]/20"
           >
-            {{ tag.label }}
+            Password Reset
+          </button>
+          <button
+            @click="handlePopularClick('VPN Setup')"
+            class="px-2.5 py-0.5 rounded bg-[#ECF2FF] text-[#5D87FF] dark:bg-slate-800 dark:text-indigo-300 font-bold text-[11px] hover:bg-[#5D87FF] hover:text-white transition-all cursor-pointer border border-[#5D87FF]/20"
+          >
+            VPN Setup
+          </button>
+          <button
+            @click="handlePopularClick('Setup Laptop')"
+            class="px-2.5 py-0.5 rounded bg-[#ECF2FF] text-[#5D87FF] dark:bg-slate-800 dark:text-indigo-300 font-bold text-[11px] hover:bg-[#5D87FF] hover:text-white transition-all cursor-pointer border border-[#5D87FF]/20"
+          >
+            Hardware Request
           </button>
         </div>
-      </div>
-    </section>
 
-    <!-- ═══════════════════════════════════════════
-         QUICK STATS — calm data strip
-         ═══════════════════════════════════════════ -->
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
-      <div
-        v-for="stat in stats"
-        :key="stat.label"
-        class="bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 rounded-xl p-3.5 sm:p-4 shadow-2xs hover:border-[#CBD5E1] dark:hover:border-slate-700 transition-all flex items-center gap-3"
-      >
-        <div
-          class="flex h-8 w-8 sm:h-9 sm:w-9 shrink-0 items-center justify-center rounded-lg"
-          :class="[stat.bg, stat.tint]"
-        >
-          <span aria-hidden="true" class="material-symbols-outlined text-[18px] sm:text-[20px]">{{ stat.icon }}</span>
-        </div>
-        <div class="min-w-0">
-          <p class="text-[10px] sm:text-[11px] font-semibold text-[#64748B] dark:text-slate-400 uppercase tracking-wider truncate">{{ stat.label }}</p>
-          <span class="font-num block text-[20px] sm:text-[24px] font-bold leading-none tracking-tight text-[#0F172A] dark:text-white mt-1.5">{{ stat.value }}</span>
-        </div>
-      </div>
-    </div>
+      </section>
 
-    <!-- ═══════════════════════════════════════════
-         CATEGORIES
-         ═══════════════════════════════════════════ -->
-    <section class="space-y-4">
-      <div class="flex items-end justify-between gap-3">
-        <div class="min-w-0">
-          <h2 class="text-lg sm:text-xl font-bold text-[#0F172A] dark:text-white tracking-tight">Kategori Layanan &amp; SOP</h2>
-          <p class="text-xs text-[#64748B] dark:text-slate-400 mt-0.5">Pilih domain panduan untuk membaca artikel operasional lengkap</p>
-        </div>
-        <RouterLink
-          to="/cases"
-          class="hidden sm:inline-flex shrink-0 items-center gap-1.5 text-xs font-semibold text-[#2563EB] dark:text-blue-400 bg-[#EFF6FF] dark:bg-slate-800 px-3.5 py-1.5 rounded-full hover:bg-[#DBEAFE] dark:hover:bg-slate-700 hover:text-[#1D4ED8] dark:hover:text-blue-300 transition-colors"
-        >
-          <span>Lihat Semua</span>
-          <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
-        </RouterLink>
-      </div>
+      <!-- 2. QUICK LINKS / POPULAR ACCESS BAR -->
+      <section class="space-y-2">
+        <h3 class="text-xs font-extrabold uppercase tracking-wider text-[#7C8BAC] dark:text-slate-400 flex items-center gap-1.5 px-1">
+          <Zap class="w-3.5 h-3.5 text-[#5D87FF]" />
+          <span>Quick Links &amp; Solusi Cepat</span>
+        </h3>
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        <button
-          v-for="card in topicCards"
-          :key="card.title"
-          type="button"
-          class="text-left bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 rounded-xl p-5 flex flex-col gap-3.5 shadow-sm hover:shadow-md hover:border-[#2563EB]/40 dark:hover:border-blue-500/40 transition-all duration-200 group cursor-pointer"
-          @click="handleCategoryNavigate(card.id)"
-        >
-          <div class="flex items-start justify-between">
-            <span class="flex items-center justify-center w-10 h-10 rounded-lg bg-[#EFF6FF] dark:bg-slate-800 text-[#2563EB] dark:text-blue-400 group-hover:bg-[#2563EB] group-hover:text-white dark:group-hover:bg-blue-600 dark:group-hover:text-white transition-colors">
-              <span class="material-symbols-outlined text-[20px]">{{ card.icon }}</span>
-            </span>
-            <span class="px-2 py-0.5 text-[9.5px] font-bold uppercase tracking-wider bg-[#F8FAFC] dark:bg-slate-800 text-[#64748B] dark:text-slate-400 rounded border border-[#E2E8F0] dark:border-slate-700">
-              {{ card.badge }}
-            </span>
-          </div>
-
-          <div class="space-y-1">
-            <h3 class="text-sm font-bold text-[#0F172A] dark:text-white group-hover:text-[#2563EB] dark:group-hover:text-blue-400 transition-colors">
-              {{ card.title }}
-            </h3>
-            <p class="text-xs text-[#64748B] dark:text-slate-400 leading-relaxed font-medium">
-              {{ card.description }}
-            </p>
-          </div>
-
-          <div class="pt-2.5 border-t border-[#F1F5F9] dark:border-slate-800 flex items-center justify-between text-xs font-bold text-[#2563EB] dark:text-blue-400">
-            <span>Buka SOP</span>
-            <span class="material-symbols-outlined text-[15px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
-          </div>
-        </button>
-      </div>
-    </section>
-
-    <!-- ═══════════════════════════════════════════
-         FEATURED SOP TABLE
-         ═══════════════════════════════════════════ -->
-    <section
-      class="bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300"
-    >
-      <div class="flex items-center justify-between gap-3 px-5 sm:px-6 py-4 sm:py-5 border-b border-[#F1F5F9] dark:border-slate-800">
-        <div class="min-w-0">
-          <h3 class="text-base sm:text-lg font-bold text-[#0F172A] dark:text-white">Dokumen SOP Utama</h3>
-          <p class="text-xs text-[#64748B] dark:text-slate-400 mt-0.5">Prosedur Operasional Standar yang paling sering dirujuk</p>
-        </div>
-        <RouterLink
-          to="/cases"
-          class="hidden sm:inline-flex shrink-0 items-center gap-1.5 text-xs font-semibold text-[#2563EB] dark:text-blue-400 bg-[#EFF6FF] dark:bg-slate-800 px-3.5 py-1.5 rounded-full hover:bg-[#DBEAFE] dark:hover:bg-slate-700 hover:text-[#1D4ED8] dark:hover:text-blue-300 transition-colors"
-        >
-          Direktori SOP
-          <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
-        </RouterLink>
-      </div>
-
-      <!-- Desktop: table (sm and up) -->
-      <div class="hidden sm:block overflow-x-auto">
-        <table class="w-full">
-          <thead>
-            <tr class="border-b border-[#F1F5F9] dark:border-slate-800">
-              <th class="text-left text-xs font-semibold text-[#64748B] dark:text-slate-400 uppercase tracking-wide py-3 px-6">Judul Dokumen SOP</th>
-              <th class="text-left text-xs font-semibold text-[#64748B] dark:text-slate-400 uppercase tracking-wide py-3 px-6 w-28">Kategori</th>
-              <th class="text-left text-xs font-semibold text-[#64748B] dark:text-slate-400 uppercase tracking-wide py-3 px-6 w-28">Prioritas</th>
-              <th class="text-right text-xs font-semibold text-[#64748B] dark:text-slate-400 uppercase tracking-wide py-3 px-6 w-24">Aksi</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr
-              v-for="c in featuredCases"
-              :key="c.id"
-              class="border-b border-[#F8FAFC] dark:border-slate-800/60 hover:bg-[#F8FAFC] dark:hover:bg-slate-800/50 transition-colors duration-150"
-            >
-              <td class="py-3.5 px-6">
-                <div class="flex items-center gap-3 min-w-0">
-                  <span class="material-symbols-outlined text-[19px] text-[#2563EB] dark:text-blue-400 flex-shrink-0" style="opacity: 0.75">description</span>
-                  <div class="min-w-0">
-                    <p class="text-sm font-semibold text-[#0F172A] dark:text-white leading-tight truncate">{{ c.title }}</p>
-                    <p class="text-xs text-[#64748B] dark:text-slate-400 truncate max-w-md mt-0.5">{{ c.summary }}</p>
-                  </div>
-                </div>
-              </td>
-              <td class="py-3.5 px-6">
-                <span class="inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-bold tracking-[0.01em] bg-[#DBEAFE] text-[#1E40AF] border-[#93C5FD] dark:bg-slate-800 dark:text-blue-300 dark:border-slate-700">
-                  <span class="h-1.5 w-1.5 rounded-full bg-[#1E40AF] dark:bg-blue-400"></span>
-                  {{ c.category }}
-                </span>
-              </td>
-              <td class="py-3.5 px-6">
-                <span
-                  class="inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-bold tracking-[0.01em] capitalize"
-                  :class="severityClasses(c.severity).pill"
-                >
-                  <span class="h-1.5 w-1.5 rounded-full" :class="severityClasses(c.severity).dot"></span>
-                  {{ c.severity }}
-                </span>
-              </td>
-              <td class="py-3.5 px-6 text-right">
-                <button
-                  type="button"
-                  @click="setSearch(c.title); router.push('/cases')"
-                  class="inline-flex items-center gap-1.5 text-xs font-semibold text-[#2563EB] dark:text-blue-400 bg-[#EFF6FF] dark:bg-slate-800 px-3 py-1.5 rounded-full hover:bg-[#2563EB] hover:text-white dark:hover:bg-blue-600 dark:hover:text-white transition-colors cursor-pointer whitespace-nowrap"
-                >
-                  Baca
-                  <span class="material-symbols-outlined text-[14px]">menu_book</span>
-                </button>
-              </td>
-            </tr>
-            <tr v-if="featuredCases.length === 0">
-              <td colspan="4" class="py-10 text-center">
-                <span class="material-symbols-outlined text-[28px] text-[#CBD5E1] dark:text-slate-600">folder_off</span>
-                <p class="text-sm text-[#64748B] dark:text-slate-400 mt-1">Belum ada data SOP tersedia.</p>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Mobile: stacked card list (below sm) -->
-      <div class="sm:hidden divide-y divide-[#F1F5F9] dark:divide-slate-800">
-        <div
-          v-for="c in featuredCases"
-          :key="c.id"
-          class="p-4 hover:bg-[#F8FAFC] dark:hover:bg-slate-800/50 transition-colors"
-        >
-          <div class="flex items-start gap-3">
-            <span class="material-symbols-outlined text-[19px] text-[#2563EB] dark:text-blue-400 flex-shrink-0 mt-0.5" style="opacity: 0.75">description</span>
-            <div class="min-w-0 flex-1">
-              <p class="text-sm font-semibold text-[#0F172A] dark:text-white leading-snug">{{ c.title }}</p>
-              <p class="text-xs text-[#64748B] dark:text-slate-400 mt-0.5 leading-relaxed line-clamp-2">{{ c.summary }}</p>
-              <div class="flex items-center gap-2 mt-2.5">
-                <span class="inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[9px] font-bold tracking-[0.01em] bg-[#DBEAFE] text-[#1E40AF] border-[#93C5FD] dark:bg-slate-800 dark:text-blue-300 dark:border-slate-700">
-                  {{ c.category }}
-                </span>
-                <span
-                  class="inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[9px] font-bold tracking-[0.01em] capitalize"
-                  :class="severityClasses(c.severity).pill"
-                >
-                  {{ c.severity }}
-                </span>
-              </div>
-            </div>
-          </div>
-          <button
-            type="button"
-            @click="setSearch(c.title); router.push('/cases')"
-            class="mt-3 w-full inline-flex items-center justify-center gap-1.5 text-xs font-semibold text-[#2563EB] dark:text-blue-400 bg-[#EFF6FF] dark:bg-slate-800 px-3 py-2 rounded-lg hover:bg-[#2563EB] hover:text-white dark:hover:bg-blue-600 dark:hover:text-white transition-colors cursor-pointer"
-          >
-            Baca SOP
-            <span class="material-symbols-outlined text-[14px]">menu_book</span>
-          </button>
-        </div>
-        <div v-if="featuredCases.length === 0" class="p-8 text-center">
-          <span class="material-symbols-outlined text-[28px] text-[#CBD5E1] dark:text-slate-600">folder_off</span>
-          <p class="text-sm text-[#64748B] dark:text-slate-400 mt-1">Belum ada data SOP tersedia.</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- ═══════════════════════════════════════════
-         FAQ
-         ═══════════════════════════════════════════ -->
-    <section class="max-w-3xl mx-auto w-full flex flex-col gap-5">
-      <div class="text-center space-y-1">
-        <h2 class="text-xl sm:text-2xl font-bold text-[#0F172A] dark:text-white tracking-tight">
-          Pertanyaan Umum (FAQ)
-        </h2>
-        <p class="text-xs sm:text-sm text-[#64748B] dark:text-slate-400">Solusi cepat untuk kendala operasional yang paling sering ditanyakan</p>
-      </div>
-
-      <div class="flex flex-col gap-3">
-        <div
-          v-for="faq in faqs"
-          :key="faq.id"
-          class="bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-200"
-        >
-          <button
-            type="button"
-            @click="toggleFaq(faq.id)"
-            class="w-full flex justify-between items-center gap-3 p-4 hover:bg-[#F8FAFC] dark:hover:bg-slate-800/50 transition-colors text-left cursor-pointer"
-            :aria-expanded="openFaqId === faq.id"
-          >
-            <span class="text-xs sm:text-[13px] font-bold text-[#0F172A] dark:text-white">
-              {{ faq.question }}
-            </span>
-            <span
-              class="material-symbols-outlined text-[20px] text-[#64748B] dark:text-slate-400 shrink-0 transition-transform duration-300"
-              :class="{ 'rotate-180 text-[#2563EB] dark:text-blue-400': openFaqId === faq.id }"
-            >
-              keyboard_arrow_down
-            </span>
-          </button>
-
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3">
           <div
-            v-if="openFaqId === faq.id"
-            class="px-4 pb-4 text-xs sm:text-[13px] text-[#475569] dark:text-slate-300 border-t border-[#F1F5F9] dark:border-slate-800 pt-3 space-y-2.5 font-medium"
+            v-for="ql in quickLinks"
+            :key="ql.label"
+            @click="handleQuickLinkClick(ql)"
+            class="bg-white dark:bg-slate-900 border border-[#E5EAEF] dark:border-slate-800 rounded-xl p-3 shadow-2xs hover:border-[#5D87FF] hover:bg-[#ECF2FF]/40 dark:hover:bg-slate-800 transition-all cursor-pointer flex items-center gap-2.5 group"
           >
-            <p v-if="faq.summary" class="leading-relaxed font-semibold">{{ faq.summary }}</p>
-
-            <ol v-if="faq.steps" class="list-decimal pl-5 space-y-1 leading-relaxed">
-              <li v-for="(step, stepIdx) in faq.steps" :key="stepIdx">{{ step }}</li>
-            </ol>
-
-            <div v-if="faq.code" class="p-3 bg-[#0F172A] dark:bg-black text-emerald-400 rounded-lg font-mono text-xs shadow-inner overflow-x-auto">
-              <code>{{ faq.code }}</code>
+            <div class="w-7 h-7 rounded-lg bg-[#ECF2FF] dark:bg-indigo-950/60 text-[#5D87FF] flex items-center justify-center shrink-0 group-hover:bg-[#5D87FF] group-hover:text-white transition-colors">
+              <component :is="ql.icon" class="w-3.5 h-3.5" />
             </div>
+            <span class="text-xs font-bold text-[#2A3547] dark:text-slate-200 group-hover:text-[#5D87FF] transition-colors truncate">
+              {{ ql.label }}
+            </span>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. PLATFORM DESTINATIONS (ASSET MANAGEMENT & TICKETING CARDS IN WHITE & ESB BLUE) -->
+      <section class="space-y-3">
+        <div class="flex items-center justify-between px-1">
+          <div>
+            <h2 class="text-sm font-extrabold text-[#0F172A] dark:text-white uppercase tracking-wider">
+              ESB TrackIT Platform Destinations
+            </h2>
+            <p class="text-xs text-[#64748B] dark:text-slate-400 font-medium">Pilih sistem utama yang ingin Anda akses di platform ESB TrackIT</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          
+          <!-- Destination Card 1: Asset Management -->
+          <div
+            @click="router.push('/assets')"
+            class="bg-white dark:bg-slate-900 border border-[#E5EAEF] dark:border-slate-800 rounded-xl p-5 shadow-2xs hover:shadow-md hover:border-[#5D87FF] transition-all group cursor-pointer flex flex-col justify-between gap-4 relative overflow-hidden"
+          >
+            <div class="flex items-start justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-11 h-11 rounded-xl bg-[#ECF2FF] dark:bg-indigo-950/60 text-[#5D87FF] dark:text-indigo-400 flex items-center justify-center shadow-2xs group-hover:bg-[#5D87FF] group-hover:text-white transition-colors">
+                  <Boxes class="w-6 h-6" />
+                </div>
+                <div>
+                  <div class="flex items-center gap-1.5">
+                    <h3 class="text-base font-extrabold text-[#0F172A] dark:text-white group-hover:text-[#5D87FF] transition-colors">
+                      Asset Management System
+                    </h3>
+                  </div>
+                  <span class="text-[10px] font-bold text-[#7C8BAC] dark:text-slate-400">Modul Inventaris &amp; Perangkat</span>
+                </div>
+              </div>
+
+              <span class="px-2 py-0.5 text-[9.5px] font-extrabold uppercase bg-[#ECF2FF] text-[#5D87FF] dark:bg-indigo-950/40 dark:text-indigo-300 rounded border border-[#5D87FF]/20">
+                Active Module
+              </span>
+            </div>
+
+            <p class="text-xs text-[#64748B] dark:text-slate-400 font-medium leading-relaxed">
+              Kelola inventaris aset IT, alokasi laptop/PC, perangkat kantor, distribusi unit karyawan, dan pantau kondisi fisik perangkat.
+            </p>
+
+            <div class="pt-3 border-t border-[#F1F5F9] dark:border-slate-800 flex items-center justify-between text-xs font-bold text-[#5D87FF]">
+              <span class="flex items-center gap-1">
+                <span>Masuk ke Asset Management</span>
+                <ArrowUpRight class="w-3.5 h-3.5" />
+              </span>
+              <ChevronRight class="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </div>
+          </div>
+
+          <!-- Destination Card 2: Ticketing System -->
+          <div
+            @click="router.push('/tickets')"
+            class="bg-white dark:bg-slate-900 border border-[#E5EAEF] dark:border-slate-800 rounded-xl p-5 shadow-2xs hover:shadow-md hover:border-[#5D87FF] transition-all group cursor-pointer flex flex-col justify-between gap-4 relative overflow-hidden"
+          >
+            <div class="flex items-start justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-11 h-11 rounded-xl bg-[#ECF2FF] dark:bg-indigo-950/60 text-[#5D87FF] dark:text-indigo-400 flex items-center justify-center shadow-2xs group-hover:bg-[#5D87FF] group-hover:text-white transition-colors">
+                  <Ticket class="w-6 h-6" />
+                </div>
+                <div>
+                  <div class="flex items-center gap-1.5">
+                    <h3 class="text-base font-extrabold text-[#0F172A] dark:text-white group-hover:text-[#5D87FF] transition-colors">
+                      Ticketing / Helpdesk System
+                    </h3>
+                  </div>
+                  <span class="text-[10px] font-bold text-[#7C8BAC] dark:text-slate-400">Modul Pelaporan &amp; Support IT</span>
+                </div>
+              </div>
+
+              <span class="px-2 py-0.5 text-[9.5px] font-extrabold uppercase bg-[#ECF2FF] text-[#5D87FF] dark:bg-indigo-950/40 dark:text-indigo-300 rounded border border-[#5D87FF]/20">
+                Active Module
+              </span>
+            </div>
+
+            <p class="text-xs text-[#64748B] dark:text-slate-400 font-medium leading-relaxed">
+              Buat tiket keluhan baru, pantau status pengerjaan tim IT, laporkan masalah teknis insiden, dan dapatkan respon cepat.
+            </p>
+
+            <div class="pt-3 border-t border-[#F1F5F9] dark:border-slate-800 flex items-center justify-between text-xs font-bold text-[#5D87FF]">
+              <span class="flex items-center gap-1">
+                <span>Masuk ke Ticketing System</span>
+                <ArrowUpRight class="w-3.5 h-3.5" />
+              </span>
+              <ChevronRight class="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- 4. BROWSE KNOWLEDGE BASE CATEGORIES -->
+      <section class="space-y-3">
+        <div class="flex items-center justify-between px-1">
+          <div>
+            <h2 class="text-sm font-extrabold text-[#0F172A] dark:text-white uppercase tracking-wider">
+              Browse Knowledge Base Categories
+            </h2>
+            <p class="text-xs text-[#64748B] dark:text-slate-400 font-medium">Pilih kategori panduan untuk membaca prosedur operasional standar</p>
+          </div>
+          <button
+            @click="router.push('/cases')"
+            class="text-xs font-bold text-[#5D87FF] hover:underline flex items-center gap-1 cursor-pointer"
+          >
+            <span>Semua SOP</span>
+            <ArrowRight class="w-3.5 h-3.5" />
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div
+            v-for="card in topicCards"
+            :key="card.title"
+            @click="handleCategoryNavigate(card.id)"
+            class="bg-white dark:bg-slate-900 border border-[#E5EAEF] dark:border-slate-800 rounded-xl p-4 sm:p-5 flex flex-col justify-between gap-3 shadow-2xs hover:shadow-md hover:border-[#5D87FF] transition-all group cursor-pointer"
+          >
+            <div class="flex items-start justify-between">
+              <div class="w-10 h-10 rounded-xl bg-[#ECF2FF] dark:bg-indigo-950/60 text-[#5D87FF] dark:text-indigo-400 flex items-center justify-center group-hover:bg-[#5D87FF] group-hover:text-white transition-colors">
+                <component :is="card.icon" class="w-5 h-5" />
+              </div>
+              <span class="px-2 py-0.5 text-[9.5px] font-extrabold uppercase bg-[#F8FAFC] dark:bg-slate-800 text-[#7C8BAC] dark:text-slate-400 rounded border border-[#E5EAEF] dark:border-slate-700">
+                {{ card.count }} SOPs
+              </span>
+            </div>
+
+            <div>
+              <h3 class="text-sm font-extrabold text-[#0F172A] dark:text-white group-hover:text-[#5D87FF] transition-colors">
+                {{ card.title }}
+              </h3>
+              <p class="text-xs text-[#64748B] dark:text-slate-400 mt-1 font-medium leading-relaxed">
+                {{ card.description }}
+              </p>
+            </div>
+
+            <div class="pt-2 border-t border-[#F1F5F9] dark:border-slate-800 flex items-center justify-between text-xs font-bold text-[#5D87FF]">
+              <span>Buka Dokumen</span>
+              <ChevronRight class="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5. FEATURED SOPS LIST TABLE -->
+      <section class="bg-white dark:bg-slate-900 border border-[#E5EAEF] dark:border-slate-800 rounded-xl p-4 sm:p-5 shadow-2xs space-y-3 transition-colors">
+        <div class="flex items-center justify-between border-b border-[#F1F5F9] dark:border-slate-800 pb-3">
+          <div class="flex items-center gap-2">
+            <BookOpen class="w-4 h-4 text-[#5D87FF]" />
+            <h2 class="text-sm font-extrabold text-[#0F172A] dark:text-white tracking-tight">Dokumen SOP Utama (Featured SOPs)</h2>
+          </div>
+          <button
+            @click="router.push('/cases')"
+            class="text-xs font-bold text-[#5D87FF] hover:underline"
+          >
+            Lihat Semua SOP
+          </button>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead>
+              <tr class="border-b border-[#E5EAEF] dark:border-slate-800 text-[#7C8BAC] dark:text-slate-400 uppercase text-[10px] font-extrabold tracking-wider bg-[#F8FAFC] dark:bg-slate-800/80">
+                <th class="py-2.5 px-3">Judul SOP</th>
+                <th class="py-2.5 px-3">Kategori</th>
+                <th class="py-2.5 px-3">Prioritas</th>
+                <th class="py-2.5 px-3 text-right">Aksi</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-[#F1F5F9] dark:divide-slate-800">
+              <tr v-for="c in featuredCases" :key="c.id" class="hover:bg-[#F8FAFC] dark:hover:bg-slate-800/60 transition-colors">
+                <td class="py-3 px-3">
+                  <div class="font-extrabold text-[#0F172A] dark:text-white text-xs sm:text-sm">{{ c.title }}</div>
+                  <div class="text-[11px] text-[#64748B] dark:text-slate-400 truncate max-w-md mt-0.5 font-medium">{{ c.summary }}</div>
+                </td>
+                <td class="py-3 px-3">
+                  <span class="px-2 py-0.5 rounded text-[9.5px] font-extrabold uppercase bg-[#ECF2FF] text-[#5D87FF] dark:bg-indigo-950/60 dark:text-indigo-300">
+                    {{ c.category }}
+                  </span>
+                </td>
+                <td class="py-3 px-3">
+                  <span :class="[getSeverityBadge(c.severity).bg, 'px-2 py-0.5 rounded text-[9.5px] font-extrabold border']">
+                    {{ getSeverityBadge(c.severity).text }}
+                  </span>
+                </td>
+                <td class="py-3 px-3 text-right">
+                  <button
+                    @click="setSearch(c.title); router.push('/cases')"
+                    class="px-3 py-1 rounded-lg bg-[#5D87FF] hover:bg-[#4570EA] text-white text-[11px] font-bold transition-colors cursor-pointer shadow-2xs"
+                  >
+                    Baca SOP
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- 6. FAQ ACCORDIONS -->
+      <section class="max-w-4xl mx-auto w-full flex flex-col gap-3 pt-2">
+        <div class="text-center space-y-0.5">
+          <h2 class="text-lg font-extrabold text-[#0F172A] dark:text-white tracking-tight">
+            Frequently Asked Questions
+          </h2>
+          <p class="text-xs text-[#64748B] dark:text-slate-400 font-medium">Panduan dan troubleshooting terpopuler di Help Center</p>
+        </div>
+
+        <div class="flex flex-col gap-2.5 mt-1">
+          <div
+            v-for="faq in faqs"
+            :key="faq.id"
+            class="bg-white dark:bg-slate-900 border border-[#E5EAEF] dark:border-slate-800 rounded-xl overflow-hidden shadow-2xs transition-colors"
+          >
+            <button
+              @click="toggleFaq(faq.id)"
+              class="w-full flex justify-between items-center p-4 bg-white dark:bg-slate-900 hover:bg-[#F8FAFC] dark:hover:bg-slate-800/60 transition-colors text-left cursor-pointer"
+            >
+              <span class="text-xs sm:text-sm font-extrabold text-[#0F172A] dark:text-white pr-4">
+                {{ faq.question }}
+              </span>
+              <ChevronDown
+                class="w-4 h-4 text-[#7C8BAC] dark:text-slate-400 shrink-0 transition-transform duration-300"
+                :class="{ 'rotate-180 text-[#5D87FF]': openFaqId === faq.id }"
+              />
+            </button>
 
             <div
-              v-if="faq.isEmergency"
-              class="bg-[#FEF2F2] dark:bg-rose-950/40 text-[#B91C1C] dark:text-rose-200 p-3 rounded-lg border border-[#FECACA] dark:border-rose-800 flex flex-col gap-1.5"
+              v-if="openFaqId === faq.id"
+              class="px-4 pb-4 bg-white dark:bg-slate-900 text-xs text-[#475569] dark:text-slate-300 border-t border-[#F1F5F9] dark:border-slate-800 pt-3 space-y-2.5 font-medium"
             >
-              <div class="flex items-center gap-2 font-bold text-xs uppercase text-[#B91C1C] dark:text-rose-300">
-                <span class="material-symbols-outlined text-[16px]">warning</span>
-                <span>{{ faq.emergencyTitle }}</span>
-              </div>
-              <p class="leading-relaxed font-bold text-xs">{{ faq.emergencyText }}</p>
-              <p class="text-[11px] opacity-90">{{ faq.details }}</p>
-            </div>
+              <p v-if="faq.summary" class="leading-relaxed">
+                {{ faq.summary }}
+              </p>
 
-            <div v-if="faq.actionLink" class="pt-1">
-              <a
-                :href="faq.actionLink"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="inline-flex items-center gap-1.5 text-xs font-bold text-white bg-[#2563EB] hover:bg-[#1D4ED8] px-3.5 py-1.5 rounded-lg transition-colors shadow-xs"
+              <ol v-if="faq.steps" class="list-decimal pl-5 space-y-1 leading-relaxed">
+                <li v-for="(step, idx) in faq.steps" :key="idx">
+                  {{ step }}
+                </li>
+              </ol>
+
+              <div v-if="faq.code" class="p-2.5 bg-[#0F172A] text-emerald-400 rounded-lg font-mono text-xs shadow-inner">
+                <code>{{ faq.code }}</code>
+              </div>
+
+              <div
+                v-if="faq.isEmergency"
+                class="bg-rose-50 dark:bg-rose-950/40 text-rose-800 dark:text-rose-200 p-3 rounded-lg border border-rose-200 dark:border-rose-900 flex flex-col gap-1"
               >
-                <span>{{ faq.actionText }}</span>
-                <span class="material-symbols-outlined text-[14px]">open_in_new</span>
-              </a>
+                <div class="flex items-center gap-2 font-extrabold text-xs uppercase text-rose-600 dark:text-rose-400">
+                  <AlertTriangle class="w-4 h-4" />
+                  <span>{{ faq.emergencyTitle }}</span>
+                </div>
+                <p class="leading-relaxed font-bold text-xs">{{ faq.emergencyText }}</p>
+                <p class="text-[11px] opacity-90">{{ faq.details }}</p>
+              </div>
+
+              <div v-if="faq.actionLink" class="pt-1">
+                <a
+                  :href="faq.actionLink"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="bg-[#5D87FF] text-white px-3.5 py-1.5 rounded-lg text-xs font-bold hover:bg-[#4570EA] transition-colors inline-flex items-center gap-1.5 shadow-2xs"
+                >
+                  <span>{{ faq.actionText }}</span>
+                  <ExternalLink class="w-3.5 h-3.5" />
+                </a>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
 
-    <!-- ═══════════════════════════════════════════
-         BOTTOM CTA
-         ═══════════════════════════════════════════ -->
-    <section
-      class="bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 rounded-xl shadow-sm p-5 sm:p-6 flex flex-col sm:flex-row items-center justify-between gap-4"
-    >
-      <div class="text-center sm:text-left min-w-0">
-        <h4 class="text-sm sm:text-base font-bold text-[#0F172A] dark:text-white">Perlu bantuan lebih lanjut atau penanganan tiket?</h4>
-        <p class="text-xs text-[#64748B] dark:text-slate-400 mt-0.5">Buka direktori lengkap SOP atau masuk ke dashboard monitoring tiket</p>
-      </div>
-      <div class="flex flex-wrap items-center justify-center gap-2 shrink-0">
-        <button
-          type="button"
-          @click="router.push('/cases')"
-          class="bg-[#2563EB] hover:bg-[#1D4ED8] text-white px-4 py-2 rounded-lg text-xs font-bold transition-all shadow-xs inline-flex items-center gap-1.5 cursor-pointer active:scale-95"
-        >
-          <span class="material-symbols-outlined text-[15px]">folder_open</span>
-          <span>Jelajahi SOP</span>
-        </button>
-        <button
-          type="button"
-          @click="router.push('/dashboard')"
-          class="bg-white dark:bg-slate-800 text-[#0F172A] dark:text-white border border-[#E2E8F0] dark:border-slate-700 px-4 py-2 rounded-lg text-xs font-bold hover:bg-[#F8FAFC] dark:hover:bg-slate-700 hover:border-[#CBD5E1] dark:hover:border-slate-600 transition-all shadow-xs inline-flex items-center gap-1.5 cursor-pointer"
-        >
-          <span class="material-symbols-outlined text-[15px] text-[#2563EB] dark:text-blue-400">dns</span>
-          <span>Dashboard Monitoring</span>
-        </button>
-      </div>
-    </section>
+    </main>
 
-  </main>
+  </div>
 </template>

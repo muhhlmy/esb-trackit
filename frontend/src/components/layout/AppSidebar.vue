@@ -75,6 +75,7 @@ async function submitChangePassword() {
 
 // State Expanded Parent Menu
 const expandedParents = ref({
+  knowledge_base: true,
   asset_management: true,
   helpdesk: true,
   master_data: true,
@@ -227,6 +228,7 @@ function isParentExpanded(key) {
 
 function autoExpandActiveParent() {
   const currentPath = route.path
+  if (['/cases', '/templates', '/analytics', '/admin/cases', '/admin/editor'].some(p => currentPath.startsWith(p))) expandedParents.value.knowledge_base = true
   if (['/assets', '/my-assets'].includes(currentPath)) expandedParents.value.asset_management = true
   if (['/tickets', '/submissions'].includes(currentPath)) expandedParents.value.helpdesk = true
   if (['/users', '/karyawan'].includes(currentPath)) expandedParents.value.master_data = true
@@ -251,10 +253,52 @@ const menuGroups = computed(() => {
       items: [
         {
           to: '/',
+          label: 'Help Center',
+          icon: 'help_center',
+          permission: null,
+          badge: 'SOP',
+        },
+        {
+          to: '/dashboard',
           label: 'Dashboard',
           icon: 'grid_view',
           permission: 'dashboard',
-          badge: 'New',
+        },
+      ],
+    },
+    {
+      title: 'KNOWLEDGE BASE',
+      parents: [
+        {
+          key: 'knowledge_base',
+          label: 'Help Center & SOP',
+          icon: 'auto_stories',
+          items: [
+            {
+              to: '/cases',
+              label: 'Cases & SOPs',
+              icon: 'menu_book',
+              permission: null,
+            },
+            {
+              to: '/templates',
+              label: 'Templates Hub',
+              icon: 'description',
+              permission: null,
+            },
+            {
+              to: '/analytics',
+              label: 'KB Analytics',
+              icon: 'analytics',
+              permission: null,
+            },
+            {
+              to: '/admin/cases',
+              label: 'Admin CMS',
+              icon: 'edit_document',
+              permission: 'users',
+            },
+          ],
         },
       ],
     },

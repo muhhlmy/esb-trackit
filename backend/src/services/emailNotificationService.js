@@ -188,10 +188,10 @@ export async function handleTicketEventNotification(
         const html = renderTicketEmailHtml({
           recipientName: admin.nama,
           title: `[${nomorTiket}] Tiket Baru Masuk Antrean`,
-          subtitle: `Sebuah tiket baru telah dibuat oleh <strong>${ticket.pelapor || reporterUser?.nama || "Pengguna"}</strong> dan membutuhkan perhatian Tim IT.`,
+          subtitle: `Sebuah tiket baru telah dibuat oleh <strong>${ticket.pelapor || reporterUser?.nama || "Pengguna"}</strong>. Harap cek Tiket terbaru pada ESB-Trackit.`,
           ticket,
           actionText:
-            "Silakan login ke sistem untuk menangani atau menugaskan tiket ini.",
+            "Silakan login ke sistem ESB-Trackit.",
         });
         await sendEmail({
           to: admin.email,

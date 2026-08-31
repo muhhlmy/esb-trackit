@@ -1,24 +1,39 @@
 <script setup>
-// App.vue — Layout utama: sidebar kiri + konten kanan
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, RouterView } from 'vue-router'
 import AppSidebar from './components/layout/AppSidebar.vue'
 import AppHeader from './components/layout/AppHeader.vue'
+
+// Help Center Layout components
+import Navbar from './components/layout/Navbar.vue'
+import Footer from './components/layout/Footer.vue'
+import MobileNav from './components/layout/MobileNav.vue'
+import Toast from './components/common/Toast.vue'
+import LoginModal from './components/common/LoginModal.vue'
+
 import { animatePageEnter, animatePageLeave } from './composables/useGsap.js'
 import { getAuthToken } from './utils/authStorage.js'
 import { initTicketRealtime, stopTicketRealtime } from './composables/useTicketRealtime.js'
+import { useCases } from './composables/useCases.js'
+import { useTheme } from './composables/useTheme.js'
 
 const route = useRoute()
+const { fetchCases } = useCases()
+useTheme()
 
-// Evaluasi robust apakah halaman saat ini adalah Login / Unauthenticated
 const isLoginPage = computed(() => {
-  if (route.name === 'login') return true
-  if (route.path === '/login') return true
-  if (typeof window !== 'undefined' && window.location.pathname.endsWith('/login')) return true
-  if (typeof window !== 'undefined' && !getAuthToken()) return true
+  return route.name === 'login' || route.path === '/login'
+})
+
+const isHelpCenterView = computed(() => {
+  const p = route.path
+  if (p === '/' || p.startsWith('/cases') || p.startsWith('/templates') || p.startsWith('/analytics') || p.startsWith('/admin') || p === '/kb-analytics') {
+    return true
+  }
   return false
 })
-// Dual state navigasi sesuai Plan.md (mobile drawer vs desktop collapse)
+
+// Dual state navigasi (mobile drawer vs desktop collapse)
 const isMobileNavigationOpen = ref(false)
 const isDesktopSidebarCollapsed = ref(
   typeof window !== 'undefined' ? localStorage.getItem('app_sidebar_collapsed') === 'true' : false,
@@ -37,9 +52,6 @@ watch(
   },
 )
 
-// ── Global SSE Lifecycle ──────────────────────────────────────
-// Koneksi SSE di-init sekali saat app mount (jika sudah login),
-// tetap hidup selama navigasi antar view, dan disconnect saat unmount.
 function handleResize() {
   if (typeof window !== 'undefined' && window.innerWidth >= 1024) {
     isMobileNavigationOpen.value = false
@@ -47,7 +59,8 @@ function handleResize() {
 }
 
 onMounted(() => {
-  if (!isLoginPage.value) {
+  fetchCases()
+  if (getAuthToken()) {
     initTicketRealtime()
   }
   if (typeof window !== 'undefined') {
@@ -61,22 +74,33 @@ onUnmounted(() => {
     window.removeEventListener('resize', handleResize)
   }
 })
-
-// Saat user login/logout, connect/disconnect SSE sesuai status auth.
-watch(isLoginPage, (loginPage) => {
-  if (loginPage) {
-    stopTicketRealtime()
-  } else {
-    initTicketRealtime()
-  }
-})
 </script>
 
 <template>
+  <!-- 1. Halaman Login Standalone -->
   <template v-if="isLoginPage">
     <RouterView />
   </template>
 
+  <!-- 2. Halaman Help Center Standalone (Tampilan Persis Branch Help-Center tanpa TrackIT Sidebar & Header) -->
+  <template v-else-if="isHelpCenterView">
+    <div class="min-h-screen bg-[#f9f9fb] dark:bg-slate-950 text-[#1a1c1d] dark:text-slate-100 flex flex-col antialiased selection:bg-[#0040e5] selection:text-white pb-16 md:pb-0 transition-colors duration-200">
+      <Navbar />
+      <div class="flex-1 flex flex-col">
+        <RouterView v-slot="{ Component }">
+          <Transition name="fade" mode="out-in">
+            <component :is="Component" />
+          </Transition>
+        </RouterView>
+      </div>
+      <Footer />
+      <MobileNav />
+      <LoginModal />
+      <Toast />
+    </div>
+  </template>
+
+  <!-- 3. Halaman Management & Monitoring TrackIT (Dengan AppSidebar & AppHeader) -->
   <template v-else>
     <a
       href="#main-content"
@@ -86,7 +110,6 @@ watch(isLoginPage, (loginPage) => {
     </a>
 
     <div class="app-shell relative flex h-dvh min-h-0 overflow-hidden bg-[#F8FAFC]">
-      <!-- ── Sidebar Navigasi ── -->
       <AppSidebar
         :is-mobile-open="isMobileNavigationOpen"
         :is-collapsed="isDesktopSidebarCollapsed"
@@ -94,9 +117,7 @@ watch(isLoginPage, (loginPage) => {
         @toggle-collapse="isDesktopSidebarCollapsed = !isDesktopSidebarCollapsed"
       />
 
-      <!-- ── Area Konten Kanan ── -->
       <div class="relative flex min-w-0 flex-1 flex-col overflow-hidden">
-        <!-- Header: search + actions -->
         <AppHeader
           :is-mobile-open="isMobileNavigationOpen"
           :is-collapsed="isDesktopSidebarCollapsed"
@@ -104,7 +125,6 @@ watch(isLoginPage, (loginPage) => {
           @toggle-collapse="isDesktopSidebarCollapsed = !isDesktopSidebarCollapsed"
         />
 
-        <!-- Konten halaman aktif, scrollable -->
         <main
           id="main-content"
           tabindex="-1"
@@ -129,3 +149,15 @@ watch(isLoginPage, (loginPage) => {
     </div>
   </template>
 </template>
+
+<style>
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.15s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+</style>

@@ -1,10 +1,6 @@
 // ============================================================
-// router/index.js - Konfigurasi Routing (Navigasi Halaman)
+// router/index.js - Konfigurasi Routing (Navigasi Halaman Unified)
 // ============================================================
-// Router menentukan: URL apa → tampilkan komponen apa
-// Misalnya: URL "/" → tampilkan DashboardView
-// ============================================================
-
 import { createRouter, createWebHistory } from 'vue-router'
 
 import {
@@ -29,16 +25,52 @@ const allowedRouteMap = [
   { key: 'export', name: 'export' },
 ]
 
-// Daftar semua route aplikasi
+// Lista semua route aplikasi (Help Center + TrackIT Monitoring)
 const routes = [
+  // Public Help Center Routes (Ditampilkan pertama kali saat aplikasi dibuka)
+  {
+    path: '/',
+    name: 'home',
+    component: () => import('../views/HomeView.vue'),
+    meta: { title: 'Help Center', subtitle: 'Pusat Bantuan & SOP Insiden', public: true },
+  },
+  {
+    path: '/cases',
+    name: 'cases',
+    component: () => import('../views/CasesView.vue'),
+    meta: { title: 'Cases & SOPs', subtitle: 'Kumpulan SOP & Playbook Insiden', public: true },
+  },
+  {
+    path: '/cases/:id',
+    name: 'case-detail',
+    component: () => import('../views/CasesView.vue'),
+    meta: { title: 'SOP Detail', subtitle: 'Detail Prosedur Operasional Standar', public: true },
+  },
+  {
+    path: '/templates',
+    name: 'templates',
+    component: () => import('../views/TemplatesView.vue'),
+    meta: { title: 'Templates Hub', subtitle: 'Template Respon & Script SOP', public: true },
+  },
+  {
+    path: '/kb-analytics',
+    alias: '/analytics',
+    name: 'kb-analytics',
+    component: () => import('../views/AnalyticsView.vue'),
+    meta: { title: 'Help Center Analytics', subtitle: 'Metrik & Tren Pencarian SOP', public: true },
+  },
+
+  // Auth Route
   {
     path: '/login',
     name: 'login',
     component: () => import('../views/LoginView.vue'),
-    meta: { title: 'Masuk', subtitle: 'Masuk ke akun Anda' },
+    meta: { title: 'Masuk', subtitle: 'Masuk ke akun Anda', public: true },
   },
+
+  // Management Routes (TrackIT Monitoring)
   {
-    path: '/',
+    path: '/dashboard',
     name: 'dashboard',
     component: () => import('../views/DashboardView.vue'),
     meta: { title: 'Dashboard', subtitle: 'Overview & analytics', permission: 'dashboard' },
@@ -122,21 +154,35 @@ const routes = [
       superadminOnly: true,
     },
   },
+
+  // Help Center Admin CMS Routes
+  {
+    path: '/admin/cases',
+    name: 'admin-cases',
+    component: () => import('../views/admin/AdminDashboardView.vue'),
+    meta: { title: 'Admin CMS', subtitle: 'Kelola SOP & Artikel Knowledge Base' },
+  },
+  {
+    path: '/admin/editor/:id?',
+    name: 'doc-editor',
+    component: () => import('../views/admin/DocEditorView.vue'),
+    meta: { title: 'Doc Editor', subtitle: 'Editor Artikel Knowledge Base' },
+  },
+
   {
     path: '/forbidden',
     name: 'forbidden',
     component: () => import('../views/AccessDeniedView.vue'),
-    meta: { title: 'Akses Ditolak', subtitle: 'Anda tidak memiliki izin untuk halaman ini' },
+    meta: { title: 'Akses Ditolak', subtitle: 'Anda tidak memiliki izin untuk halaman ini', public: true },
   },
   {
     path: '/:pathMatch(.*)*',
     name: 'NotFound',
     component: () => import('../views/NotFoundView.vue'),
-    meta: { title: 'Halaman Tidak Ditemukan', subtitle: '404' },
+    meta: { title: 'Halaman Tidak Ditemukan', subtitle: '404', public: true },
   },
 ]
 
-// Buat router dengan mode "history" (URL tanpa #)
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes,
@@ -146,8 +192,18 @@ const router = createRouter({
 router.beforeEach((to) => {
   const { token, user } = getAuthSnapshot()
 
-  // Jika halaman butuh login (semua kecuali /login) dan belum login
-  if (to.name !== 'login' && !token) {
+  // Halaman publik (Help Center landing page, Cases, Templates, Login, dll) dapat diakses tanpa login
+  if (to.meta.public) {
+    if (to.name === 'login' && token) {
+      const ticketEligibility = getTicketEligibility(user)
+      const firstAllowed = findFirstAllowedRoute(user, allowedRouteMap)
+      return { name: firstAllowed?.name || 'dashboard' }
+    }
+    return
+  }
+
+  // Jika halaman terproteksi dan belum login
+  if (!token) {
     return { name: 'login' }
   }
 
@@ -156,20 +212,15 @@ router.beforeEach((to) => {
   const canAccess = (key) => canAccessFrontendFeature(user, key)
   const firstAllowed = findFirstAllowedRoute(user, allowedRouteMap)
 
-  // Jika sudah login tapi akses ke /login, arahkan ke halaman utama yang punya izin
-  if (to.name === 'login' && token) {
-    return { name: firstAllowed?.name || 'forbidden' }
-  }
-
-  // Guard ini hanya untuk UX; otorisasi export tetap ditegakkan oleh backend.
+  // Guard untuk Superadmin Only
   if (to.meta.superadminOnly && !isSuper) {
     return { name: firstAllowed?.name || 'forbidden' }
   }
 
-  // /my-assets selalu diizinkan untuk user yang sudah login (DEF-005)
+  // /my-assets selalu diizinkan untuk user yang sudah login
   if (to.name === 'my-assets') return
 
-  // Evaluasi Hak Akses Granular RBAC
+  // Evaluasi RBAC untuk fitur manajemen TrackIT
   if (to.meta.permission && !canAccess(to.meta.permission)) {
     if (firstAllowed && firstAllowed.name !== to.name) {
       return { name: firstAllowed.name }
@@ -180,8 +231,8 @@ router.beforeEach((to) => {
 
 router.afterEach((to) => {
   document.title = to.meta.title
-    ? `${to.meta.title} | IT Assets Monitoring`
-    : 'IT Assets Monitoring'
+    ? `${to.meta.title} | ESB TrackIT & Help Center`
+    : 'ESB TrackIT & Help Center'
 })
 
 router.onError((error) => {

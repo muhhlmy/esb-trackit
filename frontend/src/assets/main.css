@@ -32,10 +32,16 @@
 
 :root {
   font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
-  color: #0f172a;
-  background: #f4f6f9;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
+}
+html.dark {
+  background-color: #020617;
+  color: #f8fafc;
+}
+html.light {
+  background-color: #f9f9fb;
+  color: #1a1c1d;
 }
 
 :focus-visible {
@@ -55,9 +61,7 @@ body,
   min-height: 100%;
 }
 
-html {
-  background: #f4f6f9;
-}
+/* html background handled by html.dark / html.light */
 
 body {
   margin: 0;
@@ -162,14 +166,14 @@ textarea {
 }
 
 /* Header & Sidebar Modernize Themes */
-header {
+.app-shell header {
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid #e5eaef;
 }
 
-aside {
+.app-shell aside {
   background: #ffffff;
   border-right: 1px solid #e5eaef;
 }
@@ -201,10 +205,10 @@ aside {
 
 /* ── Modernize Form Inputs & Select Controls ── */
 :where(
-  input:not([type='checkbox']):not([type='radio']):not(.form-control-static),
-  select,
-  textarea,
-  .form-control
+  .app-shell input:not([type='checkbox']):not([type='radio']):not(.form-control-static),
+  .app-shell select,
+  .app-shell textarea,
+  .app-shell .form-control
 ) {
   background: #ffffff;
   border: 1px solid #dfe5ef;

@@ -1,4 +1,34 @@
 import nodemailer from 'nodemailer'
+import fs from 'fs'
+import path from 'path'
+import { fileURLToPath } from 'url'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+
+export function getEsbLogoPngPath() {
+  try {
+    const candidatePaths = [
+      path.resolve(__dirname, '../assets/esb_logo_only.png'),
+      path.resolve(__dirname, '../../../../frontend/public/ESB Logo Only.png'),
+      path.resolve(process.cwd(), '../frontend/public/ESB Logo Only.png'),
+      path.resolve(process.cwd(), 'frontend/public/ESB Logo Only.png'),
+      path.resolve(process.cwd(), 'src/assets/esb_logo_only.png'),
+    ]
+    for (const p of candidatePaths) {
+      if (fs.existsSync(p)) {
+        return p.replace(/\\/g, '/')
+      }
+    }
+  } catch (err) {
+    // fallback
+  }
+  return path.resolve(__dirname, '../assets/esb_logo_only.png').replace(/\\/g, '/')
+}
+
+export function getEsbLogoSrc() {
+  return 'cid:esbLogoOnly'
+}
 
 let transporter = null
 
@@ -30,7 +60,7 @@ export function getTransporter() {
 /**
  * Send an email asynchronously. Fails gracefully if SMTP is disabled or unconfigured.
  */
-export async function sendEmail({ to, subject, html, text }) {
+export async function sendEmail({ to, subject, html, text, attachments = [] }) {
   if (!to) return false
 
   const activeTransporter = getTransporter()
@@ -41,8 +71,30 @@ export async function sendEmail({ to, subject, html, text }) {
 
   const from = process.env.EMAIL_FROM || '"People Technology" <people.technology@esb.co.id>'
 
+  const logoPngPath = getEsbLogoPngPath()
+  const mailAttachments = [...attachments]
+
+  let processedHtml = html
+  if (logoPngPath && fs.existsSync(logoPngPath)) {
+    const hasCid = mailAttachments.some((a) => a.cid === 'esbLogoOnly')
+    if (!hasCid) {
+      mailAttachments.push({
+        filename: 'ESB Logo Only.png',
+        path: logoPngPath,
+        cid: 'esbLogoOnly',
+      })
+    }
+
+    if (processedHtml) {
+      processedHtml = processedHtml.replace(/src="[^"]*ESB%20Logo%20Only\.(svg|png)[^"]*"/gi, 'src="cid:esbLogoOnly"')
+      processedHtml = processedHtml.replace(/src="[^"]*esb_logo_only\.(svg|png)[^"]*"/gi, 'src="cid:esbLogoOnly"')
+      processedHtml = processedHtml.replace(/src="[^"]*frontend\/public\/[^"]*"/gi, 'src="cid:esbLogoOnly"')
+      processedHtml = processedHtml.replace(/src="\.\.\/\.\.\/frontend\/public\/[^"]*"/gi, 'src="cid:esbLogoOnly"')
+    }
+  }
+
   try {
-    const info = await activeTransporter.sendMail({ from, to, subject, text, html })
+    const info = await activeTransporter.sendMail({ from, to, subject, text, html: processedHtml, attachments: mailAttachments })
     console.log(`[emailService] ✅ Email terkirim ke <${to}>: ${info.messageId}`)
     return true
   } catch (error) {
@@ -117,9 +169,17 @@ export function renderTicketEmailHtml({
   <table role="presentation" style="width: 100%; max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
     <!-- Header -->
     <tr>
-      <td style="background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); padding: 24px 32px; text-align: center; color: #ffffff;">
-        <h1 style="margin: 0; font-size: 20px; font-weight: 700; letter-spacing: 0.5px;">IT Monitoring & Asset System</h1>
-        <p style="margin: 4px 0 0 0; font-size: 13px; opacity: 0.9;">Notifikasi Layanan Tiket IT</p>
+      <td style="background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); padding: 24px 32px; color: #ffffff;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse: collapse;">
+          <tr>
+            <td style="vertical-align: middle; text-align: left; width: 44px; padding-right: 14px;">
+              <img src="cid:esbLogoOnly" alt="ESB Logo" style="width: 36px; height: 36px; display: block; object-fit: contain;">
+            </td>
+            <td style="vertical-align: middle; text-align: left;">
+              <h1 style="margin: 0; font-size: 20px; font-weight: 700; letter-spacing: 0.5px; color: #ffffff;">ESB Trackit</h1>
+            </td>
+          </tr>
+        </table>
       </td>
     </tr>
     <!-- Content -->
@@ -163,7 +223,7 @@ export function renderTicketEmailHtml({
     <!-- Footer -->
     <tr>
       <td style="background-color: #f9fafb; padding: 16px 32px; text-align: center; border-top: 1px solid #f3f4f6; font-size: 12px; color: #9ca3af;">
-        Email ini dikirim secara otomatis oleh Sistem IT Monitoring. Mohon tidak membalas langsung email ini.
+        Email ini dikirim secara otomatis oleh Sistem ESB-Trackit. <strong>Mohon tidak membalas langsung email ini.</strong>
       </td>
     </tr>
   </table>
@@ -210,7 +270,16 @@ export function renderPasswordResetOtpEmailHtml({
           <!-- Header -->
           <tr>
             <td style="padding:32px 40px 0 40px;">
-              <div style="font-size:13px;font-weight:700;letter-spacing:1px;color:#1d4ed8;text-transform:uppercase;margin-bottom:16px;">ESB TrackIT</div>
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse: collapse; margin-bottom: 16px;">
+                <tr>
+                  <td style="vertical-align: middle; text-align: left; width: 36px; padding-right: 10px;">
+                    <img src="cid:esbLogoOnly" alt="ESB Logo" style="width: 28px; height: 28px; display: block; object-fit: contain;">
+                  </td>
+                  <td style="vertical-align: middle; text-align: left;">
+                    <div style="font-size:13px;font-weight:700;letter-spacing:1px;color:#1d4ed8;text-transform:uppercase;">ESB TrackIT</div>
+                  </td>
+                </tr>
+              </table>
               <h1 style="margin:0;font-size:22px;font-weight:700;color:#111827;letter-spacing:-0.3px;">Verifikasi Kata Sandi</h1>
               <p style="margin:8px 0 0 0;font-size:14px;color:#6b7280;line-height:1.6;">
                 Halo <strong style="color:#111827;">${recipientName || 'Pengguna'}</strong>, gunakan kode di bawah ini untuk mereset kata sandi Anda.

@@ -25,6 +25,31 @@ function normalizeList(data) {
   return list.map(normalizeCase).filter(Boolean);
 }
 
+// Payload case yang dikirim ke backend (sesuai CASE_FIELDS di caseController).
+// Buang field UI/local yang tidak diterima API: id, isTrending, isSsoRequired, contentHtml.
+const CASE_PAYLOAD_FIELDS = [
+  'title',
+  'category',
+  'severity',
+  'tags',
+  'summary',
+  'problemContext',
+  'actionSteps',
+  'dosAndDonts',
+  'snippets',
+  'status',
+  'isCustom',
+  'sort_order',
+];
+
+function toCasePayload(data) {
+  const out = {};
+  for (const key of CASE_PAYLOAD_FIELDS) {
+    if (data?.[key] !== undefined) out[key] = data[key];
+  }
+  return out;
+}
+
 export function useCases() {
   const { showToast } = useToast();
   const { isBookmarked } = useBookmarks();
@@ -161,15 +186,16 @@ export function useCases() {
 
   async function saveCase(formData) {
     const existingId = formData?.id ? Number(formData.id) : null;
+    const payload = toCasePayload(formData);
     try {
       if (existingId) {
-        const updated = normalizeCase(await api.updateCase(existingId, formData));
+        const updated = normalizeCase(await api.updateCase(existingId, payload));
         const idx = cases.value.findIndex((c) => c.id === updated.id);
         if (idx !== -1) cases.value[idx] = updated;
         else cases.value.unshift(updated);
         showToast('Perubahan Case berhasil disimpan!', 'success');
       } else {
-        const created = normalizeCase(await api.createCase(formData));
+        const created = normalizeCase(await api.createCase(payload));
         cases.value.unshift(created);
         activeCaseId.value = created.id;
         showToast('Case baru berhasil disimpan!', 'success');
@@ -183,8 +209,6 @@ export function useCases() {
   }
 
   async function deleteCase(id) {
-    if (!confirm('Apakah Anda yakin ingin menghapus case ini?')) return false;
-
     try {
       await api.deleteCase(id);
       cases.value = cases.value.filter((c) => Number(c.id) !== Number(id));

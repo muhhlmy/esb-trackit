@@ -1,14 +1,15 @@
 const API_BASE = '/api';
 
+// Token sesi dikelola oleh utils/authStorage.js (key 'token', diisi saat login).
+import { getAuthToken as readStoredToken, clearAuthSession } from '../utils/authStorage.js';
+
 export function getAuthToken() {
-  return localStorage.getItem('esb_jwt_token') || '';
+  return readStoredToken() || '';
 }
 
 export function setAuthToken(token) {
-  if (token) {
-    localStorage.setItem('esb_jwt_token', token);
-  } else {
-    localStorage.removeItem('esb_jwt_token');
+  if (!token) {
+    clearAuthSession();
   }
 }
 

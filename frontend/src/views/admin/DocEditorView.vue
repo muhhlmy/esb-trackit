@@ -6,8 +6,6 @@ import { useToast } from '@/composables/useToast';
 import DocEditorInspector from '@/components/admin/DocEditorInspector.vue';
 import { useEditor, EditorContent } from '@tiptap/vue-3';
 import StarterKit from '@tiptap/starter-kit';
-import Underline from '@tiptap/extension-underline';
-import Link from '@tiptap/extension-link';
 import Placeholder from '@tiptap/extension-placeholder';
 import {
   Undo,
@@ -20,7 +18,6 @@ import {
   Info,
   AlertTriangle,
   Eye,
-  Cloud,
   Plus,
   Trash2,
   ExternalLink,
@@ -51,7 +48,7 @@ const { showToast } = useToast();
 const isInspectorOpen = ref(true);
 const isPreviewModalOpen = ref(false);
 const isSaving = ref(false);
-const saveStatus = ref('Saved to cloud'); // 'Saved to cloud' | 'Unsaved changes' | 'Saving...'
+const saveStatus = ref('Tersimpan'); // 'Tersimpan' | 'Belum disimpan' | 'Menyimpan...'
 
 // Active Document Metadata Model
 const doc = ref({
@@ -116,22 +113,21 @@ const editor = useEditor({
     StarterKit.configure({
       heading: {
         levels: [1, 2, 3]
-      }
-    }),
-    Underline,
-    Link.configure({
-      openOnClick: false,
-      HTMLAttributes: {
-        class: 'text-[#5D87FF] underline font-semibold'
+      },
+      link: {
+        openOnClick: false,
+        HTMLAttributes: {
+          class: 'text-[#2563EB] underline font-medium'
+        }
       }
     }),
     Placeholder.configure({
-      placeholder: 'Tulis panduan SOP, langkah resolusi, atau catatan teknis di sini...'
+      placeholder: 'Tulis panduan, langkah resolusi, atau catatan teknis di sini...'
     })
   ],
   onUpdate: ({ editor }) => {
     doc.value.contentHtml = editor.getHTML();
-    saveStatus.value = 'Unsaved changes';
+    saveStatus.value = 'Belum disimpan';
   }
 });
 
@@ -284,13 +280,13 @@ function insertStep() {
 // Save & Publish
 async function handleSaveDraft() {
   isSaving.value = true;
-  saveStatus.value = 'Saving...';
+  saveStatus.value = 'Menyimpan...';
   try {
     await saveCase({ ...doc.value, status: 'DRAFT' });
-    saveStatus.value = 'Saved to cloud';
+    saveStatus.value = 'Tersimpan';
     showToast('Draft artikel berhasil disimpan!', 'info');
   } catch (err) {
-    saveStatus.value = 'Unsaved changes';
+    saveStatus.value = 'Belum disimpan';
     showToast('Gagal menyimpan draft.', 'error');
   } finally {
     isSaving.value = false;
@@ -299,11 +295,11 @@ async function handleSaveDraft() {
 
 async function handlePublish() {
   isSaving.value = true;
-  saveStatus.value = 'Saving...';
+  saveStatus.value = 'Menyimpan...';
   try {
     await saveCase({ ...doc.value, status: 'PUBLISHED' });
-    saveStatus.value = 'Saved to cloud';
-    showToast('🎉 Artikel SOP berhasil dipublikasikan!', 'success');
+    saveStatus.value = 'Tersimpan';
+    showToast('Artikel berhasil dipublikasikan!', 'success');
   } catch (err) {
     showToast('Gagal mempublikasikan artikel.', 'error');
   } finally {
@@ -317,70 +313,67 @@ function goToAdminCases() {
 </script>
 
 <template>
-  <div class="min-h-screen bg-[#F8FAFC] dark:bg-slate-950 text-[#0F172A] dark:text-slate-100 flex flex-col font-sans selection:bg-[#5D87FF] selection:text-white select-none transition-colors duration-200">
-    
+  <div class="min-h-screen bg-[#F8FAFC] dark:bg-slate-950 text-[#1E293B] dark:text-slate-100 flex flex-col font-sans selection:bg-[#2563EB] selection:text-white transition-colors duration-200">
+
     <!-- 1. TOP APP BAR HEADER -->
-    <header class="h-16 bg-white dark:bg-slate-900 border-b border-[#E5EAEF] dark:border-slate-800 px-4 sm:px-6 fixed top-0 left-0 right-0 z-50 flex items-center justify-between shadow-2xs">
-      
-      <!-- Left: Title, Breadcrumbs, Cloud Status -->
+    <header class="h-14 bg-white dark:bg-slate-900 border-b border-[#E2E8F0] dark:border-slate-800 px-4 sm:px-6 fixed top-0 left-0 right-0 z-50 flex items-center justify-between">
+
+      <!-- Left: Title, Breadcrumbs, Status -->
       <div class="flex items-center gap-3 sm:gap-4">
-        
+
         <!-- Back to Admin CMS -->
         <RouterLink
           to="/admin/cases"
-          class="p-1.5 rounded-lg text-[#64748B] hover:text-[#0F172A] dark:hover:text-white hover:bg-[#F1F5F9] dark:hover:bg-slate-800 transition-colors flex items-center gap-1 text-xs font-bold"
-          title="Back to Admin CMS"
+          class="p-1.5 rounded-lg text-[#64748B] hover:text-[#1E293B] dark:hover:text-white hover:bg-[#F1F5F9] dark:hover:bg-slate-800 transition-colors flex items-center gap-1 text-xs font-medium"
+          title="Kembali ke Admin CMS"
         >
           <ArrowLeft class="w-4 h-4" />
           <span class="hidden sm:inline">Admin CMS</span>
         </RouterLink>
 
-        <div class="h-4 w-px bg-[#E5EAEF] dark:bg-slate-800"></div>
+        <div class="h-4 w-px bg-[#E2E8F0] dark:bg-slate-800"></div>
 
         <div class="flex items-center gap-2">
-          <div class="w-7 h-7 rounded-lg bg-[#ECF2FF] dark:bg-indigo-950/60 text-[#5D87FF] dark:text-indigo-400 flex items-center justify-center border border-[#5D87FF]/20">
-            <FileText class="w-4 h-4" />
-          </div>
-          <span class="font-extrabold text-[#0F172A] dark:text-white text-xs sm:text-sm tracking-tight">
-            SOP Article Editor
+          <span class="font-semibold text-[#1E293B] dark:text-white text-xs sm:text-sm tracking-tight">
+            Knowledge Base Editor
           </span>
         </div>
 
-        <!-- Sync & Status Badges -->
-        <div class="hidden md:flex items-center gap-2 pl-2 border-l border-[#E5EAEF] dark:border-slate-800">
+        <!-- Status Badges -->
+        <div class="hidden md:flex items-center gap-2 pl-2 border-l border-[#E2E8F0] dark:border-slate-800">
           <span
-            class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-extrabold uppercase tracking-wider"
+            class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-medium"
             :class="doc.status === 'PUBLISHED'
-              ? 'bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
-              : 'bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800'"
+              ? 'bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300'
+              : 'bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-300'"
           >
+            <span class="w-1.5 h-1.5 rounded-full" :class="doc.status === 'PUBLISHED' ? 'bg-emerald-500' : 'bg-amber-500'"></span>
             {{ doc.status || 'DRAFT' }}
           </span>
 
-          <span class="text-[11px] text-[#64748B] dark:text-slate-400 font-medium flex items-center gap-1">
-            <Cloud class="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-            <span>{{ saveStatus }}</span>
+          <span class="text-[11px] text-[#64748B] dark:text-slate-400 font-normal">
+            {{ saveStatus }}
           </span>
         </div>
       </div>
 
       <!-- Right: Action Buttons -->
-      <div class="flex items-center gap-2 sm:gap-3">
-        
+      <div class="flex items-center gap-2">
+
         <!-- Preview as Employee -->
         <button
           @click="isPreviewModalOpen = true"
-          class="hidden sm:inline-flex items-center gap-1.5 text-xs font-extrabold px-3 py-1.5 rounded-xl border border-[#E5EAEF] dark:border-slate-700 bg-white dark:bg-slate-800 text-[#0F172A] dark:text-slate-200 hover:bg-[#F8FAFC] dark:hover:bg-slate-700 transition-colors cursor-pointer shadow-2xs"
+          class="hidden sm:inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg border border-[#E2E8F0] dark:border-slate-700 bg-white dark:bg-slate-900 text-[#1E293B] dark:text-slate-200 hover:bg-[#F8FAFC] dark:hover:bg-slate-800 transition-colors cursor-pointer"
         >
-          <Eye class="w-3.5 h-3.5 text-[#5D87FF]" />
-          <span>Preview as Employee</span>
+          <Eye class="w-3.5 h-3.5 text-[#64748B] dark:text-slate-400" />
+          <span>Preview</span>
         </button>
 
         <!-- Save Draft -->
         <button
           @click="handleSaveDraft"
           :disabled="isSaving"
-          class="px-3.5 py-1.5 rounded-xl text-xs font-extrabold border border-[#5D87FF]/30 text-[#5D87FF] dark:text-indigo-300 bg-[#ECF2FF] dark:bg-indigo-950/60 hover:bg-[#5D87FF] hover:text-white transition-all cursor-pointer shadow-2xs disabled:opacity-50"
+          class="px-3.5 py-1.5 rounded-lg text-xs font-semibold border border-[#E2E8F0] dark:border-slate-700 text-[#1E293B] dark:text-slate-200 bg-white dark:bg-slate-900 hover:bg-[#F8FAFC] dark:hover:bg-slate-800 transition-colors cursor-pointer disabled:opacity-50"
         >
           Save Draft
         </button>
@@ -389,17 +382,17 @@ function goToAdminCases() {
         <button
           @click="handlePublish"
           :disabled="isSaving"
-          class="px-4 py-1.5 rounded-xl text-xs font-extrabold bg-[#5D87FF] hover:bg-[#4570EA] text-white shadow-md shadow-[#5D87FF]/25 hover:shadow-lg transition-all cursor-pointer flex items-center gap-1.5 disabled:opacity-50 active:scale-95"
+          class="px-4 py-1.5 rounded-lg text-xs font-semibold bg-[#2563EB] hover:bg-[#1D4ED8] text-white shadow-sm transition-all cursor-pointer flex items-center gap-1.5 disabled:opacity-50 active:scale-[0.98]"
         >
           <CheckCircle2 class="w-3.5 h-3.5" />
-          <span>{{ isSaving ? 'Publishing...' : 'Publish Article' }}</span>
+          <span>{{ isSaving ? 'Memublikasikan...' : 'Publish' }}</span>
         </button>
 
         <!-- Inspector Toggle Button -->
         <button
           @click="isInspectorOpen = !isInspectorOpen"
-          class="p-2 rounded-xl text-[#64748B] dark:text-slate-400 hover:bg-[#F8FAFC] dark:hover:bg-slate-800 transition-colors cursor-pointer border border-[#E5EAEF] dark:border-slate-800"
-          :class="{ 'text-[#5D87FF] bg-[#ECF2FF] dark:bg-slate-800 border-[#5D87FF]/30': isInspectorOpen }"
+          class="p-2 rounded-lg text-[#64748B] dark:text-slate-400 hover:bg-[#F8FAFC] dark:hover:bg-slate-800 transition-colors cursor-pointer"
+          :class="{ 'text-[#2563EB] bg-blue-50 dark:bg-blue-950/40': isInspectorOpen }"
           title="Toggle Inspector Panel"
         >
           <PanelRight class="w-4 h-4" />
@@ -411,14 +404,14 @@ function goToAdminCases() {
     <!-- 2. STICKY FORMATTING RIBBON (TIPTAP CONNECTED) -->
     <div
       v-if="editor"
-      class="sticky top-16 z-40 bg-white dark:bg-slate-900 border-b border-[#E5EAEF] dark:border-slate-800 px-4 sm:px-6 py-2 flex items-center gap-1 sm:gap-2 overflow-x-auto shadow-2xs text-xs select-none"
+      class="sticky top-14 z-40 bg-white dark:bg-slate-900 border-b border-[#E2E8F0] dark:border-slate-800 px-4 sm:px-6 py-1.5 flex items-center gap-1 sm:gap-1.5 overflow-x-auto text-xs select-none"
     >
       <!-- Undo / Redo -->
-      <div class="flex items-center gap-0.5 border-r border-[#E5EAEF] dark:border-slate-800 pr-2 mr-1">
+      <div class="flex items-center gap-0.5 border-r border-[#E2E8F0] dark:border-slate-800 pr-2 mr-1">
         <button
           @click="editor.chain().focus().undo().run()"
           :disabled="!editor.can().undo()"
-          class="p-1.5 text-[#64748B] dark:text-slate-400 hover:bg-[#F8FAFC] dark:hover:bg-slate-800 rounded-lg disabled:opacity-30 cursor-pointer"
+          class="p-1.5 text-[#64748B] dark:text-slate-400 hover:bg-[#F1F5F9] dark:hover:bg-slate-800 rounded-lg disabled:opacity-30 cursor-pointer"
           title="Undo"
         >
           <Undo class="w-4 h-4" />
@@ -426,7 +419,7 @@ function goToAdminCases() {
         <button
           @click="editor.chain().focus().redo().run()"
           :disabled="!editor.can().redo()"
-          class="p-1.5 text-[#64748B] dark:text-slate-400 hover:bg-[#F8FAFC] dark:hover:bg-slate-800 rounded-lg disabled:opacity-30 cursor-pointer"
+          class="p-1.5 text-[#64748B] dark:text-slate-400 hover:bg-[#F1F5F9] dark:hover:bg-slate-800 rounded-lg disabled:opacity-30 cursor-pointer"
           title="Redo"
         >
           <Redo class="w-4 h-4" />
@@ -434,11 +427,11 @@ function goToAdminCases() {
       </div>
 
       <!-- Text Style Selector (Paragraph / H1 / H2 / H3) -->
-      <div class="flex items-center gap-1 border-r border-[#E5EAEF] dark:border-slate-800 pr-2 mr-1">
+      <div class="flex items-center gap-1 border-r border-[#E2E8F0] dark:border-slate-800 pr-2 mr-1">
         <select
           :value="currentHeadingLevel"
           @change="setHeading(Number($event.target.value))"
-          class="bg-[#F8FAFC] dark:bg-slate-800 border border-[#E5EAEF] dark:border-slate-700 rounded-lg py-1 px-2 text-xs font-semibold text-[#0F172A] dark:text-slate-100 focus:outline-none cursor-pointer"
+          class="bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-700 rounded-lg py-1 px-2 text-xs font-medium text-[#1E293B] dark:text-slate-100 focus:outline-none focus:border-[#2563EB] cursor-pointer"
         >
           <option value="0">Normal Text</option>
           <option value="1">Heading 1</option>
@@ -448,11 +441,11 @@ function goToAdminCases() {
       </div>
 
       <!-- Formatting (B, I, U) -->
-      <div class="flex items-center gap-0.5 border-r border-[#E5EAEF] dark:border-slate-800 pr-2 mr-1">
+      <div class="flex items-center gap-0.5 border-r border-[#E2E8F0] dark:border-slate-800 pr-2 mr-1">
         <button
           @click="editor.chain().focus().toggleBold().run()"
           class="w-7 h-7 flex items-center justify-center rounded-lg transition-colors cursor-pointer"
-          :class="editor.isActive('bold') ? 'bg-[#5D87FF] text-white font-bold' : 'text-[#64748B] dark:text-slate-400 hover:bg-[#F8FAFC] dark:hover:bg-slate-800'"
+          :class="editor.isActive('bold') ? 'bg-[#2563EB] text-white' : 'text-[#64748B] dark:text-slate-400 hover:bg-[#F1F5F9] dark:hover:bg-slate-800'"
           title="Bold (Ctrl+B)"
         >
           <BoldIcon class="w-3.5 h-3.5" />
@@ -461,7 +454,7 @@ function goToAdminCases() {
         <button
           @click="editor.chain().focus().toggleItalic().run()"
           class="w-7 h-7 flex items-center justify-center rounded-lg transition-colors italic cursor-pointer"
-          :class="editor.isActive('italic') ? 'bg-[#5D87FF] text-white font-bold' : 'text-[#64748B] dark:text-slate-400 hover:bg-[#F8FAFC] dark:hover:bg-slate-800'"
+          :class="editor.isActive('italic') ? 'bg-[#2563EB] text-white' : 'text-[#64748B] dark:text-slate-400 hover:bg-[#F1F5F9] dark:hover:bg-slate-800'"
           title="Italic (Ctrl+I)"
         >
           <ItalicIcon class="w-3.5 h-3.5" />
@@ -470,7 +463,7 @@ function goToAdminCases() {
         <button
           @click="editor.chain().focus().toggleUnderline().run()"
           class="w-7 h-7 flex items-center justify-center rounded-lg transition-colors underline cursor-pointer"
-          :class="editor.isActive('underline') ? 'bg-[#5D87FF] text-white font-bold' : 'text-[#64748B] dark:text-slate-400 hover:bg-[#F8FAFC] dark:hover:bg-slate-800'"
+          :class="editor.isActive('underline') ? 'bg-[#2563EB] text-white' : 'text-[#64748B] dark:text-slate-400 hover:bg-[#F1F5F9] dark:hover:bg-slate-800'"
           title="Underline (Ctrl+U)"
         >
           <UnderlineIcon class="w-3.5 h-3.5" />
@@ -478,11 +471,11 @@ function goToAdminCases() {
       </div>
 
       <!-- Lists & Code Blocks -->
-      <div class="flex items-center gap-0.5 border-r border-[#E5EAEF] dark:border-slate-800 pr-2 mr-1">
+      <div class="flex items-center gap-0.5 border-r border-[#E2E8F0] dark:border-slate-800 pr-2 mr-1">
         <button
           @click="editor.chain().focus().toggleBulletList().run()"
           class="p-1.5 rounded-lg transition-colors cursor-pointer"
-          :class="editor.isActive('bulletList') ? 'bg-[#ECF2FF] text-[#5D87FF] font-bold' : 'text-[#64748B] dark:text-slate-400 hover:bg-[#F8FAFC]'"
+          :class="editor.isActive('bulletList') ? 'bg-blue-50 dark:bg-blue-950/40 text-[#2563EB] dark:text-blue-400' : 'text-[#64748B] dark:text-slate-400 hover:bg-[#F1F5F9] dark:hover:bg-slate-800'"
           title="Bullet List"
         >
           <List class="w-4 h-4" />
@@ -491,7 +484,7 @@ function goToAdminCases() {
         <button
           @click="editor.chain().focus().toggleOrderedList().run()"
           class="p-1.5 rounded-lg transition-colors cursor-pointer"
-          :class="editor.isActive('orderedList') ? 'bg-[#ECF2FF] text-[#5D87FF] font-bold' : 'text-[#64748B] dark:text-slate-400 hover:bg-[#F8FAFC]'"
+          :class="editor.isActive('orderedList') ? 'bg-blue-50 dark:bg-blue-950/40 text-[#2563EB] dark:text-blue-400' : 'text-[#64748B] dark:text-slate-400 hover:bg-[#F1F5F9] dark:hover:bg-slate-800'"
           title="Numbered List"
         >
           <ListOrdered class="w-4 h-4" />
@@ -500,7 +493,7 @@ function goToAdminCases() {
         <button
           @click="editor.chain().focus().toggleBlockquote().run()"
           class="p-1.5 rounded-lg transition-colors cursor-pointer"
-          :class="editor.isActive('blockquote') ? 'bg-[#ECF2FF] text-[#5D87FF]' : 'text-[#64748B] dark:text-slate-400 hover:bg-[#F8FAFC]'"
+          :class="editor.isActive('blockquote') ? 'bg-blue-50 dark:bg-blue-950/40 text-[#2563EB] dark:text-blue-400' : 'text-[#64748B] dark:text-slate-400 hover:bg-[#F1F5F9] dark:hover:bg-slate-800'"
           title="Blockquote"
         >
           <Quote class="w-4 h-4" />
@@ -509,7 +502,7 @@ function goToAdminCases() {
         <button
           @click="editor.chain().focus().toggleCodeBlock().run()"
           class="p-1.5 rounded-lg transition-colors cursor-pointer"
-          :class="editor.isActive('codeBlock') ? 'bg-[#5D87FF] text-white' : 'text-[#64748B] dark:text-slate-400 hover:bg-[#F8FAFC]'"
+          :class="editor.isActive('codeBlock') ? 'bg-[#2563EB] text-white' : 'text-[#64748B] dark:text-slate-400 hover:bg-[#F1F5F9] dark:hover:bg-slate-800'"
           title="Code Block"
         >
           <Code class="w-4 h-4" />
@@ -518,7 +511,7 @@ function goToAdminCases() {
         <button
           @click="setLink"
           class="p-1.5 rounded-lg transition-colors cursor-pointer"
-          :class="editor.isActive('link') ? 'bg-[#5D87FF] text-white' : 'text-[#64748B] dark:text-slate-400 hover:bg-[#F8FAFC]'"
+          :class="editor.isActive('link') ? 'bg-[#2563EB] text-white' : 'text-[#64748B] dark:text-slate-400 hover:bg-[#F1F5F9] dark:hover:bg-slate-800'"
           title="Insert Link"
         >
           <LinkIcon class="w-4 h-4" />
@@ -529,26 +522,26 @@ function goToAdminCases() {
       <div class="flex items-center gap-1.5">
         <button
           @click="insertInfoCallout"
-          class="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300 font-bold border border-blue-200 dark:border-blue-800 cursor-pointer hover:bg-blue-100 transition-colors text-[11px]"
+          class="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-[#475569] dark:text-slate-300 font-medium cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors text-[11px]"
         >
-          <Info class="w-3.5 h-3.5 text-blue-600" />
+          <Info class="w-3.5 h-3.5" />
           <span>Info Callout</span>
         </button>
 
         <button
           @click="insertWarningCallout"
-          class="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300 font-bold border border-amber-200 dark:border-amber-800 cursor-pointer hover:bg-amber-100 transition-colors text-[11px]"
+          class="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-[#475569] dark:text-slate-300 font-medium cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors text-[11px]"
         >
-          <AlertTriangle class="w-3.5 h-3.5 text-amber-600" />
+          <AlertTriangle class="w-3.5 h-3.5" />
           <span>Warning Banner</span>
         </button>
 
         <button
           @click="insertStep"
-          class="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 font-bold border border-emerald-200 dark:border-emerald-800 cursor-pointer hover:bg-emerald-100 transition-colors text-[11px]"
+          class="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-[#475569] dark:text-slate-300 font-medium cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors text-[11px]"
         >
-          <Plus class="w-3.5 h-3.5 text-emerald-600" />
-          <span>+ Step Item</span>
+          <Plus class="w-3.5 h-3.5" />
+          <span>+ Step</span>
         </button>
       </div>
 
@@ -556,22 +549,22 @@ function goToAdminCases() {
 
     <!-- 3. MAIN WORKSPACE (CENTRAL SHEET CANVAS + INSPECTOR) -->
     <div class="flex-1 flex relative pt-2">
-      
+
       <!-- Central Canvas Scroll Area -->
       <main class="flex-1 flex justify-center pb-24 overflow-y-auto px-4 sm:px-6">
-        
+
         <!-- Live Document Sheet (White Sheet Paper) -->
-        <article class="bg-white dark:bg-slate-900 rounded-2xl border border-[#E5EAEF] dark:border-slate-800 shadow-sm w-full max-w-[840px] min-h-[900px] mt-4 mb-12 p-8 sm:p-12 relative space-y-6 transition-all">
-          
+        <article class="bg-white dark:bg-slate-900 rounded-xl border border-[#E2E8F0] dark:border-slate-800 shadow-xs w-full max-w-[840px] min-h-[900px] mt-6 mb-12 p-8 sm:p-12 relative space-y-6 transition-all">
+
           <!-- Document Breadcrumbs & Category Bar -->
-          <div class="flex items-center justify-between text-xs text-[#64748B] dark:text-slate-400 pb-3 border-b border-[#E5EAEF] dark:border-slate-800">
-            <div class="flex items-center gap-1.5 font-bold">
+          <div class="flex items-center justify-between text-xs text-[#64748B] dark:text-slate-400 pb-3 border-b border-[#F1F5F9] dark:border-slate-800">
+            <div class="flex items-center gap-1.5 font-medium">
               <span>Knowledge Base</span>
-              <span>/</span>
-              <span class="capitalize text-[#5D87FF] dark:text-indigo-400">{{ doc.category }}</span>
+              <span class="text-slate-300 dark:text-slate-600">/</span>
+              <span class="capitalize text-[#2563EB] dark:text-blue-400">{{ doc.category }}</span>
             </div>
-            <span class="px-2.5 py-0.5 rounded-full text-[10px] uppercase font-extrabold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 tracking-wider">
-              {{ doc.severity }} Priority
+            <span class="px-2 py-0.5 rounded-md text-[10px] uppercase font-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 tracking-wider">
+              {{ doc.severity }} priority
             </span>
           </div>
 
@@ -579,20 +572,20 @@ function goToAdminCases() {
           <input
             v-model="doc.title"
             type="text"
-            class="w-full text-2xl sm:text-4xl font-extrabold text-[#0F172A] dark:text-white bg-transparent border-none focus:outline-none focus:ring-0 p-0 placeholder:text-[#CBD5E1] tracking-tight"
-            placeholder="SOP Document Title..."
+            class="w-full text-2xl sm:text-3xl font-bold text-[#1E293B] dark:text-white bg-transparent border-none focus:outline-none focus:ring-0 p-0 placeholder:text-[#CBD5E1] tracking-tight"
+            placeholder="Judul dokumen..."
           />
 
-          <!-- Summary Box (Italic with left border) -->
-          <div class="bg-[#F8FAFC] dark:bg-slate-800/60 border border-[#E5EAEF] dark:border-slate-700/80 rounded-2xl p-4 shadow-2xs">
-            <label class="block text-[11px] font-extrabold uppercase tracking-wider text-[#64748B] dark:text-slate-400 mb-1.5">
-              Executive Summary:
+          <!-- Summary Box -->
+          <div class="bg-[#F8FAFC] dark:bg-slate-800/50 border border-[#E2E8F0] dark:border-slate-700/60 rounded-lg p-4">
+            <label class="block text-[11px] font-medium uppercase tracking-wide text-[#64748B] dark:text-slate-400 mb-1.5">
+              Ringkasan
             </label>
             <textarea
               v-model="doc.summary"
               rows="2"
-              class="w-full bg-transparent border-l-4 border-[#5D87FF] pl-3 text-xs sm:text-sm italic text-[#334155] dark:text-slate-300 focus:outline-none resize-none leading-relaxed font-medium"
-              placeholder="Write a concise executive summary for this SOP guide..."
+              class="w-full bg-transparent text-xs sm:text-sm text-[#334155] dark:text-slate-300 focus:outline-none resize-none leading-relaxed"
+              placeholder="Ringkasan singkat dokumen ini..."
             ></textarea>
           </div>
 
@@ -600,64 +593,64 @@ function goToAdminCases() {
           <div
             v-if="isSelectionMenuOpen && editor"
             :style="{ left: selectionMenuPos.x + 'px', top: selectionMenuPos.y + 'px' }"
-            class="fixed z-50 -translate-x-1/2 -translate-y-full flex items-center gap-1 p-1 bg-white dark:bg-slate-900 border border-[#E5EAEF] dark:border-slate-700 rounded-xl shadow-xl transition-all select-none"
+            class="fixed z-50 -translate-x-1/2 -translate-y-full flex items-center gap-0.5 p-1 bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-700 rounded-lg shadow-lg transition-all select-none"
           >
             <button
               @click="editor.chain().focus().toggleBold().run()"
-              class="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-[#F8FAFC] dark:hover:bg-slate-800 text-xs font-bold"
-              :class="{ 'text-[#5D87FF] font-extrabold bg-[#ECF2FF] dark:bg-slate-800': editor.isActive('bold') }"
+              class="w-7 h-7 flex items-center justify-center rounded-md hover:bg-[#F1F5F9] dark:hover:bg-slate-800 text-xs font-semibold"
+              :class="{ 'text-[#2563EB] bg-blue-50 dark:bg-blue-950/40': editor.isActive('bold') }"
             >
               B
             </button>
             <button
               @click="editor.chain().focus().toggleItalic().run()"
-              class="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-[#F8FAFC] dark:hover:bg-slate-800 text-xs italic"
-              :class="{ 'text-[#5D87FF] font-bold bg-[#ECF2FF] dark:bg-slate-800': editor.isActive('italic') }"
+              class="w-7 h-7 flex items-center justify-center rounded-md hover:bg-[#F1F5F9] dark:hover:bg-slate-800 text-xs italic"
+              :class="{ 'text-[#2563EB] bg-blue-50 dark:bg-blue-950/40': editor.isActive('italic') }"
             >
               I
             </button>
-            <div class="w-px h-4 bg-[#E5EAEF] dark:bg-slate-700 mx-0.5"></div>
+            <div class="w-px h-4 bg-[#E2E8F0] dark:bg-slate-700 mx-0.5"></div>
             <button
               @click="editor.chain().focus().toggleHeading({ level: 1 }).run()"
-              class="px-1.5 py-1 rounded-lg hover:bg-[#F8FAFC] dark:hover:bg-slate-800 text-xs font-bold"
-              :class="{ 'text-[#5D87FF] bg-[#ECF2FF] dark:bg-slate-800': editor.isActive('heading', { level: 1 }) }"
+              class="px-1.5 py-1 rounded-md hover:bg-[#F1F5F9] dark:hover:bg-slate-800 text-xs font-semibold"
+              :class="{ 'text-[#2563EB] bg-blue-50 dark:bg-blue-950/40': editor.isActive('heading', { level: 1 }) }"
             >
               H1
             </button>
             <button
               @click="editor.chain().focus().toggleHeading({ level: 2 }).run()"
-              class="px-1.5 py-1 rounded-lg hover:bg-[#F8FAFC] dark:hover:bg-slate-800 text-xs font-bold"
-              :class="{ 'text-[#5D87FF] bg-[#ECF2FF] dark:bg-slate-800': editor.isActive('heading', { level: 2 }) }"
+              class="px-1.5 py-1 rounded-md hover:bg-[#F1F5F9] dark:hover:bg-slate-800 text-xs font-semibold"
+              :class="{ 'text-[#2563EB] bg-blue-50 dark:bg-blue-950/40': editor.isActive('heading', { level: 2 }) }"
             >
               H2
             </button>
-            <div class="w-px h-4 bg-[#E5EAEF] dark:bg-slate-700 mx-0.5"></div>
+            <div class="w-px h-4 bg-[#E2E8F0] dark:bg-slate-700 mx-0.5"></div>
             <button
               @click="setLink"
-              class="p-1 rounded-lg hover:bg-[#F8FAFC] dark:hover:bg-slate-800 text-xs"
-              :class="{ 'text-[#5D87FF]': editor.isActive('link') }"
+              class="p-1 rounded-md hover:bg-[#F1F5F9] dark:hover:bg-slate-800 text-xs"
+              :class="{ 'text-[#2563EB]': editor.isActive('link') }"
             >
               <LinkIcon class="w-3.5 h-3.5" />
             </button>
           </div>
 
           <!-- TIPTAP LIVE EDITOR CONTENT CANVAS -->
-          <div class="pt-2 border-t border-[#E5EAEF] dark:border-slate-800">
+          <div class="pt-2 border-t border-[#F1F5F9] dark:border-slate-800">
             <editor-content
               :editor="editor"
-              class="prose prose-slate max-w-none text-[#0F172A] dark:text-slate-200"
+              class="prose prose-slate max-w-none text-[#1E293B] dark:text-slate-200"
             />
           </div>
 
           <!-- Bottom Micro-feedback Preview -->
-          <div class="mt-16 pt-8 border-t border-[#E5EAEF] dark:border-slate-800 flex flex-col items-center gap-3 text-xs">
-            <p class="font-bold text-[#64748B] dark:text-slate-400">Preview: Was this article helpful?</p>
-            <div class="flex gap-3">
-              <button class="px-5 py-1.5 border border-[#E5EAEF] dark:border-slate-700 rounded-xl text-xs font-bold flex items-center gap-1.5 text-[#475569] dark:text-slate-300 hover:bg-[#F8FAFC] transition-colors">
-                <ThumbsUp class="w-3.5 h-3.5 text-[#5D87FF]" /> Yes
+          <div class="mt-16 pt-8 border-t border-[#F1F5F9] dark:border-slate-800 flex flex-col items-center gap-3 text-xs">
+            <p class="font-medium text-[#64748B] dark:text-slate-400">Preview: Apakah artikel ini membantu?</p>
+            <div class="flex gap-2">
+              <button class="px-5 py-1.5 border border-[#E2E8F0] dark:border-slate-700 rounded-lg text-xs font-medium flex items-center gap-1.5 text-[#475569] dark:text-slate-300 hover:bg-[#F8FAFC] dark:hover:bg-slate-800 transition-colors cursor-pointer">
+                <ThumbsUp class="w-3.5 h-3.5" /> Ya
               </button>
-              <button class="px-5 py-1.5 border border-[#E5EAEF] dark:border-slate-700 rounded-xl text-xs font-bold flex items-center gap-1.5 text-[#475569] dark:text-slate-300 hover:bg-[#F8FAFC] transition-colors">
-                <ThumbsDown class="w-3.5 h-3.5 text-rose-500" /> No
+              <button class="px-5 py-1.5 border border-[#E2E8F0] dark:border-slate-700 rounded-lg text-xs font-medium flex items-center gap-1.5 text-[#475569] dark:text-slate-300 hover:bg-[#F8FAFC] dark:hover:bg-slate-800 transition-colors cursor-pointer">
+                <ThumbsDown class="w-3.5 h-3.5" /> Tidak
               </button>
             </div>
           </div>
@@ -668,7 +661,7 @@ function goToAdminCases() {
       <!-- Right Inspector Panel (Metadata & Settings) -->
       <div
         v-if="isInspectorOpen"
-        class="hidden lg:block h-[calc(100vh-8rem)] sticky top-28 mr-2 rounded-2xl overflow-hidden border border-[#E5EAEF] dark:border-slate-800 shadow-sm"
+        class="hidden lg:block h-[calc(100vh-7rem)] sticky top-24 mr-2 rounded-xl overflow-hidden border border-[#E2E8F0] dark:border-slate-800 shadow-xs"
       >
         <DocEditorInspector
           v-model="doc"
@@ -682,24 +675,24 @@ function goToAdminCases() {
     <!-- 4. EMPLOYEE LIVE PREVIEW MODAL -->
     <div
       v-if="isPreviewModalOpen"
-      class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs"
+      class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/50 backdrop-blur-sm"
     >
-      <div class="relative w-full max-w-4xl max-h-[90vh] bg-white dark:bg-slate-900 border border-[#E5EAEF] dark:border-slate-800 rounded-2xl shadow-2xl overflow-hidden flex flex-col">
-        <div class="px-6 py-4 border-b border-[#E5EAEF] dark:border-slate-800 flex items-center justify-between bg-[#F8FAFC] dark:bg-slate-950">
-          <div class="flex items-center gap-2 text-xs font-bold text-[#5D87FF] dark:text-indigo-400">
+      <div class="relative w-full max-w-4xl max-h-[90vh] bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 rounded-xl shadow-xl overflow-hidden flex flex-col">
+        <div class="px-6 py-3.5 border-b border-[#E2E8F0] dark:border-slate-800 flex items-center justify-between">
+          <div class="flex items-center gap-2 text-xs font-semibold text-[#2563EB] dark:text-blue-400">
             <Eye class="w-4 h-4" />
-            <span>Employee View Preview</span>
+            <span>Preview Tampilan Employee</span>
           </div>
-          <button @click="isPreviewModalOpen = false" class="p-1 rounded-lg text-[#64748B] hover:bg-[#E5EAEF] dark:hover:bg-slate-800 transition-colors">
+          <button @click="isPreviewModalOpen = false" class="p-1 rounded-lg text-[#64748B] hover:bg-[#F1F5F9] dark:hover:bg-slate-800 transition-colors cursor-pointer">
             <X class="w-5 h-5" />
           </button>
         </div>
 
         <div class="flex-1 overflow-y-auto p-8 space-y-6">
-          <h1 class="text-3xl font-extrabold text-[#0F172A] dark:text-slate-100 tracking-tight">{{ doc.title }}</h1>
-          <p class="text-xs sm:text-sm text-[#334155] dark:text-slate-300 p-4 rounded-2xl bg-[#ECF2FF] dark:bg-indigo-950/30 border border-[#5D87FF]/20 italic font-medium leading-relaxed">{{ doc.summary }}</p>
-          
-          <div class="prose prose-slate dark:prose-invert max-w-none text-xs sm:text-sm" v-html="editor?.getHTML()"></div>
+          <h1 class="text-2xl font-bold text-[#1E293B] dark:text-slate-100 tracking-tight">{{ doc.title }}</h1>
+          <p class="text-xs sm:text-sm text-[#334155] dark:text-slate-300 p-4 rounded-lg bg-[#F8FAFC] dark:bg-slate-800/50 border border-[#E2E8F0] dark:border-slate-700/60 leading-relaxed">{{ doc.summary }}</p>
+
+          <div class="doc-preview prose prose-slate dark:prose-invert max-w-none text-[#1E293B] dark:text-slate-200" v-html="editor?.getHTML()"></div>
         </div>
       </div>
     </div>
@@ -764,14 +757,14 @@ function goToAdminCases() {
 }
 
 .ProseMirror blockquote {
-  border-left: 4px solid #5d87ff !important;
+  border-left: 3px solid #2563eb !important;
   background-color: #f8fafc !important;
   padding: 0.75rem 1rem !important;
   border-radius: 0.5rem !important;
   margin-top: 1rem !important;
   margin-bottom: 1rem !important;
-  font-style: italic !important;
-  color: #334155 !important;
+  font-style: normal !important;
+  color: #475569 !important;
 }
 
 .ProseMirror pre {
@@ -825,4 +818,107 @@ function goToAdminCases() {
   background-color: #1e293b !important;
   color: #f8fafc !important;
 }
+
+/* Preview modal: mirror the editor's ProseMirror typography exactly */
+.doc-preview p {
+  margin-bottom: 0.75rem;
+  line-height: 1.625;
+}
+
+.doc-preview h1 {
+  font-size: 1.875rem;
+  line-height: 2.25rem;
+  font-weight: 800;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+  letter-spacing: -0.025em;
+}
+
+.doc-preview h2 {
+  font-size: 1.5rem;
+  line-height: 2rem;
+  font-weight: 700;
+  margin-top: 1.25rem;
+  margin-bottom: 0.5rem;
+  letter-spacing: -0.02em;
+}
+
+.doc-preview h3 {
+  font-size: 1.25rem;
+  line-height: 1.75rem;
+  font-weight: 700;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.doc-preview ul {
+  list-style-type: disc;
+  padding-left: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.doc-preview ol {
+  list-style-type: decimal;
+  padding-left: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.doc-preview li {
+  margin-bottom: 0.25rem;
+}
+
+.doc-preview blockquote {
+  border-left: 3px solid #2563eb;
+  background-color: #f8fafc;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  font-style: normal;
+  color: #475569;
+}
+
+.doc-preview pre {
+  background-color: #0f172a;
+  color: #38bdf8;
+  padding: 1rem;
+  border-radius: 0.75rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.8125rem;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  overflow-x: auto;
+}
+
+.doc-preview code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  background-color: #f1f5f9;
+  color: #0f172a;
+  padding: 0.125rem 0.375rem;
+  border-radius: 0.25rem;
+  font-size: 0.85em;
+}
+
+.doc-preview pre code {
+  background-color: transparent;
+  color: inherit;
+  padding: 0;
+}
+
+.dark .doc-preview h1,
+.dark .doc-preview h2,
+.dark .doc-preview h3 {
+  color: #f8fafc;
+}
+
+.dark .doc-preview blockquote {
+  background-color: rgba(30, 41, 59, 0.6);
+  color: #cbd5e1;
+}
+
+.dark .doc-preview code {
+  background-color: #1e293b;
+  color: #f8fafc;
+}
+
 </style>

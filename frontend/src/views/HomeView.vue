@@ -1,8 +1,10 @@
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted, nextTick } from 'vue';
 import { useRouter } from 'vue-router';
 import { useCases } from '@/composables/useCases';
 import { useAuth } from '@/composables/useAuth';
+import gsap from 'gsap';
+import { useGsapContext, isReducedMotion } from '@/composables/useGsap';
 import {
   Search,
   Laptop,
@@ -21,7 +23,8 @@ import {
   Plus,
   Minus,
   HelpCircle,
-  Send
+  Send,
+  Clock
 } from 'lucide-vue-next';
 
 const router = useRouter();
@@ -202,33 +205,67 @@ const faqs = [
     isEmergency: true,
     emergencyTitle: 'Tindakan Darurat Diperlukan',
     emergencyText: 'Jika perangkat kerja hilang atau dicuri, segera laporkan ke Tim IT Support & Security Operations Center (SOC).',
-    details: 'Tim IT akan segera mengeksekusi perintah Remote Wipe via Endpoint Management untuk melindungi data perusahaan.'
   }
 ];
+
+const mainScope = ref(null);
+
+onMounted(async () => {
+  if (isReducedMotion()) return;
+  await nextTick();
+
+  if (!mainScope.value) return;
+
+  gsap.context(() => {
+    gsap.fromTo(
+      '.gsap-hero-el',
+      { opacity: 0, y: 16 },
+      { opacity: 1, y: 0, duration: 0.45, stagger: 0.06, ease: 'power2.out', clearProps: 'all' }
+    );
+
+    gsap.fromTo(
+      '.gsap-topic-card',
+      { opacity: 0, y: 18 },
+      { opacity: 1, y: 0, duration: 0.4, stagger: 0.05, ease: 'power2.out', delay: 0.15, clearProps: 'all' }
+    );
+
+    gsap.fromTo(
+      '.gsap-sop-item',
+      { opacity: 0, y: 12 },
+      { opacity: 1, y: 0, duration: 0.35, stagger: 0.04, ease: 'power2.out', delay: 0.25, clearProps: 'all' }
+    );
+
+    gsap.fromTo(
+      '.gsap-assistance',
+      { opacity: 0, y: 18 },
+      { opacity: 1, y: 0, duration: 0.45, ease: 'power2.out', delay: 0.35, clearProps: 'all' }
+    );
+  }, mainScope.value);
+});
 </script>
 
 <template>
-  <div class="page-home-unified-container min-h-screen bg-[#F8FAFC] dark:bg-slate-950 text-[#0F172A] dark:text-slate-100 py-10 px-4 sm:px-6 lg:px-8 transition-colors duration-200">
+  <div ref="mainScope" class="page-home-unified-container min-h-screen bg-[#F8FAFC] dark:bg-slate-950 text-[#0F172A] dark:text-slate-100 py-10 px-4 sm:px-6 lg:px-8 transition-colors duration-200">
     
     <!-- SHARED UNIFIED CONTAINER SYSTEM (max-w-[1200px] mx-auto w-full) -->
     <main class="max-w-[1200px] mx-auto w-full flex flex-col gap-14">
       
       <!-- 1. HERO SECTION: FOCAL SEARCH -->
       <section class="flex flex-col items-center text-center w-full pt-2 pb-2">
-        <div class="text-xs font-black uppercase tracking-widest text-[#5D87FF] dark:text-indigo-400 mb-2">
+        <div class="text-xs font-black uppercase tracking-widest text-[#5D87FF] dark:text-indigo-400 mb-2 gsap-hero-el">
           Help Center
         </div>
 
-        <h1 class="text-3xl sm:text-4xl lg:text-5xl font-black text-[#0F172A] dark:text-white tracking-tight leading-tight max-w-2xl">
+        <h1 class="text-3xl sm:text-4xl lg:text-5xl font-black text-[#0F172A] dark:text-white tracking-tight leading-tight max-w-2xl gsap-hero-el">
           What can we help you find?
         </h1>
         
-        <p class="text-xs sm:text-sm text-[#64748B] dark:text-slate-400 font-medium leading-relaxed mt-2.5 max-w-md">
+        <p class="text-xs sm:text-sm text-[#64748B] dark:text-slate-400 font-medium leading-relaxed mt-2.5 max-w-md gsap-hero-el">
           Search our SOPs, troubleshooting guides, and IT knowledge base.
         </p>
 
         <!-- Focal Search Input Bar -->
-        <div class="w-full relative mt-6 max-w-2xl">
+        <div class="w-full relative mt-6 max-w-2xl gsap-hero-el">
           <form @submit.prevent="handleSearchSubmit" class="relative flex items-center">
             <Search class="absolute left-4 w-5 h-5 text-[#5D87FF] pointer-events-none" />
             <input
@@ -327,7 +364,7 @@ const faqs = [
               card.isFeatured
                 ? 'bg-[#5D87FF] text-white shadow-lg shadow-[#5D87FF]/25 border border-[#5D87FF]'
                 : 'bg-white dark:bg-slate-900 border border-[#E5EAEF] dark:border-slate-800 text-[#0F172A] dark:text-white shadow-2xs hover:shadow-md hover:border-[#5D87FF]',
-              'rounded-2xl p-7 text-center flex flex-col items-center justify-between gap-5 transition-all duration-200 cursor-pointer group hover:scale-[1.01]'
+              'rounded-2xl p-7 text-center flex flex-col items-center justify-between gap-5 transition-all duration-200 cursor-pointer group hover:scale-[1.01] gsap-topic-card'
             ]"
           >
             <!-- Icon Box -->
@@ -396,7 +433,7 @@ const faqs = [
             v-for="sop in featuredSopList"
             :key="sop.id"
             @click="setSearch(sop.title); router.push('/cases')"
-            class="p-4 sm:p-5 hover:bg-[#F8FAFC] dark:hover:bg-slate-800/60 transition-colors flex items-center justify-between gap-4 cursor-pointer group"
+            class="p-4 sm:p-5 hover:bg-[#F8FAFC] dark:hover:bg-slate-800/60 transition-colors flex items-center justify-between gap-4 cursor-pointer group gsap-sop-item"
           >
             <div class="flex items-center gap-3.5">
               <span class="text-xs font-mono font-bold text-[#94A3B8] dark:text-slate-500 shrink-0">{{ sop.num }}</span>
@@ -510,37 +547,57 @@ const faqs = [
         </div>
       </section>
 
-      <!-- 5. NEED PERSONAL ASSISTANCE SECTION -->
-      <section class="bg-white dark:bg-slate-900 border border-[#E5EAEF] dark:border-slate-800 rounded-2xl p-8 sm:p-10 shadow-sm flex flex-col lg:flex-row items-center justify-between gap-8 w-full">
+      <!-- 5. NEED PERSONAL ASSISTANCE SECTION (MINIMALIST SAAS STYLE) -->
+      <section class="relative overflow-hidden bg-white dark:bg-slate-900 border border-[#E5EAEF] dark:border-slate-800 rounded-3xl p-8 sm:p-10 shadow-2xs flex flex-col lg:flex-row items-center justify-between gap-8 w-full group hover:border-[#5D87FF]/30 transition-all duration-300 gsap-assistance">
         
-        <!-- Left Text & Buttons -->
-        <div class="flex-1 space-y-4 max-w-xl text-left">
-          <h2 class="text-2xl sm:text-3xl font-black text-[#0F172A] dark:text-white tracking-tight">
+        <!-- Subtle Ambient Radial Light -->
+        <div class="absolute -top-24 -right-24 w-72 h-72 bg-[#5D87FF]/5 dark:bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+        <!-- Left Text & Action -->
+        <div class="flex-1 space-y-4 max-w-xl text-left z-10">
+          <h2 class="text-2xl sm:text-3xl font-extrabold text-[#0F172A] dark:text-white tracking-tight leading-tight">
             Need Personal Assistance?
           </h2>
           <p class="text-xs sm:text-sm text-[#64748B] dark:text-slate-400 font-medium leading-relaxed">
             If you couldn't find the information you need, our IT support team is ready to assist you. Submit a ticket to contact support right away.
           </p>
 
-          <div class="flex items-center pt-2">
+          <div class="flex items-center pt-1">
             <button
               @click="handleSupportTicketAction"
-              class="bg-[#5D87FF] hover:bg-[#4570EA] text-white font-extrabold text-xs px-6 py-3 rounded-xl shadow-md shadow-[#5D87FF]/20 transition-all cursor-pointer active:scale-95 flex items-center gap-2"
+              class="inline-flex items-center gap-2.5 px-6 py-3 rounded-xl bg-[#5D87FF] hover:bg-[#4570EA] text-white text-xs font-extrabold shadow-md shadow-[#5D87FF]/20 hover:shadow-lg hover:shadow-[#5D87FF]/30 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 cursor-pointer group/btn"
             >
-              <Ticket class="w-4 h-4" />
+              <Ticket class="w-4 h-4 group-hover/btn:rotate-12 transition-transform duration-200" />
               <span>{{ isAuthenticated ? 'Submit a Ticket' : 'Sign In to Submit a Ticket' }}</span>
+              <ArrowRight class="w-3.5 h-3.5 group-hover/btn:translate-x-1 transition-transform duration-200" />
             </button>
           </div>
         </div>
 
-        <!-- Right Support Graphic Container -->
-        <div class="w-full lg:w-72 flex justify-center shrink-0">
-          <div class="relative w-64 h-44 bg-[#ECF2FF] dark:bg-indigo-950/40 rounded-2xl p-4 flex flex-col items-center justify-center border border-[#5D87FF]/20 text-center shadow-2xs">
-            <div class="w-14 h-14 rounded-full bg-[#5D87FF] text-white flex items-center justify-center shadow-lg shadow-[#5D87FF]/30 mb-2">
-              <Send class="w-7 h-7" />
+        <!-- Right Support Info Box (Sleek Minimalist SaaS Card, No Badges) -->
+        <div class="w-full lg:w-72 shrink-0 z-10">
+          <div class="relative w-full bg-[#F8FAFC] dark:bg-slate-800/60 border border-[#E5EAEF] dark:border-slate-800 rounded-2xl p-5 flex flex-col justify-between gap-5 group-hover:border-[#5D87FF]/30 transition-all duration-200">
+            
+            <div class="flex items-center justify-between">
+              <div class="w-10 h-10 rounded-xl bg-[#ECF2FF] dark:bg-slate-700/60 text-[#5D87FF] dark:text-indigo-300 flex items-center justify-center shadow-2xs shrink-0">
+                <Send class="w-5 h-5" />
+              </div>
+              <div class="flex items-center gap-1.5 text-xs font-extrabold text-[#5D87FF] dark:text-indigo-300">
+                <span class="w-2 h-2 rounded-full bg-[#5D87FF] animate-pulse"></span>
+                <span>Active Support</span>
+              </div>
             </div>
-            <span class="text-xs font-black text-[#0F172A] dark:text-white">24/7 IT Helpdesk Support</span>
-            <span class="text-[10px] text-[#64748B] dark:text-slate-400 font-bold mt-0.5">Response Time &lt; 15 Mins</span>
+
+            <div class="space-y-1 text-left">
+              <div class="text-xs font-extrabold text-[#0F172A] dark:text-white">
+                24/7 IT Helpdesk Support
+              </div>
+              <div class="text-[11px] font-medium text-[#64748B] dark:text-slate-400 flex items-center gap-1.5">
+                <Clock class="w-3.5 h-3.5 text-[#5D87FF] shrink-0" />
+                <span>Response time &lt; 15 Mins</span>
+              </div>
+            </div>
+
           </div>
         </div>
 

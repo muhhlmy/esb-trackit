@@ -6,7 +6,6 @@ import AppHeader from './components/layout/AppHeader.vue'
 
 // Help Center Layout components
 import Navbar from './components/layout/Navbar.vue'
-import Footer from './components/layout/Footer.vue'
 import MobileNav from './components/layout/MobileNav.vue'
 import Toast from './components/common/Toast.vue'
 import LoginModal from './components/common/LoginModal.vue'
@@ -93,7 +92,6 @@ onUnmounted(() => {
           </Transition>
         </RouterView>
       </div>
-      <Footer />
       <MobileNav />
       <LoginModal />
       <Toast />

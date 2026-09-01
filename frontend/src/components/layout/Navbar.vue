@@ -10,7 +10,6 @@ import {
   Moon,
   LogIn,
   LogOut,
-  User,
   ShieldCheck,
   Ticket,
   LayoutDashboard,
@@ -20,7 +19,7 @@ import {
 const router = useRouter();
 const route = useRoute();
 const { setSearch } = useCases();
-const { isAuthenticated, user, isAdmin, isSuperAdmin, logout } = useAuth();
+const { isAuthenticated, user, isAdmin, isSuperAdmin, hasPermission, logout } = useAuth();
 const { isDark, toggleTheme } = useTheme();
 
 const isProfileOpen = ref(false);
@@ -122,39 +121,39 @@ onUnmounted(() => {
           <div class="relative">
             <button
               @click="toggleProfileMenu"
-              class="flex items-center gap-2 p-1 pl-2 rounded-xl border border-[#E5EAEF] dark:border-slate-800 bg-[#F8FAFC] dark:bg-slate-800/80 hover:bg-[#F1F5F9] dark:hover:bg-slate-800 transition-colors cursor-pointer text-xs"
+              class="flex items-center gap-2 p-1.5 pr-2.5 rounded-full border border-slate-200/80 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 hover:bg-slate-50 dark:hover:bg-slate-800/90 hover:border-slate-300 dark:hover:border-slate-700 shadow-2xs hover:shadow-xs transition-all duration-200 cursor-pointer text-xs group"
             >
               <!-- Avatar Circle -->
-              <div class="w-6 h-6 rounded-full bg-[#5D87FF] text-white text-[11px] font-extrabold flex items-center justify-center shadow-2xs">
-                {{ user?.name ? user.name.charAt(0).toUpperCase() : 'U' }}
+              <div class="w-6 h-6 rounded-full bg-gradient-to-tr from-[#5D87FF] to-[#3662E3] text-white text-[11px] font-black flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform shrink-0">
+                {{ (user?.nama || user?.name) ? (user?.nama || user?.name).charAt(0).toUpperCase() : 'U' }}
               </div>
               
-              <span class="font-bold text-[#0F172A] dark:text-slate-200 max-w-[120px] truncate hidden sm:inline-block">
-                {{ user?.name || 'User' }}
+              <span class="font-semibold text-slate-800 dark:text-slate-200 max-w-[130px] truncate hidden sm:inline-block tracking-tight">
+                {{ user?.nama || user?.name || 'User' }}
               </span>
 
               <!-- Admin Indicator Badge -->
-              <span v-if="isAdmin" class="hidden sm:inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-extrabold bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800">
+              <span v-if="isAdmin" class="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20 dark:border-amber-400/20">
                 <ShieldCheck class="w-2.5 h-2.5" />
-                Admin
+                <span>Admin</span>
               </span>
 
-              <ChevronDown class="w-3.5 h-3.5 text-[#64748B] dark:text-slate-400" />
+              <ChevronDown class="w-3.5 h-3.5 text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-transform duration-200" :class="isProfileOpen ? 'rotate-180 text-[#5D87FF]' : ''" />
             </button>
 
             <!-- Profile Dropdown Menu -->
             <div
               v-if="isProfileOpen"
-              class="absolute right-0 mt-2 w-56 rounded-2xl bg-white dark:bg-slate-900 border border-[#E5EAEF] dark:border-slate-800 shadow-xl py-2 z-50 text-xs animate-in fade-in slide-in-from-top-2 duration-150"
+              class="absolute right-0 mt-2.5 w-60 rounded-2xl bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border border-slate-200/90 dark:border-slate-800/90 shadow-2xl shadow-slate-900/10 p-1.5 z-50 text-xs animate-in fade-in slide-in-from-top-2 duration-150"
             >
               <!-- User Identity Header -->
-              <div class="px-4 py-2.5 border-b border-[#E5EAEF] dark:border-slate-800 space-y-0.5">
-                <p class="font-extrabold text-[#0F172A] dark:text-white truncate">{{ user?.name }}</p>
-                <p class="text-[11px] text-[#64748B] dark:text-slate-400 truncate">{{ user?.email }}</p>
-                <div class="pt-1 flex items-center gap-1">
+              <div class="p-3 rounded-xl bg-slate-50/80 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800/80 mb-1 space-y-0.5">
+                <p class="font-extrabold text-xs text-slate-900 dark:text-white truncate tracking-tight">{{ user?.nama || user?.name }}</p>
+                <p class="text-[11px] font-medium text-slate-500 dark:text-slate-400 truncate leading-tight">{{ user?.email }}</p>
+                <div class="pt-1.5 flex items-center gap-1">
                   <span
-                    class="px-2 py-0.5 rounded text-[10px] font-extrabold tracking-wider uppercase inline-block"
-                    :class="isAdmin ? 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300' : 'bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300'"
+                    class="px-2 py-0.5 rounded-md text-[9.5px] font-black tracking-wider uppercase inline-block"
+                    :class="isAdmin ? 'bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20' : 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20'"
                   >
                     Role: {{ user?.role || 'User' }}
                   </span>
@@ -162,44 +161,35 @@ onUnmounted(() => {
               </div>
 
               <!-- Menu Items -->
-              <div class="py-1">
+              <div class="space-y-0.5 py-1">
+                <!-- Dashboard Link -->
+                <RouterLink
+                  v-if="isAdmin || hasPermission('dashboard')"
+                  to="/dashboard"
+                  @click="closeProfileMenu"
+                  class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100/90 dark:hover:bg-slate-800/80 hover:text-slate-900 dark:hover:text-white transition-all duration-150 group"
+                >
+                  <LayoutDashboard class="w-4 h-4 text-[#5D87FF] group-hover:scale-110 transition-transform" />
+                  <span>Dashboard</span>
+                </RouterLink>
+
                 <RouterLink
                   to="/tickets"
                   @click="closeProfileMenu"
-                  class="flex items-center gap-2 px-4 py-2 text-[#334155] dark:text-slate-300 hover:bg-[#F8FAFC] dark:hover:bg-slate-800 hover:text-[#5D87FF] transition-colors"
+                  class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100/90 dark:hover:bg-slate-800/80 hover:text-slate-900 dark:hover:text-white transition-all duration-150 group"
                 >
-                  <Ticket class="w-4 h-4 text-[#5D87FF]" />
+                  <Ticket class="w-4 h-4 text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-200 group-hover:scale-110 transition-transform" />
                   <span>My Tickets</span>
-                </RouterLink>
-
-                <RouterLink
-                  to="/profile"
-                  @click="closeProfileMenu"
-                  class="flex items-center gap-2 px-4 py-2 text-[#334155] dark:text-slate-300 hover:bg-[#F8FAFC] dark:hover:bg-slate-800 hover:text-[#5D87FF] transition-colors"
-                >
-                  <User class="w-4 h-4 text-[#64748B]" />
-                  <span>My Profile</span>
-                </RouterLink>
-
-                <!-- Admin CMS Portal Link for Admin users -->
-                <RouterLink
-                  v-if="isAdmin"
-                  to="/admin/cases"
-                  @click="closeProfileMenu"
-                  class="flex items-center gap-2 px-4 py-2 text-amber-700 dark:text-amber-400 font-bold hover:bg-amber-50 dark:hover:bg-amber-950/40 transition-colors"
-                >
-                  <LayoutDashboard class="w-4 h-4 text-amber-600" />
-                  <span>Admin Portal</span>
                 </RouterLink>
               </div>
 
               <!-- Sign Out -->
-              <div class="pt-1 border-t border-[#E5EAEF] dark:border-slate-800">
+              <div class="pt-1 mt-0.5 border-t border-slate-100 dark:border-slate-800/80">
                 <button
                   @click="handleLogout"
-                  class="w-full flex items-center gap-2 px-4 py-2 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 font-semibold transition-colors text-left cursor-pointer"
+                  class="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-500/10 hover:text-rose-700 dark:hover:text-rose-300 transition-all duration-150 cursor-pointer text-left group"
                 >
-                  <LogOut class="w-4 h-4" />
+                  <LogOut class="w-4 h-4 group-hover:scale-110 transition-transform" />
                   <span>Sign Out</span>
                 </button>
               </div>

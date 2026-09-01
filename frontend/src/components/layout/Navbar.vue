@@ -157,31 +157,19 @@ onUnmounted(() => {
           <span class="hidden sm:inline">DocEditor</span>
         </RouterLink>
 
-        <!-- Ticketing Portal Log In / User Session -->
-        <div class="flex items-center">
-          <button
-            v-if="!isAuthenticated"
-            @click="isLoginModalOpen = true"
-            class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-[#0040e5] hover:bg-[#0034bf] text-white shadow-xs hover:shadow-md transition-all cursor-pointer active:scale-95"
-            title="Log in ke Ticketing & Helpdesk Portal"
-          >
-            <LogIn class="w-3.5 h-3.5" />
-            <span>Log In</span>
-          </button>
-
-          <div v-else class="flex items-center gap-1.5">
-            <div class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-[#f2f1ff] dark:bg-indigo-950/40 border border-[#c4c5d9] dark:border-indigo-500/30 text-xs">
-              <UserCheck class="w-3.5 h-3.5 text-[#0040e5] dark:text-indigo-400" />
-              <span class="font-semibold text-[#0040e5] dark:text-indigo-300">{{ currentUser?.name || currentUser?.username || 'Employee' }}</span>
-            </div>
-            <button
-              @click="logout"
-              class="p-1.5 rounded-lg text-[#575d7a] hover:text-rose-600 hover:bg-[#f3f3f5] dark:text-slate-400 dark:hover:text-rose-400 dark:hover:bg-slate-800 transition-colors cursor-pointer"
-              title="Logout"
-            >
-              <LogOut class="w-3.5 h-3.5" />
-            </button>
+        <!-- Admin Mode Status Pill & Switch Button -->
+        <div v-if="isCrudUnlocked" class="flex items-center gap-1.5">
+          <div class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-[#f2f1ff] dark:bg-indigo-950/40 border border-[#c4c5d9] dark:border-indigo-500/30 text-xs">
+            <UserCheck class="w-3.5 h-3.5 text-[#0040e5] dark:text-indigo-400" />
+            <span class="font-semibold text-[#0040e5] dark:text-indigo-300">Admin Mode</span>
           </div>
+          <button
+            @click="logout"
+            class="p-1.5 rounded-lg text-[#575d7a] hover:text-rose-600 hover:bg-[#f3f3f5] dark:text-slate-400 dark:hover:text-rose-400 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+            title="Keluar dari Mode Admin"
+          >
+            <LogOut class="w-3.5 h-3.5" />
+          </button>
         </div>
 
         <!-- Theme Toggle -->

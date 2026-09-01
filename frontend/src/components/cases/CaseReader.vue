@@ -17,13 +17,12 @@ import {
   ExternalLink,
   ThumbsUp,
   ThumbsDown,
-  MessageSquare,
   Clock,
+  Calendar,
   User,
   Lightbulb,
   ShieldAlert,
   ChevronRight,
-  Headphones,
   Sparkles
 } from 'lucide-vue-next';
 
@@ -31,6 +30,10 @@ const props = defineProps({
   caseItem: {
     type: Object,
     default: null
+  },
+  isPreview: {
+    type: Boolean,
+    default: false
   }
 });
 
@@ -55,6 +58,11 @@ function copySnippet(code, index) {
 async function handleFeedback(isHelpful) {
   feedbackGiven.value = isHelpful ? 'yes' : 'no';
   
+  if (props.isPreview) {
+    showToast('(Mode Preview) Feedback disimulasikan & tidak disimpan ke database.', 'info');
+    return;
+  }
+
   if (props.caseItem?.id) {
     try {
       const type = isHelpful ? 'helpful' : 'unhelpful';
@@ -73,6 +81,49 @@ async function handleFeedback(isHelpful) {
 
 function toggleStepCheck(idx) {
   checkedSteps.value[idx] = !checkedSteps.value[idx];
+}
+
+function formatPublishDate(dateStr) {
+  if (!dateStr) return 'Baru saja';
+  try {
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return dateStr;
+
+    const now = new Date();
+    const diffInSeconds = Math.max(0, Math.floor((now.getTime() - d.getTime()) / 1000));
+
+    // < 60 detik -> "... detik yang lalu"
+    if (diffInSeconds < 60) {
+      return `${Math.max(1, diffInSeconds)} detik yang lalu`;
+    }
+
+    const diffInMinutes = Math.floor(diffInSeconds / 60);
+    // < 60 menit -> "... menit yang lalu"
+    if (diffInMinutes < 60) {
+      return `${diffInMinutes} menit yang lalu`;
+    }
+
+    const diffInHours = Math.floor(diffInMinutes / 60);
+    // < 24 jam -> "... jam yang lalu"
+    if (diffInHours < 24) {
+      return `${diffInHours} jam yang lalu`;
+    }
+
+    const diffInDays = Math.floor(diffInHours / 24);
+    // <= 6 hari -> "... hari yang lalu"
+    if (diffInDays <= 6) {
+      return `${diffInDays} hari yang lalu`;
+    }
+
+    // > 6 hari -> format tanggal absolut "1 September 2026"
+    return new Intl.DateTimeFormat('id-ID', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
+    }).format(d);
+  } catch (e) {
+    return dateStr;
+  }
 }
 </script>
 
@@ -137,8 +188,8 @@ function toggleStepCheck(idx) {
         </div>
         <span>&bull;</span>
         <div class="flex items-center gap-1.5">
-          <Clock class="w-3.5 h-3.5 text-[#64748b]" />
-          <span>3 min read</span>
+          <Calendar class="w-3.5 h-3.5 text-[#64748b]" />
+          <span>Dirilis: {{ formatPublishDate(caseItem.createdAt || caseItem.updatedAt) }}</span>
         </div>
       </div>
 
@@ -278,10 +329,10 @@ function toggleStepCheck(idx) {
       </section>
     </template>
 
-    <!-- Micro-feedback Widget (Notion Style) -->
-    <div class="pt-6 border-t border-[#e2e2e4] dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4 bg-white dark:bg-slate-900/60 p-5 rounded-2xl border shadow-2xs">
+    <!-- Micro-feedback Widget -->
+    <div class="p-6 rounded-2xl bg-gradient-to-r from-[#f2f1ff] to-white dark:from-slate-900 dark:to-slate-950 border border-[#c4c5d9] dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-2xs">
       <div>
-        <p class="text-sm font-semibold text-[#1a1c1d] dark:text-slate-200">
+        <p class="text-sm font-semibold text-[#1a1c1d] dark:text-slate-100">
           Apakah dokumen panduan ini membantu Anda?
         </p>
         <p class="text-xs text-[#575d7a] dark:text-slate-400 mt-0.5">
@@ -292,10 +343,10 @@ function toggleStepCheck(idx) {
       <div class="flex items-center gap-2">
         <button
           @click="handleFeedback(true)"
-          class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold border transition-all cursor-pointer"
+          class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold border transition-all cursor-pointer shadow-2xs"
           :class="feedbackGiven === 'yes'
             ? 'bg-emerald-600 text-white border-emerald-600'
-            : 'bg-[#f3f3f5] dark:bg-slate-800 text-[#1a1c1d] dark:text-slate-200 border-[#c4c5d9] dark:border-slate-700 hover:bg-[#e2e2e4]'"
+            : 'bg-white dark:bg-slate-800 text-[#1a1c1d] dark:text-slate-200 border-[#c4c5d9] dark:border-slate-700 hover:bg-[#f3f3f5]'"
         >
           <ThumbsUp class="w-3.5 h-3.5" />
           <span>Ya, Sangat Membantu</span>
@@ -303,42 +354,14 @@ function toggleStepCheck(idx) {
 
         <button
           @click="handleFeedback(false)"
-          class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold border transition-all cursor-pointer"
+          class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold border transition-all cursor-pointer shadow-2xs"
           :class="feedbackGiven === 'no'
             ? 'bg-rose-600 text-white border-rose-600'
-            : 'bg-[#f3f3f5] dark:bg-slate-800 text-[#575d7a] dark:text-slate-300 border-[#c4c5d9] dark:border-slate-700 hover:bg-[#e2e2e4]'"
+            : 'bg-white dark:bg-slate-800 text-[#575d7a] dark:text-slate-300 border-[#c4c5d9] dark:border-slate-700 hover:bg-[#f3f3f5]'"
         >
           <ThumbsDown class="w-3.5 h-3.5" />
           <span>Belum Cukup</span>
         </button>
-      </div>
-    </div>
-
-    <!-- Bottom Escalation Banner (CTA) -->
-    <div class="p-6 rounded-2xl bg-gradient-to-r from-[#f2f1ff] to-white dark:from-slate-900 dark:to-slate-950 border border-[#c4c5d9] dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
-      <div class="space-y-1 text-center sm:text-left">
-        <h3 class="text-base font-bold text-[#1a1c1d] dark:text-slate-100">Still need help with this issue?</h3>
-        <p class="text-xs text-[#575d7a] dark:text-slate-400">Tim Helpdesk IT &amp; PBX siap membantu penanganan insiden darurat.</p>
-      </div>
-
-      <div class="flex items-center gap-2.5">
-        <button
-          @click="$emit('submitTicket')"
-          class="px-4 py-2.5 rounded-lg text-xs font-semibold bg-[#0040e5] hover:bg-[#0034bf] text-white shadow-xs transition-all cursor-pointer flex items-center gap-1.5"
-        >
-          <MessageSquare class="w-3.5 h-3.5" />
-          <span>Submit a Ticket</span>
-        </button>
-
-        <a
-          href="https://wa.me/"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="px-4 py-2.5 rounded-lg text-xs font-semibold border border-[#c4c5d9] dark:border-slate-700 bg-white dark:bg-slate-800 text-[#1a1c1d] dark:text-slate-200 hover:bg-[#f3f3f5] transition-all flex items-center gap-1.5"
-        >
-          <Headphones class="w-3.5 h-3.5 text-[#0040e5]" />
-          <span>Live Agent</span>
-        </a>
       </div>
     </div>
 

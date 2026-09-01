@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import {
   Info,
@@ -11,7 +11,9 @@ import {
   ChevronDown,
   ShieldCheck,
   Flame,
-  Lock
+  Lock,
+  ThumbsUp,
+  ThumbsDown
 } from 'lucide-vue-next';
 
 const props = defineProps({
@@ -61,6 +63,34 @@ function toggleSwitch(key) {
     [key]: !props.modelValue[key]
   });
 }
+
+// ---------------------------------------------
+// DYNAMIC & ACTUAL STATS CALCULATIONS
+// ---------------------------------------------
+const views = computed(() => props.modelValue.stats?.views || 0);
+const helpful = computed(() => props.modelValue.stats?.helpful || 0);
+const unhelpful = computed(() => props.modelValue.stats?.unhelpful || 0);
+const totalFeedback = computed(() => helpful.value + unhelpful.value);
+
+const helpfulRatio = computed(() => {
+  if (totalFeedback.value === 0) {
+    return views.value > 0 ? '100%' : '0%';
+  }
+  return Math.round((helpful.value / totalFeedback.value) * 100) + '%';
+});
+
+const lastUpdatedDate = computed(() => {
+  const dt = props.modelValue.updatedAt || props.modelValue.createdAt || props.modelValue.publishDate;
+  if (!dt) return new Date().toLocaleDateString('id-ID');
+  const parsed = new Date(dt);
+  return isNaN(parsed.getTime())
+    ? new Date().toLocaleDateString('id-ID')
+    : parsed.toLocaleDateString('id-ID', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+      });
+});
 </script>
 
 <template>
@@ -222,11 +252,11 @@ function toggleSwitch(key) {
           </button>
         </div>
 
-        <!-- Custom FAQ Indicator -->
+        <!-- FAQ Status Indicator -->
         <div class="p-3 rounded-lg bg-[#f2f1ff] dark:bg-indigo-950/30 border border-[#c4c5d9] dark:border-indigo-500/20 text-xs">
-          <span class="font-bold text-[#0040e5] dark:text-indigo-400 block mb-1">Status Artikel:</span>
+          <span class="font-bold text-[#0040e5] dark:text-indigo-400 block mb-1">Knowledge Base SOP</span>
           <p class="text-[11px] text-[#575d7a] dark:text-slate-300">
-            {{ modelValue.isCustom ? 'Custom FAQ (Dapat diedit & dihapus bebas oleh admin).' : 'Built-in Corporate FAQ (Artikel bawaan sistem).' }}
+            Dokumen tersimpan di database dan dapat dikelola langsung melalui CMS.
           </p>
         </div>
       </div>
@@ -283,22 +313,32 @@ function toggleSwitch(key) {
           </h4>
           <div class="grid grid-cols-2 gap-4">
             <div>
-              <span class="block text-2xl font-bold text-[#1a1c1d] dark:text-slate-100">1,420</span>
+              <span class="block text-2xl font-bold text-[#1a1c1d] dark:text-slate-100 font-mono">{{ views }}</span>
               <span class="text-[10px] text-[#575d7a] dark:text-slate-400 flex items-center gap-1 mt-0.5">
                 <Eye class="w-3 h-3 text-[#0040e5]" /> Views
               </span>
             </div>
             <div>
-              <span class="block text-2xl font-bold text-emerald-600 dark:text-emerald-400">96%</span>
+              <span class="block text-2xl font-bold text-emerald-600 dark:text-emerald-400 font-mono">{{ helpfulRatio }}</span>
               <span class="text-[10px] text-[#575d7a] dark:text-slate-400 flex items-center gap-1 mt-0.5">
                 <ShieldCheck class="w-3 h-3 text-emerald-600" /> Helpful Ratio
               </span>
             </div>
           </div>
+
+          <!-- Feedback Breakdown -->
+          <div class="pt-2 border-t border-slate-200 dark:border-slate-700 flex items-center justify-between text-[11px] font-mono">
+            <span class="flex items-center gap-1 text-emerald-600 dark:text-emerald-400" title="Membantu (Likes)">
+              <ThumbsUp class="w-3.5 h-3.5" /> {{ helpful }} Membantu
+            </span>
+            <span class="flex items-center gap-1 text-rose-600 dark:text-rose-400" title="Kurang Membantu (Dislikes)">
+              <ThumbsDown class="w-3.5 h-3.5" /> {{ unhelpful }} Kurang
+            </span>
+          </div>
         </div>
 
         <div class="text-[11px] text-[#575d7a] dark:text-slate-400 space-y-1 p-2">
-          <p>&bull; Terakhir diperbarui: {{ new Date().toLocaleDateString('id-ID') }}</p>
+          <p>&bull; Terakhir diperbarui: {{ lastUpdatedDate }}</p>
           <p>&bull; Resolusi rata-rata: &lt; 5 menit</p>
         </div>
       </div>

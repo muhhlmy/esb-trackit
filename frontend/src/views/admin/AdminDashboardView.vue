@@ -28,6 +28,9 @@ import {
   Star,
   Eye,
   EyeOff,
+  ThumbsUp,
+  ThumbsDown,
+  GripVertical,
   Filter,
   MinusCircle,
   PlusCircle,
@@ -49,7 +52,14 @@ const selectedCategory = ref('all');
 // Modal state for adding article to homepage
 const isAddModalOpen = ref(false);
 const selectedCaseToAdd = ref('');
+const modalSearchQuery = ref('');
 const isReordering = ref(false);
+
+function openAddModal() {
+  modalSearchQuery.value = '';
+  selectedCaseToAdd.value = '';
+  isAddModalOpen.value = true;
+}
 
 onMounted(async () => {
   await fetchCases();
@@ -71,9 +81,16 @@ const featuredCases = computed(() => {
     .sort((a, b) => (a.homeOrder ?? 0) - (b.homeOrder ?? 0));
 });
 
-// Non-featured cases for Add to Homepage picker
-const unfeaturedCases = computed(() => {
-  return cases.value.filter((c) => !c.isFeaturedOnHome);
+// Non-featured cases for Add to Homepage picker with search filter
+const filteredUnfeaturedCases = computed(() => {
+  const q = modalSearchQuery.value.toLowerCase().trim();
+  const list = cases.value.filter((c) => !c.isFeaturedOnHome);
+  if (!q) return list;
+  return list.filter((c) =>
+    (c.title || '').toLowerCase().includes(q) ||
+    (c.summary || '').toLowerCase().includes(q) ||
+    (c.category || '').toLowerCase().includes(q)
+  );
 });
 
 // Filtered cases for Tab 1
@@ -158,6 +175,69 @@ async function moveFeaturedCase(index, direction) {
   }
 }
 
+// ---------------------------------------------
+// DRAG & DROP REORDERING LOGIC
+// ---------------------------------------------
+const draggedItemIndex = ref(null);
+const dragOverIndex = ref(null);
+
+function handleDragStart(index, event) {
+  draggedItemIndex.value = index;
+  event.dataTransfer.effectAllowed = 'move';
+  event.dataTransfer.setData('text/plain', String(index));
+}
+
+function handleDragOver(index, event) {
+  event.preventDefault();
+  event.dataTransfer.dropEffect = 'move';
+  if (dragOverIndex.value !== index) {
+    dragOverIndex.value = index;
+  }
+}
+
+function handleDragLeave(index) {
+  if (dragOverIndex.value === index) {
+    dragOverIndex.value = null;
+  }
+}
+
+async function handleDrop(targetIndex, event) {
+  event.preventDefault();
+  const sourceIndex = draggedItemIndex.value;
+  draggedItemIndex.value = null;
+  dragOverIndex.value = null;
+
+  if (sourceIndex === null || sourceIndex === undefined || sourceIndex === targetIndex) {
+    return;
+  }
+
+  const list = [...featuredCases.value];
+  const [movedItem] = list.splice(sourceIndex, 1);
+  list.splice(targetIndex, 0, movedItem);
+
+  // Re-assign sequential order
+  const orders = list.map((c, idx) => {
+    c.homeOrder = idx;
+    return { id: c.id, homeOrder: idx, isFeaturedOnHome: true };
+  });
+
+  isReordering.value = true;
+  try {
+    await api.reorderHomeCases(orders);
+    showToast('Urutan FAQ di Homepage berhasil diperbarui via Drag & Drop!', 'success');
+  } catch (err) {
+    showToast('Gagal menyimpan urutan: ' + err.message, 'error');
+    await fetchCases();
+  } finally {
+    isReordering.value = false;
+  }
+}
+
+function handleDragEnd() {
+  draggedItemIndex.value = null;
+  dragOverIndex.value = null;
+}
+
 function editDoc(id) {
   router.push(`/admin/editor/${id}`);
 }
@@ -207,7 +287,7 @@ function createNewDoc() {
       </div>
 
       <!-- Quick Metrics Cards -->
-      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div class="p-4 rounded-xl bg-white dark:bg-slate-900 border border-[#c4c5d9] dark:border-slate-800 shadow-2xs">
           <span class="text-xs text-[#575d7a] dark:text-slate-400 font-medium">Total Artikel FAQ</span>
           <p class="text-2xl font-bold text-[#1a1c1d] dark:text-slate-100 mt-1">{{ cases.length }}</p>
@@ -218,13 +298,6 @@ function createNewDoc() {
           <p class="text-2xl font-bold text-amber-600 dark:text-amber-400 mt-1 flex items-center gap-1.5">
             <span>{{ featuredCases.length }}</span>
             <span class="text-xs font-normal text-[#575d7a] dark:text-slate-400">Pertanyaan</span>
-          </p>
-        </div>
-
-        <div class="p-4 rounded-xl bg-white dark:bg-slate-900 border border-[#c4c5d9] dark:border-slate-800 shadow-2xs">
-          <span class="text-xs text-[#575d7a] dark:text-slate-400 font-medium">Custom Articles</span>
-          <p class="text-2xl font-bold text-[#0040e5] dark:text-indigo-400 mt-1">
-            {{ cases.filter(c => c.isCustom).length }}
           </p>
         </div>
 
@@ -298,25 +371,25 @@ function createNewDoc() {
         <!-- All Articles Table -->
         <div class="bg-white dark:bg-slate-900 rounded-2xl border border-[#c4c5d9] dark:border-slate-800 overflow-hidden shadow-xs">
           <div class="overflow-x-auto">
-            <table class="w-full text-left text-xs">
+            <table class="w-full text-left text-xs align-middle">
               <thead class="bg-[#f8fafc] dark:bg-slate-950/60 border-b border-[#e2e2e4] dark:border-slate-800 text-[#575d7a] dark:text-slate-400 font-bold uppercase tracking-wider">
                 <tr>
                   <th class="py-3.5 px-6">Judul Artikel FAQ</th>
-                  <th class="py-3.5 px-4">Kategori</th>
-                  <th class="py-3.5 px-4">Tags</th>
-                  <th class="py-3.5 px-4">Status Homepage</th>
-                  <th class="py-3.5 px-4 text-center">Interaksi 30 Hari</th>
-                  <th class="py-3.5 px-6 text-right">Aksi</th>
+                  <th class="py-3.5 px-4 w-32">Kategori</th>
+                  <th class="py-3.5 px-4 w-40">Tags</th>
+                  <th class="py-3.5 px-4 w-36">Status Homepage</th>
+                  <th class="py-3.5 px-4 text-center w-52">Interaksi 30 Hari</th>
+                  <th class="py-3.5 px-6 text-right w-36">Aksi</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-[#e2e2e4] dark:divide-slate-800">
                 <tr
                   v-for="c in filteredAllCases"
                   :key="c.id"
-                  class="hover:bg-[#f8fafc] dark:hover:bg-slate-800/50 transition-colors"
+                  class="hover:bg-[#f8fafc] dark:hover:bg-slate-800/50 transition-colors align-middle"
                 >
                   <!-- Title & Summary -->
-                  <td class="py-4 px-6">
+                  <td class="py-4 px-6 align-middle">
                     <div class="font-bold text-[#1a1c1d] dark:text-slate-100 max-w-sm">
                       {{ c.title }}
                     </div>
@@ -326,14 +399,14 @@ function createNewDoc() {
                   </td>
 
                   <!-- Category -->
-                  <td class="py-4 px-4">
-                    <span class="px-2.5 py-1 rounded-md text-[11px] font-semibold bg-[#f2f1ff] dark:bg-indigo-950/40 text-[#0040e5] dark:text-indigo-400 border border-[#c4c5d9] dark:border-indigo-500/20 capitalize">
+                  <td class="py-4 px-4 align-middle">
+                    <span class="inline-block px-2.5 py-1 rounded-md text-[11px] font-semibold bg-[#f2f1ff] dark:bg-indigo-950/40 text-[#0040e5] dark:text-indigo-400 border border-[#c4c5d9] dark:border-indigo-500/20 capitalize">
                       {{ c.category }}
                     </span>
                   </td>
 
                   <!-- Tags -->
-                  <td class="py-4 px-4">
+                  <td class="py-4 px-4 align-middle">
                     <div class="flex flex-wrap gap-1 max-w-xs">
                       <span
                         v-for="t in (c.tags || []).slice(0, 3)"
@@ -346,7 +419,7 @@ function createNewDoc() {
                   </td>
 
                   <!-- Status Homepage Badge -->
-                  <td class="py-4 px-4">
+                  <td class="py-4 px-4 align-middle">
                     <span
                       v-if="c.isFeaturedOnHome"
                       class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800"
@@ -363,34 +436,45 @@ function createNewDoc() {
                   </td>
 
                   <!-- Interactions (Views, Helpful Likes, Dislikes) -->
-                  <td class="py-4 px-4 text-center">
-                    <div class="inline-flex items-center gap-1.5 text-[11px] text-[#575d7a] dark:text-slate-400 font-mono">
-                      <span title="Views">👁️ {{ c.stats?.views || 0 }}</span>
-                      <span>•</span>
-                      <span class="text-emerald-600 dark:text-emerald-400 font-semibold" title="Membantu (Likes)">👍 {{ c.stats?.helpful || 0 }}</span>
-                      <span>•</span>
-                      <span class="text-rose-600 dark:text-rose-400 font-semibold" title="Kurang Membantu (Dislikes)">👎 {{ c.stats?.unhelpful || 0 }}</span>
+                  <td class="py-4 px-4 text-center align-middle">
+                    <div class="inline-flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-[#f8fafc] dark:bg-slate-800/80 border border-[#e2e8f0] dark:border-slate-800 font-mono text-[11px]">
+                      <span class="inline-flex items-center gap-1 text-slate-600 dark:text-slate-400" title="Total Views">
+                        <Eye class="w-3.5 h-3.5 text-slate-400" />
+                        {{ c.stats?.views || 0 }}
+                      </span>
+                      <span class="text-slate-300 dark:text-slate-700">|</span>
+                      <span class="inline-flex items-center gap-1 text-emerald-700 dark:text-emerald-400 font-semibold" title="Membantu (Likes)">
+                        <ThumbsUp class="w-3.5 h-3.5 text-emerald-600" />
+                        {{ c.stats?.helpful || 0 }}
+                      </span>
+                      <span class="text-slate-300 dark:text-slate-700">|</span>
+                      <span class="inline-flex items-center gap-1 text-rose-700 dark:text-rose-400 font-semibold" title="Kurang Membantu (Dislikes)">
+                        <ThumbsDown class="w-3.5 h-3.5 text-rose-500" />
+                        {{ c.stats?.unhelpful || 0 }}
+                      </span>
                     </div>
                   </td>
 
                   <!-- Actions -->
-                  <td class="py-4 px-6 text-right space-x-2">
-                    <button
-                      @click="editDoc(c.id)"
-                      class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-[#0040e5] text-white hover:bg-[#0034bf] transition-colors cursor-pointer shadow-2xs"
-                      title="Edit di DocEditor"
-                    >
-                      <Edit3 class="w-3.5 h-3.5" />
-                      <span>Edit</span>
-                    </button>
+                  <td class="py-4 px-6 text-right align-middle">
+                    <div class="flex items-center justify-end gap-2">
+                      <button
+                        @click="editDoc(c.id)"
+                        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-[#0040e5] text-white hover:bg-[#0034bf] transition-all cursor-pointer shadow-2xs"
+                        title="Edit di DocEditor"
+                      >
+                        <Edit3 class="w-3.5 h-3.5" />
+                        <span>Edit</span>
+                      </button>
 
-                    <button
-                      @click="deleteCase(c.id)"
-                      class="p-1.5 rounded-lg text-[#575d7a] hover:text-rose-600 hover:bg-[#f3f3f5] transition-colors cursor-pointer"
-                      title="Hapus FAQ"
-                    >
-                      <Trash2 class="w-3.5 h-3.5" />
-                    </button>
+                      <button
+                        @click="deleteCase(c.id)"
+                        class="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-400 hover:text-rose-600 hover:border-rose-300 dark:hover:border-rose-800 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-all cursor-pointer"
+                        title="Hapus FAQ"
+                      >
+                        <Trash2 class="w-3.5 h-3.5" />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               </tbody>
@@ -416,62 +500,78 @@ function createNewDoc() {
           </div>
 
           <button
-            @click="isAddModalOpen = true"
+            @click="openAddModal"
             class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold bg-amber-500 hover:bg-amber-600 text-white shadow-xs transition-all cursor-pointer shrink-0"
           >
             <Plus class="w-4 h-4" />
-            <span>+ Tambah Artikel ke Homepage</span>
+            <span>Tambah Artikel ke Homepage</span>
           </button>
         </div>
 
         <!-- Featured List Table with Custom Reordering -->
         <div class="bg-white dark:bg-slate-900 rounded-2xl border border-[#c4c5d9] dark:border-slate-800 overflow-hidden shadow-xs">
           <div class="overflow-x-auto">
-            <table class="w-full text-left text-xs">
+            <table class="w-full text-left text-xs align-middle">
               <thead class="bg-[#f8fafc] dark:bg-slate-950/60 border-b border-[#e2e2e4] dark:border-slate-800 text-[#575d7a] dark:text-slate-400 font-bold uppercase tracking-wider">
                 <tr>
                   <th class="py-3.5 px-4 text-center w-28">Urutan Tampil</th>
                   <th class="py-3.5 px-6">Judul Artikel FAQ</th>
-                  <th class="py-3.5 px-4">Kategori</th>
-                  <th class="py-3.5 px-4 text-center">Interaksi 30 Hari</th>
-                  <th class="py-3.5 px-6 text-right">Aksi</th>
+                  <th class="py-3.5 px-4 w-32">Kategori</th>
+                  <th class="py-3.5 px-4 text-center w-52">Interaksi 30 Hari</th>
+                  <th class="py-3.5 px-6 text-right w-44">Aksi</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-[#e2e2e4] dark:divide-slate-800">
                 <tr
                   v-for="(c, idx) in featuredCases"
                   :key="c.id"
-                  class="hover:bg-[#f8fafc] dark:hover:bg-slate-800/50 transition-colors"
+                  draggable="true"
+                  @dragstart="handleDragStart(idx, $event)"
+                  @dragover="handleDragOver(idx, $event)"
+                  @dragleave="handleDragLeave(idx)"
+                  @drop="handleDrop(idx, $event)"
+                  @dragend="handleDragEnd"
+                  class="transition-all align-middle group cursor-grab active:cursor-grabbing select-none"
+                  :class="[
+                    draggedItemIndex === idx ? 'opacity-30 bg-amber-100/40 dark:bg-amber-950/20 border-dashed border-2 border-amber-400' : '',
+                    dragOverIndex === idx && draggedItemIndex !== idx ? 'bg-amber-50 dark:bg-amber-950/40 border-y-2 border-amber-500' : 'hover:bg-[#f8fafc] dark:hover:bg-slate-800/50'
+                  ]"
                 >
-                  <!-- Position & Up/Down Reorder Buttons -->
-                  <td class="py-4 px-4 text-center">
+                  <!-- Position & Drag Grip Icon -->
+                  <td class="py-4 px-4 text-center align-middle">
                     <div class="flex items-center justify-center gap-2">
+                      <div
+                        class="p-1 rounded text-slate-400 group-hover:text-amber-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-grab active:cursor-grabbing"
+                        title="Tahan dan geser untuk ubah urutan"
+                      >
+                        <GripVertical class="w-4 h-4" />
+                      </div>
                       <span class="w-6 h-6 rounded-full bg-amber-500 text-white font-bold text-xs flex items-center justify-center shadow-2xs">
                         #{{ idx + 1 }}
                       </span>
                       <div class="flex flex-col gap-0.5">
                         <button
                           :disabled="idx === 0 || isReordering"
-                          @click="moveFeaturedCase(idx, 'up')"
-                          class="p-1 rounded hover:bg-[#e2e2e4] dark:hover:bg-slate-700 text-[#575d7a] dark:text-slate-400 disabled:opacity-20 disabled:cursor-not-allowed cursor-pointer transition-colors"
+                          @click.stop="moveFeaturedCase(idx, 'up')"
+                          class="p-0.5 rounded hover:bg-[#e2e2e4] dark:hover:bg-slate-700 text-[#575d7a] dark:text-slate-400 disabled:opacity-20 disabled:cursor-not-allowed cursor-pointer transition-colors"
                           title="Naikkan urutan"
                         >
-                          <ArrowUp class="w-3.5 h-3.5" />
+                          <ArrowUp class="w-3 h-3" />
                         </button>
                         <button
                           :disabled="idx === featuredCases.length - 1 || isReordering"
-                          @click="moveFeaturedCase(idx, 'down')"
-                          class="p-1 rounded hover:bg-[#e2e2e4] dark:hover:bg-slate-700 text-[#575d7a] dark:text-slate-400 disabled:opacity-20 disabled:cursor-not-allowed cursor-pointer transition-colors"
+                          @click.stop="moveFeaturedCase(idx, 'down')"
+                          class="p-0.5 rounded hover:bg-[#e2e2e4] dark:hover:bg-slate-700 text-[#575d7a] dark:text-slate-400 disabled:opacity-20 disabled:cursor-not-allowed cursor-pointer transition-colors"
                           title="Turunkan urutan"
                         >
-                          <ArrowDown class="w-3.5 h-3.5" />
+                          <ArrowDown class="w-3 h-3" />
                         </button>
                       </div>
                     </div>
                   </td>
 
                   <!-- Title & Summary -->
-                  <td class="py-4 px-6">
+                  <td class="py-4 px-6 align-middle">
                     <div class="font-bold text-[#1a1c1d] dark:text-slate-100 max-w-md">
                       {{ c.title }}
                     </div>
@@ -481,42 +581,53 @@ function createNewDoc() {
                   </td>
 
                   <!-- Category -->
-                  <td class="py-4 px-4">
-                    <span class="px-2.5 py-1 rounded-md text-[11px] font-semibold bg-[#f2f1ff] dark:bg-indigo-950/40 text-[#0040e5] dark:text-indigo-400 border border-[#c4c5d9] dark:border-indigo-500/20 capitalize">
+                  <td class="py-4 px-4 align-middle">
+                    <span class="inline-block px-2.5 py-1 rounded-md text-[11px] font-semibold bg-[#f2f1ff] dark:bg-indigo-950/40 text-[#0040e5] dark:text-indigo-400 border border-[#c4c5d9] dark:border-indigo-500/20 capitalize">
                       {{ c.category }}
                     </span>
                   </td>
 
                   <!-- Interactions (Views, Likes, Dislikes) -->
-                  <td class="py-4 px-4 text-center">
-                    <div class="inline-flex items-center gap-1.5 text-[11px] text-[#575d7a] dark:text-slate-400 font-mono">
-                      <span title="Views">👁️ {{ c.stats?.views || 0 }}</span>
-                      <span>•</span>
-                      <span class="text-emerald-600 dark:text-emerald-400 font-semibold" title="Membantu (Likes)">👍 {{ c.stats?.helpful || 0 }}</span>
-                      <span>•</span>
-                      <span class="text-rose-600 dark:text-rose-400 font-semibold" title="Kurang Membantu (Dislikes)">👎 {{ c.stats?.unhelpful || 0 }}</span>
+                  <td class="py-4 px-4 text-center align-middle">
+                    <div class="inline-flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-[#f8fafc] dark:bg-slate-800/80 border border-[#e2e8f0] dark:border-slate-800 font-mono text-[11px]">
+                      <span class="inline-flex items-center gap-1 text-slate-600 dark:text-slate-400" title="Total Views">
+                        <Eye class="w-3.5 h-3.5 text-slate-400" />
+                        {{ c.stats?.views || 0 }}
+                      </span>
+                      <span class="text-slate-300 dark:text-slate-700">|</span>
+                      <span class="inline-flex items-center gap-1 text-emerald-700 dark:text-emerald-400 font-semibold" title="Membantu (Likes)">
+                        <ThumbsUp class="w-3.5 h-3.5 text-emerald-600" />
+                        {{ c.stats?.helpful || 0 }}
+                      </span>
+                      <span class="text-slate-300 dark:text-slate-700">|</span>
+                      <span class="inline-flex items-center gap-1 text-rose-700 dark:text-rose-400 font-semibold" title="Kurang Membantu (Dislikes)">
+                        <ThumbsDown class="w-3.5 h-3.5 text-rose-500" />
+                        {{ c.stats?.unhelpful || 0 }}
+                      </span>
                     </div>
                   </td>
 
                   <!-- Actions -->
-                  <td class="py-4 px-6 text-right space-x-2">
-                    <button
-                      @click="editDoc(c.id)"
-                      class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-[#f3f3f5] hover:bg-[#e2e2e4] dark:bg-slate-800 dark:hover:bg-slate-700 text-[#1a1c1d] dark:text-slate-200 transition-colors cursor-pointer"
-                      title="Edit di DocEditor"
-                    >
-                      <Edit3 class="w-3.5 h-3.5 text-[#0040e5] dark:text-indigo-400" />
-                      <span>Edit</span>
-                    </button>
+                  <td class="py-4 px-6 text-right align-middle">
+                    <div class="flex items-center justify-end gap-2">
+                      <button
+                        @click="editDoc(c.id)"
+                        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-[#0040e5] text-white hover:bg-[#0034bf] transition-all cursor-pointer shadow-2xs"
+                        title="Edit di DocEditor"
+                      >
+                        <Edit3 class="w-3.5 h-3.5" />
+                        <span>Edit</span>
+                      </button>
 
-                    <button
-                      @click="removeCaseFromHomepage(c)"
-                      class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors cursor-pointer border border-rose-200 dark:border-rose-800"
-                      title="Keluarkan dari Homepage FAQ"
-                    >
-                      <MinusCircle class="w-3.5 h-3.5" />
-                      <span>Keluarkan</span>
-                    </button>
+                      <button
+                        @click="removeCaseFromHomepage(c)"
+                        class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors cursor-pointer border border-rose-200 dark:border-rose-800"
+                        title="Keluarkan dari Homepage FAQ"
+                      >
+                        <MinusCircle class="w-3.5 h-3.5" />
+                        <span>Keluarkan</span>
+                      </button>
+                    </div>
                   </td>
                 </tr>
               </tbody>
@@ -553,7 +664,7 @@ function createNewDoc() {
           </div>
           <button
             @click="isAddModalOpen = false"
-            class="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-lg"
+            class="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-lg cursor-pointer"
           >
             <X class="w-4 h-4" />
           </button>
@@ -565,9 +676,27 @@ function createNewDoc() {
             Pilih salah satu artikel FAQ yang belum tampil di homepage untuk dijadikan pertanyaan featured:
           </p>
 
+          <!-- Modal Search Bar -->
+          <div class="relative">
+            <Search class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#575d7a] dark:text-slate-400 pointer-events-none" />
+            <input
+              v-model="modalSearchQuery"
+              type="text"
+              placeholder="Cari judul FAQ, kategori, atau topik..."
+              class="w-full bg-[#f8fafc] dark:bg-slate-800 border border-[#c4c5d9] dark:border-slate-700 rounded-xl pl-9 pr-8 py-2.5 text-xs text-[#1a1c1d] dark:text-slate-100 placeholder-[#64748b] dark:placeholder-slate-500 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-all shadow-2xs"
+            />
+            <button
+              v-if="modalSearchQuery"
+              @click="modalSearchQuery = ''"
+              class="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
+            >
+              <X class="w-3.5 h-3.5" />
+            </button>
+          </div>
+
           <div class="space-y-2 max-h-64 overflow-y-auto pr-1">
             <div
-              v-for="unf in unfeaturedCases"
+              v-for="unf in filteredUnfeaturedCases"
               :key="unf.id"
               @click="selectedCaseToAdd = unf.id"
               class="p-3 rounded-xl border transition-all cursor-pointer flex items-center justify-between gap-3"
@@ -582,8 +711,9 @@ function createNewDoc() {
               <Check v-if="selectedCaseToAdd === unf.id" class="w-4 h-4 text-amber-600 shrink-0" />
             </div>
 
-            <div v-if="unfeaturedCases.length === 0" class="text-center py-6 text-slate-400">
-              Seluruh artikel FAQ sudah ditampilkan di Homepage.
+            <div v-if="filteredUnfeaturedCases.length === 0" class="text-center py-6 text-slate-400">
+              <span v-if="modalSearchQuery">Tidak ada artikel yang cocok dengan kata kunci "{{ modalSearchQuery }}".</span>
+              <span v-else>Seluruh artikel FAQ sudah ditampilkan di Homepage.</span>
             </div>
           </div>
         </div>

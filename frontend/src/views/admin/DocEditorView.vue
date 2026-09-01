@@ -1064,7 +1064,7 @@ function goToPortal() {
 
         <div class="flex-1 overflow-y-auto p-4 sm:p-8">
           <div class="w-full max-w-4xl mx-auto bg-white dark:bg-[#1E293B] rounded-2xl border border-[#c4c5d9] dark:border-slate-700 shadow-md">
-            <CaseReader :case-item="previewCaseItem" />
+            <CaseReader :case-item="previewCaseItem" :is-preview="true" />
           </div>
         </div>
       </div>

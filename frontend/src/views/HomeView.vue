@@ -46,33 +46,45 @@ const openFaqId = ref(null);
 const viewedFaqs = ref(new Set());
 const copiedSnippetIdx = ref(null);
 
-// Category Filter for Homepage FAQ Section
+// Dynamic Category Filter for Homepage FAQ Section derived from distinct column values
 const faqSelectedCategory = ref('all');
 
-const faqCategories = [
-  { value: 'all', label: 'Semua Kategori' },
-  { value: 'hardware', label: 'Hardware & Devices' },
-  { value: 'security', label: 'Security & Access' },
-  { value: 'network', label: 'Network & Wi-Fi' },
-  { value: 'software', label: 'Software & Apps' },
-  { value: 'operations', label: 'Operations & Policies' }
-];
+const categoryLabels = {
+  hardware: 'Hardware & Equipment',
+  software: 'Software & Apps',
+  git: 'Software & Git',
+  workplace: 'Access & Security',
+  security: 'Access & Security',
+  environment: 'Network & Connectivity',
+  network: 'Network & Connectivity',
+  backend: 'Backend & Database',
+  devops: 'Policies & SLAs',
+  policies: 'Policies & SLAs',
+  operations: 'Operations & Policies'
+};
+
+const dynamicFaqCategories = computed(() => {
+  const distinctCats = new Set();
+  cases.value.forEach((c) => {
+    if (c.category && typeof c.category === 'string') {
+      distinctCats.add(c.category.trim());
+    }
+  });
+
+  const list = [{ value: 'all', label: 'Semua Kategori' }];
+  Array.from(distinctCats).sort().forEach((cat) => {
+    list.push({
+      value: cat,
+      label: categoryLabels[cat.toLowerCase()] || (cat.charAt(0).toUpperCase() + cat.slice(1))
+    });
+  });
+
+  return list;
+});
 
 // Dynamic Data
 const popularFaqs = ref([]);
 const featuredFaqs = ref([]);
-
-// Track feedback per user via localStorage
-const userFeedbacks = ref({});
-
-function loadFeedbacksFromStorage() {
-  try {
-    const raw = localStorage.getItem('esb_faq_feedbacks');
-    if (raw) userFeedbacks.value = JSON.parse(raw);
-  } catch (e) {
-    userFeedbacks.value = {};
-  }
-}
 
 async function loadFaqsData() {
   try {
@@ -97,7 +109,6 @@ async function loadFaqsData() {
 
 onMounted(() => {
   fetchCases();
-  loadFeedbacksFromStorage();
   loadFaqsData();
 });
 
@@ -114,7 +125,16 @@ const filteredFeaturedFaqs = computed(() => {
   if (faqSelectedCategory.value === 'all') {
     return featuredFaqs.value;
   }
-  return featuredFaqs.value.filter((f) => f.category === faqSelectedCategory.value);
+  return featuredFaqs.value.filter((f) => {
+    if (!f.category) return false;
+    if (f.category === faqSelectedCategory.value) return true;
+    const selected = faqSelectedCategory.value.toLowerCase();
+    const current = f.category.toLowerCase();
+    if ((selected === 'workplace' || selected === 'security') && (current === 'workplace' || current === 'security')) return true;
+    if ((selected === 'environment' || selected === 'network') && (current === 'environment' || current === 'network')) return true;
+    if ((selected === 'devops' || selected === 'policies') && (current === 'devops' || current === 'policies')) return true;
+    return false;
+  });
 });
 
 function handleSearchSubmit() {
@@ -432,10 +452,10 @@ function goToFaqDetail(id) {
         </p>
       </div>
 
-      <!-- FAQ Category Filter Tabs -->
+      <!-- FAQ Category Filter Tabs (Derived from Distinct Case Categories) -->
       <div class="flex flex-wrap items-center justify-center gap-2 mb-8">
         <button
-          v-for="cat in faqCategories"
+          v-for="cat in dynamicFaqCategories"
           :key="cat.value"
           @click="faqSelectedCategory = cat.value"
           class="px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer border"
@@ -578,46 +598,6 @@ function goToFaqDetail(id) {
                 <BookOpen class="w-3.5 h-3.5" />
                 <span>Buka Halaman Pembaca Detail &amp; Panduan Lengkap &rarr;</span>
               </button>
-            </div>
-
-            <!-- "Was this resource helpful?" Interactive Feedback Component -->
-            <div class="mt-4 pt-4 border-t border-[#f0f0f2] dark:border-slate-800/80 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-[#fafafc] dark:bg-slate-950/40 p-3.5 rounded-lg">
-              <div class="flex items-center gap-2">
-                <span class="text-xs font-medium text-slate-600 dark:text-slate-400">
-                  Apakah informasi ini membantu Anda?
-                </span>
-                <span v-if="faq.stats?.helpful > 0" class="text-[11px] text-slate-600 dark:text-slate-400">
-                  ({{ faq.stats.helpful }} orang terbantu)
-                </span>
-              </div>
-
-              <!-- Feedback Buttons -->
-              <div class="flex items-center gap-2">
-                <!-- If already voted -->
-                <div v-if="userFeedbacks[faq.id]" class="inline-flex items-center gap-1.5 text-xs font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/50 px-3 py-1.5 rounded-md">
-                  <CheckCircle2 class="w-3.5 h-3.5" />
-                  <span>Feedback tercatat ({{ userFeedbacks[faq.id] === 'helpful' ? '👍 Membantu' : '👎 Kurang Membantu' }})</span>
-                </div>
-
-                <!-- Active buttons -->
-                <template v-else>
-                  <button
-                    @click="handleHelpfulFeedback(faq, true)"
-                    class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:border-emerald-500 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors shadow-2xs cursor-pointer"
-                  >
-                    <ThumbsUp class="w-3.5 h-3.5" />
-                    <span>Ya</span>
-                  </button>
-
-                  <button
-                    @click="handleHelpfulFeedback(faq, false)"
-                    class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:border-rose-500 hover:text-rose-600 dark:hover:text-rose-400 transition-colors shadow-2xs cursor-pointer"
-                  >
-                    <ThumbsDown class="w-3.5 h-3.5" />
-                    <span>Tidak</span>
-                  </button>
-                </template>
-              </div>
             </div>
 
           </div>

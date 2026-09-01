@@ -3,8 +3,7 @@ import { api, getAuthToken, setAuthToken } from '../services/api.js';
 import { useToast } from './useToast.js';
 
 const token = ref(getAuthToken());
-const currentUser = ref({ name: 'Admin User', role: 'admin' });
-const isSecretUnlocked = ref(true);
+const isSecretUnlocked = ref(localStorage.getItem('esb_admin_mode') === 'true');
 const isLoginModalOpen = ref(false);
 const logoClickCount = ref(0);
 let clickTimer = null;
@@ -12,23 +11,24 @@ let clickTimer = null;
 export function useAuth() {
   const { showToast } = useToast();
 
-  const isAuthenticated = computed(() => true);
-  const isCrudUnlocked = computed(() => true);
+  const isAuthenticated = computed(() => isSecretUnlocked.value);
+  const isCrudUnlocked = computed(() => isSecretUnlocked.value);
+  const currentUser = computed(() => (isSecretUnlocked.value ? { name: 'Admin User', role: 'admin' } : null));
 
-  // Secret 5x click unlock
+  // Secret 5x click unlock/lock toggle
   function registerLogoClick() {
     logoClickCount.value++;
     clearTimeout(clickTimer);
 
     if (logoClickCount.value >= 5) {
       isSecretUnlocked.value = !isSecretUnlocked.value;
-      sessionStorage.setItem('esb_crud_unlocked', isSecretUnlocked.value ? 'true' : 'false');
+      localStorage.setItem('esb_admin_mode', isSecretUnlocked.value ? 'true' : 'false');
       logoClickCount.value = 0;
 
       if (isSecretUnlocked.value) {
-        showToast('🔓 Mode Admin / CRUD Aktif!', 'success');
+        showToast('🔓 Mode Admin Aktif! Akses CMS dan tombol kelola SOP telah dibuka.', 'success');
       } else {
-        showToast('🔒 Mode Admin / CRUD Dinonaktifkan.', 'info');
+        showToast('🔒 Mode Admin Dinonaktifkan. Anda beralih ke Mode Non-Admin (Pembaca).', 'info');
       }
       return;
     }
@@ -55,12 +55,9 @@ export function useAuth() {
   }
 
   function logout() {
-    api.logout();
-    token.value = '';
-    currentUser.value = null;
     isSecretUnlocked.value = false;
-    sessionStorage.removeItem('esb_crud_unlocked');
-    showToast('Logout berhasil.', 'info');
+    localStorage.setItem('esb_admin_mode', 'false');
+    showToast('🔒 Mode Admin Dinonaktifkan. Anda sekarang dalam Mode Non-Admin (Pembaca).', 'info');
   }
 
   async function checkAuth() {

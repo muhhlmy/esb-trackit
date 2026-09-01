@@ -43,40 +43,16 @@ const liveSuggestions = computed(() => {
     .slice(0, 5);
 });
 
-const featuredSopList = [
-  {
-    num: '01',
-    id: 'sop-1',
-    title: 'SOP Setup Laptop Baru',
-    summary: 'Panduan penyiapan laptop Windows untuk karyawan baru (new joiner).',
-    category: 'Hardware',
-    readTime: '5 min read'
-  },
-  {
-    num: '02',
-    id: 'sop-2',
-    title: 'SOP Setup Laptop Re-use',
-    summary: 'Panduan deployment ulang dan pembersihan perangkat laptop bekas pakai.',
-    category: 'Hardware',
-    readTime: '4 min read'
-  },
-  {
-    num: '03',
-    id: 'sop-3',
-    title: 'SOP Setup HP Baru',
-    summary: 'Panduan pendistribusian HP unit karyawan dan pendaftaran SIM.',
-    category: 'Hardware',
-    readTime: '4 min read'
-  },
-  {
-    num: '04',
-    id: 'sop-4',
-    title: 'SOP Google Workspace 2SV',
-    summary: 'Panduan aktivasi dan verifikasi 2-Step Verification akun perusahaan.',
-    category: 'Workplace',
-    readTime: '3 min read'
-  }
-];
+// Featured SOP list dari DB (4 pertama, published, diurutkan sesuai sort_order)
+const featuredSopList = computed(() =>
+  cases.value.slice(0, 4).map((c, idx) => ({
+    num: String(idx + 1).padStart(2, '0'),
+    id: c.id,
+    title: c.title,
+    summary: c.summary || '',
+    category: c.category || 'general'
+  }))
+);
 
 function handleSearchSubmit() {
   if (localSearch.value.trim()) {
@@ -211,6 +187,7 @@ const faqs = [
 const mainScope = ref(null);
 
 onMounted(async () => {
+  fetchCases();
   if (isReducedMotion()) return;
   await nextTick();
 
@@ -445,7 +422,6 @@ onMounted(async () => {
                   <span class="px-1.5 py-0.2 rounded text-[10px] font-extrabold uppercase bg-[#ECF2FF] text-[#5D87FF] dark:bg-indigo-950/60 dark:text-indigo-300">
                     {{ sop.category }}
                   </span>
-                  <span class="text-[11px] font-medium text-[#7C8BAC]">{{ sop.readTime }}</span>
                 </div>
               </div>
             </div>

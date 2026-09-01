@@ -17,8 +17,7 @@ import {
   ChevronRight,
   AlertTriangle,
   FolderOpen,
-  MoreVertical,
-  ThumbsUp
+  MoreVertical
 } from 'lucide-vue-next'
 
 const router = useRouter()
@@ -164,7 +163,7 @@ function getCategoryBadgeClass(category) {
       </div>
 
       <!-- Stats Row -->
-      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 gsap-admin-el">
+      <div class="grid grid-cols-2 lg:grid-cols-3 gap-4 gsap-admin-el">
         <!-- Total -->
         <div class="p-5 rounded-xl bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 transition-colors hover:border-slate-300 dark:hover:border-slate-700">
           <div class="flex items-center gap-2 mb-3">
@@ -201,19 +200,6 @@ function getCategoryBadgeClass(category) {
           </div>
           <p class="text-2xl font-bold text-[#1E293B] dark:text-white tracking-tight tabular-nums">
             {{ stats.custom }}
-          </p>
-        </div>
-
-        <!-- Helpful Ratio -->
-        <div class="p-5 rounded-xl bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 transition-colors hover:border-slate-300 dark:hover:border-slate-700">
-          <div class="flex items-center gap-2 mb-3">
-            <div class="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center">
-              <ThumbsUp class="w-4 h-4" />
-            </div>
-            <span class="text-xs font-medium text-[#64748B] dark:text-slate-400">Helpful Ratio</span>
-          </div>
-          <p class="text-2xl font-bold text-[#1E293B] dark:text-white tracking-tight tabular-nums">
-            96%
           </p>
         </div>
       </div>

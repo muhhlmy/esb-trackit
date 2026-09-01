@@ -608,6 +608,7 @@ CREATE TABLE cases (
     tags                        JSONB           NOT NULL DEFAULT '[]'::jsonb,
     summary                     TEXT,
     problem_context             TEXT,
+    content_html                TEXT,
     action_steps                JSONB           NOT NULL DEFAULT '[]'::jsonb,
     dos                         JSONB           NOT NULL DEFAULT '[]'::jsonb,
     donts                       JSONB           NOT NULL DEFAULT '[]'::jsonb,

@@ -32,9 +32,6 @@ import {
   List,
   ListOrdered,
   Quote,
-  ThumbsUp,
-  ThumbsDown,
-  Sparkles,
   ArrowLeft,
   ChevronRight,
   FileText
@@ -82,8 +79,6 @@ const doc = ref({
     }
   ],
   isCustom: true,
-  isTrending: false,
-  isSsoRequired: true,
   status: 'DRAFT',
   contentHtml: ''
 });
@@ -215,8 +210,6 @@ onMounted(async () => {
       dosAndDonts: { dos: [], donts: [] },
       snippets: [],
       isCustom: true,
-      isTrending: false,
-      isSsoRequired: false,
       status: 'DRAFT',
       contentHtml: ''
     };
@@ -640,19 +633,6 @@ function goToAdminCases() {
               :editor="editor"
               class="prose prose-slate max-w-none text-[#1E293B] dark:text-slate-200"
             />
-          </div>
-
-          <!-- Bottom Micro-feedback Preview -->
-          <div class="mt-16 pt-8 border-t border-[#F1F5F9] dark:border-slate-800 flex flex-col items-center gap-3 text-xs">
-            <p class="font-medium text-[#64748B] dark:text-slate-400">Preview: Apakah artikel ini membantu?</p>
-            <div class="flex gap-2">
-              <button class="px-5 py-1.5 border border-[#E2E8F0] dark:border-slate-700 rounded-lg text-xs font-medium flex items-center gap-1.5 text-[#475569] dark:text-slate-300 hover:bg-[#F8FAFC] dark:hover:bg-slate-800 transition-colors cursor-pointer">
-                <ThumbsUp class="w-3.5 h-3.5" /> Ya
-              </button>
-              <button class="px-5 py-1.5 border border-[#E2E8F0] dark:border-slate-700 rounded-lg text-xs font-medium flex items-center gap-1.5 text-[#475569] dark:text-slate-300 hover:bg-[#F8FAFC] dark:hover:bg-slate-800 transition-colors cursor-pointer">
-                <ThumbsDown class="w-3.5 h-3.5" /> Tidak
-              </button>
-            </div>
           </div>
 
         </article>

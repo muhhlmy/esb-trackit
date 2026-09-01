@@ -26,7 +26,7 @@ function normalizeList(data) {
 }
 
 // Payload case yang dikirim ke backend (sesuai CASE_FIELDS di caseController).
-// Buang field UI/local yang tidak diterima API: id, isTrending, isSsoRequired, contentHtml.
+// Buang field UI/local yang tidak diterima API: id, created_at, updated_at.
 const CASE_PAYLOAD_FIELDS = [
   'title',
   'category',
@@ -34,6 +34,7 @@ const CASE_PAYLOAD_FIELDS = [
   'tags',
   'summary',
   'problemContext',
+  'contentHtml',
   'actionSteps',
   'dosAndDonts',
   'snippets',

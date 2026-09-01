@@ -3,28 +3,20 @@ import { ref, computed } from 'vue';
 import { useAuth } from '@/composables/useAuth';
 import { useBookmarks } from '@/composables/useBookmarks';
 import { useToast } from '@/composables/useToast';
-import { 
-  AlertCircle, 
-  Bookmark, 
-  Edit3, 
-  Copy, 
-  Check, 
-  CheckCircle, 
-  XCircle, 
-  HelpCircle, 
-  ListOrdered, 
-  Terminal, 
-  Tag, 
-  ExternalLink,
-  ThumbsUp,
-  ThumbsDown,
+import {
+  Bookmark,
+  Edit3,
+  Copy,
+  Check,
+  CheckCircle,
+  XCircle,
+  HelpCircle,
+  Terminal,
   MessageSquare,
-  Clock,
   User,
   Lightbulb,
   ShieldAlert,
-  ChevronRight,
-  Headphones
+  ChevronRight
 } from 'lucide-vue-next';
 
 const props = defineProps({
@@ -41,7 +33,6 @@ const { isBookmarked, toggleBookmark } = useBookmarks();
 const { showToast } = useToast();
 
 const copiedSnippetIndex = ref(null);
-const feedbackGiven = ref(null); // 'yes' | 'no' | null
 const checkedSteps = ref({});
 
 function copySnippet(code, index) {
@@ -51,15 +42,6 @@ function copySnippet(code, index) {
   setTimeout(() => {
     copiedSnippetIndex.value = null;
   }, 2000);
-}
-
-function handleFeedback(isHelpful) {
-  feedbackGiven.value = isHelpful ? 'yes' : 'no';
-  if (isHelpful) {
-    showToast('Terima kasih atas feedback positif Anda! 👍', 'success');
-  } else {
-    showToast('Terima kasih, tim IT akan meninjau dan memperbarui SOP ini.', 'info');
-  }
 }
 
 function toggleStepCheck(idx) {
@@ -155,12 +137,7 @@ const severityClass = computed(() => {
       <div class="flex items-center gap-4 text-xs text-[#575d7a] dark:text-slate-400 pt-1">
         <div class="flex items-center gap-1.5">
           <User class="w-3.5 h-3.5 text-[#64748b]" />
-          <span>Core Logic IT Infrastructure</span>
-        </div>
-        <span>&bull;</span>
-        <div class="flex items-center gap-1.5">
-          <Clock class="w-3.5 h-3.5 text-[#64748b]" />
-          <span>3 min read</span>
+          <span>Tim IT</span>
         </div>
       </div>
 
@@ -294,42 +271,6 @@ const severityClass = computed(() => {
         <pre class="p-4 text-xs font-mono text-[#1a1c1d] dark:text-slate-200 overflow-x-auto whitespace-pre-wrap leading-relaxed">{{ snip.code }}</pre>
       </div>
     </section>
-
-    <!-- Micro-feedback Widget (Notion Style) -->
-    <div class="pt-6 border-t border-[#e2e2e4] dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4 bg-white dark:bg-slate-900/60 p-5 rounded-2xl border shadow-2xs">
-      <div>
-        <p class="text-sm font-semibold text-[#1a1c1d] dark:text-slate-200">
-          Apakah dokumen panduan ini membantu Anda?
-        </p>
-        <p class="text-xs text-[#575d7a] dark:text-slate-400 mt-0.5">
-          Feedback Anda membantu tim IT memperbarui SOP secara berkala.
-        </p>
-      </div>
-
-      <div class="flex items-center gap-2">
-        <button
-          @click="handleFeedback(true)"
-          class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold border transition-all cursor-pointer"
-          :class="feedbackGiven === 'yes'
-            ? 'bg-emerald-600 text-white border-emerald-600'
-            : 'bg-[#f3f3f5] dark:bg-slate-800 text-[#1a1c1d] dark:text-slate-200 border-[#c4c5d9] dark:border-slate-700 hover:bg-[#e2e2e4]'"
-        >
-          <ThumbsUp class="w-3.5 h-3.5" />
-          <span>Ya, Sangat Membantu</span>
-        </button>
-
-        <button
-          @click="handleFeedback(false)"
-          class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold border transition-all cursor-pointer"
-          :class="feedbackGiven === 'no'
-            ? 'bg-rose-600 text-white border-rose-600'
-            : 'bg-[#f3f3f5] dark:bg-slate-800 text-[#575d7a] dark:text-slate-300 border-[#c4c5d9] dark:border-slate-700 hover:bg-[#e2e2e4]'"
-        >
-          <ThumbsDown class="w-3.5 h-3.5" />
-          <span>Belum Cukup</span>
-        </button>
-      </div>
-    </div>
 
     <!-- Bottom Escalation Banner (CTA) -->
     <div class="p-6 rounded-2xl bg-gradient-to-r from-[#f2f1ff] to-white dark:from-slate-900 dark:to-slate-950 border border-[#c4c5d9] dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">

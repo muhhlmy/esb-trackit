@@ -124,7 +124,8 @@ try {
       tags            JSONB NOT NULL DEFAULT '[]'::jsonb,
       summary         TEXT,
       problem_context TEXT,
-      action_steps    JSONB NOT NULL DEFAULT '[]'::jsonb,
+            content_html    TEXT,
+            action_steps    JSONB NOT NULL DEFAULT '[]'::jsonb,
       dos             JSONB NOT NULL DEFAULT '[]'::jsonb,
       donts           JSONB NOT NULL DEFAULT '[]'::jsonb,
       snippets        JSONB NOT NULL DEFAULT '[]'::jsonb,
@@ -137,7 +138,8 @@ try {
       CONSTRAINT chk_cases_severity CHECK (severity IN ('low', 'medium', 'high'))
     );
     CREATE INDEX IF NOT EXISTS idx_cases_status ON cases(status);
-  `);
+        ALTER TABLE cases ADD COLUMN IF NOT EXISTS content_html TEXT;
+      `);
   await verifyRuntimeSchema(pool);
 } catch (error) {
   console.error("Database belum siap digunakan:", error.message);

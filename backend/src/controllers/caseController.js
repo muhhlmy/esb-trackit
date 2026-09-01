@@ -21,6 +21,7 @@ const CASE_FIELDS = new Set([
   'tags',
   'summary',
   'problemContext',
+  'contentHtml',
   'actionSteps',
   'dosAndDonts',
   'snippets',
@@ -38,6 +39,7 @@ function mapCaseRow(row) {
     tags: Array.isArray(row.tags) ? row.tags : [],
     summary: row.summary || '',
     problemContext: row.problem_context || '',
+    contentHtml: row.content_html || '',
     actionSteps: Array.isArray(row.action_steps) ? row.action_steps : [],
     dosAndDonts: {
       dos: Array.isArray(row.dos) ? row.dos : [],
@@ -157,6 +159,7 @@ function validateCreateBody(body) {
     tags: normalizeStringList(body.tags, 'Tags'),
     summary: normalizeOptionalText(body.summary, 'Summary'),
     problem_context: normalizeOptionalText(body.problemContext, 'Problem context'),
+    content_html: normalizeOptionalText(body.contentHtml, 'Content HTML'),
     action_steps: normalizeStringList(body.actionSteps, 'Action steps'),
     dos: normalizeDosDonts(body.dosAndDonts, 'dos', 'Dos'),
     donts: normalizeDosDonts(body.dosAndDonts, 'donts', 'Donts'),
@@ -181,6 +184,7 @@ function validateUpdateBody(body) {
   if (has('tags')) out.tags = normalizeStringList(body.tags, 'Tags')
   if (has('summary')) out.summary = normalizeOptionalText(body.summary, 'Summary')
   if (has('problemContext')) out.problem_context = normalizeOptionalText(body.problemContext, 'Problem context')
+  if (has('contentHtml')) out.content_html = normalizeOptionalText(body.contentHtml, 'Content HTML')
   if (has('actionSteps')) out.action_steps = normalizeStringList(body.actionSteps, 'Action steps')
   if (has('dosAndDonts')) {
     out.dos = normalizeDosDonts(body.dosAndDonts, 'dos', 'Dos')
@@ -194,7 +198,7 @@ function validateUpdateBody(body) {
 }
 
 const SELECT_COLUMNS = `
-  id, title, category, severity, tags, summary, problem_context,
+  id, title, category, severity, tags, summary, problem_context, content_html,
   action_steps, dos, donts, snippets, status, is_custom, sort_order,
   created_at, updated_at`
 
@@ -230,9 +234,9 @@ export async function createCase(req, res) {
   const p = validateCreateBody(req.body)
   const result = await pool.query(
     `INSERT INTO cases
-       (title, category, severity, tags, summary, problem_context,
+       (title, category, severity, tags, summary, problem_context, content_html,
         action_steps, dos, donts, snippets, status, is_custom, sort_order)
-     VALUES ($1, $2, $3, $4::jsonb, $5, $6, $7::jsonb, $8::jsonb, $9::jsonb, $10::jsonb, $11, $12, $13)
+     VALUES ($1, $2, $3, $4::jsonb, $5, $6, $7, $8::jsonb, $9::jsonb, $10::jsonb, $11::jsonb, $12, $13, $14)
      RETURNING ${SELECT_COLUMNS}`,
     [
       p.title,
@@ -241,6 +245,7 @@ export async function createCase(req, res) {
       JSON.stringify(p.tags),
       p.summary,
       p.problem_context,
+      p.content_html,
       JSON.stringify(p.action_steps),
       JSON.stringify(p.dos),
       JSON.stringify(p.donts),
@@ -269,13 +274,14 @@ export async function updateCase(req, res) {
             tags            = COALESCE($5::jsonb, tags),
             summary         = COALESCE($6, summary),
             problem_context = COALESCE($7, problem_context),
-            action_steps    = COALESCE($8::jsonb, action_steps),
-            dos             = COALESCE($9::jsonb, dos),
-            donts           = COALESCE($10::jsonb, donts),
-            snippets        = COALESCE($11::jsonb, snippets),
-            status          = COALESCE($12, status),
-            is_custom       = COALESCE($13, is_custom),
-            sort_order      = COALESCE($14, sort_order),
+            content_html    = COALESCE($8, content_html),
+            action_steps    = COALESCE($9::jsonb, action_steps),
+            dos             = COALESCE($10::jsonb, dos),
+            donts           = COALESCE($11::jsonb, donts),
+            snippets        = COALESCE($12::jsonb, snippets),
+            status          = COALESCE($13, status),
+            is_custom       = COALESCE($14, is_custom),
+            sort_order      = COALESCE($15, sort_order),
             updated_at      = CURRENT_TIMESTAMP
       WHERE id = $1
       RETURNING ${SELECT_COLUMNS}`,
@@ -287,6 +293,7 @@ export async function updateCase(req, res) {
       p.tags ? JSON.stringify(p.tags) : null,
       p.summary ?? null,
       p.problem_context ?? null,
+      p.content_html ?? null,
       p.action_steps ? JSON.stringify(p.action_steps) : null,
       p.dos ? JSON.stringify(p.dos) : null,
       p.donts ? JSON.stringify(p.donts) : null,

@@ -213,6 +213,7 @@ const REQUIRED_RUNTIME_SCHEMA = Object.freeze({
     tags: nn('jsonb'),
     summary: optional('text'),
     problem_context: optional('text'),
+    content_html: optional('text'),
     action_steps: nn('jsonb'),
     dos: nn('jsonb'),
     donts: nn('jsonb'),

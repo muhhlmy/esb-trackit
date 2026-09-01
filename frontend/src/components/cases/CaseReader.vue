@@ -23,7 +23,8 @@ import {
   Lightbulb,
   ShieldAlert,
   ChevronRight,
-  Headphones
+  Headphones,
+  Sparkles
 } from 'lucide-vue-next';
 
 const props = defineProps({
@@ -142,12 +143,14 @@ function toggleStepCheck(idx) {
       </div>
 
       <!-- Notion Summary Callout Box (Only when no contentHtml) -->
-      <div v-if="!caseItem.contentHtml && caseItem.summary" class="p-4 rounded-xl bg-white dark:bg-slate-900 border border-[#c4c5d9] dark:border-slate-800 shadow-2xs flex items-start gap-3">
-        <div class="p-2 rounded-lg bg-[#f2f1ff] dark:bg-indigo-500/10 text-[#0040e5] dark:text-indigo-400 shrink-0">
-          <Lightbulb class="w-4 h-4" />
+      <div v-if="!caseItem.contentHtml && caseItem.summary" class="p-4 sm:p-5 rounded-2xl bg-[#f8fafc] dark:bg-slate-900 border border-[#c4c5d9] dark:border-slate-800 shadow-2xs">
+        <div class="flex items-center gap-1.5 mb-2.5">
+          <Sparkles class="w-3.5 h-3.5 text-[#0040e5] dark:text-indigo-400" />
+          <span class="text-[11px] font-bold uppercase tracking-wider text-[#0040e5] dark:text-indigo-400 select-none">
+            RINGKASAN EKSEKUTIF (EXECUTIVE SUMMARY):
+          </span>
         </div>
-        <div class="text-xs sm:text-sm text-[#434656] dark:text-slate-300 leading-relaxed pt-0.5">
-          <strong class="text-[#1a1c1d] dark:text-slate-200 font-semibold block mb-1">Ringkasan Prosedur:</strong>
+        <div class="border-l-4 border-[#0040e5] dark:border-indigo-500 pl-3.5 text-xs sm:text-sm italic text-[#334155] dark:text-slate-300 leading-relaxed">
           {{ caseItem.summary }}
         </div>
       </div>

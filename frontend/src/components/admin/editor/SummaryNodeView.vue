@@ -26,9 +26,9 @@ function removeSummary(e) {
       
       <!-- Header Line with Title and Delete Button -->
       <div class="flex items-center justify-between mb-2" contenteditable="false">
-        <span class="text-[11px] font-bold uppercase tracking-wider text-[#575d7a] dark:text-slate-400 flex items-center gap-1.5 select-none">
+        <span class="text-[11px] font-bold uppercase tracking-wider text-[#0040e5] dark:text-indigo-400 flex items-center gap-1.5 select-none">
           <Sparkles class="w-3.5 h-3.5 text-[#0040e5] dark:text-indigo-400" />
-          <span>Ringkasan Panduan (Executive Summary):</span>
+          <span>RINGKASAN EKSEKUTIF (EXECUTIVE SUMMARY):</span>
         </span>
 
         <!-- Delete Cross Button [X] in Top Right Corner -->

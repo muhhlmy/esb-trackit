@@ -1,6 +1,6 @@
 <script setup>
-import { ref, computed } from 'vue';
-import { RouterLink } from 'vue-router';
+import { ref, computed, watch } from 'vue';
+import { useRouter, useRoute, RouterLink } from 'vue-router';
 import { useCases } from '@/composables/useCases';
 import { useAuth } from '@/composables/useAuth';
 import {
@@ -28,6 +28,9 @@ const props = defineProps({
 });
 
 const emit = defineEmits(['toggleCollapse']);
+
+const router = useRouter();
+const route = useRoute();
 
 const {
   cases,
@@ -63,6 +66,20 @@ function toggleCategory(catKey) {
   openCategories.value[catKey] = !openCategories.value[catKey];
 }
 
+// Auto-expand category of the active case
+watch(
+  () => activeCaseId.value,
+  (newId) => {
+    if (newId) {
+      const current = cases.value.find((c) => c.id === newId);
+      if (current?.category) {
+        openCategories.value[current.category] = true;
+      }
+    }
+  },
+  { immediate: true }
+);
+
 // Group cases by category
 const groupedCases = computed(() => {
   const q = sidebarSearch.value.toLowerCase().trim();
@@ -86,6 +103,7 @@ const groupedCases = computed(() => {
 
 function handleSelectCase(id) {
   selectCase(id);
+  router.push(`/cases/${id}`);
 }
 </script>
 

@@ -1,14 +1,18 @@
 <script setup>
-import { ref, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
+import { ref, onMounted, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import { useCases } from '@/composables/useCases';
 import NotionTreeSidebar from '@/components/cases/NotionTreeSidebar.vue';
 import CaseReader from '@/components/cases/CaseReader.vue';
 import { PanelLeft, PanelLeftClose, Menu, X, ArrowLeft } from 'lucide-vue-next';
 
+const route = useRoute();
 const router = useRouter();
 const {
+  cases,
   activeCase,
+  activeCaseId,
+  selectCase,
   fetchCases
 } = useCases();
 
@@ -28,8 +32,38 @@ function openEditInCms(item) {
   }
 }
 
+async function syncRouteCase() {
+  await fetchCases();
+  const targetId = route.params.id;
+  if (targetId) {
+    selectCase(targetId);
+  } else if (cases.value.length > 0 && !activeCaseId.value) {
+    selectCase(cases.value[0].id);
+    router.replace(`/cases/${cases.value[0].id}`);
+  }
+}
+
+watch(
+  () => route.params.id,
+  (newId) => {
+    if (newId && newId !== activeCaseId.value) {
+      selectCase(newId);
+    }
+  }
+);
+
+watch(
+  () => activeCase.value,
+  (newCase) => {
+    if (newCase?.title) {
+      document.title = `${newCase.title} — ESB Case`;
+    }
+  },
+  { immediate: true }
+);
+
 onMounted(() => {
-  fetchCases();
+  syncRouteCase();
 });
 </script>
 

@@ -27,6 +27,8 @@ import {
   ThumbsUp,
   ThumbsDown,
   CheckCircle2,
+  CheckCircle,
+  XCircle,
   BookOpen,
   Terminal,
   Copy,
@@ -205,7 +207,7 @@ function copySnippet(code, index) {
 
 function goToFaqDetail(id) {
   selectCase(id);
-  router.push('/cases');
+  router.push(`/cases/${id}`);
 }
 </script>
 
@@ -478,47 +480,97 @@ function goToFaqDetail(id) {
             v-if="openFaqId === faq.id"
             class="px-5 sm:px-6 pb-6 bg-white dark:bg-slate-900 text-sm text-[#434656] dark:text-slate-300 border-t border-[#e2e2e4] dark:border-slate-800 pt-4 space-y-4"
           >
-            <!-- Summary -->
-            <p v-if="faq.summary" class="leading-relaxed text-slate-700 dark:text-slate-300">
-              {{ faq.summary }}
-            </p>
+            <!-- 1. Rich HTML Content (If generated via DocEditor / contentHtml exists) -->
+            <div
+              v-if="faq.contentHtml"
+              class="prose prose-slate dark:prose-invert max-w-none text-xs sm:text-sm leading-relaxed"
+              v-html="faq.contentHtml"
+            ></div>
 
-            <!-- Steps List (actionSteps) -->
-            <div v-if="faq.actionSteps && faq.actionSteps.length" class="space-y-2">
-              <span class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                Langkah-Langkah Penanganan:
-              </span>
-              <ol class="list-decimal pl-6 space-y-2 leading-relaxed text-slate-700 dark:text-slate-300 text-xs sm:text-sm">
-                <li v-for="(step, idx) in faq.actionSteps" :key="idx">
-                  {{ step }}
-                </li>
-              </ol>
-            </div>
-
-            <!-- Snippets / Code blocks -->
-            <div v-if="faq.snippets && faq.snippets.length" class="space-y-2 pt-2">
-              <div
-                v-for="(snip, sIdx) in faq.snippets"
-                :key="sIdx"
-                class="rounded-xl border border-[#c4c5d9] dark:border-slate-800 bg-[#edeef0] dark:bg-slate-950 overflow-hidden text-xs"
-              >
-                <div class="flex items-center justify-between px-3 py-1.5 bg-white dark:bg-slate-900 border-b border-[#e2e2e4] dark:border-slate-800 font-mono font-semibold text-[11px]">
-                  <span>{{ snip.label || 'Snippet' }}</span>
-                  <button
-                    @click="copySnippet(snip.code, sIdx)"
-                    class="flex items-center gap-1 px-2 py-0.5 rounded bg-[#f3f3f5] hover:bg-[#e2e2e4] dark:bg-slate-800 dark:hover:bg-slate-700 text-[#1a1c1d] dark:text-slate-200 transition-colors cursor-pointer"
-                  >
-                    <Check v-if="copiedSnippetIdx === sIdx" class="w-3 h-3 text-emerald-600" />
-                    <Copy v-else class="w-3 h-3" />
-                    <span>{{ copiedSnippetIdx === sIdx ? 'Tersalin' : 'Copy' }}</span>
-                  </button>
-                </div>
-                <pre class="p-3 font-mono text-[11px] overflow-x-auto whitespace-pre-wrap leading-relaxed">{{ snip.code }}</pre>
+            <!-- 2. Structured Fallback (If contentHtml is NOT provided) -->
+            <template v-else>
+              <!-- Summary Block -->
+              <div v-if="faq.summary" class="summary-block-card">
+                <p>{{ faq.summary }}</p>
               </div>
-            </div>
+
+              <!-- Problem Context -->
+              <div v-if="faq.problemContext" class="p-3.5 rounded-xl bg-[#f8fafc] dark:bg-slate-900 border border-[#e2e8f0] dark:border-slate-800 text-xs sm:text-sm text-[#334155] dark:text-slate-300 leading-relaxed">
+                <strong class="text-[#1a1c1d] dark:text-slate-200 block mb-1">Background &amp; Skenario Kendala:</strong>
+                {{ faq.problemContext }}
+              </div>
+
+              <!-- Steps List (actionSteps) -->
+              <div v-if="faq.actionSteps && faq.actionSteps.length" class="space-y-2">
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                  Langkah-Langkah Penanganan:
+                </span>
+                <ol class="list-decimal pl-6 space-y-2 leading-relaxed text-slate-700 dark:text-slate-300 text-xs sm:text-sm">
+                  <li v-for="(step, idx) in faq.actionSteps" :key="idx">
+                    {{ step }}
+                  </li>
+                </ol>
+              </div>
+
+              <!-- DOs & DON'Ts Comparison -->
+              <div
+                v-if="(faq.dosAndDonts?.dos?.length) || (faq.dosAndDonts?.donts?.length)"
+                class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1"
+              >
+                <!-- DOs -->
+                <div v-if="faq.dosAndDonts?.dos?.length" class="p-3.5 rounded-xl bg-emerald-500/10 dark:bg-emerald-950/20 border border-emerald-500/25 space-y-2">
+                  <div class="flex items-center gap-1.5 text-emerald-800 dark:text-emerald-400 font-bold text-xs uppercase tracking-wider">
+                    <CheckCircle class="w-3.5 h-3.5" />
+                    <span>Best Practices (DOs)</span>
+                  </div>
+                  <ul class="space-y-1.5 text-xs text-emerald-950 dark:text-emerald-200">
+                    <li v-for="(doItem, idx) in faq.dosAndDonts.dos" :key="idx" class="flex items-start gap-1.5">
+                      <span class="text-emerald-600 font-bold">•</span>
+                      <span>{{ doItem }}</span>
+                    </li>
+                  </ul>
+                </div>
+
+                <!-- DON'Ts -->
+                <div v-if="faq.dosAndDonts?.donts?.length" class="p-3.5 rounded-xl bg-rose-500/10 dark:bg-rose-950/20 border border-rose-500/25 space-y-2">
+                  <div class="flex items-center gap-1.5 text-rose-800 dark:text-rose-400 font-bold text-xs uppercase tracking-wider">
+                    <XCircle class="w-3.5 h-3.5" />
+                    <span>Peringatan (DON'Ts)</span>
+                  </div>
+                  <ul class="space-y-1.5 text-xs text-rose-950 dark:text-rose-200">
+                    <li v-for="(dontItem, idx) in faq.dosAndDonts.donts" :key="idx" class="flex items-start gap-1.5">
+                      <span class="text-rose-600 font-bold">•</span>
+                      <span>{{ dontItem }}</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              <!-- Snippets / Code blocks -->
+              <div v-if="faq.snippets && faq.snippets.length" class="space-y-2 pt-2">
+                <div
+                  v-for="(snip, sIdx) in faq.snippets"
+                  :key="sIdx"
+                  class="rounded-xl border border-[#c4c5d9] dark:border-slate-800 bg-[#edeef0] dark:bg-slate-950 overflow-hidden text-xs"
+                >
+                  <div class="flex items-center justify-between px-3 py-1.5 bg-white dark:bg-slate-900 border-b border-[#e2e2e4] dark:border-slate-800 font-mono font-semibold text-[11px]">
+                    <span>{{ snip.label || 'Snippet' }}</span>
+                    <button
+                      @click="copySnippet(snip.code, sIdx)"
+                      class="flex items-center gap-1 px-2 py-0.5 rounded bg-[#f3f3f5] hover:bg-[#e2e2e4] dark:bg-slate-800 dark:hover:bg-slate-700 text-[#1a1c1d] dark:text-slate-200 transition-colors cursor-pointer"
+                    >
+                      <Check v-if="copiedSnippetIdx === sIdx" class="w-3 h-3 text-emerald-600" />
+                      <Copy v-else class="w-3 h-3" />
+                      <span>{{ copiedSnippetIdx === sIdx ? 'Tersalin' : 'Copy' }}</span>
+                    </button>
+                  </div>
+                  <pre class="p-3 font-mono text-[11px] overflow-x-auto whitespace-pre-wrap leading-relaxed">{{ snip.code }}</pre>
+                </div>
+              </div>
+            </template>
 
             <!-- Link to full Case/SOP Document -->
-            <div class="pt-2 flex items-center justify-between flex-wrap gap-3">
+            <div class="pt-2 flex items-center justify-between flex-wrap gap-3 border-t border-[#f0f0f2] dark:border-slate-800/80">
               <button
                 @click="goToFaqDetail(faq.id)"
                 class="inline-flex items-center gap-1.5 text-xs font-semibold text-[#0040e5] dark:text-indigo-400 hover:underline cursor-pointer"

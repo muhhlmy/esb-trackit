@@ -515,7 +515,7 @@ function goToPortal() {
     />
 
     <!-- 1. TOP APP BAR (Compact High-Density Header) -->
-    <header class="h-11 bg-white dark:bg-slate-900 border-b border-[#c4c5d9] dark:border-slate-800 px-3 sm:px-5 fixed top-0 left-0 right-0 z-50 flex items-center justify-between shadow-2xs">
+    <header class="h-11 bg-white dark:bg-slate-900 border-b border-[#c4c5d9] dark:border-slate-800 px-3 sm:px-5 sticky top-0 z-50 flex items-center justify-between shadow-2xs">
       
       <!-- Left: Logo, Breadcrumbs, Status -->
       <div class="flex items-center gap-2.5 sm:gap-3">
@@ -1062,8 +1062,8 @@ function goToPortal() {
           </button>
         </div>
 
-        <div class="flex-1 overflow-y-auto p-4 sm:p-8 flex justify-center">
-          <div class="w-full max-w-4xl bg-white dark:bg-[#1E293B] rounded-2xl border border-[#c4c5d9] dark:border-slate-700 shadow-md min-h-full">
+        <div class="flex-1 overflow-y-auto p-4 sm:p-8">
+          <div class="w-full max-w-4xl mx-auto bg-white dark:bg-[#1E293B] rounded-2xl border border-[#c4c5d9] dark:border-slate-700 shadow-md">
             <CaseReader :case-item="previewCaseItem" />
           </div>
         </div>

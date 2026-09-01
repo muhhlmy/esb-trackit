@@ -27,7 +27,8 @@ test.describe('Negative Scenarios Suite', () => {
       const lokasiTrigger = page.locator('form button[aria-haspopup="listbox"]').first()
       if (await lokasiTrigger.isVisible()) {
         await lokasiTrigger.click()
-        await page.waitForTimeout(200)
+        // Wait for listbox to appear
+        await page.locator('ul[role="listbox"]').first().waitFor({ state: 'visible', timeout: 3000 }).catch(() => {})
         const firstOption = page.locator('ul[role="listbox"] li[role="option"]').first()
         if (await firstOption.isVisible()) {
           await firstOption.click()
@@ -38,7 +39,8 @@ test.describe('Negative Scenarios Suite', () => {
 
       const saveBtn = page.locator('button[type="submit"]').or(page.getByRole('button', { name: /^tambah aset$/i })).last()
       await saveBtn.click()
-      await page.waitForTimeout(1000)
+      // Wait for form submission to complete
+      await page.waitForLoadState('networkidle')
 
       // 2. Attempt creating second asset with duplicate hostname & serial number
       const addAgainBtn = page.getByRole('button', { name: /tambah aset/i }).first()
@@ -55,7 +57,8 @@ test.describe('Negative Scenarios Suite', () => {
 
         if (await lokasiTrigger.isVisible()) {
           await lokasiTrigger.click()
-          await page.waitForTimeout(200)
+          // Wait for listbox to appear
+          await page.locator('ul[role="listbox"]').first().waitFor({ state: 'visible', timeout: 3000 }).catch(() => {})
           const firstOption = page.locator('ul[role="listbox"] li[role="option"]').first()
           if (await firstOption.isVisible()) {
             await firstOption.click()
@@ -83,7 +86,8 @@ test.describe('Negative Scenarios Suite', () => {
     const openModalBtn = page.getByRole('button', { name: /buat tiket/i }).first()
     if (await openModalBtn.isVisible()) {
       await openModalBtn.click()
-      await page.waitForTimeout(300)
+      // Wait for modal to appear
+      await page.locator('[role="dialog"], .modal').first().waitFor({ state: 'visible', timeout: 5000 }).catch(() => {})
 
       // Submit without filling title
       const submitBtn = page.locator('form button[type="submit"]').first()

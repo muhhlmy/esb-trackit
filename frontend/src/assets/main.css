@@ -86,13 +86,13 @@ textarea {
 }
 
 button {
-  font-size: 0.75rem;
+  font-size: 0.8125rem; /* 13px — ponytail: was 12px, fails readability */
 }
 
 input:not([type='checkbox']):not([type='radio']),
 select,
 textarea {
-  font-size: 0.75rem;
+  font-size: 0.8125rem; /* 13px — ponytail: was 12px, fails readability */
 }
 
 input::placeholder,
@@ -273,7 +273,7 @@ input[class*='pr-12'] {
 input::placeholder,
 textarea::placeholder,
 .form-control::placeholder {
-  color: #98a4ae;
+  color: #64748b; /* ponytail: was #98a4ae (2.8:1), now 4.6:1 contrast */
   opacity: 1;
 }
 
@@ -562,6 +562,18 @@ svg.w-full.h-full {
 svg circle {
   opacity: 1 !important;
   stroke-opacity: 1 !important;
+}
+
+/* ── Reduced Motion ── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 /* Material Symbols Solid Fill Utility */

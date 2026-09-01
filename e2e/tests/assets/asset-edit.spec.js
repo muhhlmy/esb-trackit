@@ -12,13 +12,15 @@ test.describe('Asset Management - Edit Asset Suite', () => {
 
     if (await firstRowActions.isVisible()) {
       await firstRowActions.click()
-      await page.waitForTimeout(200)
+      // Wait for dropdown/popover to appear
+      await page.locator('[role="menu"], [role="listbox"], .dropdown-menu').first().waitFor({ state: 'visible', timeout: 3000 }).catch(() => {})
 
       // Click Edit action item if dropdown popover appears
       const editBtn = page.getByRole('button', { name: /edit|ubah/i }).or(page.getByText(/edit aset/i)).first()
       if (await editBtn.isVisible()) {
         await editBtn.click()
-        await page.waitForTimeout(300)
+        // Wait for modal to appear
+        await page.locator('[role="dialog"], .modal').first().waitFor({ state: 'visible', timeout: 5000 }).catch(() => {})
 
         // Move to specifications tab
         const specStepBtn = page.getByRole('button', { name: /spesifikasi/i }).first()

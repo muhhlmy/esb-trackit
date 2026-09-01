@@ -243,10 +243,10 @@ const editingCase = ref(null);
 export function useCases() {
   const { showToast } = useToast();
 
-  async function fetchCases() {
+  async function fetchCases(params = {}) {
     isLoading.value = true;
     try {
-      const res = await api.getCases();
+      const res = await api.getCases(params);
       if (res && Array.isArray(res.data)) {
         cases.value = res.data;
       }

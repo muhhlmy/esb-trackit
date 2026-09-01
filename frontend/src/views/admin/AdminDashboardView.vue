@@ -62,7 +62,7 @@ function openAddModal() {
 }
 
 onMounted(async () => {
-  await fetchCases();
+  await fetchCases({ all: true });
 });
 
 const categories = [
@@ -376,7 +376,8 @@ function createNewDoc() {
                 <tr>
                   <th class="py-3.5 px-6">Judul Artikel FAQ</th>
                   <th class="py-3.5 px-4 w-32">Kategori</th>
-                  <th class="py-3.5 px-4 w-40">Tags</th>
+                  <th class="py-3.5 px-4 w-36">Tags</th>
+                  <th class="py-3.5 px-4 w-32">Status Publikasi</th>
                   <th class="py-3.5 px-4 w-36">Status Homepage</th>
                   <th class="py-3.5 px-4 text-center w-52">Interaksi 30 Hari</th>
                   <th class="py-3.5 px-6 text-right w-36">Aksi</th>
@@ -416,6 +417,24 @@ function createNewDoc() {
                         #{{ t }}
                       </span>
                     </div>
+                  </td>
+
+                  <!-- Status Publikasi Badge -->
+                  <td class="py-4 px-4 align-middle">
+                    <span
+                      v-if="c.isPublished !== false"
+                      class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800"
+                    >
+                      <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                      <span>Published</span>
+                    </span>
+                    <span
+                      v-else
+                      class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-300 dark:border-slate-700"
+                    >
+                      <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+                      <span>Draft</span>
+                    </span>
                   </td>
 
                   <!-- Status Homepage Badge -->

@@ -33,7 +33,8 @@ test.describe('Asset Management - Create Asset Suite', () => {
     const lokasiTrigger = page.locator('form button[aria-haspopup="listbox"]').first()
     if (await lokasiTrigger.isVisible()) {
       await lokasiTrigger.click()
-      await page.waitForTimeout(200)
+      // Wait for listbox to appear
+      await page.locator('ul[role="listbox"]').first().waitFor({ state: 'visible', timeout: 3000 }).catch(() => {})
       const firstOption = page.locator('ul[role="listbox"] li[role="option"]').first()
       if (await firstOption.isVisible()) {
         await firstOption.click()
@@ -66,7 +67,7 @@ test.describe('Asset Management - Create Asset Suite', () => {
     const searchInput = page.getByPlaceholder(/cari/i).first()
     if (await searchInput.isVisible()) {
       await searchInput.fill(testAsset.hostname)
-      await page.waitForTimeout(300)
+      await page.waitForLoadState('networkidle')
     }
 
     await expect(page.getByText(testAsset.hostname, { exact: true }).first()).toBeVisible({

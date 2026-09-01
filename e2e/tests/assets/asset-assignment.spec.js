@@ -14,12 +14,14 @@ test.describe('Asset Management - Assignment Suite', () => {
 
     if (await firstRowActions.isVisible()) {
       await firstRowActions.click()
-      await page.waitForTimeout(200)
+      // Wait for dropdown/popover to appear
+      await page.locator('[role="menu"], [role="listbox"], .dropdown-menu').first().waitFor({ state: 'visible', timeout: 3000 }).catch(() => {})
 
       const editBtn = page.getByRole('button', { name: /edit|ubah/i }).or(page.getByText(/edit aset/i)).first()
       if (await editBtn.isVisible()) {
         await editBtn.click()
-        await page.waitForTimeout(300)
+        // Wait for modal to appear
+        await page.locator('[role="dialog"], .modal').first().waitFor({ state: 'visible', timeout: 5000 }).catch(() => {})
 
         // Go to Step 2: Penempatan
         const placementStepBtn = page.getByRole('button', { name: /penempatan/i }).first()

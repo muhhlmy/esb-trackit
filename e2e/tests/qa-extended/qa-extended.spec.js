@@ -5,8 +5,8 @@ import { test, expect, chromium } from '@playwright/test'
 import AxeBuilder from '@axe-core/playwright'
 import fs from 'node:fs'
 
-const BASE = 'http://192.168.100.85:5173'
-const API = 'http://192.168.100.85:5000'
+const BASE = process.env.E2E_BASE_URL || 'http://localhost:5173'
+const API = process.env.E2E_API_URL || 'http://localhost:5000'
 
 // Get superadmin auth token via API
 async function getSuperadminToken() {
@@ -58,7 +58,7 @@ test.describe('QA Extended: Accessibility & Responsive', () => {
       }, token)
 
       await page.goto(`${BASE}${pg.path}`, { waitUntil: 'domcontentloaded' })
-      await page.waitForTimeout(1500)
+      await page.waitForLoadState('networkidle')
 
       const results = await new AxeBuilder({ page })
         .withTags(['wcag2a', 'wcag2aa'])
@@ -111,7 +111,7 @@ test.describe('QA Extended: Accessibility & Responsive', () => {
       }, token)
 
       await page.goto(`${BASE}/`, { waitUntil: 'domcontentloaded' })
-      await page.waitForTimeout(1000)
+      await page.waitForLoadState('networkidle')
 
       // Check for horizontal overflow
       const overflow = await page.evaluate(() => {
@@ -161,7 +161,8 @@ test.describe('QA Extended: Accessibility & Responsive', () => {
     await page.locator('#email').fill('test@test.com')
     await page.locator('#password').fill('wrongpass')
     await page.locator('#password').press('Enter')
-    await page.waitForTimeout(1500)
+    // Wait for error response
+    await page.waitForLoadState('networkidle')
     const errorVisible = await page.locator('[role="alert"], .error, [class*="error"]').count() > 0
     console.log('[UI] Error shown on wrong credentials:', errorVisible)
   })
@@ -177,7 +178,7 @@ test.describe('QA Extended: Accessibility & Responsive', () => {
     }, token)
 
     await page.goto(`${BASE}/`, { waitUntil: 'domcontentloaded' })
-    await page.waitForTimeout(1000)
+    await page.waitForLoadState('networkidle')
 
     // Check sidebar exists
     const sidebar = page.locator('nav, aside, [role="navigation"]').first()
@@ -194,7 +195,7 @@ test.describe('QA Extended: Accessibility & Responsive', () => {
     const navLinks = ['/assets', '/tickets', '/users', '/export']
     for (const link of navLinks) {
       await page.goto(`${BASE}${link}`, { waitUntil: 'domcontentloaded' })
-      await page.waitForTimeout(500)
+      await page.waitForLoadState('networkidle')
       const currentURL = page.url()
       console.log(`[UI] Nav to ${link}: landed on ${currentURL.replace(BASE, '')}`)
     }
@@ -213,19 +214,21 @@ test.describe('QA Extended: Accessibility & Responsive', () => {
     }, token)
 
     await page.goto(`${BASE}/assets`, { waitUntil: 'domcontentloaded' })
-    await page.waitForTimeout(1000)
+    await page.waitForLoadState('networkidle')
 
     // Open add asset modal
     const addBtn = page.getByRole('button', { name: /tambah aset/i }).first()
     if (await addBtn.isVisible()) {
       await addBtn.click()
-      await page.waitForTimeout(500)
+      // Wait for modal to appear
+      await page.locator('[role="dialog"], .modal').first().waitFor({ state: 'visible', timeout: 5000 })
 
       // Try to submit empty form
       const submitBtn = page.locator('button[type="submit"]').or(page.getByRole('button', { name: /simpan|tambah/i })).first()
       if (await submitBtn.isVisible()) {
         await submitBtn.click()
-        await page.waitForTimeout(500)
+        // Wait for validation response
+        await page.waitForLoadState('networkidle')
 
         // Check for validation messages
         const hasValidation = await page.locator('[class*="error"], [role="alert"], .text-red-500, .invalid-feedback').count() > 0
@@ -241,7 +244,8 @@ test.describe('QA Extended: Accessibility & Responsive', () => {
     await page.locator('#email').fill('wrong@test.com')
     await page.locator('#password').fill('wrongpassword123')
     await page.getByRole('button', { name: /masuk/i }).click()
-    await page.waitForTimeout(2000)
+    // Wait for error response
+    await page.waitForLoadState('networkidle')
 
     // Check for toast/notification
     const toast = page.locator('[role="alert"], [class*="toast"], [class*="notification"]')
@@ -251,7 +255,7 @@ test.describe('QA Extended: Accessibility & Responsive', () => {
 
   test('UI: 404/Forbidden page renders correctly', async ({ page }) => {
     await page.goto(`${BASE}/nonexistent-page-xyz123`, { waitUntil: 'domcontentloaded' })
-    await page.waitForTimeout(1000)
+    await page.waitForLoadState('networkidle')
     const bodyText = await page.locator('body').innerText()
     const has404 = bodyText.includes('404') || bodyText.includes('Tidak Ditemukan') || bodyText.includes('halaman')
     console.log('[UI] 404 page shows appropriate content:', has404)

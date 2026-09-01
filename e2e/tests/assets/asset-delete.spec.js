@@ -25,7 +25,8 @@ test.describe('Asset Management - Delete Asset Suite', () => {
       const lokasiTrigger = page.locator('form button[aria-haspopup="listbox"]').first()
       if (await lokasiTrigger.isVisible()) {
         await lokasiTrigger.click()
-        await page.waitForTimeout(200)
+        // Wait for listbox to appear
+        await page.locator('ul[role="listbox"]').first().waitFor({ state: 'visible', timeout: 3000 }).catch(() => {})
         const firstOption = page.locator('ul[role="listbox"] li[role="option"]').first()
         if (await firstOption.isVisible()) {
           await firstOption.click()
@@ -36,14 +37,15 @@ test.describe('Asset Management - Delete Asset Suite', () => {
 
       const saveBtn = page.locator('button[type="submit"]').or(page.getByRole('button', { name: /^tambah aset$/i })).last()
       await saveBtn.click()
-      await page.waitForTimeout(1000)
+      // Wait for form submission to complete
+      await page.waitForLoadState('networkidle')
     }
 
     // 2. Search for the newly created asset
     const searchInput = page.getByPlaceholder(/cari/i).first()
     if (await searchInput.isVisible()) {
       await searchInput.fill(testAsset.hostname)
-      await page.waitForTimeout(500)
+      await page.waitForLoadState('networkidle')
     }
 
     // 3. Trigger delete action on the asset row or table first row fallback
@@ -51,18 +53,21 @@ test.describe('Asset Management - Delete Asset Suite', () => {
     if ((await targetRow.count()) > 0 && await targetRow.first().isVisible()) {
       const actionBtn = targetRow.first().locator('button').filter({ hasText: /edit|opsi/i }).or(targetRow.first().locator('button').last())
       await actionBtn.click()
-      await page.waitForTimeout(200)
+      // Wait for dropdown/popover to appear
+      await page.locator('[role="menu"], [role="listbox"], .dropdown-menu').first().waitFor({ state: 'visible', timeout: 3000 }).catch(() => {})
 
       const deleteActionBtn = page.getByRole('button', { name: /hapus/i }).or(page.getByText(/hapus aset/i)).first()
       if (await deleteActionBtn.isVisible()) {
         await deleteActionBtn.click()
-        await page.waitForTimeout(300)
+        // Wait for confirmation modal to appear
+        await page.locator('[role="dialog"], .modal').first().waitFor({ state: 'visible', timeout: 5000 }).catch(() => {})
 
         // 4. Confirm delete modal
         const confirmBtn = page.getByRole('button', { name: /ya, hapus|hapus|konfirmasi/i }).last()
         if (await confirmBtn.isVisible()) {
           await confirmBtn.click()
-          await page.waitForTimeout(500)
+          // Wait for deletion to complete
+          await page.waitForLoadState('networkidle')
         }
       }
     }

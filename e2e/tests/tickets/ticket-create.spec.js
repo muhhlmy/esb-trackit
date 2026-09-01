@@ -29,7 +29,8 @@ test.describe('Ticket Management - Create Ticket Suite', () => {
       page.locator('form select').nth(1)
     )
     if (await queueSelect.isVisible()) {
-      await page.waitForTimeout(300)
+      // Wait for options to load
+      await expect(queueSelect.locator('option').nth(1)).toBeAttached({ timeout: 5000 })
       const optionsCount = await queueSelect.locator('option').count()
       if (optionsCount > 1) {
         await queueSelect.selectOption({ index: 1 })

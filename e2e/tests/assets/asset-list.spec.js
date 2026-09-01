@@ -21,7 +21,7 @@ test.describe('Asset Management - List & Search Suite', () => {
 
     if (await searchInput.isVisible()) {
       await searchInput.fill('Lenovo')
-      await page.waitForTimeout(300)
+      await page.waitForLoadState('networkidle')
 
       const tableRows = page.locator('tbody tr')
       expect(await tableRows.count()).toBeGreaterThanOrEqual(0)

@@ -4,8 +4,7 @@ import { TEST_USERS } from './users.js'
 
 async function ensureAuthenticated(page, userCred, baseURL) {
   const targetBase = baseURL || 'http://localhost:5173'
-  await page.goto(`${targetBase}/login`, { waitUntil: 'domcontentloaded' })
-  await page.waitForTimeout(200)
+  await page.goto(`${targetBase}/login`, { waitUntil: 'networkidle' })
 
   if (page.url().includes('/login')) {
     await page.locator('#email').fill(userCred.email)

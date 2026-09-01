@@ -2,7 +2,6 @@
 import { ref, computed, onMounted, nextTick } from 'vue'
 import { useRouter, RouterLink } from 'vue-router'
 import { useCases } from '@/composables/useCases'
-import { useAuth } from '@/composables/useAuth'
 import gsap from 'gsap'
 import { isReducedMotion } from '@/composables/useGsap'
 import {
@@ -17,12 +16,12 @@ import {
   ChevronRight,
   AlertTriangle,
   FolderOpen,
-  MoreVertical
+  MoreVertical,
+  LayoutGrid
 } from 'lucide-vue-next'
 
 const router = useRouter()
 const { cases, deleteCase, fetchAllCases } = useCases()
-const { user } = useAuth()
 
 const searchQuery = ref('')
 const selectedCategory = ref('all')
@@ -160,6 +159,27 @@ function getCategoryBadgeClass(category) {
           <Plus class="w-4 h-4" />
           <span>Dokumen Baru</span>
         </button>
+      </div>
+
+      <!-- Quick Nav: Kelola Kategori KB -->
+      <div class="gsap-admin-el">
+        <RouterLink
+          to="/admin/kb-categories"
+          class="flex items-center justify-between p-4 rounded-xl bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 hover:border-[#2563EB] dark:hover:border-[#2563EB] transition-colors group"
+        >
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-lg bg-[#ECF2FF] dark:bg-slate-800 text-[#2563EB] dark:text-indigo-300 flex items-center justify-center group-hover:bg-[#2563EB] group-hover:text-white transition-colors">
+              <LayoutGrid class="w-4 h-4" />
+            </div>
+            <div>
+              <div class="text-sm font-semibold text-[#1E293B] dark:text-white">Kategori Knowledge Base</div>
+              <div class="text-xs text-[#64748B] dark:text-slate-400 font-normal">
+                Kelola topic cards yang tampil di halaman Browse Topics Help Center.
+              </div>
+            </div>
+          </div>
+          <ChevronRight class="w-4 h-4 text-[#94A3B8] group-hover:text-[#2563EB] group-hover:translate-x-0.5 transition-all" />
+        </RouterLink>
       </div>
 
       <!-- Stats Row -->

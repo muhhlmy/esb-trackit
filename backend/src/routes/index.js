@@ -16,6 +16,11 @@ import { faqRouter }      from './faqRoutes.js'
 import { listPublicFaqs } from '../controllers/faqController.js'
 import { caseRouter }      from './caseRoutes.js'
 import { listPublicCases } from '../controllers/caseController.js'
+import { kbCategoryRouter } from './kbCategoryRoutes.js'
+import { listPublicKbCategories } from '../controllers/kbCategoryController.js'
+import { kbSearchLogRouter } from './kbSearchLogRoutes.js'
+import { listPopularKbSearches } from '../controllers/kbSearchLogController.js'
+import { caseBookmarkRouter } from './caseBookmarkRoutes.js'
 import authRoutes from './authRoutes.js'
 import { apiRateLimiter } from '../middleware/rateLimitMiddleware.js'
 
@@ -44,6 +49,17 @@ router.use('/api/faqs',         authenticateToken, faqRouter)
 // Public Help Center Cases/SOP (read-only, published only, no auth)
 router.get('/api/cases/public', listPublicCases)
 router.use('/api/cases',        authenticateToken, caseRouter)
+
+// Public Help Center KB Categories/topic cards (read-only, published only, no auth)
+router.get('/api/kb-categories/public', listPublicKbCategories)
+router.use('/api/kb-categories',        authenticateToken, kbCategoryRouter)
+
+// Popular searches Help Center (read-only, no auth) + search logging & stats
+router.get('/api/kb-search-logs/popular', listPopularKbSearches)
+router.use('/api/kb-search-logs',         authenticateToken, kbSearchLogRouter)
+
+// Case bookmarks per-user (selalu dalam konteks user login)
+router.use('/api/case-bookmarks', authenticateToken, caseBookmarkRouter)
 
 const requireAdmin = authorizeRoles('admin', 'super admin', 'superadmin')
 

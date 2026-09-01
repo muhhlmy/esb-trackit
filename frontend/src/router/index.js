@@ -169,6 +169,12 @@ const routes = [
     meta: { title: 'Admin CMS', subtitle: 'Kelola SOP & Artikel Knowledge Base' },
   },
   {
+    path: '/admin/kb-categories',
+    name: 'admin-kb-categories',
+    component: () => import('../views/admin/KbCategoriesView.vue'),
+    meta: { title: 'Kategori KB', subtitle: 'Kelola Topic Cards Help Center' },
+  },
+  {
     path: '/admin/editor/:id?',
     name: 'doc-editor',
     component: () => import('../views/admin/DocEditorView.vue'),

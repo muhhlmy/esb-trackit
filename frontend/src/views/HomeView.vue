@@ -2,9 +2,11 @@
 import { ref, computed, onMounted, nextTick } from 'vue';
 import { useRouter } from 'vue-router';
 import { useCases } from '@/composables/useCases';
+import { useKbCategories } from '@/composables/useKbCategories';
 import { useAuth } from '@/composables/useAuth';
+import { api } from '@/services/api';
 import gsap from 'gsap';
-import { useGsapContext, isReducedMotion } from '@/composables/useGsap';
+import { isReducedMotion } from '@/composables/useGsap';
 import {
   Search,
   Laptop,
@@ -18,22 +20,22 @@ import {
   ExternalLink,
   X,
   ArrowRight,
-  LogIn,
   Ticket,
-  Plus,
-  Minus,
   HelpCircle,
   Send,
   Clock
 } from 'lucide-vue-next';
 
 const router = useRouter();
-const { cases, setSearch, setCategory, hasNoSearchResult } = useCases();
-const { isAuthenticated, currentUser } = useAuth();
+const { cases, setSearch, setCategory, hasNoSearchResult, fetchCases } = useCases();
+const { publishedCategories, fetchPublicCategories } = useKbCategories();
+const { isAuthenticated } = useAuth();
 
 const localSearch = ref('');
 const isInputFocused = ref(false);
 const openFaqId = ref(null);
+const dbFaqs = ref([]);
+const popularSearches = ref([]);
 
 const liveSuggestions = computed(() => {
   if (!localSearch.value.trim()) return [];
@@ -88,53 +90,76 @@ function handleSupportTicketAction() {
   }
 }
 
-// 6 Cards for Browse Topics matching mockup grid
-const topicCards = [
+// 6 Cards for Browse Topics — dari tabel kb_categories (fallback ke default statis)
+const DEFAULT_TOPIC_CARDS = [
   {
-    id: 'hardware',
+    key: 'getting-started',
     title: 'Getting Started',
     description: 'Learn the basics of setting up your IT profile, laptop requests, and connecting tools.',
-    icon: Laptop,
-    isFeatured: false
+    icon: 'Laptop',
+    is_featured: false
   },
   {
-    id: 'workplace',
+    key: 'account-access',
     title: 'Account & Access',
     description: 'Customize your experience with account settings, Google Workspace, 2SV, and permissions.',
-    icon: ShieldCheck,
-    isFeatured: true
+    icon: 'ShieldCheck',
+    is_featured: true
   },
   {
-    id: 'backend',
+    key: 'troubleshooting',
     title: 'Troubleshooting',
     description: 'Resolve common issues, network errors, printer fixes, and runtime system bugs.',
-    icon: HelpCircle,
-    isFeatured: false
+    icon: 'HelpCircle',
+    is_featured: false
   },
   {
-    id: 'environment',
+    key: 'network-vpn',
     title: 'Network & VPN',
     description: 'Explore features for VPN configuration, Microsoft OOBE bypass, branch Wi-Fi, and proxy.',
-    icon: Wifi,
-    isFeatured: false
+    icon: 'Wifi',
+    is_featured: false
   },
   {
-    id: 'software',
+    key: 'software-apps',
     title: 'Software & Apps',
     description: 'Standard software installation, licenses, PR setup, and application troubleshooting.',
-    icon: AppWindow,
-    isFeatured: false
+    icon: 'AppWindow',
+    is_featured: false
   },
   {
-    id: 'workplace',
+    key: 'security-compliance',
     title: 'Security & Compliance',
     description: 'SOC procedures, endpoint security, remote wipe, and device protection compliance.',
-    icon: Building2,
-    isFeatured: false
+    icon: 'Building2',
+    is_featured: false
   }
 ];
 
-const faqs = [
+// Map nama icon (string dari DB) ke komponen Lucide
+const ICON_COMPONENTS = {
+  Laptop,
+  AppWindow,
+  ShieldCheck,
+  Wifi,
+  Building2,
+  Server,
+  HelpCircle,
+  Ticket
+};
+
+const topicCards = computed(() => {
+  const source = publishedCategories.value.length ? publishedCategories.value : DEFAULT_TOPIC_CARDS;
+  return source.map((c) => ({
+    id: c.key,
+    title: c.title,
+    description: c.description || '',
+    icon: ICON_COMPONENTS[c.icon] || HelpCircle,
+    isFeatured: Boolean(c.is_featured)
+  }));
+});
+
+const DEFAULT_FAQS = [
   {
     num: '01',
     id: 'faq-1',
@@ -160,7 +185,7 @@ const faqs = [
       'Ketikkan perintah oobe\\bypassnro lalu tekan Enter.',
       'Laptop akan restart otomatis dan menampilkan opsi setup Local Account offline.'
     ],
-    code: 'oobe\bypassnro'
+    code: 'oobe\\bypassnro'
   },
   {
     num: '03',
@@ -184,10 +209,46 @@ const faqs = [
   }
 ];
 
+// FAQ dari tabel faq (rich content) — fallback ke default statis bila DB kosong
+const faqs = computed(() => {
+  if (!dbFaqs.value.length) return DEFAULT_FAQS;
+  return dbFaqs.value.map((f, idx) => ({
+    num: String(idx + 1).padStart(2, '0'),
+    id: `faq-${f.id}`,
+    question: f.question,
+    summary: f.answer,
+    steps: Array.isArray(f.steps) && f.steps.length ? f.steps : null,
+    code: f.code_snippet || null,
+    actionText: f.action_text || null,
+    actionLink: f.action_link || null,
+    isEmergency: Boolean(f.is_emergency),
+    emergencyTitle: f.emergency_title || null,
+    emergencyText: f.emergency_text || null,
+  }));
+});
+
 const mainScope = ref(null);
+
+// Muat konten dinamis Help Center: kategori (topic cards), FAQ, popular searches
+async function fetchHelpCenterContent() {
+  try {
+    await fetchPublicCategories();
+  } catch { /* fallback ke default statis */ }
+
+  try {
+    const data = await api.getPublicFaqs();
+    dbFaqs.value = Array.isArray(data) ? data : data?.data || [];
+  } catch { /* fallback ke default statis */ }
+
+  try {
+    const popular = await api.getPopularKbSearches();
+    popularSearches.value = Array.isArray(popular) ? popular.map((p) => p.query) : [];
+  } catch { /* popular searches opsional */ }
+}
 
 onMounted(async () => {
   fetchCases();
+  fetchHelpCenterContent();
   if (isReducedMotion()) return;
   await nextTick();
 
@@ -293,27 +354,39 @@ onMounted(async () => {
           </div>
         </div>
 
-        <!-- Popular Searches Clean Chips (No Bullets) -->
+        <!-- Popular Searches Clean Chips (No Bullets) — data-driven dari kb_search_logs, fallback statis -->
         <div class="flex flex-wrap justify-center items-center gap-2 text-xs mt-4">
           <span class="text-[#7C8BAC] dark:text-slate-400 font-bold text-xs">Popular searches</span>
-          <button
-            @click="handlePopularClick('Password Reset')"
-            class="px-2.5 py-1 rounded-lg bg-white dark:bg-slate-900 border border-[#E5EAEF] dark:border-slate-800 text-[#475569] dark:text-slate-300 font-extrabold text-[11px] hover:border-[#5D87FF] hover:text-[#5D87FF] transition-all cursor-pointer shadow-2xs"
-          >
-            Password Reset
-          </button>
-          <button
-            @click="handlePopularClick('VPN Setup')"
-            class="px-2.5 py-1 rounded-lg bg-white dark:bg-slate-900 border border-[#E5EAEF] dark:border-slate-800 text-[#475569] dark:text-slate-300 font-extrabold text-[11px] hover:border-[#5D87FF] hover:text-[#5D87FF] transition-all cursor-pointer shadow-2xs"
-          >
-            VPN Setup
-          </button>
-          <button
-            @click="handlePopularClick('Setup Laptop')"
-            class="px-2.5 py-1 rounded-lg bg-white dark:bg-slate-900 border border-[#E5EAEF] dark:border-slate-800 text-[#475569] dark:text-slate-300 font-extrabold text-[11px] hover:border-[#5D87FF] hover:text-[#5D87FF] transition-all cursor-pointer shadow-2xs"
-          >
-            Hardware Request
-          </button>
+          <template v-if="popularSearches.length">
+            <button
+              v-for="term in popularSearches"
+              :key="term"
+              @click="handlePopularClick(term)"
+              class="px-2.5 py-1 rounded-lg bg-white dark:bg-slate-900 border border-[#E5EAEF] dark:border-slate-800 text-[#475569] dark:text-slate-300 font-extrabold text-[11px] hover:border-[#5D87FF] hover:text-[#5D87FF] transition-all cursor-pointer shadow-2xs"
+            >
+              {{ term }}
+            </button>
+          </template>
+          <template v-else>
+            <button
+              @click="handlePopularClick('Password Reset')"
+              class="px-2.5 py-1 rounded-lg bg-white dark:bg-slate-900 border border-[#E5EAEF] dark:border-slate-800 text-[#475569] dark:text-slate-300 font-extrabold text-[11px] hover:border-[#5D87FF] hover:text-[#5D87FF] transition-all cursor-pointer shadow-2xs"
+            >
+              Password Reset
+            </button>
+            <button
+              @click="handlePopularClick('VPN Setup')"
+              class="px-2.5 py-1 rounded-lg bg-white dark:bg-slate-900 border border-[#E5EAEF] dark:border-slate-800 text-[#475569] dark:text-slate-300 font-extrabold text-[11px] hover:border-[#5D87FF] hover:text-[#5D87FF] transition-all cursor-pointer shadow-2xs"
+            >
+              VPN Setup
+            </button>
+            <button
+              @click="handlePopularClick('Setup Laptop')"
+              class="px-2.5 py-1 rounded-lg bg-white dark:bg-slate-900 border border-[#E5EAEF] dark:border-slate-800 text-[#475569] dark:text-slate-300 font-extrabold text-[11px] hover:border-[#5D87FF] hover:text-[#5D87FF] transition-all cursor-pointer shadow-2xs"
+            >
+              Hardware Request
+            </button>
+          </template>
         </div>
       </section>
 

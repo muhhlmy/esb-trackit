@@ -202,8 +202,40 @@ const REQUIRED_RUNTIME_SCHEMA = Object.freeze({
     category: nn('varchar'),
     status: nn('varchar'),
     sort_order: nn('int4'),
+    steps: nn('jsonb'),
+    code_snippet: optional('text'),
+    action_text: optional('varchar'),
+    action_link: optional('text'),
+    is_emergency: nn('bool'),
+    emergency_title: optional('varchar'),
+    emergency_text: optional('text'),
     created_at: nn('timestamp'),
     updated_at: nn('timestamp'),
+  },
+  kb_categories: {
+    id: nn('int4'),
+    key: nn('varchar'),
+    title: nn('varchar'),
+    description: optional('text'),
+    icon: optional('varchar'),
+    is_featured: nn('bool'),
+    sort_order: nn('int4'),
+    status: nn('varchar'),
+    created_at: nn('timestamp'),
+    updated_at: nn('timestamp'),
+  },
+  kb_search_logs: {
+    id: nn('int8'),
+    query: nn('varchar'),
+    results_count: nn('int4'),
+    user_id: optional('int4'),
+    created_at: nn('timestamp'),
+  },
+  case_bookmarks: {
+    id: nn('int4'),
+    user_id: nn('int4'),
+    case_id: nn('int4'),
+    created_at: nn('timestamp'),
   },
   cases: {
     id: nn('int4'),
@@ -245,6 +277,9 @@ const REQUIRED_RELATION_KINDS = Object.freeze({
   log_audit_login: 'r',
   faq: 'r',
   cases: 'r',
+  kb_categories: 'r',
+  kb_search_logs: 'r',
+  case_bookmarks: 'r',
 })
 
 const REQUIRED_INDEXES = Object.freeze([
@@ -278,6 +313,10 @@ const REQUIRED_INDEXES = Object.freeze([
   'idx_log_audit_login_time',
   'idx_faq_status',
   'idx_cases_status',
+  'idx_kb_categories_status',
+  'idx_kb_search_logs_query',
+  'idx_kb_search_logs_created',
+  'idx_case_bookmarks_user',
 ])
 
 const REQUIRED_TRIGGERS = Object.freeze([]) // Triggers are optional

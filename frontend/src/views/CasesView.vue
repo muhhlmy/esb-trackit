@@ -3,9 +3,10 @@ import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useCases } from '@/composables/useCases';
 import { useAuth } from '@/composables/useAuth';
+import { useBookmarks } from '@/composables/useBookmarks';
 import NotionTreeSidebar from '@/components/cases/NotionTreeSidebar.vue';
 import CaseReader from '@/components/cases/CaseReader.vue';
-import { PanelLeft, PanelLeftClose, Menu, X, ArrowLeft, SearchX } from 'lucide-vue-next';
+import { PanelLeft, PanelLeftClose, Menu, X, SearchX } from 'lucide-vue-next';
 
 const router = useRouter();
 const {
@@ -16,6 +17,7 @@ const {
   clearSearch
 } = useCases();
 const { isAuthenticated } = useAuth();
+const { syncBookmarks } = useBookmarks();
 
 const isSidebarCollapsed = ref(false);
 const isMobileSidebarOpen = ref(false);
@@ -40,6 +42,7 @@ function handleEditDoc(caseItem) {
 
 onMounted(() => {
   fetchCases();
+  syncBookmarks();
 });
 </script>
 

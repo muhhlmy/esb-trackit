@@ -97,12 +97,12 @@ CREATE TABLE users (
 CREATE INDEX idx_users_email ON users(email);
 CREATE INDEX idx_users_is_active ON users(is_active) WHERE is_active = TRUE;
 
--- Seed Default Superadmin (Password: admin123 - bcrypt hash)
+-- Seed Default Superadmin (Password: admin123 - valid bcrypt hash)
 INSERT INTO users (nama, email, password_hash, role, permissions, is_active)
 VALUES (
     'Super Admin',
     'superadmin@admin.com',
-    '$2b$10$KUuuaQWHvErN2WNcqrJOXeRC1Ym6GRyxcIzwpmRboOSkDpOPxE/Cu',
+    '$2b$10$PHVaudp1y7TpM48VpmZX4OQj5AGW3Vb0CeoszLzKbo2Vw038e0Rje',
     'superadmin',
     '{"dashboard":"full","assets":"full","tickets":"full"}'::jsonb,
     true

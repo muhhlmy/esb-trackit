@@ -79,6 +79,74 @@ export const api = {
     });
   },
 
+  // KB Categories — public Help Center (published only)
+  async getPublicKbCategories() {
+    return request('/kb-categories/public');
+  },
+
+  // KB Categories — admin CMS (all)
+  async getKbCategories() {
+    return request('/kb-categories');
+  },
+
+  async createKbCategory(data) {
+    return request('/kb-categories', {
+      method: 'POST',
+      body: JSON.stringify(data)
+    });
+  },
+
+  async updateKbCategory(id, data) {
+    return request(`/kb-categories/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data)
+    });
+  },
+
+  async deleteKbCategory(id) {
+    return request(`/kb-categories/${id}`, {
+      method: 'DELETE'
+    });
+  },
+
+  // FAQs — public Help Center (published only)
+  async getPublicFaqs() {
+    return request('/faqs/public');
+  },
+
+  // KB Search logs
+  async logKbSearch(query, resultsCount = 0) {
+    return request('/kb-search-logs', {
+      method: 'POST',
+      body: JSON.stringify({ query, results_count: resultsCount })
+    });
+  },
+
+  async getPopularKbSearches() {
+    return request('/kb-search-logs/popular');
+  },
+
+  async getKbSearchStats() {
+    return request('/kb-search-logs/stats');
+  },
+
+  // Case bookmarks (konteks user login)
+  async getCaseBookmarks() {
+    return request('/case-bookmarks');
+  },
+
+  async addCaseBookmark(caseId) {
+    return request(`/case-bookmarks/${caseId}`, {
+      method: 'POST'
+    });
+  },
+
+  async removeCaseBookmark(caseId) {
+    return request(`/case-bookmarks/${caseId}`, {
+      method: 'DELETE'
+    });
+  },
+
   // Templates
   async getTemplates() {
     return request('/templates');

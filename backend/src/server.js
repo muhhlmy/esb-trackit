@@ -139,6 +139,45 @@ try {
     );
     CREATE INDEX IF NOT EXISTS idx_cases_status ON cases(status);
         ALTER TABLE cases ADD COLUMN IF NOT EXISTS content_html TEXT;
+    -- KB enhancements: rich content FAQ + kategori dinamis + search logs + bookmarks
+    ALTER TABLE faq ADD COLUMN IF NOT EXISTS steps JSONB NOT NULL DEFAULT '[]'::jsonb;
+    ALTER TABLE faq ADD COLUMN IF NOT EXISTS code_snippet TEXT;
+    ALTER TABLE faq ADD COLUMN IF NOT EXISTS action_text VARCHAR(150);
+    ALTER TABLE faq ADD COLUMN IF NOT EXISTS action_link TEXT;
+    ALTER TABLE faq ADD COLUMN IF NOT EXISTS is_emergency BOOLEAN NOT NULL DEFAULT FALSE;
+    ALTER TABLE faq ADD COLUMN IF NOT EXISTS emergency_title VARCHAR(200);
+    ALTER TABLE faq ADD COLUMN IF NOT EXISTS emergency_text TEXT;
+    CREATE TABLE IF NOT EXISTS kb_categories (
+      id              SERIAL PRIMARY KEY,
+      key             VARCHAR(50) NOT NULL UNIQUE,
+      title           VARCHAR(150) NOT NULL,
+      description     TEXT,
+      icon            VARCHAR(50),
+      is_featured     BOOLEAN NOT NULL DEFAULT FALSE,
+      sort_order      INTEGER NOT NULL DEFAULT 0,
+      status          VARCHAR(20) NOT NULL DEFAULT 'PUBLISHED',
+      created_at      TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      updated_at      TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      CONSTRAINT chk_kb_categories_status CHECK (status IN ('DRAFT', 'PUBLISHED'))
+    );
+    CREATE INDEX IF NOT EXISTS idx_kb_categories_status ON kb_categories(status, sort_order);
+    CREATE TABLE IF NOT EXISTS kb_search_logs (
+      id              BIGSERIAL PRIMARY KEY,
+      query           VARCHAR(300) NOT NULL,
+      results_count   INTEGER NOT NULL DEFAULT 0,
+      user_id         INTEGER REFERENCES users(id) ON DELETE SET NULL,
+      created_at      TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );
+    CREATE INDEX IF NOT EXISTS idx_kb_search_logs_query ON kb_search_logs(query);
+    CREATE INDEX IF NOT EXISTS idx_kb_search_logs_created ON kb_search_logs(created_at DESC);
+    CREATE TABLE IF NOT EXISTS case_bookmarks (
+      id              SERIAL PRIMARY KEY,
+      user_id         INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      case_id         INTEGER NOT NULL REFERENCES cases(id) ON DELETE CASCADE,
+      created_at      TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      CONSTRAINT uq_case_bookmarks UNIQUE (user_id, case_id)
+    );
+    CREATE INDEX IF NOT EXISTS idx_case_bookmarks_user ON case_bookmarks(user_id, created_at DESC);
       `);
   await verifyRuntimeSchema(pool);
 } catch (error) {

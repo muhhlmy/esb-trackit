@@ -184,7 +184,8 @@ export const caseController = {
         isCustom = true,
         isFeaturedOnHome = false,
         homeOrder,
-        isPublished = true
+        isPublished = true,
+        contentHtml = ''
       } = req.body;
 
       if (!title || !category) {
@@ -218,7 +219,8 @@ export const caseController = {
           isCustom,
           isFeaturedOnHome: Boolean(isFeaturedOnHome),
           homeOrder: order,
-          isPublished: Boolean(isPublished)
+          isPublished: Boolean(isPublished),
+          contentHtml: contentHtml || ''
         }
       });
 
@@ -245,9 +247,11 @@ export const caseController = {
         actionSteps,
         dosAndDonts,
         snippets,
+        isCustom,
         isFeaturedOnHome,
         homeOrder,
-        isPublished
+        isPublished,
+        contentHtml
       } = req.body;
 
       const existing = await prisma.case.findUnique({
@@ -272,9 +276,11 @@ export const caseController = {
           ...(actionSteps !== undefined && { actionSteps }),
           ...(dosAndDonts !== undefined && { dosAndDonts }),
           ...(snippets !== undefined && { snippets }),
+          ...(isCustom !== undefined && { isCustom: Boolean(isCustom) }),
           ...(isFeaturedOnHome !== undefined && { isFeaturedOnHome: Boolean(isFeaturedOnHome) }),
           ...(homeOrder !== undefined && { homeOrder: Number(homeOrder) }),
-          ...(isPublished !== undefined && { isPublished: Boolean(isPublished) })
+          ...(isPublished !== undefined && { isPublished: Boolean(isPublished) }),
+          ...(contentHtml !== undefined && { contentHtml })
         }
       });
 

@@ -5,6 +5,7 @@ datasource db {
 
 generator client {
   provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
 }
 
 model Case {
@@ -21,6 +22,7 @@ model Case {
   isFeaturedOnHome Boolean           @default(false) @map("is_featured_on_home")
   homeOrder        Int               @default(0) @map("home_order")
   isPublished      Boolean           @default(true) @map("is_published")
+  contentHtml      String?           @default("") @map("content_html")
   createdAt        DateTime          @default(now()) @map("created_at")
   updatedAt        DateTime          @updatedAt @map("updated_at")
 

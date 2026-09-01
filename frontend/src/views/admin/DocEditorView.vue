@@ -243,7 +243,18 @@ onMounted(async () => {
   const caseId = route.params.id;
 
   if (caseId) {
-    const existing = cases.value.find((c) => c.id === caseId);
+    let existing = cases.value.find((c) => c.id === caseId);
+    if (!existing) {
+      try {
+        const res = await api.getCaseById(caseId);
+        if (res?.data) {
+          existing = res.data;
+        }
+      } catch (e) {
+        console.warn('API getCaseById fallback:', e.message);
+      }
+    }
+
     if (existing) {
       doc.value = JSON.parse(JSON.stringify(existing));
       
@@ -302,6 +313,26 @@ onMounted(async () => {
       if (editor.value) {
         editor.value.commands.setContent(htmlContent || initialEditorContent);
       }
+    }
+  } else {
+    // New Article Mode
+    doc.value = {
+      id: '',
+      title: '',
+      category: 'hardware',
+      tags: [],
+      summary: '',
+      problemContext: '',
+      actionSteps: [],
+      dosAndDonts: { dos: [], donts: [] },
+      snippets: [],
+      isCustom: true,
+      isFeaturedOnHome: false,
+      isPublished: true,
+      contentHtml: ''
+    };
+    if (editor.value) {
+      editor.value.commands.setContent('');
     }
   }
 });
@@ -423,15 +454,20 @@ async function handleSaveDraft() {
   isSaving.value = true;
   saveStatus.value = 'Saving...';
   try {
+    if (editor.value) {
+      doc.value.contentHtml = editor.value.getHTML();
+    }
     const extracted = extractSummaryFromEditor(editor.value);
     if (extracted) doc.value.summary = extracted;
     
-    await saveCase(doc.value);
+    const saved = await saveCase(doc.value);
+    if (saved?.id && !doc.value.id) {
+      doc.value.id = saved.id;
+      router.replace(`/admin/editor/${saved.id}`);
+    }
     saveStatus.value = 'Saved to cloud';
-    showToast('Draft artikel berhasil disimpan ke cloud!', 'info');
   } catch (err) {
     saveStatus.value = 'Unsaved changes';
-    showToast('Gagal menyimpan draft.', 'error');
   } finally {
     isSaving.value = false;
   }
@@ -441,15 +477,21 @@ async function handlePublish() {
   isSaving.value = true;
   saveStatus.value = 'Saving...';
   try {
+    if (editor.value) {
+      doc.value.contentHtml = editor.value.getHTML();
+    }
     const extracted = extractSummaryFromEditor(editor.value);
     if (extracted) doc.value.summary = extracted;
 
     doc.value.isPublished = true;
-    await saveCase(doc.value);
+    const saved = await saveCase(doc.value);
+    if (saved?.id && !doc.value.id) {
+      doc.value.id = saved.id;
+      router.replace(`/admin/editor/${saved.id}`);
+    }
     saveStatus.value = 'Saved to cloud';
-    showToast('🎉 Artikel FAQ berhasil dipublikasikan!', 'success');
   } catch (err) {
-    showToast('Gagal mempublikasikan artikel.', 'error');
+    saveStatus.value = 'Unsaved changes';
   } finally {
     isSaving.value = false;
   }
@@ -472,30 +514,30 @@ function goToPortal() {
       @change="handleImageFileChange"
     />
 
-    <!-- 1. TOP APP BAR -->
-    <header class="h-16 bg-white dark:bg-slate-900 border-b border-[#c4c5d9] dark:border-slate-800 px-4 sm:px-6 fixed top-0 left-0 right-0 z-50 flex items-center justify-between shadow-2xs">
+    <!-- 1. TOP APP BAR (Compact High-Density Header) -->
+    <header class="h-11 bg-white dark:bg-slate-900 border-b border-[#c4c5d9] dark:border-slate-800 px-3 sm:px-5 fixed top-0 left-0 right-0 z-50 flex items-center justify-between shadow-2xs">
       
       <!-- Left: Logo, Breadcrumbs, Status -->
-      <div class="flex items-center gap-3 sm:gap-4">
+      <div class="flex items-center gap-2.5 sm:gap-3">
         <RouterLink
           to="/admin"
-          class="flex items-center gap-2.5 group hover:opacity-90 transition-opacity select-none"
+          class="flex items-center gap-2 group hover:opacity-90 transition-opacity select-none"
           title="Ke Dashboard CMS"
         >
-          <div class="relative w-8 h-8 rounded-lg overflow-hidden flex items-center justify-center bg-[#f2f1ff] dark:bg-indigo-500/10 border border-[#c4c5d9] dark:border-indigo-500/20 group-hover:scale-105 transition-transform shrink-0">
-            <img src="/ESB Case.svg" alt="ESB Case" class="w-6 h-6 object-contain" />
+          <div class="relative w-6 h-6 rounded-md overflow-hidden flex items-center justify-center bg-[#f2f1ff] dark:bg-indigo-500/10 border border-[#c4c5d9] dark:border-indigo-500/20 group-hover:scale-105 transition-transform shrink-0">
+            <img src="/ESB Case.svg" alt="ESB Case" class="w-4.5 h-4.5 object-contain" />
           </div>
           <div class="flex items-center gap-1.5">
-            <span class="font-bold text-[#1a1c1d] dark:text-slate-100 text-base tracking-tight">ESB Case</span>
-            <span class="text-[11px] font-bold text-[#0040e5] dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/50 px-1.5 py-0.5 rounded border border-indigo-200 dark:border-indigo-800/60">
+            <span class="font-bold text-[#1a1c1d] dark:text-slate-100 text-xs sm:text-sm tracking-tight">ESB Case</span>
+            <span class="text-[10px] font-bold text-[#0040e5] dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/50 px-1.5 py-0.25 rounded border border-indigo-200 dark:border-indigo-800/60">
               DocEditor
             </span>
           </div>
         </RouterLink>
 
-        <div class="h-5 w-px bg-[#e2e2e4] dark:bg-slate-800 hidden sm:block"></div>
+        <div class="h-4 w-px bg-[#e2e2e4] dark:bg-slate-800 hidden sm:block"></div>
 
-        <nav class="hidden md:flex items-center gap-4 text-xs font-medium text-[#575d7a] dark:text-slate-400">
+        <nav class="hidden md:flex items-center gap-3 text-[11px] font-medium text-[#575d7a] dark:text-slate-400">
           <RouterLink to="/cases" class="hover:text-[#0040e5] dark:hover:text-white transition-colors">
             &larr; Back to Portal
           </RouterLink>
@@ -505,38 +547,39 @@ function goToPortal() {
           </RouterLink>
         </nav>
 
-        <div class="h-5 w-px bg-[#e2e2e4] dark:bg-slate-800 hidden md:block"></div>
+        <div class="h-4 w-px bg-[#e2e2e4] dark:bg-slate-800 hidden md:block"></div>
 
         <!-- Sync & Status Badges -->
-        <div class="flex items-center gap-2">
-          <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-400">
+        <div class="flex items-center gap-1.5">
+          <span class="inline-flex items-center px-1.5 py-0.25 rounded text-[10px] font-semibold bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-400">
             Draft
           </span>
-          <span class="text-[11px] text-[#575d7a] dark:text-slate-400 flex items-center gap-1 hidden sm:inline-flex">
-            <Cloud class="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+          <span class="text-[10px] text-[#575d7a] dark:text-slate-400 flex items-center gap-1 hidden sm:inline-flex">
+            <Cloud class="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
             <span>{{ saveStatus }}</span>
           </span>
         </div>
       </div>
 
       <!-- Right: Action Buttons -->
-      <div class="flex items-center gap-2 sm:gap-3">
+      <div class="flex items-center gap-1.5 sm:gap-2">
         
         <!-- Preview as Employee -->
         <button
           @click="isPreviewModalOpen = true"
-          class="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border border-[#c4c5d9] dark:border-slate-700 bg-white dark:bg-slate-800 text-[#1a1c1d] dark:text-slate-200 hover:bg-[#f3f3f5] transition-colors cursor-pointer shadow-2xs"
+          class="inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1 rounded-md border border-[#c4c5d9] dark:border-slate-700 bg-white dark:bg-slate-800 text-[#1a1c1d] dark:text-slate-200 hover:bg-[#f3f3f5] transition-colors cursor-pointer shadow-2xs"
           title="Lihat tampilan aktual pembaca karyawan secara real-time"
         >
           <Eye class="w-3.5 h-3.5 text-[#0040e5] dark:text-indigo-400" />
-          <span>Preview as Employee</span>
+          <span class="hidden sm:inline">Preview as Employee</span>
+          <span class="sm:hidden">Preview</span>
         </button>
 
         <!-- Save Draft -->
         <button
           @click="handleSaveDraft"
           :disabled="isSaving"
-          class="px-3.5 py-1.5 rounded-lg text-xs font-semibold border border-[#c4c5d9] dark:border-slate-700 text-[#0040e5] dark:text-indigo-300 bg-white dark:bg-slate-800 hover:bg-[#f2f1ff] dark:hover:bg-slate-700 transition-colors cursor-pointer shadow-2xs"
+          class="px-2.5 py-1 rounded-md text-[11px] font-semibold border border-[#c4c5d9] dark:border-slate-700 text-[#0040e5] dark:text-indigo-300 bg-white dark:bg-slate-800 hover:bg-[#f2f1ff] dark:hover:bg-slate-700 transition-colors cursor-pointer shadow-2xs"
           title="Simpan perubahan tanpa mempublikasikan artikel"
         >
           {{ isSaving ? 'Menyimpan...' : 'Save Draft' }}
@@ -546,16 +589,16 @@ function goToPortal() {
         <button
           @click="handlePublish"
           :disabled="isSaving"
-          class="px-4 py-1.5 rounded-lg text-xs font-semibold bg-[#00BC84] hover:bg-[#009e6f] text-white shadow-sm shadow-[#00BC84]/20 transition-all cursor-pointer flex items-center gap-1.5"
+          class="px-3 py-1 rounded-md text-[11px] font-semibold bg-[#00BC84] hover:bg-[#009e6f] text-white shadow-xs shadow-[#00BC84]/20 transition-all cursor-pointer flex items-center gap-1.5"
         >
           <CheckCircle2 class="w-3.5 h-3.5" />
-          <span>{{ isSaving ? 'Publishing...' : 'Publish Article' }}</span>
+          <span>{{ isSaving ? 'Publishing...' : 'Publish' }}</span>
         </button>
 
         <!-- Inspector Toggle Button -->
         <button
           @click="isInspectorOpen = !isInspectorOpen"
-          class="p-2 rounded-lg text-[#575d7a] dark:text-slate-400 hover:bg-[#f3f3f5] dark:hover:bg-slate-800 transition-colors cursor-pointer"
+          class="p-1 rounded-md text-[#575d7a] dark:text-slate-400 hover:bg-[#f3f3f5] dark:hover:bg-slate-800 transition-colors cursor-pointer"
           :class="{ 'text-[#0040e5] bg-[#f2f1ff] dark:bg-slate-800': isInspectorOpen }"
           title="Toggle Inspector Panel"
         >
@@ -565,36 +608,36 @@ function goToPortal() {
       </div>
     </header>
 
-    <!-- 2. STICKY FORMATTING RIBBON (TIPTAP CONNECTED) -->
+    <!-- 2. STICKY FORMATTING RIBBON (TIPTAP CONNECTED - Compact Mode) -->
     <div
       v-if="editor"
-      class="sticky top-16 z-40 bg-white dark:bg-slate-900 border-b border-[#c4c5d9] dark:border-slate-800 px-4 sm:px-6 py-2 flex items-center gap-1 sm:gap-2 overflow-x-auto shadow-xs text-xs"
+      class="sticky top-11 z-40 bg-white dark:bg-slate-900 border-b border-[#c4c5d9] dark:border-slate-800 px-3 sm:px-5 py-1 flex items-center gap-1 sm:gap-1.5 overflow-x-auto shadow-xs text-xs"
     >
       <!-- Undo / Redo -->
-      <div class="flex items-center gap-0.5 border-r border-[#e2e2e4] dark:border-slate-800 pr-2 mr-1">
+      <div class="flex items-center gap-0.5 border-r border-[#e2e2e4] dark:border-slate-800 pr-1.5 mr-0.5">
         <button
           @click="performUndo"
           :disabled="!editor.can().undo()"
-          class="p-1.5 text-[#575d7a] dark:text-slate-400 hover:bg-[#f3f3f5] dark:hover:bg-slate-800 rounded disabled:opacity-30 cursor-pointer"
+          class="p-1 text-[#575d7a] dark:text-slate-400 hover:bg-[#f3f3f5] dark:hover:bg-slate-800 rounded-md disabled:opacity-30 cursor-pointer"
           title="Undo (Ctrl+Z)"
         >
-          <Undo class="w-4 h-4" />
+          <Undo class="w-3.5 h-3.5" />
         </button>
         <button
           @click="performRedo"
           :disabled="!editor.can().redo()"
-          class="p-1.5 text-[#575d7a] dark:text-slate-400 hover:bg-[#f3f3f5] dark:hover:bg-slate-800 rounded disabled:opacity-30 cursor-pointer"
+          class="p-1 text-[#575d7a] dark:text-slate-400 hover:bg-[#f3f3f5] dark:hover:bg-slate-800 rounded-md disabled:opacity-30 cursor-pointer"
           title="Redo (Ctrl+Y)"
         >
-          <Redo class="w-4 h-4" />
+          <Redo class="w-3.5 h-3.5" />
         </button>
       </div>
 
       <!-- Text Style Selector (Paragraph / H1 / H2 / H3) -->
-      <div class="flex items-center gap-1 border-r border-[#e2e2e4] dark:border-slate-800 pr-2 mr-1">
+      <div class="flex items-center gap-0.5 border-r border-[#e2e2e4] dark:border-slate-800 pr-1.5 mr-0.5">
         <select
           @change="setHeading(Number($event.target.value))"
-          class="bg-[#f8fafc] dark:bg-slate-800 border border-[#c4c5d9] dark:border-slate-700 rounded-lg px-2.5 py-1 text-xs text-[#1a1c1d] dark:text-slate-100 focus:outline-none"
+          class="bg-[#f8fafc] dark:bg-slate-800 border border-[#c4c5d9] dark:border-slate-700 rounded-md px-2 py-0.5 text-[11px] text-[#1a1c1d] dark:text-slate-100 focus:outline-none h-6"
         >
           <option value="0">Normal Text</option>
           <option value="1">Heading 1</option>
@@ -604,186 +647,186 @@ function goToPortal() {
       </div>
 
       <!-- Formatting Icons (Bold, Italic, Underline) -->
-      <div class="flex items-center gap-0.5 border-r border-[#e2e2e4] dark:border-slate-800 pr-2 mr-1">
+      <div class="flex items-center gap-0.5 border-r border-[#e2e2e4] dark:border-slate-800 pr-1.5 mr-0.5">
         <button
           @click="editor.chain().focus().toggleBold().run()"
-          class="p-1.5 rounded transition-colors cursor-pointer"
+          class="p-1 rounded-md transition-colors cursor-pointer"
           :class="editor.isActive('bold') ? 'bg-[#0040e5] text-white' : 'text-[#575d7a] dark:text-slate-400 hover:bg-[#f3f3f5]'"
           title="Bold (Ctrl+B)"
         >
-          <BoldIcon class="w-4 h-4" />
+          <BoldIcon class="w-3.5 h-3.5" />
         </button>
 
         <button
           @click="editor.chain().focus().toggleItalic().run()"
-          class="p-1.5 rounded transition-colors cursor-pointer"
+          class="p-1 rounded-md transition-colors cursor-pointer"
           :class="editor.isActive('italic') ? 'bg-[#0040e5] text-white' : 'text-[#575d7a] dark:text-slate-400 hover:bg-[#f3f3f5]'"
           title="Italic (Ctrl+I)"
         >
-          <ItalicIcon class="w-4 h-4" />
+          <ItalicIcon class="w-3.5 h-3.5" />
         </button>
 
         <button
           @click="editor.chain().focus().toggleUnderline().run()"
-          class="p-1.5 rounded transition-colors cursor-pointer"
+          class="p-1 rounded-md transition-colors cursor-pointer"
           :class="editor.isActive('underline') ? 'bg-[#0040e5] text-white' : 'text-[#575d7a] dark:text-slate-400 hover:bg-[#f3f3f5]'"
           title="Underline (Ctrl+U)"
         >
-          <UnderlineIcon class="w-4 h-4" />
+          <UnderlineIcon class="w-3.5 h-3.5" />
         </button>
       </div>
 
       <!-- Text Alignment Group (Left, Center, Right, Justify) -->
-      <div class="flex items-center gap-0.5 border-r border-[#e2e2e4] dark:border-slate-800 pr-2 mr-1">
+      <div class="flex items-center gap-0.5 border-r border-[#e2e2e4] dark:border-slate-800 pr-1.5 mr-0.5">
         <button
           @click="setTextAlignment('left')"
-          class="p-1.5 rounded transition-colors cursor-pointer"
+          class="p-1 rounded-md transition-colors cursor-pointer"
           :class="editor.isActive({ textAlign: 'left' }) ? 'bg-[#0040e5] text-white' : 'text-[#575d7a] dark:text-slate-400 hover:bg-[#f3f3f5] dark:hover:bg-slate-800'"
           title="Rata Kiri (Align Left)"
         >
-          <AlignLeft class="w-4 h-4" />
+          <AlignLeft class="w-3.5 h-3.5" />
         </button>
 
         <button
           @click="setTextAlignment('center')"
-          class="p-1.5 rounded transition-colors cursor-pointer"
+          class="p-1 rounded-md transition-colors cursor-pointer"
           :class="editor.isActive({ textAlign: 'center' }) ? 'bg-[#0040e5] text-white' : 'text-[#575d7a] dark:text-slate-400 hover:bg-[#f3f3f5] dark:hover:bg-slate-800'"
           title="Rata Tengah (Align Center)"
         >
-          <AlignCenter class="w-4 h-4" />
+          <AlignCenter class="w-3.5 h-3.5" />
         </button>
 
         <button
           @click="setTextAlignment('right')"
-          class="p-1.5 rounded transition-colors cursor-pointer"
+          class="p-1 rounded-md transition-colors cursor-pointer"
           :class="editor.isActive({ textAlign: 'right' }) ? 'bg-[#0040e5] text-white' : 'text-[#575d7a] dark:text-slate-400 hover:bg-[#f3f3f5] dark:hover:bg-slate-800'"
           title="Rata Kanan (Align Right)"
         >
-          <AlignRight class="w-4 h-4" />
+          <AlignRight class="w-3.5 h-3.5" />
         </button>
 
         <button
           @click="setTextAlignment('justify')"
-          class="p-1.5 rounded transition-colors cursor-pointer"
+          class="p-1 rounded-md transition-colors cursor-pointer"
           :class="editor.isActive({ textAlign: 'justify' }) ? 'bg-[#0040e5] text-white' : 'text-[#575d7a] dark:text-slate-400 hover:bg-[#f3f3f5] dark:hover:bg-slate-800'"
           title="Rata Kiri Kanan (Justify)"
         >
-          <AlignJustify class="w-4 h-4" />
+          <AlignJustify class="w-3.5 h-3.5" />
         </button>
       </div>
 
       <!-- Lists & Quotes -->
-      <div class="flex items-center gap-0.5 border-r border-[#e2e2e4] dark:border-slate-800 pr-2 mr-1">
+      <div class="flex items-center gap-0.5 border-r border-[#e2e2e4] dark:border-slate-800 pr-1.5 mr-0.5">
         <button
           @click="editor.chain().focus().toggleBulletList().run()"
-          class="p-1.5 rounded transition-colors cursor-pointer"
+          class="p-1 rounded-md transition-colors cursor-pointer"
           :class="editor.isActive('bulletList') ? 'bg-[#0040e5] text-white' : 'text-[#575d7a] dark:text-slate-400 hover:bg-[#f3f3f5]'"
           title="Bullet List"
         >
-          <List class="w-4 h-4" />
+          <List class="w-3.5 h-3.5" />
         </button>
 
         <button
           @click="editor.chain().focus().toggleOrderedList().run()"
-          class="p-1.5 rounded transition-colors cursor-pointer"
+          class="p-1 rounded-md transition-colors cursor-pointer"
           :class="editor.isActive('orderedList') ? 'bg-[#0040e5] text-white' : 'text-[#575d7a] dark:text-slate-400 hover:bg-[#f3f3f5]'"
           title="Numbered List"
         >
-          <ListOrdered class="w-4 h-4" />
+          <ListOrdered class="w-3.5 h-3.5" />
         </button>
 
         <button
           @click="editor.chain().focus().toggleBlockquote().run()"
-          class="p-1.5 rounded transition-colors cursor-pointer"
+          class="p-1 rounded-md transition-colors cursor-pointer"
           :class="editor.isActive('blockquote') ? 'bg-[#0040e5] text-white' : 'text-[#575d7a] dark:text-slate-400 hover:bg-[#f3f3f5]'"
           title="Quote"
         >
-          <Quote class="w-4 h-4" />
+          <Quote class="w-3.5 h-3.5" />
         </button>
 
         <button
           @click="editor.chain().focus().toggleCodeBlock().run()"
-          class="p-1.5 rounded transition-colors cursor-pointer"
+          class="p-1 rounded-md transition-colors cursor-pointer"
           :class="editor.isActive('codeBlock') ? 'bg-[#0040e5] text-white' : 'text-[#575d7a] dark:text-slate-400 hover:bg-[#f3f3f5]'"
           title="Code Block"
         >
-          <Code class="w-4 h-4" />
+          <Code class="w-3.5 h-3.5" />
         </button>
       </div>
 
       <!-- Links & Image Attachment -->
-      <div class="flex items-center gap-1 border-r border-[#e2e2e4] dark:border-slate-800 pr-2 mr-1">
+      <div class="flex items-center gap-0.5 border-r border-[#e2e2e4] dark:border-slate-800 pr-1.5 mr-0.5">
         <button
           @click="setLink"
-          class="p-1.5 rounded transition-colors cursor-pointer"
+          class="p-1 rounded-md transition-colors cursor-pointer"
           :class="editor.isActive('link') ? 'bg-[#0040e5] text-white' : 'text-[#575d7a] dark:text-slate-400 hover:bg-[#f3f3f5]'"
           title="Insert Link"
         >
-          <LinkIcon class="w-4 h-4" />
+          <LinkIcon class="w-3.5 h-3.5" />
         </button>
 
         <!-- Attach Image Button -->
         <button
           @click="isImageModalOpen = true"
-          class="p-1.5 rounded transition-colors text-[#575d7a] dark:text-slate-400 hover:bg-[#f3f3f5] dark:hover:bg-slate-800 flex items-center gap-1 cursor-pointer font-semibold hover:text-[#0040e5]"
+          class="p-1 rounded-md transition-colors text-[#575d7a] dark:text-slate-400 hover:bg-[#f3f3f5] dark:hover:bg-slate-800 flex items-center gap-1 cursor-pointer font-semibold text-[11px] hover:text-[#0040e5]"
           title="Sisipkan Gambar (Upload / URL)"
         >
-          <ImageIcon class="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+          <ImageIcon class="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
           <span class="hidden sm:inline">Attach Gambar</span>
         </button>
       </div>
 
       <!-- Inserter Components with [X] support -->
-      <div class="flex items-center gap-1.5">
+      <div class="flex items-center gap-1">
         <button
           @click="insertSummaryBlock"
-          class="flex items-center gap-1 px-2.5 py-1 rounded bg-indigo-50 text-indigo-800 dark:bg-indigo-950/40 dark:text-indigo-300 font-medium border border-indigo-200 dark:border-indigo-800 cursor-pointer shadow-2xs hover:bg-indigo-100 transition-colors"
+          class="flex items-center gap-1 px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-800 dark:bg-indigo-950/40 dark:text-indigo-300 font-medium text-[10.5px] border border-indigo-200 dark:border-indigo-800 cursor-pointer shadow-2xs hover:bg-indigo-100 transition-colors"
           title="Sisipkan kotak Ringkasan Panduan"
         >
-          <FileText class="w-3.5 h-3.5 text-indigo-600" />
+          <FileText class="w-3 h-3 text-indigo-600" />
           <span>+ Summary Box</span>
         </button>
 
         <button
           @click="insertInfoCallout"
-          class="flex items-center gap-1 px-2.5 py-1 rounded bg-blue-50 text-blue-800 dark:bg-blue-950/40 dark:text-blue-300 font-medium border border-blue-200 dark:border-blue-800 cursor-pointer shadow-2xs hover:bg-blue-100 transition-colors"
+          class="flex items-center gap-1 px-2 py-0.5 rounded-md bg-blue-50 text-blue-800 dark:bg-blue-950/40 dark:text-blue-300 font-medium text-[10.5px] border border-blue-200 dark:border-blue-800 cursor-pointer shadow-2xs hover:bg-blue-100 transition-colors"
         >
-          <Info class="w-3.5 h-3.5 text-blue-600" />
+          <Info class="w-3 h-3 text-blue-600" />
           <span>Info Callout</span>
         </button>
 
         <button
           @click="insertWarningCallout"
-          class="flex items-center gap-1 px-2.5 py-1 rounded bg-amber-50 text-amber-800 dark:bg-amber-950/40 dark:text-amber-300 font-medium border border-amber-200 dark:border-amber-800 cursor-pointer shadow-2xs hover:bg-amber-100 transition-colors"
+          class="flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-50 text-amber-800 dark:bg-amber-950/40 dark:text-amber-300 font-medium text-[10.5px] border border-amber-200 dark:border-amber-800 cursor-pointer shadow-2xs hover:bg-amber-100 transition-colors"
         >
-          <AlertTriangle class="w-3.5 h-3.5 text-amber-600" />
+          <AlertTriangle class="w-3 h-3 text-amber-600" />
           <span>Warning Banner</span>
         </button>
 
         <button
           @click="insertDosCallout"
-          class="flex items-center gap-1 px-2.5 py-1 rounded bg-emerald-50 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300 font-medium border border-emerald-200 dark:border-emerald-800 cursor-pointer shadow-2xs hover:bg-emerald-100 transition-colors"
+          class="flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300 font-medium text-[10.5px] border border-emerald-200 dark:border-emerald-800 cursor-pointer shadow-2xs hover:bg-emerald-100 transition-colors"
           title="Sisipkan kotak Best Practices (DOs)"
         >
-          <CheckCircle class="w-3.5 h-3.5 text-emerald-600" />
-          <span>+ DOs (Best Practice)</span>
+          <CheckCircle class="w-3 h-3 text-emerald-600" />
+          <span>+ DOs</span>
         </button>
 
         <button
           @click="insertDontsCallout"
-          class="flex items-center gap-1 px-2.5 py-1 rounded bg-rose-50 text-rose-800 dark:bg-rose-950/40 dark:text-rose-300 font-medium border border-rose-200 dark:border-rose-800 cursor-pointer shadow-2xs hover:bg-rose-100 transition-colors"
+          class="flex items-center gap-1 px-2 py-0.5 rounded-md bg-rose-50 text-rose-800 dark:bg-rose-950/40 dark:text-rose-300 font-medium text-[10.5px] border border-rose-200 dark:border-rose-800 cursor-pointer shadow-2xs hover:bg-rose-100 transition-colors"
           title="Sisipkan kotak Peringatan / Larangan (DON'Ts)"
         >
-          <XCircle class="w-3.5 h-3.5 text-rose-600" />
-          <span>+ DON'Ts (Peringatan)</span>
+          <XCircle class="w-3 h-3 text-rose-600" />
+          <span>+ DON'Ts</span>
         </button>
 
         <button
           @click="insertStep"
-          class="flex items-center gap-1 px-2.5 py-1 rounded bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-200 font-medium border border-slate-300 dark:border-slate-700 cursor-pointer shadow-2xs hover:bg-slate-200 transition-colors"
+          class="flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-200 font-medium text-[10.5px] border border-slate-300 dark:border-slate-700 cursor-pointer shadow-2xs hover:bg-slate-200 transition-colors"
         >
-          <Plus class="w-3.5 h-3.5 text-indigo-600" />
-          <span>+ Step Item</span>
+          <Plus class="w-3 h-3 text-indigo-600" />
+          <span>+ Step</span>
         </button>
       </div>
 
@@ -796,7 +839,7 @@ function goToPortal() {
       <main class="flex-1 flex justify-center pb-24 overflow-y-auto px-4 sm:px-6">
         
         <!-- Live Document Sheet (White Sheet Paper) -->
-        <article class="bg-white dark:bg-[#1E293B] rounded-2xl border border-[#c4c5d9] dark:border-slate-700 shadow-lg w-full max-w-[840px] min-h-[900px] mt-6 mb-12 p-8 sm:p-12 relative space-y-6 transition-all">
+        <article class="bg-white dark:bg-[#1E293B] rounded-2xl border border-[#c4c5d9] dark:border-slate-700 shadow-lg w-full max-w-[840px] min-h-[900px] mt-4 mb-12 p-8 sm:p-12 relative space-y-6 transition-all">
           
           <!-- Document Breadcrumbs & Category Bar -->
           <div class="flex items-center justify-between text-xs text-[#575d7a] dark:text-slate-400 pb-2 border-b border-[#e2e2e4] dark:border-slate-700">
@@ -916,7 +959,7 @@ function goToPortal() {
       <!-- Right Inspector Panel (Metadata & Settings) -->
       <div
         v-if="isInspectorOpen"
-        class="hidden lg:block h-[calc(100vh-8rem)] sticky top-28 mr-2 rounded-xl overflow-hidden border border-[#c4c5d9] dark:border-slate-800 shadow-md"
+        class="hidden lg:block h-[calc(100vh-6.5rem)] sticky top-20 mr-2 rounded-xl overflow-hidden border border-[#c4c5d9] dark:border-slate-800 shadow-md"
       >
         <DocEditorInspector
           v-model="doc"

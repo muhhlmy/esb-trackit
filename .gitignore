@@ -16,6 +16,8 @@ dist/
 */dist/
 dist-ssr/
 *.local
+src/generated/
+*/src/generated/
 
 # Environment variables
 .env

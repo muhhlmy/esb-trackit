@@ -1,184 +1,154 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '../src/generated/prisma/index.js';
 import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
 
-const SEED_CASES = [
+const DUMMY_CASES = [
+  // 1. HARDWARE
   {
     id: 'laptop-01',
     title: 'SOP Setup Laptop Baru untuk New Joiner / Pergantian Perangkat',
     category: 'hardware',
     severity: 'high',
     tags: ['laptop-baru', 'oobe', 'setup-device', 'new-joiner', 'it-support', 'windows'],
-    summary: 'Panduan Operasional Standar (SOP) penyiapan unit laptop Windows baru bagi karyawan baru (*new joiner*) atau fasilitas penggantian unit kerja.',
+    summary: 'Panduan Operasional Standar (SOP) penyiapan unit laptop Windows baru bagi karyawan baru (new joiner) atau fasilitas penggantian unit kerja.',
     problemContext: 'Saat menyiapkan unit laptop baru dari distributor/vendor, diperlukan proses bypass pembuatan akun online Microsoft saat OOBE, penyiapan akun lokal standar perusahaan, penyesuaian opsi keamanan, serta instalasi paket aplikasi kerja wajib.',
     actionSteps: [
-      'Nyalakan unit laptop baru hingga masuk ke tampilan Out-of-Box Experience (OOBE) pada tahap **"Let\'s connect you to a network"**.',
-      'Tekan kombinasi tombol `Shift + F10` (atau `Fn + Shift + F10`) pada keyboard untuk membuka jendela **Command Prompt (CMD)**.',
-      'Ketik perintah `oobe\\bypassnro` lalu tekan **Enter**. Laptop akan melakukan restart otomatis dan mengizinkan proses setup tanpa koneksi internet (*Local Account mode*).',
-      'Setelah berhasil masuk ke desktop Windows, buka aplikasi **Notepad**, lalu salin dan simpan script otomatisasi user sebagai file `.bat` (contoh: `setup_user.bat`).',
-      'Klik kanan pada file `.bat` tersebut lalu pilih **Run as Administrator** untuk membuat user `ESB-User` dengan password `Essensians@2026` dan mengonfigurasi batas waktu password menjadi *Never Expire*.',
-      'Lakukan pengubahan nama perangkat (**Rename This PC**) sesuai standar penamaan label inventaris laptop perusahaan (contoh: `LAPTOP-IT-01` atau `ESB-DEPT-NAME`).',
-      'Buka menu **Settings > Windows Update**, jalankan pembaruan sistem hingga selesai, dan aktifkan opsi **"Get the latest updates as soon as they\'re available"**.',
-      'Matikan enkripsi perangkat melalui menu **Settings > Privacy & Security > Device Encryption** (setel status menjadi *Off*).',
-      'Hubungkan flashdisk instalasi IT, kemudian jalankan installer **Ninite**.',
-      'Verifikasi bahwa perangkat telah terpasang aplikasi wajib perusahaan: **Google Chrome**, **AnyDesk**, dan **Microsoft Office suite**.',
-      'Setelah seluruh proses setup selesai, buat dan lengkapi [Form Serah Terima Laptop](https://docs.google.com/document/d/1uDDbC77cmnm1J4yBDSQLW23pDkv4Y2R7h0myL_lkdbM/edit?usp=drive_link).',
-      'Proses setup selesai dan unit laptop siap diserahkan kepada *User*.'
+      'Nyalakan unit laptop baru hingga masuk ke tampilan Out-of-Box Experience (OOBE) pada tahap "Let\'s connect you to a network".',
+      'Tekan kombinasi tombol Shift + F10 (atau Fn + Shift + F10) pada keyboard untuk membuka jendela Command Prompt (CMD).',
+      'Ketik perintah oobe\\bypassnro lalu tekan Enter. Laptop akan restart otomatis dan mengizinkan proses setup tanpa koneksi internet (Local Account mode).',
+      'Setelah berhasil masuk ke desktop Windows, buka aplikasi Notepad, lalu salin dan simpan script otomatisasi user sebagai file .bat (contoh: setup_user.bat).',
+      'Klik kanan pada file .bat tersebut lalu pilih Run as Administrator untuk membuat user ESB-User dengan password Essensians@2026 dan mengonfigurasi batas waktu password menjadi Never Expire.',
+      'Lakukan pengubahan nama perangkat (Rename This PC) sesuai standar penamaan label inventaris laptop perusahaan (contoh: LAPTOP-IT-01 atau ESB-DEPT-NAME).',
+      'Buka menu Settings > Windows Update, jalankan pembaruan sistem hingga selesai, dan aktifkan opsi "Get the latest updates as soon as they\'re available".',
+      'Matikan enkripsi perangkat melalui menu Settings > Privacy & Security > Device Encryption (setel status menjadi Off).',
+      'Hubungkan flashdisk instalasi IT, kemudian jalankan installer Ninite.',
+      'Verifikasi bahwa perangkat telah terpasang aplikasi wajib perusahaan: Google Chrome, AnyDesk, dan Microsoft Office suite.',
+      'Setelah seluruh proses setup selesai, buat dan lengkapi Form Serah Terima Laptop.',
+      'Proses setup selesai dan unit laptop siap diserahkan kepada User.'
     ],
     dosAndDonts: {
       dos: [
-        'Pastikan script installer `.bat` dieksekusi dengan hak akses Administrator (*Run as Administrator*).',
+        'Pastikan script installer .bat dieksekusi dengan hak akses Administrator (Run as Administrator).',
         'Verifikasi seluruh aplikasi wajib (Chrome, AnyDesk, MS Office) dapat terbuka dengan normal sebelum diserahkan.',
         'Catat Serial Number dan label perangkat pada Formulir Serah Terima Perangkat.'
       ],
       donts: [
-        'Jangan menghubungkan laptop ke koneksi Wi-Fi/Internet pada tahap awal OOBE sebelum menjalankan perintah `oobe\\bypassnro`.',
-        'Jangan melewatkan penonaktifan *Device Encryption* untuk menghindari terkuncinya drive di kemudian hari.'
+        'Jangan menghubungkan laptop ke koneksi Wi-Fi/Internet pada tahap awal OOBE sebelum menjalankan perintah oobe\\bypassnro.',
+        'Jangan melewatkan penonaktifan Device Encryption untuk menghindari terkuncinya drive di kemudian hari.'
       ]
     },
     snippets: [
       {
         label: 'Script Auto Setup User & Password Never Expire (.bat)',
-        code: `@echo off
-REM Jalankan sebagai Administrator
-REM Membuat user baru
-net user "ESB-User" Essensians@2026 /add
+        code: `@echo off\nREM Jalankan sebagai Administrator\nREM Membuat user baru\nnet user "ESB-User" Essensians@2026 /add\n\nREM Set agar password tidak pernah expired via PowerShell\npowershell -Command "Set-LocalUser -Name 'ESB-User' -PasswordNeverExpires $true"\n\necho User ESB-User berhasil dibuat dengan password tidak pernah expired.\npause`
+      }
+    ],
+    isCustom: false,
+    isFeaturedOnHome: true,
+    homeOrder: 0,
+    isPublished: true,
+    contentHtml: `<div class="summary-block-card" data-summary-block=""><p>Panduan Operasional Standar (SOP) penyiapan unit laptop Windows baru bagi karyawan baru (<em>new joiner</em>) atau fasilitas penggantian unit kerja.</p></div><div data-callout="context" class="callout-card callout-context"><p><strong>Background &amp; Skenario Kendala:</strong><br>Saat menyiapkan unit laptop baru dari distributor/vendor, diperlukan proses bypass pembuatan akun online Microsoft saat OOBE, penyiapan akun lokal standar perusahaan, penyesuaian opsi keamanan, serta instalasi paket aplikasi kerja wajib.</p></div><h3>Langkah Penyelesaian (Action Steps)</h3><ol><li>Nyalakan unit laptop baru hingga masuk ke tampilan Out-of-Box Experience (OOBE) pada tahap <em>"Let's connect you to a network"</em>.</li><li>Tekan kombinasi tombol <code>Shift + F10</code> (atau <code>Fn + Shift + F10</code>) pada keyboard untuk membuka Command Prompt (CMD).</li><li>Ketik perintah <code>oobe\\bypassnro</code> lalu tekan <strong>Enter</strong>.</li><li>Buat user lokal <code>ESB-User</code> dan setel password standar.</li><li>Lakukan pembaruan sistem melalui menu <strong>Windows Update</strong>.</li><li>Matikan enkripsi <em>Device Encryption</em> dan pasang aplikasi kerja standar.</li></ol><div data-callout="dos" class="callout-card callout-dos"><p><strong>Best Practices (DOs):</strong></p><ul><li>Pastikan script installer dijalankan dengan Run as Administrator.</li><li>Verifikasi aplikasi Google Chrome, AnyDesk, dan MS Office terbuka dengan normal.</li></ul></div>`
+  },
 
-REM Set agar password tidak pernah expired via PowerShell
-powershell -Command "Set-LocalUser -Name 'ESB-User' -PasswordNeverExpires $true"
+  // 2. SOFTWARE
+  {
+    id: 'software-01',
+    title: 'Panduan Instalasi & Aktivasi Lisensi Microsoft 365 Enterprise',
+    category: 'software',
+    severity: 'high',
+    tags: ['microsoft-365', 'office', 'lisensi', 'word', 'excel', 'outlook'],
+    summary: 'Prosedur instalasi dan aktivasi paket aplikasi Microsoft 365 (Word, Excel, PowerPoint, Outlook) menggunakan akun email korporat.',
+    problemContext: 'Karyawan yang baru bergabung atau mengalami lisensi expired memerlukan instalasi resmi dan login SSO Microsoft 365 perusahaan.',
+    actionSteps: [
+      'Buka browser dan akses portal resmi https://portal.office.com.',
+      'Masuk menggunakan alamat email korporat (@esb.co.id) dan password SSO akun Anda.',
+      'Klik tombol "Install Apps" di pojok kanan atas, lalu pilih "Microsoft 365 apps".',
+      'Jalankan file installer OfficeSetup.exe yang terunduh dan tunggu hingga proses instalasi selesai.',
+      'Buka salah satu aplikasi (misal: Microsoft Word), klik tombol "Sign In" di pojok kanan atas.',
+      'Masukkan kredensial akun perusahaan dan lakukan verifikasi 2FA jika diminta.',
+      'Pastikan status lisensi pada menu File > Account tertera "Subscription Product Microsoft 365 Apps for Enterprise".'
+    ],
+    dosAndDonts: {
+      dos: [
+        'Selalu unduh installer langsung dari portal resmi Microsoft 365.',
+        'Pastikan koneksi internet stabil dengan bandwidth minimal 10 Mbps saat proses instalasi.'
+      ],
+      donts: [
+        'Jangan menggunakan software activator pihak ketiga atau crack di perangkat kantor.',
+        'Jangan login menggunakan akun Microsoft personal pada aplikasi kerja.'
+      ]
+    },
+    snippets: [
+      {
+        label: 'URL Portal Microsoft 365',
+        code: 'https://portal.office.com'
+      }
+    ],
+    isCustom: false,
+    isFeaturedOnHome: true,
+    homeOrder: 1,
+    isPublished: true,
+    contentHtml: `<div class="summary-block-card" data-summary-block=""><p>Prosedur instalasi dan aktivasi paket aplikasi Microsoft 365 (Word, Excel, PowerPoint, Outlook) menggunakan akun email korporat.</p></div><h3>Langkah-Langkah Instalasi &amp; Aktivasi:</h3><ol><li>Buka portal resmi <a href="https://portal.office.com" target="_blank" class="text-[#0040e5] underline font-semibold">portal.office.com</a>.</li><li>Masuk menggunakan email korporat Anda.</li><li>Klik tombol <strong>Install Apps</strong> di pojok kanan atas.</li><li>Jalankan file installer dan buka Microsoft Word setelah selesai.</li><li>Login akun kerja untuk mengaktifkan lisensi Enterprise.</li></ol>`
+  },
 
-echo User ESB-User berhasil dibuat dengan password tidak pernah expired.
-pause`
-      }
-    ],
-    isCustom: false
-  },
+  // 3. GIT
   {
-    id: 'laptop-02',
-    title: 'SOP Setup Laptop Re-use / Bekas untuk New Joiner / Pergantian Perangkat',
-    category: 'hardware',
+    id: 'git-01',
+    title: 'SOP Standard Git Branching & Pull Request (PR) Review Workflow',
+    category: 'git',
     severity: 'high',
-    tags: ['laptop-reuse', 'hardware-check', 'setup-device', 'new-joiner', 'it-support'],
-    summary: 'Panduan Operasional Standar (SOP) penyiapan laptop pengembalian (*re-use*) untuk dialokasikan kembali kepada karyawan baru atau pergantian unit.',
-    problemContext: 'Perangkat laptop pengembalian eks-karyawan perlu melalui tahapan verifikasi kondisi perangkat keras (hardware check), pembersihan profil user lama, penyesuaian nama akun pengguna baru, serta konfigurasinya sebelum diserahterimakan.',
+    tags: ['git', 'github', 'branching', 'pull-request', 'code-review', 'gitflow'],
+    summary: 'Standar alur kerja branching Git, penamaan branch, format commit message, dan tata cara pembuatan Pull Request (PR) di repositori perusahaan.',
+    problemContext: 'Mencegah terjadinya konflik kode di branch master/main serta memastikan setiap perubahan melalui tahapan code review dan automated testing yang memadai.',
     actionSteps: [
-      'Siapkan unit laptop pengembalian yang akan dialokasikan untuk penyerahan atau penggantian perangkat.',
-      'Login menggunakan akun **Administrator**, lalu lakukan pengujian fungsi hardware mencakup: **Keyboard**, **Microphone**, **Kamera/Webcam**, dan **Speaker**.',
-      'Hapus akun/profil user lama jika ada, kemudian tambahkan akun lokal baru sesuai dengan nama pengguna (*User Name*) yang akan menerima laptop.',
-      'Gunakan kata sandi standar default perusahaan yaitu `Essensians@2026` untuk akun user baru tersebut.',
-      'Buka Command Prompt sebagai Administrator, lalu jalankan perintah berikut agar password tidak pernah kadaluarsa: `powershell -Command "Set-LocalUser -Name \'ESB-User\' -PasswordNeverExpires $true"`.',
-      'Ubah nama perangkat (**Rename This PC**) sesuai label registrasi inventaris yang diperuntukkan bagi laptop tersebut.',
-      'Buka menu **Settings > Windows Update**, periksa ketersediaan pembaruan sistem, dan nyalakan opsi **"Get the latest updates as soon as they\'re available"**.',
-      'Matikan enkripsi perangkat pada menu **Settings > Privacy & Security > Device Encryption** (setel status menjadi *Off*).',
-      'Periksa dan lakukan instalasi aplikasi **Google Chrome**, **AnyDesk**, dan **Microsoft Office** jika belum terpasang pada sistem.',
-      'Setelah seluruh proses penyiapan selesai, buat dan lengkapi dokumen pada [Form Serah Terima Laptop](https://docs.google.com/document/d/1uDDbC77cmnm1J4yBDSQLW23pDkv4Y2R7h0myL_lkdbM/edit?usp=drive_link).',
-      'Proses penyiapan selesai dan unit laptop siap diserahkan kepada *User*.'
+      'Lakukan update branch utama sebelum membuat branch baru: git checkout staging && git pull origin staging.',
+      'Buat branch fitur dengan konvensi penamaan standar: git checkout -b feat/ESB-123-nama-fitur atau fix/ESB-456-bug-deskripsi.',
+      'Tulis commit message sesuai konvensi Conventional Commits (contoh: feat(auth): add google sso login).',
+      'Push branch ke remote repository: git push -u origin feat/ESB-123-nama-fitur.',
+      'Buka GitHub, buat Pull Request (PR) dengan target branch staging.',
+      'Isi template PR secara lengkap: deskripsi perubahan, checklist pengujian, dan screenshot/video hasil implementasi.',
+      'Assign minimal 1 peer reviewer dan pastikan seluruh automated CI checks berstatus PASS sebelum meminta merge.'
     ],
     dosAndDonts: {
       dos: [
-        'Wajib melakukan pengujian fungsionalitas hardware (keyboard, webcam, mic, speaker) sebelum melangkah ke proses software.',
-        'Pastikan seluruh berkas pribadi dan data dari pengguna sebelumnya telah dihapus bersih dari sistem.'
+        'Gunakan format commit: feat:, fix:, docs:, refactor:, test:, chore:.',
+        'Pastikan branch selalu up-to-date dengan staging sebelum submit PR.'
       ],
       donts: [
-        'Jangan mempertahankan profil user atau nama PC lama pada unit laptop yang diserahterimakan ke karyawan baru.',
-        'Jangan menyerahkan laptop yang memiliki kendala fisik/hardware tanpa pemberitahuan atau perbaikan terlebih dahulu.'
+        'DILARANG KERAS melakukan force push (git push -f) pada branch master, main, atau staging.',
+        'Jangan memasukkan credential, API keys, atau file .env ke dalam git commit.'
       ]
     },
     snippets: [
       {
-        label: 'PowerShell Command - Set Password Never Expire',
-        code: `powershell -Command "Set-LocalUser -Name 'ESB-User' -PasswordNeverExpires $true"`
+        label: 'Contoh Perintah Pembuatan Branch & Push',
+        code: `git checkout staging\ngit pull origin staging\ngit checkout -b feat/AUTH-102-biometric-login\ngit add .\ngit commit -m "feat(auth): implement biometric login handler"\ngit push -u origin feat/AUTH-102-biometric-login`
       }
     ],
-    isCustom: false
+    isCustom: false,
+    isFeaturedOnHome: true,
+    homeOrder: 2,
+    isPublished: true,
+    contentHtml: `<div class="summary-block-card" data-summary-block=""><p>Standar alur kerja branching Git, penamaan branch, format commit message, dan tata cara pembuatan Pull Request (PR) di repositori perusahaan.</p></div><div data-callout="context" class="callout-card callout-context"><p><strong>Tujuan Standar:</strong><br>Mencegah konflik kode di branch utama dan memastikan standar kualitas kode melalui automated testing &amp; peer code review.</p></div><h3>Format Penamaan Branch Standar:</h3><ul><li><code>feat/TICKET-ID-fitur-name</code> (untuk fitur baru)</li><li><code>fix/TICKET-ID-bug-desc</code> (untuk perbaikan bug)</li><li><code>refactor/TICKET-ID-clean-code</code> (untuk refactoring)</li></ul><div data-callout="donts" class="callout-card callout-donts"><p><strong>Larangan Kritis:</strong></p><ul><li>Dilarang keras push langsung atau force push ke branch <code>main</code> / <code>staging</code>.</li><li>Jangan pernah commit file <code>.env</code> atau token secret ke git.</li></ul></div>`
   },
+
+  // 4. WORKPLACE
   {
-    id: 'hp-01',
-    title: 'SOP Setup HP Baru untuk New Joiner / Replacement',
-    category: 'hardware',
-    severity: 'high',
-    tags: ['hp-baru', 'handphone', 'smartphone', 'setup-device', 'new-joiner', 'it-support'],
-    summary: 'Panduan Operasional Standar (SOP) penyiapan unit handphone (HP) baru bagi karyawan baru (*new joiner*) atau fasilitas penggantian unit kerja.',
-    problemContext: 'Saat menyiapkan unit HP baru dari distributor/vendor, diperlukan proses konfigurasi awal hingga halaman utama, pengecekan fungsi perangkat keras (layar, kamera, microphone, speaker), serta pencatatan penyerahan perangkat dan pembaruan data aset perusahaan.',
-    actionSteps: [
-      'Buka kemasan HP baru, keluarkan unit perangkat, lalu **nyalakan** HP dengan menekan tombol power hingga menyala.',
-      'Lakukan **konfigurasi awal** (bahasa, koneksi Wi-Fi, akun, dsb.) hingga masuk ke **halaman awal** (*home screen*).',
-      'Cek fungsi perangkat keras: **Layar**, **Kamera**, **Microphone**, dan **Speaker** untuk memastikan seluruhnya berfungsi normal.',
-      'Setelah seluruh proses setup selesai, buat dan lengkapi [Form Serah Terima HP](https://docs.google.com/document/d/1uDDbC77cmnm1J4yBDSQLW23pDkv4Y2R7h0myL_lkdbM/).',
-      'Berikan **Label** pada **Box HP** dan **belakang HP** sesuai standar penamaan inventaris perusahaan.',
-      'Update **Master Data Aset Management** dengan informasi unit HP yang telah disiapkan.',
-      'Proses setup selesai dan unit HP siap diserahkan kepada *User*.'
-    ],
-    dosAndDonts: {
-      dos: [
-        'Pastikan seluruh fungsi perangkat keras (layar, kamera, mic, speaker) telah diuji sebelum diserahkan.',
-        'Catat Serial Number, IMEI, dan label perangkat pada Form Serah Terima dan Master Data Aset Management.'
-      ],
-      donts: [
-        'Jangan menyerahkan HP yang masih memiliki kendala pada layar, kamera, microphone, atau speaker tanpa perbaikan terlebih dahulu.',
-        'Jangan melewatkan pelabelan pada box dan belakang HP serta pembaruan Master Data Aset Management.'
-      ]
-    },
-    snippets: [
-      {
-        label: 'Link Form Serah Terima HP',
-        code: 'https://docs.google.com/document/d/1uDDbC77cmnm1J4yBDSQLW23pDkv4Y2R7h0myL_lkdbM/'
-      }
-    ],
-    isCustom: false
-  },
-  {
-    id: 'hp-02',
-    title: 'SOP Setup HP Stock untuk New Joiner / Replacement',
-    category: 'hardware',
-    severity: 'high',
-    tags: ['hp-stock', 'handphone', 'smartphone', 'factory-reset', 'setup-device', 'new-joiner', 'it-support'],
-    summary: 'Panduan Operasional Standar (SOP) penyiapan unit handphone (HP) stok untuk dialokasikan kepada karyawan baru (*new joiner*) atau penggantian unit kerja.',
-    problemContext: 'Perangkat HP stok perlu melalui tahapan pengecekan kondisi perangkat keras (layar, kamera, microphone, speaker), proses factory reset untuk membersihkan data lama, serta konfigurasi ulang hingga halaman utama sebelum diserahterimakan dan dicatat pada data aset perusahaan.',
-    actionSteps: [
-      'Nyalakan HP dengan menekan tombol power hingga menyala.',
-      'Cek fungsi perangkat keras: **Layar**, **Kamera**, **Microphone**, dan **Speaker** untuk memastikan seluruhnya berfungsi normal.',
-      'Lakukan **Factory Reset** pada HP tersebut untuk membersihkan seluruh data dan pengaturan lama.',
-      'Lakukan **konfigurasi** awal (bahasa, koneksi Wi-Fi, akun, dsb.) hingga masuk ke **halaman awal** (*home screen*).',
-      'Setelah seluruh proses setup selesai, buat dan lengkapi [Form Serah Terima HP](https://docs.google.com/document/d/1uDDbC77cmnm1J4yBDSQLW23pDkv4Y2R7h0myL_lkdbM/).',
-      'Berikan **Label** pada **Box HP** dan **belakang HP** sesuai standar penamaan inventaris perusahaan.',
-      'Update **Master Data Aset Management** dengan informasi unit HP yang telah disiapkan.',
-      'Proses setup selesai dan unit HP siap diserahkan kepada *User*.'
-    ],
-    dosAndDonts: {
-      dos: [
-        'Wajib melakukan pengujian fungsionalitas hardware (layar, kamera, mic, speaker) sebelum melangkah ke proses reset dan konfigurasi.',
-        'Pastikan seluruh data dari pengguna/pemakaian sebelumnya telah terhapus bersih melalui Factory Reset.'
-      ],
-      donts: [
-        'Jangan melewatkan proses Factory Reset sebelum melakukan konfigurasi ulang pada HP stok.',
-        'Jangan menyerahkan HP yang memiliki kendala fisik/hardware tanpa pemberitahuan atau perbaikan terlebih dahulu.'
-      ]
-    },
-    snippets: [
-      {
-        label: 'Link Form Serah Terima HP',
-        code: 'https://docs.google.com/document/d/1uDDbC77cmnm1J4yBDSQLW23pDkv4Y2R7h0myL_lkdbM/'
-      }
-    ],
-    isCustom: false
-  },
-  {
-    id: 'google-workspace-01',
+    id: 'workplace-01',
     title: 'SOP Permintaan Kode Backup 2-Step Verification (2SV) Google Workspace',
     category: 'workplace',
     severity: 'medium',
     tags: ['google-workspace', '2sv', 'backup-codes', 'security', 'admin-console', 'pbx'],
-    summary: 'Panduan Operasional Standar (SOP) penanganan permintaan kode cadangan verifikasi 2 langkah (*2-Step Verification*) akun Google Workspace atas permintaan PBX / People & Culture.',
-    problemContext: 'Tim People & Culture (PBX) atau atasan memohon kode verifikasi cadangan (*Backup Verification Codes*) untuk membantu akses masuk (*login*) akun Google Workspace milik anggota tim/subordinat yang mengalami kendala otentikasi.',
+    summary: 'Panduan Operasional Standar (SOP) penanganan permintaan kode cadangan verifikasi 2 langkah (2-Step Verification) akun Google Workspace atas permintaan PBX / People & Culture.',
+    problemContext: 'Tim People & Culture (PBX) atau atasan memohon kode verifikasi cadangan (Backup Verification Codes) untuk membantu akses masuk akun Google Workspace milik karyawan yang mengalami kendala otentikasi (HP hilang/ganti nomor).',
     actionSteps: [
-      'Buka dan login ke portal [Google Admin Console](https://admin.google.com/) menggunakan akun Administrator berwenang.',
-      'Cari nama atau alamat email pengguna (*User*) yang bersangkutan melalui kolom pencarian utama atau navigasi **Directory > Users**.',
-      'Klik profil akun pengguna tersebut, lalu pilih tab **Security** pada panel detail.',
-      'Pilih dan buka bagian **2-Step Verification**.',
-      'Klik opsi **"Get Backup Verification Codes"** untuk menampilkan daftar kode cadangan otentikasi.',
-      'Salin minimal **2 (dua) kode verifikasi cadangan** dari daftar yang tersedia.',
+      'Buka dan login ke portal Google Admin Console (https://admin.google.com) menggunakan akun Administrator berwenang.',
+      'Cari nama atau alamat email pengguna (User) yang bersangkutan melalui kolom pencarian utama atau navigasi Directory > Users.',
+      'Klik profil akun pengguna tersebut, lalu pilih tab Security pada panel detail.',
+      'Pilih dan buka bagian 2-Step Verification.',
+      'Klik opsi "Get Backup Verification Codes" untuk menampilkan daftar kode cadangan otentikasi.',
+      'Salin minimal 2 (dua) kode verifikasi cadangan dari daftar yang tersedia.',
       'Kirimkan kedua kode verifikasi cadangan tersebut secara aman kepada pihak PBX / pemohon berwenang.'
     ],
     dosAndDonts: {
@@ -197,129 +167,209 @@ pause`
         code: 'https://admin.google.com/'
       }
     ],
-    isCustom: false
+    isCustom: false,
+    isFeaturedOnHome: true,
+    homeOrder: 3,
+    isPublished: true,
+    contentHtml: `<div class="summary-block-card" data-summary-block=""><p>Panduan Operasional Standar (SOP) penanganan permintaan kode cadangan verifikasi 2 langkah (<em>2-Step Verification</em>) akun Google Workspace atas permohonan resmi PBX / People &amp; Culture.</p></div><h3>Langkah di Google Admin Console:</h3><ol><li>Buka portal <a href="https://admin.google.com" target="_blank" class="text-[#0040e5] underline font-semibold">admin.google.com</a>.</li><li>Cari akun pengguna di menu <strong>Directory &gt; Users</strong>.</li><li>Buka tab <strong>Security</strong> &gt; <strong>2-Step Verification</strong>.</li><li>Klik <strong>Get Backup Verification Codes</strong>.</li><li>Salin 2 kode cadangan dan kirimkan secara privat ke pihak pemohon.</li></ol>`
   },
+
+  // 5. ENVIRONMENT
   {
-    id: 'google-workspace-02',
-    title: 'SOP Permintaan Reset Password Akun Google Workspace Karyawan',
-    category: 'workplace',
-    severity: 'medium',
-    tags: ['google-workspace', 'reset-password', 'security', 'admin-console', 'pbx', 'default-password'],
-    summary: 'Panduan Operasional Standar (SOP) penanganan permintaan reset kata sandi (*reset password*) akun Google Workspace karyawan yang mengalami lupa password atau atas permintaan PBX.',
-    problemContext: 'Perwakilan People & Culture (PBX) atau atasan mengajukan permohonan reset kata sandi (*password reset*) untuk anggota tim/subordinat yang lupa password atau tidak bisa mengakses akun Google Workspace perusahaan.',
+    id: 'env-01',
+    title: 'Panduan Koneksi Jaringan Wi-Fi Kantor (ESB-Secure WPA2-Enterprise)',
+    category: 'environment',
+    severity: 'high',
+    tags: ['wifi', 'network', 'wpa2-enterprise', 'radius', 'office-network'],
+    summary: 'Petunjuk menghubungkan laptop Windows / macOS dan smartphone ke jaringan nirkabel internal ESB-Secure menggunakan kredensial domain.',
+    problemContext: 'Perangkat kerja karyawan perlu terhubung ke SSID aman ESB-Secure untuk mendapatkan akses internet cepat dan server lokal kantor.',
     actionSteps: [
-      'Buka dan login ke portal [Google Admin Console](https://admin.google.com/) menggunakan akun Administrator berwenang.',
-      'Cari nama atau alamat email pengguna (*User*) yang akan di-reset pada kolom pencarian utama atau navigasi **Directory > Users**.',
-      'Klik tombol **Reset Password** pada panel profil akun pengguna tersebut.',
-      'Pilih metode **Create Password** (buat kata sandi secara manual).',
-      'Masukkan kata sandi default resmi perusahaan yaitu `Essensians@2026` pada kolom password baru.',
-      'Pastikan untuk mencentang opsi **"Ask user to change their password when they sign in"** agar pengguna wajib memperbarui kata sandi saat pertama kali login kembali.',
-      'Klik tombol **Reset** untuk mengeksekusi perbaikan, kemudian kabarkan password sementara tersebut secara aman kepada pihak PBX / pemohon berwenang.'
+      'Buka menu Wi-Fi di perangkat laptop atau handphone Anda.',
+      'Pilih jaringan SSID: ESB-Secure.',
+      'Pada metode otentikasi EAP, pilih "PEAP" dengan Phase 2 Authentication "MSCHAPV2".',
+      'Pada kolom CA Certificate, pilih "Do not validate" atau "Use system certificates".',
+      'Masukkan Identity: email korporat Anda (contoh: budi@esb.co.id) dan Password email Anda.',
+      'Klik Connect / Join dan terima sertifikat jaringan jika muncul konfirmasi keamanan.'
     ],
     dosAndDonts: {
       dos: [
-        'Wajib mencentang opsi *Ask user to change their password when they sign in* agar kata sandi baru segera diubah oleh pemilik akun.',
-        'Gunakan password default resmi perusahaan (`Essensians@2026`) untuk konsistensi prosedur IT Support.'
+        'Gunakan SSID ESB-Guest khusus untuk tamu/vendor eksternal yang berkunjung.',
+        'Lapor ke IT Support jika perangkat gagal melakukan handshake radius authentication.'
       ],
       donts: [
-        'Jangan membagikan kata sandi baru pada grup obrolan publik; selalu kirimkan secara privat (*Direct Message*) kepada pihak PBX.',
-        'Jangan mengabaikan verifikasi pemohon; pastikan permintaan reset berasal dari saluran resmi PBX / People & Culture.'
+        'Jangan membagikan akun Wi-Fi korporat kepada tamu non-karyawan.'
       ]
     },
     snippets: [
       {
-        label: 'Default Password Reset & Console Link',
-        code: `Portal: https://admin.google.com/\nDefault Temp Password: Essensians@2026`
+        label: 'Konfigurasi Parameter Wi-Fi ESB-Secure',
+        code: `SSID: ESB-Secure\nSecurity: WPA2-Enterprise (802.1X)\nEAP Method: PEAP\nPhase 2: MSCHAPv2`
       }
     ],
-    isCustom: false
+    isCustom: false,
+    isFeaturedOnHome: true,
+    homeOrder: 4,
+    isPublished: true,
+    contentHtml: `<div class="summary-block-card" data-summary-block=""><p>Petunjuk menghubungkan laptop Windows / macOS dan smartphone ke jaringan nirkabel internal <strong>ESB-Secure</strong> menggunakan kredensial domain.</p></div><h3>Parameter Koneksi:</h3><ul><li><strong>SSID:</strong> ESB-Secure</li><li><strong>Security:</strong> WPA2/WPA3 Enterprise (802.1X)</li><li><strong>EAP Method:</strong> PEAP &gt; MSCHAPv2</li><li><strong>Username:</strong> Email Korporat (@esb.co.id)</li><li><strong>Password:</strong> Password Email Akun Anda</li></ul>`
+  },
+
+  // 6. BACKEND
+  {
+    id: 'backend-01',
+    title: 'SOP Database Migration & Zero-Downtime Rollback Procedure',
+    category: 'backend',
+    severity: 'high',
+    tags: ['database', 'postgresql', 'migration', 'prisma', 'rollback', 'zero-downtime'],
+    summary: 'Standard Operating Procedure (SOP) eksekusi migrasi skema database production dengan strategi Zero-Downtime dan rencana rollback instan.',
+    problemContext: 'Mencegah table lock berkepanjangan dan downtime layanan pada database utama saat rilis fitur baru yang mengubah struktur skema database.',
+    actionSteps: [
+      'Buat manual snapshot backup database sebelum memulai jendela rilis.',
+      'Tinjau script SQL migrasi untuk memastikan tidak ada operasi destruktif (seperti DROP COLUMN tanpa deprecation period).',
+      'Jalankan migrasi pada database staging terlebih dahulu dan amati eksekusi query time.',
+      'Jalankan migrasi production menggunakan tool resmi: npx prisma migrate deploy.',
+      'Verifikasi status database health dan connection pool metrics di dashboard monitoring.',
+      'Jika terjadi kegagalan atau lonjakan latency > 500ms, segera jalankan script rollback yang telah disiapkan.'
+    ],
+    dosAndDonts: {
+      dos: [
+        'Gunakan pola expand-and-contract untuk perubahan kolom besar.',
+        'Jadwalkan migrasi besar di luar jam sibuk operasional (maintenance window 23:00 - 04:00).'
+      ],
+      donts: [
+        'DILARANG mengubah tipe data kolom besar tanpa nullable intermediate column.',
+        'Jangan pernah menjalankan prisma db push di environment production.'
+      ]
+    },
+    snippets: [
+      {
+        label: 'Perintah Eksekusi Migration Production',
+        code: `# Cek status migration pending\nnpx prisma migrate status\n\n# Eksekusi migrasi aman\nnpx prisma migrate deploy`
+      }
+    ],
+    isCustom: false,
+    isFeaturedOnHome: false,
+    homeOrder: 5,
+    isPublished: true,
+    contentHtml: `<div class="summary-block-card" data-summary-block=""><p>Standard Operating Procedure (SOP) eksekusi migrasi skema database production dengan strategi Zero-Downtime dan rencana rollback instan.</p></div><h3>Aturan Emas Migrasi Database:</h3><ol><li>Wajib membuat database snapshot sebelum migrasi dijalankan.</li><li>Gunakan perintah <code>npx prisma migrate deploy</code> (bukan <code>db push</code>).</li><li>Gunakan pola <em>Expand and Contract</em> untuk perubahan kolom.</li><li>Siapkan skrip SQL rollback sebelum memulai maintenance.</li></ol>`
+  },
+
+  // 7. DEVOPS
+  {
+    id: 'devops-01',
+    title: 'Incident Response Playbook: Severity 1 Escalation Matrix & War Room',
+    category: 'devops',
+    severity: 'high',
+    tags: ['incident-response', 'sev1', 'war-room', 'escalation', 'sla', 'pagerduty'],
+    summary: 'Protokol penanganan insiden kritis (Severity 1 / P0) ketika sistem utama mengalami downtime atau gangguan fungsionalitas mayor.',
+    problemContext: 'Ketika layanan utama mengalami gangguan total dan memerlukan penanganan cepat dalam SLA response time 15 menit.',
+    actionSteps: [
+      'Incident Commander (IC) membuka Slack Incident Channel #incident-sev1-[nama-insiden] dan Google Meet War Room.',
+      'Panggil On-Call Engineers melalui PagerDuty / panggilan darurat.',
+      'Kirimkan notifikasi awal status insiden ke grup stakeholder maksimal 15 menit sejak insiden terdeteksi.',
+      'Tech Lead mengidentifikasi root cause dan menentukan strategi mitigasi (rollback, failover, atau hotfix).',
+      'Setelah sistem kembali normal (resolve), kirimkan konfirmasi pulih ke seluruh saluran komunikasi.',
+      'Jadwalkan Post-Mortem Blameless Review dalam 2x24 jam kerja.'
+    ],
+    dosAndDonts: {
+      dos: [
+        'Tunjuk 1 orang Incident Commander yang bertanggung jawab penuh atas komunikasi dan koordinasi.',
+        'Dokumentasikan linimasa kejadian (timestamped timeline) secara real-time di channel insiden.'
+      ],
+      donts: [
+        'Dilarang melakukan perubahan konfigurasi di server tanpa persetujuan Incident Commander saat war room aktif.',
+        'Hindari saling menyalahkan saat sesi Post-Mortem (Blameless Culture).'
+      ]
+    },
+    snippets: [
+      {
+        label: 'Template Broadcast Status Insiden',
+        code: `🚨 [INCIDENT SEV-1 UPDATE]\nLayanan: Payment Gateway & Login\nStatus: Investigasi / Mitigasi\nEstimasi Update: 30 Menit ke depan\nWar Room: https://meet.google.com/esb-war-room`
+      }
+    ],
+    isCustom: false,
+    isFeaturedOnHome: false,
+    homeOrder: 6,
+    isPublished: true,
+    contentHtml: `<div class="summary-block-card" data-summary-block=""><p>Protokol penanganan insiden kritis (<strong>Severity 1 / P0</strong>) ketika sistem utama mengalami downtime atau gangguan fungsionalitas mayor.</p></div><h3>Matriks Eskalasi SLA Respon:</h3><ul><li><strong>Sev 1 (Kritis):</strong> Respon &lt; 15 menit | Target Mitigasi &lt; 1 jam</li><li><strong>Sev 2 (Mayor):</strong> Respon &lt; 30 menit | Target Mitigasi &lt; 4 jam</li><li><strong>Sev 3 (Minor):</strong> Respon &lt; 2 jam | Target Mitigasi &lt; 24 jam</li></ul>`
   }
 ];
 
 async function main() {
-  console.log('🌱 Starting Database Seeding with Prisma...');
+  console.log('🗑️ Menghapus seluruh data cases dan interaksi lama...');
+  await prisma.caseInteraction.deleteMany({});
+  await prisma.case.deleteMany({});
+  console.log('✅ Berhasil membersihkan tabel cases dan case_interactions.');
 
-  // 1. Seed FAQ Articles
-  for (let i = 0; i < SEED_CASES.length; i++) {
-    const caseData = SEED_CASES[i];
-    await prisma.case.upsert({
-      where: { id: caseData.id },
-      update: {
-        title: caseData.title,
-        category: caseData.category,
-        tags: caseData.tags,
-        summary: caseData.summary,
-        problemContext: caseData.problemContext,
-        actionSteps: caseData.actionSteps,
-        dosAndDonts: caseData.dosAndDonts,
-        snippets: caseData.snippets,
-        isCustom: caseData.isCustom,
-        isFeaturedOnHome: i < 5, // Top 5 featured on homepage by default
-        homeOrder: i,
-        isPublished: true
-      },
-      create: {
-        id: caseData.id,
-        title: caseData.title,
-        category: caseData.category,
-        tags: caseData.tags,
-        summary: caseData.summary,
-        problemContext: caseData.problemContext,
-        actionSteps: caseData.actionSteps,
-        dosAndDonts: caseData.dosAndDonts,
-        snippets: caseData.snippets,
-        isCustom: caseData.isCustom,
-        isFeaturedOnHome: i < 5,
-        homeOrder: i,
-        isPublished: true
+  console.log(`🌱 Memasukkan ${DUMMY_CASES.length} dummy cases (1 case per kategori)...`);
+
+  for (const c of DUMMY_CASES) {
+    await prisma.case.create({
+      data: {
+        id: c.id,
+        title: c.title,
+        category: c.category,
+        tags: c.tags || [],
+        summary: c.summary || '',
+        problemContext: c.problemContext || '',
+        actionSteps: c.actionSteps || [],
+        dosAndDonts: c.dosAndDonts || { dos: [], donts: [] },
+        snippets: c.snippets || [],
+        isCustom: c.isCustom ?? false,
+        isFeaturedOnHome: Boolean(c.isFeaturedOnHome),
+        homeOrder: c.homeOrder ?? 0,
+        isPublished: c.isPublished ?? true,
+        contentHtml: c.contentHtml || ''
       }
     });
   }
-  console.log(`✅ Seeded ${SEED_CASES.length} FAQ Articles (Top 5 Featured on Homepage)`);
+  console.log(`✅ Sukses generate ${DUMMY_CASES.length} dummy cases!`);
 
-  // 2. Seed initial interaction logs for realistic 30-day popularity ranking
+  // Generate interaction data for popular scoring
   const now = new Date();
   const sampleInteractions = [
-    // google-workspace-02: Password Reset (High Popularity)
-    ...Array(35).fill({ caseId: 'google-workspace-02', type: 'view' }),
-    ...Array(20).fill({ caseId: 'google-workspace-02', type: 'click' }),
-    ...Array(15).fill({ caseId: 'google-workspace-02', type: 'helpful' }),
-    // laptop-01: Laptop Setup
-    ...Array(28).fill({ caseId: 'laptop-01', type: 'view' }),
-    ...Array(16).fill({ caseId: 'laptop-01', type: 'click' }),
-    ...Array(10).fill({ caseId: 'laptop-01', type: 'helpful' }),
-    // laptop-02: Laptop Re-use
-    ...Array(22).fill({ caseId: 'laptop-02', type: 'view' }),
-    ...Array(12).fill({ caseId: 'laptop-02', type: 'click' }),
-    ...Array(8).fill({ caseId: 'laptop-02', type: 'helpful' }),
-    // hp-01: Phone Setup
-    ...Array(18).fill({ caseId: 'hp-01', type: 'view' }),
-    ...Array(9).fill({ caseId: 'hp-01', type: 'click' }),
-    ...Array(6).fill({ caseId: 'hp-01', type: 'helpful' }),
-    // google-workspace-01: Account Creation
-    ...Array(14).fill({ caseId: 'google-workspace-01', type: 'view' }),
-    ...Array(6).fill({ caseId: 'google-workspace-01', type: 'click' }),
-    ...Array(4).fill({ caseId: 'google-workspace-01', type: 'helpful' })
+    ...Array(35).fill({ caseId: 'laptop-01', type: 'view' }),
+    ...Array(18).fill({ caseId: 'laptop-01', type: 'click' }),
+    ...Array(12).fill({ caseId: 'laptop-01', type: 'helpful' }),
+
+    ...Array(28).fill({ caseId: 'software-01', type: 'view' }),
+    ...Array(14).fill({ caseId: 'software-01', type: 'click' }),
+    ...Array(9).fill({ caseId: 'software-01', type: 'helpful' }),
+
+    ...Array(24).fill({ caseId: 'git-01', type: 'view' }),
+    ...Array(10).fill({ caseId: 'git-01', type: 'click' }),
+    ...Array(8).fill({ caseId: 'git-01', type: 'helpful' }),
+
+    ...Array(20).fill({ caseId: 'workplace-01', type: 'view' }),
+    ...Array(8).fill({ caseId: 'workplace-01', type: 'click' }),
+    ...Array(6).fill({ caseId: 'workplace-01', type: 'helpful' }),
+
+    ...Array(16).fill({ caseId: 'env-01', type: 'view' }),
+    ...Array(6).fill({ caseId: 'env-01', type: 'click' }),
+    ...Array(5).fill({ caseId: 'env-01', type: 'helpful' }),
+
+    ...Array(15).fill({ caseId: 'backend-01', type: 'view' }),
+    ...Array(5).fill({ caseId: 'backend-01', type: 'click' }),
+    ...Array(4).fill({ caseId: 'backend-01', type: 'helpful' }),
+
+    ...Array(12).fill({ caseId: 'devops-01', type: 'view' }),
+    ...Array(4).fill({ caseId: 'devops-01', type: 'click' }),
+    ...Array(3).fill({ caseId: 'devops-01', type: 'helpful' })
   ];
 
-  // Only create sample interactions if table is empty
-  const interactionCount = await prisma.caseInteraction.count();
-  if (interactionCount === 0) {
-    for (const inter of sampleInteractions) {
-      const daysAgo = Math.floor(Math.random() * 20);
-      const createdAt = new Date(now.getTime() - daysAgo * 24 * 60 * 60 * 1000);
-      await prisma.caseInteraction.create({
-        data: {
-          caseId: inter.caseId,
-          type: inter.type,
-          createdAt
-        }
-      });
-    }
-    console.log(`✅ Seeded ${sampleInteractions.length} sample Case interactions for 30-day popularity ranking`);
+  for (const inter of sampleInteractions) {
+    const daysAgo = Math.floor(Math.random() * 20);
+    const createdAt = new Date(now.getTime() - daysAgo * 24 * 60 * 60 * 1000);
+    await prisma.caseInteraction.create({
+      data: {
+        caseId: inter.caseId,
+        type: inter.type,
+        createdAt
+      }
+    });
   }
+  console.log(`✅ Sukses generate sample interaction logs.`);
 
-  // 3. Seed Admin User
+  // Ensure Admin User exists
   const adminPassword = await bcrypt.hash('admin123', 10);
   await prisma.user.upsert({
     where: { username: 'admin' },
@@ -333,14 +383,13 @@ async function main() {
       role: 'admin'
     }
   });
-  console.log('✅ Seeded default Admin user (username: admin, password: admin123)');
-
-  console.log('🎉 Seeding successfully completed!');
+  console.log('✅ Admin user ready (username: admin, password: admin123).');
+  console.log('🎉 Selesai!');
 }
 
 main()
   .catch((e) => {
-    console.error('❌ Error during seeding:', e);
+    console.error('❌ Error saat seeding:', e);
     process.exit(1);
   })
   .finally(async () => {

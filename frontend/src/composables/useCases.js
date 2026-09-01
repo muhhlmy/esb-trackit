@@ -336,49 +336,44 @@ export function useCases() {
 
   async function saveCase(formData) {
     try {
-      const isCreate = drawerMode.value === 'create' || !formData.id || !cases.value.some((c) => c.id === formData.id);
+      const exists = Boolean(formData.id && cases.value.some((c) => c.id === formData.id));
+      const isCreate = !formData.id || (!exists && drawerMode.value !== 'edit');
 
       if (isCreate) {
-        const id = formData.id || `case-${Date.now().toString(36)}`;
-        const payload = { ...formData, id, isCustom: true };
+        const id = formData.id || `faq-${Date.now().toString(36)}`;
+        const payload = { ...formData, id, isCustom: formData.isCustom !== undefined ? formData.isCustom : true };
         
-        try {
-          const res = await api.createCase(payload);
-          if (res?.data) {
-            const existingIdx = cases.value.findIndex((c) => c.id === id);
-            if (existingIdx !== -1) {
-              cases.value[existingIdx] = res.data;
-            } else {
-              cases.value.unshift(res.data);
-            }
-          }
-        } catch (apiErr) {
-          console.warn('API createCase fallback:', apiErr.message);
-          cases.value.unshift(payload);
+        const res = await api.createCase(payload);
+        const savedData = res?.data || payload;
+
+        const existingIdx = cases.value.findIndex((c) => c.id === id);
+        if (existingIdx !== -1) {
+          cases.value[existingIdx] = savedData;
+        } else {
+          cases.value.unshift(savedData);
         }
 
         activeCaseId.value = id;
-        showToast('Case baru berhasil disimpan ke database!', 'success');
+        showToast('Artikel FAQ baru berhasil disimpan ke database!', 'success');
+        closeDrawer();
+        return savedData;
       } else {
         const id = formData.id;
-        try {
-          const res = await api.updateCase(id, formData);
-          const idx = cases.value.findIndex((c) => c.id === id);
-          if (idx !== -1 && res?.data) {
-            cases.value[idx] = res.data;
-          }
-        } catch (apiErr) {
-          console.warn('API updateCase fallback:', apiErr.message);
-          const idx = cases.value.findIndex((c) => c.id === id);
-          if (idx !== -1) cases.value[idx] = { ...formData };
+        const res = await api.updateCase(id, formData);
+        const savedData = res?.data || { ...formData };
+
+        const idx = cases.value.findIndex((c) => c.id === id);
+        if (idx !== -1) {
+          cases.value[idx] = savedData;
         }
-        showToast('Perubahan Case berhasil disimpan ke database!', 'success');
+        showToast('Perubahan artikel berhasil disimpan ke database!', 'success');
+        closeDrawer();
+        return savedData;
       }
-      closeDrawer();
-      return true;
     } catch (err) {
-      showToast(err.message || 'Gagal menyimpan case.', 'error');
-      return false;
+      console.error('API save error:', err);
+      showToast('Gagal menyimpan ke database: ' + (err.message || 'Error'), 'error');
+      throw err;
     }
   }
 

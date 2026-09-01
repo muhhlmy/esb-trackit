@@ -311,10 +311,10 @@ const faqs = [
           </h2>
           <button
             @click="router.push('/cases')"
-            class="text-xs font-bold text-[#5D87FF] hover:underline flex items-center gap-1"
+            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-extrabold text-[#5D87FF] bg-[#ECF2FF] dark:bg-slate-800 dark:text-indigo-300 hover:bg-[#5D87FF] hover:text-white dark:hover:bg-[#5D87FF] dark:hover:text-white transition-all duration-200 cursor-pointer shadow-2xs group"
           >
             <span>Lihat Semua SOP</span>
-            <ArrowRight class="w-3.5 h-3.5" />
+            <ArrowRight class="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
           </button>
         </div>
 
@@ -384,10 +384,10 @@ const faqs = [
           </h2>
           <button
             @click="router.push('/cases')"
-            class="text-xs font-bold text-[#5D87FF] hover:underline flex items-center gap-1"
+            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-extrabold text-[#5D87FF] bg-[#ECF2FF] dark:bg-slate-800 dark:text-indigo-300 hover:bg-[#5D87FF] hover:text-white dark:hover:bg-[#5D87FF] dark:hover:text-white transition-all duration-200 cursor-pointer shadow-2xs group"
           >
             <span>View all SOPs</span>
-            <ArrowRight class="w-3.5 h-3.5" />
+            <ArrowRight class="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
           </button>
         </div>
 

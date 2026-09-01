@@ -1,13 +1,23 @@
 -- =====================================================================
 -- SKEMA DATABASE (PostgreSQL): ESB TRACKIT / IT MONITORING ASSETS
--- Simple Schema with CHECK Constraints & Data Validation
+-- Canonical Master Schema with CHECK Constraints & Data Validation
 -- =====================================================================
 
 -- Drop existing tables/views (reverse dependency order)
+DROP VIEW IF EXISTS v_employee_asset_summary CASCADE;
+DROP VIEW IF EXISTS v_ticket_stats_per_queue CASCADE;
 DROP VIEW IF EXISTS daftar_aset_ti_lengkap CASCADE;
+
+DROP TABLE IF EXISTS cases CASCADE;
+DROP TABLE IF EXISTS faq CASCADE;
+DROP TABLE IF EXISTS backup_audit_log CASCADE;
+DROP TABLE IF EXISTS backup_metadata CASCADE;
+DROP TABLE IF EXISTS password_reset_otps CASCADE;
 DROP TABLE IF EXISTS user_sessions CASCADE;
+DROP TABLE IF EXISTS account_security_state CASCADE;
 DROP TABLE IF EXISTS log_audit_login CASCADE;
 DROP TABLE IF EXISTS riwayat_pemakaian_aset CASCADE;
+DROP TABLE IF EXISTS log_riwayat_aset CASCADE;
 DROP TABLE IF EXISTS log_riwayat_tiket CASCADE;
 DROP TABLE IF EXISTS user_ticket_queues CASCADE;
 DROP TABLE IF EXISTS ticket_casp_ratings CASCADE;
@@ -96,7 +106,7 @@ VALUES (
     'superadmin',
     '{"dashboard":"full","assets":"full","tickets":"full"}'::jsonb,
     true
-);
+) ON CONFLICT (email) DO NOTHING;
 
 -- =====================================================================
 -- TABEL 2B: User Sessions (Server-Side Session Store for JWT Revocation)
@@ -136,12 +146,35 @@ CREATE TABLE account_security_state (
 CREATE INDEX idx_account_security_locked_until ON account_security_state(locked_until) WHERE locked_until IS NOT NULL;
 
 -- =====================================================================
+-- TABEL 2D: Password Reset OTPs (Secure Password Reset Flow)
+-- =====================================================================
+CREATE TABLE password_reset_otps (
+    id                          SERIAL          PRIMARY KEY,
+    user_id                     INTEGER         NOT NULL,
+    email                       VARCHAR(150)    NOT NULL,
+    otp_hash                    TEXT            NOT NULL,
+    reset_token                 VARCHAR(255),
+    attempts                    INTEGER         NOT NULL DEFAULT 0,
+    max_attempts                INTEGER         NOT NULL DEFAULT 5,
+    expires_at                  TIMESTAMPTZ     NOT NULL,
+    used_at                     TIMESTAMPTZ,
+    created_at                  TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_password_reset_otps_user
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_password_reset_otps_user ON password_reset_otps(user_id);
+CREATE INDEX idx_password_reset_otps_email ON password_reset_otps(email);
+CREATE INDEX idx_password_reset_otps_token ON password_reset_otps(reset_token);
+
+-- =====================================================================
 -- TABEL 3: Asset (Master Data Aset IT)
 -- =====================================================================
 CREATE TABLE aset_ti (
     id                          SERIAL          PRIMARY KEY,
-    hostname                    VARCHAR(50)     NOT NULL,
-    serial_number               VARCHAR(50)     NOT NULL,
+    hostname                    VARCHAR(50),
+    serial_number               VARCHAR(50),
     spesifikasi                 TEXT,
     nik_pemegang_asset           VARCHAR(20),
     nama_karyawan_pemegang_asset VARCHAR(150),
@@ -205,7 +238,8 @@ CREATE INDEX idx_aset_ga_kondisi ON aset_ga(kondisi);
 -- Seed Data Aset GA
 INSERT INTO aset_ga (hostname, quantity, tipe_fasilitas, nama_asset, ukuran, detail, lokasi, lokasi_detail, kondisi) VALUES
     ('GA-PL-001', 10, 'Meja', 'Meja Kerja', '100x100x75 cm', 'Warna Cream, Kayu Jati', 'Pluit', 'Ruang Bubur Ayam', 'Baik'),
-    ('GA-GS-002', 5, 'AC', 'AC Split 2 PK', '2 PK', 'Daikin Inverter', 'Gading Serpong', 'Lantai 2', 'Baik');
+    ('GA-GS-002', 5, 'AC', 'AC Split 2 PK', '2 PK', 'Daikin Inverter', 'Gading Serpong', 'Lantai 2', 'Baik')
+ON CONFLICT (hostname) DO NOTHING;
 
 -- =====================================================================
 -- TABEL 3C: Asset OPS (Operational Assets)
@@ -237,7 +271,8 @@ CREATE INDEX idx_aset_ops_status ON aset_ops(status) WHERE deleted_at IS NULL;
 -- Seed Data Aset OPS
 INSERT INTO aset_ops (hostname, nama_asset, kategori, lokasi, pic, tanggal_beli, total_asset_amount, kondisi, status) VALUES
     ('OPS-PL-001', 'KIOSK', 'Self Service', 'Pluit', 'Store Manager', '2026-08-01', 15000000.00, 'Baik', 'Aktif'),
-    ('OPS-GS-002', 'POS Terminal', 'Point of Sales', 'Gading Serpong', 'Supervisor', '2026-06-15', 8500000.00, 'Baik', 'Aktif');
+    ('OPS-GS-002', 'POS Terminal', 'Point of Sales', 'Gading Serpong', 'Supervisor', '2026-06-15', 8500000.00, 'Baik', 'Aktif')
+ON CONFLICT (hostname) DO NOTHING;
 
 -- =====================================================================
 -- TABEL 4: Ticket Queue (Helpdesk Categories/Teams)
@@ -256,7 +291,8 @@ CREATE TABLE ticket_queues (
 INSERT INTO ticket_queues (kode, nama, deskripsi) VALUES
     ('IT', 'IT Support', 'IT support & services'),
     ('HR', 'HR Support', 'Human Resources support & services'),
-    ('GA', 'GA Support', 'General Affairs support & facilities');
+    ('GA', 'GA Support', 'General Affairs support & facilities')
+ON CONFLICT (kode) DO NOTHING;
 
 -- =====================================================================
 -- TABEL 5: Tickets (Helpdesk System)
@@ -319,6 +355,7 @@ CREATE TABLE komentar_tiket (
     id_tiket                    INTEGER         NOT NULL,
     pesan                       TEXT            NOT NULL,
     attachment_data             TEXT,
+    attachment_name             VARCHAR(255),
     user_id                     INTEGER         NOT NULL,
     created_at                  TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
@@ -420,7 +457,7 @@ CREATE INDEX idx_log_riwayat_aset_id ON log_riwayat_aset(id_aset, dibuat_pada DE
 CREATE TABLE riwayat_pemakaian_aset (
     id                          SERIAL          PRIMARY KEY,
     id_aset                     INTEGER         NOT NULL,
-    nik_pemegang                 VARCHAR(20)     NOT NULL,
+    nik_pemegang                 VARCHAR(20),
     tanggal_mulai               TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
     tanggal_selesai             TIMESTAMP,
     catatan                     TEXT,
@@ -456,6 +493,138 @@ CREATE TABLE log_audit_login (
 -- Index
 CREATE INDEX idx_log_audit_login_time ON log_audit_login(login_time DESC);
 CREATE INDEX idx_log_audit_login_email ON log_audit_login(email);
+
+-- =====================================================================
+-- TABEL 12: Backup Metadata (Backup & Restore Database)
+-- =====================================================================
+CREATE TABLE backup_metadata (
+    id                          SERIAL          PRIMARY KEY,
+    filename                    VARCHAR(255)    NOT NULL,
+    filepath                    TEXT            NOT NULL,
+    file_size                   BIGINT          NOT NULL DEFAULT 0,
+    database_name               VARCHAR(100)    NOT NULL,
+    backup_type                 VARCHAR(50)     NOT NULL DEFAULT 'manual',
+    status                      VARCHAR(50)     NOT NULL DEFAULT 'success',
+    checksum                    VARCHAR(128),
+    created_by                  INTEGER,
+    created_by_name             VARCHAR(150),
+    created_at                  TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT chk_backup_type
+        CHECK (backup_type IN ('manual', 'pre_restore', 'scheduled')),
+
+    CONSTRAINT chk_backup_status
+        CHECK (status IN ('success', 'failed', 'in_progress')),
+
+    CONSTRAINT fk_backup_created_by
+        FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL
+);
+
+CREATE INDEX idx_backup_created_at ON backup_metadata(created_at DESC);
+CREATE INDEX idx_backup_status ON backup_metadata(status);
+CREATE INDEX idx_backup_type ON backup_metadata(backup_type);
+
+-- =====================================================================
+-- TABEL 13: Backup Audit Log (Audit Trail Backup & Restore)
+-- =====================================================================
+CREATE TABLE backup_audit_log (
+    id                          SERIAL          PRIMARY KEY,
+    user_id                     INTEGER,
+    user_name                   VARCHAR(150),
+    operation                   VARCHAR(50)     NOT NULL,
+    target_database             VARCHAR(100)    NOT NULL,
+    backup_id                   INTEGER,
+    status                      VARCHAR(50)     NOT NULL DEFAULT 'success',
+    error_summary               TEXT,
+    created_at                  TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT chk_audit_operation
+        CHECK (operation IN (
+            'BACKUP_STARTED',
+            'BACKUP_SUCCESS',
+            'BACKUP_FAILED',
+            'RESTORE_STARTED',
+            'RESTORE_VALIDATED',
+            'PRE_RESTORE_BACKUP_STARTED',
+            'PRE_RESTORE_BACKUP_SUCCESS',
+            'PRE_RESTORE_BACKUP_FAILED',
+            'RESTORE_SUCCESS',
+            'RESTORE_FAILED',
+            'BACKUP_DELETED',
+            'BACKUP_DOWNLOADED'
+        )),
+
+    CONSTRAINT chk_audit_status
+        CHECK (status IN ('success', 'failed', 'in_progress')),
+
+    CONSTRAINT fk_audit_user
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL,
+
+    CONSTRAINT fk_audit_backup
+        FOREIGN KEY (backup_id) REFERENCES backup_metadata(id) ON DELETE SET NULL
+);
+
+CREATE INDEX idx_backup_audit_created ON backup_audit_log(created_at DESC);
+CREATE INDEX idx_backup_audit_operation ON backup_audit_log(operation);
+CREATE INDEX idx_backup_audit_user ON backup_audit_log(user_id);
+
+-- =====================================================================
+-- TABEL 14: FAQ (Help Center FAQ CMS)
+-- =====================================================================
+CREATE TABLE faq (
+    id                          SERIAL          PRIMARY KEY,
+    question                    VARCHAR(500)    NOT NULL,
+    answer                      TEXT            NOT NULL,
+    category                    VARCHAR(100)    NOT NULL,
+    status                      VARCHAR(20)     NOT NULL DEFAULT 'DRAFT',
+    sort_order                  INTEGER         NOT NULL DEFAULT 0,
+    created_at                  TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at                  TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT chk_faq_status
+        CHECK (status IN ('DRAFT', 'PUBLISHED'))
+);
+
+CREATE INDEX idx_faq_status ON faq(status);
+
+-- Seed FAQ
+INSERT INTO faq (question, answer, category, status, sort_order)
+VALUES (
+    'Bagaimana cara melakukan reset password akun Google Workspace?',
+    'Untuk melakukan reset password akun Google Workspace, silakan hubungi tim IT atau ikuti prosedur reset password yang telah ditetapkan perusahaan.',
+    'Account & Access',
+    'PUBLISHED',
+    1
+);
+
+-- =====================================================================
+-- TABEL 15: Cases (Help Center SOP / Case CMS)
+-- =====================================================================
+CREATE TABLE cases (
+    id                          SERIAL          PRIMARY KEY,
+    title                       VARCHAR(300)    NOT NULL,
+    category                    VARCHAR(100)    NOT NULL,
+    severity                    VARCHAR(20)     NOT NULL DEFAULT 'medium',
+    tags                        JSONB           NOT NULL DEFAULT '[]'::jsonb,
+    summary                     TEXT,
+    problem_context             TEXT,
+    action_steps                JSONB           NOT NULL DEFAULT '[]'::jsonb,
+    dos                         JSONB           NOT NULL DEFAULT '[]'::jsonb,
+    donts                       JSONB           NOT NULL DEFAULT '[]'::jsonb,
+    snippets                    JSONB           NOT NULL DEFAULT '[]'::jsonb,
+    status                      VARCHAR(20)     NOT NULL DEFAULT 'DRAFT',
+    is_custom                   BOOLEAN         NOT NULL DEFAULT FALSE,
+    sort_order                  INTEGER         NOT NULL DEFAULT 0,
+    created_at                  TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at                  TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT chk_cases_status
+        CHECK (status IN ('DRAFT', 'PUBLISHED')),
+    CONSTRAINT chk_cases_severity
+        CHECK (severity IN ('low', 'medium', 'high'))
+);
+
+CREATE INDEX idx_cases_status ON cases(status);
 
 -- =====================================================================
 -- HELPFUL VIEWS
@@ -512,7 +681,7 @@ LEFT JOIN aset_ti a ON k.nik = a.nik_pemegang_asset AND a.deleted_at IS NULL
 GROUP BY k.id, k.nik, k.nama_karyawan, k.departemen;
 
 -- =====================================================================
--- AUTO UPDATE TRIGGERS (Optional but recommended)
+-- AUTO UPDATE TRIGGERS (Timestamp management)
 -- =====================================================================
 
 CREATE OR REPLACE FUNCTION auto_update_timestamp() RETURNS TRIGGER AS $$
@@ -544,15 +713,5 @@ CREATE TRIGGER trg_aset_ti_prevent_hard_delete BEFORE DELETE ON aset_ti FOR EACH
 CREATE TRIGGER trg_tickets_prevent_hard_delete BEFORE DELETE ON tickets FOR EACH ROW EXECUTE FUNCTION prevent_hard_delete();
 
 -- =====================================================================
--- SEED DATA (Optional Sample Employees)
--- =====================================================================
-
--- INSERT INTO karyawan (nik, nama_karyawan, status, title, job_level, departemen, directorate, tanggal_mulai_bekerja, employeement_status, nik_atasan_langsung, email_kantor, lokasi_kerja)
--- VALUES 
--- ('EMP001', 'John Doe', 'Active', 'Senior Developer', 'S1', 'Engineering', 'Technology Directorate', '2020-01-15', 'Permanent', NULL, 'john.doe@company.com', 'Jakarta'),
--- ('EMP002', 'Jane Smith', 'Active', 'Lead Engineer', 'S1', 'Engineering', 'Technology Directorate', '2019-06-01', 'Permanent', 'EMP001', 'jane.smith@company.com', 'Jakarta'),
--- ('EMP003', 'Bob Wilson', 'Active', 'DevOps Engineer', 'S1', 'Infrastructure', 'Technology Directorate', '2021-03-10', 'Contract', NULL, 'bob.wilson@company.com', 'Surabaya');
-
--- =====================================================================
--- COMPLETED: Simple Schema with Checks Ready for Use
+-- COMPLETED: Full Schema Master Ready for Production & Local Setup
 -- =====================================================================

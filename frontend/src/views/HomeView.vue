@@ -146,20 +146,14 @@ function handleSearchSubmit() {
 
 // Click Quick Action Popular Pill
 async function handlePopularChipClick(faq) {
-  // 1. Record Click event to backend
+  // 1. Select case in state
+  selectCase(faq.id);
+
+  // 2. Record Click event to backend
   try {
     await api.recordCaseInteraction(faq.id, 'click');
   } catch (e) {
     console.warn('Click track error:', e.message);
-  }
-
-  // 2. Open accordion if featured or route to cases view
-  openFaqId.value = faq.id;
-
-  // 3. Smooth scroll to FAQ section
-  const section = document.getElementById('faqs-section');
-  if (section) {
-    section.scrollIntoView({ behavior: 'smooth' });
   }
 }
 
@@ -303,15 +297,16 @@ function goToFaqDetail(id) {
           <Flame class="w-3.5 h-3.5 text-amber-500" />
           <span>Popular:</span>
         </span>
-        <button
+        <router-link
           v-for="p in popularFaqs"
           :key="p.id"
+          :to="'/cases/' + p.id"
           @click="handlePopularChipClick(p)"
-          class="text-xs px-3 py-1.5 rounded-full bg-white dark:bg-slate-900 border border-[#c4c5d9] dark:border-slate-800 text-[#1a1c1d] dark:text-slate-300 hover:border-[#0040e5] hover:text-[#0040e5] dark:hover:border-indigo-400 dark:hover:text-indigo-400 transition-all shadow-2xs cursor-pointer flex items-center gap-1.5 group"
+          class="text-xs px-3 py-1.5 rounded-full bg-white dark:bg-slate-900 border border-[#c4c5d9] dark:border-slate-800 text-[#1a1c1d] dark:text-slate-300 hover:border-[#0040e5] hover:text-[#0040e5] dark:hover:border-indigo-400 dark:hover:text-indigo-400 transition-all shadow-2xs cursor-pointer flex items-center gap-1.5 group inline-flex"
         >
           <span>{{ p.title }}</span>
           <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 opacity-60 group-hover:opacity-100"></span>
-        </button>
+        </router-link>
       </div>
 
     </section>

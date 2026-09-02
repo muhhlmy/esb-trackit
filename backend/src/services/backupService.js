@@ -14,7 +14,7 @@ const PG_RESTORE_PATH = process.env.PG_RESTORE_PATH || 'pg_restore'
 const PSQL_PATH = process.env.PSQL_PATH || 'psql'
 const MAX_UPLOAD_SIZE = 500 * 1024 * 1024 // 500MB
 
-function resolveBackupDir() {
+export function resolveBackupDir() {
   return path.resolve(BACKUP_DIR)
 }
 
@@ -335,10 +335,17 @@ export async function deleteBackup(id, userId, userName) {
     throw new Error('Backup tidak ditemukan.')
   }
 
+  // Security: pastikan filepath berada di dalam backup directory (anti path traversal)
+  const resolvedPath = path.resolve(backup.filepath)
+  const backupDir = resolveBackupDir()
+  if (!resolvedPath.startsWith(backupDir + path.sep)) {
+    throw new Error('Path backup tidak valid.')
+  }
+
   const dbName = env.database.database
 
   try {
-    await fsp.unlink(backup.filepath)
+    await fsp.unlink(resolvedPath)
   } catch (err) {
     if (err.code !== 'ENOENT') {
       throw new Error(`Gagal menghapus file backup: ${err.message}`)
@@ -532,7 +539,7 @@ async function dropConnections(dbName, dbUser, dbPassword, dbHost, dbPort) {
       '--command',
       `SELECT pg_terminate_backend(pg_stat_activity.pid)
        FROM pg_stat_activity
-       WHERE pg_stat_activity.datname = '${dbName}'
+       WHERE pg_stat_activity.datname = current_database()
          AND pid <> pg_backend_pid()`,
     ], { env: envVars })
   } catch {

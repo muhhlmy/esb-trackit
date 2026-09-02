@@ -1,0 +1,1 @@
+Paths that match both --include and --exclude will be skipped by Semgrep.

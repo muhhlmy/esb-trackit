@@ -351,7 +351,9 @@ const finishResetAndLogin = () => {
 
         <!-- Top Header: Brand Logo -->
         <div class="relative z-10 flex items-center justify-between">
-          <img src="/ESB Logo.svg" alt="ESB People Technology Logo" class="h-7 lg:h-8 w-auto object-contain" />
+          <router-link to="/" aria-label="Kembali ke Help Center">
+            <img src="/ESB Logo.svg" alt="ESB People Technology Logo" class="h-7 lg:h-8 w-auto object-contain cursor-pointer" />
+          </router-link>
         </div>
 
         <!-- Middle Focal Point: Brand Statement & Typography -->
@@ -416,7 +418,9 @@ const finishResetAndLogin = () => {
         <div
           class="flex md:hidden items-center justify-between pb-4 border-b border-slate-100 mb-4 shrink-0"
         >
-          <img src="/ESB Logo.svg" alt="ESB People Technology Logo" class="h-7 w-auto object-contain" />
+          <router-link to="/" aria-label="Kembali ke Help Center">
+            <img src="/ESB Logo.svg" alt="ESB People Technology Logo" class="h-7 w-auto object-contain cursor-pointer" />
+          </router-link>
           <div
             class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-slate-100 border border-slate-200/80 text-[10px] font-semibold text-slate-700"
           >

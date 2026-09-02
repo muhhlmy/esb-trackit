@@ -5,6 +5,7 @@ import {
   createHttpError,
   parsePositiveIntegerParam,
 } from '../security/requestValidation.js'
+import { sanitizeRichTextHtml } from '../security/htmlSanitizer.js'
 
 const MAX_TITLE_LENGTH = 300
 const MAX_CATEGORY_LENGTH = 100
@@ -159,7 +160,7 @@ function validateCreateBody(body) {
     tags: normalizeStringList(body.tags, 'Tags'),
     summary: normalizeOptionalText(body.summary, 'Summary'),
     problem_context: normalizeOptionalText(body.problemContext, 'Problem context'),
-    content_html: normalizeOptionalText(body.contentHtml, 'Content HTML'),
+    content_html: sanitizeRichTextHtml(normalizeOptionalText(body.contentHtml, 'Content HTML')),
     action_steps: normalizeStringList(body.actionSteps, 'Action steps'),
     dos: normalizeDosDonts(body.dosAndDonts, 'dos', 'Dos'),
     donts: normalizeDosDonts(body.dosAndDonts, 'donts', 'Donts'),
@@ -184,7 +185,7 @@ function validateUpdateBody(body) {
   if (has('tags')) out.tags = normalizeStringList(body.tags, 'Tags')
   if (has('summary')) out.summary = normalizeOptionalText(body.summary, 'Summary')
   if (has('problemContext')) out.problem_context = normalizeOptionalText(body.problemContext, 'Problem context')
-  if (has('contentHtml')) out.content_html = normalizeOptionalText(body.contentHtml, 'Content HTML')
+  if (has('contentHtml')) out.content_html = sanitizeRichTextHtml(normalizeOptionalText(body.contentHtml, 'Content HTML'))
   if (has('actionSteps')) out.action_steps = normalizeStringList(body.actionSteps, 'Action steps')
   if (has('dosAndDonts')) {
     out.dos = normalizeDosDonts(body.dosAndDonts, 'dos', 'Dos')

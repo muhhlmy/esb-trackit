@@ -7,6 +7,13 @@ import {
   ensureAccountSecurityTable,
   resetFailedLogin,
 } from '../src/services/accountSecurityService.js'
+import { loginRateLimiter, authRateLimiter } from '../src/middleware/rateLimitMiddleware.js'
+
+// Helper: reset semua rate limiter
+function resetAllRateLimiters() {
+  loginRateLimiter.reset()
+  authRateLimiter.reset()
+}
 
 function makeRequest(server, path, headers = {}, bodyObj = null) {
   return new Promise((resolve, reject) => {
@@ -60,6 +67,8 @@ test('Brute-Force Lockout & Account Protection Suite (DEFECT-04 / SEC-11)', asyn
   t.before(async () => {
     await ensureAccountSecurityTable(pool)
     await resetFailedLogin(testUserEmail).catch(() => {})
+    loginRateLimiter.reset()
+    authRateLimiter.reset()
 
     // Insert test user into database
     const userRes = await pool.query(
@@ -86,9 +95,12 @@ test('Brute-Force Lockout & Account Protection Suite (DEFECT-04 / SEC-11)', asyn
     if (server) {
       await new Promise((resolve) => server.close(resolve))
     }
+    loginRateLimiter.reset()
+    authRateLimiter.reset()
   })
 
   await t.test('TEST 1 — First failed login returns 401 without lockout', async () => {
+    resetAllRateLimiters()
     await resetFailedLogin(testUserEmail)
 
     const res = await makeRequest(
@@ -108,6 +120,7 @@ test('Brute-Force Lockout & Account Protection Suite (DEFECT-04 / SEC-11)', asyn
   })
 
   await t.test('TEST 2 — Attempts 1-4 return 401 without lockout', async () => {
+    resetAllRateLimiters()
     await resetFailedLogin(testUserEmail)
 
     for (let i = 1; i <= 4; i++) {
@@ -127,6 +140,7 @@ test('Brute-Force Lockout & Account Protection Suite (DEFECT-04 / SEC-11)', asyn
   })
 
   await t.test('TEST 3 — 5th failed attempt triggers account lockout (30s) and returns 429', async () => {
+    resetAllRateLimiters()
     await resetFailedLogin(testUserEmail)
 
     // Execute 4 failed attempts
@@ -163,6 +177,7 @@ test('Brute-Force Lockout & Account Protection Suite (DEFECT-04 / SEC-11)', asyn
   })
 
   await t.test('TEST 4 — 6th attempt during lock is blocked with 429', async () => {
+    resetAllRateLimiters()
     const res = await makeRequest(
       server,
       '/api/auth/login',
@@ -178,6 +193,7 @@ test('Brute-Force Lockout & Account Protection Suite (DEFECT-04 / SEC-11)', asyn
   })
 
   await t.test('TEST 5 — Account enumeration protection (existing vs non-existing return identical status & message)', async () => {
+    resetAllRateLimiters()
     await resetFailedLogin(testUserEmail)
 
     const nonExistingEmail = `nonexistent.${Date.now()}@company.com`
@@ -213,6 +229,7 @@ test('Brute-Force Lockout & Account Protection Suite (DEFECT-04 / SEC-11)', asyn
   })
 
   await t.test('TEST 6 — Successful login resets failure counter and clears lock', async () => {
+    resetAllRateLimiters()
     await resetFailedLogin(testUserEmail)
 
     // Failed login x 2
@@ -249,6 +266,7 @@ test('Brute-Force Lockout & Account Protection Suite (DEFECT-04 / SEC-11)', asyn
   })
 
   await t.test('TEST 7 — Concurrent failed logins handle counter race conditions atomically', async () => {
+    resetAllRateLimiters()
     const concurrentEmail = `concurrent.${Date.now()}@company.com`
     await resetFailedLogin(concurrentEmail)
 
@@ -283,6 +301,7 @@ test('Brute-Force Lockout & Account Protection Suite (DEFECT-04 / SEC-11)', asyn
   })
 
   await t.test('TEST 8 — Failed logins do NOT create sessions in database', async () => {
+    resetAllRateLimiters()
     const freshEmail = `sessiontest.${Date.now()}@company.com`
     const initialSessionCountRes = await pool.query('SELECT COUNT(*)::int as cnt FROM user_sessions')
     const initialCount = initialSessionCountRes.rows[0].cnt

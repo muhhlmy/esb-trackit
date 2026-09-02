@@ -93,9 +93,9 @@ test('HTTP Security Headers & CORS Policy Suite (DEFECT-02 / DEFECT-15 / SEC-07)
     assert.ok(csp.includes("object-src 'none'"))
   })
 
-  await t.test('TEST 8 — X-XSS-Protection === 1; mode=block', async () => {
+  await t.test('TEST 8 — X-XSS-Protection header removed (deprecated, CSP supersedes)', async () => {
     const res = await makeRequest(server, '/health')
-    assert.equal(res.headers['x-xss-protection'], '1; mode=block')
+    assert.equal(res.headers['x-xss-protection'], undefined)
   })
 
   await t.test('TEST 9 — Strict-Transport-Security (HSTS) included on HTTPS requests', async () => {
@@ -124,7 +124,6 @@ test('HTTP Security Headers & CORS Policy Suite (DEFECT-02 / DEFECT-15 / SEC-07)
     assert.equal(res.status, 404)
     assert.equal(res.headers['x-content-type-options'], 'nosniff')
     assert.equal(res.headers['x-frame-options'], 'DENY')
-    assert.equal(res.headers['x-xss-protection'], '1; mode=block')
   })
 
   await t.test('TEST 13 — CORS allows configured frontend origin', async () => {

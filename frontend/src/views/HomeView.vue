@@ -267,11 +267,13 @@ onMounted(async () => {
       { opacity: 1, y: 0, duration: 0.4, stagger: 0.05, ease: 'power2.out', delay: 0.15, clearProps: 'all' }
     );
 
-    gsap.fromTo(
-      '.gsap-sop-item',
-      { opacity: 0, y: 12 },
-      { opacity: 1, y: 0, duration: 0.35, stagger: 0.04, ease: 'power2.out', delay: 0.25, clearProps: 'all' }
-    );
+    if (document.querySelector('.gsap-sop-item')) {
+      gsap.fromTo(
+        '.gsap-sop-item',
+        { opacity: 0, y: 12 },
+        { opacity: 1, y: 0, duration: 0.35, stagger: 0.04, ease: 'power2.out', delay: 0.25, clearProps: 'all' }
+      );
+    }
 
     gsap.fromTo(
       '.gsap-assistance',
@@ -639,11 +641,15 @@ onMounted(async () => {
 
             <div class="space-y-1 text-left">
               <div class="text-xs font-extrabold text-[#0F172A] dark:text-white">
-                24/7 IT Helpdesk Support
+                IT Helpdesk Support
               </div>
               <div class="text-[11px] font-medium text-[#64748B] dark:text-slate-400 flex items-center gap-1.5">
                 <Clock class="w-3.5 h-3.5 text-[#5D87FF] shrink-0" />
-                <span>Response time &lt; 15 Mins</span>
+                <span>Mon - Fri</span>
+              </div>
+              <div class="text-[11px] font-medium text-[#64748B] dark:text-slate-400 flex items-center gap-1.5">
+                <Clock class="w-3.5 h-3.5 text-[#5D87FF] shrink-0" />
+                <span>08:30 - 17:30</span>
               </div>
             </div>
 

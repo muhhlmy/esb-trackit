@@ -1,5 +1,7 @@
 import { pool } from '../config/database.js'
 import { normalizeLocation } from '../utils/locationNormalizer.js'
+import { env } from '../config/env.js'
+import { hashPassword } from '../security/passwordService.js'
 
 const MAX_EXPORT_ROWS = 1000
 const MAX_SEARCH_LENGTH = 200
@@ -851,9 +853,28 @@ export async function exportTicketsHandler(req, res) {
 
 /**
  * Resets and truncates all database tables, restoring clean initial state.
- * Superadmin-only endpoint.
+ * Superadmin-only endpoint. Requires ENABLE_DB_RESET=true and
+ * SEED_SUPERADMIN_EMAIL + SEED_SUPERADMIN_PASSWORD env vars.
  */
 export async function resetDatabaseHandler(req, res, next) {
+  // Guard: jangan izinkan reset di produksi kecuali secara eksplisit diaktifkan
+  if (!env.security.enableDbReset) {
+    return res.status(403).json({
+      success: false,
+      message: 'Reset database dinonaktifkan. Set ENABLE_DB_RESET=true untuk mengaktifkan.',
+    })
+  }
+
+  // Guard: wajib ada kredensial seed superadmin dari env (jangan hardcode)
+  const seedEmail = String(env.seed.superadminEmail || '').trim()
+  const seedPassword = String(env.seed.superadminPassword || '')
+  if (!seedEmail || !seedPassword || seedPassword.length < 8) {
+    return res.status(500).json({
+      success: false,
+      message: 'SEED_SUPERADMIN_EMAIL dan SEED_SUPERADMIN_PASSWORD (min 8 karakter) wajib diisi di env.',
+    })
+  }
+
   const client = await pool.connect()
   try {
     await client.query('BEGIN')
@@ -880,14 +901,19 @@ export async function resetDatabaseHandler(req, res, next) {
       RESTART IDENTITY CASCADE
     `)
 
-    // Re-seed default Superadmin, Admin, and User accounts
-    await client.query(`
-      INSERT INTO users (nama, email, password_hash, role, permissions, is_active)
-      VALUES 
-        ('Super Administrator', 'superadmin@admin.com', '$2b$10$KUuuaQWHvErN2WNcqrJOXeRC1Ym6GRyxcIzwpmRboOSkDpOPxE/Cu', 'superadmin', '{"dashboard":"full","assets":"full","tickets":"full"}'::jsonb, true),
-        ('Admin IT', 'admin@admin.com', '$2b$10$KUuuaQWHvErN2WNcqrJOXeRC1Ym6GRyxcIzwpmRboOSkDpOPxE/Cu', 'admin', '{"dashboard":"full","assets":"full","tickets":"full","karyawan":"full","users":"full"}'::jsonb, true),
-        ('User Karyawan', 'user@user.com', '$2b$10$S9GfD12n8/R1E840Wq0fOu102lY.761.34181.1', 'user', '{"my_assets":"read","tickets":"read"}'::jsonb, true)
-    `)
+    // Re-seed default superadmin dari env (password di-hash on-the-fly)
+    const seedHash = await hashPassword(seedPassword)
+    const seedName = env.seed.superadminName || 'Super Administrator'
+    await client.query(
+      `INSERT INTO users (nama, email, password_hash, role, permissions, is_active)
+       VALUES ($1, $2, $3, 'superadmin', $4::jsonb, true)`,
+      [
+        seedName,
+        seedEmail,
+        seedHash,
+        '{"dashboard":"full","assets":"full","tickets":"full","karyawan":"full","users":"full","knowledge_base":"full","export":"full","backup":"full"}',
+      ]
+    )
 
     // Re-seed default ticket queues
     await client.query(`
@@ -904,7 +930,7 @@ export async function resetDatabaseHandler(req, res, next) {
 
     res.json({
       success: true,
-      message: 'Database berhasil di-reset dan dikosongkan. Seluruh data aset, tiket, karyawan, dan log telah dibersihkan.',
+      message: `Database berhasil di-reset. Akun superadmin (${seedEmail}) telah dibuat dari env SEED_SUPERADMIN_*.`,
     })
   } catch (error) {
     await client.query('ROLLBACK').catch(() => {})

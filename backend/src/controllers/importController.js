@@ -295,8 +295,8 @@ export async function importExcelData(req, res) {
     }
 
     // ── Phase 2: Hash Default Password HANYA SEKALI sebelum loop ──
-    const defaultPassword = env.auth?.defaultUserPassword || process.env.DEFAULT_USER_PASSWORD || 'Esb123456!';
-    const defaultPasswordHash = await hashPassword(defaultPassword);
+        const defaultPassword = env.auth.defaultUserPassword
+        const defaultPasswordHash = await hashPassword(defaultPassword)
 
     // ── Phase 3: Proses Karyawan, User & Aset dalam SATU Database Transaction ──
     await withTransaction(async (client) => {

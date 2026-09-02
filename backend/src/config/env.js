@@ -161,7 +161,15 @@ export const env = {
     legacyMode: readLegacyPasswordMode(),
   },
   auth: {
-    defaultUserPassword: process.env.DEFAULT_USER_PASSWORD || "Esb123456!",
+      defaultUserPassword: readRequiredSecret("DEFAULT_USER_PASSWORD", 8),
+    },
+  seed: {
+    superadminEmail: process.env.SEED_SUPERADMIN_EMAIL || "",
+    superadminPassword: process.env.SEED_SUPERADMIN_PASSWORD || "",
+    superadminName: process.env.SEED_SUPERADMIN_NAME || "Super Administrator",
+  },
+  security: {
+    enableDbReset: process.env.ENABLE_DB_RESET === "true",
   },
   rateLimit: {
     windowMs: readNumber("API_RATE_LIMIT_WINDOW_MS", 60_000),

@@ -9,6 +9,16 @@ function hashOtp(otpCode) {
   return crypto.createHash('sha256').update(String(otpCode).trim()).digest('hex')
 }
 
+// Perbandingan constant-time untuk hash/token (anti timing oracle).
+// Fallback ke !== hanya bila panjang tidak sama (tak ada info bocor via timing
+// karena panjang hash bersifat publik).
+function safeEquals(a, b) {
+  const bufA = Buffer.from(String(a), 'utf8')
+  const bufB = Buffer.from(String(b), 'utf8')
+  if (bufA.length !== bufB.length) return false
+  return crypto.timingSafeEqual(bufA, bufB)
+}
+
 /**
  * Generate 6-digit numeric OTP and save to database.
  */
@@ -118,9 +128,9 @@ export async function verifyPasswordResetOtp(email, submittedOtp) {
     throw error
   }
 
-  // Verifikasi hash
+  // Verifikasi hash (constant-time)
   const submittedHash = hashOtp(cleanOtp)
-  if (submittedHash !== record.otp_hash) {
+  if (!safeEquals(submittedHash, record.otp_hash)) {
     // Tambah counter attempts
     await pool.query('UPDATE password_reset_otps SET attempts = attempts + 1 WHERE id = $1', [record.id])
     const remainingAttempts = record.max_attempts - (record.attempts + 1)

@@ -1,5 +1,6 @@
 import { pool } from '../config/database.js';
 import { env } from '../config/env.js';
+import { createHash } from 'node:crypto';
 import jwt from 'jsonwebtoken';
 import {
   DEFAULT_USER_PERMISSIONS,
@@ -31,6 +32,10 @@ import {
 
 const MAX_LOGIN_EMAIL_LENGTH = 150
 const MAX_LOGIN_PASSWORD_LENGTH = 255
+
+function hashIdentifier(value) {
+  return 'sha256:' + createHash('sha256').update(String(value)).digest('hex').slice(0, 16)
+}
 
 export function normalizeLoginCredentials(body) {
   if (!body || typeof body !== 'object' || Array.isArray(body)) return null
@@ -391,18 +396,22 @@ export async function forgotPassword(req, res) {
       [parsedEmail],
     )
 
+    // Anti user-enumeration: status & pesan selalu identik untuk email terdaftar
+    // maupun tidak. Untuk email tidak dikenal / akun nonaktif, jalankan timing
+    // equalization (dummy hash verification) agar respons tidak dapat dibedakan.
+    const genericMessage =
+      'Jika alamat email terdaftar, kode verifikasi OTP telah dikirim. Periksa kotak masuk Anda.'
+
     if (userResult.rowCount === 0) {
-      return res.status(404).json({
-        message: 'Alamat email tidak terdaftar dalam sistem.',
-      })
+      await verifyPassword('x', DUMMY_BCRYPT_HASH)
+      return res.json({ message: genericMessage })
     }
 
     const user = userResult.rows[0]
 
     if (!user.is_active) {
-      return res.status(403).json({
-        message: 'Akun Anda sedang dinonaktifkan. Silakan hubungi Administrator.',
-      })
+      await verifyPassword('x', DUMMY_BCRYPT_HASH)
+      return res.json({ message: genericMessage })
     }
 
     // 2. Buat OTP 6 digit dan simpan ke database (berlaku 5 menit)
@@ -422,13 +431,9 @@ export async function forgotPassword(req, res) {
       text: `Halo ${user.nama}, kode verifikasi OTP Anda untuk reset kata sandi adalah: ${otpCode}. Kode ini berlaku selama ${expiresMinutes} menit.`,
     })
 
-    console.log(`[forgotPassword] OTP generated for <${user.email}>: ${otpCode} (Email sent status: ${isSent})`)
+    console.log(`[forgotPassword] OTP issued for ${hashIdentifier(user.email)} (email sent: ${isSent})`)
 
-    res.json({
-      message: `Kode verifikasi OTP (5 menit) telah dikirim ke email ${user.email}.`,
-      email: user.email,
-      expiresMinutes,
-    })
+    res.json({ message: genericMessage })
   } catch (error) {
     if (error.statusCode) {
       if (error.retryAfter) {

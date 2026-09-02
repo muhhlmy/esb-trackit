@@ -13,6 +13,7 @@ import {
   restoreDatabase,
   runRetentionCleanup,
   getAuditLogs,
+  resolveBackupDir,
 } from '../services/backupService.js'
 
 /**
@@ -106,6 +107,10 @@ export async function downloadBackupHandler(req, res) {
 
     // Security: resolve path dan pastikan file berada di dalam backup directory
     const resolvedPath = path.resolve(filePath)
+    const backupDir = resolveBackupDir()
+    if (!resolvedPath.startsWith(backupDir + path.sep)) {
+      throw new AppError(ERROR_CODES.FORBIDDEN, 'Path backup tidak valid.', 403)
+    }
     if (!fs.existsSync(resolvedPath)) {
       throw new AppError(ERROR_CODES.RESOURCE_NOT_FOUND, 'File backup tidak ditemukan di storage.', 404)
     }
@@ -119,7 +124,12 @@ export async function downloadBackupHandler(req, res) {
 
     // Stream file
     res.setHeader('Content-Type', 'application/octet-stream')
-    res.setHeader('Content-Disposition', `attachment; filename="${backup.filename}"`)
+    // RFC 5987/6266: filename* untuk nilai aman; fallback ASCII ter-sanitasi
+    const asciiFallback = String(backup.filename || 'backup.dump').replace(/[^\w.\-]+/g, '_')
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename="${asciiFallback}"; filename*=UTF-8''${encodeURIComponent(backup.filename || 'backup.dump')}`,
+    )
     res.setHeader('Content-Length', backup.file_size)
 
     const readStream = fs.createReadStream(resolvedPath)

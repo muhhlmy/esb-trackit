@@ -258,9 +258,9 @@ export async function storeEmployee(req, res) {
       );
 
       if (existingUser.rowCount === 0) {
-              const defaultPassword = env.auth?.defaultUserPassword || process.env.DEFAULT_USER_PASSWORD || 'Esb123456!';
-              const defaultPasswordHash = await hashPassword(defaultPassword);
-        const defaultPermissions = JSON.stringify({
+              const defaultPassword = env.auth.defaultUserPassword
+              const defaultPasswordHash = await hashPassword(defaultPassword)
+              const defaultPermissions = JSON.stringify({
           dashboard: "none",
           assets: "none",
           my_assets: "read_only",

@@ -706,6 +706,8 @@ function formatKondisiPill(kondisi) {
             <SearchableSelect
               v-model="form.tipe_fasilitas"
               :options="tipeOptions"
+              value-key="value"
+              label-key="label"
               placeholder="Pilih Fasilitas"
             />
           </div>
@@ -733,6 +735,8 @@ function formatKondisiPill(kondisi) {
             <SearchableSelect
               v-model="form.lokasi"
               :options="locationOptions"
+              value-key="value"
+              label-key="label"
               placeholder="Pilih Lokasi"
             />
           </div>

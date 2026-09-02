@@ -710,6 +710,8 @@ function formatDate(dateStr) {
             <SearchableSelect
               v-model="form.kategori"
               :options="kategoriSelectOptions"
+              value-key="value"
+              label-key="label"
               placeholder="Pilih Kategori"
             />
           </div>
@@ -722,6 +724,8 @@ function formatDate(dateStr) {
             <SearchableSelect
               v-model="form.lokasi"
               :options="locationOptions"
+              value-key="value"
+              label-key="label"
               placeholder="Pilih Lokasi"
             />
           </div>

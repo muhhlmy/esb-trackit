@@ -34,10 +34,13 @@ async function handleConfirmResetDatabase() {
   try {
     const res = await api.post('/api/export/reset-database')
     if (res.success) {
+      localStorage.removeItem('app_notifications')
       showToast(res.message || 'Database berhasil di-reset dan dikosongkan!', 'success')
       showResetModal.value = false
       confirmResetInput.value = ''
       await fetchTablesMetadata()
+      // Force reload so notification bell re-reads cleared localStorage
+      window.location.reload()
     } else {
       showToast(res.message || 'Gagal me-reset database.', 'error')
     }

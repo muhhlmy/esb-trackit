@@ -20,19 +20,20 @@
     "format:write": "prettier --write --experimental-cli src/"
   },
   "dependencies": {
-    "chart.js": "^4.5.1",
-    "gsap": "^3.15.0",
-    "vue": "^3.5.38",
-    "vue-chartjs": "^5.3.4",
-    "vue-router": "^5.1.0",
-    "xlsx": "^0.18.5",
-    "lucide-vue-next": "^0.475.0",
-    "@tiptap/vue-3": "^3.30.5",
-    "@tiptap/starter-kit": "^3.30.5",
+    "@tiptap/extension-bubble-menu": "^3.30.5",
+    "@tiptap/extension-image": "3.30.5",
     "@tiptap/extension-link": "^3.30.5",
     "@tiptap/extension-placeholder": "^3.30.5",
     "@tiptap/extension-underline": "^3.30.5",
-    "@tiptap/extension-bubble-menu": "^3.30.5"
+    "@tiptap/starter-kit": "^3.30.5",
+    "@tiptap/vue-3": "^3.30.5",
+    "chart.js": "^4.5.1",
+    "gsap": "^3.15.0",
+    "lucide-vue-next": "^0.475.0",
+    "vue": "^3.5.38",
+    "vue-chartjs": "^5.3.4",
+    "vue-router": "^5.1.0",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

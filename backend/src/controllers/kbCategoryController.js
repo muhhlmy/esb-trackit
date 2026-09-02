@@ -104,14 +104,27 @@ function normalizeStatus(value) {
 
 function normalizeSortOrder(value) {
   if (value === undefined || value === null || value === '') return 0
-  if (typeof value !== 'number' || !Number.isSafeInteger(value) || value < 0) {
+  const parsed = typeof value === 'string' ? Number(value) : value
+  if (typeof parsed !== 'number' || !Number.isSafeInteger(parsed) || parsed < 0) {
     throw createHttpError(400, 'Sort order wajib berupa integer >= 0.')
   }
-  return value
+  return parsed
 }
 
-function validateCreateBody(body) {
-  assertPlainObject(body, 'Payload pembuatan kategori tidak valid.')
+function sanitizeCategoryBody(body) {
+  if (body && typeof body === 'object' && !Array.isArray(body)) {
+    const cleaned = { ...body }
+    delete cleaned.id
+    delete cleaned.created_at
+    delete cleaned.updated_at
+    return cleaned
+  }
+  return body
+}
+
+function validateCreateBody(rawBody) {
+  assertPlainObject(rawBody, 'Payload pembuatan kategori tidak valid.')
+  const body = sanitizeCategoryBody(rawBody)
   assertAllowedFields(body, KB_CATEGORY_CREATE_FIELDS, 'Payload pembuatan kategori')
   return {
     key: normalizeKey(body.key),
@@ -124,8 +137,9 @@ function validateCreateBody(body) {
   }
 }
 
-function validateUpdateBody(body) {
-  assertPlainObject(body, 'Payload pembaruan kategori tidak valid.')
+function validateUpdateBody(rawBody) {
+  assertPlainObject(rawBody, 'Payload pembaruan kategori tidak valid.')
+  const body = sanitizeCategoryBody(rawBody)
   const fields = Object.keys(body)
   if (fields.length === 0) {
     throw createHttpError(400, 'Payload pembaruan kategori tidak boleh kosong.')

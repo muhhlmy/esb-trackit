@@ -35,42 +35,24 @@ CREATE TABLE IF NOT EXISTS kb_categories (
 CREATE INDEX IF NOT EXISTS idx_kb_categories_status
     ON kb_categories(status, sort_order);
 
--- Seed: 6 topic cards sesuai mockup HomeView (idempotent)
+-- Seed: 3 topic cards (IT, HR, GA) sesuai mockup HomeView (idempotent)
 INSERT INTO kb_categories (key, title, description, icon, is_featured, sort_order, status)
-SELECT 'getting-started', 'Getting Started',
-       'Learn the basics of setting up your IT profile, laptop requests, and connecting tools.',
+SELECT 'it-support', 'IT Support',
+       'Learn the basics of setting up your IT profile, laptop requests, software, and connecting network tools.',
        'Laptop', FALSE, 1, 'PUBLISHED'
-WHERE NOT EXISTS (SELECT 1 FROM kb_categories WHERE key = 'getting-started');
+WHERE NOT EXISTS (SELECT 1 FROM kb_categories WHERE key = 'it-support');
 
 INSERT INTO kb_categories (key, title, description, icon, is_featured, sort_order, status)
-SELECT 'account-access', 'Account & Access',
-       'Customize your experience with account settings, Google Workspace, 2SV, and permissions.',
+SELECT 'hr-people', 'Human Resources (HR)',
+       'Customize your experience with account settings, Google Workspace, onboarding, 2SV, and permissions.',
        'ShieldCheck', TRUE, 2, 'PUBLISHED'
-WHERE NOT EXISTS (SELECT 1 FROM kb_categories WHERE key = 'account-access');
+WHERE NOT EXISTS (SELECT 1 FROM kb_categories WHERE key = 'hr-people');
 
 INSERT INTO kb_categories (key, title, description, icon, is_featured, sort_order, status)
-SELECT 'troubleshooting', 'Troubleshooting',
-       'Resolve common issues, network errors, printer fixes, and runtime system bugs.',
-       'HelpCircle', FALSE, 3, 'PUBLISHED'
-WHERE NOT EXISTS (SELECT 1 FROM kb_categories WHERE key = 'troubleshooting');
-
-INSERT INTO kb_categories (key, title, description, icon, is_featured, sort_order, status)
-SELECT 'network-vpn', 'Network & VPN',
-       'Explore features for VPN configuration, Microsoft OOBE bypass, branch Wi-Fi, and proxy.',
-       'Wifi', FALSE, 4, 'PUBLISHED'
-WHERE NOT EXISTS (SELECT 1 FROM kb_categories WHERE key = 'network-vpn');
-
-INSERT INTO kb_categories (key, title, description, icon, is_featured, sort_order, status)
-SELECT 'software-apps', 'Software & Apps',
-       'Standard software installation, licenses, PR setup, and application troubleshooting.',
-       'AppWindow', FALSE, 5, 'PUBLISHED'
-WHERE NOT EXISTS (SELECT 1 FROM kb_categories WHERE key = 'software-apps');
-
-INSERT INTO kb_categories (key, title, description, icon, is_featured, sort_order, status)
-SELECT 'security-compliance', 'Security & Compliance',
-       'SOC procedures, endpoint security, remote wipe, and device protection compliance.',
-       'Building2', FALSE, 6, 'PUBLISHED'
-WHERE NOT EXISTS (SELECT 1 FROM kb_categories WHERE key = 'security-compliance');
+SELECT 'general-affairs', 'General Affairs (GA)',
+       'Office facility management, physical asset requests, building maintenance, and operational tools.',
+       'Building2', FALSE, 3, 'PUBLISHED'
+WHERE NOT EXISTS (SELECT 1 FROM kb_categories WHERE key = 'general-affairs');
 
 -- ---------------------------------------------------------------------
 -- 2. ALTER TABEL: faq — rich content untuk accordion HomeView

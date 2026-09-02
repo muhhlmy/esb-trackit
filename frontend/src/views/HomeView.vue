@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router';
 import { useCases } from '@/composables/useCases';
 import { useKbCategories } from '@/composables/useKbCategories';
 import { useAuth } from '@/composables/useAuth';
+import { useLanguage } from '@/composables/useLanguage';
 import { api } from '@/services/api';
 import gsap from 'gsap';
 import { isReducedMotion } from '@/composables/useGsap';
@@ -29,7 +30,8 @@ import {
 const router = useRouter();
 const { cases, setSearch, setCategory, hasNoSearchResult, fetchCases } = useCases();
 const { publishedCategories, fetchPublicCategories } = useKbCategories();
-const { isAuthenticated } = useAuth();
+const { isAuthenticated, isAdmin } = useAuth();
+const { currentLang, t } = useLanguage();
 
 const localSearch = ref('');
 const isInputFocused = ref(false);
@@ -61,7 +63,7 @@ function handleSearchSubmit() {
     setSearch(localSearch.value.trim());
     // Tidak ada case yang cocok → arahkan ke login (atau buat tiket bila sudah login)
     if (hasNoSearchResult.value) {
-      router.push(isAuthenticated.value ? '/tickets' : '/login');
+      router.push(isAuthenticated.value ? (isAdmin.value ? '/dashboard' : '/tickets') : '/login');
       return;
     }
   }
@@ -85,52 +87,33 @@ function toggleFaq(id) {
 function handleSupportTicketAction() {
   if (!isAuthenticated.value) {
     router.push({ path: '/login', query: { redirect: '/tickets' } });
+  } else if (isAdmin.value) {
+    router.push('/dashboard');
   } else {
     router.push('/tickets');
   }
 }
 
-// 6 Cards for Browse Topics — dari tabel kb_categories (fallback ke default statis)
+// 3 Cards for Browse Topics — dari tabel kb_categories (fallback ke default statis)
 const DEFAULT_TOPIC_CARDS = [
   {
-    key: 'getting-started',
-    title: 'Getting Started',
-    description: 'Learn the basics of setting up your IT profile, laptop requests, and connecting tools.',
+    key: 'it-support',
+    title: 'IT Support',
+    description: 'Learn the basics of setting up your IT profile, laptop requests, software, and connecting network tools.',
     icon: 'Laptop',
     is_featured: false
   },
   {
-    key: 'account-access',
-    title: 'Account & Access',
-    description: 'Customize your experience with account settings, Google Workspace, 2SV, and permissions.',
+    key: 'hr-people',
+    title: 'Human Resources (HR)',
+    description: 'Customize your experience with account settings, Google Workspace, onboarding, 2SV, and permissions.',
     icon: 'ShieldCheck',
     is_featured: true
   },
   {
-    key: 'troubleshooting',
-    title: 'Troubleshooting',
-    description: 'Resolve common issues, network errors, printer fixes, and runtime system bugs.',
-    icon: 'HelpCircle',
-    is_featured: false
-  },
-  {
-    key: 'network-vpn',
-    title: 'Network & VPN',
-    description: 'Explore features for VPN configuration, Microsoft OOBE bypass, branch Wi-Fi, and proxy.',
-    icon: 'Wifi',
-    is_featured: false
-  },
-  {
-    key: 'software-apps',
-    title: 'Software & Apps',
-    description: 'Standard software installation, licenses, PR setup, and application troubleshooting.',
-    icon: 'AppWindow',
-    is_featured: false
-  },
-  {
-    key: 'security-compliance',
-    title: 'Security & Compliance',
-    description: 'SOC procedures, endpoint security, remote wipe, and device protection compliance.',
+    key: 'general-affairs',
+    title: 'General Affairs (GA)',
+    description: 'Office facility management, physical asset requests, building maintenance, and operational tools.',
     icon: 'Building2',
     is_featured: false
   }
@@ -150,13 +133,29 @@ const ICON_COMPONENTS = {
 
 const topicCards = computed(() => {
   const source = publishedCategories.value.length ? publishedCategories.value : DEFAULT_TOPIC_CARDS;
-  return source.map((c) => ({
-    id: c.key,
-    title: c.title,
-    description: c.description || '',
-    icon: ICON_COMPONENTS[c.icon] || HelpCircle,
-    isFeatured: Boolean(c.is_featured)
-  }));
+  return source.map((c) => {
+    let title = c.title;
+    let description = c.description || '';
+
+    if (c.key === 'it-support') {
+      title = t('topic_it_title', 'IT Support');
+      description = t('topic_it_desc', 'Learn the basics of setting up your IT profile, laptop requests, software, and connecting network tools.');
+    } else if (c.key === 'hr-people') {
+      title = t('topic_hr_title', 'Human Resources (HR)');
+      description = t('topic_hr_desc', 'Customize your experience with account settings, Google Workspace, onboarding, 2SV, and permissions.');
+    } else if (c.key === 'general-affairs') {
+      title = t('topic_ga_title', 'General Affairs (GA)');
+      description = t('topic_ga_desc', 'Office facility management, physical asset requests, building maintenance, and operational tools.');
+    }
+
+    return {
+      id: c.key,
+      title,
+      description,
+      icon: ICON_COMPONENTS[c.icon] || HelpCircle,
+      isFeatured: Boolean(c.is_featured)
+    };
+  });
 });
 
 const DEFAULT_FAQS = [
@@ -293,15 +292,15 @@ onMounted(async () => {
       <!-- 1. HERO SECTION: FOCAL SEARCH -->
       <section class="flex flex-col items-center text-center w-full pt-2 pb-2">
         <div class="text-xs font-black uppercase tracking-widest text-[#5D87FF] dark:text-indigo-400 mb-2 gsap-hero-el">
-          Help Center
+          {{ t('hero_tag', 'Help Center') }}
         </div>
 
         <h1 class="text-3xl sm:text-4xl lg:text-5xl font-black text-[#0F172A] dark:text-white tracking-tight leading-tight max-w-2xl gsap-hero-el">
-          What can we help you find?
+          {{ t('hero_title', 'What can we help you find?') }}
         </h1>
         
         <p class="text-xs sm:text-sm text-[#64748B] dark:text-slate-400 font-medium leading-relaxed mt-2.5 max-w-md gsap-hero-el">
-          Search our SOPs, troubleshooting guides, and IT knowledge base.
+          {{ t('hero_subtitle', 'Search our SOPs, troubleshooting guides, and IT knowledge base.') }}
         </p>
 
         <!-- Focal Search Input Bar -->
@@ -313,7 +312,7 @@ onMounted(async () => {
               @focus="isInputFocused = true"
               type="text"
               class="w-full h-14 pl-12 pr-28 bg-white dark:bg-slate-900 border border-[#E5EAEF] dark:border-slate-800 rounded-xl text-sm font-bold text-[#0F172A] dark:text-white placeholder-[#94A3B8] focus:border-[#5D87FF] focus:ring-2 focus:ring-[#5D87FF]/15 focus:outline-none transition-all shadow-sm"
-              placeholder="Search the knowledge base..."
+              :placeholder="t('search_placeholder', 'Search the knowledge base...')"
               autocomplete="off"
             />
             <div class="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
@@ -329,7 +328,7 @@ onMounted(async () => {
                 type="submit"
                 class="h-9 px-5 bg-[#5D87FF] hover:bg-[#4570EA] text-white font-extrabold text-xs rounded-lg transition-colors cursor-pointer shadow-2xs"
               >
-                Search
+                {{ t('search_btn', 'Search') }}
               </button>
             </div>
           </form>
@@ -358,7 +357,7 @@ onMounted(async () => {
 
         <!-- Popular Searches Clean Chips (No Bullets) — data-driven dari kb_search_logs, fallback statis -->
         <div class="flex flex-wrap justify-center items-center gap-2 text-xs mt-4">
-          <span class="text-[#7C8BAC] dark:text-slate-400 font-bold text-xs">Popular searches</span>
+          <span class="text-[#7C8BAC] dark:text-slate-400 font-bold text-xs">{{ t('popular_searches', 'Popular searches') }}</span>
           <template v-if="popularSearches.length">
             <button
               v-for="term in popularSearches"
@@ -396,13 +395,13 @@ onMounted(async () => {
       <section class="space-y-4 w-full">
         <div class="flex items-center justify-between border-b border-[#E5EAEF] dark:border-slate-800 pb-3">
           <h2 class="text-xs font-black uppercase tracking-wider text-[#7C8BAC] dark:text-slate-400">
-            Browse topics
+            {{ t('browse_topics', 'Browse topics') }}
           </h2>
           <button
             @click="router.push('/cases')"
             class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-extrabold text-[#5D87FF] bg-[#ECF2FF] dark:bg-slate-800 dark:text-indigo-300 hover:bg-[#5D87FF] hover:text-white dark:hover:bg-[#5D87FF] dark:hover:text-white transition-all duration-200 cursor-pointer shadow-2xs group"
           >
-            <span>Lihat Semua SOP</span>
+            <span>{{ t('view_all_articles', 'Lihat Semua Artikel') }}</span>
             <ArrowRight class="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
           </button>
         </div>
@@ -458,7 +457,7 @@ onMounted(async () => {
                 'text-xs font-black inline-flex items-center gap-1.5 group-hover:translate-x-1 transition-transform'
               ]"
             >
-              <span>Learn More</span>
+              <span>{{ t('learn_more', 'Learn More') }}</span>
               <ArrowRight class="w-3.5 h-3.5" />
             </div>
           </div>
@@ -469,13 +468,13 @@ onMounted(async () => {
       <section class="space-y-3 w-full">
         <div class="flex items-center justify-between border-b border-[#E5EAEF] dark:border-slate-800 pb-3">
           <h2 class="text-xs font-black uppercase tracking-wider text-[#7C8BAC] dark:text-slate-400">
-            Featured SOPs
+            {{ t('featured_articles', 'Featured Articles') }}
           </h2>
           <button
             @click="router.push('/cases')"
             class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-extrabold text-[#5D87FF] bg-[#ECF2FF] dark:bg-slate-800 dark:text-indigo-300 hover:bg-[#5D87FF] hover:text-white dark:hover:bg-[#5D87FF] dark:hover:text-white transition-all duration-200 cursor-pointer shadow-2xs group"
           >
-            <span>View all SOPs</span>
+            <span>{{ t('view_all_articles', 'View all Articles') }}</span>
             <ArrowRight class="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
           </button>
         </div>
@@ -511,10 +510,10 @@ onMounted(async () => {
         <div class="flex items-center justify-between border-b border-[#E5EAEF] dark:border-slate-800 pb-3">
           <div>
             <div class="text-[11px] font-black uppercase tracking-widest text-[#5D87FF] dark:text-indigo-400">
-              FREQUENTLY ASKED QUESTIONS
+              {{ t('faq_tag', 'FREQUENTLY ASKED QUESTIONS') }}
             </div>
             <h2 class="text-xl sm:text-2xl font-black text-[#0F172A] dark:text-white tracking-tight mt-0.5">
-              Pertanyaan Umum &amp; Troubleshooting
+              {{ t('faq_title', 'Pertanyaan Umum & Troubleshooting') }}
             </h2>
           </div>
         </div>
@@ -607,10 +606,10 @@ onMounted(async () => {
         <!-- Left Text & Action -->
         <div class="flex-1 space-y-4 max-w-xl text-left z-10">
           <h2 class="text-2xl sm:text-3xl font-extrabold text-[#0F172A] dark:text-white tracking-tight leading-tight">
-            Need Personal Assistance?
+            {{ t('need_assistance_title', 'Need Personal Assistance?') }}
           </h2>
           <p class="text-xs sm:text-sm text-[#64748B] dark:text-slate-400 font-medium leading-relaxed">
-            If you couldn't find the information you need, our IT support team is ready to assist you. Submit a ticket to contact support right away.
+            {{ t('need_assistance_desc', "If you couldn't find the information you need, our IT support team is ready to assist you. Submit a ticket to contact support right away.") }}
           </p>
 
           <div class="flex items-center pt-1">
@@ -619,7 +618,7 @@ onMounted(async () => {
               class="inline-flex items-center gap-2.5 px-6 py-3 rounded-xl bg-[#5D87FF] hover:bg-[#4570EA] text-white text-xs font-extrabold shadow-md shadow-[#5D87FF]/20 hover:shadow-lg hover:shadow-[#5D87FF]/30 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 cursor-pointer group/btn"
             >
               <Ticket class="w-4 h-4 group-hover/btn:rotate-12 transition-transform duration-200" />
-              <span>{{ isAuthenticated ? 'Submit a Ticket' : 'Sign In to Submit a Ticket' }}</span>
+              <span>{{ !isAuthenticated ? t('sign_in_to_submit', 'Sign In to Submit a Ticket') : (isAdmin ? t('go_to_dashboard', 'Go to Dashboard') : t('submit_ticket', 'Submit a Ticket')) }}</span>
               <ArrowRight class="w-3.5 h-3.5 group-hover/btn:translate-x-1 transition-transform duration-200" />
             </button>
           </div>
@@ -635,21 +634,21 @@ onMounted(async () => {
               </div>
               <div class="flex items-center gap-1.5 text-xs font-extrabold text-[#5D87FF] dark:text-indigo-300">
                 <span class="w-2 h-2 rounded-full bg-[#5D87FF] animate-pulse"></span>
-                <span>Active Support</span>
+                <span>{{ t('active_support', 'Active Support') }}</span>
               </div>
             </div>
 
             <div class="space-y-1 text-left">
               <div class="text-xs font-extrabold text-[#0F172A] dark:text-white">
-                IT Helpdesk Support
+                {{ t('it_helpdesk', 'IT Helpdesk Support') }}
               </div>
               <div class="text-[11px] font-medium text-[#64748B] dark:text-slate-400 flex items-center gap-1.5">
                 <Clock class="w-3.5 h-3.5 text-[#5D87FF] shrink-0" />
-                <span>Mon - Fri</span>
+                <span>{{ t('work_days', 'Mon - Fri') }}</span>
               </div>
               <div class="text-[11px] font-medium text-[#64748B] dark:text-slate-400 flex items-center gap-1.5">
                 <Clock class="w-3.5 h-3.5 text-[#5D87FF] shrink-0" />
-                <span>08:30 - 17:30</span>
+                <span>{{ t('work_hours', '08:30 - 17:30') }}</span>
               </div>
             </div>
 

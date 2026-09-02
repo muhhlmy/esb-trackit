@@ -45,14 +45,23 @@ export function useKbCategories() {
 
   async function saveCategory(data) {
     const existingId = data?.id ? Number(data.id) : null;
+    const payload = {
+      key: data.key,
+      title: data.title,
+      description: data.description ?? '',
+      icon: data.icon || 'HelpCircle',
+      is_featured: Boolean(data.is_featured),
+      sort_order: Number(data.sort_order ?? 0),
+      status: data.status || 'PUBLISHED',
+    };
     try {
       if (existingId) {
-        const updated = normalizeCategory(await api.updateKbCategory(existingId, data));
+        const updated = normalizeCategory(await api.updateKbCategory(existingId, payload));
         const idx = categories.value.findIndex((c) => c.id === updated.id);
         if (idx !== -1) categories.value[idx] = updated;
         showToast('Kategori berhasil diperbarui!', 'success');
       } else {
-        const created = normalizeCategory(await api.createKbCategory(data));
+        const created = normalizeCategory(await api.createKbCategory(payload));
         categories.value.push(created);
         showToast('Kategori baru berhasil dibuat!', 'success');
       }

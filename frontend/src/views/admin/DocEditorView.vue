@@ -7,6 +7,7 @@ import DocEditorInspector from '@/components/admin/DocEditorInspector.vue';
 import { useEditor, EditorContent } from '@tiptap/vue-3';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
+import ImageExtension from '@tiptap/extension-image';
 import {
   Undo,
   Redo,
@@ -14,6 +15,8 @@ import {
   Italic as ItalicIcon,
   Underline as UnderlineIcon,
   Link as LinkIcon,
+  Image as ImageIcon,
+  Upload,
   Code,
   Info,
   AlertTriangle,
@@ -118,6 +121,13 @@ const editor = useEditor({
     }),
     Placeholder.configure({
       placeholder: 'Tulis panduan, langkah resolusi, atau catatan teknis di sini...'
+    }),
+    ImageExtension.configure({
+      inline: false,
+      allowBase64: true,
+      HTMLAttributes: {
+        class: 'rounded-xl max-w-full my-4 border border-slate-200 dark:border-slate-800 shadow-sm mx-auto block object-contain max-h-[500px]'
+      }
     })
   ],
   onUpdate: ({ editor }) => {
@@ -125,6 +135,79 @@ const editor = useEditor({
     saveStatus.value = 'Belum disimpan';
   }
 });
+
+// Image Insertion Modal State & Methods
+const isImageModalOpen = ref(false);
+const imageInputTab = ref('upload'); // 'upload' | 'url'
+const imageUrlInput = ref('');
+const imageCaptionInput = ref('');
+const selectedFilePreview = ref('');
+const imageFileInputRef = ref(null);
+
+function openImageModal() {
+  imageInputTab.value = 'upload';
+  imageUrlInput.value = '';
+  imageCaptionInput.value = '';
+  selectedFilePreview.value = '';
+  isImageModalOpen.value = true;
+}
+
+function handleImageFileSelect(event) {
+  const file = event.target.files?.[0];
+  if (!file) return;
+
+  if (file.size > 5 * 1024 * 1024) {
+    showToast('Ukuran gambar maksimal 5MB.', 'error');
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    selectedFilePreview.value = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function handleDropImage(event) {
+  const file = event.dataTransfer?.files?.[0];
+  if (!file) return;
+  if (!file.type.startsWith('image/')) {
+    showToast('Harap upload file berupa gambar (JPG, PNG, WebP, GIF, SVG).', 'error');
+    return;
+  }
+  if (file.size > 5 * 1024 * 1024) {
+    showToast('Ukuran gambar maksimal 5MB.', 'error');
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    selectedFilePreview.value = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function confirmInsertImage() {
+  let src = '';
+  if (imageInputTab.value === 'upload') {
+    src = selectedFilePreview.value;
+  } else {
+    src = imageUrlInput.value.trim();
+  }
+
+  if (!src) {
+    showToast('Harap pilih file gambar atau masukkan URL gambar valid.', 'error');
+    return;
+  }
+
+  editor.value?.chain().focus().setImage({
+    src,
+    alt: imageCaptionInput.value.trim() || 'Gambar Dokumen',
+    title: imageCaptionInput.value.trim() || ''
+  }).run();
+
+  isImageModalOpen.value = false;
+  showToast('Gambar berhasil disisipkan!', 'success');
+}
 
 const isSelectionMenuOpen = ref(false);
 const selectionMenuPos = ref({ x: 0, y: 0 });
@@ -509,10 +592,26 @@ function goToAdminCases() {
         >
           <LinkIcon class="w-4 h-4" />
         </button>
+
+        <button
+          @click="openImageModal"
+          class="p-1.5 rounded-lg transition-colors cursor-pointer text-[#64748B] dark:text-slate-400 hover:bg-[#F1F5F9] dark:hover:bg-slate-800"
+          title="Insert Gambar"
+        >
+          <ImageIcon class="w-4 h-4 text-[#5D87FF]" />
+        </button>
       </div>
 
       <!-- Inserter Components -->
       <div class="flex items-center gap-1.5">
+        <button
+          @click="openImageModal"
+          class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#ECF2FF] dark:bg-indigo-950/60 text-[#5D87FF] dark:text-indigo-300 font-extrabold cursor-pointer hover:bg-[#5D87FF] hover:text-white transition-colors text-[11px] shadow-2xs"
+        >
+          <ImageIcon class="w-3.5 h-3.5" />
+          <span>+ Gambar</span>
+        </button>
+
         <button
           @click="insertInfoCallout"
           class="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-[#475569] dark:text-slate-300 font-medium cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors text-[11px]"
@@ -622,8 +721,16 @@ function goToAdminCases() {
               @click="setLink"
               class="p-1 rounded-md hover:bg-[#F1F5F9] dark:hover:bg-slate-800 text-xs"
               :class="{ 'text-[#2563EB]': editor.isActive('link') }"
+              title="Insert Link"
             >
               <LinkIcon class="w-3.5 h-3.5" />
+            </button>
+            <button
+              @click="openImageModal"
+              class="p-1 rounded-md hover:bg-[#F1F5F9] dark:hover:bg-slate-800 text-xs"
+              title="Insert Gambar"
+            >
+              <ImageIcon class="w-3.5 h-3.5 text-[#5D87FF]" />
             </button>
           </div>
 
@@ -673,6 +780,126 @@ function goToAdminCases() {
           <p class="text-xs sm:text-sm text-[#334155] dark:text-slate-300 p-4 rounded-lg bg-[#F8FAFC] dark:bg-slate-800/50 border border-[#E2E8F0] dark:border-slate-700/60 leading-relaxed">{{ doc.summary }}</p>
 
           <div class="doc-preview prose prose-slate dark:prose-invert max-w-none text-[#1E293B] dark:text-slate-200" v-html="editor?.getHTML()"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. INSERT IMAGE MODAL -->
+    <div
+      v-if="isImageModalOpen"
+      class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm animate-in fade-in duration-150"
+    >
+      <div class="relative w-full max-w-md bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 rounded-2xl shadow-2xl overflow-hidden flex flex-col">
+        <!-- Modal Header -->
+        <div class="px-5 py-4 border-b border-[#E2E8F0] dark:border-slate-800 flex items-center justify-between">
+          <div class="flex items-center gap-2 text-xs font-extrabold text-[#0F172A] dark:text-white">
+            <ImageIcon class="w-4 h-4 text-[#5D87FF]" />
+            <span>Sisipkan Gambar</span>
+          </div>
+          <button
+            @click="isImageModalOpen = false"
+            class="p-1 rounded-lg text-[#64748B] hover:bg-[#F1F5F9] dark:hover:bg-slate-800 transition-colors cursor-pointer"
+          >
+            <X class="w-4 h-4" />
+          </button>
+        </div>
+
+        <!-- Modal Body & Tab Switcher -->
+        <div class="p-5 space-y-4">
+          <!-- Tabs: Upload File vs URL -->
+          <div class="flex items-center p-1 bg-[#F1F5F9] dark:bg-slate-800 rounded-xl text-xs font-bold">
+            <button
+              @click="imageInputTab = 'upload'"
+              class="flex-1 py-1.5 rounded-lg transition-all cursor-pointer text-center"
+              :class="imageInputTab === 'upload' ? 'bg-white dark:bg-slate-900 text-[#5D87FF] shadow-2xs' : 'text-[#64748B] dark:text-slate-400'"
+            >
+              Upload Local File
+            </button>
+            <button
+              @click="imageInputTab = 'url'"
+              class="flex-1 py-1.5 rounded-lg transition-all cursor-pointer text-center"
+              :class="imageInputTab === 'url' ? 'bg-white dark:bg-slate-900 text-[#5D87FF] shadow-2xs' : 'text-[#64748B] dark:text-slate-400'"
+            >
+              URL Gambar Web
+            </button>
+          </div>
+
+          <!-- Tab 1: Upload File Area -->
+          <div v-if="imageInputTab === 'upload'" class="space-y-3">
+            <div
+              @click="imageFileInputRef?.click()"
+              @dragover.prevent
+              @drop.prevent="handleDropImage"
+              class="border-2 border-dashed border-[#CBD5E1] dark:border-slate-700 hover:border-[#5D87FF] dark:hover:border-[#5D87FF] rounded-2xl p-6 text-center cursor-pointer transition-colors bg-[#F8FAFC] dark:bg-slate-800/40 group flex flex-col items-center justify-center gap-2"
+            >
+              <input
+                ref="imageFileInputRef"
+                type="file"
+                accept="image/png, image/jpeg, image/webp, image/gif, image/svg+xml"
+                class="hidden"
+                @change="handleImageFileSelect"
+              />
+
+              <template v-if="selectedFilePreview">
+                <img :src="selectedFilePreview" alt="Preview Upload" class="max-h-36 rounded-lg object-contain shadow-sm border border-slate-200 dark:border-slate-700" />
+                <span class="text-[11px] font-bold text-[#5D87FF] group-hover:underline">Klik untuk mengganti gambar</span>
+              </template>
+              <template v-else>
+                <div class="w-10 h-10 rounded-full bg-[#ECF2FF] dark:bg-slate-800 text-[#5D87FF] flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <Upload class="w-5 h-5" />
+                </div>
+                <div>
+                  <p class="text-xs font-extrabold text-[#0F172A] dark:text-white">Klik atau Tarik File Gambar ke Sini</p>
+                  <p class="text-[10px] text-[#64748B] dark:text-slate-400 font-medium">PNG, JPG, WebP, GIF, SVG (Maksimal 5MB)</p>
+                </div>
+              </template>
+            </div>
+          </div>
+
+          <!-- Tab 2: URL Input Area -->
+          <div v-else class="space-y-2">
+            <label class="block text-[11px] font-extrabold uppercase text-[#64748B] dark:text-slate-400">URL Gambar (HTTPS):</label>
+            <div class="relative flex items-center">
+              <LinkIcon class="absolute left-3 w-4 h-4 text-[#7C8BAC]" />
+              <input
+                v-model="imageUrlInput"
+                type="url"
+                placeholder="https://example.com/image.png"
+                class="w-full h-10 pl-9 pr-3 bg-[#F8FAFC] dark:bg-slate-800 border border-[#E2E8F0] dark:border-slate-700 rounded-xl text-xs font-medium focus:border-[#5D87FF] focus:outline-none"
+              />
+            </div>
+            <div v-if="imageUrlInput" class="pt-2 text-center">
+              <img :src="imageUrlInput" alt="Preview URL" class="max-h-32 rounded-lg mx-auto object-contain border border-slate-200 dark:border-slate-700 shadow-sm" @error="showToast('URL Gambar tidak valid atau tidak dapat dimuat.', 'error')" />
+            </div>
+          </div>
+
+          <!-- Caption Input -->
+          <div class="space-y-1">
+            <label class="block text-[11px] font-extrabold uppercase text-[#64748B] dark:text-slate-400">Keterangan Gambar / Caption (Opsional):</label>
+            <input
+              v-model="imageCaptionInput"
+              type="text"
+              placeholder="Contoh: Tangkapan layar menu Okta Portal..."
+              class="w-full h-9 px-3 bg-[#F8FAFC] dark:bg-slate-800 border border-[#E2E8F0] dark:border-slate-700 rounded-xl text-xs font-medium focus:border-[#5D87FF] focus:outline-none"
+            />
+          </div>
+        </div>
+
+        <!-- Modal Footer -->
+        <div class="px-5 py-3.5 bg-[#F8FAFC] dark:bg-slate-800/60 border-t border-[#E2E8F0] dark:border-slate-800 flex items-center justify-end gap-2">
+          <button
+            @click="isImageModalOpen = false"
+            class="px-4 py-2 rounded-xl text-xs font-extrabold text-[#64748B] hover:bg-[#F1F5F9] dark:hover:bg-slate-800 transition-colors cursor-pointer"
+          >
+            Batal
+          </button>
+          <button
+            @click="confirmInsertImage"
+            class="px-4 py-2 rounded-xl text-xs font-extrabold bg-[#5D87FF] hover:bg-[#4570EA] text-white shadow-sm transition-all cursor-pointer flex items-center gap-1.5"
+          >
+            <Plus class="w-4 h-4" />
+            <span>Sisipkan Gambar</span>
+          </button>
         </div>
       </div>
     </div>
@@ -780,6 +1007,22 @@ function goToAdminCases() {
   float: left;
   height: 0;
   pointer-events: none;
+}
+
+.ProseMirror img,
+.doc-preview img {
+  max-width: 100% !important;
+  height: auto !important;
+  border-radius: 0.75rem !important;
+  margin: 1.5rem auto !important;
+  display: block !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1) !important;
+  border: 1px solid #e2e8f0 !important;
+}
+
+.dark .ProseMirror img,
+.dark .doc-preview img {
+  border-color: #334155 !important;
 }
 
 /* Dark mode styling */

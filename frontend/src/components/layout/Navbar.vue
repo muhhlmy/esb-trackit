@@ -4,6 +4,7 @@ import { useRouter, useRoute, RouterLink } from 'vue-router';
 import { useCases } from '@/composables/useCases';
 import { useAuth } from '@/composables/useAuth';
 import { useTheme } from '@/composables/useTheme';
+import { useLanguage } from '@/composables/useLanguage';
 import {
   Search,
   Sun,
@@ -13,7 +14,9 @@ import {
   ShieldCheck,
   Ticket,
   LayoutDashboard,
-  ChevronDown
+  ChevronDown,
+  Laptop,
+  Globe
 } from 'lucide-vue-next';
 
 const router = useRouter();
@@ -21,6 +24,7 @@ const route = useRoute();
 const { setSearch } = useCases();
 const { isAuthenticated, user, isAdmin, isSuperAdmin, hasPermission, logout } = useAuth();
 const { isDark, toggleTheme } = useTheme();
+const { currentLang, setLanguage, t } = useLanguage();
 
 const isProfileOpen = ref(false);
 
@@ -89,7 +93,7 @@ onUnmounted(() => {
           class="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#F8FAFC] dark:bg-slate-800/80 border border-[#E5EAEF] dark:border-slate-700 text-[#64748B] dark:text-slate-400 text-xs hover:border-[#5D87FF] transition-all"
         >
           <Search class="w-3.5 h-3.5" />
-          <span>Cari panduan SOP...</span>
+          <span>{{ t('search_placeholder_nav', 'Cari panduan SOP & artikel...') }}</span>
           <kbd class="px-1.5 py-0.5 text-[10px] font-mono font-bold bg-white dark:bg-slate-700 rounded border border-[#E5EAEF] dark:border-slate-600 text-[#64748B] dark:text-slate-300">Ctrl K</kbd>
         </RouterLink>
 
@@ -112,7 +116,7 @@ onUnmounted(() => {
             class="px-4 py-2 rounded-xl text-xs font-extrabold bg-[#5D87FF] hover:bg-[#4570EA] text-white shadow-md shadow-[#5D87FF]/20 hover:shadow-lg transition-all flex items-center gap-1.5 cursor-pointer"
           >
             <LogIn class="w-3.5 h-3.5" />
-            <span>Sign In</span>
+            <span>{{ t('sign_in', 'Sign In') }}</span>
           </RouterLink>
         </template>
 
@@ -162,25 +166,38 @@ onUnmounted(() => {
 
               <!-- Menu Items -->
               <div class="space-y-0.5 py-1">
-                <!-- Dashboard Link -->
-                <RouterLink
-                  v-if="isAdmin || hasPermission('dashboard')"
-                  to="/dashboard"
-                  @click="closeProfileMenu"
-                  class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100/90 dark:hover:bg-slate-800/80 hover:text-slate-900 dark:hover:text-white transition-all duration-150 group"
-                >
-                  <LayoutDashboard class="w-4 h-4 text-[#5D87FF] group-hover:scale-110 transition-transform" />
-                  <span>Dashboard</span>
-                </RouterLink>
+                <!-- 1. ADMIN / SUPER ADMIN ROLE: Dashboard only -->
+                <template v-if="isAdmin">
+                  <RouterLink
+                    to="/dashboard"
+                    @click="closeProfileMenu"
+                    class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100/90 dark:hover:bg-slate-800/80 hover:text-slate-900 dark:hover:text-white transition-all duration-150 group"
+                  >
+                    <LayoutDashboard class="w-4 h-4 text-[#5D87FF] group-hover:scale-110 transition-transform" />
+                    <span>{{ t('dashboard', 'Dashboard') }}</span>
+                  </RouterLink>
+                </template>
 
-                <RouterLink
-                  to="/tickets"
-                  @click="closeProfileMenu"
-                  class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100/90 dark:hover:bg-slate-800/80 hover:text-slate-900 dark:hover:text-white transition-all duration-150 group"
-                >
-                  <Ticket class="w-4 h-4 text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-200 group-hover:scale-110 transition-transform" />
-                  <span>My Tickets</span>
-                </RouterLink>
+                <!-- 2. REGULAR USER ROLE: My Asset & My Tickets -->
+                <template v-else>
+                  <RouterLink
+                    to="/my-assets"
+                    @click="closeProfileMenu"
+                    class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100/90 dark:hover:bg-slate-800/80 hover:text-slate-900 dark:hover:text-white transition-all duration-150 group"
+                  >
+                    <Laptop class="w-4 h-4 text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-200 group-hover:scale-110 transition-transform" />
+                    <span>{{ t('my_asset', 'My Asset') }}</span>
+                  </RouterLink>
+
+                  <RouterLink
+                    to="/tickets"
+                    @click="closeProfileMenu"
+                    class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100/90 dark:hover:bg-slate-800/80 hover:text-slate-900 dark:hover:text-white transition-all duration-150 group"
+                  >
+                    <Ticket class="w-4 h-4 text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-200 group-hover:scale-110 transition-transform" />
+                    <span>{{ t('my_tickets', 'My Tickets') }}</span>
+                  </RouterLink>
+                </template>
               </div>
 
               <!-- Sign Out -->
@@ -190,7 +207,7 @@ onUnmounted(() => {
                   class="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-500/10 hover:text-rose-700 dark:hover:text-rose-300 transition-all duration-150 cursor-pointer text-left group"
                 >
                   <LogOut class="w-4 h-4 group-hover:scale-110 transition-transform" />
-                  <span>Sign Out</span>
+                  <span>{{ t('sign_out', 'Sign Out') }}</span>
                 </button>
               </div>
             </div>
@@ -208,4 +225,29 @@ onUnmounted(() => {
 
     </div>
   </header>
+
+  <!-- Floating Bottom-Right Language Switcher Pill -->
+  <div class="fixed bottom-6 right-6 z-50 flex items-center p-1.5 rounded-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border border-[#E5EAEF] dark:border-slate-800 shadow-xl shadow-slate-900/15 text-xs font-black transition-all hover:scale-[1.03] select-none">
+    <div class="flex items-center gap-1.5 pl-2 pr-1.5 text-[#5D87FF] shrink-0">
+      <Globe class="w-4 h-4" />
+    </div>
+    <div class="flex items-center p-0.5 rounded-full bg-[#F1F5F9] dark:bg-slate-800">
+      <button
+        @click="setLanguage('id')"
+        class="px-2.5 py-1 rounded-full transition-all cursor-pointer text-[11px]"
+        :class="currentLang === 'id' ? 'bg-[#5D87FF] text-white shadow-2xs' : 'text-[#64748B] dark:text-slate-400 hover:text-[#0F172A] dark:hover:text-white'"
+        title="Bahasa Indonesia"
+      >
+        ID
+      </button>
+      <button
+        @click="setLanguage('en')"
+        class="px-2.5 py-1 rounded-full transition-all cursor-pointer text-[11px]"
+        :class="currentLang === 'en' ? 'bg-[#5D87FF] text-white shadow-2xs' : 'text-[#64748B] dark:text-slate-400 hover:text-[#0F172A] dark:hover:text-white'"
+        title="English"
+      >
+        EN
+      </button>
+    </div>
+  </div>
 </template>

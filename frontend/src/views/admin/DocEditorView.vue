@@ -77,9 +77,9 @@ const doc = ref({
   summary: 'Short guide for employees to reset their Windows/Domain credentials using Okta self-service.',
   problemContext: 'If you find yourself locked out of your workstation or need to proactively update your credentials, follow these steps to securely reset your password through our SSO provider.',
   actionSteps: [
-    'Step 1: Open web browser and navigate to the company Okta portal (okta.corelogic.internal).',
+    'Step 1: Open web browser and navigate to the company SSO portal (sso.company.example).',
     'Step 2: Click on "Need help signing in?" at the bottom of the login widget, then select "Forgot password?".',
-    'Step 3: Enter your username or employee ID, then verify via Okta Verify app or SMS code.',
+    'Step 3: Enter your username or employee ID, then verify via Authenticator app or SMS code.',
     'Step 4: Create a new password meeting the 16-character minimum requirement and confirm.'
   ],
   dosAndDonts: {
@@ -94,8 +94,8 @@ const doc = ref({
   },
   snippets: [
     {
-      label: 'Direct Okta SSO Portal Link',
-      code: 'https://okta.corelogic.internal/signin/forgot-password'
+      label: 'Direct SSO Portal Link',
+      code: 'https://sso.company.example/signin/forgot-password'
     }
   ],
   isCustom: true,
@@ -117,7 +117,7 @@ const initialEditorContent = `
   <li><strong>Step 4: Set New Password</strong><br/>Enter a new password meeting the 16-character company security policy.</li>
 </ol>
 
-<pre><code>Portal Gateway: https://okta.corelogic.internal/
+<pre><code>Portal Gateway: https://sso.company.example/
 Password Rule: Min 16 chars, 1 uppercase, 1 symbol, 1 digit</code></pre>
 `;
 
@@ -971,7 +971,7 @@ function goToAdminCases() {
             <input
               v-model="imageCaptionInput"
               type="text"
-              placeholder="Contoh: Tangkapan layar menu Okta Portal..."
+              placeholder="Contoh: Tangkapan layar menu SSO Portal..."
               class="w-full h-9 px-3 bg-[#F8FAFC] dark:bg-slate-800 border border-[#E2E8F0] dark:border-slate-700 rounded-xl text-xs font-medium focus:border-[#5D87FF] focus:outline-none"
             />
           </div>

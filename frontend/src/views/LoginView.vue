@@ -67,9 +67,16 @@ watch(isMounting, async (mounting) => {
   }
 })
 
+const EMAIL_FORMAT_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
 const handleLogin = async () => {
   if (!email.value || !password.value) {
     errorMessage.value = 'Email dan kata sandi wajib diisi.'
+    return
+  }
+
+  if (!EMAIL_FORMAT_PATTERN.test(email.value.trim())) {
+    errorMessage.value = 'Format email tidak valid.'
     return
   }
 

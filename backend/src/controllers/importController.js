@@ -509,6 +509,6 @@ export async function importExcelData(req, res) {
 
   } catch (error) {
     console.error('[Import Excel Error]', error);
-    res.status(500).json({ error: error.message || 'Gagal memproses import data Excel.' });
+    res.status(500).json({ error: 'Gagal memproses import data Excel. Silakan periksa format file Anda atau hubungi administrator.' });
   }
 }

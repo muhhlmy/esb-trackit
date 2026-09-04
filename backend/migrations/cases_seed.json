@@ -18,7 +18,7 @@
       "Tekan kombinasi tombol Shift + F10 (atau Fn + Shift + F10) pada keyboard untuk membuka jendela Command Prompt (CMD).",
       "Ketik perintah oobe\\bypassnro lalu tekan Enter. Laptop akan melakukan restart otomatis dan mengizinkan proses setup tanpa koneksi internet (Local Account mode).",
       "Setelah berhasil masuk ke desktop Windows, buka aplikasi Notepad, lalu salin dan simpan script otomatisasi user sebagai file .bat (contoh: setup_user.bat).",
-      "Klik kanan pada file .bat tersebut lalu pilih Run as Administrator untuk membuat user ESB-User dengan password Essensians@2026 dan mengonfigurasi batas waktu password menjadi Never Expire.",
+      "Klik kanan pada file .bat tersebut lalu pilih Run as Administrator untuk membuat user ESB-User dengan password sementara sesuai SOP dan mengonfigurasi batas waktu password menjadi Never Expire.",
       "Lakukan pengubahan nama perangkat (Rename This PC) sesuai standar penamaan label inventaris laptop perusahaan (contoh: LAPTOP-IT-01 atau ESB-DEPT-NAME).",
       "Buka menu Settings > Windows Update, jalankan pembaruan sistem hingga selesai, dan aktifkan opsi \"Get the latest updates as soon as they're available\".",
       "Matikan enkripsi perangkat melalui menu Settings > Privacy & Security > Device Encryption (setel status menjadi Off).",
@@ -39,7 +39,7 @@
     "snippets": [
       {
         "label": "Script Auto Setup User & Password Never Expire (.bat)",
-        "code": "@echo off\nREM Jalankan sebagai Administrator\nREM Membuat user baru\nnet user \"ESB-User\" Essensians@2026 /add\n\nREM Set agar password tidak pernah expired via PowerShell\npowershell -Command \"Set-LocalUser -Name 'ESB-User' -PasswordNeverExpires $true\"\n\necho User ESB-User berhasil dibuat dengan password tidak pernah expired.\npause"
+        "code": "@echo off\nREM Jalankan sebagai Administrator\nREM Membuat user baru\nnet user \"ESB-User\" <Password_Sementara_Sesuai_SOP> /add\n\nREM Set agar password tidak pernah expired via PowerShell\npowershell -Command \"Set-LocalUser -Name 'ESB-User' -PasswordNeverExpires $true\"\n\necho User ESB-User berhasil dibuat dengan password tidak pernah expired.\npause"
       }
     ],
     "isCustom": false
@@ -61,7 +61,7 @@
       "Siapkan unit laptop pengembalian yang akan dialokasikan untuk penyerahan atau penggantian perangkat.",
       "Login menggunakan akun Administrator, lalu lakukan pengujian fungsi hardware mencakup: Keyboard, Microphone, Kamera/Webcam, dan Speaker.",
       "Hapus akun/profil user lama jika ada, kemudian tambahkan akun lokal baru sesuai dengan nama pengguna (User Name) yang akan menerima laptop.",
-      "Gunakan kata sandi standar default perusahaan yaitu Essensians@2026 untuk akun user baru tersebut.",
+      "Gunakan kata sandi standar sementara sesuai kebijakan IT perusahaan untuk akun user baru tersebut.",
       "Buka Command Prompt sebagai Administrator, lalu jalankan perintah berikut agar password tidak pernah kadaluarsa: powershell -Command \"Set-LocalUser -Name 'ESB-User' -PasswordNeverExpires $true\".",
       "Ubah nama perangkat (Rename This PC) sesuai label registrasi inventaris yang diperuntukkan bagi laptop tersebut.",
       "Buka menu Settings > Windows Update, periksa ketersediaan pembaruan sistem, dan nyalakan opsi \"Get the latest updates as soon as they're available\".",
@@ -224,13 +224,13 @@
       "Cari nama atau alamat email pengguna (User) yang akan di-reset pada kolom pencarian utama atau navigasi Directory > Users.",
       "Klik tombol Reset Password pada panel profil akun pengguna tersebut.",
       "Pilih metode Create Password (buat kata sandi secara manual).",
-      "Masukkan kata sandi default resmi perusahaan yaitu Essensians@2026 pada kolom password baru.",
+      "Masukkan kata sandi sementara yang ditentukan oleh kebijakan resmi IT perusahaan pada kolom password baru.",
       "Pastikan untuk mencentang opsi \"Ask user to change their password when they sign in\" agar pengguna wajib memperbarui kata sandi saat pertama kali login kembali.",
       "Klik tombol Reset untuk mengeksekusi perbaikan, kemudian kabarkan password sementara tersebut secara aman kepada pihak PBX / pemohon berwenang."
     ],
     "dos": [
       "Wajib mencentang opsi Ask user to change their password when they sign in agar kata sandi baru segera diubah oleh pemilik akun.",
-      "Gunakan password default resmi perusahaan (Essensians@2026) untuk konsistensi prosedur IT Support."
+      "Gunakan password sementara yang ditentukan oleh SOP resmi untuk konsistensi prosedur IT Support."
     ],
     "donts": [
       "Jangan membagikan kata sandi baru pada grup obrolan publik; selalu kirimkan secara privat (Direct Message) kepada pihak PBX.",
@@ -239,7 +239,7 @@
     "snippets": [
       {
         "label": "Default Password Reset & Console Link",
-        "code": "Portal: https://admin.google.com/\nDefault Temp Password: Essensians@2026"
+        "code": "Portal: https://admin.google.com/\nDefault Temp Password: <Password_Sementara_Sesuai_SOP>"
       }
     ],
     "isCustom": false

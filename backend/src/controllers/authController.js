@@ -7,7 +7,7 @@ import {
   normalizePermissions,
 } from '../services/permissionService.js';
 import { verifyPassword, hashPassword } from '../security/passwordService.js';
-import { parseRequiredEmail } from '../security/requestValidation.js';
+import { parseRequiredEmail, parseNewPassword } from '../security/requestValidation.js';
 import {
   createSession,
   revokeSession,
@@ -329,8 +329,11 @@ export async function changePassword(req, res) {
     if (!currentPassword || typeof currentPassword !== 'string') {
       return res.status(400).json({ message: 'Password saat ini wajib diisi.' });
     }
-    if (!newPassword || typeof newPassword !== 'string' || Array.from(newPassword).length < 8) {
-      return res.status(400).json({ message: 'Password baru minimal harus 8 karakter.' });
+    let validatedNewPassword;
+    try {
+      validatedNewPassword = parseNewPassword(newPassword);
+    } catch (err) {
+      return res.status(400).json({ message: err.message || 'Password baru tidak memenuhi syarat kompleksitas.' });
     }
 
     const userResult = await pool.query(
@@ -349,7 +352,7 @@ export async function changePassword(req, res) {
       return res.status(400).json({ message: 'Password saat ini salah.' });
     }
 
-    const newHashedPassword = await hashPassword(newPassword);
+    const newHashedPassword = await hashPassword(validatedNewPassword);
     await pool.query(
       `UPDATE users SET password_hash = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2`,
       [newHashedPassword, userId],
@@ -484,15 +487,18 @@ export async function resetPassword(req, res) {
     if (!resetToken || typeof resetToken !== 'string') {
       return res.status(400).json({ message: 'Token reset wajib disertakan.' })
     }
-    if (!newPassword || typeof newPassword !== 'string' || Array.from(newPassword).length < 8) {
-      return res.status(400).json({ message: 'Kata sandi baru minimal harus 8 karakter.' })
+    let validatedNewPassword;
+    try {
+      validatedNewPassword = parseNewPassword(newPassword);
+    } catch (err) {
+      return res.status(400).json({ message: err.message || 'Kata sandi baru tidak memenuhi syarat kompleksitas.' });
     }
 
     // 1. Validasi token dan ambil userId
     const { userId } = await consumePasswordResetToken(email, resetToken)
 
     // 2. Hash kata sandi baru
-    const newHashedPassword = await hashPassword(newPassword)
+    const newHashedPassword = await hashPassword(validatedNewPassword)
 
     // 3. Update database
     await pool.query(

@@ -54,6 +54,7 @@ export function useApi() {
 
     const customHeaders = {
       Accept: 'application/json',
+      'X-Requested-With': 'XMLHttpRequest',
       ...fetchOptions.headers,
     }
 

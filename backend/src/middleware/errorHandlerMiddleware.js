@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto'
 import fs from 'node:fs'
 import { AppError, ERROR_CODES } from '../errors/AppError.js'
+import { appendRotatingLog } from '../utils/logRotator.js'
 
 export function requestIdMiddleware(req, res, next) {
   const reqId = req.headers['x-request-id'] || randomUUID()
@@ -87,9 +88,7 @@ export function globalErrorHandler(err, req, res, next) {
       `[${timestamp}] SERVER ERROR [ReqID: ${requestId}] [${req.method} ${req.path}]:\n` +
       `Message: ${err?.message || 'Unknown'}\n` +
       `Stack: ${(err?.stack || 'No stack').substring(0, 1000)}\n`
-    try {
-      fs.appendFileSync('./error_log.log', errorLog)
-    } catch {}
+    appendRotatingLog('./error_log.log', errorLog)
     console.error(errorLog)
   }
 

@@ -134,6 +134,7 @@ if (process.env.DB_SSL === "true") {
 }
 
 export const env = {
+  host: (process.env.HOST || "127.0.0.1").trim(),
   port: readNumber("PORT", 3000),
   database: {
     host: process.env.DB_HOST || "localhost",

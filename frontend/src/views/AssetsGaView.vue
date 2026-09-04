@@ -656,10 +656,11 @@ function formatKondisiPill(kondisi) {
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <!-- Hostname -->
           <div>
-            <label class="block text-[12px] font-bold text-[#1E293B] mb-1">
+            <label for="ga-hostname" class="block text-[12px] font-bold text-[#1E293B] mb-1">
               Hostname / Kode Aset <span class="text-rose-500">*</span>
             </label>
             <input
+              id="ga-hostname"
               v-model="form.hostname"
               type="text"
               required
@@ -670,10 +671,11 @@ function formatKondisiPill(kondisi) {
 
           <!-- Nama Asset -->
           <div>
-            <label class="block text-[12px] font-bold text-[#1E293B] mb-1">
+            <label for="ga-nama-asset" class="block text-[12px] font-bold text-[#1E293B] mb-1">
               Nama Asset <span class="text-rose-500">*</span>
             </label>
             <input
+              id="ga-nama-asset"
               v-model="form.nama_asset"
               type="text"
               required
@@ -686,10 +688,11 @@ function formatKondisiPill(kondisi) {
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <!-- Quantity -->
           <div>
-            <label class="block text-[12px] font-bold text-[#1E293B] mb-1">
+            <label for="ga-quantity" class="block text-[12px] font-bold text-[#1E293B] mb-1">
               Quantity <span class="text-rose-500">*</span>
             </label>
             <input
+              id="ga-quantity"
               v-model.number="form.quantity"
               type="number"
               min="1"
@@ -714,10 +717,11 @@ function formatKondisiPill(kondisi) {
 
           <!-- Kondisi -->
           <div>
-            <label class="block text-[12px] font-bold text-[#1E293B] mb-1">
+            <label for="ga-kondisi" class="block text-[12px] font-bold text-[#1E293B] mb-1">
               Kondisi <span class="text-rose-500">*</span>
             </label>
             <select
+              id="ga-kondisi"
               v-model="form.kondisi"
               class="w-full h-10 px-3 text-[12.5px] rounded-xl border border-[#E2E8F0] bg-white focus:border-[#2563EB] focus:outline-none cursor-pointer"
             >
@@ -743,8 +747,9 @@ function formatKondisiPill(kondisi) {
 
           <!-- Lokasi Detail -->
           <div>
-            <label class="block text-[12px] font-bold text-[#1E293B] mb-1">Lokasi Detail</label>
+            <label for="ga-lokasi-detail" class="block text-[12px] font-bold text-[#1E293B] mb-1">Lokasi Detail</label>
             <input
+              id="ga-lokasi-detail"
               v-model="form.lokasi_detail"
               type="text"
               placeholder="Contoh: Lantai 2 / Ruang Rapat Utama"
@@ -756,8 +761,9 @@ function formatKondisiPill(kondisi) {
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <!-- Ukuran -->
           <div>
-            <label class="block text-[12px] font-bold text-[#1E293B] mb-1">Ukuran / Dimensi</label>
+            <label for="ga-ukuran" class="block text-[12px] font-bold text-[#1E293B] mb-1">Ukuran / Dimensi</label>
             <input
+              id="ga-ukuran"
               v-model="form.ukuran"
               type="text"
               placeholder="Contoh: 120x60x75 cm / 2 PK"
@@ -767,8 +773,9 @@ function formatKondisiPill(kondisi) {
 
           <!-- Detail Spesifikasi -->
           <div>
-            <label class="block text-[12px] font-bold text-[#1E293B] mb-1">Detail / Catatan</label>
+            <label for="ga-detail" class="block text-[12px] font-bold text-[#1E293B] mb-1">Detail / Catatan</label>
             <input
+              id="ga-detail"
               v-model="form.detail"
               type="text"
               placeholder="Contoh: Warna Hitam, Daikin Inverter"

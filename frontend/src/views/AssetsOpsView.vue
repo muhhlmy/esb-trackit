@@ -674,10 +674,11 @@ function formatDate(dateStr) {
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <!-- Hostname -->
           <div>
-            <label class="block text-[12px] font-bold text-[#1E293B] mb-1">
+            <label for="ops-hostname" class="block text-[12px] font-bold text-[#1E293B] mb-1">
               Hostname / Kode Aset <span class="text-rose-500">*</span>
             </label>
             <input
+              id="ops-hostname"
               v-model="form.hostname"
               type="text"
               required
@@ -688,10 +689,11 @@ function formatDate(dateStr) {
 
           <!-- Nama Asset -->
           <div>
-            <label class="block text-[12px] font-bold text-[#1E293B] mb-1">
+            <label for="ops-nama-asset" class="block text-[12px] font-bold text-[#1E293B] mb-1">
               Nama Asset <span class="text-rose-500">*</span>
             </label>
             <input
+              id="ops-nama-asset"
               v-model="form.nama_asset"
               type="text"
               required
@@ -734,8 +736,9 @@ function formatDate(dateStr) {
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <!-- PIC Penanggung Jawab -->
           <div>
-            <label class="block text-[12px] font-bold text-[#1E293B] mb-1">PIC (Penanggung Jawab)</label>
+            <label for="ops-pic" class="block text-[12px] font-bold text-[#1E293B] mb-1">PIC (Penanggung Jawab)</label>
             <input
+              id="ops-pic"
               v-model="form.pic"
               type="text"
               placeholder="Contoh: Store Manager / Spv Kasir"
@@ -745,8 +748,9 @@ function formatDate(dateStr) {
 
           <!-- Tanggal Beli -->
           <div>
-            <label class="block text-[12px] font-bold text-[#1E293B] mb-1">Tanggal Pembelian</label>
+            <label for="ops-tanggal-beli" class="block text-[12px] font-bold text-[#1E293B] mb-1">Tanggal Pembelian</label>
             <input
+              id="ops-tanggal-beli"
               v-model="form.tanggal_beli"
               type="date"
               class="w-full h-10 px-3 text-[12.5px] rounded-xl border border-[#E2E8F0] bg-white focus:border-[#2563EB] focus:outline-none"
@@ -757,8 +761,9 @@ function formatDate(dateStr) {
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <!-- Total Asset Amount -->
           <div>
-            <label class="block text-[12px] font-bold text-[#1E293B] mb-1">Total Amount (Rp)</label>
+            <label for="ops-total-amount" class="block text-[12px] font-bold text-[#1E293B] mb-1">Total Amount (Rp)</label>
             <input
+              id="ops-total-amount"
               v-model.number="form.total_asset_amount"
               type="number"
               min="0"
@@ -770,8 +775,9 @@ function formatDate(dateStr) {
 
           <!-- Kondisi -->
           <div>
-            <label class="block text-[12px] font-bold text-[#1E293B] mb-1">Kondisi</label>
+            <label for="ops-kondisi" class="block text-[12px] font-bold text-[#1E293B] mb-1">Kondisi</label>
             <select
+              id="ops-kondisi"
               v-model="form.kondisi"
               class="w-full h-10 px-3 text-[12.5px] rounded-xl border border-[#E2E8F0] bg-white focus:border-[#2563EB] focus:outline-none cursor-pointer"
             >
@@ -781,8 +787,9 @@ function formatDate(dateStr) {
 
           <!-- Status -->
           <div>
-            <label class="block text-[12px] font-bold text-[#1E293B] mb-1">Status Operasional</label>
+            <label for="ops-status" class="block text-[12px] font-bold text-[#1E293B] mb-1">Status Operasional</label>
             <select
+              id="ops-status"
               v-model="form.status"
               class="w-full h-10 px-3 text-[12.5px] rounded-xl border border-[#E2E8F0] bg-white focus:border-[#2563EB] focus:outline-none cursor-pointer"
             >

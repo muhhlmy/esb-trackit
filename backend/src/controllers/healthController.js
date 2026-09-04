@@ -1,6 +1,11 @@
 import { query } from '../config/database.js'
 
 export async function checkHealth(req, res) {
-  await query('SELECT 1')
-  res.json({ status: 'ok', database: 'connected' })
+  try {
+    await query('SELECT 1')
+    res.json({ status: 'healthy' })
+  } catch {
+    res.status(503).json({ status: 'unhealthy' })
+  }
 }
+

@@ -63,6 +63,8 @@ export function parseRequiredEmail(value) {
   return normalized
 }
 
+export const PASSWORD_COMPLEXITY_PATTERN = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[\d\W_]).{8,}$/
+
 export function parseNewPassword(value, { required = true } = {}) {
   if (value === undefined && !required) return undefined
   if (typeof value !== 'string') {
@@ -82,6 +84,14 @@ export function parseNewPassword(value, { required = true } = {}) {
       `Password baru minimal ${NEW_PASSWORD_MIN_LENGTH} karakter dan maksimal ${NEW_PASSWORD_MAX_BYTES} byte tanpa karakter kontrol.`,
     )
   }
+
+  if (!PASSWORD_COMPLEXITY_PATTERN.test(value)) {
+    throw createHttpError(
+      400,
+      'Password baru harus mengandung kombinasi huruf besar, huruf kecil, dan angka atau simbol.',
+    )
+  }
+
   return value
 }
 

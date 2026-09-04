@@ -93,12 +93,19 @@ export async function sendEmail({ to, subject, html, text, attachments = [] }) {
     }
   }
 
+function maskEmail(email) {
+  if (typeof email !== 'string' || !email.includes('@')) return '***'
+  const [user, domain] = email.split('@')
+  const maskedUser = user.length > 2 ? `${user[0]}***${user.slice(-1)}` : `${user[0] || '*'}***`
+  return `${maskedUser}@${domain}`
+}
+
   try {
     const info = await activeTransporter.sendMail({ from, to, subject, text, html: processedHtml, attachments: mailAttachments })
-    console.log(`[emailService] ✅ Email terkirim ke <${to}>: ${info.messageId}`)
+    console.log(`[emailService] ✅ Email terkirim ke <${maskEmail(to)}>: ${info.messageId}`)
     return true
   } catch (error) {
-    console.error(`[emailService] ❌ Gagal kirim ke <${to}>:`, error.message)
+    console.error(`[emailService] ❌ Gagal kirim ke <${maskEmail(to)}>:`, error.message)
     return false
   }
 }

@@ -46,7 +46,9 @@ function checkCorsOrigin(origin, callback) {
     return;
   }
 
-  console.warn(`[CORS Blocked] Origin: "${origin}". Allowed origins:`, env.corsOrigins);
+  if (process.env.NODE_ENV !== 'production') {
+    console.info(`[CORS Blocked] Origin: "${origin}". Allowed origins:`, env.corsOrigins);
+  }
   // Deny CORS permission by passing false to cors middleware (suppresses Access-Control-Allow-Origin header)
   callback(null, false);
 }

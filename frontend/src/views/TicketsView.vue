@@ -158,7 +158,9 @@ onUnmounted(() => {
 
 // ── Queue / Tab state ─────────────────────────────────────────
 const queues = ref([]) // list queue (HR, IT, GA, OPS)
+const isQueuesLoading = ref(false)
 const reporters = ref([]) // list user untuk dropdown pelapor (admin)
+const isReportersLoading = ref(false)
 const activeTab = ref('all') // 'all' | 'unassigned' | 'mine'
 const filterQueue = ref('') // queue_id filter
 
@@ -611,13 +613,13 @@ async function fetchQueueAdmins() {
   }
 }
 
-// eslint-disable-next-line no-unused-vars
 function getAdminsForQueue(queueId) {
   if (!queueId) return []
   return queueAdmins.value[queueId] || []
 }
 
 async function fetchQueues() {
+  isQueuesLoading.value = true
   try {
     const data = await get('/api/ticket-queues')
     if (Array.isArray(data)) {
@@ -625,18 +627,23 @@ async function fetchQueues() {
       await fetchQueueAdmins()
     }
   } catch (err) {
-    void err
+    toast('Gagal memuat antrean tiket: ' + (err.message || 'Kesalahan jaringan'), 'error')
+  } finally {
+    isQueuesLoading.value = false
   }
 }
 
 async function fetchReporters() {
+  isReportersLoading.value = true
   try {
     const data = await get('/api/tickets/reporters')
     const rows = Array.isArray(data?.reporters) ? data.reporters : []
     reporters.value = rows.map((u) => ({ id: Number(u.id), nama: u.nama }))
   } catch (err) {
     reporters.value = []
-    void err
+    toast('Gagal memuat daftar pelapor: ' + (err.message || 'Kesalahan jaringan'), 'error')
+  } finally {
+    isReportersLoading.value = false
   }
 }
 
@@ -2626,6 +2633,8 @@ function toast(message, type = 'success') {
                 <button
                   type="button"
                   @click="removeCommentAttachment"
+                  aria-label="Hapus lampiran"
+                  title="Hapus lampiran"
                   class="text-rose-500 hover:text-rose-700 cursor-pointer"
                 >
                   <span class="material-symbols-outlined text-[16px]">close</span>
@@ -2696,6 +2705,9 @@ function toast(message, type = 'success') {
                 type="button"
                 :disabled="isUpdatingStatus"
                 @click="toggleStatusDropdown"
+                aria-label="Ubah status tiket"
+                aria-haspopup="true"
+                :aria-expanded="showStatusDropdown"
                 class="inline-flex h-9 items-center gap-2 rounded-xl border border-[#E5EAEF] bg-white px-3.5 text-xs font-bold text-[#2A3547] shadow-2xs hover:bg-[#F8FAFC] hover:border-[#5D87FF] transition-all cursor-pointer disabled:opacity-50"
               >
                 <span
@@ -2764,6 +2776,9 @@ function toast(message, type = 'success') {
               type="button"
               :disabled="isReassigning || ['Closed', 'Resolved', 'Cancelled'].includes(selectedTicket.status_tiket)"
               @click="toggleReassignDropdown"
+              aria-label="Assign tiket ke admin unit"
+              aria-haspopup="true"
+              :aria-expanded="showReassignDropdown"
               class="inline-flex h-9 items-center gap-1.5 rounded-xl border border-[#E5EAEF] bg-white px-3.5 text-xs font-bold text-[#2A3547] shadow-2xs hover:bg-[#F8FAFC] hover:border-[#5D87FF] transition-all cursor-pointer disabled:opacity-50"
             >
               <span class="material-symbols-outlined text-[16px] text-[#2563EB]">assignment_ind</span>

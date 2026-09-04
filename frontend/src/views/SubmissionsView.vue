@@ -14,6 +14,7 @@ const employees = ref([])
 const assets = ref([])
 const isLoading = ref(true)
 const pageError = ref('')
+const validationError = ref('')
 
 // Form State
 const form = ref({
@@ -194,8 +195,36 @@ function removeAssetLamaRow(index) {
   }
 }
 
-// ── PDF Print Engine ─────────────────────────────────────────
 function generatePdf() {
+  validationError.value = ''
+
+  if (!form.value.pemberiNama?.trim()) {
+    validationError.value = 'Pihak Pemberi wajib dipilih atau diisi sebelum mencetak formulir.'
+    return
+  }
+
+  if (!form.value.penerimaNama?.trim()) {
+    validationError.value = 'Pihak Penerima wajib dipilih atau diisi sebelum mencetak formulir.'
+    return
+  }
+
+  if (!form.value.tanggal) {
+    validationError.value = 'Tanggal serah terima wajib diisi.'
+    return
+  }
+
+  if (form.value.tujuan === 'lainnya' && !form.value.tujuanLainnya?.trim()) {
+    validationError.value = 'Keterangan tujuan lainnya wajib diisi.'
+    return
+  }
+
+  const hasAsetBaru = asetBaruList.value.some((a) => a.id_aset)
+  const hasAsetLama = asetLamaList.value.some((a) => a.id_aset)
+  if (!hasAsetBaru && !hasAsetLama) {
+    validationError.value = 'Minimal pilih salah satu Aset (Aset Baru / Aset Lama) untuk serah terima.'
+    return
+  }
+
   // Format Date to Indonsian Date (e.g. 21 Juli 2026)
   const months = [
     'Januari',
@@ -241,10 +270,7 @@ function generatePdf() {
     labelPerbaikanHtml = '<s>Perbaikan</s>/Penggantian'
   }
 
-  // Check if Aset Baru or Aset Lama lists have valid selections
-  const hasAsetBaru = asetBaruList.value.some((a) => a.id_aset)
-  const hasAsetLama = asetLamaList.value.some((a) => a.id_aset)
-
+  // Section 3: Daftar Data Serah Terima Aset
   let section3Html = ''
   if (hasAsetBaru || hasAsetLama) {
     section3Html += '<h3 class="section-title">III. Daftar Data Serah Terima Aset</h3>'
@@ -688,6 +714,17 @@ onMounted(fetchData)
     </div>
 
     <form v-else class="flex flex-col gap-6" @submit.prevent="generatePdf">
+      <!-- Validation Error Banner -->
+      <div
+        v-if="validationError"
+        role="alert"
+        aria-live="assertive"
+        class="flex items-center gap-3 p-4 rounded-xl border border-rose-300 bg-rose-50 text-rose-800 text-xs font-semibold shadow-xs"
+      >
+        <span class="material-symbols-outlined text-[20px] text-rose-600">error</span>
+        <span>{{ validationError }}</span>
+      </div>
+
       <!-- Section 1: Profil Pihak Terkait -->
       <div
         class="submission-section shadow-card rounded-[20px] border border-[#E8EDF3] bg-white p-5 sm:p-6"

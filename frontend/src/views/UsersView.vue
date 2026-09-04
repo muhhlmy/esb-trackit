@@ -31,6 +31,8 @@ const selectedEmployeeId = ref('')
 const isLoading = ref(true)
 const pageError = ref('')
 const modalError = ref('')
+const isQueuesLoading = ref(false)
+const isEmployeesLoading = ref(false)
 const notification = ref(null)
 
 const currentPage = ref(1)
@@ -243,11 +245,14 @@ const paginatedUsers = computed(() => {
 
 // ── CRUD Functions ───────────────────────────────────────────
 async function fetchQueues() {
+  isQueuesLoading.value = true
   try {
     const data = await get('/api/ticket-queues')
     if (Array.isArray(data)) queues.value = data
   } catch (err) {
-    void err
+    showNotification('error', 'Gagal memuat data antrean unit: ' + (err.message || 'Kesalahan jaringan'))
+  } finally {
+    isQueuesLoading.value = false
   }
 }
 
@@ -344,11 +349,14 @@ async function fetchUsers() {
 }
 
 async function fetchEmployees() {
+  isEmployeesLoading.value = true
   try {
     const data = await get('/api/karyawan?all=true')
     if (Array.isArray(data)) employees.value = data
   } catch (err) {
-    void err
+    showNotification('error', 'Gagal memuat data karyawan: ' + (err.message || 'Kesalahan jaringan'))
+  } finally {
+    isEmployeesLoading.value = false
   }
 }
 
@@ -473,8 +481,9 @@ async function saveUser() {
     isSubmitting.value = false
     return
   }
-  if (form.value.password && Array.from(form.value.password).length < 8) {
-    modalError.value = 'Password minimal harus terdiri dari 8 karakter.'
+  const PASSWORD_COMPLEXITY_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[\d\W_]).{8,}$/
+  if (form.value.password && !PASSWORD_COMPLEXITY_REGEX.test(form.value.password)) {
+    modalError.value = 'Password minimal 8 karakter dan harus mengandung kombinasi huruf besar, huruf kecil, serta angka atau simbol.'
     isSubmitting.value = false
     return
   }

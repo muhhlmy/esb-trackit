@@ -1,6 +1,12 @@
 import { onBeforeUnmount, onMounted } from 'vue'
 import gsap from 'gsap'
 
+function devWarn(...args) {
+  if (import.meta.env?.DEV) {
+    console.warn(...args)
+  }
+}
+
 /**
  * Native check for prefers-reduced-motion
  */
@@ -50,7 +56,7 @@ export function animatePageEnter(el, done) {
       try {
         done()
       } catch (err) {
-        console.warn('[PageEnter] Navigation transition hook handled:', err?.message)
+        devWarn('[PageEnter] Navigation transition hook handled:', err?.message)
       }
     }
   }
@@ -85,7 +91,7 @@ export function animatePageEnter(el, done) {
     )
     setTimeout(safeDone, 350)
   } catch (err) {
-    console.warn('[PageEnter] GSAP fallback triggered:', err?.message)
+    devWarn('[PageEnter] GSAP fallback triggered:', err?.message)
     safeDone()
   }
 }
@@ -102,7 +108,7 @@ export function animatePageLeave(el, done) {
       try {
         done()
       } catch (err) {
-        console.warn('[PageLeave] Navigation transition hook handled:', err?.message)
+        devWarn('[PageLeave] Navigation transition hook handled:', err?.message)
       }
     }
   }
@@ -132,7 +138,7 @@ export function animatePageLeave(el, done) {
     })
     setTimeout(safeDone, 280)
   } catch (err) {
-    console.warn('[PageLeave] GSAP fallback triggered:', err?.message)
+    devWarn('[PageLeave] GSAP fallback triggered:', err?.message)
     safeDone()
   }
 }
@@ -184,7 +190,7 @@ export function animateStagger(targets, options = {}) {
       },
     )
   } catch (err) {
-    console.warn('[Stagger Animation] GSAP error handled:', err?.message)
+    devWarn('[Stagger Animation] GSAP error handled:', err?.message)
   }
 }
 
@@ -200,7 +206,7 @@ export function animateModalEnter(el, done) {
       try {
         done()
       } catch (err) {
-        console.warn('[ModalEnter] Transition hook handled:', err?.message)
+        devWarn('[ModalEnter] Transition hook handled:', err?.message)
       }
     }
   }
@@ -240,7 +246,7 @@ export function animateModalEnter(el, done) {
     )
     setTimeout(safeDone, 350)
   } catch (err) {
-    console.warn('[ModalEnter] GSAP fallback triggered:', err?.message)
+    devWarn('[ModalEnter] GSAP fallback triggered:', err?.message)
     safeDone()
   }
 }
@@ -257,7 +263,7 @@ export function animateModalLeave(el, done) {
       try {
         done()
       } catch (err) {
-        console.warn('[ModalLeave] Transition hook handled:', err?.message)
+        devWarn('[ModalLeave] Transition hook handled:', err?.message)
       }
     }
   }
@@ -293,7 +299,7 @@ export function animateModalLeave(el, done) {
     })
     setTimeout(safeDone, 280)
   } catch (err) {
-    console.warn('[ModalLeave] GSAP fallback triggered:', err?.message)
+    devWarn('[ModalLeave] GSAP fallback triggered:', err?.message)
     safeDone()
   }
 }

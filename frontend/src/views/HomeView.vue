@@ -168,7 +168,7 @@ const DEFAULT_FAQS = [
       'Buka Google Admin Console di browser (admin.google.com).',
       'Cari nama atau email karyawan pada menu Directory > Users.',
       'Klik tombol "Reset Password" dan pilih opsi buat kata sandi secara manual.',
-      'Gunakan kata sandi default resmi perusahaan: Essensians@2026.',
+      'Gunakan format kata sandi sementara sesuai SOP resmi IT perusahaan (hubungi IT Administrator jika membutuhkan bantuan).',
       'Pastikan mencentang "Ask user to change their password when they sign in" sebelum menyimpan.'
     ],
     actionText: 'Buka Portal Admin',

@@ -8,11 +8,15 @@
 // Cara pakai di komponen Vue:
 //   import { useApi } from '@/composables/useApi.js'
 //   const { get, post, put, del } = useApi()
+//
+// Autentikasi: token JWT dibawa oleh cookie HttpOnly (diterbitkan
+// backend). fetch dengan credentials:'same-origin' otomatis menyertakan
+// cookie tersebut — header Authorization tidak diperlukan lagi.
 // ============================================================
 
 // Kosong secara default agar deployment dapat memakai origin yang sama.
 // Pada development, request /api diteruskan oleh proxy Vite ke backend.
-import { clearAuthSession, getAuthToken } from '../utils/authStorage.js'
+import { clearAuthSession } from '../utils/authStorage.js'
 
 const BASE_URL = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/+$/, '')
 
@@ -36,24 +40,29 @@ async function parseResponse(response) {
   return text || null
 }
 
+function handleSessionExpired() {
+  clearAuthSession()
+  if (typeof window !== 'undefined' && window.location.pathname !== '/login') {
+    window.location.href = '/login'
+  }
+}
+
 export function useApi() {
   async function request(endpoint, options = {}) {
     let response
     const { withResponse = false, ...fetchOptions } = options
 
-    const token = getAuthToken()
     const customHeaders = {
       Accept: 'application/json',
       ...fetchOptions.headers,
     }
 
-    if (token) {
-      customHeaders['Authorization'] = `Bearer ${token}`
-    }
-
     try {
       response = await fetch(createUrl(endpoint), {
         ...fetchOptions,
+        // Cookie sesi HttpOnly dikirim otomatis untuk request same-origin
+        // (dev: proxy Vite; produksi: satu origin di balik reverse proxy).
+        credentials: 'same-origin',
         headers: customHeaders,
       })
     } catch (error) {
@@ -71,10 +80,7 @@ export function useApi() {
 
     if (response.status === 401) {
       if (endpoint !== '/api/auth/login') {
-        clearAuthSession()
-        if (typeof window !== 'undefined' && window.location.pathname !== '/login') {
-          window.location.href = '/login'
-        }
+        handleSessionExpired()
       }
 
       const message =

@@ -1,6 +1,7 @@
 import { ref, computed } from 'vue';
 import { api } from '../services/api.js';
 import { useAuth } from './useAuth.js';
+import { useToast } from './useToast.js';
 
 // Bookmark disimpan sebagai array of case_id (number) agar kompatibel
 // dengan konsumen yang sudah ada: CaseCard, CaseReader, NotionTreeSidebar.
@@ -16,6 +17,7 @@ function persistLocal() {
 
 export function useBookmarks() {
   const { isAuthenticated } = useAuth();
+  const { showToast } = useToast();
 
   function isBookmarked(caseId) {
     return bookmarks.value.includes(Number(caseId));
@@ -76,12 +78,12 @@ export function useBookmarks() {
         await api.addCaseBookmark(id);
       }
     } catch (err) {
-      // Rollback ke kondisi sebelum toggle
+      // Rollback ke kondisi sebelum toggle + beri umpan balik ke user.
       bookmarks.value = wasBookmarked
         ? [...bookmarks.value, id]
         : bookmarks.value.filter((x) => x !== id);
       persistLocal();
-      console.warn('Gagal memperbarui bookmark di server:', err.message);
+      showToast('Gagal memperbarui bookmark. Silakan coba lagi.', 'error');
     } finally {
       pendingToggles.delete(id);
     }

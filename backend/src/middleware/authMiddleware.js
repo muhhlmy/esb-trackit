@@ -9,6 +9,7 @@ import {
   normalizePermissions,
 } from '../services/permissionService.js';
 import { isValidUuid, verifySession } from '../services/sessionService.js';
+import { readSessionToken } from '../security/sessionToken.js';
 
 const BEARER_TOKEN_PATTERN =
   /^Bearer ([A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+)$/i;
@@ -44,6 +45,16 @@ function readBearerToken(req) {
   return match[1];
 }
 
+function extractToken(req) {
+  // Sumber utama: HttpOnly cookie sesi (browser).
+  const cookieToken = readSessionToken(req);
+  if (cookieToken) return cookieToken;
+
+  // Fallback: Authorization: Bearer untuk klien non-browser (cURL, Postman,
+  // CI, E2E API test). Klien ini tidak memakai cookie.
+  return readBearerToken(req);
+}
+
 function normalizeAuthenticatedRole(value) {
   if (typeof value !== 'string') return null;
   const role = value.trim().toLowerCase();
@@ -53,17 +64,20 @@ function normalizeAuthenticatedRole(value) {
 }
 
 export async function authenticateToken(req, res, next) {
-  const token = readBearerToken(req);
+  const token = extractToken(req);
   if (!token) return rejectAuthentication(res);
 
   let claims;
   try {
+    // JWT payload dipertahankan minimal (sub, sid, iat, exp).
+    // Klaim tambahan (email/role/permissions) diabaikan: otorisasi SELALU
+    // diresolve dari database pada middleware ini.
     claims = jwt.verify(token, env.jwt.secret, { algorithms: ['HS256'] });
   } catch {
     return rejectAuthentication(res);
   }
 
-  const userId = Number(claims?.id || claims?.sub);
+  const userId = Number(claims?.sub ?? claims?.id);
   const sessionId = claims?.sid;
 
   if (

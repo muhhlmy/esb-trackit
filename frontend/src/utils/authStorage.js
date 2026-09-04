@@ -1,11 +1,23 @@
-const AUTH_TOKEN_KEY = 'token'
+// ============================================================
+// authStorage.js - Penyimpanan state autentikasi di sisi client
+// ============================================================
+// Keamanan: token JWT TIDAK lagi disimpan di localStorage/sessionStorage.
+// Token kini hidup sebagai cookie HttpOnly (diterbitkan backend saat login),
+// sehingga tidak dapat dibaca oleh JavaScript browser (ketahanan terhadap XSS).
+//
+// Yang masih disimpan di localStorage hanyalah objek `user` yang sudah
+// di-sanitasi (tanpa password, hash, token, atau metadata internal) —
+// murni cache UI untuk guard router & render instan. Kredensial sebenarnya
+// (cookie sesi) tetap menjadi sumber kebenaran, dan setiap 401 dari API
+// akan menghapus cache ini dan mengarahkan kembali ke /login.
+// ============================================================
+
 const AUTH_USER_KEY = 'user'
 
-function getStorage(name) {
+function getStorage() {
   if (typeof window === 'undefined') return null
-
   try {
-    return window[name] || null
+    return window.localStorage || null
   } catch {
     return null
   }
@@ -13,7 +25,6 @@ function getStorage(name) {
 
 function safeGetItem(storage, key) {
   if (!storage) return null
-
   try {
     return storage.getItem(key)
   } catch {
@@ -23,17 +34,11 @@ function safeGetItem(storage, key) {
 
 function safeRemoveItem(storage, key) {
   if (!storage) return
-
   try {
     storage.removeItem(key)
   } catch {
     // Storage dapat dinonaktifkan browser; sesi tetap gagal tertutup.
   }
-}
-
-function clearStorage(storage) {
-  safeRemoveItem(storage, AUTH_TOKEN_KEY)
-  safeRemoveItem(storage, AUTH_USER_KEY)
 }
 
 function isPlainObject(value) {
@@ -77,77 +82,74 @@ export function sanitizeUserForStorage(user) {
   }
 }
 
-function readStorage(storage, persistent) {
-  const token = safeGetItem(storage, AUTH_TOKEN_KEY)
+/**
+ * Ambil objek user ter-sanitasi dari cache lokal (bukan token).
+ * Returns null bila tidak ada / tidak valid.
+ */
+export function getStoredUser() {
+  const storage = getStorage()
   const rawUser = safeGetItem(storage, AUTH_USER_KEY)
-
-  if (token === null && rawUser === null) return null
-  if (typeof token !== 'string' || !token.trim() || typeof rawUser !== 'string') {
-    clearStorage(storage)
-    return null
-  }
+  if (typeof rawUser !== 'string') return null
 
   try {
-    const parsedUser = JSON.parse(rawUser)
-    const user = sanitizeUserForStorage(parsedUser)
-    if (!user) {
-      clearStorage(storage)
-      return null
-    }
-
-    return { token, user, persistent }
+    return sanitizeUserForStorage(JSON.parse(rawUser))
   } catch {
-    clearStorage(storage)
     return null
   }
 }
 
-export function getAuthSnapshot() {
-  const session = readStorage(getStorage('sessionStorage'), false)
-  if (session) return session
-
-  const persistent = readStorage(getStorage('localStorage'), true)
-  if (persistent) return persistent
-
-  return { token: null, user: null, persistent: false }
-}
-
-export function getAuthToken() {
-  return getAuthSnapshot().token
-}
-
-export function getStoredUser() {
-  return getAuthSnapshot().user
-}
-
-export function clearAuthSession() {
-  clearStorage(getStorage('sessionStorage'))
-  clearStorage(getStorage('localStorage'))
-}
-
-export function storeAuthSession({ token, user, remember = false } = {}) {
+/**
+ * Simpan objek user ter-sanitasi ke cache lokal.
+ * Catatan: token TIDAK diterima/disimpan — kredensial ada di cookie HttpOnly.
+ */
+export function storeAuthSession({ user } = {}) {
   const sanitizedUser = sanitizeUserForStorage(user)
-  if (typeof token !== 'string' || !token.trim() || !sanitizedUser) {
+  if (!sanitizedUser) {
     throw new TypeError('Data sesi autentikasi tidak valid.')
   }
 
-  // Selalu simpan ke localStorage (persistent) agar sesi dibagikan antar tab,
-  // termasuk saat user membuka submenu di tab baru.
-  const storage = getStorage('localStorage')
+  const storage = getStorage()
   if (!storage) {
     throw new Error('Penyimpanan sesi tidak tersedia pada browser ini.')
   }
 
-  const serializedUser = JSON.stringify(sanitizedUser)
-  clearAuthSession()
-
   try {
-    storage.setItem(AUTH_TOKEN_KEY, token)
-    storage.setItem(AUTH_USER_KEY, serializedUser)
+    storage.setItem(AUTH_USER_KEY, JSON.stringify(sanitizedUser))
   } catch (error) {
-    clearStorage(storage)
+    safeRemoveItem(storage, AUTH_USER_KEY)
     throw new Error('Sesi tidak dapat disimpan pada browser ini.', { cause: error })
   }
 
   return true
+}
+
+/**
+ * Hapus cache user lokal. Dipanggil saat logout / 401.
+ * Cookie sesi sendiri dihapus oleh backend (logout) atau kadaluarsa.
+ */
+export function clearAuthSession() {
+  safeRemoveItem(getStorage(), AUTH_USER_KEY)
+}
+
+/**
+ * Back-compat: tidak ada token di sisi client lagi (berpindah ke cookie
+ * HttpOnly). Mengembalikan null agar konsumen lama tidak error.
+ */
+export function getAuthToken() {
+  return null
+}
+
+/**
+ * Snapshot autentikasi untuk guard router & boot.
+ * `authenticated` = ada cache user; validasi sesungguhnya oleh server
+ * (cookie + sesi) dan dikoreksi pada panggilan API pertama (401 → logout).
+ */
+export function getAuthSnapshot() {
+  const user = getStoredUser()
+  return {
+    token: null,
+    user,
+    authenticated: Boolean(user),
+    persistent: true,
+  }
 }

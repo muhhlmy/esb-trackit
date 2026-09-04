@@ -55,16 +55,6 @@ function readBoundedInteger(name, defaultValue, minimum, maximum) {
   return value;
 }
 
-function readLegacyPasswordMode() {
-  const value = process.env.PASSWORD_LEGACY_MODE || "disabled";
-  if (value !== "disabled" && value !== "verify-plaintext") {
-    throw new Error(
-      "PASSWORD_LEGACY_MODE hanya boleh 'disabled' atau 'verify-plaintext'.",
-    );
-  }
-  return value;
-}
-
 function isValidProxyAddress(value) {
   const slashIndex = value.indexOf("/");
   if (slashIndex === -1) return isIP(value) !== 0;
@@ -158,11 +148,13 @@ export const env = {
   },
   password: {
     bcryptRounds: readBoundedInteger("PASSWORD_BCRYPT_ROUNDS", 12, 10, 14),
-    legacyMode: readLegacyPasswordMode(),
   },
   auth: {
       defaultUserPassword: readRequiredSecret("DEFAULT_USER_PASSWORD", 8),
-    },
+    // Umur akses JWT (dipangkas dari 12 jam menjadi 15 menit; sesi server 12 jam
+    // tetap menjadi sumber kebenaran, token diperpanjang secara gliding via cookie).
+    accessTokenTtlSeconds: readBoundedInteger("ACCESS_TOKEN_TTL_SECONDS", 900, 300, 3600),
+  },
   seed: {
     superadminEmail: process.env.SEED_SUPERADMIN_EMAIL || "",
     superadminPassword: process.env.SEED_SUPERADMIN_PASSWORD || "",
@@ -170,6 +162,8 @@ export const env = {
   },
   security: {
     enableDbReset: process.env.ENABLE_DB_RESET === "true",
+    // Path cookie sesi (default "/"). Atur sesuai sub-path deployment bila ada.
+    cookiePath: (process.env.SESSION_COOKIE_PATH || "/"),
   },
   rateLimit: {
     windowMs: readNumber("API_RATE_LIMIT_WINDOW_MS", 60_000),

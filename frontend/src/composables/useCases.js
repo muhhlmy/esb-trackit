@@ -64,7 +64,7 @@ export function useCases() {
         activeCaseId.value = cases.value[0].id;
       }
     } catch (err) {
-      console.warn('Gagal memuat cases:', err.message);
+      // Fail-safe: tampilkan empty state; detail teknis tidak dibocorkan ke UI.
       cases.value = [];
     } finally {
       isLoading.value = false;
@@ -80,13 +80,13 @@ export function useCases() {
         activeCaseId.value = cases.value[0].id;
       }
     } catch (err) {
+      // Fallback ke daftar public (read-only) bila sesi admin tidak cukup.
       try {
         cases.value = normalizeList(await api.getPublicCases());
         if (!activeCaseId.value && cases.value.length) {
           activeCaseId.value = cases.value[0].id;
         }
       } catch {
-        console.warn('Gagal memuat cases:', err.message);
         cases.value = [];
       }
     } finally {

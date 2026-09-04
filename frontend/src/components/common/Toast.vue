@@ -19,6 +19,8 @@ const { toasts, removeToast } = useToast();
         v-for="toast in toasts"
         :key="toast.id"
         class="pointer-events-auto flex items-center justify-between gap-3 p-4 rounded-xl border shadow-xl backdrop-blur-md transition-all text-sm font-medium"
+        :role="toast.type === 'error' ? 'alert' : 'status'"
+        :aria-live="toast.type === 'error' ? 'assertive' : 'polite'"
         :class="{
           'bg-emerald-950/90 text-emerald-200 border-emerald-800/60': toast.type === 'success',
           'bg-rose-950/90 text-rose-200 border-rose-800/60': toast.type === 'error',
@@ -35,7 +37,7 @@ const { toasts, removeToast } = useToast();
         <button
           @click="removeToast(toast.id)"
           class="p-1 rounded-lg hover:bg-white/10 text-slate-400 hover:text-white transition-colors"
-          aria-label="Close"
+          :aria-label="toast.type === 'error' ? 'Tutup notifikasi error' : 'Tutup notifikasi'"
         >
           <X class="w-4 h-4" />
         </button>

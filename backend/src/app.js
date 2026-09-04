@@ -12,6 +12,7 @@ import {
 import { loginRateLimiter, authRateLimiter } from "./middleware/rateLimitMiddleware.js";
 import { router } from "./routes/index.js";
 import { isCorsOriginAllowed } from "./security/corsPolicy.js";
+import { maybeSlideSessionToken } from "./security/sessionToken.js";
 
 export const app = express();
 // Express App Initialization
@@ -74,6 +75,17 @@ app.use(requireSafeOrigin);
 app.use(requireJsonRequest);
 app.use(express.json({ limit: "10mb" }));
 app.use(router);
+
+// Perpanjangan gliding token sesi: setelah route terautentikasi menyelesaikan
+// respons (header belum terkirim), cookie diperbarui bila sisa TTL < 50%.
+// Sesi server (expires_at) TIDAK berubah — revocation/logout/lockout tetap
+// sesuai aturan asli.
+app.use((req, res, next) => {
+  if (req.user && !res.headersSent) {
+    void maybeSlideSessionToken(req, res);
+  }
+  next();
+});
 
 // Unknown route & global error handlers (must be registered last)
 app.use(apiNotFoundHandler);

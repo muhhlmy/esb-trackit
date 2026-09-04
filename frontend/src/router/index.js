@@ -202,11 +202,11 @@ const router = createRouter({
 })
 
 router.beforeEach((to) => {
-  const { token, user } = getAuthSnapshot()
+  const { user, authenticated } = getAuthSnapshot()
 
   // Halaman publik (Help Center landing page, Cases, Templates, Login, dll) dapat diakses tanpa login
   if (to.meta.public) {
-    if (to.name === 'login' && token) {
+    if (to.name === 'login' && authenticated) {
       const ticketEligibility = getTicketEligibility(user)
       const firstAllowed = findFirstAllowedRoute(user, allowedRouteMap)
       return { name: firstAllowed?.name || 'dashboard' }
@@ -214,8 +214,8 @@ router.beforeEach((to) => {
     return
   }
 
-  // Jika halaman terproteksi dan belum login
-  if (!token) {
+  // Jika halaman terproteksi dan belum login (cache user tidak ada)
+  if (!authenticated) {
     return { name: 'login', query: { redirect: to.fullPath } }
   }
 

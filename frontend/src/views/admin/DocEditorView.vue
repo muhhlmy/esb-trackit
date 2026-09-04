@@ -1,9 +1,10 @@
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue';
+import { ref, computed, onMounted, onBeforeUnmount, watch, nextTick } from 'vue';
 import { useRoute, useRouter, RouterLink } from 'vue-router';
 import { useCases } from '@/composables/useCases';
 import { useToast } from '@/composables/useToast';
 import DocEditorInspector from '@/components/admin/DocEditorInspector.vue';
+import { sanitizeRichTextHtml } from '@/utils/htmlSanitizer';
 import { useEditor, EditorContent } from '@tiptap/vue-3';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
@@ -49,6 +50,22 @@ const isInspectorOpen = ref(true);
 const isPreviewModalOpen = ref(false);
 const isSaving = ref(false);
 const saveStatus = ref('Tersimpan'); // 'Tersimpan' | 'Belum disimpan' | 'Menyimpan...'
+
+// Sanitasi output editor sebelum dirender via v-html (preview) — pertahanan
+// terhadap XSS bila konten DB/editor mengandung payload berbahaya.
+const safePreviewHtml = computed(() => sanitizeRichTextHtml(editor?.value?.getHTML() || ''));
+
+// Dialog input URL tautan (pengganti window.prompt yang tidak aksesibel).
+const showLinkDialog = ref(false);
+const linkDialogInput = ref(null);
+const linkDialogUrl = ref('');
+const linkDialogMode = ref('set'); // 'set' | 'clear'
+const linkDialogError = ref('');
+
+// Fokus ke input saat dialog terbuka (aksesibilitas keyboard).
+watch(showLinkDialog, (open) => {
+  if (open) nextTick(() => linkDialogInput.value?.focus());
+});
 
 // Active Document Metadata Model
 const doc = ref({
@@ -325,14 +342,42 @@ function setHeading(level) {
 
 function setLink() {
   const previousUrl = editor.value?.getAttributes('link').href;
-  const url = window.prompt('URL Tautan:', previousUrl);
+  // Dialog aksesibel menggantikan window.prompt (screen reader friendly).
+  linkDialogUrl.value = previousUrl || '';
+  linkDialogMode.value = 'set';
+  linkDialogError.value = '';
+  showLinkDialog.value = true;
+}
 
-  if (url === null) return;
-  if (url === '') {
+function confirmLinkDialog() {
+  const url = linkDialogUrl.value.trim();
+  if (!url) {
+    // URL kosong = hapus tautan dari seleksi.
     editor.value?.chain().focus().extendMarkRange('link').unsetLink().run();
+    showLinkDialog.value = false;
     return;
   }
+
+  let parsed;
+  try {
+    parsed = new URL(url, window.location.origin);
+  } catch {
+    linkDialogError.value = 'URL tidak valid. Contoh: https://portal.esb.co.id';
+    return;
+  }
+
+  // Blokir skema berbahaya (javascript:, data:, vbscript:).
+  if (!['http:', 'https:', 'mailto:'].includes(parsed.protocol)) {
+    linkDialogError.value = 'Hanya URL http(s) atau mailto yang diizinkan.';
+    return;
+  }
+
   editor.value?.chain().focus().extendMarkRange('link').setLink({ href: url }).run();
+  showLinkDialog.value = false;
+}
+
+function cancelLinkDialog() {
+  showLinkDialog.value = false;
 }
 
 function insertInfoCallout() {
@@ -779,7 +824,54 @@ function goToAdminCases() {
           <h1 class="text-2xl font-bold text-[#1E293B] dark:text-slate-100 tracking-tight">{{ doc.title }}</h1>
           <p class="text-xs sm:text-sm text-[#334155] dark:text-slate-300 p-4 rounded-lg bg-[#F8FAFC] dark:bg-slate-800/50 border border-[#E2E8F0] dark:border-slate-700/60 leading-relaxed">{{ doc.summary }}</p>
 
-          <div class="doc-preview prose prose-slate dark:prose-invert max-w-none text-[#1E293B] dark:text-slate-200" v-html="editor?.getHTML()"></div>
+          <div class="doc-preview prose prose-slate dark:prose-invert max-w-none text-[#1E293B] dark:text-slate-200" v-html="safePreviewHtml"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4b. LINK URL DIALOG (pengganti window.prompt; aksesibel) -->
+    <div
+      v-if="showLinkDialog"
+      class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="link-dialog-title"
+      @keydown.esc="cancelLinkDialog"
+    >
+      <div class="relative w-full max-w-md bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 rounded-xl shadow-2xl p-5">
+        <h2 id="link-dialog-title" class="text-sm font-bold text-[#0F172A] dark:text-slate-100 mb-3">
+          Tautan URL
+        </h2>
+        <label for="link-dialog-url" class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">
+          Alamat tautan (kosongkan untuk menghapus tautan)
+        </label>
+        <input
+          id="link-dialog-url"
+          ref="linkDialogInput"
+          v-model="linkDialogUrl"
+          type="url"
+          inputmode="url"
+          placeholder="https://portal.esb.co.id"
+          class="w-full rounded-lg border border-[#E2E8F0] dark:border-slate-700 bg-white dark:bg-slate-950 px-3 py-2 text-sm text-[#0F172A] dark:text-slate-100 focus:outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/20"
+        />
+        <p v-if="linkDialogError" class="mt-2 text-xs font-medium text-rose-600 dark:text-rose-400" role="alert">
+          {{ linkDialogError }}
+        </p>
+        <div class="mt-4 flex justify-end gap-2">
+          <button
+            type="button"
+            @click="cancelLinkDialog"
+            class="px-3.5 py-2 rounded-lg text-sm font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+          >
+            Batal
+          </button>
+          <button
+            type="button"
+            @click="confirmLinkDialog"
+            class="px-3.5 py-2 rounded-lg text-sm font-semibold text-white bg-[#2563EB] hover:bg-[#1D4ED8] transition-colors"
+          >
+            Simpan Tautan
+          </button>
         </div>
       </div>
     </div>

@@ -3,6 +3,7 @@ import { ref, computed } from 'vue';
 import { useAuth } from '@/composables/useAuth';
 import { useBookmarks } from '@/composables/useBookmarks';
 import { useToast } from '@/composables/useToast';
+import { sanitizeRichTextHtml } from '@/utils/htmlSanitizer';
 import {
   Bookmark,
   Edit3,
@@ -31,6 +32,12 @@ const emit = defineEmits(['edit', 'submitTicket']);
 const { isCrudUnlocked } = useAuth();
 const { isBookmarked, toggleBookmark } = useBookmarks();
 const { showToast } = useToast();
+
+// Sanitasi HTML rich-text sebelum v-html (pertahanan terhadap XSS dari konten
+// yang tersimpan di DB / output editor).
+const safeContentHtml = computed(() =>
+  sanitizeRichTextHtml(props.caseItem?.contentHtml || '')
+);
 
 const copiedSnippetIndex = ref(null);
 const checkedSteps = ref({});
@@ -154,7 +161,7 @@ const severityClass = computed(() => {
     </div>
 
     <!-- TipTap Rich HTML Content Section (if available) -->
-    <section v-if="caseItem.contentHtml" class="prose prose-slate dark:prose-invert max-w-none text-xs sm:text-sm leading-relaxed" v-html="caseItem.contentHtml">
+    <section v-if="caseItem.contentHtml" class="prose prose-slate dark:prose-invert max-w-none text-xs sm:text-sm leading-relaxed" v-html="safeContentHtml">
     </section>
 
     <!-- Problem Context Section -->

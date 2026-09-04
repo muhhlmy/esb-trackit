@@ -1,4 +1,3 @@
-import { timingSafeEqual } from 'node:crypto'
 import bcrypt from 'bcryptjs'
 import { env } from '../config/env.js'
 
@@ -12,33 +11,23 @@ export async function hashPassword(password) {
   return bcrypt.hash(password, env.password.bcryptRounds)
 }
 
-function verifyLegacyPlaintextPassword(submittedPassword, storedPassword) {
-  const submitted = Buffer.from(submittedPassword, 'utf8')
-  const stored = Buffer.from(storedPassword, 'utf8')
-  if (submitted.length !== stored.length) return false
-  return timingSafeEqual(submitted, stored)
-}
-
-export async function verifyPassword(
-  submittedPassword,
-  storedPassword,
-  { legacyMode = env.password.legacyMode } = {},
-) {
+/**
+ * Verifikasi password HANYA terhadap hash bcrypt.
+ * Mode legacy perbandingan plaintext DILEPAS: password di DB yang bukan
+ * hash bcrypt berarti data korup/terkompromi dan TIDAK BISA diverifikasi
+ * (fail-closed). Akun semacam itu harus di-reset oleh admin, bukan
+ * diverifikasi dengan perbandingan plaintext.
+ */
+export async function verifyPassword(submittedPassword, storedPassword) {
   if (typeof submittedPassword !== 'string' || typeof storedPassword !== 'string') return false
 
-  if (isBcryptPasswordHash(storedPassword)) {
-    try {
-      return await bcrypt.compare(submittedPassword, storedPassword)
-    } catch {
-      return false
-    }
+  if (!isBcryptPasswordHash(storedPassword)) {
+    return false
   }
 
-  if (legacyMode !== 'verify-plaintext') return false
-  console.warn(
-    '[SECURITY WARNING] PASSWORD_LEGACY_MODE is active (verify-plaintext). ' +
-    'Plaintext password comparison is being used. All user passwords should be migrated to bcrypt. ' +
-    'Disable PASSWORD_LEGACY_MODE after migration is complete.',
-  )
-  return verifyLegacyPlaintextPassword(submittedPassword, storedPassword)
+  try {
+    return await bcrypt.compare(submittedPassword, storedPassword)
+  } catch {
+    return false
+  }
 }

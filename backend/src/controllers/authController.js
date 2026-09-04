@@ -1,7 +1,6 @@
 import { pool } from '../config/database.js';
 import { env } from '../config/env.js';
 import { createHash } from 'node:crypto';
-import jwt from 'jsonwebtoken';
 import {
   DEFAULT_USER_PERMISSIONS,
   SUPERADMIN_PERMISSIONS,
@@ -14,6 +13,10 @@ import {
   revokeSession,
   revokeAllUserSessions,
 } from '../services/sessionService.js';
+import {
+  issueSessionCookie,
+  clearSessionCookie,
+} from '../security/sessionToken.js';
 import {
   checkAccountLockout,
   recordFailedLogin,
@@ -175,27 +178,16 @@ export async function login(req, res) {
       employee,
     }
 
-    // Server-side session creation (UUID v4)
+    // Server-side session creation (UUID v4) — sumber kebenaran autentikasi.
     const session = await createSession(userRow.id, { ttlHours: 12 })
-    const iatInSec = Math.floor(new Date(session.issuedAt).getTime() / 1000)
-    const expInSec = Math.floor(new Date(session.expiresAt).getTime() / 1000)
 
-    const token = jwt.sign(
-      {
-        sub: String(userRow.id),
-        id: userRow.id,
-        sid: session.sessionId,
-        nama: userRow.employee_nama || userRow.nama,
-        email: userRow.email,
-        role: userRow.role,
-        nik: userRow.nik || '',
-        jabatan: userRow.title || userRow.role,
-        permissions,
-        iat: iatInSec,
-        exp: expInSec,
-      },
-      env.jwt.secret,
-    )
+    // Token pendek (15 menit, claims minimal: sub+sid+exp) dikirim sebagai
+    // cookie HttpOnly. Token tidak lagi dikirim di body respons login.
+    const { expMs } = issueSessionCookie(res, {
+      userId: userRow.id,
+      sessionId: session.sessionId,
+      expiresAt: session.expiresAt,
+    })
 
     // Catat log sukses
     await pool.query(
@@ -205,8 +197,10 @@ export async function login(req, res) {
 
     res.json({
       message: 'Login berhasil.',
-      token,
       user: payload,
+      session: {
+        expiresAt: new Date(expMs).toISOString(),
+      },
     })
   } catch (error) {
     console.error('Error login:', error)
@@ -229,6 +223,9 @@ export async function logout(req, res) {
         [userId, req.user?.email || '', req.ip, req.headers['user-agent'], 'LOGOUT'],
       ).catch(() => {})
     }
+
+    // Hapus cookie sesi HttpOnly (session revocation di sisi browser).
+    clearSessionCookie(res)
 
     res.json({ message: 'Logout berhasil.' })
   } catch (error) {

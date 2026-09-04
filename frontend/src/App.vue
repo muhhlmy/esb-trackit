@@ -8,10 +8,9 @@ import AppHeader from './components/layout/AppHeader.vue'
 import Navbar from './components/layout/Navbar.vue'
 import MobileNav from './components/layout/MobileNav.vue'
 import Toast from './components/common/Toast.vue'
-import LoginModal from './components/common/LoginModal.vue'
 
 import { animatePageEnter, animatePageLeave } from './composables/useGsap.js'
-import { getAuthToken } from './utils/authStorage.js'
+import { getStoredUser } from './utils/authStorage.js'
 import { initTicketRealtime, stopTicketRealtime } from './composables/useTicketRealtime.js'
 import { useCases } from './composables/useCases.js'
 import { useTheme } from './composables/useTheme.js'
@@ -59,7 +58,7 @@ function handleResize() {
 
 onMounted(() => {
   fetchCases()
-  if (getAuthToken()) {
+  if (getStoredUser()) {
     initTicketRealtime()
   }
   if (typeof window !== 'undefined') {
@@ -93,7 +92,6 @@ onUnmounted(() => {
         </RouterView>
       </div>
       <MobileNav />
-      <LoginModal />
       <Toast />
     </div>
   </template>

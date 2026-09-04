@@ -1,179 +1,116 @@
-const API_BASE = '/api';
+// ============================================================
+// services/api.js - Lapisan API terpadu (satu-satunya jalur HTTP)
+// ============================================================
+// Gabungan dari pola lama (services/api.js manual-fetch) dan pola modern
+// (useApi composable). SELURUH komunikasi HTTP frontend sekarang memakai
+// implementasi `useApi`:
+//   - cookie sesi HttpOnly dikirim otomatis (credentials: same-origin)
+//   - penanganan 401 global (auto-logout + redirect /login)
+//   - pesan error terstruktur dari backend
+//
+// Konsumen lama (useCases, useKbCategories, useBookmarks, AnalyticsView,
+// TemplatesView, HomeView) tetap memakai API permukaan yang sama
+// (api.getCases, api.createCase, ...), sehingga tidak ada perubahan
+// perilaku.
+// ============================================================
 
-// Token sesi dikelola oleh utils/authStorage.js (key 'token', diisi saat login).
-import { getAuthToken as readStoredToken, clearAuthSession } from '../utils/authStorage.js';
+import { useApi } from '../composables/useApi.js'
 
-export function getAuthToken() {
-  return readStoredToken() || '';
-}
-
-export function setAuthToken(token) {
-  if (!token) {
-    clearAuthSession();
-  }
-}
-
-async function request(endpoint, options = {}) {
-  const token = getAuthToken();
-  const headers = {
-    'Content-Type': 'application/json',
-    ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    ...options.headers
-  };
-
-  try {
-    const response = await fetch(`${API_BASE}${endpoint}`, {
-      ...options,
-      headers
-    });
-
-    const data = await response.json();
-    if (!response.ok) {
-      throw new Error(data.error || `HTTP error! status: ${response.status}`);
-    }
-    return data;
-  } catch (err) {
-    console.warn(`[API Error: ${endpoint}]`, err.message);
-    throw err;
-  }
-}
+const { get, post, put, del } = useApi()
 
 export const api = {
   // Cases — public Help Center (published only)
   async getPublicCases() {
-    return request('/cases/public');
+    return get('/api/cases/public')
   },
 
   // Cases — admin CMS (all)
   async getCases(params = {}) {
-    const query = new URLSearchParams();
-    if (params.search) query.append('search', params.search);
-    if (params.category && params.category !== 'all') query.append('category', params.category);
-    if (params.severity && params.severity !== 'all') query.append('severity', params.severity);
+    const query = new URLSearchParams()
+    if (params.search) query.append('search', params.search)
+    if (params.category && params.category !== 'all') query.append('category', params.category)
+    if (params.severity && params.severity !== 'all') query.append('severity', params.severity)
 
-    const queryString = query.toString() ? `?${query.toString()}` : '';
-    return request(`/cases${queryString}`);
+    const queryString = query.toString() ? `?${query.toString()}` : ''
+    return get(`/api/cases${queryString}`)
   },
 
   async getCaseById(id) {
-    return request(`/cases/${id}`);
+    return get(`/api/cases/${id}`)
   },
 
   async createCase(caseData) {
-    return request('/cases', {
-      method: 'POST',
-      body: JSON.stringify(caseData)
-    });
+    return post('/api/cases', caseData)
   },
 
   async updateCase(id, caseData) {
-    return request(`/cases/${id}`, {
-      method: 'PUT',
-      body: JSON.stringify(caseData)
-    });
+    return put(`/api/cases/${id}`, caseData)
   },
 
   async deleteCase(id) {
-    return request(`/cases/${id}`, {
-      method: 'DELETE'
-    });
+    return del(`/api/cases/${id}`)
   },
 
   // KB Categories — public Help Center (published only)
   async getPublicKbCategories() {
-    return request('/kb-categories/public');
+    return get('/api/kb-categories/public')
   },
 
   // KB Categories — admin CMS (all)
   async getKbCategories() {
-    return request('/kb-categories');
+    return get('/api/kb-categories')
   },
 
   async createKbCategory(data) {
-    return request('/kb-categories', {
-      method: 'POST',
-      body: JSON.stringify(data)
-    });
+    return post('/api/kb-categories', data)
   },
 
   async updateKbCategory(id, data) {
-    return request(`/kb-categories/${id}`, {
-      method: 'PUT',
-      body: JSON.stringify(data)
-    });
+    return put(`/api/kb-categories/${id}`, data)
   },
 
   async deleteKbCategory(id) {
-    return request(`/kb-categories/${id}`, {
-      method: 'DELETE'
-    });
+    return del(`/api/kb-categories/${id}`)
   },
 
   // FAQs — public Help Center (published only)
   async getPublicFaqs() {
-    return request('/faqs/public');
+    return get('/api/faqs/public')
   },
 
   // KB Search logs
   async logKbSearch(query, resultsCount = 0) {
-    return request('/kb-search-logs', {
-      method: 'POST',
-      body: JSON.stringify({ query, results_count: resultsCount })
-    });
+    return post('/api/kb-search-logs', { query, results_count: resultsCount })
   },
 
   async getPopularKbSearches() {
-    return request('/kb-search-logs/popular');
+    return get('/api/kb-search-logs/popular')
   },
 
   async getKbSearchStats() {
-    return request('/kb-search-logs/stats');
+    return get('/api/kb-search-logs/stats')
   },
 
   // Case bookmarks (konteks user login)
   async getCaseBookmarks() {
-    return request('/case-bookmarks');
+    return get('/api/case-bookmarks')
   },
 
   async addCaseBookmark(caseId) {
-    return request(`/case-bookmarks/${caseId}`, {
-      method: 'POST'
-    });
+    return post(`/api/case-bookmarks/${caseId}`)
   },
 
   async removeCaseBookmark(caseId) {
-    return request(`/case-bookmarks/${caseId}`, {
-      method: 'DELETE'
-    });
+    return del(`/api/case-bookmarks/${caseId}`)
   },
 
-  // Templates
+  // Templates (endpoint bantu; data fallback tersedia di view)
   async getTemplates() {
-    return request('/templates');
+    return get('/api/templates')
   },
 
-  // Stats
+  // Stats (endpoint bantu; data fallback tersedia di view)
   async getStats() {
-    return request('/stats');
+    return get('/api/stats')
   },
-
-  // Auth
-  async login(username, password) {
-    const res = await request('/auth/login', {
-      method: 'POST',
-      body: JSON.stringify({ username, password })
-    });
-    if (res.token) {
-      setAuthToken(res.token);
-    }
-    return res;
-  },
-
-  async getMe() {
-    return request('/auth/me');
-  },
-
-  logout() {
-    setAuthToken(null);
-  }
-};
+}

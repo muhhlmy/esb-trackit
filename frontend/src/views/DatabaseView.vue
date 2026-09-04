@@ -2,7 +2,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useApi } from '@/composables/useApi'
 import { useAuth } from '@/composables/useAuth'
-import { getAuthToken } from '@/utils/authStorage.js'
+import { clearAuthSession } from '@/utils/authStorage.js'
 import AppModal from '@/components/ui/AppModal.vue'
 import SkeletonCard from '@/components/ui/skeleton/SkeletonCard.vue'
 
@@ -182,13 +182,18 @@ async function handleBackupNow() {
 
 async function handleDownload(backup) {
   try {
-    const token = getAuthToken()
     const baseUrl = import.meta.env.VITE_API_BASE_URL || ''
     const url = `${baseUrl}/api/admin/database/backups/${backup.id}/download`
 
     const response = await fetch(url, {
-          headers: { Authorization: `Bearer ${token}` },
+        credentials: 'same-origin',
         })
+
+    if (response.status === 401) {
+      clearAuthSession()
+      window.location.href = '/login'
+      throw new Error('Sesi telah berakhir, silakan login kembali.')
+    }
 
     if (!response.ok) {
       const err = await response.json().catch(() => ({}))
@@ -259,16 +264,21 @@ async function handleValidateRestore() {
     const formData = new FormData()
     formData.append('backupFile', restoreFile.value)
 
-    const token = getAuthToken()
     const baseUrl = import.meta.env.VITE_API_BASE_URL || ''
 
     const response = await fetch(`${baseUrl}/api/admin/database/restore/validate`, {
       method: 'POST',
-      headers: { Authorization: `Bearer ${token}` },
+      credentials: 'same-origin',
       body: formData,
     })
 
-    const res = await response.json()
+    const res = await response.json().catch(() => ({}))
+
+    if (response.status === 401) {
+      clearAuthSession()
+      window.location.href = '/login'
+      throw new Error('Sesi telah berakhir, silakan login kembali.')
+    }
 
     if (!response.ok || !res.success) {
       throw new Error(res.error?.message || 'Validasi gagal.')
@@ -301,16 +311,21 @@ async function handleConfirmRestore() {
     const formData = new FormData()
     formData.append('backupFile', restoreFile.value)
 
-    const token = getAuthToken()
     const baseUrl = import.meta.env.VITE_API_BASE_URL || ''
 
     const response = await fetch(`${baseUrl}/api/admin/database/restore`, {
       method: 'POST',
-      headers: { Authorization: `Bearer ${token}` },
+      credentials: 'same-origin',
       body: formData,
     })
 
-    const res = await response.json()
+    const res = await response.json().catch(() => ({}))
+
+    if (response.status === 401) {
+      clearAuthSession()
+      window.location.href = '/login'
+      throw new Error('Sesi telah berakhir, silakan login kembali.')
+    }
 
     if (!response.ok || !res.success) {
       throw new Error(res.error?.message || 'Restore gagal.')

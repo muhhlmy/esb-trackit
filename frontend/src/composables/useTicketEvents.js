@@ -1,5 +1,5 @@
 import { ref } from 'vue'
-import { clearAuthSession, getAuthToken } from '../utils/authStorage.js'
+import { clearAuthSession, getStoredUser } from '../utils/authStorage.js'
 
 const API_BASE = (import.meta.env?.VITE_API_BASE_URL || '').replace(/\/+$/, '')
 const INITIAL_RECONNECT_DELAY_MS = 1000
@@ -166,8 +166,7 @@ function scheduleReconnect(generation) {
 async function openStream(generation) {
   if (stopped || generation !== connectionGeneration || activeController) return
 
-  const token = getAuthToken()
-  if (!token) {
+  if (!getStoredUser()) {
     if (generation === connectionGeneration) stopped = true
     return
   }
@@ -177,11 +176,12 @@ async function openStream(generation) {
   let reconnect = true
 
   try {
+    // Sesi (cookie HttpOnly) dikirim otomatis via credentials same-origin.
     const response = await fetch(`${API_BASE}/api/tickets/events`, {
       method: 'GET',
+      credentials: 'same-origin',
       headers: {
         Accept: 'text/event-stream',
-        Authorization: `Bearer ${token}`,
       },
       cache: 'no-store',
       signal: controller.signal,
@@ -217,7 +217,7 @@ async function openStream(generation) {
 
 function connect() {
   if (activeController || reconnectTimer || isConnected.value) return
-  if (!getAuthToken()) return
+  if (!getStoredUser()) return
 
   stopped = false
   reconnectAttempts = 0
@@ -228,7 +228,7 @@ function connect() {
 }
 
 function forceReconnect() {
-  if (stopped || !getAuthToken()) return
+  if (stopped || !getStoredUser()) return
   if (isConnected.value) return
 
   // Reset backoff agar reconnect cepat saat tab kembali visible / online.

@@ -23,7 +23,6 @@ export function useKbCategories() {
     try {
       categories.value = normalizeList(await api.getPublicKbCategories());
     } catch (err) {
-      console.warn('Gagal memuat kategori KB:', err.message);
       categories.value = [];
     } finally {
       isLoading.value = false;
@@ -36,7 +35,6 @@ export function useKbCategories() {
     try {
       categories.value = normalizeList(await api.getKbCategories());
     } catch (err) {
-      console.warn('Gagal memuat kategori KB:', err.message);
       categories.value = [];
     } finally {
       isLoading.value = false;

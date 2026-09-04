@@ -7,18 +7,18 @@ import {
   canWritePermission,
   getTicketEligibility,
 } from '../utils/permissionAccess.js'
-import { clearAuthSession, getAuthSnapshot, storeAuthSession } from '../utils/authStorage.js'
+import { clearAuthSession, getStoredUser, storeAuthSession } from '../utils/authStorage.js'
 
-// State global menggunakan ref (bisa juga pakai Pinia)
-const initialSession = getAuthSnapshot()
-const user = ref(initialSession.user)
-const token = ref(initialSession.token)
+// State global menggunakan ref (bisa juga pakai Pinia).
+// Kredensial sesi (JWT) berada di cookie HttpOnly — tidak pernah muncul di
+// state client. Di sini hanya cache user ter-sanitasi untuk UI & guard.
+const user = ref(getStoredUser())
 
 export function useAuth() {
   const api = useApi()
   const router = useRouter()
 
-  const isAuthenticated = computed(() => !!token.value)
+  const isAuthenticated = computed(() => Boolean(user.value))
   const ticketEligibility = computed(() => getTicketEligibility(user.value))
   const isSuperAdmin = computed(() => ticketEligibility.value.role === TICKET_ROLES.SUPERADMIN)
   const isAdmin = computed(
@@ -29,28 +29,23 @@ export function useAuth() {
   const isCrudUnlocked = computed(() => isAdmin.value)
   const isUser = computed(() => ticketEligibility.value.role === TICKET_ROLES.REPORTER)
 
-  const login = async (email, password, remember = false) => {
+  const login = async (email, password) => {
     const response = await api.post('/api/auth/login', { email, password })
 
-    storeAuthSession({
-      token: response.token,
-      user: response.user,
-      remember,
-    })
+    if (!response || !response.user) {
+      throw new Error('Login gagal. Respons server tidak valid.')
+    }
 
-    token.value = response.token
-    user.value = response.user
+    storeAuthSession({ user: response.user })
+    user.value = getStoredUser()
 
     return response
   }
 
   const logout = async () => {
     try {
-      if (token.value) {
-        await api.post('/api/auth/logout').catch(() => {})
-      }
+      await api.post('/api/auth/logout').catch(() => {})
     } finally {
-      token.value = null
       user.value = null
       clearAuthSession()
       router.push('/login')
@@ -63,13 +58,13 @@ export function useAuth() {
 
   // Returns true if the user has AT LEAST 'read_only' access to the feature
   const hasPermission = (featureKey) => {
-    if (!token.value || !user.value) return false
+    if (!user.value) return false
     return canAccessFrontendFeature(user.value, featureKey)
   }
 
   // Returns true only if the user has 'full' (CRUD) access to the feature
   const hasWritePermission = (featureKey) => {
-    if (!token.value || !user.value) return false
+    if (!user.value) return false
     if (!featureKey) return false
     if (featureKey === 'tickets') return ticketEligibility.value.canWrite
     if (isSuperAdmin.value) return true
@@ -82,25 +77,20 @@ export function useAuth() {
   }
 
   const refreshUser = async () => {
-    if (!token.value) return null
+    if (!user.value) return null
     try {
       const freshUser = await api.get('/api/auth/me')
       user.value = freshUser
-      storeAuthSession({
-        token: token.value,
-        user: freshUser,
-        remember: initialSession.persistent,
-      })
+      storeAuthSession({ user: freshUser })
       return freshUser
     } catch (err) {
-      console.error('Failed to refresh user profile:', err)
+      // 401 sudah ditangani global (auto-logout). Error lain: pertahankan profil lama.
       return user.value
     }
   }
 
   return {
     user,
-    token,
     isAuthenticated,
     isSuperAdmin,
     isAdmin,

@@ -32,7 +32,7 @@ async function handleConfirmResetDatabase() {
 
   isResetting.value = true
   try {
-    const res = await api.post('/api/export/reset-database')
+    const res = await api.post('/api/export/reset-database', { confirm: 'RESET' })
     if (res.success) {
       localStorage.removeItem('app_notifications')
       showToast(res.message || 'Database berhasil di-reset dan dikosongkan!', 'success')

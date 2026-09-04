@@ -3,9 +3,11 @@ import { ref, onMounted, onUnmounted, nextTick, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuth } from '@/composables/useAuth'
 import { useApi } from '@/composables/useApi'
+import { findFirstAllowedRoute } from '@/utils/permissionAccess.js'
+import { allowedRouteMap } from '@/router/index.js'
 
 const router = useRouter()
-const { login } = useAuth()
+const { login, user } = useAuth()
 const { post } = useApi()
 
 const isMounting = ref(true)
@@ -86,9 +88,13 @@ const handleLogin = async () => {
   try {
     await login(email.value, password.value, rememberMe.value)
 
-    // Langsung lempar ke /dashboard setelah login berhasil
-    const redirectPath = (router.currentRoute.value.query.redirect) || '/dashboard'
-    router.push(redirectPath)
+    const redirectPath = router.currentRoute.value.query.redirect
+    if (redirectPath) {
+      router.push(redirectPath)
+    } else {
+      const firstAllowed = findFirstAllowedRoute(user.value, allowedRouteMap)
+      router.push({ name: firstAllowed?.name || 'dashboard' })
+    }
   } catch (error) {
     errorMessage.value = error.message || 'Login gagal. Periksa kembali kredensial Anda.'
   } finally {

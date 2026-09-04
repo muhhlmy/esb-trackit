@@ -11,7 +11,7 @@ import {
 } from '../utils/permissionAccess.js'
 import { getAuthSnapshot } from '../utils/authStorage.js'
 
-const allowedRouteMap = [
+export const allowedRouteMap = [
   { key: 'dashboard', name: 'dashboard' },
   { key: 'my_assets', name: 'my-assets' },
   { key: 'tickets', name: 'tickets' },
@@ -166,19 +166,34 @@ const routes = [
     path: '/admin/cases',
     name: 'admin-cases',
     component: () => import('../views/admin/AdminDashboardView.vue'),
-    meta: { title: 'Admin CMS', subtitle: 'Kelola SOP & Artikel Knowledge Base' },
+    meta: {
+      title: 'Admin CMS',
+      subtitle: 'Kelola SOP & Artikel Knowledge Base',
+      adminOnly: true,
+      permission: 'users',
+    },
   },
   {
     path: '/admin/kb-categories',
     name: 'admin-kb-categories',
     component: () => import('../views/admin/KbCategoriesView.vue'),
-    meta: { title: 'Kategori KB', subtitle: 'Kelola Topic Cards Help Center' },
+    meta: {
+      title: 'Kategori KB',
+      subtitle: 'Kelola Topic Cards Help Center',
+      adminOnly: true,
+      permission: 'users',
+    },
   },
   {
     path: '/admin/editor/:id?',
     name: 'doc-editor',
     component: () => import('../views/admin/DocEditorView.vue'),
-    meta: { title: 'Doc Editor', subtitle: 'Editor Artikel Knowledge Base' },
+    meta: {
+      title: 'Doc Editor',
+      subtitle: 'Editor Artikel Knowledge Base',
+      adminOnly: true,
+      permission: 'users',
+    },
   },
 
   {
@@ -221,11 +236,19 @@ router.beforeEach((to) => {
 
   const ticketEligibility = getTicketEligibility(user)
   const isSuper = ticketEligibility.role === TICKET_ROLES.SUPERADMIN
+  const isAdminOrSuper =
+    ticketEligibility.role === TICKET_ROLES.ADMIN ||
+    ticketEligibility.role === TICKET_ROLES.SUPERADMIN
   const canAccess = (key) => canAccessFrontendFeature(user, key)
   const firstAllowed = findFirstAllowedRoute(user, allowedRouteMap)
 
   // Guard untuk Superadmin Only
   if (to.meta.superadminOnly && !isSuper) {
+    return { name: firstAllowed?.name || 'forbidden' }
+  }
+
+  // Guard untuk Admin / Superadmin Only (CMS / Admin routes)
+  if (to.meta.adminOnly && !isAdminOrSuper) {
     return { name: firstAllowed?.name || 'forbidden' }
   }
 

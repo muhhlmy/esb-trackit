@@ -29,8 +29,8 @@ export function useAuth() {
   const isCrudUnlocked = computed(() => isAdmin.value)
   const isUser = computed(() => ticketEligibility.value.role === TICKET_ROLES.REPORTER)
 
-  const login = async (email, password) => {
-    const response = await api.post('/api/auth/login', { email, password })
+  const login = async (email, password, rememberMe = false) => {
+    const response = await api.post('/api/auth/login', { email, password, rememberMe })
 
     if (!response || !response.user) {
       throw new Error('Login gagal. Respons server tidak valid.')

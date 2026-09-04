@@ -865,6 +865,15 @@ export async function resetDatabaseHandler(req, res, next) {
     })
   }
 
+  // Guard: konfirmasi eksplisit wajib dikirimkan
+  const confirmation = req.body?.confirm || req.headers['x-confirm-reset']
+  if (confirmation !== 'RESET') {
+    return res.status(400).json({
+      success: false,
+      message: 'Konfirmasi reset tidak valid. Kirimkan { confirm: "RESET" } untuk melanjutkan.',
+    })
+  }
+
   // Guard: wajib ada kredensial seed superadmin dari env (jangan hardcode)
   const seedEmail = String(env.seed.superadminEmail || '').trim()
   const seedPassword = String(env.seed.superadminPassword || '')
@@ -874,6 +883,8 @@ export async function resetDatabaseHandler(req, res, next) {
       message: 'SEED_SUPERADMIN_EMAIL dan SEED_SUPERADMIN_PASSWORD (min 8 karakter) wajib diisi di env.',
     })
   }
+
+  console.warn(`[SECURITY AUDIT] Database reset initiated by user ${req.user?.id || req.user?.email || 'superadmin'} from IP ${req.ip}`)
 
   const client = await pool.connect()
   try {

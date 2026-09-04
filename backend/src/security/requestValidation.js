@@ -204,3 +204,12 @@ export function parseSearchQuery(queryParam, maxLength = 100) {
   return trimmed
 }
 
+const ACTIVE_MARKUP_PATTERN = /<[a-z/!?][\s\S]*>|javascript\s*:|\bon\w+\s*=/i
+
+export function assertNoActiveMarkup(value, label = 'Field') {
+  if (typeof value !== 'string' || !value) return
+  if (ACTIVE_MARKUP_PATTERN.test(value)) {
+    throw createHttpError(400, `${label} tidak boleh mengandung tag HTML atau skrip aktif.`)
+  }
+}
+

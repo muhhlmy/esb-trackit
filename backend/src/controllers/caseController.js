@@ -1,6 +1,7 @@
 import { pool } from '../config/database.js'
 import {
   assertAllowedFields,
+  assertNoActiveMarkup,
   assertPlainObject,
   createHttpError,
   parsePositiveIntegerParam,
@@ -62,6 +63,7 @@ function normalizeTitle(value) {
   if (title.length > MAX_TITLE_LENGTH) {
     throw createHttpError(400, `Title maksimal ${MAX_TITLE_LENGTH} karakter.`)
   }
+  assertNoActiveMarkup(title, 'Title')
   return title
 }
 
@@ -72,6 +74,7 @@ function normalizeCategory(value) {
   if (category.length > MAX_CATEGORY_LENGTH) {
     throw createHttpError(400, `Category maksimal ${MAX_CATEGORY_LENGTH} karakter.`)
   }
+  assertNoActiveMarkup(category, 'Category')
   return category
 }
 
@@ -96,6 +99,7 @@ function normalizeOptionalText(value, label) {
   if (text.length > MAX_TEXT_LENGTH) {
     throw createHttpError(400, `${label} maksimal ${MAX_TEXT_LENGTH} karakter.`)
   }
+  assertNoActiveMarkup(text, label)
   return text
 }
 
@@ -110,6 +114,7 @@ function normalizeStringList(value, label) {
     if (text.length > MAX_LIST_ITEM_LENGTH) {
       throw createHttpError(400, `Item ${label} maksimal ${MAX_LIST_ITEM_LENGTH} karakter.`)
     }
+    assertNoActiveMarkup(text, `Item ${label}`)
     return text
   })
 }
@@ -134,6 +139,7 @@ function normalizeSnippets(value) {
       throw createHttpError(400, 'Setiap snippet wajib berupa object { label, code }.')
     }
     const label = typeof snip.label === 'string' ? snip.label.trim().slice(0, 200) : ''
+    assertNoActiveMarkup(label, 'Snippet label')
     const code = typeof snip.code === 'string' ? snip.code.trim() : ''
     if (code.length > MAX_TEXT_LENGTH) {
       throw createHttpError(400, `Snippet code maksimal ${MAX_TEXT_LENGTH} karakter.`)

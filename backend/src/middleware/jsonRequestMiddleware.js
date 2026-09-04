@@ -6,6 +6,13 @@ export function requireJsonRequest(req, res, next) {
     return
   }
 
+  // Bodiless POST to logout does not require Content-Type: application/json
+  const path = req.path || req.originalUrl || ''
+  if (path === '/api/auth/logout' || path.endsWith('/auth/logout') || path.endsWith('/logout')) {
+    next()
+    return
+  }
+
   const contentType = req.headers['content-type']
   if (typeof contentType !== 'string') {
     res.status(415).json({ message: 'Request body wajib menggunakan application/json.' })

@@ -1,6 +1,7 @@
 import { pool } from '../config/database.js'
 import {
   assertAllowedFields,
+  assertNoActiveMarkup,
   assertPlainObject,
   createHttpError,
   parsePositiveIntegerParam,
@@ -56,6 +57,7 @@ function normalizeQuestion(value) {
   if (question.length > MAX_QUESTION_LENGTH) {
     throw createHttpError(400, `Question maksimal ${MAX_QUESTION_LENGTH} karakter.`)
   }
+  assertNoActiveMarkup(question, 'Question')
   return question
 }
 
@@ -76,6 +78,7 @@ function normalizeCategory(value) {
   if (category.length > MAX_CATEGORY_LENGTH) {
     throw createHttpError(400, `Category maksimal ${MAX_CATEGORY_LENGTH} karakter.`)
   }
+  assertNoActiveMarkup(category, 'Category')
   return category
 }
 
@@ -102,6 +105,13 @@ function normalizeOptionalText(value, label, maxLength) {
   if (text.length > maxLength) {
     throw createHttpError(400, `${label} maksimal ${maxLength} karakter.`)
   }
+  if (label === 'Action link') {
+    if (/^javascript:/i.test(text)) {
+      throw createHttpError(400, 'Action link tidak boleh berupa javascript:')
+    }
+  } else if (label !== 'Code snippet') {
+    assertNoActiveMarkup(text, label)
+  }
   return text
 }
 
@@ -120,6 +130,7 @@ function normalizeSteps(value) {
     if (text.length > MAX_STEP_LENGTH) {
       throw createHttpError(400, `Step ke-${index + 1} maksimal ${MAX_STEP_LENGTH} karakter.`)
     }
+    assertNoActiveMarkup(text, `Step ke-${index + 1}`)
     return text
   })
 }

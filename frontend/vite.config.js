@@ -16,8 +16,24 @@ const FRONTEND_SECURITY_HEADERS = {
   'Cross-Origin-Resource-Policy': 'same-origin',
 }
 
-// Custom plugin: inject security headers in dev & preview servers
+// Custom plugin: inject security headers in dev & preview servers + block sensitive dotfiles
 function securityHeadersPlugin() {
+  const blockSensitiveDotfiles = (req, res, next) => {
+    const rawUrl = (req.url || '').split('?')[0]
+    // Allow Vite internal dev assets and dependencies
+    if (rawUrl.includes('/.vite/')) {
+      next()
+      return
+    }
+    // Block sensitive dotfiles like /.env, /.git, etc.
+    if (/^\/\.[a-zA-Z0-9_-]/i.test(rawUrl) || /\/\.(env|git|svn|hg|DS_Store|dockerignore)/i.test(rawUrl)) {
+      res.statusCode = 404
+      res.end('Not Found')
+      return
+    }
+    next()
+  }
+
   const applyHeaders = (_req, res, next) => {
     for (const [name, value] of Object.entries(FRONTEND_SECURITY_HEADERS)) {
       res.setHeader(name, value)
@@ -28,9 +44,11 @@ function securityHeadersPlugin() {
   return {
     name: 'security-headers',
     configureServer(server) {
+      server.middlewares.use(blockSensitiveDotfiles)
       server.middlewares.use(applyHeaders)
     },
     configurePreviewServer(server) {
+      server.middlewares.use(blockSensitiveDotfiles)
       server.middlewares.use(applyHeaders)
     },
   }

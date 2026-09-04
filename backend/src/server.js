@@ -51,3 +51,4 @@ try {
 
 console.log(`API berjalan di http://${env.host}:${env.port}`);
 const server = app.listen(env.port, env.host);
+// Server reload trigger

@@ -22,6 +22,7 @@ import {
   normalizeTicketRole,
   canTransitionTicketStatus,
 } from '../services/ticketAccessService.js'
+import { assertNoActiveMarkup } from '../security/requestValidation.js'
 
 function createHttpError(statusCode, message) {
   const error = new Error(message)
@@ -938,6 +939,7 @@ export async function createTicketComment(req, res) {
   if (normalizedMessage.length > MAX_COMMENT_LENGTH) {
     throw createHttpError(400, `Pesan komentar maksimal ${MAX_COMMENT_LENGTH} karakter.`)
   }
+  assertNoActiveMarkup(normalizedMessage, 'Pesan komentar')
   const normalizedAttachment = normalizeFileAttachment(
     attachment,
     'komentar',
@@ -1670,6 +1672,9 @@ export async function submitTicketCasp(req, res) {
     typeof feedback === 'string' && feedback.trim() ? feedback.trim() : null
   if (normalizedFeedback && normalizedFeedback.length > MAX_COMMENT_LENGTH) {
     throw createHttpError(400, `Feedback CASP maksimal ${MAX_COMMENT_LENGTH} karakter.`)
+  }
+  if (normalizedFeedback) {
+    assertNoActiveMarkup(normalizedFeedback, 'Feedback CASP')
   }
 
   const client = await pool.connect()

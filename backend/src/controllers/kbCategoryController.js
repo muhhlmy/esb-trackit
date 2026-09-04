@@ -1,6 +1,7 @@
 import { pool } from '../config/database.js'
 import {
   assertAllowedFields,
+  assertNoActiveMarkup,
   assertPlainObject,
   createHttpError,
   parsePositiveIntegerParam,
@@ -66,6 +67,7 @@ function normalizeTitle(value) {
   if (title.length > MAX_TITLE_LENGTH) {
     throw createHttpError(400, `Title maksimal ${MAX_TITLE_LENGTH} karakter.`)
   }
+  assertNoActiveMarkup(title, 'Title')
   return title
 }
 
@@ -77,6 +79,7 @@ function normalizeOptionalText(value, label, maxLength) {
   if (text.length > maxLength) {
     throw createHttpError(400, `${label} maksimal ${maxLength} karakter.`)
   }
+  assertNoActiveMarkup(text, label)
   return text
 }
 

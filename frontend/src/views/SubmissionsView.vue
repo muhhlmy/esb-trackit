@@ -773,6 +773,7 @@ onMounted(fetchData)
                   v-model="form.pemberiDirektorat"
                   required
                   type="text"
+                  aria-label="Direktorat Pemberi (Auto)"
                   class="form-control bg-slate-50 text-[#64748B]"
                   readonly
                 />
@@ -790,6 +791,7 @@ onMounted(fetchData)
                 <input
                   v-model="form.isPenerimaLainnya"
                   type="checkbox"
+                  aria-label="Penerima Non-Karyawan (Vendor/Lainnya)"
                   class="rounded border-[#DCE3EC] accent-brand-orange h-3.5 w-3.5"
                 />
                 <span class="text-[10px] font-bold text-[#475569]"
@@ -818,6 +820,7 @@ onMounted(fetchData)
                 v-model="form.penerimaNama"
                 required
                 type="text"
+                aria-label="Nama Lengkap / Vendor Penerima"
                 class="form-control"
                 placeholder="Tulis nama lengkap penerima/vendor"
               />
@@ -832,6 +835,7 @@ onMounted(fetchData)
                   v-model="form.penerimaNama"
                   required
                   type="text"
+                  aria-label="Nama Lengkap Penerima (Auto)"
                   class="form-control bg-slate-50 text-[#64748B]"
                   readonly
                 />
@@ -847,6 +851,7 @@ onMounted(fetchData)
                   v-model="form.penerimaDirektorat"
                   required
                   type="text"
+                  :aria-label="form.isPenerimaLainnya ? 'Direktorat / Perusahaan Penerima' : 'Direktorat Penerima (Auto)'"
                   class="form-control"
                   :class="!form.isPenerimaLainnya ? 'bg-slate-50 text-[#64748B]' : ''"
                   :readonly="!form.isPenerimaLainnya"
@@ -892,6 +897,7 @@ onMounted(fetchData)
               type="radio"
               name="tujuan"
               :value="t.key"
+              :aria-label="t.label"
               class="accent-brand"
             />
           </label>
@@ -904,6 +910,7 @@ onMounted(fetchData)
               v-model="form.tujuanLainnya"
               required
               type="text"
+              aria-label="Keterangan Tujuan Serah Terima Lainnya"
               class="form-control"
               placeholder="Tuliskan tujuan serah terima aset lainnya"
             />
@@ -971,6 +978,7 @@ onMounted(fetchData)
                   <input
                     v-model="row.tipe"
                     type="text"
+                    :aria-label="`Deskripsi Aset Baru Baris ${index + 1}`"
                     class="form-control h-8 bg-slate-50 text-[#64748B] text-[11px]"
                     readonly
                   />
@@ -982,6 +990,7 @@ onMounted(fetchData)
                     required
                     type="number"
                     min="1"
+                    :aria-label="`Jumlah (Qty) Aset Baru Baris ${index + 1}`"
                     class="form-control h-8 text-[11px]"
                   />
                 </label>
@@ -994,6 +1003,7 @@ onMounted(fetchData)
                 <input
                   v-model="row.spesifikasi"
                   type="text"
+                  :aria-label="`Spesifikasi Aset Baru Baris ${index + 1}`"
                   class="form-control h-8 bg-slate-50 text-[#64748B] text-[11px]"
                   readonly
                 />
@@ -1060,6 +1070,7 @@ onMounted(fetchData)
                   <input
                     v-model="row.tipe"
                     type="text"
+                    :aria-label="`Deskripsi Aset Lama Baris ${index + 1}`"
                     class="form-control h-8 bg-slate-50 text-[#64748B] text-[11px]"
                     readonly
                   />
@@ -1071,6 +1082,7 @@ onMounted(fetchData)
                     required
                     type="number"
                     min="1"
+                    :aria-label="`Jumlah (Qty) Aset Lama Baris ${index + 1}`"
                     class="form-control h-8 text-[11px]"
                   />
                 </label>
@@ -1083,6 +1095,7 @@ onMounted(fetchData)
                 <input
                   v-model="row.spesifikasi"
                   type="text"
+                  :aria-label="`Spesifikasi Aset Lama Baris ${index + 1}`"
                   class="form-control h-8 bg-slate-50 text-[#64748B] text-[11px]"
                   readonly
                 />
@@ -1100,7 +1113,7 @@ onMounted(fetchData)
           <span class="text-[11px] font-bold uppercase tracking-wider text-[#374151]"
             >Tanggal Formulir:</span
           >
-          <input v-model="form.tanggal" required type="date" class="form-control w-44" />
+          <input v-model="form.tanggal" required type="date" aria-label="Tanggal Formulir Serah Terima" class="form-control w-44" />
         </label>
         <button
           type="submit"

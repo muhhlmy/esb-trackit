@@ -678,7 +678,7 @@ function goToAdminCases() {
           class="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-[#475569] dark:text-slate-300 font-medium cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors text-[11px]"
         >
           <Plus class="w-3.5 h-3.5" />
-          <span>+ Step</span>
+          <span>Step</span>
         </button>
       </div>
 
@@ -879,6 +879,9 @@ function goToAdminCases() {
     <!-- 5. INSERT IMAGE MODAL -->
     <div
       v-if="isImageModalOpen"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Sisipkan Gambar"
       class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm animate-in fade-in duration-150"
     >
       <div class="relative w-full max-w-md bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 rounded-2xl shadow-2xl overflow-hidden flex flex-col">

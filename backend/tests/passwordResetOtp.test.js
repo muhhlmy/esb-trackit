@@ -79,12 +79,12 @@ test('OTP Password Reset Flow', async (t) => {
     )
   })
 
-  // Cleanup: Reset back superadmin password to admin123
-  await t.test('Cleanup: ensure superadmin password is admin123', async () => {
-    const defaultHash = await hashPassword('admin123')
+  // Cleanup: Reset back superadmin password to Admin123!
+  await t.test('Cleanup: ensure superadmin password is Admin123!', async () => {
+    const defaultHash = await hashPassword('Admin123!')
     await pool.query('UPDATE users SET password_hash = $1 WHERE email = $2', [defaultHash, testEmail])
     const checkUser = await pool.query('SELECT password_hash FROM users WHERE email = $1', [testEmail])
-    const valid = await verifyPassword('admin123', checkUser.rows[0].password_hash)
+    const valid = await verifyPassword('Admin123!', checkUser.rows[0].password_hash)
     assert.equal(valid, true)
   })
 })

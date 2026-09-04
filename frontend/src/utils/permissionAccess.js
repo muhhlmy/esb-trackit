@@ -61,7 +61,7 @@ export function canAccessFrontendFeature(user, featureKey) {
 
   const ticketEligibility = getTicketEligibility(user)
   if (ticketEligibility.role === TICKET_ROLES.UNKNOWN) return false
-  if (featureKey === 'export') {
+  if (featureKey === 'export' || featureKey === 'database') {
     return ticketEligibility.role === TICKET_ROLES.SUPERADMIN
   }
   if (featureKey === 'tickets') return ticketEligibility.canRead

@@ -241,9 +241,32 @@ function handleRestoreFromHistory(backup) {
 }
 
 // ========== Restore Flow ==========
+const ALLOWED_BACKUP_EXTS = ['.dump', '.sql', '.tar']
+const MAX_BACKUP_SIZE = 150 * 1024 * 1024 // 150 MB
+
+function validateBackupFile(file) {
+  if (!file) return 'Pilih file backup terlebih dahulu.'
+  const ext = '.' + (file.name.split('.').pop() || '').toLowerCase()
+  if (!ALLOWED_BACKUP_EXTS.includes(ext)) {
+    return `Format file tidak didukung (${ext}). Hanya format .dump, .sql, atau .tar yang diizinkan.`
+  }
+  if (file.size > MAX_BACKUP_SIZE) {
+    return `Ukuran file terlalu besar (${(file.size / (1024 * 1024)).toFixed(1)} MB). Maksimal 150 MB.`
+  }
+  return null
+}
+
 function handleFileSelect(event) {
   const file = event.target.files?.[0]
   if (file) {
+    const errorMsg = validateBackupFile(file)
+    if (errorMsg) {
+      showToast(errorMsg, 'error')
+      restoreError.value = errorMsg
+      restoreFile.value = null
+      if (event.target) event.target.value = ''
+      return
+    }
     restoreFile.value = file
     restoreStep.value = 'upload'
     restoreValidation.value = null
@@ -252,8 +275,10 @@ function handleFileSelect(event) {
 }
 
 async function handleValidateRestore() {
-  if (!restoreFile.value) {
-    showToast('Pilih file backup terlebih dahulu.', 'error')
+  const fileError = validateBackupFile(restoreFile.value)
+  if (fileError) {
+    showToast(fileError, 'error')
+    restoreError.value = fileError
     return
   }
 
@@ -264,24 +289,10 @@ async function handleValidateRestore() {
     const formData = new FormData()
     formData.append('backupFile', restoreFile.value)
 
-    const baseUrl = import.meta.env.VITE_API_BASE_URL || ''
+    const res = await api.upload('/api/admin/database/restore/validate', formData)
 
-    const response = await fetch(`${baseUrl}/api/admin/database/restore/validate`, {
-      method: 'POST',
-      credentials: 'same-origin',
-      body: formData,
-    })
-
-    const res = await response.json().catch(() => ({}))
-
-    if (response.status === 401) {
-      clearAuthSession()
-      window.location.href = '/login'
-      throw new Error('Sesi telah berakhir, silakan login kembali.')
-    }
-
-    if (!response.ok || !res.success) {
-      throw new Error(res.error?.message || 'Validasi gagal.')
+    if (!res || !res.success) {
+      throw new Error(res?.error?.message || 'Validasi gagal.')
     }
 
     restoreValidation.value = res.data
@@ -311,24 +322,10 @@ async function handleConfirmRestore() {
     const formData = new FormData()
     formData.append('backupFile', restoreFile.value)
 
-    const baseUrl = import.meta.env.VITE_API_BASE_URL || ''
+    const res = await api.upload('/api/admin/database/restore', formData)
 
-    const response = await fetch(`${baseUrl}/api/admin/database/restore`, {
-      method: 'POST',
-      credentials: 'same-origin',
-      body: formData,
-    })
-
-    const res = await response.json().catch(() => ({}))
-
-    if (response.status === 401) {
-      clearAuthSession()
-      window.location.href = '/login'
-      throw new Error('Sesi telah berakhir, silakan login kembali.')
-    }
-
-    if (!response.ok || !res.success) {
-      throw new Error(res.error?.message || 'Restore gagal.')
+    if (!res || !res.success) {
+      throw new Error(res?.error?.message || 'Restore gagal.')
     }
 
     restoreResult.value = res.data
@@ -336,6 +333,7 @@ async function handleConfirmRestore() {
     showToast('Restore database berhasil! Silakan login kembali.', 'success')
     // Session invalid setelah restore — redirect ke login
     setTimeout(() => {
+      clearAuthSession()
       window.location.href = '/login'
     }, 2000)
   } catch (err) {

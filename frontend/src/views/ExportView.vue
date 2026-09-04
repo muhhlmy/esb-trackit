@@ -661,6 +661,7 @@ onMounted(() => {
               <input
                 type="checkbox"
                 :value="col.name"
+                :aria-label="`Pilih kolom ${col.label || col.name}`"
                 v-model="selectedColumns"
                 class="h-4 w-4 rounded-md border-[#CBD5E1] text-[#2563EB] focus:ring-[#2563EB]"
               />
@@ -688,26 +689,32 @@ onMounted(() => {
 
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
-              <label class="block text-xs font-medium text-[#64748B] mb-1">Tanggal Mulai</label>
+              <label for="export-start-date" class="block text-xs font-medium text-[#64748B] mb-1">Tanggal Mulai</label>
               <input
+                id="export-start-date"
                 type="date"
+                aria-label="Tanggal Mulai Ekspor"
                 v-model="startDate"
                 class="w-full rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-2 text-xs font-medium text-[#0F172A] focus:border-[#2563EB] focus:bg-white focus:outline-none"
               />
             </div>
             <div>
-              <label class="block text-xs font-medium text-[#64748B] mb-1">Tanggal Selesai</label>
+              <label for="export-end-date" class="block text-xs font-medium text-[#64748B] mb-1">Tanggal Selesai</label>
               <input
+                id="export-end-date"
                 type="date"
+                aria-label="Tanggal Selesai Ekspor"
                 v-model="endDate"
                 class="w-full rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-2 text-xs font-medium text-[#0F172A] focus:border-[#2563EB] focus:bg-white focus:outline-none"
               />
             </div>
             <div>
-              <label class="block text-xs font-medium text-[#64748B] mb-1"
+              <label for="export-row-limit" class="block text-xs font-medium text-[#64748B] mb-1"
                 >Batas Maksimal Baris</label
               >
               <select
+                id="export-row-limit"
+                aria-label="Batas Maksimal Baris"
                 v-model="rowLimit"
                 class="w-full rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-2 text-xs font-semibold text-[#0F172A] focus:border-[#2563EB] focus:bg-white focus:outline-none cursor-pointer"
               >
@@ -721,7 +728,7 @@ onMounted(() => {
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
             <div>
-              <label class="block text-xs font-medium text-[#64748B] mb-1"
+              <label for="export-search-query" class="block text-xs font-medium text-[#64748B] mb-1"
                 >Pencarian Kata Kunci</label
               >
               <div class="relative">
@@ -730,7 +737,9 @@ onMounted(() => {
                   >search</span
                 >
                 <input
+                  id="export-search-query"
                   type="text"
+                  aria-label="Pencarian Kata Kunci Data"
                   v-model="searchQuery"
                   maxlength="200"
                   placeholder="Cari kata kunci data..."

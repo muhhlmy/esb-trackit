@@ -1510,6 +1510,7 @@ function toast(message, type = 'success') {
           <input
             v-model="searchQuery"
             type="search"
+            aria-label="Cari tiket, judul, nomor, atau pelapor"
             placeholder="Cari ticket, judul, nomor, pelapor..."
             class="h-9 w-full rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] pl-9 pr-3 text-xs font-medium text-[#0F172A] placeholder-[#94A3B8] focus:border-[#2563EB] focus:bg-white focus:outline-none transition-all"
           />
@@ -1967,6 +1968,7 @@ function toast(message, type = 'success') {
               type="text"
               required
               maxlength="150"
+              aria-label="Judul Tiket"
               placeholder="Contoh: Laptop tidak dapat terhubung ke Wi-Fi"
               class="h-10 w-full rounded-lg border border-[#E5EAEF] bg-white px-3 text-[12px] font-medium text-[#2A3547] placeholder-[#94A3B8] focus:border-[#5D87FF] focus:outline-none transition-all shadow-2xs"
             />
@@ -1978,6 +1980,7 @@ function toast(message, type = 'success') {
             <textarea
               v-model="form.deskripsi"
               rows="3"
+              aria-label="Deskripsi Kendala Tiket"
               placeholder="Jelaskan kendala secara singkat dan detail agar tim dapat membantu..."
               class="min-h-[80px] max-h-[140px] w-full rounded-lg border border-[#E5EAEF] bg-white p-2.5 text-[12px] font-medium text-[#2A3547] placeholder-[#94A3B8] focus:border-[#5D87FF] focus:outline-none transition-all resize-y shadow-2xs"
             ></textarea>
@@ -2673,6 +2676,7 @@ function toast(message, type = 'success') {
                 <input
                   v-model="newCommentText"
                   type="text"
+                  aria-label="Tulis komentar tiket"
                   placeholder="Tulis komentar atau catatan perbaikan..."
                   class="h-10 flex-1 min-w-0 rounded-xl border border-slate-200 bg-slate-50/70 px-3.5 text-xs font-medium text-slate-900 placeholder-slate-400 outline-none transition-all focus:bg-white focus:border-blue-600 focus:ring-1 focus:ring-blue-600/20"
                 />

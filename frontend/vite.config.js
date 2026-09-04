@@ -25,8 +25,12 @@ function securityHeadersPlugin() {
       next()
       return
     }
-    // Block sensitive dotfiles like /.env, /.git, etc.
-    if (/^\/\.[a-zA-Z0-9_-]/i.test(rawUrl) || /\/\.(env|git|svn|hg|DS_Store|dockerignore)/i.test(rawUrl)) {
+    // Block sensitive dotfiles like /.env, /.git, and package lockfiles
+    if (
+      /^\/\.[a-zA-Z0-9_-]/i.test(rawUrl) ||
+      /\/\.(env|git|svn|hg|DS_Store|dockerignore)/i.test(rawUrl) ||
+      /\/(package(-lock)?\.json|yarn\.lock|pnpm-lock\.yaml)/i.test(rawUrl)
+    ) {
       res.statusCode = 404
       res.end('Not Found')
       return
@@ -67,7 +71,7 @@ export default defineConfig({
     },
   },
   server: {
-    host: '0.0.0.0',
+    host: process.env.VITE_HOST || '127.0.0.1',
     port: 5173,
     headers: FRONTEND_SECURITY_HEADERS,
     proxy: {
@@ -79,8 +83,11 @@ export default defineConfig({
     },
   },
   preview: {
-    host: '0.0.0.0',
+    host: process.env.VITE_HOST || '127.0.0.1',
     port: 5173,
     headers: FRONTEND_SECURITY_HEADERS,
+  },
+  build: {
+    sourcemap: false,
   },
 })

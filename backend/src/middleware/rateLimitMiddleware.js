@@ -57,14 +57,23 @@ export function createBoundedRateLimiter({
 
     const currentTime = now()
     const generatedKeys = keyGenerator(req)
-    const keys = [...new Set((Array.isArray(generatedKeys) ? generatedKeys : [generatedKeys]).filter(Boolean))]
-    if (keys.length === 0) keys.push('anonymous')
+    const rawList = Array.isArray(generatedKeys) ? generatedKeys : [generatedKeys]
+    const keyConfigs = rawList
+      .filter(Boolean)
+      .map((item) =>
+        typeof item === 'string'
+          ? { key: item, maxLimit: max, message }
+          : { key: item.key, maxLimit: item.max || max, message: item.message || message },
+      )
+      .filter((cfg) => Boolean(cfg.key))
+    if (keyConfigs.length === 0) keyConfigs.push({ key: 'anonymous', maxLimit: max, message })
 
     let remaining = max
     let resetAt = currentTime + windowMs
     let blocked = false
+    let activeMessage = message
 
-    for (const key of keys) {
+    for (const { key, maxLimit, message: itemMessage } of keyConfigs) {
       let bucket = buckets.get(key)
       if (!bucket || bucket.resetAt <= currentTime) {
         if (!bucket) makeRoom(currentTime)
@@ -76,9 +85,12 @@ export function createBoundedRateLimiter({
 
       bucket.count += 1
       buckets.set(key, bucket)
-      remaining = Math.min(remaining, Math.max(0, max - bucket.count))
+      remaining = Math.min(remaining, Math.max(0, maxLimit - bucket.count))
       resetAt = Math.min(resetAt, bucket.resetAt)
-      if (bucket.count > max) blocked = true
+      if (bucket.count > maxLimit) {
+        blocked = true
+        if (itemMessage) activeMessage = itemMessage
+      }
     }
 
     const resetSeconds = Math.max(1, Math.ceil((resetAt - currentTime) / 1000))
@@ -92,16 +104,21 @@ export function createBoundedRateLimiter({
       return res.status(429).json({
         error: {
           code: 'RATE_LIMITED',
-          message,
+          message: activeMessage,
           ...(requestId ? { requestId } : {}),
         },
-        message,
+        message: activeMessage,
       })
     }
     return next()
   }
 
   middleware.reset = () => buckets.clear()
+  middleware.clearKey = (key) => {
+    if (typeof key === 'string') {
+      buckets.delete(key)
+    }
+  }
   middleware.size = () => buckets.size
   return middleware
 }
@@ -118,14 +135,28 @@ export const loginRateLimiter = createBoundedRateLimiter({
   keyGenerator: (req) => {
     const ipKey = `login:ip:${getClientIp(req)}`
     const email = normalizedLoginEmail(req)
-    return email ? [ipKey, `login:account:${email}`] : [ipKey]
+    const configs = [
+      {
+        key: ipKey,
+        max: 60,
+        message: 'Terlalu banyak permintaan login dari alamat IP ini. Silakan coba lagi nanti.',
+      },
+    ]
+    if (email) {
+      configs.push({
+        key: `login:account:${email}`,
+        max: 10,
+        message: 'Terlalu banyak percobaan login untuk akun ini. Silakan coba lagi nanti.',
+      })
+    }
+    return configs
   },
   message: 'Terlalu banyak percobaan login. Silakan coba lagi nanti.',
 })
 
 export const authRateLimiter = createBoundedRateLimiter({
   windowMs: 15 * 60_000,
-  max: env.rateLimit?.authMax || 20,
+  max: env.rateLimit?.authMax || 60,
   keyGenerator: (req) => (req.user?.id ? `auth:user:${req.user.id}` : `auth:ip:${getClientIp(req)}`),
   message: 'Terlalu banyak permintaan otentikasi. Silakan coba lagi nanti.',
 })

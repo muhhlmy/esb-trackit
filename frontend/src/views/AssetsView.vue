@@ -733,6 +733,7 @@ onMounted(async () => {
           <input
             v-model="searchQuery"
             type="text"
+            aria-label="Cari aset, serial number, atau pemegang"
             placeholder="Cari aset, serial number, atau pemegang..."
             class="h-9 w-full rounded-lg border border-[#E2E8F0] bg-white pl-8 pr-2.5 text-xs text-[#0F172A] placeholder-[#94A3B8] focus:border-[#2563EB] focus:outline-none transition-all shadow-2xs"
           />
@@ -1115,6 +1116,7 @@ onMounted(async () => {
                 v-model="form.hostname"
                 required
                 maxlength="100"
+                aria-label="Hostname Aset"
                 placeholder="Laptop-HR-01 atau SN-ABC123"
                 class="h-10 w-full rounded-lg border border-[#E5EAEF] bg-white px-3 text-[12px] font-medium text-[#2A3547] placeholder-[#94A3B8] focus:border-[#5D87FF] focus:outline-none transition-all shadow-2xs"
               />
@@ -1128,6 +1130,7 @@ onMounted(async () => {
                 v-model="form.serial_number"
                 required
                 maxlength="100"
+                aria-label="Serial Number Aset"
                 placeholder="Nomor seri perangkat"
                 class="h-10 w-full rounded-lg border border-[#E5EAEF] bg-white px-3 text-[12px] font-medium text-[#2A3547] placeholder-[#94A3B8] focus:border-[#5D87FF] focus:outline-none transition-all shadow-2xs"
               />
@@ -1139,6 +1142,7 @@ onMounted(async () => {
               >
               <select
                 v-model="form.tipe_perangkat"
+                aria-label="Tipe Perangkat Aset"
                 class="h-10 w-full rounded-lg border border-[#E5EAEF] bg-white px-3 text-[12px] font-medium text-[#2A3547] focus:border-[#5D87FF] focus:outline-none transition-all appearance-none cursor-pointer shadow-2xs"
               >
                 <option value="">Pilih tipe perangkat</option>

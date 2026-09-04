@@ -3,16 +3,34 @@ import { api } from '../services/api.js';
 import { useAuth } from './useAuth.js';
 import { useToast } from './useToast.js';
 
+function loadStoredBookmarks() {
+  try {
+    if (typeof window === 'undefined' || !window.localStorage) return []
+    const raw = localStorage.getItem('esb_bookmarks')
+    if (!raw) return []
+    const parsed = JSON.parse(raw)
+    return Array.isArray(parsed) ? parsed.map(Number).filter(Number.isFinite) : []
+  } catch {
+    return []
+  }
+}
+
 // Bookmark disimpan sebagai array of case_id (number) agar kompatibel
 // dengan konsumen yang sudah ada: CaseCard, CaseReader, NotionTreeSidebar.
-const bookmarks = ref(JSON.parse(localStorage.getItem('esb_bookmarks') || '[]'));
+const bookmarks = ref(loadStoredBookmarks());
 
 // Anti double-fetch & anti double-toggle (race guard per case_id)
 let fetchPromise = null;
 const pendingToggles = new Set();
 
 function persistLocal() {
-  localStorage.setItem('esb_bookmarks', JSON.stringify(bookmarks.value));
+  try {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      localStorage.setItem('esb_bookmarks', JSON.stringify(bookmarks.value));
+    }
+  } catch (err) {
+    console.warn('Gagal menyimpan bookmark ke localStorage:', err);
+  }
 }
 
 export function useBookmarks() {

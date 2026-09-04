@@ -16,10 +16,14 @@ FROM nginx:alpine AS runner
 
 COPY --from=builder /app/dist /usr/share/nginx/html
 
-# Custom nginx config to handle SPA client routing
+# Custom nginx config to handle SPA client routing & security headers
 RUN printf 'server {\n\
   listen 80;\n\
   server_name localhost;\n\
+  add_header X-Content-Type-Options "nosniff" always;\n\
+  add_header X-Frame-Options "DENY" always;\n\
+  add_header Referrer-Policy "strict-origin-when-cross-origin" always;\n\
+  add_header Permissions-Policy "camera=(), geolocation=(), microphone=(), payment=(), usb=()" always;\n\
   location / {\n\
     root /usr/share/nginx/html;\n\
     index index.html;\n\

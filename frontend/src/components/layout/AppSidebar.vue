@@ -585,7 +585,7 @@ function handlePopoverLogout() {
 
           <button
             type="button"
-            aria-label="Perluas Sidepanel"
+            aria-label="Perluas Sidebar"
             title="Perluas Sidebar"
             class="flex h-6 w-6 items-center justify-center rounded-md text-[#7C8BAC] hover:bg-[#ECF2FF] hover:text-[#5D87FF] transition-all cursor-pointer shrink-0"
             @click="emit('toggle-collapse')"
@@ -602,7 +602,7 @@ function handlePopoverLogout() {
         v-if="!isEffectiveCollapsed"
         ref="closeButtonRef"
         type="button"
-        aria-label="Ciutkan Sidepanel"
+        aria-label="Ciutkan Sidebar"
         title="Ciutkan Sidebar"
         class="hidden lg:flex h-7 w-7 items-center justify-center rounded-lg text-[#7C8BAC] hover:bg-[#ECF2FF] hover:text-[#5D87FF] transition-all cursor-pointer shrink-0"
         @click="emit('toggle-collapse')"
@@ -709,6 +709,9 @@ function handlePopoverLogout() {
               <!-- Parent Menu Trigger Button -->
               <button
                 type="button"
+                :aria-expanded="!isEffectiveCollapsed ? String(isParentExpanded(parent.key)) : (activeFlyoutParent?.key === parent.key ? 'true' : 'false')"
+                :aria-controls="`submenu-${parent.key}`"
+                :aria-label="parent.label"
                 class="group flex items-center transition-all duration-150 cursor-pointer select-none"
                 :class="[
                   isEffectiveCollapsed
@@ -760,7 +763,10 @@ function handlePopoverLogout() {
               <!-- Expanded Mode Submenu Items -->
               <div
                 v-if="!isEffectiveCollapsed"
+                :id="`submenu-${parent.key}`"
                 v-show="isParentExpanded(parent.key)"
+                role="region"
+                :aria-label="parent.label"
                 class="pl-5 space-y-0.5 mt-0.5 transition-all"
               >
                 <RouterLink

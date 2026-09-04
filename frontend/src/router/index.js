@@ -23,6 +23,7 @@ export const allowedRouteMap = [
   { key: 'logs', name: 'logs' },
   { key: 'users', name: 'users' },
   { key: 'export', name: 'export' },
+  { key: 'database', name: 'database' },
 ]
 
 // Lista semua route aplikasi (Help Center + TrackIT Monitoring)

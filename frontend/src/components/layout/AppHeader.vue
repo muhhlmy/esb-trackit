@@ -603,6 +603,8 @@ onBeforeUnmount(() => {
       <!-- Toggle Mobile Drawer (lg:hidden) -->
       <button
         type="button"
+        :aria-expanded="isMobileOpen ? 'true' : 'false'"
+        aria-controls="app-navigation"
         aria-label="Buka Navigasi Mobile"
         title="Buka Navigasi Mobile"
         class="flex lg:hidden h-8 w-8 shrink-0 items-center justify-center rounded-lg text-[#2A3547] hover:bg-[#ECF2FF] hover:text-[#5D87FF] transition-all cursor-pointer"

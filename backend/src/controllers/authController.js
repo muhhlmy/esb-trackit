@@ -32,6 +32,7 @@ import {
   sendEmail,
   renderPasswordResetOtpEmailHtml,
 } from '../services/emailService.js';
+import { loginRateLimiter } from '../middleware/rateLimitMiddleware.js';
 
 const MAX_LOGIN_EMAIL_LENGTH = 150
 const MAX_LOGIN_PASSWORD_LENGTH = 255
@@ -137,6 +138,7 @@ export async function login(req, res) {
 
     // Reset failed login state on successful authentication
     await resetFailedLogin(email)
+    loginRateLimiter.clearKey(`login:account:${email.trim().toLowerCase()}`)
 
     const userRole = (userRow.role || '').trim().toLowerCase()
     const isSuper = userRole === 'superadmin' || userRole === 'super admin'

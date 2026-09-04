@@ -147,12 +147,26 @@ export function useApi() {
   // "delete" adalah kata kunci (reserved word) di JavaScript
   // Contoh: del('/api/assets/ASSET-001')
   // ----------------------------------------------------------
-  async function del(endpoint) {
+  async function del(endpoint, options = {}) {
     return request(endpoint, {
+      ...options,
       method: 'DELETE',
     })
   }
 
+  // ----------------------------------------------------------
+  // UPLOAD — Mengirim data file / FormData (multipart/form-data)
+  // Browser otomatis menyertakan multipart boundary tanpa header Content-Type manual
+  // Contoh: upload('/api/admin/database/restore', formData)
+  // ----------------------------------------------------------
+  async function upload(endpoint, formData, options = {}) {
+    return request(endpoint, {
+      ...options,
+      method: 'POST',
+      body: formData,
+    })
+  }
+
   // Kembalikan semua fungsi agar bisa digunakan di komponen
-  return { get, post, put, del }
+  return { get, post, put, del, upload }
 }

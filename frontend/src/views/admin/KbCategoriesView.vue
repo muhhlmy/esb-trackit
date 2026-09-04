@@ -464,6 +464,9 @@ function clearFilters() {
       <Transition name="slide">
         <div
           v-if="isDrawerOpen && editingCategory"
+          role="dialog"
+          aria-modal="true"
+          :aria-label="drawerMode === 'create' ? 'Kategori Baru' : 'Edit Kategori'"
           class="fixed top-0 right-0 bottom-0 z-50 w-full max-w-md bg-white dark:bg-slate-900 border-l border-[#E2E8F0] dark:border-slate-800 shadow-2xl overflow-y-auto"
         >
           <div class="p-6 space-y-5">

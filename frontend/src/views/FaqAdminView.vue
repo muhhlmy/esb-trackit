@@ -329,6 +329,7 @@ onMounted(fetchFaqs)
         <input
           v-model="searchQuery"
           type="text"
+          aria-label="Cari pertanyaan atau jawaban FAQ"
           placeholder="Search questions or answer keywords..."
           class="w-full bg-[#F8FAFC] dark:bg-slate-800/80 border border-[#E5EAEF] dark:border-slate-700 rounded-xl pl-10 pr-9 py-2 text-xs font-medium text-[#0F172A] dark:text-white placeholder-[#94A3B8] focus:outline-none focus:border-[#5D87FF] focus:bg-white dark:focus:bg-slate-900 transition-all"
         />
@@ -515,8 +516,9 @@ onMounted(fetchFaqs)
     >
       <form @submit.prevent="saveFaq" class="space-y-4 pt-1">
         <div>
-          <label class="mb-1.5 block text-xs font-bold text-[#0F172A] dark:text-slate-200">Question</label>
+          <label for="faq-question" class="mb-1.5 block text-xs font-bold text-[#0F172A] dark:text-slate-200">Question</label>
           <input
+            id="faq-question"
             v-model="form.question"
             type="text"
             placeholder="e.g. Bagaimana cara mereset password Google Workspace?"
@@ -525,8 +527,9 @@ onMounted(fetchFaqs)
         </div>
 
         <div>
-          <label class="mb-1.5 block text-xs font-bold text-[#0F172A] dark:text-slate-200">Answer</label>
+          <label for="faq-answer" class="mb-1.5 block text-xs font-bold text-[#0F172A] dark:text-slate-200">Answer</label>
           <textarea
+            id="faq-answer"
             v-model="form.answer"
             rows="5"
             placeholder="Tulis langkah-langkah atau jawaban secara detail..."
@@ -536,8 +539,9 @@ onMounted(fetchFaqs)
 
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div>
-            <label class="mb-1.5 block text-xs font-bold text-[#0F172A] dark:text-slate-200">Category</label>
+            <label for="faq-category" class="mb-1.5 block text-xs font-bold text-[#0F172A] dark:text-slate-200">Category</label>
             <select
+              id="faq-category"
               v-model="form.category"
               class="w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] dark:bg-slate-800 px-3.5 py-2.5 text-xs font-semibold text-[#0F172A] dark:text-slate-100 focus:border-[#5D87FF] focus:outline-none transition-all cursor-pointer"
             >
@@ -546,8 +550,9 @@ onMounted(fetchFaqs)
           </div>
 
           <div>
-            <label class="mb-1.5 block text-xs font-bold text-[#0F172A] dark:text-slate-200">Status</label>
+            <label for="faq-status" class="mb-1.5 block text-xs font-bold text-[#0F172A] dark:text-slate-200">Status</label>
             <select
+              id="faq-status"
               v-model="form.status"
               class="w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] dark:bg-slate-800 px-3.5 py-2.5 text-xs font-semibold text-[#0F172A] dark:text-slate-100 focus:border-[#5D87FF] focus:outline-none transition-all cursor-pointer"
             >
@@ -557,8 +562,9 @@ onMounted(fetchFaqs)
           </div>
 
           <div>
-            <label class="mb-1.5 block text-xs font-bold text-[#0F172A] dark:text-slate-200">Sort Order</label>
+            <label for="faq-sort-order" class="mb-1.5 block text-xs font-bold text-[#0F172A] dark:text-slate-200">Sort Order</label>
             <input
+              id="faq-sort-order"
               v-model.number="form.sort_order"
               type="number"
               min="0"

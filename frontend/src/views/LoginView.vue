@@ -597,6 +597,9 @@ const finishResetAndLogin = () => {
           class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm select-none"
         >
           <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="forgot-modal-title"
             class="w-full max-w-md bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden animate-scale-up"
             @click.stop
           >
@@ -607,7 +610,7 @@ const finishResetAndLogin = () => {
                   <span class="material-symbols-outlined text-[20px]">lock_reset</span>
                 </div>
                 <div>
-                  <h3 class="text-base font-bold text-slate-900">Reset Kata Sandi</h3>
+                  <h3 id="forgot-modal-title" class="text-base font-bold text-slate-900">Reset Kata Sandi</h3>
                   <p class="text-xs text-slate-500">Verifikasi email dengan kode OTP</p>
                 </div>
               </div>
@@ -752,6 +755,8 @@ const finishResetAndLogin = () => {
                       v-model="otpDigits[idx]"
                       type="text"
                       inputmode="numeric"
+                      autocomplete="one-time-code"
+                      :aria-label="`Digit OTP ${idx + 1}`"
                       maxlength="1"
                       class="w-11 h-12 text-center text-xl font-bold rounded-xl border border-slate-300 bg-slate-50/50 text-slate-900 focus:border-[#2563EB] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#2563EB]/10 transition-all"
                       @input="handleOtpInput(idx, $event)"

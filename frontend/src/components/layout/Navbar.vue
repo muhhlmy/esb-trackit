@@ -227,7 +227,10 @@ onUnmounted(() => {
   </header>
 
   <!-- Floating Bottom-Right Language Switcher Pill -->
-  <div class="fixed bottom-6 right-6 z-50 flex items-center p-1.5 rounded-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border border-[#E5EAEF] dark:border-slate-800 shadow-xl shadow-slate-900/15 text-xs font-black transition-all hover:scale-[1.03] select-none">
+  <div
+    v-if="route.path === '/'"
+    class="fixed bottom-6 right-6 z-50 flex items-center p-1.5 rounded-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border border-[#E5EAEF] dark:border-slate-800 shadow-xl shadow-slate-900/15 text-xs font-black transition-all hover:scale-[1.03] select-none"
+  >
     <div class="flex items-center gap-1.5 pl-2 pr-1.5 text-[#5D87FF] shrink-0">
       <Globe class="w-4 h-4" />
     </div>

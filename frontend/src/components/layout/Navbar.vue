@@ -69,15 +69,15 @@ onUnmounted(() => {
     <div class="max-w-[1200px] mx-auto w-full h-16 flex items-center justify-between gap-4">
       
       <!-- Left Branding: ESB TrackIT Help Center -->
-      <div class="flex items-center gap-4">
+      <div class="flex items-center gap-4 min-w-0">
         <button
           @click="handleLogoClick"
-          class="flex items-center gap-2.5 group focus:outline-none select-none text-left cursor-pointer"
+          class="flex items-center gap-2 sm:gap-2.5 group focus:outline-none select-none text-left cursor-pointer min-w-0"
         >
-          <img src="/ESB Logo Only.svg" alt="ESB Logo" class="h-5 w-auto object-contain group-hover:scale-105 transition-transform" />
-          <div class="flex items-center gap-2">
-            <span class="font-extrabold text-[#0F172A] dark:text-white tracking-tight text-xs group-hover:text-[#5D87FF] transition-colors">ESB TrackIT</span>
-            <span class="text-[10px] text-[#64748B] dark:text-slate-400 font-extrabold uppercase tracking-wider bg-[#F1F5F9] dark:bg-slate-800 px-2 py-0.5 rounded border border-[#E5EAEF] dark:border-slate-700/80">
+          <img src="/ESB Logo Only.svg" alt="ESB Logo" class="h-5 w-auto object-contain shrink-0 group-hover:scale-105 transition-transform" />
+          <div class="flex items-center gap-1.5 sm:gap-2 min-w-0">
+            <span class="font-extrabold text-[#0F172A] dark:text-white tracking-tight text-xs sm:text-sm group-hover:text-[#5D87FF] transition-colors truncate">ESB TrackIT</span>
+            <span class="hidden sm:inline-block text-[10px] text-[#64748B] dark:text-slate-400 font-extrabold uppercase tracking-wider bg-[#F1F5F9] dark:bg-slate-800 px-2 py-0.5 rounded border border-[#E5EAEF] dark:border-slate-700/80 shrink-0">
               Help Center
             </span>
           </div>
@@ -85,7 +85,7 @@ onUnmounted(() => {
       </div>
 
       <!-- Right Actions: Quick Search, Auth Profile / Sign In, Theme Toggle -->
-      <div class="flex items-center gap-3">
+      <div class="flex items-center gap-2 sm:gap-3 shrink-0">
         
         <!-- Search Trigger Hint -->
         <RouterLink
@@ -100,7 +100,7 @@ onUnmounted(() => {
         <!-- Theme Switcher -->
         <button
           @click="toggleTheme"
-          class="p-2 rounded-xl text-[#64748B] dark:text-slate-400 hover:bg-[#F1F5F9] dark:hover:bg-slate-800 hover:text-[#0F172A] dark:hover:text-white transition-colors cursor-pointer"
+          class="p-2 rounded-xl text-[#64748B] dark:text-slate-400 hover:bg-[#F1F5F9] dark:hover:bg-slate-800 hover:text-[#0F172A] dark:hover:text-white transition-colors cursor-pointer min-h-[38px] min-w-[38px] flex items-center justify-center touch-manipulation"
           :title="isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'"
         >
           <Sun v-if="isDark" class="w-4 h-4 text-amber-400" />
@@ -113,7 +113,7 @@ onUnmounted(() => {
         <template v-if="!isAuthenticated">
           <RouterLink
             :to="{ path: '/login', query: { redirect: route.fullPath } }"
-            class="px-4 py-2 rounded-xl text-xs font-extrabold bg-[#5D87FF] hover:bg-[#4570EA] text-white shadow-md shadow-[#5D87FF]/20 hover:shadow-lg transition-all flex items-center gap-1.5 cursor-pointer"
+            class="px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-xs font-extrabold bg-[#5D87FF] hover:bg-[#4570EA] text-white shadow-md shadow-[#5D87FF]/20 hover:shadow-lg transition-all flex items-center gap-1.5 cursor-pointer min-h-[38px] touch-manipulation active:scale-95"
           >
             <LogIn class="w-3.5 h-3.5" />
             <span>{{ t('sign_in', 'Sign In') }}</span>
@@ -125,7 +125,7 @@ onUnmounted(() => {
           <div class="relative">
             <button
               @click="toggleProfileMenu"
-              class="flex items-center gap-2 p-1.5 pr-2.5 rounded-full border border-slate-200/80 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 hover:bg-slate-50 dark:hover:bg-slate-800/90 hover:border-slate-300 dark:hover:border-slate-700 shadow-2xs hover:shadow-xs transition-all duration-200 cursor-pointer text-xs group"
+              class="flex items-center gap-2 p-1 sm:p-1.5 pr-2 sm:pr-2.5 rounded-full border border-slate-200/80 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 hover:bg-slate-50 dark:hover:bg-slate-800/90 hover:border-slate-300 dark:hover:border-slate-700 shadow-2xs hover:shadow-xs transition-all duration-200 cursor-pointer text-xs group min-h-[38px]"
             >
               <!-- Avatar Circle -->
               <div class="w-6 h-6 rounded-full bg-gradient-to-tr from-[#5D87FF] to-[#3662E3] text-white text-[11px] font-black flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform shrink-0">
@@ -229,7 +229,7 @@ onUnmounted(() => {
   <!-- Floating Bottom-Right Language Switcher Pill -->
   <div
     v-if="route.path === '/'"
-    class="fixed bottom-6 right-6 z-50 flex items-center p-1.5 rounded-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border border-[#E5EAEF] dark:border-slate-800 shadow-xl shadow-slate-900/15 text-xs font-black transition-all hover:scale-[1.03] select-none"
+    class="fixed bottom-[4.75rem] md:bottom-6 right-3.5 sm:right-6 z-40 flex items-center p-1 sm:p-1.5 rounded-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border border-[#E5EAEF] dark:border-slate-800 shadow-xl shadow-slate-900/15 text-xs font-black transition-all hover:scale-[1.03] select-none"
   >
     <div class="flex items-center gap-1.5 pl-2 pr-1.5 text-[#5D87FF] shrink-0">
       <Globe class="w-4 h-4" />
@@ -237,7 +237,7 @@ onUnmounted(() => {
     <div class="flex items-center p-0.5 rounded-full bg-[#F1F5F9] dark:bg-slate-800">
       <button
         @click="setLanguage('id')"
-        class="px-2.5 py-1 rounded-full transition-all cursor-pointer text-[11px]"
+        class="px-2.5 py-1 rounded-full transition-all cursor-pointer text-[11px] min-h-[30px] flex items-center justify-center touch-manipulation"
         :class="currentLang === 'id' ? 'bg-[#5D87FF] text-white shadow-2xs' : 'text-[#64748B] dark:text-slate-400 hover:text-[#0F172A] dark:hover:text-white'"
         title="Bahasa Indonesia"
       >
@@ -245,7 +245,7 @@ onUnmounted(() => {
       </button>
       <button
         @click="setLanguage('en')"
-        class="px-2.5 py-1 rounded-full transition-all cursor-pointer text-[11px]"
+        class="px-2.5 py-1 rounded-full transition-all cursor-pointer text-[11px] min-h-[30px] flex items-center justify-center touch-manipulation"
         :class="currentLang === 'en' ? 'bg-[#5D87FF] text-white shadow-2xs' : 'text-[#64748B] dark:text-slate-400 hover:text-[#0F172A] dark:hover:text-white'"
         title="English"
       >

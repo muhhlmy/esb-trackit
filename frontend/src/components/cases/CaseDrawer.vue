@@ -96,7 +96,7 @@ async function onSubmit() {
         <div class="px-6 py-4 border-b border-slate-800 flex items-center justify-between">
           <div>
             <h2 class="text-lg font-bold text-slate-100">
-              {{ drawerMode === 'create' ? 'Create New Case / SOP' : 'Edit Case / SOP' }}
+              {{ drawerMode === 'create' ? 'Create New Artikel' : 'Edit Artikel' }}
             </h2>
             <p class="text-xs text-slate-400">Isi detail panduan playbook & resolusi insiden</p>
           </div>
@@ -112,12 +112,12 @@ async function onSubmit() {
         <form @submit.prevent="onSubmit" id="case-drawer-form" class="flex-1 overflow-y-auto p-6 space-y-4 text-xs">
           
           <div>
-            <label class="block font-semibold text-slate-300 mb-1">Judul SOP / Case <span class="text-rose-400">*</span></label>
+            <label class="block font-semibold text-slate-300 mb-1">Judul Artikel / Case <span class="text-rose-400">*</span></label>
             <input
               v-model="form.title"
               type="text"
               class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-100 focus:outline-none focus:border-indigo-500"
-              placeholder="Contoh: SOP Setup Laptop Baru"
+              placeholder="Contoh: Panduan Setup Laptop Baru"
               required
             />
           </div>
@@ -159,7 +159,7 @@ async function onSubmit() {
               v-model="form.summary"
               rows="2"
               class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-slate-100 focus:outline-none focus:border-indigo-500"
-              placeholder="Ringkasan singkat SOP..."
+              placeholder="Ringkasan singkat artikel..."
               required
             ></textarea>
           </div>
@@ -176,7 +176,7 @@ async function onSubmit() {
 
           <div>
             <label class="block font-semibold text-slate-300 mb-1">
-              Langkah SOP Resolusi <span class="text-rose-400">*</span>
+              Langkah Resolusi <span class="text-rose-400">*</span>
               <span class="text-slate-500 font-normal ml-1">(1 baris per langkah)</span>
             </label>
             <textarea

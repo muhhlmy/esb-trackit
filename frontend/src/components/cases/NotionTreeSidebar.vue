@@ -155,7 +155,7 @@ function handleSelectCase(id) {
           </span>
         </button>
 
-        <!-- Nested Children Articles (SOPs) -->
+        <!-- Nested Children Articles -->
         <div
           v-if="openCategories[catKey]"
           class="pl-4 space-y-0.5 border-l border-[#e2e2e4] dark:border-slate-800/80 ml-3.5 my-0.5"

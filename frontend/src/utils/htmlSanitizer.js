@@ -1,6 +1,6 @@
 import DOMPurify from 'dompurify'
 
-// Whitelist tag TipTap + atribut aman untuk konten rich-text SOP/knowledge base.
+// Whitelist tag TipTap + atribut aman untuk konten rich-text artikel/knowledge base.
 // Segala tag/atribut di luar daftar (script, iframe, event handler, dsb.) dihapus.
 // Mirip konfigurasi backend/src/security/htmlSanitizer.js — pertahankan sinkron.
 const ALLOWED_TAGS = [

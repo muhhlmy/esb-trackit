@@ -31,7 +31,7 @@ const categoryChartData = computed(() => {
     labels: labels.map((l) => l.toUpperCase()),
     datasets: [
       {
-        label: 'Jumlah SOP',
+        label: 'Jumlah Artikel',
         backgroundColor: [
           '#6366f1', // Indigo
           '#06b6d4', // Cyan
@@ -118,7 +118,7 @@ const doughnutOptions = {
     <!-- Top Summary KPI Cards -->
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
       <div class="p-5 rounded-2xl bg-slate-900/60 border border-slate-800">
-        <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total SOP / Cases</p>
+        <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Artikel / Cases</p>
         <p class="text-3xl font-extrabold text-slate-100 mt-2">{{ stats.summary?.totalCases || 0 }}</p>
       </div>
 
@@ -133,7 +133,7 @@ const doughnutOptions = {
       </div>
 
       <div class="p-5 rounded-2xl bg-slate-900/60 border border-slate-800">
-        <p class="text-xs font-semibold text-amber-400 uppercase tracking-wider">Custom SOPs</p>
+        <p class="text-xs font-semibold text-amber-400 uppercase tracking-wider">Custom Artikel</p>
         <p class="text-3xl font-extrabold text-amber-300 mt-2">{{ stats.summary?.customCasesCount || 0 }}</p>
       </div>
     </div>
@@ -143,7 +143,7 @@ const doughnutOptions = {
       
       <!-- Category Breakdown (Bar) -->
       <div class="p-6 rounded-2xl bg-slate-900/60 border border-slate-800 space-y-4">
-        <h3 class="text-sm font-bold text-slate-200">Distribusi SOP berdasarkan Kategori</h3>
+        <h3 class="text-sm font-bold text-slate-200">Distribusi Artikel berdasarkan Kategori</h3>
         <div class="h-64 relative">
           <Bar :data="categoryChartData" :options="chartOptions" />
         </div>

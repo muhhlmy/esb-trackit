@@ -93,7 +93,7 @@ onUnmounted(() => {
           class="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#F8FAFC] dark:bg-slate-800/80 border border-[#E5EAEF] dark:border-slate-700 text-[#64748B] dark:text-slate-400 text-xs hover:border-[#5D87FF] transition-all"
         >
           <Search class="w-3.5 h-3.5" />
-          <span>{{ t('search_placeholder_nav', 'Cari panduan SOP & artikel...') }}</span>
+          <span>{{ t('search_placeholder_nav', 'Cari panduan & artikel...') }}</span>
           <kbd class="px-1.5 py-0.5 text-[10px] font-mono font-bold bg-white dark:bg-slate-700 rounded border border-[#E5EAEF] dark:border-slate-600 text-[#64748B] dark:text-slate-300">Ctrl K</kbd>
         </RouterLink>
 

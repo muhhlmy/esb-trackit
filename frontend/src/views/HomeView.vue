@@ -47,7 +47,7 @@ const liveSuggestions = computed(() => {
     .slice(0, 5);
 });
 
-// Featured SOP list dari DB (4 pertama, published, diurutkan sesuai sort_order)
+// Featured Article list dari DB (4 pertama, published, diurutkan sesuai sort_order)
 const featuredSopList = computed(() =>
   cases.value.slice(0, 4).map((c, idx) => ({
     num: String(idx + 1).padStart(2, '0'),
@@ -163,12 +163,12 @@ const DEFAULT_FAQS = [
     num: '01',
     id: 'faq-1',
     question: 'How do I reset my Google Workspace password?',
-    summary: 'Anda dapat mereset kata sandi akun karyawan melalui Google Admin Console sesuai SOP resmi:',
+    summary: 'Anda dapat mereset kata sandi akun karyawan melalui Google Admin Console sesuai panduan resmi:',
     steps: [
       'Buka Google Admin Console di browser (admin.google.com).',
       'Cari nama atau email karyawan pada menu Directory > Users.',
       'Klik tombol "Reset Password" dan pilih opsi buat kata sandi secara manual.',
-      'Gunakan format kata sandi sementara sesuai SOP resmi IT perusahaan (hubungi IT Administrator jika membutuhkan bantuan).',
+      'Gunakan format kata sandi sementara sesuai panduan resmi IT perusahaan (hubungi IT Administrator jika membutuhkan bantuan).',
       'Pastikan mencentang "Ask user to change their password when they sign in" sebelum menyimpan.'
     ],
     actionText: 'Buka Portal Admin',
@@ -300,7 +300,7 @@ onMounted(async () => {
         </h1>
         
         <p class="text-xs sm:text-sm text-[#64748B] dark:text-slate-400 font-medium leading-relaxed mt-2.5 max-w-md gsap-hero-el">
-          {{ t('hero_subtitle', 'Search our SOPs, troubleshooting guides, and IT knowledge base.') }}
+          {{ t('hero_subtitle', 'Search our articles, troubleshooting guides, and IT knowledge base.') }}
         </p>
 
         <!-- Focal Search Input Bar -->
@@ -464,7 +464,7 @@ onMounted(async () => {
         </div>
       </section>
 
-      <!-- 3. FEATURED CONTENT: NUMBERED EDITORIAL SOP LIST (CLEAN METADATA, NO BULLETS) -->
+      <!-- 3. FEATURED CONTENT: NUMBERED EDITORIAL ARTICLE LIST (CLEAN METADATA, NO BULLETS) -->
       <section class="space-y-3 w-full">
         <div class="flex items-center justify-between border-b border-[#E5EAEF] dark:border-slate-800 pb-3">
           <h2 class="text-xs font-black uppercase tracking-wider text-[#7C8BAC] dark:text-slate-400">

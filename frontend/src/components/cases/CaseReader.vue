@@ -73,7 +73,7 @@ const severityClass = computed(() => {
     <div class="w-16 h-16 rounded-2xl bg-[#edeef0] dark:bg-slate-900 flex items-center justify-center mb-4">
       <HelpCircle class="w-8 h-8 text-[#64748b] dark:text-slate-600" />
     </div>
-    <h3 class="text-base font-bold text-[#1a1c1d] dark:text-slate-300">Pilih Dokumen SOP</h3>
+    <h3 class="text-base font-bold text-[#1a1c1d] dark:text-slate-300">Pilih Artikel</h3>
     <p class="text-xs text-[#575d7a] dark:text-slate-500 mt-1 max-w-sm">
       Pilih salah satu panduan di panel navigasi pohon sebelah kiri untuk membaca playbook dokumentasi lengkap.
     </p>

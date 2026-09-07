@@ -109,7 +109,7 @@ onMounted(() => {
               class="md:hidden flex items-center gap-1.5 py-1 px-2 rounded-lg bg-[#f3f3f5] dark:bg-slate-800 text-[#1a1c1d] dark:text-slate-200 font-medium"
             >
               <Menu class="w-4 h-4 text-[#0040e5]" />
-              <span>Pilih SOP</span>
+              <span>Pilih Artikel</span>
             </button>
           </div>
         </div>
@@ -128,7 +128,7 @@ onMounted(() => {
               Tidak ada hasil untuk "{{ searchQuery }}"
             </h3>
             <p class="text-xs text-[#575d7a] dark:text-slate-500 mt-1 max-w-sm">
-              SOP / panduan yang Anda cari belum tersedia. Ajukan tiket agar tim IT dapat membantu.
+              Artikel / panduan yang Anda cari belum tersedia. Ajukan tiket agar tim IT dapat membantu.
             </p>
             <div class="flex items-center gap-2 mt-5">
               <button

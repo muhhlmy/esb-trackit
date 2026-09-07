@@ -33,32 +33,32 @@ const routes = [
     path: '/',
     name: 'home',
     component: () => import('../views/HomeView.vue'),
-    meta: { title: 'Help Center', subtitle: 'Pusat Bantuan & SOP Insiden', public: true },
+    meta: { title: 'Help Center', subtitle: 'Pusat Bantuan & Artikel Insiden', public: true },
   },
   {
     path: '/cases',
     name: 'cases',
     component: () => import('../views/CasesView.vue'),
-    meta: { title: 'Cases & SOPs', subtitle: 'Kumpulan SOP & Playbook Insiden', public: true },
+    meta: { title: 'Cases & Artikel', subtitle: 'Kumpulan Artikel & Playbook Insiden', public: true },
   },
   {
     path: '/cases/:id',
     name: 'case-detail',
     component: () => import('../views/CasesView.vue'),
-    meta: { title: 'SOP Detail', subtitle: 'Detail Prosedur Operasional Standar', public: true },
+    meta: { title: 'Detail Artikel', subtitle: 'Detail Artikel Panduan Insiden', public: true },
   },
   {
     path: '/templates',
     name: 'templates',
     component: () => import('../views/TemplatesView.vue'),
-    meta: { title: 'Templates Hub', subtitle: 'Template Respon & Script SOP', public: true },
+    meta: { title: 'Templates Hub', subtitle: 'Template Respon & Komunikasi', public: true },
   },
   {
     path: '/kb-analytics',
     alias: '/analytics',
     name: 'kb-analytics',
     component: () => import('../views/AnalyticsView.vue'),
-    meta: { title: 'Help Center Analytics', subtitle: 'Metrik & Tren Pencarian SOP', public: true },
+    meta: { title: 'Help Center Analytics', subtitle: 'Metrik & Tren Pencarian Artikel', public: true },
   },
 
   // Auth Route
@@ -169,7 +169,7 @@ const routes = [
     component: () => import('../views/admin/AdminDashboardView.vue'),
     meta: {
       title: 'Admin CMS',
-      subtitle: 'Kelola SOP & Artikel Knowledge Base',
+      subtitle: 'Kelola Artikel Knowledge Base',
       adminOnly: true,
       permission: 'users',
     },

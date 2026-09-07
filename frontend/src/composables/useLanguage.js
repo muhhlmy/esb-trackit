@@ -7,7 +7,7 @@ const dictionaries = {
   id: {
     // Navbar
     help_center: 'Help Center',
-    search_placeholder_nav: 'Cari panduan SOP & artikel...',
+    search_placeholder_nav: 'Cari panduan & artikel...',
     sign_in: 'Masuk',
     dashboard: 'Dashboard',
     my_asset: 'Aset Saya',
@@ -17,7 +17,7 @@ const dictionaries = {
     // Home Hero
     hero_tag: 'Pusat Bantuan',
     hero_title: 'Apa yang bisa kami bantu?',
-    hero_subtitle: 'Cari SOP, panduan troubleshooting, dan artikel basis pengetahuan IT kami.',
+    hero_subtitle: 'Cari artikel, panduan troubleshooting, dan basis pengetahuan IT kami.',
     search_placeholder: 'Cari basis pengetahuan...',
     search_btn: 'Cari',
     popular_searches: 'Pencarian populer',
@@ -35,7 +35,7 @@ const dictionaries = {
     topic_ga_title: 'General Affairs (GA)',
     topic_ga_desc: 'Layanan operasional kantor, pengadaan aset fasilitas GA, inventaris gedung, dan kebutuhan kerja.',
 
-    // Featured SOPs
+    // Featured Articles
     featured_articles: 'Artikel Unggulan',
     view_all_sops: 'Lihat Semua Artikel',
 
@@ -57,7 +57,7 @@ const dictionaries = {
   en: {
     // Navbar
     help_center: 'Help Center',
-    search_placeholder_nav: 'Search SOP guides & articles...',
+    search_placeholder_nav: 'Search guides & articles...',
     sign_in: 'Sign In',
     dashboard: 'Dashboard',
     my_asset: 'My Asset',
@@ -67,7 +67,7 @@ const dictionaries = {
     // Home Hero
     hero_tag: 'Help Center',
     hero_title: 'What can we help you find?',
-    hero_subtitle: 'Search our SOPs, troubleshooting guides, and IT knowledge base.',
+    hero_subtitle: 'Search our articles, troubleshooting guides, and IT knowledge base.',
     search_placeholder: 'Search the knowledge base...',
     search_btn: 'Search',
     popular_searches: 'Popular searches',
@@ -85,7 +85,7 @@ const dictionaries = {
     topic_ga_title: 'General Affairs (GA)',
     topic_ga_desc: 'Office facility management, physical asset requests, building maintenance, and operational tools.',
 
-    // Featured SOPs
+    // Featured Articles
     featured_articles: 'Featured Articles',
     view_all_sops: 'View all Articles',
 

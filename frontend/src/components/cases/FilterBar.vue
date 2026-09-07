@@ -57,7 +57,7 @@ const severities = [
         </div>
 
         <span class="text-xs text-[#575d7a] dark:text-slate-400 font-mono">
-          <strong class="text-[#1a1c1d] dark:text-slate-200">{{ filteredCases.length }}</strong> SOPs
+          <strong class="text-[#1a1c1d] dark:text-slate-200">{{ filteredCases.length }}</strong> Artikel
         </span>
       </div>
 

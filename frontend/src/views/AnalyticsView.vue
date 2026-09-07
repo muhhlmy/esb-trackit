@@ -77,7 +77,7 @@ onMounted(() => {
           Statistik Incident Playbook
         </h1>
         <p class="text-xs sm:text-sm text-slate-400 mt-1">
-          Metrik distribusi SOP, klasifikasi severity, dan efektivitas dokumentasi insiden.
+          Metrik distribusi artikel, klasifikasi severity, dan efektivitas dokumentasi insiden.
         </p>
       </div>
 

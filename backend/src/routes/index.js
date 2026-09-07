@@ -46,7 +46,7 @@ router.use('/api/export',        authenticateToken, exportRouter)
 router.get('/api/faqs/public',  listPublicFaqs)
 router.use('/api/faqs',         authenticateToken, faqRouter)
 
-// Public Help Center Cases/SOP (read-only, published only, no auth)
+// Public Help Center Cases/Artikel (read-only, published only, no auth)
 router.get('/api/cases/public', listPublicCases)
 router.use('/api/cases',        authenticateToken, caseRouter)
 

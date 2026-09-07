@@ -256,7 +256,7 @@ const menuGroups = computed(() => {
           label: 'Help Center',
           icon: 'help_center',
           permission: null,
-          badge: 'SOP',
+          badge: 'Artikel',
         },
         {
           to: '/dashboard',
@@ -271,12 +271,12 @@ const menuGroups = computed(() => {
       parents: [
         {
           key: 'knowledge_base',
-          label: 'Help Center & SOP',
+          label: 'Help Center & Artikel',
           icon: 'auto_stories',
           items: [
             {
               to: '/cases',
-              label: 'Cases & SOPs',
+              label: 'Cases & Artikel',
               icon: 'menu_book',
               permission: null,
             },

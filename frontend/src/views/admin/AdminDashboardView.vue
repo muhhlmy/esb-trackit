@@ -128,59 +128,61 @@ function getCategoryBadgeClass(category) {
 </script>
 
 <template>
-  <div ref="mainScope" class="min-h-screen bg-[#F8FAFC] dark:bg-slate-950 text-[#1E293B] dark:text-slate-100 font-sans transition-colors duration-200">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+  <div ref="mainScope" class="w-full max-w-7xl mx-auto space-y-6 font-sans">
 
-      <!-- Header -->
-      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 gsap-admin-el">
-        <div class="space-y-1">
-          <!-- Breadcrumb -->
-          <div class="flex items-center gap-1.5 text-xs font-medium text-[#64748B] dark:text-slate-400">
-            <RouterLink to="/" class="hover:text-[#2563EB] transition-colors">
-              Help Center
-            </RouterLink>
-            <ChevronRight class="w-3.5 h-3.5 text-slate-300 dark:text-slate-600" />
-            <span class="text-[#1E293B] dark:text-slate-200 font-semibold">Admin CMS</span>
-          </div>
-
-          <h1 class="text-xl sm:text-2xl font-bold text-[#1E293B] dark:text-white tracking-tight">
-            Knowledge Base
-          </h1>
-
-          <p class="text-sm text-[#64748B] dark:text-slate-400 font-normal">
-            Kelola panduan dan artikel knowledge base.
-          </p>
+    <!-- Header Card -->
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white dark:bg-slate-900 border border-[#E5EAEF] dark:border-slate-800 p-6 rounded-2xl shadow-sm gsap-admin-el">
+      <div class="space-y-1.5">
+        <!-- Breadcrumb -->
+        <div class="flex items-center gap-2 text-xs font-semibold text-[#64748B] dark:text-slate-400">
+          <RouterLink to="/dashboard" class="hover:text-[#5D87FF] transition-colors flex items-center gap-1">
+            <span>Dashboard</span>
+          </RouterLink>
+          <ChevronRight class="w-3.5 h-3.5 text-slate-400" />
+          <span class="text-[#5D87FF] font-bold">Admin CMS</span>
         </div>
 
-        <button
-          @click="createNewDoc"
-          class="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold bg-[#2563EB] hover:bg-[#1D4ED8] text-white shadow-sm transition-all cursor-pointer active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-950 shrink-0"
-        >
-          <Plus class="w-4 h-4" />
-          <span>Dokumen Baru</span>
-        </button>
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-[#0F172A] dark:text-white tracking-tight flex items-center gap-2.5">
+          <span>Knowledge Base</span>
+          <span class="text-xs px-2.5 py-0.5 rounded-full font-bold bg-[#ECF2FF] dark:bg-indigo-950/80 text-[#5D87FF] dark:text-indigo-300 border border-[#5D87FF]/20">
+            Admin CMS
+          </span>
+        </h1>
+
+        <p class="text-xs sm:text-sm text-[#64748B] dark:text-slate-400 font-medium">
+          Kelola panduan dan artikel knowledge base.
+        </p>
       </div>
 
-      <!-- Quick Nav: Kelola Kategori KB -->
-      <div class="gsap-admin-el">
-        <RouterLink
-          to="/admin/kb-categories"
-          class="flex items-center justify-between p-4 rounded-xl bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 hover:border-[#2563EB] dark:hover:border-[#2563EB] transition-colors group"
-        >
-          <div class="flex items-center gap-3">
-            <div class="w-9 h-9 rounded-lg bg-[#ECF2FF] dark:bg-slate-800 text-[#2563EB] dark:text-indigo-300 flex items-center justify-center group-hover:bg-[#2563EB] group-hover:text-white transition-colors">
-              <LayoutGrid class="w-4 h-4" />
-            </div>
-            <div>
-              <div class="text-sm font-semibold text-[#1E293B] dark:text-white">Kategori Knowledge Base</div>
-              <div class="text-xs text-[#64748B] dark:text-slate-400 font-normal">
-                Kelola topic cards yang tampil di halaman Browse Topics Help Center.
-              </div>
+      <button
+        @click="createNewDoc"
+        class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-[#5D87FF] hover:bg-[#4570EA] text-white shadow-md shadow-[#5D87FF]/25 hover:shadow-lg transition-all cursor-pointer active:scale-95 shrink-0"
+      >
+        <Plus class="w-4 h-4" />
+        <span>Dokumen Baru</span>
+      </button>
+    </div>
+
+    <!-- Quick Nav: Kelola Kategori KB -->
+    <div class="gsap-admin-el">
+      <RouterLink
+        to="/admin/kb-categories"
+        class="flex items-center justify-between p-4 rounded-xl bg-white dark:bg-slate-900 border border-[#E5EAEF] dark:border-slate-800 hover:border-[#5D87FF] dark:hover:border-[#5D87FF] transition-colors group shadow-2xs"
+      >
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-lg bg-[#ECF2FF] dark:bg-slate-800 text-[#5D87FF] dark:text-indigo-300 flex items-center justify-center group-hover:bg-[#5D87FF] group-hover:text-white transition-colors">
+            <LayoutGrid class="w-4 h-4" />
+          </div>
+          <div>
+            <div class="text-sm font-semibold text-[#0F172A] dark:text-white">Kategori Knowledge Base</div>
+            <div class="text-xs text-[#64748B] dark:text-slate-400 font-normal">
+              Kelola topic cards yang tampil di halaman Browse Topics Help Center.
             </div>
           </div>
-          <ChevronRight class="w-4 h-4 text-[#94A3B8] group-hover:text-[#2563EB] group-hover:translate-x-0.5 transition-all" />
-        </RouterLink>
-      </div>
+        </div>
+        <ChevronRight class="w-4 h-4 text-[#94A3B8] group-hover:text-[#5D87FF] group-hover:translate-x-0.5 transition-all" />
+      </RouterLink>
+    </div>
 
       <!-- Stats Row -->
       <div class="grid grid-cols-2 lg:grid-cols-3 gap-4 gsap-admin-el">
@@ -413,8 +415,6 @@ function getCategoryBadgeClass(category) {
           </table>
         </div>
       </div>
-
-    </div>
 
     <!-- Action Menu (Teleported to body, avoids overflow clipping) -->
     <Teleport to="body">

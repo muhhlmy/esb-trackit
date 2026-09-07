@@ -14,6 +14,7 @@ import SearchableSelect from '../components/ui/SearchableSelect.vue'
 import CustomSelect from '../components/ui/CustomSelect.vue'
 import AppRowActions from '../components/ui/AppRowActions.vue'
 import AppImportModal from '../components/ui/AppImportModal.vue'
+import AssetLabelModal from '../components/common/AssetLabelModal.vue'
 import AppPagination from '../components/ui/AppPagination.vue'
 import BaseSkeleton from '../components/ui/skeleton/BaseSkeleton.vue'
 import SkeletonAvatar from '../components/ui/skeleton/SkeletonAvatar.vue'
@@ -51,6 +52,13 @@ const showDeleteModal = ref(false)
 const showDetailsModal = ref(false)
 const showSpecificationModal = ref(false)
 const showExportModal = ref(false)
+const showLabelModal = ref(false)
+const selectedLabelAsset = ref(null)
+
+function openLabelModal(asset) {
+  selectedLabelAsset.value = asset
+  showLabelModal.value = true
+}
 const exportFormat = ref('csv')
 const exportStatus = ref('')
 const exportTipe = ref('')
@@ -598,6 +606,11 @@ function getAssetActions(asset) {
       label: 'Lihat Detail',
       icon: 'visibility',
       onClick: () => openDetails(asset),
+    },
+    {
+      label: 'Cetak Label',
+      icon: 'print',
+      onClick: () => openLabelModal(asset),
     },
   ]
   if (canWriteAssets.value) {
@@ -1792,6 +1805,13 @@ onMounted(async () => {
       :is-open="showImportModal"
       @close="showImportModal = false"
       @imported="onImported"
+    />
+
+    <!-- Modal Cetak Label Aset -->
+    <AssetLabelModal
+      :is-open="showLabelModal"
+      :asset="selectedLabelAsset"
+      @close="showLabelModal = false"
     />
   </div>
 </template>

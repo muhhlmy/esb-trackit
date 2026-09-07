@@ -30,6 +30,7 @@
     "chart.js": "^4.5.1",
     "dompurify": "^3.4.14",
     "gsap": "^3.15.0",
+    "jsbarcode": "^3.12.3",
     "lucide-vue-next": "^0.475.0",
     "vue": "^3.5.38",
     "vue-chartjs": "^5.3.4",

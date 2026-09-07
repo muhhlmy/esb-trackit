@@ -23,9 +23,13 @@ const isLoginPage = computed(() => {
   return route.name === 'login' || route.path === '/login'
 })
 
+const isFullscreenEditor = computed(() => {
+  return route.path.startsWith('/admin/editor')
+})
+
 const isHelpCenterView = computed(() => {
   const p = route.path
-  if (p === '/' || p.startsWith('/cases') || p.startsWith('/templates') || p.startsWith('/analytics') || p.startsWith('/admin') || p === '/kb-analytics') {
+  if (p === '/' || p.startsWith('/cases') || p.startsWith('/templates') || p.startsWith('/analytics') || p === '/kb-analytics') {
     return true
   }
   return false
@@ -80,7 +84,13 @@ onUnmounted(() => {
     <RouterView />
   </template>
 
-  <!-- 2. Halaman Help Center Standalone (Tampilan Persis Branch Help-Center tanpa TrackIT Sidebar & Header) -->
+  <!-- 2. Halaman Editor Fullscreen (Distraction-Free Editor) -->
+  <template v-else-if="isFullscreenEditor">
+    <RouterView />
+    <Toast />
+  </template>
+
+  <!-- 3. Halaman Help Center Standalone (Tampilan Persis Branch Help-Center tanpa TrackIT Sidebar & Header) -->
   <template v-else-if="isHelpCenterView">
     <div class="min-h-screen bg-[#F8FAFC] dark:bg-slate-950 text-[#0F172A] dark:text-slate-100 flex flex-col antialiased selection:bg-[#5D87FF] selection:text-white pb-16 md:pb-0 transition-colors duration-200">
       <Navbar />

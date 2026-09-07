@@ -10,6 +10,7 @@ import SearchableSelect from '../components/ui/SearchableSelect.vue'
 import CustomSelect from '../components/ui/CustomSelect.vue'
 import AppRowActions from '../components/ui/AppRowActions.vue'
 import AppPagination from '../components/ui/AppPagination.vue'
+import AssetLabelModal from '../components/common/AssetLabelModal.vue'
 import BaseSkeleton from '../components/ui/skeleton/BaseSkeleton.vue'
 import SkeletonAvatar from '../components/ui/skeleton/SkeletonAvatar.vue'
 
@@ -35,10 +36,17 @@ const selectedStatus = ref('')
 const showFormModal = ref(false)
 const showDeleteModal = ref(false)
 const showDetailsModal = ref(false)
+const showLabelModal = ref(false)
+const selectedLabelAsset = ref(null)
 const modalMode = ref('add') // 'add' | 'edit'
 const selectedAsset = ref(null)
 const isSubmitting = ref(false)
 const modalError = ref('')
+
+function openLabelModal(asset) {
+  selectedLabelAsset.value = asset
+  showLabelModal.value = true
+}
 
 // Opsi Pilihan Dropdown
 const kategoriOptions = [
@@ -292,6 +300,12 @@ function getOpsActions(asset) {
       icon: 'visibility',
       onClick: () => openDetails(asset),
       handler: () => openDetails(asset),
+    },
+    {
+      label: 'Cetak Label',
+      icon: 'print',
+      onClick: () => openLabelModal(asset),
+      handler: () => openLabelModal(asset),
     },
   ]
   if (canWriteAssets.value) {
@@ -925,6 +939,13 @@ function formatDate(dateStr) {
         </div>
       </div>
     </AppModal>
+
+    <!-- Modal Cetak Label Aset -->
+    <AssetLabelModal
+      :is-open="showLabelModal"
+      :asset="selectedLabelAsset"
+      @close="showLabelModal = false"
+    />
   </div>
 </template>
 

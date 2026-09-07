@@ -46,7 +46,40 @@ const router = useRouter();
 const { cases, saveCase, fetchAllCases } = useCases();
 const { showToast } = useToast();
 
-const isInspectorOpen = ref(true);
+const isMobileInspectorOpen = ref(false);
+const isDesktopInspectorOpen = ref(true);
+const isMobile = ref(typeof window !== 'undefined' ? window.innerWidth < 1024 : false);
+
+function updateWindowWidth() {
+  if (typeof window !== 'undefined') {
+    isMobile.value = window.innerWidth < 1024;
+    if (!isMobile.value && isMobileInspectorOpen.value) {
+      isMobileInspectorOpen.value = false;
+    }
+  }
+}
+
+onMounted(() => {
+  window.addEventListener('resize', updateWindowWidth);
+  updateWindowWidth();
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', updateWindowWidth);
+});
+
+function toggleInspector() {
+  if (isMobile.value) {
+    isMobileInspectorOpen.value = !isMobileInspectorOpen.value;
+  } else {
+    isDesktopInspectorOpen.value = !isDesktopInspectorOpen.value;
+  }
+}
+
+const isInspectorActive = computed(() => {
+  return isMobile.value ? isMobileInspectorOpen.value : isDesktopInspectorOpen.value;
+});
+
 const isPreviewModalOpen = ref(false);
 const isSaving = ref(false);
 const saveStatus = ref('Tersimpan'); // 'Tersimpan' | 'Belum disimpan' | 'Menyimpan...'
@@ -437,84 +470,86 @@ function goToAdminCases() {
   <div class="min-h-screen bg-[#F8FAFC] dark:bg-slate-950 text-[#1E293B] dark:text-slate-100 flex flex-col font-sans selection:bg-[#2563EB] selection:text-white transition-colors duration-200">
 
     <!-- 1. TOP APP BAR HEADER -->
-    <header class="h-14 bg-white dark:bg-slate-900 border-b border-[#E2E8F0] dark:border-slate-800 px-4 sm:px-6 fixed top-0 left-0 right-0 z-50 flex items-center justify-between">
+    <header class="h-14 bg-white dark:bg-slate-900 border-b border-[#E2E8F0] dark:border-slate-800 px-3 sm:px-6 sticky top-0 z-50 flex items-center justify-between">
 
-      <!-- Left: Title, Breadcrumbs, Status -->
-      <div class="flex items-center gap-3 sm:gap-4">
+      <!-- Left: Back Button, Title, Status -->
+      <div class="flex items-center gap-2 sm:gap-4 min-w-0">
 
         <!-- Back to Admin CMS -->
         <RouterLink
           to="/admin/cases"
-          class="p-1.5 rounded-lg text-[#64748B] hover:text-[#1E293B] dark:hover:text-white hover:bg-[#F1F5F9] dark:hover:bg-slate-800 transition-colors flex items-center gap-1 text-xs font-medium"
+          class="p-1.5 rounded-lg text-[#64748B] hover:text-[#1E293B] dark:hover:text-white hover:bg-[#F1F5F9] dark:hover:bg-slate-800 transition-colors flex items-center gap-1 text-xs font-semibold shrink-0 active:scale-95 touch-manipulation"
           title="Kembali ke Admin CMS"
         >
           <ArrowLeft class="w-4 h-4" />
           <span class="hidden sm:inline">Admin CMS</span>
         </RouterLink>
 
-        <div class="h-4 w-px bg-[#E2E8F0] dark:bg-slate-800"></div>
+        <div class="h-4 w-px bg-[#E2E8F0] dark:bg-slate-800 shrink-0"></div>
 
-        <div class="flex items-center gap-2">
-          <span class="font-semibold text-[#1E293B] dark:text-white text-xs sm:text-sm tracking-tight">
-            Knowledge Base Editor
+        <div class="flex items-center gap-1.5 min-w-0">
+          <span class="font-bold text-[#1E293B] dark:text-white text-xs sm:text-sm tracking-tight truncate max-w-[100px] sm:max-w-none">
+            Article Editor
           </span>
         </div>
 
-        <!-- Status Badges -->
+        <!-- Status Badges (Desktop) -->
         <div class="hidden md:flex items-center gap-2 pl-2 border-l border-[#E2E8F0] dark:border-slate-800">
           <span
-            class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-medium"
+            class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold"
             :class="doc.status === 'PUBLISHED'
-              ? 'bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300'
-              : 'bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-300'"
+              ? 'bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-200/50'
+              : 'bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-300 border border-amber-200/50'"
           >
             <span class="w-1.5 h-1.5 rounded-full" :class="doc.status === 'PUBLISHED' ? 'bg-emerald-500' : 'bg-amber-500'"></span>
             {{ doc.status || 'DRAFT' }}
           </span>
 
-          <span class="text-[11px] text-[#64748B] dark:text-slate-400 font-normal">
+          <span class="text-[11px] text-[#64748B] dark:text-slate-400 font-medium">
             {{ saveStatus }}
           </span>
         </div>
       </div>
 
       <!-- Right: Action Buttons -->
-      <div class="flex items-center gap-2">
+      <div class="flex items-center gap-1 sm:gap-2 shrink-0">
 
-        <!-- Preview as Employee -->
+        <!-- Preview as Employee (Available on mobile as icon button, with text on sm+) -->
         <button
           @click="isPreviewModalOpen = true"
-          class="hidden sm:inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg border border-[#E2E8F0] dark:border-slate-700 bg-white dark:bg-slate-900 text-[#1E293B] dark:text-slate-200 hover:bg-[#F8FAFC] dark:hover:bg-slate-800 transition-colors cursor-pointer"
+          class="flex items-center gap-1.5 text-xs font-semibold px-2 sm:px-3 py-1.5 rounded-lg border border-[#E2E8F0] dark:border-slate-700 bg-white dark:bg-slate-900 text-[#1E293B] dark:text-slate-200 hover:bg-[#F8FAFC] dark:hover:bg-slate-800 transition-colors cursor-pointer active:scale-95 touch-manipulation"
+          title="Preview Tampilan Employee"
         >
           <Eye class="w-3.5 h-3.5 text-[#64748B] dark:text-slate-400" />
-          <span>Preview</span>
+          <span class="hidden sm:inline">Preview</span>
         </button>
 
         <!-- Save Draft -->
         <button
           @click="handleSaveDraft"
           :disabled="isSaving"
-          class="px-3.5 py-1.5 rounded-lg text-xs font-semibold border border-[#E2E8F0] dark:border-slate-700 text-[#1E293B] dark:text-slate-200 bg-white dark:bg-slate-900 hover:bg-[#F8FAFC] dark:hover:bg-slate-800 transition-colors cursor-pointer disabled:opacity-50"
+          class="px-2.5 sm:px-3.5 py-1.5 rounded-lg text-xs font-semibold border border-[#E2E8F0] dark:border-slate-700 text-[#1E293B] dark:text-slate-200 bg-white dark:bg-slate-900 hover:bg-[#F8FAFC] dark:hover:bg-slate-800 transition-colors cursor-pointer disabled:opacity-50 active:scale-95 touch-manipulation"
         >
-          Save Draft
+          Draft
         </button>
 
         <!-- Publish Article -->
         <button
           @click="handlePublish"
           :disabled="isSaving"
-          class="px-4 py-1.5 rounded-lg text-xs font-semibold bg-[#2563EB] hover:bg-[#1D4ED8] text-white shadow-sm transition-all cursor-pointer flex items-center gap-1.5 disabled:opacity-50 active:scale-[0.98]"
+          class="px-3 sm:px-4 py-1.5 rounded-lg text-xs font-bold bg-[#2563EB] hover:bg-[#1D4ED8] text-white shadow-xs transition-all cursor-pointer flex items-center gap-1 disabled:opacity-50 active:scale-95 touch-manipulation"
         >
           <CheckCircle2 class="w-3.5 h-3.5" />
-          <span>{{ isSaving ? 'Memublikasikan...' : 'Publish' }}</span>
+          <span>{{ isSaving ? '...' : 'Publish' }}</span>
         </button>
 
         <!-- Inspector Toggle Button -->
         <button
-          @click="isInspectorOpen = !isInspectorOpen"
-          class="p-2 rounded-lg text-[#64748B] dark:text-slate-400 hover:bg-[#F8FAFC] dark:hover:bg-slate-800 transition-colors cursor-pointer"
-          :class="{ 'text-[#2563EB] bg-blue-50 dark:bg-blue-950/40': isInspectorOpen }"
-          title="Toggle Inspector Panel"
+          type="button"
+          @click="toggleInspector"
+          class="p-1.5 sm:p-2 rounded-lg text-[#64748B] dark:text-slate-400 hover:bg-[#F8FAFC] dark:hover:bg-slate-800 transition-colors cursor-pointer active:scale-95 touch-manipulation"
+          :class="{ 'text-[#2563EB] bg-blue-50 dark:bg-blue-950/40': isInspectorActive }"
+          title="Pengaturan Artikel (Metadata Inspector)"
         >
           <PanelRight class="w-4 h-4" />
         </button>
@@ -525,34 +560,34 @@ function goToAdminCases() {
     <!-- 2. STICKY FORMATTING RIBBON (TIPTAP CONNECTED) -->
     <div
       v-if="editor"
-      class="sticky top-14 z-40 bg-white dark:bg-slate-900 border-b border-[#E2E8F0] dark:border-slate-800 px-4 sm:px-6 py-1.5 flex items-center gap-1 sm:gap-1.5 overflow-x-auto text-xs select-none"
+      class="sticky top-14 z-40 bg-white dark:bg-slate-900 border-b border-[#E2E8F0] dark:border-slate-800 px-3 sm:px-6 py-1.5 flex items-center gap-1 sm:gap-1.5 overflow-x-auto no-scrollbar text-xs select-none touch-manipulation shadow-2xs"
     >
       <!-- Undo / Redo -->
-      <div class="flex items-center gap-0.5 border-r border-[#E2E8F0] dark:border-slate-800 pr-2 mr-1">
+      <div class="flex items-center gap-0.5 border-r border-[#E2E8F0] dark:border-slate-800 pr-1.5 sm:pr-2 mr-0.5 sm:mr-1 shrink-0">
         <button
           @click="editor.chain().focus().undo().run()"
           :disabled="!editor.can().undo()"
-          class="p-1.5 text-[#64748B] dark:text-slate-400 hover:bg-[#F1F5F9] dark:hover:bg-slate-800 rounded-lg disabled:opacity-30 cursor-pointer"
-          title="Undo"
+          class="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center text-[#64748B] dark:text-slate-400 hover:bg-[#F1F5F9] dark:hover:bg-slate-800 rounded-lg disabled:opacity-30 cursor-pointer active:scale-95 touch-manipulation"
+          title="Undo (Ctrl+Z)"
         >
-          <Undo class="w-4 h-4" />
+          <Undo class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
         </button>
         <button
           @click="editor.chain().focus().redo().run()"
           :disabled="!editor.can().redo()"
-          class="p-1.5 text-[#64748B] dark:text-slate-400 hover:bg-[#F1F5F9] dark:hover:bg-slate-800 rounded-lg disabled:opacity-30 cursor-pointer"
-          title="Redo"
+          class="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center text-[#64748B] dark:text-slate-400 hover:bg-[#F1F5F9] dark:hover:bg-slate-800 rounded-lg disabled:opacity-30 cursor-pointer active:scale-95 touch-manipulation"
+          title="Redo (Ctrl+Y)"
         >
-          <Redo class="w-4 h-4" />
+          <Redo class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
         </button>
       </div>
 
       <!-- Text Style Selector (Paragraph / H1 / H2 / H3) -->
-      <div class="flex items-center gap-1 border-r border-[#E2E8F0] dark:border-slate-800 pr-2 mr-1">
+      <div class="flex items-center gap-1 border-r border-[#E2E8F0] dark:border-slate-800 pr-1.5 sm:pr-2 mr-0.5 sm:mr-1 shrink-0">
         <select
           :value="currentHeadingLevel"
           @change="setHeading(Number($event.target.value))"
-          class="bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-700 rounded-lg py-1 px-2 text-xs font-medium text-[#1E293B] dark:text-slate-100 focus:outline-none focus:border-[#2563EB] cursor-pointer"
+          class="bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-700 rounded-lg py-1 px-2 text-[11px] sm:text-xs font-semibold text-[#1E293B] dark:text-slate-100 focus:outline-none focus:border-[#2563EB] cursor-pointer"
         >
           <option value="0">Normal Text</option>
           <option value="1">Heading 1</option>
@@ -562,96 +597,96 @@ function goToAdminCases() {
       </div>
 
       <!-- Formatting (B, I, U) -->
-      <div class="flex items-center gap-0.5 border-r border-[#E2E8F0] dark:border-slate-800 pr-2 mr-1">
+      <div class="flex items-center gap-0.5 border-r border-[#E2E8F0] dark:border-slate-800 pr-1.5 sm:pr-2 mr-0.5 sm:mr-1 shrink-0">
         <button
           @click="editor.chain().focus().toggleBold().run()"
-          class="w-7 h-7 flex items-center justify-center rounded-lg transition-colors cursor-pointer"
-          :class="editor.isActive('bold') ? 'bg-[#2563EB] text-white' : 'text-[#64748B] dark:text-slate-400 hover:bg-[#F1F5F9] dark:hover:bg-slate-800'"
+          class="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-lg transition-colors cursor-pointer active:scale-95 touch-manipulation"
+          :class="editor.isActive('bold') ? 'bg-[#2563EB] text-white shadow-2xs' : 'text-[#64748B] dark:text-slate-400 hover:bg-[#F1F5F9] dark:hover:bg-slate-800'"
           title="Bold (Ctrl+B)"
         >
-          <BoldIcon class="w-3.5 h-3.5" />
+          <BoldIcon class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
         </button>
 
         <button
           @click="editor.chain().focus().toggleItalic().run()"
-          class="w-7 h-7 flex items-center justify-center rounded-lg transition-colors italic cursor-pointer"
-          :class="editor.isActive('italic') ? 'bg-[#2563EB] text-white' : 'text-[#64748B] dark:text-slate-400 hover:bg-[#F1F5F9] dark:hover:bg-slate-800'"
+          class="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-lg transition-colors italic cursor-pointer active:scale-95 touch-manipulation"
+          :class="editor.isActive('italic') ? 'bg-[#2563EB] text-white shadow-2xs' : 'text-[#64748B] dark:text-slate-400 hover:bg-[#F1F5F9] dark:hover:bg-slate-800'"
           title="Italic (Ctrl+I)"
         >
-          <ItalicIcon class="w-3.5 h-3.5" />
+          <ItalicIcon class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
         </button>
 
         <button
           @click="editor.chain().focus().toggleUnderline().run()"
-          class="w-7 h-7 flex items-center justify-center rounded-lg transition-colors underline cursor-pointer"
-          :class="editor.isActive('underline') ? 'bg-[#2563EB] text-white' : 'text-[#64748B] dark:text-slate-400 hover:bg-[#F1F5F9] dark:hover:bg-slate-800'"
+          class="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-lg transition-colors underline cursor-pointer active:scale-95 touch-manipulation"
+          :class="editor.isActive('underline') ? 'bg-[#2563EB] text-white shadow-2xs' : 'text-[#64748B] dark:text-slate-400 hover:bg-[#F1F5F9] dark:hover:bg-slate-800'"
           title="Underline (Ctrl+U)"
         >
-          <UnderlineIcon class="w-3.5 h-3.5" />
+          <UnderlineIcon class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
         </button>
       </div>
 
       <!-- Lists & Code Blocks -->
-      <div class="flex items-center gap-0.5 border-r border-[#E2E8F0] dark:border-slate-800 pr-2 mr-1">
+      <div class="flex items-center gap-0.5 border-r border-[#E2E8F0] dark:border-slate-800 pr-1.5 sm:pr-2 mr-0.5 sm:mr-1 shrink-0">
         <button
           @click="editor.chain().focus().toggleBulletList().run()"
-          class="p-1.5 rounded-lg transition-colors cursor-pointer"
+          class="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-lg transition-colors cursor-pointer active:scale-95 touch-manipulation"
           :class="editor.isActive('bulletList') ? 'bg-blue-50 dark:bg-blue-950/40 text-[#2563EB] dark:text-blue-400' : 'text-[#64748B] dark:text-slate-400 hover:bg-[#F1F5F9] dark:hover:bg-slate-800'"
           title="Bullet List"
         >
-          <List class="w-4 h-4" />
+          <List class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
         </button>
 
         <button
           @click="editor.chain().focus().toggleOrderedList().run()"
-          class="p-1.5 rounded-lg transition-colors cursor-pointer"
+          class="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-lg transition-colors cursor-pointer active:scale-95 touch-manipulation"
           :class="editor.isActive('orderedList') ? 'bg-blue-50 dark:bg-blue-950/40 text-[#2563EB] dark:text-blue-400' : 'text-[#64748B] dark:text-slate-400 hover:bg-[#F1F5F9] dark:hover:bg-slate-800'"
           title="Numbered List"
         >
-          <ListOrdered class="w-4 h-4" />
+          <ListOrdered class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
         </button>
 
         <button
           @click="editor.chain().focus().toggleBlockquote().run()"
-          class="p-1.5 rounded-lg transition-colors cursor-pointer"
+          class="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-lg transition-colors cursor-pointer active:scale-95 touch-manipulation"
           :class="editor.isActive('blockquote') ? 'bg-blue-50 dark:bg-blue-950/40 text-[#2563EB] dark:text-blue-400' : 'text-[#64748B] dark:text-slate-400 hover:bg-[#F1F5F9] dark:hover:bg-slate-800'"
           title="Blockquote"
         >
-          <Quote class="w-4 h-4" />
+          <Quote class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
         </button>
 
         <button
           @click="editor.chain().focus().toggleCodeBlock().run()"
-          class="p-1.5 rounded-lg transition-colors cursor-pointer"
-          :class="editor.isActive('codeBlock') ? 'bg-[#2563EB] text-white' : 'text-[#64748B] dark:text-slate-400 hover:bg-[#F1F5F9] dark:hover:bg-slate-800'"
+          class="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-lg transition-colors cursor-pointer active:scale-95 touch-manipulation"
+          :class="editor.isActive('codeBlock') ? 'bg-[#2563EB] text-white shadow-2xs' : 'text-[#64748B] dark:text-slate-400 hover:bg-[#F1F5F9] dark:hover:bg-slate-800'"
           title="Code Block"
         >
-          <Code class="w-4 h-4" />
+          <Code class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
         </button>
 
         <button
           @click="setLink"
-          class="p-1.5 rounded-lg transition-colors cursor-pointer"
-          :class="editor.isActive('link') ? 'bg-[#2563EB] text-white' : 'text-[#64748B] dark:text-slate-400 hover:bg-[#F1F5F9] dark:hover:bg-slate-800'"
+          class="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-lg transition-colors cursor-pointer active:scale-95 touch-manipulation"
+          :class="editor.isActive('link') ? 'bg-[#2563EB] text-white shadow-2xs' : 'text-[#64748B] dark:text-slate-400 hover:bg-[#F1F5F9] dark:hover:bg-slate-800'"
           title="Insert Link"
         >
-          <LinkIcon class="w-4 h-4" />
+          <LinkIcon class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
         </button>
 
         <button
           @click="openImageModal"
-          class="p-1.5 rounded-lg transition-colors cursor-pointer text-[#64748B] dark:text-slate-400 hover:bg-[#F1F5F9] dark:hover:bg-slate-800"
+          class="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-lg transition-colors cursor-pointer text-[#64748B] dark:text-slate-400 hover:bg-[#F1F5F9] dark:hover:bg-slate-800 active:scale-95 touch-manipulation"
           title="Insert Gambar"
         >
-          <ImageIcon class="w-4 h-4 text-[#5D87FF]" />
+          <ImageIcon class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#5D87FF]" />
         </button>
       </div>
 
       <!-- Inserter Components -->
-      <div class="flex items-center gap-1.5">
+      <div class="flex items-center gap-1 sm:gap-1.5 shrink-0">
         <button
           @click="openImageModal"
-          class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#ECF2FF] dark:bg-indigo-950/60 text-[#5D87FF] dark:text-indigo-300 font-extrabold cursor-pointer hover:bg-[#5D87FF] hover:text-white transition-colors text-[11px] shadow-2xs"
+          class="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-1 rounded-lg bg-[#ECF2FF] dark:bg-indigo-950/60 text-[#5D87FF] dark:text-indigo-300 font-bold cursor-pointer hover:bg-[#5D87FF] hover:text-white transition-colors text-[10.5px] sm:text-[11px] shadow-2xs active:scale-95 touch-manipulation shrink-0"
         >
           <ImageIcon class="w-3.5 h-3.5" />
           <span>+ Gambar</span>
@@ -659,7 +694,7 @@ function goToAdminCases() {
 
         <button
           @click="insertInfoCallout"
-          class="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-[#475569] dark:text-slate-300 font-medium cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors text-[11px]"
+          class="flex items-center gap-1 px-2 sm:px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-[#475569] dark:text-slate-300 font-semibold cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors text-[10.5px] sm:text-[11px] active:scale-95 touch-manipulation shrink-0"
         >
           <Info class="w-3.5 h-3.5" />
           <span>Info Callout</span>
@@ -667,7 +702,7 @@ function goToAdminCases() {
 
         <button
           @click="insertWarningCallout"
-          class="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-[#475569] dark:text-slate-300 font-medium cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors text-[11px]"
+          class="flex items-center gap-1 px-2 sm:px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-[#475569] dark:text-slate-300 font-semibold cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors text-[10.5px] sm:text-[11px] active:scale-95 touch-manipulation shrink-0"
         >
           <AlertTriangle class="w-3.5 h-3.5" />
           <span>Warning Banner</span>
@@ -675,7 +710,7 @@ function goToAdminCases() {
 
         <button
           @click="insertStep"
-          class="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-[#475569] dark:text-slate-300 font-medium cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors text-[11px]"
+          class="flex items-center gap-1 px-2 sm:px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-[#475569] dark:text-slate-300 font-semibold cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors text-[10.5px] sm:text-[11px] active:scale-95 touch-manipulation shrink-0"
         >
           <Plus class="w-3.5 h-3.5" />
           <span>Step</span>
@@ -688,19 +723,19 @@ function goToAdminCases() {
     <div class="flex-1 flex relative pt-2">
 
       <!-- Central Canvas Scroll Area -->
-      <main class="flex-1 flex justify-center pb-24 overflow-y-auto px-4 sm:px-6">
+      <main class="flex-1 flex justify-center pb-24 overflow-y-auto px-2 sm:px-6">
 
         <!-- Live Document Sheet (White Sheet Paper) -->
-        <article class="bg-white dark:bg-slate-900 rounded-xl border border-[#E2E8F0] dark:border-slate-800 shadow-xs w-full max-w-[840px] min-h-[900px] mt-6 mb-12 p-8 sm:p-12 relative space-y-6 transition-all">
+        <article class="bg-white dark:bg-slate-900 rounded-2xl border border-[#E2E8F0] dark:border-slate-800 shadow-xs w-full max-w-[840px] min-h-[600px] sm:min-h-[900px] mt-3 sm:mt-6 mb-8 sm:mb-12 p-3.5 sm:p-10 relative space-y-4 sm:space-y-6 transition-all">
 
           <!-- Document Breadcrumbs & Category Bar -->
-          <div class="flex items-center justify-between text-xs text-[#64748B] dark:text-slate-400 pb-3 border-b border-[#F1F5F9] dark:border-slate-800">
-            <div class="flex items-center gap-1.5 font-medium">
+          <div class="flex flex-wrap items-center justify-between gap-2 text-xs text-[#64748B] dark:text-slate-400 pb-2.5 sm:pb-3 border-b border-[#F1F5F9] dark:border-slate-800">
+            <div class="flex items-center gap-1.5 font-semibold text-[11px] sm:text-xs">
               <span>Knowledge Base</span>
               <span class="text-slate-300 dark:text-slate-600">/</span>
               <span class="capitalize text-[#2563EB] dark:text-blue-400">{{ doc.category }}</span>
             </div>
-            <span class="px-2 py-0.5 rounded-md text-[10px] uppercase font-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 tracking-wider">
+            <span class="px-2 py-0.5 rounded-md text-[9.5px] sm:text-[10px] uppercase font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 tracking-wider">
               {{ doc.severity }} priority
             </span>
           </div>
@@ -709,20 +744,20 @@ function goToAdminCases() {
           <input
             v-model="doc.title"
             type="text"
-            class="w-full text-2xl sm:text-3xl font-bold text-[#1E293B] dark:text-white bg-transparent border-none focus:outline-none focus:ring-0 p-0 placeholder:text-[#CBD5E1] tracking-tight"
-            placeholder="Judul dokumen..."
+            class="w-full text-xl sm:text-3xl font-extrabold text-[#1E293B] dark:text-white bg-transparent border-none focus:outline-none focus:ring-0 p-0 placeholder:text-[#CBD5E1] tracking-tight"
+            placeholder="Judul artikel..."
           />
 
           <!-- Summary Box -->
-          <div class="bg-[#F8FAFC] dark:bg-slate-800/50 border border-[#E2E8F0] dark:border-slate-700/60 rounded-lg p-4">
-            <label class="block text-[11px] font-medium uppercase tracking-wide text-[#64748B] dark:text-slate-400 mb-1.5">
+          <div class="bg-[#F8FAFC] dark:bg-slate-800/50 border border-[#E2E8F0] dark:border-slate-700/60 rounded-xl p-3 sm:p-4">
+            <label class="block text-[10.5px] sm:text-[11px] font-bold uppercase tracking-wide text-[#64748B] dark:text-slate-400 mb-1">
               Ringkasan
             </label>
             <textarea
               v-model="doc.summary"
               rows="2"
-              class="w-full bg-transparent text-xs sm:text-sm text-[#334155] dark:text-slate-300 focus:outline-none resize-none leading-relaxed"
-              placeholder="Ringkasan singkat dokumen ini..."
+              class="w-full bg-transparent text-xs sm:text-sm text-[#334155] dark:text-slate-300 focus:outline-none resize-none leading-relaxed font-normal"
+              placeholder="Ringkasan singkat artikel ini..."
             ></textarea>
           </div>
 
@@ -790,17 +825,55 @@ function goToAdminCases() {
         </article>
       </main>
 
-      <!-- Right Inspector Panel (Metadata & Settings) -->
+      <!-- Right Inspector Panel (Desktop: Docked on the right >= lg) -->
       <div
-        v-if="isInspectorOpen"
+        v-if="isDesktopInspectorOpen"
         class="hidden lg:block h-[calc(100vh-7rem)] sticky top-24 mr-2 rounded-xl overflow-hidden border border-[#E2E8F0] dark:border-slate-800 shadow-xs"
       >
         <DocEditorInspector
           v-model="doc"
-          @close="isInspectorOpen = false"
+          @close="isDesktopInspectorOpen = false"
           @view-portal="goToAdminCases"
         />
       </div>
+
+      <!-- Mobile Slide-Over Inspector Drawer (< lg) -->
+      <Teleport to="body">
+        <div
+          v-if="isMobileInspectorOpen"
+          class="lg:hidden fixed inset-0 z-[60] flex justify-end bg-slate-950/40 backdrop-blur-xs transition-opacity"
+          @click.self="isMobileInspectorOpen = false"
+        >
+          <div class="relative w-full max-w-sm sm:max-w-md h-full bg-white dark:bg-slate-900 shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-right duration-200">
+            <!-- Mobile Drawer Header -->
+            <div class="flex items-center justify-between px-4 py-3 border-b border-[#E2E8F0] dark:border-slate-800 bg-[#FAFBFC] dark:bg-slate-900/80 shrink-0">
+              <div class="flex items-center gap-2">
+                <PanelRight class="w-4 h-4 text-[#2563EB]" />
+                <span class="text-xs font-bold text-[#0F172A] dark:text-white uppercase tracking-wider">
+                  Pengaturan Artikel
+                </span>
+              </div>
+              <button
+                type="button"
+                @click="isMobileInspectorOpen = false"
+                class="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer active:scale-95 touch-manipulation"
+                title="Tutup Panel"
+              >
+                <X class="w-5 h-5" />
+              </button>
+            </div>
+
+            <!-- Inspector Body -->
+            <div class="flex-1 overflow-y-auto">
+              <DocEditorInspector
+                v-model="doc"
+                @close="isMobileInspectorOpen = false"
+                @view-portal="goToAdminCases"
+              />
+            </div>
+          </div>
+        </div>
+      </Teleport>
 
     </div>
 

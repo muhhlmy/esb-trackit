@@ -187,10 +187,11 @@ const routes = [
   },
   {
     path: '/admin/editor/:id?',
-    name: 'doc-editor',
+    alias: '/admin/article-editor/:id?',
+    name: 'article-editor',
     component: () => import('../views/admin/DocEditorView.vue'),
     meta: {
-      title: 'Doc Editor',
+      title: 'Article Editor',
       subtitle: 'Editor Artikel Knowledge Base',
       adminOnly: true,
       permission: 'users',

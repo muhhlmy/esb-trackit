@@ -76,7 +76,7 @@ function removeTag(tagToRemove) {
           <X class="w-4 h-4" />
         </button>
       </div>
-      <p class="text-[11px] font-medium text-[#64748B] dark:text-slate-400">Metadata &amp; tag dokumen</p>
+      <p class="text-[11px] font-medium text-[#64748B] dark:text-slate-400">Metadata &amp; tag artikel</p>
     </div>
 
     <!-- Tab Navigation -->
@@ -149,7 +149,7 @@ function removeTag(tagToRemove) {
 
         <!-- Document Status Indicator -->
         <div class="p-3 rounded-lg bg-[#F8FAFC] dark:bg-slate-800/50 border border-[#E2E8F0] dark:border-slate-700/60 text-xs space-y-1">
-          <span class="font-semibold text-[#1E293B] dark:text-slate-200 block">Status Dokumen:</span>
+          <span class="font-semibold text-[#1E293B] dark:text-slate-200 block">Status Artikel:</span>
           <p class="text-[11px] text-[#64748B] dark:text-slate-400 leading-relaxed">
             {{ modelValue.isCustom ? 'Custom — dapat diedit & dihapus admin.' : 'Built-in — template bawaan korporat.' }}
           </p>

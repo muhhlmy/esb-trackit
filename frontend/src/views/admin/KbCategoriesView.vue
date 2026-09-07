@@ -175,140 +175,246 @@ function clearFilters() {
   <div ref="mainScope" class="w-full max-w-7xl mx-auto space-y-6 font-sans">
 
     <!-- Header Card -->
-    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white dark:bg-slate-900 border border-[#E5EAEF] dark:border-slate-800 p-6 rounded-2xl shadow-sm gsap-admin-el">
-      <div class="space-y-1.5">
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3.5 sm:gap-4 bg-white dark:bg-slate-900 border border-[#E5EAEF] dark:border-slate-800 p-4 sm:p-6 rounded-xl sm:rounded-2xl shadow-xs gsap-admin-el">
+      <div class="space-y-1 sm:space-y-1.5 w-full sm:w-auto">
         <!-- Breadcrumb -->
-        <div class="flex items-center gap-2 text-xs font-semibold text-[#64748B] dark:text-slate-400">
+        <div class="flex items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs font-semibold text-[#64748B] dark:text-slate-400">
           <RouterLink to="/dashboard" class="hover:text-[#5D87FF] transition-colors flex items-center gap-1">
             <span>Dashboard</span>
           </RouterLink>
-          <ChevronRight class="w-3.5 h-3.5 text-slate-400" />
+          <ChevronRight class="w-3 h-3 text-slate-400" />
           <RouterLink to="/admin/cases" class="hover:text-[#5D87FF] transition-colors">
             <span>Admin CMS</span>
           </RouterLink>
-          <ChevronRight class="w-3.5 h-3.5 text-slate-400" />
+          <ChevronRight class="w-3 h-3 text-slate-400" />
           <span class="text-[#5D87FF] font-bold">Kategori</span>
         </div>
 
-        <h1 class="text-2xl sm:text-3xl font-extrabold text-[#0F172A] dark:text-white tracking-tight flex items-center gap-2.5">
+        <h1 class="text-xl sm:text-3xl font-extrabold text-[#0F172A] dark:text-white tracking-tight flex items-center gap-2 flex-wrap">
           <span>Kategori Knowledge Base</span>
-          <span class="text-xs px-2.5 py-0.5 rounded-full font-bold bg-[#ECF2FF] dark:bg-indigo-950/80 text-[#5D87FF] dark:text-indigo-300 border border-[#5D87FF]/20">
+          <span class="text-[10px] sm:text-xs px-2 sm:px-2.5 py-0.5 rounded-full font-bold bg-[#ECF2FF] dark:bg-indigo-950/80 text-[#5D87FF] dark:text-indigo-300 border border-[#5D87FF]/20">
             Admin CMS
           </span>
         </h1>
 
-        <p class="text-xs sm:text-sm text-[#64748B] dark:text-slate-400 font-medium">
+        <p class="text-xs sm:text-sm text-[#64748B] dark:text-slate-400 font-medium leading-relaxed">
           Kelola topic cards yang tampil di halaman Browse Topics Help Center.
         </p>
       </div>
 
       <button
         @click="openCreateDrawer"
-        class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-[#5D87FF] hover:bg-[#4570EA] text-white shadow-md shadow-[#5D87FF]/25 hover:shadow-lg transition-all cursor-pointer active:scale-95 shrink-0"
+        class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-[#5D87FF] hover:bg-[#4570EA] text-white shadow-sm shadow-[#5D87FF]/25 hover:shadow-md transition-all cursor-pointer active:scale-95 touch-manipulation shrink-0"
       >
         <Plus class="w-4 h-4" />
         <span>Kategori Baru</span>
       </button>
     </div>
 
-      <!-- Stats Row -->
-      <div class="grid grid-cols-2 lg:grid-cols-3 gap-4 gsap-admin-el">
-        <!-- Total -->
-        <div class="p-5 rounded-xl bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 transition-colors hover:border-slate-300 dark:hover:border-slate-700">
-          <div class="flex items-center gap-2 mb-3">
-            <div class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center">
-              <LayoutGrid class="w-4 h-4" />
-            </div>
-            <span class="text-xs font-medium text-[#64748B] dark:text-slate-400">Total Kategori</span>
+    <!-- Stats Row (3 Columns Balanced) -->
+    <div class="grid grid-cols-3 gap-2 sm:gap-4 gsap-admin-el">
+      <!-- Total -->
+      <div class="p-3 sm:p-5 rounded-xl bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 transition-colors hover:border-slate-300 dark:hover:border-slate-700">
+        <div class="flex items-center gap-1.5 sm:gap-2 mb-1.5 sm:mb-3">
+          <div class="w-6 h-6 sm:w-8 sm:h-8 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center shrink-0">
+            <LayoutGrid class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           </div>
-          <p class="text-2xl font-bold text-[#1E293B] dark:text-white tracking-tight tabular-nums">
-            {{ stats.total }}
-          </p>
+          <span class="text-[10px] sm:text-xs font-medium text-[#64748B] dark:text-slate-400 truncate">Total</span>
         </div>
-
-        <!-- Published -->
-        <div class="p-5 rounded-xl bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 transition-colors hover:border-slate-300 dark:hover:border-slate-700">
-          <div class="flex items-center gap-2 mb-3">
-            <div class="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
-              <CheckCircle class="w-4 h-4" />
-            </div>
-            <span class="text-xs font-medium text-[#64748B] dark:text-slate-400">Published</span>
-          </div>
-          <p class="text-2xl font-bold text-[#1E293B] dark:text-white tracking-tight tabular-nums">
-            {{ stats.published }}
-          </p>
-        </div>
-
-        <!-- Featured -->
-        <div class="p-5 rounded-xl bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 transition-colors hover:border-slate-300 dark:hover:border-slate-700">
-          <div class="flex items-center gap-2 mb-3">
-            <div class="w-8 h-8 rounded-lg bg-violet-50 dark:bg-violet-950/60 text-violet-600 dark:text-violet-400 flex items-center justify-center">
-              <Star class="w-4 h-4" />
-            </div>
-            <span class="text-xs font-medium text-[#64748B] dark:text-slate-400">Featured</span>
-          </div>
-          <p class="text-2xl font-bold text-[#1E293B] dark:text-white tracking-tight tabular-nums">
-            {{ stats.featured }}
-          </p>
-        </div>
+        <p class="text-lg sm:text-2xl font-extrabold text-[#1E293B] dark:text-white tracking-tight tabular-nums">
+          {{ stats.total }}
+        </p>
       </div>
 
-      <!-- Toolbar -->
-      <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 gsap-admin-el">
+      <!-- Published -->
+      <div class="p-3 sm:p-5 rounded-xl bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 transition-colors hover:border-slate-300 dark:hover:border-slate-700">
+        <div class="flex items-center gap-1.5 sm:gap-2 mb-1.5 sm:mb-3">
+          <div class="w-6 h-6 sm:w-8 sm:h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+            <CheckCircle class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+          </div>
+          <span class="text-[10px] sm:text-xs font-medium text-[#64748B] dark:text-slate-400 truncate">Published</span>
+        </div>
+        <p class="text-lg sm:text-2xl font-extrabold text-[#1E293B] dark:text-white tracking-tight tabular-nums">
+          {{ stats.published }}
+        </p>
+      </div>
 
-        <!-- Search -->
-        <div class="relative flex-1 max-w-sm">
-          <Search class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8] pointer-events-none" />
-          <input
-            v-model="searchQuery"
-            type="text"
-            placeholder="Cari kategori..."
-            class="w-full bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-700 rounded-lg pl-9 pr-9 py-2.5 text-sm font-normal text-[#1E293B] dark:text-white placeholder-[#94A3B8] dark:placeholder-slate-500 focus:outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/10 transition-all"
-          />
+      <!-- Featured -->
+      <div class="p-3 sm:p-5 rounded-xl bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 transition-colors hover:border-slate-300 dark:hover:border-slate-700">
+        <div class="flex items-center gap-1.5 sm:gap-2 mb-1.5 sm:mb-3">
+          <div class="w-6 h-6 sm:w-8 sm:h-8 rounded-lg bg-violet-50 dark:bg-violet-950/60 text-violet-600 dark:text-violet-400 flex items-center justify-center shrink-0">
+            <Star class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+          </div>
+          <span class="text-[10px] sm:text-xs font-medium text-[#64748B] dark:text-slate-400 truncate">Featured</span>
+        </div>
+        <p class="text-lg sm:text-2xl font-extrabold text-[#1E293B] dark:text-white tracking-tight tabular-nums">
+          {{ stats.featured }}
+        </p>
+      </div>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 sm:gap-3 gsap-admin-el">
+
+      <!-- Search -->
+      <div class="relative flex-1 sm:max-w-sm">
+        <Search class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8] pointer-events-none" />
+        <input
+          v-model="searchQuery"
+          type="text"
+          placeholder="Cari kategori..."
+          class="w-full bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-700 rounded-xl pl-9 pr-9 py-2 text-xs sm:text-sm font-normal text-[#1E293B] dark:text-white placeholder-[#94A3B8] dark:placeholder-slate-500 focus:outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/10 transition-all"
+        />
+        <button
+          v-if="searchQuery"
+          @click="searchQuery = ''"
+          class="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 rounded text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors cursor-pointer"
+          title="Hapus pencarian"
+        >
+          <X class="w-3.5 h-3.5" />
+        </button>
+      </div>
+
+      <!-- Filters -->
+      <div class="flex items-center gap-2">
+        <!-- Status Segmented Control -->
+        <div class="flex items-center p-0.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-xs flex-1 sm:flex-none">
           <button
-            v-if="searchQuery"
-            @click="searchQuery = ''"
-            class="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 rounded text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors cursor-pointer"
-            title="Hapus pencarian"
+            v-for="st in [
+              { key: 'all', label: 'Semua' },
+              { key: 'PUBLISHED', label: 'Published' },
+              { key: 'DRAFT', label: 'Draft' }
+            ]"
+            :key="st.key"
+            @click="selectedStatus = st.key"
+            class="flex-1 sm:flex-none px-3 py-1.5 rounded-lg font-medium transition-all cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] text-center active:scale-95 touch-manipulation"
+            :class="selectedStatus === st.key
+              ? 'bg-white dark:bg-slate-900 text-[#1E293B] dark:text-white shadow-2xs font-bold'
+              : 'text-[#64748B] dark:text-slate-400 hover:text-[#1E293B] dark:hover:text-slate-200'"
           >
-            <X class="w-3.5 h-3.5" />
+            {{ st.label }}
           </button>
         </div>
 
-        <!-- Filters -->
-        <div class="flex flex-wrap items-center gap-2">
-          <!-- Status Segmented Control -->
-          <div class="flex items-center p-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-xs">
-            <button
-              v-for="st in [
-                { key: 'all', label: 'Semua' },
-                { key: 'PUBLISHED', label: 'Published' },
-                { key: 'DRAFT', label: 'Draft' }
-              ]"
-              :key="st.key"
-              @click="selectedStatus = st.key"
-              class="px-3 py-1.5 rounded-md font-medium transition-all cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB]"
-              :class="selectedStatus === st.key
-                ? 'bg-white dark:bg-slate-900 text-[#1E293B] dark:text-white shadow-sm'
-                : 'text-[#64748B] dark:text-slate-400 hover:text-[#1E293B] dark:hover:text-slate-200'"
-            >
-              {{ st.label }}
-            </button>
-          </div>
+        <!-- Clear Filters -->
+        <button
+          v-if="searchQuery || selectedStatus !== 'all'"
+          @click="clearFilters"
+          class="px-3 py-1.5 rounded-xl text-xs font-semibold text-[#64748B] dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors cursor-pointer active:scale-95 touch-manipulation shrink-0"
+        >
+          Reset
+        </button>
+      </div>
+    </div>
 
-          <!-- Clear Filters -->
+    <!-- MOBILE CARD VIEW (< md) -->
+      <div class="md:hidden divide-y divide-[#F1F5F9] dark:divide-slate-800/60 bg-white dark:bg-slate-900 rounded-xl border border-[#E2E8F0] dark:border-slate-800 overflow-hidden gsap-admin-el">
+        <!-- Empty State Mobile -->
+        <div v-if="filteredCategories.length === 0" class="py-12 px-4 text-center">
+          <div class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center justify-center mx-auto mb-2">
+            <FolderOpen class="w-5 h-5" />
+          </div>
+          <p class="text-sm font-semibold text-[#1E293B] dark:text-slate-200">Tidak ada kategori</p>
+          <p class="text-xs text-[#64748B] dark:text-slate-400 font-normal mt-1">
+            Tidak ada kategori yang cocok dengan filter atau pencarian.
+          </p>
           <button
-            v-if="searchQuery || selectedStatus !== 'all'"
             @click="clearFilters"
-            class="px-3 py-2 rounded-lg text-xs font-medium text-[#64748B] dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors cursor-pointer"
+            class="mt-3 px-4 py-2 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-[#1E293B] dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors cursor-pointer active:scale-95 touch-manipulation"
           >
-            Reset
+            Reset Filter
           </button>
+        </div>
+
+        <!-- Mobile Card Item -->
+        <div
+          v-for="c in filteredCategories"
+          :key="c.id"
+          class="p-3.5 sm:p-4 space-y-2.5 hover:bg-[#F8FAFC] dark:hover:bg-slate-800/30 transition-colors"
+        >
+          <!-- Card Header: Icon + Title + Quick Actions -->
+          <div class="flex items-start justify-between gap-2">
+            <div class="flex items-center gap-2.5 min-w-0 flex-1">
+              <span class="w-8 h-8 rounded-lg bg-[#ECF2FF] dark:bg-slate-800 text-[#5D87FF] dark:text-indigo-300 flex items-center justify-center shrink-0 shadow-2xs">
+                <component :is="iconComponent(c.icon)" class="w-4 h-4" />
+              </span>
+              <div class="min-w-0 flex-1">
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <h3
+                    @click="openEditDrawer(c.id)"
+                    class="font-bold text-[#1E293B] dark:text-slate-100 text-sm hover:text-[#2563EB] dark:hover:text-blue-400 transition-colors cursor-pointer leading-tight truncate"
+                  >
+                    {{ c.title }}
+                  </h3>
+                  <Star
+                    v-if="c.is_featured"
+                    class="w-3.5 h-3.5 text-amber-500 shrink-0 fill-amber-500"
+                  />
+                </div>
+                <div class="flex items-center gap-1.5 mt-0.5 text-[11px] text-[#64748B] dark:text-slate-400">
+                  <code class="px-1.5 py-0.5 rounded font-mono text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+                    {{ c.key }}
+                  </code>
+                  <span>•</span>
+                  <span>Urutan: {{ c.sort_order }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Quick Action Buttons -->
+            <div class="flex items-center gap-1 shrink-0">
+              <button
+                @click="openEditDrawer(c.id)"
+                class="flex items-center justify-center h-8 px-2.5 gap-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-[#5D87FF] hover:text-white text-xs font-semibold transition-all active:scale-95 touch-manipulation cursor-pointer"
+                title="Edit Kategori"
+              >
+                <Edit3 class="w-3.5 h-3.5" />
+                <span>Edit</span>
+              </button>
+              <button
+                @click="confirmDelete(c.id)"
+                class="flex items-center justify-center h-8 w-8 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors active:scale-95 touch-manipulation cursor-pointer"
+                title="Hapus Kategori"
+              >
+                <Trash2 class="w-3.5 h-3.5" />
+              </button>
+            </div>
+          </div>
+
+          <!-- Card Body: Description -->
+          <p
+            v-if="c.description"
+            class="text-xs text-[#475569] dark:text-slate-300 line-clamp-2 leading-relaxed font-normal"
+          >
+            {{ c.description }}
+          </p>
+
+          <!-- Card Footer: Status Pill & Featured Badge -->
+          <div class="flex items-center justify-between gap-2 pt-2 border-t border-slate-100 dark:border-slate-800/60 text-xs">
+            <span
+              class="inline-flex items-center gap-1.5 text-[11px] font-medium"
+              :class="c.status === 'DRAFT' ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400'"
+            >
+              <span
+                class="w-1.5 h-1.5 rounded-full"
+                :class="c.status === 'DRAFT' ? 'bg-amber-500' : 'bg-emerald-500'"
+              ></span>
+              <span>{{ c.status === 'DRAFT' ? 'Draft' : 'Published' }}</span>
+            </span>
+
+            <span
+              v-if="c.is_featured"
+              class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-300 border border-amber-200/50 dark:border-amber-800/50"
+            >
+              <Star class="w-3 h-3 fill-amber-500 text-amber-500" />
+              Featured
+            </span>
+          </div>
         </div>
       </div>
 
-      <!-- Table -->
-      <div class="bg-white dark:bg-slate-900 rounded-xl border border-[#E2E8F0] dark:border-slate-800 overflow-hidden gsap-admin-el">
+      <!-- DESKTOP TABLE VIEW (>= md) -->
+      <div class="hidden md:block bg-white dark:bg-slate-900 rounded-xl border border-[#E2E8F0] dark:border-slate-800 overflow-hidden gsap-admin-el">
         <div class="overflow-x-auto">
           <table class="w-full text-left text-sm border-collapse">
             <thead class="border-b border-[#E2E8F0] dark:border-slate-800 text-[#64748B] dark:text-slate-400 font-medium text-xs">
@@ -467,22 +573,24 @@ function clearFilters() {
           role="dialog"
           aria-modal="true"
           :aria-label="drawerMode === 'create' ? 'Kategori Baru' : 'Edit Kategori'"
-          class="fixed top-0 right-0 bottom-0 z-50 w-full max-w-md bg-white dark:bg-slate-900 border-l border-[#E2E8F0] dark:border-slate-800 shadow-2xl overflow-y-auto"
+          class="fixed top-0 right-0 bottom-0 z-50 w-full max-w-md bg-white dark:bg-slate-900 border-l border-[#E2E8F0] dark:border-slate-800 shadow-2xl flex flex-col overflow-hidden"
         >
-          <div class="p-6 space-y-5">
-            <!-- Drawer Header -->
-            <div class="flex items-center justify-between">
-              <h2 class="text-base font-bold text-[#1E293B] dark:text-white">
-                {{ drawerMode === 'create' ? 'Kategori Baru' : 'Edit Kategori' }}
-              </h2>
-              <button
-                @click="closeDrawer"
-                class="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
-              >
-                <X class="w-4 h-4" />
-              </button>
-            </div>
+          <!-- Drawer Header -->
+          <div class="px-4 sm:px-6 py-3.5 sm:py-4 border-b border-[#E2E8F0] dark:border-slate-800 flex items-center justify-between shrink-0 bg-[#FAFBFC] dark:bg-slate-900/80">
+            <h2 class="text-sm sm:text-base font-bold text-[#1E293B] dark:text-white">
+              {{ drawerMode === 'create' ? 'Kategori Baru' : 'Edit Kategori' }}
+            </h2>
+            <button
+              @click="closeDrawer"
+              class="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer active:scale-95 touch-manipulation"
+              title="Tutup drawer"
+            >
+              <X class="w-4 h-4" />
+            </button>
+          </div>
 
+          <!-- Drawer Body Scrollable -->
+          <div class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 sm:space-y-5">
             <!-- Title -->
             <div class="space-y-1.5">
               <label class="text-xs font-semibold text-[#475569] dark:text-slate-300">Judul Kategori</label>
@@ -491,7 +599,7 @@ function clearFilters() {
                 @input="handleTitleInput"
                 type="text"
                 placeholder="mis. Network & VPN"
-                class="w-full bg-white dark:bg-slate-950 border border-[#E2E8F0] dark:border-slate-700 rounded-lg px-3 py-2.5 text-sm text-[#1E293B] dark:text-white placeholder-[#94A3B8] focus:outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/10 transition-all"
+                class="w-full bg-white dark:bg-slate-950 border border-[#E2E8F0] dark:border-slate-700 rounded-lg px-3 py-2 text-xs sm:text-sm text-[#1E293B] dark:text-white placeholder-[#94A3B8] focus:outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/10 transition-all"
               />
             </div>
 
@@ -502,7 +610,7 @@ function clearFilters() {
                 v-model="editingCategory.key"
                 type="text"
                 placeholder="mis. network-vpn"
-                class="w-full bg-white dark:bg-slate-950 border border-[#E2E8F0] dark:border-slate-700 rounded-lg px-3 py-2.5 text-sm font-mono text-[#1E293B] dark:text-white placeholder-[#94A3B8] focus:outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/10 transition-all"
+                class="w-full bg-white dark:bg-slate-950 border border-[#E2E8F0] dark:border-slate-700 rounded-lg px-3 py-2 text-xs sm:text-sm font-mono text-[#1E293B] dark:text-white placeholder-[#94A3B8] focus:outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/10 transition-all"
               />
               <p class="text-[11px] text-[#94A3B8] dark:text-slate-500">
                 Huruf kecil, angka, dan tanda hubung. Digunakan untuk filter kategori di Help Center.
@@ -516,46 +624,46 @@ function clearFilters() {
                 v-model="editingCategory.description"
                 rows="3"
                 placeholder="Deskripsi singkat yang tampil pada kartu topik..."
-                class="w-full bg-white dark:bg-slate-950 border border-[#E2E8F0] dark:border-slate-700 rounded-lg px-3 py-2.5 text-sm text-[#1E293B] dark:text-white placeholder-[#94A3B8] focus:outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/10 transition-all resize-none"
+                class="w-full bg-white dark:bg-slate-950 border border-[#E2E8F0] dark:border-slate-700 rounded-lg px-3 py-2 text-xs sm:text-sm text-[#1E293B] dark:text-white placeholder-[#94A3B8] focus:outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/10 transition-all resize-none"
               ></textarea>
             </div>
 
             <!-- Icon Picker -->
             <div class="space-y-1.5">
               <label class="text-xs font-semibold text-[#475569] dark:text-slate-300">Icon</label>
-              <div class="grid grid-cols-4 gap-2">
+              <div class="grid grid-cols-4 gap-1.5 sm:gap-2">
                 <button
                   v-for="opt in ICON_OPTIONS"
                   :key="opt.name"
                   type="button"
                   @click="editingCategory.icon = opt.name"
-                  class="flex flex-col items-center gap-1.5 p-2.5 rounded-lg border transition-all cursor-pointer"
+                  class="flex flex-col items-center gap-1.5 p-2 sm:p-2.5 rounded-lg border transition-all cursor-pointer active:scale-95 touch-manipulation"
                   :class="editingCategory.icon === opt.name
-                    ? 'border-[#2563EB] bg-[#ECF2FF] dark:bg-indigo-950/50 text-[#2563EB] dark:text-indigo-300'
+                    ? 'border-[#2563EB] bg-[#ECF2FF] dark:bg-indigo-950/50 text-[#2563EB] dark:text-indigo-300 font-bold'
                     : 'border-[#E2E8F0] dark:border-slate-700 text-[#64748B] dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-600'"
                 >
                   <component :is="opt.component" class="w-4 h-4" />
-                  <span class="text-[9px] font-medium leading-none">{{ opt.name }}</span>
+                  <span class="text-[9px] font-medium leading-none truncate max-w-full">{{ opt.name }}</span>
                 </button>
               </div>
             </div>
 
             <!-- Sort Order & Status -->
-            <div class="grid grid-cols-2 gap-3">
+            <div class="grid grid-cols-2 gap-2.5 sm:gap-3">
               <div class="space-y-1.5">
                 <label class="text-xs font-semibold text-[#475569] dark:text-slate-300">Urutan</label>
                 <input
                   v-model.number="editingCategory.sort_order"
                   type="number"
                   min="0"
-                  class="w-full bg-white dark:bg-slate-950 border border-[#E2E8F0] dark:border-slate-700 rounded-lg px-3 py-2.5 text-sm text-[#1E293B] dark:text-white focus:outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/10 transition-all"
+                  class="w-full bg-white dark:bg-slate-950 border border-[#E2E8F0] dark:border-slate-700 rounded-lg px-3 py-2 text-xs sm:text-sm text-[#1E293B] dark:text-white focus:outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/10 transition-all"
                 />
               </div>
               <div class="space-y-1.5">
                 <label class="text-xs font-semibold text-[#475569] dark:text-slate-300">Status</label>
                 <select
                   v-model="editingCategory.status"
-                  class="w-full bg-white dark:bg-slate-950 border border-[#E2E8F0] dark:border-slate-700 rounded-lg px-3 py-2.5 text-sm text-[#1E293B] dark:text-white focus:outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/10 cursor-pointer transition-all"
+                  class="w-full bg-white dark:bg-slate-950 border border-[#E2E8F0] dark:border-slate-700 rounded-lg px-3 py-2 text-xs sm:text-sm text-[#1E293B] dark:text-white focus:outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/10 cursor-pointer transition-all"
                 >
                   <option value="PUBLISHED">Published</option>
                   <option value="DRAFT">Draft</option>
@@ -565,9 +673,9 @@ function clearFilters() {
 
             <!-- Featured Toggle -->
             <label class="flex items-center justify-between p-3 rounded-lg border border-[#E2E8F0] dark:border-slate-700 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
-              <div>
+              <div class="pr-2">
                 <div class="text-xs font-semibold text-[#1E293B] dark:text-white">Featured Card</div>
-                <div class="text-[11px] text-[#94A3B8] dark:text-slate-500 mt-0.5">
+                <div class="text-[11px] text-[#94A3B8] dark:text-slate-500 mt-0.5 leading-tight">
                   Tampilkan dengan highlight warna utama di halaman Help Center.
                 </div>
               </div>
@@ -583,23 +691,23 @@ function clearFilters() {
                 ></span>
               </button>
             </label>
+          </div>
 
-            <!-- Actions -->
-            <div class="flex items-center justify-end gap-2 pt-2 border-t border-[#F1F5F9] dark:border-slate-800">
-              <button
-                @click="closeDrawer"
-                class="px-4 py-2 rounded-lg text-xs font-semibold text-[#1E293B] dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
-              >
-                Batal
-              </button>
-              <button
-                @click="handleSave"
-                :disabled="isSaving || !editingCategory.title || !editingCategory.key"
-                class="px-4 py-2 rounded-lg text-xs font-semibold bg-[#2563EB] hover:bg-[#1D4ED8] text-white transition-colors cursor-pointer active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {{ isSaving ? 'Menyimpan...' : 'Simpan' }}
-              </button>
-            </div>
+          <!-- Drawer Footer Sticky -->
+          <div class="px-4 sm:px-6 py-3 border-t border-[#E2E8F0] dark:border-slate-800 bg-[#FAFBFC] dark:bg-slate-900/80 flex items-center justify-end gap-2 shrink-0">
+            <button
+              @click="closeDrawer"
+              class="px-4 py-2 rounded-lg text-xs font-semibold text-[#1E293B] dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer active:scale-95 touch-manipulation"
+            >
+              Batal
+            </button>
+            <button
+              @click="handleSave"
+              :disabled="isSaving || !editingCategory.title || !editingCategory.key"
+              class="px-4 py-2 rounded-lg text-xs font-bold bg-[#2563EB] hover:bg-[#1D4ED8] text-white shadow-xs transition-colors cursor-pointer active:scale-95 touch-manipulation disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {{ isSaving ? 'Menyimpan...' : 'Simpan Kategori' }}
+            </button>
           </div>
         </div>
       </Transition>
@@ -611,12 +719,12 @@ function clearFilters() {
         v-if="deleteConfirmId"
         class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm"
       >
-        <div class="bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 rounded-xl p-6 max-w-sm w-full shadow-xl space-y-4">
-          <div class="w-10 h-10 rounded-lg bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center">
+        <div class="bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 rounded-2xl p-5 sm:p-6 max-w-sm w-full shadow-xl space-y-4">
+          <div class="w-10 h-10 rounded-xl bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center">
             <AlertTriangle class="w-5 h-5" />
           </div>
           <div>
-            <h3 class="text-sm font-semibold text-[#1E293B] dark:text-white">Hapus kategori?</h3>
+            <h3 class="text-sm sm:text-base font-bold text-[#1E293B] dark:text-white">Hapus kategori?</h3>
             <p class="text-xs text-[#64748B] dark:text-slate-400 mt-1 leading-relaxed font-normal">
               Kategori ini akan dihapus permanen dan tidak lagi tampil di Help Center. Tindakan ini tidak dapat dibatalkan.
             </p>
@@ -624,13 +732,13 @@ function clearFilters() {
           <div class="flex items-center justify-end gap-2 pt-1">
             <button
               @click="deleteConfirmId = null"
-              class="px-4 py-2 rounded-lg text-xs font-semibold text-[#1E293B] dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+              class="px-4 py-2 rounded-xl text-xs font-semibold text-[#1E293B] dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer active:scale-95 touch-manipulation"
             >
               Batal
             </button>
             <button
               @click="executeDelete"
-              class="px-4 py-2 rounded-lg text-xs font-semibold bg-rose-600 hover:bg-rose-700 text-white transition-colors cursor-pointer active:scale-[0.98]"
+              class="px-4 py-2 rounded-xl text-xs font-bold bg-rose-600 hover:bg-rose-700 text-white shadow-xs transition-colors cursor-pointer active:scale-95 touch-manipulation"
             >
               Hapus
             </button>

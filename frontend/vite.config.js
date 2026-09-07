@@ -73,6 +73,7 @@ export default defineConfig({
   server: {
     host: process.env.VITE_HOST || '127.0.0.1',
     port: 5173,
+    allowedHosts: true,
     headers: FRONTEND_SECURITY_HEADERS,
     proxy: {
       '/api': {
@@ -85,6 +86,7 @@ export default defineConfig({
   preview: {
     host: process.env.VITE_HOST || '127.0.0.1',
     port: 5173,
+    allowedHosts: true,
     headers: FRONTEND_SECURITY_HEADERS,
   },
   build: {

@@ -23,7 +23,11 @@ const isLoginPage = computed(() => {
 })
 
 const isFullscreenEditor = computed(() => {
-  return route.path.startsWith('/admin/editor')
+  return (
+    route.path.startsWith('/admin/editor') ||
+    route.path.startsWith('/admin/article-editor') ||
+    route.name === 'article-editor'
+  )
 })
 
 const isHelpCenterView = computed(() => {
@@ -87,6 +91,7 @@ onUnmounted(() => {
   <template v-else-if="isFullscreenEditor">
     <RouterView />
     <Toast />
+    <AppBottomNav />
   </template>
 
   <!-- 3. Halaman Help Center Standalone (Tampilan Persis Branch Help-Center tanpa TrackIT Sidebar & Header) -->

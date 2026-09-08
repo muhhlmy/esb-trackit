@@ -102,7 +102,7 @@ export function clearSessionCookie(res) {
  * Sesi server (expires_at) TIDAK diperpanjang — logout/revocation/lockout
  * tetap berlaku persis seperti sebelumnya.
  */
-export async function maybeSlideSessionToken(req, res) {
+export async function maybeSlideSessionToken(req, res, verifiedSession = null) {
   try {
     const token = readSessionToken(req);
     if (!token) return;
@@ -119,7 +119,7 @@ export async function maybeSlideSessionToken(req, res) {
     // Cukup segar — jangan putar ulang token tiap request.
     if (remainingMs > ttlMs / 2) return;
 
-    const session = await verifySession(claims.sid, userId);
+    const session = verifiedSession || (await verifySession(claims.sid, userId));
     if (!session) return;
 
     const expiresMs = new Date(session.expires_at).getTime();
@@ -149,3 +149,4 @@ export async function maybeSlideSessionToken(req, res) {
     // sesuai umur token.
   }
 }
+

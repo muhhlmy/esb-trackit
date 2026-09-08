@@ -17,6 +17,9 @@ ENV NODE_ENV=production
 ENV HOST=0.0.0.0
 ENV PORT=3000
 
+# Create storage directory for persistent database backups
+RUN mkdir -p /app/storage/backups && chown -R node:node /app/storage
+
 # Non-root user for security hardening
 USER node
 

@@ -24,15 +24,51 @@ process.on('unhandledRejection', (reason, promise) => {
   logError(`UNHANDLED REJECTION: ${reason}\nPromise: ${promise}`);
 });
 
+let isShuttingDown = false;
+let server = null;
+
 async function handleShutdown(signal) {
-  console.log(signal + " diterima, menutup server...");
-  
+  if (isShuttingDown) return;
+  isShuttingDown = true;
+
+  console.log(`${signal} diterima, menutup server secara graceful...`);
+
+  // Fail-safe timeout: paksa keluar jika shutdown macet lebih dari 10 detik
+  const forceExitTimer = setTimeout(() => {
+    console.error('Batas waktu graceful shutdown terlampaui (10s), mematikan paksa...');
+    process.exit(1);
+  }, 10_000);
+  forceExitTimer.unref();
+
+  // 1. Stop HTTP listener (tidak menerima koneksi baru)
+  if (server) {
+    try {
+      await new Promise((resolve, reject) => {
+        server.close((err) => (err ? reject(err) : resolve()));
+      });
+      console.log('HTTP server berhasil ditutup.');
+    } catch (error) {
+      console.error('Gagal menutup HTTP server:', error.message);
+    }
+  }
+
+  // 2. Putuskan semua koneksi realtime SSE dengan pesan penutupan bersih
+  try {
+    closeAllSseClients('Server sedang dimatikan (graceful shutdown).');
+    console.log('Koneksi realtime SSE berhasil ditutup.');
+  } catch (error) {
+    console.error('Gagal menutup klien SSE:', error.message);
+  }
+
+  // 3. Tutup connection pool database PostgreSQL
   try {
     await pool.end();
+    console.log('Database pool berhasil ditutup.');
   } catch (error) {
-    console.error("Gagal menutup pool database:", error.message);
+    console.error('Gagal menutup pool database:', error.message);
   }
-  
+
+  clearTimeout(forceExitTimer);
   process.exit(0);
 }
 
@@ -50,5 +86,4 @@ try {
 }
 
 console.log(`API berjalan di http://${env.host}:${env.port}`);
-const server = app.listen(env.port, env.host);
-// Server reload trigger
+server = app.listen(env.port, env.host);

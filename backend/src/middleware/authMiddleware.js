@@ -9,7 +9,7 @@ import {
   normalizePermissions,
 } from '../services/permissionService.js';
 import { isValidUuid, verifySession } from '../services/sessionService.js';
-import { readSessionToken } from '../security/sessionToken.js';
+import { readSessionToken, maybeSlideSessionToken } from '../security/sessionToken.js';
 
 const BEARER_TOKEN_PATTERN =
   /^Bearer ([A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+)$/i;
@@ -139,7 +139,17 @@ export async function authenticateToken(req, res, next) {
       jabatan: typeof user.jabatan === 'string' ? user.jabatan : '',
       iat: claims.iat,
       exp: claims.exp,
+      tokenExpiresAt: new Date(claims.exp * 1000).toISOString(),
+      sessionExpiresAt: new Date(session.expires_at).toISOString(),
     };
+
+    // Sliding refresh token: jika token JWT dekat masa kedaluwarsa (<50% TTL),
+    // terbitkan token JWT baru dalam Set-Cookie HttpOnly sebelum header respons dikirim.
+    // Sesi server di database TIDAK berubah / diperpanjang.
+    if (!res.headersSent) {
+      await maybeSlideSessionToken(req, res, session);
+    }
+
     next();
   } catch (error) {
     next(error);

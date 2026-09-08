@@ -1,6 +1,5 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue';
-import { api } from '@/services/api';
+import { ref, computed } from 'vue';
 import TemplateCard from '@/components/templates/TemplateCard.vue';
 import { MessageSquare, Search } from 'lucide-vue-next';
 
@@ -40,17 +39,6 @@ const filteredTemplates = computed(() => {
   return templates.value.filter(
     (t) => t.title.toLowerCase().includes(q) || t.content.toLowerCase().includes(q) || t.category.toLowerCase().includes(q)
   );
-});
-
-onMounted(async () => {
-  try {
-    const res = await api.getTemplates();
-    if (res?.data && res.data.length > 0) {
-      templates.value = res.data;
-    }
-  } catch {
-    // using fallback
-  }
 });
 </script>
 

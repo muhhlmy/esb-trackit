@@ -1,6 +1,5 @@
 <script setup>
 import { ref, onMounted } from 'vue';
-import { api } from '@/services/api';
 import { useCases } from '@/composables/useCases';
 import AnalyticsCharts from '@/components/charts/AnalyticsCharts.vue';
 import { BarChart3, RefreshCw } from 'lucide-vue-next';
@@ -22,17 +21,7 @@ const isLoading = ref(false);
 
 async function loadStats() {
   isLoading.value = true;
-  try {
-    const res = await api.getStats();
-    if (res?.data) {
-      statsData.value = res.data;
-      return;
-    }
-  } catch {
-    // calculate from local cases
-  }
 
-  // Fallback calculation
   const cats = {};
   const sevs = { high: 0, medium: 0, low: 0 };
   let custom = 0;

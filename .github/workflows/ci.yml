@@ -11,6 +11,16 @@ jobs:
     name: Backend CI
     runs-on: ubuntu-latest
 
+    env:
+      DB_HOST: localhost
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: ci-dummy-postgres-password
+      DB_NAME: assets_monitoring
+      JWT_SECRET: ci-only-dummy-secret-minimum-32-chars-xyz123
+      DEFAULT_USER_PASSWORD: CIDummyUserPass123!
+      NODE_ENV: test
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0

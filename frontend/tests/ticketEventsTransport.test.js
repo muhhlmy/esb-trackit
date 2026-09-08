@@ -34,19 +34,19 @@ test('SSE parser joins data lines and handles event metadata without treating co
   assert.equal(parseSseFrame(': heartbeat'), null)
 })
 
-test('ticket realtime transport sends Bearer header and never places token in URL', async () => {
+test('ticket realtime transport uses HttpOnly same-origin credentials and never places token in URL', async () => {
   const source = await readFile(sourceUrl, 'utf8')
 
   assert.match(source, /fetch\(`\$\{API_BASE\}\/api\/tickets\/events`,\s*\{/)
-  assert.match(source, /Authorization:\s*`Bearer \$\{token\}`/)
+  assert.match(source, /credentials:\s*'same-origin'/)
   assert.match(source, /new AbortController\(\)/)
   assert.match(source, /MAX_RECONNECT_DELAY_MS/)
   assert.match(source, /MAX_RECONNECT_ATTEMPTS/)
   const connectSection = source.slice(source.indexOf('function connect()'))
-  const tokenGuard = connectSection.indexOf('if (!getAuthToken()) return')
+  const userGuard = connectSection.indexOf('if (!getStoredUser()) return')
   const stateTransition = connectSection.indexOf('stopped = false')
-  assert.notEqual(tokenGuard, -1)
-  assert.ok(tokenGuard < stateTransition)
+  assert.notEqual(userGuard, -1)
+  assert.ok(userGuard < stateTransition)
   assert.doesNotMatch(source, /new EventSource\s*\(/)
   assert.doesNotMatch(source, /[?&]token=/)
   assert.doesNotMatch(source, /encodeURIComponent\(token\)/)

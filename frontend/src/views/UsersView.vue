@@ -612,13 +612,13 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
 
     <!-- Simplified SaaS Header & Toolbar Container -->
     <div
-      class="flex flex-col gap-3.5 bg-white p-4.5 rounded-2xl border border-[#E2E8F0]/80 shadow-2xs"
+      class="flex flex-col gap-3.5 bg-white p-3.5 sm:p-4.5 rounded-2xl border border-[#E2E8F0]/80 shadow-2xs"
     >
       <!-- Row 1: Page Title & Primary CTA -->
-      <div class="flex items-center justify-between gap-3">
-        <div>
-          <h2 class="text-lg font-bold text-[#0F172A] tracking-tight">Data Pengguna</h2>
-          <p class="text-xs text-[#64748B] mt-0.5 leading-normal">
+      <div class="flex items-center justify-between gap-2 sm:gap-3">
+        <div class="min-w-0">
+          <h2 class="text-base sm:text-lg font-bold text-[#0F172A] tracking-tight">Data Pengguna</h2>
+          <p class="text-[11px] sm:text-xs text-[#64748B] mt-0.5 leading-normal">
             Pengelolaan akun, role, dan hak akses pengguna sistem
           </p>
         </div>
@@ -627,17 +627,17 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
           v-if="canWriteUsers"
           type="button"
           @click="openAdd"
-          class="h-9 shrink-0 whitespace-nowrap rounded-lg bg-[#2563EB] px-3.5 text-xs font-semibold text-white shadow-2xs hover:bg-[#1D4ED8] transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+          class="h-9 shrink-0 rounded-lg bg-[#2563EB] px-2.5 sm:px-3.5 text-xs font-semibold text-white shadow-2xs hover:bg-[#1D4ED8] active:scale-[0.98] transition-all flex items-center justify-center gap-1.5 cursor-pointer"
           title="Tambah admin baru atau promosikan akses"
         >
           <span aria-hidden="true" class="material-symbols-outlined text-[16px]">person_add</span>
-          <span>Tambah Admin / Akses</span>
+          <span class="hidden sm:inline whitespace-nowrap">Tambah Admin / Akses</span>
         </button>
       </div>
 
       <!-- Row 2: Search & Filters -->
-      <div class="flex flex-wrap items-center gap-2 w-full min-w-0 pt-2 border-t border-[#F1F5F9]">
-        <div class="relative flex-1 min-w-[200px]">
+      <div class="flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-2 w-full min-w-0 pt-2 border-t border-[#F1F5F9]">
+        <div class="relative w-full sm:flex-1 sm:min-w-[200px]">
           <span
             aria-hidden="true"
             class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-[17px] text-[#94A3B8] pointer-events-none"
@@ -649,30 +649,42 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
             type="search"
             autocomplete="off"
             placeholder="Cari nama atau email pengguna..."
-            class="h-9 w-full rounded-lg border border-[#E2E8F0] bg-white pl-8 pr-2.5 text-xs text-[#0F172A] placeholder-[#94A3B8] focus:border-[#2563EB] focus:outline-none transition-all shadow-2xs"
+            class="h-9 w-full rounded-lg border border-[#E2E8F0] bg-white pl-8 text-xs text-[#0F172A] placeholder-[#94A3B8] focus:border-[#2563EB] focus:outline-none transition-all shadow-2xs"
+            :class="searchQuery ? 'pr-8' : 'pr-2.5'"
           />
+          <button
+            v-if="searchQuery"
+            type="button"
+            @click="searchQuery = ''"
+            class="absolute right-2 top-1/2 -translate-y-1/2 flex h-5 w-5 items-center justify-center rounded-full bg-[#E2E8F0] text-[#64748B] hover:bg-[#CBD5E1] hover:text-[#0F172A] transition-colors cursor-pointer"
+            title="Hapus pencarian"
+          >
+            <span class="material-symbols-outlined text-[13px]">close</span>
+          </button>
         </div>
 
-        <CustomSelect
-          v-model="filterRole"
-          :options="[
-            { value: '', label: 'Semua Role' },
-            { value: 'admin', label: 'ADMIN' },
-            { value: 'superadmin', label: 'SUPERADMIN' },
-            { value: 'user', label: 'USER' },
-          ]"
-          aria-label="Filter by role"
-          width-class="w-[135px]"
-        />
+        <div class="flex items-center gap-2">
+          <CustomSelect
+            v-model="filterRole"
+            :options="[
+              { value: '', label: 'Semua Role' },
+              { value: 'admin', label: 'ADMIN' },
+              { value: 'superadmin', label: 'SUPERADMIN' },
+              { value: 'user', label: 'USER' },
+            ]"
+            aria-label="Filter by role"
+            width-class="w-[135px]"
+          />
 
-        <button
-          v-if="searchQuery || filterRole"
-          type="button"
-          @click="resetFilters"
-          class="h-9 rounded-lg border border-[#FDE8E8] bg-[#FDF2F2] px-3 text-xs font-semibold text-[#E11D48] hover:bg-[#FCE7F3] transition-all cursor-pointer"
-        >
-          Reset
-        </button>
+          <button
+            v-if="searchQuery || filterRole"
+            type="button"
+            @click="resetFilters"
+            class="h-9 rounded-lg border border-[#FDE8E8] bg-[#FDF2F2] px-3 text-xs font-semibold text-[#E11D48] hover:bg-[#FCE7F3] active:scale-[0.98] transition-all cursor-pointer"
+          >
+            Reset
+          </button>
+        </div>
       </div>
     </div>
 
@@ -680,170 +692,296 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
     <div class="rounded-2xl border border-[#E2E8F0]/80 bg-white shadow-2xs overflow-hidden">
       <!-- Loading -->
       <div v-if="isLoading" role="status" aria-busy="true">
-        <SkeletonTable preset="users" :rows="5" />
+        <!-- Desktop Skeleton -->
+        <div class="hidden md:block">
+          <SkeletonTable preset="users" :rows="5" />
+        </div>
+        <!-- Mobile Skeleton -->
+        <div class="md:hidden flex flex-col gap-3 p-3.5">
+          <div v-for="i in 4" :key="'skel-user-' + i" class="rounded-xl border border-[#F1F5F9] bg-[#FAFCFF] p-3.5 flex flex-col gap-3 animate-pulse">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2.5">
+                <div class="h-9 w-9 rounded-lg bg-[#E2E8F0]"></div>
+                <div class="flex flex-col gap-1.5">
+                  <div class="h-3.5 w-28 rounded bg-[#E2E8F0]"></div>
+                  <div class="h-3 w-36 rounded bg-[#F1F5F9]"></div>
+                </div>
+              </div>
+              <div class="h-5 w-5 rounded bg-[#F1F5F9]"></div>
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+              <div class="h-8 rounded-lg bg-[#F1F5F9]"></div>
+              <div class="h-8 rounded-lg bg-[#F1F5F9]"></div>
+              <div class="h-8 rounded-lg bg-[#F1F5F9]"></div>
+              <div class="h-8 rounded-lg bg-[#F1F5F9]"></div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- Error -->
       <div
         v-else-if="pageError"
         role="alert"
-        class="flex flex-wrap items-center gap-2 px-5 py-4 text-[12.5px] text-rose-600 bg-rose-50"
+        class="flex flex-wrap items-center gap-2 px-4 sm:px-5 py-4 text-[12.5px] text-rose-600 bg-rose-50"
       >
-        <span aria-hidden="true" class="material-symbols-outlined text-[18px]">error</span>
+        <span aria-hidden="true" class="material-symbols-outlined text-[18px] shrink-0">error</span>
         <span class="flex-1 font-semibold">{{ pageError }}</span>
         <button type="button" class="font-bold underline cursor-pointer" @click="fetchUsers">
           Coba lagi
         </button>
       </div>
 
-      <!-- Tabel -->
-      <div v-else class="w-full max-w-full overflow-hidden" tabindex="0" aria-label="Tabel pengguna">
-        <table class="w-full max-w-full text-left border-collapse table-fixed">
-          <caption class="sr-only">
-            Daftar pengguna sistem
-          </caption>
-          <colgroup>
-            <col class="w-[31%]" />
-            <col class="w-[12%]" />
-            <col class="w-[22%]" />
-            <col class="w-[15%]" />
-            <col class="w-[12%]" />
-            <col class="w-[8%]" />
-          </colgroup>
-          <thead
-            class="sticky top-0 z-10 border-b border-[#E2E8F0]/80 bg-[#F8FAFC]/80 backdrop-blur-xs select-none whitespace-nowrap"
-          >
-            <tr>
-              <th
-                class="py-3 pl-5 pr-4 text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B] text-left whitespace-nowrap"
-              >
-                Pengguna
-              </th>
-              <th
-                class="py-3 px-4 text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B] text-left whitespace-nowrap"
-              >
-                Role Akses
-              </th>
-              <th
-                class="py-3 px-4 text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B] text-left whitespace-nowrap"
-              >
-                Sub Role / Unit Ditangani
-              </th>
-              <th
-                class="py-3 px-4 text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B] text-left whitespace-nowrap"
-              >
-                Hak Akses Fitur
-              </th>
-              <th
-                class="py-3 px-4 text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B] text-left whitespace-nowrap"
-              >
-                Status
-              </th>
-              <th
-                class="py-3 pr-5 pl-4 text-right text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B] whitespace-nowrap"
-              >
-                Aksi
-              </th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-[#F1F5F9]">
-            <tr
-              v-for="user in paginatedUsers"
-              :key="user.id"
-              class="group hover:bg-[#F8FAFC] transition-colors duration-150"
+      <template v-else>
+        <!-- ═══ Desktop Table (>= md / 768px) ═══ -->
+        <div class="hidden md:block w-full max-w-full overflow-hidden" tabindex="0" aria-label="Tabel pengguna">
+          <table class="w-full max-w-full text-left border-collapse table-fixed">
+            <caption class="sr-only">
+              Daftar pengguna sistem
+            </caption>
+            <colgroup>
+              <col class="w-[31%]" />
+              <col class="w-[12%]" />
+              <col class="w-[22%]" />
+              <col class="w-[15%]" />
+              <col class="w-[12%]" />
+              <col class="w-[8%]" />
+            </colgroup>
+            <thead
+              class="sticky top-0 z-10 border-b border-[#E2E8F0]/80 bg-[#F8FAFC]/80 backdrop-blur-xs select-none whitespace-nowrap"
             >
-              <!-- Kolom Pengguna (nama + email) -->
-              <td class="py-4 pl-5 pr-4 overflow-hidden">
-                <div class="flex flex-col min-w-0">
-                  <span
-                    class="text-[13.5px] font-bold text-[#0F172A] leading-snug truncate group-hover:text-[#2563EB] transition-colors block"
-                    :title="user.nama"
-                  >
-                    {{ user.nama }}
-                  </span>
-                  <span
-                    class="text-[11.5px] font-normal text-[#64748B] mt-0.5 truncate block"
-                    :title="user.email"
-                  >
-                    {{ user.email }}
-                  </span>
-                </div>
-              </td>
-
-              <!-- Role Badge -->
-              <td class="py-4 px-4 overflow-hidden">
-                <AppBadge
-                  :type="getRoleBadgeType(user.role)"
-                  :text="(user.role || 'user').toUpperCase()"
-                />
-              </td>
-
-              <!-- Unit Tiket (Queue) Badge -->
-              <td class="py-4 px-4 overflow-hidden">
-                <div
-                  v-if="isRoleSuperAdmin(user.role)"
-                  class="text-[11.5px] font-semibold text-[#2563EB] truncate block"
+              <tr>
+                <th
+                  class="py-3 pl-5 pr-4 text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B] text-left whitespace-nowrap"
                 >
-                  Semua Unit (Superadmin)
-                </div>
-                <div v-else-if="user.queues && user.queues.length > 0" class="flex flex-wrap gap-1 min-w-0">
-                  <span
-                    v-for="q in user.queues"
-                    :key="q.id"
-                    class="inline-flex items-center rounded-md bg-[#EFF6FF] px-2 py-0.5 text-[10.5px] font-semibold text-[#2563EB] shrink-0"
-                    >{{ q.kode }}</span
+                  Pengguna
+                </th>
+                <th
+                  class="py-3 px-4 text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B] text-left whitespace-nowrap"
+                >
+                  Role Akses
+                </th>
+                <th
+                  class="py-3 px-4 text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B] text-left whitespace-nowrap"
+                >
+                  Sub Role / Unit Ditangani
+                </th>
+                <th
+                  class="py-3 px-4 text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B] text-left whitespace-nowrap"
+                >
+                  Hak Akses Fitur
+                </th>
+                <th
+                  class="py-3 px-4 text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B] text-left whitespace-nowrap"
+                >
+                  Status
+                </th>
+                <th
+                  class="py-3 pr-5 pl-4 text-right text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B] whitespace-nowrap"
+                >
+                  Aksi
+                </th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-[#F1F5F9]">
+              <tr
+                v-for="user in paginatedUsers"
+                :key="user.id"
+                class="group hover:bg-[#F8FAFC] transition-colors duration-150"
+              >
+                <!-- Kolom Pengguna (nama + email) -->
+                <td class="py-4 pl-5 pr-4 overflow-hidden">
+                  <div class="flex flex-col min-w-0">
+                    <span
+                      class="text-[13.5px] font-bold text-[#0F172A] leading-snug truncate group-hover:text-[#2563EB] transition-colors block"
+                      :title="user.nama"
+                    >
+                      {{ user.nama }}
+                    </span>
+                    <span
+                      class="text-[11.5px] font-normal text-[#64748B] mt-0.5 truncate block"
+                      :title="user.email"
+                    >
+                      {{ user.email }}
+                    </span>
+                  </div>
+                </td>
+
+                <!-- Role Badge -->
+                <td class="py-4 px-4 overflow-hidden">
+                  <AppBadge
+                    :type="getRoleBadgeType(user.role)"
+                    :text="(user.role || 'user').toUpperCase()"
+                  />
+                </td>
+
+                <!-- Unit Tiket (Queue) Badge -->
+                <td class="py-4 px-4 overflow-hidden">
+                  <div
+                    v-if="isRoleSuperAdmin(user.role)"
+                    class="text-[11.5px] font-semibold text-[#2563EB] truncate block"
                   >
-                </div>
-                <span v-else class="text-[11.5px] text-[#94A3B8] italic truncate block">Tidak ada unit</span>
-              </td>
+                    Semua Unit (Superadmin)
+                  </div>
+                  <div v-else-if="user.queues && user.queues.length > 0" class="flex flex-wrap gap-1 min-w-0">
+                    <span
+                      v-for="q in user.queues"
+                      :key="q.id"
+                      class="inline-flex items-center rounded-md bg-[#EFF6FF] px-2 py-0.5 text-[10.5px] font-semibold text-[#2563EB] shrink-0"
+                      >{{ q.kode }}</span
+                    >
+                  </div>
+                  <span v-else class="text-[11.5px] text-[#94A3B8] italic truncate block">Tidak ada unit</span>
+                </td>
 
-              <!-- Hak Akses Fitur Count Badge -->
-              <td class="py-4 px-4 overflow-hidden">
-                <AppBadge
-                  :type="getPermissionBadge(user).type"
-                  :text="getPermissionBadge(user).text"
-                />
-              </td>
+                <!-- Hak Akses Fitur Count Badge -->
+                <td class="py-4 px-4 overflow-hidden">
+                  <AppBadge
+                    :type="getPermissionBadge(user).type"
+                    :text="getPermissionBadge(user).text"
+                  />
+                </td>
 
-              <!-- Status Akun -->
-              <td class="py-4 px-4 overflow-hidden">
-                <AppBadge
-                  :type="user.is_active === false ? 'danger' : 'success'"
-                  :text="user.is_active === false ? 'NONAKTIF' : 'AKTIF'"
-                />
-              </td>
+                <!-- Status Akun -->
+                <td class="py-4 px-4 overflow-hidden">
+                  <AppBadge
+                    :type="user.is_active === false ? 'danger' : 'success'"
+                    :text="user.is_active === false ? 'NONAKTIF' : 'AKTIF'"
+                  />
+                </td>
 
-              <!-- Aksi -->
-              <td class="py-4 pr-5 pl-4 text-right overflow-hidden" @click.stop>
-                <AppRowActions :actions="getUserActions(user)" />
-              </td>
-            </tr>
+                <!-- Aksi -->
+                <td class="py-4 pr-5 pl-4 text-right overflow-hidden" @click.stop>
+                  <AppRowActions :actions="getUserActions(user)" />
+                </td>
+              </tr>
 
-            <!-- Empty state -->
-            <tr v-if="filteredUsers.length === 0">
-              <td colspan="7" class="px-5 py-12 text-center">
-                <div class="flex flex-col items-center gap-2">
-                  <span
-                    aria-hidden="true"
-                    class="material-symbols-outlined text-[40px] text-[#D1D5DB]"
-                    >group</span
+              <!-- Empty state -->
+              <tr v-if="filteredUsers.length === 0">
+                <td colspan="7" class="px-5 py-12 text-center">
+                  <div class="flex flex-col items-center gap-2">
+                    <span
+                      aria-hidden="true"
+                      class="material-symbols-outlined text-[40px] text-[#D1D5DB]"
+                      >group</span
+                    >
+                    <p class="text-[13px] text-[#9CA3AF]">
+                      Tidak ada pengguna yang sesuai pencarian.
+                    </p>
+                    <button
+                      v-if="searchQuery || filterRole"
+                      @click="resetFilters"
+                      class="text-[12px] text-brand font-bold hover:text-brand-dark cursor-pointer"
+                    >
+                      Reset Filter
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- ═══ Mobile Card List (< md / < 768px) ═══ -->
+        <div class="md:hidden">
+          <!-- Empty State -->
+          <div v-if="filteredUsers.length === 0" class="px-4 py-10 text-center">
+            <div class="flex flex-col items-center gap-2">
+              <span aria-hidden="true" class="material-symbols-outlined text-[36px] text-[#D1D5DB]">group</span>
+              <p class="text-[13px] text-[#9CA3AF]">Tidak ada pengguna yang sesuai pencarian.</p>
+              <button
+                v-if="searchQuery || filterRole"
+                @click="resetFilters"
+                class="text-[12px] text-brand font-bold hover:text-brand-dark cursor-pointer"
+              >
+                Reset Filter
+              </button>
+            </div>
+          </div>
+
+          <!-- User Cards -->
+          <div v-else class="flex flex-col gap-3 p-3.5">
+            <div
+              v-for="user in paginatedUsers"
+              :key="'m-' + user.id"
+              class="rounded-xl border border-[#E2E8F0] bg-white p-3.5 flex flex-col gap-2.5 shadow-2xs active:bg-[#F8FAFC] transition-colors"
+            >
+              <!-- Card Header: Avatar + Name + Email + Actions -->
+              <div class="flex items-start justify-between gap-2">
+                <div class="flex items-center gap-2.5 min-w-0 flex-1">
+                  <div
+                    class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-[11px] font-bold text-white select-none"
+                    :class="{
+                      'bg-purple-600': isRoleSuperAdmin(user.role),
+                      'bg-[#2563EB]': user.role === 'admin' && !isRoleSuperAdmin(user.role),
+                      'bg-[#64748B]': user.role === 'user' || (!user.role),
+                    }"
                   >
-                  <p class="text-[13px] text-[#9CA3AF]">
-                    Tidak ada pengguna yang sesuai pencarian.
-                  </p>
-                  <button
-                    v-if="searchQuery || filterRole"
-                    @click="resetFilters"
-                    class="text-[12px] text-brand font-bold hover:text-brand-dark"
-                  >
-                    Reset Filter
-                  </button>
+                    {{ getInitials(user.nama) }}
+                  </div>
+                  <div class="min-w-0 flex-1">
+                    <p class="text-[13px] font-bold text-[#0F172A] leading-snug truncate" :title="user.nama">
+                      {{ user.nama }}
+                    </p>
+                    <p class="text-[11px] text-[#64748B] truncate" :title="user.email">
+                      {{ user.email }}
+                    </p>
+                  </div>
                 </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+                <div @click.stop>
+                  <AppRowActions :actions="getUserActions(user)" />
+                </div>
+              </div>
+
+              <!-- Card Body: 2x2 Metadata Grid -->
+              <div class="grid grid-cols-2 gap-2">
+                <!-- Role -->
+                <div class="flex flex-col gap-0.5 rounded-lg bg-[#F8FAFC] px-2.5 py-2">
+                  <span class="text-[9px] font-semibold uppercase tracking-wider text-[#94A3B8]">Role</span>
+                  <AppBadge
+                    :type="getRoleBadgeType(user.role)"
+                    :text="(user.role || 'user').toUpperCase()"
+                  />
+                </div>
+
+                <!-- Status -->
+                <div class="flex flex-col gap-0.5 rounded-lg bg-[#F8FAFC] px-2.5 py-2">
+                  <span class="text-[9px] font-semibold uppercase tracking-wider text-[#94A3B8]">Status</span>
+                  <AppBadge
+                    :type="user.is_active === false ? 'danger' : 'success'"
+                    :text="user.is_active === false ? 'NONAKTIF' : 'AKTIF'"
+                  />
+                </div>
+
+                <!-- Unit Ditangani -->
+                <div class="flex flex-col gap-1 rounded-lg bg-[#F8FAFC] px-2.5 py-2">
+                  <span class="text-[9px] font-semibold uppercase tracking-wider text-[#94A3B8]">Unit</span>
+                  <div v-if="isRoleSuperAdmin(user.role)" class="text-[10.5px] font-semibold text-[#2563EB] leading-tight">
+                    Semua Unit
+                  </div>
+                  <div v-else-if="user.queues && user.queues.length > 0" class="flex flex-wrap gap-1">
+                    <span
+                      v-for="q in user.queues"
+                      :key="'mq-' + q.id"
+                      class="inline-flex items-center rounded bg-[#EFF6FF] px-1.5 py-0.5 text-[9.5px] font-semibold text-[#2563EB]"
+                    >{{ q.kode }}</span>
+                  </div>
+                  <span v-else class="text-[10.5px] text-[#94A3B8] italic leading-tight">—</span>
+                </div>
+
+                <!-- Hak Akses -->
+                <div class="flex flex-col gap-0.5 rounded-lg bg-[#F8FAFC] px-2.5 py-2">
+                  <span class="text-[9px] font-semibold uppercase tracking-wider text-[#94A3B8]">Hak Akses</span>
+                  <AppBadge
+                    :type="getPermissionBadge(user).type"
+                    :text="getPermissionBadge(user).text"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </template>
 
       <!-- Footer Pagination -->
       <AppPagination
@@ -1106,7 +1244,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
                 <div
                   v-for="f in OPERATIONAL_FEATURES"
                   :key="f.key"
-                  class="flex items-center justify-between gap-3 px-3.5 py-2.5 hover:bg-[#F8FAFC] transition-colors"
+                  class="flex items-center justify-between gap-2 sm:gap-3 px-3 sm:px-3.5 py-2.5 hover:bg-[#F8FAFC] transition-colors"
                 >
                   <div class="flex items-center gap-2.5 min-w-0 flex-1">
                     <span class="material-symbols-outlined text-[18px] text-[#64748B] shrink-0">{{
@@ -1148,7 +1286,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
                 <div
                   v-for="f in ADMINISTRATIVE_FEATURES"
                   :key="f.key"
-                  class="flex items-center justify-between gap-3 px-3.5 py-2.5 hover:bg-[#F8FAFC] transition-colors"
+                  class="flex items-center justify-between gap-2 sm:gap-3 px-3 sm:px-3.5 py-2.5 hover:bg-[#F8FAFC] transition-colors"
                 >
                   <div class="flex items-center gap-2.5 min-w-0 flex-1">
                     <span class="material-symbols-outlined text-[18px] text-[#64748B] shrink-0">{{
@@ -1200,19 +1338,19 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
         </label>
 
         <!-- 6. Sticky Footer -->
-        <div class="flex items-center justify-between gap-3 pt-3 border-t border-[#F1F5F9]">
+        <div class="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-2.5 sm:gap-3 pt-3 border-t border-[#F1F5F9]">
           <div class="min-w-0">
-            <p v-if="modalError" class="text-xs font-semibold text-rose-600 truncate">
+            <p v-if="modalError" class="text-xs font-semibold text-rose-600">
               {{ modalError }}
             </p>
           </div>
 
-          <div class="flex items-center gap-2 shrink-0">
+          <div class="flex flex-col-reverse sm:flex-row items-stretch sm:items-center gap-2 shrink-0">
             <button
               type="button"
               :disabled="isSubmitting"
               @click="requestCloseModal"
-              class="h-9 px-4 rounded-lg border border-[#E2E8F0] bg-white text-xs font-semibold text-[#475569] hover:bg-[#F8FAFC] hover:text-[#0F172A] transition-all cursor-pointer shadow-2xs"
+              class="h-9 w-full sm:w-auto px-4 rounded-lg border border-[#E2E8F0] bg-white text-xs font-semibold text-[#475569] hover:bg-[#F8FAFC] hover:text-[#0F172A] active:scale-[0.98] transition-all cursor-pointer shadow-2xs"
             >
               Batal
             </button>
@@ -1220,7 +1358,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
             <button
               type="submit"
               :disabled="isSubmitting || !canWriteUsers"
-              class="h-9 px-4 rounded-lg bg-[#2563EB] text-xs font-semibold text-white shadow-2xs hover:bg-[#1D4ED8] disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2 cursor-pointer"
+              class="h-9 w-full sm:w-auto px-4 rounded-lg bg-[#2563EB] text-xs font-semibold text-white shadow-2xs hover:bg-[#1D4ED8] disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer"
             >
               <span
                 v-if="isSubmitting"

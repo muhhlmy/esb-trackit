@@ -1452,10 +1452,10 @@ function toast(message, type = 'success') {
 
     <!-- ── 2. Integrated Control Bar & Workspace Navigation ─ -->
     <div class="flex flex-col gap-3 bg-white p-3.5 sm:p-4 rounded-2xl border border-[#E2E8F0]/80 shadow-2xs">
-      <!-- Top Row: Queue Tabs & Secondary Summary -->
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 border-b border-[#F1F5F9] pb-3">
+      <!-- Top Row: Queue Tabs -->
+      <div class="border-b border-[#F1F5F9] pb-3">
         <!-- Ticket Queue Navigation (Tabs) -->
-        <div class="flex items-center gap-1.5 overflow-x-auto scrollbar-none [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden py-0.5 w-full sm:w-auto">
+        <div class="flex items-center gap-1.5 overflow-x-auto scrollbar-none [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden py-0.5 w-full">
           <button
             v-for="tab in !isAdmin && !isSuperAdmin
               ? [
@@ -1494,29 +1494,6 @@ function toast(message, type = 'success') {
               {{ tab.count }}
             </span>
           </button>
-        </div>
-
-        <!-- Secondary Summary (Quiet metadata) -->
-        <div
-          class="text-[11.5px] sm:text-[12px] font-medium text-[#64748B] flex items-center gap-1.5 flex-wrap shrink-0 select-none pt-0.5 sm:pt-0"
-        >
-          <span
-            ><strong class="text-[#0F172A] font-bold">{{ stats.totalTickets }}</strong> Inbox</span
-          >
-          <span>·</span>
-          <span
-            ><strong class="text-emerald-600 font-bold">{{ stats.openTickets }}</strong> Open</span
-          >
-          <span>·</span>
-          <span
-            ><strong class="text-amber-600 font-bold">{{ stats.pendingTickets }}</strong>
-            Pending</span
-          >
-          <span>·</span>
-          <span
-            ><strong class="text-slate-600 font-bold">{{ stats.closedTickets }}</strong>
-            Closed</span
-          >
         </div>
       </div>
 

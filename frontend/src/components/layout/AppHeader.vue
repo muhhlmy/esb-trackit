@@ -633,7 +633,7 @@ onBeforeUnmount(() => {
         aria-controls="app-navigation"
         aria-label="Buka Navigasi Mobile"
         title="Buka Navigasi Mobile"
-        class="flex lg:hidden h-8 w-8 shrink-0 items-center justify-center rounded-lg text-[#2A3547] hover:bg-[#ECF2FF] hover:text-[#5D87FF] transition-all cursor-pointer active:scale-95 touch-manipulation"
+        class="flex lg:hidden h-11 w-11 sm:h-8 sm:w-8 shrink-0 items-center justify-center rounded-lg text-[#2A3547] hover:bg-[#ECF2FF] hover:text-[#5D87FF] transition-all cursor-pointer active:scale-95 touch-manipulation"
         @click="$emit('toggle-mobile')"
       >
         <span aria-hidden="true" class="material-symbols-outlined text-[20px]">menu</span>
@@ -674,7 +674,7 @@ onBeforeUnmount(() => {
             autocomplete="off"
             @focus="initGlobalSearchData"
             :placeholder="searchPlaceholder"
-            class="h-8 sm:h-9 w-full rounded-full border border-[#DFE5EF] bg-[#F8FAFC] pl-8 sm:pl-9 pr-8 sm:pr-20 text-[11px] sm:text-xs font-medium text-[#0F172A] placeholder-[#64748B] outline-none transition-all shadow-xs focus:bg-white focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/20 [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden"
+            class="h-11 sm:h-9 w-full rounded-full border border-[#DFE5EF] bg-[#F8FAFC] pl-8 sm:pl-9 pr-8 sm:pr-20 text-[11px] sm:text-xs font-medium text-[#0F172A] placeholder-[#64748B] outline-none transition-all shadow-xs focus:bg-white focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/20 [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden"
           />
 
           <!-- Action Buttons / Hotkey Indicator -->
@@ -1104,7 +1104,7 @@ onBeforeUnmount(() => {
           type="button"
           :title="unreadCount > 0 ? `Notifikasi (${unreadCount})` : 'Notifikasi'"
           @click="toggleNotif"
-          class="relative flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-xl text-[#64748B] hover:bg-[#F8FAFC] hover:text-[#0F172A] transition-all cursor-pointer select-none active:scale-95 touch-manipulation"
+          class="relative flex h-11 w-11 sm:h-9 sm:w-9 items-center justify-center rounded-xl text-[#64748B] hover:bg-[#F8FAFC] hover:text-[#0F172A] transition-all cursor-pointer select-none active:scale-95 touch-manipulation"
           :class="isNotifOpen ? 'bg-[#EFF6FF] text-[#2563EB]' : ''"
         >
           <span aria-hidden="true" class="material-symbols-outlined text-[20px]"
@@ -1123,7 +1123,7 @@ onBeforeUnmount(() => {
         <Transition name="dropdown">
           <div
             v-if="isNotifOpen"
-            class="absolute right-0 mt-2 w-88 sm:w-96 rounded-2xl border border-[#E2E8F0] bg-white shadow-xl z-50 overflow-hidden outline-none"
+            class="fixed left-3 right-3 top-16 sm:absolute sm:left-auto sm:top-auto sm:right-0 sm:mt-2 sm:w-96 rounded-2xl border border-[#E2E8F0] bg-white shadow-xl z-50 overflow-hidden outline-none"
             @click.stop
           >
             <!-- 1. Header -->
@@ -1178,7 +1178,7 @@ onBeforeUnmount(() => {
             </div>
 
             <!-- 3. Notification List (Sole Scrollable Body) -->
-            <div class="max-h-[380px] overflow-y-auto custom-scrollbar divide-y divide-[#F1F5F9]">
+            <div class="max-h-[min(380px,calc(100dvh-15rem))] sm:max-h-[380px] overflow-y-auto custom-scrollbar divide-y divide-[#F1F5F9]">
               <div
                 v-if="isFetchingNotif && latestNotifications.length === 0"
                 class="p-2"

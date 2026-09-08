@@ -334,12 +334,15 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="space-y-6 pb-12 text-[#0F172A]" :data-testid="!isLoading ? 'page-ready' : undefined">
+  <div
+    class="export-page min-w-0 space-y-4 sm:space-y-6 pb-6 sm:pb-12 text-[#0F172A] wrap-anywhere"
+    :data-testid="!isLoading ? 'page-ready' : undefined"
+  >
     <!-- Notification Toast -->
     <Transition name="fade">
       <div
         v-if="toast.show"
-        class="fixed top-5 right-5 z-50 flex items-center gap-2.5 rounded-xl px-4 py-3 shadow-lg text-white font-semibold text-xs border"
+        class="fixed top-3 left-3 right-3 sm:top-5 sm:left-auto sm:right-5 sm:max-w-md z-50 flex items-center gap-2.5 rounded-xl px-4 py-3 shadow-lg text-white font-semibold text-xs border"
         :class="[
           toast.type === 'error'
             ? 'bg-rose-600 border-rose-500'
@@ -361,13 +364,13 @@ onMounted(() => {
                   : 'check_circle'
           }}
         </span>
-        <span>{{ toast.message }}</span>
+        <span class="min-w-0 wrap-anywhere" role="status">{{ toast.message }}</span>
       </div>
     </Transition>
 
     <!-- Header SaaS Section -->
     <div
-      class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white border border-[#E2E8F0] rounded-2xl p-5 shadow-2xs"
+      class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white border border-[#E2E8F0] rounded-2xl p-3.5 sm:p-5 shadow-2xs"
     >
       <div class="space-y-1">
         <div class="flex items-center gap-1.5 text-xs text-[#94A3B8] font-medium">
@@ -407,14 +410,19 @@ onMounted(() => {
     >
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div class="space-y-1">
-          <div class="flex items-center gap-1.5 text-xs text-rose-700 font-bold tracking-wide uppercase">
+          <div
+            class="flex items-center gap-1.5 text-xs text-rose-700 font-bold tracking-wide uppercase"
+          >
             <span class="material-symbols-outlined text-[16px]">warning</span>
             <span>Danger Zone — Pemeliharaan Database</span>
           </div>
           <h3 class="text-sm font-bold text-rose-900">Reset &amp; Kosongkan Database</h3>
           <p class="text-xs text-rose-700/90 leading-relaxed max-w-2xl">
-            Menghapus secara permanen seluruh data aset TI, aset GA, aset OPS, tiket helpdesk, karyawan, dan log aktivitas.
-            Akun Superadmin default (<code class="font-mono bg-white/80 px-1 py-0.5 rounded text-rose-900 border border-rose-200">superadmin@admin.com</code>) akan diprovisi kembali secara otomatis.
+            Menghapus secara permanen seluruh data aset TI, aset GA, aset OPS, tiket helpdesk,
+            karyawan, dan log aktivitas. Akun Superadmin default (<code
+              class="font-mono bg-white/80 px-1 py-0.5 rounded text-rose-900 border border-rose-200"
+              >superadmin@admin.com</code
+            >) akan diprovisi kembali secara otomatis.
           </p>
         </div>
         <button
@@ -429,12 +437,15 @@ onMounted(() => {
     </div>
 
     <!-- Navigation Tabs -->
-    <div class="flex items-center justify-between border-b border-[#E2E8F0] pb-px">
-      <div class="flex items-center gap-1 overflow-x-auto">
+    <div
+      class="flex flex-col items-stretch sm:flex-row sm:items-center justify-between gap-2 border-b border-[#E2E8F0] pb-px"
+    >
+      <div class="grid grid-cols-1 min-w-0 sm:flex sm:flex-wrap sm:items-center gap-1">
         <button
           type="button"
+          :aria-pressed="activeTab === 'quick'"
           @click="activeTab = 'quick'"
-          class="flex items-center gap-2 px-3.5 py-2 text-xs font-semibold rounded-lg transition-all cursor-pointer whitespace-nowrap select-none"
+          class="flex items-center gap-2 px-3.5 py-2 text-xs font-semibold rounded-lg transition-all cursor-pointer whitespace-normal sm:whitespace-nowrap select-none"
           :class="
             activeTab === 'quick'
               ? 'bg-[#F1F5F9] text-[#0F172A]'
@@ -447,8 +458,9 @@ onMounted(() => {
 
         <button
           type="button"
+          :aria-pressed="activeTab === 'custom'"
           @click="activeTab = 'custom'"
-          class="flex items-center gap-2 px-3.5 py-2 text-xs font-semibold rounded-lg transition-all cursor-pointer whitespace-nowrap select-none"
+          class="flex items-center gap-2 px-3.5 py-2 text-xs font-semibold rounded-lg transition-all cursor-pointer whitespace-normal sm:whitespace-nowrap select-none"
           :class="
             activeTab === 'custom'
               ? 'bg-[#F1F5F9] text-[#0F172A]'
@@ -464,8 +476,9 @@ onMounted(() => {
 
         <button
           type="button"
+          :aria-pressed="activeTab === 'presets'"
           @click="activeTab = 'presets'"
-          class="flex items-center gap-2 px-3.5 py-2 text-xs font-semibold rounded-lg transition-all cursor-pointer whitespace-nowrap select-none"
+          class="flex items-center gap-2 px-3.5 py-2 text-xs font-semibold rounded-lg transition-all cursor-pointer whitespace-normal sm:whitespace-nowrap select-none"
           :class="
             activeTab === 'presets'
               ? 'bg-[#F1F5F9] text-[#0F172A]'
@@ -480,7 +493,7 @@ onMounted(() => {
       <button
         type="button"
         @click="fetchTablesMetadata"
-        class="hidden sm:flex items-center gap-1.5 text-xs font-medium text-[#64748B] hover:text-[#2563EB] transition-colors cursor-pointer"
+        class="flex items-center justify-center shrink-0 gap-1.5 text-xs font-medium text-[#64748B] hover:text-[#2563EB] transition-colors cursor-pointer"
       >
         <span class="material-symbols-outlined text-[16px]">refresh</span>
         <span>Refresh Stats</span>
@@ -501,7 +514,7 @@ onMounted(() => {
         <div
           v-for="table in tables"
           :key="table.tableName"
-          class="group flex flex-col justify-between rounded-2xl border border-[#E2E8F0] bg-white p-4 transition-all duration-150 hover:border-[#CBD5E1] hover:shadow-2xs"
+          class="group min-w-0 flex flex-col justify-between rounded-2xl border border-[#E2E8F0] bg-white p-4 transition-all duration-150 hover:border-[#CBD5E1] hover:shadow-2xs"
         >
           <div class="space-y-3">
             <div class="flex items-center justify-between gap-2">
@@ -523,7 +536,7 @@ onMounted(() => {
               >
                 {{ table.label }}
               </h3>
-              <p class="mt-1 text-xs text-[#64748B] line-clamp-2 leading-relaxed">
+              <p class="mt-1 text-xs text-[#64748B] sm:line-clamp-2 leading-relaxed">
                 {{ table.description }}
               </p>
             </div>
@@ -575,10 +588,12 @@ onMounted(() => {
     <!-- TAB 2: EKSPOR KUSTOM (CUSTOM QUERY & FIELD PICKER) -->
     <div v-if="activeTab === 'custom'" class="grid grid-cols-1 lg:grid-cols-12 gap-6">
       <!-- Left Column: Table & Field Selector -->
-      <div class="lg:col-span-8 space-y-6">
+      <div class="min-w-0 lg:col-span-8 space-y-4 sm:space-y-6">
         <!-- Step 1: Select Table -->
-        <div class="rounded-2xl border border-[#E2E8F0] bg-white p-5 space-y-4">
-          <div class="flex items-center justify-between">
+        <div class="rounded-2xl border border-[#E2E8F0] bg-white p-3.5 sm:p-5 space-y-4">
+          <div
+            class="flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-between"
+          >
             <h2 class="text-sm font-bold text-[#0F172A] flex items-center gap-2">
               <span
                 class="flex h-5 w-5 items-center justify-center rounded-full bg-[#2563EB] text-white text-[10px]"
@@ -591,13 +606,13 @@ onMounted(() => {
             </span>
           </div>
 
-          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2.5">
+          <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-2.5">
             <button
               v-for="tbl in tables"
               :key="tbl.tableName"
               type="button"
               @click="selectedTableKey = tbl.tableName"
-              class="flex flex-col p-3 rounded-xl border text-left transition-all cursor-pointer"
+              class="flex min-w-0 flex-col p-3 rounded-xl border text-left transition-all cursor-pointer"
               :class="
                 selectedTableKey === tbl.tableName
                   ? 'border-[#2563EB] bg-[#EFF6FF] text-[#1E3A8A]'
@@ -610,15 +625,17 @@ onMounted(() => {
               >
                 {{ tbl.icon }}
               </span>
-              <span class="text-xs font-bold truncate">{{ tbl.label }}</span>
+              <span class="text-xs font-bold whitespace-normal sm:truncate">{{ tbl.label }}</span>
               <span class="text-[10px] text-[#64748B] mt-0.5">{{ tbl.rowCount }} rows</span>
             </button>
           </div>
         </div>
 
         <!-- Step 2: Choose Columns / Fields -->
-        <div class="rounded-2xl border border-[#E2E8F0] bg-white p-5 space-y-4">
-          <div class="flex items-center justify-between">
+        <div class="rounded-2xl border border-[#E2E8F0] bg-white p-3.5 sm:p-5 space-y-4">
+          <div
+            class="flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-between"
+          >
             <h2 class="text-sm font-bold text-[#0F172A] flex items-center gap-2">
               <span
                 class="flex h-5 w-5 items-center justify-center rounded-full bg-[#2563EB] text-white text-[10px]"
@@ -646,7 +663,7 @@ onMounted(() => {
           </div>
 
           <div
-            class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 max-h-60 overflow-y-auto pr-1"
+            class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-2 max-h-60 overflow-y-auto pr-1"
           >
             <label
               v-for="col in currentTableColumns"
@@ -666,8 +683,12 @@ onMounted(() => {
                 class="h-4 w-4 rounded-md border-[#CBD5E1] text-[#2563EB] focus:ring-[#2563EB]"
               />
               <div class="min-w-0 flex-1">
-                <p class="text-xs truncate leading-tight">{{ col.label }}</p>
-                <p class="text-[10px] font-mono text-[#94A3B8] truncate">{{ col.name }}</p>
+                <p class="text-xs whitespace-normal sm:truncate leading-relaxed">{{ col.label }}</p>
+                <p
+                  class="text-xs sm:text-[10px] font-mono text-[#64748B] sm:text-[#94A3B8] whitespace-normal sm:truncate"
+                >
+                  {{ col.name }}
+                </p>
               </div>
             </label>
           </div>
@@ -678,7 +699,7 @@ onMounted(() => {
         </div>
 
         <!-- Step 3: Date & Filter Settings -->
-        <div class="rounded-2xl border border-[#E2E8F0] bg-white p-5 space-y-4">
+        <div class="rounded-2xl border border-[#E2E8F0] bg-white p-3.5 sm:p-5 space-y-4">
           <h2 class="text-sm font-bold text-[#0F172A] flex items-center gap-2">
             <span
               class="flex h-5 w-5 items-center justify-center rounded-full bg-[#2563EB] text-white text-[10px]"
@@ -687,25 +708,29 @@ onMounted(() => {
             <span>Filter & Batas Baris Data</span>
           </h2>
 
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
             <div>
-              <label for="export-start-date" class="block text-xs font-medium text-[#64748B] mb-1">Tanggal Mulai</label>
+              <label for="export-start-date" class="block text-xs font-medium text-[#64748B] mb-1"
+                >Tanggal Mulai</label
+              >
               <input
                 id="export-start-date"
                 type="date"
                 aria-label="Tanggal Mulai Ekspor"
                 v-model="startDate"
-                class="w-full rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-2 text-xs font-medium text-[#0F172A] focus:border-[#2563EB] focus:bg-white focus:outline-none"
+                class="min-w-0 max-w-full w-full rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-2 text-xs font-medium text-[#0F172A] focus:border-[#2563EB] focus:bg-white focus:outline-none"
               />
             </div>
             <div>
-              <label for="export-end-date" class="block text-xs font-medium text-[#64748B] mb-1">Tanggal Selesai</label>
+              <label for="export-end-date" class="block text-xs font-medium text-[#64748B] mb-1"
+                >Tanggal Selesai</label
+              >
               <input
                 id="export-end-date"
                 type="date"
                 aria-label="Tanggal Selesai Ekspor"
                 v-model="endDate"
-                class="w-full rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-2 text-xs font-medium text-[#0F172A] focus:border-[#2563EB] focus:bg-white focus:outline-none"
+                class="min-w-0 max-w-full w-full rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-2 text-xs font-medium text-[#0F172A] focus:border-[#2563EB] focus:bg-white focus:outline-none"
               />
             </div>
             <div>
@@ -716,7 +741,7 @@ onMounted(() => {
                 id="export-row-limit"
                 aria-label="Batas Maksimal Baris"
                 v-model="rowLimit"
-                class="w-full rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-2 text-xs font-semibold text-[#0F172A] focus:border-[#2563EB] focus:bg-white focus:outline-none cursor-pointer"
+                class="min-w-0 max-w-full w-full rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-2 text-xs font-semibold text-[#0F172A] focus:border-[#2563EB] focus:bg-white focus:outline-none cursor-pointer"
               >
                 <option :value="50">50 Baris Pertama</option>
                 <option :value="100">100 Baris Pertama</option>
@@ -743,21 +768,24 @@ onMounted(() => {
                   v-model="searchQuery"
                   maxlength="200"
                   placeholder="Cari kata kunci data..."
-                  class="w-full rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] pl-9 pr-3 py-2 text-xs font-medium text-[#0F172A] focus:border-[#2563EB] focus:bg-white focus:outline-none"
+                  class="min-w-0 max-w-full w-full rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] pl-9 pr-3 py-2 text-xs font-medium text-[#0F172A] focus:border-[#2563EB] focus:bg-white focus:outline-none"
                 />
               </div>
             </div>
 
             <div>
-              <label class="block text-xs font-medium text-[#64748B] mb-1"
+              <label
+                for="export-status-filter"
+                class="block text-xs font-medium text-[#64748B] mb-1"
                 >Filter Status (Jika Ada)</label
               >
               <input
                 type="text"
+                id="export-status-filter"
                 v-model="statusFilter"
                 maxlength="100"
                 placeholder="misal: Digunakan, Rusak, Resolved..."
-                class="w-full rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-2 text-xs font-medium text-[#0F172A] focus:border-[#2563EB] focus:bg-white focus:outline-none"
+                class="min-w-0 max-w-full w-full rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-2 text-xs font-medium text-[#0F172A] focus:border-[#2563EB] focus:bg-white focus:outline-none"
               />
             </div>
           </div>
@@ -765,8 +793,10 @@ onMounted(() => {
       </div>
 
       <!-- Right Column: Export Output Controls & Preview Trigger -->
-      <div class="lg:col-span-4 space-y-6">
-        <div class="sticky top-6 rounded-2xl border border-[#E2E8F0] bg-white p-5 space-y-4">
+      <div class="min-w-0 lg:col-span-4 space-y-4 sm:space-y-6">
+        <div
+          class="lg:sticky lg:top-6 rounded-2xl border border-[#E2E8F0] bg-white p-3.5 sm:p-5 space-y-4"
+        >
           <h2 class="text-sm font-bold text-[#0F172A] flex items-center gap-2">
             <span
               class="flex h-5 w-5 items-center justify-center rounded-full bg-[#2563EB] text-white text-[10px]"
@@ -848,15 +878,15 @@ onMounted(() => {
 
           <!-- Summary Box -->
           <div class="rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] p-3.5 space-y-1.5 text-xs">
-            <div class="flex justify-between text-[#64748B]">
+            <div class="flex flex-wrap justify-between gap-x-3 gap-y-1 text-[#64748B]">
               <span>Tabel Terpilih:</span>
               <strong class="text-[#0F172A] font-mono">{{ selectedTableKey }}</strong>
             </div>
-            <div class="flex justify-between text-[#64748B]">
+            <div class="flex flex-wrap justify-between gap-x-3 gap-y-1 text-[#64748B]">
               <span>Jumlah Kolom:</span>
               <strong class="text-[#0F172A]">{{ selectedColumns.length }} Kolom</strong>
             </div>
-            <div class="flex justify-between text-[#64748B]">
+            <div class="flex flex-wrap justify-between gap-x-3 gap-y-1 text-[#64748B]">
               <span>Batas Baris:</span>
               <strong class="text-[#0F172A] capitalize">{{ rowLimit }}</strong>
             </div>
@@ -989,34 +1019,28 @@ onMounted(() => {
       </div>
     </div>
 
-    <!-- LIVE PREVIEW MODAL -->
-    <div
-      v-if="showPreviewModal"
-      class="fixed inset-0 z-50 flex items-center justify-center bg-[#0F172A]/40 backdrop-blur-xs p-4"
+    <!-- Live preview reuses the shared modal for viewport bounds and keyboard focus. -->
+    <AppModal
+      :is-open="showPreviewModal"
+      :title="'Pratinjau Data Ekspor (Sampel ' + previewData.length + ' Baris)'"
+      :subtitle="'Tabel: ' + selectedTableKey"
+      icon="preview"
+      size="xl"
+      @close="showPreviewModal = false"
     >
-      <div
-        class="relative w-full max-w-4xl rounded-2xl bg-white shadow-xl overflow-hidden flex flex-col max-h-[85vh] text-[#0F172A]"
-      >
-        <!-- Modal Header -->
-        <div class="flex items-center justify-between border-b border-[#F1F5F9] px-6 py-4">
-          <div>
-            <h3 class="text-base font-bold text-[#0F172A] flex items-center gap-2">
-              <span class="material-symbols-outlined text-[18px] text-[#2563EB]">preview</span>
-              <span>Pratinjau Data Ekspor (Sampel {{ previewData.length }} Baris)</span>
-            </h3>
-            <p class="text-xs text-[#64748B] font-mono">Tabel: {{ selectedTableKey }}</p>
-          </div>
-          <button
-            type="button"
-            @click="showPreviewModal = false"
-            class="rounded-xl p-1.5 text-[#94A3B8] hover:bg-[#F8FAFC] hover:text-[#0F172A] transition-colors cursor-pointer"
-          >
-            <span class="material-symbols-outlined text-[20px]">close</span>
-          </button>
-        </div>
-
-        <!-- Modal Body Table -->
-        <div class="flex-1 overflow-auto p-6">
+      <div class="export-modal min-w-0 space-y-4 wrap-anywhere">
+        <p class="text-xs text-[#64748B]">
+          Menampilkan maksimal 10 baris pertama sebagai gambaran format.
+        </p>
+        <p class="text-xs text-[#64748B] sm:hidden">
+          Geser tabel ke samping untuk melihat seluruh kolom.
+        </p>
+        <div
+          class="max-h-[50dvh] overflow-auto rounded-xl border border-[#E2E8F0]"
+          tabindex="0"
+          role="region"
+          aria-label="Pratinjau tabel ekspor, geser untuk melihat seluruh kolom"
+        >
           <div v-if="previewData.length === 0" class="py-12 text-center text-xs text-[#94A3B8]">
             Tidak ada data untuk ditampilkan.
           </div>
@@ -1035,7 +1059,7 @@ onMounted(() => {
                 <td
                   v-for="col in previewColumns"
                   :key="col.name"
-                  class="p-3 text-[#334155] max-w-xs truncate"
+                  class="p-3 text-[#334155] min-w-36 max-w-xs whitespace-normal wrap-anywhere"
                 >
                   {{ row[col.name] !== null && row[col.name] !== undefined ? row[col.name] : '—' }}
                 </td>
@@ -1044,32 +1068,24 @@ onMounted(() => {
           </table>
         </div>
 
-        <!-- Modal Footer -->
-        <div
-          class="flex items-center justify-between border-t border-[#F1F5F9] px-6 py-3.5 bg-white"
-        >
-          <span class="text-xs text-[#64748B]">
-            Menampilkan maksimal 10 baris pertama sebagai gambaran format.
-          </span>
-          <div class="flex items-center gap-2.5">
-            <button
-              type="button"
-              @click="showPreviewModal = false"
-              class="rounded-xl border border-[#E2E8F0] bg-white px-4 py-2 text-xs font-semibold text-[#64748B] hover:bg-[#F8FAFC] hover:text-[#0F172A] transition-colors cursor-pointer"
-            >
-              Tutup
-            </button>
-            <button
-              type="button"
-              @click="handleConfirmExportModal"
-              class="rounded-xl bg-[#2563EB] px-4 py-2 text-xs font-bold text-white hover:bg-[#1D4ED8] transition-colors cursor-pointer"
-            >
-              Unduh Sekarang
-            </button>
-          </div>
+        <div class="grid grid-cols-1 gap-2 sm:flex sm:justify-end border-t border-[#F1F5F9] pt-3">
+          <button
+            type="button"
+            @click="showPreviewModal = false"
+            class="rounded-xl border border-[#E2E8F0] bg-white px-4 py-2 text-xs font-semibold text-[#64748B] hover:bg-[#F8FAFC]"
+          >
+            Tutup
+          </button>
+          <button
+            type="button"
+            @click="handleConfirmExportModal"
+            class="rounded-xl bg-[#2563EB] px-4 py-2 text-xs font-bold text-white hover:bg-[#1D4ED8]"
+          >
+            Unduh Sekarang
+          </button>
         </div>
       </div>
-    </div>
+    </AppModal>
 
     <!-- Reset Database Confirmation Modal -->
     <AppModal
@@ -1080,23 +1096,35 @@ onMounted(() => {
       size="md"
       @close="closeResetModal"
     >
-      <div class="space-y-4 text-[#0F172A]">
+      <div class="export-modal space-y-4 text-[#0F172A] wrap-anywhere">
         <div class="rounded-xl bg-rose-50 p-4 border border-rose-200 flex items-start gap-3">
-          <span class="material-symbols-outlined text-rose-600 text-[22px] shrink-0 mt-0.5">error</span>
+          <span class="material-symbols-outlined text-rose-600 text-[22px] shrink-0 mt-0.5"
+            >error</span
+          >
           <div class="text-xs text-rose-900 space-y-1">
             <p class="font-bold text-sm">Peringatan Keamanan Database</p>
             <p class="leading-relaxed text-rose-800">
-              Tindakan ini <strong>TIDAK DAPAT DIBATALKAN</strong>. Seluruh data aset TI/GA/OPS, tiket bantuan, riwayat log audit, karyawan, dan sesi pengguna akan dihapus secara permanen.
+              Tindakan ini <strong>TIDAK DAPAT DIBATALKAN</strong>. Seluruh data aset TI/GA/OPS,
+              tiket bantuan, riwayat log audit, karyawan, dan sesi pengguna akan dihapus secara
+              permanen.
             </p>
             <p class="text-[11px] text-rose-700">
-              Setelah reset, akun Superadmin (<code class="font-mono font-semibold">superadmin@admin.com</code> / <code class="font-mono font-semibold">admin123</code>) dan unit helpdesk default akan disiapkan kembali secara otomatis.
+              Setelah reset, akun Superadmin (<code class="font-mono font-semibold"
+                >superadmin@admin.com</code
+              >
+              / <code class="font-mono font-semibold">admin123</code>) dan unit helpdesk default
+              akan disiapkan kembali secara otomatis.
             </p>
           </div>
         </div>
 
         <div class="space-y-2 pt-1">
           <label for="confirm-reset-input" class="block text-xs font-bold text-slate-800">
-            Ketik <span class="font-mono text-rose-700 bg-rose-100 px-1.5 py-0.5 rounded font-bold">RESET</span> di bawah ini untuk mengonfirmasi:
+            Ketik
+            <span class="font-mono text-rose-700 bg-rose-100 px-1.5 py-0.5 rounded font-bold"
+              >RESET</span
+            >
+            di bawah ini untuk mengonfirmasi:
           </label>
           <input
             id="confirm-reset-input"
@@ -1104,11 +1132,15 @@ onMounted(() => {
             type="text"
             placeholder="RESET"
             class="h-10 w-full rounded-xl border border-slate-300 bg-white px-3.5 text-xs text-slate-900 font-mono tracking-wider focus:border-rose-500 focus:outline-none focus:ring-2 focus:ring-rose-500/20"
-            @keydown.enter="confirmResetInput.trim().toUpperCase() === 'RESET' && handleConfirmResetDatabase()"
+            @keydown.enter="
+              confirmResetInput.trim().toUpperCase() === 'RESET' && handleConfirmResetDatabase()
+            "
           />
         </div>
 
-        <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-[#F1F5F9]">
+        <div
+          class="grid grid-cols-1 sm:flex sm:items-center sm:justify-end gap-2.5 pt-3 border-t border-[#F1F5F9]"
+        >
           <button
             type="button"
             @click="closeResetModal"
@@ -1122,7 +1154,9 @@ onMounted(() => {
             @click="handleConfirmResetDatabase"
             class="inline-flex items-center gap-1.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white px-4 py-2 text-xs font-bold transition-all shadow-xs disabled:opacity-50 disabled:pointer-events-none cursor-pointer"
           >
-            <span v-if="isResetting" class="material-symbols-outlined text-[16px] animate-spin">progress_activity</span>
+            <span v-if="isResetting" class="material-symbols-outlined text-[16px] animate-spin"
+              >progress_activity</span
+            >
             <span v-else class="material-symbols-outlined text-[16px]">restart_alt</span>
             <span>{{ isResetting ? 'Me-reset...' : 'Reset Database Sekarang' }}</span>
           </button>
@@ -1133,6 +1167,26 @@ onMounted(() => {
 </template>
 
 <style scoped>
+@media (width < 40rem) {
+  .export-page button,
+  .export-modal button,
+  .export-page label:has(input) {
+    min-height: 2.75rem;
+  }
+  .export-page input:not([type='radio']):not([type='checkbox']),
+  .export-page select,
+  .export-modal input {
+    min-height: 2.75rem;
+    font-size: 1rem;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fade-enter-active,
+  .fade-leave-active {
+    transition: none;
+  }
+}
+
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.3s ease;

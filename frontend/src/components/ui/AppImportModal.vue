@@ -377,7 +377,7 @@ async function submitImport() {
         <button
           type="button"
           @click="downloadTemplate"
-          class="flex items-center gap-2 rounded-xl bg-[#5D87FF] px-4 py-2 text-[12px] font-bold text-white shadow-md hover:bg-[#4570EA] transition-all cursor-pointer shrink-0"
+          class="flex min-h-11 sm:min-h-0 justify-center items-center gap-2 rounded-xl bg-[#5D87FF] px-4 py-2 text-[12px] font-bold text-white shadow-md hover:bg-[#4570EA] transition-all cursor-pointer shrink-0"
         >
           <span class="material-symbols-outlined text-[16px]">download</span>
           <span>Unduh Template (.xlsx)</span>
@@ -386,6 +386,11 @@ async function submitImport() {
 
       <!-- File Upload Dropzone -->
       <div
+        role="button"
+        tabindex="0"
+        aria-label="Pilih file Excel"
+        @keydown.enter.prevent="fileInputRef?.click()"
+        @keydown.space.prevent="fileInputRef?.click()"
         @dragover.prevent
         @drop="onDropFile"
         class="relative flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-[#DFE5EF] bg-[#F8FAFC] p-6 text-center hover:border-[#5D87FF] hover:bg-[#ECF2FF]/40 transition-all cursor-pointer"
@@ -409,7 +414,7 @@ async function submitImport() {
           Tarik &amp; lepas file Excel di sini, atau
           <span class="text-[#5D87FF] underline">pilih file</span>
         </p>
-        <p v-else class="text-[13px] font-bold text-[#5D87FF] truncate max-w-md">
+        <p v-else class="text-[13px] font-bold text-[#5D87FF] max-w-full wrap-anywhere sm:max-w-md">
           📄 {{ selectedFile.name }} ({{ (selectedFile.size / 1024).toFixed(1) }} KB)
         </p>
 
@@ -432,11 +437,11 @@ async function submitImport() {
         class="space-y-3 pt-2"
       >
         <!-- Tab Switcher -->
-        <div class="flex items-center gap-2 border-b border-[#E5EAEF] pb-2">
+        <div class="grid grid-cols-1 sm:flex sm:items-center gap-2 border-b border-[#E5EAEF] pb-2">
           <button
             type="button"
             @click="activeTab = 'karyawan'"
-            class="flex items-center gap-2 rounded-xl px-4 py-2 text-[12px] font-bold transition-all cursor-pointer"
+            class="flex min-h-11 sm:min-h-0 items-center gap-2 rounded-xl px-4 py-2 text-[12px] font-bold transition-all cursor-pointer"
             :class="
               activeTab === 'karyawan'
                 ? 'bg-[#5D87FF] text-white shadow-sm'
@@ -450,7 +455,7 @@ async function submitImport() {
           <button
             type="button"
             @click="activeTab = 'assets'"
-            class="flex items-center gap-2 rounded-xl px-4 py-2 text-[12px] font-bold transition-all cursor-pointer"
+            class="flex min-h-11 sm:min-h-0 items-center gap-2 rounded-xl px-4 py-2 text-[12px] font-bold transition-all cursor-pointer"
             :class="
               activeTab === 'assets'
                 ? 'bg-[#5D87FF] text-white shadow-sm'
@@ -518,6 +523,7 @@ async function submitImport() {
             </p>
           </div>
           <AppPagination
+            mobile-compact
             v-if="parsedKaryawanRows.length > 0"
             v-model:currentPage="currentPageKaryawan"
             :total-items="parsedKaryawanRows.length"
@@ -614,6 +620,7 @@ async function submitImport() {
             </p>
           </div>
           <AppPagination
+            mobile-compact
             v-if="parsedAssetRows.length > 0"
             v-model:currentPage="currentPageAssets"
             :total-items="parsedAssetRows.length"
@@ -623,11 +630,11 @@ async function submitImport() {
       </div>
 
       <!-- Action Buttons -->
-      <div class="flex items-center justify-end gap-3 pt-4 border-t border-[#E5EAEF]">
+      <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-3 pt-4 border-t border-[#E5EAEF]">
         <button
           type="button"
           @click="handleClose"
-          class="rounded-xl border border-[#E5EAEF] px-4 py-2 text-[12px] font-bold text-[#7C8BAC] hover:bg-gray-50 transition-all cursor-pointer"
+          class="min-h-11 sm:min-h-0 rounded-xl border border-[#E5EAEF] px-4 py-2 text-[12px] font-bold text-[#7C8BAC] hover:bg-gray-50 transition-all cursor-pointer"
         >
           Batal
         </button>
@@ -637,7 +644,7 @@ async function submitImport() {
             isSubmitting || (parsedKaryawanRows.length === 0 && parsedAssetRows.length === 0)
           "
           @click="submitImport"
-          class="flex items-center gap-2 rounded-xl bg-[#5D87FF] px-5 py-2 text-[12px] font-bold text-white shadow-md hover:bg-[#4570EA] transition-all cursor-pointer disabled:opacity-50"
+          class="flex min-h-11 sm:min-h-0 justify-center items-center gap-2 rounded-xl bg-[#5D87FF] px-5 py-2 text-[12px] font-bold text-white shadow-md hover:bg-[#4570EA] transition-all cursor-pointer disabled:opacity-50"
         >
           <span
             v-if="isSubmitting"

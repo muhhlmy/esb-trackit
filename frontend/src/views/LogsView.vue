@@ -210,10 +210,13 @@ function parsePerubahan(perubahan, aksi) {
 </script>
 
 <template>
-  <div class="flex min-w-0 flex-col gap-4" :data-testid="!isLoading ? 'page-ready' : undefined">
+  <div
+    class="logs-page flex min-w-0 flex-col gap-4"
+    :data-testid="!isLoading ? 'page-ready' : undefined"
+  >
     <!-- Simplified SaaS Header Container -->
     <div
-      class="flex flex-col gap-3.5 bg-white p-4.5 rounded-2xl border border-[#E2E8F0]/80 shadow-2xs"
+      class="flex flex-col gap-3.5 bg-white p-3.5 sm:p-4.5 rounded-2xl border border-[#E2E8F0]/80 shadow-2xs"
     >
       <div>
         <h2 class="text-lg font-bold text-[#0F172A] tracking-tight">
@@ -233,55 +236,62 @@ function parsePerubahan(perubahan, aksi) {
     <div
       v-if="pageError"
       role="alert"
-      class="shadow-card flex items-center gap-2 rounded-[20px] border border-red-200 bg-red-50/60 px-5 py-4 text-[13px] text-red-700 backdrop-blur-xl"
+      class="shadow-card flex flex-wrap items-center gap-2 rounded-[20px] border border-red-200 bg-red-50/60 px-5 py-4 text-[13px] text-red-700 backdrop-blur-xl"
     >
-      <span class="material-symbols-outlined text-[18px]" aria-hidden="true">error</span>
-      <span>{{ pageError }}</span>
+      <span aria-hidden="true" class="material-symbols-outlined text-[18px]">error</span>
+      <span class="min-w-0 flex-1 wrap-anywhere">{{ pageError }}</span>
       <button
         @click="fetchLogs"
-        class="ml-auto text-[11px] font-extrabold uppercase tracking-wider text-red-800 hover:underline"
+        type="button"
+        class="min-h-11 px-2 ml-auto text-xs font-extrabold uppercase tracking-wider text-red-800 hover:underline"
       >
         Coba Lagi
       </button>
     </div>
 
     <!-- Tab Selection Navigation -->
-    <div class="flex border-b border-[#E2E8F0]/80">
+    <div
+      class="grid sm:flex border-b border-[#E2E8F0]/80"
+      :class="isSuperAdmin ? 'grid-cols-2' : 'grid-cols-1'"
+      aria-label="Jenis log"
+    >
       <button
         type="button"
+        :aria-pressed="activeTab === 'assets'"
         @click="activeTab = 'assets'"
-        class="flex items-center gap-2 px-5 py-3.5 text-[12px] font-bold transition-all duration-150 border-b-2 -mb-[2px]"
+        class="flex min-w-0 min-h-11 items-center justify-center sm:justify-start gap-2 px-2 sm:px-5 py-3.5 text-xs leading-relaxed text-left font-bold transition-all duration-150 border-b-2 -mb-[2px]"
         :class="
           activeTab === 'assets'
             ? 'border-brand text-brand font-black'
             : 'border-transparent text-[#64748B] hover:text-[#172033]'
         "
       >
-        <span class="material-symbols-outlined text-[18px]">history</span>
+        <span aria-hidden="true" class="material-symbols-outlined text-[18px]">history</span>
         Riwayat Perubahan Aset
       </button>
       <button
         v-if="isSuperAdmin"
         type="button"
+        :aria-pressed="activeTab === 'audit'"
         @click="activeTab = 'audit'"
-        class="flex items-center gap-2 px-5 py-3.5 text-[12px] font-bold transition-all duration-150 border-b-2 -mb-[2px]"
+        class="flex min-w-0 min-h-11 items-center justify-center sm:justify-start gap-2 px-2 sm:px-5 py-3.5 text-xs leading-relaxed text-left font-bold transition-all duration-150 border-b-2 -mb-[2px]"
         :class="
           activeTab === 'audit'
             ? 'border-brand text-brand font-black'
             : 'border-transparent text-[#64748B] hover:text-[#172033]'
         "
       >
-        <span class="material-symbols-outlined text-[18px]">security</span>
+        <span aria-hidden="true" class="material-symbols-outlined text-[18px]">security</span>
         Audit Aktivitas Login
       </button>
     </div>
 
     <!-- Filters Bar Card -->
     <div
-      class="shadow-card flex min-w-0 flex-wrap items-center gap-3 rounded-2xl border border-[#E8EDF3] bg-white p-3"
+      class="logs-filters shadow-card flex flex-col sm:flex-row min-w-0 flex-wrap items-stretch sm:items-center gap-3 rounded-2xl border border-[#E8EDF3] bg-white p-3"
     >
       <!-- Search -->
-      <div class="relative flex-1 min-w-[200px]">
+      <div class="relative min-w-0 sm:flex-1 sm:min-w-[200px]">
         <span
           aria-hidden="true"
           class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-[18px] text-[#94A3B8] pointer-events-none"
@@ -290,16 +300,17 @@ function parsePerubahan(perubahan, aksi) {
         </span>
         <input
           v-model="searchQuery"
+          aria-label="Cari kata kunci log"
           type="text"
           placeholder="Cari kata kunci log..."
-          class="h-10 w-full rounded-xl border border-[#DCE3EC] bg-white pl-10 pr-3 text-[11px] font-semibold text-[#334155] outline-none transition-all focus:border-brand focus:ring-1 focus:ring-brand/10"
+          class="h-11 sm:h-10 w-full rounded-xl border border-[#DCE3EC] bg-white pl-10 pr-3 text-[11px] font-semibold text-[#334155] outline-none transition-all focus:border-brand focus:ring-1 focus:ring-brand/10"
         />
       </div>
 
       <!-- Filter + Refresh grouped (kept together) -->
-      <div class="flex items-center gap-2">
+      <div class="grid grid-cols-1 min-w-0 gap-2 sm:flex sm:items-center">
         <!-- Action Filter (Asset Tab only) -->
-        <div v-if="activeTab === 'assets'" class="w-36">
+        <div v-if="activeTab === 'assets'" class="min-w-0 sm:w-36">
           <CustomSelect
             v-model="filterAction"
             :options="[
@@ -309,12 +320,13 @@ function parsePerubahan(perubahan, aksi) {
               { value: 'HAPUS', label: 'Hapus Aset' },
             ]"
             aria-label="Filter aksi"
+            height-class="h-11 sm:h-9"
             block
           />
         </div>
 
         <!-- Activity Filter (Audit Tab only) -->
-        <div v-if="activeTab === 'audit'" class="w-44">
+        <div v-if="activeTab === 'audit'" class="min-w-0 sm:w-44">
           <CustomSelect
             v-model="filterActivity"
             :options="[
@@ -326,6 +338,7 @@ function parsePerubahan(perubahan, aksi) {
               { value: 'LOGOUT', label: 'Logout' },
             ]"
             aria-label="Filter aktivitas"
+            height-class="h-11 sm:h-9"
             block
           />
         </div>
@@ -335,9 +348,12 @@ function parsePerubahan(perubahan, aksi) {
           type="button"
           @click="fetchLogs"
           :disabled="isLoading"
-          class="flex h-10 items-center justify-center gap-2 rounded-xl border border-[#DCE3EC] bg-white/50 px-4 text-[12px] font-bold text-[#334155] shadow-sm hover:bg-[#F8FAFC] disabled:opacity-50"
+          class="flex h-11 sm:h-10 items-center justify-center gap-2 rounded-xl border border-[#DCE3EC] bg-white/50 px-4 text-[12px] font-bold text-[#334155] shadow-sm hover:bg-[#F8FAFC] disabled:opacity-50"
         >
-          <span class="material-symbols-outlined text-[18px]" :class="{ 'animate-spin': isLoading }"
+          <span
+            aria-hidden="true"
+            class="material-symbols-outlined text-[18px]"
+            :class="{ 'animate-spin': isLoading }"
             >refresh</span
           >
           Segarkan
@@ -357,12 +373,12 @@ function parsePerubahan(perubahan, aksi) {
         <!-- Empty State -->
         <div
           v-if="filteredAssetLogs.length === 0"
-          class="flex flex-col items-center justify-center py-20 gap-3"
+          class="flex flex-col items-center justify-center px-4 py-10 sm:py-20 gap-3 text-center"
         >
-          <span class="material-symbols-outlined text-[40px] text-[#D1D5DB]"
+          <span aria-hidden="true" class="material-symbols-outlined text-[40px] text-[#D1D5DB]"
             >history_toggle_off</span
           >
-          <p class="text-[13px] font-semibold text-[#9CA3AF]">
+          <p class="text-[13px] font-semibold text-[#64748B]">
             Tidak ada riwayat perubahan aset ditemukan.
           </p>
         </div>
@@ -372,32 +388,35 @@ function parsePerubahan(perubahan, aksi) {
           <div
             v-for="log in paginatedAssetLogs"
             :key="log.id"
-            class="group flex gap-4 px-5 py-4 hover:bg-[#FAFBFD] transition-colors"
+            class="group flex min-w-0 gap-4 px-3.5 sm:px-5 py-4 hover:bg-[#FAFBFD] transition-colors"
           >
             <!-- Left: Icon + Timeline connector -->
-            <div class="flex flex-col items-center pt-0.5">
+            <div class="hidden sm:flex flex-col items-center pt-0.5">
               <div
                 class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl"
                 :class="getActionColor(log.aksi)"
               >
-                <span class="material-symbols-outlined text-[18px]">{{
+                <span aria-hidden="true" class="material-symbols-outlined text-[18px]">{{
                   getActionIcon(log.aksi)
                 }}</span>
               </div>
             </div>
 
             <!-- Middle: Main content -->
-            <div class="flex-1 min-w-0">
+            <div class="flex-1 min-w-0 wrap-anywhere">
               <!-- Top row: Badge + Label + Time -->
-              <div class="flex flex-wrap items-center gap-2 mb-2">
+              <div class="flex flex-wrap items-center gap-2 mb-3 sm:mb-2">
                 <AppBadge :type="getActionBadgeType(log.aksi)" :text="log.aksi" />
-                <span class="text-[13px] font-extrabold text-[#111827] font-mono tracking-tight">{{
-                  log.label_aset
-                }}</span>
+                <span
+                  class="w-full sm:w-auto min-w-0 text-sm sm:text-[13px] font-extrabold text-[#111827] font-mono tracking-tight"
+                  >{{ log.label_aset }}</span
+                >
                 <span
                   class="text-[10px] text-[#94A3B8] font-medium ml-auto shrink-0 hidden sm:inline"
                 >
-                  <span class="material-symbols-outlined text-[12px] align-text-bottom mr-0.5"
+                  <span
+                    aria-hidden="true"
+                    class="material-symbols-outlined text-[12px] align-text-bottom mr-0.5"
                     >schedule</span
                   >
                   {{ formatDateTime(log.dibuat_pada) }}
@@ -411,28 +430,32 @@ function parsePerubahan(perubahan, aksi) {
                   parsePerubahan(log.perubahan, log.aksi).length &&
                   parsePerubahan(log.perubahan, log.aksi)[0].old !== undefined
                 "
-                class="space-y-1.5"
+                class="space-y-3 sm:space-y-1.5"
               >
                 <div
                   v-for="(row, idx) in parsePerubahan(log.perubahan, log.aksi)"
                   :key="idx"
-                  class="flex items-baseline gap-2 text-[11px]"
+                  class="flex flex-col sm:flex-row sm:items-baseline gap-1.5 sm:gap-2 text-[13px] sm:text-[11px]"
                 >
                   <span
-                    class="w-28 shrink-0 text-[10px] font-bold text-[#6B7280] uppercase tracking-wide"
+                    class="sm:w-28 shrink-0 text-xs sm:text-[10px] font-bold text-[#6B7280] uppercase tracking-wide"
                     >{{ row.field }}</span
                   >
-                  <span class="flex items-center gap-1.5 min-w-0 flex-wrap">
+                  <span
+                    class="flex flex-col items-start sm:flex-row sm:items-center gap-1.5 min-w-0 max-w-full flex-wrap"
+                  >
                     <span
-                      class="inline-flex items-center gap-1 rounded-md bg-[#FEF2F2] px-2 py-0.5 text-[10px] font-semibold text-[#991B1B] line-through decoration-[#FECACA]"
-                      >{{ displayValue(row.old) }}</span
+                      class="inline-block max-w-full rounded-md bg-[#FEF2F2] px-2 py-0.5 text-[13px] sm:text-[10px] font-semibold text-[#991B1B] line-through decoration-[#FECACA]"
+                      ><span class="sr-only">Sebelum: </span>{{ displayValue(row.old) }}</span
                     >
-                    <span class="material-symbols-outlined text-[12px] text-[#CBD5E1] shrink-0"
+                    <span
+                      aria-hidden="true"
+                      class="material-symbols-outlined rotate-90 sm:rotate-0 text-[16px] sm:text-[12px] text-[#64748B] sm:text-[#CBD5E1] shrink-0"
                       >arrow_forward</span
                     >
                     <span
-                      class="inline-flex items-center gap-1 rounded-md bg-[#F0FDF4] px-2 py-0.5 text-[10px] font-bold text-[#166534]"
-                      >{{ displayValue(row.new) }}</span
+                      class="inline-block max-w-full rounded-md bg-[#F0FDF4] px-2 py-0.5 text-[13px] sm:text-[10px] font-bold text-[#166534]"
+                      ><span class="sr-only">Sesudah: </span>{{ displayValue(row.new) }}</span
                     >
                   </span>
                 </div>
@@ -443,12 +466,12 @@ function parsePerubahan(perubahan, aksi) {
                 v-else-if="
                   log.aksi === 'TAMBAH' && parsePerubahan(log.perubahan, log.aksi).length > 1
                 "
-                class="flex flex-wrap gap-x-4 gap-y-1"
+                class="grid grid-cols-1 sm:flex sm:flex-wrap gap-x-4 gap-y-2 sm:gap-y-1"
               >
                 <span
                   v-for="(row, idx) in parsePerubahan(log.perubahan, log.aksi)"
                   :key="idx"
-                  class="text-[10px] text-[#6B7280]"
+                  class="text-[13px] sm:text-[10px] text-[#6B7280]"
                 >
                   <span class="font-bold uppercase tracking-wide">{{ row.field }}:</span>
                   <span class="ml-1 font-semibold text-[#374151]">{{
@@ -458,17 +481,26 @@ function parsePerubahan(perubahan, aksi) {
               </div>
 
               <!-- Fallback text -->
-              <p v-else class="text-[11px] font-medium text-[#64748B] leading-relaxed">
+              <p
+                v-else
+                class="text-[13px] sm:text-[11px] font-medium text-[#64748B] leading-relaxed whitespace-pre-line"
+              >
                 {{ log.perubahan }}
               </p>
 
               <!-- Mobile timestamp + Author -->
-              <div class="flex items-center gap-3 mt-2">
-                <span class="text-[10px] text-[#94A3B8] font-medium sm:hidden">
+              <div
+                class="flex flex-col items-start sm:flex-row sm:items-center gap-1.5 sm:gap-3 mt-3 sm:mt-2"
+              >
+                <span class="text-xs text-[#64748B] font-medium sm:hidden">
                   {{ formatDateTime(log.dibuat_pada) }}
                 </span>
-                <span class="text-[10px] font-bold text-[#94A3B8]">
-                  <span class="material-symbols-outlined text-[11px] align-text-bottom mr-0.5"
+                <span
+                  class="text-xs sm:text-[10px] font-semibold sm:font-bold text-[#64748B] sm:text-[#94A3B8]"
+                >
+                  <span
+                    aria-hidden="true"
+                    class="material-symbols-outlined text-[11px] align-text-bottom mr-0.5"
                     >person</span
                   >
                   {{ log.oleh_pengguna }}
@@ -480,6 +512,7 @@ function parsePerubahan(perubahan, aksi) {
 
         <!-- Footer Pagination Assets -->
         <AppPagination
+          mobile-compact
           v-if="filteredAssetLogs.length > 0"
           v-model:currentPage="currentPageAssets"
           :total-items="filteredAssetLogs.length"
@@ -489,7 +522,41 @@ function parsePerubahan(perubahan, aksi) {
 
       <!-- ── TAB 2: Login Audit Log Table ────────────────────── -->
       <div v-else-if="activeTab === 'audit'">
-        <div class="overflow-x-auto" tabindex="0" aria-label="Tabel log audit login">
+        <div v-if="filteredAuditLogs.length === 0" class="px-4 py-10 text-center lg:hidden">
+          <span aria-hidden="true" class="material-symbols-outlined text-[40px] text-[#D1D5DB]"
+            >shield_person</span
+          >
+          <p class="mt-3 text-[13px] font-semibold text-[#64748B]">
+            Tidak ada audit aktivitas login ditemukan.
+          </p>
+        </div>
+        <ul v-else class="divide-y divide-[#F3F4F6] lg:hidden" aria-label="Audit aktivitas login">
+          <li
+            v-for="log in paginatedAuditLogs"
+            :key="log.id"
+            class="min-w-0 space-y-3 p-3.5 sm:p-4 wrap-anywhere"
+          >
+            <AppBadge
+              :type="getActivityBadgeType(log.aktifitas)"
+              :text="getActivityBadgeText(log.aktifitas)"
+            />
+            <div class="space-y-1">
+              <h3 class="text-sm font-bold leading-relaxed text-[#111827]">
+                {{ log.nama_pengguna }}
+              </h3>
+              <p class="text-[13px] leading-relaxed text-[#374151]">{{ log.email }}</p>
+            </div>
+            <dl class="text-xs leading-relaxed text-[#64748B]">
+              <dt class="font-semibold">Waktu aktivitas</dt>
+              <dd>{{ formatDateTime(log.dibuat_pada) }}</dd>
+            </dl>
+          </li>
+        </ul>
+        <div
+          class="hidden lg:block overflow-x-auto"
+          tabindex="0"
+          aria-label="Tabel log audit login"
+        >
           <table class="w-full min-w-[700px]">
             <caption class="sr-only">
               Tabel log audit login aktivitas pengguna
@@ -530,16 +597,21 @@ function parsePerubahan(perubahan, aksi) {
                   {{ log.email }}
                 </td>
                 <td class="px-5 py-3.5">
-                  <AppBadge :type="getActivityBadgeType(log.aktifitas)" :text="getActivityBadgeText(log.aktifitas)" />
+                  <AppBadge
+                    :type="getActivityBadgeType(log.aktifitas)"
+                    :text="getActivityBadgeText(log.aktifitas)"
+                  />
                 </td>
               </tr>
               <tr v-if="filteredAuditLogs.length === 0">
                 <td colspan="4" class="px-5 py-12 text-center">
                   <div class="flex flex-col items-center gap-3">
-                    <span class="material-symbols-outlined text-[40px] text-[#D1D5DB]"
+                    <span
+                      aria-hidden="true"
+                      class="material-symbols-outlined text-[40px] text-[#D1D5DB]"
                       >shield_person</span
                     >
-                    <p class="text-[13px] font-semibold text-[#9CA3AF]">
+                    <p class="text-[13px] font-semibold text-[#64748B]">
                       Tidak ada audit aktivitas login ditemukan.
                     </p>
                   </div>
@@ -551,6 +623,7 @@ function parsePerubahan(perubahan, aksi) {
 
         <!-- Footer Pagination Audit -->
         <AppPagination
+          mobile-compact
           v-if="filteredAuditLogs.length > 0"
           v-model:currentPage="currentPageAudit"
           :total-items="filteredAuditLogs.length"
@@ -562,22 +635,18 @@ function parsePerubahan(perubahan, aksi) {
 </template>
 
 <style scoped>
-.form-control {
-  height: 2.5rem;
-  border: 1px solid #dce3ec;
-  border-radius: 0.75rem;
-  background: #ffffff;
-  padding: 0 0.75rem;
-  font-size: 0.6875rem;
-  font-weight: 600;
-  color: #334155;
-  outline: none;
-  transition:
-    border-color 0.15s,
-    box-shadow 0.15s;
-}
-.form-control:focus {
-  border-color: var(--color-brand);
-  box-shadow: 0 0 0 3px rgb(9 124 222 / 10%);
+@media (width < 40rem) {
+  .logs-page input {
+    font-size: 1rem;
+  }
+  .logs-filters :deep([role='option']) {
+    height: auto;
+    min-height: 2.75rem;
+    padding-block: 0.5rem;
+  }
+  .logs-filters :deep(.truncate) {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
 }
 </style>

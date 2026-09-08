@@ -65,7 +65,9 @@ const toast = ref({ show: false, message: '', type: 'success' })
 
 function showToast(message, type = 'success') {
   toast.value = { show: true, message, type }
-  setTimeout(() => { toast.value.show = false }, 4000)
+  setTimeout(() => {
+    toast.value.show = false
+  }, 4000)
 }
 
 // ========== Formatters ==========
@@ -81,8 +83,11 @@ function formatDate(dateStr) {
   if (!dateStr) return '-'
   const d = new Date(dateStr)
   return d.toLocaleDateString('id-ID', {
-    day: '2-digit', month: 'short', year: 'numeric',
-    hour: '2-digit', minute: '2-digit',
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
   })
 }
 
@@ -186,8 +191,8 @@ async function handleDownload(backup) {
     const url = `${baseUrl}/api/admin/database/backups/${backup.id}/download`
 
     const response = await fetch(url, {
-        credentials: 'same-origin',
-        })
+      credentials: 'same-origin',
+    })
 
     if (response.status === 401) {
       clearAuthSession()
@@ -367,20 +372,26 @@ function switchTab(tab) {
 </script>
 
 <template>
-  <div class="flex flex-col gap-5">
+  <div
+    class="database-page flex min-w-0 flex-col gap-4 sm:gap-5 wrap-anywhere"
+    :data-testid="!isLoading ? 'page-ready' : undefined"
+  >
     <!-- Page Header -->
-    <div class="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
       <div>
         <h1 class="text-xl font-bold tracking-tight text-[#1E293B]">Database</h1>
         <p class="text-sm text-[#64748B]">Backup & restore database PostgreSQL</p>
       </div>
-      <div class="flex items-center gap-2">
+      <div class="flex flex-col sm:flex-row sm:items-center gap-2">
         <button
           :disabled="isBackingUp || !dbStatus.pgDumpAvailable"
           class="inline-flex items-center gap-2 rounded-lg bg-[#2563EB] px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all hover:bg-[#1D4ED8] disabled:cursor-not-allowed disabled:opacity-50"
           @click="handleBackupNow"
         >
-          <span v-if="isBackingUp" class="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
+          <span
+            v-if="isBackingUp"
+            class="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"
+          ></span>
           <span v-else class="material-symbols-outlined text-lg">database</span>
           {{ isBackingUp ? 'Membuat Backup...' : 'Backup Now' }}
         </button>
@@ -388,7 +399,10 @@ function switchTab(tab) {
     </div>
 
     <!-- Tab Navigation -->
-    <div class="flex gap-1 rounded-xl bg-[#F1F5F9] p-1 w-fit">
+    <div
+      class="grid grid-cols-2 sm:flex gap-1 rounded-xl bg-[#F1F5F9] p-1 w-full sm:w-fit"
+      aria-label="Navigasi database"
+    >
       <button
         v-for="tab in [
           { key: 'overview', label: 'Overview', icon: 'monitor_heart' },
@@ -397,10 +411,13 @@ function switchTab(tab) {
           { key: 'audit', label: 'Audit Log', icon: 'receipt_long' },
         ]"
         :key="tab.key"
-        class="flex items-center gap-1.5 rounded-lg px-3.5 py-1.5 text-sm font-medium transition-all"
-        :class="activeTab === tab.key
-          ? 'bg-white text-[#1E293B] shadow-sm'
-          : 'text-[#64748B] hover:text-[#334155]'"
+        class="flex min-w-0 items-center justify-center gap-1.5 rounded-lg px-2 sm:px-3.5 py-1.5 text-sm font-medium transition-all"
+        :class="
+          activeTab === tab.key
+            ? 'bg-white text-[#1E293B] shadow-sm'
+            : 'text-[#64748B] hover:text-[#334155]'
+        "
+        :aria-pressed="activeTab === tab.key"
         @click="switchTab(tab.key)"
       >
         <span class="material-symbols-outlined text-base">{{ tab.icon }}</span>
@@ -423,8 +440,13 @@ function switchTab(tab) {
             PostgreSQL
           </div>
           <div class="mt-2 flex items-center gap-2">
-            <span class="inline-block h-2.5 w-2.5 rounded-full" :class="dbStatus.connected ? 'bg-emerald-500' : 'bg-red-500'"></span>
-            <span class="text-lg font-semibold text-[#1E293B]">{{ dbStatus.connected ? 'Connected' : 'Disconnected' }}</span>
+            <span
+              class="inline-block h-2.5 w-2.5 rounded-full"
+              :class="dbStatus.connected ? 'bg-emerald-500' : 'bg-red-500'"
+            ></span>
+            <span class="text-lg font-semibold text-[#1E293B]">{{
+              dbStatus.connected ? 'Connected' : 'Disconnected'
+            }}</span>
           </div>
           <div class="mt-1 text-xs text-[#94A3B8]">{{ dbStatus.databaseName }}</div>
         </div>
@@ -435,10 +457,17 @@ function switchTab(tab) {
             Schema
           </div>
           <div class="mt-2 flex items-center gap-2">
-            <span class="inline-block h-2.5 w-2.5 rounded-full" :class="dbStatus.schemaHealthy ? 'bg-emerald-500' : 'bg-amber-500'"></span>
-            <span class="text-lg font-semibold text-[#1E293B]">{{ dbStatus.schemaHealthy ? 'Healthy' : 'Incomplete' }}</span>
+            <span
+              class="inline-block h-2.5 w-2.5 rounded-full"
+              :class="dbStatus.schemaHealthy ? 'bg-emerald-500' : 'bg-amber-500'"
+            ></span>
+            <span class="text-lg font-semibold text-[#1E293B]">{{
+              dbStatus.schemaHealthy ? 'Healthy' : 'Incomplete'
+            }}</span>
           </div>
-          <div class="mt-1 text-xs text-[#94A3B8]">{{ dbStatus.tables.length }} tables, {{ dbStatus.views.length }} views</div>
+          <div class="mt-1 text-xs text-[#94A3B8]">
+            {{ dbStatus.tables.length }} tables, {{ dbStatus.views.length }} views
+          </div>
         </div>
 
         <div class="rounded-xl border border-[#E5EAEF] bg-white p-4 shadow-sm">
@@ -448,19 +477,34 @@ function switchTab(tab) {
           </div>
           <div class="mt-2 space-y-1">
             <div class="flex items-center gap-2 text-xs">
-              <span class="inline-block h-1.5 w-1.5 rounded-full" :class="dbStatus.pgDumpAvailable ? 'bg-emerald-500' : 'bg-red-500'"></span>
+              <span
+                class="inline-block h-1.5 w-1.5 rounded-full"
+                :class="dbStatus.pgDumpAvailable ? 'bg-emerald-500' : 'bg-red-500'"
+              ></span>
               <span class="text-[#64748B]">pg_dump</span>
-              <span class="text-[#94A3B8]">{{ dbStatus.pgDumpAvailable ? 'Ready' : 'Not Found' }}</span>
+              <span class="text-[#94A3B8]">{{
+                dbStatus.pgDumpAvailable ? 'Ready' : 'Not Found'
+              }}</span>
             </div>
             <div class="flex items-center gap-2 text-xs">
-              <span class="inline-block h-1.5 w-1.5 rounded-full" :class="dbStatus.pgRestoreAvailable ? 'bg-emerald-500' : 'bg-red-500'"></span>
+              <span
+                class="inline-block h-1.5 w-1.5 rounded-full"
+                :class="dbStatus.pgRestoreAvailable ? 'bg-emerald-500' : 'bg-red-500'"
+              ></span>
               <span class="text-[#64748B]">pg_restore</span>
-              <span class="text-[#94A3B8]">{{ dbStatus.pgRestoreAvailable ? 'Ready' : 'Not Found' }}</span>
+              <span class="text-[#94A3B8]">{{
+                dbStatus.pgRestoreAvailable ? 'Ready' : 'Not Found'
+              }}</span>
             </div>
             <div class="flex items-center gap-2 text-xs">
-              <span class="inline-block h-1.5 w-1.5 rounded-full" :class="dbStatus.psqlAvailable ? 'bg-emerald-500' : 'bg-red-500'"></span>
+              <span
+                class="inline-block h-1.5 w-1.5 rounded-full"
+                :class="dbStatus.psqlAvailable ? 'bg-emerald-500' : 'bg-red-500'"
+              ></span>
               <span class="text-[#64748B]">psql</span>
-              <span class="text-[#94A3B8]">{{ dbStatus.psqlAvailable ? 'Ready' : 'Not Found' }}</span>
+              <span class="text-[#94A3B8]">{{
+                dbStatus.psqlAvailable ? 'Ready' : 'Not Found'
+              }}</span>
             </div>
           </div>
         </div>
@@ -471,8 +515,13 @@ function switchTab(tab) {
             Storage
           </div>
           <div class="mt-2 flex items-center gap-2">
-            <span class="inline-block h-2.5 w-2.5 rounded-full" :class="dbStatus.backupStorageAvailable ? 'bg-emerald-500' : 'bg-red-500'"></span>
-            <span class="text-lg font-semibold text-[#1E293B]">{{ dbStatus.backupStorageAvailable ? 'Available' : 'Unavailable' }}</span>
+            <span
+              class="inline-block h-2.5 w-2.5 rounded-full"
+              :class="dbStatus.backupStorageAvailable ? 'bg-emerald-500' : 'bg-red-500'"
+            ></span>
+            <span class="text-lg font-semibold text-[#1E293B]">{{
+              dbStatus.backupStorageAvailable ? 'Available' : 'Unavailable'
+            }}</span>
           </div>
           <div class="mt-1 text-xs text-[#94A3B8]">{{ dbStatus.backupCount }} backup files</div>
         </div>
@@ -520,9 +569,67 @@ function switchTab(tab) {
     <!-- ===== BACKUP HISTORY TAB ===== -->
     <template v-if="!isLoading && activeTab === 'history'">
       <div class="rounded-xl border border-[#E5EAEF] bg-white shadow-sm">
-        <div class="overflow-x-auto">
+        <div v-if="isLoadingBackups" class="p-4 lg:hidden" role="status">
+          Memuat riwayat backup...
+        </div>
+        <p
+          v-else-if="backups.length === 0"
+          class="px-4 py-10 text-center text-sm text-[#64748B] lg:hidden"
+        >
+          Belum ada backup
+        </p>
+        <ul v-else class="divide-y divide-[#F1F5F9] lg:hidden" aria-label="Riwayat backup">
+          <li v-for="backup in backups" :key="backup.id" class="min-w-0 space-y-3 p-4">
+            <h3 class="text-sm font-semibold text-[#1E293B]">{{ backup.filename }}</h3>
+            <span
+              class="inline-flex rounded-full border px-2 py-0.5 text-xs font-medium"
+              :class="statusClass(backup.status)"
+              >{{ statusLabel(backup.status) }}</span
+            >
+            <dl class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+              <div>
+                <dt class="text-xs text-[#64748B]">Date</dt>
+                <dd>{{ formatDate(backup.created_at) }}</dd>
+              </div>
+              <div>
+                <dt class="text-xs text-[#64748B]">Size</dt>
+                <dd>{{ formatBytes(backup.file_size) }}</dd>
+              </div>
+              <div>
+                <dt class="text-xs text-[#64748B]">Created By</dt>
+                <dd>{{ backup.created_by_name || '-' }}</dd>
+              </div>
+              <div class="sm:col-span-2">
+                <dt class="text-xs text-[#64748B]">Checksum</dt>
+                <dd class="font-mono text-xs leading-relaxed">{{ backup.checksum || '-' }}</dd>
+              </div>
+            </dl>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 border-t border-[#F1F5F9] pt-3">
+              <button
+                v-if="backup.status === 'success'"
+                type="button"
+                class="flex items-center justify-center gap-2 rounded-lg border border-[#E5EAEF] px-3 py-2 text-sm font-medium text-[#2563EB] hover:bg-[#F8FAFC]"
+                @click="handleDownload(backup)"
+              >
+                <span aria-hidden="true" class="material-symbols-outlined text-lg">download</span
+                >Download
+              </button>
+              <button
+                type="button"
+                class="flex items-center justify-center gap-2 rounded-lg border border-[#E5EAEF] px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50"
+                @click="openDeleteConfirm(backup)"
+              >
+                <span aria-hidden="true" class="material-symbols-outlined text-lg">delete</span
+                >Delete
+              </button>
+            </div>
+          </li>
+        </ul>
+        <div class="hidden lg:block overflow-x-auto">
           <table class="w-full text-left text-sm">
-            <thead class="border-b border-[#F1F5F9] bg-[#F8FAFC] text-xs font-semibold uppercase text-[#64748B]">
+            <thead
+              class="border-b border-[#F1F5F9] bg-[#F8FAFC] text-xs font-semibold uppercase text-[#64748B]"
+            >
               <tr>
                 <th class="px-4 py-3">Filename</th>
                 <th class="px-4 py-3">Date</th>
@@ -540,8 +647,15 @@ function switchTab(tab) {
                   Belum ada backup
                 </td>
               </tr>
-              <tr v-for="backup in backups" :key="backup.id" class="hover:bg-[#F8FAFC] transition-colors">
-                <td class="px-4 py-3 font-medium text-[#1E293B] max-w-[220px] truncate" :title="backup.filename">
+              <tr
+                v-for="backup in backups"
+                :key="backup.id"
+                class="hover:bg-[#F8FAFC] transition-colors"
+              >
+                <td
+                  class="px-4 py-3 font-medium text-[#1E293B] max-w-[220px] truncate"
+                  :title="backup.filename"
+                >
                   {{ backup.filename }}
                 </td>
                 <td class="px-4 py-3 text-[#64748B] whitespace-nowrap">
@@ -552,11 +666,17 @@ function switchTab(tab) {
                 </td>
                 <td class="px-4 py-3 text-[#64748B]">{{ backup.created_by_name || '-' }}</td>
                 <td class="px-4 py-3">
-                  <span class="inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium" :class="statusClass(backup.status)">
+                  <span
+                    class="inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium"
+                    :class="statusClass(backup.status)"
+                  >
                     {{ statusLabel(backup.status) }}
                   </span>
                 </td>
-                <td class="px-4 py-3 text-[#94A3B8] font-mono text-xs max-w-[100px] truncate" :title="backup.checksum">
+                <td
+                  class="px-4 py-3 text-[#94A3B8] font-mono text-xs max-w-[100px] truncate"
+                  :title="backup.checksum"
+                >
                   {{ backup.checksum ? backup.checksum.slice(0, 12) + '...' : '-' }}
                 </td>
                 <td class="px-4 py-3">
@@ -587,7 +707,7 @@ function switchTab(tab) {
 
     <!-- ===== RESTORE TAB ===== -->
     <template v-if="!isLoading && activeTab === 'restore'">
-      <div class="rounded-xl border border-[#E5EAEF] bg-white p-6 shadow-sm">
+      <div class="rounded-xl border border-[#E5EAEF] bg-white p-3.5 sm:p-6 shadow-sm">
         <!-- Warning Banner -->
         <div class="mb-6 rounded-lg border border-red-200 bg-red-50 p-4">
           <div class="flex items-start gap-3">
@@ -608,18 +728,29 @@ function switchTab(tab) {
         <!-- Step 1: Upload -->
         <div v-if="restoreStep === 'upload' || restoreStep === 'validating'">
           <h3 class="mb-4 text-base font-semibold text-[#1E293B]">Upload File Backup</h3>
-          <div class="rounded-lg border-2 border-dashed border-[#CBD5E1] p-8 text-center transition-colors hover:border-[#2563EB]">
+          <div
+            class="rounded-lg border-2 border-dashed border-[#CBD5E1] p-4 sm:p-8 text-center transition-colors hover:border-[#2563EB]"
+          >
             <input
               id="restoreFileInput"
               type="file"
               accept=".dump,.sql,.tar"
-              class="hidden"
+              class="peer sr-only"
               @change="handleFileSelect"
             />
-            <label for="restoreFileInput" class="cursor-pointer">
-              <span class="material-symbols-outlined mb-2 block text-4xl text-[#94A3B8]">upload_file</span>
+            <label
+              for="restoreFileInput"
+              class="block cursor-pointer rounded-lg peer-focus-visible:outline-2 peer-focus-visible:outline-offset-4 peer-focus-visible:outline-[#2563EB]"
+            >
+              <span class="material-symbols-outlined mb-2 block text-4xl text-[#94A3B8]"
+                >upload_file</span
+              >
               <p class="text-sm text-[#64748B]">
-                {{ restoreFile ? restoreFile.name : 'Klik untuk memilih file backup (.dump, .sql, .tar)' }}
+                {{
+                  restoreFile
+                    ? restoreFile.name
+                    : 'Klik untuk memilih file backup (.dump, .sql, .tar)'
+                }}
               </p>
               <p v-if="restoreFile" class="mt-1 text-xs text-[#94A3B8]">
                 {{ formatBytes(restoreFile.size) }}
@@ -627,7 +758,10 @@ function switchTab(tab) {
             </label>
           </div>
 
-          <div v-if="restoreError" class="mt-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+          <div
+            v-if="restoreError"
+            class="mt-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700"
+          >
             {{ restoreError }}
           </div>
 
@@ -636,7 +770,10 @@ function switchTab(tab) {
             class="mt-4 inline-flex items-center gap-2 rounded-lg bg-[#2563EB] px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all hover:bg-[#1D4ED8] disabled:cursor-not-allowed disabled:opacity-50"
             @click="handleValidateRestore"
           >
-            <span v-if="restoreStep === 'validating'" class="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
+            <span
+              v-if="restoreStep === 'validating'"
+              class="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"
+            ></span>
             <span v-else class="material-symbols-outlined text-lg">fact_check</span>
             {{ restoreStep === 'validating' ? 'Memvalidasi...' : 'Validate Backup' }}
           </button>
@@ -648,40 +785,62 @@ function switchTab(tab) {
           <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div class="rounded-lg bg-[#F8FAFC] p-3">
               <div class="text-xs text-[#94A3B8]">Format</div>
-              <div class="text-sm font-medium text-[#1E293B]">{{ restoreValidation?.format || '-' }}</div>
+              <div class="text-sm font-medium text-[#1E293B]">
+                {{ restoreValidation?.format || '-' }}
+              </div>
             </div>
             <div class="rounded-lg bg-[#F8FAFC] p-3">
               <div class="text-xs text-[#94A3B8]">Database</div>
-              <div class="text-sm font-medium text-[#1E293B]">{{ restoreValidation?.databaseName || '-' }}</div>
+              <div class="text-sm font-medium text-[#1E293B]">
+                {{ restoreValidation?.databaseName || '-' }}
+              </div>
             </div>
             <div class="rounded-lg bg-[#F8FAFC] p-3">
               <div class="text-xs text-[#94A3B8]">Size</div>
-              <div class="text-sm font-medium text-[#1E293B]">{{ formatBytes(restoreValidation?.fileSize) }}</div>
+              <div class="text-sm font-medium text-[#1E293B]">
+                {{ formatBytes(restoreValidation?.fileSize) }}
+              </div>
             </div>
             <div class="rounded-lg bg-[#F8FAFC] p-3">
               <div class="text-xs text-[#94A3B8]">Checksum</div>
-              <div class="text-sm font-mono font-medium text-[#1E293B] truncate">{{ restoreValidation?.checksum?.slice(0, 24) || '-' }}</div>
+              <div class="text-sm font-mono font-medium text-[#1E293B] truncate">
+                {{ restoreValidation?.checksum?.slice(0, 24) || '-' }}
+              </div>
             </div>
-            <div class="rounded-lg sm:col-span-2" :class="restoreValidation?.contentValid ? 'bg-emerald-50' : 'bg-red-50'">
+            <div
+              class="rounded-lg sm:col-span-2"
+              :class="restoreValidation?.contentValid ? 'bg-emerald-50' : 'bg-red-50'"
+            >
               <div class="p-3">
                 <div class="flex items-center gap-2">
-                  <span class="material-symbols-outlined text-sm" :class="restoreValidation?.contentValid ? 'text-emerald-600' : 'text-red-600'">
+                  <span
+                    class="material-symbols-outlined text-sm"
+                    :class="restoreValidation?.contentValid ? 'text-emerald-600' : 'text-red-600'"
+                  >
                     {{ restoreValidation?.contentValid ? 'check_circle' : 'cancel' }}
                   </span>
-                  <span class="text-sm font-medium" :class="restoreValidation?.contentValid ? 'text-emerald-700' : 'text-red-700'">
+                  <span
+                    class="text-sm font-medium"
+                    :class="restoreValidation?.contentValid ? 'text-emerald-700' : 'text-red-700'"
+                  >
                     {{ restoreValidation?.contentValid ? 'Valid' : 'Invalid' }}
                   </span>
                 </div>
-                <p v-if="restoreValidation?.contentError" class="mt-1 text-xs text-red-600">{{ restoreValidation.contentError }}</p>
+                <p v-if="restoreValidation?.contentError" class="mt-1 text-xs text-red-600">
+                  {{ restoreValidation.contentError }}
+                </p>
               </div>
             </div>
           </div>
 
-          <div v-if="restoreError" class="mt-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+          <div
+            v-if="restoreError"
+            class="mt-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700"
+          >
             {{ restoreError }}
           </div>
 
-          <div class="mt-4 flex gap-2">
+          <div class="mt-4 grid grid-cols-1 sm:flex gap-2">
             <button
               class="rounded-lg border border-[#E5EAEF] px-4 py-2 text-sm font-medium text-[#64748B] hover:bg-[#F8FAFC]"
               @click="resetRestore"
@@ -693,7 +852,10 @@ function switchTab(tab) {
               class="inline-flex items-center gap-2 rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50"
               @click="openRestoreConfirm"
             >
-              <span v-if="restoreStep === 'restoring'" class="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
+              <span
+                v-if="restoreStep === 'restoring'"
+                class="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"
+              ></span>
               <span v-else class="material-symbols-outlined text-lg">restore_page</span>
               {{ restoreStep === 'restoring' ? 'Restoring...' : 'Restore Database' }}
             </button>
@@ -704,7 +866,9 @@ function switchTab(tab) {
         <div v-if="restoreStep === 'done'" class="text-center">
           <span class="material-symbols-outlined mb-3 text-5xl text-emerald-500">check_circle</span>
           <h3 class="text-lg font-semibold text-[#1E293B]">Restore Berhasil</h3>
-          <p class="mt-1 text-sm text-[#64748B]">Database telah diverifikasi dan berjalan normal.</p>
+          <p class="mt-1 text-sm text-[#64748B]">
+            Database telah diverifikasi dan berjalan normal.
+          </p>
           <p v-if="restoreResult?.safetyBackupId" class="mt-1 text-xs text-[#94A3B8]">
             Safety backup ID: {{ restoreResult.safetyBackupId }}
           </p>
@@ -721,9 +885,50 @@ function switchTab(tab) {
     <!-- ===== AUDIT LOG TAB ===== -->
     <template v-if="!isLoading && activeTab === 'audit'">
       <div class="rounded-xl border border-[#E5EAEF] bg-white shadow-sm">
-        <div class="overflow-x-auto">
+        <div v-if="isLoadingAudit" class="p-4 lg:hidden" role="status">Memuat audit log...</div>
+        <p
+          v-else-if="auditLogs.length === 0"
+          class="px-4 py-10 text-center text-sm text-[#64748B] lg:hidden"
+        >
+          Belum ada audit log
+        </p>
+        <ul v-else class="divide-y divide-[#F1F5F9] lg:hidden" aria-label="Audit database">
+          <li v-for="log in auditLogs" :key="log.id" class="min-w-0 space-y-3 p-4">
+            <h3 class="text-sm font-semibold text-[#1E293B]">
+              {{ operationLabel(log.operation) }}
+            </h3>
+            <span
+              class="inline-flex rounded-full border px-2 py-0.5 text-xs font-medium"
+              :class="statusClass(log.status)"
+              >{{ statusLabel(log.status) }}</span
+            >
+            <dl class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+              <div>
+                <dt class="text-xs text-[#64748B]">User</dt>
+                <dd>{{ log.user_name || '-' }}</dd>
+              </div>
+              <div>
+                <dt class="text-xs text-[#64748B]">Database</dt>
+                <dd class="font-mono text-xs leading-relaxed">{{ log.target_database }}</dd>
+              </div>
+              <div>
+                <dt class="text-xs text-[#64748B]">Timestamp</dt>
+                <dd>{{ formatDate(log.created_at) }}</dd>
+              </div>
+              <div class="sm:col-span-2">
+                <dt class="text-xs text-[#64748B]">Error</dt>
+                <dd class="text-[13px] leading-relaxed whitespace-pre-line">
+                  {{ log.error_summary || '-' }}
+                </dd>
+              </div>
+            </dl>
+          </li>
+        </ul>
+        <div class="hidden lg:block overflow-x-auto">
           <table class="w-full text-left text-sm">
-            <thead class="border-b border-[#F1F5F9] bg-[#F8FAFC] text-xs font-semibold uppercase text-[#64748B]">
+            <thead
+              class="border-b border-[#F1F5F9] bg-[#F8FAFC] text-xs font-semibold uppercase text-[#64748B]"
+            >
               <tr>
                 <th class="px-4 py-3">Operation</th>
                 <th class="px-4 py-3">User</th>
@@ -739,21 +944,35 @@ function switchTab(tab) {
                   Belum ada audit log
                 </td>
               </tr>
-              <tr v-for="log in auditLogs" :key="log.id" class="hover:bg-[#F8FAFC] transition-colors">
+              <tr
+                v-for="log in auditLogs"
+                :key="log.id"
+                class="hover:bg-[#F8FAFC] transition-colors"
+              >
                 <td class="px-4 py-3">
-                  <span class="inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium"
-                    :class="statusClass(log.status)">
+                  <span
+                    class="inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium"
+                    :class="statusClass(log.status)"
+                  >
                     {{ operationLabel(log.operation) }}
                   </span>
                 </td>
                 <td class="px-4 py-3 text-[#64748B]">{{ log.user_name || '-' }}</td>
-                <td class="px-4 py-3 text-[#64748B] font-mono text-xs">{{ log.target_database }}</td>
+                <td class="px-4 py-3 text-[#64748B] font-mono text-xs">
+                  {{ log.target_database }}
+                </td>
                 <td class="px-4 py-3">
-                  <span class="inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium" :class="statusClass(log.status)">
+                  <span
+                    class="inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium"
+                    :class="statusClass(log.status)"
+                  >
                     {{ statusLabel(log.status) }}
                   </span>
                 </td>
-                <td class="px-4 py-3 text-[#94A3B8] text-xs max-w-[200px] truncate" :title="log.error_summary">
+                <td
+                  class="px-4 py-3 text-[#94A3B8] text-xs max-w-[200px] truncate"
+                  :title="log.error_summary"
+                >
                   {{ log.error_summary || '-' }}
                 </td>
                 <td class="px-4 py-3 text-[#94A3B8] whitespace-nowrap text-xs">
@@ -772,15 +991,15 @@ function switchTab(tab) {
       title="Konfirmasi Restore Database"
       @close="showRestoreConfirm = false"
     >
-      <div class="space-y-4">
+      <div class="database-modal space-y-4 wrap-anywhere">
         <div class="rounded-lg border border-red-200 bg-red-50 p-4">
           <div class="flex items-start gap-3">
             <span class="material-symbols-outlined text-red-600">dangerous</span>
             <div>
               <p class="font-semibold text-red-800">PERINGATAN: Operasi Destructive</p>
               <p class="mt-1 text-sm text-red-700">
-                Restore database akan <strong>mengganti seluruh data</strong> database aktif dengan isi backup.
-                Data yang belum di-backup akan hilang permanen.
+                Restore database akan <strong>mengganti seluruh data</strong> database aktif dengan
+                isi backup. Data yang belum di-backup akan hilang permanen.
               </p>
               <p class="mt-1 text-sm text-red-700">
                 Sistem akan membuat <strong>safety backup otomatis</strong> sebelum restore dimulai.
@@ -790,10 +1009,18 @@ function switchTab(tab) {
         </div>
 
         <div>
-          <label class="mb-1.5 block text-sm font-medium text-[#1E293B]">
-            Ketik <code class="rounded bg-[#F1F5F9] px-1.5 py-0.5 font-mono text-xs text-red-600">RESTORE DATABASE</code> untuk melanjutkan:
+          <label
+            for="confirm-restore-input"
+            class="mb-1.5 block text-sm font-medium text-[#1E293B]"
+          >
+            Ketik
+            <code class="rounded bg-[#F1F5F9] px-1.5 py-0.5 font-mono text-xs text-red-600"
+              >RESTORE DATABASE</code
+            >
+            untuk melanjutkan:
           </label>
           <input
+            id="confirm-restore-input"
             v-model="confirmRestoreInput"
             type="text"
             class="w-full rounded-lg border border-[#E5EAEF] px-3 py-2 text-sm focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-200"
@@ -802,7 +1029,7 @@ function switchTab(tab) {
           />
         </div>
 
-        <div class="flex justify-end gap-3 pt-2">
+        <div class="grid grid-cols-1 sm:flex sm:justify-end gap-3 pt-2">
           <button
             class="rounded-lg border border-[#E5EAEF] px-4 py-2 text-sm font-medium text-[#64748B] hover:bg-[#F8FAFC]"
             @click="showRestoreConfirm = false"
@@ -821,17 +1048,13 @@ function switchTab(tab) {
     </AppModal>
 
     <!-- ===== DELETE CONFIRMATION MODAL ===== -->
-    <AppModal
-      :is-open="showDeleteConfirm"
-      title="Hapus Backup"
-      @close="showDeleteConfirm = false"
-    >
-      <div class="space-y-4">
+    <AppModal :is-open="showDeleteConfirm" title="Hapus Backup" @close="showDeleteConfirm = false">
+      <div class="database-modal space-y-4 wrap-anywhere">
         <p class="text-sm text-[#64748B]">
-          Anda yakin ingin menghapus backup <strong>{{ deleteTargetName }}</strong>?
-          Tindakan ini tidak dapat dibatalkan.
+          Anda yakin ingin menghapus backup <strong>{{ deleteTargetName }}</strong
+          >? Tindakan ini tidak dapat dibatalkan.
         </p>
-        <div class="flex justify-end gap-3">
+        <div class="grid grid-cols-1 sm:flex sm:justify-end gap-3">
           <button
             class="rounded-lg border border-[#E5EAEF] px-4 py-2 text-sm font-medium text-[#64748B] hover:bg-[#F8FAFC]"
             @click="showDeleteConfirm = false"
@@ -853,16 +1076,18 @@ function switchTab(tab) {
     <Transition name="toast">
       <div
         v-if="toast.show"
-        class="fixed bottom-6 right-6 z-50 flex items-center gap-2 rounded-xl px-4 py-3 shadow-lg text-sm font-medium"
-        :class="toast.type === 'success'
-          ? 'bg-emerald-600 text-white'
-          : 'bg-red-600 text-white'"
+        class="fixed bottom-3 left-3 right-3 sm:bottom-6 sm:left-auto sm:right-6 sm:max-w-md z-50 flex items-center gap-2 rounded-xl px-4 py-3 shadow-lg text-sm font-medium"
+        :class="toast.type === 'success' ? 'bg-emerald-600 text-white' : 'bg-red-600 text-white'"
       >
         <span class="material-symbols-outlined text-lg">
           {{ toast.type === 'success' ? 'check_circle' : 'error' }}
         </span>
-        {{ toast.message }}
-        <button class="ml-2 opacity-70 hover:opacity-100" @click="toast.show = false">
+        <span class="min-w-0 wrap-anywhere" role="status">{{ toast.message }}</span>
+        <button
+          aria-label="Tutup notifikasi"
+          class="ml-2 opacity-70 hover:opacity-100"
+          @click="toast.show = false"
+        >
           <span class="material-symbols-outlined text-base">close</span>
         </button>
       </div>
@@ -871,8 +1096,39 @@ function switchTab(tab) {
 </template>
 
 <style scoped>
-.toast-enter-active { transition: all 0.3s ease-out; }
-.toast-leave-active { transition: all 0.2s ease-in; }
-.toast-enter-from { opacity: 0; transform: translateY(20px); }
-.toast-leave-to { opacity: 0; transform: translateY(20px); }
+@media (width < 40rem) {
+  .database-page button,
+  .database-modal button {
+    min-height: 2.75rem;
+  }
+  .database-page button,
+  .database-modal button {
+    justify-content: center;
+  }
+  .database-modal input {
+    min-height: 2.75rem;
+    font-size: 1rem;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .toast-enter-active,
+  .toast-leave-active {
+    transition: none;
+  }
+}
+
+.toast-enter-active {
+  transition: all 0.3s ease-out;
+}
+.toast-leave-active {
+  transition: all 0.2s ease-in;
+}
+.toast-enter-from {
+  opacity: 0;
+  transform: translateY(20px);
+}
+.toast-leave-to {
+  opacity: 0;
+  transform: translateY(20px);
+}
 </style>

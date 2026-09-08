@@ -114,7 +114,7 @@ onBeforeUnmount(() => {
           aria-modal="true"
           :aria-labelledby="titleId"
           tabindex="-1"
-          class="modal-panel app-modal-panel flex max-h-[85vh] w-full flex-col overflow-hidden rounded-2xl border border-[#E2E8F0] bg-white shadow-2xl outline-none"
+          class="modal-panel app-modal-panel flex max-h-[calc(100dvh-1.5rem)] sm:max-h-[85vh] w-full flex-col overflow-hidden rounded-2xl border border-[#E2E8F0] bg-white shadow-2xl outline-none"
           :class="{
             'max-w-sm': size === 'sm',
             'max-w-lg': size === 'md',
@@ -126,7 +126,7 @@ onBeforeUnmount(() => {
         >
           <!-- Header Modal (Fixed Non-Scrollable Header) -->
           <div
-            class="flex shrink-0 items-center justify-between gap-3 border-b border-[#F1F5F9] bg-white px-5 py-3.5"
+            class="flex shrink-0 items-center justify-between gap-3 border-b border-[#F1F5F9] bg-white px-3.5 sm:px-5 py-3.5"
           >
             <div class="flex items-center gap-2.5 min-w-0">
               <span
@@ -137,7 +137,7 @@ onBeforeUnmount(() => {
                 }}</span>
               </span>
               <div class="min-w-0">
-                <h2 :id="titleId" class="text-sm font-bold text-[#0F172A] leading-tight truncate">
+                <h2 :id="titleId" class="text-sm font-bold text-[#0F172A] leading-tight wrap-anywhere sm:truncate">
                   {{ title }}
                 </h2>
                 <p
@@ -152,7 +152,7 @@ onBeforeUnmount(() => {
               type="button"
               aria-label="Tutup dialog"
               @click="close"
-              class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-[#475569] transition-colors hover:bg-[#F8FAFC] hover:text-[#0F172A] cursor-pointer"
+              class="flex h-11 w-11 sm:h-7 sm:w-7 shrink-0 items-center justify-center rounded-lg text-[#475569] transition-colors hover:bg-[#F8FAFC] hover:text-[#0F172A] cursor-pointer"
             >
               <span aria-hidden="true" class="material-symbols-outlined text-[18px]">close</span>
             </button>

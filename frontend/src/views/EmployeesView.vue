@@ -391,27 +391,30 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="flex min-w-0 flex-col gap-5" :data-testid="!isLoading ? 'page-ready' : undefined">
+  <div
+    class="employees-page flex min-w-0 flex-col gap-4 sm:gap-5"
+    :data-testid="!isLoading ? 'page-ready' : undefined"
+  >
     <!-- Notification Toast -->
     <Transition name="fade">
       <div
         v-if="notification"
-        class="fixed top-5 right-5 z-50 flex items-center gap-3 rounded-2xl px-5 py-3.5 shadow-2xl text-white font-semibold text-[13px]"
+        class="fixed top-3 left-3 right-3 sm:top-5 sm:left-auto sm:right-5 sm:max-w-md z-50 flex items-center gap-3 rounded-2xl px-5 py-3.5 shadow-2xl text-white font-semibold text-[13px]"
         :class="notification.type === 'error' ? 'bg-rose-600' : 'bg-emerald-600'"
       >
         <span class="material-symbols-outlined text-[20px]">
           {{ notification.type === 'error' ? 'error' : 'check_circle' }}
         </span>
-        <span>{{ notification.message }}</span>
+        <span class="min-w-0 wrap-anywhere" role="status">{{ notification.message }}</span>
       </div>
     </Transition>
 
     <!-- Modern SaaS Header & Control Bar Container -->
     <div
-      class="flex flex-col gap-4 bg-white p-5 rounded-2xl border border-[#E2E8F0] shadow-2xs"
+      class="flex min-w-0 flex-col gap-4 bg-white p-3.5 sm:p-5 rounded-2xl border border-[#E2E8F0] shadow-2xs"
     >
       <!-- Row 1: Page Title & Primary/Secondary Action Bar -->
-      <div class="flex items-center justify-between gap-3">
+      <div class="flex flex-col items-stretch justify-between gap-3 lg:flex-row lg:items-center">
         <div>
           <h2 class="text-xl font-bold text-[#0F172A] tracking-tight">Data Karyawan</h2>
           <p class="text-[13px] text-[#64748B] mt-0.5 leading-normal">
@@ -419,11 +422,11 @@ onMounted(() => {
           </p>
         </div>
 
-        <div v-if="canWriteKaryawan" class="flex items-center gap-2">
+        <div v-if="canWriteKaryawan" class="grid grid-cols-1 gap-2 sm:flex sm:items-center">
           <button
             type="button"
             @click="showImportModal = true"
-            class="h-9 shrink-0 whitespace-nowrap rounded-lg border border-[#CBD5E1] bg-white px-3.5 text-xs font-semibold text-[#334155] hover:bg-[#F8FAFC] hover:text-[#0F172A] transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs"
+            class="h-11 sm:h-9 shrink-0 whitespace-nowrap rounded-lg border border-[#CBD5E1] bg-white px-3.5 text-xs font-semibold text-[#334155] hover:bg-[#F8FAFC] hover:text-[#0F172A] transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs"
             title="Import data karyawan dari Excel"
           >
             <span class="material-symbols-outlined text-[16px] text-[#64748B]">file_upload</span>
@@ -433,7 +436,7 @@ onMounted(() => {
           <button
             type="button"
             @click="openAdd"
-            class="h-9 shrink-0 whitespace-nowrap rounded-lg bg-[#2563EB] px-4 text-xs font-semibold text-white shadow-2xs hover:bg-[#1D4ED8] transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+            class="h-11 sm:h-9 shrink-0 whitespace-nowrap rounded-lg bg-[#2563EB] px-4 text-xs font-semibold text-white shadow-2xs hover:bg-[#1D4ED8] transition-all flex items-center justify-center gap-1.5 cursor-pointer"
             title="Tambah karyawan baru"
           >
             <span class="material-symbols-outlined text-[16px]">person_add</span>
@@ -443,37 +446,48 @@ onMounted(() => {
       </div>
 
       <!-- Row 2: Search Input & Filters Control Bar -->
-      <div class="flex flex-wrap items-center gap-2.5 w-full min-w-0 pt-3 border-t border-[#F1F5F9]">
-        <div class="relative flex-1 min-w-[220px]">
+      <div
+        class="employee-filters grid grid-cols-1 sm:grid-cols-2 xl:flex xl:flex-wrap items-center gap-2.5 w-full min-w-0 pt-3 border-t border-[#F1F5F9]"
+      >
+        <div class="relative min-w-0 xl:flex-1 xl:min-w-[220px]">
           <span
             class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[18px] text-[#94A3B8] pointer-events-none"
             >search</span
           >
           <input
             v-model="searchQuery"
+            aria-label="Cari karyawan"
             type="text"
             placeholder="Cari NIK, nama, email, jabatan, atau departemen..."
-            class="h-10 w-full rounded-xl border border-[#E2E8F0] bg-white pl-9.5 pr-3 text-xs text-[#0F172A] placeholder-[#94A3B8] focus:border-[#2563EB] focus:outline-none transition-all shadow-2xs"
+            class="h-11 sm:h-10 w-full rounded-xl border border-[#E2E8F0] bg-white pl-9.5 pr-3 text-base sm:text-xs text-[#0F172A] placeholder-[#94A3B8] focus:border-[#2563EB] focus:outline-none transition-all shadow-2xs"
           />
         </div>
 
         <CustomSelect
           v-model="filterDepartemen"
           aria-label="Filter departemen"
-          :options="[{ value: '', label: 'Semua Departemen' }, ...availableDepartemenOptions.map((dep) => ({ value: dep, label: dep }))]"
+          :options="[
+            { value: '', label: 'Semua Departemen' },
+            ...availableDepartemenOptions.map((dep) => ({ value: dep, label: dep })),
+          ]"
           placeholder="Semua Departemen"
-          width-class="w-[155px]"
-          height-class="h-10"
+          class="min-w-0 xl:w-[155px]"
+          width-class="w-full"
+          height-class="min-h-11 sm:min-h-10"
           @change="currentPage = 1"
         />
 
         <CustomSelect
           v-model="filterLokasi"
           aria-label="Filter lokasi"
-          :options="[{ value: '', label: 'Semua Lokasi' }, ...availableLokasiOptions.map((loc) => ({ value: loc, label: loc }))]"
+          :options="[
+            { value: '', label: 'Semua Lokasi' },
+            ...availableLokasiOptions.map((loc) => ({ value: loc, label: loc })),
+          ]"
           placeholder="Semua Lokasi"
-          width-class="w-[135px]"
-          height-class="h-10"
+          class="min-w-0 xl:w-[135px]"
+          width-class="w-full"
+          height-class="min-h-11 sm:min-h-10"
           @change="currentPage = 1"
         />
 
@@ -487,46 +501,34 @@ onMounted(() => {
             { value: 'Resigned', label: 'Resigned' },
           ]"
           placeholder="Semua Status"
-          width-class="w-[130px]"
-          height-class="h-10"
+          class="min-w-0 xl:w-[130px]"
+          width-class="w-full"
+          height-class="min-h-11 sm:min-h-10"
           @change="currentPage = 1"
         />
       </div>
     </div>
 
     <!-- ── Card Stats Karyawan ── -->
-    <div v-if="!isLoading && stats" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-      <StatCard
-        title="Total Karyawan"
-        :value="stats.totalKaryawan"
-        icon="groups"
-        color="primary"
-      />
-      <StatCard
-        title="Active"
-        :value="stats.active"
-        icon="check_circle"
-        color="success"
-      />
-      <StatCard
-        title="Outsource"
-        :value="stats.outsource"
-        icon="contract"
-        color="warning"
-      />
+    <div
+      v-if="!isLoading && stats"
+      class="employee-stats grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 sm:gap-3"
+    >
+      <StatCard title="Total Karyawan" :value="stats.totalKaryawan" icon="groups" color="primary" />
+      <StatCard title="Active" :value="stats.active" icon="check_circle" color="success" />
+      <StatCard title="Outsource" :value="stats.outsource" icon="contract" color="warning" />
       <StatCard
         title="Resigned"
         :value="stats.resigned"
         icon="person_off"
         color="danger"
-        :subtitle="stats.totalKaryawan ? Math.round(stats.resigned / stats.totalKaryawan * 100) + '% turnover' : ''"
+        :subtitle="
+          stats.totalKaryawan
+            ? Math.round((stats.resigned / stats.totalKaryawan) * 100) + '% turnover'
+            : ''
+        "
       />
-      <StatCard
-        title="Permanent"
-        :value="stats.permanent"
-        icon="badge"
-        color="cyan"
-      />
+      <StatCard title="Permanent" :value="stats.permanent" icon="badge" color="cyan" />
       <StatCard
         title="Departemen"
         :value="stats.totalDepartemen"
@@ -552,7 +554,10 @@ onMounted(() => {
         </button>
       </div>
 
-      <div v-else-if="filteredEmployees.length === 0" class="p-12 text-center text-[#64748B]">
+      <div
+        v-else-if="filteredEmployees.length === 0"
+        class="px-4 py-8 sm:p-12 text-center text-[#64748B]"
+      >
         <span class="material-symbols-outlined text-[44px] text-[#CBD5E1]">person_off</span>
         <p class="mt-2 font-bold text-[13.5px] text-[#0F172A]">Tidak Ada Data Karyawan</p>
         <p class="text-[11.5px] text-[#64748B]">
@@ -561,7 +566,78 @@ onMounted(() => {
       </div>
 
       <div v-else class="w-full max-w-full overflow-hidden">
-        <table class="w-full max-w-full text-left border-collapse table-fixed">
+        <ul class="divide-y divide-[#E2E8F0] lg:hidden" aria-label="Daftar karyawan">
+          <li
+            v-for="emp in paginatedEmployees"
+            :key="emp.id_karyawan || emp.nik"
+            class="min-w-0 p-4 space-y-3 wrap-anywhere"
+          >
+            <div class="space-y-1">
+              <h3 class="text-sm font-bold leading-snug text-[#0F172A]">{{ emp.nama_karyawan }}</h3>
+              <p class="text-[13px] leading-relaxed text-[#64748B]">
+                {{ emp.email_kantor || '—' }}
+              </p>
+            </div>
+            <AppBadge
+              :type="
+                (emp.status_karyawan || emp.status) === 'Active'
+                  ? 'success'
+                  : (emp.status_karyawan || emp.status) === 'Outsource'
+                    ? 'warning'
+                    : 'danger'
+              "
+              :text="emp.status_karyawan || emp.status || 'Active'"
+            />
+            <dl class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-[13px] leading-relaxed">
+              <div>
+                <dt class="text-xs text-[#64748B]">NIK</dt>
+                <dd class="font-mono font-semibold text-[#0F172A]">{{ emp.nik }}</dd>
+              </div>
+              <div>
+                <dt class="text-xs text-[#64748B]">Title / Jabatan</dt>
+                <dd class="text-[#1E293B]">{{ emp.jabatan || emp.title || '—' }}</dd>
+              </div>
+              <div>
+                <dt class="text-xs text-[#64748B]">Departemen</dt>
+                <dd class="text-[#1E293B]">{{ emp.departemen || '—' }}</dd>
+              </div>
+              <div>
+                <dt class="text-xs text-[#64748B]">Direktorat</dt>
+                <dd class="text-[#1E293B]">{{ emp.direktorat || emp.directorate || '—' }}</dd>
+              </div>
+              <div>
+                <dt class="text-xs text-[#64748B]">Lokasi Kerja</dt>
+                <dd class="text-[#1E293B]">
+                  {{ normalizeLocation(emp.lokasi_kerja || emp.work_location) || '—' }}
+                </dd>
+              </div>
+            </dl>
+            <div
+              v-if="canWriteKaryawan"
+              class="grid grid-cols-2 gap-2 border-t border-[#F1F5F9] pt-3"
+            >
+              <button
+                type="button"
+                :aria-label="'Edit ' + emp.nama_karyawan"
+                class="flex min-h-11 items-center justify-center gap-2 rounded-lg border border-[#E2E8F0] text-[13px] font-semibold text-[#334155] hover:bg-[#F8FAFC] cursor-pointer"
+                @click="openEdit(emp)"
+              >
+                <span aria-hidden="true" class="material-symbols-outlined text-[18px]">edit</span
+                >Edit
+              </button>
+              <button
+                type="button"
+                :aria-label="'Hapus ' + emp.nama_karyawan"
+                class="flex min-h-11 items-center justify-center gap-2 rounded-lg border border-[#E2E8F0] text-[13px] font-semibold text-rose-700 hover:bg-rose-50 cursor-pointer"
+                @click="openDelete(emp)"
+              >
+                <span aria-hidden="true" class="material-symbols-outlined text-[18px]">delete</span
+                >Hapus
+              </button>
+            </div>
+          </li>
+        </ul>
+        <table class="hidden lg:table w-full max-w-full text-left border-collapse table-fixed">
           <colgroup>
             <col :class="canWriteKaryawan ? 'w-[22%]' : 'w-[24%]'" />
             <col :class="canWriteKaryawan ? 'w-[11%]' : 'w-[12%]'" />
@@ -686,7 +762,11 @@ onMounted(() => {
                   >{{ normalizeLocation(emp.lokasi_kerja || emp.work_location) || '—' }}</span
                 >
               </td>
-              <td v-if="canWriteKaryawan" class="py-4 pr-5 pl-4 text-right overflow-hidden" @click.stop>
+              <td
+                v-if="canWriteKaryawan"
+                class="py-4 pr-5 pl-4 text-right overflow-hidden"
+                @click.stop
+              >
                 <AppRowActions :actions="getEmployeeActions(emp)" />
               </td>
             </tr>
@@ -694,6 +774,7 @@ onMounted(() => {
         </table>
 
         <AppPagination
+          mobile-compact
           v-model:currentPage="currentPage"
           :total-items="filteredEmployees.length"
           :items-per-page="itemsPerPage"
@@ -708,7 +789,7 @@ onMounted(() => {
       size="lg"
       @close="closeModal"
     >
-      <form @submit.prevent="saveEmployee" class="space-y-4">
+      <form @submit.prevent="saveEmployee" class="employee-modal-content space-y-4 wrap-anywhere">
         <div
           v-if="modalError"
           class="rounded-xl bg-rose-50 p-3 text-[12px] font-semibold text-rose-600"
@@ -718,82 +799,100 @@ onMounted(() => {
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
-            <label class="block text-[11px] font-bold uppercase tracking-wider text-[#7C8BAC] mb-1"
+            <label
+              for="employee-nik"
+              class="block text-xs sm:text-[11px] font-bold uppercase tracking-wider text-[#7C8BAC] mb-1"
               >NIK *</label
             >
             <input
+              id="employee-nik"
               v-model="form.nik"
               type="text"
               required
               placeholder="Contoh: 2026001"
-              class="w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-[13px] text-[#2A3547] focus:outline-none focus:border-[#5D87FF]"
+              class="min-w-0 min-h-11 sm:min-h-0 w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-base sm:text-[13px] text-[#2A3547] focus:outline-none focus:border-[#5D87FF]"
             />
           </div>
 
           <div>
-            <label class="block text-[11px] font-bold uppercase tracking-wider text-[#7C8BAC] mb-1"
+            <label
+              for="employee-nama_karyawan"
+              class="block text-xs sm:text-[11px] font-bold uppercase tracking-wider text-[#7C8BAC] mb-1"
               >Nama Karyawan *</label
             >
             <input
+              id="employee-nama_karyawan"
               v-model="form.nama_karyawan"
               type="text"
               required
               placeholder="Nama lengkap"
-              class="w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-[13px] text-[#2A3547] focus:outline-none focus:border-[#5D87FF]"
+              class="min-w-0 min-h-11 sm:min-h-0 w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-base sm:text-[13px] text-[#2A3547] focus:outline-none focus:border-[#5D87FF]"
             />
           </div>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
-            <label class="block text-[11px] font-bold uppercase tracking-wider text-[#7C8BAC] mb-1"
+            <label
+              for="employee-email_kantor"
+              class="block text-xs sm:text-[11px] font-bold uppercase tracking-wider text-[#7C8BAC] mb-1"
               >Email Kantor *</label
             >
             <input
+              id="employee-email_kantor"
               v-model="form.email_kantor"
               type="email"
               required
               placeholder="nama@esb.co.id"
-              class="w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-[13px] text-[#2A3547] focus:outline-none focus:border-[#5D87FF]"
+              class="min-w-0 min-h-11 sm:min-h-0 w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-base sm:text-[13px] text-[#2A3547] focus:outline-none focus:border-[#5D87FF]"
             />
           </div>
 
           <div>
-            <label class="block text-[11px] font-bold uppercase tracking-wider text-[#7C8BAC] mb-1"
+            <label
+              for="employee-lokasi_kerja"
+              class="block text-xs sm:text-[11px] font-bold uppercase tracking-wider text-[#7C8BAC] mb-1"
               >Lokasi Kerja *</label
             >
             <input
+              id="employee-lokasi_kerja"
               v-model="form.lokasi_kerja"
               type="text"
               required
               placeholder="Contoh: JKT, Solo, BSD"
-              class="w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-[13px] text-[#2A3547] focus:outline-none focus:border-[#5D87FF]"
+              class="min-w-0 min-h-11 sm:min-h-0 w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-base sm:text-[13px] text-[#2A3547] focus:outline-none focus:border-[#5D87FF]"
             />
           </div>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
-            <label class="block text-[11px] font-bold uppercase tracking-wider text-[#7C8BAC] mb-1"
+            <label
+              for="employee-jabatan"
+              class="block text-xs sm:text-[11px] font-bold uppercase tracking-wider text-[#7C8BAC] mb-1"
               >Title / Jabatan *</label
             >
             <input
+              id="employee-jabatan"
               v-model="form.jabatan"
               type="text"
               required
               placeholder="Contoh: Software Engineer"
-              class="w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-[13px] text-[#2A3547] focus:outline-none focus:border-[#5D87FF]"
+              class="min-w-0 min-h-11 sm:min-h-0 w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-base sm:text-[13px] text-[#2A3547] focus:outline-none focus:border-[#5D87FF]"
             />
           </div>
 
           <div>
-            <label class="block text-[11px] font-bold uppercase tracking-wider text-[#7C8BAC] mb-1"
+            <label
+              for="employee-tingkat_jabatan"
+              class="block text-xs sm:text-[11px] font-bold uppercase tracking-wider text-[#7C8BAC] mb-1"
               >Job Level *</label
             >
             <select
+              id="employee-tingkat_jabatan"
               v-model="form.tingkat_jabatan"
               required
-              class="w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-[13px] text-[#2A3547] focus:outline-none"
+              class="min-w-0 min-h-11 sm:min-h-0 w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-base sm:text-[13px] text-[#2A3547] focus:outline-none"
             >
               <option v-for="lvl in jobLevelOptions" :key="lvl" :value="lvl">{{ lvl }}</option>
             </select>
@@ -802,41 +901,50 @@ onMounted(() => {
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
-            <label class="block text-[11px] font-bold uppercase tracking-wider text-[#7C8BAC] mb-1"
+            <label
+              for="employee-departemen"
+              class="block text-xs sm:text-[11px] font-bold uppercase tracking-wider text-[#7C8BAC] mb-1"
               >Departemen *</label
             >
             <input
+              id="employee-departemen"
               v-model="form.departemen"
               type="text"
               required
               placeholder="Contoh: Technology"
-              class="w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-[13px] text-[#2A3547] focus:outline-none focus:border-[#5D87FF]"
+              class="min-w-0 min-h-11 sm:min-h-0 w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-base sm:text-[13px] text-[#2A3547] focus:outline-none focus:border-[#5D87FF]"
             />
           </div>
 
           <div>
-            <label class="block text-[11px] font-bold uppercase tracking-wider text-[#7C8BAC] mb-1"
+            <label
+              for="employee-direktorat"
+              class="block text-xs sm:text-[11px] font-bold uppercase tracking-wider text-[#7C8BAC] mb-1"
               >Directorate *</label
             >
             <input
+              id="employee-direktorat"
               v-model="form.direktorat"
               type="text"
               required
               placeholder="Contoh: Technology"
-              class="w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-[13px] text-[#2A3547] focus:outline-none focus:border-[#5D87FF]"
+              class="min-w-0 min-h-11 sm:min-h-0 w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-base sm:text-[13px] text-[#2A3547] focus:outline-none focus:border-[#5D87FF]"
             />
           </div>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div>
-            <label class="block text-[11px] font-bold uppercase tracking-wider text-[#7C8BAC] mb-1"
+            <label
+              for="employee-status_karyawan"
+              class="block text-xs sm:text-[11px] font-bold uppercase tracking-wider text-[#7C8BAC] mb-1"
               >Status Karyawan *</label
             >
             <select
+              id="employee-status_karyawan"
               v-model="form.status_karyawan"
               required
-              class="w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-[13px] text-[#2A3547] focus:outline-none"
+              class="min-w-0 min-h-11 sm:min-h-0 w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-base sm:text-[13px] text-[#2A3547] focus:outline-none"
             >
               <option value="Active">Active</option>
               <option value="Outsource">Outsource</option>
@@ -845,13 +953,16 @@ onMounted(() => {
           </div>
 
           <div>
-            <label class="block text-[11px] font-bold uppercase tracking-wider text-[#7C8BAC] mb-1"
+            <label
+              for="employee-status_kepegawaian"
+              class="block text-xs sm:text-[11px] font-bold uppercase tracking-wider text-[#7C8BAC] mb-1"
               >Status Kepegawaian *</label
             >
             <select
+              id="employee-status_kepegawaian"
               v-model="form.status_kepegawaian"
               required
-              class="w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-[13px] text-[#2A3547] focus:outline-none"
+              class="min-w-0 min-h-11 sm:min-h-0 w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-base sm:text-[13px] text-[#2A3547] focus:outline-none"
             >
               <option value="Permanent">Permanent</option>
               <option value="Contract">Contract</option>
@@ -861,25 +972,31 @@ onMounted(() => {
           </div>
 
           <div>
-            <label class="block text-[11px] font-bold uppercase tracking-wider text-[#7C8BAC] mb-1"
+            <label
+              for="employee-tanggal_mulai_bekerja"
+              class="block text-xs sm:text-[11px] font-bold uppercase tracking-wider text-[#7C8BAC] mb-1"
               >Tgl Mulai Bekerja *</label
             >
             <input
+              id="employee-tanggal_mulai_bekerja"
               v-model="form.tanggal_mulai_bekerja"
               type="date"
               required
-              class="w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-[13px] text-[#2A3547] focus:outline-none"
+              class="min-w-0 min-h-11 sm:min-h-0 w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-base sm:text-[13px] text-[#2A3547] focus:outline-none"
             />
           </div>
         </div>
 
         <div>
-          <label class="block text-[11px] font-bold uppercase tracking-wider text-[#7C8BAC] mb-1"
+          <label
+            for="employee-nik_atasan_langsung"
+            class="block text-xs sm:text-[11px] font-bold uppercase tracking-wider text-[#7C8BAC] mb-1"
             >NIK Atasan Langsung</label
           >
           <select
+            id="employee-nik_atasan_langsung"
             v-model="form.nik_atasan_langsung"
-            class="w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-[13px] text-[#2A3547] focus:outline-none"
+            class="min-w-0 min-h-11 sm:min-h-0 w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-base sm:text-[13px] text-[#2A3547] focus:outline-none"
           >
             <option value="">-- Tanpa Atasan / Tidak Ada --</option>
             <option
@@ -892,18 +1009,20 @@ onMounted(() => {
           </select>
         </div>
 
-        <div class="flex items-center justify-end gap-2 pt-4 border-t border-[#E5EAEF]">
+        <div
+          class="grid grid-cols-1 sm:flex sm:items-center sm:justify-end gap-2 pt-4 border-t border-[#E5EAEF]"
+        >
           <button
             type="button"
             @click="closeModal"
-            class="rounded-xl border border-[#E5EAEF] px-4 py-2 text-[12px] font-bold text-[#7C8BAC] hover:bg-gray-50 transition-all cursor-pointer"
+            class="min-h-11 sm:min-h-0 rounded-xl border border-[#E5EAEF] px-4 py-2 text-[12px] font-bold text-[#7C8BAC] hover:bg-gray-50 transition-all cursor-pointer"
           >
             Batal
           </button>
           <button
             type="submit"
             :disabled="isSubmitting"
-            class="rounded-xl bg-[#5D87FF] px-4 py-2 text-[12px] font-bold text-white shadow-md hover:bg-[#4570EA] transition-all cursor-pointer disabled:opacity-60"
+            class="min-h-11 sm:min-h-0 rounded-xl bg-[#5D87FF] px-4 py-2 text-[12px] font-bold text-white shadow-md hover:bg-[#4570EA] transition-all cursor-pointer disabled:opacity-60"
           >
             {{ isSubmitting ? 'Menyimpan...' : 'Simpan Data' }}
           </button>
@@ -913,7 +1032,7 @@ onMounted(() => {
 
     <!-- Modal Hapus Karyawan -->
     <AppModal :is-open="showDeleteModal" title="Hapus Data Karyawan" @close="closeModal">
-      <div class="space-y-4">
+      <div class="employee-modal-content space-y-4 wrap-anywhere">
         <div
           v-if="modalError"
           class="rounded-xl bg-rose-50 p-3 text-[12px] font-semibold text-rose-600"
@@ -942,11 +1061,13 @@ onMounted(() => {
           </div>
         </div>
 
-        <div class="flex items-center justify-end gap-2 pt-4 border-t border-[#E5EAEF]">
+        <div
+          class="grid grid-cols-1 sm:flex sm:items-center sm:justify-end gap-2 pt-4 border-t border-[#E5EAEF]"
+        >
           <button
             type="button"
             @click="closeModal"
-            class="rounded-xl border border-[#E5EAEF] px-4 py-2 text-[12px] font-bold text-[#7C8BAC] hover:bg-gray-50 transition-all cursor-pointer"
+            class="min-h-11 sm:min-h-0 rounded-xl border border-[#E5EAEF] px-4 py-2 text-[12px] font-bold text-[#7C8BAC] hover:bg-gray-50 transition-all cursor-pointer"
           >
             Batal
           </button>
@@ -954,7 +1075,7 @@ onMounted(() => {
             type="button"
             @click="deleteEmployee"
             :disabled="isSubmitting"
-            class="rounded-xl bg-rose-600 px-4 py-2 text-[12px] font-bold text-white shadow-md hover:bg-rose-700 transition-all cursor-pointer disabled:opacity-60"
+            class="min-h-11 sm:min-h-0 rounded-xl bg-rose-600 px-4 py-2 text-[12px] font-bold text-white shadow-md hover:bg-rose-700 transition-all cursor-pointer disabled:opacity-60"
           >
             {{ isSubmitting ? 'Menghapus...' : 'Ya, Hapus Karyawan' }}
           </button>
@@ -972,6 +1093,42 @@ onMounted(() => {
 </template>
 
 <style scoped>
+@media (width < 64rem) {
+  .employee-stats :deep(.truncate),
+  .employee-filters :deep(.truncate) {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+  .employee-stats :deep(.tracking-wider) {
+    font-size: 0.75rem;
+    letter-spacing: normal;
+  }
+  .employee-stats :deep(.items-center) {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+  .employee-filters :deep([role='option']) {
+    height: auto;
+    min-height: 2.75rem;
+    padding-block: 0.5rem;
+  }
+}
+.employee-modal-content :is(input, select) {
+  max-width: 100%;
+}
+@media (width < 40rem) {
+  .employees-page input,
+  .employee-modal-content :is(input, select) {
+    font-size: 1rem;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fade-enter-active,
+  .fade-leave-active {
+    transition: none;
+  }
+}
+
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.3s ease;

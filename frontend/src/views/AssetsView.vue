@@ -711,13 +711,13 @@ onMounted(async () => {
   <div class="space-y-4" :data-testid="!isLoading ? 'page-ready' : undefined">
     <!-- Simplified SaaS Header & Toolbar Container -->
     <div
-      class="flex flex-col gap-3.5 bg-white p-4.5 rounded-2xl border border-[#E2E8F0]/80 shadow-2xs"
+      class="flex flex-col gap-3 sm:gap-3.5 bg-white p-3.5 sm:p-4.5 rounded-2xl border border-[#E2E8F0]/80 shadow-2xs"
     >
       <!-- Row 1: Page Title & Primary CTA -->
-      <div class="flex items-center justify-between gap-3">
-        <div>
-          <h2 class="text-lg font-bold text-[#0F172A] tracking-tight">Aset IT</h2>
-          <p class="text-xs text-[#64748B] mt-0.5 leading-normal">
+      <div class="flex items-center justify-between gap-2.5">
+        <div class="min-w-0">
+          <h2 class="text-base sm:text-lg font-bold text-[#0F172A] tracking-tight truncate">Aset IT</h2>
+          <p class="text-[11px] sm:text-xs text-[#64748B] mt-0.5 leading-normal line-clamp-1 sm:line-clamp-none">
             Monitor dan kelola seluruh perangkat IT perusahaan
           </p>
         </div>
@@ -727,7 +727,7 @@ onMounted(async () => {
           v-if="canWriteAssets"
           type="button"
           @click="openAdd"
-          class="h-9 shrink-0 whitespace-nowrap rounded-lg bg-[#2563EB] px-3.5 text-xs font-semibold text-white shadow-2xs hover:bg-[#1D4ED8] transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+          class="h-9 shrink-0 whitespace-nowrap rounded-lg bg-[#2563EB] px-3 sm:px-3.5 text-xs font-semibold text-white shadow-2xs hover:bg-[#1D4ED8] active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer touch-manipulation"
           title="Tambah aset baru"
         >
           <span class="material-symbols-outlined text-[16px]">add</span>
@@ -736,9 +736,9 @@ onMounted(async () => {
       </div>
 
       <!-- Row 2: Search, Filters & Actions -->
-      <div class="flex flex-wrap items-center gap-2 w-full min-w-0 pt-2 border-t border-[#F1F5F9]">
+      <div class="flex flex-col sm:flex-row sm:items-center gap-2 w-full min-w-0 pt-2.5 border-t border-[#F1F5F9]">
         <!-- Search Input -->
-        <div class="relative flex-1 min-w-[200px]">
+        <div class="relative w-full sm:flex-1 sm:min-w-[200px]">
           <span
             class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-[17px] text-[#94A3B8] pointer-events-none"
             >search</span
@@ -748,53 +748,72 @@ onMounted(async () => {
             type="text"
             aria-label="Cari aset, serial number, atau pemegang"
             placeholder="Cari aset, serial number, atau pemegang..."
-            class="h-9 w-full rounded-lg border border-[#E2E8F0] bg-white pl-8 pr-2.5 text-xs text-[#0F172A] placeholder-[#94A3B8] focus:border-[#2563EB] focus:outline-none transition-all shadow-2xs"
+            class="h-9 w-full rounded-lg border border-[#E2E8F0] bg-white pl-8 pr-8 text-xs text-[#0F172A] placeholder-[#94A3B8] focus:border-[#2563EB] focus:outline-none transition-all shadow-2xs"
           />
+          <!-- Inline Clear Button -->
+          <button
+            v-if="searchQuery"
+            type="button"
+            @click="searchQuery = ''; resetFilters()"
+            aria-label="Bersihkan pencarian"
+            class="absolute right-2 top-1/2 -translate-y-1/2 flex h-5 w-5 items-center justify-center rounded-full text-[#94A3B8] hover:bg-[#F1F5F9] hover:text-[#0F172A] transition-all cursor-pointer touch-manipulation"
+            title="Bersihkan"
+          >
+            <span class="material-symbols-outlined text-[15px]">close</span>
+          </button>
         </div>
 
-        <!-- Filter Status -->
-        <CustomSelect
-          v-model="filterStatus"
-          :options="filterStatusOptions"
-          aria-label="Filter status"
-          :width-class="'w-[135px]'"
-          @change="fetchData"
-        />
+        <!-- Filter & Actions Cluster -->
+        <div class="flex flex-col sm:flex-row sm:items-center gap-2 w-full sm:w-auto">
+          <!-- Filter Group: Status & Reset -->
+          <div class="flex items-center gap-2 w-full sm:w-auto">
+            <div class="flex-1 sm:w-[150px] min-w-0">
+              <CustomSelect
+                v-model="filterStatus"
+                :options="filterStatusOptions"
+                aria-label="Filter status"
+                :block="true"
+                @change="fetchData"
+              />
+            </div>
 
-        <!-- Reset Filter Button -->
-        <button
-          v-if="searchQuery || filterStatus || filterTipe"
-          type="button"
-          @click="resetFilters"
-          class="h-9 shrink-0 whitespace-nowrap rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-2.5 text-xs font-medium text-[#64748B] hover:text-[#0F172A] transition-all flex items-center justify-center gap-1 cursor-pointer shadow-2xs"
-          title="Reset filter"
-        >
-          <span class="material-symbols-outlined text-[15px]">restart_alt</span>
-          <span>Reset</span>
-        </button>
+            <!-- Reset Filter Button -->
+            <button
+              v-if="searchQuery || filterStatus || filterTipe"
+              type="button"
+              @click="resetFilters"
+              class="h-9 shrink-0 whitespace-nowrap rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-medium text-[#64748B] hover:text-[#0F172A] active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs touch-manipulation"
+              title="Reset filter"
+            >
+              <span class="material-symbols-outlined text-[16px]">restart_alt</span>
+              <span>Reset</span>
+            </button>
+          </div>
 
-        <!-- Export Button -->
-        <button
-          type="button"
-          @click="openExport"
-          class="h-9 shrink-0 whitespace-nowrap rounded-lg border border-[#E2E8F0] bg-white px-3 text-xs font-medium text-[#475569] hover:bg-[#F8FAFC] hover:text-[#0F172A] transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs"
-          title="Ekspor laporan data aset"
-        >
-          <span class="material-symbols-outlined text-[16px] text-[#64748B]">download</span>
-          <span>Ekspor</span>
-        </button>
+          <!-- Actions Group: Ekspor & Impor -->
+          <div class="flex items-center gap-2 w-full sm:w-auto">
+            <button
+              type="button"
+              @click="openExport"
+              class="h-9 flex-1 sm:flex-initial shrink-0 whitespace-nowrap rounded-lg border border-[#E2E8F0] bg-white px-3.5 text-xs font-medium text-[#475569] hover:bg-[#F8FAFC] hover:text-[#0F172A] active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs touch-manipulation"
+              title="Ekspor laporan data aset"
+            >
+              <span class="material-symbols-outlined text-[16px] text-[#64748B]">download</span>
+              <span>Ekspor</span>
+            </button>
 
-        <!-- Import Button -->
-        <button
-          v-if="canWriteAssets"
-          type="button"
-          @click="showImportModal = true"
-          class="h-9 shrink-0 whitespace-nowrap rounded-lg border border-[#E2E8F0] bg-white px-3 text-xs font-medium text-[#475569] hover:bg-[#F8FAFC] hover:text-[#0F172A] transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs"
-          title="Impor data dari file Excel"
-        >
-          <span class="material-symbols-outlined text-[16px] text-[#64748B]">file_upload</span>
-          <span>Impor</span>
-        </button>
+            <button
+              v-if="canWriteAssets"
+              type="button"
+              @click="showImportModal = true"
+              class="h-9 flex-1 sm:flex-initial shrink-0 whitespace-nowrap rounded-lg border border-[#E2E8F0] bg-white px-3.5 text-xs font-medium text-[#475569] hover:bg-[#F8FAFC] hover:text-[#0F172A] active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs touch-manipulation"
+              title="Impor data dari file Excel"
+            >
+              <span class="material-symbols-outlined text-[16px] text-[#64748B]">file_upload</span>
+              <span>Impor</span>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
     <!-- ─── MODERN ENTERPRISE SAAS DATA MANAGEMENT CONTAINER ──────────────── -->
@@ -804,10 +823,45 @@ onMounted(async () => {
         <div
           v-for="r in 6"
           :key="'asset-skel-' + r"
-          class="asset-row-grid gap-4 rounded-xl border border-[#E2E8F0]/80 bg-white p-4 shadow-2xs select-none"
+          class="asset-row-grid gap-3 md:gap-4 rounded-xl border border-[#E2E8F0]/80 bg-white p-3.5 sm:p-4 shadow-2xs select-none"
         >
+          <!-- Mobile Skeleton Structure -->
+          <div class="flex items-center justify-between gap-2.5 md:hidden">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <SkeletonAvatar size="38px" shape="rounded" class="shrink-0" />
+              <div class="flex flex-col gap-1 min-w-0">
+                <BaseSkeleton width="110px" height="14px" radius="md" />
+                <BaseSkeleton width="80px" height="11px" radius="sm" />
+              </div>
+            </div>
+            <div class="flex items-center gap-1.5 shrink-0">
+              <BaseSkeleton width="65px" height="22px" radius="full" />
+              <BaseSkeleton width="20px" height="20px" radius="md" />
+            </div>
+          </div>
+          <div class="border-t border-[#F1F5F9] my-0.5 md:hidden"></div>
+          <div class="grid grid-cols-2 gap-2.5 md:hidden">
+            <div class="flex flex-col gap-1">
+              <BaseSkeleton width="45px" height="9px" radius="sm" />
+              <BaseSkeleton width="85px" height="12px" radius="md" />
+            </div>
+            <div class="flex flex-col gap-1">
+              <BaseSkeleton width="60px" height="9px" radius="sm" />
+              <BaseSkeleton width="95px" height="12px" radius="md" />
+            </div>
+            <div class="flex flex-col gap-1">
+              <BaseSkeleton width="40px" height="9px" radius="sm" />
+              <BaseSkeleton width="70px" height="12px" radius="md" />
+            </div>
+            <div class="flex flex-col gap-1">
+              <BaseSkeleton width="45px" height="9px" radius="sm" />
+              <BaseSkeleton width="75px" height="12px" radius="md" />
+            </div>
+          </div>
+
+          <!-- Desktop Skeleton Structure -->
           <!-- 1. Asset Identity -->
-          <div class="flex items-center gap-3.5 min-w-0">
+          <div class="hidden md:flex items-center gap-3.5 min-w-0">
             <SkeletonAvatar size="40px" shape="rounded" class="shrink-0" />
             <div class="flex flex-col gap-1.5 min-w-0">
               <BaseSkeleton width="130px" height="15px" radius="md" />
@@ -815,28 +869,28 @@ onMounted(async () => {
             </div>
           </div>
           <!-- 2. Perangkat -->
-          <div class="flex flex-col gap-1 min-w-0">
+          <div class="hidden md:flex flex-col gap-1 min-w-0">
             <BaseSkeleton width="50px" height="10px" radius="sm" />
             <BaseSkeleton width="100px" height="13px" radius="md" />
             <BaseSkeleton width="80px" height="11px" radius="sm" />
           </div>
           <!-- 3. Penanggung Jawab -->
-          <div class="flex flex-col gap-1 min-w-0">
+          <div class="hidden md:flex flex-col gap-1 min-w-0">
             <BaseSkeleton width="85px" height="10px" radius="sm" />
             <BaseSkeleton width="120px" height="13px" radius="md" />
             <BaseSkeleton width="70px" height="11px" radius="sm" />
           </div>
           <!-- 4. Lokasi -->
-          <div class="flex flex-col gap-1 min-w-0">
+          <div class="hidden md:flex flex-col gap-1 min-w-0">
             <BaseSkeleton width="45px" height="10px" radius="sm" />
             <BaseSkeleton width="80px" height="13px" radius="md" />
           </div>
           <!-- 5. Status -->
-          <div class="flex items-center">
+          <div class="hidden md:flex items-center">
             <BaseSkeleton width="75px" height="22px" radius="full" />
           </div>
           <!-- 6. Action -->
-          <div class="flex justify-end">
+          <div class="hidden md:flex justify-end">
             <BaseSkeleton width="18px" height="18px" radius="md" />
           </div>
         </div>
@@ -889,10 +943,146 @@ onMounted(async () => {
           v-for="asset in paginatedAssets"
           :key="asset.id_aset"
           @click="openDetails(asset)"
-          class="asset-row-grid group relative gap-4 rounded-xl border border-[#E2E8F0]/80 bg-white p-4 shadow-2xs hover:border-[#2563EB]/40 hover:shadow-sm transition-all duration-200 cursor-pointer select-none"
+          class="asset-row-grid group relative gap-3 md:gap-4 rounded-xl border border-[#E2E8F0]/80 bg-white p-3.5 sm:p-4 shadow-2xs hover:border-[#2563EB]/40 hover:shadow-sm transition-all duration-200 cursor-pointer select-none"
         >
+          <!-- ── MOBILE LAYOUT (< 768px / md:hidden) ─────────────────── -->
+          <!-- Mobile Header: Icon + Device Info + Status Badge + Actions -->
+          <div class="flex items-start justify-between gap-2.5 min-w-0 md:hidden">
+            <div class="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
+              <div
+                class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#EFF6FF] text-[#2563EB] group-hover:scale-105 transition-transform"
+              >
+                <span class="material-symbols-outlined text-[20px]">{{
+                  getDeviceIcon(asset.tipe_perangkat)
+                }}</span>
+              </div>
+              <div class="flex flex-col min-w-0 flex-1">
+                <span
+                  class="text-[13.5px] font-bold text-[#0F172A] leading-tight group-hover:text-[#2563EB] transition-colors truncate block"
+                  :title="asset.hostname || asset.label_aset || '—'"
+                >
+                  {{ asset.hostname || asset.label_aset || '—' }}
+                </span>
+                <span
+                  class="font-mono text-[11px] font-normal text-[#64748B] mt-0.5 tracking-tight truncate block"
+                  :title="asset.serial_number || asset.nomor_seri || '—'"
+                >
+                  {{ asset.serial_number || asset.nomor_seri || '—' }}
+                </span>
+              </div>
+            </div>
+
+            <!-- Mobile Status & Action Menu -->
+            <div class="flex items-center gap-1.5 shrink-0 self-start">
+              <div
+                class="flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold border"
+                :class="[
+                  formatStatusPill(asset.status_aset).bg,
+                  formatStatusPill(asset.status_aset).text,
+                  formatStatusPill(asset.status_aset).border,
+                ]"
+              >
+                <span
+                  class="h-1.5 w-1.5 rounded-full shrink-0"
+                  :class="formatStatusPill(asset.status_aset).dot"
+                ></span>
+                <span class="truncate max-w-[85px] xs:max-w-none">{{
+                  formatStatusPill(asset.status_aset).label
+                }}</span>
+              </div>
+              <div @click.stop class="shrink-0">
+                <AppRowActions :actions="getAssetActions(asset)" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Mobile Divider -->
+          <div class="border-t border-[#F1F5F9] my-0.5 md:hidden"></div>
+
+          <!-- Mobile 2x2 Metadata Grid -->
+          <div class="grid grid-cols-2 gap-2.5 md:hidden text-left">
+            <!-- 1. Perangkat -->
+            <div class="flex flex-col min-w-0 overflow-hidden">
+              <span class="text-[10px] font-semibold uppercase text-[#94A3B8] tracking-wider"
+                >Perangkat</span
+              >
+              <span
+                class="text-[12px] font-semibold text-[#1E293B] mt-0.5 truncate block"
+                :title="asset.tipe_perangkat || '—'"
+              >
+                {{ asset.tipe_perangkat || '—' }}
+              </span>
+              <span
+                class="text-[11px] font-normal text-[#64748B] mt-0.5 truncate block"
+                :title="
+                  [asset.merek || asset.brand_merek, asset.model].filter(Boolean).join(' ') || '—'
+                "
+              >
+                {{
+                  [asset.merek || asset.brand_merek, asset.model].filter(Boolean).join(' ') || '—'
+                }}
+              </span>
+            </div>
+
+            <!-- 2. Penanggung Jawab -->
+            <div class="flex flex-col min-w-0 overflow-hidden">
+              <span class="text-[10px] font-semibold uppercase text-[#94A3B8] tracking-wider"
+                >Penanggung Jawab</span
+              >
+              <span
+                class="text-[12px] mt-0.5 truncate block"
+                :class="
+                  asset.nama_karyawan
+                    ? 'font-semibold text-[#1E293B]'
+                    : 'text-[#94A3B8] italic font-normal'
+                "
+                :title="asset.nama_karyawan || 'Belum ditetapkan'"
+              >
+                {{ asset.nama_karyawan || 'Belum ditetapkan' }}
+              </span>
+              <span
+                v-if="asset.nama_karyawan && asset.nik"
+                class="font-mono text-[10.5px] text-[#64748B] mt-0.5 truncate block"
+                :title="'NIK: ' + asset.nik"
+              >
+                NIK: {{ asset.nik }}
+              </span>
+            </div>
+
+            <!-- 3. Lokasi -->
+            <div class="flex flex-col min-w-0 overflow-hidden">
+              <span class="text-[10px] font-semibold uppercase text-[#94A3B8] tracking-wider"
+                >Lokasi</span
+              >
+              <span
+                class="text-[12px] font-medium text-[#1E293B] mt-0.5 truncate block"
+                :title="asset.lokasi_kerja || asset.lokasi_aset || '—'"
+              >
+                {{ asset.lokasi_kerja || asset.lokasi_aset || '—' }}
+              </span>
+            </div>
+
+            <!-- 4. Kondisi -->
+            <div class="flex flex-col min-w-0 overflow-hidden">
+              <span class="text-[10px] font-semibold uppercase text-[#94A3B8] tracking-wider"
+                >Kondisi</span
+              >
+              <div
+                class="flex items-center gap-1 text-[11.5px] mt-0.5 truncate max-w-full"
+                :class="formatKondisiStyle(asset.kondisi_aset)"
+              >
+                <span
+                  class="h-1.5 w-1.5 rounded-full shrink-0"
+                  :class="formatKondisiDot(asset.kondisi_aset)"
+                ></span>
+                <span class="truncate">{{ formatKondisiText(asset.kondisi_aset) }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- ── DESKTOP LAYOUT (>= 768px / hidden md:flex) ──────────── -->
           <!-- 1. Asset Identity (Code & SN + Device Icon) -->
-          <div class="flex items-center gap-3.5 min-w-0 overflow-hidden">
+          <div class="hidden md:flex items-center gap-3.5 min-w-0 overflow-hidden">
             <div
               class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#EFF6FF] text-[#2563EB] group-hover:scale-105 transition-transform"
             >
@@ -917,7 +1107,7 @@ onMounted(async () => {
           </div>
 
           <!-- 2. Perangkat & Model -->
-          <div class="flex flex-col min-w-0 overflow-hidden">
+          <div class="hidden md:flex flex-col min-w-0 overflow-hidden">
             <span class="text-[10px] font-semibold uppercase text-[#94A3B8] tracking-wider"
               >Perangkat</span
             >
@@ -938,7 +1128,7 @@ onMounted(async () => {
           </div>
 
           <!-- 3. Penanggung Jawab -->
-          <div class="flex flex-col min-w-0 overflow-hidden">
+          <div class="hidden md:flex flex-col min-w-0 overflow-hidden">
             <span class="text-[10px] font-semibold uppercase text-[#94A3B8] tracking-wider"
               >Penanggung Jawab</span
             >
@@ -963,7 +1153,7 @@ onMounted(async () => {
           </div>
 
           <!-- 4. Lokasi -->
-          <div class="flex flex-col min-w-0 overflow-hidden">
+          <div class="hidden md:flex flex-col min-w-0 overflow-hidden">
             <span class="text-[10px] font-semibold uppercase text-[#94A3B8] tracking-wider"
               >Lokasi</span
             >
@@ -976,7 +1166,7 @@ onMounted(async () => {
           </div>
 
           <!-- 5. Unified Status & Kondisi Component Block -->
-          <div class="flex flex-col items-start min-w-0 overflow-hidden select-none">
+          <div class="hidden md:flex flex-col items-start min-w-0 overflow-hidden select-none">
             <!-- Primary Status Line -->
             <div
               class="flex items-center gap-1.5 text-[12.5px] font-semibold truncate max-w-full"
@@ -1002,7 +1192,10 @@ onMounted(async () => {
           </div>
 
           <!-- 6. Action Menu -->
-          <div @click.stop class="flex items-center justify-end w-8 shrink-0 justify-self-end">
+          <div
+            @click.stop
+            class="hidden md:flex items-center justify-end w-8 shrink-0 justify-self-end"
+          >
             <AppRowActions :actions="getAssetActions(asset)" />
           </div>
         </div>
@@ -1030,39 +1223,39 @@ onMounted(async () => {
       @close="closeModal"
     >
       <!-- Step Indicator Bar -->
-      <div class="mb-4 rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] p-2.5">
-        <div class="flex items-center justify-between max-w-lg mx-auto text-[11.5px] font-bold">
+      <div class="mb-4 rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] p-2 sm:p-2.5">
+        <div class="flex items-center justify-between max-w-lg mx-auto text-[10.5px] sm:text-[11.5px] font-bold">
           <!-- Step 1 -->
           <button
             type="button"
             @click="activeTab = 'info'"
-            class="flex items-center gap-1.5 transition-colors cursor-pointer select-none"
+            class="flex items-center gap-1 sm:gap-1.5 transition-colors cursor-pointer select-none"
             :class="activeTab === 'info' ? 'text-[#5D87FF]' : 'text-[#7C8BAC] hover:text-[#2A3547]'"
           >
             <span
-              class="flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-extrabold"
+              class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] font-extrabold"
               :class="
                 activeTab === 'info' ? 'bg-[#5D87FF] text-white' : 'bg-[#E5EAEF] text-[#7C8BAC]'
               "
             >
               1
             </span>
-            <span>Informasi</span>
+            <span class="truncate">Informasi</span>
           </button>
 
-          <div class="flex-1 h-px bg-[#E5EAEF] mx-3"></div>
+          <div class="flex-1 h-px bg-[#E5EAEF] mx-1.5 sm:mx-3 min-w-[10px]"></div>
 
           <!-- Step 2 -->
           <button
             type="button"
             @click="activeTab = 'placement'"
-            class="flex items-center gap-1.5 transition-colors cursor-pointer select-none"
+            class="flex items-center gap-1 sm:gap-1.5 transition-colors cursor-pointer select-none"
             :class="
               activeTab === 'placement' ? 'text-[#5D87FF]' : 'text-[#7C8BAC] hover:text-[#2A3547]'
             "
           >
             <span
-              class="flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-extrabold"
+              class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] font-extrabold"
               :class="
                 activeTab === 'placement'
                   ? 'bg-[#5D87FF] text-white'
@@ -1071,16 +1264,16 @@ onMounted(async () => {
             >
               2
             </span>
-            <span>Penempatan</span>
+            <span class="truncate">Penempatan</span>
           </button>
 
-          <div class="flex-1 h-px bg-[#E5EAEF] mx-3"></div>
+          <div class="flex-1 h-px bg-[#E5EAEF] mx-1.5 sm:mx-3 min-w-[10px]"></div>
 
           <!-- Step 3 -->
           <button
             type="button"
             @click="activeTab = 'specifications'"
-            class="flex items-center gap-1.5 transition-colors cursor-pointer select-none"
+            class="flex items-center gap-1 sm:gap-1.5 transition-colors cursor-pointer select-none"
             :class="
               activeTab === 'specifications'
                 ? 'text-[#5D87FF]'
@@ -1088,7 +1281,7 @@ onMounted(async () => {
             "
           >
             <span
-              class="flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-extrabold"
+              class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] font-extrabold"
               :class="
                 activeTab === 'specifications'
                   ? 'bg-[#5D87FF] text-white'
@@ -1097,7 +1290,7 @@ onMounted(async () => {
             >
               3
             </span>
-            <span>Spesifikasi</span>
+            <span class="truncate">Spesifikasi</span>
           </button>
         </div>
       </div>
@@ -1313,21 +1506,21 @@ onMounted(async () => {
         </div>
 
         <!-- Footer Action Bar -->
-        <div class="flex items-center justify-between pt-4 mt-5 border-t border-[#E5EAEF]">
+        <div class="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-2.5 pt-3.5 mt-4 border-t border-[#E5EAEF]">
           <button
             type="button"
             @click="closeModal"
-            class="h-9 rounded-lg border border-[#E5EAEF] px-3.5 text-[12px] font-bold text-[#7C8BAC] hover:bg-[#F8FAFC] hover:text-[#2A3547] transition-all cursor-pointer"
+            class="h-9 w-full sm:w-auto rounded-lg border border-[#E5EAEF] px-3.5 text-[12px] font-bold text-[#7C8BAC] hover:bg-[#F8FAFC] hover:text-[#2A3547] active:scale-95 transition-all cursor-pointer touch-manipulation"
           >
             Batal
           </button>
 
-          <div class="flex items-center gap-2">
+          <div class="flex items-center gap-2 w-full sm:w-auto">
             <button
               v-if="activeTab !== 'info'"
               type="button"
               @click="activeTab = activeTab === 'specifications' ? 'placement' : 'info'"
-              class="h-9 rounded-lg border border-[#E5EAEF] bg-white px-3.5 text-[12px] font-bold text-[#2A3547] hover:bg-[#F8FAFC] transition-all flex items-center gap-1 cursor-pointer"
+              class="h-9 flex-1 sm:flex-initial rounded-lg border border-[#E5EAEF] bg-white px-3.5 text-[12px] font-bold text-[#2A3547] hover:bg-[#F8FAFC] active:scale-95 transition-all flex items-center justify-center gap-1 cursor-pointer touch-manipulation"
             >
               <span class="material-symbols-outlined text-[15px]">arrow_back</span>
               <span>Kembali</span>
@@ -1338,7 +1531,7 @@ onMounted(async () => {
               type="button"
               @click="nextStep"
               :disabled="isSubmitting || hasValidationErrors"
-              class="h-9 rounded-lg bg-[#5D87FF] px-4 text-[12px] font-bold text-white shadow-sm hover:bg-[#4570EA] disabled:opacity-50 transition-all flex items-center gap-1 cursor-pointer"
+              class="h-9 flex-1 sm:flex-initial rounded-lg bg-[#5D87FF] px-4 text-[12px] font-bold text-white shadow-sm hover:bg-[#4570EA] disabled:opacity-50 active:scale-95 transition-all flex items-center justify-center gap-1 cursor-pointer touch-manipulation"
             >
               <span>Lanjutkan</span>
               <span class="material-symbols-outlined text-[15px]">arrow_forward</span>
@@ -1348,7 +1541,7 @@ onMounted(async () => {
               v-else
               type="submit"
               :disabled="isSubmitting || !canWriteAssets || hasValidationErrors"
-              class="h-9 rounded-lg bg-[#5D87FF] px-4 text-[12px] font-bold text-white shadow-sm hover:bg-[#4570EA] disabled:opacity-50 transition-all flex items-center gap-1.5 cursor-pointer"
+              class="h-9 flex-1 sm:flex-initial rounded-lg bg-[#5D87FF] px-4 text-[12px] font-bold text-white shadow-sm hover:bg-[#4570EA] disabled:opacity-50 active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer touch-manipulation"
             >
               <span
                 v-if="isSubmitting"
@@ -1471,11 +1664,11 @@ onMounted(async () => {
         </div>
 
         <!-- Tab Navigation -->
-        <div class="flex border-b border-[#E2E8F0]/80 mb-4">
+        <div class="flex border-b border-[#E2E8F0]/80 mb-4 overflow-x-auto">
           <button
             type="button"
             @click="detailsTab = 'info'"
-            class="flex items-center gap-2 px-4 py-3 text-[12px] font-bold transition-all duration-150 border-b-2 -mb-[2px]"
+            class="flex items-center gap-2 px-4 py-3 text-[12px] font-bold transition-all duration-150 border-b-2 -mb-[2px] shrink-0"
             :class="
               detailsTab === 'info'
                 ? 'border-brand text-brand font-black'
@@ -1489,7 +1682,7 @@ onMounted(async () => {
             v-if="isAdmin || isSuperAdmin"
             type="button"
             @click="detailsTab = 'logs'"
-            class="flex items-center gap-2 px-4 py-3 text-[12px] font-bold transition-all duration-150 border-b-2 -mb-[2px]"
+            class="flex items-center gap-2 px-4 py-3 text-[12px] font-bold transition-all duration-150 border-b-2 -mb-[2px] shrink-0"
             :class="
               detailsTab === 'logs'
                 ? 'border-brand text-brand font-black'
@@ -1612,68 +1805,72 @@ onMounted(async () => {
                 </div>
 
                 <!-- UBAH: Table with old -> new -->
-                <table
+                <div
                   v-if="
                     log.aksi === 'UBAH' &&
                     parsePerubahan(log.perubahan, log.aksi).length &&
                     parsePerubahan(log.perubahan, log.aksi)[0].old !== undefined
                   "
-                  class="w-full text-[10px] border-collapse"
+                  class="overflow-x-auto w-full -mx-0.5"
                 >
-                  <thead>
-                    <tr class="border-b border-[#E5E7EB]">
-                      <th
-                        class="py-1 pr-2 text-left font-bold text-[#9CA3AF] uppercase tracking-wider w-28"
+                  <table class="w-full text-[10px] border-collapse min-w-[260px]">
+                    <thead>
+                      <tr class="border-b border-[#E5E7EB]">
+                        <th
+                          class="py-1 pr-2 text-left font-bold text-[#9CA3AF] uppercase tracking-wider w-24 sm:w-28"
+                        >
+                          Field
+                        </th>
+                        <th
+                          class="py-1 px-2 text-left font-bold text-[#9CA3AF] uppercase tracking-wider"
+                        >
+                          Sebelum
+                        </th>
+                        <th
+                          class="py-1 pl-2 text-left font-bold text-[#9CA3AF] uppercase tracking-wider"
+                        >
+                          Sesudah
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr
+                        v-for="(row, idx) in parsePerubahan(log.perubahan, log.aksi)"
+                        :key="idx"
+                        class="border-b border-[#F3F4F6] last:border-0"
                       >
-                        Field
-                      </th>
-                      <th
-                        class="py-1 px-2 text-left font-bold text-[#9CA3AF] uppercase tracking-wider"
-                      >
-                        Sebelum
-                      </th>
-                      <th
-                        class="py-1 pl-2 text-left font-bold text-[#9CA3AF] uppercase tracking-wider"
-                      >
-                        Sesudah
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr
-                      v-for="(row, idx) in parsePerubahan(log.perubahan, log.aksi)"
-                      :key="idx"
-                      class="border-b border-[#F3F4F6] last:border-0"
-                    >
-                      <td class="py-1.5 pr-2 font-bold text-[#475569]">{{ row.field }}</td>
-                      <td class="py-1.5 px-2 text-[#DC2626] line-through">{{ row.old }}</td>
-                      <td class="py-1.5 pl-2 font-semibold text-[#059669]">{{ row.new }}</td>
-                    </tr>
-                  </tbody>
-                </table>
+                        <td class="py-1.5 pr-2 font-bold text-[#475569]">{{ row.field }}</td>
+                        <td class="py-1.5 px-2 text-[#DC2626] line-through">{{ row.old }}</td>
+                        <td class="py-1.5 pl-2 font-semibold text-[#059669]">{{ row.new }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
 
                 <!-- TAMBAH: Key-value detail list -->
-                <table
+                <div
                   v-else-if="
                     log.aksi === 'TAMBAH' && parsePerubahan(log.perubahan, log.aksi).length > 1
                   "
-                  class="w-full text-[10px] border-collapse"
+                  class="overflow-x-auto w-full -mx-0.5"
                 >
-                  <tbody>
-                    <tr
-                      v-for="(row, idx) in parsePerubahan(log.perubahan, log.aksi)"
-                      :key="idx"
-                      class="border-b border-[#F3F4F6] last:border-0"
-                    >
-                      <td
-                        class="py-1.5 pr-2 font-bold text-[#9CA3AF] uppercase tracking-wider w-28"
+                  <table class="w-full text-[10px] border-collapse min-w-[260px]">
+                    <tbody>
+                      <tr
+                        v-for="(row, idx) in parsePerubahan(log.perubahan, log.aksi)"
+                        :key="idx"
+                        class="border-b border-[#F3F4F6] last:border-0"
                       >
-                        {{ row.field }}
-                      </td>
-                      <td class="py-1.5 font-semibold text-[#374151]">{{ row.value }}</td>
-                    </tr>
-                  </tbody>
-                </table>
+                        <td
+                          class="py-1.5 pr-2 font-bold text-[#9CA3AF] uppercase tracking-wider w-24 sm:w-28"
+                        >
+                          {{ row.field }}
+                        </td>
+                        <td class="py-1.5 font-semibold text-[#374151]">{{ row.value }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
 
                 <!-- Fallback: plain text -->
                 <p v-else class="text-[11px] font-medium leading-relaxed text-[#374151]">
@@ -1710,7 +1907,7 @@ onMounted(async () => {
           <legend class="text-[11px] font-bold uppercase tracking-wider text-[#374151] mb-2">
             Pilih Format Ekspor
           </legend>
-          <div class="grid grid-cols-2 gap-3">
+          <div class="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 gap-2.5 sm:gap-3">
             <label
               class="flex cursor-pointer items-center justify-between rounded-xl border p-3.5 transition-colors"
               :class="
@@ -1781,18 +1978,18 @@ onMounted(async () => {
           </label>
         </div>
 
-        <div class="flex justify-end gap-3 border-t border-[#F3F4F6] pt-4 mt-2">
+        <div class="flex flex-col-reverse sm:flex-row justify-end gap-2.5 sm:gap-3 border-t border-[#F3F4F6] pt-4 mt-2">
           <button
             type="button"
             @click="closeModal"
-            class="h-10 rounded-xl border border-[#DCE3EC] px-5 text-[12px] font-semibold text-[#475569] hover:bg-[#F8FAFC]"
+            class="h-10 w-full sm:w-auto rounded-xl border border-[#DCE3EC] px-5 text-[12px] font-semibold text-[#475569] hover:bg-[#F8FAFC] active:scale-95 transition-all cursor-pointer touch-manipulation"
           >
             Batal
           </button>
           <button
             type="submit"
             :disabled="isExporting"
-            class="h-10 rounded-xl bg-brand px-5 text-[12px] font-bold text-white shadow-md shadow-brand/20 hover:bg-brand-dark disabled:opacity-50"
+            class="h-10 w-full sm:w-auto rounded-xl bg-brand px-5 text-[12px] font-bold text-white shadow-md shadow-brand/20 hover:bg-brand-dark active:scale-95 disabled:opacity-50 transition-all cursor-pointer touch-manipulation"
           >
             {{ isExporting ? 'Mengekspor...' : 'Unduh File' }}
           </button>

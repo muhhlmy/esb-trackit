@@ -365,15 +365,13 @@ function formatKondisiPill(kondisi) {
   <div class="space-y-4" :data-testid="!isLoading ? 'page-ready' : undefined">
     <!-- Simplified SaaS Header & Toolbar Container -->
     <div
-      class="flex flex-col gap-3.5 bg-white p-4.5 rounded-2xl border border-[#E2E8F0]/80 shadow-2xs"
+      class="flex flex-col gap-3 sm:gap-3.5 bg-white p-3.5 sm:p-4.5 rounded-2xl border border-[#E2E8F0]/80 shadow-2xs"
     >
       <!-- Row 1: Page Title & Primary CTA -->
-      <div class="flex items-center justify-between gap-3">
-        <div>
-          <div class="flex items-center gap-2">
-            <h2 class="text-lg font-bold text-[#0F172A] tracking-tight">Aset GA</h2>
-          </div>
-          <p class="text-xs text-[#64748B] mt-0.5 leading-normal">
+      <div class="flex items-center justify-between gap-2.5">
+        <div class="min-w-0">
+          <h2 class="text-base sm:text-lg font-bold text-[#0F172A] tracking-tight truncate">Aset GA</h2>
+          <p class="text-[11px] sm:text-xs text-[#64748B] mt-0.5 leading-normal line-clamp-1 sm:line-clamp-none">
             Kelola inventaris fasilitas General Affair, mebel, AC, dan perlengkapan kantor.
           </p>
         </div>
@@ -383,7 +381,7 @@ function formatKondisiPill(kondisi) {
           v-if="canWriteAssets"
           type="button"
           @click="openAdd"
-          class="h-9 shrink-0 whitespace-nowrap rounded-lg bg-[#2563EB] px-3.5 text-xs font-semibold text-white shadow-2xs hover:bg-[#1D4ED8] transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+          class="h-9 shrink-0 whitespace-nowrap rounded-lg bg-[#2563EB] px-3 sm:px-3.5 text-xs font-semibold text-white shadow-2xs hover:bg-[#1D4ED8] active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer touch-manipulation"
           title="Tambah Aset GA baru"
         >
           <span class="material-symbols-outlined text-[16px]">add</span>
@@ -392,9 +390,9 @@ function formatKondisiPill(kondisi) {
       </div>
 
       <!-- Row 2: Search, Filters & Actions -->
-      <div class="flex flex-wrap items-center gap-2 w-full min-w-0 pt-2 border-t border-[#F1F5F9]">
+      <div class="flex flex-col sm:flex-row sm:items-center gap-2 w-full min-w-0 pt-2.5 border-t border-[#F1F5F9]">
         <!-- Search Input -->
-        <div class="relative flex-1 min-w-[200px]">
+        <div class="relative w-full sm:flex-1 sm:min-w-[200px]">
           <span
             class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-[17px] text-[#94A3B8] pointer-events-none"
             >search</span
@@ -403,51 +401,71 @@ function formatKondisiPill(kondisi) {
             v-model="searchQuery"
             type="text"
             placeholder="Cari hostname, nama asset, detail, lokasi..."
-            class="h-9 w-full rounded-lg border border-[#E2E8F0] bg-white pl-8 pr-2.5 text-xs text-[#0F172A] placeholder-[#94A3B8] focus:border-[#2563EB] focus:outline-none transition-all shadow-2xs"
+            class="h-9 w-full rounded-lg border border-[#E2E8F0] bg-white pl-8 pr-8 text-xs text-[#0F172A] placeholder-[#94A3B8] focus:border-[#2563EB] focus:outline-none transition-all shadow-2xs"
           />
+          <!-- Inline Clear Button -->
+          <button
+            v-if="searchQuery"
+            type="button"
+            @click="searchQuery = ''"
+            aria-label="Bersihkan pencarian"
+            class="absolute right-2 top-1/2 -translate-y-1/2 flex h-5 w-5 items-center justify-center rounded-full text-[#94A3B8] hover:bg-[#F1F5F9] hover:text-[#0F172A] transition-all cursor-pointer touch-manipulation"
+            title="Bersihkan"
+          >
+            <span class="material-symbols-outlined text-[15px]">close</span>
+          </button>
         </div>
 
-        <!-- Filter Lokasi -->
-        <CustomSelect
-          v-model="selectedLocation"
-          :options="locationFilterOptions"
-          aria-label="Filter lokasi"
-          placeholder="Semua Lokasi"
-          width-class="w-[140px]"
-          height-class="h-9"
-        />
+        <!-- Filter Cluster -->
+        <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+          <!-- Filter Lokasi -->
+          <div class="flex-1 min-w-[120px] sm:w-[140px] sm:flex-initial">
+            <CustomSelect
+              v-model="selectedLocation"
+              :options="locationFilterOptions"
+              aria-label="Filter lokasi"
+              placeholder="Semua Lokasi"
+              :block="true"
+              height-class="h-9"
+            />
+          </div>
 
-        <!-- Filter Tipe Fasilitas -->
-        <CustomSelect
-          v-model="selectedTipe"
-          :options="tipeFilterOptions"
-          aria-label="Filter tipe fasilitas"
-          placeholder="Semua Fasilitas"
-          width-class="w-[145px]"
-          height-class="h-9"
-        />
+          <!-- Filter Tipe Fasilitas -->
+          <div class="flex-1 min-w-[120px] sm:w-[145px] sm:flex-initial">
+            <CustomSelect
+              v-model="selectedTipe"
+              :options="tipeFilterOptions"
+              aria-label="Filter tipe fasilitas"
+              placeholder="Semua Fasilitas"
+              :block="true"
+              height-class="h-9"
+            />
+          </div>
 
-        <!-- Filter Kondisi -->
-        <CustomSelect
-          v-model="selectedKondisi"
-          :options="kondisiFilterOptions"
-          aria-label="Filter kondisi"
-          placeholder="Semua Kondisi"
-          width-class="w-[135px]"
-          height-class="h-9"
-        />
+          <!-- Filter Kondisi -->
+          <div class="flex-1 min-w-[110px] sm:w-[135px] sm:flex-initial">
+            <CustomSelect
+              v-model="selectedKondisi"
+              :options="kondisiFilterOptions"
+              aria-label="Filter kondisi"
+              placeholder="Semua Kondisi"
+              :block="true"
+              height-class="h-9"
+            />
+          </div>
 
-        <!-- Reset Filter Button -->
-        <button
-          v-if="searchQuery || selectedLocation || selectedTipe || selectedKondisi"
-          type="button"
-          @click="resetFilters"
-          class="h-9 shrink-0 whitespace-nowrap rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-2.5 text-xs font-medium text-[#64748B] hover:text-[#0F172A] transition-all flex items-center justify-center gap-1 cursor-pointer shadow-2xs"
-          title="Reset filter"
-        >
-          <span class="material-symbols-outlined text-[15px]">restart_alt</span>
-          <span>Reset</span>
-        </button>
+          <!-- Reset Filter Button -->
+          <button
+            v-if="searchQuery || selectedLocation || selectedTipe || selectedKondisi"
+            type="button"
+            @click="resetFilters"
+            class="h-9 shrink-0 whitespace-nowrap rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-medium text-[#64748B] hover:text-[#0F172A] active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs touch-manipulation"
+            title="Reset filter"
+          >
+            <span class="material-symbols-outlined text-[16px]">restart_alt</span>
+            <span>Reset</span>
+          </button>
+        </div>
       </div>
     </div>
 
@@ -471,10 +489,48 @@ function formatKondisiPill(kondisi) {
         <div
           v-for="r in 6"
           :key="'ga-skel-' + r"
-          class="ga-row-grid gap-4 rounded-xl border border-[#E2E8F0]/80 bg-white p-4 shadow-2xs select-none"
+          class="ga-row-grid gap-3 md:gap-4 rounded-xl border border-[#E2E8F0]/80 bg-white p-3.5 sm:p-4 shadow-2xs select-none"
         >
+          <!-- Mobile Skeleton Structure (< 768px) -->
+          <div class="flex items-start justify-between gap-2.5 min-w-0 md:hidden">
+            <div class="flex items-center gap-2.5 min-w-0 flex-1">
+              <SkeletonAvatar size="40px" shape="rounded" class="shrink-0" />
+              <div class="flex flex-col gap-1.5 min-w-0 flex-1">
+                <BaseSkeleton width="120px" height="15px" radius="md" />
+                <BaseSkeleton width="80px" height="11px" radius="sm" />
+              </div>
+            </div>
+            <div class="flex items-center gap-1.5 shrink-0 self-start">
+              <BaseSkeleton width="65px" height="22px" radius="full" />
+              <BaseSkeleton width="18px" height="18px" radius="md" />
+            </div>
+          </div>
+
+          <div class="border-t border-[#F1F5F9] my-0.5 md:hidden"></div>
+
+          <div class="grid grid-cols-2 gap-2.5 md:hidden">
+            <div class="flex flex-col gap-1 min-w-0">
+              <BaseSkeleton width="65px" height="10px" radius="sm" />
+              <BaseSkeleton width="85px" height="13px" radius="md" />
+              <BaseSkeleton width="50px" height="11px" radius="sm" />
+            </div>
+            <div class="flex flex-col gap-1 min-w-0">
+              <BaseSkeleton width="45px" height="10px" radius="sm" />
+              <BaseSkeleton width="75px" height="13px" radius="md" />
+            </div>
+            <div class="flex flex-col gap-1 min-w-0">
+              <BaseSkeleton width="55px" height="10px" radius="sm" />
+              <BaseSkeleton width="90px" height="13px" radius="md" />
+            </div>
+            <div class="flex flex-col gap-1 min-w-0">
+              <BaseSkeleton width="45px" height="10px" radius="sm" />
+              <BaseSkeleton width="90px" height="13px" radius="md" />
+            </div>
+          </div>
+
+          <!-- Desktop Skeleton Structure (>= 768px) -->
           <!-- 1. Identity -->
-          <div class="flex items-center gap-3.5 min-w-0">
+          <div class="hidden md:flex items-center gap-3.5 min-w-0">
             <SkeletonAvatar size="40px" shape="rounded" class="shrink-0" />
             <div class="flex flex-col gap-1.5 min-w-0">
               <BaseSkeleton width="130px" height="15px" radius="md" />
@@ -482,28 +538,28 @@ function formatKondisiPill(kondisi) {
             </div>
           </div>
           <!-- 2. Fasilitas & Qty -->
-          <div class="flex flex-col gap-1 min-w-0">
+          <div class="hidden md:flex flex-col gap-1 min-w-0">
             <BaseSkeleton width="60px" height="10px" radius="sm" />
             <BaseSkeleton width="90px" height="13px" radius="md" />
             <BaseSkeleton width="50px" height="11px" radius="sm" />
           </div>
           <!-- 3. Lokasi -->
-          <div class="flex flex-col gap-1 min-w-0">
+          <div class="hidden md:flex flex-col gap-1 min-w-0">
             <BaseSkeleton width="45px" height="10px" radius="sm" />
             <BaseSkeleton width="80px" height="13px" radius="md" />
             <BaseSkeleton width="90px" height="11px" radius="sm" />
           </div>
           <!-- 4. Ukuran & Detail -->
-          <div class="flex flex-col gap-1 min-w-0">
+          <div class="hidden md:flex flex-col gap-1 min-w-0">
             <BaseSkeleton width="55px" height="10px" radius="sm" />
             <BaseSkeleton width="100px" height="13px" radius="md" />
           </div>
           <!-- 5. Kondisi -->
-          <div class="flex items-center">
+          <div class="hidden md:flex items-center">
             <BaseSkeleton width="75px" height="22px" radius="full" />
           </div>
           <!-- 6. Action -->
-          <div class="flex justify-end">
+          <div class="hidden md:flex justify-end">
             <BaseSkeleton width="18px" height="18px" radius="md" />
           </div>
         </div>
@@ -542,10 +598,124 @@ function formatKondisiPill(kondisi) {
           v-for="asset in paginatedAssets"
           :key="asset.id"
           @click="openDetails(asset)"
-          class="ga-row-grid group relative gap-4 rounded-xl border border-[#E2E8F0]/80 bg-white p-4 shadow-2xs hover:border-[#2563EB]/40 hover:shadow-sm transition-all duration-200 cursor-pointer select-none"
+          class="ga-row-grid group relative gap-3 md:gap-4 rounded-xl border border-[#E2E8F0]/80 bg-white p-3.5 sm:p-4 shadow-2xs hover:border-[#2563EB]/40 hover:shadow-sm transition-all duration-200 cursor-pointer select-none"
         >
+          <!-- ── MOBILE LAYOUT (< 768px / md:hidden) ─────────────────── -->
+          <!-- Mobile Header: Icon + Identity + Kondisi Pill + Actions -->
+          <div class="flex items-start justify-between gap-2.5 min-w-0 md:hidden">
+            <div class="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
+              <div
+                class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#EFF6FF] text-[#2563EB] group-hover:scale-105 transition-transform"
+              >
+                <span class="material-symbols-outlined text-[20px]">{{
+                  getGaIcon(asset.tipe_fasilitas)
+                }}</span>
+              </div>
+              <div class="flex flex-col min-w-0 flex-1">
+                <span
+                  class="text-[13.5px] font-bold text-[#0F172A] leading-tight group-hover:text-[#2563EB] transition-colors truncate block"
+                  :title="asset.nama_asset || '—'"
+                >
+                  {{ asset.nama_asset || '—' }}
+                </span>
+                <span
+                  class="font-mono text-[11px] font-normal text-[#64748B] mt-0.5 tracking-tight truncate block"
+                  :title="asset.hostname || '—'"
+                >
+                  {{ asset.hostname || '—' }}
+                </span>
+              </div>
+            </div>
+
+            <!-- Mobile Kondisi & Action Menu -->
+            <div class="flex items-center gap-1.5 shrink-0 self-start">
+              <div
+                class="flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-bold"
+                :class="[formatKondisiPill(asset.kondisi).bg, formatKondisiPill(asset.kondisi).text]"
+              >
+                <span
+                  class="h-1.5 w-1.5 rounded-full shrink-0"
+                  :class="formatKondisiPill(asset.kondisi).dot"
+                ></span>
+                <span class="truncate max-w-[85px] xs:max-w-none">{{ asset.kondisi }}</span>
+              </div>
+              <div @click.stop class="shrink-0">
+                <AppRowActions :actions="getGaActions(asset)" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Mobile Divider -->
+          <div class="border-t border-[#F1F5F9] my-0.5 md:hidden"></div>
+
+          <!-- Mobile 2x2 Metadata Grid -->
+          <div class="grid grid-cols-2 gap-2.5 md:hidden text-left">
+            <!-- 1. Fasilitas & Qty -->
+            <div class="flex flex-col min-w-0 overflow-hidden">
+              <span class="text-[10px] font-semibold uppercase text-[#94A3B8] tracking-wider"
+                >Fasilitas & Qty</span
+              >
+              <span
+                class="text-[12px] font-semibold text-[#1E293B] mt-0.5 truncate block"
+                :title="asset.tipe_fasilitas || '—'"
+              >
+                {{ asset.tipe_fasilitas || '—' }}
+              </span>
+              <span class="text-[11px] font-medium text-[#2563EB] mt-0.5 truncate block">
+                {{ asset.quantity || 1 }} Unit
+              </span>
+            </div>
+
+            <!-- 2. Lokasi & Detail -->
+            <div class="flex flex-col min-w-0 overflow-hidden">
+              <span class="text-[10px] font-semibold uppercase text-[#94A3B8] tracking-wider"
+                >Lokasi</span
+              >
+              <span
+                class="text-[12px] font-normal text-[#1E293B] mt-0.5 truncate block"
+                :title="asset.lokasi || '—'"
+              >
+                {{ asset.lokasi || '—' }}
+              </span>
+              <span
+                v-if="asset.lokasi_detail"
+                class="text-[11px] font-normal text-[#64748B] mt-0.5 truncate block"
+                :title="asset.lokasi_detail"
+              >
+                {{ asset.lokasi_detail }}
+              </span>
+            </div>
+
+            <!-- 3. Ukuran -->
+            <div class="flex flex-col min-w-0 overflow-hidden">
+              <span class="text-[10px] font-semibold uppercase text-[#94A3B8] tracking-wider"
+                >Ukuran</span
+              >
+              <span
+                class="text-[12px] font-normal text-[#1E293B] mt-0.5 truncate block"
+                :title="asset.ukuran || '—'"
+              >
+                {{ asset.ukuran || '—' }}
+              </span>
+            </div>
+
+            <!-- 4. Detail / Catatan -->
+            <div class="flex flex-col min-w-0 overflow-hidden">
+              <span class="text-[10px] font-semibold uppercase text-[#94A3B8] tracking-wider"
+                >Detail</span
+              >
+              <span
+                class="text-[12px] font-normal text-[#64748B] mt-0.5 truncate block"
+                :title="asset.detail || '—'"
+              >
+                {{ asset.detail || '—' }}
+              </span>
+            </div>
+          </div>
+
+          <!-- ── DESKTOP LAYOUT (>= 768px / hidden md:flex) ──────────── -->
           <!-- 1. Asset Identity -->
-          <div class="flex items-center gap-3.5 min-w-0 overflow-hidden">
+          <div class="hidden md:flex items-center gap-3.5 min-w-0 overflow-hidden">
             <div
               class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#EFF6FF] text-[#2563EB] group-hover:scale-105 transition-transform"
             >
@@ -570,7 +740,7 @@ function formatKondisiPill(kondisi) {
           </div>
 
           <!-- 2. Fasilitas & Qty -->
-          <div class="flex flex-col min-w-0 overflow-hidden">
+          <div class="hidden md:flex flex-col min-w-0 overflow-hidden">
             <span class="text-[10px] font-semibold uppercase text-[#94A3B8] tracking-wider"
               >Fasilitas & Qty</span
             >
@@ -586,7 +756,7 @@ function formatKondisiPill(kondisi) {
           </div>
 
           <!-- 3. Lokasi & Detail -->
-          <div class="flex flex-col min-w-0 overflow-hidden">
+          <div class="hidden md:flex flex-col min-w-0 overflow-hidden">
             <span class="text-[10px] font-semibold uppercase text-[#94A3B8] tracking-wider"
               >Lokasi</span
             >
@@ -606,7 +776,7 @@ function formatKondisiPill(kondisi) {
           </div>
 
           <!-- 4. Ukuran & Detail -->
-          <div class="flex flex-col min-w-0 overflow-hidden">
+          <div class="hidden md:flex flex-col min-w-0 overflow-hidden">
             <span class="text-[10px] font-semibold uppercase text-[#94A3B8] tracking-wider"
               >Ukuran & Detail</span
             >
@@ -626,7 +796,7 @@ function formatKondisiPill(kondisi) {
           </div>
 
           <!-- 5. Kondisi Component Block -->
-          <div class="flex flex-col items-start min-w-0 overflow-hidden select-none">
+          <div class="hidden md:flex flex-col items-start min-w-0 overflow-hidden select-none">
             <div
               class="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold"
               :class="[formatKondisiPill(asset.kondisi).bg, formatKondisiPill(asset.kondisi).text]"
@@ -640,7 +810,7 @@ function formatKondisiPill(kondisi) {
           </div>
 
           <!-- 6. Action Menu -->
-          <div @click.stop class="flex items-center justify-end w-8 shrink-0 justify-self-end">
+          <div @click.stop class="hidden md:flex items-center justify-end w-8 shrink-0 justify-self-end">
             <AppRowActions :actions="getGaActions(asset)" />
           </div>
         </div>

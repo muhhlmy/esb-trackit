@@ -542,6 +542,27 @@ const filteredTickets = computed(() => {
   })
 })
 
+const hasActiveFilters = computed(() => {
+  return Boolean(
+    searchQuery.value.trim() ||
+    filterStatus.value ||
+    filterPrioritas.value ||
+    filterQueue.value ||
+    filterKategori.value ||
+    (sortOrder.value && sortOrder.value !== 'terbaru')
+  )
+})
+
+function resetFilters() {
+  searchQuery.value = ''
+  filterStatus.value = ''
+  filterPrioritas.value = ''
+  filterQueue.value = ''
+  filterKategori.value = ''
+  sortOrder.value = 'terbaru'
+  fetchTickets()
+}
+
 const currentPage = ref(1)
 const itemsPerPage = ref(10)
 
@@ -1405,13 +1426,13 @@ function toast(message, type = 'success') {
 
     <!-- ── 1. Page Header ───────────────────────────────── -->
     <div
-      class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-[#E2E8F0]/80 shadow-2xs"
+      class="flex flex-row items-center justify-between gap-3 bg-white p-4 sm:p-5 rounded-2xl border border-[#E2E8F0]/80 shadow-2xs"
     >
-      <div>
-        <h1 class="text-xl font-bold text-[#0F172A] tracking-tight">
+      <div class="min-w-0">
+        <h1 class="text-lg sm:text-xl font-bold text-[#0F172A] tracking-tight truncate">
           {{ isAdmin || isSuperAdmin ? 'Ticket Inbox' : 'Tiket' }}
         </h1>
-        <p class="text-xs font-normal text-[#64748B] mt-0.5">
+        <p class="text-xs font-normal text-[#64748B] mt-0.5 truncate">
           {{
             isAdmin || isSuperAdmin ? 'Kelola pengajuan dan kendala IT' : 'Pengajuan dan layanan IT'
           }}
@@ -1421,7 +1442,7 @@ function toast(message, type = 'success') {
       <button
         type="button"
         @click="openAdd"
-        class="h-9 shrink-0 whitespace-nowrap rounded-xl bg-[#2563EB] px-4 text-xs font-bold text-white shadow-2xs hover:bg-[#1D4ED8] transition-all flex items-center justify-center gap-1.5 cursor-pointer self-start sm:self-auto"
+        class="h-9 shrink-0 whitespace-nowrap rounded-xl bg-[#2563EB] px-3.5 sm:px-4 text-xs font-bold text-white shadow-2xs hover:bg-[#1D4ED8] active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
         :title="isAdmin || isSuperAdmin ? 'Buat tiket baru' : 'Request ticket baru'"
       >
         <span class="material-symbols-outlined text-[16px]">add</span>
@@ -1430,11 +1451,11 @@ function toast(message, type = 'success') {
     </div>
 
     <!-- ── 2. Integrated Control Bar & Workspace Navigation ─ -->
-    <div class="flex flex-col gap-3 bg-white p-4 rounded-2xl border border-[#E2E8F0]/80 shadow-2xs">
+    <div class="flex flex-col gap-3 bg-white p-3.5 sm:p-4 rounded-2xl border border-[#E2E8F0]/80 shadow-2xs">
       <!-- Top Row: Queue Tabs & Secondary Summary -->
-      <div class="flex flex-wrap items-center justify-between gap-3 border-b border-[#F1F5F9] pb-3">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 border-b border-[#F1F5F9] pb-3">
         <!-- Ticket Queue Navigation (Tabs) -->
-        <div class="flex items-center gap-1.5 overflow-x-auto">
+        <div class="flex items-center gap-1.5 overflow-x-auto scrollbar-none [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden py-0.5 w-full sm:w-auto">
           <button
             v-for="tab in !isAdmin && !isSuperAdmin
               ? [
@@ -1451,7 +1472,7 @@ function toast(message, type = 'success') {
             :key="tab.key"
             type="button"
             @click="switchTab(tab.key)"
-            class="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition-all whitespace-nowrap cursor-pointer"
+            class="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition-all whitespace-nowrap cursor-pointer shrink-0 active:scale-95"
             :class="
               activeTab === tab.key
                 ? 'bg-[#2563EB] text-white shadow-2xs'
@@ -1477,7 +1498,7 @@ function toast(message, type = 'success') {
 
         <!-- Secondary Summary (Quiet metadata) -->
         <div
-          class="text-[12px] font-medium text-[#64748B] flex items-center gap-1.5 shrink-0 select-none"
+          class="text-[11.5px] sm:text-[12px] font-medium text-[#64748B] flex items-center gap-1.5 flex-wrap shrink-0 select-none pt-0.5 sm:pt-0"
         >
           <span
             ><strong class="text-[#0F172A] font-bold">{{ stats.totalTickets }}</strong> Inbox</span
@@ -1500,9 +1521,9 @@ function toast(message, type = 'success') {
       </div>
 
       <!-- Bottom Row: Toolbar (Search + Filters) -->
-      <div class="flex flex-wrap items-center justify-between gap-3">
-        <!-- Search Input -->
-        <div class="relative flex-1 min-w-[220px]">
+      <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+        <!-- Search Input with Inline Clear (X) -->
+        <div class="relative w-full lg:flex-1 lg:min-w-[220px]">
           <span
             class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[18px] text-[#94A3B8] pointer-events-none"
             >search</span
@@ -1512,73 +1533,108 @@ function toast(message, type = 'success') {
             type="search"
             aria-label="Cari tiket, judul, nomor, atau pelapor"
             placeholder="Cari ticket, judul, nomor, pelapor..."
-            class="h-9 w-full rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] pl-9 pr-3 text-xs font-medium text-[#0F172A] placeholder-[#94A3B8] focus:border-[#2563EB] focus:bg-white focus:outline-none transition-all"
+            class="h-9 w-full rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] pl-9 pr-8 text-xs font-medium text-[#0F172A] placeholder-[#94A3B8] focus:border-[#2563EB] focus:bg-white focus:outline-none transition-all"
           />
+          <button
+            v-if="searchQuery"
+            type="button"
+            aria-label="Hapus pencarian"
+            @click="searchQuery = ''"
+            class="absolute right-2.5 top-1/2 -translate-y-1/2 flex h-5 w-5 items-center justify-center rounded-full text-[#94A3B8] hover:bg-slate-200/60 hover:text-slate-600 transition-colors cursor-pointer"
+          >
+            <span class="material-symbols-outlined text-[14px]">close</span>
+          </button>
         </div>
 
-        <!-- Filter Options -->
-        <div class="flex items-center gap-2 flex-wrap">
-          <CustomSelect
-            v-model="filterStatus"
-            :options="[
-              { value: '', label: 'Status: Semua' },
-              { value: 'Open', label: 'Open' },
-              { value: 'In Progress', label: 'In Progress' },
-              { value: 'Pending', label: 'Pending' },
-              { value: 'Resolved', label: 'Resolved' },
-              { value: 'Closed', label: 'Closed' },
-            ]"
-            aria-label="Filter status"
-            @change="fetchTickets"
-          />
+        <!-- Filter Options Cluster -->
+        <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto">
+          <div class="flex-1 min-w-[130px] sm:w-[135px] sm:flex-initial">
+            <CustomSelect
+              v-model="filterStatus"
+              :options="[
+                { value: '', label: 'Status: Semua' },
+                { value: 'Open', label: 'Open' },
+                { value: 'In Progress', label: 'In Progress' },
+                { value: 'Pending', label: 'Pending' },
+                { value: 'Resolved', label: 'Resolved' },
+                { value: 'Closed', label: 'Closed' },
+              ]"
+              aria-label="Filter status"
+              :block="true"
+              @change="fetchTickets"
+            />
+          </div>
 
-          <CustomSelect
-            v-model="filterPrioritas"
-            :options="[
-              { value: '', label: 'Priority: Semua' },
-              { value: 'Critical', label: 'Critical' },
-              { value: 'High', label: 'High' },
-              { value: 'Medium', label: 'Medium' },
-              { value: 'Low', label: 'Low' },
-            ]"
-            aria-label="Filter priority"
-            @change="fetchTickets"
-          />
+          <div class="flex-1 min-w-[130px] sm:w-[135px] sm:flex-initial">
+            <CustomSelect
+              v-model="filterPrioritas"
+              :options="[
+                { value: '', label: 'Priority: Semua' },
+                { value: 'Critical', label: 'Critical' },
+                { value: 'High', label: 'High' },
+                { value: 'Medium', label: 'Medium' },
+                { value: 'Low', label: 'Low' },
+              ]"
+              aria-label="Filter priority"
+              :block="true"
+              @change="fetchTickets"
+            />
+          </div>
 
-          <CustomSelect
-            v-model="filterQueue"
-            :options="[
-              { value: '', label: 'Unit: Semua' },
-              ...queues.map((q) => ({ value: q.id, label: `${q.kode} — ${q.nama}` })),
-            ]"
-            aria-label="Filter unit"
-            @change="fetchTickets"
-          />
+          <div class="flex-1 min-w-[130px] sm:w-[140px] sm:flex-initial">
+            <CustomSelect
+              v-model="filterQueue"
+              :options="[
+                { value: '', label: 'Unit: Semua' },
+                ...queues.map((q) => ({ value: q.id, label: `${q.kode} — ${q.nama}` })),
+              ]"
+              aria-label="Filter unit"
+              :block="true"
+              @change="fetchTickets"
+            />
+          </div>
 
-          <CustomSelect
-            v-model="filterKategori"
-            :options="[
-              { value: '', label: 'Kategori: Semua' },
-              { value: 'Request', label: 'Request' },
-              { value: 'Support', label: 'Support' },
-              { value: 'Incident', label: 'Incident' },
-              { value: 'QNA', label: 'QNA' },
-            ]"
-            aria-label="Filter kategori"
-            @change="fetchTickets"
-          />
+          <div class="flex-1 min-w-[130px] sm:w-[140px] sm:flex-initial">
+            <CustomSelect
+              v-model="filterKategori"
+              :options="[
+                { value: '', label: 'Kategori: Semua' },
+                { value: 'Request', label: 'Request' },
+                { value: 'Support', label: 'Support' },
+                { value: 'Incident', label: 'Incident' },
+                { value: 'QNA', label: 'QNA' },
+              ]"
+              aria-label="Filter kategori"
+              :block="true"
+              @change="fetchTickets"
+            />
+          </div>
 
-          <CustomSelect
-            v-model="sortOrder"
-            :options="[
-              { value: 'terbaru', label: 'Terbaru' },
-              { value: 'terlama', label: 'Terlama' },
-            ]"
-            aria-label="Urutkan tiket"
-            width-class="w-32"
-            align="right"
-            @change="fetchTickets"
-          />
+          <div class="flex-1 min-w-[110px] sm:w-[115px] sm:flex-initial">
+            <CustomSelect
+              v-model="sortOrder"
+              :options="[
+                { value: 'terbaru', label: 'Terbaru' },
+                { value: 'terlama', label: 'Terlama' },
+              ]"
+              aria-label="Urutkan tiket"
+              align="right"
+              :block="true"
+              @change="fetchTickets"
+            />
+          </div>
+
+          <!-- Reset Filter Button -->
+          <button
+            v-if="hasActiveFilters"
+            type="button"
+            @click="resetFilters"
+            class="flex-1 min-w-[110px] sm:w-auto sm:flex-initial h-9 rounded-xl border border-[#E2E8F0] bg-slate-50 px-3 text-xs font-semibold text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-all flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 shrink-0"
+            title="Reset semua filter"
+          >
+            <span class="material-symbols-outlined text-[15px]">filter_alt_off</span>
+            <span>Reset Filter</span>
+          </button>
         </div>
       </div>
     </div>
@@ -1623,11 +1679,11 @@ function toast(message, type = 'success') {
             v-for="ticket in paginatedTickets"
             :key="ticket.id"
             @click="openDetail(ticket)"
-            class="tck-list-item group relative flex flex-col bg-white rounded-xl border border-slate-200/80 hover:border-slate-300 hover:shadow-xs p-3.5 sm:p-4 transition-all duration-200 cursor-pointer select-none gap-2"
+            class="tck-list-item group relative flex flex-col bg-white rounded-xl border border-slate-200/80 hover:border-slate-300 hover:shadow-xs p-3.5 sm:p-4 transition-all duration-200 cursor-pointer select-none gap-2 active:scale-[0.99] active:bg-slate-50/60"
           >
             <!-- TOP ROW: Subtle Ticket ID (Left) | Status Badge & Chevron (Right) -->
             <div class="flex items-center justify-between gap-3 min-w-0">
-              <span class="text-[11.5px] font-mono font-medium text-slate-400 tracking-wide">
+              <span class="text-[11.5px] font-mono font-medium text-slate-400 tracking-wide truncate">
                 {{ ticket.nomor_tiket || `TCK-${ticket.id}` }}
               </span>
 
@@ -1653,17 +1709,17 @@ function toast(message, type = 'success') {
 
             <!-- MAIN CONTENT: Prominent Title & Short Description -->
             <div class="flex flex-col gap-0.5 min-w-0">
-              <h3 class="text-[15px] font-bold text-slate-900 group-hover:text-blue-600 transition-colors leading-snug line-clamp-1">
+              <h3 class="text-[14.5px] sm:text-[15px] font-bold text-slate-900 group-hover:text-blue-600 transition-colors leading-snug line-clamp-2 sm:line-clamp-1">
                 {{ ticket.judul }}
               </h3>
-              <p v-if="ticket.deskripsi" class="text-[12.5px] font-normal text-slate-500 line-clamp-1 leading-relaxed">
+              <p v-if="ticket.deskripsi" class="text-[12px] sm:text-[12.5px] font-normal text-slate-500 line-clamp-2 sm:line-clamp-1 leading-relaxed">
                 {{ ticket.deskripsi }}
               </p>
             </div>
 
             <!-- METADATA & FOOTER ROW: Unit, Category, Priority, SLA, & Timestamp -->
-            <div class="flex items-center justify-between gap-3 text-[12px] pt-1.5 border-t border-slate-100 flex-wrap sm:flex-nowrap">
-              <div class="flex items-center gap-x-4 gap-y-1 flex-wrap text-slate-600">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-3 text-[12px] pt-2 border-t border-slate-100">
+              <div class="flex items-center gap-x-3 gap-y-1.5 flex-wrap text-slate-600">
                 <!-- Unit / Queue -->
                 <span class="flex items-center gap-1.5 font-medium text-slate-700" title="Unit Tujuan">
                   <span class="material-symbols-outlined text-[15px] text-slate-400">
@@ -1700,7 +1756,7 @@ function toast(message, type = 'success') {
               </div>
 
               <!-- Secondary Information (Timestamp, Comments, Attachments) -->
-              <div class="flex items-center gap-3 text-[11.5px] text-slate-400 shrink-0 font-normal ml-auto sm:ml-0">
+              <div class="flex items-center gap-3 text-[11.5px] text-slate-400 shrink-0 font-normal self-end sm:self-auto">
                 <span class="flex items-center gap-1">
                   <span class="material-symbols-outlined text-[13.5px]">schedule</span>
                   <span>{{ formatRelativeTime(ticket.diperbarui_pada || ticket.dibuat_pada) }}</span>
@@ -1725,11 +1781,11 @@ function toast(message, type = 'success') {
             v-for="ticket in paginatedTickets"
             :key="ticket.id"
             @click="openDetail(ticket)"
-            class="tck-list-item group relative flex flex-col bg-white rounded-xl border border-slate-200/80 hover:border-slate-300 hover:shadow-xs p-3.5 sm:p-4 transition-all duration-200 cursor-pointer select-none gap-2"
+            class="tck-list-item group relative flex flex-col bg-white rounded-xl border border-slate-200/80 hover:border-slate-300 hover:shadow-xs p-3.5 sm:p-4 transition-all duration-200 cursor-pointer select-none gap-2 active:scale-[0.99] active:bg-slate-50/60"
           >
             <!-- TOP ROW: Subtle Ticket ID (Left) | Status Badge & Row Action Menu (Right) -->
             <div class="flex items-center justify-between gap-3 min-w-0">
-              <span class="text-[11.5px] font-mono font-medium text-slate-400 tracking-wide">
+              <span class="text-[11.5px] font-mono font-medium text-slate-400 tracking-wide truncate">
                 {{ ticket.nomor_tiket || `TCK-${ticket.id}` }}
               </span>
 
@@ -1753,16 +1809,16 @@ function toast(message, type = 'success') {
 
             <!-- MAIN CONTENT: Prominent Title & Short Description -->
             <div class="flex flex-col gap-0.5 min-w-0">
-              <h3 class="text-[15px] font-bold text-slate-900 group-hover:text-blue-600 transition-colors leading-snug line-clamp-1">
+              <h3 class="text-[14.5px] sm:text-[15px] font-bold text-slate-900 group-hover:text-blue-600 transition-colors leading-snug line-clamp-2 sm:line-clamp-1">
                 {{ ticket.judul }}
               </h3>
-              <p v-if="ticket.deskripsi" class="text-[12.5px] font-normal text-slate-500 line-clamp-1 leading-relaxed">
+              <p v-if="ticket.deskripsi" class="text-[12px] sm:text-[12.5px] font-normal text-slate-500 line-clamp-2 sm:line-clamp-1 leading-relaxed">
                 {{ ticket.deskripsi }}
               </p>
             </div>
 
             <!-- METADATA ROW 1: Requester, Unit, Category (Plain Text + Icons) -->
-            <div class="flex items-center gap-x-4 gap-y-1 flex-wrap text-[12px] text-slate-600">
+            <div class="flex items-center gap-x-3 sm:gap-x-4 gap-y-1 flex-wrap text-[12px] text-slate-600">
               <!-- Requester / Pelapor -->
               <span class="flex items-center gap-1.5 font-medium text-slate-700" title="Pelapor / Requester">
                 <span class="material-symbols-outlined text-[15px] text-slate-400">person</span>
@@ -1785,8 +1841,8 @@ function toast(message, type = 'success') {
             </div>
 
             <!-- METADATA ROW 2 & FOOTER: Priority Badge, SLA, Assignee, & Timestamp -->
-            <div class="flex items-center justify-between gap-3 text-[12px] pt-1.5 border-t border-slate-100 flex-wrap sm:flex-nowrap">
-              <div class="flex items-center gap-x-4 gap-y-1 flex-wrap text-slate-600">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-3 text-[12px] pt-2 border-t border-slate-100">
+              <div class="flex items-center gap-x-3 gap-y-1.5 flex-wrap text-slate-600">
                 <!-- Priority (Subtle Badge) -->
                 <span
                   class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] border"
@@ -1824,7 +1880,7 @@ function toast(message, type = 'success') {
               </div>
 
               <!-- Secondary Information (Timestamp, Comments, Attachments) -->
-              <div class="flex items-center gap-3 text-[11.5px] text-slate-400 shrink-0 font-normal ml-auto sm:ml-0">
+              <div class="flex items-center gap-3 text-[11.5px] text-slate-400 shrink-0 font-normal self-end sm:self-auto">
                 <span class="flex items-center gap-1">
                   <span class="material-symbols-outlined text-[13.5px]">schedule</span>
                   <span>{{ formatRelativeTime(ticket.diperbarui_pada || ticket.dibuat_pada) }}</span>
@@ -1991,11 +2047,11 @@ function toast(message, type = 'success') {
             <span class="text-[12px] font-semibold text-[#2A3547]"
               >Unit Support Target <span class="text-[#FA896B]">*</span></span
             >
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div class="grid grid-cols-3 gap-2 sm:gap-3">
               <button
                 type="button"
                 @click="setSupportUnit('IT')"
-                class="flex h-[60px] items-center gap-3 rounded-xl border p-3 text-left transition-all cursor-pointer select-none"
+                class="flex h-[72px] sm:h-[60px] flex-col sm:flex-row items-center justify-center sm:justify-start gap-1.5 sm:gap-3 rounded-xl border p-2 sm:p-3 text-center sm:text-left transition-all cursor-pointer select-none active:scale-95"
                 :class="
                   selectedSupportUnit === 'IT'
                     ? 'border-[#5D87FF] bg-[#ECF2FF] text-[#5D87FF] ring-2 ring-[#5D87FF]/20 shadow-xs'
@@ -2003,21 +2059,21 @@ function toast(message, type = 'success') {
                 "
               >
                 <div
-                  class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg"
+                  class="flex h-7 w-7 sm:h-9 sm:w-9 shrink-0 items-center justify-center rounded-lg"
                   :class="selectedSupportUnit === 'IT' ? 'bg-[#5D87FF] text-white' : 'bg-[#F1F5F9] text-[#7C8BAC]'"
                 >
-                  <span class="material-symbols-outlined text-[18px]">computer</span>
+                  <span class="material-symbols-outlined text-[16px] sm:text-[18px]">computer</span>
                 </div>
-                <div>
-                  <p class="text-[12.5px] font-bold">IT Support</p>
-                  <p class="text-[10.5px] text-[#7C8BAC] leading-tight">Perangkat, Network & Software</p>
+                <div class="min-w-0">
+                  <p class="text-[11px] sm:text-[12.5px] font-bold leading-tight truncate">IT Support</p>
+                  <p class="hidden sm:block text-[10.5px] text-[#7C8BAC] leading-tight mt-0.5">Perangkat & Network</p>
                 </div>
               </button>
 
               <button
                 type="button"
                 @click="setSupportUnit('HR')"
-                class="flex h-[60px] items-center gap-3 rounded-xl border p-3 text-left transition-all cursor-pointer select-none"
+                class="flex h-[72px] sm:h-[60px] flex-col sm:flex-row items-center justify-center sm:justify-start gap-1.5 sm:gap-3 rounded-xl border p-2 sm:p-3 text-center sm:text-left transition-all cursor-pointer select-none active:scale-95"
                 :class="
                   selectedSupportUnit === 'HR'
                     ? 'border-[#5D87FF] bg-[#ECF2FF] text-[#5D87FF] ring-2 ring-[#5D87FF]/20 shadow-xs'
@@ -2025,21 +2081,21 @@ function toast(message, type = 'success') {
                 "
               >
                 <div
-                  class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg"
+                  class="flex h-7 w-7 sm:h-9 sm:w-9 shrink-0 items-center justify-center rounded-lg"
                   :class="selectedSupportUnit === 'HR' ? 'bg-[#5D87FF] text-white' : 'bg-[#F1F5F9] text-[#7C8BAC]'"
                 >
-                  <span class="material-symbols-outlined text-[18px]">badge</span>
+                  <span class="material-symbols-outlined text-[16px] sm:text-[18px]">badge</span>
                 </div>
-                <div>
-                  <p class="text-[12.5px] font-bold">HR Support</p>
-                  <p class="text-[10.5px] text-[#7C8BAC] leading-tight">Kepegawaian, Dokumen & QNA</p>
+                <div class="min-w-0">
+                  <p class="text-[11px] sm:text-[12.5px] font-bold leading-tight truncate">HR Support</p>
+                  <p class="hidden sm:block text-[10.5px] text-[#7C8BAC] leading-tight mt-0.5">Kepegawaian & Dokumen</p>
                 </div>
               </button>
 
               <button
                 type="button"
                 @click="setSupportUnit('GA')"
-                class="flex h-[60px] items-center gap-3 rounded-xl border p-3 text-left transition-all cursor-pointer select-none"
+                class="flex h-[72px] sm:h-[60px] flex-col sm:flex-row items-center justify-center sm:justify-start gap-1.5 sm:gap-3 rounded-xl border p-2 sm:p-3 text-center sm:text-left transition-all cursor-pointer select-none active:scale-95"
                 :class="
                   selectedSupportUnit === 'GA'
                     ? 'border-[#5D87FF] bg-[#ECF2FF] text-[#5D87FF] ring-2 ring-[#5D87FF]/20 shadow-xs'
@@ -2047,14 +2103,14 @@ function toast(message, type = 'success') {
                 "
               >
                 <div
-                  class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg"
+                  class="flex h-7 w-7 sm:h-9 sm:w-9 shrink-0 items-center justify-center rounded-lg"
                   :class="selectedSupportUnit === 'GA' ? 'bg-[#5D87FF] text-white' : 'bg-[#F1F5F9] text-[#7C8BAC]'"
                 >
-                  <span class="material-symbols-outlined text-[18px]">corporate_fare</span>
+                  <span class="material-symbols-outlined text-[16px] sm:text-[18px]">corporate_fare</span>
                 </div>
-                <div>
-                  <p class="text-[12.5px] font-bold">GA Support</p>
-                  <p class="text-[10.5px] text-[#7C8BAC] leading-tight">Fasilitas, Gedung & Logistik</p>
+                <div class="min-w-0">
+                  <p class="text-[11px] sm:text-[12.5px] font-bold leading-tight truncate">GA Support</p>
+                  <p class="hidden sm:block text-[10.5px] text-[#7C8BAC] leading-tight mt-0.5">Fasilitas & Gedung</p>
                 </div>
               </button>
             </div>
@@ -2065,28 +2121,28 @@ function toast(message, type = 'success') {
             <span class="text-[12px] font-semibold text-[#2A3547]"
               >Kategori Tiket {{ selectedSupportUnit }} <span class="text-[#FA896B]">*</span></span
             >
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+            <div class="grid grid-cols-3 gap-2 sm:gap-2.5">
               <button
                 v-for="cat in availableCategories"
                 :key="cat.value"
                 type="button"
                 @click="form.kategori = cat.value"
-                class="flex h-[68px] flex-col justify-between rounded-xl border p-2.5 text-left transition-all cursor-pointer select-none"
+                class="flex h-[56px] sm:h-[68px] flex-col items-center sm:items-start justify-center sm:justify-between rounded-xl border p-2 sm:p-2.5 text-center sm:text-left transition-all cursor-pointer select-none active:scale-95"
                 :class="
                   form.kategori === cat.value
                     ? 'border-[#5D87FF] bg-[#ECF2FF] text-[#5D87FF] ring-2 ring-[#5D87FF]/20 shadow-xs'
                     : 'border-[#E5EAEF] bg-white text-[#2A3547] hover:bg-[#F8FAFC] hover:border-[#CBD5E1]'
                 "
               >
-                <div class="flex items-center justify-between">
-                  <span class="text-[12px] font-bold">{{ cat.title }}</span>
+                <div class="flex items-center justify-center sm:justify-between w-full">
+                  <span class="text-[11.5px] sm:text-[12px] font-bold truncate">{{ cat.title }}</span>
                   <span
                     v-if="form.kategori === cat.value"
-                    class="material-symbols-outlined text-[15px] text-[#5D87FF]"
+                    class="hidden sm:inline material-symbols-outlined text-[15px] text-[#5D87FF]"
                     >check_circle</span
                   >
                 </div>
-                <span class="text-[10px] text-[#7C8BAC] leading-tight">{{ cat.desc }}</span>
+                <span class="hidden sm:block text-[10px] text-[#7C8BAC] leading-tight truncate">{{ cat.desc }}</span>
               </button>
             </div>
           </div>
@@ -2228,7 +2284,14 @@ function toast(message, type = 'success') {
     </AppModal>
 
     <!-- ── Detail Ticket Modal (Modern SaaS Ticket Workspace) ─ -->
-    <AppModal :is-open="showDetailModal" title="" size="xl" @close="closeModal">
+    <AppModal
+      :is-open="showDetailModal"
+      :title="selectedTicket?.nomor_tiket || 'Detail Tiket'"
+      :subtitle="selectedTicket?.queue_nama || (selectedTicket?.queue_kode ? `${selectedTicket.queue_kode} Support` : 'Support Ticket')"
+      icon="confirmation_number"
+      size="xl"
+      @close="closeModal"
+    >
       <div v-if="selectedTicket" class="flex flex-col text-[#0F172A]">
         <!-- HEADER AREA (Compact SaaS Title Block) -->
         <div class="flex items-center justify-between gap-4 border-b border-[#F1F5F9] pb-3 mb-3">
@@ -2684,10 +2747,10 @@ function toast(message, type = 'success') {
                 <button
                   type="submit"
                   :disabled="isSubmittingComment || (!newCommentText.trim() && !commentAttachment)"
-                  class="flex h-10 px-4 items-center justify-center gap-1.5 rounded-xl bg-[#2563EB] text-xs font-bold text-white shadow-2xs hover:bg-[#1D4ED8] disabled:opacity-40 transition-all cursor-pointer shrink-0"
+                  class="flex h-10 px-3.5 sm:px-4 items-center justify-center gap-1.5 rounded-xl bg-[#2563EB] text-xs font-bold text-white shadow-2xs hover:bg-[#1D4ED8] disabled:opacity-40 transition-all cursor-pointer shrink-0 active:scale-95"
                 >
                   <span class="material-symbols-outlined text-[16px]">send</span>
-                  <span>Kirim</span>
+                  <span class="hidden sm:inline">Kirim</span>
                 </button>
               </form>
             </div>
@@ -2697,13 +2760,13 @@ function toast(message, type = 'success') {
         <!-- FOOTER ACTION BAR (Admin Status Selector & Claim Actions) -->
         <div
           v-if="isAdmin || isSuperAdmin"
-          class="flex items-center justify-between gap-4 border-t border-[#F1F5F9] pt-4 mt-6"
+          class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-4 border-t border-[#F1F5F9] pt-4 mt-6"
         >
-          <div class="flex items-center gap-2">
+          <div class="grid grid-cols-1 xs:grid-cols-2 sm:flex sm:items-center gap-2 w-full sm:w-auto">
             <!-- Custom Modern & Minimalist Status Selector Dropdown -->
             <div
               v-if="!['Closed', 'Resolved', 'Cancelled'].includes(selectedTicket.status_tiket)"
-              class="relative inline-block text-left"
+              class="relative w-full sm:w-auto text-left"
             >
               <button
                 type="button"
@@ -2712,13 +2775,15 @@ function toast(message, type = 'success') {
                 aria-label="Ubah status tiket"
                 aria-haspopup="true"
                 :aria-expanded="showStatusDropdown"
-                class="inline-flex h-9 items-center gap-2 rounded-xl border border-[#E5EAEF] bg-white px-3.5 text-xs font-bold text-[#2A3547] shadow-2xs hover:bg-[#F8FAFC] hover:border-[#5D87FF] transition-all cursor-pointer disabled:opacity-50"
+                class="inline-flex h-9 w-full sm:w-auto items-center justify-between sm:justify-center gap-2 rounded-xl border border-[#E5EAEF] bg-white px-3.5 text-xs font-bold text-[#2A3547] shadow-2xs hover:bg-[#F8FAFC] hover:border-[#5D87FF] transition-all cursor-pointer disabled:opacity-50 active:scale-95"
               >
-                <span
-                  class="h-2 w-2 rounded-full shrink-0"
-                  :class="getStatusDotInfo(selectedTicket.status_tiket).dotClass"
-                ></span>
-                <span>{{ getStatusDotInfo(selectedTicket.status_tiket).label }}</span>
+                <div class="flex items-center gap-2">
+                  <span
+                    class="h-2 w-2 rounded-full shrink-0"
+                    :class="getStatusDotInfo(selectedTicket.status_tiket).dotClass"
+                  ></span>
+                  <span>{{ getStatusDotInfo(selectedTicket.status_tiket).label }}</span>
+                </div>
                 <span class="material-symbols-outlined text-[16px] text-[#7C8BAC]">expand_more</span>
               </button>
 
@@ -2726,7 +2791,7 @@ function toast(message, type = 'success') {
               <Transition name="fade">
                 <div
                   v-if="showStatusDropdown"
-                  class="absolute bottom-full left-0 mb-1.5 w-44 rounded-xl border border-[#E5EAEF] bg-white p-1.5 shadow-lg z-50 focus:outline-none"
+                  class="absolute bottom-full left-0 mb-1.5 w-full sm:w-44 rounded-xl border border-[#E5EAEF] bg-white p-1.5 shadow-lg z-50 focus:outline-none"
                 >
                   <button
                     v-for="st in [
@@ -2765,71 +2830,73 @@ function toast(message, type = 'success') {
               type="button"
               @click="claimTicket(selectedTicket)"
               :disabled="isClaiming === selectedTicket.id"
-              class="h-9 inline-flex items-center gap-1.5 rounded-xl bg-[#5D87FF] px-3.5 text-xs font-bold text-white shadow-2xs hover:bg-[#4570EA] disabled:opacity-50 transition-all cursor-pointer"
+              class="h-9 w-full sm:w-auto inline-flex items-center justify-center gap-1.5 rounded-xl bg-[#5D87FF] px-3.5 text-xs font-bold text-white shadow-2xs hover:bg-[#4570EA] disabled:opacity-50 transition-all cursor-pointer whitespace-nowrap active:scale-95"
             >
               <span class="material-symbols-outlined text-[16px]">person_add</span>
               <span>{{
                 isClaiming === selectedTicket.id ? 'Mengambil...' : 'Ambil Tiket Ini'
               }}</span>
             </button>
-          </div>
 
-          <!-- Assign to Admin (Superadmin only) -->
-          <div v-if="isSuperAdmin" class="relative inline-block text-left">
-            <button
-              type="button"
-              :disabled="isReassigning || ['Closed', 'Resolved', 'Cancelled'].includes(selectedTicket.status_tiket)"
-              @click="toggleReassignDropdown"
-              aria-label="Assign tiket ke admin unit"
-              aria-haspopup="true"
-              :aria-expanded="showReassignDropdown"
-              class="inline-flex h-9 items-center gap-1.5 rounded-xl border border-[#E5EAEF] bg-white px-3.5 text-xs font-bold text-[#2A3547] shadow-2xs hover:bg-[#F8FAFC] hover:border-[#5D87FF] transition-all cursor-pointer disabled:opacity-50"
-            >
-              <span class="material-symbols-outlined text-[16px] text-[#2563EB]">assignment_ind</span>
-              <span>Assign ke Admin</span>
-              <span class="material-symbols-outlined text-[16px] text-[#7C8BAC]">expand_more</span>
-            </button>
-
-            <Transition name="fade">
-              <div
-                v-if="showReassignDropdown"
-                class="absolute bottom-full left-0 mb-1.5 w-64 rounded-xl border border-[#E5EAEF] bg-white p-1.5 shadow-lg z-50"
+            <!-- Assign to Admin (Superadmin only) -->
+            <div v-if="isSuperAdmin" class="relative w-full sm:w-auto text-left">
+              <button
+                type="button"
+                :disabled="isReassigning || ['Closed', 'Resolved', 'Cancelled'].includes(selectedTicket.status_tiket)"
+                @click="toggleReassignDropdown"
+                aria-label="Assign tiket ke admin unit"
+                aria-haspopup="true"
+                :aria-expanded="showReassignDropdown"
+                class="inline-flex h-9 w-full sm:w-auto items-center justify-between sm:justify-center gap-1.5 rounded-xl border border-[#E5EAEF] bg-white px-3.5 text-xs font-bold text-[#2A3547] shadow-2xs hover:bg-[#F8FAFC] hover:border-[#5D87FF] transition-all cursor-pointer disabled:opacity-50 whitespace-nowrap active:scale-95"
               >
-                <p class="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-[#94A3B8]">
-                  Admin unit {{ selectedTicket.queue_nama || selectedTicket.queue_kode || '—' }}
-                </p>
-                <button
-                  v-for="admin in getAdminsForQueue(selectedTicket.queue_id)"
-                  :key="admin.id"
-                  type="button"
-                  :disabled="isReassigning"
-                  @click="assignTicket(selectedTicket, admin.id)"
-                  class="flex h-8 w-full items-center justify-between rounded-lg px-2.5 text-xs font-medium text-[#2A3547] hover:bg-[#F8FAFC] transition-colors cursor-pointer disabled:opacity-50"
-                  :class="selectedTicket.assigned_to_user_id === admin.id ? 'bg-[#ECF2FF] font-bold text-[#5D87FF]' : ''"
+                <div class="flex items-center gap-1.5">
+                  <span class="material-symbols-outlined text-[16px] text-[#2563EB]">assignment_ind</span>
+                  <span>Assign ke Admin</span>
+                </div>
+                <span class="material-symbols-outlined text-[16px] text-[#7C8BAC]">expand_more</span>
+              </button>
+
+              <Transition name="fade">
+                <div
+                  v-if="showReassignDropdown"
+                  class="absolute bottom-full left-0 mb-1.5 w-full sm:w-64 rounded-xl border border-[#E5EAEF] bg-white p-1.5 shadow-lg z-50"
                 >
-                  <span class="truncate">{{ admin.nama }}</span>
-                  <span
-                    v-if="selectedTicket.assigned_to_user_id === admin.id"
-                    class="material-symbols-outlined text-[15px] text-[#5D87FF]"
-                    >check</span
+                  <p class="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-[#94A3B8]">
+                    Admin unit {{ selectedTicket.queue_nama || selectedTicket.queue_kode || '—' }}
+                  </p>
+                  <button
+                    v-for="admin in getAdminsForQueue(selectedTicket.queue_id)"
+                    :key="admin.id"
+                    type="button"
+                    :disabled="isReassigning"
+                    @click="assignTicket(selectedTicket, admin.id)"
+                    class="flex h-8 w-full items-center justify-between rounded-lg px-2.5 text-xs font-medium text-[#2A3547] hover:bg-[#F8FAFC] transition-colors cursor-pointer disabled:opacity-50"
+                    :class="selectedTicket.assigned_to_user_id === admin.id ? 'bg-[#ECF2FF] font-bold text-[#5D87FF]' : ''"
                   >
-                </button>
-                <p
-                  v-if="getAdminsForQueue(selectedTicket.queue_id).length === 0"
-                  class="px-2 py-3 text-center text-[11px] text-[#94A3B8]"
-                >
-                  Tidak ada admin terdaftar di unit ini.
-                </p>
-              </div>
-            </Transition>
+                    <span class="truncate">{{ admin.nama }}</span>
+                    <span
+                      v-if="selectedTicket.assigned_to_user_id === admin.id"
+                      class="material-symbols-outlined text-[15px] text-[#5D87FF]"
+                      >check</span
+                    >
+                  </button>
+                  <p
+                    v-if="getAdminsForQueue(selectedTicket.queue_id).length === 0"
+                    class="px-2 py-3 text-center text-[11px] text-[#94A3B8]"
+                  >
+                    Tidak ada admin terdaftar di unit ini.
+                  </p>
+                </div>
+              </Transition>
+            </div>
           </div>
 
           <!-- Default Close Button -->
-          <div class="flex items-center justify-end gap-2 ml-auto">
+          <div class="flex items-center justify-end gap-2 w-full sm:w-auto sm:ml-auto">
             <button
               type="button"
               @click="closeModal"
-              class="h-9 rounded-xl border border-[#E5EAEF] px-4 text-xs font-bold text-[#7C8BAC] hover:bg-[#F8FAFC] hover:text-[#2A3547] transition-colors cursor-pointer"
+              class="h-9 w-full sm:w-auto rounded-xl border border-[#E5EAEF] px-4 text-xs font-bold text-[#7C8BAC] hover:bg-[#F8FAFC] hover:text-[#2A3547] transition-colors cursor-pointer active:scale-95"
             >
               Tutup
             </button>

@@ -540,18 +540,18 @@ onMounted(() => {
       <!-- Enterprise Header & Title -->
       <div class="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 class="text-xl font-bold tracking-tight text-[#0F172A]">Aset Karyawan</h1>
+          <h1 class="text-lg sm:text-xl font-bold tracking-tight text-[#0F172A]">Aset Karyawan</h1>
           <p class="mt-0.5 text-xs text-[#64748B]">
             Karyawan yang sedang memegang aset IT perusahaan
           </p>
         </div>
       </div>
 
-      <!-- KPI Summary Cards Grid (Compact & Minimalist) -->
-      <div class="grid grid-cols-1 gap-3.5 sm:grid-cols-3">
+      <!-- KPI Summary Cards Grid (Compact & Responsive) -->
+      <div class="grid grid-cols-1 gap-2.5 sm:gap-3.5 sm:grid-cols-3">
         <!-- KPI Card 1: Karyawan dengan Aset -->
         <div
-          class="relative flex flex-col justify-between rounded-xl border border-[#E2E8F0] bg-white p-4 shadow-2xs transition-all hover:border-[#CBD5E1]"
+          class="relative flex flex-col justify-between rounded-xl border border-[#E2E8F0] bg-white p-3.5 sm:p-4 shadow-2xs transition-all hover:border-[#CBD5E1]"
         >
           <div class="flex items-center justify-between">
             <span class="text-[11px] font-semibold tracking-wide uppercase text-[#64748B]"
@@ -563,8 +563,8 @@ onMounted(() => {
               <span class="material-symbols-outlined text-[16px]">badge</span>
             </div>
           </div>
-          <div class="mt-3 flex items-baseline justify-between">
-            <span class="text-2xl font-bold tracking-tight text-[#0F172A]">{{
+          <div class="mt-2.5 sm:mt-3 flex items-baseline justify-between">
+            <span class="text-xl sm:text-2xl font-bold tracking-tight text-[#0F172A]">{{
               totalEmployeesHoldingAssets
             }}</span>
             <span
@@ -577,7 +577,7 @@ onMounted(() => {
 
         <!-- KPI Card 2: Total Aset Terassigned -->
         <div
-          class="relative flex flex-col justify-between rounded-xl border border-[#E2E8F0] bg-white p-4 shadow-2xs transition-all hover:border-[#CBD5E1]"
+          class="relative flex flex-col justify-between rounded-xl border border-[#E2E8F0] bg-white p-3.5 sm:p-4 shadow-2xs transition-all hover:border-[#CBD5E1]"
         >
           <div class="flex items-center justify-between">
             <span class="text-[11px] font-semibold tracking-wide uppercase text-[#64748B]"
@@ -589,8 +589,8 @@ onMounted(() => {
               <span class="material-symbols-outlined text-[16px]">devices</span>
             </div>
           </div>
-          <div class="mt-3 flex items-baseline justify-between">
-            <span class="text-2xl font-bold tracking-tight text-[#0F172A]">{{
+          <div class="mt-2.5 sm:mt-3 flex items-baseline justify-between">
+            <span class="text-xl sm:text-2xl font-bold tracking-tight text-[#0F172A]">{{
               totalAssignedAssetsCount
             }}</span>
             <span
@@ -603,7 +603,7 @@ onMounted(() => {
 
         <!-- KPI Card 3: Baru Ditugaskan -->
         <div
-          class="relative flex flex-col justify-between rounded-xl border border-[#E2E8F0] bg-white p-4 shadow-2xs transition-all hover:border-[#CBD5E1]"
+          class="relative flex flex-col justify-between rounded-xl border border-[#E2E8F0] bg-white p-3.5 sm:p-4 shadow-2xs transition-all hover:border-[#CBD5E1]"
         >
           <div class="flex items-center justify-between">
             <span class="text-[11px] font-semibold tracking-wide uppercase text-[#64748B]"
@@ -615,8 +615,8 @@ onMounted(() => {
               <span class="material-symbols-outlined text-[16px]">assignment_turned_in</span>
             </div>
           </div>
-          <div class="mt-3 flex items-baseline justify-between">
-            <span class="text-2xl font-bold tracking-tight text-[#0F172A]">{{
+          <div class="mt-2.5 sm:mt-3 flex items-baseline justify-between">
+            <span class="text-xl sm:text-2xl font-bold tracking-tight text-[#0F172A]">{{
               recentlyAssignedCount
             }}</span>
             <span
@@ -631,9 +631,9 @@ onMounted(() => {
       <!-- Toolbar: Elegant Single Search & Compact Filters -->
       <div
         v-if="isAdmin"
-        class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[#E2E8F0] bg-white p-3 shadow-2xs"
+        class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 rounded-xl border border-[#E2E8F0] bg-white p-3 shadow-2xs"
       >
-        <div class="relative flex-1 min-w-[240px]">
+        <div class="relative w-full sm:flex-1 sm:min-w-[200px]">
           <label for="emp-search" class="sr-only">Cari karyawan dengan aset</label>
           <span
             class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[18px] text-[#94A3B8] pointer-events-none"
@@ -642,33 +642,49 @@ onMounted(() => {
           <input
             id="emp-search"
             v-model="employeeSearch"
-            type="search"
-            autocomplete="off"
+            type="text"
             placeholder="Cari nama karyawan, NIK, atau departemen..."
-            class="h-9 w-full rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] pl-9 pr-3 text-xs text-[#0F172A] placeholder-[#94A3B8] focus:border-[#2563EB] focus:bg-white focus:outline-none transition-all"
+            class="h-9 w-full rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] pl-9 pr-8 text-xs text-[#0F172A] placeholder-[#94A3B8] focus:border-[#2563EB] focus:bg-white focus:outline-none transition-all"
           />
+          <!-- Inline Clear Button -->
+          <button
+            v-if="employeeSearch"
+            type="button"
+            @click="employeeSearch = ''"
+            aria-label="Bersihkan pencarian"
+            class="absolute right-2 top-1/2 -translate-y-1/2 flex h-5 w-5 items-center justify-center rounded-full text-[#94A3B8] hover:bg-[#F1F5F9] hover:text-[#0F172A] transition-all cursor-pointer touch-manipulation"
+            title="Bersihkan"
+          >
+            <span class="material-symbols-outlined text-[15px]">close</span>
+          </button>
         </div>
 
-        <div class="flex items-center gap-2 flex-wrap">
-          <CustomSelect
-            v-model="filterDepartemen"
-            :options="departemenFilterOptions"
-            aria-label="Filter departemen"
-            width-class="w-[150px]"
-          />
+        <div class="flex items-center gap-2 flex-wrap w-full sm:w-auto">
+          <div class="flex-1 min-w-[130px] sm:w-[150px] sm:flex-initial">
+            <CustomSelect
+              v-model="filterDepartemen"
+              :options="departemenFilterOptions"
+              aria-label="Filter departemen"
+              :block="true"
+              height-class="h-9"
+            />
+          </div>
 
-          <CustomSelect
-            v-model="filterLokasi"
-            :options="lokasiFilterOptions"
-            aria-label="Filter lokasi"
-            width-class="w-[140px]"
-          />
+          <div class="flex-1 min-w-[120px] sm:w-[140px] sm:flex-initial">
+            <CustomSelect
+              v-model="filterLokasi"
+              :options="lokasiFilterOptions"
+              aria-label="Filter lokasi"
+              :block="true"
+              height-class="h-9"
+            />
+          </div>
 
           <button
             v-if="employeeSearch || filterDepartemen || filterLokasi"
             type="button"
             @click="resetEmployeeFilters"
-            class="h-9 rounded-lg border border-[#FECACA] bg-[#FEF2F2] px-3 text-xs font-semibold text-[#DC2626] hover:bg-[#FEE2E2] transition-all cursor-pointer"
+            class="h-9 shrink-0 whitespace-nowrap rounded-lg border border-[#FECACA] bg-[#FEF2F2] px-3 text-xs font-semibold text-[#DC2626] hover:bg-[#FEE2E2] active:scale-95 transition-all cursor-pointer shadow-2xs touch-manipulation"
           >
             Reset Filter
           </button>
@@ -705,88 +721,205 @@ onMounted(() => {
           </p>
         </div>
 
-        <!-- Data Table -->
-        <div v-else class="w-full max-w-full overflow-hidden">
-          <table class="w-full max-w-full text-left border-collapse table-fixed">
-            <colgroup>
-              <col class="w-[27%]" />
-              <col class="w-[21%]" />
-              <col class="w-[14%]" />
-              <col class="w-[10%]" />
-              <col class="w-[20%]" />
-              <col class="w-[8%]" />
-            </colgroup>
-            <thead>
-              <tr
-                class="border-b border-[#E2E8F0] bg-[#F8FAFC] text-[11px] font-semibold text-[#64748B] uppercase tracking-wider select-none whitespace-nowrap"
-              >
-                <th class="py-3 pl-4 pr-3 text-left whitespace-nowrap">Karyawan</th>
-                <th class="py-3 px-3 text-left whitespace-nowrap">Departemen & Lokasi</th>
-                <th class="py-3 px-3 text-left whitespace-nowrap">Kategori Aset</th>
-                <th class="py-3 px-2 text-center whitespace-nowrap">Total Aset</th>
-                <th class="py-3 px-3 text-center whitespace-nowrap">Penugasan Terakhir</th>
-                <th class="py-3 pr-4 pl-2 text-center whitespace-nowrap">Detail</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-[#F1F5F9] text-xs">
-              <tr
-                v-for="(employee, idx) in paginatedEmployees"
-                :key="employee.id_karyawan || employee.nik"
-                @click="goToLevel2(employee)"
-                class="group hover:bg-[#F8FAFC] transition-colors duration-150 cursor-pointer select-none"
-              >
-                <!-- Avatar & Employee Info -->
-                <td class="py-3.5 pl-4 pr-3 overflow-hidden">
-                  <div class="flex items-center gap-2.5 min-w-0">
-                    <div
-                      class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br text-[11px] font-bold text-white shadow-2xs"
-                      :class="getAvatarGradient(idx)"
-                    >
-                      {{ getInitials(employee.nama_karyawan) }}
+        <!-- Data Presentation (Responsive: Desktop Table >= 768px, Mobile Cards < 768px) -->
+        <div v-else class="w-full max-w-full">
+          <!-- Desktop Table (>= 768px / hidden md:block) -->
+          <div class="hidden md:block w-full max-w-full overflow-hidden">
+            <table class="w-full max-w-full text-left border-collapse table-fixed">
+              <colgroup>
+                <col class="w-[27%]" />
+                <col class="w-[21%]" />
+                <col class="w-[14%]" />
+                <col class="w-[10%]" />
+                <col class="w-[20%]" />
+                <col class="w-[8%]" />
+              </colgroup>
+              <thead>
+                <tr
+                  class="border-b border-[#E2E8F0] bg-[#F8FAFC] text-[11px] font-semibold text-[#64748B] uppercase tracking-wider select-none whitespace-nowrap"
+                >
+                  <th class="py-3 pl-4 pr-3 text-left whitespace-nowrap">Karyawan</th>
+                  <th class="py-3 px-3 text-left whitespace-nowrap">Departemen & Lokasi</th>
+                  <th class="py-3 px-3 text-left whitespace-nowrap">Kategori Aset</th>
+                  <th class="py-3 px-2 text-center whitespace-nowrap">Total Aset</th>
+                  <th class="py-3 px-3 text-center whitespace-nowrap">Penugasan Terakhir</th>
+                  <th class="py-3 pr-4 pl-2 text-center whitespace-nowrap">Detail</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-[#F1F5F9] text-xs">
+                <tr
+                  v-for="(employee, idx) in paginatedEmployees"
+                  :key="employee.id_karyawan || employee.nik"
+                  @click="goToLevel2(employee)"
+                  class="group hover:bg-[#F8FAFC] transition-colors duration-150 cursor-pointer select-none"
+                >
+                  <!-- Avatar & Employee Info -->
+                  <td class="py-3.5 pl-4 pr-3 overflow-hidden">
+                    <div class="flex items-center gap-2.5 min-w-0">
+                      <div
+                        class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br text-[11px] font-bold text-white shadow-2xs"
+                        :class="getAvatarGradient(idx)"
+                      >
+                        {{ getInitials(employee.nama_karyawan) }}
+                      </div>
+                      <div class="flex flex-col min-w-0">
+                        <span
+                          class="text-xs font-semibold text-[#0F172A] group-hover:text-[#2563EB] transition-colors truncate block"
+                          :title="employee.nama_karyawan"
+                        >
+                          {{ employee.nama_karyawan }}
+                        </span>
+                        <span
+                          class="font-mono text-[11px] text-[#64748B] truncate block"
+                          :title="`NIK: ${employee.nik}`"
+                          >NIK: {{ employee.nik }}</span
+                        >
+                      </div>
                     </div>
+                  </td>
+
+                  <!-- Departemen & Lokasi -->
+                  <td class="py-3.5 px-3 overflow-hidden">
                     <div class="flex flex-col min-w-0">
                       <span
-                        class="text-xs font-semibold text-[#0F172A] group-hover:text-[#2563EB] transition-colors truncate block"
-                        :title="employee.nama_karyawan"
+                        class="font-semibold text-[#1E293B] truncate block"
+                        :title="employee.departemen || '—'"
+                        >{{ employee.departemen || '—' }}</span
                       >
-                        {{ employee.nama_karyawan }}
-                      </span>
                       <span
-                        class="font-mono text-[11px] text-[#64748B] truncate block"
-                        :title="`NIK: ${employee.nik}`"
-                        >NIK: {{ employee.nik }}</span
+                        class="text-[11px] text-[#64748B] flex items-center gap-1 truncate mt-0.5"
+                        :title="normalizeLocation(employee.lokasi_kerja) || '—'"
                       >
+                        <span class="material-symbols-outlined text-[13px] text-[#94A3B8] shrink-0"
+                          >location_on</span
+                        >
+                        <span class="truncate block">{{ normalizeLocation(employee.lokasi_kerja) || '—' }}</span>
+                      </span>
                     </div>
-                  </div>
-                </td>
+                  </td>
 
-                <!-- Departemen & Lokasi -->
-                <td class="py-3.5 px-3 overflow-hidden">
-                  <div class="flex flex-col min-w-0">
+                  <!-- Asset Type Chips -->
+                  <td class="py-3.5 px-3 overflow-hidden">
+                    <div class="flex items-center gap-1 min-w-0 overflow-hidden">
+                      <template v-if="employee.asset_types && employee.asset_types.length > 0">
+                        <span
+                          v-for="tipe in employee.asset_types.slice(0, 2)"
+                          :key="tipe"
+                          class="inline-flex items-center gap-1 rounded-md bg-[#F1F5F9] px-1.5 py-0.5 text-[10px] font-medium text-[#475569] border border-[#E2E8F0] shrink min-w-0 overflow-hidden"
+                        >
+                          <span class="material-symbols-outlined text-[12px] text-[#2563EB] shrink-0">{{
+                            getDeviceIcon(tipe)
+                          }}</span>
+                          <span class="truncate">{{ tipe }}</span>
+                        </span>
+                        <span
+                          v-if="employee.asset_types.length > 2"
+                          class="text-[10px] font-semibold text-[#94A3B8] shrink-0"
+                        >
+                          +{{ employee.asset_types.length - 2 }}
+                        </span>
+                      </template>
+                      <span v-else class="text-[11px] text-[#94A3B8] truncate">Aset IT</span>
+                    </div>
+                  </td>
+
+                  <!-- Total Aset Badge -->
+                  <td class="py-3.5 px-2 text-center overflow-hidden">
                     <span
-                      class="font-semibold text-[#1E293B] truncate block"
-                      :title="employee.departemen || '—'"
-                      >{{ employee.departemen || '—' }}</span
+                      class="inline-flex items-center justify-center rounded-full bg-[#EFF6FF] px-2 py-0.5 text-[11px] font-bold text-[#2563EB] border border-[#BFDBFE]/60 whitespace-nowrap"
                     >
+                      {{ employee.jumlah_aset || 0 }} Aset
+                    </span>
+                  </td>
+
+                  <!-- Last Assignment Date -->
+                  <td class="py-3.5 px-4 text-[#64748B] overflow-hidden text-center">
                     <span
-                      class="text-[11px] text-[#64748B] flex items-center gap-1 truncate mt-0.5"
-                      :title="normalizeLocation(employee.lokasi_kerja) || '—'"
+                      class="text-xs font-medium truncate block"
+                      :title="formatDate(employee.last_assignment_date)"
+                      >{{ formatDate(employee.last_assignment_date) }}</span
                     >
-                      <span class="material-symbols-outlined text-[13px] text-[#94A3B8] shrink-0"
-                        >location_on</span
-                      >
-                      <span class="truncate block">{{ normalizeLocation(employee.lokasi_kerja) || '—' }}</span>
+                  </td>
+
+                  <!-- Action Chevron -->
+                  <td class="py-3.5 pr-5 pl-4 text-center overflow-hidden">
+                    <span
+                      class="material-symbols-outlined text-[18px] text-[#94A3B8] group-hover:text-[#2563EB] group-hover:translate-x-0.5 transition-all inline-block"
+                      >chevron_right</span
+                    >
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Mobile Card List (< 768px / md:hidden) -->
+          <div class="md:hidden divide-y divide-[#F1F5F9]">
+            <div
+              v-for="(employee, idx) in paginatedEmployees"
+              :key="'mob-' + (employee.id_karyawan || employee.nik)"
+              @click="goToLevel2(employee)"
+              class="p-3.5 hover:bg-[#F8FAFC] active:bg-[#F1F5F9] transition-colors cursor-pointer select-none"
+            >
+              <!-- Card Header: Avatar, Name, NIK, Total Aset Badge & Chevron -->
+              <div class="flex items-center justify-between gap-2.5">
+                <div class="flex items-center gap-2.5 min-w-0 flex-1">
+                  <div
+                    class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br text-xs font-bold text-white shadow-2xs"
+                    :class="getAvatarGradient(idx)"
+                  >
+                    {{ getInitials(employee.nama_karyawan) }}
+                  </div>
+                  <div class="flex flex-col min-w-0 flex-1">
+                    <span class="text-[13.5px] font-bold text-[#0F172A] truncate block">
+                      {{ employee.nama_karyawan }}
+                    </span>
+                    <span class="font-mono text-[11px] text-[#64748B] truncate block">
+                      NIK: {{ employee.nik }}
                     </span>
                   </div>
-                </td>
+                </div>
 
-                <!-- Asset Type Chips -->
-                <td class="py-3.5 px-3 overflow-hidden">
-                  <div class="flex items-center gap-1 min-w-0 overflow-hidden">
+                <div class="flex items-center gap-1.5 shrink-0">
+                  <span
+                    class="inline-flex items-center justify-center rounded-full bg-[#EFF6FF] px-2 py-0.5 text-[10.5px] font-bold text-[#2563EB] border border-[#BFDBFE]/60 whitespace-nowrap"
+                  >
+                    {{ employee.jumlah_aset || 0 }} Aset
+                  </span>
+                  <span class="material-symbols-outlined text-[18px] text-[#94A3B8]">chevron_right</span>
+                </div>
+              </div>
+
+              <!-- Subtle Divider -->
+              <div class="border-t border-[#F1F5F9] my-2"></div>
+
+              <!-- 2x2 Metadata Grid -->
+              <div class="grid grid-cols-2 gap-2 text-left">
+                <!-- 1. Departemen -->
+                <div class="flex flex-col min-w-0 overflow-hidden">
+                  <span class="text-[10px] font-semibold uppercase text-[#94A3B8] tracking-wider">Departemen</span>
+                  <span class="text-[12px] font-semibold text-[#1E293B] mt-0.5 truncate block" :title="employee.departemen || '—'">
+                    {{ employee.departemen || '—' }}
+                  </span>
+                </div>
+
+                <!-- 2. Lokasi -->
+                <div class="flex flex-col min-w-0 overflow-hidden">
+                  <span class="text-[10px] font-semibold uppercase text-[#94A3B8] tracking-wider">Lokasi</span>
+                  <span class="text-[12px] font-normal text-[#1E293B] mt-0.5 truncate flex items-center gap-1" :title="normalizeLocation(employee.lokasi_kerja) || '—'">
+                    <span class="material-symbols-outlined text-[12px] text-[#94A3B8] shrink-0">location_on</span>
+                    <span class="truncate">{{ normalizeLocation(employee.lokasi_kerja) || '—' }}</span>
+                  </span>
+                </div>
+
+                <!-- 3. Kategori Aset -->
+                <div class="flex flex-col min-w-0 overflow-hidden">
+                  <span class="text-[10px] font-semibold uppercase text-[#94A3B8] tracking-wider">Kategori Aset</span>
+                  <div class="flex items-center gap-1 min-w-0 overflow-hidden mt-0.5">
                     <template v-if="employee.asset_types && employee.asset_types.length > 0">
                       <span
                         v-for="tipe in employee.asset_types.slice(0, 2)"
-                        :key="tipe"
+                        :key="'mob-tip-' + tipe"
                         class="inline-flex items-center gap-1 rounded-md bg-[#F1F5F9] px-1.5 py-0.5 text-[10px] font-medium text-[#475569] border border-[#E2E8F0] shrink min-w-0 overflow-hidden"
                       >
                         <span class="material-symbols-outlined text-[12px] text-[#2563EB] shrink-0">{{
@@ -803,36 +936,18 @@ onMounted(() => {
                     </template>
                     <span v-else class="text-[11px] text-[#94A3B8] truncate">Aset IT</span>
                   </div>
-                </td>
+                </div>
 
-                <!-- Total Aset Badge -->
-                <td class="py-3.5 px-2 text-center overflow-hidden">
-                  <span
-                    class="inline-flex items-center justify-center rounded-full bg-[#EFF6FF] px-2 py-0.5 text-[11px] font-bold text-[#2563EB] border border-[#BFDBFE]/60 whitespace-nowrap"
-                  >
-                    {{ employee.jumlah_aset || 0 }} Aset
+                <!-- 4. Penugasan Terakhir -->
+                <div class="flex flex-col min-w-0 overflow-hidden">
+                  <span class="text-[10px] font-semibold uppercase text-[#94A3B8] tracking-wider">Penugasan Terakhir</span>
+                  <span class="text-[12px] font-medium text-[#64748B] mt-0.5 truncate block" :title="formatDate(employee.last_assignment_date)">
+                    {{ formatDate(employee.last_assignment_date) }}
                   </span>
-                </td>
-
-                <!-- Last Assignment Date -->
-                <td class="py-3.5 px-4 text-[#64748B] overflow-hidden text-center">
-                  <span
-                    class="text-xs font-medium truncate block"
-                    :title="formatDate(employee.last_assignment_date)"
-                    >{{ formatDate(employee.last_assignment_date) }}</span
-                  >
-                </td>
-
-                <!-- Action Chevron -->
-                <td class="py-3.5 pr-5 pl-4 text-center overflow-hidden">
-                  <span
-                    class="material-symbols-outlined text-[18px] text-[#94A3B8] group-hover:text-[#2563EB] group-hover:translate-x-0.5 transition-all inline-block"
-                    >chevron_right</span
-                  >
-                </td>
-              </tr>
-            </tbody>
-          </table>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         <AppPagination
@@ -849,45 +964,46 @@ onMounted(() => {
     ════════════════════════════════════════════════════════════════════════ -->
     <template v-else-if="currentLevel === 2 && selectedEmployee">
       <!-- Interactive Breadcrumb & Back Navigation -->
-      <div class="flex items-center justify-between gap-3">
-        <nav class="flex items-center gap-2 text-xs" aria-label="Breadcrumb">
+      <div class="flex items-center justify-between gap-2.5 min-w-0">
+        <nav class="flex items-center gap-1.5 text-xs min-w-0 overflow-hidden" aria-label="Breadcrumb">
           <button
             v-if="isAdmin"
             type="button"
             @click="goToLevel1"
-            class="font-medium text-[#64748B] hover:text-[#2563EB] transition-colors"
+            class="font-medium text-[#64748B] hover:text-[#2563EB] transition-colors shrink-0"
           >
             Aset Karyawan
           </button>
-          <span v-else class="font-medium text-[#64748B]">Aset Saya</span>
-          <span class="material-symbols-outlined text-[14px] text-[#CBD5E1]">chevron_right</span>
-          <span class="font-bold text-[#0F172A]">{{ selectedEmployee.nama_karyawan }}</span>
+          <span v-else class="font-medium text-[#64748B] shrink-0">Aset Saya</span>
+          <span class="material-symbols-outlined text-[14px] text-[#CBD5E1] shrink-0">chevron_right</span>
+          <span class="font-bold text-[#0F172A] truncate">{{ selectedEmployee.nama_karyawan }}</span>
         </nav>
 
         <button
           v-if="isAdmin"
           type="button"
           @click="goToLevel1"
-          class="flex items-center gap-1.5 rounded-lg border border-[#E2E8F0] bg-white px-3 py-1.5 text-xs font-semibold text-[#475569] hover:bg-[#F8FAFC] hover:text-[#0F172A] transition-all cursor-pointer shadow-2xs"
+          class="flex items-center gap-1 shrink-0 rounded-lg border border-[#E2E8F0] bg-white px-2.5 sm:px-3 py-1.5 text-xs font-semibold text-[#475569] hover:bg-[#F8FAFC] hover:text-[#0F172A] active:scale-95 transition-all cursor-pointer shadow-2xs touch-manipulation"
+          title="Kembali ke Daftar Karyawan"
         >
           <span class="material-symbols-outlined text-[16px]">arrow_back</span>
-          <span>Kembali ke Daftar</span>
+          <span class="hidden xs:inline">Kembali</span>
         </button>
       </div>
 
       <!-- Employee Hero Profile Identity Header -->
       <div
-        class="rounded-xl border border-[#E2E8F0] bg-white p-5 shadow-2xs flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
+        class="rounded-xl border border-[#E2E8F0] bg-white p-3.5 sm:p-5 shadow-2xs flex flex-col gap-3.5 sm:flex-row sm:items-center sm:justify-between"
       >
-        <div class="flex items-center gap-4 min-w-0">
+        <div class="flex items-start sm:items-center gap-3 sm:gap-4 min-w-0">
           <div
-            class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#2563EB] to-[#1D4ED8] text-sm font-bold text-white shadow-2xs"
+            class="flex h-11 w-11 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#2563EB] to-[#1D4ED8] text-sm font-bold text-white shadow-2xs"
           >
             {{ getInitials(selectedEmployee.nama_karyawan) }}
           </div>
           <div class="min-w-0 flex-1">
-            <div class="flex items-center gap-2.5 flex-wrap">
-              <h2 class="text-lg font-bold text-[#0F172A] tracking-tight truncate">
+            <div class="flex items-center gap-2 flex-wrap">
+              <h2 class="text-base sm:text-lg font-bold text-[#0F172A] tracking-tight truncate">
                 {{ selectedEmployee.nama_karyawan }}
               </h2>
               <AppBadge
@@ -903,37 +1019,39 @@ onMounted(() => {
             <p class="text-xs font-medium text-[#475569] mt-0.5 truncate">
               {{ selectedEmployee.jabatan || selectedEmployee.title || 'Staff' }}
             </p>
-            <div class="mt-1.5 flex flex-wrap items-center gap-x-3 text-xs text-[#64748B]">
-              <span class="font-mono font-medium text-[#0F172A]"
-                >NIK: {{ selectedEmployee.nik }}</span
-              >
-              <span>·</span>
-              <span>{{ selectedEmployee.departemen || '—' }}</span>
-              <span v-if="selectedEmployee.lokasi_kerja"
-                >· {{ selectedEmployee.lokasi_kerja }}</span
-              >
-              <span v-if="selectedEmployee.email_kantor"
-                >· {{ selectedEmployee.email_kantor }}</span
-              >
+            <div class="mt-2 flex flex-wrap items-center gap-1.5 text-[11px] text-[#64748B]">
+              <span class="inline-flex items-center font-mono font-medium px-2 py-0.5 rounded-md bg-[#F1F5F9] text-[#1E293B]">
+                NIK: {{ selectedEmployee.nik }}
+              </span>
+              <span v-if="selectedEmployee.departemen" class="inline-flex items-center px-2 py-0.5 rounded-md bg-[#F8FAFC] border border-[#E2E8F0] text-[#475569]">
+                {{ selectedEmployee.departemen }}
+              </span>
+              <span v-if="selectedEmployee.lokasi_kerja" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#F8FAFC] border border-[#E2E8F0] text-[#475569]">
+                <span class="material-symbols-outlined text-[12px] text-[#94A3B8]">location_on</span>
+                {{ selectedEmployee.lokasi_kerja }}
+              </span>
+              <span v-if="selectedEmployee.email_kantor" class="inline-flex items-center px-2 py-0.5 rounded-md bg-[#F8FAFC] border border-[#E2E8F0] text-[#475569] truncate max-w-[200px]">
+                {{ selectedEmployee.email_kantor }}
+              </span>
             </div>
           </div>
         </div>
 
         <!-- Employee Summary Stat Badges -->
         <div
-          class="flex items-center gap-3 shrink-0 border-t border-[#F1F5F9] pt-3 sm:border-t-0 sm:pt-0"
+          class="grid grid-cols-2 sm:flex items-center gap-2.5 shrink-0 border-t border-[#F1F5F9] pt-3 sm:border-t-0 sm:pt-0"
         >
-          <div class="rounded-lg bg-[#F8FAFC] px-3.5 py-2 border border-[#E2E8F0] text-right">
+          <div class="rounded-lg bg-[#F8FAFC] px-3 py-2 border border-[#E2E8F0] text-center sm:text-right">
             <span class="block text-[10px] font-semibold uppercase text-[#64748B]">Total Aset</span>
             <span class="text-base font-bold text-[#2563EB] mt-0.5 block"
               >{{ myAssets.length }} Unit</span
             >
           </div>
-          <div class="rounded-lg bg-[#F8FAFC] px-3.5 py-2 border border-[#E2E8F0] text-right">
+          <div class="rounded-lg bg-[#F8FAFC] px-3 py-2 border border-[#E2E8F0] text-center sm:text-right">
             <span class="block text-[10px] font-semibold uppercase text-[#64748B]"
               >Penugasan Awal</span
             >
-            <span class="text-xs font-semibold text-[#0F172A] mt-1 block">{{
+            <span class="text-xs font-semibold text-[#0F172A] mt-1 block truncate">{{
               employeeAssignedSince
             }}</span>
           </div>
@@ -942,7 +1060,7 @@ onMounted(() => {
 
       <!-- Section: Assigned Assets -->
       <div class="flex flex-col gap-3">
-        <div class="flex items-center justify-between">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5">
           <div class="flex items-center gap-2">
             <span class="material-symbols-outlined text-[20px] text-[#2563EB]">inventory_2</span>
             <h3 class="text-sm font-bold text-[#0F172A]">Aset Terassigned</h3>
@@ -952,17 +1070,26 @@ onMounted(() => {
           </div>
 
           <!-- Quick Search Assets inside Employee -->
-          <div v-if="myAssets.length > 0" class="relative min-w-[200px]">
+          <div v-if="myAssets.length > 0" class="relative w-full sm:w-auto sm:min-w-[220px]">
             <span
               class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-[16px] text-[#94A3B8] pointer-events-none"
               >search</span
             >
             <input
               v-model="assetSearch"
-              type="search"
+              type="text"
               placeholder="Cari label / serial..."
-              class="h-8 w-full rounded-lg border border-[#E2E8F0] bg-white pl-8 pr-2.5 text-xs text-[#0F172A] focus:border-[#2563EB] focus:outline-none shadow-2xs"
+              class="h-8.5 w-full rounded-lg border border-[#E2E8F0] bg-white pl-8 pr-8 text-xs text-[#0F172A] focus:border-[#2563EB] focus:outline-none shadow-2xs"
             />
+            <button
+              v-if="assetSearch"
+              type="button"
+              @click="assetSearch = ''"
+              aria-label="Bersihkan"
+              class="absolute right-2 top-1/2 -translate-y-1/2 flex h-5 w-5 items-center justify-center rounded-full text-[#94A3B8] hover:bg-[#F1F5F9] hover:text-[#0F172A] cursor-pointer"
+            >
+              <span class="material-symbols-outlined text-[14px]">close</span>
+            </button>
           </div>
         </div>
 
@@ -1021,12 +1148,12 @@ onMounted(() => {
         </div>
 
         <!-- Assigned Asset Cards Grid -->
-        <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-4">
           <div
             v-for="asset in paginatedAssets"
             :key="asset.id_aset"
             @click="goToLevel3(asset)"
-            class="group relative flex flex-col justify-between rounded-xl border border-[#E2E8F0] bg-white p-4 shadow-2xs hover:border-[#2563EB] hover:shadow-md transition-all duration-200 cursor-pointer"
+            class="group relative flex flex-col justify-between rounded-xl border border-[#E2E8F0] bg-white p-3.5 sm:p-4 shadow-2xs hover:border-[#2563EB] hover:shadow-md active:scale-[0.99] transition-all duration-200 cursor-pointer touch-manipulation"
           >
             <div>
               <!-- Top Row: Device Icon & Status Pill -->
@@ -1065,8 +1192,8 @@ onMounted(() => {
                 }}
               </h4>
               <div class="mt-1 flex items-center justify-between text-xs text-[#64748B]">
-                <span class="font-mono font-medium">SN: {{ asset.nomor_seri || '—' }}</span>
-                <span class="font-mono text-[11px] text-[#94A3B8]"
+                <span class="font-mono font-medium truncate">SN: {{ asset.nomor_seri || '—' }}</span>
+                <span class="font-mono text-[11px] text-[#94A3B8] shrink-0"
                   >AST-IT-{{ String(asset.id_aset).padStart(5, '0') }}</span
                 >
               </div>
@@ -1092,7 +1219,7 @@ onMounted(() => {
 
             <!-- Bottom Trigger link -->
             <div
-              class="mt-4 pt-3 border-t border-[#F1F5F9] flex items-center justify-between text-xs font-semibold text-[#2563EB]"
+              class="mt-3.5 pt-2.5 border-t border-[#F1F5F9] flex items-center justify-between text-xs font-semibold text-[#2563EB]"
             >
               <span>Lihat Audit History</span>
               <span
@@ -1117,35 +1244,46 @@ onMounted(() => {
     ════════════════════════════════════════════════════════════════════════ -->
     <template v-else-if="currentLevel === 3 && selectedAsset && selectedEmployee">
       <!-- Breadcrumb Navigation -->
-      <div class="flex items-center justify-between gap-3">
-        <nav class="flex items-center gap-2 text-xs" aria-label="Breadcrumb">
+      <div class="flex items-center justify-between gap-2.5 min-w-0">
+        <!-- Desktop Breadcrumb (>= sm) -->
+        <nav class="hidden sm:flex items-center gap-2 text-xs min-w-0 overflow-hidden" aria-label="Breadcrumb">
           <button
             v-if="isAdmin"
             type="button"
             @click="goToLevel1"
-            class="font-medium text-[#64748B] hover:text-[#2563EB] transition-colors"
+            class="font-medium text-[#64748B] hover:text-[#2563EB] transition-colors shrink-0"
           >
             Aset Karyawan
           </button>
           <button
             type="button"
             @click="currentLevel = 2"
-            class="font-medium text-[#64748B] hover:text-[#2563EB] transition-colors"
+            class="font-medium text-[#64748B] hover:text-[#2563EB] transition-colors shrink-0"
           >
             {{ selectedEmployee.nama_karyawan }}
           </button>
-          <span class="material-symbols-outlined text-[14px] text-[#CBD5E1]">chevron_right</span>
-          <span class="font-bold text-[#0F172A]">{{
+          <span class="material-symbols-outlined text-[14px] text-[#CBD5E1] shrink-0">chevron_right</span>
+          <span class="font-bold text-[#0F172A] truncate">{{
             selectedAsset.label_aset || selectedAsset.nomor_seri
           }}</span>
-          <span class="material-symbols-outlined text-[14px] text-[#CBD5E1]">chevron_right</span>
-          <span class="font-semibold text-[#64748B]">Audit History</span>
+          <span class="material-symbols-outlined text-[14px] text-[#CBD5E1] shrink-0">chevron_right</span>
+          <span class="font-semibold text-[#64748B] shrink-0">Audit History</span>
         </nav>
+
+        <!-- Mobile Breadcrumb / Back Button (< sm) -->
+        <button
+          type="button"
+          @click="currentLevel = 2"
+          class="sm:hidden flex items-center gap-1 text-xs font-semibold text-[#2563EB] truncate"
+        >
+          <span class="material-symbols-outlined text-[16px]">arrow_back</span>
+          <span class="truncate">Kembali ke {{ selectedEmployee.nama_karyawan }}</span>
+        </button>
 
         <button
           type="button"
           @click="currentLevel = 2"
-          class="flex items-center gap-1.5 rounded-lg border border-[#E2E8F0] bg-white px-3 py-1.5 text-xs font-semibold text-[#475569] hover:bg-[#F8FAFC] hover:text-[#0F172A] transition-all cursor-pointer shadow-2xs"
+          class="hidden sm:flex items-center gap-1.5 rounded-lg border border-[#E2E8F0] bg-white px-3 py-1.5 text-xs font-semibold text-[#475569] hover:bg-[#F8FAFC] hover:text-[#0F172A] active:scale-95 transition-all cursor-pointer shadow-2xs touch-manipulation shrink-0"
         >
           <span class="material-symbols-outlined text-[16px]">arrow_back</span>
           <span>Kembali ke Detail Karyawan</span>
@@ -1154,19 +1292,19 @@ onMounted(() => {
 
       <!-- Asset Title Header Banner -->
       <div
-        class="rounded-xl border border-[#E2E8F0] bg-white p-5 shadow-2xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
+        class="rounded-xl border border-[#E2E8F0] bg-white p-4 sm:p-5 shadow-2xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3.5"
       >
-        <div class="flex items-center gap-4 min-w-0">
+        <div class="flex items-start sm:items-center gap-3.5 min-w-0">
           <div
-            class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#EFF6FF] text-[#2563EB]"
+            class="flex h-11 w-11 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-xl bg-[#EFF6FF] text-[#2563EB]"
           >
             <span class="material-symbols-outlined text-[24px]">{{
               getDeviceIcon(selectedAsset.tipe_perangkat)
             }}</span>
           </div>
           <div class="min-w-0 flex-1">
-            <div class="flex items-center gap-2.5 flex-wrap">
-              <h2 class="text-lg font-bold text-[#0F172A] tracking-tight truncate">
+            <div class="flex items-center gap-2 flex-wrap">
+              <h2 class="text-base sm:text-lg font-bold text-[#0F172A] tracking-tight truncate">
                 {{
                   selectedAsset.label_aset ||
                   [selectedAsset.merek, selectedAsset.model].filter(Boolean).join(' ') ||
@@ -1178,17 +1316,17 @@ onMounted(() => {
                 :text="selectedAsset.status_aset || 'In Use'"
               />
             </div>
-            <div class="mt-1 flex flex-wrap items-center gap-x-3 text-xs text-[#64748B]">
-              <span class="font-mono font-medium text-[#0F172A]"
-                >Asset ID: AST-IT-{{ String(selectedAsset.id_aset).padStart(5, '0') }}</span
-              >
-              <span>·</span>
-              <span class="font-mono">SN: {{ selectedAsset.nomor_seri || '—' }}</span>
-              <span>·</span>
-              <span
-                >Pemegang:
-                <strong class="text-[#0F172A]">{{ selectedEmployee.nama_karyawan }}</strong></span
-              >
+            <div class="mt-2 flex flex-wrap items-center gap-1.5 text-[11px] text-[#64748B]">
+              <span class="inline-flex items-center font-mono font-medium px-2 py-0.5 rounded-md bg-[#F1F5F9] text-[#0F172A]">
+                AST-IT-{{ String(selectedAsset.id_aset).padStart(5, '0') }}
+              </span>
+              <span class="inline-flex items-center font-mono px-2 py-0.5 rounded-md bg-[#F8FAFC] border border-[#E2E8F0] text-[#475569]">
+                SN: {{ selectedAsset.nomor_seri || '—' }}
+              </span>
+              <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#F8FAFC] border border-[#E2E8F0] text-[#475569]">
+                <span class="material-symbols-outlined text-[12px] text-[#94A3B8]">person</span>
+                {{ selectedEmployee.nama_karyawan }}
+              </span>
             </div>
           </div>
         </div>
@@ -1196,7 +1334,7 @@ onMounted(() => {
         <button
           type="button"
           @click="openSpecification(selectedAsset)"
-          class="inline-flex items-center justify-center gap-1.5 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-3.5 py-2 text-xs font-semibold text-[#2563EB] hover:bg-[#EFF6FF] cursor-pointer transition-colors"
+          class="w-full sm:w-auto h-9 inline-flex items-center justify-center gap-1.5 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-3.5 text-xs font-semibold text-[#2563EB] hover:bg-[#EFF6FF] active:scale-95 cursor-pointer transition-colors shadow-2xs touch-manipulation shrink-0"
         >
           <span class="material-symbols-outlined text-[16px]">description</span>
           <span>Lihat Spesifikasi</span>
@@ -1204,57 +1342,57 @@ onMounted(() => {
       </div>
 
       <!-- Main Two-Column View: Specs Grid (Left) & Audit Timeline (Right) -->
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5 items-start">
         <!-- LEFT COLUMN: Asset Metadata Grid (lg:col-span-6) -->
         <div class="lg:col-span-6 flex flex-col gap-4">
           <!-- Information Card -->
-          <div class="rounded-xl border border-[#E2E8F0] bg-white p-4 shadow-2xs">
-            <div class="flex items-center gap-2 pb-3 mb-3 border-b border-[#F1F5F9]">
+          <div class="rounded-xl border border-[#E2E8F0] bg-white p-3.5 sm:p-4 shadow-2xs">
+            <div class="flex items-center gap-2 pb-2.5 mb-3 border-b border-[#F1F5F9]">
               <span class="material-symbols-outlined text-[18px] text-[#2563EB]">info</span>
               <h3 class="text-xs font-bold uppercase tracking-wider text-[#0F172A]">
                 Informasi Perangkat
               </h3>
             </div>
 
-            <dl class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 text-xs">
+            <dl class="grid grid-cols-2 gap-3 text-xs">
               <div>
                 <dt class="text-[10px] font-semibold uppercase text-[#94A3B8]">Tipe Perangkat</dt>
-                <dd class="mt-0.5 font-semibold text-[#0F172A]">
+                <dd class="mt-0.5 font-semibold text-[#0F172A] truncate">
                   {{ selectedAsset.tipe_perangkat || '—' }}
                 </dd>
               </div>
 
               <div>
                 <dt class="text-[10px] font-semibold uppercase text-[#94A3B8]">Brand / Merek</dt>
-                <dd class="mt-0.5 font-semibold text-[#0F172A]">
+                <dd class="mt-0.5 font-semibold text-[#0F172A] truncate">
                   {{ selectedAsset.merek || '—' }}
                 </dd>
               </div>
 
               <div>
                 <dt class="text-[10px] font-semibold uppercase text-[#94A3B8]">Model</dt>
-                <dd class="mt-0.5 font-semibold text-[#0F172A]">
+                <dd class="mt-0.5 font-semibold text-[#0F172A] truncate">
                   {{ selectedAsset.model || '—' }}
                 </dd>
               </div>
 
               <div>
                 <dt class="text-[10px] font-semibold uppercase text-[#94A3B8]">Serial Number</dt>
-                <dd class="mt-0.5 font-mono font-medium text-[#0F172A]">
+                <dd class="mt-0.5 font-mono font-medium text-[#0F172A] truncate">
                   {{ selectedAsset.nomor_seri || '—' }}
                 </dd>
               </div>
 
               <div>
                 <dt class="text-[10px] font-semibold uppercase text-[#94A3B8]">Kode / ID Aset</dt>
-                <dd class="mt-0.5 font-mono font-medium text-[#0F172A]">
+                <dd class="mt-0.5 font-mono font-medium text-[#0F172A] truncate">
                   AST-IT-{{ String(selectedAsset.id_aset).padStart(5, '0') }}
                 </dd>
               </div>
 
               <div>
                 <dt class="text-[10px] font-semibold uppercase text-[#94A3B8]">Lokasi Aset</dt>
-                <dd class="mt-0.5 font-semibold text-[#0F172A]">
+                <dd class="mt-0.5 font-semibold text-[#0F172A] truncate">
                   {{ selectedAsset.lokasi_aset || selectedEmployee.lokasi_kerja || '—' }}
                 </dd>
               </div>
@@ -1273,7 +1411,7 @@ onMounted(() => {
                 <dt class="text-[10px] font-semibold uppercase text-[#94A3B8]">
                   Kondisi Perangkat
                 </dt>
-                <dd class="mt-0.5 font-semibold text-[#0F172A]">
+                <dd class="mt-0.5 font-semibold text-[#0F172A] truncate">
                   {{ selectedAsset.kondisi_aset || 'Normal' }}
                 </dd>
               </div>
@@ -1281,8 +1419,8 @@ onMounted(() => {
           </div>
 
           <!-- Current Holder Identity Card -->
-          <div class="rounded-xl border border-[#E2E8F0] bg-white p-4 shadow-2xs">
-            <div class="flex items-center justify-between pb-3 mb-3 border-b border-[#F1F5F9]">
+          <div class="rounded-xl border border-[#E2E8F0] bg-white p-3.5 sm:p-4 shadow-2xs">
+            <div class="flex items-center justify-between pb-2.5 mb-3 border-b border-[#F1F5F9]">
               <div class="flex items-center gap-2">
                 <span class="material-symbols-outlined text-[18px] text-[#059669]">person_pin</span>
                 <h3 class="text-xs font-bold uppercase tracking-wider text-[#0F172A]">
@@ -1318,8 +1456,8 @@ onMounted(() => {
         </div>
 
         <!-- RIGHT COLUMN: Modern SaaS Audit Timeline (lg:col-span-6) -->
-        <div class="lg:col-span-6 rounded-xl border border-[#E2E8F0] bg-white p-4 shadow-2xs">
-          <div class="flex items-center justify-between pb-3 mb-4 border-b border-[#F1F5F9]">
+        <div class="lg:col-span-6 rounded-xl border border-[#E2E8F0] bg-white p-3.5 sm:p-4 shadow-2xs">
+          <div class="flex items-center justify-between pb-2.5 mb-3.5 border-b border-[#F1F5F9]">
             <div class="flex items-center gap-2">
               <span class="material-symbols-outlined text-[18px] text-[#7C3AED]">history</span>
               <h3 class="text-xs font-bold uppercase tracking-wider text-[#0F172A]">
@@ -1340,11 +1478,11 @@ onMounted(() => {
           </div>
 
           <!-- Audit Timeline Activity Stream -->
-          <div v-else class="relative border-l border-[#E2E8F0] pl-4 ml-3 space-y-4">
+          <div v-else class="relative border-l border-[#E2E8F0] pl-4 ml-2 sm:ml-3 space-y-3.5">
             <div v-for="(log, idx) in assetHistoryTimeline" :key="idx" class="relative group">
               <!-- Timeline Node Dot -->
               <div
-                class="absolute -left-[21px] top-1 h-2.5 w-2.5 rounded-full border-2 border-white ring-2 ring-white"
+                class="absolute -left-[21.5px] top-1.5 h-2.5 w-2.5 rounded-full border-2 border-white ring-2 ring-white"
                 :class="[
                   log.type === 'assignment'
                     ? 'bg-[#2563EB]'
@@ -1362,7 +1500,7 @@ onMounted(() => {
                   class="flex items-center justify-between gap-2 text-[10.5px] text-[#64748B] mb-1"
                 >
                   <span class="font-medium">{{ formatDateTime(log.date) }}</span>
-                  <span class="font-semibold text-[#475569]">Oleh: {{ log.actor }}</span>
+                  <span class="font-semibold text-[#475569] truncate">Oleh: {{ log.actor }}</span>
                 </div>
 
                 <h4 class="font-bold text-[#0F172A] leading-snug">

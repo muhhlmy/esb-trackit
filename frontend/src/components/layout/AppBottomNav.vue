@@ -13,6 +13,7 @@ import {
   ScrollText,
   HelpCircle,
   FilePen,
+  Truck,
   X,
 } from 'lucide-vue-next';
 
@@ -32,6 +33,7 @@ const items = computed(() =>
 const lainnyaItems = computed(() =>
   [
     { to: '/submissions', label: 'Pengajuan', icon: FilePen, permission: 'submissions' },
+    { to: '/shipments', label: 'Pengiriman', icon: Truck, permission: 'shipments' },
     { to: '/', label: 'Help Center', icon: Home, permission: null },
     { to: '/my-assets', label: 'Aset Saya', icon: Laptop, permission: 'my_assets' },
     { to: '/users', label: 'Pengguna', icon: Users, permission: 'users' },

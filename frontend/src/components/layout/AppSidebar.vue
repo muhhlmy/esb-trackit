@@ -101,7 +101,7 @@ function autoExpandActiveParent() {
   const currentPath = route.path
   if (['/cases', '/templates', '/analytics', '/admin/cases', '/admin/kb-categories', '/admin/editor', '/faqs'].some(p => currentPath.startsWith(p))) expandedParents.value.knowledge_base = true
   if (['/assets', '/my-assets'].includes(currentPath)) expandedParents.value.asset_management = true
-  if (['/tickets', '/submissions'].includes(currentPath)) expandedParents.value.helpdesk = true
+  if (['/tickets', '/submissions', '/shipments', '/pengiriman'].some(p => currentPath.startsWith(p))) expandedParents.value.helpdesk = true
   if (['/users', '/karyawan'].includes(currentPath)) expandedParents.value.master_data = true
   if (['/logs', '/export', '/database'].includes(currentPath)) expandedParents.value.sistem = true
 }
@@ -234,6 +234,12 @@ const menuGroups = computed(() => {
               label: 'Pengajuan',
               icon: 'assignment',
               permission: 'submissions',
+            },
+            {
+              to: '/shipments',
+              label: 'Pengiriman',
+              icon: 'local_shipping',
+              permission: 'shipments',
             },
           ],
         },

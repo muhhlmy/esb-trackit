@@ -8,6 +8,7 @@ DROP VIEW IF EXISTS v_employee_asset_summary CASCADE;
 DROP VIEW IF EXISTS v_ticket_stats_per_queue CASCADE;
 DROP VIEW IF EXISTS daftar_aset_ti_lengkap CASCADE;
 
+DROP TABLE IF EXISTS asset_shipments CASCADE;
 DROP TABLE IF EXISTS cases CASCADE;
 DROP TABLE IF EXISTS faq CASCADE;
 DROP TABLE IF EXISTS backup_audit_log CASCADE;
@@ -628,6 +629,34 @@ CREATE TABLE cases (
 CREATE INDEX idx_cases_status ON cases(status);
 
 -- =====================================================================
+-- TABEL 16: Asset Shipments (Tracker Pengiriman Barang / Aset)
+-- =====================================================================
+CREATE TABLE asset_shipments (
+    id                          SERIAL          PRIMARY KEY,
+    request_date                DATE            NOT NULL,
+    recipient_name              VARCHAR(150)    NOT NULL,
+    item_description            TEXT            NOT NULL,
+    destination                 VARCHAR(255)    NOT NULL,
+    tracking_number             VARCHAR(100),
+    status                      VARCHAR(30)     NOT NULL DEFAULT 'belum_dikirim',
+    delivery_proof_url          TEXT,
+    created_by                  INTEGER,
+    created_at                  TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at                  TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT chk_asset_shipments_status
+        CHECK (status IN ('belum_dikirim', 'pending', 'sedang_dikirim', 'diterima', 'cancel')),
+
+    CONSTRAINT fk_asset_shipments_created_by
+        FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL
+);
+
+CREATE INDEX idx_asset_shipments_request_date ON asset_shipments(request_date DESC);
+CREATE INDEX idx_asset_shipments_status ON asset_shipments(status);
+CREATE INDEX idx_asset_shipments_tracking_number ON asset_shipments(tracking_number);
+CREATE INDEX idx_asset_shipments_created_at ON asset_shipments(created_at DESC);
+
+-- =====================================================================
 -- HELPFUL VIEWS
 -- =====================================================================
 
@@ -698,6 +727,7 @@ CREATE TRIGGER trg_aset_ti_auto_updated_at BEFORE UPDATE ON aset_ti FOR EACH ROW
 CREATE TRIGGER trg_tickets_auto_updated_at BEFORE UPDATE ON tickets FOR EACH ROW EXECUTE FUNCTION auto_update_timestamp();
 CREATE TRIGGER trg_ticket_queues_auto_updated_at BEFORE UPDATE ON ticket_queues FOR EACH ROW EXECUTE FUNCTION auto_update_timestamp();
 CREATE TRIGGER trg_riwayat_pemakaian_auto_updated_at BEFORE UPDATE ON riwayat_pemakaian_aset FOR EACH ROW EXECUTE FUNCTION auto_update_timestamp();
+CREATE TRIGGER trg_asset_shipments_auto_updated_at BEFORE UPDATE ON asset_shipments FOR EACH ROW EXECUTE FUNCTION auto_update_timestamp();
 
 -- =====================================================================
 -- HARD DELETE PREVENTION TRIGGERS

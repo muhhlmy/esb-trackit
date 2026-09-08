@@ -80,6 +80,12 @@ const OPERATIONAL_FEATURES = [
     icon: 'assignment',
     desc: 'Formulir serah terima & layanan',
   },
+  {
+    key: 'shipments',
+    label: 'Pengiriman',
+    icon: 'local_shipping',
+    desc: 'Tracker pengiriman barang & aset',
+  },
 ]
 
 const ADMINISTRATIVE_FEATURES = [
@@ -130,6 +136,7 @@ const defaultPermissions = () => ({
   my_assets: 'read_only',
   tickets: 'read_only',
   submissions: 'none',
+  shipments: 'none',
   users: 'none',
   logs: 'none',
   karyawan: 'none',
@@ -141,6 +148,7 @@ const superadminPermissions = () => ({
   my_assets: 'full',
   tickets: 'full',
   submissions: 'full',
+  shipments: 'full',
   users: 'full',
   logs: 'full',
   karyawan: 'full',
@@ -196,7 +204,7 @@ function handleRoleChange() {
 function getPermissionBadge(u) {
   const isSuper = isRoleSuperAdmin(u.role)
   if (isSuper) {
-    return { text: '8/8 Akses Penuh', type: 'primary' }
+    return { text: `${ALL_FEATURES.length}/${ALL_FEATURES.length} Akses Penuh`, type: 'primary' }
   }
   const perms = u.permissions || {}
   const fullCount = Object.values(perms).filter((v) => v === 'full').length

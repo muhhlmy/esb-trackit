@@ -20,6 +20,7 @@ export const allowedRouteMap = [
   { key: 'assets_ops', name: 'assets-ops' },
   { key: 'karyawan', name: 'karyawan' },
   { key: 'submissions', name: 'submissions' },
+  { key: 'shipments', name: 'shipments' },
   { key: 'logs', name: 'logs' },
   { key: 'users', name: 'users' },
   { key: 'export', name: 'export' },
@@ -135,6 +136,17 @@ const routes = [
     meta: { title: 'Pengajuan', subtitle: 'Kelola pengajuan', permission: 'submissions' },
   },
   {
+    path: '/shipments',
+    alias: '/pengiriman',
+    name: 'shipments',
+    component: () => import('../views/ShipmentsView.vue'),
+    meta: {
+      title: 'Pengiriman',
+      subtitle: 'Tracker pengiriman barang & aset',
+      permission: 'shipments',
+    },
+  },
+  {
     path: '/logs',
     name: 'logs',
     component: () => import('../views/LogsView.vue'),
@@ -224,7 +236,6 @@ router.beforeEach((to) => {
   // Halaman publik (Help Center landing page, Cases, Templates, Login, dll) dapat diakses tanpa login
   if (to.meta.public) {
     if (to.name === 'login' && authenticated) {
-      const ticketEligibility = getTicketEligibility(user)
       const firstAllowed = findFirstAllowedRoute(user, allowedRouteMap)
       return { name: firstAllowed?.name || 'dashboard' }
     }

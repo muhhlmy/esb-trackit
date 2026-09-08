@@ -21,6 +21,7 @@ import { listPublicKbCategories } from '../controllers/kbCategoryController.js'
 import { kbSearchLogRouter } from './kbSearchLogRoutes.js'
 import { listPopularKbSearches } from '../controllers/kbSearchLogController.js'
 import { caseBookmarkRouter } from './caseBookmarkRoutes.js'
+import { shipmentRouter } from './shipmentRoutes.js'
 import authRoutes from './authRoutes.js'
 import { apiRateLimiter, authenticatedUserRateLimiter } from '../middleware/rateLimitMiddleware.js'
 
@@ -44,6 +45,8 @@ router.use('/api/assets-ops',    authStack, opsAssetRouter)
 router.use('/api/assets_ops',    authStack, opsAssetRouter) // Deprecated snake_case alias
 router.use('/api/tickets',       authStack, ticketRouter)
 router.use('/api/ticket-queues', authStack, queueRouter)
+router.use('/api/shipments',     authStack, shipmentRouter)
+router.use('/api/pengiriman',    authStack, shipmentRouter)
 router.use('/api/export',        authStack, exportRouter)
 
 // Public Help Center FAQ (read-only, published only, no auth)

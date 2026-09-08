@@ -97,7 +97,7 @@ onUnmounted(() => {
         <RouterLink
           v-if="isAdmin"
           to="/dashboard"
-          class="p-2 rounded-xl text-[#64748B] dark:text-slate-400 hover:bg-[#F1F5F9] dark:hover:bg-slate-800 hover:text-[#5D87FF] transition-colors cursor-pointer min-h-[38px] min-w-[38px] flex items-center justify-center touch-manipulation"
+          class="hidden md:flex p-2 rounded-xl text-[#64748B] dark:text-slate-400 hover:bg-[#F1F5F9] dark:hover:bg-slate-800 hover:text-[#5D87FF] transition-colors cursor-pointer min-h-[38px] min-w-[38px] items-center justify-center touch-manipulation"
           :title="t('dashboard', 'Dashboard')"
         >
           <LayoutDashboard class="w-4 h-4" />

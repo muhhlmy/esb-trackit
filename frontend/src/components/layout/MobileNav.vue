@@ -1,7 +1,7 @@
 <script setup>
 import { RouterLink, useRouter } from 'vue-router';
 import { useAuth } from '@/composables/useAuth';
-import { Home, Ticket, LogIn, User, LayoutDashboard } from 'lucide-vue-next';
+import { Home, Ticket, LogIn, LayoutDashboard } from 'lucide-vue-next';
 
 const router = useRouter();
 const { isAuthenticated, isAdmin, user } = useAuth();
@@ -36,25 +36,13 @@ const { isAuthenticated, isAdmin, user } = useAuth();
       </RouterLink>
 
       <RouterLink
-        v-if="isAdmin"
         to="/dashboard"
-        aria-label="Panel Admin Dashboard"
-        class="flex flex-col items-center justify-center gap-0.5 px-3 py-1 rounded-xl text-amber-600 dark:text-amber-400 hover:text-amber-700 transition-colors min-w-[56px] min-h-[44px] touch-manipulation active:scale-95"
-        active-class="font-bold text-amber-600 dark:text-amber-300"
-      >
-        <LayoutDashboard class="w-4 h-4" />
-        <span class="text-[10px]">Admin</span>
-      </RouterLink>
-
-      <RouterLink
-        v-else
-        to="/my-assets"
-        aria-label="Aset Saya / Profil"
+        aria-label="Dashboard"
         class="flex flex-col items-center justify-center gap-0.5 px-3 py-1 rounded-xl text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors min-w-[56px] min-h-[44px] touch-manipulation active:scale-95"
         active-class="text-[#5D87FF] dark:text-indigo-400 font-bold"
       >
-        <User class="w-4 h-4" />
-        <span class="text-[10px]">Profile</span>
+        <LayoutDashboard class="w-4 h-4" />
+        <span class="text-[10px]">Dashboard</span>
       </RouterLink>
     </template>
 

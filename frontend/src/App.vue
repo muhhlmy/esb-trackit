@@ -7,6 +7,7 @@ import AppHeader from './components/layout/AppHeader.vue'
 // Help Center Layout components
 import Navbar from './components/layout/Navbar.vue'
 import MobileNav from './components/layout/MobileNav.vue'
+import AppBottomNav from './components/layout/AppBottomNav.vue'
 import Toast from './components/common/Toast.vue'
 
 import { animatePageEnter, animatePageLeave } from './composables/useGsap.js'
@@ -132,7 +133,7 @@ onUnmounted(() => {
         <main
           id="main-content"
           tabindex="-1"
-          class="app-main flex-1 overflow-y-auto p-3.5 outline-none sm:p-4 lg:p-5"
+          class="app-main flex-1 overflow-y-auto p-3.5 outline-none sm:p-4 lg:p-5 pb-[68px] lg:pb-0"
         >
           <div class="mx-auto w-full max-w-[1560px]">
             <RouterView v-slot="{ Component, route: currentRoute }">
@@ -151,6 +152,8 @@ onUnmounted(() => {
         </main>
       </div>
     </div>
+
+    <AppBottomNav />
   </template>
 </template>
 

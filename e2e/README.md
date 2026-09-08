@@ -43,7 +43,7 @@ e2e/
 │   │   ├── logout.spec.js           # Test UI Logout & guard route
 │   │   └── authentication.spec.js   # Test invalid session & token expiration
 │   ├── dashboard/
-│   │   └── dashboard.spec.js        # Test KPI cards, charts, & navigasi (@smoke)
+│   │   └── dashboard.spec.js        # Test KPI cards, charts, navigasi & mobile bottom nav smoke (@smoke)
 │   ├── assets/
 │   │   ├── asset-list.spec.js       # Test tabel list asset & pencarian (@smoke)
 │   │   ├── asset-create.spec.js     # Test alur tambah asset via modal UI (@smoke)

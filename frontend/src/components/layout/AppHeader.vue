@@ -34,8 +34,8 @@ function handleWindowResize() {
 }
 const searchPlaceholder = computed(() => {
   if (windowWidth.value < 640) return 'Cari aset, tiket...'
-  if (windowWidth.value < 1024) return 'Cari aset, tiket, user...'
-  return 'Cari aset, karyawan, tiket, atau user...'
+  if (windowWidth.value < 1024) return 'Cari'
+  return 'Cari'
 })
 
 const profileMenuButtonRef = ref(null)
@@ -374,6 +374,37 @@ async function initGlobalSearchData() {
   }
 }
 
+const searchableGroups = [
+  {
+    key: 'assets',
+    label: 'Aset',
+    labelLine: (item) => item.label_aset || item.hostname || 'Aset',
+    sub: (item) => `${item.merek || ''} ${item.model || ''} · ${item.tipe_perangkat || ''}`.trim() || item.nomor_seri || '',
+    click: (item) => selectResultAsset(item),
+  },
+  {
+    key: 'karyawan',
+    label: 'Karyawan',
+    labelLine: (item) => item.nama_karyawan || 'Karyawan',
+    sub: (item) => `NIK ${item.nik}${item.departemen ? ' · ' + item.departemen : ''}`,
+    click: (item) => selectResultKaryawan(item),
+  },
+  {
+    key: 'tickets',
+    label: 'Tiket',
+    labelLine: (item) => `${item.nomor_tiket || ''}: ${item.judul || ''}`,
+    sub: (item) => `${item.pelapor || 'User'} · ${item.status_tiket}`,
+    click: (item) => selectResultTicket(item),
+  },
+  {
+    key: 'users',
+    label: 'Pengguna',
+    labelLine: (item) => `${item.nama || ''} (${item.email || ''})`,
+    sub: (item) => `Peran: ${item.role || ''}`,
+    click: (item) => selectResultUser(item),
+  },
+]
+
 const searchResults = computed(() => {
   const q = searchQuery.value.trim().toLowerCase()
   if (!q) {
@@ -383,44 +414,39 @@ const searchResults = computed(() => {
   const assets = allAssets.value
     .filter(
       (a) =>
-        String(a.label_aset || '').toLowerCase().includes(q) ||
-        String(a.hostname || '').toLowerCase().includes(q) ||
-        String(a.nomor_seri || '').toLowerCase().includes(q) ||
-        String(a.spesifikasi || '').toLowerCase().includes(q) ||
-        String(a.catatan_aset || '').toLowerCase().includes(q) ||
-        String(a.tipe_perangkat || '').toLowerCase().includes(q) ||
-        String(a.merek || '').toLowerCase().includes(q) ||
-        String(a.model || '').toLowerCase().includes(q) ||
-        String(a.lokasi_aset || '').toLowerCase().includes(q),
+        (a.label_aset || '').toLowerCase().includes(q) ||
+        (a.hostname || '').toLowerCase().includes(q) ||
+        (a.nomor_seri || '').toLowerCase().includes(q) ||
+        (a.merek || '').toLowerCase().includes(q) ||
+        (a.model || '').toLowerCase().includes(q) ||
+        (a.tipe_perangkat || '').toLowerCase().includes(q),
     )
     .slice(0, 6)
 
   const karyawan = allKaryawan.value
     .filter(
       (k) =>
-        String(k.nama_karyawan || '').toLowerCase().includes(q) ||
-        String(k.nik || '').toLowerCase().includes(q) ||
-        String(k.departemen || '').toLowerCase().includes(q) ||
-        String(k.email_kantor || '').toLowerCase().includes(q),
+        (k.nama_karyawan || '').toLowerCase().includes(q) ||
+        (k.nik || '').toLowerCase().includes(q) ||
+        (k.departemen || '').toLowerCase().includes(q),
     )
     .slice(0, 6)
 
   const tickets = allTickets.value
     .filter(
       (t) =>
-        String(t.nomor_tiket || '').toLowerCase().includes(q) ||
-        String(t.judul || '').toLowerCase().includes(q) ||
-        String(t.deskripsi || '').toLowerCase().includes(q) ||
-        String(t.pelapor || t.pelapor_nama || '').toLowerCase().includes(q),
+        (t.nomor_tiket || '').toLowerCase().includes(q) ||
+        (t.judul || '').toLowerCase().includes(q) ||
+        (t.pelapor || t.pelapor_nama || '').toLowerCase().includes(q),
     )
     .slice(0, 6)
 
   const users = allUsers.value
     .filter(
       (u) =>
-        String(u.nama || '').toLowerCase().includes(q) ||
-        String(u.email || '').toLowerCase().includes(q) ||
-        String(u.role || '').toLowerCase().includes(q),
+        (u.nama || '').toLowerCase().includes(q) ||
+        (u.email || '').toLowerCase().includes(q) ||
+        (u.role || '').toLowerCase().includes(q),
     )
     .slice(0, 6)
 
@@ -659,6 +685,20 @@ function handleSseCommentCreated(data) {
   fetchTickets()
 }
 
+function connectTicketRealtime() {
+  connectSSE()
+  onSSE('TICKET_CREATED', handleSseTicketCreated)
+  onSSE('TICKET_UPDATED', handleSseTicketUpdated)
+  onSSE('COMMENT_CREATED', handleSseCommentCreated)
+}
+
+function disconnectTicketRealtime() {
+  offSSE('TICKET_CREATED', handleSseTicketCreated)
+  offSSE('TICKET_UPDATED', handleSseTicketUpdated)
+  offSSE('COMMENT_CREATED', handleSseCommentCreated)
+  disconnectSSE()
+}
+
 onMounted(() => {
   window.addEventListener('keydown', handleGlobalKeydown)
   window.addEventListener('resize', handleWindowResize)
@@ -666,21 +706,14 @@ onMounted(() => {
   if (!hasPermission('tickets')) return
   loadNotifications()
   fetchTickets()
-
-  connectSSE()
-  onSSE('TICKET_CREATED', handleSseTicketCreated)
-  onSSE('TICKET_UPDATED', handleSseTicketUpdated)
-  onSSE('COMMENT_CREATED', handleSseCommentCreated)
+  connectTicketRealtime()
 })
 
 onBeforeUnmount(() => {
   window.removeEventListener('keydown', handleGlobalKeydown)
   window.removeEventListener('resize', handleWindowResize)
   document.removeEventListener('click', handleClickOutside)
-  offSSE('TICKET_CREATED', handleSseTicketCreated)
-  offSSE('TICKET_UPDATED', handleSseTicketUpdated)
-  offSSE('COMMENT_CREATED', handleSseCommentCreated)
-  disconnectSSE()
+  disconnectTicketRealtime()
 })
 </script>
 
@@ -741,7 +774,7 @@ onBeforeUnmount(() => {
             class="h-11 md:h-9 w-full rounded-xl md:rounded-full border border-[#DFE5EF] bg-[#F8FAFC] pl-10 md:pl-9 pr-12 md:pr-20 text-[11px] sm:text-xs font-medium text-[#0F172A] placeholder-[#64748B] outline-none transition-all shadow-xs focus:bg-white focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/20 [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden"
           />
 
-          <!-- Action Buttons / Hotkey Indicator -->
+          <!-- Action Buttons -->
           <div class="absolute right-0 md:right-2 flex items-center gap-1">
             <button
               v-if="searchQuery"
@@ -761,13 +794,6 @@ onBeforeUnmount(() => {
             >
               Cari
             </button>
-
-            <kbd
-              v-if="!searchQuery"
-              class="hidden md:inline-flex items-center rounded-md border border-[#E2E8F0] bg-white px-1.5 py-0.5 text-[9px] font-mono font-semibold text-[#475569] shadow-2xs"
-            >
-              Ctrl K
-            </kbd>
           </div>
         </form>
 
@@ -778,28 +804,19 @@ onBeforeUnmount(() => {
               v-if="isSearchOpen"
               class="header-search-panel fixed inset-0 z-[9999] flex flex-col bg-white md:inset-auto md:absolute md:top-full md:left-0 md:right-0 md:mt-2 md:max-h-[500px] md:w-full md:rounded-2xl md:border md:border-[#E5EAEF] md:shadow-2xl md:z-50 overflow-hidden text-left"
             >
-            <!-- Mobile-Only Dedicated Search Top Bar (Replaces blurred navbar with crisp, active search header) -->
-            <div
-              class="flex h-16 shrink-0 items-center gap-2 border-b border-[#E5EAEF] px-2.5 sm:px-3 bg-white md:hidden"
-            >
-              <!-- Back button to close search -->
+            <!-- Mobile search top bar -->
+            <div class="flex h-14 shrink-0 items-center gap-2 border-b border-[#E5EAEF] px-3 bg-white md:hidden">
               <button
                 type="button"
                 @click="closeSearch"
                 aria-label="Tutup pencarian"
-                title="Tutup pencarian"
-                class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-[#64748B] hover:bg-[#F1F5F9] active:scale-95 touch-manipulation cursor-pointer"
+                class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-[#64748B] hover:bg-[#F1F5F9] active:scale-95 touch-manipulation"
               >
-                <span class="material-symbols-outlined text-[22px]">arrow_back</span>
+                <span class="material-symbols-outlined text-[20px]">arrow_back</span>
               </button>
 
-              <!-- Dedicated Mobile Search Input -->
-              <div class="relative flex flex-1 items-center min-w-0">
-                <span
-                  class="material-symbols-outlined absolute left-3 text-[17px] text-[#5D87FF] pointer-events-none"
-                >
-                  search
-                </span>
+              <div class="relative flex flex-1 items-center">
+                <span class="material-symbols-outlined absolute left-2.5 text-[15px] text-[#5D87FF] pointer-events-none">search</span>
                 <input
                   id="mobile-overlay-search-input"
                   aria-label="Cari aset, tiket, karyawan, atau pengguna"
@@ -811,341 +828,102 @@ onBeforeUnmount(() => {
                   autocapitalize="off"
                   spellcheck="false"
                   placeholder="Cari aset, tiket, karyawan, user..."
-                  class="h-11 w-full rounded-xl border border-[#DFE5EF] bg-[#F8FAFC] pl-9 pr-11 text-xs font-medium text-[#0F172A] placeholder-[#64748B] outline-none transition-all focus:bg-white focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/20 [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden"
+                  class="h-9 w-full rounded-lg border border-[#DFE5EF] bg-[#F8FAFC] pl-8 pr-8 text-sm text-[#0F172A] placeholder-[#64748B] outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/20 [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden"
                 />
                 <button
                   v-if="searchQuery"
                   type="button"
                   @click="clearSearch"
                   aria-label="Bersihkan kata kunci"
-                  class="absolute right-0 flex h-11 w-11 items-center justify-center rounded-full text-[#64748B] hover:bg-[#E2E8F0] active:scale-90 touch-manipulation cursor-pointer"
+                  class="absolute right-1 flex h-7 w-7 items-center justify-center rounded-full text-[#64748B] hover:bg-[#E2E8F0]"
                 >
-                  <span class="material-symbols-outlined text-[15px]">close</span>
+                  <span class="material-symbols-outlined text-[13px]">close</span>
                 </button>
               </div>
 
-              <!-- Quick Submit Button on Mobile -->
               <button
                 type="button"
                 @click="submitSearch"
                 :disabled="!searchQuery.trim()"
-                class="flex min-h-11 shrink-0 items-center px-2 py-1 text-xs font-bold text-[#2563EB] disabled:opacity-30 active:scale-95 touch-manipulation cursor-pointer"
+                class="shrink-0 px-3 py-1.5 text-sm font-semibold text-[#2563EB] disabled:opacity-40 active:scale-95 touch-manipulation"
               >
                 Cari
               </button>
             </div>
 
-            <!-- Filter Tabs -->
-            <div
-              class="flex items-center gap-1 px-2.5 sm:px-3 py-2 border-b border-[#F1F5F9] bg-[#FAFBFC] overflow-x-auto no-scrollbar shrink-0"
-            >
-              <button
-                v-for="tab in [
-                  { key: 'ALL', label: 'Semua', icon: 'grid_view' },
-                  {
-                    key: 'ASSETS',
-                    label: 'Aset',
-                    icon: 'devices',
-                    count: searchResults.assets.length,
-                  },
-                  {
-                    key: 'KARYAWAN',
-                    label: 'Karyawan',
-                    icon: 'badge',
-                    count: searchResults.karyawan.length,
-                  },
-                  {
-                    key: 'TICKETS',
-                    label: 'Tiket',
-                    icon: 'confirmation_number',
-                    count: searchResults.tickets.length,
-                  },
-                  {
-                    key: 'USERS',
-                    label: 'User',
-                    icon: 'manage_accounts',
-                    count: searchResults.users.length,
-                  },
-                ]"
-                :key="tab.key"
-                type="button"
-                @click="searchTabFilter = tab.key"
-                class="flex min-h-11 md:min-h-0 items-center gap-1 shrink-0 rounded-lg px-2 sm:px-2.5 py-1 text-[11px] font-bold transition-all cursor-pointer touch-manipulation active:scale-95"
-                :class="
-                  searchTabFilter === tab.key
-                    ? 'bg-[#5D87FF] text-white shadow-xs'
-                    : 'text-[#64748B] hover:bg-[#ECF2FF] hover:text-[#5D87FF]'
-                "
-              >
-                <span class="material-symbols-outlined text-[14px]">{{ tab.icon }}</span>
-                <span>{{ tab.label }}</span>
-                <span
-                  v-if="searchQuery.trim() && tab.count !== undefined"
-                  class="ml-0.5 rounded-full px-1.5 py-0.2 text-[9px] font-extrabold"
-                  :class="
-                    searchTabFilter === tab.key
-                      ? 'bg-white/25 text-white'
-                      : 'bg-[#E2E8F0] text-[#475569]'
-                  "
-                  >{{ tab.count }}</span
+            <!-- Results list -->
+            <div v-if="searchQuery.trim()" class="flex-1 overflow-y-auto">
+              <!-- Results header -->
+              <div class="px-4 py-2 border-b border-[#F1F5F9] bg-[#FAFBFC] flex items-center justify-between">
+                <span class="text-[11px] font-semibold text-[#64748B]">
+                  {{ searchResults.totalCount }} hasil
+                </span>
+                <button
+                  type="button"
+                  @click="submitSearch"
+                  class="text-[11px] font-semibold text-[#2563EB] hover:underline"
                 >
-              </button>
-            </div>
+                  Lihat semua →
+                </button>
+              </div>
 
-            <!-- Loading State -->
-            <div
-              v-if="isFetchingSearch"
-              class="flex items-center justify-center gap-2 py-8 text-[12px] text-[#94A3B8]"
-            >
+              <!-- No results -->
+              <div v-if="searchResults.totalCount === 0" class="flex flex-col items-center justify-center py-10 px-4">
+                <span class="material-symbols-outlined text-[32px] text-[#CBD5E1]">search_off</span>
+                <p class="text-[12px] font-semibold text-[#64748B] mt-1">
+                  Tidak ada hasil untuk "{{ searchQuery }}"
+                </p>
+                <p class="text-[11px] text-[#94A3B8]">
+                  Coba kata kunci lain.
+                </p>
+              </div>
+
+              <!-- ASET -->
               <div
-                class="w-4 h-4 border-2 border-[#E2E8F0] border-t-[#5D87FF] rounded-full animate-spin"
-              ></div>
-              Memuat data pencarian...
-            </div>
-
-            <!-- Initial Prompt State (No query typed yet) -->
-            <div v-else-if="!searchQuery.trim()" class="p-4 sm:p-5 text-center overflow-y-auto">
-              <p class="text-[10.5px] sm:text-[11px] font-bold uppercase tracking-wider text-[#94A3B8] mb-2.5">
-                Pencarian Cepat Global
-              </p>
-              <div class="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2">
+                v-for="group in searchableGroups"
+                :key="group.key"
+                v-show="searchResults[group.key].length > 0"
+                class="py-1"
+              >
+                <div class="px-4 py-1.5 text-[10px] font-semibold uppercase tracking-wide text-[#64748B]">
+                  {{ group.label }} ({{ searchResults[group.key].length }})
+                </div>
                 <button
+                  v-for="item in searchResults[group.key]"
+                  :key="group.key + '-' + item.id"
                   type="button"
-                  @click="quickSearchPreset('Laptop', 'ASSETS')"
-                  class="rounded-full border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-1.5 text-[11px] font-semibold text-[#475569] hover:border-[#5D87FF] hover:text-[#5D87FF] transition-all cursor-pointer active:scale-95 touch-manipulation shadow-2xs"
+                  @click="group.click(item)"
+                  class="w-full flex items-center gap-2.5 px-4 py-2 hover:bg-[#F8FAFC] transition-colors text-left"
                 >
-                  💻 Laptop
-                </button>
-                <button
-                  type="button"
-                  @click="quickSearchPreset('Tiket', 'TICKETS')"
-                  class="rounded-full border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-1.5 text-[11px] font-semibold text-[#475569] hover:border-[#5D87FF] hover:text-[#5D87FF] transition-all cursor-pointer active:scale-95 touch-manipulation shadow-2xs"
-                >
-                  🎫 Tiket
-                </button>
-                <button
-                  type="button"
-                  @click="quickSearchPreset('Active', 'KARYAWAN')"
-                  class="rounded-full border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-1.5 text-[11px] font-semibold text-[#475569] hover:border-[#5D87FF] hover:text-[#5D87FF] transition-all cursor-pointer active:scale-95 touch-manipulation shadow-2xs"
-                >
-                  👥 Karyawan Active
+                  <span class="text-[12px] font-semibold text-[#2A3547] truncate">
+                    {{ group.labelLine(item) }}
+                  </span>
+                  <span class="text-[10px] font-medium text-[#7C8BAC] truncate">
+                    {{ group.sub(item) }}
+                  </span>
                 </button>
               </div>
             </div>
 
-            <!-- No Results Found -->
-            <div
-              v-else-if="searchResults.totalCount === 0"
-              class="flex flex-col items-center justify-center py-8 text-center px-4"
-            >
-              <span class="material-symbols-outlined text-[36px] text-[#CBD5E1]">search_off</span>
-              <p class="text-[12px] font-semibold text-[#64748B] mt-1">
-                Tidak ada hasil ditemukan untuk "{{ searchQuery }}"
+            <!-- Empty state (no query) -->
+            <div v-else class="flex flex-col items-center justify-center py-10 px-4 text-center">
+              <p class="text-[11px] font-semibold text-[#94A3B8] uppercase tracking-wider">
+                Pencarian Global
               </p>
-              <p class="text-[11px] text-[#94A3B8]">
-                Coba kata kunci lain atau pilih kategori pencarian yang sesuai.
+              <p class="text-[11px] text-[#64748B] mt-1">
+                Ketik kata kunci di atas
               </p>
             </div>
 
-            <!-- SEARCH RESULTS DISPLAY LIST -->
-            <div v-else class="flex-1 max-h-[360px] sm:max-h-[380px] overflow-y-auto divide-y divide-[#F1F5F9]">
-              <!-- Category 1: ASET IT -->
-              <div
-                v-if="
-                  (searchTabFilter === 'ALL' || searchTabFilter === 'ASSETS') &&
-                  searchResults.assets.length > 0
-                "
-              >
-                <div
-                  class="px-3.5 sm:px-4 py-1.5 bg-[#F8FAFC] text-[10px] font-extrabold uppercase tracking-wider text-[#5D87FF] flex items-center justify-between"
-                >
-                  <span>💻 Aset IT ({{ searchResults.assets.length }})</span>
-                </div>
-                <button
-                  v-for="item in searchResults.assets"
-                  :key="'asset_' + item.id_aset"
-                  type="button"
-                  @click="selectResultAsset(item)"
-                  class="w-full flex items-center justify-between px-3.5 sm:px-4 py-2.5 hover:bg-[#F0F5FF] transition-all text-left group cursor-pointer touch-manipulation"
-                >
-                  <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
-                    <div
-                      class="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-[#ECF2FF] text-[#5D87FF] group-hover:bg-[#5D87FF] group-hover:text-white transition-all"
-                    >
-                      <span class="material-symbols-outlined text-[17px]">devices</span>
-                    </div>
-                    <div class="min-w-0">
-                      <p
-                        class="text-[12px] font-bold text-[#2A3547] truncate group-hover:text-[#5D87FF]"
-                      >
-                        {{ item.label_aset || item.hostname || 'Aset' }}
-                      </p>
-                      <p class="text-[10px] font-medium text-[#7C8BAC] truncate">
-                        {{ item.nomor_seri ? 'SN: ' + item.nomor_seri : '' }}
-                        <span v-if="item.tipe_perangkat"> · {{ item.tipe_perangkat }}</span>
-                        <span v-if="item.merek"> · {{ item.merek }} {{ item.model }}</span>
-                        <span v-if="item.spesifikasi" class="text-amber-600 font-semibold">
-                          · {{ item.spesifikasi }}</span
-                        >
-                      </p>
-                    </div>
-                  </div>
-                  <span
-                    class="material-symbols-outlined text-[16px] text-[#CBD5E1] group-hover:text-[#5D87FF] shrink-0"
-                    >chevron_right</span
-                  >
-                </button>
-              </div>
-
-              <!-- Category 2: KARYAWAN -->
-              <div
-                v-if="
-                  (searchTabFilter === 'ALL' || searchTabFilter === 'KARYAWAN') &&
-                  searchResults.karyawan.length > 0
-                "
-              >
-                <div
-                  class="px-3.5 sm:px-4 py-1.5 bg-[#F8FAFC] text-[10px] font-extrabold uppercase tracking-wider text-[#13DEB9] flex items-center justify-between"
-                >
-                  <span>👥 Karyawan ({{ searchResults.karyawan.length }})</span>
-                </div>
-                <button
-                  v-for="item in searchResults.karyawan"
-                  :key="'karyawan_' + item.id_karyawan"
-                  type="button"
-                  @click="selectResultKaryawan(item)"
-                  class="w-full flex items-center justify-between px-3.5 sm:px-4 py-2.5 hover:bg-[#E6FFFA] transition-all text-left group cursor-pointer touch-manipulation"
-                >
-                  <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
-                    <div
-                      class="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-[#E6FFFA] text-[#13DEB9] group-hover:bg-[#13DEB9] group-hover:text-white transition-all"
-                    >
-                      <span class="material-symbols-outlined text-[17px]">badge</span>
-                    </div>
-                    <div class="min-w-0">
-                      <p
-                        class="text-[12px] font-bold text-[#2A3547] truncate group-hover:text-[#13DEB9]"
-                      >
-                        {{ item.nama_karyawan }}
-                      </p>
-                      <p class="text-[10px] font-medium text-[#7C8BAC] truncate">
-                        NIK: {{ item.nik }}
-                        <span v-if="item.departemen">· {{ item.departemen }}</span>
-                      </p>
-                    </div>
-                  </div>
-                  <span
-                    class="material-symbols-outlined text-[16px] text-[#CBD5E1] group-hover:text-[#13DEB9] shrink-0"
-                    >chevron_right</span
-                  >
-                </button>
-              </div>
-
-              <!-- Category 3: TIKET -->
-              <div
-                v-if="
-                  (searchTabFilter === 'ALL' || searchTabFilter === 'TICKETS') &&
-                  searchResults.tickets.length > 0
-                "
-              >
-                <div
-                  class="px-3.5 sm:px-4 py-1.5 bg-[#F8FAFC] text-[10px] font-extrabold uppercase tracking-wider text-[#FA896B] flex items-center justify-between"
-                >
-                  <span>🎫 Tiket Helpdesk ({{ searchResults.tickets.length }})</span>
-                </div>
-                <button
-                  v-for="item in searchResults.tickets"
-                  :key="'ticket_' + item.id"
-                  type="button"
-                  @click="selectResultTicket(item)"
-                  class="w-full flex items-center justify-between px-3.5 sm:px-4 py-2.5 hover:bg-[#FDF2F0] transition-all text-left group cursor-pointer touch-manipulation"
-                >
-                  <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
-                    <div
-                      class="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-[#FDEDE8] text-[#FA896B] group-hover:bg-[#FA896B] group-hover:text-white transition-all"
-                    >
-                      <span class="material-symbols-outlined text-[17px]">confirmation_number</span>
-                    </div>
-                    <div class="min-w-0">
-                      <p
-                        class="text-[12px] font-bold text-[#2A3547] truncate group-hover:text-[#FA896B]"
-                      >
-                        {{ item.nomor_tiket }}: {{ item.judul }}
-                      </p>
-                      <p class="text-[10px] font-medium text-[#7C8BAC] truncate">
-                        Pelapor: {{ item.pelapor || 'User' }} · Status: {{ item.status_tiket }}
-                      </p>
-                    </div>
-                  </div>
-                  <span
-                    class="material-symbols-outlined text-[16px] text-[#CBD5E1] group-hover:text-[#FA896B] shrink-0"
-                    >chevron_right</span
-                  >
-                </button>
-              </div>
-
-              <!-- Category 4: USERS -->
-              <div
-                v-if="
-                  (searchTabFilter === 'ALL' || searchTabFilter === 'USERS') &&
-                  searchResults.users.length > 0
-                "
-              >
-                <div
-                  class="px-3.5 sm:px-4 py-1.5 bg-[#F8FAFC] text-[10px] font-extrabold uppercase tracking-wider text-[#7C3AED] flex items-center justify-between"
-                >
-                  <span>👤 Users ({{ searchResults.users.length }})</span>
-                </div>
-                <button
-                  v-for="item in searchResults.users"
-                  :key="'user_' + item.id"
-                  type="button"
-                  @click="selectResultUser(item)"
-                  class="w-full flex items-center justify-between px-3.5 sm:px-4 py-2.5 hover:bg-[#F3E8FF] transition-all text-left group cursor-pointer touch-manipulation"
-                >
-                  <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
-                    <div
-                      class="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-[#F3E8FF] text-[#7C3AED] group-hover:bg-[#7C3AED] group-hover:text-white transition-all"
-                    >
-                      <span class="material-symbols-outlined text-[17px]">manage_accounts</span>
-                    </div>
-                    <div class="min-w-0">
-                      <p
-                        class="text-[12px] font-bold text-[#2A3547] truncate group-hover:text-[#7C3AED]"
-                      >
-                        {{ item.nama }} ({{ item.email }})
-                      </p>
-                      <p class="text-[10px] font-medium text-[#7C8BAC] uppercase tracking-wide">
-                        Role: {{ item.role }}
-                      </p>
-                    </div>
-                  </div>
-                  <span
-                    class="material-symbols-outlined text-[16px] text-[#CBD5E1] group-hover:text-[#7C3AED] shrink-0"
-                    >chevron_right</span
-                  >
-                </button>
-              </div>
-            </div>
-
-            <!-- Popup Footer -->
-            <div
-              class="px-3.5 sm:px-4 py-2.5 sm:py-2.5 border-t border-[#F1F5F9] bg-[#FAFBFC] flex items-center justify-between text-[11px] font-semibold text-[#7C8BAC] shrink-0 pb-[max(0.625rem,env(safe-area-inset-bottom))]"
-            >
-              <span class="hidden md:inline">
-                Tekan
-                <kbd class="font-mono bg-white px-1 border border-[#E2E8F0] rounded">ENTER</kbd>
-                untuk cari semua
-              </span>
-              <span class="md:hidden text-[#94A3B8] text-[11px]">
-                {{ searchResults.totalCount }} hasil ditemukan
-              </span>
+            <!-- Footer -->
+            <div class="px-4 py-2 border-t border-[#F1F5F9] bg-[#FAFBFC] flex items-center justify-between text-[11px] text-[#64748B]">
+              <span>{{ searchResults.totalCount }} hasil ditemukan</span>
               <button
                 type="button"
                 @click="submitSearch"
-                class="text-[#2563EB] hover:text-[#1D4ED8] hover:underline font-bold transition-colors cursor-pointer touch-manipulation ml-auto"
+                class="text-[#2563EB] font-semibold hover:underline"
               >
-                Lihat Hasil Lengkap →
+                Lihat semua →
               </button>
             </div>
           </div>

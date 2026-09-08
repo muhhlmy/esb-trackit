@@ -1,9 +1,7 @@
 <script setup>
-import { nextTick, onBeforeUnmount, onMounted, ref, watch, computed } from 'vue'
+import { onBeforeUnmount, onMounted, ref, watch, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useAuth } from '@/composables/useAuth'
-import { useApi } from '@/composables/useApi'
-import AppModal from '../ui/AppModal.vue'
 
 const props = defineProps({
   isMobileOpen: { type: Boolean, default: false },
@@ -14,65 +12,7 @@ const route = useRoute()
 const sidebarRef = ref(null)
 const closeButtonRef = ref(null)
 
-const { user, isSuperAdmin, logout, hasPermission } = useAuth()
-const { post } = useApi()
-
-// Password Modal State
-const showPasswordModal = ref(false)
-const isSubmittingPassword = ref(false)
-const passwordModalError = ref('')
-const passwordSuccessMessage = ref('')
-const passwordForm = ref({
-  currentPassword: '',
-  newPassword: '',
-  confirmPassword: '',
-})
-
-function openChangePassword() {
-  passwordForm.value = { currentPassword: '', newPassword: '', confirmPassword: '' }
-  passwordModalError.value = ''
-  passwordSuccessMessage.value = ''
-  showPasswordModal.value = true
-}
-
-function closePasswordModal() {
-  showPasswordModal.value = false
-  passwordModalError.value = ''
-  passwordSuccessMessage.value = ''
-}
-
-async function submitChangePassword() {
-  const { currentPassword, newPassword, confirmPassword } = passwordForm.value
-  if (!currentPassword) {
-    passwordModalError.value = 'Password saat ini wajib diisi.'
-    return
-  }
-  if (!newPassword || newPassword.length < 8) {
-    passwordModalError.value = 'Password baru minimal 8 karakter.'
-    return
-  }
-  if (newPassword !== confirmPassword) {
-    passwordModalError.value = 'Konfirmasi password baru tidak cocok.'
-    return
-  }
-
-  isSubmittingPassword.value = true
-  passwordModalError.value = ''
-  passwordSuccessMessage.value = ''
-
-  try {
-    const res = await post('/api/auth/change-password', { currentPassword, newPassword })
-    passwordSuccessMessage.value = res.message || 'Password berhasil diperbarui.'
-    setTimeout(() => {
-      closePasswordModal()
-    }, 1500)
-  } catch (err) {
-    passwordModalError.value = err.message || 'Gagal mengganti password.'
-  } finally {
-    isSubmittingPassword.value = false
-  }
-}
-
+const { isSuperAdmin, hasPermission } = useAuth()
 // State Expanded Parent Menu
 const expandedParents = ref({
   knowledge_base: true,
@@ -88,12 +28,6 @@ const flyoutPos = ref({ top: 0, left: 0 })
 
 const hoveredTooltipLabel = ref('')
 const tooltipPos = ref({ top: 0, left: 0 })
-
-const profilePopoverRef = ref(null)
-const profileBtnRef = ref(null)
-const showProfilePopover = ref(false)
-const profilePopoverPos = ref({ top: 0, left: 0 })
-const popoverPlacement = ref('up')
 
 let closeFlyoutTimer = null
 
@@ -155,69 +89,6 @@ function handleDirectMouseLeave() {
   hoveredTooltipLabel.value = ''
 }
 
-function toggleProfilePopover(event) {
-  if (showProfilePopover.value) {
-    showProfilePopover.value = false
-    return
-  }
-  const btn = event?.currentTarget || profileBtnRef.value
-  if (!btn) return
-  profileBtnRef.value = btn
-
-  // Calculate position synchronously first frame
-  calcPopoverPosition(btn)
-  showProfilePopover.value = true
-
-  // Refine using exact DOM measurements
-  nextTick(() => {
-    calcPopoverPosition(btn)
-  })
-}
-
-function calcPopoverPosition(btn) {
-  if (!btn) return
-  const rect = btn.getBoundingClientRect()
-  const viewportHeight = window.innerHeight
-  const viewportWidth = window.innerWidth
-  const gap = 8
-
-  const popoverEl = profilePopoverRef.value
-  const popoverHeight = popoverEl ? popoverEl.offsetHeight : 138
-  const popoverWidth = popoverEl ? popoverEl.offsetWidth : 208
-
-  let left = props.isCollapsed ? rect.right + gap : rect.left
-
-  if (left + popoverWidth > viewportWidth - 12) {
-    left = viewportWidth - popoverWidth - 12
-  }
-  if (left < 12) left = 12
-
-  const spaceBelow = viewportHeight - rect.bottom
-  let top
-  let placement
-
-  if (spaceBelow < popoverHeight + gap && rect.top > popoverHeight + gap) {
-    placement = 'up'
-    top = rect.top - popoverHeight - gap
-  } else {
-    placement = 'down'
-    top = rect.bottom + gap
-  }
-
-  if (top + popoverHeight > viewportHeight - 12) {
-    top = viewportHeight - popoverHeight - 12
-  }
-  if (top < 12) {
-    top = 12
-  }
-
-  popoverPlacement.value = placement
-  profilePopoverPos.value = {
-    top: Math.round(top),
-    left: Math.round(left),
-  }
-}
-
 function toggleParent(key) {
   expandedParents.value[key] = !expandedParents.value[key]
 }
@@ -241,7 +112,6 @@ watch(
     autoExpandActiveParent()
     activeFlyoutParent.value = null
     hoveredTooltipLabel.value = ''
-    showProfilePopover.value = false
   },
   { immediate: true },
 )
@@ -476,31 +346,12 @@ function handleKeydown(event) {
   }
 }
 
-function handleClickOutside(event) {
-  if (!showProfilePopover.value) return
-  const popoverEl = profilePopoverRef.value
-  const btnEl = profileBtnRef.value
-  if (popoverEl && !popoverEl.contains(event.target) && btnEl && !btnEl.contains(event.target)) {
-    showProfilePopover.value = false
-  }
-}
-
-function handleWindowResize() {
-  if (showProfilePopover.value && profileBtnRef.value) {
-    calcPopoverPosition(profileBtnRef.value)
-  }
-}
-
 onMounted(() => {
   document.addEventListener('keydown', handleKeydown)
-  document.addEventListener('click', handleClickOutside, true)
-  window.addEventListener('resize', handleWindowResize)
 })
 
 onBeforeUnmount(() => {
   document.removeEventListener('keydown', handleKeydown)
-  document.removeEventListener('click', handleClickOutside, true)
-  window.removeEventListener('resize', handleWindowResize)
 })
 
 function closeSubmenuAndMobile() {
@@ -508,15 +359,6 @@ function closeSubmenuAndMobile() {
   emit('close-mobile')
 }
 
-function handlePopoverChangePassword() {
-  showProfilePopover.value = false
-  openChangePassword()
-}
-
-function handlePopoverLogout() {
-  showProfilePopover.value = false
-  logout()
-}
 </script>
 
 <template>
@@ -804,51 +646,6 @@ function handlePopoverLogout() {
       </div>
     </div>
 
-    <!-- ── Bottom User Profile Section ── -->
-    <div class="relative p-2 border-t border-[#F1F5F9]">
-      <!-- Expanded Mode User Profile Compact Control -->
-      <div v-if="!isEffectiveCollapsed">
-        <button
-          ref="profileBtnRef"
-          type="button"
-          @click="toggleProfilePopover($event)"
-          class="flex w-full items-center justify-between gap-2 rounded-xl p-2 text-left hover:bg-[#F8FAFC] transition-colors cursor-pointer select-none group"
-        >
-          <div class="flex items-center gap-2.5 min-w-0">
-            <div
-              class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#2563EB] text-xs font-bold text-white shadow-2xs"
-            >
-              {{ (user && user.nama ? user.nama.charAt(0) : 'U').toUpperCase() }}
-            </div>
-            <div class="min-w-0">
-              <p class="text-xs font-bold text-[#0F172A] truncate leading-tight">
-                {{ user?.nama || 'Pengguna' }}
-              </p>
-              <p class="text-[10.5px] font-normal text-[#64748B] truncate leading-tight capitalize">
-                {{ user?.role || 'User' }}
-              </p>
-            </div>
-          </div>
-          <span
-            class="material-symbols-outlined text-[16px] text-[#94A3B8] group-hover:text-[#0F172A] shrink-0"
-            >unfold_more</span
-          >
-        </button>
-      </div>
-
-      <!-- Collapsed Mode Navigation Rail User Avatar Button -->
-      <div v-else class="relative flex flex-col items-center">
-        <button
-          ref="profileBtnRef"
-          type="button"
-          @click="toggleProfilePopover($event)"
-          title="Profil & Pengaturan"
-          class="flex h-8 w-8 items-center justify-center rounded-lg bg-[#2563EB] text-xs font-bold text-white shadow-2xs hover:scale-105 transition-all cursor-pointer"
-        >
-          {{ (user && user.nama ? user.nama.charAt(0) : 'U').toUpperCase() }}
-        </button>
-      </div>
-    </div>
   </aside>
 
   <!-- ── Teleport Flyout Popovers & Tooltips for Collapsed Navigation Rail ── -->
@@ -902,119 +699,8 @@ function handlePopoverLogout() {
       {{ hoveredTooltipLabel }}
     </div>
 
-    <!-- User Profile Popover -->
-    <Transition :name="popoverPlacement === 'up' ? 'popover-up' : 'popover-down'">
-      <div
-        v-if="showProfilePopover"
-        ref="profilePopoverRef"
-        class="fixed z-[9999] w-52 rounded-2xl border border-[#E2E8F0] bg-white p-1.5 shadow-xl select-none outline-none"
-        :style="{ top: `${profilePopoverPos.top}px`, left: `${profilePopoverPos.left}px` }"
-      >
-        <div class="px-3 py-2 border-b border-[#F1F5F9] mb-1">
-          <p class="truncate text-xs font-bold text-[#0F172A]">{{ user?.nama || 'Pengguna' }}</p>
-          <p class="truncate text-[11px] text-[#64748B] capitalize mt-0.5">
-            {{ user?.role || 'Guest' }} {{ user?.nik ? '· ' + user.nik : '' }}
-          </p>
-        </div>
-        <div class="space-y-0.5">
-          <button
-            type="button"
-            @click="handlePopoverChangePassword"
-            class="w-full flex items-center gap-2 rounded-xl px-2.5 py-1.5 text-xs font-medium text-[#334155] hover:bg-[#F8FAFC] transition-colors cursor-pointer"
-          >
-            <span class="material-symbols-outlined text-[16px] text-[#64748B]">key</span>
-            <span>Ganti Password</span>
-          </button>
-          <div class="my-1 border-t border-[#F1F5F9]"></div>
-          <button
-            type="button"
-            @click="handlePopoverLogout"
-            class="w-full flex items-center gap-2 rounded-xl px-2.5 py-1.5 text-xs font-medium text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
-          >
-            <span class="material-symbols-outlined text-[16px]">logout</span>
-            <span>Keluar</span>
-          </button>
-        </div>
-      </div>
-    </Transition>
   </Teleport>
 
-  <!-- Modal Ganti Password Akun -->
-  <AppModal :is-open="showPasswordModal" title="Ganti Password Akun" @close="closePasswordModal">
-    <form @submit.prevent="submitChangePassword" class="space-y-4">
-      <div
-        v-if="passwordModalError"
-        class="rounded-xl bg-rose-50 p-3 text-[12px] font-semibold text-rose-600"
-      >
-        {{ passwordModalError }}
-      </div>
-
-      <div
-        v-if="passwordSuccessMessage"
-        class="rounded-xl bg-emerald-50 p-3 text-[12px] font-semibold text-emerald-600"
-      >
-        {{ passwordSuccessMessage }}
-      </div>
-
-      <div>
-        <label class="block text-[11px] font-bold uppercase tracking-wider text-[#7C8BAC] mb-1"
-          >Password Saat Ini *</label
-        >
-        <input
-          v-model="passwordForm.currentPassword"
-          type="password"
-          required
-          placeholder="Masukkan password Anda saat ini"
-          class="w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-[13px] text-[#2A3547] focus:outline-none focus:border-[#5D87FF]"
-        />
-      </div>
-
-      <div>
-        <label class="block text-[11px] font-bold uppercase tracking-wider text-[#7C8BAC] mb-1"
-          >Password Baru (min 8 karakter) *</label
-        >
-        <input
-          v-model="passwordForm.newPassword"
-          type="password"
-          required
-          minlength="8"
-          placeholder="Masukkan password baru"
-          class="w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-[13px] text-[#2A3547] focus:outline-none focus:border-[#5D87FF]"
-        />
-      </div>
-
-      <div>
-        <label class="block text-[11px] font-bold uppercase tracking-wider text-[#7C8BAC] mb-1"
-          >Konfirmasi Password Baru *</label
-        >
-        <input
-          v-model="passwordForm.confirmPassword"
-          type="password"
-          required
-          minlength="8"
-          placeholder="Ketik ulang password baru"
-          class="w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-[13px] text-[#2A3547] focus:outline-none focus:border-[#5D87FF]"
-        />
-      </div>
-
-      <div class="flex items-center justify-end gap-2 pt-4 border-t border-[#E5EAEF]">
-        <button
-          type="button"
-          @click="closePasswordModal"
-          class="rounded-xl border border-[#E5EAEF] px-4 py-2 text-[12px] font-bold text-[#7C8BAC] hover:bg-gray-50 transition-all cursor-pointer"
-        >
-          Batal
-        </button>
-        <button
-          type="submit"
-          :disabled="isSubmittingPassword"
-          class="rounded-xl bg-[#5D87FF] px-4 py-2 text-[12px] font-bold text-white shadow-md hover:bg-[#4570EA] transition-all cursor-pointer disabled:opacity-60"
-        >
-          {{ isSubmittingPassword ? 'Menyimpan...' : 'Simpan Password Baru' }}
-        </button>
-      </div>
-    </form>
-  </AppModal>
 </template>
 
 <style scoped>
@@ -1027,30 +713,4 @@ function handlePopoverLogout() {
   opacity: 0;
 }
 
-/* User Profile Popover Directional Animations */
-.popover-up-enter-active,
-.popover-up-leave-active {
-  transition:
-    opacity 150ms cubic-bezier(0.2, 0.8, 0.2, 1),
-    transform 150ms cubic-bezier(0.2, 0.8, 0.2, 1);
-  transform-origin: bottom left;
-}
-.popover-up-enter-from,
-.popover-up-leave-to {
-  opacity: 0;
-  transform: translateY(4px) scale(0.96);
-}
-
-.popover-down-enter-active,
-.popover-down-leave-active {
-  transition:
-    opacity 150ms cubic-bezier(0.2, 0.8, 0.2, 1),
-    transform 150ms cubic-bezier(0.2, 0.8, 0.2, 1);
-  transform-origin: top left;
-}
-.popover-down-enter-from,
-.popover-down-leave-to {
-  opacity: 0;
-  transform: translateY(-4px) scale(0.96);
-}
 </style>

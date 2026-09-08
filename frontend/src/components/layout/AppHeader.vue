@@ -5,6 +5,7 @@ import { useAuth } from '@/composables/useAuth'
 import { useApi } from '@/composables/useApi'
 import { useTicketEvents } from '@/composables/useTicketEvents'
 import SkeletonList from '../ui/skeleton/SkeletonList.vue'
+import AppModal from '../ui/AppModal.vue'
 
 defineProps({
   isMobileOpen: { type: Boolean, default: false },
@@ -15,7 +16,7 @@ defineEmits(['toggle-mobile', 'toggle-collapse'])
 const route = useRoute()
 const router = useRouter()
 const { user, logout, hasPermission, isSuperAdmin } = useAuth()
-const { get } = useApi()
+const { get, post } = useApi()
 const { connect: connectSSE, disconnect: disconnectSSE, on: onSSE, off: offSSE } = useTicketEvents()
 
 // Search & UI State
@@ -37,7 +38,69 @@ const searchPlaceholder = computed(() => {
   return 'Cari aset, karyawan, tiket, atau user...'
 })
 
+const profileMenuButtonRef = ref(null)
 const isProfileOpen = ref(false)
+
+// Password Modal State
+const showPasswordModal = ref(false)
+const isSubmittingPassword = ref(false)
+const passwordModalError = ref('')
+const passwordSuccessMessage = ref('')
+const passwordForm = ref({
+  currentPassword: '',
+  newPassword: '',
+  confirmPassword: '',
+})
+
+async function openChangePassword() {
+  isProfileOpen.value = false
+  await nextTick()
+  profileMenuButtonRef.value?.focus()
+  passwordForm.value = { currentPassword: '', newPassword: '', confirmPassword: '' }
+  passwordModalError.value = ''
+  passwordSuccessMessage.value = ''
+  showPasswordModal.value = true
+}
+
+function closePasswordModal() {
+  showPasswordModal.value = false
+  passwordModalError.value = ''
+  passwordSuccessMessage.value = ''
+}
+
+async function submitChangePassword() {
+  const { currentPassword, newPassword, confirmPassword } = passwordForm.value
+  if (!currentPassword) {
+    passwordModalError.value = 'Password saat ini wajib diisi.'
+    return
+  }
+  if (!newPassword || newPassword.length < 8) {
+    passwordModalError.value = 'Password baru minimal 8 karakter.'
+    return
+  }
+  if (newPassword !== confirmPassword) {
+    passwordModalError.value = 'Konfirmasi password baru tidak cocok.'
+    return
+  }
+
+  isSubmittingPassword.value = true
+  passwordModalError.value = ''
+  passwordSuccessMessage.value = ''
+
+  try {
+    const res = await post('/api/auth/change-password', { currentPassword, newPassword })
+    passwordSuccessMessage.value = res.message || 'Password berhasil diperbarui.'
+    setTimeout(() => {
+      closePasswordModal()
+    }, 1500)
+  } catch (err) {
+    passwordModalError.value = err.message || 'Gagal mengganti password.'
+  } finally {
+    isSubmittingPassword.value = false
+  }
+}
+
+
 const isNotifOpen = ref(false)
 
 // Datasets for Global Search
@@ -440,6 +503,8 @@ function handleGlobalKeydown(e) {
     }
   } else if (e.key === 'Escape') {
     closeSearch()
+    isNotifOpen.value = false
+    isProfileOpen.value = false
   }
 }
 
@@ -519,7 +584,6 @@ watch(
   { immediate: true },
 )
 
-let pollTimer
 
 function handleSseTicketCreated(data) {
   if (data && typeof data === 'object') {
@@ -622,10 +686,10 @@ onBeforeUnmount(() => {
 
 <template>
   <header
-    class="relative z-30 flex h-[52px] shrink-0 items-center justify-between border-b border-[#E5EAEF] bg-white/95 px-2.5 sm:px-5 backdrop-blur-md"
+    class="app-header relative z-30 grid h-28 grid-cols-[minmax(0,1fr)_auto] grid-rows-2 gap-x-2 gap-y-2 py-2 shrink-0 items-center border-b border-[#E5EAEF] bg-white/95 px-3 md:flex md:h-[52px] md:justify-between md:gap-0 md:py-0 md:px-5 md:backdrop-blur-md"
   >
     <!-- 1. LEFT: Navigation Drawer Toggle & Page Titles -->
-    <div class="flex items-center gap-1.5 sm:gap-2.5 shrink-0 min-w-0">
+    <div class="flex items-center gap-2 md:gap-2.5 md:shrink-0 min-w-0">
       <!-- Toggle Mobile Drawer (lg:hidden) -->
       <button
         type="button"
@@ -633,25 +697,25 @@ onBeforeUnmount(() => {
         aria-controls="app-navigation"
         aria-label="Buka Navigasi Mobile"
         title="Buka Navigasi Mobile"
-        class="flex lg:hidden h-11 w-11 sm:h-8 sm:w-8 shrink-0 items-center justify-center rounded-lg text-[#2A3547] hover:bg-[#ECF2FF] hover:text-[#5D87FF] transition-all cursor-pointer active:scale-95 touch-manipulation"
+        class="flex lg:hidden h-11 w-11 md:h-8 md:w-8 shrink-0 items-center justify-center rounded-lg text-[#2A3547] hover:bg-[#ECF2FF] hover:text-[#5D87FF] transition-all cursor-pointer active:scale-95 touch-manipulation"
         @click="$emit('toggle-mobile')"
       >
         <span aria-hidden="true" class="material-symbols-outlined text-[20px]">menu</span>
       </button>
 
-      <div class="min-w-0 hidden sm:block">
-        <h1 class="truncate text-[13px] sm:text-[14px] font-extrabold tracking-tight text-[#0F172A] leading-tight">
+      <div class="min-w-0">
+        <h1 class="text-sm wrap-anywhere md:truncate md:text-[14px] font-extrabold tracking-tight text-[#0F172A] leading-tight">
           {{ pageTitle }}
         </h1>
-        <p class="truncate text-[9.5px] sm:text-[10px] font-medium text-[#475569] leading-none">
+        <p class="hidden md:block truncate text-[10px] font-medium text-[#475569] leading-none">
           {{ pageSubtitle }}
         </p>
       </div>
     </div>
 
     <!-- 2. CENTER: Main Global Search Bar -->
-    <div class="flex-1 max-w-lg mx-1.5 sm:mx-4 relative flex justify-center z-40 min-w-0">
-      <div ref="searchContainerRef" class="relative w-full max-w-sm sm:max-w-md">
+    <div class="order-3 col-span-2 w-full md:order-none md:flex-1 md:max-w-lg md:mx-4 relative flex justify-center z-40 min-w-0">
+      <div ref="searchContainerRef" class="relative w-full md:max-w-md">
         <form
           role="search"
           @submit.prevent="submitSearch"
@@ -674,17 +738,17 @@ onBeforeUnmount(() => {
             autocomplete="off"
             @focus="initGlobalSearchData"
             :placeholder="searchPlaceholder"
-            class="h-11 sm:h-9 w-full rounded-full border border-[#DFE5EF] bg-[#F8FAFC] pl-8 sm:pl-9 pr-8 sm:pr-20 text-[11px] sm:text-xs font-medium text-[#0F172A] placeholder-[#64748B] outline-none transition-all shadow-xs focus:bg-white focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/20 [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden"
+            class="h-11 md:h-9 w-full rounded-xl md:rounded-full border border-[#DFE5EF] bg-[#F8FAFC] pl-10 md:pl-9 pr-12 md:pr-20 text-[11px] sm:text-xs font-medium text-[#0F172A] placeholder-[#64748B] outline-none transition-all shadow-xs focus:bg-white focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/20 [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden"
           />
 
           <!-- Action Buttons / Hotkey Indicator -->
-          <div class="absolute right-1.5 sm:right-2 flex items-center gap-1">
+          <div class="absolute right-0 md:right-2 flex items-center gap-1">
             <button
               v-if="searchQuery"
               type="button"
               @click="clearSearch"
               aria-label="Bersihkan pencarian"
-              class="flex h-6 w-6 items-center justify-center rounded-full text-[#475569] hover:bg-[#F1F5F9] hover:text-[#0F172A] transition-all cursor-pointer touch-manipulation"
+              class="flex h-11 w-11 md:h-6 md:w-6 items-center justify-center rounded-full text-[#475569] hover:bg-[#F1F5F9] hover:text-[#0F172A] transition-all cursor-pointer touch-manipulation"
               title="Bersihkan Pencarian"
             >
               <span aria-hidden="true" class="material-symbols-outlined text-[15px]">close</span>
@@ -693,7 +757,7 @@ onBeforeUnmount(() => {
             <button
               type="submit"
               :disabled="!searchQuery.trim()"
-              class="hidden sm:flex items-center gap-1 rounded-full bg-[#EFF6FF] px-2.5 py-1 text-[10px] font-extrabold text-[#1D4ED8] hover:bg-[#1D4ED8] hover:text-white disabled:opacity-40 transition-all cursor-pointer"
+              class="hidden md:flex items-center gap-1 rounded-full bg-[#EFF6FF] px-2.5 py-1 text-[10px] font-extrabold text-[#1D4ED8] hover:bg-[#1D4ED8] hover:text-white disabled:opacity-40 transition-all cursor-pointer"
             >
               Cari
             </button>
@@ -712,11 +776,11 @@ onBeforeUnmount(() => {
           <Transition name="dropdown">
             <div
               v-if="isSearchOpen"
-              class="fixed inset-0 z-[9999] flex flex-col bg-white md:inset-auto md:absolute md:top-full md:left-0 md:right-0 md:mt-2 md:max-h-[500px] md:w-full md:rounded-2xl md:border md:border-[#E5EAEF] md:shadow-2xl md:z-50 overflow-hidden text-left"
+              class="header-search-panel fixed inset-0 z-[9999] flex flex-col bg-white md:inset-auto md:absolute md:top-full md:left-0 md:right-0 md:mt-2 md:max-h-[500px] md:w-full md:rounded-2xl md:border md:border-[#E5EAEF] md:shadow-2xl md:z-50 overflow-hidden text-left"
             >
             <!-- Mobile-Only Dedicated Search Top Bar (Replaces blurred navbar with crisp, active search header) -->
             <div
-              class="flex h-[52px] sm:h-[56px] shrink-0 items-center gap-2 border-b border-[#E5EAEF] px-2.5 sm:px-3 bg-white md:hidden"
+              class="flex h-16 shrink-0 items-center gap-2 border-b border-[#E5EAEF] px-2.5 sm:px-3 bg-white md:hidden"
             >
               <!-- Back button to close search -->
               <button
@@ -724,7 +788,7 @@ onBeforeUnmount(() => {
                 @click="closeSearch"
                 aria-label="Tutup pencarian"
                 title="Tutup pencarian"
-                class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-[#64748B] hover:bg-[#F1F5F9] active:scale-95 touch-manipulation cursor-pointer"
+                class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-[#64748B] hover:bg-[#F1F5F9] active:scale-95 touch-manipulation cursor-pointer"
               >
                 <span class="material-symbols-outlined text-[22px]">arrow_back</span>
               </button>
@@ -738,6 +802,8 @@ onBeforeUnmount(() => {
                 </span>
                 <input
                   id="mobile-overlay-search-input"
+                  aria-label="Cari aset, tiket, karyawan, atau pengguna"
+                  @keydown.enter.prevent="submitSearch"
                   ref="mobileSearchInputRef"
                   v-model="searchQuery"
                   type="search"
@@ -745,14 +811,14 @@ onBeforeUnmount(() => {
                   autocapitalize="off"
                   spellcheck="false"
                   placeholder="Cari aset, tiket, karyawan, user..."
-                  class="h-9 w-full rounded-full border border-[#DFE5EF] bg-[#F8FAFC] pl-9 pr-8 text-xs font-medium text-[#0F172A] placeholder-[#64748B] outline-none transition-all focus:bg-white focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/20 [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden"
+                  class="h-11 w-full rounded-xl border border-[#DFE5EF] bg-[#F8FAFC] pl-9 pr-11 text-xs font-medium text-[#0F172A] placeholder-[#64748B] outline-none transition-all focus:bg-white focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/20 [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden"
                 />
                 <button
                   v-if="searchQuery"
                   type="button"
                   @click="clearSearch"
                   aria-label="Bersihkan kata kunci"
-                  class="absolute right-2 flex h-6 w-6 items-center justify-center rounded-full text-[#64748B] hover:bg-[#E2E8F0] active:scale-90 touch-manipulation cursor-pointer"
+                  class="absolute right-0 flex h-11 w-11 items-center justify-center rounded-full text-[#64748B] hover:bg-[#E2E8F0] active:scale-90 touch-manipulation cursor-pointer"
                 >
                   <span class="material-symbols-outlined text-[15px]">close</span>
                 </button>
@@ -763,7 +829,7 @@ onBeforeUnmount(() => {
                 type="button"
                 @click="submitSearch"
                 :disabled="!searchQuery.trim()"
-                class="flex shrink-0 items-center px-2 py-1 text-xs font-bold text-[#2563EB] disabled:opacity-30 active:scale-95 touch-manipulation cursor-pointer"
+                class="flex min-h-11 shrink-0 items-center px-2 py-1 text-xs font-bold text-[#2563EB] disabled:opacity-30 active:scale-95 touch-manipulation cursor-pointer"
               >
                 Cari
               </button>
@@ -804,7 +870,7 @@ onBeforeUnmount(() => {
                 :key="tab.key"
                 type="button"
                 @click="searchTabFilter = tab.key"
-                class="flex items-center gap-1 shrink-0 rounded-lg px-2 sm:px-2.5 py-1 text-[11px] font-bold transition-all cursor-pointer touch-manipulation active:scale-95"
+                class="flex min-h-11 md:min-h-0 items-center gap-1 shrink-0 rounded-lg px-2 sm:px-2.5 py-1 text-[11px] font-bold transition-all cursor-pointer touch-manipulation active:scale-95"
                 :class="
                   searchTabFilter === tab.key
                     ? 'bg-[#5D87FF] text-white shadow-xs'
@@ -1096,15 +1162,18 @@ onBeforeUnmount(() => {
     </div>
 
     <!-- 4. RIGHT: Actions (Notification Bell & Profile Menu) -->
-    <div class="flex shrink-0 items-center gap-1.5 sm:gap-2.5 z-40">
+    <div class="flex shrink-0 items-center gap-1 md:gap-2.5 z-40">
       <!-- Notification Bell -->
       <div class="relative">
         <button
           id="notif-bell-btn"
+          aria-label="Notifikasi"
+          :aria-expanded="isNotifOpen"
+          aria-controls="header-notifications"
           type="button"
           :title="unreadCount > 0 ? `Notifikasi (${unreadCount})` : 'Notifikasi'"
           @click="toggleNotif"
-          class="relative flex h-11 w-11 sm:h-9 sm:w-9 items-center justify-center rounded-xl text-[#64748B] hover:bg-[#F8FAFC] hover:text-[#0F172A] transition-all cursor-pointer select-none active:scale-95 touch-manipulation"
+          class="relative flex h-11 w-11 md:h-9 md:w-9 items-center justify-center rounded-xl text-[#64748B] hover:bg-[#F8FAFC] hover:text-[#0F172A] transition-all cursor-pointer select-none active:scale-95 touch-manipulation"
           :class="isNotifOpen ? 'bg-[#EFF6FF] text-[#2563EB]' : ''"
         >
           <span aria-hidden="true" class="material-symbols-outlined text-[20px]"
@@ -1123,7 +1192,8 @@ onBeforeUnmount(() => {
         <Transition name="dropdown">
           <div
             v-if="isNotifOpen"
-            class="fixed left-3 right-3 top-16 sm:absolute sm:left-auto sm:top-auto sm:right-0 sm:mt-2 sm:w-96 rounded-2xl border border-[#E2E8F0] bg-white shadow-xl z-50 overflow-hidden outline-none"
+            id="header-notifications"
+            class="header-popover fixed left-3 right-3 top-[7.5rem] max-h-[calc(100dvh-8.25rem)] flex flex-col md:max-h-[calc(100dvh-4.5rem)] md:absolute md:left-auto md:top-auto md:right-0 md:mt-2 md:w-96 rounded-2xl border border-[#E2E8F0] bg-white shadow-xl z-50 overflow-hidden outline-none"
             @click.stop
           >
             <!-- 1. Header -->
@@ -1178,7 +1248,7 @@ onBeforeUnmount(() => {
             </div>
 
             <!-- 3. Notification List (Sole Scrollable Body) -->
-            <div class="max-h-[min(380px,calc(100dvh-15rem))] sm:max-h-[380px] overflow-y-auto custom-scrollbar divide-y divide-[#F1F5F9]">
+            <div class="min-h-0 flex-1 md:max-h-[380px] overflow-y-auto custom-scrollbar divide-y divide-[#F1F5F9]">
               <div
                 v-if="isFetchingNotif && latestNotifications.length === 0"
                 class="p-2"
@@ -1280,13 +1350,17 @@ onBeforeUnmount(() => {
         <div v-if="isNotifOpen" class="fixed inset-0 z-40" @click="isNotifOpen = false"></div>
       </div>
 
-      <div class="h-6 w-px bg-[#E5EAEF] mx-1"></div>
+      <div class="hidden md:block h-6 w-px bg-[#E5EAEF] mx-1"></div>
 
       <!-- User Profile (Top-Right Primary User Identity) -->
       <div class="relative">
         <button
           type="button"
+          ref="profileMenuButtonRef"
           @click="toggleProfileMenu"
+          aria-label="Menu profil"
+          :aria-expanded="isProfileOpen"
+          aria-controls="header-profile"
           class="flex items-center gap-2 rounded-xl p-1.5 transition-all hover:bg-[#F8FAFC] cursor-pointer select-none"
           :class="isProfileOpen ? 'bg-[#F8FAFC]' : ''"
         >
@@ -1295,7 +1369,7 @@ onBeforeUnmount(() => {
           >
             {{ (user && user.nama ? user.nama.charAt(0) : 'U').toUpperCase() }}
           </div>
-          <div class="hidden text-left sm:block">
+          <div class="hidden text-left lg:block">
             <p class="text-xs font-bold text-[#0F172A] leading-tight truncate max-w-[140px]">
               {{ user ? user.nama : 'Pengguna' }}
             </p>
@@ -1305,7 +1379,7 @@ onBeforeUnmount(() => {
               {{ user?.role || 'Guest' }} {{ user?.nik ? '· ' + user.nik : '' }}
             </p>
           </div>
-          <span class="material-symbols-outlined text-[16px] text-[#94A3B8] hidden sm:block"
+          <span class="material-symbols-outlined text-[16px] header-profile-chevron text-[#94A3B8] hidden lg:block"
             >expand_more</span
           >
         </button>
@@ -1314,7 +1388,8 @@ onBeforeUnmount(() => {
         <Transition name="dropdown">
           <div
             v-if="isProfileOpen"
-            class="absolute right-0 mt-2 w-56 rounded-2xl border border-[#E2E8F0] bg-white p-1.5 shadow-xl z-50 outline-none"
+            id="header-profile"
+            class="header-popover fixed left-3 right-3 top-[7.5rem] max-h-[calc(100dvh-8.25rem)] overflow-y-auto md:absolute md:left-auto md:top-auto md:right-0 md:mt-2 md:w-56 rounded-2xl border border-[#E2E8F0] bg-white p-1.5 shadow-xl z-50 outline-none"
             @click.stop
           >
             <!-- Account Header -->
@@ -1339,6 +1414,15 @@ onBeforeUnmount(() => {
               >
                 <span class="material-symbols-outlined text-[16px] text-[#64748B]">badge</span>
                 <span>Aset Saya</span>
+              </button>
+
+              <button
+                type="button"
+                @click="openChangePassword"
+                class="w-full flex items-center gap-2 rounded-xl px-2.5 py-1.5 text-xs font-medium text-[#334155] hover:bg-[#F8FAFC] hover:text-[#0F172A] transition-colors text-left cursor-pointer"
+              >
+                <span aria-hidden="true" class="material-symbols-outlined text-[16px] text-[#64748B]">key</span>
+                <span>Ganti Password</span>
               </button>
 
               <button
@@ -1369,9 +1453,94 @@ onBeforeUnmount(() => {
       </div>
     </div>
   </header>
+
+  <!-- Modal Ganti Password Akun -->
+  <AppModal :is-open="showPasswordModal" title="Ganti Password Akun" @close="closePasswordModal">
+    <form @submit.prevent="submitChangePassword" class="password-form space-y-4">
+      <div
+        v-if="passwordModalError" role="alert"
+        class="rounded-xl bg-rose-50 p-3 text-[12px] font-semibold text-rose-600"
+      >
+        {{ passwordModalError }}
+      </div>
+
+      <div
+        v-if="passwordSuccessMessage" role="status"
+        class="rounded-xl bg-emerald-50 p-3 text-[12px] font-semibold text-emerald-600"
+      >
+        {{ passwordSuccessMessage }}
+      </div>
+
+      <div>
+        <label for="account-currentPassword" class="block text-[11px] font-bold uppercase tracking-wider text-[#7C8BAC] mb-1"
+          >Password Saat Ini *</label>
+        <input id="account-currentPassword" autocomplete="current-password" v-model="passwordForm.currentPassword"
+          type="password"
+          required
+          placeholder="Masukkan password Anda saat ini"
+          class="w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-[13px] text-[#2A3547] focus:outline-none focus:border-[#5D87FF]"
+        />
+      </div>
+
+      <div>
+        <label for="account-newPassword" class="block text-[11px] font-bold uppercase tracking-wider text-[#7C8BAC] mb-1"
+          >Password Baru (min 8 karakter) *</label>
+        <input id="account-newPassword" autocomplete="new-password" v-model="passwordForm.newPassword"
+          type="password"
+          required
+          minlength="8"
+          placeholder="Masukkan password baru"
+          class="w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-[13px] text-[#2A3547] focus:outline-none focus:border-[#5D87FF]"
+        />
+      </div>
+
+      <div>
+        <label for="account-confirmPassword" class="block text-[11px] font-bold uppercase tracking-wider text-[#7C8BAC] mb-1"
+          >Konfirmasi Password Baru *</label>
+        <input id="account-confirmPassword" autocomplete="new-password" v-model="passwordForm.confirmPassword"
+          type="password"
+          required
+          minlength="8"
+          placeholder="Ketik ulang password baru"
+          class="w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-[13px] text-[#2A3547] focus:outline-none focus:border-[#5D87FF]"
+        />
+      </div>
+
+      <div class="grid grid-cols-1 sm:flex sm:items-center sm:justify-end gap-2 pt-4 border-t border-[#E5EAEF]">
+        <button
+          type="button"
+          @click="closePasswordModal"
+          class="rounded-xl border border-[#E5EAEF] px-4 py-2 text-[12px] font-bold text-[#7C8BAC] hover:bg-gray-50 transition-all cursor-pointer"
+        >
+          Batal
+        </button>
+        <button
+          type="submit"
+          :disabled="isSubmittingPassword"
+          class="rounded-xl bg-[#5D87FF] px-4 py-2 text-[12px] font-bold text-white shadow-md hover:bg-[#4570EA] transition-all cursor-pointer disabled:opacity-60"
+        >
+          {{ isSubmittingPassword ? 'Menyimpan...' : 'Simpan Password Baru' }}
+        </button>
+      </div>
+    </form>
+  </AppModal>
 </template>
 
 <style scoped>
+@media (width < 40rem) {
+  .password-form input[type='password'] { min-height: 2.75rem; font-size: 1rem; }
+  .password-form button { min-height: 2.75rem; }
+}
+
+@media (width < 64rem) { .header-profile-chevron { display: none; } }
+@media (width < 48rem) {
+  .app-header #global-main-search, .header-search-panel input[type="search"] { font-size: 1rem; }
+  .header-popover button { min-height: 2.75rem; }
+  .header-popover > div:not(.overflow-y-auto) { flex-shrink: 0; }
+  .header-popover .truncate { white-space: normal; overflow-wrap: anywhere; }
+  .header-popover p { overflow-wrap: anywhere; }
+}
+
 .dropdown-enter-active,
 .dropdown-leave-active {
   transition: all 0.15s ease;
@@ -1392,5 +1561,8 @@ onBeforeUnmount(() => {
 .badge-pop-leave-to {
   opacity: 0;
   transform: scale(0.5);
+}
+@media (prefers-reduced-motion: reduce) {
+  .dropdown-enter-active, .dropdown-leave-active, .badge-pop-enter-active, .badge-pop-leave-active { transition: none; }
 }
 </style>

@@ -97,15 +97,15 @@ onUnmounted(() => {
           <kbd class="px-1.5 py-0.5 text-[10px] font-mono font-bold bg-white dark:bg-slate-700 rounded border border-[#E5EAEF] dark:border-slate-600 text-[#64748B] dark:text-slate-300">Ctrl K</kbd>
         </RouterLink>
 
-        <!-- Theme Switcher -->
-        <button
-          @click="toggleTheme"
-          class="p-2 rounded-xl text-[#64748B] dark:text-slate-400 hover:bg-[#F1F5F9] dark:hover:bg-slate-800 hover:text-[#0F172A] dark:hover:text-white transition-colors cursor-pointer min-h-[38px] min-w-[38px] flex items-center justify-center touch-manipulation"
-          :title="isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'"
+        <!-- Dashboard (Admin only) -->
+        <RouterLink
+          v-if="isAdmin"
+          to="/dashboard"
+          class="p-2 rounded-xl text-[#64748B] dark:text-slate-400 hover:bg-[#F1F5F9] dark:hover:bg-slate-800 hover:text-[#5D87FF] transition-colors cursor-pointer min-h-[38px] min-w-[38px] flex items-center justify-center touch-manipulation"
+          :title="t('dashboard', 'Dashboard')"
         >
-          <Sun v-if="isDark" class="w-4 h-4 text-amber-400" />
-          <Moon v-else class="w-4 h-4" />
-        </button>
+          <LayoutDashboard class="w-4 h-4" />
+        </RouterLink>
 
         <!-- AUTH STATE DEPENDENT PROFILE / SIGN IN BUTTON -->
         
@@ -166,38 +166,37 @@ onUnmounted(() => {
 
               <!-- Menu Items -->
               <div class="space-y-0.5 py-1">
-                <!-- 1. ADMIN / SUPER ADMIN ROLE: Dashboard only -->
-                <template v-if="isAdmin">
-                  <RouterLink
-                    to="/dashboard"
-                    @click="closeProfileMenu"
-                    class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100/90 dark:hover:bg-slate-800/80 hover:text-slate-900 dark:hover:text-white transition-all duration-150 group"
-                  >
-                    <LayoutDashboard class="w-4 h-4 text-[#5D87FF] group-hover:scale-110 transition-transform" />
-                    <span>{{ t('dashboard', 'Dashboard') }}</span>
-                  </RouterLink>
-                </template>
+                <!-- Regular User: My Asset & My Tickets -->
+                <RouterLink
+                  v-if="!isAdmin"
+                  to="/my-assets"
+                  @click="closeProfileMenu"
+                  class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100/90 dark:hover:bg-slate-800/80 hover:text-slate-900 dark:hover:text-white transition-all duration-150 group"
+                >
+                  <Laptop class="w-4 h-4 text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-200 group-hover:scale-110 transition-transform" />
+                  <span>{{ t('my_asset', 'My Asset') }}</span>
+                </RouterLink>
 
-                <!-- 2. REGULAR USER ROLE: My Asset & My Tickets -->
-                <template v-else>
-                  <RouterLink
-                    to="/my-assets"
-                    @click="closeProfileMenu"
-                    class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100/90 dark:hover:bg-slate-800/80 hover:text-slate-900 dark:hover:text-white transition-all duration-150 group"
-                  >
-                    <Laptop class="w-4 h-4 text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-200 group-hover:scale-110 transition-transform" />
-                    <span>{{ t('my_asset', 'My Asset') }}</span>
-                  </RouterLink>
+                <RouterLink
+                  v-if="!isAdmin"
+                  to="/tickets"
+                  @click="closeProfileMenu"
+                  class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100/90 dark:hover:bg-slate-800/80 hover:text-slate-900 dark:hover:text-white transition-all duration-150 group"
+                >
+                  <Ticket class="w-4 h-4 text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-200 group-hover:scale-110 transition-transform" />
+                  <span>{{ t('my_tickets', 'My Tickets') }}</span>
+                </RouterLink>
 
-                  <RouterLink
-                    to="/tickets"
-                    @click="closeProfileMenu"
-                    class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100/90 dark:hover:bg-slate-800/80 hover:text-slate-900 dark:hover:text-white transition-all duration-150 group"
-                  >
-                    <Ticket class="w-4 h-4 text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-200 group-hover:scale-110 transition-transform" />
-                    <span>{{ t('my_tickets', 'My Tickets') }}</span>
-                  </RouterLink>
-                </template>
+                <!-- Theme Switcher -->
+                <button
+                  @click="toggleTheme"
+                  class="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100/90 dark:hover:bg-slate-800/80 hover:text-slate-900 dark:hover:text-white transition-all duration-150 cursor-pointer text-left group"
+                  :title="isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'"
+                >
+                  <Sun v-if="isDark" class="w-4 h-4 text-amber-400 group-hover:scale-110 transition-transform" />
+                  <Moon v-else class="w-4 h-4 text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-200 group-hover:scale-110 transition-transform" />
+                  <span>{{ isDark ? t('light_mode', 'Light Mode') : t('dark_mode', 'Dark Mode') }}</span>
+                </button>
               </div>
 
               <!-- Sign Out -->

@@ -13,11 +13,9 @@ import { animatePageEnter, animatePageLeave } from './composables/useGsap.js'
 import { getStoredUser } from './utils/authStorage.js'
 import { initTicketRealtime, stopTicketRealtime } from './composables/useTicketRealtime.js'
 import { useCases } from './composables/useCases.js'
-import { useTheme } from './composables/useTheme.js'
 
 const route = useRoute()
 const { fetchCases } = useCases()
-useTheme()
 
 const isLoginPage = computed(() => {
   return route.name === 'login' || route.path === '/login'

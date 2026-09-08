@@ -335,7 +335,7 @@ onMounted(() => {
 
 <template>
   <div
-    class="export-page min-w-0 space-y-4 sm:space-y-6 pb-6 sm:pb-12 text-[#0F172A] wrap-anywhere"
+    class="export-page min-w-0 space-y-4 sm:space-y-6 text-[#0F172A] wrap-anywhere"
     :data-testid="!isLoading ? 'page-ready' : undefined"
   >
     <!-- Notification Toast -->

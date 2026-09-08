@@ -1182,64 +1182,6 @@ async function confirmDeleteTicket() {
   }
 }
 
-function getSlaHours(prioritas) {
-  const p = (prioritas || '').toLowerCase()
-  if (p.includes('critical') || p.includes('urgent') || p.includes('4h')) return 4
-  if (p.includes('high') || p.includes('1day')) return 24
-  if (p.includes('medium') || p.includes('3d')) return 72
-  if (p.includes('low') || p.includes('7d')) return 168
-  return 72
-}
-
-function getSlaCountdownInfo(ticket) {
-  if (!ticket || !ticket.dibuat_pada) {
-    return { text: ticket?.prioritas || 'Medium (3d)', isOverdue: false, isClosed: false }
-  }
-
-  if (ticket.status_tiket === 'Closed') {
-    return { text: '✓ Selesai', isOverdue: false, isClosed: true }
-  }
-
-  const createdAt = new Date(ticket.dibuat_pada).getTime()
-  const hours = getSlaHours(ticket.prioritas)
-  const deadline = createdAt + hours * 60 * 60 * 1000
-  const diffMs = deadline - nowTick.value
-
-  const isOverdue = diffMs < 0
-  const absDiff = Math.abs(diffMs)
-
-  const diffSec = Math.floor(absDiff / 1000)
-  const diffMin = Math.floor(diffSec / 60)
-  const diffHours = Math.floor(diffMin / 60)
-  const diffDays = Math.floor(diffHours / 24)
-
-  const remHours = diffHours % 24
-  const remMin = diffMin % 60
-
-  let formatted
-  if (diffDays > 0) {
-    formatted = `${diffDays}h ${remHours}j`
-  } else if (diffHours > 0) {
-    formatted = `${diffHours}j ${remMin}m`
-  } else {
-    formatted = `${remMin}m`
-  }
-
-  if (isOverdue) {
-    return {
-      text: `⚠️ Terlewat ${formatted}`,
-      isOverdue: true,
-      isClosed: false,
-    }
-  }
-
-  return {
-    text: `⏱️ ${formatted} sisa`,
-    isOverdue: false,
-    isClosed: false,
-  }
-}
-
 function formatDateTime(iso) {
   if (!iso) return '-'
   const date = new Date(iso)
@@ -1322,23 +1264,16 @@ function getStatusDotInfo(status) {
 
 function getPriorityInfo(prioritas) {
   const p = (prioritas || '').toLowerCase()
-  if (p.includes('critical') || p.includes('urgent') || p.includes('4h')) {
+  if (p.includes('critical') || p.includes('urgent')) {
     return { label: 'Critical', class: 'text-rose-700 font-bold bg-rose-50 border-rose-200/80', icon: 'warning' }
   }
-  if (p.includes('high') || p.includes('1day')) {
+  if (p.includes('high')) {
     return { label: 'High', class: 'text-amber-800 font-semibold bg-amber-50 border-amber-200/80', icon: 'priority_high' }
   }
-  if (p.includes('medium') || p.includes('3d')) {
+  if (p.includes('medium')) {
     return { label: 'Medium', class: 'text-slate-700 font-medium bg-slate-100/90 border-slate-200/80', icon: 'remove' }
   }
   return { label: 'Low', class: 'text-slate-600 font-medium bg-slate-50 border-slate-200/60', icon: 'arrow_downward' }
-}
-
-function getSlaInfo(ticket) {
-  const sla = getSlaCountdownInfo(ticket)
-  if (sla.isClosed) return { text: '✓ Selesai', class: 'bg-slate-50 text-slate-500 border-slate-200', icon: 'check_circle' }
-  if (sla.isOverdue) return { text: sla.text, class: 'bg-rose-50 text-rose-700 border-rose-200/80 font-semibold', icon: 'timer_off' }
-  return { text: sla.text, class: 'bg-slate-50 text-slate-600 border-slate-200/70', icon: 'schedule' }
 }
 
 function getTicketActions(ticket) {
@@ -1694,7 +1629,7 @@ function toast(message, type = 'success') {
               </p>
             </div>
 
-            <!-- METADATA & FOOTER ROW: Unit, Category, Priority, SLA, & Timestamp -->
+            <!-- METADATA & FOOTER ROW: Unit, Category, Priority, & Timestamp -->
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-3 text-[12px] pt-2 border-t border-slate-100">
               <div class="flex items-center gap-x-3 gap-y-1.5 flex-wrap text-slate-600">
                 <!-- Unit / Queue -->
@@ -1721,14 +1656,6 @@ function toast(message, type = 'success') {
                     {{ getPriorityInfo(ticket.prioritas).icon }}
                   </span>
                   <span>Priority: {{ getPriorityInfo(ticket.prioritas).label }}</span>
-                </span>
-
-                <!-- SLA Countdown -->
-                <span class="flex items-center gap-1 font-medium" :class="getSlaInfo(ticket).isOverdue ? 'text-rose-600' : 'text-slate-600'" title="SLA Ticket">
-                  <span class="material-symbols-outlined text-[15px]" :class="getSlaInfo(ticket).isOverdue ? 'text-rose-500' : 'text-slate-400'">
-                    {{ getSlaInfo(ticket).icon }}
-                  </span>
-                  <span>SLA {{ getSlaInfo(ticket).text }}</span>
                 </span>
               </div>
 
@@ -1817,7 +1744,7 @@ function toast(message, type = 'success') {
               </span>
             </div>
 
-            <!-- METADATA ROW 2 & FOOTER: Priority Badge, SLA, Assignee, & Timestamp -->
+            <!-- METADATA ROW 2 & FOOTER: Priority Badge, Assignee, & Timestamp -->
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-3 text-[12px] pt-2 border-t border-slate-100">
               <div class="flex items-center gap-x-3 gap-y-1.5 flex-wrap text-slate-600">
                 <!-- Priority (Subtle Badge) -->
@@ -1830,14 +1757,6 @@ function toast(message, type = 'success') {
                     {{ getPriorityInfo(ticket.prioritas).icon }}
                   </span>
                   <span>Priority: {{ getPriorityInfo(ticket.prioritas).label }}</span>
-                </span>
-
-                <!-- SLA Countdown -->
-                <span class="flex items-center gap-1 font-medium" :class="getSlaInfo(ticket).isOverdue ? 'text-rose-600' : 'text-slate-600'" title="SLA Ticket">
-                  <span class="material-symbols-outlined text-[15px]" :class="getSlaInfo(ticket).isOverdue ? 'text-rose-500' : 'text-slate-400'">
-                    {{ getSlaInfo(ticket).icon }}
-                  </span>
-                  <span>SLA {{ getSlaInfo(ticket).text }}</span>
                 </span>
 
                 <!-- Assignee -->
@@ -2124,14 +2043,14 @@ function toast(message, type = 'success') {
             </div>
           </div>
 
-          <!-- Prioritas SLA & Status -->
+          <!-- Prioritas & Status -->
           <div
             class="grid gap-3"
             :class="modalMode === 'edit' ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1'"
           >
-            <!-- Prioritas SLA -->
+            <!-- Prioritas -->
             <label class="flex flex-col gap-1.5 w-full">
-              <span class="text-[12px] font-semibold text-[#2A3547]">Prioritas SLA</span>
+              <span class="text-[12px] font-semibold text-[#2A3547]">Prioritas</span>
               <select
                 v-model="form.prioritas"
                 class="h-10 w-full rounded-lg border border-[#E5EAEF] bg-white px-3 text-[12px] font-medium text-[#2A3547] focus:border-[#5D87FF] focus:outline-none transition-all appearance-none cursor-pointer shadow-2xs"
@@ -2419,14 +2338,11 @@ function toast(message, type = 'success') {
                   }}</span>
                 </div>
 
-                <!-- Priority & SLA -->
+                <!-- Priority -->
                 <div class="flex flex-col gap-0.5">
-                  <span class="text-[11px] font-medium text-[#94A3B8]">Priority & SLA</span>
+                  <span class="text-[11px] font-medium text-[#94A3B8]">Priority</span>
                   <span class="font-medium text-[#0F172A]">
-                    {{ getPriorityInfo(selectedTicket.prioritas).label }} ·
-                    <span :class="getSlaInfo(selectedTicket).class">{{
-                      getSlaInfo(selectedTicket).text
-                    }}</span>
+                    {{ getPriorityInfo(selectedTicket.prioritas).label }}
                   </span>
                 </div>
 

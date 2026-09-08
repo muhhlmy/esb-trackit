@@ -397,37 +397,38 @@ onUnmounted(() => {
 
           <!-- Desktop Skeleton (Table) -->
           <div class="hidden md:block overflow-x-auto">
-            <table class="w-full text-left">
-              <thead>
-                <tr class="border-b border-[#F1F5F9]">
-                  <th class="py-3 px-4 text-xs font-semibold text-[#64748B] uppercase">Perangkat</th>
-                  <th class="py-3 px-4 text-xs font-semibold text-[#64748B] uppercase">
-                    Merek &amp; Tipe
-                  </th>
-                  <th class="py-3 px-4 text-xs font-semibold text-[#64748B] uppercase">Serial</th>
-                  <th class="py-3 px-4 text-xs font-semibold text-[#64748B] uppercase">Kondisi</th>
-                  <th class="py-3 px-4 text-xs font-semibold text-[#64748B] uppercase">Status</th>
-                  <th class="py-3 px-4 text-right text-xs font-semibold text-[#64748B] uppercase">
-                    Ditambahkan
-                  </th>
+            <table class="w-full text-left min-w-[760px]">
+              <thead class="bg-slate-50/60 border-b border-slate-100">
+                <tr>
+                  <th class="py-2.5 px-4 text-[11px] font-semibold text-slate-500 uppercase tracking-wider w-[32%]">Perangkat</th>
+                  <th class="py-2.5 px-4 text-[11px] font-semibold text-slate-500 uppercase tracking-wider w-[20%]">Merek &amp; Tipe</th>
+                  <th class="py-2.5 px-4 text-[11px] font-semibold text-slate-500 uppercase tracking-wider w-[18%]">Serial</th>
+                  <th class="py-2.5 px-4 text-[11px] font-semibold text-slate-500 uppercase tracking-wider w-[10%]">Kondisi</th>
+                  <th class="py-2.5 px-4 text-[11px] font-semibold text-slate-500 uppercase tracking-wider w-[10%]">Status</th>
+                  <th class="py-2.5 px-4 text-right text-[11px] font-semibold text-slate-500 uppercase tracking-wider w-[10%]">Ditambahkan</th>
                 </tr>
               </thead>
-              <tbody class="divide-y divide-[#F8FAFC]">
+              <tbody class="divide-y divide-slate-100/80">
                 <tr v-for="r in 3" :key="'recent-asset-skel-' + r">
-                  <td class="py-3.5 px-4">
-                    <BaseSkeleton width="130px" height="14px" radius="md" />
+                  <td class="py-3 px-4">
+                    <div class="flex items-center gap-3">
+                      <BaseSkeleton width="32px" height="32px" radius="md" />
+                      <div class="space-y-1">
+                        <BaseSkeleton width="130px" height="13px" radius="sm" />
+                        <BaseSkeleton width="50px" height="10px" radius="sm" />
+                      </div>
+                    </div>
                   </td>
-                  <td class="py-3.5 px-4">
-                    <BaseSkeleton width="100px" height="14px" radius="sm" />
+                  <td class="py-3 px-4">
+                    <div class="space-y-1">
+                      <BaseSkeleton width="90px" height="13px" radius="sm" />
+                      <BaseSkeleton width="60px" height="10px" radius="sm" />
+                    </div>
                   </td>
-                  <td class="py-3.5 px-4"><BaseSkeleton width="90px" height="12px" radius="sm" /></td>
-                  <td class="py-3.5 px-4"><BaseSkeleton width="70px" height="14px" radius="sm" /></td>
-                  <td class="py-3.5 px-4">
-                    <BaseSkeleton width="65px" height="20px" radius="full" />
-                  </td>
-                  <td class="py-3.5 px-4 text-right">
-                    <BaseSkeleton width="80px" height="12px" radius="sm" class="ml-auto" />
-                  </td>
+                  <td class="py-3 px-4"><BaseSkeleton width="90px" height="12px" radius="sm" /></td>
+                  <td class="py-3 px-4"><BaseSkeleton width="60px" height="14px" radius="sm" /></td>
+                  <td class="py-3 px-4"><BaseSkeleton width="65px" height="20px" radius="full" /></td>
+                  <td class="py-3 px-4 text-right"><BaseSkeleton width="75px" height="12px" radius="sm" class="ml-auto" /></td>
                 </tr>
               </tbody>
             </table>
@@ -461,41 +462,30 @@ onUnmounted(() => {
 
           <!-- Desktop Skeleton (Table) -->
           <div class="hidden md:block overflow-x-auto">
-            <table class="w-full text-left">
-              <thead>
-                <tr class="border-b border-[#F1F5F9]">
-                  <th class="py-3 px-4 text-xs font-semibold text-[#64748B] uppercase">No. Tiket</th>
-                  <th class="py-3 px-4 text-xs font-semibold text-[#64748B] uppercase">Judul</th>
-                  <th class="py-3 px-4 text-xs font-semibold text-[#64748B] uppercase">
-                    Assigned To
-                  </th>
-                  <th class="py-3 px-4 text-xs font-semibold text-[#64748B] uppercase">Prioritas</th>
-                  <th class="py-3 px-4 text-xs font-semibold text-[#64748B] uppercase">Status</th>
-                  <th class="py-3 px-4 text-right text-xs font-semibold text-[#64748B] uppercase">
-                    Tanggal
-                  </th>
+            <table class="w-full text-left min-w-[780px]">
+              <thead class="bg-slate-50/60 border-b border-slate-100">
+                <tr>
+                  <th class="py-2.5 px-4 text-[11px] font-semibold text-slate-500 uppercase tracking-wider w-[14%]">No. Tiket</th>
+                  <th class="py-2.5 px-4 text-[11px] font-semibold text-slate-500 uppercase tracking-wider w-[38%]">Judul</th>
+                  <th class="py-2.5 px-4 text-[11px] font-semibold text-slate-500 uppercase tracking-wider w-[18%]">Assigned To</th>
+                  <th class="py-2.5 px-4 text-[11px] font-semibold text-slate-500 uppercase tracking-wider w-[10%]">Prioritas</th>
+                  <th class="py-2.5 px-4 text-[11px] font-semibold text-slate-500 uppercase tracking-wider w-[10%]">Status</th>
+                  <th class="py-2.5 px-4 text-right text-[11px] font-semibold text-slate-500 uppercase tracking-wider w-[10%]">Tanggal</th>
                 </tr>
               </thead>
-              <tbody class="divide-y divide-[#F8FAFC]">
+              <tbody class="divide-y divide-slate-100/80">
                 <tr v-for="r in 3" :key="'recent-ticket-skel-' + r">
-                  <td class="py-3.5 px-4">
-                    <BaseSkeleton width="100px" height="14px" radius="md" />
+                  <td class="py-3 px-4"><BaseSkeleton width="90px" height="18px" radius="md" /></td>
+                  <td class="py-3 px-4">
+                    <div class="space-y-1">
+                      <BaseSkeleton width="180px" height="13px" radius="sm" />
+                      <BaseSkeleton width="70px" height="10px" radius="sm" />
+                    </div>
                   </td>
-                  <td class="py-3.5 px-4">
-                    <BaseSkeleton width="180px" height="14px" radius="md" />
-                  </td>
-                  <td class="py-3.5 px-4">
-                    <BaseSkeleton width="110px" height="14px" radius="sm" />
-                  </td>
-                  <td class="py-3.5 px-4">
-                    <BaseSkeleton width="65px" height="20px" radius="full" />
-                  </td>
-                  <td class="py-3.5 px-4">
-                    <BaseSkeleton width="65px" height="20px" radius="full" />
-                  </td>
-                  <td class="py-3.5 px-4 text-right">
-                    <BaseSkeleton width="80px" height="12px" radius="sm" class="ml-auto" />
-                  </td>
+                  <td class="py-3 px-4"><BaseSkeleton width="100px" height="13px" radius="sm" /></td>
+                  <td class="py-3 px-4"><BaseSkeleton width="55px" height="20px" radius="full" /></td>
+                  <td class="py-3 px-4"><BaseSkeleton width="65px" height="20px" radius="full" /></td>
+                  <td class="py-3 px-4 text-right"><BaseSkeleton width="75px" height="12px" radius="sm" class="ml-auto" /></td>
                 </tr>
               </tbody>
             </table>
@@ -864,17 +854,17 @@ onUnmounted(() => {
         v-if="canReadAssets"
         class="shadow-sm rounded-xl border border-[#E2E8F0] bg-white overflow-hidden hover:shadow-md transition-shadow duration-300"
       >
-        <div class="flex items-center justify-between px-4 py-3.5 sm:px-6 sm:py-5 border-b border-[#F1F5F9]">
-          <div class="min-w-0 pr-2">
-            <h3 class="text-base sm:text-lg font-bold text-[#1E293B] truncate">Aset Terbaru</h3>
-            <p class="text-[11px] sm:text-xs text-[#64748B] mt-0.5 sm:mt-1 truncate">5 Perangkat IT paling baru dalam sistem</p>
+        <div class="flex items-center justify-between px-4 py-3.5 sm:px-6 sm:py-4 border-b border-slate-100 bg-white">
+          <div class="min-w-0 pr-3">
+            <h3 class="text-sm sm:text-base font-bold text-slate-900 tracking-tight truncate">Aset Terbaru</h3>
+            <p class="text-[11.5px] sm:text-xs text-slate-500 mt-0.5 truncate">5 Perangkat IT paling baru dalam sistem</p>
           </div>
           <RouterLink
             to="/assets"
-            class="inline-flex items-center gap-1 text-[11px] sm:text-xs font-semibold text-[#3B82F6] bg-[#EFF6FF] px-2.5 py-1 sm:px-3.5 sm:py-1.5 rounded-full hover:bg-[#DBEAFE] hover:text-[#2563EB] transition-colors duration-200 shrink-0 active:scale-95 touch-manipulation"
+            class="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-600 bg-blue-50/70 hover:bg-blue-100/80 hover:text-blue-700 px-3 py-1.5 rounded-lg border border-blue-100/60 transition-all duration-150 shrink-0 active:scale-95 touch-manipulation"
           >
             <span>Lihat Semua</span>
-            <span class="material-symbols-outlined text-[13px] sm:text-[14px]">arrow_forward</span>
+            <span class="material-symbols-outlined text-[15px]">arrow_forward</span>
           </RouterLink>
         </div>
 
@@ -892,7 +882,7 @@ onUnmounted(() => {
                   <span class="material-symbols-outlined text-[18px]">
                     {{
                       asset.tipe_perangkat?.toLowerCase().includes('laptop')
-                        ? 'laptop'
+                        ? 'laptop_mac'
                         : asset.tipe_perangkat?.toLowerCase().includes('server')
                           ? 'dns'
                           : asset.tipe_perangkat?.toLowerCase().includes('printer')
@@ -913,8 +903,8 @@ onUnmounted(() => {
 
               <AppBadge
                 :type="getStatusBadgeType(asset.status_aset)"
-                :text="asset.status_aset"
-                class="shrink-0 text-[10.5px]"
+                :text="asset.status_aset || 'Available'"
+                class="shrink-0 text-[10.5px] whitespace-nowrap"
               />
             </div>
 
@@ -923,7 +913,7 @@ onUnmounted(() => {
               <div class="min-w-0">
                 <span class="block text-[10px] uppercase font-semibold text-[#94A3B8]">Merek &amp; Tipe</span>
                 <span class="font-medium text-[#1E293B] truncate block text-[11.5px]">
-                  {{ asset.merek }} <span class="text-slate-400 font-normal">({{ asset.tipe_perangkat }})</span>
+                  {{ asset.merek || '—' }} <span v-if="asset.tipe_perangkat" class="text-slate-400 font-normal">({{ asset.tipe_perangkat }})</span>
                 </span>
               </div>
               <div class="min-w-0">
@@ -954,94 +944,98 @@ onUnmounted(() => {
 
         <!-- Desktop Table View (>= md) -->
         <div class="hidden md:block overflow-x-auto">
-          <table class="w-full">
-            <thead>
-              <tr class="border-b border-[#F1F5F9]">
-                <th
-                  class="text-left text-xs font-semibold text-[#64748B] uppercase tracking-wide py-3 px-4"
-                >
+          <table class="w-full text-left min-w-[760px]">
+            <thead class="bg-slate-50/60 border-b border-slate-100">
+              <tr>
+                <th class="w-[32%] min-w-[220px] text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider py-2.5 px-4 whitespace-nowrap">
                   Perangkat
                 </th>
-                <th
-                  class="text-left text-xs font-semibold text-[#64748B] uppercase tracking-wide py-3 px-4"
-                >
-                  Merek & Tipe
+                <th class="w-[20%] min-w-[140px] text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider py-2.5 px-4 whitespace-nowrap">
+                  Merek &amp; Tipe
                 </th>
-                <th
-                  class="text-left text-xs font-semibold text-[#64748B] uppercase tracking-wide py-3 px-4"
-                >
+                <th class="w-[18%] min-w-[130px] text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider py-2.5 px-4 whitespace-nowrap">
                   Serial
                 </th>
-                <th
-                  class="text-left text-xs font-semibold text-[#64748B] uppercase tracking-wide py-3 px-4"
-                >
+                <th class="w-[10%] min-w-[90px] text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider py-2.5 px-4 whitespace-nowrap">
                   Kondisi
                 </th>
-                <th
-                  class="text-left text-xs font-semibold text-[#64748B] uppercase tracking-wide py-3 px-4"
-                >
+                <th class="w-[10%] min-w-[90px] text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider py-2.5 px-4 whitespace-nowrap">
                   Status
                 </th>
-                <th
-                  class="text-right text-xs font-semibold text-[#64748B] uppercase tracking-wide py-3 px-4"
-                >
+                <th class="w-[10%] min-w-[90px] text-right text-[11px] font-semibold text-slate-500 uppercase tracking-wider py-2.5 px-4 whitespace-nowrap">
                   Ditambahkan
                 </th>
               </tr>
             </thead>
-            <tbody>
+            <tbody class="divide-y divide-slate-100/80">
               <tr
                 v-for="asset in recentAssets"
                 :key="asset.id_aset"
-                class="border-b border-[#F8FAFC] hover:bg-[#F8FAFC] transition-colors duration-150"
+                class="hover:bg-slate-50/60 transition-colors duration-150 group"
               >
-                <td class="py-4 px-4">
-                  <div class="flex items-center gap-3">
-                    <span
-                      class="material-symbols-outlined text-[19px] text-[#3B82F6]/70 flex-shrink-0"
-                      style="opacity: 0.7"
-                    >
-                      {{
-                        asset.tipe_perangkat?.toLowerCase().includes('laptop')
-                          ? 'laptop'
-                          : asset.tipe_perangkat?.toLowerCase().includes('server')
-                            ? 'dns'
-                            : asset.tipe_perangkat?.toLowerCase().includes('printer')
-                              ? 'print'
-                              : 'computer'
-                      }}
-                    </span>
-                    <div>
-                      <p class="text-sm font-semibold text-[#1E293B] leading-tight">
+                <td class="py-3 px-4 align-middle">
+                  <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-8 h-8 rounded-lg bg-slate-100/80 text-blue-600 flex items-center justify-center shrink-0 border border-slate-200/60 group-hover:border-blue-200 group-hover:bg-blue-50/60 transition-colors">
+                      <span class="material-symbols-outlined text-[17px]">
+                        {{
+                          asset.tipe_perangkat?.toLowerCase().includes('laptop')
+                            ? 'laptop_mac'
+                            : asset.tipe_perangkat?.toLowerCase().includes('server')
+                              ? 'dns'
+                              : asset.tipe_perangkat?.toLowerCase().includes('printer')
+                                ? 'print'
+                                : 'computer'
+                        }}
+                      </span>
+                    </div>
+                    <div class="min-w-0 pr-2">
+                      <p class="text-xs sm:text-[13px] font-semibold text-slate-900 leading-snug truncate group-hover:text-blue-600 transition-colors" :title="asset.label_aset">
                         {{ asset.label_aset }}
                       </p>
-                      <p class="text-xs text-[#64748B]">ID #{{ asset.id_aset }}</p>
+                      <p class="text-[11px] font-mono text-slate-400 mt-0.5">ID #{{ asset.id_aset }}</p>
                     </div>
                   </div>
                 </td>
-                <td class="py-4 px-4">
-                  <p class="text-sm font-medium text-[#1E293B]">{{ asset.merek }}</p>
-                  <p class="text-xs text-[#64748B]">{{ asset.tipe_perangkat }}</p>
+                <td class="py-3 px-4 align-middle">
+                  <div class="min-w-0">
+                    <p class="text-xs font-medium text-slate-800 truncate" :title="asset.merek || '—'">
+                      {{ asset.merek || '—' }}
+                    </p>
+                    <p v-if="asset.tipe_perangkat" class="text-[11px] text-slate-400 truncate mt-0.5">
+                      {{ asset.tipe_perangkat }}
+                    </p>
+                  </div>
                 </td>
-                <td class="py-4 px-4 font-mono text-xs text-[#64748B] font-medium">
-                  {{ asset.nomor_seri }}
+                <td class="py-3 px-4 align-middle">
+                  <span class="font-mono text-xs text-slate-600 font-medium truncate block" :title="asset.nomor_seri || '—'">
+                    {{ asset.nomor_seri || '—' }}
+                  </span>
                 </td>
-                <td class="py-4 px-4 text-sm font-medium text-[#1E293B]">
-                  {{ asset.kondisi_aset }}
+                <td class="py-3 px-4 align-middle whitespace-nowrap">
+                  <span class="inline-flex items-center gap-1.5 text-xs font-medium text-slate-700">
+                    <span
+                      class="w-1.5 h-1.5 rounded-full shrink-0"
+                      :class="asset.kondisi_aset?.toLowerCase() === 'baik' ? 'bg-emerald-500' : 'bg-amber-500'"
+                    />
+                    {{ asset.kondisi_aset || '—' }}
+                  </span>
                 </td>
-                <td class="py-4 px-4">
+                <td class="py-3 px-4 align-middle whitespace-nowrap">
                   <AppBadge
                     :type="getStatusBadgeType(asset.status_aset)"
                     :text="asset.status_aset"
+                    class="whitespace-nowrap"
                   />
                 </td>
-                <td class="py-4 px-4 text-right text-xs font-medium text-[#64748B]">
-                  {{ formatDate(asset.dibuat_pada) }}
+                <td class="py-3 px-4 align-middle text-right whitespace-nowrap">
+                  <span class="text-xs font-medium text-slate-400">
+                    {{ formatDate(asset.dibuat_pada) }}
+                  </span>
                 </td>
               </tr>
               <tr v-if="recentAssets.length === 0">
                 <td colspan="6" class="py-8 text-center">
-                  <p class="text-sm text-[#64748B]">Belum ada data aset.</p>
+                  <p class="text-xs text-slate-400">Belum ada data aset.</p>
                 </td>
               </tr>
             </tbody>
@@ -1049,22 +1043,22 @@ onUnmounted(() => {
         </div>
       </div>
 
-      <!-- ─── ROW 7: Tabel Tiket Permintaan Terbaru ──────────────── -->
+      <!-- ─── ROW 7: Tabel Tiket Permintaan Terbaru ────────────────── -->
       <div
         v-if="canReadTickets"
         class="shadow-sm rounded-xl border border-[#E2E8F0] bg-white overflow-hidden hover:shadow-md transition-shadow duration-300"
       >
-        <div class="flex items-center justify-between px-4 py-3.5 sm:px-6 sm:py-5 border-b border-[#F1F5F9]">
-          <div class="min-w-0 pr-2">
-            <h3 class="text-base sm:text-lg font-bold text-[#1E293B] truncate">Tiket Terbaru</h3>
-            <p class="text-[11px] sm:text-xs text-[#64748B] mt-0.5 sm:mt-1 truncate">5 Laporan kendala &amp; permintaan IT terbaru</p>
+        <div class="flex items-center justify-between px-4 py-3.5 sm:px-6 sm:py-4 border-b border-slate-100 bg-white">
+          <div class="min-w-0 pr-3">
+            <h3 class="text-sm sm:text-base font-bold text-slate-900 tracking-tight truncate">Tiket Terbaru</h3>
+            <p class="text-[11.5px] sm:text-xs text-slate-500 mt-0.5 truncate">5 Laporan kendala &amp; permintaan IT terbaru</p>
           </div>
           <RouterLink
             to="/tickets"
-            class="inline-flex items-center gap-1 text-[11px] sm:text-xs font-semibold text-[#3B82F6] bg-[#EFF6FF] px-2.5 py-1 sm:px-3.5 sm:py-1.5 rounded-full hover:bg-[#DBEAFE] hover:text-[#2563EB] transition-colors duration-200 shrink-0 active:scale-95 touch-manipulation"
+            class="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-600 bg-blue-50/70 hover:bg-blue-100/80 hover:text-blue-700 px-3 py-1.5 rounded-lg border border-blue-100/60 transition-all duration-150 shrink-0 active:scale-95 touch-manipulation"
           >
             <span>Lihat Semua</span>
-            <span class="material-symbols-outlined text-[13px] sm:text-[14px]">arrow_forward</span>
+            <span class="material-symbols-outlined text-[15px]">arrow_forward</span>
           </RouterLink>
         </div>
 
@@ -1077,7 +1071,7 @@ onUnmounted(() => {
           >
             <!-- Top Row: No. Tiket + Badges (Prioritas & Status) -->
             <div class="flex items-center justify-between gap-2">
-              <span class="font-mono text-xs font-bold text-[#3B82F6] bg-blue-50/70 border border-blue-100 px-2 py-0.5 rounded-md">
+              <span class="font-mono text-xs font-bold text-[#3B82F6] bg-blue-50/70 border border-blue-100 px-2 py-0.5 rounded-md shrink-0 whitespace-nowrap">
                 {{ ticket.nomor_tiket || `TCK-#${ticket.id}` }}
               </span>
 
@@ -1085,12 +1079,12 @@ onUnmounted(() => {
                 <AppBadge
                   :type="getPriorityBadgeType(ticket.prioritas)"
                   :text="ticket.prioritas"
-                  class="text-[10px]"
+                  class="text-[10px] whitespace-nowrap shrink-0"
                 />
                 <AppBadge
                   :type="getTicketStatusBadgeType(ticket.status_tiket)"
                   :text="ticket.status_tiket"
-                  class="text-[10px]"
+                  class="text-[10px] whitespace-nowrap shrink-0"
                 />
               </div>
             </div>
@@ -1126,89 +1120,94 @@ onUnmounted(() => {
 
         <!-- Desktop Table View (>= md) -->
         <div class="hidden md:block overflow-x-auto">
-          <table class="w-full">
-            <thead>
-              <tr class="border-b border-[#F1F5F9]">
-                <th
-                  class="text-left text-xs font-semibold text-[#64748B] uppercase tracking-wide py-3 px-4"
-                >
+          <table class="w-full text-left min-w-[780px]">
+            <thead class="bg-slate-50/60 border-b border-slate-100">
+              <tr>
+                <th class="w-[14%] min-w-[125px] text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider py-2.5 px-4 whitespace-nowrap">
                   No. Tiket
                 </th>
-                <th
-                  class="text-left text-xs font-semibold text-[#64748B] uppercase tracking-wide py-3 px-4"
-                >
+                <th class="w-[38%] min-w-[250px] text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider py-2.5 px-4 whitespace-nowrap">
                   Judul
                 </th>
-                <th
-                  class="text-left text-xs font-semibold text-[#64748B] uppercase tracking-wide py-3 px-4"
-                >
+                <th class="w-[18%] min-w-[135px] text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider py-2.5 px-4 whitespace-nowrap">
                   Assigned To
                 </th>
-                <th
-                  class="text-left text-xs font-semibold text-[#64748B] uppercase tracking-wide py-3 px-4"
-                >
+                <th class="w-[10%] min-w-[85px] text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider py-2.5 px-4 whitespace-nowrap">
                   Prioritas
                 </th>
-                <th
-                  class="text-left text-xs font-semibold text-[#64748B] uppercase tracking-wide py-3 px-4"
-                >
+                <th class="w-[10%] min-w-[95px] text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider py-2.5 px-4 whitespace-nowrap">
                   Status
                 </th>
-                <th
-                  class="text-right text-xs font-semibold text-[#64748B] uppercase tracking-wide py-3 px-4"
-                >
+                <th class="w-[10%] min-w-[90px] text-right text-[11px] font-semibold text-slate-500 uppercase tracking-wider py-2.5 px-4 whitespace-nowrap">
                   Tanggal
                 </th>
               </tr>
             </thead>
-            <tbody>
+            <tbody class="divide-y divide-slate-100/80">
               <tr
                 v-for="ticket in recentTickets"
                 :key="ticket.id"
-                class="border-b border-[#F8FAFC] hover:bg-[#F8FAFC] transition-colors duration-150"
+                class="hover:bg-slate-50/60 transition-colors duration-150 group"
               >
-                <td class="py-4 px-4">
-                  <span class="font-mono text-xs font-bold text-[#3B82F6]">{{
-                    ticket.nomor_tiket || `TCK-#${ticket.id}`
-                  }}</span>
+                <td class="py-3 px-4 align-middle whitespace-nowrap">
+                  <span class="font-mono text-xs font-semibold text-blue-600 bg-blue-50/70 border border-blue-100 px-2 py-0.5 rounded-md inline-block whitespace-nowrap">
+                    {{ ticket.nomor_tiket || `TCK-#${ticket.id}` }}
+                  </span>
                 </td>
-                <td class="py-4 px-4">
-                  <p class="text-sm font-semibold text-[#1E293B] leading-tight">
-                    {{ ticket.judul }}
-                  </p>
-                  <p class="text-xs text-[#64748B]">Pelapor: {{ ticket.pelapor || 'User' }}</p>
-                </td>
-                <td class="py-4 px-4">
-                  <div class="flex items-center gap-2.5">
-                    <span
-                      class="material-symbols-outlined text-[18px] text-[#3B82F6]/70 flex-shrink-0"
-                      style="opacity: 0.7"
-                      >person</span
+                <td class="py-3 px-4 align-middle">
+                  <div class="min-w-0 pr-2">
+                    <p
+                      class="text-xs sm:text-[13px] font-semibold text-slate-900 leading-snug line-clamp-2 group-hover:text-blue-600 transition-colors"
+                      :title="ticket.judul"
                     >
-                    <span class="text-sm font-medium text-[#1E293B]">{{
-                      ticket.assigned_to || 'Belum ditugaskan'
-                    }}</span>
+                      {{ ticket.judul }}
+                    </p>
+                    <p class="text-[11px] text-slate-400 mt-0.5 truncate flex items-center gap-1">
+                      <span>Pelapor:</span>
+                      <span class="font-medium text-slate-600">{{ ticket.pelapor || 'User' }}</span>
+                    </p>
                   </div>
                 </td>
-                <td class="py-4 px-4">
+                <td class="py-3 px-4 align-middle">
+                  <div class="flex items-center gap-1.5 min-w-0">
+                    <span
+                      class="material-symbols-outlined text-[16px] shrink-0"
+                      :class="ticket.assigned_to ? 'text-slate-400' : 'text-amber-500'"
+                    >
+                      {{ ticket.assigned_to ? 'person' : 'person_off' }}
+                    </span>
+                    <span
+                      class="text-xs truncate"
+                      :class="ticket.assigned_to ? 'font-medium text-slate-700' : 'font-semibold text-amber-700'"
+                      :title="ticket.assigned_to || 'Belum ditugaskan'"
+                    >
+                      {{ ticket.assigned_to || 'Belum ditugaskan' }}
+                    </span>
+                  </div>
+                </td>
+                <td class="py-3 px-4 align-middle whitespace-nowrap">
                   <AppBadge
                     :type="getPriorityBadgeType(ticket.prioritas)"
                     :text="ticket.prioritas"
+                    class="whitespace-nowrap"
                   />
                 </td>
-                <td class="py-4 px-4">
+                <td class="py-3 px-4 align-middle whitespace-nowrap">
                   <AppBadge
                     :type="getTicketStatusBadgeType(ticket.status_tiket)"
                     :text="ticket.status_tiket"
+                    class="whitespace-nowrap"
                   />
                 </td>
-                <td class="py-4 px-4 text-right text-xs font-medium text-[#64748B]">
-                  {{ formatDate(ticket.dibuat_pada) }}
+                <td class="py-3 px-4 align-middle text-right whitespace-nowrap">
+                  <span class="text-xs font-medium text-slate-400">
+                    {{ formatDate(ticket.dibuat_pada) }}
+                  </span>
                 </td>
               </tr>
               <tr v-if="recentTickets.length === 0">
                 <td colspan="6" class="py-8 text-center">
-                  <p class="text-sm text-[#64748B]">Belum ada tiket permintaan.</p>
+                  <p class="text-xs text-slate-400">Belum ada tiket permintaan.</p>
                 </td>
               </tr>
             </tbody>

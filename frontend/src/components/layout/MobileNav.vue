@@ -36,7 +36,7 @@ const { isAuthenticated, isAdmin, user } = useAuth();
       </RouterLink>
 
       <RouterLink
-        to="/dashboard"
+        :to="isAdmin ? '/dashboard' : '/my-assets'"
         aria-label="Dashboard"
         class="flex flex-col items-center justify-center gap-0.5 px-3 py-1 rounded-xl text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors min-w-[56px] min-h-[44px] touch-manipulation active:scale-95"
         active-class="text-[#5D87FF] dark:text-indigo-400 font-bold"

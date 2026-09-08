@@ -17,12 +17,13 @@ import {
 } from 'lucide-vue-next';
 
 const route = useRoute();
-const { hasPermission } = useAuth();
+const { hasPermission, isAdmin } = useAuth();
 const isLainnyaOpen = ref(false);
+const dashboardTo = computed(() => (isAdmin.value ? '/dashboard' : '/my-assets'));
 
 const items = computed(() =>
   [
-    { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, permission: 'dashboard' },
+    { to: dashboardTo, label: 'Dashboard', icon: LayoutDashboard, permission: 'dashboard' },
     { to: '/tickets', label: 'Tiket', icon: Ticket, permission: 'tickets' },
     { to: '/assets', label: 'Aset', icon: Laptop, permission: 'assets' },
   ].filter((item) => !item.permission || hasPermission(item.permission)),

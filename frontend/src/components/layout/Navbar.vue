@@ -93,10 +93,9 @@ onUnmounted(() => {
           <kbd class="px-1.5 py-0.5 text-[10px] font-mono font-bold bg-white dark:bg-slate-700 rounded border border-[#E5EAEF] dark:border-slate-600 text-[#64748B] dark:text-slate-300">Ctrl K</kbd>
         </RouterLink>
 
-        <!-- Dashboard (Admin only) -->
+        <!-- Dashboard -->
         <RouterLink
-          v-if="isAdmin"
-          to="/dashboard"
+          :to="isAdmin ? '/dashboard' : '/my-assets'"
           class="hidden md:flex p-2 rounded-xl text-[#64748B] dark:text-slate-400 hover:bg-[#F1F5F9] dark:hover:bg-slate-800 hover:text-[#5D87FF] transition-colors cursor-pointer min-h-[38px] min-w-[38px] items-center justify-center touch-manipulation"
           :title="t('dashboard', 'Dashboard')"
         >

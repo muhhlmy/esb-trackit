@@ -40,6 +40,8 @@ services:
       CORS_ORIGINS: "http://localhost,http://localhost:80,http://localhost:5173"
     ports:
       - "3000:3000"
+    volumes:
+      - backups:/app/storage/backups
 
   frontend:
     build:
@@ -54,4 +56,6 @@ services:
 
 volumes:
   pgdata:
+    driver: local
+  backups:
     driver: local

@@ -103,14 +103,5 @@ export const api = {
   async removeCaseBookmark(caseId) {
     return del(`/api/case-bookmarks/${caseId}`)
   },
-
-  // Templates (endpoint bantu; data fallback tersedia di view)
-  async getTemplates() {
-    return get('/api/templates')
-  },
-
-  // Stats (endpoint bantu; data fallback tersedia di view)
-  async getStats() {
-    return get('/api/stats')
-  },
 }
+

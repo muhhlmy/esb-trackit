@@ -6,6 +6,22 @@ import {
 } from './ticketAccessService.js'
 import { handleTicketEventNotification } from './emailNotificationService.js'
 
+// ============================================================================
+// REALTIME SSE ARCHITECTURE & HORIZONTAL SCALING CONTRACT
+// ============================================================================
+// Currently, realtime event dispatch uses an in-process EventEmitter and Set<Client>
+// registry, designed and optimized for single-instance backend deployments.
+//
+// Scalability Roadmap (Multi-instance):
+// When horizontal multi-instance scaling is required, replace/augment `realtimeEmitter`
+// with a distributed broker adapter:
+//   - Option A (Preferred with PostgreSQL): LISTEN/NOTIFY channel `ticket_events`
+//   - Option B (Enterprise): Redis Pub/Sub / NATS topic
+// The per-client RBAC filtering logic (evaluateTicketEventAudience & resolveLiveClientContexts)
+// MUST remain preserved on each receiving instance before sending SSE frames down the wire.
+// Sensitive ticket payload details MUST NEVER be broadcast without RBAC filtering.
+// ============================================================================
+
 export const realtimeEmitter = new EventEmitter()
 
 const SUPPORTED_TICKET_EVENTS = new Set([

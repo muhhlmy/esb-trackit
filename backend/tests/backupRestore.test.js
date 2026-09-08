@@ -224,3 +224,58 @@ describe('Audit Log Operations', () => {
     assert.equal(requiredOps.length, 12)
   })
 })
+
+// ========== FORMAT-AWARE VALIDATION TESTS ==========
+
+describe('Backup Format-Aware Content Validation', () => {
+  it('should validate valid plain text SQL files without running pg_restore', async () => {
+    const { validateBackupContent } = await import('../src/services/backupService.js')
+    const fs = await import('node:fs/promises')
+    const os = await import('node:os')
+    
+    const tempSqlPath = path.join(os.tmpdir(), `test_valid_${Date.now()}.sql`)
+    await fs.writeFile(tempSqlPath, '-- Test SQL Dump\nCREATE TABLE test (id int);\n', 'utf8')
+    
+    try {
+      const result = await validateBackupContent(tempSqlPath, 'backup.sql')
+      assert.equal(result.valid, true)
+    } finally {
+      await fs.unlink(tempSqlPath).catch(() => {})
+    }
+  })
+
+  it('should reject empty SQL files during content validation', async () => {
+    const { validateBackupContent } = await import('../src/services/backupService.js')
+    const fs = await import('node:fs/promises')
+    const os = await import('node:os')
+    
+    const tempSqlPath = path.join(os.tmpdir(), `test_empty_${Date.now()}.sql`)
+    await fs.writeFile(tempSqlPath, '', 'utf8')
+    
+    try {
+      const result = await validateBackupContent(tempSqlPath, 'empty.sql')
+      assert.equal(result.valid, false)
+      assert.ok(result.error.includes('kosong'))
+    } finally {
+      await fs.unlink(tempSqlPath).catch(() => {})
+    }
+  })
+
+  it('should reject binary files disguised with .sql extension', async () => {
+    const { validateBackupContent } = await import('../src/services/backupService.js')
+    const fs = await import('node:fs/promises')
+    const os = await import('node:os')
+    
+    const tempSqlPath = path.join(os.tmpdir(), `test_fake_${Date.now()}.sql`)
+    const fakeBinary = Buffer.from([0x00, 0x01, 0x02, 0x00])
+    await fs.writeFile(tempSqlPath, fakeBinary)
+    
+    try {
+      const result = await validateBackupContent(tempSqlPath, 'fake.sql')
+      assert.equal(result.valid, false)
+      assert.ok(result.error.includes('biner'))
+    } finally {
+      await fs.unlink(tempSqlPath).catch(() => {})
+    }
+  })
+})

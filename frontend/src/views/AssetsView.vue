@@ -1224,7 +1224,7 @@ onMounted(async () => {
     <!-- ── Modal Form Tambah / Edit Aset IT (Modern SaaS UI) ── -->
     <AppModal
       :is-open="showFormModal"
-      :title="modalMode === 'add' ? 'Tambah Aset IT' : 'Edit Aset IT'"
+      :title="modalMode === 'add' ? 'Tambah Aset IT Baru' : 'Edit Aset IT'"
       :subtitle="
         modalMode === 'add'
           ? 'Tambahkan perangkat baru ke inventaris.'

@@ -112,16 +112,21 @@ const kondisiFilterOptions = [
   ...kondisiOptions.map((k) => ({ value: k, label: k })),
 ]
 
-// Form State
+const kondisiFormOptions = computed(() =>
+  kondisiOptions.map((k) => ({ value: k, label: k })),
+)
+
+// Form State (9 fields)
 const emptyForm = () => ({
-  hostname: '',
-  quantity: 1,
-  tipe_fasilitas: 'Meja',
-  nama_asset: '',
-  ukuran: '',
-  detail: '',
   lokasi: 'Pluit',
   lokasi_detail: '',
+  hostname: '',
+  nomor_tagging: '',
+  quantity: 1,
+  tipe_fasilitas: 'Meja',
+  brand: '',
+  ukuran: '',
+  detail: '',
   kondisi: 'Baik',
 })
 
@@ -134,7 +139,9 @@ const filteredAssets = computed(() => {
     const searchable = [
       asset.id,
       asset.hostname,
+      asset.nomor_tagging,
       asset.nama_asset,
+      asset.brand,
       asset.tipe_fasilitas,
       asset.ukuran,
       asset.detail,
@@ -206,15 +213,17 @@ function openEdit(asset) {
   if (!canWriteAssets.value) return
   modalMode.value = 'edit'
   selectedAsset.value = asset
+  const tagging = asset.hostname || asset.nomor_tagging || ''
   form.value = {
-    hostname: asset.hostname || '',
-    quantity: asset.quantity || 1,
-    tipe_fasilitas: asset.tipe_fasilitas || 'Meja',
-    nama_asset: asset.nama_asset || '',
-    ukuran: asset.ukuran || '',
-    detail: asset.detail || '',
     lokasi: asset.lokasi || 'Pluit',
     lokasi_detail: asset.lokasi_detail || '',
+    hostname: tagging,
+    nomor_tagging: tagging,
+    quantity: asset.quantity || 1,
+    tipe_fasilitas: asset.tipe_fasilitas || 'Meja',
+    brand: asset.brand || asset.nama_asset || '',
+    ukuran: asset.ukuran || '',
+    detail: asset.detail || '',
     kondisi: asset.kondisi || 'Baik',
   }
   modalError.value = ''
@@ -233,8 +242,8 @@ function openDetails(asset) {
   showDetailsModal.value = true
 }
 
-function closeModal() {
-  if (isSubmitting.value) return
+function closeModal(force = false) {
+  if (isSubmitting.value && !force) return
   showFormModal.value = false
   showDeleteModal.value = false
   showDetailsModal.value = false
@@ -244,12 +253,13 @@ function closeModal() {
 
 async function submitForm() {
   modalError.value = ''
-  if (!form.value.hostname) {
-    modalError.value = 'Hostname wajib diisi.'
+  if (!form.value.lokasi) {
+    modalError.value = 'Lokasi wajib diisi.'
     return
   }
-  if (!form.value.nama_asset) {
-    modalError.value = 'Nama Asset wajib diisi.'
+  const tagging = (form.value.hostname || form.value.nomor_tagging || '').trim()
+  if (!tagging) {
+    modalError.value = 'Nomor Tagging wajib diisi.'
     return
   }
   if (!form.value.quantity || form.value.quantity <= 0) {
@@ -257,18 +267,28 @@ async function submitForm() {
     return
   }
   if (!form.value.tipe_fasilitas) {
-    modalError.value = 'Tipe Fasilitas wajib diisi.'
+    modalError.value = 'Tipe wajib diisi.'
     return
   }
-  if (!form.value.lokasi) {
-    modalError.value = 'Lokasi wajib diisi.'
+  if (!form.value.kondisi) {
+    modalError.value = 'Kondisi Aset wajib diisi.'
     return
   }
 
   isSubmitting.value = true
   try {
+    const brandVal = (form.value.brand || '').trim()
+    const tipeVal = (form.value.tipe_fasilitas || '').trim()
+    const computedNamaAsset = brandVal
+      ? (brandVal.toLowerCase().includes(tipeVal.toLowerCase()) ? brandVal : `${tipeVal} ${brandVal}`)
+      : tipeVal
+
     const payload = {
       ...form.value,
+      hostname: tagging,
+      nomor_tagging: tagging,
+      nama_asset: computedNamaAsset,
+      brand: brandVal,
       lokasi: normalizeLocation(form.value.lokasi),
     }
 
@@ -277,7 +297,9 @@ async function submitForm() {
     } else {
       await put(`/api/ga-assets/${selectedAsset.value.id}`, payload)
     }
-    closeModal()
+    showFormModal.value = false
+    selectedAsset.value = null
+    modalError.value = ''
     await fetchData()
   } catch (err) {
     modalError.value = err.message || 'Gagal menyimpan data Aset GA.'
@@ -292,7 +314,9 @@ async function confirmDelete() {
   modalError.value = ''
   try {
     await del(`/api/ga-assets/${selectedAsset.value.id}`)
-    closeModal()
+    showDeleteModal.value = false
+    selectedAsset.value = null
+    modalError.value = ''
     await fetchData()
   } catch (err) {
     modalError.value = err.message || 'Gagal menghapus Aset GA.'
@@ -845,53 +869,71 @@ function formatKondisiPill(kondisi) {
     <AppModal
       :is-open="showFormModal"
       :title="modalMode === 'add' ? 'Tambah Aset GA Baru' : 'Edit Aset GA'"
-      size="md"
+      :subtitle="
+        modalMode === 'add'
+          ? 'Lengkapi data inventaris fasilitas General Affair kantor.'
+          : 'Perbarui informasi dan spesifikasi aset GA.'
+      "
+      size="xl"
       @close="closeModal"
     >
-      <form @submit.prevent="submitForm" class="space-y-4">
+      <form @submit.prevent="submitForm" class="space-y-3.5">
         <div
           v-if="modalError"
-          class="p-3 bg-[#FEF2F2] border border-[#FECACA] rounded-xl text-[#991B1B] text-[12px]"
+          class="p-2.5 bg-[#FEF2F2] border border-[#FECACA] rounded-xl text-[#991B1B] text-[12px]"
         >
           {{ modalError }}
         </div>
 
-        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <!-- Hostname -->
-          <div>
-            <label for="ga-hostname" class="block text-[12px] font-bold text-[#1E293B] mb-1">
-              Hostname / Kode Aset <span class="text-rose-500">*</span>
+        <div class="grid grid-cols-1 sm:grid-cols-12 gap-x-3.5 gap-y-3">
+          <!-- 1. Lokasi -->
+          <div class="sm:col-span-4">
+            <label class="block text-[12px] font-semibold text-[#1E293B] mb-1">
+              Lokasi <span class="text-rose-500">*</span>
+            </label>
+            <SearchableSelect
+              v-model="form.lokasi"
+              :options="locationOptions"
+              value-key="value"
+              label-key="label"
+              placeholder="Pilih Lokasi"
+              height-class="h-9.5"
+              teleport
+            />
+          </div>
+
+          <!-- 2. Lokasi Detail -->
+          <div class="sm:col-span-4">
+            <label for="ga-lokasi-detail" class="block text-[12px] font-semibold text-[#1E293B] mb-1">
+              Lokasi Detail
             </label>
             <input
-              id="ga-hostname"
+              id="ga-lokasi-detail"
+              v-model="form.lokasi_detail"
+              type="text"
+              placeholder="Contoh: Lantai 2 / Ruang Rapat"
+              class="w-full h-9.5 px-3 text-[12.5px] rounded-xl border border-[#E2E8F0] bg-white focus:border-[#2563EB] focus:outline-none transition-all shadow-2xs"
+            />
+          </div>
+
+          <!-- 3. Nomor Tagging -->
+          <div class="sm:col-span-4">
+            <label for="ga-nomor-tagging" class="block text-[12px] font-semibold text-[#1E293B] mb-1">
+              Nomor Tagging <span class="text-rose-500">*</span>
+            </label>
+            <input
+              id="ga-nomor-tagging"
               v-model="form.hostname"
               type="text"
               required
               placeholder="Contoh: GA-PL-001"
-              class="w-full h-10 px-3 text-[12.5px] rounded-xl border border-[#E2E8F0] bg-white focus:border-[#2563EB] focus:outline-none"
+              class="w-full h-9.5 px-3 text-[12.5px] rounded-xl border border-[#E2E8F0] bg-white focus:border-[#2563EB] focus:outline-none transition-all shadow-2xs font-mono"
             />
           </div>
 
-          <!-- Nama Asset -->
-          <div>
-            <label for="ga-nama-asset" class="block text-[12px] font-bold text-[#1E293B] mb-1">
-              Nama Asset <span class="text-rose-500">*</span>
-            </label>
-            <input
-              id="ga-nama-asset"
-              v-model="form.nama_asset"
-              type="text"
-              required
-              placeholder="Contoh: Meja Kerja Kayu Jati"
-              class="w-full h-10 px-3 text-[12.5px] rounded-xl border border-[#E2E8F0] bg-white focus:border-[#2563EB] focus:outline-none"
-            />
-          </div>
-        </div>
-
-        <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
-          <!-- Quantity -->
-          <div>
-            <label for="ga-quantity" class="block text-[12px] font-bold text-[#1E293B] mb-1">
+          <!-- 4. Quantity -->
+          <div class="sm:col-span-2">
+            <label for="ga-quantity" class="block text-[12px] font-semibold text-[#1E293B] mb-1">
               Quantity <span class="text-rose-500">*</span>
             </label>
             <input
@@ -900,95 +942,83 @@ function formatKondisiPill(kondisi) {
               type="number"
               min="1"
               required
-              class="w-full h-10 px-3 text-[12.5px] rounded-xl border border-[#E2E8F0] bg-white focus:border-[#2563EB] focus:outline-none"
+              placeholder="1"
+              class="w-full h-9.5 px-3 text-[12.5px] rounded-xl border border-[#E2E8F0] bg-white focus:border-[#2563EB] focus:outline-none transition-all shadow-2xs"
             />
           </div>
 
-          <!-- Tipe Fasilitas -->
-          <div>
-            <label class="block text-[12px] font-bold text-[#1E293B] mb-1">
-              Tipe Fasilitas <span class="text-rose-500">*</span>
+          <!-- 5. Tipe -->
+          <div class="sm:col-span-4">
+            <label class="block text-[12px] font-semibold text-[#1E293B] mb-1">
+              Tipe <span class="text-rose-500">*</span>
             </label>
             <SearchableSelect
               v-model="form.tipe_fasilitas"
               :options="tipeOptions"
               value-key="value"
               label-key="label"
-              placeholder="Pilih Fasilitas"
+              placeholder="Pilih Tipe"
+              height-class="h-9.5"
+              teleport
             />
           </div>
 
-          <!-- Kondisi -->
-          <div>
-            <label for="ga-kondisi" class="block text-[12px] font-bold text-[#1E293B] mb-1">
-              Kondisi <span class="text-rose-500">*</span>
+          <!-- 6. Brand -->
+          <div class="sm:col-span-3">
+            <label for="ga-brand" class="block text-[12px] font-semibold text-[#1E293B] mb-1">
+              Brand
             </label>
-            <select
-              id="ga-kondisi"
-              v-model="form.kondisi"
-              class="w-full h-10 px-3 text-[12.5px] rounded-xl border border-[#E2E8F0] bg-white focus:border-[#2563EB] focus:outline-none cursor-pointer"
-            >
-              <option v-for="k in kondisiOptions" :key="k" :value="k">{{ k }}</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <!-- Lokasi Utama -->
-          <div>
-            <label class="block text-[12px] font-bold text-[#1E293B] mb-1">
-              Lokasi Utama <span class="text-rose-500">*</span>
-            </label>
-            <SearchableSelect
-              v-model="form.lokasi"
-              :options="locationOptions"
-              value-key="value"
-              label-key="label"
-              placeholder="Pilih Lokasi"
-            />
-          </div>
-
-          <!-- Lokasi Detail -->
-          <div>
-            <label for="ga-lokasi-detail" class="block text-[12px] font-bold text-[#1E293B] mb-1"
-              >Lokasi Detail</label
-            >
             <input
-              id="ga-lokasi-detail"
-              v-model="form.lokasi_detail"
+              id="ga-brand"
+              v-model="form.brand"
               type="text"
-              placeholder="Contoh: Lantai 2 / Ruang Rapat Utama"
-              class="w-full h-10 px-3 text-[12.5px] rounded-xl border border-[#E2E8F0] bg-white focus:border-[#2563EB] focus:outline-none"
+              placeholder="Contoh: Daikin, IKEA, Informa"
+              class="w-full h-9.5 px-3 text-[12.5px] rounded-xl border border-[#E2E8F0] bg-white focus:border-[#2563EB] focus:outline-none transition-all shadow-2xs"
             />
           </div>
-        </div>
 
-        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <!-- Ukuran -->
-          <div>
-            <label for="ga-ukuran" class="block text-[12px] font-bold text-[#1E293B] mb-1"
-              >Ukuran / Dimensi</label
-            >
+          <!-- 7. Ukuran -->
+          <div class="sm:col-span-3">
+            <label for="ga-ukuran" class="block text-[12px] font-semibold text-[#1E293B] mb-1">
+              Ukuran
+            </label>
             <input
               id="ga-ukuran"
               v-model="form.ukuran"
               type="text"
-              placeholder="Contoh: 120x60x75 cm / 2 PK"
-              class="w-full h-10 px-3 text-[12.5px] rounded-xl border border-[#E2E8F0] bg-white focus:border-[#2563EB] focus:outline-none"
+              placeholder="Contoh: 120x60 cm / 2 PK"
+              class="w-full h-9.5 px-3 text-[12.5px] rounded-xl border border-[#E2E8F0] bg-white focus:border-[#2563EB] focus:outline-none transition-all shadow-2xs"
             />
           </div>
 
-          <!-- Detail Spesifikasi -->
-          <div>
-            <label for="ga-detail" class="block text-[12px] font-bold text-[#1E293B] mb-1"
-              >Detail / Catatan</label
-            >
+          <!-- 8. Detail Aset -->
+          <div class="sm:col-span-8">
+            <label for="ga-detail" class="block text-[12px] font-semibold text-[#1E293B] mb-1">
+              Detail Aset
+            </label>
             <input
               id="ga-detail"
               v-model="form.detail"
               type="text"
-              placeholder="Contoh: Warna Hitam, Daikin Inverter"
-              class="w-full h-10 px-3 text-[12.5px] rounded-xl border border-[#E2E8F0] bg-white focus:border-[#2563EB] focus:outline-none"
+              placeholder="Contoh: Warna Hitam, Kayu Jati"
+              class="w-full h-9.5 px-3 text-[12.5px] rounded-xl border border-[#E2E8F0] bg-white focus:border-[#2563EB] focus:outline-none transition-all shadow-2xs"
+            />
+          </div>
+
+          <!-- 9. Kondisi Aset -->
+          <div class="sm:col-span-4">
+            <label for="ga-kondisi" class="block text-[12px] font-semibold text-[#1E293B] mb-1">
+              Kondisi Aset <span class="text-rose-500">*</span>
+            </label>
+            <SearchableSelect
+              id="ga-kondisi"
+              v-model="form.kondisi"
+              :options="kondisiFormOptions"
+              value-key="value"
+              label-key="label"
+              placeholder="Pilih Kondisi"
+              height-class="h-9.5"
+              teleport
             />
           </div>
         </div>
@@ -998,17 +1028,17 @@ function formatKondisiPill(kondisi) {
           <button
             type="button"
             @click="closeModal"
-            class="h-10 px-4 rounded-xl border border-[#E2E8F0] text-[12.5px] font-semibold text-[#64748B] hover:bg-[#F8FAFC]"
+            class="h-9.5 px-4 rounded-xl border border-[#E2E8F0] text-[12.5px] font-semibold text-[#64748B] hover:bg-[#F8FAFC]"
           >
             Batal
           </button>
           <button
             type="submit"
             :disabled="isSubmitting"
-            class="h-10 px-5 rounded-xl bg-[#2563EB] text-[12.5px] font-bold text-white shadow-2xs hover:bg-[#1D4ED8] disabled:opacity-50 flex items-center gap-2"
+            class="h-9.5 px-5 rounded-xl bg-[#2563EB] text-[12.5px] font-bold text-white shadow-2xs hover:bg-[#1D4ED8] disabled:opacity-50 flex items-center gap-2"
           >
             <span v-if="isSubmitting" class="animate-spin text-[16px]">hourglass_empty</span>
-            <span>{{ isSubmitting ? 'Menyimpan...' : 'Simpan Aset GA' }}</span>
+            <span>{{ isSubmitting ? 'Menyimpan...' : (modalMode === 'add' ? 'Simpan Aset GA' : 'Perbarui Aset GA') }}</span>
           </button>
         </div>
       </form>
@@ -1019,7 +1049,7 @@ function formatKondisiPill(kondisi) {
       <div class="space-y-4">
         <p class="text-[13px] text-[#475569]">
           Apakah Anda yakin ingin menghapus Aset GA
-          <strong class="text-[#0F172A]">{{ selectedAsset?.nama_asset }}</strong> ({{
+          <strong class="text-[#0F172A]">{{ selectedAsset?.nama_asset || selectedAsset?.brand }}</strong> ({{
             selectedAsset?.hostname
           }})?
         </p>
@@ -1049,46 +1079,58 @@ function formatKondisiPill(kondisi) {
       <div v-if="selectedAsset" class="space-y-4">
         <div class="flex items-center gap-3 p-3 bg-[#F8FAFC] rounded-xl border border-[#E2E8F0]">
           <div
-            class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#EFF6FF] text-[#2563EB]"
+            class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#EFF6FF] text-[#2563EB]"
           >
-            <span class="material-symbols-outlined text-[22px]">{{
+            <span class="material-symbols-outlined text-[24px]">{{
               getGaIcon(selectedAsset.tipe_fasilitas)
             }}</span>
           </div>
-          <div>
-            <h3 class="font-bold text-[#0F172A] text-[14px]">{{ selectedAsset.nama_asset }}</h3>
+          <div class="min-w-0 flex-1">
+            <h3 class="font-bold text-[#0F172A] text-[14px] truncate">
+              {{ selectedAsset.brand || selectedAsset.nama_asset || selectedAsset.tipe_fasilitas }}
+            </h3>
             <p class="font-mono text-[11px] text-[#64748B]">{{ selectedAsset.hostname }}</p>
           </div>
         </div>
 
-        <div class="grid grid-cols-2 gap-4 text-[12.5px]">
+        <div class="grid grid-cols-2 gap-3.5 text-[12.5px]">
           <div>
-            <span class="text-[#64748B] block text-[11px] font-medium">Quantity</span>
-            <span class="font-bold text-[#0F172A]">{{ selectedAsset.quantity }} Unit</span>
-          </div>
-
-          <div>
-            <span class="text-[#64748B] block text-[11px] font-medium">Tipe Fasilitas</span>
-            <span class="font-semibold text-[#1E293B]">{{ selectedAsset.tipe_fasilitas }}</span>
-          </div>
-
-          <div>
-            <span class="text-[#64748B] block text-[11px] font-medium">Lokasi</span>
+            <span class="text-[#64748B] block text-[11px] font-medium">1. Lokasi</span>
             <span class="font-semibold text-[#1E293B]">{{ selectedAsset.lokasi }}</span>
           </div>
 
           <div>
-            <span class="text-[#64748B] block text-[11px] font-medium">Lokasi Detail</span>
+            <span class="text-[#64748B] block text-[11px] font-medium">2. Lokasi Detail</span>
             <span class="text-[#1E293B]">{{ selectedAsset.lokasi_detail || '—' }}</span>
           </div>
 
           <div>
-            <span class="text-[#64748B] block text-[11px] font-medium">Ukuran / Dimensi</span>
+            <span class="text-[#64748B] block text-[11px] font-medium">3. Nomor Tagging</span>
+            <span class="font-mono text-[#1E293B]">{{ selectedAsset.hostname || '—' }}</span>
+          </div>
+
+          <div>
+            <span class="text-[#64748B] block text-[11px] font-medium">4. Quantity</span>
+            <span class="font-bold text-[#0F172A]">{{ selectedAsset.quantity }} Unit</span>
+          </div>
+
+          <div>
+            <span class="text-[#64748B] block text-[11px] font-medium">5. Tipe</span>
+            <span class="font-semibold text-[#1E293B]">{{ selectedAsset.tipe_fasilitas }}</span>
+          </div>
+
+          <div>
+            <span class="text-[#64748B] block text-[11px] font-medium">6. Brand</span>
+            <span class="text-[#1E293B]">{{ selectedAsset.brand || selectedAsset.nama_asset || '—' }}</span>
+          </div>
+
+          <div>
+            <span class="text-[#64748B] block text-[11px] font-medium">7. Ukuran</span>
             <span class="text-[#1E293B]">{{ selectedAsset.ukuran || '—' }}</span>
           </div>
 
           <div>
-            <span class="text-[#64748B] block text-[11px] font-medium">Kondisi</span>
+            <span class="text-[#64748B] block text-[11px] font-medium">9. Kondisi Aset</span>
             <span
               class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold mt-0.5"
               :class="[
@@ -1107,7 +1149,7 @@ function formatKondisiPill(kondisi) {
 
         <div class="pt-2 border-t border-[#E2E8F0]">
           <span class="text-[#64748B] block text-[11px] font-medium"
-            >Detail / Catatan Spesifikasi</span
+            >8. Detail Aset</span
           >
           <p
             class="text-[12.5px] text-[#1E293B] mt-1 p-3 bg-[#F8FAFC] rounded-xl border border-[#E2E8F0]"

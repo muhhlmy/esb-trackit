@@ -25,4 +25,24 @@ describe('Aset GA Data & Validation Logic', () => {
     const isValid = invalidQty > 0;
     assert.equal(isValid, false);
   });
+
+  test('harus menerima nomor_tagging, brand, dan tipe sebagai alias field GA Asset', () => {
+    const assetPayload = {
+      nomor_tagging: 'GA-PL-002',
+      quantity: 5,
+      tipe: 'Kursi',
+      brand: 'Informa',
+      lokasi: 'GS',
+      kondisi: 'Baik'
+    };
+
+    const hostname = assetPayload.hostname || assetPayload.nomor_tagging;
+    const tipeFasilitas = assetPayload.tipe_fasilitas || assetPayload.tipe;
+    const namaAsset = assetPayload.nama_asset || assetPayload.brand || assetPayload.nama;
+
+    assert.equal(hostname, 'GA-PL-002');
+    assert.equal(tipeFasilitas, 'Kursi');
+    assert.equal(namaAsset, 'Informa');
+    assert.equal(normalizeLocation(assetPayload.lokasi), 'Gading Serpong');
+  });
 });

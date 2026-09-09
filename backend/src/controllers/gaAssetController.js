@@ -112,10 +112,10 @@ export async function fetchGaAsset(req, res) {
 export async function addGaAsset(req, res) {
   try {
     const body = req.body || {};
-    const hostname = cleanText(body.hostname);
+    const hostname = cleanText(body.hostname || body.nomor_tagging);
     const quantity = parseQuantity(body.quantity);
-    const tipeFasilitas = cleanText(body.tipe_fasilitas);
-    const namaAsset = cleanText(body.nama_asset || body.nama);
+    const tipeFasilitas = cleanText(body.tipe_fasilitas || body.tipe);
+    const namaAsset = cleanText(body.nama_asset || body.brand || body.nama);
     const ukuran = cleanText(body.ukuran);
     const detail = cleanText(body.detail);
     const lokasi = normalizeLocation(cleanText(body.lokasi));
@@ -172,10 +172,10 @@ export async function replaceGaAsset(req, res) {
     }
 
     const body = req.body || {};
-    const hostname = cleanText(body.hostname);
+    const hostname = cleanText(body.hostname || body.nomor_tagging);
     const quantity = parseQuantity(body.quantity);
-    const tipeFasilitas = cleanText(body.tipe_fasilitas);
-    const namaAsset = cleanText(body.nama_asset || body.nama);
+    const tipeFasilitas = cleanText(body.tipe_fasilitas || body.tipe);
+    const namaAsset = cleanText(body.nama_asset || body.brand || body.nama);
     const ukuran = cleanText(body.ukuran);
     const detail = cleanText(body.detail);
     const lokasi = normalizeLocation(cleanText(body.lokasi));

@@ -18,6 +18,7 @@ const props = defineProps({
   heightClass: { type: String, default: 'h-10' },
   triggerClass: { type: String, default: '' },
   dropDirection: { type: String, default: 'down' }, // 'down' | 'up'
+  teleport: { type: Boolean, default: false },
 })
 
 const emit = defineEmits(['update:modelValue'])
@@ -30,6 +31,28 @@ const activeIndex = ref(-1)
 const containerRef = ref(null)
 const triggerRef = ref(null)
 const searchInputRef = ref(null)
+const dropdownRef = ref(null)
+const dropdownStyle = ref({})
+
+function updateDropdownPosition() {
+  if (!props.teleport || !triggerRef.value) return
+  const rect = triggerRef.value.getBoundingClientRect()
+  const spaceBelow = window.innerHeight - rect.bottom
+  const spaceAbove = rect.top
+  const placeAbove =
+    props.dropDirection === 'up' ||
+    (props.dropDirection !== 'down' && spaceBelow < 230 && spaceAbove > spaceBelow)
+
+  dropdownStyle.value = {
+    position: 'fixed',
+    left: `${rect.left}px`,
+    width: `${rect.width}px`,
+    zIndex: 9999,
+    ...(placeAbove
+      ? { bottom: `${window.innerHeight - rect.top + 4}px`, top: 'auto' }
+      : { top: `${rect.bottom + 4}px`, bottom: 'auto' }),
+  }
+}
 
 const selectedOption = computed(() => {
   const found = props.options.find((option) => option[props.valueKey] === props.modelValue)
@@ -197,25 +220,50 @@ function handleSearchKeydown(event) {
 }
 
 function handleClickOutside(event) {
-  if (containerRef.value && !containerRef.value.contains(event.target)) {
+  const inContainer = containerRef.value && containerRef.value.contains(event.target)
+  const inDropdown = dropdownRef.value && dropdownRef.value.contains(event.target)
+  if (!inContainer && !inDropdown) {
     closeDropdown({ restoreFocus: false })
   }
 }
 
 watch(isOpen, async (open) => {
-  if (!open) return
+  if (!open) {
+    if (props.teleport) {
+      window.removeEventListener('scroll', updateDropdownPosition, true)
+      window.removeEventListener('resize', updateDropdownPosition)
+    }
+    return
+  }
   searchQuery.value = ''
+  if (props.teleport) {
+    updateDropdownPosition()
+    window.addEventListener('scroll', updateDropdownPosition, true)
+    window.addEventListener('resize', updateDropdownPosition)
+  }
   await nextTick()
+  if (props.teleport) {
+    updateDropdownPosition()
+  }
   searchInputRef.value?.focus()
 })
 
 watch(filteredOptions, () => {
   if (!isOpen.value) return
   setInitialActiveIndex()
+  if (props.teleport) {
+    nextTick(() => updateDropdownPosition())
+  }
 })
 
 onMounted(() => document.addEventListener('click', handleClickOutside))
-onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside))
+onBeforeUnmount(() => {
+  document.removeEventListener('click', handleClickOutside)
+  if (props.teleport) {
+    window.removeEventListener('scroll', updateDropdownPosition, true)
+    window.removeEventListener('resize', updateDropdownPosition)
+  }
+})
 </script>
 
 <template>
@@ -264,11 +312,17 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside))
       <span aria-hidden="true" class="material-symbols-outlined text-[14px]">close</span>
     </button>
 
-    <div
-      v-if="isOpen"
-      class="absolute left-0 right-0 z-50 flex flex-col rounded-lg border border-[#E8EDF3] bg-white shadow-xl animate-fade-in"
-      :class="dropDirection === 'up' ? 'bottom-full mb-1' : 'top-full mt-1'"
-    >
+    <Teleport to="body" :disabled="!teleport">
+      <div
+        v-if="isOpen"
+        ref="dropdownRef"
+        :style="teleport ? dropdownStyle : {}"
+        class="z-50 flex flex-col rounded-lg border border-[#E8EDF3] bg-white shadow-xl animate-fade-in"
+        :class="[
+          teleport ? '' : 'absolute left-0 right-0',
+          teleport ? '' : (dropDirection === 'up' ? 'bottom-full mb-1' : 'top-full mt-1'),
+        ]"
+      >
       <div class="relative border-b border-[#F1F5F9] p-1.5">
         <span
           aria-hidden="true"
@@ -337,6 +391,7 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside))
         </template>
       </ul>
     </div>
+    </Teleport>
   </div>
 </template>
 

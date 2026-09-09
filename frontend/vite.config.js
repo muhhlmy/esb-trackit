@@ -64,7 +64,7 @@ function securityHeadersPlugin(devHeaders) {
     },
     configurePreviewServer(server) {
       server.middlewares.use(blockSensitiveDotfiles)
-      server.middlewares.use(applyHeaders)
+      server.middlewares.use(applyHeaders(FRONTEND_SECURITY_HEADERS))
     },
   }
 }

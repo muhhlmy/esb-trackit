@@ -123,11 +123,21 @@ export function createBoundedRateLimiter({
   return middleware
 }
 
-export const apiRateLimiter = createBoundedRateLimiter({
+export const publicApiRateLimiter = createBoundedRateLimiter({
+  windowMs: env.rateLimit?.windowMs || 60_000,
+  max: (env.rateLimit?.max || 150) * 2, // Generous IP-level global abuse guard
+  keyGenerator: (req) => `api:ip:${getClientIp(req)}`,
+  message: 'Terlalu banyak permintaan dari alamat IP ini. Silakan coba lagi nanti.',
+})
+
+export const authenticatedUserRateLimiter = createBoundedRateLimiter({
   windowMs: env.rateLimit?.windowMs || 60_000,
   max: env.rateLimit?.max || 150,
   keyGenerator: (req) => (req.user?.id ? `api:user:${req.user.id}` : `api:ip:${getClientIp(req)}`),
+  message: 'Terlalu banyak permintaan API. Silakan coba lagi nanti.',
 })
+
+export const apiRateLimiter = publicApiRateLimiter
 
 export const loginRateLimiter = createBoundedRateLimiter({
   windowMs: 15 * 60_000,

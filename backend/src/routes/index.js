@@ -21,51 +21,58 @@ import { listPublicKbCategories } from '../controllers/kbCategoryController.js'
 import { kbSearchLogRouter } from './kbSearchLogRoutes.js'
 import { listPopularKbSearches } from '../controllers/kbSearchLogController.js'
 import { caseBookmarkRouter } from './caseBookmarkRoutes.js'
+import { shipmentRouter } from './shipmentRoutes.js'
 import authRoutes from './authRoutes.js'
-import { apiRateLimiter } from '../middleware/rateLimitMiddleware.js'
+import { apiRateLimiter, authenticatedUserRateLimiter } from '../middleware/rateLimitMiddleware.js'
 
 export const router = Router()
 
+// Layer 1: Public/Global IP abuse protection
 router.use('/health',     healthRouter)
 router.use('/api',        apiRateLimiter)
 router.use('/api/auth',   authRoutes)
 
+// Layer 2: Authenticated per-user rate limiting middleware combination
+const authStack = [authenticateToken, authenticatedUserRateLimiter]
+
 // Canonical RESTful endpoints & backward-compatible aliases
-router.use('/api/assets',        authenticateToken, assetRouter)
-router.use('/api/ga-assets',     authenticateToken, gaAssetRouter)
-router.use('/api/assets-ga',     authenticateToken, gaAssetRouter)
-router.use('/api/assets_ga',     authenticateToken, gaAssetRouter) // Deprecated snake_case alias
-router.use('/api/ops-assets',    authenticateToken, opsAssetRouter)
-router.use('/api/assets-ops',    authenticateToken, opsAssetRouter)
-router.use('/api/assets_ops',    authenticateToken, opsAssetRouter) // Deprecated snake_case alias
-router.use('/api/tickets',       authenticateToken, ticketRouter)
-router.use('/api/ticket-queues', authenticateToken, queueRouter)
-router.use('/api/export',        authenticateToken, exportRouter)
+router.use('/api/assets',        authStack, assetRouter)
+router.use('/api/ga-assets',     authStack, gaAssetRouter)
+router.use('/api/assets-ga',     authStack, gaAssetRouter)
+router.use('/api/assets_ga',     authStack, gaAssetRouter) // Deprecated snake_case alias
+router.use('/api/ops-assets',    authStack, opsAssetRouter)
+router.use('/api/assets-ops',    authStack, opsAssetRouter)
+router.use('/api/assets_ops',    authStack, opsAssetRouter) // Deprecated snake_case alias
+router.use('/api/tickets',       authStack, ticketRouter)
+router.use('/api/ticket-queues', authStack, queueRouter)
+router.use('/api/shipments',     authStack, shipmentRouter)
+router.use('/api/pengiriman',    authStack, shipmentRouter)
+router.use('/api/export',        authStack, exportRouter)
 
 // Public Help Center FAQ (read-only, published only, no auth)
 router.get('/api/faqs/public',  listPublicFaqs)
-router.use('/api/faqs',         authenticateToken, faqRouter)
+router.use('/api/faqs',         authStack, faqRouter)
 
 // Public Help Center Cases/Artikel (read-only, published only, no auth)
 router.get('/api/cases/public', listPublicCases)
-router.use('/api/cases',        authenticateToken, caseRouter)
+router.use('/api/cases',        authStack, caseRouter)
 
 // Public Help Center KB Categories/topic cards (read-only, published only, no auth)
 router.get('/api/kb-categories/public', listPublicKbCategories)
-router.use('/api/kb-categories',        authenticateToken, kbCategoryRouter)
+router.use('/api/kb-categories',        authStack, kbCategoryRouter)
 
 // Popular searches Help Center (read-only, no auth) + search logging & stats
 router.get('/api/kb-search-logs/popular', listPopularKbSearches)
-router.use('/api/kb-search-logs',         authenticateToken, kbSearchLogRouter)
+router.use('/api/kb-search-logs',         authStack, kbSearchLogRouter)
 
 // Case bookmarks per-user (selalu dalam konteks user login)
-router.use('/api/case-bookmarks', authenticateToken, caseBookmarkRouter)
+router.use('/api/case-bookmarks', authStack, caseBookmarkRouter)
 
 const requireAdmin = authorizeRoles('admin', 'super admin', 'superadmin')
 
-router.use('/api/employees', authenticateToken, requireAdmin, employeeRouter) // Canonical endpoint
-router.use('/api/karyawan',  authenticateToken, requireAdmin, employeeRouter) // Legacy alias
-router.use('/api/users',     authenticateToken, requireAdmin, userRouter)
-router.use('/api/logs',      authenticateToken, requireAdmin, logRouter)
-router.use('/api/import',    authenticateToken, requireAdmin, importRouter)
-router.use('/api/admin/database', authenticateToken, backupRouter)
+router.use('/api/employees', authStack, requireAdmin, employeeRouter) // Canonical endpoint
+router.use('/api/karyawan',  authStack, requireAdmin, employeeRouter) // Legacy alias
+router.use('/api/users',     authStack, requireAdmin, userRouter)
+router.use('/api/logs',      authStack, requireAdmin, logRouter)
+router.use('/api/import',    authStack, requireAdmin, importRouter)
+router.use('/api/admin/database', authStack, backupRouter)

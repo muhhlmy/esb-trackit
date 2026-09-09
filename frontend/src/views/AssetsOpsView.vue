@@ -5,7 +5,6 @@ import { useAuth } from '../composables/useAuth.js'
 import { animateStagger } from '../composables/useGsap.js'
 import { normalizeLocation } from '../utils/locationNormalizer.js'
 import AppModal from '../components/ui/AppModal.vue'
-import AppBadge from '../components/ui/AppBadge.vue'
 import SearchableSelect from '../components/ui/SearchableSelect.vue'
 import CustomSelect from '../components/ui/CustomSelect.vue'
 import AppRowActions from '../components/ui/AppRowActions.vue'
@@ -17,7 +16,11 @@ import SkeletonAvatar from '../components/ui/skeleton/SkeletonAvatar.vue'
 const { get, post, put, del } = useApi()
 const { isAdmin, isSuperAdmin, hasWritePermission } = useAuth()
 const canWriteAssets = computed(
-  () => isAdmin.value || isSuperAdmin.value || hasWritePermission('assets_ops') || hasWritePermission('assets'),
+  () =>
+    isAdmin.value ||
+    isSuperAdmin.value ||
+    hasWritePermission('assets_ops') ||
+    hasWritePermission('assets'),
 )
 
 const assets = ref([])
@@ -85,10 +88,9 @@ const locationOptions = computed(() =>
 )
 
 const kategoriSelectOptions = computed(() =>
-  mergeOptions(
-    kategoriOptions,
-    [...assets.value.map((a) => a.kategori), form.value.kategori],
-  ).map((k) => ({ value: k, label: k })),
+  mergeOptions(kategoriOptions, [...assets.value.map((a) => a.kategori), form.value.kategori]).map(
+    (k) => ({ value: k, label: k }),
+  ),
 )
 
 // Filter option lists (include an empty "all" entry for CustomSelect)
@@ -382,8 +384,12 @@ function formatDate(dateStr) {
       <!-- Row 1: Page Title & Primary CTA -->
       <div class="flex items-center justify-between gap-2.5">
         <div class="min-w-0">
-          <h2 class="text-base sm:text-lg font-bold text-[#0F172A] tracking-tight truncate">Aset OPS</h2>
-          <p class="text-[11px] sm:text-xs text-[#64748B] mt-0.5 leading-normal line-clamp-1 sm:line-clamp-none">
+          <h2 class="text-base sm:text-lg font-bold text-[#0F172A] tracking-tight truncate">
+            Aset OPS
+          </h2>
+          <p
+            class="text-[11px] sm:text-xs text-[#64748B] mt-0.5 leading-normal line-clamp-1 sm:line-clamp-none"
+          >
             Kelola perangkat & mesin operasional outlet / store (POS, KIOSK, Payment, Display).
           </p>
         </div>
@@ -402,7 +408,9 @@ function formatDate(dateStr) {
       </div>
 
       <!-- Row 2: Search, Filters & Actions -->
-      <div class="flex flex-col sm:flex-row sm:items-center gap-2 w-full min-w-0 pt-2.5 border-t border-[#F1F5F9]">
+      <div
+        class="flex flex-col sm:flex-row sm:items-center gap-2 w-full min-w-0 pt-2.5 border-t border-[#F1F5F9]"
+      >
         <!-- Search Input -->
         <div class="relative w-full sm:flex-1 sm:min-w-[200px]">
           <span
@@ -590,7 +598,8 @@ function formatDate(dateStr) {
           </span>
           <h3 class="text-[14px] font-bold text-[#0F172A] mt-1">Belum Ada Aset OPS</h3>
           <p class="text-[11.5px] text-[#64748B] leading-relaxed">
-            Belum ada perangkat operasional yang terdaftar dalam inventaris atau sesuai dengan kata kunci pencarian.
+            Belum ada perangkat operasional yang terdaftar dalam inventaris atau sesuai dengan kata
+            kunci pencarian.
           </p>
           <button
             v-if="canWriteAssets"
@@ -643,7 +652,10 @@ function formatDate(dateStr) {
             <div class="flex items-center gap-1.5 shrink-0 self-start">
               <div
                 class="flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-bold"
-                :class="[formatStatusPillOps(asset.status).bg, formatStatusPillOps(asset.status).text]"
+                :class="[
+                  formatStatusPillOps(asset.status).bg,
+                  formatStatusPillOps(asset.status).text,
+                ]"
               >
                 <span
                   class="h-1.5 w-1.5 rounded-full shrink-0"
@@ -682,7 +694,9 @@ function formatDate(dateStr) {
               >
               <span
                 class="text-[12px] mt-0.5 truncate block"
-                :class="asset.pic ? 'font-medium text-[#1E293B]' : 'text-[#94A3B8] italic font-normal'"
+                :class="
+                  asset.pic ? 'font-medium text-[#1E293B]' : 'text-[#94A3B8] italic font-normal'
+                "
                 :title="asset.pic || 'Belum ada PIC'"
               >
                 {{ asset.pic || 'Belum ada PIC' }}
@@ -762,7 +776,9 @@ function formatDate(dateStr) {
             </span>
             <span
               class="text-[11.5px] mt-0.5 truncate block w-full"
-              :class="asset.pic ? 'font-medium text-[#64748B]' : 'text-[#94A3B8] italic font-normal'"
+              :class="
+                asset.pic ? 'font-medium text-[#64748B]' : 'text-[#94A3B8] italic font-normal'
+              "
               :title="asset.pic || 'Belum ada PIC'"
             >
               {{ asset.pic ? 'PIC: ' + asset.pic : 'Belum ada PIC' }}
@@ -807,7 +823,10 @@ function formatDate(dateStr) {
             <!-- Primary Status Line -->
             <div
               class="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold"
-              :class="[formatStatusPillOps(asset.status).bg, formatStatusPillOps(asset.status).text]"
+              :class="[
+                formatStatusPillOps(asset.status).bg,
+                formatStatusPillOps(asset.status).text,
+              ]"
             >
               <span
                 class="h-1.5 w-1.5 rounded-full shrink-0"
@@ -826,7 +845,10 @@ function formatDate(dateStr) {
           </div>
 
           <!-- 6. Action Menu -->
-          <div @click.stop class="hidden md:flex items-center justify-end w-8 shrink-0 justify-self-end">
+          <div
+            @click.stop
+            class="hidden md:flex items-center justify-end w-8 shrink-0 justify-self-end"
+          >
             <AppRowActions :actions="getOpsActions(asset)" />
           </div>
         </div>
@@ -849,7 +871,10 @@ function formatDate(dateStr) {
       @close="closeModal"
     >
       <form @submit.prevent="submitForm" class="space-y-4">
-        <div v-if="modalError" class="p-3 bg-[#FEF2F2] border border-[#FECACA] rounded-xl text-[#991B1B] text-[12px]">
+        <div
+          v-if="modalError"
+          class="p-3 bg-[#FEF2F2] border border-[#FECACA] rounded-xl text-[#991B1B] text-[12px]"
+        >
           {{ modalError }}
         </div>
 
@@ -918,7 +943,9 @@ function formatDate(dateStr) {
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <!-- PIC Penanggung Jawab -->
           <div>
-            <label for="ops-pic" class="block text-[12px] font-bold text-[#1E293B] mb-1">PIC (Penanggung Jawab)</label>
+            <label for="ops-pic" class="block text-[12px] font-bold text-[#1E293B] mb-1"
+              >PIC (Penanggung Jawab)</label
+            >
             <input
               id="ops-pic"
               v-model="form.pic"
@@ -930,7 +957,9 @@ function formatDate(dateStr) {
 
           <!-- Tanggal Beli -->
           <div>
-            <label for="ops-tanggal-beli" class="block text-[12px] font-bold text-[#1E293B] mb-1">Tanggal Pembelian</label>
+            <label for="ops-tanggal-beli" class="block text-[12px] font-bold text-[#1E293B] mb-1"
+              >Tanggal Pembelian</label
+            >
             <input
               id="ops-tanggal-beli"
               v-model="form.tanggal_beli"
@@ -943,7 +972,9 @@ function formatDate(dateStr) {
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <!-- Total Asset Amount -->
           <div>
-            <label for="ops-total-amount" class="block text-[12px] font-bold text-[#1E293B] mb-1">Total Amount (Rp)</label>
+            <label for="ops-total-amount" class="block text-[12px] font-bold text-[#1E293B] mb-1"
+              >Total Amount (Rp)</label
+            >
             <input
               id="ops-total-amount"
               v-model.number="form.total_asset_amount"
@@ -957,7 +988,9 @@ function formatDate(dateStr) {
 
           <!-- Kondisi -->
           <div>
-            <label for="ops-kondisi" class="block text-[12px] font-bold text-[#1E293B] mb-1">Kondisi</label>
+            <label for="ops-kondisi" class="block text-[12px] font-bold text-[#1E293B] mb-1"
+              >Kondisi</label
+            >
             <select
               id="ops-kondisi"
               v-model="form.kondisi"
@@ -969,7 +1002,9 @@ function formatDate(dateStr) {
 
           <!-- Status -->
           <div>
-            <label for="ops-status" class="block text-[12px] font-bold text-[#1E293B] mb-1">Status Operasional</label>
+            <label for="ops-status" class="block text-[12px] font-bold text-[#1E293B] mb-1"
+              >Status Operasional</label
+            >
             <select
               id="ops-status"
               v-model="form.status"
@@ -1002,15 +1037,13 @@ function formatDate(dateStr) {
     </AppModal>
 
     <!-- Modal Confirm Delete -->
-    <AppModal
-      :is-open="showDeleteModal"
-      title="Hapus Aset OPS"
-      size="sm"
-      @close="closeModal"
-    >
+    <AppModal :is-open="showDeleteModal" title="Hapus Aset OPS" size="sm" @close="closeModal">
       <div class="space-y-4">
         <p class="text-[13px] text-[#475569]">
-          Apakah Anda yakin ingin menghapus Aset OPS <strong class="text-[#0F172A]">{{ selectedAsset?.nama_asset }}</strong> ({{ selectedAsset?.hostname }})?
+          Apakah Anda yakin ingin menghapus Aset OPS
+          <strong class="text-[#0F172A]">{{ selectedAsset?.nama_asset }}</strong> ({{
+            selectedAsset?.hostname
+          }})?
         </p>
 
         <div class="flex items-center justify-end gap-3 pt-3 border-t border-[#E2E8F0]">
@@ -1034,16 +1067,15 @@ function formatDate(dateStr) {
     </AppModal>
 
     <!-- Modal Details View -->
-    <AppModal
-      :is-open="showDetailsModal"
-      title="Detail Aset OPS"
-      size="md"
-      @close="closeModal"
-    >
+    <AppModal :is-open="showDetailsModal" title="Detail Aset OPS" size="md" @close="closeModal">
       <div v-if="selectedAsset" class="space-y-4">
         <div class="flex items-center gap-3 p-3 bg-[#F8FAFC] rounded-xl border border-[#E2E8F0]">
-          <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#EFF6FF] text-[#2563EB]">
-            <span class="material-symbols-outlined text-[22px]">{{ getOpsIcon(selectedAsset.kategori) }}</span>
+          <div
+            class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#EFF6FF] text-[#2563EB]"
+          >
+            <span class="material-symbols-outlined text-[22px]">{{
+              getOpsIcon(selectedAsset.kategori)
+            }}</span>
           </div>
           <div>
             <h3 class="font-bold text-[#0F172A] text-[14px]">{{ selectedAsset.nama_asset }}</h3>
@@ -1064,7 +1096,9 @@ function formatDate(dateStr) {
 
           <div>
             <span class="text-[#64748B] block text-[11px] font-medium">PIC / Penanggung Jawab</span>
-            <span class="text-[#1E293B] font-medium">{{ selectedAsset.pic || 'Belum ditetapkan' }}</span>
+            <span class="text-[#1E293B] font-medium">{{
+              selectedAsset.pic || 'Belum ditetapkan'
+            }}</span>
           </div>
 
           <div>
@@ -1074,16 +1108,24 @@ function formatDate(dateStr) {
 
           <div>
             <span class="text-[#64748B] block text-[11px] font-medium">Total Asset Amount</span>
-            <span class="font-bold text-[#0F172A] text-[13.5px]">{{ formatCurrency(selectedAsset.total_asset_amount) }}</span>
+            <span class="font-bold text-[#0F172A] text-[13.5px]">{{
+              formatCurrency(selectedAsset.total_asset_amount)
+            }}</span>
           </div>
 
           <div>
             <span class="text-[#64748B] block text-[11px] font-medium">Status Operasional</span>
             <span
               class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold mt-0.5"
-              :class="[formatStatusPillOps(selectedAsset.status).bg, formatStatusPillOps(selectedAsset.status).text]"
+              :class="[
+                formatStatusPillOps(selectedAsset.status).bg,
+                formatStatusPillOps(selectedAsset.status).text,
+              ]"
             >
-              <span class="h-1.5 w-1.5 rounded-full" :class="formatStatusPillOps(selectedAsset.status).dot"></span>
+              <span
+                class="h-1.5 w-1.5 rounded-full"
+                :class="formatStatusPillOps(selectedAsset.status).dot"
+              ></span>
               {{ selectedAsset.status }}
             </span>
           </div>
@@ -1128,10 +1170,9 @@ function formatDate(dateStr) {
 @media (min-width: 768px) {
   .ops-row-grid {
     display: grid;
-    grid-template-columns: minmax(220px, 2fr) minmax(140px, 1.1fr) minmax(140px, 1.1fr) minmax(
-        130px,
-        1fr
-      ) minmax(130px, 1fr) 32px;
+    grid-template-columns:
+      minmax(220px, 2fr) minmax(140px, 1.1fr) minmax(140px, 1.1fr) minmax(130px, 1fr)
+      minmax(130px, 1fr) 32px;
     align-items: center;
   }
 }

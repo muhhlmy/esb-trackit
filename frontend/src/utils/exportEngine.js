@@ -37,7 +37,13 @@ function neutralizeSpreadsheetFormula(value) {
 }
 
 function getNormalizedExportValue(key, value) {
-  if ((key === 'lokasi_asset' || key === 'lokasi_kerja' || key === 'lokasi_aset' || key === 'lokasi') && value) {
+  if (
+    (key === 'lokasi_asset' ||
+      key === 'lokasi_kerja' ||
+      key === 'lokasi_aset' ||
+      key === 'lokasi') &&
+    value
+  ) {
     return normalizeLocation(value)
   }
   return value
@@ -59,7 +65,9 @@ export function exportToCsv(data, columns = [], filenamePrefix = 'Export_Data') 
   }
 
   const headerRow = colLabels.map(escapeCsv).join(',')
-  const dataRows = data.map((row) => colKeys.map((key) => escapeCsv(getNormalizedExportValue(key, row[key]))).join(','))
+  const dataRows = data.map((row) =>
+    colKeys.map((key) => escapeCsv(getNormalizedExportValue(key, row[key]))).join(','),
+  )
 
   const csvContent = '\uFEFF' + [headerRow, ...dataRows].join('\r\n')
   const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })

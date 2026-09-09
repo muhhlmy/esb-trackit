@@ -320,36 +320,69 @@ async function submitImport() {
         <!-- Detail Import Breakdown -->
         <div v-if="importDetails" class="mt-2 space-y-2 text-[11px] font-normal text-emerald-800">
           <!-- Karyawan & User Stats -->
-          <div v-if="importDetails.totalKaryawanRows > 0" class="bg-white/60 rounded-lg p-2.5 space-y-2">
+          <div
+            v-if="importDetails.totalKaryawanRows > 0"
+            class="bg-white/60 rounded-lg p-2.5 space-y-2"
+          >
             <p class="font-bold text-[12px] text-emerald-900">Data Karyawan</p>
             <div class="flex gap-4 flex-wrap">
-              <span>Total Excel: <b>{{ importDetails.totalKaryawanRows }}</b></span>
-              <span>Karyawan Baru: <b>{{ importDetails.importedKaryawanCount }}</b></span>
-              <span>Karyawan Diupdate: <b>{{ importDetails.updatedKaryawanCount }}</b></span>
-              <span v-if="importDetails.skippedKaryawan > 0" class="text-amber-700">Skip/Gagal: <b>{{ importDetails.skippedKaryawan }}</b></span>
+              <span
+                >Total Excel: <b>{{ importDetails.totalKaryawanRows }}</b></span
+              >
+              <span
+                >Karyawan Baru: <b>{{ importDetails.importedKaryawanCount }}</b></span
+              >
+              <span
+                >Karyawan Diupdate: <b>{{ importDetails.updatedKaryawanCount }}</b></span
+              >
+              <span v-if="importDetails.skippedKaryawan > 0" class="text-amber-700"
+                >Skip/Gagal: <b>{{ importDetails.skippedKaryawan }}</b></span
+              >
             </div>
 
-            <p class="font-bold text-[12px] text-emerald-900 pt-1 border-t border-emerald-200/60">Akun Pengguna (Users)</p>
+            <p class="font-bold text-[12px] text-emerald-900 pt-1 border-t border-emerald-200/60">
+              Akun Pengguna (Users)
+            </p>
             <div class="flex gap-4 flex-wrap">
-              <span>User Baru (Dibuat): <b>{{ importDetails.createdUserCount || 0 }}</b></span>
-              <span>User Existing: <b>{{ importDetails.existingUserCount || 0 }}</b></span>
-              <span v-if="importDetails.failedUserCount > 0" class="text-rose-700 font-bold">User Gagal: <b>{{ importDetails.failedUserCount }}</b></span>
+              <span
+                >User Baru (Dibuat): <b>{{ importDetails.createdUserCount || 0 }}</b></span
+              >
+              <span
+                >User Existing: <b>{{ importDetails.existingUserCount || 0 }}</b></span
+              >
+              <span v-if="importDetails.failedUserCount > 0" class="text-rose-700 font-bold"
+                >User Gagal: <b>{{ importDetails.failedUserCount }}</b></span
+              >
             </div>
           </div>
 
           <!-- Asset Stats -->
-          <div v-if="importDetails.totalAssetRows > 0" class="bg-white/60 rounded-lg p-2.5 space-y-1">
+          <div
+            v-if="importDetails.totalAssetRows > 0"
+            class="bg-white/60 rounded-lg p-2.5 space-y-1"
+          >
             <p class="font-bold text-[12px] text-emerald-900">Data Asset</p>
             <div class="flex gap-4 flex-wrap">
-              <span>Total Excel: <b>{{ importDetails.totalAssetRows }}</b></span>
-              <span>Berhasil: <b>{{ importDetails.importedAssetCount }}</b></span>
-              <span v-if="importDetails.skippedAssets > 0" class="text-amber-700">Skip/Error: <b>{{ importDetails.skippedAssets }}</b></span>
+              <span
+                >Total Excel: <b>{{ importDetails.totalAssetRows }}</b></span
+              >
+              <span
+                >Berhasil: <b>{{ importDetails.importedAssetCount }}</b></span
+              >
+              <span v-if="importDetails.skippedAssets > 0" class="text-amber-700"
+                >Skip/Error: <b>{{ importDetails.skippedAssets }}</b></span
+              >
             </div>
           </div>
 
           <!-- Error List -->
-          <div v-if="importDetails.errors && importDetails.errors.length > 0" class="bg-amber-50 rounded-lg p-2.5 max-h-[180px] overflow-y-auto">
-            <p class="font-bold text-[12px] text-amber-800 mb-1">Detail Error / Skip ({{ importDetails.errors.length }}):</p>
+          <div
+            v-if="importDetails.errors && importDetails.errors.length > 0"
+            class="bg-amber-50 rounded-lg p-2.5 max-h-[180px] overflow-y-auto"
+          >
+            <p class="font-bold text-[12px] text-amber-800 mb-1">
+              Detail Error / Skip ({{ importDetails.errors.length }}):
+            </p>
             <ul class="list-disc list-inside space-y-0.5 text-[11px] text-amber-900">
               <li v-for="(err, idx) in importDetails.errors" :key="idx">
                 Row {{ err.row }} ({{ err.type }}): {{ err.reason }}
@@ -359,7 +392,8 @@ async function submitImport() {
         </div>
 
         <p class="text-[11px] font-normal text-emerald-800">
-          Setiap karyawan baru otomatis dibuatkan akun pengguna default (role: User) dengan password default sistem. Pengguna disarankan mengganti password saat login pertama.
+          Setiap karyawan baru otomatis dibuatkan akun pengguna default (role: User) dengan password
+          default sistem. Pengguna disarankan mengganti password saat login pertama.
         </p>
       </div>
 
@@ -514,7 +548,12 @@ async function submitImport() {
                       '—'
                     }}
                   </td>
-                  <td class="p-2 text-[#2A3547]">{{ normalizeLocation(row['Lokasi Kerja'] || row.lokasi || row.lokasi_kerja) || '—' }}</td>
+                  <td class="p-2 text-[#2A3547]">
+                    {{
+                      normalizeLocation(row['Lokasi Kerja'] || row.lokasi || row.lokasi_kerja) ||
+                      '—'
+                    }}
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -602,10 +641,10 @@ async function submitImport() {
                     {{
                       normalizeLocation(
                         row['Lokasi Asset'] ||
-                        row.Lokasi ||
-                        row.lokasi_aset ||
-                        row['Lokasi Aset'] ||
-                        row['Lokasi Kerja']
+                          row.Lokasi ||
+                          row.lokasi_aset ||
+                          row['Lokasi Aset'] ||
+                          row['Lokasi Kerja'],
                       ) || '—'
                     }}
                   </td>
@@ -630,7 +669,9 @@ async function submitImport() {
       </div>
 
       <!-- Action Buttons -->
-      <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-3 pt-4 border-t border-[#E5EAEF]">
+      <div
+        class="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-3 pt-4 border-t border-[#E5EAEF]"
+      >
         <button
           type="button"
           @click="handleClose"

@@ -47,11 +47,15 @@ function handleLoginRedirect() {
       <ShieldAlert class="w-6 h-6" />
     </div>
 
-    <h3 class="text-base sm:text-lg font-extrabold text-[#0F172A] dark:text-slate-100 tracking-tight">
+    <h3
+      class="text-base sm:text-lg font-extrabold text-[#0F172A] dark:text-slate-100 tracking-tight"
+    >
       {{ title }}
     </h3>
 
-    <p class="mt-1.5 text-xs sm:text-sm text-[#64748B] dark:text-slate-400 max-w-md mx-auto leading-relaxed">
+    <p
+      class="mt-1.5 text-xs sm:text-sm text-[#64748B] dark:text-slate-400 max-w-md mx-auto leading-relaxed"
+    >
       {{ description }}
     </p>
 

@@ -196,7 +196,7 @@ export async function validateRestoreHandler(req, res) {
     const validation = validateUploadFile(filePath, originalName)
 
     // Validate backup content
-    const contentValidation = await validateBackupContent(filePath)
+    const contentValidation = await validateBackupContent(filePath, originalName)
 
     // Get backup info
     const info = await getBackupFileInfo(filePath)

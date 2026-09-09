@@ -394,9 +394,38 @@ export function validateUploadFile(filePath, originalName) {
 }
 
 /**
- * Validasi isi backup dengan pg_restore --list.
+ * Validasi isi backup. Untuk arsip (.dump, .tar), gunakan pg_restore --list.
+ * Untuk script SQL (.sql), validasi keberadaan konten teks SQL yang valid tanpa eksekusi langsung.
  */
-export async function validateBackupContent(filePath) {
+export async function validateBackupContent(filePath, originalName = '') {
+  const ext = path.extname(originalName || filePath).toLowerCase()
+
+  if (ext === '.sql') {
+    try {
+      // Baca 8KB awal untuk memvalidasi teks SQL tidak kosong dan bukan binary acak
+      const buffer = Buffer.alloc(8192)
+      const fd = await fsp.open(filePath, 'r')
+      const { bytesRead } = await fd.read(buffer, 0, 8192, 0)
+      await fd.close()
+
+      if (bytesRead === 0) {
+        return { valid: false, error: 'File SQL kosong.' }
+      }
+
+      // Cek apakah terdapat null byte (indikator file biner palsu dinamai .sql)
+      for (let i = 0; i < bytesRead; i++) {
+        if (buffer[i] === 0) {
+          return { valid: false, error: 'File SQL terdeteksi memiliki data biner tidak valid.' }
+        }
+      }
+
+      return { valid: true }
+    } catch (error) {
+      return { valid: false, error: error.message || 'Gagal membaca file SQL.' }
+    }
+  }
+
+  // Format .dump atau .tar: validasi menggunakan pg_restore --list
   try {
     await runCommand(PG_RESTORE_PATH, ['--list', filePath], {
       env: { ...process.env, PGPASSWORD: env.database.password },

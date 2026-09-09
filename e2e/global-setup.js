@@ -27,7 +27,7 @@ export default async function globalSetup(config) {
       await page.locator('#email').fill(userCred.email)
       await page.locator('#password').fill(userCred.password)
 
-      // Ensure "Ingat saya" is checked so session data is stored in localStorage (captured by storageState)
+      // Persist display preferences; authentication itself is captured as HttpOnly cookies.
       const rememberCheckbox = page.locator('input[type="checkbox"]').first()
       if (await rememberCheckbox.isVisible()) {
         await rememberCheckbox.check()
@@ -35,7 +35,7 @@ export default async function globalSetup(config) {
 
       await page.getByRole('button', { name: /masuk/i }).click()
 
-      await page.waitForURL((url) => !url.href.includes('/login'), { timeout: 10000 })
+      await page.waitForURL((url) => !url.href.includes('/login'), { timeout: 15000, waitUntil: 'domcontentloaded' })
 
       // Fail fast — jangan lanjut dengan empty auth state
       if (page.url().includes('/login')) {
@@ -50,12 +50,9 @@ export default async function globalSetup(config) {
       // Validate auth state is not empty
       const raw = fs.readFileSync(storageStatePath, 'utf-8')
       const state = JSON.parse(raw)
-      const hasCookies = Array.isArray(state.cookies) && state.cookies.length > 0
-      const hasLocalStorage =
-        Array.isArray(state.origins) &&
-        state.origins.some((o) => Array.isArray(o.localStorage) && o.localStorage.length > 0)
+      const hasSessionCookie = state.cookies?.some((cookie) => cookie.name === 'esb_session' && cookie.httpOnly)
 
-      if (!hasCookies && !hasLocalStorage) {
+      if (!hasSessionCookie) {
         throw new Error(
           `Authentication state empty for role "${roleKey}". ` +
           `cookies: ${state.cookies?.length || 0}, origins: ${state.origins?.length || 0}`

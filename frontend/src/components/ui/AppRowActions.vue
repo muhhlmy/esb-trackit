@@ -152,7 +152,11 @@ onBeforeUnmount(() => {
                     : 'text-[#0F172A] hover:bg-[#EFF6FF] hover:text-[#1D4ED8]',
               ]"
             >
-              <span v-if="act.icon" aria-hidden="true" class="material-symbols-outlined text-[16px] shrink-0">
+              <span
+                v-if="act.icon"
+                aria-hidden="true"
+                class="material-symbols-outlined text-[16px] shrink-0"
+              >
                 {{ act.icon }}
               </span>
               <span class="whitespace-nowrap shrink-0">{{ act.label }}</span>

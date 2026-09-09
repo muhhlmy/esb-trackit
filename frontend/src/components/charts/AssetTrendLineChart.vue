@@ -100,7 +100,11 @@ const chartOptions = computed(() => ({
     :error="error"
   >
     <div class="h-full w-full">
-      <Line :data="chartData" :options="chartOptions" aria-label="Line chart showing asset trend over time" />
+      <Line
+        :data="chartData"
+        :options="chartOptions"
+        aria-label="Line chart showing asset trend over time"
+      />
     </div>
   </BaseChartCard>
 </template>

@@ -1,11 +1,14 @@
-import http from 'http';
+import http from 'node:http';
+import https from 'node:https';
+const apiUrl = new URL(process.env.E2E_API_URL || 'http://localhost:3000');
+const transport = apiUrl.protocol === 'https:' ? https : http;
 function req(method, path, body, token) {
   return new Promise((resolve) => {
-    const opts = { hostname: '192.168.100.85', port: 5000, path, method,
-      headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) }, timeout: 10000 };
-    const r = http.request(opts, (res) => {
+    const opts = { hostname: apiUrl.hostname, port: apiUrl.port || (apiUrl.protocol === 'https:' ? 443 : 80), path, method,
+      headers: { 'Content-Type': 'application/json', ...(token ? { Cookie: token } : {}) }, timeout: 10000 };
+    const r = transport.request(opts, (res) => {
       let data = ''; res.on('data', c => data += c);
-      res.on('end', () => { try { resolve({ status: res.statusCode, body: JSON.parse(data) }); } catch { resolve({ status: res.statusCode, body: data.slice(0,300) }); } });
+      res.on('end', () => { try { resolve({ status: res.statusCode, cookie: res.headers['set-cookie']?.map(value => value.split(';')[0]).join('; '), body: JSON.parse(data) }); } catch { resolve({ status: res.statusCode, body: data.slice(0,300) }); } });
     });
     r.on('error', e => resolve({ error: e.message }));
     if (body) r.write(JSON.stringify(body));
@@ -15,7 +18,8 @@ function req(method, path, body, token) {
 
 const results = {};
 const sa = await req('POST', '/api/auth/login', { email: 'superadmin@admin.com', password: 'admin123' });
-const token = sa.body?.token;
+const token = sa.cookie;
+if (sa.status !== 200 || !token) throw new Error('QA login did not issue an authenticated session cookie.');
 
 const assets = await req('GET', '/api/assets?limit=100', null, token);
 const assetList = assets.body?.data || (Array.isArray(assets.body) ? assets.body : []);

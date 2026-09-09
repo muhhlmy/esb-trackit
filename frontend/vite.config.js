@@ -1,12 +1,12 @@
 import { fileURLToPath, URL } from 'node:url'
 
-import { defineConfig } from 'vite'
+import { defineConfig, loadEnv } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import tailwindcss from '@tailwindcss/vite'
 
 const FRONTEND_SECURITY_HEADERS = {
   'Content-Security-Policy':
-    "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' ws: wss: http: https:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'; worker-src 'self' blob:;",
+    "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'; worker-src 'self' blob:;",
   'Permissions-Policy': 'camera=(), geolocation=(), microphone=(), payment=(), usb=()',
   'Referrer-Policy': 'strict-origin-when-cross-origin',
   'X-Content-Type-Options': 'nosniff',
@@ -16,14 +16,23 @@ const FRONTEND_SECURITY_HEADERS = {
   'Cross-Origin-Resource-Policy': 'same-origin',
 }
 
+function resolveApiProxyTarget(env = {}) {
+  if (env.VITE_API_PROXY_TARGET) {
+    return env.VITE_API_PROXY_TARGET
+  }
+  if (process.env.VITE_API_PROXY_TARGET) {
+    return process.env.VITE_API_PROXY_TARGET
+  }
+  return 'http://127.0.0.1:3000'
+}
+
 // Custom plugin: inject security headers in dev & preview servers + block sensitive dotfiles
-function securityHeadersPlugin() {
+function securityHeadersPlugin(devHeaders) {
   const blockSensitiveDotfiles = (req, res, next) => {
     const rawUrl = (req.url || '').split('?')[0]
     // Allow Vite internal dev assets and dependencies
-    if (rawUrl.includes('/.vite/')) {
-      next()
-      return
+    if (rawUrl.includes('/.vite/') || rawUrl.startsWith('/@')) {
+      return next()
     }
     // Block sensitive dotfiles like /.env, /.git, and package lockfiles
     if (
@@ -35,61 +44,77 @@ function securityHeadersPlugin() {
       res.end('Not Found')
       return
     }
-    next()
+    return next()
   }
 
-  const applyHeaders = (_req, res, next) => {
-    for (const [name, value] of Object.entries(FRONTEND_SECURITY_HEADERS)) {
-      res.setHeader(name, value)
+  const applyHeaders = (headers) => (_req, res, next) => {
+    if (!res.headersSent) {
+      for (const [name, value] of Object.entries(headers)) {
+        res.setHeader(name, value)
+      }
     }
-    next()
+    return next()
   }
 
   return {
     name: 'security-headers',
     configureServer(server) {
       server.middlewares.use(blockSensitiveDotfiles)
-      server.middlewares.use(applyHeaders)
+      server.middlewares.use(applyHeaders(devHeaders))
     },
     configurePreviewServer(server) {
       server.middlewares.use(blockSensitiveDotfiles)
-      server.middlewares.use(applyHeaders)
+      server.middlewares.use(applyHeaders(FRONTEND_SECURITY_HEADERS))
     },
   }
 }
 
 // https://vite.dev/config/
-export default defineConfig({
-  plugins: [
-    tailwindcss(),
-    vue(),
-    securityHeadersPlugin(),
-  ],
-  resolve: {
-    alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url)),
-    },
-  },
-  server: {
-    host: process.env.VITE_HOST || '127.0.0.1',
-    port: 5173,
-    allowedHosts: true,
-    headers: FRONTEND_SECURITY_HEADERS,
-    proxy: {
-      '/api': {
-        target: 'http://127.0.0.1:5000',
-        changeOrigin: true,
-        ws: true,
+export default defineConfig(({ mode = 'development' }) => {
+  const env = loadEnv(mode, fileURLToPath(new URL('.', import.meta.url)), 'VITE_')
+  const proxyTarget = resolveApiProxyTarget(env)
+  const port = Number(env.VITE_PORT || 5173)
+  const allowedHosts = (env.VITE_ALLOWED_HOSTS || '').split(',').map((host) => host.trim()).filter(Boolean)
+  const hmrHosts = new Set(['localhost', '127.0.0.1', ...allowedHosts.filter((host) => !host.startsWith('.'))])
+  if (env.VITE_HOST && !['0.0.0.0', '::'].includes(env.VITE_HOST)) hmrHosts.add(env.VITE_HOST)
+  const hmrOrigins = [...hmrHosts].flatMap((host) => ['ws', 'wss'].map((scheme) => scheme + '://' + host + ':' + port))
+  const devHeaders = {
+    ...FRONTEND_SECURITY_HEADERS,
+    'Content-Security-Policy': FRONTEND_SECURITY_HEADERS['Content-Security-Policy'].replace("connect-src 'self';", "connect-src 'self' " + hmrOrigins.join(' ') + ';'),
+  }
+
+  return {
+    plugins: [
+      tailwindcss(),
+      vue(),
+      securityHeadersPlugin(devHeaders),
+    ],
+    resolve: {
+      alias: {
+        '@': fileURLToPath(new URL('./src', import.meta.url)),
       },
     },
-  },
-  preview: {
-    host: process.env.VITE_HOST || '127.0.0.1',
-    port: 5173,
-    allowedHosts: true,
-    headers: FRONTEND_SECURITY_HEADERS,
-  },
-  build: {
-    sourcemap: false,
-  },
+    server: {
+      host: env.VITE_HOST || process.env.VITE_HOST || '127.0.0.1',
+      port,
+      allowedHosts,
+      headers: devHeaders,
+      proxy: {
+        '/api': {
+          target: proxyTarget,
+          changeOrigin: true,
+          ws: true,
+        },
+      },
+    },
+    preview: {
+      host: env.VITE_HOST || process.env.VITE_HOST || '127.0.0.1',
+      port,
+      allowedHosts,
+      headers: FRONTEND_SECURITY_HEADERS,
+    },
+    build: {
+      sourcemap: false,
+    },
+  }
 })

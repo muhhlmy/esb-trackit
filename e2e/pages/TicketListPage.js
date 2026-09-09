@@ -33,7 +33,7 @@ export class TicketListPage {
     this.modalSubmitBtn = page.locator('form button[type="submit"]').last()
 
     // Detail modal
-    this.statusBtn = page.getByRole('button', { name: /status|open|in progress|pending/i })
+    this.statusBtn = page.getByRole('button', { name: 'Ubah status tiket', exact: true })
     this.undoBtn = page.getByRole('button', { name: /urungkan/i })
     this.commentInput = page.getByPlaceholder(/ketik komentar/i)
 
@@ -46,7 +46,7 @@ export class TicketListPage {
 
   async goto() {
     await this.page.goto('/tickets', { waitUntil: 'domcontentloaded' })
-    await this.page.waitForLoadState('networkidle')
+    await expect(this.page.getByTestId('page-ready')).toBeVisible()
   }
 
   // ── List interactions ──
@@ -86,7 +86,7 @@ export class TicketListPage {
     if (target && await target.isVisible()) {
       await target.click()
       // Wait for tab content to load
-      await this.page.waitForLoadState('networkidle')
+      await expect(this.page.getByTestId('page-ready')).toBeVisible()
     }
   }
 

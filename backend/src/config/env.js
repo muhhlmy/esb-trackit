@@ -137,6 +137,7 @@ export const env = {
   host: (process.env.HOST || "127.0.0.1").trim(),
   port: readNumber("PORT", 3000),
   database: {
+    production: process.env.NODE_ENV === "production",
     host: process.env.DB_HOST || "localhost",
     port: readNumber("DB_PORT", 5432),
     user: process.env.DB_USER || "postgres",
@@ -151,7 +152,6 @@ export const env = {
     bcryptRounds: readBoundedInteger("PASSWORD_BCRYPT_ROUNDS", 12, 10, 14),
   },
   auth: {
-      defaultUserPassword: readRequiredSecret("DEFAULT_USER_PASSWORD", 8),
     // Umur akses JWT (dipangkas dari 12 jam menjadi 15 menit; sesi server 12 jam
     // tetap menjadi sumber kebenaran, token diperpanjang secara gliding via cookie).
     accessTokenTtlSeconds: readBoundedInteger("ACCESS_TOKEN_TTL_SECONDS", 900, 300, 3600),

@@ -230,8 +230,11 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside))
       class="flex h-10 w-full items-center justify-between rounded-lg border border-[#E5EAEF] bg-white px-3 text-left text-[12px] font-medium text-[#2A3547] shadow-2xs focus:border-[#5D87FF] focus:outline-none focus:ring-1 focus:ring-[#5D87FF]/20 transition-all cursor-pointer"
       :class="[
         heightClass,
-        { 'border-[#5D87FF] ring-1 ring-[#5D87FF]/20': isOpen, 'pr-14': clearable && selectedOption },
-        triggerClass
+        {
+          'border-[#5D87FF] ring-1 ring-[#5D87FF]/20': isOpen,
+          'pr-14': clearable && selectedOption,
+        },
+        triggerClass,
       ]"
       @click="toggleDropdown"
       @keydown="handleTriggerKeydown"

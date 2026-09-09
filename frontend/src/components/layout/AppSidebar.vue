@@ -99,9 +99,23 @@ function isParentExpanded(key) {
 
 function autoExpandActiveParent() {
   const currentPath = route.path
-  if (['/cases', '/templates', '/analytics', '/admin/cases', '/admin/kb-categories', '/admin/editor', '/faqs'].some(p => currentPath.startsWith(p))) expandedParents.value.knowledge_base = true
+  if (
+    [
+      '/cases',
+      '/templates',
+      '/analytics',
+      '/admin/cases',
+      '/admin/kb-categories',
+      '/admin/editor',
+      '/faqs',
+    ].some((p) => currentPath.startsWith(p))
+  )
+    expandedParents.value.knowledge_base = true
   if (['/assets', '/my-assets'].includes(currentPath)) expandedParents.value.asset_management = true
-  if (['/tickets', '/submissions'].includes(currentPath)) expandedParents.value.helpdesk = true
+  if (
+    ['/tickets', '/submissions', '/shipments', '/pengiriman'].some((p) => currentPath.startsWith(p))
+  )
+    expandedParents.value.helpdesk = true
   if (['/users', '/karyawan'].includes(currentPath)) expandedParents.value.master_data = true
   if (['/logs', '/export', '/database'].includes(currentPath)) expandedParents.value.sistem = true
 }
@@ -235,6 +249,12 @@ const menuGroups = computed(() => {
               icon: 'assignment',
               permission: 'submissions',
             },
+            {
+              to: '/shipments',
+              label: 'Pengiriman',
+              icon: 'local_shipping',
+              permission: 'shipments',
+            },
           ],
         },
       ],
@@ -294,7 +314,9 @@ const menuGroups = computed(() => {
   return groups
     .map((g) => {
       const validItems = (g.items || []).filter(
-        (item) => (!item.superadminOnly || isSuperAdmin.value) && (item.superadminOnly || hasPermission(item.permission)),
+        (item) =>
+          (!item.superadminOnly || isSuperAdmin.value) &&
+          (item.superadminOnly || hasPermission(item.permission)),
       )
 
       const validParents = (g.parents || [])
@@ -302,7 +324,8 @@ const menuGroups = computed(() => {
           ...p,
           items: (p.items || []).filter(
             (item) =>
-              (!item.superadminOnly || isSuperAdmin.value) && (item.superadminOnly || hasPermission(item.permission)),
+              (!item.superadminOnly || isSuperAdmin.value) &&
+              (item.superadminOnly || hasPermission(item.permission)),
           ),
         }))
         .filter((p) => p.items.length > 0)
@@ -358,7 +381,6 @@ function closeSubmenuAndMobile() {
   activeFlyoutParent.value = null
   emit('close-mobile')
 }
-
 </script>
 
 <template>
@@ -393,7 +415,9 @@ function closeSubmenuAndMobile() {
     <div
       class="relative flex h-[56px] shrink-0 items-center border-b border-[#F1F5F9] transition-all"
       :class="
-        isEffectiveCollapsed ? 'justify-center flex-col gap-1 px-0 py-1' : 'justify-between gap-2 px-3.5'
+        isEffectiveCollapsed
+          ? 'justify-center flex-col gap-1 px-0 py-1'
+          : 'justify-between gap-2 px-3.5'
       "
     >
       <!-- Logo saat Expanded -->
@@ -519,7 +543,10 @@ function closeSubmenuAndMobile() {
                   {{ item.icon }}
                 </span>
 
-                <span v-if="!isEffectiveCollapsed" class="min-w-0 flex-1 leading-none whitespace-nowrap">
+                <span
+                  v-if="!isEffectiveCollapsed"
+                  class="min-w-0 flex-1 leading-none whitespace-nowrap"
+                >
                   {{ item.label }}
                 </span>
 
@@ -551,7 +578,13 @@ function closeSubmenuAndMobile() {
               <!-- Parent Menu Trigger Button -->
               <button
                 type="button"
-                :aria-expanded="!isEffectiveCollapsed ? String(isParentExpanded(parent.key)) : (activeFlyoutParent?.key === parent.key ? 'true' : 'false')"
+                :aria-expanded="
+                  !isEffectiveCollapsed
+                    ? String(isParentExpanded(parent.key))
+                    : activeFlyoutParent?.key === parent.key
+                      ? 'true'
+                      : 'false'
+                "
                 :aria-controls="`submenu-${parent.key}`"
                 :aria-label="parent.label"
                 class="group flex items-center transition-all duration-150 cursor-pointer select-none"
@@ -645,7 +678,6 @@ function closeSubmenuAndMobile() {
         </nav>
       </div>
     </div>
-
   </aside>
 
   <!-- ── Teleport Flyout Popovers & Tooltips for Collapsed Navigation Rail ── -->
@@ -698,9 +730,7 @@ function closeSubmenuAndMobile() {
     >
       {{ hoveredTooltipLabel }}
     </div>
-
   </Teleport>
-
 </template>
 
 <style scoped>
@@ -712,5 +742,4 @@ function closeSubmenuAndMobile() {
 .sidebar-backdrop-leave-to {
   opacity: 0;
 }
-
 </style>

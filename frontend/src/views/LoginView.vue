@@ -365,7 +365,11 @@ const finishResetAndLogin = () => {
         <!-- Top Header: Brand Logo -->
         <div class="relative z-10 flex items-center justify-between">
           <router-link to="/" aria-label="Kembali ke Help Center">
-            <img src="/ESB Logo.svg" alt="ESB People Technology Logo" class="h-7 lg:h-8 w-auto object-contain cursor-pointer" />
+            <img
+              src="/ESB Logo.svg"
+              alt="ESB People Technology Logo"
+              class="h-7 lg:h-8 w-auto object-contain cursor-pointer"
+            />
           </router-link>
         </div>
 
@@ -394,13 +398,17 @@ const finishResetAndLogin = () => {
             <div
               class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/90 border border-slate-300/80 text-slate-800 shadow-[0_1px_2px_rgba(0,0,0,0.03)]"
             >
-              <span aria-hidden="true" class="material-symbols-outlined text-[15px] text-[#1D4ED8]">inventory_2</span>
+              <span aria-hidden="true" class="material-symbols-outlined text-[15px] text-[#1D4ED8]"
+                >inventory_2</span
+              >
               <span>Asset Control</span>
             </div>
             <div
               class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/90 border border-slate-300/80 text-slate-800 shadow-[0_1px_2px_rgba(0,0,0,0.03)]"
             >
-              <span aria-hidden="true" class="material-symbols-outlined text-[15px] text-[#1D4ED8]">devices</span>
+              <span aria-hidden="true" class="material-symbols-outlined text-[15px] text-[#1D4ED8]"
+                >devices</span
+              >
               <span>Health Monitoring</span>
             </div>
             <div
@@ -431,8 +439,16 @@ const finishResetAndLogin = () => {
         <div
           class="flex md:hidden items-center justify-between pb-3.5 sm:pb-4 border-b border-slate-100 mb-3 sm:mb-4 shrink-0"
         >
-          <router-link to="/" aria-label="Kembali ke Help Center" class="inline-flex items-center gap-2">
-            <img src="/ESB Logo.svg" alt="ESB People Technology Logo" class="h-6 sm:h-7 w-auto object-contain cursor-pointer" />
+          <router-link
+            to="/"
+            aria-label="Kembali ke Help Center"
+            class="inline-flex items-center gap-2"
+          >
+            <img
+              src="/ESB Logo.svg"
+              alt="ESB People Technology Logo"
+              class="h-6 sm:h-7 w-auto object-contain cursor-pointer"
+            />
           </router-link>
 
           <router-link
@@ -464,7 +480,9 @@ const finishResetAndLogin = () => {
             class="mb-4 sm:mb-5 rounded-xl bg-red-50 p-3.5 border border-red-200 flex items-start gap-2.5 transition-all"
             role="alert"
           >
-            <span aria-hidden="true" class="material-symbols-outlined text-red-700 text-[18px] mt-0.5 shrink-0"
+            <span
+              aria-hidden="true"
+              class="material-symbols-outlined text-red-700 text-[18px] mt-0.5 shrink-0"
               >error</span
             >
             <p class="text-xs font-semibold text-red-800 leading-relaxed">{{ errorMessage }}</p>
@@ -551,7 +569,7 @@ const finishResetAndLogin = () => {
                 @click="openForgotModal"
                 class="text-xs sm:text-sm font-semibold text-[#2563EB] hover:text-[#1D4ED8] hover:underline transition-all cursor-pointer focus:outline-none min-h-[36px] flex items-center shrink-0 touch-manipulation"
               >
-                Lupa kata sandi?
+                Aktivasi akun / Lupa kata sandi?
               </button>
             </div>
 
@@ -606,14 +624,27 @@ const finishResetAndLogin = () => {
             @click.stop
           >
             <!-- Modal Header -->
-            <div class="px-4 sm:px-6 pt-5 sm:pt-6 pb-3.5 sm:pb-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50 shrink-0">
+            <div
+              class="px-4 sm:px-6 pt-5 sm:pt-6 pb-3.5 sm:pb-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50 shrink-0"
+            >
               <div class="flex items-center gap-2.5">
-                <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-blue-50 text-[#2563EB] flex items-center justify-center font-bold shrink-0">
-                  <span class="material-symbols-outlined text-[18px] sm:text-[20px]">lock_reset</span>
+                <div
+                  class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-blue-50 text-[#2563EB] flex items-center justify-center font-bold shrink-0"
+                >
+                  <span class="material-symbols-outlined text-[18px] sm:text-[20px]"
+                    >lock_reset</span
+                  >
                 </div>
                 <div>
-                  <h3 id="forgot-modal-title" class="text-sm sm:text-base font-bold text-slate-900 leading-snug">Reset Kata Sandi</h3>
-                  <p class="text-[11px] sm:text-xs text-slate-500">Verifikasi email dengan kode OTP</p>
+                  <h3
+                    id="forgot-modal-title"
+                    class="text-sm sm:text-base font-bold text-slate-900 leading-snug"
+                  >
+                    Reset Kata Sandi
+                  </h3>
+                  <p class="text-[11px] sm:text-xs text-slate-500">
+                    Verifikasi email dengan kode OTP
+                  </p>
                 </div>
               </div>
               <button
@@ -626,41 +657,61 @@ const finishResetAndLogin = () => {
             </div>
 
             <!-- Stepper Progress Dots -->
-            <div class="px-4 sm:px-6 pt-3.5 pb-2 flex items-center justify-center gap-1.5 sm:gap-2 shrink-0">
+            <div
+              class="px-4 sm:px-6 pt-3.5 pb-2 flex items-center justify-center gap-1.5 sm:gap-2 shrink-0"
+            >
               <div
                 class="flex items-center gap-1 sm:gap-1.5 text-[11px] sm:text-xs font-semibold"
                 :class="forgotStep >= 1 ? 'text-[#2563EB]' : 'text-slate-400'"
               >
                 <span
                   class="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0"
-                  :class="forgotStep >= 1 ? 'bg-[#2563EB] text-white' : 'bg-slate-100 text-slate-500'"
+                  :class="
+                    forgotStep >= 1 ? 'bg-[#2563EB] text-white' : 'bg-slate-100 text-slate-500'
+                  "
                   >1</span
                 >
                 <span class="truncate max-w-[60px] sm:max-w-none">Email</span>
               </div>
-              <div class="flex-1 max-w-[20px] sm:max-w-[28px] h-0.5 bg-slate-200 shrink-0" :class="{ 'bg-[#2563EB]': forgotStep >= 2 }"></div>
+              <div
+                class="flex-1 max-w-[20px] sm:max-w-[28px] h-0.5 bg-slate-200 shrink-0"
+                :class="{ 'bg-[#2563EB]': forgotStep >= 2 }"
+              ></div>
               <div
                 class="flex items-center gap-1 sm:gap-1.5 text-[11px] sm:text-xs font-semibold"
                 :class="forgotStep >= 2 ? 'text-[#2563EB]' : 'text-slate-400'"
               >
                 <span
                   class="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0"
-                  :class="forgotStep >= 2 ? 'bg-[#2563EB] text-white' : 'bg-slate-100 text-slate-500'"
+                  :class="
+                    forgotStep >= 2 ? 'bg-[#2563EB] text-white' : 'bg-slate-100 text-slate-500'
+                  "
                   >2</span
                 >
-                <span class="truncate max-w-[60px] sm:max-w-none"><span class="sm:hidden">OTP</span><span class="hidden sm:inline">Kode OTP</span></span>
+                <span class="truncate max-w-[60px] sm:max-w-none"
+                  ><span class="sm:hidden">OTP</span
+                  ><span class="hidden sm:inline">Kode OTP</span></span
+                >
               </div>
-              <div class="flex-1 max-w-[20px] sm:max-w-[28px] h-0.5 bg-slate-200 shrink-0" :class="{ 'bg-[#2563EB]': forgotStep >= 3 }"></div>
+              <div
+                class="flex-1 max-w-[20px] sm:max-w-[28px] h-0.5 bg-slate-200 shrink-0"
+                :class="{ 'bg-[#2563EB]': forgotStep >= 3 }"
+              ></div>
               <div
                 class="flex items-center gap-1 sm:gap-1.5 text-[11px] sm:text-xs font-semibold"
                 :class="forgotStep >= 3 ? 'text-[#2563EB]' : 'text-slate-400'"
               >
                 <span
                   class="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0"
-                  :class="forgotStep >= 3 ? 'bg-[#2563EB] text-white' : 'bg-slate-100 text-slate-500'"
+                  :class="
+                    forgotStep >= 3 ? 'bg-[#2563EB] text-white' : 'bg-slate-100 text-slate-500'
+                  "
                   >3</span
                 >
-                <span class="truncate max-w-[70px] sm:max-w-none"><span class="sm:hidden">Sandi</span><span class="hidden sm:inline">Password Baru</span></span>
+                <span class="truncate max-w-[70px] sm:max-w-none"
+                  ><span class="sm:hidden">Sandi</span
+                  ><span class="hidden sm:inline">Password Baru</span></span
+                >
               </div>
             </div>
 
@@ -672,7 +723,9 @@ const finishResetAndLogin = () => {
                 class="mb-3.5 sm:mb-4 rounded-xl bg-red-50 p-3 border border-red-200 flex items-start gap-2.5"
                 role="alert"
               >
-                <span class="material-symbols-outlined text-red-600 text-[18px] shrink-0 mt-0.5">error</span>
+                <span class="material-symbols-outlined text-red-600 text-[18px] shrink-0 mt-0.5"
+                  >error</span
+                >
                 <p class="text-xs font-semibold text-red-800 leading-snug">{{ forgotError }}</p>
               </div>
 
@@ -682,14 +735,20 @@ const finishResetAndLogin = () => {
                 class="mb-3.5 sm:mb-4 rounded-xl bg-emerald-50 p-3 border border-emerald-200 flex items-start gap-2.5"
                 role="alert"
               >
-                <span class="material-symbols-outlined text-emerald-600 text-[18px] shrink-0 mt-0.5">check_circle</span>
-                <p class="text-xs font-semibold text-emerald-800 leading-snug">{{ forgotSuccessMsg }}</p>
+                <span class="material-symbols-outlined text-emerald-600 text-[18px] shrink-0 mt-0.5"
+                  >check_circle</span
+                >
+                <p class="text-xs font-semibold text-emerald-800 leading-snug">
+                  {{ forgotSuccessMsg }}
+                </p>
               </div>
 
               <!-- ── STEP 1: Masukkan Email ── -->
               <div v-if="forgotStep === 1" class="space-y-4">
                 <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                  Masukkan alamat email akun Anda. Kami akan mengirimkan <strong>6 digit kode verifikasi (OTP)</strong> yang berlaku selama <strong>5 menit</strong>.
+                  Masukkan alamat email akun Anda. Kami akan mengirimkan
+                  <strong>6 digit kode verifikasi (OTP)</strong> yang berlaku selama
+                  <strong>5 menit</strong>.
                 </p>
 
                 <form @submit.prevent="handleRequestOtp" class="space-y-3.5 sm:space-y-4">
@@ -698,7 +757,9 @@ const finishResetAndLogin = () => {
                       Alamat Email Terdaftar
                     </label>
                     <div class="relative">
-                      <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none flex items-center">
+                      <span
+                        class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none flex items-center"
+                      >
                         <span class="material-symbols-outlined text-[18px]">mail</span>
                       </span>
                       <input
@@ -718,7 +779,9 @@ const finishResetAndLogin = () => {
                     class="w-full h-11 sm:h-12 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-semibold text-sm transition-all shadow-xs flex items-center justify-center gap-2 disabled:opacity-60 cursor-pointer active:scale-[0.98] touch-manipulation"
                   >
                     <span v-if="forgotLoading" class="flex items-center gap-2">
-                      <span class="material-symbols-outlined animate-spin text-[18px]">progress_activity</span>
+                      <span class="material-symbols-outlined animate-spin text-[18px]"
+                        >progress_activity</span
+                      >
                       <span>Mengirim OTP...</span>
                     </span>
                     <span v-else class="flex items-center gap-2">
@@ -738,7 +801,9 @@ const finishResetAndLogin = () => {
                   <p class="text-sm font-bold text-slate-900 mt-0.5 break-all">
                     {{ forgotEmail }}
                   </p>
-                  <div class="inline-flex items-center gap-1.5 mt-2 px-3 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-700 text-xs font-semibold">
+                  <div
+                    class="inline-flex items-center gap-1.5 mt-2 px-3 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-700 text-xs font-semibold"
+                  >
                     <span class="material-symbols-outlined text-[14px]">timer</span>
                     <span>Berlaku: {{ formatTimer(otpExpirySeconds) }}</span>
                   </div>
@@ -749,7 +814,10 @@ const finishResetAndLogin = () => {
                   <label class="block text-center text-xs font-bold text-slate-700">
                     Masukkan 6 Digit Kode OTP
                   </label>
-                  <div class="flex justify-center gap-1.5 sm:gap-2.5 max-w-full overflow-x-auto py-1" @paste="handleOtpPaste">
+                  <div
+                    class="flex justify-center gap-1.5 sm:gap-2.5 max-w-full overflow-x-auto py-1"
+                    @paste="handleOtpPaste"
+                  >
                     <input
                       v-for="(digit, idx) in otpDigits"
                       :key="idx"
@@ -771,12 +839,16 @@ const finishResetAndLogin = () => {
                 <div class="space-y-3 pt-1">
                   <button
                     type="button"
-                    :disabled="forgotLoading || otpDigits.join('').length !== 6 || otpExpirySeconds <= 0"
+                    :disabled="
+                      forgotLoading || otpDigits.join('').length !== 6 || otpExpirySeconds <= 0
+                    "
                     @click="handleVerifyOtp"
                     class="w-full h-11 sm:h-12 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-semibold text-sm transition-all shadow-xs flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer active:scale-[0.98] touch-manipulation"
                   >
                     <span v-if="forgotLoading" class="flex items-center gap-2">
-                      <span class="material-symbols-outlined animate-spin text-[18px]">progress_activity</span>
+                      <span class="material-symbols-outlined animate-spin text-[18px]"
+                        >progress_activity</span
+                      >
                       <span>Memverifikasi...</span>
                     </span>
                     <span v-else class="flex items-center gap-1.5">
@@ -820,7 +892,9 @@ const finishResetAndLogin = () => {
                       Kata Sandi Baru
                     </label>
                     <div class="relative">
-                      <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none flex items-center">
+                      <span
+                        class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none flex items-center"
+                      >
                         <span class="material-symbols-outlined text-[18px]">lock</span>
                       </span>
                       <input
@@ -850,7 +924,9 @@ const finishResetAndLogin = () => {
                       Ulangi Kata Sandi Baru
                     </label>
                     <div class="relative">
-                      <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none flex items-center">
+                      <span
+                        class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none flex items-center"
+                      >
                         <span class="material-symbols-outlined text-[18px]">lock_clock</span>
                       </span>
                       <input
@@ -875,24 +951,52 @@ const finishResetAndLogin = () => {
                   </div>
 
                   <!-- Requirements helper -->
-                  <div class="p-2.5 sm:p-3 bg-slate-50 rounded-xl border border-slate-200 text-[11px] sm:text-xs space-y-1 text-slate-600">
-                    <div class="flex items-center gap-1.5" :class="forgotNewPassword.length >= 8 ? 'text-emerald-600 font-semibold' : 'text-slate-500'">
-                      <span class="material-symbols-outlined text-[15px]">{{ forgotNewPassword.length >= 8 ? 'check_circle' : 'radio_button_unchecked' }}</span>
+                  <div
+                    class="p-2.5 sm:p-3 bg-slate-50 rounded-xl border border-slate-200 text-[11px] sm:text-xs space-y-1 text-slate-600"
+                  >
+                    <div
+                      class="flex items-center gap-1.5"
+                      :class="
+                        forgotNewPassword.length >= 8
+                          ? 'text-emerald-600 font-semibold'
+                          : 'text-slate-500'
+                      "
+                    >
+                      <span class="material-symbols-outlined text-[15px]">{{
+                        forgotNewPassword.length >= 8 ? 'check_circle' : 'radio_button_unchecked'
+                      }}</span>
                       <span>Minimal 8 karakter</span>
                     </div>
-                    <div class="flex items-center gap-1.5" :class="forgotNewPassword && forgotNewPassword === forgotConfirmPassword ? 'text-emerald-600 font-semibold' : 'text-slate-500'">
-                      <span class="material-symbols-outlined text-[15px]">{{ forgotNewPassword && forgotNewPassword === forgotConfirmPassword ? 'check_circle' : 'radio_button_unchecked' }}</span>
+                    <div
+                      class="flex items-center gap-1.5"
+                      :class="
+                        forgotNewPassword && forgotNewPassword === forgotConfirmPassword
+                          ? 'text-emerald-600 font-semibold'
+                          : 'text-slate-500'
+                      "
+                    >
+                      <span class="material-symbols-outlined text-[15px]">{{
+                        forgotNewPassword && forgotNewPassword === forgotConfirmPassword
+                          ? 'check_circle'
+                          : 'radio_button_unchecked'
+                      }}</span>
                       <span>Kata sandi cocok</span>
                     </div>
                   </div>
 
                   <button
                     type="submit"
-                    :disabled="forgotLoading || forgotNewPassword.length < 8 || forgotNewPassword !== forgotConfirmPassword"
+                    :disabled="
+                      forgotLoading ||
+                      forgotNewPassword.length < 8 ||
+                      forgotNewPassword !== forgotConfirmPassword
+                    "
                     class="w-full h-11 sm:h-12 mt-2 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-semibold text-sm transition-all shadow-xs flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer active:scale-[0.98] touch-manipulation"
                   >
                     <span v-if="forgotLoading" class="flex items-center gap-2">
-                      <span class="material-symbols-outlined animate-spin text-[18px]">progress_activity</span>
+                      <span class="material-symbols-outlined animate-spin text-[18px]"
+                        >progress_activity</span
+                      >
                       <span>Menyimpan Password...</span>
                     </span>
                     <span v-else class="flex items-center gap-2">
@@ -905,14 +1009,21 @@ const finishResetAndLogin = () => {
 
               <!-- ── STEP 4: Sukses ── -->
               <div v-else-if="forgotStep === 4" class="text-center py-4 space-y-4">
-                <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-emerald-100 text-emerald-600 mx-auto flex items-center justify-center">
-                  <span class="material-symbols-outlined text-[32px] sm:text-[36px]">check_circle</span>
+                <div
+                  class="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-emerald-100 text-emerald-600 mx-auto flex items-center justify-center"
+                >
+                  <span class="material-symbols-outlined text-[32px] sm:text-[36px]"
+                    >check_circle</span
+                  >
                 </div>
 
                 <div class="space-y-1">
-                  <h4 class="text-base sm:text-lg font-bold text-slate-900">Kata Sandi Berhasil Direset!</h4>
+                  <h4 class="text-base sm:text-lg font-bold text-slate-900">
+                    Kata Sandi Berhasil Direset!
+                  </h4>
                   <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                    Kata sandi akun Anda telah diperbarui. Silakan masuk kembali dengan kata sandi baru Anda.
+                    Kata sandi akun Anda telah diperbarui. Silakan masuk kembali dengan kata sandi
+                    baru Anda.
                   </p>
                 </div>
 

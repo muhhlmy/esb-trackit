@@ -39,8 +39,8 @@ const normalizedOptions = computed(() =>
   }),
 )
 
-const selectedOption = computed(() =>
-  normalizedOptions.value.find((opt) => opt.value === props.modelValue) || null,
+const selectedOption = computed(
+  () => normalizedOptions.value.find((opt) => opt.value === props.modelValue) || null,
 )
 
 function toggle() {
@@ -71,7 +71,11 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside))
 </script>
 
 <template>
-  <div ref="containerRef" class="relative text-left" :class="block ? 'block w-full' : 'inline-block'">
+  <div
+    ref="containerRef"
+    class="relative text-left"
+    :class="block ? 'block w-full' : 'inline-block'"
+  >
     <button
       type="button"
       :disabled="disabled"
@@ -87,7 +91,9 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside))
         class="h-2 w-2 rounded-full shrink-0"
         :class="selectedOption.dot"
       ></span>
-      <span class="min-w-0 flex-1 truncate">{{ selectedOption ? selectedOption.label : placeholder }}</span>
+      <span class="min-w-0 flex-1 truncate">{{
+        selectedOption ? selectedOption.label : placeholder
+      }}</span>
       <span class="material-symbols-outlined text-[16px] text-[#7C8BAC] shrink-0">expand_more</span>
     </button>
 
@@ -137,7 +143,9 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside))
 <style scoped>
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity 0.12s ease, transform 0.12s ease;
+  transition:
+    opacity 0.12s ease,
+    transform 0.12s ease;
 }
 .fade-enter-from,
 .fade-leave-to {

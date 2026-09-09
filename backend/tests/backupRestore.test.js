@@ -136,42 +136,26 @@ describe('Backup Retention', () => {
 
 // ========== DATABASE STATUS TESTS ==========
 
-describe('Database Status Endpoint', () => {
-  it('should return 401 when unauthenticated', async () => {
-    const baseUrl = process.env.TEST_API_URL || 'http://localhost:3000'
-    try {
-      const response = await fetch(`${baseUrl}/api/admin/database/status`)
-      assert.equal(response.status, 401)
-    } catch {
-      // Server not running — skip integration test
-      console.log('[SKIP] Server not available for integration test')
-    }
+describe('Database Status Endpoint (explicit live test target)', () => {
+  it('returns 401 when unauthenticated', async (t) => {
+    if (!process.env.TEST_API_URL) return t.skip('TEST_API_URL not configured')
+    const response = await fetch(process.env.TEST_API_URL + '/api/admin/database/status')
+    assert.equal(response.status, 401)
   })
 
-  it('should return 403 for non-superadmin user', async () => {
-    const baseUrl = process.env.TEST_API_URL || 'http://localhost:3000'
-    try {
-      // Login as regular user
-      const loginRes = await fetch(`${baseUrl}/api/auth/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: 'superadmin@admin.com',
-          password: 'admin123',
-        }),
-      })
-      
-      if (loginRes.status === 200) {
-        const { token } = await loginRes.json()
-        const res = await fetch(`${baseUrl}/api/admin/database/status`, {
-          headers: { Authorization: `Bearer ${token}` },
-        })
-        // superadmin should get 200, not 403
-        assert.ok(res.status === 200)
-      }
-    } catch {
-      console.log('[SKIP] Server not available for integration test')
+  it('returns 403 for an authenticated regular user', async (t) => {
+    if (!process.env.TEST_API_URL || !process.env.TEST_USER_EMAIL || !process.env.TEST_USER_PASSWORD) {
+      return t.skip('Explicit regular-user test credentials and TEST_API_URL required')
     }
+    const login = await fetch(process.env.TEST_API_URL + '/api/auth/login', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: process.env.TEST_USER_EMAIL, password: process.env.TEST_USER_PASSWORD }),
+    })
+    assert.equal(login.status, 200)
+    const cookie = login.headers.getSetCookie().map(value => value.split(';')[0]).join('; ')
+    assert.ok(cookie.includes('esb_session='))
+    const response = await fetch(process.env.TEST_API_URL + '/api/admin/database/status', { headers: { Cookie: cookie } })
+    assert.equal(response.status, 403)
   })
 })
 
@@ -222,5 +206,60 @@ describe('Audit Log Operations', () => {
     
     // All operations should be defined in the migration constraint
     assert.equal(requiredOps.length, 12)
+  })
+})
+
+// ========== FORMAT-AWARE VALIDATION TESTS ==========
+
+describe('Backup Format-Aware Content Validation', () => {
+  it('should validate valid plain text SQL files without running pg_restore', async () => {
+    const { validateBackupContent } = await import('../src/services/backupService.js')
+    const fs = await import('node:fs/promises')
+    const os = await import('node:os')
+    
+    const tempSqlPath = path.join(os.tmpdir(), `test_valid_${Date.now()}.sql`)
+    await fs.writeFile(tempSqlPath, '-- Test SQL Dump\nCREATE TABLE test (id int);\n', 'utf8')
+    
+    try {
+      const result = await validateBackupContent(tempSqlPath, 'backup.sql')
+      assert.equal(result.valid, true)
+    } finally {
+      await fs.unlink(tempSqlPath).catch(() => {})
+    }
+  })
+
+  it('should reject empty SQL files during content validation', async () => {
+    const { validateBackupContent } = await import('../src/services/backupService.js')
+    const fs = await import('node:fs/promises')
+    const os = await import('node:os')
+    
+    const tempSqlPath = path.join(os.tmpdir(), `test_empty_${Date.now()}.sql`)
+    await fs.writeFile(tempSqlPath, '', 'utf8')
+    
+    try {
+      const result = await validateBackupContent(tempSqlPath, 'empty.sql')
+      assert.equal(result.valid, false)
+      assert.ok(result.error.includes('kosong'))
+    } finally {
+      await fs.unlink(tempSqlPath).catch(() => {})
+    }
+  })
+
+  it('should reject binary files disguised with .sql extension', async () => {
+    const { validateBackupContent } = await import('../src/services/backupService.js')
+    const fs = await import('node:fs/promises')
+    const os = await import('node:os')
+    
+    const tempSqlPath = path.join(os.tmpdir(), `test_fake_${Date.now()}.sql`)
+    const fakeBinary = Buffer.from([0x00, 0x01, 0x02, 0x00])
+    await fs.writeFile(tempSqlPath, fakeBinary)
+    
+    try {
+      const result = await validateBackupContent(tempSqlPath, 'fake.sql')
+      assert.equal(result.valid, false)
+      assert.ok(result.error.includes('biner'))
+    } finally {
+      await fs.unlink(tempSqlPath).catch(() => {})
+    }
   })
 })

@@ -69,7 +69,11 @@ const chartOptions = computed(() => ({
     :error="error"
   >
     <div class="h-full w-full">
-      <Pie :data="chartData" :options="chartOptions" aria-label="Pie chart showing asset condition distribution" />
+      <Pie
+        :data="chartData"
+        :options="chartOptions"
+        aria-label="Pie chart showing asset condition distribution"
+      />
     </div>
   </BaseChartCard>
 </template>

@@ -78,7 +78,11 @@ const chartOptions = computed(() => ({
     :error="error"
   >
     <div class="h-full w-full">
-      <Bar :data="chartData" :options="chartOptions" aria-label="Bar chart showing asset types by category" />
+      <Bar
+        :data="chartData"
+        :options="chartOptions"
+        aria-label="Bar chart showing asset types by category"
+      />
     </div>
   </BaseChartCard>
 </template>

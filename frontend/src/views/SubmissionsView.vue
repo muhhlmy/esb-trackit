@@ -39,7 +39,10 @@ async function fetchData() {
   isLoading.value = true
   pageError.value = ''
   try {
-    const [employeeData, assetData] = await Promise.all([get('/api/karyawan?all=true'), get('/api/assets?all=true')])
+    const [employeeData, assetData] = await Promise.all([
+      get('/api/karyawan?all=true'),
+      get('/api/assets?all=true'),
+    ])
     employees.value = Array.isArray(employeeData) ? employeeData : []
     assets.value = (Array.isArray(assetData) ? assetData : []).map((a) => {
       const hostname = a.hostname || a.label_aset || ''
@@ -221,7 +224,8 @@ function generatePdf() {
   const hasAsetBaru = asetBaruList.value.some((a) => a.id_aset)
   const hasAsetLama = asetLamaList.value.some((a) => a.id_aset)
   if (!hasAsetBaru && !hasAsetLama) {
-    validationError.value = 'Minimal pilih salah satu Aset (Aset Baru / Aset Lama) untuk serah terima.'
+    validationError.value =
+      'Minimal pilih salah satu Aset (Aset Baru / Aset Lama) untuk serah terima.'
     return
   }
 
@@ -631,7 +635,9 @@ onMounted(fetchData)
         </div>
         <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
           <!-- Pihak Pemberi Box -->
-          <div class="flex flex-col gap-4 rounded-xl sm:rounded-2xl border border-[#F1F5F9] bg-[#FAFCFF] p-3.5 sm:p-4">
+          <div
+            class="flex flex-col gap-4 rounded-xl sm:rounded-2xl border border-[#F1F5F9] bg-[#FAFCFF] p-3.5 sm:p-4"
+          >
             <BaseSkeleton width="150px" height="14px" radius="md" />
             <div class="flex flex-col gap-1.5">
               <BaseSkeleton width="100px" height="12px" radius="sm" />
@@ -650,7 +656,9 @@ onMounted(fetchData)
           </div>
 
           <!-- Pihak Penerima Box -->
-          <div class="flex flex-col gap-4 rounded-xl sm:rounded-2xl border border-[#F1F5F9] bg-[#FAFCFF] p-3.5 sm:p-4">
+          <div
+            class="flex flex-col gap-4 rounded-xl sm:rounded-2xl border border-[#F1F5F9] bg-[#FAFCFF] p-3.5 sm:p-4"
+          >
             <BaseSkeleton width="150px" height="14px" radius="md" />
             <div class="flex flex-col gap-1.5">
               <BaseSkeleton width="100px" height="12px" radius="sm" />
@@ -749,14 +757,18 @@ onMounted(fetchData)
       <div
         class="submission-section shadow-card rounded-[20px] border border-[#E8EDF3] bg-white p-4 sm:p-6"
       >
-        <h3 class="mb-4 text-[13px] sm:text-[14px] font-extrabold text-[#172033] flex items-center gap-2">
+        <h3
+          class="mb-4 text-[13px] sm:text-[14px] font-extrabold text-[#172033] flex items-center gap-2"
+        >
           <span class="material-symbols-outlined text-brand shrink-0">assignment_ind</span>
           <span>I. Profil Pihak Terkait</span>
         </h3>
 
         <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
           <!-- Pihak Pemberi -->
-          <div class="flex flex-col gap-3.5 sm:gap-4 rounded-xl sm:rounded-2xl border border-[#F1F5F9] bg-[#FAFCFF] p-3.5 sm:p-4">
+          <div
+            class="flex flex-col gap-3.5 sm:gap-4 rounded-xl sm:rounded-2xl border border-[#F1F5F9] bg-[#FAFCFF] p-3.5 sm:p-4"
+          >
             <h4 class="text-[11px] font-bold uppercase tracking-wider text-brand">
               Pihak Pemberi (Karyawan)
             </h4>
@@ -802,7 +814,9 @@ onMounted(fetchData)
           </div>
 
           <!-- Pihak Penerima -->
-          <div class="flex flex-col gap-3.5 sm:gap-4 rounded-xl sm:rounded-2xl border border-[#F1F5F9] bg-[#FAFCFF] p-3.5 sm:p-4">
+          <div
+            class="flex flex-col gap-3.5 sm:gap-4 rounded-xl sm:rounded-2xl border border-[#F1F5F9] bg-[#FAFCFF] p-3.5 sm:p-4"
+          >
             <div class="flex flex-wrap items-center justify-between gap-2">
               <h4 class="text-[11px] font-bold uppercase tracking-wider text-brand-orange">
                 Pihak Penerima
@@ -871,7 +885,11 @@ onMounted(fetchData)
                   v-model="form.penerimaDirektorat"
                   required
                   type="text"
-                  :aria-label="form.isPenerimaLainnya ? 'Direktorat / Perusahaan Penerima' : 'Direktorat Penerima (Auto)'"
+                  :aria-label="
+                    form.isPenerimaLainnya
+                      ? 'Direktorat / Perusahaan Penerima'
+                      : 'Direktorat Penerima (Auto)'
+                  "
                   class="form-control"
                   :class="!form.isPenerimaLainnya ? 'bg-slate-50 text-[#64748B]' : ''"
                   :readonly="!form.isPenerimaLainnya"
@@ -887,7 +905,9 @@ onMounted(fetchData)
       <div
         class="submission-section shadow-card rounded-[20px] border border-[#E8EDF3] bg-white p-4 sm:p-6"
       >
-        <h3 class="mb-4 text-[13px] sm:text-[14px] font-extrabold text-[#172033] flex items-center gap-2">
+        <h3
+          class="mb-4 text-[13px] sm:text-[14px] font-extrabold text-[#172033] flex items-center gap-2"
+        >
           <span class="material-symbols-outlined text-brand shrink-0">checklist</span>
           <span>II. Tujuan Serah Terima Aset</span>
         </h3>
@@ -915,7 +935,8 @@ onMounted(fetchData)
               <span
                 class="material-symbols-outlined text-[16px] shrink-0"
                 :class="form.tujuan === t.key ? 'text-brand' : 'text-[#94A3B8]'"
-              >{{ t.icon }}</span>
+                >{{ t.icon }}</span
+              >
               <span class="text-[11px] font-bold text-[#334155] truncate">{{ t.label }}</span>
             </div>
             <input
@@ -949,7 +970,9 @@ onMounted(fetchData)
         <!-- Aset Baru -->
         <div class="shadow-card rounded-[20px] border border-[#E8EDF3] bg-white p-4 sm:p-6">
           <div class="mb-4 flex items-center justify-between gap-2">
-            <h3 class="text-[13px] sm:text-[14px] font-extrabold text-[#172033] flex items-center gap-2 truncate">
+            <h3
+              class="text-[13px] sm:text-[14px] font-extrabold text-[#172033] flex items-center gap-2 truncate"
+            >
               <span class="material-symbols-outlined text-brand shrink-0">add_box</span>
               <span>III. Aset Baru (Diserahkan)</span>
             </h3>
@@ -971,7 +994,9 @@ onMounted(fetchData)
             >
               <!-- Card Unit Header -->
               <div class="flex items-center justify-between border-b border-[#EEF2F6] pb-2 mb-0.5">
-                <span class="inline-flex items-center gap-1.5 rounded-md bg-blue-50 px-2 py-0.5 text-[10px] font-bold text-blue-700">
+                <span
+                  class="inline-flex items-center gap-1.5 rounded-md bg-blue-50 px-2 py-0.5 text-[10px] font-bold text-blue-700"
+                >
                   <span class="material-symbols-outlined text-[13px]">inventory_2</span>
                   Unit #{{ index + 1 }}
                 </span>
@@ -1046,7 +1071,9 @@ onMounted(fetchData)
         <!-- Aset Lama -->
         <div class="shadow-card rounded-[20px] border border-[#E8EDF3] bg-white p-4 sm:p-6">
           <div class="mb-4 flex items-center justify-between gap-2">
-            <h3 class="text-[13px] sm:text-[14px] font-extrabold text-[#172033] flex items-center gap-2 truncate">
+            <h3
+              class="text-[13px] sm:text-[14px] font-extrabold text-[#172033] flex items-center gap-2 truncate"
+            >
               <span class="material-symbols-outlined text-brand shrink-0">history</span>
               <span>IV. Aset Lama (Dikembalikan)</span>
             </h3>
@@ -1068,8 +1095,12 @@ onMounted(fetchData)
             >
               <!-- Card Unit Header -->
               <div class="flex items-center justify-between border-b border-[#EEF2F6] pb-2 mb-0.5">
-                <span class="inline-flex items-center gap-1.5 rounded-md bg-amber-50 px-2 py-0.5 text-[10px] font-bold text-amber-700">
-                  <span class="material-symbols-outlined text-[13px]">history_toggle_drop_down</span>
+                <span
+                  class="inline-flex items-center gap-1.5 rounded-md bg-amber-50 px-2 py-0.5 text-[10px] font-bold text-amber-700"
+                >
+                  <span class="material-symbols-outlined text-[13px]"
+                    >history_toggle_drop_down</span
+                  >
                   Unit Lama #{{ index + 1 }}
                 </span>
                 <button
@@ -1085,7 +1116,9 @@ onMounted(fetchData)
               </div>
 
               <label class="flex flex-col gap-1.5">
-                <span class="text-[10px] font-bold uppercase text-[#475569]">Aset Lama (Opsional)</span>
+                <span class="text-[10px] font-bold uppercase text-[#475569]"
+                  >Aset Lama (Opsional)</span
+                >
                 <SearchableSelect
                   v-model="row.id_aset"
                   :options="assets"

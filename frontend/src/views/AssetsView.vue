@@ -716,8 +716,12 @@ onMounted(async () => {
       <!-- Row 1: Page Title & Primary CTA -->
       <div class="flex items-center justify-between gap-2.5">
         <div class="min-w-0">
-          <h2 class="text-base sm:text-lg font-bold text-[#0F172A] tracking-tight truncate">Aset IT</h2>
-          <p class="text-[11px] sm:text-xs text-[#64748B] mt-0.5 leading-normal line-clamp-1 sm:line-clamp-none">
+          <h2 class="text-base sm:text-lg font-bold text-[#0F172A] tracking-tight truncate">
+            Aset IT
+          </h2>
+          <p
+            class="text-[11px] sm:text-xs text-[#64748B] mt-0.5 leading-normal line-clamp-1 sm:line-clamp-none"
+          >
             Monitor dan kelola seluruh perangkat IT perusahaan
           </p>
         </div>
@@ -736,7 +740,9 @@ onMounted(async () => {
       </div>
 
       <!-- Row 2: Search, Filters & Actions -->
-      <div class="flex flex-col sm:flex-row sm:items-center gap-2 w-full min-w-0 pt-2.5 border-t border-[#F1F5F9]">
+      <div
+        class="flex flex-col sm:flex-row sm:items-center gap-2 w-full min-w-0 pt-2.5 border-t border-[#F1F5F9]"
+      >
         <!-- Search Input -->
         <div class="relative w-full sm:flex-1 sm:min-w-[200px]">
           <span
@@ -754,7 +760,12 @@ onMounted(async () => {
           <button
             v-if="searchQuery"
             type="button"
-            @click="searchQuery = ''; resetFilters()"
+            @click="
+              ($event) => {
+                searchQuery = ''
+                resetFilters()
+              }
+            "
             aria-label="Bersihkan pencarian"
             class="absolute right-2 top-1/2 -translate-y-1/2 flex h-5 w-5 items-center justify-center rounded-full text-[#94A3B8] hover:bg-[#F1F5F9] hover:text-[#0F172A] transition-all cursor-pointer touch-manipulation"
             title="Bersihkan"
@@ -1226,7 +1237,9 @@ onMounted(async () => {
     >
       <!-- Step Indicator Bar -->
       <div class="mb-4 rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] p-2 sm:p-2.5">
-        <div class="flex items-center justify-between max-w-lg mx-auto text-[10.5px] sm:text-[11.5px] font-bold">
+        <div
+          class="flex items-center justify-between max-w-lg mx-auto text-[10.5px] sm:text-[11.5px] font-bold"
+        >
           <!-- Step 1 -->
           <button
             type="button"
@@ -1508,7 +1521,9 @@ onMounted(async () => {
         </div>
 
         <!-- Footer Action Bar -->
-        <div class="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-2.5 pt-3.5 mt-4 border-t border-[#E5EAEF]">
+        <div
+          class="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-2.5 pt-3.5 mt-4 border-t border-[#E5EAEF]"
+        >
           <button
             type="button"
             @click="closeModal"
@@ -1984,7 +1999,9 @@ onMounted(async () => {
           </label>
         </div>
 
-        <div class="flex flex-col-reverse sm:flex-row justify-end gap-2.5 sm:gap-3 border-t border-[#F3F4F6] pt-4 mt-2">
+        <div
+          class="flex flex-col-reverse sm:flex-row justify-end gap-2.5 sm:gap-3 border-t border-[#F3F4F6] pt-4 mt-2"
+        >
           <button
             type="button"
             @click="closeModal"
@@ -2028,10 +2045,9 @@ onMounted(async () => {
 @media (min-width: 768px) {
   .asset-row-grid {
     display: grid;
-    grid-template-columns: minmax(220px, 2fr) minmax(130px, 1fr) minmax(150px, 1.2fr) minmax(
-        140px,
-        1.1fr
-      ) minmax(120px, 1fr) 32px;
+    grid-template-columns:
+      minmax(230px, 2.2fr) minmax(140px, 1.2fr) minmax(170px, 1.5fr) minmax(120px, 1fr)
+      minmax(130px, 1fr) 32px;
     align-items: center;
   }
 }

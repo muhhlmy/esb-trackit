@@ -74,7 +74,9 @@ export function canAccessFrontendFeature(user, featureKey) {
   const permValue =
     perms[featureKey] !== undefined
       ? perms[featureKey]
-      : (featureKey === 'assets_ga' || featureKey === 'assets_ops' ? perms.assets : undefined)
+      : featureKey === 'assets_ga' || featureKey === 'assets_ops'
+        ? perms.assets
+        : undefined
   return canReadPermission(permValue)
 }
 

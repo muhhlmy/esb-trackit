@@ -5,7 +5,6 @@ import { useAuth } from '../composables/useAuth.js'
 import { animateStagger } from '../composables/useGsap.js'
 import { normalizeLocation } from '../utils/locationNormalizer.js'
 import AppModal from '../components/ui/AppModal.vue'
-import AppBadge from '../components/ui/AppBadge.vue'
 import SearchableSelect from '../components/ui/SearchableSelect.vue'
 import CustomSelect from '../components/ui/CustomSelect.vue'
 import AppRowActions from '../components/ui/AppRowActions.vue'
@@ -17,7 +16,11 @@ import SkeletonAvatar from '../components/ui/skeleton/SkeletonAvatar.vue'
 const { get, post, put, del } = useApi()
 const { isAdmin, isSuperAdmin, hasWritePermission } = useAuth()
 const canWriteAssets = computed(
-  () => isAdmin.value || isSuperAdmin.value || hasWritePermission('assets_ga') || hasWritePermission('assets'),
+  () =>
+    isAdmin.value ||
+    isSuperAdmin.value ||
+    hasWritePermission('assets_ga') ||
+    hasWritePermission('assets'),
 )
 
 const assets = ref([])
@@ -87,10 +90,10 @@ const locationOptions = computed(() =>
 )
 
 const tipeOptions = computed(() =>
-  mergeOptions(
-    tipeFasilitasOptions,
-    [...assets.value.map((a) => a.tipe_fasilitas), form.value.tipe_fasilitas],
-  ).map((t) => ({ value: t, label: t })),
+  mergeOptions(tipeFasilitasOptions, [
+    ...assets.value.map((a) => a.tipe_fasilitas),
+    form.value.tipe_fasilitas,
+  ]).map((t) => ({ value: t, label: t })),
 )
 
 // Filter option lists (include an empty "all" entry for CustomSelect)
@@ -370,8 +373,12 @@ function formatKondisiPill(kondisi) {
       <!-- Row 1: Page Title & Primary CTA -->
       <div class="flex items-center justify-between gap-2.5">
         <div class="min-w-0">
-          <h2 class="text-base sm:text-lg font-bold text-[#0F172A] tracking-tight truncate">Aset GA</h2>
-          <p class="text-[11px] sm:text-xs text-[#64748B] mt-0.5 leading-normal line-clamp-1 sm:line-clamp-none">
+          <h2 class="text-base sm:text-lg font-bold text-[#0F172A] tracking-tight truncate">
+            Aset GA
+          </h2>
+          <p
+            class="text-[11px] sm:text-xs text-[#64748B] mt-0.5 leading-normal line-clamp-1 sm:line-clamp-none"
+          >
             Kelola inventaris fasilitas General Affair, mebel, AC, dan perlengkapan kantor.
           </p>
         </div>
@@ -390,7 +397,9 @@ function formatKondisiPill(kondisi) {
       </div>
 
       <!-- Row 2: Search, Filters & Actions -->
-      <div class="flex flex-col sm:flex-row sm:items-center gap-2 w-full min-w-0 pt-2.5 border-t border-[#F1F5F9]">
+      <div
+        class="flex flex-col sm:flex-row sm:items-center gap-2 w-full min-w-0 pt-2.5 border-t border-[#F1F5F9]"
+      >
         <!-- Search Input -->
         <div class="relative w-full sm:flex-1 sm:min-w-[200px]">
           <span
@@ -578,7 +587,8 @@ function formatKondisiPill(kondisi) {
           </span>
           <h3 class="text-[14px] font-bold text-[#0F172A] mt-1">Belum Ada Aset GA</h3>
           <p class="text-[11.5px] text-[#64748B] leading-relaxed">
-            Belum ada fasilitas General Affair yang terdaftar dalam inventaris atau sesuai dengan kata kunci pencarian.
+            Belum ada fasilitas General Affair yang terdaftar dalam inventaris atau sesuai dengan
+            kata kunci pencarian.
           </p>
           <button
             v-if="canWriteAssets"
@@ -631,7 +641,10 @@ function formatKondisiPill(kondisi) {
             <div class="flex items-center gap-1.5 shrink-0 self-start">
               <div
                 class="flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-bold"
-                :class="[formatKondisiPill(asset.kondisi).bg, formatKondisiPill(asset.kondisi).text]"
+                :class="[
+                  formatKondisiPill(asset.kondisi).bg,
+                  formatKondisiPill(asset.kondisi).text,
+                ]"
               >
                 <span
                   class="h-1.5 w-1.5 rounded-full shrink-0"
@@ -810,7 +823,10 @@ function formatKondisiPill(kondisi) {
           </div>
 
           <!-- 6. Action Menu -->
-          <div @click.stop class="hidden md:flex items-center justify-end w-8 shrink-0 justify-self-end">
+          <div
+            @click.stop
+            class="hidden md:flex items-center justify-end w-8 shrink-0 justify-self-end"
+          >
             <AppRowActions :actions="getGaActions(asset)" />
           </div>
         </div>
@@ -833,7 +849,10 @@ function formatKondisiPill(kondisi) {
       @close="closeModal"
     >
       <form @submit.prevent="submitForm" class="space-y-4">
-        <div v-if="modalError" class="p-3 bg-[#FEF2F2] border border-[#FECACA] rounded-xl text-[#991B1B] text-[12px]">
+        <div
+          v-if="modalError"
+          class="p-3 bg-[#FEF2F2] border border-[#FECACA] rounded-xl text-[#991B1B] text-[12px]"
+        >
           {{ modalError }}
         </div>
 
@@ -931,7 +950,9 @@ function formatKondisiPill(kondisi) {
 
           <!-- Lokasi Detail -->
           <div>
-            <label for="ga-lokasi-detail" class="block text-[12px] font-bold text-[#1E293B] mb-1">Lokasi Detail</label>
+            <label for="ga-lokasi-detail" class="block text-[12px] font-bold text-[#1E293B] mb-1"
+              >Lokasi Detail</label
+            >
             <input
               id="ga-lokasi-detail"
               v-model="form.lokasi_detail"
@@ -945,7 +966,9 @@ function formatKondisiPill(kondisi) {
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <!-- Ukuran -->
           <div>
-            <label for="ga-ukuran" class="block text-[12px] font-bold text-[#1E293B] mb-1">Ukuran / Dimensi</label>
+            <label for="ga-ukuran" class="block text-[12px] font-bold text-[#1E293B] mb-1"
+              >Ukuran / Dimensi</label
+            >
             <input
               id="ga-ukuran"
               v-model="form.ukuran"
@@ -957,7 +980,9 @@ function formatKondisiPill(kondisi) {
 
           <!-- Detail Spesifikasi -->
           <div>
-            <label for="ga-detail" class="block text-[12px] font-bold text-[#1E293B] mb-1">Detail / Catatan</label>
+            <label for="ga-detail" class="block text-[12px] font-bold text-[#1E293B] mb-1"
+              >Detail / Catatan</label
+            >
             <input
               id="ga-detail"
               v-model="form.detail"
@@ -990,15 +1015,13 @@ function formatKondisiPill(kondisi) {
     </AppModal>
 
     <!-- Modal Confirm Delete -->
-    <AppModal
-      :is-open="showDeleteModal"
-      title="Hapus Aset GA"
-      size="sm"
-      @close="closeModal"
-    >
+    <AppModal :is-open="showDeleteModal" title="Hapus Aset GA" size="sm" @close="closeModal">
       <div class="space-y-4">
         <p class="text-[13px] text-[#475569]">
-          Apakah Anda yakin ingin menghapus Aset GA <strong class="text-[#0F172A]">{{ selectedAsset?.nama_asset }}</strong> ({{ selectedAsset?.hostname }})?
+          Apakah Anda yakin ingin menghapus Aset GA
+          <strong class="text-[#0F172A]">{{ selectedAsset?.nama_asset }}</strong> ({{
+            selectedAsset?.hostname
+          }})?
         </p>
 
         <div class="flex items-center justify-end gap-3 pt-3 border-t border-[#E2E8F0]">
@@ -1022,16 +1045,15 @@ function formatKondisiPill(kondisi) {
     </AppModal>
 
     <!-- Modal Details View -->
-    <AppModal
-      :is-open="showDetailsModal"
-      title="Detail Aset GA"
-      size="md"
-      @close="closeModal"
-    >
+    <AppModal :is-open="showDetailsModal" title="Detail Aset GA" size="md" @close="closeModal">
       <div v-if="selectedAsset" class="space-y-4">
         <div class="flex items-center gap-3 p-3 bg-[#F8FAFC] rounded-xl border border-[#E2E8F0]">
-          <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#EFF6FF] text-[#2563EB]">
-            <span class="material-symbols-outlined text-[22px]">{{ getGaIcon(selectedAsset.tipe_fasilitas) }}</span>
+          <div
+            class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#EFF6FF] text-[#2563EB]"
+          >
+            <span class="material-symbols-outlined text-[22px]">{{
+              getGaIcon(selectedAsset.tipe_fasilitas)
+            }}</span>
           </div>
           <div>
             <h3 class="font-bold text-[#0F172A] text-[14px]">{{ selectedAsset.nama_asset }}</h3>
@@ -1069,17 +1091,27 @@ function formatKondisiPill(kondisi) {
             <span class="text-[#64748B] block text-[11px] font-medium">Kondisi</span>
             <span
               class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold mt-0.5"
-              :class="[formatKondisiPill(selectedAsset.kondisi).bg, formatKondisiPill(selectedAsset.kondisi).text]"
+              :class="[
+                formatKondisiPill(selectedAsset.kondisi).bg,
+                formatKondisiPill(selectedAsset.kondisi).text,
+              ]"
             >
-              <span class="h-1.5 w-1.5 rounded-full" :class="formatKondisiPill(selectedAsset.kondisi).dot"></span>
+              <span
+                class="h-1.5 w-1.5 rounded-full"
+                :class="formatKondisiPill(selectedAsset.kondisi).dot"
+              ></span>
               {{ selectedAsset.kondisi }}
             </span>
           </div>
         </div>
 
         <div class="pt-2 border-t border-[#E2E8F0]">
-          <span class="text-[#64748B] block text-[11px] font-medium">Detail / Catatan Spesifikasi</span>
-          <p class="text-[12.5px] text-[#1E293B] mt-1 p-3 bg-[#F8FAFC] rounded-xl border border-[#E2E8F0]">
+          <span class="text-[#64748B] block text-[11px] font-medium"
+            >Detail / Catatan Spesifikasi</span
+          >
+          <p
+            class="text-[12.5px] text-[#1E293B] mt-1 p-3 bg-[#F8FAFC] rounded-xl border border-[#E2E8F0]"
+          >
             {{ selectedAsset.detail || 'Tidak ada detail tambahan.' }}
           </p>
         </div>
@@ -1116,10 +1148,9 @@ function formatKondisiPill(kondisi) {
 @media (min-width: 768px) {
   .ga-row-grid {
     display: grid;
-    grid-template-columns: minmax(220px, 2fr) minmax(130px, 1fr) minmax(150px, 1.2fr) minmax(
-        140px,
-        1.1fr
-      ) minmax(120px, 1fr) 32px;
+    grid-template-columns:
+      minmax(220px, 2fr) minmax(130px, 1fr) minmax(150px, 1.2fr) minmax(140px, 1.1fr)
+      minmax(120px, 1fr) 32px;
     align-items: center;
   }
 }

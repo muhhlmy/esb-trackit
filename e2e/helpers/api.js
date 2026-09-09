@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.E2E_API_URL || 'http://localhost:5000'
+const API_BASE_URL = process.env.E2E_API_URL || 'http://localhost:3000'
 
 export async function loginViaApi(request, email, password) {
   const response = await request.post(`${API_BASE_URL}/api/auth/login`, {
@@ -10,9 +10,8 @@ export async function loginViaApi(request, email, password) {
   return response.json()
 }
 
-export async function createAssetViaApi(request, token, assetData) {
+export async function createAssetViaApi(request, assetData) {
   const response = await request.post(`${API_BASE_URL}/api/assets`, {
-    headers: { Authorization: `Bearer ${token}` },
     data: assetData,
   })
   if (!response.ok()) {
@@ -21,9 +20,8 @@ export async function createAssetViaApi(request, token, assetData) {
   return response.json()
 }
 
-export async function createTicketViaApi(request, token, ticketData) {
+export async function createTicketViaApi(request, ticketData) {
   const response = await request.post(`${API_BASE_URL}/api/tickets`, {
-    headers: { Authorization: `Bearer ${token}` },
     data: ticketData,
   })
   if (!response.ok()) {
@@ -32,9 +30,8 @@ export async function createTicketViaApi(request, token, ticketData) {
   return response.json()
 }
 
-export async function deleteAssetViaApi(request, token, id) {
+export async function deleteAssetViaApi(request, id) {
   const response = await request.delete(`${API_BASE_URL}/api/assets/${id}`, {
-    headers: { Authorization: `Bearer ${token}` },
   })
   return response.ok()
 }

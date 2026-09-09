@@ -46,7 +46,6 @@ export async function checkAccountLockout(email) {
   const accountKey = normalizeAccountKey(email)
   if (!accountKey) return { isLocked: false, retryAfterSeconds: 0, failedAttemptCount: 0 }
 
-  await ensureAccountSecurityTable().catch(() => {})
 
   const res = await pool.query(
     `SELECT account_key, failed_attempt_count, locked_until 
@@ -86,7 +85,6 @@ export async function recordFailedLogin(email) {
   const accountKey = normalizeAccountKey(email)
   if (!accountKey) return { failedAttemptCount: 0, lockedUntil: null, retryAfterSeconds: 0 }
 
-  await ensureAccountSecurityTable().catch(() => {})
 
   const res = await pool.query(
     `
@@ -148,7 +146,6 @@ export async function resetFailedLogin(email) {
   const accountKey = normalizeAccountKey(email)
   if (!accountKey) return
 
-  await ensureAccountSecurityTable().catch(() => {})
 
   await pool.query(
     `UPDATE account_security_state

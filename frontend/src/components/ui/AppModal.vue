@@ -137,7 +137,10 @@ onBeforeUnmount(() => {
                 }}</span>
               </span>
               <div class="min-w-0">
-                <h2 :id="titleId" class="text-sm font-bold text-[#0F172A] leading-tight wrap-anywhere sm:truncate">
+                <h2
+                  :id="titleId"
+                  class="text-sm font-bold text-[#0F172A] leading-tight wrap-anywhere sm:truncate"
+                >
                   {{ title }}
                 </h2>
                 <p

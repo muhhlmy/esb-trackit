@@ -6,16 +6,29 @@ on:
   pull_request:
     branches: [main]
 
+permissions:
+  contents: read
+
 jobs:
   e2e-tests:
     timeout-minutes: 20
     runs-on: ubuntu-latest
 
+    env:
+      NODE_ENV: test
+      EMAIL_ENABLED: false
+      DB_HOST: localhost
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: postgrespassword
+      DB_NAME: assets_monitoring_test
+      JWT_SECRET: supersecretjwtkeyfortestingpurpose1234567890
+
     services:
       postgres:
-        image: postgres:15-alpine
+        image: postgres:16-alpine
         env:
-          POSTGRES_DB: assets_monitoring
+          POSTGRES_DB: assets_monitoring_test
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgrespassword
         ports:
@@ -37,16 +50,16 @@ jobs:
           cache: 'npm'
 
       - name: Install Root Dependencies
-        run: npm ci || npm install
+        run: npm ci
 
       - name: Install Backend Dependencies
-        run: npm --prefix backend ci || npm --prefix backend install
+        run: npm --prefix backend ci
 
       - name: Install Frontend Dependencies
-        run: npm --prefix frontend ci || npm --prefix frontend install
+        run: npm --prefix frontend ci
 
       - name: Install Playwright Browsers
-        run: npx playwright install --with-deps chromium
+        run: npx playwright install --with-deps chromium firefox
 
       - name: Initialize PostgreSQL Test Database
         env:
@@ -54,10 +67,9 @@ jobs:
           DB_PORT: 5432
           DB_USER: postgres
           DB_PASSWORD: postgrespassword
-          DB_NAME: assets_monitoring
+          DB_NAME: assets_monitoring_test
           JWT_SECRET: supersecretjwtkeyfortestingpurpose1234567890
-        run: |
-          PGPASSWORD=postgrespassword psql -h localhost -U postgres -d assets_monitoring -f backend/esb_trackit_db.sql
+        run: node scripts/initialize-test-database.mjs --seed-e2e
 
       - name: Run E2E Smoke Suite (Pull Request)
         if: github.event_name == 'pull_request'
@@ -68,7 +80,7 @@ jobs:
           DB_PORT: 5432
           DB_USER: postgres
           DB_PASSWORD: postgrespassword
-          DB_NAME: assets_monitoring
+          DB_NAME: assets_monitoring_test
           JWT_SECRET: supersecretjwtkeyfortestingpurpose1234567890
         run: npx playwright test --grep @smoke
 
@@ -81,7 +93,7 @@ jobs:
           DB_PORT: 5432
           DB_USER: postgres
           DB_PASSWORD: postgrespassword
-          DB_NAME: assets_monitoring
+          DB_NAME: assets_monitoring_test
           JWT_SECRET: supersecretjwtkeyfortestingpurpose1234567890
         run: npx playwright test
 

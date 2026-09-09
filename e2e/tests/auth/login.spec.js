@@ -60,7 +60,7 @@ test.describe('Authentication - Login Suite', () => {
 
   test('Accessibility: Should set initial keyboard focus on email input after page load', async ({ page }) => {
     // Wait for page to fully load, then check focus
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('domcontentloaded')
     await expect(page.locator('#email')).toBeFocused()
   })
 })

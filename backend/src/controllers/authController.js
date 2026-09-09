@@ -201,7 +201,9 @@ export async function login(req, res) {
       message: 'Login berhasil.',
       user: payload,
       session: {
-        expiresAt: new Date(expMs).toISOString(),
+        tokenExpiresAt: new Date(expMs).toISOString(),
+        sessionExpiresAt: new Date(session.expiresAt).toISOString(),
+        expiresAt: new Date(session.expiresAt).toISOString(),
       },
     })
   } catch (error) {

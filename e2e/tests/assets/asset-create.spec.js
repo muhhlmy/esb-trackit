@@ -19,10 +19,7 @@ test.describe('Asset Management - Create Asset Suite', () => {
     await page.getByPlaceholder(/laptop-hr-01/i).fill(testAsset.hostname)
     await page.getByPlaceholder(/nomor seri/i).fill(testAsset.serial_number)
 
-    const typeSelect = page.locator('form select').first()
-    if (await typeSelect.isVisible()) {
-      await typeSelect.selectOption('Laptop')
-    }
+    await page.getByRole('combobox', { name: 'Tipe Perangkat Aset' }).selectOption('Laptop')
 
     // Step 1 -> Step 2
     const nextBtn1 = page.getByRole('button', { name: /lanjutkan/i })
@@ -30,19 +27,9 @@ test.describe('Asset Management - Create Asset Suite', () => {
     await nextBtn1.click()
 
     // Step 2 (Placement): Select Lokasi Aset option from SearchableSelect
-    const lokasiTrigger = page.locator('form button[aria-haspopup="listbox"]').first()
-    if (await lokasiTrigger.isVisible()) {
-      await lokasiTrigger.click()
-      // Wait for listbox to appear
-      await page.locator('ul[role="listbox"]').first().waitFor({ state: 'visible', timeout: 3000 }).catch(() => {})
-      const firstOption = page.locator('ul[role="listbox"] li[role="option"]').first()
-      if (await firstOption.isVisible()) {
-        await firstOption.click()
-      } else {
-        await page.locator('input[role="combobox"]').fill('Solo')
-        await page.keyboard.press('Enter')
-      }
-    }
+    await page.getByRole('button', { name: 'Pilih atau ketik lokasi penempatan aset', exact: true }).click()
+    await page.getByPlaceholder('Cari atau ketik lokasi baru...').fill('QA Test Location')
+    await page.getByRole('option').filter({ hasText: 'QA Test Location' }).click()
 
     // Step 2 -> Step 3
     const nextBtn2 = page.getByRole('button', { name: /lanjutkan/i })
@@ -67,7 +54,7 @@ test.describe('Asset Management - Create Asset Suite', () => {
     const searchInput = page.getByPlaceholder(/cari/i).first()
     if (await searchInput.isVisible()) {
       await searchInput.fill(testAsset.hostname)
-      await page.waitForLoadState('networkidle')
+      await page.waitForLoadState('domcontentloaded')
     }
 
     await expect(page.getByText(testAsset.hostname, { exact: true }).first()).toBeVisible({

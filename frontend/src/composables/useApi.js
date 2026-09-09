@@ -85,9 +85,7 @@ export function useApi() {
       }
 
       const message =
-        payload?.error?.message ||
-        payload?.message ||
-        'Sesi telah berakhir, silakan login kembali.'
+        payload?.error?.message || payload?.message || 'Sesi telah berakhir, silakan login kembali.'
       throw new Error(message)
     }
 

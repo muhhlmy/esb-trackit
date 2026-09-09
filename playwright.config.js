@@ -1,7 +1,7 @@
 import { defineConfig, devices } from '@playwright/test'
 
 const FRONTEND_URL = process.env.E2E_BASE_URL || 'http://localhost:5173'
-const API_URL = process.env.E2E_API_URL || 'http://localhost:5000'
+const API_URL = process.env.E2E_API_URL || 'http://localhost:3000'
 
 export default defineConfig({
   testDir: './e2e/tests',
@@ -33,14 +33,16 @@ export default defineConfig({
   webServer: [
     {
       command: 'npm --prefix backend start',
+      env: { EMAIL_ENABLED: 'false', HOST: new URL(API_URL).hostname, PORT: new URL(API_URL).port || '3000', CORS_ORIGINS: FRONTEND_URL },
       url: `${API_URL}/api/assets`,
-      reuseExistingServer: true,
+      reuseExistingServer: !process.env.CI,
       timeout: 60000,
     },
     {
-      command: 'npm --prefix frontend dev',
+      command: 'npm --prefix frontend run dev -- --strictPort',
+      env: { VITE_HOST: new URL(FRONTEND_URL).hostname, VITE_PORT: new URL(FRONTEND_URL).port || '5173', VITE_API_PROXY_TARGET: API_URL },
       url: FRONTEND_URL,
-      reuseExistingServer: true,
+      reuseExistingServer: !process.env.CI,
       timeout: 60000,
     },
   ],

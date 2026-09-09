@@ -104,13 +104,35 @@ export const api = {
     return del(`/api/case-bookmarks/${caseId}`)
   },
 
-  // Templates (endpoint bantu; data fallback tersedia di view)
-  async getTemplates() {
-    return get('/api/templates')
+  // Shipments — Tracker Pengiriman
+  async getShipments(params = {}) {
+    const query = new URLSearchParams()
+    if (params.page) query.append('page', params.page)
+    if (params.pageSize || params.limit) query.append('pageSize', params.pageSize || params.limit)
+    if (params.search) query.append('search', params.search)
+    if (params.status && params.status !== 'all' && params.status !== 'semua') {
+      query.append('status', params.status)
+    }
+    if (params.dateFrom) query.append('dateFrom', params.dateFrom)
+    if (params.dateTo) query.append('dateTo', params.dateTo)
+
+    const queryString = query.toString() ? `?${query.toString()}` : ''
+    return get(`/api/shipments${queryString}`)
   },
 
-  // Stats (endpoint bantu; data fallback tersedia di view)
-  async getStats() {
-    return get('/api/stats')
+  async getShipmentById(id) {
+    return get(`/api/shipments/${id}`)
+  },
+
+  async createShipment(data) {
+    return post('/api/shipments', data)
+  },
+
+  async updateShipment(id, data) {
+    return put(`/api/shipments/${id}`, data)
+  },
+
+  async deleteShipment(id) {
+    return del(`/api/shipments/${id}`)
   },
 }

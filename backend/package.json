@@ -8,8 +8,7 @@
     "jsonwebtoken": "^9.0.3",
     "multer": "^2.2.0",
     "nodemailer": "^9.0.3",
-    "pg": "^8.22.0",
-    "xlsx": "^0.18.5"
+    "pg": "^8.22.0"
   },
   "name": "backend",
   "version": "1.0.0",
@@ -21,10 +20,11 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon --watch .env --watch src src/server.js",
-    "db:setup": "node src/config/setupDatabase.js",
     "db:check": "node src/config/checkSchema.js",
     "test": "node --test",
-    "check": "node --check src/server.js && node --check src/app.js && node --check src/config/setupDatabase.js && node --check src/config/checkSchema.js && node --test"
+    "check": "node --check src/server.js && node --check src/app.js && node --check src/config/setupDatabase.js && node --check src/config/checkSchema.js",
+    "db:migrate:plan": "node src/config/migrateDatabase.js --plan",
+    "db:migrate:apply": "node src/config/migrateDatabase.js --apply"
   },
   "engines": {
     "node": "^22.18.0 || >=24.12.0"

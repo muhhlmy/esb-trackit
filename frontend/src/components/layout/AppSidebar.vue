@@ -403,7 +403,7 @@ function closeSubmenuAndMobile() {
     :role="isMobileOpen ? 'dialog' : undefined"
     :aria-modal="isMobileOpen ? 'true' : undefined"
     aria-label="Navigasi aplikasi"
-    class="fixed inset-y-0 left-0 z-40 flex h-dvh shrink-0 flex-col border-r border-[#E5EAEF] bg-white text-[#2A3547] shadow-xl transition-all duration-300 ease-in-out lg:static lg:z-10 lg:shadow-none select-none"
+    class="clean-sidebar fixed inset-y-0 left-0 z-40 flex h-dvh shrink-0 flex-col border-r border-[#E5EAEF] bg-white text-[#2A3547] shadow-xl transition-all duration-300 ease-in-out lg:static lg:z-10 lg:shadow-none select-none"
     :class="[
       isMobileOpen
         ? 'w-[250px] translate-x-0 visible opacity-100'
@@ -413,7 +413,7 @@ function closeSubmenuAndMobile() {
   >
     <!-- ── Brand Logo Top Header Area ── -->
     <div
-      class="relative flex h-[56px] shrink-0 items-center border-b border-[#F1F5F9] transition-all"
+      class="sidebar-brand relative flex h-[64px] shrink-0 items-center border-b border-[#F1F5F9] transition-all"
       :class="
         isEffectiveCollapsed
           ? 'justify-center flex-col gap-1 px-0 py-1'
@@ -424,14 +424,11 @@ function closeSubmenuAndMobile() {
       <RouterLink
         v-if="!isEffectiveCollapsed"
         to="/"
-        title="Kembali ke Dashboard"
+        title="Kembali ke Help Center"
         class="flex items-center justify-center shrink-0 hover:opacity-80 transition-opacity cursor-pointer"
       >
-        <img
-          src="/ESB Logo.svg"
-          alt="ESB Logo"
-          class="h-7 w-auto shrink-0 transition-all duration-200"
-        />
+        <img src="/ESB Logo Only.svg" alt="ESB Logo" class="h-6 w-8 object-contain shrink-0" />
+        <span class="sidebar-wordmark">TrackIT</span>
       </RouterLink>
 
       <!-- Logo Mark + Control Button saat Collapsed Navigation Rail -->
@@ -439,13 +436,13 @@ function closeSubmenuAndMobile() {
         <div class="flex items-center justify-center gap-1.5 w-full px-1">
           <RouterLink
             to="/"
-            title="Kembali ke Dashboard"
+            title="Kembali ke Help Center"
             class="flex h-7 w-7 items-center justify-center rounded-lg hover:bg-[#ECF2FF] transition-all cursor-pointer shrink-0"
           >
             <img
-              src="/ESB Logo.svg"
+              src="/ESB Logo Only.svg"
               alt="ESB Logo"
-              class="h-6 w-6 object-left object-cover shrink-0 block"
+              class="h-6 w-6 object-contain shrink-0 block"
             />
           </RouterLink>
 
@@ -453,7 +450,7 @@ function closeSubmenuAndMobile() {
             type="button"
             aria-label="Perluas Sidebar"
             title="Perluas Sidebar"
-            class="flex h-6 w-6 items-center justify-center rounded-md text-[#7C8BAC] hover:bg-[#ECF2FF] hover:text-[#5D87FF] transition-all cursor-pointer shrink-0"
+            class="flex h-6 w-6 items-center justify-center rounded-md text-[#71829B] hover:bg-[#ECF2FF] hover:text-[#2563EB] transition-all cursor-pointer shrink-0"
             @click="emit('toggle-collapse')"
           >
             <span aria-hidden="true" class="material-symbols-outlined text-[16px]"
@@ -470,7 +467,7 @@ function closeSubmenuAndMobile() {
         type="button"
         aria-label="Ciutkan Sidebar"
         title="Ciutkan Sidebar"
-        class="hidden lg:flex h-7 w-7 items-center justify-center rounded-lg text-[#7C8BAC] hover:bg-[#ECF2FF] hover:text-[#5D87FF] transition-all cursor-pointer shrink-0"
+        class="hidden lg:flex h-7 w-7 items-center justify-center rounded-lg text-[#71829B] hover:bg-[#ECF2FF] hover:text-[#2563EB] transition-all cursor-pointer shrink-0"
         @click="emit('toggle-collapse')"
       >
         <span aria-hidden="true" class="material-symbols-outlined text-[18px]">menu_open</span>
@@ -481,7 +478,7 @@ function closeSubmenuAndMobile() {
         type="button"
         aria-label="Tutup navigasi mobile"
         title="Tutup Navigasi"
-        class="flex lg:hidden h-7 w-7 items-center justify-center rounded-lg text-[#7C8BAC] hover:bg-[#ECF2FF] hover:text-[#5D87FF] transition-all cursor-pointer shrink-0"
+        class="flex lg:hidden h-7 w-7 items-center justify-center rounded-lg text-[#71829B] hover:bg-[#ECF2FF] hover:text-[#2563EB] transition-all cursor-pointer shrink-0"
         @click="emit('close-mobile')"
       >
         <span aria-hidden="true" class="material-symbols-outlined text-[18px]">close</span>
@@ -490,7 +487,7 @@ function closeSubmenuAndMobile() {
 
     <!-- ── Sidebar Scrollable Menu / Navigation Rail Container ── -->
     <div
-      class="relative flex-1 overflow-y-auto py-3 transition-all"
+      class="sidebar-menu relative flex-1 overflow-y-auto py-3 transition-all"
       :class="isEffectiveCollapsed ? 'px-0 space-y-3' : 'px-2.5 space-y-4'"
     >
       <div
@@ -501,7 +498,7 @@ function closeSubmenuAndMobile() {
         <!-- Category Title (Hanya di Expanded Mode) -->
         <p
           v-if="!isEffectiveCollapsed"
-          class="px-2 text-[10.5px] font-extrabold uppercase tracking-wider text-[#475569] transition-all"
+          class="sidebar-group-title px-2 text-[10px] font-semibold uppercase tracking-wider text-[#71829B] transition-all"
         >
           {{ group.title }}
         </p>
@@ -525,8 +522,8 @@ function closeSubmenuAndMobile() {
                     ? 'h-10 w-10 justify-center rounded-xl'
                     : 'w-full gap-2.5 rounded-lg px-2.5 py-2 text-[12.5px]',
                   route.path === item.to
-                    ? 'bg-[#5D87FF] text-white shadow-xs font-semibold'
-                    : 'text-[#2A3547] hover:bg-[#ECF2FF] hover:text-[#5D87FF] font-medium',
+                    ? 'bg-[#EAF1FC] text-[#234B83] font-semibold'
+                    : 'text-[#2A3547] hover:bg-[#ECF2FF] hover:text-[#2563EB] font-medium',
                 ]"
                 @click="emit('close-mobile')"
               >
@@ -536,8 +533,8 @@ function closeSubmenuAndMobile() {
                   :class="[
                     isEffectiveCollapsed ? 'text-[20px]' : 'text-[18px]',
                     route.path === item.to
-                      ? 'text-white'
-                      : 'text-[#7C8BAC] group-hover:text-[#5D87FF]',
+                      ? 'text-[#234B83]'
+                      : 'text-[#71829B] group-hover:text-[#2563EB]',
                   ]"
                 >
                   {{ item.icon }}
@@ -556,7 +553,7 @@ function closeSubmenuAndMobile() {
                   :class="
                     route.path === item.to
                       ? 'bg-white/20 text-white'
-                      : 'bg-[#ECF2FF] text-[#5D87FF]'
+                      : 'bg-[#ECF2FF] text-[#2563EB]'
                   "
                 >
                   {{ item.badge }}
@@ -594,9 +591,9 @@ function closeSubmenuAndMobile() {
                     : 'w-full gap-2.5 rounded-lg px-2.5 py-2 text-[12.5px] font-semibold justify-between',
                   parent.items.some((child) => route.path === child.to)
                     ? isEffectiveCollapsed
-                      ? 'bg-[#ECF2FF] text-[#5D87FF]'
+                      ? 'bg-[#ECF2FF] text-[#2563EB]'
                       : 'text-[#2A3547] bg-[#F8FAFC]'
-                    : 'text-[#2A3547] hover:bg-[#F8FAFC] hover:text-[#5D87FF]',
+                    : 'text-[#2A3547] hover:bg-[#F8FAFC] hover:text-[#2563EB]',
                 ]"
                 @click="handleParentClick(parent, $event)"
               >
@@ -610,8 +607,8 @@ function closeSubmenuAndMobile() {
                     :class="[
                       isEffectiveCollapsed ? 'text-[20px]' : 'text-[18px]',
                       parent.items.some((child) => route.path === child.to)
-                        ? 'text-[#5D87FF]'
-                        : 'text-[#7C8BAC] group-hover:text-[#5D87FF]',
+                        ? 'text-[#2563EB]'
+                        : 'text-[#71829B] group-hover:text-[#2563EB]',
                     ]"
                   >
                     {{ parent.icon }}
@@ -628,7 +625,7 @@ function closeSubmenuAndMobile() {
                 <span
                   v-if="!isEffectiveCollapsed"
                   aria-hidden="true"
-                  class="material-symbols-outlined text-[16px] text-[#7C8BAC] transition-transform duration-200 shrink-0"
+                  class="material-symbols-outlined text-[16px] text-[#71829B] transition-transform duration-200 shrink-0"
                   :class="{ 'rotate-180': isParentExpanded(parent.key) }"
                 >
                   keyboard_arrow_down
@@ -651,8 +648,8 @@ function closeSubmenuAndMobile() {
                   class="group flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-[12px] transition-all duration-150 relative"
                   :class="
                     route.path === sub.to
-                      ? 'bg-[#ECF2FF] text-[#5D87FF] font-bold shadow-2xs border-l-2 border-[#5D87FF] rounded-r-lg'
-                      : 'text-[#64748B] hover:bg-[#F8FAFC] hover:text-[#5D87FF] font-medium'
+                      ? 'bg-[#ECF2FF] text-[#2563EB] font-bold shadow-2xs border-l-2 border-[#2563EB] rounded-r-lg'
+                      : 'text-[#64748B] hover:bg-[#F8FAFC] hover:text-[#2563EB] font-medium'
                   "
                   @click="emit('close-mobile')"
                 >
@@ -661,8 +658,8 @@ function closeSubmenuAndMobile() {
                     class="material-symbols-outlined text-[16px] transition-colors shrink-0"
                     :class="
                       route.path === sub.to
-                        ? 'text-[#5D87FF]'
-                        : 'text-[#94A3B8] group-hover:text-[#5D87FF]'
+                        ? 'text-[#2563EB]'
+                        : 'text-[#94A3B8] group-hover:text-[#2563EB]'
                     "
                   >
                     {{ sub.icon }}
@@ -691,7 +688,7 @@ function closeSubmenuAndMobile() {
       @mouseleave="handleParentMouseLeave"
     >
       <div class="px-2 py-1.5 border-b border-[#F1F5F9] mb-1">
-        <p class="text-[10.5px] font-extrabold uppercase tracking-wider text-[#7C8BAC]">
+        <p class="text-[10.5px] font-extrabold uppercase tracking-wider text-[#71829B]">
           {{ activeFlyoutParent.label }}
         </p>
       </div>
@@ -712,7 +709,7 @@ function closeSubmenuAndMobile() {
             aria-hidden="true"
             class="material-symbols-outlined text-[16px] shrink-0"
             :class="
-              route.path === sub.to ? 'text-[#2563EB]' : 'text-[#7C8BAC] group-hover:text-[#2563EB]'
+              route.path === sub.to ? 'text-[#2563EB]' : 'text-[#71829B] group-hover:text-[#2563EB]'
             "
           >
             {{ sub.icon }}
@@ -734,6 +731,62 @@ function closeSubmenuAndMobile() {
 </template>
 
 <style scoped>
+.clean-sidebar {
+  border-color: #e3e9f1;
+  color: #172b4d;
+}
+.sidebar-brand {
+  border-color: #edf1f6;
+}
+.sidebar-wordmark {
+  margin-left: 9px;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.045em;
+  color: #172b4d;
+}
+.sidebar-menu {
+  scrollbar-width: thin;
+  scrollbar-color: #d9e2ef transparent;
+  padding-top: 20px;
+  padding-bottom: 24px;
+}
+.sidebar-group-title {
+  font-size: 9px;
+  letter-spacing: 0.11em;
+  margin-bottom: 9px;
+}
+.sidebar-menu nav > div > a,
+.sidebar-menu nav > div > button {
+  min-height: 42px;
+}
+.sidebar-menu [role='region'] {
+  margin-left: 17px;
+  padding-left: 10px;
+  border-left: 1px solid #e5ebf3;
+}
+.sidebar-menu [role='region'] a {
+  min-height: 38px;
+  font-weight: 500;
+}
+.clean-sidebar :is(a, button):focus-visible {
+  outline: 2px solid #5285d8;
+  outline-offset: 2px;
+}
+@media (max-width: 1023px) {
+  .sidebar-brand button {
+    min-width: 44px;
+    min-height: 44px;
+  }
+  .sidebar-menu nav a,
+  .sidebar-menu nav button {
+    min-height: 44px;
+  }
+  .clean-sidebar {
+    max-width: calc(100vw - 40px);
+  }
+}
+
 .sidebar-backdrop-enter-active,
 .sidebar-backdrop-leave-active {
   transition: opacity 0.2s ease;

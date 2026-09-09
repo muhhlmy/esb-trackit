@@ -92,7 +92,7 @@ watch(
   <nav
     role="navigation"
     aria-label="Navigasi Mobile Bawah"
-    class="lg:hidden fixed bottom-0 left-0 right-0 z-30 border-t border-slate-200/90 dark:border-slate-800 bg-white/95 dark:bg-slate-950/95 backdrop-blur-lg px-2 py-1 pb-[max(0.375rem,env(safe-area-inset-bottom))] flex items-center justify-around select-none shadow-lg shadow-slate-900/5 min-h-[56px]"
+    class="clean-bottom-nav lg:hidden fixed bottom-0 left-0 right-0 z-30 border-t border-slate-200/90 dark:border-slate-800 bg-white/95 dark:bg-slate-950/95 backdrop-blur-lg px-2 py-1 pb-[max(0.375rem,env(safe-area-inset-bottom))] flex items-center justify-around select-none shadow-none min-h-[56px]"
   >
     <RouterLink
       v-for="item in items"
@@ -102,7 +102,7 @@ watch(
       class="flex flex-col items-center justify-center gap-0.5 px-2 py-1 rounded-xl transition-colors min-w-[52px] min-h-[44px] touch-manipulation active:scale-95"
       :class="
         isItemActive(item.to)
-          ? 'text-[#5D87FF] font-bold'
+          ? 'text-[#234B83] bg-[#EAF1FC] font-semibold'
           : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
       "
     >
@@ -118,7 +118,7 @@ watch(
       class="flex flex-col items-center justify-center gap-0.5 px-2 py-1 rounded-xl transition-colors cursor-pointer min-w-[52px] min-h-[44px] touch-manipulation active:scale-95"
       :class="
         isLainnyaOpen || isLainnyaActive
-          ? 'text-[#5D87FF] font-bold'
+          ? 'text-[#2563EB] font-bold'
           : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
       "
     >
@@ -137,9 +137,9 @@ watch(
 
     <div
       v-if="isLainnyaOpen"
-      role="menu"
+      role="navigation"
       aria-label="Menu lainnya"
-      class="lg:hidden fixed left-2 right-2 bottom-[64px] z-50 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl shadow-slate-900/15 p-2 animate-in fade-in slide-in-from-bottom-2 duration-150"
+      class="clean-more-menu lg:hidden fixed left-2 right-2 bottom-[calc(64px+env(safe-area-inset-bottom))] z-50 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl shadow-slate-900/15 p-2 animate-in fade-in slide-in-from-bottom-2 duration-150"
     >
       <div class="flex items-center justify-between px-2 pt-1 pb-2">
         <span
@@ -156,17 +156,16 @@ watch(
         </button>
       </div>
 
-      <div class="grid grid-cols-3 gap-1">
+      <div class="grid grid-cols-3 gap-2">
         <RouterLink
           v-for="item in lainnyaItems"
           :key="item.to"
           :to="item.to"
-          role="menuitem"
           class="flex flex-col items-center justify-center gap-1.5 px-2 py-3 rounded-xl transition-colors text-center active:scale-95"
           :class="
             isLainnyaItemActive(item.to)
-              ? 'text-[#5D87FF] bg-[#5D87FF]/10 dark:bg-[#5D87FF]/20 font-bold'
-              : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-[#5D87FF]'
+              ? 'text-[#2563EB] bg-[#2563EB]/10 dark:bg-[#2563EB]/20 font-bold'
+              : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-[#2563EB]'
           "
         >
           <component :is="item.icon" class="w-5 h-5" />
@@ -176,3 +175,65 @@ watch(
     </div>
   </Teleport>
 </template>
+
+<style scoped>
+.clean-bottom-nav {
+  background: #fff;
+  border-color: #e3e9f1;
+  gap: 5px;
+  padding-left: 12px;
+  padding-right: 12px;
+}
+.clean-bottom-nav > a,
+.clean-bottom-nav > button {
+  flex: 1;
+  max-width: 112px;
+  border-radius: 9px;
+  gap: 3px;
+  font-weight: 550;
+}
+.clean-bottom-nav svg {
+  width: 18px;
+  height: 18px;
+  stroke-width: 1.7;
+}
+.clean-more-menu {
+  max-height: calc(100dvh - 100px - env(safe-area-inset-bottom));
+  overflow-y: auto;
+  padding: 14px;
+}
+.clean-more-menu > div:first-child {
+  padding: 0 4px 10px;
+}
+.clean-more-menu > div:first-child > span {
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 13px;
+  font-weight: 650;
+  color: #172b4d;
+}
+.clean-more-menu button {
+  min-width: 44px;
+  min-height: 44px;
+}
+.clean-more-menu a {
+  border: 1px solid #edf1f6;
+  padding: 15px 7px;
+  gap: 9px;
+}
+.clean-bottom-nav :is(a, button):focus-visible,
+.clean-more-menu :is(a, button):focus-visible {
+  outline: 2px solid #5285d8;
+  outline-offset: 2px;
+}
+:global(.dark) .clean-bottom-nav {
+  background: #0f172a;
+  border-color: #28384e;
+}
+:global(.dark) .clean-more-menu a {
+  border-color: #28384e;
+}
+:global(.dark) .clean-more-menu > div:first-child > span {
+  color: #e2e8f0;
+}
+</style>

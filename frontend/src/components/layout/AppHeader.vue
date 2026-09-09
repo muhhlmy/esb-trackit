@@ -724,7 +724,7 @@ onBeforeUnmount(() => {
 
 <template>
   <header
-    class="app-header relative z-30 grid h-28 grid-cols-[minmax(0,1fr)_auto] grid-rows-2 gap-x-2 gap-y-2 py-2 shrink-0 items-center border-b border-[#E5EAEF] bg-white/95 px-3 md:flex md:h-[52px] md:justify-between md:gap-0 md:py-0 md:px-5 md:backdrop-blur-md"
+    class="app-header relative z-30 grid h-28 grid-cols-[minmax(0,1fr)_auto] grid-rows-2 gap-x-2 gap-y-2 py-2 shrink-0 items-center border-b border-[#E5EAEF] bg-white/95 px-3 md:flex md:h-[64px] md:justify-between md:gap-0 md:py-0 md:px-5 md:backdrop-blur-md"
   >
     <!-- 1. LEFT: Navigation Drawer Toggle & Page Titles -->
     <div class="flex items-center gap-2 md:gap-2.5 md:shrink-0 min-w-0">
@@ -735,7 +735,7 @@ onBeforeUnmount(() => {
         aria-controls="app-navigation"
         aria-label="Buka Navigasi Mobile"
         title="Buka Navigasi Mobile"
-        class="flex lg:hidden h-11 w-11 md:h-8 md:w-8 shrink-0 items-center justify-center rounded-lg text-[#2A3547] hover:bg-[#ECF2FF] hover:text-[#5D87FF] transition-all cursor-pointer active:scale-95 touch-manipulation"
+        class="flex lg:hidden h-11 w-11 md:h-8 md:w-8 shrink-0 items-center justify-center rounded-lg text-[#2A3547] hover:bg-[#ECF2FF] hover:text-[#2563EB] transition-all cursor-pointer active:scale-95 touch-manipulation"
         @click="$emit('toggle-mobile')"
       >
         <span aria-hidden="true" class="material-symbols-outlined text-[20px]">menu</span>
@@ -743,11 +743,13 @@ onBeforeUnmount(() => {
 
       <div class="min-w-0">
         <h1
-          class="text-sm wrap-anywhere md:truncate md:text-[14px] font-extrabold tracking-tight text-[#0F172A] leading-tight"
+          class="text-sm wrap-anywhere md:truncate md:text-[15px] font-semibold tracking-tight text-[#0F172A] leading-tight"
         >
           {{ pageTitle }}
         </h1>
-        <p class="hidden md:block truncate text-[10px] font-medium text-[#475569] leading-none">
+        <p
+          class="hidden md:block truncate text-[10px] font-medium text-[#71829B] leading-relaxed mt-1"
+        >
           {{ pageSubtitle }}
         </p>
       </div>
@@ -780,7 +782,7 @@ onBeforeUnmount(() => {
             autocomplete="off"
             @focus="initGlobalSearchData"
             :placeholder="searchPlaceholder"
-            class="h-11 md:h-9 w-full rounded-xl md:rounded-full border border-[#DFE5EF] bg-[#F8FAFC] pl-10 md:pl-9 pr-12 md:pr-20 text-[11px] sm:text-xs font-medium text-[#0F172A] placeholder-[#64748B] outline-none transition-all shadow-xs focus:bg-white focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/20 [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden"
+            class="h-11 md:h-9 w-full rounded-lg md:rounded-lg border border-[#DFE5EF] bg-[#F8FAFC] pl-10 md:pl-9 pr-12 md:pr-20 text-[11px] sm:text-xs font-medium text-[#0F172A] placeholder-[#64748B] outline-none transition-all focus:bg-white focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/20 [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden"
           />
 
           <!-- Action Buttons / Hotkey Indicator -->
@@ -799,7 +801,8 @@ onBeforeUnmount(() => {
             <button
               type="submit"
               :disabled="!searchQuery.trim()"
-              class="hidden md:flex items-center gap-1 rounded-full bg-[#EFF6FF] px-2.5 py-1 text-[10px] font-extrabold text-[#1D4ED8] hover:bg-[#1D4ED8] hover:text-white disabled:opacity-40 transition-all cursor-pointer"
+              v-if="searchQuery.trim()"
+              class="hidden md:flex items-center gap-1 rounded-lg bg-[#EFF6FF] px-2.5 py-1 text-[10px] font-extrabold text-[#1D4ED8] hover:bg-[#1D4ED8] hover:text-white disabled:opacity-40 transition-all cursor-pointer"
             >
               Cari
             </button>
@@ -838,7 +841,7 @@ onBeforeUnmount(() => {
                 <!-- Dedicated Mobile Search Input -->
                 <div class="relative flex flex-1 items-center min-w-0">
                   <span
-                    class="material-symbols-outlined absolute left-3 text-[17px] text-[#5D87FF] pointer-events-none"
+                    class="material-symbols-outlined absolute left-3 text-[17px] text-[#2563EB] pointer-events-none"
                   >
                     search
                   </span>
@@ -878,9 +881,7 @@ onBeforeUnmount(() => {
               </div>
 
               <!-- Filter Tabs -->
-              <div
-                class="flex items-center gap-1 px-2.5 sm:px-3 py-2 border-b border-[#F1F5F9] bg-[#FAFBFC] overflow-x-auto no-scrollbar shrink-0"
-              >
+              <div class="search-filter-tabs" aria-label="Kategori pencarian">
                 <button
                   v-for="tab in [
                     { key: 'ALL', label: 'Semua', icon: 'grid_view' },
@@ -912,11 +913,12 @@ onBeforeUnmount(() => {
                   :key="tab.key"
                   type="button"
                   @click="searchTabFilter = tab.key"
-                  class="flex min-h-11 md:min-h-0 items-center gap-1 shrink-0 rounded-lg px-2 sm:px-2.5 py-1 text-[11px] font-bold transition-all cursor-pointer touch-manipulation active:scale-95"
+                  :aria-pressed="searchTabFilter === tab.key"
+                  class="search-filter-tab flex min-h-11 md:min-h-0 items-center gap-1 shrink-0 rounded-lg px-2 sm:px-2.5 py-1 text-[11px] font-bold transition-all cursor-pointer touch-manipulation active:scale-95"
                   :class="
                     searchTabFilter === tab.key
-                      ? 'bg-[#5D87FF] text-white shadow-xs'
-                      : 'text-[#64748B] hover:bg-[#ECF2FF] hover:text-[#5D87FF]'
+                      ? 'bg-[#2563EB] text-white shadow-xs'
+                      : 'text-[#64748B] hover:bg-[#ECF2FF] hover:text-[#2563EB]'
                   "
                 >
                   <span class="material-symbols-outlined text-[14px]">{{ tab.icon }}</span>
@@ -940,46 +942,60 @@ onBeforeUnmount(() => {
                 class="flex items-center justify-center gap-2 py-8 text-[12px] text-[#94A3B8]"
               >
                 <div
-                  class="w-4 h-4 border-2 border-[#E2E8F0] border-t-[#5D87FF] rounded-full animate-spin"
+                  class="w-4 h-4 border-2 border-[#E2E8F0] border-t-[#2563EB] rounded-full animate-spin"
                 ></div>
                 Memuat data pencarian...
               </div>
 
               <!-- Initial Prompt State (No query typed yet) -->
-              <div v-else-if="!searchQuery.trim()" class="p-4 sm:p-5 text-center overflow-y-auto">
+              <div
+                v-else-if="!searchQuery.trim()"
+                class="search-start p-4 sm:p-5 text-center overflow-y-auto"
+              >
                 <p
                   class="text-[10.5px] sm:text-[11px] font-bold uppercase tracking-wider text-[#94A3B8] mb-2.5"
                 >
-                  Pencarian Cepat Global
+                  Mulai pencarian Anda
                 </p>
                 <div class="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2">
                   <button
                     type="button"
                     @click="quickSearchPreset('Laptop', 'ASSETS')"
-                    class="rounded-full border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-1.5 text-[11px] font-semibold text-[#475569] hover:border-[#5D87FF] hover:text-[#5D87FF] transition-all cursor-pointer active:scale-95 touch-manipulation shadow-2xs"
+                    class="rounded-full border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-1.5 text-[11px] font-semibold text-[#475569] hover:border-[#2563EB] hover:text-[#2563EB] transition-all cursor-pointer active:scale-95 touch-manipulation shadow-2xs"
                   >
-                    💻 Laptop
+                    Laptop
                   </button>
                   <button
                     type="button"
                     @click="quickSearchPreset('Tiket', 'TICKETS')"
-                    class="rounded-full border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-1.5 text-[11px] font-semibold text-[#475569] hover:border-[#5D87FF] hover:text-[#5D87FF] transition-all cursor-pointer active:scale-95 touch-manipulation shadow-2xs"
+                    class="rounded-full border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-1.5 text-[11px] font-semibold text-[#475569] hover:border-[#2563EB] hover:text-[#2563EB] transition-all cursor-pointer active:scale-95 touch-manipulation shadow-2xs"
                   >
-                    🎫 Tiket
+                    Tiket
                   </button>
                   <button
                     type="button"
                     @click="quickSearchPreset('Active', 'KARYAWAN')"
-                    class="rounded-full border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-1.5 text-[11px] font-semibold text-[#475569] hover:border-[#5D87FF] hover:text-[#5D87FF] transition-all cursor-pointer active:scale-95 touch-manipulation shadow-2xs"
+                    class="rounded-full border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-1.5 text-[11px] font-semibold text-[#475569] hover:border-[#2563EB] hover:text-[#2563EB] transition-all cursor-pointer active:scale-95 touch-manipulation shadow-2xs"
                   >
-                    👥 Karyawan Active
+                    Karyawan aktif
                   </button>
                 </div>
               </div>
 
               <!-- No Results Found -->
               <div
-                v-else-if="searchResults.totalCount === 0"
+                v-else-if="
+                  searchResults.totalCount === 0 ||
+                  (searchTabFilter !== 'ALL' &&
+                    !searchResults[
+                      {
+                        ASSETS: 'assets',
+                        KARYAWAN: 'karyawan',
+                        TICKETS: 'tickets',
+                        USERS: 'users',
+                      }[searchTabFilter]
+                    ]?.length)
+                "
                 class="flex flex-col items-center justify-center py-8 text-center px-4"
               >
                 <span class="material-symbols-outlined text-[36px] text-[#CBD5E1]">search_off</span>
@@ -994,7 +1010,7 @@ onBeforeUnmount(() => {
               <!-- SEARCH RESULTS DISPLAY LIST -->
               <div
                 v-else
-                class="flex-1 max-h-[360px] sm:max-h-[380px] overflow-y-auto divide-y divide-[#F1F5F9]"
+                class="search-result-list flex-1 overflow-y-auto divide-y divide-[#F1F5F9]"
               >
                 <!-- Category 1: ASET IT -->
                 <div
@@ -1004,9 +1020,9 @@ onBeforeUnmount(() => {
                   "
                 >
                   <div
-                    class="px-3.5 sm:px-4 py-1.5 bg-[#F8FAFC] text-[10px] font-extrabold uppercase tracking-wider text-[#5D87FF] flex items-center justify-between"
+                    class="px-3.5 sm:px-4 py-1.5 bg-[#F8FAFC] text-[10px] font-extrabold uppercase tracking-wider text-[#2563EB] flex items-center justify-between"
                   >
-                    <span>💻 Aset IT ({{ searchResults.assets.length }})</span>
+                    <span>Aset IT ({{ searchResults.assets.length }})</span>
                   </div>
                   <button
                     v-for="item in searchResults.assets"
@@ -1017,17 +1033,17 @@ onBeforeUnmount(() => {
                   >
                     <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
                       <div
-                        class="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-[#ECF2FF] text-[#5D87FF] group-hover:bg-[#5D87FF] group-hover:text-white transition-all"
+                        class="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-[#ECF2FF] text-[#2563EB] group-hover:bg-[#2563EB] group-hover:text-white transition-all"
                       >
                         <span class="material-symbols-outlined text-[17px]">devices</span>
                       </div>
                       <div class="min-w-0">
                         <p
-                          class="text-[12px] font-bold text-[#2A3547] truncate group-hover:text-[#5D87FF]"
+                          class="text-[12px] font-bold text-[#2A3547] truncate group-hover:text-[#2563EB]"
                         >
                           {{ item.label_aset || item.hostname || 'Aset' }}
                         </p>
-                        <p class="text-[10px] font-medium text-[#7C8BAC] truncate">
+                        <p class="text-[10px] font-medium text-[#71829B] truncate">
                           {{ item.nomor_seri ? 'SN: ' + item.nomor_seri : '' }}
                           <span v-if="item.tipe_perangkat"> · {{ item.tipe_perangkat }}</span>
                           <span v-if="item.merek"> · {{ item.merek }} {{ item.model }}</span>
@@ -1038,7 +1054,7 @@ onBeforeUnmount(() => {
                       </div>
                     </div>
                     <span
-                      class="material-symbols-outlined text-[16px] text-[#CBD5E1] group-hover:text-[#5D87FF] shrink-0"
+                      class="material-symbols-outlined text-[16px] text-[#CBD5E1] group-hover:text-[#2563EB] shrink-0"
                       >chevron_right</span
                     >
                   </button>
@@ -1054,7 +1070,7 @@ onBeforeUnmount(() => {
                   <div
                     class="px-3.5 sm:px-4 py-1.5 bg-[#F8FAFC] text-[10px] font-extrabold uppercase tracking-wider text-[#13DEB9] flex items-center justify-between"
                   >
-                    <span>👥 Karyawan ({{ searchResults.karyawan.length }})</span>
+                    <span>Karyawan ({{ searchResults.karyawan.length }})</span>
                   </div>
                   <button
                     v-for="item in searchResults.karyawan"
@@ -1075,7 +1091,7 @@ onBeforeUnmount(() => {
                         >
                           {{ item.nama_karyawan }}
                         </p>
-                        <p class="text-[10px] font-medium text-[#7C8BAC] truncate">
+                        <p class="text-[10px] font-medium text-[#71829B] truncate">
                           NIK: {{ item.nik }}
                           <span v-if="item.departemen">· {{ item.departemen }}</span>
                         </p>
@@ -1098,7 +1114,7 @@ onBeforeUnmount(() => {
                   <div
                     class="px-3.5 sm:px-4 py-1.5 bg-[#F8FAFC] text-[10px] font-extrabold uppercase tracking-wider text-[#FA896B] flex items-center justify-between"
                   >
-                    <span>🎫 Tiket Helpdesk ({{ searchResults.tickets.length }})</span>
+                    <span>Tiket Helpdesk ({{ searchResults.tickets.length }})</span>
                   </div>
                   <button
                     v-for="item in searchResults.tickets"
@@ -1121,7 +1137,7 @@ onBeforeUnmount(() => {
                         >
                           {{ item.nomor_tiket }}: {{ item.judul }}
                         </p>
-                        <p class="text-[10px] font-medium text-[#7C8BAC] truncate">
+                        <p class="text-[10px] font-medium text-[#71829B] truncate">
                           Pelapor: {{ item.pelapor || 'User' }} · Status: {{ item.status_tiket }}
                         </p>
                       </div>
@@ -1143,7 +1159,7 @@ onBeforeUnmount(() => {
                   <div
                     class="px-3.5 sm:px-4 py-1.5 bg-[#F8FAFC] text-[10px] font-extrabold uppercase tracking-wider text-[#7C3AED] flex items-center justify-between"
                   >
-                    <span>👤 Users ({{ searchResults.users.length }})</span>
+                    <span>Pengguna ({{ searchResults.users.length }})</span>
                   </div>
                   <button
                     v-for="item in searchResults.users"
@@ -1164,7 +1180,7 @@ onBeforeUnmount(() => {
                         >
                           {{ item.nama }} ({{ item.email }})
                         </p>
-                        <p class="text-[10px] font-medium text-[#7C8BAC] uppercase tracking-wide">
+                        <p class="text-[10px] font-medium text-[#71829B] uppercase tracking-wide">
                           Role: {{ item.role }}
                         </p>
                       </div>
@@ -1179,7 +1195,7 @@ onBeforeUnmount(() => {
 
               <!-- Popup Footer -->
               <div
-                class="px-3.5 sm:px-4 py-2.5 sm:py-2.5 border-t border-[#F1F5F9] bg-[#FAFBFC] flex items-center justify-between text-[11px] font-semibold text-[#7C8BAC] shrink-0 pb-[max(0.625rem,env(safe-area-inset-bottom))]"
+                class="search-popup-footer px-3.5 sm:px-4 py-2.5 sm:py-2.5 border-t border-[#F1F5F9] bg-[#FAFBFC] flex items-center justify-between text-[11px] font-semibold text-[#71829B] shrink-0 pb-[max(0.625rem,env(safe-area-inset-bottom))]"
               >
                 <span class="hidden md:inline">
                   Tekan
@@ -1204,7 +1220,7 @@ onBeforeUnmount(() => {
         <!-- Desktop Backdrop overlay when search is open (hidden on mobile, zero blur) -->
         <div
           v-if="isSearchOpen"
-          class="hidden md:block fixed inset-0 z-40 bg-slate-900/20 transition-opacity"
+          class="hidden md:block fixed inset-0 z-40 bg-transparent"
           @click="closeSearch"
         ></div>
       </div>
@@ -1537,7 +1553,7 @@ onBeforeUnmount(() => {
       <div>
         <label
           for="account-currentPassword"
-          class="block text-[11px] font-bold uppercase tracking-wider text-[#7C8BAC] mb-1"
+          class="block text-[11px] font-bold uppercase tracking-wider text-[#71829B] mb-1"
           >Password Saat Ini *</label
         >
         <input
@@ -1547,14 +1563,14 @@ onBeforeUnmount(() => {
           type="password"
           required
           placeholder="Masukkan password Anda saat ini"
-          class="w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-[13px] text-[#2A3547] focus:outline-none focus:border-[#5D87FF]"
+          class="w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-[13px] text-[#2A3547] focus:outline-none focus:border-[#2563EB]"
         />
       </div>
 
       <div>
         <label
           for="account-newPassword"
-          class="block text-[11px] font-bold uppercase tracking-wider text-[#7C8BAC] mb-1"
+          class="block text-[11px] font-bold uppercase tracking-wider text-[#71829B] mb-1"
           >Password Baru (min 8 karakter) *</label
         >
         <input
@@ -1565,14 +1581,14 @@ onBeforeUnmount(() => {
           required
           minlength="8"
           placeholder="Masukkan password baru"
-          class="w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-[13px] text-[#2A3547] focus:outline-none focus:border-[#5D87FF]"
+          class="w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-[13px] text-[#2A3547] focus:outline-none focus:border-[#2563EB]"
         />
       </div>
 
       <div>
         <label
           for="account-confirmPassword"
-          class="block text-[11px] font-bold uppercase tracking-wider text-[#7C8BAC] mb-1"
+          class="block text-[11px] font-bold uppercase tracking-wider text-[#71829B] mb-1"
           >Konfirmasi Password Baru *</label
         >
         <input
@@ -1583,7 +1599,7 @@ onBeforeUnmount(() => {
           required
           minlength="8"
           placeholder="Ketik ulang password baru"
-          class="w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-[13px] text-[#2A3547] focus:outline-none focus:border-[#5D87FF]"
+          class="w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-[13px] text-[#2A3547] focus:outline-none focus:border-[#2563EB]"
         />
       </div>
 
@@ -1593,14 +1609,14 @@ onBeforeUnmount(() => {
         <button
           type="button"
           @click="closePasswordModal"
-          class="rounded-xl border border-[#E5EAEF] px-4 py-2 text-[12px] font-bold text-[#7C8BAC] hover:bg-gray-50 transition-all cursor-pointer"
+          class="rounded-xl border border-[#E5EAEF] px-4 py-2 text-[12px] font-bold text-[#71829B] hover:bg-gray-50 transition-all cursor-pointer"
         >
           Batal
         </button>
         <button
           type="submit"
           :disabled="isSubmittingPassword"
-          class="rounded-xl bg-[#5D87FF] px-4 py-2 text-[12px] font-bold text-white shadow-md hover:bg-[#4570EA] transition-all cursor-pointer disabled:opacity-60"
+          class="rounded-xl bg-[#2563EB] px-4 py-2 text-[12px] font-bold text-white shadow-md hover:bg-[#4570EA] transition-all cursor-pointer disabled:opacity-60"
         >
           {{ isSubmittingPassword ? 'Menyimpan...' : 'Simpan Password Baru' }}
         </button>
@@ -1610,6 +1626,200 @@ onBeforeUnmount(() => {
 </template>
 
 <style scoped>
+.header-search-panel {
+  border-color: #e2e8f0;
+}
+.search-filter-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px;
+  padding: 12px;
+  border-bottom: 1px solid #edf1f6;
+  background: #fff;
+  flex-shrink: 0;
+}
+.search-filter-tab {
+  min-height: 36px;
+  border-radius: 7px;
+  padding: 7px 9px;
+  font-size: 11px;
+  font-weight: 550;
+  gap: 5px;
+}
+.search-filter-tab[aria-pressed='true'] {
+  background: #eaf1fc;
+  color: #234b83;
+  box-shadow: none;
+}
+.search-filter-tab[aria-pressed='true'] > span:last-child:not(:nth-child(2)) {
+  background: #d8e5f8;
+  color: #234b83;
+}
+.search-start {
+  padding: 26px 18px;
+}
+.search-start > p {
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 13px;
+  color: #52647e;
+  font-weight: 600;
+  margin-bottom: 14px;
+}
+.search-start button {
+  border-radius: 8px;
+  box-shadow: none;
+  min-height: 38px;
+  font-weight: 500;
+}
+.search-result-list {
+  min-height: 0;
+  scrollbar-width: thin;
+  scrollbar-color: #d5deeb transparent;
+}
+.search-result-list > div > div:first-child {
+  background: #f8fafc;
+  color: #71829b;
+  padding: 10px 16px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+}
+.search-result-list > div > button {
+  min-height: 64px;
+  gap: 12px;
+  padding: 12px 16px;
+}
+.search-result-list > div > button:hover {
+  background: #f4f7fc;
+}
+.search-result-list button p:first-child {
+  font-weight: 600;
+  color: #172b4d;
+  font-size: 12px;
+}
+.search-result-list button p + p {
+  font-size: 11px;
+  color: #71829b;
+  margin-top: 4px;
+}
+.search-result-list button > div {
+  flex: 1;
+}
+.search-result-list button > div > div:first-child {
+  border-radius: 9px;
+  background: #edf3fc;
+  color: #527bad;
+}
+.search-popup-footer {
+  gap: 12px;
+  font-size: 10px;
+  font-weight: 500;
+}
+.search-popup-footer button {
+  min-height: 36px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.header-search-panel :is(button, input):focus-visible {
+  outline: 2px solid #5285d8;
+  outline-offset: -2px;
+}
+@media (min-width: 768px) {
+  .header-search-panel {
+    width: max(100%, 520px);
+    max-width: calc(100vw - 40px);
+    right: 0;
+    left: auto;
+    max-height: min(560px, calc(100dvh - 88px));
+    border-radius: 12px;
+    box-shadow: 0 14px 42px #172b4d20;
+  }
+  .search-filter-tabs {
+    flex-wrap: nowrap;
+  }
+  .search-filter-tab {
+    flex: 1;
+    justify-content: center;
+    padding-left: 6px;
+    padding-right: 6px;
+  }
+  .search-result-list {
+    max-height: 380px;
+  }
+}
+@media (max-width: 767px) {
+  .header-search-panel {
+    height: 100dvh;
+  }
+  .search-filter-tabs {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 3px;
+    padding: 10px 8px;
+  }
+  .search-filter-tab {
+    flex-direction: column;
+    justify-content: center;
+    min-width: 0;
+    gap: 4px;
+    padding: 8px 2px;
+    font-size: 10px;
+    min-height: 48px;
+  }
+  .search-filter-tab > span:first-child {
+    display: none;
+  }
+  .search-result-list {
+    max-height: none;
+  }
+  .search-popup-footer {
+    margin-top: auto;
+  }
+  .search-popup-footer button {
+    min-height: 44px;
+  }
+  .search-start button {
+    min-height: 44px;
+  }
+}
+
+.app-header {
+  border-color: #e3e9f1;
+  background: #fff;
+}
+.app-header #global-main-search {
+  border-color: #e3e9f1;
+  background: #f7f9fc;
+}
+.app-header #global-main-search:focus {
+  background: white;
+}
+.app-header button[aria-label='Menu profil'] > div:first-child {
+  background: #eaf1fc;
+  color: #234b83;
+  border-radius: 50%;
+  box-shadow: none;
+}
+.app-header button[aria-label='Menu profil'] {
+  min-height: 44px;
+}
+.app-header button[aria-label='Menu profil'] p:first-child {
+  font-weight: 600;
+}
+.header-popover {
+  border-radius: 12px;
+}
+@media (min-width: 768px) {
+  .app-header #global-main-search {
+    height: 40px;
+  }
+  .app-header button[aria-label='Buka Navigasi Mobile'] {
+    width: 40px;
+    height: 44px;
+  }
+}
+
 @media (width < 40rem) {
   .password-form input[type='password'] {
     min-height: 2.75rem;

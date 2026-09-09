@@ -266,7 +266,7 @@ export async function storeEmployee(req, res) {
           my_assets: "read_only",
           tickets: "read_only",
           submissions: "none",
-          shipments: "none",
+        shipments: "none",
           users: "none",
           logs: "none",
           karyawan: "none",

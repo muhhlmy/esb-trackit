@@ -1,7 +1,19 @@
 <script setup>
 import { ref, onMounted, onUnmounted, nextTick } from 'vue'
 import { RouterLink, useRouter } from 'vue-router'
-import { ArrowLeft, ArrowRight, Laptop, Ticket, BookOpen, CircleAlert, Mail, LockKeyhole, Eye, EyeOff, LoaderCircle } from 'lucide-vue-next'
+import {
+  ArrowLeft,
+  ArrowRight,
+  Laptop,
+  Ticket,
+  BookOpen,
+  CircleAlert,
+  Mail,
+  LockKeyhole,
+  Eye,
+  EyeOff,
+  LoaderCircle,
+} from 'lucide-vue-next'
 import { useAuth } from '@/composables/useAuth'
 import { useApi } from '@/composables/useApi'
 import { findFirstAllowedRoute } from '@/utils/permissionAccess.js'
@@ -282,19 +294,37 @@ const finishResetAndLogin = () => {
         <img src="/ESB Logo Only.svg" alt="" width="36" height="28" />
         <span>TrackIT</span>
       </RouterLink>
-      <RouterLink to="/" class="back-help"><ArrowLeft :size="16" aria-hidden="true" /><span>Pusat Bantuan</span></RouterLink>
+      <RouterLink to="/" class="back-help"
+        ><ArrowLeft :size="16" aria-hidden="true" /><span>Pusat Bantuan</span></RouterLink
+      >
     </header>
     <main class="login-main">
       <aside class="login-story" aria-labelledby="story-title">
-        <div class="story-top"><span class="story-mark"></span>ESB PEOPLE TECHNOLOGY</div>
         <div class="story-content">
-          <span class="story-eyebrow">RUANG KERJA ANDA</span>
           <h2 id="story-title">Aset terkelola.<br />Kerja lebih mudah.</h2>
           <p>Akses inventaris perangkat dan bantuan tim support dalam satu tempat.</p>
           <div class="story-features">
-            <div><span class="feature-icon"><Laptop :size="21" aria-hidden="true" /></span><span><strong>Aset & perangkat</strong><small>Lihat inventaris dan penempatan aset.</small></span></div>
-            <div><span class="feature-icon"><Ticket :size="21" aria-hidden="true" /></span><span><strong>Tiket bantuan</strong><small>Ajukan kendala dan pantau penanganannya.</small></span></div>
-            <div><span class="feature-icon"><BookOpen :size="21" aria-hidden="true" /></span><span><strong>Panduan kerja</strong><small>Temukan artikel dan solusi di Help Center.</small></span></div>
+            <div>
+              <span class="feature-icon"><Laptop :size="21" aria-hidden="true" /></span
+              ><span
+                ><strong>Aset & perangkat</strong
+                ><small>Lihat inventaris dan penempatan aset.</small></span
+              >
+            </div>
+            <div>
+              <span class="feature-icon"><Ticket :size="21" aria-hidden="true" /></span
+              ><span
+                ><strong>Tiket bantuan</strong
+                ><small>Ajukan kendala dan pantau penanganannya.</small></span
+              >
+            </div>
+            <div>
+              <span class="feature-icon"><BookOpen :size="21" aria-hidden="true" /></span
+              ><span
+                ><strong>Panduan kerja</strong
+                ><small>Temukan artikel dan solusi di Help Center.</small></span
+              >
+            </div>
           </div>
         </div>
         <div class="story-footer">ESB TrackIT <span>Helpdesk & Asset Management</span></div>
@@ -304,25 +334,86 @@ const finishResetAndLogin = () => {
           <span class="login-eyebrow">MASUK KE TRACKIT</span>
           <h1 id="login-title">Selamat datang kembali.</h1>
           <p class="login-intro">Gunakan email akun Anda untuk melanjutkan.</p>
-          <div v-if="errorMessage" id="login-error" class="login-error" role="alert"><CircleAlert :size="18" aria-hidden="true" /><span>{{ errorMessage }}</span></div>
+          <div v-if="errorMessage" id="login-error" class="login-error" role="alert">
+            <CircleAlert :size="18" aria-hidden="true" /><span>{{ errorMessage }}</span>
+          </div>
           <form class="login-form" :aria-busy="isLoading" @submit.prevent="handleLogin">
             <div class="login-field">
               <label for="email">Alamat email</label>
-              <div class="input-wrap"><Mail :size="18" aria-hidden="true" /><input id="email" ref="emailInput" v-model="email" type="email" inputmode="email" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="nama@esb.co.id" required :disabled="isLoading" :aria-describedby="errorMessage ? 'login-error' : undefined" /></div>
+              <div class="input-wrap">
+                <Mail :size="18" aria-hidden="true" /><input
+                  id="email"
+                  ref="emailInput"
+                  v-model="email"
+                  type="email"
+                  inputmode="email"
+                  autocomplete="username"
+                  autocapitalize="none"
+                  spellcheck="false"
+                  placeholder="nama@esb.co.id"
+                  required
+                  :disabled="isLoading"
+                  :aria-describedby="errorMessage ? 'login-error' : undefined"
+                />
+              </div>
             </div>
             <div class="login-field">
               <label for="password">Kata sandi</label>
-              <div class="input-wrap"><LockKeyhole :size="18" aria-hidden="true" /><input id="password" v-model="password" :type="showPassword ? 'text' : 'password'" autocomplete="current-password" placeholder="Masukkan kata sandi" required :disabled="isLoading" :aria-describedby="errorMessage ? 'login-error' : undefined" /><button type="button" class="password-toggle" :aria-label="showPassword ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'" :aria-pressed="showPassword" @click="showPassword = !showPassword"><EyeOff v-if="showPassword" :size="18" /><Eye v-else :size="18" /></button></div>
+              <div class="input-wrap">
+                <LockKeyhole :size="18" aria-hidden="true" /><input
+                  id="password"
+                  v-model="password"
+                  :type="showPassword ? 'text' : 'password'"
+                  autocomplete="current-password"
+                  placeholder="Masukkan kata sandi"
+                  required
+                  :disabled="isLoading"
+                  :aria-describedby="errorMessage ? 'login-error' : undefined"
+                /><button
+                  type="button"
+                  class="password-toggle"
+                  :aria-label="showPassword ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'"
+                  :aria-pressed="showPassword"
+                  @click="showPassword = !showPassword"
+                >
+                  <EyeOff v-if="showPassword" :size="18" /><Eye v-else :size="18" />
+                </button>
+              </div>
             </div>
-            <div class="login-options"><label><input v-model="rememberMe" type="checkbox" :disabled="isLoading" /><span>Ingat saya</span></label><button type="button" :disabled="isLoading" @click="openForgotModal">Lupa kata sandi?</button></div>
-            <button type="submit" class="login-submit" :disabled="isLoading"><LoaderCircle v-if="isLoading" :size="18" class="login-spinner" aria-hidden="true" /><span>{{ isLoading ? 'Sedang masuk…' : 'Masuk' }}</span><ArrowRight v-if="!isLoading" :size="18" aria-hidden="true" /></button>
+            <div class="login-options">
+              <label
+                ><input v-model="rememberMe" type="checkbox" :disabled="isLoading" /><span
+                  >Ingat saya</span
+                ></label
+              ><button type="button" :disabled="isLoading" @click="openForgotModal">
+                Lupa kata sandi?
+              </button>
+            </div>
+            <button type="submit" class="login-submit" :disabled="isLoading">
+              <LoaderCircle
+                v-if="isLoading"
+                :size="18"
+                class="login-spinner"
+                aria-hidden="true"
+              /><span>{{ isLoading ? 'Sedang masuk…' : 'Masuk' }}</span
+              ><ArrowRight v-if="!isLoading" :size="18" aria-hidden="true" />
+            </button>
           </form>
-          <div class="activation-note"><span>Belum mengaktifkan akun?</span><button type="button" @click="openForgotModal">Aktivasi akun<ArrowRight :size="14" aria-hidden="true" /></button></div>
+          <div class="activation-note">
+            <span>Belum mengaktifkan akun?</span
+            ><button type="button" @click="openForgotModal">
+              Aktivasi akun<ArrowRight :size="14" aria-hidden="true" />
+            </button>
+          </div>
         </div>
-        <p class="form-help">Butuh panduan? <RouterLink to="/">Kunjungi Pusat Bantuan</RouterLink></p>
+        <p class="form-help">
+          Butuh panduan? <RouterLink to="/">Kunjungi Pusat Bantuan</RouterLink>
+        </p>
       </section>
     </main>
-    <footer class="login-footer">&copy; {{ new Date().getFullYear() }} ESB People Technology</footer>
+    <footer class="login-footer">
+      &copy; {{ new Date().getFullYear() }} ESB People Technology
+    </footer>
     <Teleport to="body">
       <Transition name="modal-fade">
         <div
@@ -622,7 +713,11 @@ const finishResetAndLogin = () => {
                         type="button"
                         @click="showNewPassword = !showNewPassword"
                         class="absolute right-1.5 top-1/2 -translate-y-1/2 w-8 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors focus:outline-none cursor-pointer touch-manipulation"
-                        :aria-label="showNewPassword ? 'Sembunyikan kata sandi baru' : 'Tampilkan kata sandi baru'"
+                        :aria-label="
+                          showNewPassword
+                            ? 'Sembunyikan kata sandi baru'
+                            : 'Tampilkan kata sandi baru'
+                        "
                       >
                         <span class="material-symbols-outlined text-[18px] block">
                           {{ showNewPassword ? 'visibility_off' : 'visibility' }}
@@ -758,6 +853,569 @@ const finishResetAndLogin = () => {
 </template>
 
 <style scoped>
+.login-page {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: #f5f7fb;
+  color: #172b4d;
+  padding: 0 32px;
+}
+.login-header {
+  width: 100%;
+  max-width: 1120px;
+  margin: 0 auto;
+  min-height: 88px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+.login-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  font-size: 20px;
+  font-weight: 750;
+  letter-spacing: -0.045em;
+}
+.login-brand img {
+  object-fit: contain;
+}
+.back-help {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 550;
+}
+.back-help:hover {
+  color: #2563eb;
+}
+.login-main {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  width: 100%;
+  max-width: 1120px;
+  margin: auto;
+  border: 1px solid #e3e9f1;
+  border-radius: 24px;
+  background: white;
+  box-shadow: 0 16px 50px #142d5206;
+  overflow: hidden;
+}
+.login-story {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 38px 44px;
+  color: #fff;
+  background: #142d52;
+  min-width: 0;
+}
+.story-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.13em;
+  color: #b7c9e3;
+}
+.story-mark {
+  width: 20px;
+  height: 2px;
+  background: #8eaff0;
+}
+.story-content {
+  padding: 50px 0;
+}
+.story-eyebrow {
+  display: block;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: #9cbae4;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+.story-content h2 {
+  font-size: clamp(30px, 3.1vw, 42px);
+  font-weight: 650;
+  line-height: 1.22;
+  letter-spacing: -0.045em;
+}
+.story-content > p {
+  font-size: 13px;
+  line-height: 1.8;
+  color: #bdcce1;
+  margin-top: 18px;
+  max-width: 330px;
+}
+.story-features {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  margin-top: 36px;
+}
+.story-features > div {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.feature-icon {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  background: #ffffff08;
+  border: 1px solid #ffffff22;
+  color: #b9d2fa;
+  border-radius: 11px;
+  flex-shrink: 0;
+}
+.story-features strong {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+}
+.story-features small {
+  display: block;
+  font-size: 11px;
+  line-height: 1.65;
+  color: #adbfda;
+  margin-top: 4px;
+}
+.story-footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  justify-content: space-between;
+  border-top: 1px solid #ffffff22;
+  padding-top: 18px;
+  font-size: 10px;
+  color: #b7c9e3;
+}
+.story-footer span {
+  color: #93aace;
+}
+.login-form-panel {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 48px;
+}
+.login-form-inner {
+  width: 100%;
+  max-width: 360px;
+  margin: auto;
+}
+.login-eyebrow {
+  display: block;
+  font-size: 10px;
+  font-weight: 650;
+  letter-spacing: 0.1em;
+  color: #71829b;
+  margin-bottom: 14px;
+}
+.login-form-panel h1 {
+  font-size: 29px;
+  line-height: 1.25;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  max-width: 310px;
+}
+.login-intro {
+  margin-top: 12px;
+  color: #64748b;
+  font-size: 13px;
+  line-height: 1.8;
+}
+.login-form {
+  margin-top: 30px;
+}
+.login-field + .login-field {
+  margin-top: 20px;
+}
+.login-field > label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 9px;
+}
+.input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding-left: 14px;
+  border: 1px solid #d9e1ec;
+  background: #fff;
+  border-radius: 9px;
+  color: #8291a7;
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
+}
+.input-wrap > svg {
+  flex-shrink: 0;
+}
+.input-wrap:focus-within {
+  border-color: #5285d8;
+  box-shadow: 0 0 0 3px #2563eb12;
+}
+.input-wrap input {
+  width: 100%;
+  min-width: 0;
+  height: 49px;
+  border: 0;
+  background: transparent;
+  outline: none;
+  padding-right: 12px;
+  font-size: 14px;
+  color: #172b4d;
+}
+.input-wrap input::placeholder {
+  color: #8d9bb0;
+}
+.password-toggle {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  margin-right: 3px;
+  color: #71829b;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.password-toggle:hover {
+  color: #2563eb;
+  background: #f5f7fb;
+}
+.login-options {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px 16px;
+  margin: 12px 0 18px;
+  font-size: 12px;
+}
+.login-options label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  cursor: pointer;
+  color: #52647e;
+}
+.login-options input {
+  width: 16px;
+  height: 16px;
+  accent-color: #2563eb;
+}
+.login-options button {
+  color: #2563eb;
+  min-height: 44px;
+  font-weight: 550;
+  cursor: pointer;
+}
+.login-submit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 49px;
+  border-radius: 9px;
+  background: #2563eb;
+  color: white;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.login-submit:hover {
+  background: #1d4ed8;
+}
+.login-form :disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+.activation-note {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 0 6px;
+  font-size: 11px;
+  color: #71829b;
+  margin-top: 22px;
+  padding-top: 16px;
+  border-top: 1px solid #edf0f5;
+}
+.activation-note button {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 44px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #2563eb;
+  cursor: pointer;
+}
+.form-help {
+  margin: 26px auto 0;
+  text-align: center;
+  color: #8795a9;
+  font-size: 11px;
+  line-height: 1.8;
+}
+.form-help a {
+  color: #52647e;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.login-error {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 20px;
+  padding: 12px;
+  background: #fff1f2;
+  border: 1px solid #fecdd3;
+  border-radius: 9px;
+  color: #9f1239;
+  font-size: 12px;
+  line-height: 1.7;
+}
+.login-error svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.login-footer {
+  text-align: center;
+  padding: 24px 0;
+  color: #8996a9;
+  font-size: 10px;
+}
+.login-page :is(a, button, input):focus-visible {
+  outline: 2px solid #5285d8;
+  outline-offset: 4px;
+}
+.input-wrap input:focus-visible {
+  outline: none;
+}
+.login-spinner {
+  animation: login-spin 1s linear infinite;
+}
+@keyframes login-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.login-reset input:not([maxlength]) {
+  font-size: 16px;
+}
+.login-reset button:focus-visible {
+  outline: 2px solid #5285d8;
+  outline-offset: 2px;
+}
+@media (max-width: 1023px) {
+  .login-page {
+    padding: 0 24px;
+  }
+  .login-story {
+    padding: 30px;
+  }
+  .login-form-panel {
+    padding: 36px 30px;
+  }
+  .story-content {
+    padding: 36px 0;
+  }
+  .login-form-panel h1 {
+    font-size: 27px;
+  }
+}
+@media (min-width: 768px) {
+  .login-page {
+    height: 100dvh;
+    min-height: 0;
+  }
+  .login-header {
+    min-height: 64px;
+    flex-shrink: 0;
+  }
+  .login-main {
+    flex: 0 1 590px;
+    min-height: 0;
+    max-width: 1040px;
+    margin: auto;
+  }
+  .login-story {
+    padding: 28px 36px;
+    overflow-y: auto;
+  }
+  .story-content {
+    padding: 28px 0;
+  }
+  .story-content h2 {
+    font-size: 36px;
+  }
+  .story-features {
+    margin-top: 26px;
+    gap: 18px;
+  }
+  .login-form-panel {
+    padding: 28px 36px;
+    overflow-y: auto;
+    justify-content: flex-start;
+  }
+  .login-form {
+    margin-top: 22px;
+  }
+  .login-field + .login-field {
+    margin-top: 16px;
+  }
+  .activation-note {
+    margin-top: 16px;
+    padding-top: 10px;
+  }
+  .form-help {
+    margin-top: 16px;
+  }
+  .login-footer {
+    flex-shrink: 0;
+    padding: 14px 0;
+  }
+}
+@media (min-width: 768px) and (max-height: 740px) {
+  .login-main {
+    flex-basis: 520px;
+  }
+  .login-story,
+  .login-form-panel {
+    padding: 22px 30px;
+  }
+  .story-content {
+    padding: 20px 0;
+  }
+  .story-content h2 {
+    font-size: 32px;
+  }
+  .story-features {
+    margin-top: 20px;
+    gap: 14px;
+  }
+  .login-eyebrow {
+    margin-bottom: 8px;
+  }
+  .login-form-panel h1 {
+    font-size: 26px;
+  }
+  .login-intro {
+    margin-top: 8px;
+  }
+  .login-form {
+    margin-top: 18px;
+  }
+  .login-options {
+    margin: 6px 0 10px;
+  }
+  .activation-note {
+    margin-top: 10px;
+    padding-top: 4px;
+  }
+  .form-help {
+    margin-top: 10px;
+  }
+}
+@media (max-width: 767px) {
+  .login-page {
+    padding: 0 20px;
+    background: #fff;
+  }
+  .login-header {
+    min-height: 76px;
+    border-bottom: 1px solid #edf0f5;
+  }
+  .login-brand {
+    font-size: 18px;
+  }
+  .login-brand img {
+    width: 30px;
+  }
+  .back-help {
+    font-size: 11px;
+  }
+  .login-main {
+    display: block;
+    max-width: 440px;
+    margin: auto;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    overflow: visible;
+  }
+  .login-story {
+    display: none;
+  }
+  .login-form-panel {
+    padding: 40px 4px 20px;
+  }
+  .login-form-inner {
+    max-width: 380px;
+  }
+  .login-form-panel h1 {
+    font-size: 30px;
+    max-width: 340px;
+  }
+  .login-intro {
+    font-size: 13px;
+  }
+  .login-form {
+    margin-top: 28px;
+  }
+  .input-wrap input {
+    font-size: 16px;
+    height: 50px;
+  }
+  .login-options {
+    font-size: 12px;
+  }
+  .login-submit {
+    min-height: 50px;
+  }
+  .form-help {
+    margin-top: 24px;
+  }
+  .login-footer {
+    padding: 18px 0 max(20px, env(safe-area-inset-bottom));
+  }
+}
+@media (max-width: 360px) {
+  .login-page {
+    padding: 0 16px;
+  }
+  .login-form-panel {
+    padding-left: 0;
+    padding-right: 0;
+  }
+  .login-form-panel h1 {
+    font-size: 27px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .login-page *,
+  .login-reset * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
 @keyframes fadeIn {
   from {
     opacity: 0;

@@ -1,9 +1,9 @@
 <script setup>
-import { ref, watch } from 'vue';
-import { useCases } from '@/composables/useCases';
-import { X, Trash2, Save, Plus, Minus } from 'lucide-vue-next';
+import { ref, watch } from 'vue'
+import { useCases } from '@/composables/useCases'
+import { X, Trash2, Save } from 'lucide-vue-next'
 
-const { isDrawerOpen, drawerMode, editingCase, closeDrawer, saveCase, deleteCase } = useCases();
+const { isDrawerOpen, drawerMode, editingCase, closeDrawer, saveCase, deleteCase } = useCases()
 
 const form = ref({
   id: '',
@@ -17,52 +17,61 @@ const form = ref({
   dosString: '',
   dontsString: '',
   snippetLabel: '',
-  snippetCode: ''
-});
+  snippetCode: '',
+})
 
-watch(editingCase, (val) => {
-  if (val) {
-    form.value = {
-      id: val.id || '',
-      title: val.title || '',
-      category: val.category || 'hardware',
-      severity: val.severity || 'medium',
-      tagsString: Array.isArray(val.tags) ? val.tags.join(', ') : '',
-      summary: val.summary || '',
-      problemContext: val.problemContext || '',
-      stepsString: Array.isArray(val.actionSteps) ? val.actionSteps.join('\n') : '',
-      dosString: Array.isArray(val.dosAndDonts?.dos) ? val.dosAndDonts.dos.join('\n') : '',
-      dontsString: Array.isArray(val.dosAndDonts?.donts) ? val.dosAndDonts.donts.join('\n') : '',
-      snippetLabel: val.snippets?.[0]?.label || '',
-      snippetCode: val.snippets?.[0]?.code || ''
-    };
-  }
-}, { immediate: true });
+watch(
+  editingCase,
+  (val) => {
+    if (val) {
+      form.value = {
+        id: val.id || '',
+        title: val.title || '',
+        category: val.category || 'hardware',
+        severity: val.severity || 'medium',
+        tagsString: Array.isArray(val.tags) ? val.tags.join(', ') : '',
+        summary: val.summary || '',
+        problemContext: val.problemContext || '',
+        stepsString: Array.isArray(val.actionSteps) ? val.actionSteps.join('\n') : '',
+        dosString: Array.isArray(val.dosAndDonts?.dos) ? val.dosAndDonts.dos.join('\n') : '',
+        dontsString: Array.isArray(val.dosAndDonts?.donts) ? val.dosAndDonts.donts.join('\n') : '',
+        snippetLabel: val.snippets?.[0]?.label || '',
+        snippetCode: val.snippets?.[0]?.code || '',
+      }
+    }
+  },
+  { immediate: true },
+)
 
 async function onSubmit() {
   const tags = form.value.tagsString
     .split(',')
     .map((t) => t.trim())
-    .filter(Boolean);
+    .filter(Boolean)
 
   const actionSteps = form.value.stepsString
     .split('\n')
     .map((s) => s.trim())
-    .filter(Boolean);
+    .filter(Boolean)
 
   const dos = form.value.dosString
     .split('\n')
     .map((s) => s.trim())
-    .filter(Boolean);
+    .filter(Boolean)
 
   const donts = form.value.dontsString
     .split('\n')
     .map((s) => s.trim())
-    .filter(Boolean);
+    .filter(Boolean)
 
   const snippets = form.value.snippetCode.trim()
-    ? [{ label: form.value.snippetLabel.trim() || 'Command / Script', code: form.value.snippetCode.trim() }]
-    : [];
+    ? [
+        {
+          label: form.value.snippetLabel.trim() || 'Command / Script',
+          code: form.value.snippetCode.trim(),
+        },
+      ]
+    : []
 
   const payload = {
     id: form.value.id,
@@ -74,10 +83,10 @@ async function onSubmit() {
     problemContext: form.value.problemContext,
     actionSteps,
     dosAndDonts: { dos, donts },
-    snippets
-  };
+    snippets,
+  }
 
-  await saveCase(payload);
+  await saveCase(payload)
 }
 </script>
 
@@ -90,8 +99,9 @@ async function onSubmit() {
     ></div>
 
     <div class="fixed inset-y-0 right-0 max-w-full flex pl-10">
-      <div class="w-screen max-w-xl bg-slate-900 border-l border-slate-800 shadow-2xl flex flex-col">
-        
+      <div
+        class="w-screen max-w-xl bg-slate-900 border-l border-slate-800 shadow-2xl flex flex-col"
+      >
         <!-- Header -->
         <div class="px-6 py-4 border-b border-slate-800 flex items-center justify-between">
           <div>
@@ -109,10 +119,15 @@ async function onSubmit() {
         </div>
 
         <!-- Form Body -->
-        <form @submit.prevent="onSubmit" id="case-drawer-form" class="flex-1 overflow-y-auto p-6 space-y-4 text-xs">
-          
+        <form
+          @submit.prevent="onSubmit"
+          id="case-drawer-form"
+          class="flex-1 overflow-y-auto p-6 space-y-4 text-xs"
+        >
           <div>
-            <label class="block font-semibold text-slate-300 mb-1">Judul Artikel / Case <span class="text-rose-400">*</span></label>
+            <label class="block font-semibold text-slate-300 mb-1"
+              >Judul Artikel / Case <span class="text-rose-400">*</span></label
+            >
             <input
               v-model="form.title"
               type="text"
@@ -124,7 +139,9 @@ async function onSubmit() {
 
           <div class="grid grid-cols-2 gap-3">
             <div>
-              <label class="block font-semibold text-slate-300 mb-1">Kategori <span class="text-rose-400">*</span></label>
+              <label class="block font-semibold text-slate-300 mb-1"
+                >Kategori <span class="text-rose-400">*</span></label
+              >
               <select
                 v-model="form.category"
                 class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-100 focus:outline-none focus:border-indigo-500"
@@ -140,7 +157,9 @@ async function onSubmit() {
             </div>
 
             <div>
-              <label class="block font-semibold text-slate-300 mb-1">Severity <span class="text-rose-400">*</span></label>
+              <label class="block font-semibold text-slate-300 mb-1"
+                >Severity <span class="text-rose-400">*</span></label
+              >
               <select
                 v-model="form.severity"
                 class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-100 focus:outline-none focus:border-indigo-500"
@@ -154,7 +173,9 @@ async function onSubmit() {
           </div>
 
           <div>
-            <label class="block font-semibold text-slate-300 mb-1">Ringkasan (Summary) <span class="text-rose-400">*</span></label>
+            <label class="block font-semibold text-slate-300 mb-1"
+              >Ringkasan (Summary) <span class="text-rose-400">*</span></label
+            >
             <textarea
               v-model="form.summary"
               rows="2"
@@ -165,7 +186,9 @@ async function onSubmit() {
           </div>
 
           <div>
-            <label class="block font-semibold text-slate-300 mb-1">Problem Context / Latar Belakang</label>
+            <label class="block font-semibold text-slate-300 mb-1"
+              >Problem Context / Latar Belakang</label
+            >
             <textarea
               v-model="form.problemContext"
               rows="2"
@@ -236,11 +259,12 @@ async function onSubmit() {
               placeholder="hardware, setup, windows"
             />
           </div>
-
         </form>
 
         <!-- Footer -->
-        <div class="px-6 py-4 border-t border-slate-800 flex items-center justify-between bg-slate-900/90">
+        <div
+          class="px-6 py-4 border-t border-slate-800 flex items-center justify-between bg-slate-900/90"
+        >
           <div>
             <button
               v-if="drawerMode === 'edit'"
@@ -272,7 +296,6 @@ async function onSubmit() {
             </button>
           </div>
         </div>
-
       </div>
     </div>
   </div>

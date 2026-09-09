@@ -1,9 +1,9 @@
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue';
-import { useRouter, useRoute, RouterLink } from 'vue-router';
-import { useCases } from '@/composables/useCases';
-import { useAuth } from '@/composables/useAuth';
-import { useLanguage } from '@/composables/useLanguage';
+defineOptions({ name: 'AppNavbar' })
+import { ref, onMounted, onUnmounted } from 'vue'
+import { useRouter, useRoute, RouterLink } from 'vue-router'
+import { useAuth } from '@/composables/useAuth'
+import { useLanguage } from '@/composables/useLanguage'
 import {
   Search,
   LogIn,
@@ -13,67 +13,76 @@ import {
   LayoutDashboard,
   ChevronDown,
   Laptop,
-  Globe
-} from 'lucide-vue-next';
+  Globe,
+} from 'lucide-vue-next'
 
-const router = useRouter();
-const route = useRoute();
-const { setSearch } = useCases();
-const { isAuthenticated, user, isAdmin, isSuperAdmin, hasPermission, logout } = useAuth();
-const { currentLang, setLanguage, t } = useLanguage();
+const router = useRouter()
+const route = useRoute()
+const { isAuthenticated, user, isAdmin, logout } = useAuth()
+const { currentLang, setLanguage, t } = useLanguage()
 
-const isProfileOpen = ref(false);
+const isProfileOpen = ref(false)
 
 function handleLogoClick() {
-  router.push('/');
+  router.push('/')
 }
 
 function toggleProfileMenu() {
-  isProfileOpen.value = !isProfileOpen.value;
+  isProfileOpen.value = !isProfileOpen.value
 }
 
 function closeProfileMenu() {
-  isProfileOpen.value = false;
+  isProfileOpen.value = false
 }
 
 function handleLogout() {
-  closeProfileMenu();
-  logout();
-  router.push('/login');
+  closeProfileMenu()
+  logout()
+  router.push('/login')
 }
 
 function handleKeydown(e) {
   if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
-    e.preventDefault();
-    router.push('/cases');
+    e.preventDefault()
+    router.push('/cases')
   } else if (e.key === 'Escape') {
-    closeProfileMenu();
+    closeProfileMenu()
   }
 }
 
 onMounted(() => {
-  window.addEventListener('keydown', handleKeydown);
-});
+  window.addEventListener('keydown', handleKeydown)
+})
 
 onUnmounted(() => {
-  window.removeEventListener('keydown', handleKeydown);
-});
+  window.removeEventListener('keydown', handleKeydown)
+})
 </script>
 
 <template>
-  <header class="sticky top-0 z-40 w-full border-b border-[#E5EAEF] dark:border-slate-800 bg-white/95 dark:bg-[#0F172A]/95 backdrop-blur-md text-[#0F172A] dark:text-white transition-colors duration-200 px-4 sm:px-6 lg:px-8 select-none">
+  <header
+    class="sticky top-0 z-40 w-full border-b border-[#E5EAEF] dark:border-slate-800 bg-white/95 dark:bg-[#0F172A]/95 backdrop-blur-md text-[#0F172A] dark:text-white transition-colors duration-200 px-4 sm:px-6 lg:px-8 select-none"
+  >
     <div class="max-w-[1200px] mx-auto w-full h-16 flex items-center justify-between gap-4">
-      
       <!-- Left Branding: ESB TrackIT Help Center -->
       <div class="flex items-center gap-4 min-w-0">
         <button
           @click="handleLogoClick"
           class="flex items-center gap-2 sm:gap-2.5 group focus:outline-none select-none text-left cursor-pointer min-w-0"
         >
-          <img src="/ESB Logo Only.svg" alt="ESB Logo" class="h-5 w-auto object-contain shrink-0 group-hover:scale-105 transition-transform" />
+          <img
+            src="/ESB Logo Only.svg"
+            alt="ESB Logo"
+            class="h-5 w-auto object-contain shrink-0 group-hover:scale-105 transition-transform"
+          />
           <div class="flex items-center gap-1.5 sm:gap-2 min-w-0">
-            <span class="font-extrabold text-[#0F172A] dark:text-white tracking-tight text-xs sm:text-sm group-hover:text-[#5D87FF] transition-colors truncate">ESB TrackIT</span>
-            <span class="hidden sm:inline-block text-[10px] text-[#64748B] dark:text-slate-400 font-extrabold uppercase tracking-wider bg-[#F1F5F9] dark:bg-slate-800 px-2 py-0.5 rounded border border-[#E5EAEF] dark:border-slate-700/80 shrink-0">
+            <span
+              class="font-extrabold text-[#0F172A] dark:text-white tracking-tight text-xs sm:text-sm group-hover:text-[#5D87FF] transition-colors truncate"
+              >ESB TrackIT</span
+            >
+            <span
+              class="hidden sm:inline-block text-[10px] text-[#64748B] dark:text-slate-400 font-extrabold uppercase tracking-wider bg-[#F1F5F9] dark:bg-slate-800 px-2 py-0.5 rounded border border-[#E5EAEF] dark:border-slate-700/80 shrink-0"
+            >
               Help Center
             </span>
           </div>
@@ -82,7 +91,6 @@ onUnmounted(() => {
 
       <!-- Right Actions: Quick Search, Auth Profile / Sign In, Theme Toggle -->
       <div class="flex items-center gap-2 sm:gap-3 shrink-0">
-        
         <!-- Search Trigger Hint -->
         <RouterLink
           to="/cases"
@@ -90,7 +98,10 @@ onUnmounted(() => {
         >
           <Search class="w-3.5 h-3.5" />
           <span>{{ t('search_placeholder_nav', 'Cari panduan & artikel...') }}</span>
-          <kbd class="px-1.5 py-0.5 text-[10px] font-mono font-bold bg-white dark:bg-slate-700 rounded border border-[#E5EAEF] dark:border-slate-600 text-[#64748B] dark:text-slate-300">Ctrl K</kbd>
+          <kbd
+            class="px-1.5 py-0.5 text-[10px] font-mono font-bold bg-white dark:bg-slate-700 rounded border border-[#E5EAEF] dark:border-slate-600 text-[#64748B] dark:text-slate-300"
+            >Ctrl K</kbd
+          >
         </RouterLink>
 
         <!-- Dashboard -->
@@ -104,7 +115,7 @@ onUnmounted(() => {
         </RouterLink>
 
         <!-- AUTH STATE DEPENDENT PROFILE / SIGN IN BUTTON -->
-        
+
         <!-- 1. VISITOR / NOT LOGGED IN: Sign In Button -->
         <template v-if="!isAuthenticated">
           <RouterLink
@@ -124,21 +135,35 @@ onUnmounted(() => {
               class="flex items-center gap-2 p-1 sm:p-1.5 pr-2 sm:pr-2.5 rounded-full border border-slate-200/80 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 hover:bg-slate-50 dark:hover:bg-slate-800/90 hover:border-slate-300 dark:hover:border-slate-700 shadow-2xs hover:shadow-xs transition-all duration-200 cursor-pointer text-xs group min-h-[38px]"
             >
               <!-- Avatar Circle -->
-              <div class="w-6 h-6 rounded-full bg-gradient-to-tr from-[#5D87FF] to-[#3662E3] text-white text-[11px] font-black flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform shrink-0">
-                {{ (user?.nama || user?.name) ? (user?.nama || user?.name).charAt(0).toUpperCase() : 'U' }}
+              <div
+                class="w-6 h-6 rounded-full bg-gradient-to-tr from-[#5D87FF] to-[#3662E3] text-white text-[11px] font-black flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform shrink-0"
+              >
+                {{
+                  user?.nama || user?.name
+                    ? (user?.nama || user?.name).charAt(0).toUpperCase()
+                    : 'U'
+                }}
               </div>
-              
-              <span class="font-semibold text-slate-800 dark:text-slate-200 max-w-[130px] truncate hidden sm:inline-block tracking-tight">
+
+              <span
+                class="font-semibold text-slate-800 dark:text-slate-200 max-w-[130px] truncate hidden sm:inline-block tracking-tight"
+              >
                 {{ user?.nama || user?.name || 'User' }}
               </span>
 
               <!-- Admin Indicator Badge -->
-              <span v-if="isAdmin" class="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20 dark:border-amber-400/20">
+              <span
+                v-if="isAdmin"
+                class="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20 dark:border-amber-400/20"
+              >
                 <ShieldCheck class="w-2.5 h-2.5" />
                 <span>Admin</span>
               </span>
 
-              <ChevronDown class="w-3.5 h-3.5 text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-transform duration-200" :class="isProfileOpen ? 'rotate-180 text-[#5D87FF]' : ''" />
+              <ChevronDown
+                class="w-3.5 h-3.5 text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-transform duration-200"
+                :class="isProfileOpen ? 'rotate-180 text-[#5D87FF]' : ''"
+              />
             </button>
 
             <!-- Profile Dropdown Menu -->
@@ -147,13 +172,27 @@ onUnmounted(() => {
               class="absolute right-0 mt-2.5 w-60 rounded-2xl bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border border-slate-200/90 dark:border-slate-800/90 shadow-2xl shadow-slate-900/10 p-1.5 z-50 text-xs animate-in fade-in slide-in-from-top-2 duration-150"
             >
               <!-- User Identity Header -->
-              <div class="p-3 rounded-xl bg-slate-50/80 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800/80 mb-1 space-y-0.5">
-                <p class="font-extrabold text-xs text-slate-900 dark:text-white truncate tracking-tight">{{ user?.nama || user?.name }}</p>
-                <p class="text-[11px] font-medium text-slate-500 dark:text-slate-400 truncate leading-tight">{{ user?.email }}</p>
+              <div
+                class="p-3 rounded-xl bg-slate-50/80 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800/80 mb-1 space-y-0.5"
+              >
+                <p
+                  class="font-extrabold text-xs text-slate-900 dark:text-white truncate tracking-tight"
+                >
+                  {{ user?.nama || user?.name }}
+                </p>
+                <p
+                  class="text-[11px] font-medium text-slate-500 dark:text-slate-400 truncate leading-tight"
+                >
+                  {{ user?.email }}
+                </p>
                 <div class="pt-1.5 flex items-center gap-1">
                   <span
                     class="px-2 py-0.5 rounded-md text-[9.5px] font-black tracking-wider uppercase inline-block"
-                    :class="isAdmin ? 'bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20' : 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20'"
+                    :class="
+                      isAdmin
+                        ? 'bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20'
+                        : 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20'
+                    "
                   >
                     Role: {{ user?.role || 'User' }}
                   </span>
@@ -169,7 +208,9 @@ onUnmounted(() => {
                   @click="closeProfileMenu"
                   class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100/90 dark:hover:bg-slate-800/80 hover:text-slate-900 dark:hover:text-white transition-all duration-150 group"
                 >
-                  <Laptop class="w-4 h-4 text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-200 group-hover:scale-110 transition-transform" />
+                  <Laptop
+                    class="w-4 h-4 text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-200 group-hover:scale-110 transition-transform"
+                  />
                   <span>{{ t('my_asset', 'My Asset') }}</span>
                 </RouterLink>
 
@@ -179,7 +220,9 @@ onUnmounted(() => {
                   @click="closeProfileMenu"
                   class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100/90 dark:hover:bg-slate-800/80 hover:text-slate-900 dark:hover:text-white transition-all duration-150 group"
                 >
-                  <Ticket class="w-4 h-4 text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-200 group-hover:scale-110 transition-transform" />
+                  <Ticket
+                    class="w-4 h-4 text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-200 group-hover:scale-110 transition-transform"
+                  />
                   <span>{{ t('my_tickets', 'My Tickets') }}</span>
                 </RouterLink>
               </div>
@@ -197,16 +240,10 @@ onUnmounted(() => {
             </div>
 
             <!-- Click Outside Overlay -->
-            <div
-              v-if="isProfileOpen"
-              @click="closeProfileMenu"
-              class="fixed inset-0 z-40"
-            ></div>
+            <div v-if="isProfileOpen" @click="closeProfileMenu" class="fixed inset-0 z-40"></div>
           </div>
         </template>
-
       </div>
-
     </div>
   </header>
 
@@ -222,7 +259,11 @@ onUnmounted(() => {
       <button
         @click="setLanguage('id')"
         class="px-2.5 py-1 rounded-full transition-all cursor-pointer text-[11px] min-h-[30px] flex items-center justify-center touch-manipulation"
-        :class="currentLang === 'id' ? 'bg-[#5D87FF] text-white shadow-2xs' : 'text-[#64748B] dark:text-slate-400 hover:text-[#0F172A] dark:hover:text-white'"
+        :class="
+          currentLang === 'id'
+            ? 'bg-[#5D87FF] text-white shadow-2xs'
+            : 'text-[#64748B] dark:text-slate-400 hover:text-[#0F172A] dark:hover:text-white'
+        "
         title="Bahasa Indonesia"
       >
         ID
@@ -230,7 +271,11 @@ onUnmounted(() => {
       <button
         @click="setLanguage('en')"
         class="px-2.5 py-1 rounded-full transition-all cursor-pointer text-[11px] min-h-[30px] flex items-center justify-center touch-manipulation"
-        :class="currentLang === 'en' ? 'bg-[#5D87FF] text-white shadow-2xs' : 'text-[#64748B] dark:text-slate-400 hover:text-[#0F172A] dark:hover:text-white'"
+        :class="
+          currentLang === 'en'
+            ? 'bg-[#5D87FF] text-white shadow-2xs'
+            : 'text-[#64748B] dark:text-slate-400 hover:text-[#0F172A] dark:hover:text-white'
+        "
         title="English"
       >
         EN

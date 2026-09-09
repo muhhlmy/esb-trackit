@@ -1,8 +1,9 @@
 <script setup>
-import { useToast } from '@/composables/useToast';
-import { CheckCircle2, AlertCircle, Info, X } from 'lucide-vue-next';
+defineOptions({ name: 'AppToast' })
+import { useToast } from '@/composables/useToast'
+import { CheckCircle2, AlertCircle, Info, X } from 'lucide-vue-next'
 
-const { toasts, removeToast } = useToast();
+const { toasts, removeToast } = useToast()
 </script>
 
 <template>
@@ -24,7 +25,7 @@ const { toasts, removeToast } = useToast();
         :class="{
           'bg-emerald-950/90 text-emerald-200 border-emerald-800/60': toast.type === 'success',
           'bg-rose-950/90 text-rose-200 border-rose-800/60': toast.type === 'error',
-          'bg-slate-900/90 text-slate-200 border-slate-700/60': toast.type === 'info'
+          'bg-slate-900/90 text-slate-200 border-slate-700/60': toast.type === 'info',
         }"
       >
         <div class="flex items-center gap-3">

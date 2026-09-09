@@ -6,16 +6,25 @@ import {
   consumePasswordResetToken,
 } from '../src/services/otpService.js'
 import { pool } from '../src/config/database.js'
-import { hashPassword, verifyPassword } from '../src/security/passwordService.js'
+import { createEnrollmentCredential, hashPassword, verifyPassword } from '../src/security/passwordService.js'
 
 test('OTP Password Reset Flow', async (t) => {
-  const testEmail = 'superadmin@admin.com'
+  const testEmail = `otp.${crypto.randomUUID()}@example.test`
   let userId
 
-  await t.test('Setup: Verify user exists', async () => {
-    const userRes = await pool.query('SELECT id, email FROM users WHERE email = $1', [testEmail])
-    assert.ok(userRes.rowCount > 0, 'User test should exist')
+  t.after(async () => {
+    if (!userId) return
+    await pool.query('DELETE FROM password_reset_otps WHERE user_id = $1', [userId])
+    await pool.query('UPDATE users SET is_active = false, deleted_at = CURRENT_TIMESTAMP WHERE id = $1', [userId])
+  })
+  await t.test('Setup: provision an isolated account requiring enrollment', async () => {
+    const credential = createEnrollmentCredential()
+    const userRes = await pool.query(
+      "INSERT INTO users (nama, email, password_hash, role) VALUES ('OTP Test', $1, $2, 'user') RETURNING id",
+      [testEmail, credential],
+    )
     userId = userRes.rows[0].id
+    assert.equal(await verifyPassword('TemporaryUserPass123!', credential), false)
   })
 
   let generatedOtp
@@ -43,7 +52,7 @@ test('OTP Password Reset Flow', async (t) => {
   await t.test('3. verifyPasswordResetOtp rejects invalid OTP and decrements attempts', async () => {
     await assert.rejects(
       async () => {
-        await verifyPasswordResetOtp(testEmail, '000000')
+        await verifyPasswordResetOtp(testEmail, generatedOtp === '000000' ? '000001' : '000000')
       },
       (err) => {
         assert.equal(err.statusCode, 400)
@@ -79,8 +88,8 @@ test('OTP Password Reset Flow', async (t) => {
     )
   })
 
-  // Cleanup: Reset back superadmin password to Admin123!
-  await t.test('Cleanup: ensure superadmin password is Admin123!', async () => {
+  // Complete enrollment for the isolated user only.
+  await t.test('7. Enrolled password authenticates after OTP verification', async () => {
     const defaultHash = await hashPassword('Admin123!')
     await pool.query('UPDATE users SET password_hash = $1 WHERE email = $2', [defaultHash, testEmail])
     const checkUser = await pool.query('SELECT password_hash FROM users WHERE email = $1', [testEmail])

@@ -69,7 +69,9 @@ export function animatePageEnter(el, done) {
   if (isReducedMotion()) {
     try {
       gsap.set(el, { opacity: 1, y: 0 })
-    } catch {}
+    } catch {
+      /* Animation cleanup is best-effort after component teardown. */
+    }
     safeDone()
     return
   }
@@ -121,7 +123,9 @@ export function animatePageLeave(el, done) {
   if (isReducedMotion()) {
     try {
       gsap.set(el, { opacity: 0 })
-    } catch {}
+    } catch {
+      /* Animation cleanup is best-effort after component teardown. */
+    }
     safeDone()
     return
   }
@@ -168,7 +172,9 @@ export function animateStagger(targets, options = {}) {
   if (isReducedMotion()) {
     try {
       gsap.set(els, { opacity: 1, y: 0 })
-    } catch {}
+    } catch {
+      /* Animation cleanup is best-effort after component teardown. */
+    }
     return
   }
 
@@ -219,7 +225,9 @@ export function animateModalEnter(el, done) {
   if (isReducedMotion()) {
     try {
       gsap.set(el, { opacity: 1 })
-    } catch {}
+    } catch {
+      /* Animation cleanup is best-effort after component teardown. */
+    }
     safeDone()
     return
   }

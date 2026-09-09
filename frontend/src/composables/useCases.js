@@ -1,28 +1,27 @@
-import { ref, computed } from 'vue';
-import { api } from '../services/api.js';
-import { useToast } from './useToast.js';
-import { useBookmarks } from './useBookmarks.js';
+import { ref, computed } from 'vue'
+import { api } from '../services/api.js'
+import { useToast } from './useToast.js'
 
-const cases = ref([]);
-const activeCaseId = ref(null);
-const selectedCategory = ref('all');
-const selectedSeverity = ref('all');
-const searchQuery = ref('');
-const recentSearches = ref(JSON.parse(localStorage.getItem('esb_recent_searches') || '[]'));
-const isLoading = ref(false);
+const cases = ref([])
+const activeCaseId = ref(null)
+const selectedCategory = ref('all')
+const selectedSeverity = ref('all')
+const searchQuery = ref('')
+const recentSearches = ref(JSON.parse(localStorage.getItem('esb_recent_searches') || '[]'))
+const isLoading = ref(false)
 
 // Drawer state
-const isDrawerOpen = ref(false);
-const drawerMode = ref('create'); // 'create' | 'edit'
-const editingCase = ref(null);
+const isDrawerOpen = ref(false)
+const drawerMode = ref('create') // 'create' | 'edit'
+const editingCase = ref(null)
 
 function normalizeCase(c) {
-  return c ? { ...c, id: Number(c.id) } : null;
+  return c ? { ...c, id: Number(c.id) } : null
 }
 
 function normalizeList(data) {
-  const list = Array.isArray(data) ? data : data?.data || [];
-  return list.map(normalizeCase).filter(Boolean);
+  const list = Array.isArray(data) ? data : data?.data || []
+  return list.map(normalizeCase).filter(Boolean)
 }
 
 // Payload case yang dikirim ke backend (sesuai CASE_FIELDS di caseController).
@@ -41,124 +40,126 @@ const CASE_PAYLOAD_FIELDS = [
   'status',
   'isCustom',
   'sort_order',
-];
+]
 
 function toCasePayload(data) {
-  const out = {};
+  const out = {}
   for (const key of CASE_PAYLOAD_FIELDS) {
-    if (data?.[key] !== undefined) out[key] = data[key];
+    if (data?.[key] !== undefined) out[key] = data[key]
   }
-  return out;
+  return out
 }
 
 export function useCases() {
-  const { showToast } = useToast();
-  const { isBookmarked } = useBookmarks();
+  const { showToast } = useToast()
 
   // Public Help Center: hanya case berstatus PUBLISHED
   async function fetchCases() {
-    isLoading.value = true;
+    isLoading.value = true
     try {
-      cases.value = normalizeList(await api.getPublicCases());
+      cases.value = normalizeList(await api.getPublicCases())
       if (!activeCaseId.value && cases.value.length) {
-        activeCaseId.value = cases.value[0].id;
+        activeCaseId.value = cases.value[0].id
       }
-    } catch (err) {
+    } catch {
       // Fail-safe: tampilkan empty state; detail teknis tidak dibocorkan ke UI.
-      cases.value = [];
+      cases.value = []
     } finally {
-      isLoading.value = false;
+      isLoading.value = false
     }
   }
 
   // Admin CMS: semua case (termasuk DRAFT)
   async function fetchAllCases() {
-    isLoading.value = true;
+    isLoading.value = true
     try {
-      cases.value = normalizeList(await api.getCases());
+      cases.value = normalizeList(await api.getCases())
       if (!activeCaseId.value && cases.value.length) {
-        activeCaseId.value = cases.value[0].id;
+        activeCaseId.value = cases.value[0].id
       }
-    } catch (err) {
+    } catch {
       // Fallback ke daftar public (read-only) bila sesi admin tidak cukup.
       try {
-        cases.value = normalizeList(await api.getPublicCases());
+        cases.value = normalizeList(await api.getPublicCases())
         if (!activeCaseId.value && cases.value.length) {
-          activeCaseId.value = cases.value[0].id;
+          activeCaseId.value = cases.value[0].id
         }
       } catch {
-        cases.value = [];
+        cases.value = []
       }
     } finally {
-      isLoading.value = false;
+      isLoading.value = false
     }
   }
 
   const filteredCases = computed(() => {
     return cases.value.filter((c) => {
-      const matchCategory = selectedCategory.value === 'all' || c.category === selectedCategory.value;
-      const matchSeverity = selectedSeverity.value === 'all' || c.severity === selectedSeverity.value;
+      const matchCategory =
+        selectedCategory.value === 'all' || c.category === selectedCategory.value
+      const matchSeverity =
+        selectedSeverity.value === 'all' || c.severity === selectedSeverity.value
 
-      if (!matchCategory || !matchSeverity) return false;
+      if (!matchCategory || !matchSeverity) return false
 
-      if (!searchQuery.value.trim()) return true;
+      if (!searchQuery.value.trim()) return true
 
-      const q = searchQuery.value.toLowerCase().trim();
-      const matchTitle = (c.title || '').toLowerCase().includes(q);
-      const matchSummary = (c.summary || '').toLowerCase().includes(q);
-      const matchContext = (c.problemContext || '').toLowerCase().includes(q);
-      const matchTags = Array.isArray(c.tags) && c.tags.some((t) => (t || '').toLowerCase().includes(q));
+      const q = searchQuery.value.toLowerCase().trim()
+      const matchTitle = (c.title || '').toLowerCase().includes(q)
+      const matchSummary = (c.summary || '').toLowerCase().includes(q)
+      const matchContext = (c.problemContext || '').toLowerCase().includes(q)
+      const matchTags =
+        Array.isArray(c.tags) && c.tags.some((t) => (t || '').toLowerCase().includes(q))
 
-      return matchTitle || matchSummary || matchContext || matchTags;
-    });
-  });
+      return matchTitle || matchSummary || matchContext || matchTags
+    })
+  })
 
   // True bila user sedang mencari dan tidak ada case yang cocok
   const hasNoSearchResult = computed(() => {
-    return !!searchQuery.value.trim() && filteredCases.value.length === 0;
-  });
+    return !!searchQuery.value.trim() && filteredCases.value.length === 0
+  })
 
   const activeCase = computed(() => {
-    if (hasNoSearchResult.value) return null;
+    if (hasNoSearchResult.value) return null
     return (
       cases.value.find((c) => c.id === activeCaseId.value) ||
       filteredCases.value[0] ||
       cases.value[0] ||
       null
-    );
-  });
+    )
+  })
 
   function selectCase(id) {
-    activeCaseId.value = Number(id);
+    activeCaseId.value = Number(id)
   }
 
   function setCategory(cat) {
-    selectedCategory.value = cat;
+    selectedCategory.value = cat
   }
 
   function setSeverity(sev) {
-    selectedSeverity.value = sev;
+    selectedSeverity.value = sev
   }
 
   function setSearch(query) {
-    searchQuery.value = query;
+    searchQuery.value = query
     if (query.trim() && !recentSearches.value.includes(query.trim())) {
-      recentSearches.value = [query.trim(), ...recentSearches.value.slice(0, 4)];
-      localStorage.setItem('esb_recent_searches', JSON.stringify(recentSearches.value));
+      recentSearches.value = [query.trim(), ...recentSearches.value.slice(0, 4)]
+      localStorage.setItem('esb_recent_searches', JSON.stringify(recentSearches.value))
     }
   }
 
   function clearSearch() {
-    searchQuery.value = '';
+    searchQuery.value = ''
   }
 
   function clearRecentSearches() {
-    recentSearches.value = [];
-    localStorage.removeItem('esb_recent_searches');
+    recentSearches.value = []
+    localStorage.removeItem('esb_recent_searches')
   }
 
   function openCreateDrawer() {
-    drawerMode.value = 'create';
+    drawerMode.value = 'create'
     editingCase.value = {
       title: '',
       category: 'hardware',
@@ -170,58 +171,58 @@ export function useCases() {
       dosAndDonts: { dos: [], donts: [] },
       snippets: [],
       status: 'PUBLISHED',
-    };
-    isDrawerOpen.value = true;
+    }
+    isDrawerOpen.value = true
   }
 
   function openEditDrawer(caseItem) {
-    drawerMode.value = 'edit';
-    editingCase.value = JSON.parse(JSON.stringify(caseItem));
-    isDrawerOpen.value = true;
+    drawerMode.value = 'edit'
+    editingCase.value = JSON.parse(JSON.stringify(caseItem))
+    isDrawerOpen.value = true
   }
 
   function closeDrawer() {
-    isDrawerOpen.value = false;
-    editingCase.value = null;
+    isDrawerOpen.value = false
+    editingCase.value = null
   }
 
   async function saveCase(formData) {
-    const existingId = formData?.id ? Number(formData.id) : null;
-    const payload = toCasePayload(formData);
+    const existingId = formData?.id ? Number(formData.id) : null
+    const payload = toCasePayload(formData)
     try {
       if (existingId) {
-        const updated = normalizeCase(await api.updateCase(existingId, payload));
-        const idx = cases.value.findIndex((c) => c.id === updated.id);
-        if (idx !== -1) cases.value[idx] = updated;
-        else cases.value.unshift(updated);
-        showToast('Perubahan Case berhasil disimpan!', 'success');
+        const updated = normalizeCase(await api.updateCase(existingId, payload))
+        const idx = cases.value.findIndex((c) => c.id === updated.id)
+        if (idx !== -1) cases.value[idx] = updated
+        else cases.value.unshift(updated)
+        showToast('Perubahan Case berhasil disimpan!', 'success')
       } else {
-        const created = normalizeCase(await api.createCase(payload));
-        cases.value.unshift(created);
-        activeCaseId.value = created.id;
-        showToast('Case baru berhasil disimpan!', 'success');
+        const created = normalizeCase(await api.createCase(payload))
+        cases.value.unshift(created)
+        activeCaseId.value = created.id
+        showToast('Case baru berhasil disimpan!', 'success')
       }
-      closeDrawer();
-      return true;
+      closeDrawer()
+      return true
     } catch (err) {
-      showToast(err.message || 'Gagal menyimpan case.', 'error');
-      return false;
+      showToast(err.message || 'Gagal menyimpan case.', 'error')
+      return false
     }
   }
 
   async function deleteCase(id) {
     try {
-      await api.deleteCase(id);
-      cases.value = cases.value.filter((c) => Number(c.id) !== Number(id));
+      await api.deleteCase(id)
+      cases.value = cases.value.filter((c) => Number(c.id) !== Number(id))
       if (Number(activeCaseId.value) === Number(id)) {
-        activeCaseId.value = cases.value[0]?.id ?? null;
+        activeCaseId.value = cases.value[0]?.id ?? null
       }
-      showToast('Case berhasil dihapus.', 'info');
-      closeDrawer();
-      return true;
+      showToast('Case berhasil dihapus.', 'info')
+      closeDrawer()
+      return true
     } catch (err) {
-      showToast(err.message || 'Gagal menghapus case.', 'error');
-      return false;
+      showToast(err.message || 'Gagal menghapus case.', 'error')
+      return false
     }
   }
 
@@ -252,5 +253,5 @@ export function useCases() {
     closeDrawer,
     saveCase,
     deleteCase,
-  };
+  }
 }

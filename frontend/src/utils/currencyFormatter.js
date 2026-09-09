@@ -10,7 +10,8 @@
  */
 export function formatCurrency(amount, { prefix = 'Rp ', fallback = 'Rp 0' } = {}) {
   if (amount === null || amount === undefined || amount === '') return fallback
-  const num = typeof amount === 'number' ? amount : parseFloat(String(amount).replace(/[^0-9.-]+/g, ''))
+  const num =
+    typeof amount === 'number' ? amount : parseFloat(String(amount).replace(/[^0-9.-]+/g, ''))
   if (isNaN(num)) return fallback
 
   const formatted = new Intl.NumberFormat('id-ID', {

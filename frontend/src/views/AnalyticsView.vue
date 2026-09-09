@@ -1,64 +1,65 @@
 <script setup>
-import { ref, onMounted } from 'vue';
-import { useCases } from '@/composables/useCases';
-import AnalyticsCharts from '@/components/charts/AnalyticsCharts.vue';
-import { BarChart3, RefreshCw } from 'lucide-vue-next';
+import { ref, onMounted } from 'vue'
+import { useCases } from '@/composables/useCases'
+import AnalyticsCharts from '@/components/charts/AnalyticsCharts.vue'
+import { BarChart3, RefreshCw } from 'lucide-vue-next'
 
-const { cases } = useCases();
+const { cases } = useCases()
 
 const statsData = ref({
   summary: {
     totalCases: 0,
     totalTemplates: 4,
     customCasesCount: 0,
-    builtInCasesCount: 6
+    builtInCasesCount: 6,
   },
   categories: {},
-  severities: { high: 0, medium: 0, low: 0 }
-});
+  severities: { high: 0, medium: 0, low: 0 },
+})
 
-const isLoading = ref(false);
+const isLoading = ref(false)
 
 async function loadStats() {
-  isLoading.value = true;
+  isLoading.value = true
 
-  const cats = {};
-  const sevs = { high: 0, medium: 0, low: 0 };
-  let custom = 0;
+  const cats = {}
+  const sevs = { high: 0, medium: 0, low: 0 }
+  let custom = 0
 
   cases.value.forEach((c) => {
-    cats[c.category] = (cats[c.category] || 0) + 1;
-    const sev = (c.severity || 'medium').toLowerCase();
-    if (sevs[sev] !== undefined) sevs[sev]++;
-    if (c.isCustom) custom++;
-  });
+    cats[c.category] = (cats[c.category] || 0) + 1
+    const sev = (c.severity || 'medium').toLowerCase()
+    if (sevs[sev] !== undefined) sevs[sev]++
+    if (c.isCustom) custom++
+  })
 
   statsData.value = {
     summary: {
       totalCases: cases.value.length,
       totalTemplates: 4,
       customCasesCount: custom,
-      builtInCasesCount: cases.value.length - custom
+      builtInCasesCount: cases.value.length - custom,
     },
     categories: cats,
-    severities: sevs
-  };
+    severities: sevs,
+  }
 
-  isLoading.value = false;
+  isLoading.value = false
 }
 
 onMounted(() => {
-  loadStats();
-});
+  loadStats()
+})
 </script>
 
 <template>
   <div class="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-8">
-    
     <!-- Header -->
     <div class="flex items-center justify-between border-b border-slate-800 pb-6">
       <div>
-        <div class="flex items-center gap-2 text-indigo-400 font-semibold text-xs uppercase tracking-wider mb-1">
+        <div
+          class="flex items-center gap-2 text-indigo-400 font-semibold text-xs uppercase tracking-wider mb-1"
+        >
           <BarChart3 class="w-4 h-4" />
           <span>Analytics & Metrics</span>
         </div>
@@ -82,6 +83,5 @@ onMounted(() => {
 
     <!-- Charts and KPIs -->
     <AnalyticsCharts :stats="statsData" />
-
   </div>
 </template>

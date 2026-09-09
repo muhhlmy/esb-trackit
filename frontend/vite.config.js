@@ -1,4 +1,3 @@
-import fs from 'node:fs'
 import { fileURLToPath, URL } from 'node:url'
 
 import { defineConfig, loadEnv } from 'vite'
@@ -7,7 +6,7 @@ import tailwindcss from '@tailwindcss/vite'
 
 const FRONTEND_SECURITY_HEADERS = {
   'Content-Security-Policy':
-    "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' ws: wss: http: https:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'; worker-src 'self' blob:;",
+    "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'; worker-src 'self' blob:;",
   'Permissions-Policy': 'camera=(), geolocation=(), microphone=(), payment=(), usb=()',
   'Referrer-Policy': 'strict-origin-when-cross-origin',
   'X-Content-Type-Options': 'nosniff',
@@ -24,23 +23,11 @@ function resolveApiProxyTarget(env = {}) {
   if (process.env.VITE_API_PROXY_TARGET) {
     return process.env.VITE_API_PROXY_TARGET
   }
-  try {
-    const backendEnvPath = fileURLToPath(new URL('../backend/.env', import.meta.url))
-    if (fs.existsSync(backendEnvPath)) {
-      const content = fs.readFileSync(backendEnvPath, 'utf-8')
-      const match = content.match(/^PORT\s*=\s*(\d+)/m)
-      if (match && match[1]) {
-        return `http://127.0.0.1:${match[1]}`
-      }
-    }
-  } catch {
-    // ignore
-  }
   return 'http://127.0.0.1:3000'
 }
 
 // Custom plugin: inject security headers in dev & preview servers + block sensitive dotfiles
-function securityHeadersPlugin() {
+function securityHeadersPlugin(devHeaders) {
   const blockSensitiveDotfiles = (req, res, next) => {
     const rawUrl = (req.url || '').split('?')[0]
     // Allow Vite internal dev assets and dependencies
@@ -60,9 +47,9 @@ function securityHeadersPlugin() {
     return next()
   }
 
-  const applyHeaders = (_req, res, next) => {
+  const applyHeaders = (headers) => (_req, res, next) => {
     if (!res.headersSent) {
-      for (const [name, value] of Object.entries(FRONTEND_SECURITY_HEADERS)) {
+      for (const [name, value] of Object.entries(headers)) {
         res.setHeader(name, value)
       }
     }
@@ -73,7 +60,7 @@ function securityHeadersPlugin() {
     name: 'security-headers',
     configureServer(server) {
       server.middlewares.use(blockSensitiveDotfiles)
-      server.middlewares.use(applyHeaders)
+      server.middlewares.use(applyHeaders(devHeaders))
     },
     configurePreviewServer(server) {
       server.middlewares.use(blockSensitiveDotfiles)
@@ -84,14 +71,23 @@ function securityHeadersPlugin() {
 
 // https://vite.dev/config/
 export default defineConfig(({ mode = 'development' }) => {
-  const env = loadEnv(mode, process.cwd(), '')
+  const env = loadEnv(mode, fileURLToPath(new URL('.', import.meta.url)), 'VITE_')
   const proxyTarget = resolveApiProxyTarget(env)
+  const port = Number(env.VITE_PORT || 5173)
+  const allowedHosts = (env.VITE_ALLOWED_HOSTS || '').split(',').map((host) => host.trim()).filter(Boolean)
+  const hmrHosts = new Set(['localhost', '127.0.0.1', ...allowedHosts.filter((host) => !host.startsWith('.'))])
+  if (env.VITE_HOST && !['0.0.0.0', '::'].includes(env.VITE_HOST)) hmrHosts.add(env.VITE_HOST)
+  const hmrOrigins = [...hmrHosts].flatMap((host) => ['ws', 'wss'].map((scheme) => scheme + '://' + host + ':' + port))
+  const devHeaders = {
+    ...FRONTEND_SECURITY_HEADERS,
+    'Content-Security-Policy': FRONTEND_SECURITY_HEADERS['Content-Security-Policy'].replace("connect-src 'self';", "connect-src 'self' " + hmrOrigins.join(' ') + ';'),
+  }
 
   return {
     plugins: [
       tailwindcss(),
       vue(),
-      securityHeadersPlugin(),
+      securityHeadersPlugin(devHeaders),
     ],
     resolve: {
       alias: {
@@ -100,9 +96,9 @@ export default defineConfig(({ mode = 'development' }) => {
     },
     server: {
       host: env.VITE_HOST || process.env.VITE_HOST || '127.0.0.1',
-      port: 5173,
-      allowedHosts: true,
-      headers: FRONTEND_SECURITY_HEADERS,
+      port,
+      allowedHosts,
+      headers: devHeaders,
       proxy: {
         '/api': {
           target: proxyTarget,
@@ -113,8 +109,8 @@ export default defineConfig(({ mode = 'development' }) => {
     },
     preview: {
       host: env.VITE_HOST || process.env.VITE_HOST || '127.0.0.1',
-      port: 5173,
-      allowedHosts: true,
+      port,
+      allowedHosts,
       headers: FRONTEND_SECURITY_HEADERS,
     },
     build: {

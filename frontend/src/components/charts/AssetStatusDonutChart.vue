@@ -101,7 +101,12 @@ const centerTextPlugin = {
     :error="error"
   >
     <div class="relative h-full w-full flex items-center justify-center">
-      <Doughnut :data="chartData" :options="chartOptions" :plugins="[centerTextPlugin]" aria-label="Donut chart showing asset status distribution" />
+      <Doughnut
+        :data="chartData"
+        :options="chartOptions"
+        :plugins="[centerTextPlugin]"
+        aria-label="Donut chart showing asset status distribution"
+      />
     </div>
   </BaseChartCard>
 </template>

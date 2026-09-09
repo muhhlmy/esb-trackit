@@ -7,8 +7,6 @@ services:
       POSTGRES_DB: ${DB_NAME:-assets_monitoring}
       POSTGRES_USER: ${DB_USER:-postgres}
       POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD must be set in environment}
-    ports:
-      - "${DB_PORT:-5432}:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
@@ -36,10 +34,19 @@ services:
       DB_NAME: ${DB_NAME:-assets_monitoring}
       JWT_SECRET: ${JWT_SECRET:?JWT_SECRET must be set in environment (min 32 characters)}
       PASSWORD_BCRYPT_ROUNDS: 12
-      DEFAULT_USER_PASSWORD: ${DEFAULT_USER_PASSWORD:?DEFAULT_USER_PASSWORD must be set in environment}
-      CORS_ORIGINS: "http://localhost,http://localhost:80,http://localhost:5173"
-    ports:
-      - "3000:3000"
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost}
+      TRUST_PROXY_CIDRS: ${TRUST_PROXY_CIDRS:-}
+      EMAIL_ENABLED: ${EMAIL_ENABLED:-false}
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_SECURE: ${SMTP_SECURE:-false}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+      EMAIL_FROM: ${EMAIL_FROM:-}
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
     volumes:
       - backups:/app/storage/backups
 

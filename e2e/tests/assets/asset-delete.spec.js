@@ -38,14 +38,14 @@ test.describe('Asset Management - Delete Asset Suite', () => {
       const saveBtn = page.locator('button[type="submit"]').or(page.getByRole('button', { name: /^tambah aset$/i })).last()
       await saveBtn.click()
       // Wait for form submission to complete
-      await page.waitForLoadState('networkidle')
+      await page.waitForLoadState('domcontentloaded')
     }
 
     // 2. Search for the newly created asset
     const searchInput = page.getByPlaceholder(/cari/i).first()
     if (await searchInput.isVisible()) {
       await searchInput.fill(testAsset.hostname)
-      await page.waitForLoadState('networkidle')
+      await page.waitForLoadState('domcontentloaded')
     }
 
     // 3. Trigger delete action on the asset row or table first row fallback
@@ -67,7 +67,7 @@ test.describe('Asset Management - Delete Asset Suite', () => {
         if (await confirmBtn.isVisible()) {
           await confirmBtn.click()
           // Wait for deletion to complete
-          await page.waitForLoadState('networkidle')
+          await page.waitForLoadState('domcontentloaded')
         }
       }
     }

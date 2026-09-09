@@ -1,7 +1,11 @@
 <script setup>
 import { computed, ref, watch } from 'vue'
 import AppModal from '../ui/AppModal.vue'
-import { ESB_LOGO_MONO_SVG, generateBarcodeSvg, printAssetLabel } from '../../utils/assetLabelPrinter.js'
+import {
+  ESB_LOGO_MONO_SVG,
+  generateBarcodeSvg,
+  printAssetLabel,
+} from '../../utils/assetLabelPrinter.js'
 
 const props = defineProps({
   isOpen: {
@@ -102,7 +106,9 @@ function handlePrint() {
     <div class="space-y-4">
       <!-- Asset Summary Info -->
       <div class="rounded-xl border border-slate-200/80 bg-slate-50/80 p-3 flex items-start gap-3">
-        <div class="h-9 w-9 rounded-lg bg-blue-100/70 text-blue-600 flex items-center justify-center shrink-0">
+        <div
+          class="h-9 w-9 rounded-lg bg-blue-100/70 text-blue-600 flex items-center justify-center shrink-0"
+        >
           <span class="material-symbols-outlined text-lg">qr_code_2</span>
         </div>
         <div class="min-w-0 flex-1">
@@ -117,7 +123,10 @@ function handlePrint() {
 
       <!-- Hostname Input & Note -->
       <div>
-        <label for="asset-label-hostname-input" class="block text-xs font-medium text-slate-700 mb-1">
+        <label
+          for="asset-label-hostname-input"
+          class="block text-xs font-medium text-slate-700 mb-1"
+        >
           Hostname / Nilai Barcode Label
         </label>
         <div class="relative">
@@ -137,19 +146,27 @@ function handlePrint() {
       <!-- Sticker Preview Box -->
       <div>
         <div class="flex items-center justify-between mb-1.5">
-          <span class="text-xs font-medium text-slate-700">Preview Label Stiker (2.17" × 0.98" Rectangle)</span>
-          <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200/60">
+          <span class="text-xs font-medium text-slate-700"
+            >Preview Label Stiker (2.17" × 0.98" Rectangle)</span
+          >
+          <span
+            class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200/60"
+          >
             2.17" × 0.98" Rectangle
           </span>
         </div>
 
         <!-- Physical Label Canvas Preview -->
-        <div class="w-full rounded-xl border border-slate-300 bg-slate-100/90 p-3 sm:p-4 flex items-center justify-center shadow-inner">
+        <div
+          class="w-full rounded-xl border border-slate-300 bg-slate-100/90 p-3 sm:p-4 flex items-center justify-center shadow-inner"
+        >
           <div
             class="relative w-full max-w-[360px] aspect-[217/98] rounded-xl bg-white border border-slate-400 p-2 sm:p-2.5 flex flex-col justify-between shadow-md select-none overflow-hidden text-black font-sans"
           >
             <!-- Header -->
-            <div class="text-center font-extrabold text-[8.5px] sm:text-[9.5px] leading-tight tracking-[0.1px] text-black">
+            <div
+              class="text-center font-extrabold text-[8.5px] sm:text-[9.5px] leading-tight tracking-[0.1px] text-black"
+            >
               <div>ASET INI MERUPAKAN PROPERTI MILIK</div>
               <div>PT ESENSI SOLUSI BUANA.</div>
             </div>
@@ -158,8 +175,13 @@ function handlePrint() {
             <div class="flex items-center justify-between gap-2.5 my-0.5 px-0.5">
               <!-- Left: Logo & Tagline -->
               <div class="w-[30%] shrink-0 flex flex-col items-center justify-center text-center">
-                <div class="w-full max-w-[80px] flex items-center justify-center" v-html="ESB_LOGO_MONO_SVG"></div>
-                <div class="text-[5.5px] sm:text-[6.5px] font-bold text-black tracking-tight mt-0.5 whitespace-nowrap">
+                <div
+                  class="w-full max-w-[80px] flex items-center justify-center"
+                  v-html="ESB_LOGO_MONO_SVG"
+                ></div>
+                <div
+                  class="text-[5.5px] sm:text-[6.5px] font-bold text-black tracking-tight mt-0.5 whitespace-nowrap"
+                >
                   Ahlinya Bisnis Kuliner
                 </div>
               </div>
@@ -177,14 +199,18 @@ function handlePrint() {
                 >
                   (Barcode Kosong)
                 </div>
-                <div class="mt-0.5 text-[10px] sm:text-[11.5px] font-extrabold tracking-wide text-black text-center truncate max-w-full">
+                <div
+                  class="mt-0.5 text-[10px] sm:text-[11.5px] font-extrabold tracking-wide text-black text-center truncate max-w-full"
+                >
                   {{ activeHostname || 'KODE-LABEL-0' }}
                 </div>
               </div>
             </div>
 
             <!-- Footer -->
-            <div class="text-center text-[6px] sm:text-[7px] font-extrabold tracking-wider text-black uppercase">
+            <div
+              class="text-center text-[6px] sm:text-[7px] font-extrabold tracking-wider text-black uppercase"
+            >
               WARRANTY INVALID IF SEALIS TAMPERED
             </div>
           </div>

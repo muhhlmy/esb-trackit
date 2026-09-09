@@ -80,7 +80,7 @@
 - **Real-Time**: Server-Sent Events (SSE) untuk update tiket.
 - **Email**: Nodemailer (notifikasi & OTP reset password).
 - **File Upload**: Multer (lampiran komentar tiket & file backup restore).
-- **Migrasi**: Versioned SQL migrations dengan ledger `app_schema_migrations` (checksum SHA-256, advisory lock, recovery proof) + bootstrap tabel runtime & `verifyRuntimeSchema` saat server start.
+- **Migrasi**: Versioned SQL migrations dengan ledger `app_schema_migrations` (checksum SHA-256, advisory lock, recovery proof) diikuti `verifyRuntimeSchema` saat server start; startup tidak menjalankan DDL.
 
 ### Testing & QA
 - **Backend tests**: `node --test` — 25+ file test (keamanan, IDOR, session lifecycle, rate limiting, import/export, GA/Ops assets, dsb.).
@@ -167,7 +167,7 @@ erDiagram
 | `GET/POST/DELETE /api/admin/database/*` | JWT (Superadmin) | Backup, restore, status & audit database |
 | `GET /health` | Public | Health check |
 
-> Validasi payload ketat di setiap controller (`assertAllowedFields` — field di luar whitelist ditolak 400). Semua endpoint selain `/health`, login/reset-password, dan endpoint `/public` memerlukan header `Authorization: Bearer <token>`.
+> Validasi payload ketat di setiap controller (`assertAllowedFields` — field di luar whitelist ditolak 400). Semua endpoint selain `/health`, login/reset-password, dan endpoint `/public` memerlukan cookie sesi HttpOnly `esb_session`. Browser memakai `credentials: 'include'`; token tidak disimpan di localStorage atau dikirim melalui header Authorization.
 
 ---
 
@@ -240,7 +240,9 @@ it-monitoring-assets/
    Alternatif: gunakan skrip setup otomatis:
    ```bash
    cd backend
-   npm run db:setup    # Setup database
+   npm run db:migrate:plan  # Lihat docs/AUDIT-5746c2f-REMEDIATION.md untuk konfigurasi target
+   npm run db:migrate:apply # Hanya setelah target dan recovery proof diverifikasi
+   npm run db:check
    npm run db:check    # Verifikasi skema
    ```
 3. (Opsional) Seed data awal Knowledge Base:

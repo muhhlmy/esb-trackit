@@ -83,7 +83,7 @@ export function useAuth() {
       user.value = freshUser
       storeAuthSession({ user: freshUser })
       return freshUser
-    } catch (err) {
+    } catch {
       // 401 sudah ditangani global (auto-logout). Error lain: pertahankan profil lama.
       return user.value
     }

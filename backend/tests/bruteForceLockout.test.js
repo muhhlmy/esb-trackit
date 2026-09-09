@@ -250,6 +250,8 @@ test('Brute-Force Lockout & Account Protection Suite (DEFECT-04 / SEC-11)', asyn
     assert.equal(resSuccess.status, 200)
     const successJson = JSON.parse(resSuccess.body)
     assert.ok(resSuccess.headers['set-cookie'] || successJson.user)
+    assert.ok(Date.parse(successJson.session.tokenExpiresAt) > Date.now())
+    assert.ok(Date.parse(successJson.session.tokenExpiresAt) < Date.parse(successJson.session.sessionExpiresAt))
 
     // Next failed attempt starts counter fresh at 1 (returns 401 instead of lock)
     const resAfterReset = await makeRequest(

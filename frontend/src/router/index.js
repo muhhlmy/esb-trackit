@@ -20,6 +20,7 @@ export const allowedRouteMap = [
   { key: 'assets_ops', name: 'assets-ops' },
   { key: 'karyawan', name: 'karyawan' },
   { key: 'submissions', name: 'submissions' },
+  { key: 'shipments', name: 'shipments' },
   { key: 'logs', name: 'logs' },
   { key: 'users', name: 'users' },
   { key: 'export', name: 'export' },
@@ -39,7 +40,11 @@ const routes = [
     path: '/cases',
     name: 'cases',
     component: () => import('../views/CasesView.vue'),
-    meta: { title: 'Cases & Artikel', subtitle: 'Kumpulan Artikel & Playbook Insiden', public: true },
+    meta: {
+      title: 'Cases & Artikel',
+      subtitle: 'Kumpulan Artikel & Playbook Insiden',
+      public: true,
+    },
   },
   {
     path: '/cases/:id',
@@ -58,7 +63,11 @@ const routes = [
     alias: '/analytics',
     name: 'kb-analytics',
     component: () => import('../views/AnalyticsView.vue'),
-    meta: { title: 'Help Center Analytics', subtitle: 'Metrik & Tren Pencarian Artikel', public: true },
+    meta: {
+      title: 'Help Center Analytics',
+      subtitle: 'Metrik & Tren Pencarian Artikel',
+      public: true,
+    },
   },
 
   // Auth Route
@@ -135,6 +144,17 @@ const routes = [
     meta: { title: 'Pengajuan', subtitle: 'Kelola pengajuan', permission: 'submissions' },
   },
   {
+    path: '/shipments',
+    alias: '/pengiriman',
+    name: 'shipments',
+    component: () => import('../views/ShipmentsView.vue'),
+    meta: {
+      title: 'Pengiriman',
+      subtitle: 'Tracker pengiriman barang & aset',
+      permission: 'shipments',
+    },
+  },
+  {
     path: '/logs',
     name: 'logs',
     component: () => import('../views/LogsView.vue'),
@@ -202,7 +222,11 @@ const routes = [
     path: '/forbidden',
     name: 'forbidden',
     component: () => import('../views/AccessDeniedView.vue'),
-    meta: { title: 'Akses Ditolak', subtitle: 'Anda tidak memiliki izin untuk halaman ini', public: true },
+    meta: {
+      title: 'Akses Ditolak',
+      subtitle: 'Anda tidak memiliki izin untuk halaman ini',
+      public: true,
+    },
   },
   {
     path: '/:pathMatch(.*)*',
@@ -224,7 +248,6 @@ router.beforeEach((to) => {
   // Halaman publik (Help Center landing page, Cases, Templates, Login, dll) dapat diakses tanpa login
   if (to.meta.public) {
     if (to.name === 'login' && authenticated) {
-      const ticketEligibility = getTicketEligibility(user)
       const firstAllowed = findFirstAllowedRoute(user, allowedRouteMap)
       return { name: firstAllowed?.name || 'dashboard' }
     }

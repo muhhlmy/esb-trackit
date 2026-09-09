@@ -153,6 +153,8 @@ export function addSseClient(res, userOrIdentity, queueIds = [], options = {}) {
 function endSseClient(client) {
   client.__ticketEventCleanup?.()
   try {
+    // SSE is finished permanently; do not leave its socket idle in keep-alive.
+    client.shouldKeepAlive = false
     if (typeof client.end === 'function') client.end()
   } catch {
     // Client sudah terputus; cleanup lokal di atas tetap berlaku.

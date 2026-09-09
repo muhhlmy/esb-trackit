@@ -44,7 +44,13 @@ const isLoadingCycle = ref(false)
 const isLoadingLogs = ref(false)
 
 // ── Page-level loading state (aggregates all loading flags) ──────────────────
-const isLoading = computed(() => isLoadingEmployees.value || isLoadingAssets.value || isLoadingCycle.value || isLoadingLogs.value)
+const isLoading = computed(
+  () =>
+    isLoadingEmployees.value ||
+    isLoadingAssets.value ||
+    isLoadingCycle.value ||
+    isLoadingLogs.value,
+)
 
 // ── Level 1: Filtered Employees (Rule: STRICTLY ONLY employees with assets > 0) ──
 const employeesWithAssets = computed(() => {
@@ -76,7 +82,11 @@ const departemenOptions = computed(() => {
 })
 
 const lokasiOptions = computed(() => {
-  const locs = [...new Set(employeesWithAssets.value.map((e) => normalizeLocation(e.lokasi_kerja)).filter(Boolean))]
+  const locs = [
+    ...new Set(
+      employeesWithAssets.value.map((e) => normalizeLocation(e.lokasi_kerja)).filter(Boolean),
+    ),
+  ]
   return locs.sort()
 })
 
@@ -793,7 +803,9 @@ onMounted(() => {
                         <span class="material-symbols-outlined text-[13px] text-[#94A3B8] shrink-0"
                           >location_on</span
                         >
-                        <span class="truncate block">{{ normalizeLocation(employee.lokasi_kerja) || '—' }}</span>
+                        <span class="truncate block">{{
+                          normalizeLocation(employee.lokasi_kerja) || '—'
+                        }}</span>
                       </span>
                     </div>
                   </td>
@@ -807,9 +819,10 @@ onMounted(() => {
                           :key="tipe"
                           class="inline-flex items-center gap-1 rounded-md bg-[#F1F5F9] px-1.5 py-0.5 text-[10px] font-medium text-[#475569] border border-[#E2E8F0] shrink min-w-0 overflow-hidden"
                         >
-                          <span class="material-symbols-outlined text-[12px] text-[#2563EB] shrink-0">{{
-                            getDeviceIcon(tipe)
-                          }}</span>
+                          <span
+                            class="material-symbols-outlined text-[12px] text-[#2563EB] shrink-0"
+                            >{{ getDeviceIcon(tipe) }}</span
+                          >
                           <span class="truncate">{{ tipe }}</span>
                         </span>
                         <span
@@ -886,7 +899,9 @@ onMounted(() => {
                   >
                     {{ employee.jumlah_aset || 0 }} Aset
                   </span>
-                  <span class="material-symbols-outlined text-[18px] text-[#94A3B8]">chevron_right</span>
+                  <span class="material-symbols-outlined text-[18px] text-[#94A3B8]"
+                    >chevron_right</span
+                  >
                 </div>
               </div>
 
@@ -897,24 +912,40 @@ onMounted(() => {
               <div class="grid grid-cols-2 gap-2 text-left">
                 <!-- 1. Departemen -->
                 <div class="flex flex-col min-w-0 overflow-hidden">
-                  <span class="text-[10px] font-semibold uppercase text-[#94A3B8] tracking-wider">Departemen</span>
-                  <span class="text-[12px] font-semibold text-[#1E293B] mt-0.5 truncate block" :title="employee.departemen || '—'">
+                  <span class="text-[10px] font-semibold uppercase text-[#94A3B8] tracking-wider"
+                    >Departemen</span
+                  >
+                  <span
+                    class="text-[12px] font-semibold text-[#1E293B] mt-0.5 truncate block"
+                    :title="employee.departemen || '—'"
+                  >
                     {{ employee.departemen || '—' }}
                   </span>
                 </div>
 
                 <!-- 2. Lokasi -->
                 <div class="flex flex-col min-w-0 overflow-hidden">
-                  <span class="text-[10px] font-semibold uppercase text-[#94A3B8] tracking-wider">Lokasi</span>
-                  <span class="text-[12px] font-normal text-[#1E293B] mt-0.5 truncate flex items-center gap-1" :title="normalizeLocation(employee.lokasi_kerja) || '—'">
-                    <span class="material-symbols-outlined text-[12px] text-[#94A3B8] shrink-0">location_on</span>
-                    <span class="truncate">{{ normalizeLocation(employee.lokasi_kerja) || '—' }}</span>
+                  <span class="text-[10px] font-semibold uppercase text-[#94A3B8] tracking-wider"
+                    >Lokasi</span
+                  >
+                  <span
+                    class="text-[12px] font-normal text-[#1E293B] mt-0.5 truncate flex items-center gap-1"
+                    :title="normalizeLocation(employee.lokasi_kerja) || '—'"
+                  >
+                    <span class="material-symbols-outlined text-[12px] text-[#94A3B8] shrink-0"
+                      >location_on</span
+                    >
+                    <span class="truncate">{{
+                      normalizeLocation(employee.lokasi_kerja) || '—'
+                    }}</span>
                   </span>
                 </div>
 
                 <!-- 3. Kategori Aset -->
                 <div class="flex flex-col min-w-0 overflow-hidden">
-                  <span class="text-[10px] font-semibold uppercase text-[#94A3B8] tracking-wider">Kategori Aset</span>
+                  <span class="text-[10px] font-semibold uppercase text-[#94A3B8] tracking-wider"
+                    >Kategori Aset</span
+                  >
                   <div class="flex items-center gap-1 min-w-0 overflow-hidden mt-0.5">
                     <template v-if="employee.asset_types && employee.asset_types.length > 0">
                       <span
@@ -922,9 +953,10 @@ onMounted(() => {
                         :key="'mob-tip-' + tipe"
                         class="inline-flex items-center gap-1 rounded-md bg-[#F1F5F9] px-1.5 py-0.5 text-[10px] font-medium text-[#475569] border border-[#E2E8F0] shrink min-w-0 overflow-hidden"
                       >
-                        <span class="material-symbols-outlined text-[12px] text-[#2563EB] shrink-0">{{
-                          getDeviceIcon(tipe)
-                        }}</span>
+                        <span
+                          class="material-symbols-outlined text-[12px] text-[#2563EB] shrink-0"
+                          >{{ getDeviceIcon(tipe) }}</span
+                        >
                         <span class="truncate">{{ tipe }}</span>
                       </span>
                       <span
@@ -940,8 +972,13 @@ onMounted(() => {
 
                 <!-- 4. Penugasan Terakhir -->
                 <div class="flex flex-col min-w-0 overflow-hidden">
-                  <span class="text-[10px] font-semibold uppercase text-[#94A3B8] tracking-wider">Penugasan Terakhir</span>
-                  <span class="text-[12px] font-medium text-[#64748B] mt-0.5 truncate block" :title="formatDate(employee.last_assignment_date)">
+                  <span class="text-[10px] font-semibold uppercase text-[#94A3B8] tracking-wider"
+                    >Penugasan Terakhir</span
+                  >
+                  <span
+                    class="text-[12px] font-medium text-[#64748B] mt-0.5 truncate block"
+                    :title="formatDate(employee.last_assignment_date)"
+                  >
                     {{ formatDate(employee.last_assignment_date) }}
                   </span>
                 </div>
@@ -965,7 +1002,10 @@ onMounted(() => {
     <template v-else-if="currentLevel === 2 && selectedEmployee">
       <!-- Interactive Breadcrumb & Back Navigation -->
       <div class="flex items-center justify-between gap-2.5 min-w-0">
-        <nav class="flex items-center gap-1.5 text-xs min-w-0 overflow-hidden" aria-label="Breadcrumb">
+        <nav
+          class="flex items-center gap-1.5 text-xs min-w-0 overflow-hidden"
+          aria-label="Breadcrumb"
+        >
           <button
             v-if="isAdmin"
             type="button"
@@ -975,8 +1015,12 @@ onMounted(() => {
             Aset Karyawan
           </button>
           <span v-else class="font-medium text-[#64748B] shrink-0">Aset Saya</span>
-          <span class="material-symbols-outlined text-[14px] text-[#CBD5E1] shrink-0">chevron_right</span>
-          <span class="font-bold text-[#0F172A] truncate">{{ selectedEmployee.nama_karyawan }}</span>
+          <span class="material-symbols-outlined text-[14px] text-[#CBD5E1] shrink-0"
+            >chevron_right</span
+          >
+          <span class="font-bold text-[#0F172A] truncate">{{
+            selectedEmployee.nama_karyawan
+          }}</span>
         </nav>
 
         <button
@@ -1020,17 +1064,30 @@ onMounted(() => {
               {{ selectedEmployee.jabatan || selectedEmployee.title || 'Staff' }}
             </p>
             <div class="mt-2 flex flex-wrap items-center gap-1.5 text-[11px] text-[#64748B]">
-              <span class="inline-flex items-center font-mono font-medium px-2 py-0.5 rounded-md bg-[#F1F5F9] text-[#1E293B]">
+              <span
+                class="inline-flex items-center font-mono font-medium px-2 py-0.5 rounded-md bg-[#F1F5F9] text-[#1E293B]"
+              >
                 NIK: {{ selectedEmployee.nik }}
               </span>
-              <span v-if="selectedEmployee.departemen" class="inline-flex items-center px-2 py-0.5 rounded-md bg-[#F8FAFC] border border-[#E2E8F0] text-[#475569]">
+              <span
+                v-if="selectedEmployee.departemen"
+                class="inline-flex items-center px-2 py-0.5 rounded-md bg-[#F8FAFC] border border-[#E2E8F0] text-[#475569]"
+              >
                 {{ selectedEmployee.departemen }}
               </span>
-              <span v-if="selectedEmployee.lokasi_kerja" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#F8FAFC] border border-[#E2E8F0] text-[#475569]">
-                <span class="material-symbols-outlined text-[12px] text-[#94A3B8]">location_on</span>
+              <span
+                v-if="selectedEmployee.lokasi_kerja"
+                class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#F8FAFC] border border-[#E2E8F0] text-[#475569]"
+              >
+                <span class="material-symbols-outlined text-[12px] text-[#94A3B8]"
+                  >location_on</span
+                >
                 {{ selectedEmployee.lokasi_kerja }}
               </span>
-              <span v-if="selectedEmployee.email_kantor" class="inline-flex items-center px-2 py-0.5 rounded-md bg-[#F8FAFC] border border-[#E2E8F0] text-[#475569] truncate max-w-[200px]">
+              <span
+                v-if="selectedEmployee.email_kantor"
+                class="inline-flex items-center px-2 py-0.5 rounded-md bg-[#F8FAFC] border border-[#E2E8F0] text-[#475569] truncate max-w-[200px]"
+              >
                 {{ selectedEmployee.email_kantor }}
               </span>
             </div>
@@ -1041,13 +1098,17 @@ onMounted(() => {
         <div
           class="grid grid-cols-2 sm:flex items-center gap-2.5 shrink-0 border-t border-[#F1F5F9] pt-3 sm:border-t-0 sm:pt-0"
         >
-          <div class="rounded-lg bg-[#F8FAFC] px-3 py-2 border border-[#E2E8F0] text-center sm:text-right">
+          <div
+            class="rounded-lg bg-[#F8FAFC] px-3 py-2 border border-[#E2E8F0] text-center sm:text-right"
+          >
             <span class="block text-[10px] font-semibold uppercase text-[#64748B]">Total Aset</span>
             <span class="text-base font-bold text-[#2563EB] mt-0.5 block"
               >{{ myAssets.length }} Unit</span
             >
           </div>
-          <div class="rounded-lg bg-[#F8FAFC] px-3 py-2 border border-[#E2E8F0] text-center sm:text-right">
+          <div
+            class="rounded-lg bg-[#F8FAFC] px-3 py-2 border border-[#E2E8F0] text-center sm:text-right"
+          >
             <span class="block text-[10px] font-semibold uppercase text-[#64748B]"
               >Penugasan Awal</span
             >
@@ -1192,7 +1253,9 @@ onMounted(() => {
                 }}
               </h4>
               <div class="mt-1 flex items-center justify-between text-xs text-[#64748B]">
-                <span class="font-mono font-medium truncate">SN: {{ asset.nomor_seri || '—' }}</span>
+                <span class="font-mono font-medium truncate"
+                  >SN: {{ asset.nomor_seri || '—' }}</span
+                >
                 <span class="font-mono text-[11px] text-[#94A3B8] shrink-0"
                   >AST-IT-{{ String(asset.id_aset).padStart(5, '0') }}</span
                 >
@@ -1246,7 +1309,10 @@ onMounted(() => {
       <!-- Breadcrumb Navigation -->
       <div class="flex items-center justify-between gap-2.5 min-w-0">
         <!-- Desktop Breadcrumb (>= sm) -->
-        <nav class="hidden sm:flex items-center gap-2 text-xs min-w-0 overflow-hidden" aria-label="Breadcrumb">
+        <nav
+          class="hidden sm:flex items-center gap-2 text-xs min-w-0 overflow-hidden"
+          aria-label="Breadcrumb"
+        >
           <button
             v-if="isAdmin"
             type="button"
@@ -1262,11 +1328,15 @@ onMounted(() => {
           >
             {{ selectedEmployee.nama_karyawan }}
           </button>
-          <span class="material-symbols-outlined text-[14px] text-[#CBD5E1] shrink-0">chevron_right</span>
+          <span class="material-symbols-outlined text-[14px] text-[#CBD5E1] shrink-0"
+            >chevron_right</span
+          >
           <span class="font-bold text-[#0F172A] truncate">{{
             selectedAsset.label_aset || selectedAsset.nomor_seri
           }}</span>
-          <span class="material-symbols-outlined text-[14px] text-[#CBD5E1] shrink-0">chevron_right</span>
+          <span class="material-symbols-outlined text-[14px] text-[#CBD5E1] shrink-0"
+            >chevron_right</span
+          >
           <span class="font-semibold text-[#64748B] shrink-0">Audit History</span>
         </nav>
 
@@ -1317,13 +1387,19 @@ onMounted(() => {
               />
             </div>
             <div class="mt-2 flex flex-wrap items-center gap-1.5 text-[11px] text-[#64748B]">
-              <span class="inline-flex items-center font-mono font-medium px-2 py-0.5 rounded-md bg-[#F1F5F9] text-[#0F172A]">
+              <span
+                class="inline-flex items-center font-mono font-medium px-2 py-0.5 rounded-md bg-[#F1F5F9] text-[#0F172A]"
+              >
                 AST-IT-{{ String(selectedAsset.id_aset).padStart(5, '0') }}
               </span>
-              <span class="inline-flex items-center font-mono px-2 py-0.5 rounded-md bg-[#F8FAFC] border border-[#E2E8F0] text-[#475569]">
+              <span
+                class="inline-flex items-center font-mono px-2 py-0.5 rounded-md bg-[#F8FAFC] border border-[#E2E8F0] text-[#475569]"
+              >
                 SN: {{ selectedAsset.nomor_seri || '—' }}
               </span>
-              <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#F8FAFC] border border-[#E2E8F0] text-[#475569]">
+              <span
+                class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#F8FAFC] border border-[#E2E8F0] text-[#475569]"
+              >
                 <span class="material-symbols-outlined text-[12px] text-[#94A3B8]">person</span>
                 {{ selectedEmployee.nama_karyawan }}
               </span>
@@ -1456,7 +1532,9 @@ onMounted(() => {
         </div>
 
         <!-- RIGHT COLUMN: Modern SaaS Audit Timeline (lg:col-span-6) -->
-        <div class="lg:col-span-6 rounded-xl border border-[#E2E8F0] bg-white p-3.5 sm:p-4 shadow-2xs">
+        <div
+          class="lg:col-span-6 rounded-xl border border-[#E2E8F0] bg-white p-3.5 sm:p-4 shadow-2xs"
+        >
           <div class="flex items-center justify-between pb-2.5 mb-3.5 border-b border-[#F1F5F9]">
             <div class="flex items-center gap-2">
               <span class="material-symbols-outlined text-[18px] text-[#7C3AED]">history</span>

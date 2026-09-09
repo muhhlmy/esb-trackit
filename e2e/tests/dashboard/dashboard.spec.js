@@ -13,7 +13,7 @@ test.describe('Dashboard Suite', () => {
       }
     })
 
-    await page.goto('/')
+    await page.goto('/dashboard', { waitUntil: 'domcontentloaded' })
     await page.waitForLoadState('domcontentloaded')
 
     // Verify main KPI cards
@@ -34,7 +34,7 @@ test.describe('Dashboard Suite', () => {
     superAdminPage,
   }) => {
     const page = superAdminPage
-    await page.goto('/')
+    await page.goto('/dashboard', { waitUntil: 'domcontentloaded' })
     await page.waitForLoadState('domcontentloaded')
 
     const addBtn = page.getByRole('button', { name: /\+\s*tambah/i }).first()

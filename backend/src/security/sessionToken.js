@@ -82,7 +82,7 @@ export function issueSessionCookie(res, { userId, sessionId, expiresAt }) {
       (isProductionEnv() ? '; Secure' : ''),
   );
 
-  return { token, expMs: expiresMs };
+  return { token, expMs: exp * 1000 };
 }
 
 /**
@@ -149,4 +149,3 @@ export async function maybeSlideSessionToken(req, res, verifiedSession = null) {
     // sesuai umur token.
   }
 }
-

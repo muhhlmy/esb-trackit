@@ -256,6 +256,19 @@ const REQUIRED_RUNTIME_SCHEMA = Object.freeze({
     created_at: nn('timestamp'),
     updated_at: nn('timestamp'),
   },
+  asset_shipments: {
+    id: nn('int4'),
+    request_date: nn('date'),
+    recipient_name: nn('varchar'),
+    item_description: nn('text'),
+    destination: nn('varchar'),
+    tracking_number: optional('varchar'),
+    status: nn('varchar'),
+    delivery_proof_url: optional('text'),
+    created_by: optional('int4'),
+    created_at: nn('timestamp'),
+    updated_at: nn('timestamp'),
+  },
 })
 
 const REQUIRED_RELATION_KINDS = Object.freeze({
@@ -280,6 +293,7 @@ const REQUIRED_RELATION_KINDS = Object.freeze({
   kb_categories: 'r',
   kb_search_logs: 'r',
   case_bookmarks: 'r',
+  asset_shipments: 'r',
 })
 
 const REQUIRED_INDEXES = Object.freeze([
@@ -317,6 +331,10 @@ const REQUIRED_INDEXES = Object.freeze([
   'idx_kb_search_logs_query',
   'idx_kb_search_logs_created',
   'idx_case_bookmarks_user',
+  'idx_asset_shipments_request_date',
+  'idx_asset_shipments_status',
+  'idx_asset_shipments_tracking_number',
+  'idx_asset_shipments_created_at',
 ])
 
 const REQUIRED_TRIGGERS = Object.freeze([]) // Triggers are optional

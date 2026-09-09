@@ -33,7 +33,7 @@ test.describe('Ticket Search & Filter', () => {
     await searchInput.fill('nonexistent-ticket-xyz-999')
     await searchInput.press('Enter')
     // Wait for search to process — either empty state or filtered list appears
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('domcontentloaded')
 
     // Clear search
     await searchInput.fill('')
@@ -55,7 +55,7 @@ test.describe('Ticket Search & Filter', () => {
     if (await unassignedTab.isVisible()) {
       await unassignedTab.click()
       // Wait for tab content to load
-      await page.waitForLoadState('networkidle')
+      await page.waitForLoadState('domcontentloaded')
 
       // Verify tab is active
       await expect(unassignedTab).toHaveClass(/bg-\[#2563EB\]|text-white/)
@@ -74,7 +74,7 @@ test.describe('Ticket Search & Filter', () => {
     if (await statusFilter.isVisible()) {
       await statusFilter.selectOption('Open')
       // Wait for filter to apply
-      await page.waitForLoadState('networkidle')
+      await page.waitForLoadState('domcontentloaded')
 
       // Verify filter applied (list may be empty or filtered)
       // The key assertion is that the select didn't crash

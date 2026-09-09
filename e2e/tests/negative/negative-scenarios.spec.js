@@ -40,7 +40,7 @@ test.describe('Negative Scenarios Suite', () => {
       const saveBtn = page.locator('button[type="submit"]').or(page.getByRole('button', { name: /^tambah aset$/i })).last()
       await saveBtn.click()
       // Wait for form submission to complete
-      await page.waitForLoadState('networkidle')
+      await page.waitForLoadState('domcontentloaded')
 
       // 2. Attempt creating second asset with duplicate hostname & serial number
       const addAgainBtn = page.getByRole('button', { name: /tambah aset/i }).first()

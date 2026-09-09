@@ -109,7 +109,7 @@ def generate_report():
     now = datetime.now().strftime('%B %d, %Y at %H:%M WIB')
     pdf.cell(0, 6, f'Generated: {now}', 0, 1, 'C')
     pdf.cell(0, 6, 'Target: http://192.168.100.85:5173 (TrackIT)', 0, 1, 'C')
-    pdf.cell(0, 6, 'Backend API: http://localhost:5000', 0, 1, 'C')
+    pdf.cell(0, 6, 'Backend API: http://localhost:3000', 0, 1, 'C')
     pdf.ln(10)
 
     # Status banner
@@ -185,7 +185,7 @@ def generate_report():
         ('Realtime', 'Server-Sent Events (SSE) for live ticket updates'),
         ('E2E Framework', 'Playwright 1.62 (chromium)'),
         ('Frontend URL', 'http://localhost:5173 / http://192.168.100.85:5173'),
-        ('Backend URL', 'http://localhost:5000'),
+        ('Backend URL', 'http://localhost:3000'),
         ('Test Date', datetime.now().strftime('%Y-%m-%d %H:%M WIB')),
     ]
     for k, v in info:

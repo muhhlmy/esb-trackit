@@ -6,20 +6,38 @@ on:
   pull_request:
     branches: [ main, master, dev ]
 
+permissions:
+  contents: read
+
 jobs:
   backend-ci:
     name: Backend CI
     runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: assets_monitoring_test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: ci-dummy-postgres-password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
     env:
       DB_HOST: localhost
       DB_PORT: 5432
       DB_USER: postgres
       DB_PASSWORD: ci-dummy-postgres-password
-      DB_NAME: assets_monitoring
+      DB_NAME: assets_monitoring_test
       JWT_SECRET: ci-only-dummy-secret-minimum-32-chars-xyz123
-      DEFAULT_USER_PASSWORD: CIDummyUserPass123!
       NODE_ENV: test
+      EMAIL_ENABLED: false
 
     steps:
       - name: Checkout Repository
@@ -39,6 +57,9 @@ jobs:
       - name: Run Syntax & Preflight Check
         run: npm run check
         working-directory: backend
+
+      - name: Initialize and validate isolated test database
+        run: node scripts/initialize-test-database.mjs
 
       - name: Run Unit Tests
         run: npm test
@@ -78,3 +99,33 @@ jobs:
       - name: Build Application
         run: npm run build
         working-directory: frontend
+
+  dependency-ci:
+    name: Dependencies (${{ matrix.directory }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        directory: ['.', 'backend', 'frontend']
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: Setup Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22'
+      - name: Install locked dependencies
+        run: npm ci
+        working-directory: ${{ matrix.directory }}
+      - name: Audit dependencies
+        run: npm audit --audit-level=high
+        working-directory: ${{ matrix.directory }}
+      - name: Generate dependency SBOM
+        run: npm sbom --sbom-format cyclonedx > sbom.json
+        working-directory: ${{ matrix.directory }}
+      - name: Upload SBOMs
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: sbom-${{ strategy.job-index }}
+          path: ${{ matrix.directory }}/sbom.json
+          retention-days: 30

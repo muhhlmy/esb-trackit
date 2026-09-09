@@ -1068,7 +1068,9 @@ onMounted(() => {
           </table>
         </div>
 
-        <div class="grid grid-cols-1 gap-2 sm:flex sm:justify-end border-t border-[#F1F5F9] pt-3">
+      </div>
+      <template #footer>
+        <div class="grid grid-cols-1 gap-2 sm:flex sm:justify-end">
           <button
             type="button"
             @click="showPreviewModal = false"
@@ -1084,7 +1086,7 @@ onMounted(() => {
             Unduh Sekarang
           </button>
         </div>
-      </div>
+      </template>
     </AppModal>
 
     <!-- Reset Database Confirmation Modal -->

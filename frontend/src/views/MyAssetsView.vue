@@ -1557,7 +1557,9 @@ onMounted(() => {
           </div>
         </div>
 
-        <div class="flex justify-end border-t border-[#E2E8F0] pt-3">
+      </div>
+      <template #footer>
+        <div class="flex justify-end">
           <button
             type="button"
             class="h-8 rounded-lg bg-[#2563EB] px-4 text-xs font-semibold text-white hover:bg-[#1D4ED8] cursor-pointer transition-colors"
@@ -1566,7 +1568,7 @@ onMounted(() => {
             Tutup
           </button>
         </div>
-      </div>
+      </template>
     </AppModal>
   </div>
 </template>

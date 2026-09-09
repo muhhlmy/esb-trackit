@@ -825,37 +825,40 @@ onMounted(async () => {
           :key="'asset-skel-' + r"
           class="asset-row-grid gap-3 md:gap-4 rounded-xl border border-[#E2E8F0]/80 bg-white p-3.5 sm:p-4 shadow-2xs select-none"
         >
-          <!-- Mobile Skeleton Structure -->
-          <div class="flex items-center justify-between gap-2.5 md:hidden">
-            <div class="flex items-center gap-2.5 min-w-0">
-              <SkeletonAvatar size="38px" shape="rounded" class="shrink-0" />
-              <div class="flex flex-col gap-1 min-w-0">
-                <BaseSkeleton width="110px" height="14px" radius="md" />
+          <!-- Mobile Skeleton Structure (< 768px) -->
+          <div class="flex items-start justify-between gap-2.5 min-w-0 md:hidden">
+            <div class="flex items-center gap-2.5 min-w-0 flex-1">
+              <SkeletonAvatar size="40px" shape="rounded" class="shrink-0" />
+              <div class="flex flex-col gap-1.5 min-w-0 flex-1">
+                <BaseSkeleton width="120px" height="15px" radius="md" />
                 <BaseSkeleton width="80px" height="11px" radius="sm" />
               </div>
             </div>
-            <div class="flex items-center gap-1.5 shrink-0">
+            <div class="flex items-center gap-1.5 shrink-0 self-start">
               <BaseSkeleton width="65px" height="22px" radius="full" />
-              <BaseSkeleton width="20px" height="20px" radius="md" />
+              <BaseSkeleton width="18px" height="18px" radius="md" />
             </div>
           </div>
+
           <div class="border-t border-[#F1F5F9] my-0.5 md:hidden"></div>
+
           <div class="grid grid-cols-2 gap-2.5 md:hidden">
-            <div class="flex flex-col gap-1">
-              <BaseSkeleton width="45px" height="9px" radius="sm" />
-              <BaseSkeleton width="85px" height="12px" radius="md" />
+            <div class="flex flex-col gap-1 min-w-0">
+              <BaseSkeleton width="65px" height="10px" radius="sm" />
+              <BaseSkeleton width="85px" height="13px" radius="md" />
+              <BaseSkeleton width="50px" height="11px" radius="sm" />
             </div>
-            <div class="flex flex-col gap-1">
-              <BaseSkeleton width="60px" height="9px" radius="sm" />
-              <BaseSkeleton width="95px" height="12px" radius="md" />
+            <div class="flex flex-col gap-1 min-w-0">
+              <BaseSkeleton width="45px" height="10px" radius="sm" />
+              <BaseSkeleton width="75px" height="13px" radius="md" />
             </div>
-            <div class="flex flex-col gap-1">
-              <BaseSkeleton width="40px" height="9px" radius="sm" />
-              <BaseSkeleton width="70px" height="12px" radius="md" />
+            <div class="flex flex-col gap-1 min-w-0">
+              <BaseSkeleton width="55px" height="10px" radius="sm" />
+              <BaseSkeleton width="90px" height="13px" radius="md" />
             </div>
-            <div class="flex flex-col gap-1">
-              <BaseSkeleton width="45px" height="9px" radius="sm" />
-              <BaseSkeleton width="75px" height="12px" radius="md" />
+            <div class="flex flex-col gap-1 min-w-0">
+              <BaseSkeleton width="45px" height="10px" radius="sm" />
+              <BaseSkeleton width="90px" height="13px" radius="md" />
             </div>
           </div>
 
@@ -975,11 +978,10 @@ onMounted(async () => {
             <!-- Mobile Status & Action Menu -->
             <div class="flex items-center gap-1.5 shrink-0 self-start">
               <div
-                class="flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold border"
+                class="flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-bold"
                 :class="[
                   formatStatusPill(asset.status_aset).bg,
                   formatStatusPill(asset.status_aset).text,
-                  formatStatusPill(asset.status_aset).border,
                 ]"
               >
                 <span
@@ -1055,7 +1057,7 @@ onMounted(async () => {
                 >Lokasi</span
               >
               <span
-                class="text-[12px] font-medium text-[#1E293B] mt-0.5 truncate block"
+                class="text-[12px] font-normal text-[#1E293B] mt-0.5 truncate block"
                 :title="asset.lokasi_kerja || asset.lokasi_aset || '—'"
               >
                 {{ asset.lokasi_kerja || asset.lokasi_aset || '—' }}
@@ -1169,8 +1171,8 @@ onMounted(async () => {
           <div class="hidden md:flex flex-col items-start min-w-0 overflow-hidden select-none">
             <!-- Primary Status Line -->
             <div
-              class="flex items-center gap-1.5 text-[12.5px] font-semibold truncate max-w-full"
-              :class="formatStatusPill(asset.status_aset).text"
+              class="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold max-w-full"
+              :class="[formatStatusPill(asset.status_aset).bg, formatStatusPill(asset.status_aset).text]"
             >
               <span
                 class="h-1.5 w-1.5 rounded-full shrink-0"
@@ -1180,7 +1182,7 @@ onMounted(async () => {
             </div>
             <!-- Secondary Condition Line -->
             <div
-              class="flex items-center gap-1 text-[11px] mt-0.5 truncate max-w-full"
+              class="flex items-center gap-1 text-[11px] mt-1.5 truncate max-w-full"
               :class="formatKondisiStyle(asset.kondisi_aset)"
             >
               <span
@@ -1634,7 +1636,9 @@ onMounted(async () => {
           </div>
         </div>
 
-        <div class="flex justify-end border-t border-[#E8EDF3] pt-4">
+      </div>
+      <template #footer>
+        <div class="flex justify-end">
           <button
             type="button"
             class="h-9 rounded-xl bg-brand px-5 font-bold text-white hover:bg-brand-dark"
@@ -1643,7 +1647,7 @@ onMounted(async () => {
             Tutup
           </button>
         </div>
-      </div>
+      </template>
     </AppModal>
 
     <AppModal :is-open="showDetailsModal" title="Detail Aset" size="lg" @close="closeModal">
@@ -1664,11 +1668,11 @@ onMounted(async () => {
         </div>
 
         <!-- Tab Navigation -->
-        <div class="flex border-b border-[#E2E8F0]/80 mb-4 overflow-x-auto">
+        <div class="flex flex-wrap border-b border-[#E2E8F0]/80 mb-4">
           <button
             type="button"
             @click="detailsTab = 'info'"
-            class="flex items-center gap-2 px-4 py-3 text-[12px] font-bold transition-all duration-150 border-b-2 -mb-[2px] shrink-0"
+            class="flex items-center gap-2 px-3 sm:px-4 py-3 text-[12px] font-bold transition-all duration-150 border-b-2"
             :class="
               detailsTab === 'info'
                 ? 'border-brand text-brand font-black'
@@ -1682,7 +1686,7 @@ onMounted(async () => {
             v-if="isAdmin || isSuperAdmin"
             type="button"
             @click="detailsTab = 'logs'"
-            class="flex items-center gap-2 px-4 py-3 text-[12px] font-bold transition-all duration-150 border-b-2 -mb-[2px] shrink-0"
+            class="flex items-center gap-2 px-3 sm:px-4 py-3 text-[12px] font-bold transition-all duration-150 border-b-2"
             :class="
               detailsTab === 'logs'
                 ? 'border-brand text-brand font-black'
@@ -1889,7 +1893,9 @@ onMounted(async () => {
         </div>
 
         <!-- Footer -->
-        <div class="flex justify-end border-t border-[#F3F4F6] pt-3 mt-4">
+      </div>
+      <template #footer>
+        <div class="flex justify-end">
           <button
             type="button"
             @click="closeModal"
@@ -1898,7 +1904,7 @@ onMounted(async () => {
             Tutup
           </button>
         </div>
-      </div>
+      </template>
     </AppModal>
 
     <AppModal :is-open="showExportModal" title="Ekspor Aset IT" size="md" @close="closeModal">
@@ -2022,10 +2028,10 @@ onMounted(async () => {
 @media (min-width: 768px) {
   .asset-row-grid {
     display: grid;
-    grid-template-columns: minmax(230px, 2.2fr) minmax(140px, 1.2fr) minmax(170px, 1.5fr) minmax(
-        120px,
-        1fr
-      ) minmax(130px, 1fr) 32px;
+    grid-template-columns: minmax(220px, 2fr) minmax(130px, 1fr) minmax(150px, 1.2fr) minmax(
+        140px,
+        1.1fr
+      ) minmax(120px, 1fr) 32px;
     align-items: center;
   }
 }

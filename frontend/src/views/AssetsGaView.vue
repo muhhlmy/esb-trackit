@@ -1084,7 +1084,9 @@ function formatKondisiPill(kondisi) {
           </p>
         </div>
 
-        <div class="flex justify-end pt-3 border-t border-[#E2E8F0]">
+      </div>
+      <template #footer>
+        <div class="flex justify-end">
           <button
             type="button"
             @click="closeModal"
@@ -1093,7 +1095,7 @@ function formatKondisiPill(kondisi) {
             Tutup
           </button>
         </div>
-      </div>
+      </template>
     </AppModal>
 
     <!-- Modal Cetak Label Aset -->

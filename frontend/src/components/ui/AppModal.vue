@@ -162,6 +162,12 @@ onBeforeUnmount(() => {
           <div class="modal-body flex-1 min-h-0 overflow-y-auto p-3.5 sm:p-4">
             <slot />
           </div>
+          <div
+            v-if="$slots.footer"
+            class="modal-footer shrink-0 border-t border-[#F1F5F9] bg-white px-3.5 py-3 sm:px-4"
+          >
+            <slot name="footer" />
+          </div>
         </div>
       </div>
     </Transition>

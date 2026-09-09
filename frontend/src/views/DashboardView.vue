@@ -336,16 +336,13 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div
-    class="flex flex-col gap-6 min-h-[calc(100vh-80px)]"
-    :data-testid="!isLoading ? 'page-ready' : undefined"
-  >
+  <div class="dashboard-view" :data-testid="!isLoading ? 'page-ready' : undefined">
     <!-- ═══════════════════════════════════════════
          LOADING
          ═══════════════════════════════════════════ -->
     <div v-if="isLoading" class="space-y-4" role="status" aria-live="polite" aria-busy="true">
       <!-- Row 1: 5 Stat Cards Skeleton -->
-      <div class="grid grid-cols-1 gap-3.5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
+      <div class="dashboard-stats dashboard-stat-skeleton">
         <SkeletonCard v-for="i in 5" :key="i" variant="summary" />
       </div>
 
@@ -594,164 +591,74 @@ onUnmounted(() => {
          DASHBOARD CONTENT
          ═══════════════════════════════════════════ -->
     <template v-else-if="stats">
-      <!-- ─── ROW 1: Hero Banner + 5 Stat Cards ────────── -->
-      <div class="grid grid-cols-1 gap-3.5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
-        <!-- 1. Total Asset (ESB Primary Orange Hero Card) -->
-        <div
-          class="dash-stat-card relative overflow-hidden rounded-xl bg-gradient-to-br from-[#FC841B] to-[#E26F10] p-3.5 text-white shadow-md shadow-orange-500/10 border border-white/10 flex flex-col justify-between transition-transform hover:scale-[1.01]"
-        >
-          <div class="flex items-center justify-between">
-            <span class="text-[10px] font-bold uppercase tracking-wider text-white/90"
-              >Total Aset</span
-            >
-            <span class="flex items-center -mr-1">
-              <span class="material-symbols-outlined text-[18px] text-white/90">inventory_2</span>
-            </span>
-          </div>
-          <div class="mt-2.5">
-            <p class="font-num text-[24px] font-black leading-none tracking-tight text-white">
-              {{ totalAssets }}
-            </p>
-            <div class="mt-2.5 flex items-center justify-between gap-1.5 flex-wrap">
-              <span class="text-[10px] font-medium text-white/85">Unit Terdaftar</span>
-              <button
-                v-if="canWriteAssets"
-                type="button"
-                class="rounded-md bg-white/10 hover:bg-white/20 px-2 py-1 text-[10px] font-bold text-white border border-white/30 backdrop-blur-sm transition-all duration-200 cursor-pointer"
-                @click="goToAddAsset"
-              >
-                + Tambah
-              </button>
-            </div>
-          </div>
+      <div class="dashboard-intro">
+        <div>
+          <p class="dashboard-eyebrow">RINGKASAN OPERASIONAL</p>
+          <h2>Inventaris & layanan</h2>
+          <p>Pantau penggunaan aset, kondisi perangkat, dan permintaan terbaru.</p>
         </div>
-
-        <!-- 2. In Use -->
-        <div
-          class="dash-stat-card shadow-2xs hover:shadow-xs transition-shadow duration-300 flex flex-col justify-between rounded-xl border border-[#A7F3D0] bg-gradient-to-br from-[#ECFDF5] to-white p-3.5"
-        >
-          <div class="flex items-center justify-between">
-            <span class="text-[10px] font-extrabold uppercase tracking-wide text-[#047857]"
-              >Digunakan</span
-            >
-            <span class="flex items-center -mr-1">
-              <span aria-hidden="true" class="material-symbols-outlined text-[18px] text-[#047857]"
-                >check_circle</span
-              >
-            </span>
+        <button v-if="canWriteAssets" type="button" class="dashboard-add" @click="goToAddAsset">
+          <span class="material-symbols-outlined" aria-hidden="true">add</span>Tambah aset
+        </button>
+      </div>
+      <div class="dashboard-stats">
+        <div class="dash-stat-card stat-total">
+          <div class="stat-label">
+            Total aset<span class="material-symbols-outlined" aria-hidden="true">inventory_2</span>
           </div>
-          <div class="mt-2.5">
-            <p class="font-num text-[22px] font-extrabold text-[#0F172A] leading-none">
-              {{ countDipakai }}
-            </p>
-            <div class="flex items-center gap-1.5 mt-2">
-              <div class="flex-1 h-1.5 bg-[#D1FAE5] rounded-full overflow-hidden">
-                <div
-                  class="h-full bg-gradient-to-r from-[#059669] to-[#047857] rounded-full transition-all duration-500"
-                  :style="{ width: pctDipakai + '%' }"
-                ></div>
-              </div>
-              <span class="text-[10px] font-extrabold text-[#047857]">{{ pctDipakai }}%</span>
-            </div>
-          </div>
+          <p class="stat-number">{{ totalAssets }}</p>
+          <span class="stat-caption">Perangkat terdaftar</span>
         </div>
-
-        <!-- 3. Stock -->
         <div
-          class="dash-stat-card shadow-2xs hover:shadow-xs transition-shadow duration-300 flex flex-col justify-between rounded-xl border border-[#BAE6FD] bg-gradient-to-br from-[#F0F9FF] to-white p-3.5"
+          v-for="item in [
+            {
+              label: 'Digunakan',
+              count: countDipakai,
+              pct: pctDipakai,
+              icon: 'check_circle',
+              tone: 'green',
+            },
+            {
+              label: 'Stok tersedia',
+              count: countTersedia,
+              pct: pctTersedia,
+              icon: 'inventory',
+              tone: 'blue',
+            },
+            {
+              label: 'Rusak',
+              count: countRusak,
+              pct: pctRusak,
+              icon: 'report_problem',
+              tone: 'red',
+            },
+            {
+              label: 'Dalam perawatan',
+              count: countMaintenance,
+              pct: pctMaintenance,
+              icon: 'build',
+              tone: 'amber',
+            },
+          ]"
+          :key="item.label"
+          class="dash-stat-card"
+          :class="'stat-' + item.tone"
         >
-          <div class="flex items-center justify-between">
-            <span class="text-[10px] font-extrabold uppercase tracking-wide text-[#0369A1]"
-              >Stok</span
-            >
-            <span class="flex items-center -mr-1">
-              <span aria-hidden="true" class="material-symbols-outlined text-[18px] text-[#0369A1]"
-                >inventory</span
-              >
-            </span>
+          <div class="stat-label">
+            {{ item.label
+            }}<span class="material-symbols-outlined" aria-hidden="true">{{ item.icon }}</span>
           </div>
-          <div class="mt-2.5">
-            <p class="font-num text-[22px] font-extrabold text-[#0F172A] leading-none">
-              {{ countTersedia }}
-            </p>
-            <div class="flex items-center gap-1.5 mt-2">
-              <div class="flex-1 h-1.5 bg-[#E0F2FE] rounded-full overflow-hidden">
-                <div
-                  class="h-full bg-gradient-to-r from-[#0284C7] to-[#0369A1] rounded-full transition-all duration-500"
-                  :style="{ width: pctTersedia + '%' }"
-                ></div>
-              </div>
-              <span class="text-[10px] font-extrabold text-[#0369A1]">{{ pctTersedia }}%</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- 4. Damaged -->
-        <div
-          class="dash-stat-card shadow-2xs hover:shadow-xs transition-shadow duration-300 flex flex-col justify-between rounded-xl border border-[#FECACA] bg-gradient-to-br from-[#FEF2F2] to-white p-3.5"
-        >
-          <div class="flex items-center justify-between">
-            <span class="text-[10px] font-extrabold uppercase tracking-wide text-[#B91C1C]"
-              >Rusak</span
-            >
-            <span class="flex items-center -mr-1">
-              <span aria-hidden="true" class="material-symbols-outlined text-[18px] text-[#B91C1C]"
-                >report_problem</span
-              >
-            </span>
-          </div>
-          <div class="mt-2.5">
-            <p class="font-num text-[22px] font-extrabold text-[#0F172A] leading-none">
-              {{ countRusak }}
-            </p>
-            <div class="flex items-center gap-1.5 mt-2">
-              <div class="flex-1 h-1.5 bg-[#FEE2E2] rounded-full overflow-hidden">
-                <div
-                  class="h-full bg-gradient-to-r from-[#DC2626] to-[#B91C1C] rounded-full transition-all duration-500"
-                  :style="{ width: pctRusak + '%' }"
-                ></div>
-              </div>
-              <span class="text-[10px] font-extrabold text-[#B91C1C]">{{ pctRusak }}%</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- 5. In Service -->
-        <div
-          class="dash-stat-card shadow-2xs hover:shadow-xs transition-shadow duration-300 flex flex-col justify-between rounded-xl border border-[#FDE68A] bg-gradient-to-br from-[#FFFBEB] to-white p-3.5"
-        >
-          <div class="flex items-center justify-between">
-            <span class="text-[10px] font-extrabold uppercase tracking-wide text-[#B45309]"
-              >Dalam Perawatan</span
-            >
-            <span class="flex items-center -mr-1">
-              <span aria-hidden="true" class="material-symbols-outlined text-[18px] text-[#B45309]"
-                >build</span
-              >
-            </span>
-          </div>
-          <div class="mt-2.5">
-            <p class="font-num text-[22px] font-extrabold text-[#0F172A] leading-none">
-              {{ countMaintenance }}
-            </p>
-            <div class="flex items-center gap-1.5 mt-2">
-              <div class="flex-1 h-1.5 bg-[#FEF3C7] rounded-full overflow-hidden">
-                <div
-                  class="h-full bg-gradient-to-r from-[#D97706] to-[#B45309] rounded-full transition-all duration-500"
-                  :style="{ width: pctMaintenance + '%' }"
-                ></div>
-              </div>
-              <span class="text-[10px] font-extrabold text-[#B45309]">{{ pctMaintenance }}%</span>
-            </div>
+          <p class="stat-number">{{ item.count }}</p>
+          <div class="stat-bottom">
+            <span class="stat-progress"><span :style="{ width: item.pct + '%' }"></span></span
+            ><span>{{ item.pct }}%</span>
           </div>
         </div>
       </div>
 
       <!-- ─── ROW 2: Line Chart (8 col) + Donut Chart (4 col) ── -->
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-3.5 mt-3.5">
-        <div
-          class="lg:col-span-8 shadow-xs rounded-xl border border-[#E2E8F0] bg-white p-3.5 hover:shadow-xs transition-shadow duration-300"
-        >
+      <div class="dashboard-chart-grid grid grid-cols-1 lg:grid-cols-12">
+        <div class="lg:col-span-8 dashboard-panel">
           <div class="flex items-center justify-between mb-3">
             <h3 class="text-sm font-bold text-[#1E293B]">Tren Aset Bulanan</h3>
             <span class="text-[10px] font-medium text-[#64748B] bg-[#F1F5F9] px-2 py-0.5 rounded-md"
@@ -765,9 +672,7 @@ onUnmounted(() => {
             :error="error"
           />
         </div>
-        <div
-          class="lg:col-span-4 shadow-xs rounded-xl border border-[#E2E8F0] bg-white p-3.5 hover:shadow-xs transition-shadow duration-300"
-        >
+        <div class="lg:col-span-4 dashboard-panel">
           <div class="flex items-center justify-between mb-3">
             <h3 class="text-sm font-bold text-[#1E293B]">Status Aset</h3>
             <span class="text-[10px] font-medium text-[#64748B] bg-[#F1F5F9] px-2 py-0.5 rounded-md"
@@ -832,12 +737,10 @@ onUnmounted(() => {
       </div>
 
       <!-- ─── ROW 3: Bar Chart (7 col) + Pie Chart (5 col) ── -->
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
-        <div
-          class="lg:col-span-7 shadow-sm rounded-xl border border-[#E2E8F0] bg-white p-5 hover:shadow-md transition-shadow duration-300"
-        >
+      <div class="dashboard-chart-grid grid grid-cols-1 lg:grid-cols-12">
+        <div class="lg:col-span-7 dashboard-panel">
           <div class="flex items-center justify-between mb-4">
-            <h3 class="text-base font-bold text-[#1E293B]">Aset Per Tipe</h3>
+            <h3 class="text-sm font-semibold text-[#1E293B]">Aset Per Tipe</h3>
             <span class="text-xs font-medium text-[#64748B] bg-[#F1F5F9] px-2.5 py-1 rounded-lg"
               >Kategori</span
             >
@@ -849,11 +752,9 @@ onUnmounted(() => {
             :error="error"
           />
         </div>
-        <div
-          class="lg:col-span-5 shadow-sm rounded-xl border border-[#E2E8F0] bg-white p-5 hover:shadow-md transition-shadow duration-300"
-        >
+        <div class="lg:col-span-5 dashboard-panel">
           <div class="flex items-center justify-between mb-4">
-            <h3 class="text-base font-bold text-[#1E293B]">Kondisi Aset</h3>
+            <h3 class="text-sm font-semibold text-[#1E293B]">Kondisi Aset</h3>
             <span class="text-xs font-medium text-[#64748B] bg-[#F1F5F9] px-2.5 py-1 rounded-lg"
               >Persentase</span
             >
@@ -868,15 +769,13 @@ onUnmounted(() => {
       </div>
 
       <!-- ─── ROW 4: CSAT / Kepuasan Penanganan Tiket ────────── -->
-      <CsatDashboardSection v-if="canReadTickets" />
+      <CsatDashboardSection v-if="canReadTickets" class="dashboard-csat" />
 
       <!-- ─── ROW 5: Lokasi Aset ─────────────────────────────── -->
-      <div
-        class="shadow-sm rounded-xl border border-[#E2E8F0] bg-white p-6 hover:shadow-md transition-shadow duration-300"
-      >
+      <div class="dashboard-panel location-panel">
         <div class="flex items-center justify-between mb-5 pb-4 border-b border-[#F1F5F9]">
           <div>
-            <h3 class="text-lg font-bold text-[#1E293B]">Sebaran Lokasi Aset</h3>
+            <h3 class="text-sm font-semibold text-[#1E293B]">Sebaran Lokasi Aset</h3>
             <p class="text-xs text-[#64748B] mt-1">Lokasi penempatan perangkat saat ini</p>
           </div>
           <span
@@ -891,13 +790,9 @@ onUnmounted(() => {
 
         <div
           v-if="locationBreakdown.length"
-          class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+          class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3"
         >
-          <div
-            v-for="location in locationBreakdown"
-            :key="location.label"
-            class="rounded-lg border border-[#E2E8F0] bg-gradient-to-br from-[#F8FAFC] to-white p-4 transition-all duration-200 hover:border-[#CBD5E1] hover:shadow-sm hover:shadow-[#0F172A]/5"
-          >
+          <div v-for="location in locationBreakdown" :key="location.label" class="location-card">
             <div class="flex items-center justify-between gap-3 mb-3">
               <span class="truncate text-sm font-semibold text-[#1E293B]" :title="location.label">
                 {{ location.label }}
@@ -908,7 +803,7 @@ onUnmounted(() => {
             </div>
             <div class="h-1.5 overflow-hidden rounded-full bg-[#E2E8F0] mb-2">
               <div
-                class="h-full rounded-full bg-gradient-to-r from-[#3B82F6] to-[#60A5FA]"
+                class="h-full rounded-full bg-[#638dcc]"
                 :style="{ width: `${location.pct}%` }"
               ></div>
             </div>
@@ -921,10 +816,7 @@ onUnmounted(() => {
       </div>
 
       <!-- ─── ROW 6: Tabel 5 Aset Terbaru ────────────────────── -->
-      <div
-        v-if="canReadAssets"
-        class="shadow-sm rounded-xl border border-[#E2E8F0] bg-white overflow-hidden hover:shadow-md transition-shadow duration-300"
-      >
+      <div v-if="canReadAssets" class="dashboard-table">
         <div
           class="flex items-center justify-between px-4 py-3.5 sm:px-6 sm:py-4 border-b border-slate-100 bg-white"
         >
@@ -1162,10 +1054,7 @@ onUnmounted(() => {
       </div>
 
       <!-- ─── ROW 7: Tabel Tiket Permintaan Terbaru ────────────────── -->
-      <div
-        v-if="canReadTickets"
-        class="shadow-sm rounded-xl border border-[#E2E8F0] bg-white overflow-hidden hover:shadow-md transition-shadow duration-300"
-      >
+      <div v-if="canReadTickets" class="dashboard-table">
         <div
           class="flex items-center justify-between px-4 py-3.5 sm:px-6 sm:py-4 border-b border-slate-100 bg-white"
         >
@@ -1367,3 +1256,322 @@ onUnmounted(() => {
     </template>
   </div>
 </template>
+
+<style scoped>
+.dashboard-view {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  width: 100%;
+  max-width: 1500px;
+  margin: 0 auto;
+  padding: 4px 0 16px;
+  color: #172b4d;
+}
+.dashboard-intro {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 5px 0 2px;
+}
+.dashboard-eyebrow {
+  color: #7b8aa0;
+  font-size: 9px;
+  letter-spacing: 0.13em;
+  font-weight: 650;
+  margin-bottom: 7px;
+}
+.dashboard-intro h2 {
+  font-size: 25px;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 1.3;
+}
+.dashboard-intro h2 + p {
+  font-size: 12px;
+  color: #6d7d93;
+  line-height: 1.7;
+  margin-top: 7px;
+}
+.dashboard-add {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  flex-shrink: 0;
+  gap: 7px;
+  min-height: 42px;
+  padding: 0 16px;
+  border-radius: 8px;
+  background: #172f52;
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.dashboard-add:hover {
+  background: #244673;
+}
+.dashboard-add span {
+  font-size: 18px;
+}
+.dashboard-stats {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 14px;
+}
+.dash-stat-card {
+  --stat-color: #4d7fc2;
+  min-width: 0;
+  padding: 20px;
+  border: 1px solid #e2e8f0;
+  border-radius: 13px;
+  background: white;
+}
+.stat-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 7px;
+  font-size: 11px;
+  font-weight: 550;
+  color: #63748e;
+  line-height: 1.5;
+}
+.stat-label > span {
+  font-size: 18px;
+  color: var(--stat-color);
+  flex-shrink: 0;
+}
+.stat-number {
+  font-size: 32px;
+  line-height: 1.15;
+  font-weight: 650;
+  letter-spacing: -0.05em;
+  font-variant-numeric: tabular-nums;
+  color: #172b4d;
+  margin: 18px 0 13px;
+}
+.stat-caption {
+  font-size: 10px;
+  color: #bdcce1;
+}
+.stat-total {
+  background: #172f52;
+  border-color: #172f52;
+}
+.stat-total .stat-number {
+  color: white;
+}
+.stat-total .stat-label,
+.stat-total .stat-label > span {
+  color: #d3e1f6;
+}
+.stat-green {
+  --stat-color: #369580;
+}
+.stat-blue {
+  --stat-color: #548acd;
+}
+.stat-red {
+  --stat-color: #ce7180;
+}
+.stat-amber {
+  --stat-color: #c09951;
+}
+.stat-bottom {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 10px;
+  color: #71829b;
+  font-variant-numeric: tabular-nums;
+}
+.stat-progress {
+  display: block;
+  height: 4px;
+  background: #edf1f6;
+  flex: 1;
+  overflow: hidden;
+  border-radius: 4px;
+}
+.stat-progress > span {
+  display: block;
+  height: 100%;
+  background: var(--stat-color);
+  border-radius: inherit;
+}
+.dashboard-chart-grid {
+  gap: 18px;
+}
+.dashboard-panel {
+  min-width: 0;
+  background: white;
+  padding: 22px;
+  border: 1px solid #e2e8f0;
+  border-radius: 13px;
+}
+.dashboard-panel h3 {
+  font-size: 14px;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+}
+.dashboard-panel > div:first-child {
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+.dashboard-panel :deep(canvas) {
+  max-width: 100%;
+}
+.location-card {
+  border: 1px solid #e7ecf3;
+  border-radius: 9px;
+  background: #f8fafc;
+  padding: 16px;
+}
+.dashboard-table {
+  min-width: 0;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 13px;
+  overflow: hidden;
+}
+.dashboard-table > div:first-child {
+  gap: 10px;
+}
+.dashboard-table > div:first-child a {
+  min-height: 40px;
+  background: transparent;
+  border-color: transparent;
+  padding: 0 4px;
+  font-size: 11px;
+}
+.dashboard-table h3 {
+  font-size: 14px;
+  font-weight: 650;
+}
+.dashboard-table table thead {
+  background: #f8fafc;
+}
+.dashboard-table table th {
+  font-weight: 600;
+  font-size: 10px;
+  color: #7b8aa0;
+}
+.dashboard-table table td {
+  padding-top: 15px;
+  padding-bottom: 15px;
+}
+.dashboard-csat :deep(.shadow-card) {
+  box-shadow: none;
+  border-radius: 13px;
+  border-color: #e2e8f0;
+  padding: 22px;
+}
+.dashboard-csat :deep(h3) {
+  font-size: 14px;
+  font-weight: 650;
+}
+.dashboard-csat :deep(h2) {
+  font-size: 18px;
+  font-weight: 650;
+  letter-spacing: -0.025em;
+}
+@media (max-width: 1199px) and (min-width: 768px) {
+  .dashboard-stats {
+    gap: 10px;
+  }
+  .dash-stat-card {
+    padding: 16px 13px;
+  }
+  .stat-label {
+    font-size: 10px;
+  }
+  .stat-number {
+    font-size: 28px;
+  }
+}
+@media (max-width: 767px) {
+  .dashboard-view {
+    gap: 18px;
+  }
+  .dashboard-intro {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .dashboard-intro h2 {
+    font-size: 22px;
+  }
+  .dashboard-intro h2 + p {
+    font-size: 11px;
+    max-width: 310px;
+  }
+  .dashboard-add {
+    min-height: 44px;
+    font-size: 11px;
+    padding: 0 13px;
+  }
+  .dashboard-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+  .stat-total,
+  .dashboard-stat-skeleton > :first-child {
+    grid-column: 1 / -1;
+  }
+  .stat-total {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 5px 20px;
+  }
+  .stat-total .stat-label {
+    justify-content: flex-start;
+    gap: 10px;
+  }
+  .stat-total .stat-number {
+    grid-column: 2;
+    grid-row: 1 / 3;
+    margin: 0;
+    font-size: 34px;
+  }
+  .dash-stat-card {
+    padding: 17px;
+  }
+  .stat-number {
+    font-size: 28px;
+    margin: 13px 0 12px;
+  }
+  .dashboard-panel {
+    padding: 17px;
+  }
+  .dashboard-chart-grid {
+    gap: 14px;
+  }
+  .dashboard-panel > div:first-child {
+    margin-bottom: 16px;
+  }
+  .location-card {
+    padding: 14px;
+  }
+  .dashboard-table > div:first-child {
+    padding: 16px;
+  }
+  .dashboard-table > div:first-child a {
+    min-height: 44px;
+  }
+  .dashboard-table > div:first-child p {
+    white-space: normal;
+    line-height: 1.6;
+  }
+  .dashboard-csat :deep(.shadow-card) {
+    padding: 17px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dashboard-view * {
+    transition: none !important;
+  }
+}
+</style>

@@ -14,6 +14,11 @@ const requireGaWrite = authorizeAnyPermission(['assets_ga', 'assets'], 'write')
 
 gaAssetRouter.use(requireAdmin)
 
+gaAssetRouter.get('/types', requireGaRead, gaAssetController.listGaAssetTypes)
+gaAssetRouter.post('/types', requireGaWrite, gaAssetController.addGaAssetType)
+gaAssetRouter.put('/types/:id', requireGaWrite, gaAssetController.updateGaAssetType)
+gaAssetRouter.delete('/types/:id', requireGaWrite, gaAssetController.deleteGaAssetType)
+
 gaAssetRouter.get('/', requireGaRead, gaAssetController.listGaAssets)
 gaAssetRouter.get('/:id', requireGaRead, gaAssetController.fetchGaAsset)
 gaAssetRouter.post('/', requireGaWrite, gaAssetController.addGaAsset)

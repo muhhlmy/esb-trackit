@@ -46,13 +46,28 @@ const selectedAsset = ref(null)
 const isSubmitting = ref(false)
 const modalError = ref('')
 
+// Tipe Aset GA States (Dynamic from Database)
+const gaTypes = ref([])
+const isLoadingTypes = ref(false)
+const showTypeModal = ref(false)
+const typeMode = ref('add') // 'add' | 'edit'
+const typeForm = ref({
+  id: null,
+  nama_tipe: '',
+  deskripsi: '',
+})
+const typeModalError = ref('')
+const isSubmittingType = ref(false)
+const typeToDelete = ref(null)
+const showDeleteTypeModal = ref(false)
+
 function openLabelModal(asset) {
   selectedLabelAsset.value = asset
   showLabelModal.value = true
 }
 
 // Opsi Pilihan Dropdown
-const tipeFasilitasOptions = [
+const defaultTipeFasilitas = [
   'Meja',
   'Kursi',
   'AC',
@@ -89,12 +104,14 @@ const locationOptions = computed(() =>
   ).map((loc) => ({ value: loc, label: loc })),
 )
 
-const tipeOptions = computed(() =>
-  mergeOptions(tipeFasilitasOptions, [
+const tipeOptions = computed(() => {
+  const dynamicNames = gaTypes.value.map((t) => t.nama_tipe).filter(Boolean)
+  const base = dynamicNames.length > 0 ? dynamicNames : defaultTipeFasilitas
+  return mergeOptions(base, [
     ...assets.value.map((a) => a.tipe_fasilitas),
     form.value.tipe_fasilitas,
-  ]).map((t) => ({ value: t, label: t })),
-)
+  ]).map((t) => ({ value: t, label: t }))
+})
 
 // Filter option lists (include an empty "all" entry for CustomSelect)
 const locationFilterOptions = computed(() => [
@@ -123,7 +140,7 @@ const emptyForm = () => ({
   hostname: '',
   nomor_tagging: '',
   quantity: 1,
-  tipe_fasilitas: 'Meja',
+  tipe_fasilitas: gaTypes.value[0]?.nama_tipe || 'Meja',
   brand: '',
   ukuran: '',
   detail: '',
@@ -180,7 +197,108 @@ function resetFilters() {
 // Lifecycle
 onMounted(() => {
   fetchData()
+  fetchGaTypes()
 })
+
+async function fetchGaTypes() {
+  isLoadingTypes.value = true
+  try {
+    const data = await get('/api/ga-assets/types')
+    gaTypes.value = Array.isArray(data) ? data : []
+  } catch (error) {
+    console.error('Gagal memuat tipe aset GA:', error)
+  } finally {
+    isLoadingTypes.value = false
+  }
+}
+
+function openTypeManager() {
+  typeMode.value = 'add'
+  typeForm.value = { id: null, nama_tipe: '', deskripsi: '' }
+  typeModalError.value = ''
+  showTypeModal.value = true
+  fetchGaTypes()
+}
+
+function closeTypeModal() {
+  if (isSubmittingType.value) return
+  showTypeModal.value = false
+  typeForm.value = { id: null, nama_tipe: '', deskripsi: '' }
+  typeModalError.value = ''
+}
+
+function editType(item) {
+  typeMode.value = 'edit'
+  typeForm.value = {
+    id: item.id,
+    nama_tipe: item.nama_tipe,
+    deskripsi: item.deskripsi || '',
+  }
+  typeModalError.value = ''
+}
+
+function cancelEditType() {
+  typeMode.value = 'add'
+  typeForm.value = { id: null, nama_tipe: '', deskripsi: '' }
+  typeModalError.value = ''
+}
+
+async function submitTypeForm() {
+  typeModalError.value = ''
+  const nama = (typeForm.value.nama_tipe || '').trim()
+  if (!nama) {
+    typeModalError.value = 'Nama tipe wajib diisi.'
+    return
+  }
+
+  isSubmittingType.value = true
+  try {
+    const payload = {
+      nama_tipe: nama,
+      deskripsi: (typeForm.value.deskripsi || '').trim(),
+    }
+
+    if (typeMode.value === 'add') {
+      await post('/api/ga-assets/types', payload)
+    } else {
+      await put(`/api/ga-assets/types/${typeForm.value.id}`, payload)
+    }
+
+    typeForm.value = { id: null, nama_tipe: '', deskripsi: '' }
+    typeMode.value = 'add'
+    await Promise.all([fetchGaTypes(), fetchData()])
+  } catch (err) {
+    typeModalError.value = err.message || 'Gagal menyimpan tipe aset GA.'
+  } finally {
+    isSubmittingType.value = false
+  }
+}
+
+function openDeleteType(item) {
+  typeToDelete.value = item
+  showDeleteTypeModal.value = true
+}
+
+function closeDeleteTypeModal() {
+  if (isSubmittingType.value) return
+  showDeleteTypeModal.value = false
+  typeToDelete.value = null
+}
+
+async function confirmDeleteType() {
+  if (!typeToDelete.value) return
+  isSubmittingType.value = true
+  try {
+    await del(`/api/ga-assets/types/${typeToDelete.value.id}`)
+    showDeleteTypeModal.value = false
+    typeToDelete.value = null
+    await Promise.all([fetchGaTypes(), fetchData()])
+  } catch (err) {
+    typeModalError.value = err.message || 'Gagal menghapus tipe aset GA.'
+  } finally {
+    isSubmittingType.value = false
+  }
+}
 
 async function fetchData() {
   isLoading.value = true
@@ -408,16 +526,28 @@ function formatKondisiPill(kondisi) {
         </div>
 
         <!-- Primary Action CTA -->
-        <button
-          v-if="canWriteAssets"
-          type="button"
-          @click="openAdd"
-          class="h-9 shrink-0 whitespace-nowrap rounded-lg bg-[#2563EB] px-3 sm:px-3.5 text-xs font-semibold text-white shadow-2xs hover:bg-[#1D4ED8] active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer touch-manipulation"
-          title="Tambah Aset GA baru"
-        >
-          <span class="material-symbols-outlined text-[16px]">add</span>
-          <span>Tambah Aset GA</span>
-        </button>
+        <div class="flex items-center gap-2">
+          <button
+            v-if="canWriteAssets"
+            type="button"
+            @click="openTypeManager"
+            class="h-9 shrink-0 whitespace-nowrap rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-semibold text-[#1E293B] shadow-2xs hover:bg-[#F1F5F9] hover:border-[#CBD5E1] active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer touch-manipulation"
+            title="Kelola Tipe Fasilitas Aset GA"
+          >
+            <span class="material-symbols-outlined text-[16px] text-[#64748B]">category</span>
+            <span>Kelola Tipe</span>
+          </button>
+          <button
+            v-if="canWriteAssets"
+            type="button"
+            @click="openAdd"
+            class="h-9 shrink-0 whitespace-nowrap rounded-lg bg-[#2563EB] px-3 sm:px-3.5 text-xs font-semibold text-white shadow-2xs hover:bg-[#1D4ED8] active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer touch-manipulation"
+            title="Tambah Aset GA baru"
+          >
+            <span class="material-symbols-outlined text-[16px]">add</span>
+            <span>Tambah Aset GA</span>
+          </button>
+        </div>
       </div>
 
       <!-- Row 2: Search, Filters & Actions -->
@@ -647,16 +777,16 @@ function formatKondisiPill(kondisi) {
               </div>
               <div class="flex flex-col min-w-0 flex-1">
                 <span
-                  class="text-[13.5px] font-bold text-[#0F172A] leading-tight group-hover:text-[#2563EB] transition-colors truncate block"
-                  :title="asset.nama_asset || '—'"
-                >
-                  {{ asset.nama_asset || '—' }}
-                </span>
-                <span
-                  class="font-mono text-[11px] font-normal text-[#64748B] mt-0.5 tracking-tight truncate block"
+                  class="font-mono text-[13.5px] font-bold text-[#0F172A] leading-tight group-hover:text-[#2563EB] transition-colors truncate block"
                   :title="asset.hostname || '—'"
                 >
                   {{ asset.hostname || '—' }}
+                </span>
+                <span
+                  class="text-[11px] font-medium text-[#64748B] mt-0.5 tracking-tight truncate block"
+                  :title="asset.tipe_fasilitas || '—'"
+                >
+                  {{ asset.tipe_fasilitas || '—' }}
                 </span>
               </div>
             </div>
@@ -687,16 +817,16 @@ function formatKondisiPill(kondisi) {
 
           <!-- Mobile 2x2 Metadata Grid -->
           <div class="grid grid-cols-2 gap-2.5 md:hidden text-left">
-            <!-- 1. Fasilitas & Qty -->
+            <!-- 1. Brand & Qty -->
             <div class="flex flex-col min-w-0 overflow-hidden">
               <span class="text-[10px] font-semibold uppercase text-[#94A3B8] tracking-wider"
-                >Fasilitas & Qty</span
+                >Brand & Qty</span
               >
               <span
                 class="text-[12px] font-semibold text-[#1E293B] mt-0.5 truncate block"
-                :title="asset.tipe_fasilitas || '—'"
+                :title="asset.brand || '—'"
               >
-                {{ asset.tipe_fasilitas || '—' }}
+                {{ asset.brand || '—' }}
               </span>
               <span class="text-[11px] font-medium text-[#2563EB] mt-0.5 truncate block">
                 {{ asset.quantity || 1 }} Unit
@@ -762,30 +892,30 @@ function formatKondisiPill(kondisi) {
             </div>
             <div class="flex flex-col min-w-0 overflow-hidden">
               <span
-                class="text-[14px] font-bold text-[#0F172A] leading-snug group-hover:text-[#2563EB] transition-colors truncate block w-full"
-                :title="asset.nama_asset || '—'"
-              >
-                {{ asset.nama_asset || '—' }}
-              </span>
-              <span
-                class="font-mono text-[11px] font-normal text-[#64748B] mt-0.5 tracking-tight truncate block w-full"
+                class="font-mono text-[14px] font-bold text-[#0F172A] leading-snug group-hover:text-[#2563EB] transition-colors truncate block w-full"
                 :title="asset.hostname || '—'"
               >
                 {{ asset.hostname || '—' }}
               </span>
+              <span
+                class="text-[12px] font-medium text-[#64748B] mt-0.5 tracking-tight truncate block w-full"
+                :title="asset.tipe_fasilitas || '—'"
+              >
+                {{ asset.tipe_fasilitas || '—' }}
+              </span>
             </div>
           </div>
 
-          <!-- 2. Fasilitas & Qty -->
+          <!-- 2. Brand & Qty -->
           <div class="hidden md:flex flex-col min-w-0 overflow-hidden">
             <span class="text-[10px] font-semibold uppercase text-[#94A3B8] tracking-wider"
-              >Fasilitas & Qty</span
+              >Brand & Qty</span
             >
             <span
               class="text-[12.5px] font-semibold text-[#1E293B] mt-0.5 truncate block w-full"
-              :title="asset.tipe_fasilitas || '—'"
+              :title="asset.brand || '—'"
             >
-              {{ asset.tipe_fasilitas || '—' }}
+              {{ asset.brand || '—' }}
             </span>
             <span class="text-[11.5px] font-medium text-[#2563EB] mt-0.5 truncate block w-full">
               {{ asset.quantity || 1 }} Unit
@@ -949,9 +1079,21 @@ function formatKondisiPill(kondisi) {
 
           <!-- 5. Tipe -->
           <div class="sm:col-span-4">
-            <label class="block text-[12px] font-semibold text-[#1E293B] mb-1">
-              Tipe <span class="text-rose-500">*</span>
-            </label>
+            <div class="flex items-center justify-between mb-1">
+              <label class="block text-[12px] font-semibold text-[#1E293B]">
+                Tipe <span class="text-rose-500">*</span>
+              </label>
+              <button
+                v-if="canWriteAssets"
+                type="button"
+                @click="openTypeManager"
+                class="text-[11px] font-medium text-[#2563EB] hover:text-[#1D4ED8] hover:underline flex items-center gap-0.5 cursor-pointer"
+                title="Kelola Daftar Tipe Fasilitas"
+              >
+                <span class="material-symbols-outlined text-[13px]">tune</span>
+                <span>Kelola</span>
+              </button>
+            </div>
             <SearchableSelect
               v-model="form.tipe_fasilitas"
               :options="tipeOptions"
@@ -1037,7 +1179,7 @@ function formatKondisiPill(kondisi) {
             :disabled="isSubmitting"
             class="h-9.5 px-5 rounded-xl bg-[#2563EB] text-[12.5px] font-bold text-white shadow-2xs hover:bg-[#1D4ED8] disabled:opacity-50 flex items-center gap-2"
           >
-            <span v-if="isSubmitting" class="animate-spin text-[16px]">hourglass_empty</span>
+            <span v-if="isSubmitting" class="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" aria-hidden="true"></span>
             <span>{{ isSubmitting ? 'Menyimpan...' : (modalMode === 'add' ? 'Simpan Aset GA' : 'Perbarui Aset GA') }}</span>
           </button>
         </div>
@@ -1176,6 +1318,251 @@ function formatKondisiPill(kondisi) {
       :asset="selectedLabelAsset"
       @close="showLabelModal = false"
     />
+
+    <!-- Modal Kelola Tipe Aset GA -->
+    <AppModal
+      :is-open="showTypeModal"
+      title="Kelola Tipe Aset GA"
+      subtitle="Kelola master data kategori fasilitas General Affair (Meja, Kursi, AC, dll)."
+      size="lg"
+      @close="closeTypeModal"
+    >
+      <div class="space-y-4">
+        <!-- Add / Edit Inline Form -->
+        <div class="p-3.5 bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl space-y-3">
+          <div class="flex items-center justify-between">
+            <h4 class="text-[12.5px] font-bold text-[#0F172A] flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-[16px] text-[#2563EB]">{{
+                typeMode === 'add' ? 'add_circle' : 'edit_square'
+              }}</span>
+              <span>{{ typeMode === 'add' ? 'Tambah Tipe Baru' : `Edit Tipe: ${typeForm.nama_tipe}` }}</span>
+            </h4>
+            <span
+              v-if="typeMode === 'edit'"
+              class="text-[11px] font-medium text-amber-600 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200"
+            >
+              Mode Pengeditan
+            </span>
+          </div>
+
+          <div
+            v-if="typeModalError"
+            class="p-2.5 bg-[#FEF2F2] border border-[#FECACA] rounded-xl text-[#991B1B] text-[12px] flex items-center gap-1.5"
+          >
+            <span class="material-symbols-outlined text-[15px]">error</span>
+            <span>{{ typeModalError }}</span>
+          </div>
+
+          <form @submit.prevent="submitTypeForm" class="space-y-2.5">
+            <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5">
+              <div class="sm:col-span-5">
+                <label for="type-form-nama" class="block text-[11.5px] font-semibold text-[#1E293B] mb-1">
+                  Nama Tipe <span class="text-rose-500">*</span>
+                </label>
+                <input
+                  id="type-form-nama"
+                  v-model="typeForm.nama_tipe"
+                  type="text"
+                  required
+                  placeholder="Contoh: Genset, Brankas..."
+                  class="w-full h-9 px-3 text-[12.5px] rounded-xl border border-[#E2E8F0] bg-white focus:border-[#2563EB] focus:outline-none transition-all shadow-2xs"
+                />
+              </div>
+
+              <div class="sm:col-span-7">
+                <label for="type-form-desc" class="block text-[11.5px] font-semibold text-[#1E293B] mb-1">
+                  Deskripsi / Keterangan
+                </label>
+                <input
+                  id="type-form-desc"
+                  v-model="typeForm.deskripsi"
+                  type="text"
+                  placeholder="Contoh: Fasilitas ruang pertemuan (opsional)"
+                  class="w-full h-9 px-3 text-[12.5px] rounded-xl border border-[#E2E8F0] bg-white focus:border-[#2563EB] focus:outline-none transition-all shadow-2xs"
+                />
+              </div>
+            </div>
+
+            <div class="flex items-center justify-end gap-2 pt-1">
+              <button
+                v-if="typeMode === 'edit'"
+                type="button"
+                @click="cancelEditType"
+                class="h-8.5 px-3 rounded-lg border border-[#E2E8F0] text-[12px] font-semibold text-[#64748B] hover:bg-white cursor-pointer"
+              >
+                Batal Edit
+              </button>
+              <button
+                type="submit"
+                :disabled="isSubmittingType"
+                class="h-8.5 px-4 rounded-lg bg-[#2563EB] text-[12px] font-bold text-white shadow-2xs hover:bg-[#1D4ED8] disabled:opacity-50 flex items-center gap-1.5 cursor-pointer"
+              >
+                <span
+                  v-if="isSubmittingType"
+                  class="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"
+                  aria-hidden="true"
+                ></span>
+                <span v-else class="material-symbols-outlined text-[15px]">{{
+                  typeMode === 'add' ? 'add' : 'check'
+                }}</span>
+                <span>{{
+                  isSubmittingType
+                    ? 'Menyimpan...'
+                    : typeMode === 'add'
+                    ? 'Tambah Tipe'
+                    : 'Simpan Perubahan'
+                }}</span>
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Daftar Tipe Table -->
+        <div class="space-y-2">
+          <div class="flex items-center justify-between px-0.5">
+            <span class="text-[12px] font-bold text-[#0F172A] flex items-center gap-1.5">
+              <span>Daftar Tipe Terdaftar</span>
+              <span class="text-[11px] font-normal text-[#64748B]">({{ gaTypes.length }} kategori)</span>
+            </span>
+            <button
+              type="button"
+              @click="fetchGaTypes"
+              class="text-[11px] font-medium text-[#2563EB] hover:text-[#1D4ED8] flex items-center gap-1 cursor-pointer"
+              title="Segarkan daftar tipe"
+            >
+              <span class="material-symbols-outlined text-[13px]">refresh</span>
+              <span>Segarkan</span>
+            </button>
+          </div>
+
+          <div class="border border-[#E2E8F0] rounded-xl overflow-hidden bg-white shadow-2xs">
+            <div class="max-h-[260px] overflow-y-auto divide-y divide-[#F1F5F9]">
+              <div
+                v-if="isLoadingTypes"
+                class="p-6 text-center text-[12px] text-[#64748B] flex items-center justify-center gap-2"
+              >
+                <span class="w-4 h-4 border-2 border-[#2563EB] border-t-transparent rounded-full animate-spin"></span>
+                <span>Memuat tipe fasilitas...</span>
+              </div>
+
+              <div
+                v-else-if="gaTypes.length === 0"
+                class="p-6 text-center text-[12px] text-[#64748B]"
+              >
+                Belum ada tipe fasilitas terdaftar. Tambahkan tipe pertama di atas.
+              </div>
+
+              <div
+                v-else
+                v-for="item in gaTypes"
+                :key="item.id"
+                class="p-3 flex items-center justify-between gap-3 hover:bg-[#F8FAFC] transition-colors"
+                :class="{ 'bg-blue-50/50': typeForm.id === item.id }"
+              >
+                <div class="flex items-center gap-3 min-w-0">
+                  <div
+                    class="h-8 w-8 rounded-lg bg-[#EFF6FF] text-[#2563EB] flex items-center justify-center shrink-0"
+                  >
+                    <span class="material-symbols-outlined text-[17px]">{{ getGaIcon(item.nama_tipe) }}</span>
+                  </div>
+                  <div class="min-w-0">
+                    <div class="flex items-center gap-2">
+                      <span class="text-[13px] font-bold text-[#0F172A] truncate">{{ item.nama_tipe }}</span>
+                      <span
+                        class="px-1.5 py-0.5 rounded-full text-[10px] font-semibold bg-slate-100 text-slate-600 border border-slate-200"
+                        :title="`${item.total_aset || 0} unit aset terdaftar dengan tipe ini`"
+                      >
+                        {{ item.total_aset || 0 }} Aset
+                      </span>
+                    </div>
+                    <p class="text-[11px] text-[#64748B] truncate mt-0.5">
+                      {{ item.deskripsi || 'Tidak ada deskripsi' }}
+                    </p>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-1 shrink-0">
+                  <button
+                    type="button"
+                    @click="editType(item)"
+                    class="h-7 w-7 rounded-lg text-[#64748B] hover:text-[#2563EB] hover:bg-[#EFF6FF] flex items-center justify-center transition-colors cursor-pointer"
+                    title="Edit tipe"
+                  >
+                    <span class="material-symbols-outlined text-[15px]">edit</span>
+                  </button>
+                  <button
+                    type="button"
+                    @click="openDeleteType(item)"
+                    class="h-7 w-7 rounded-lg text-[#64748B] hover:text-rose-600 hover:bg-rose-50 flex items-center justify-center transition-colors cursor-pointer"
+                    title="Hapus tipe"
+                  >
+                    <span class="material-symbols-outlined text-[15px]">delete</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end pt-2 border-t border-[#E2E8F0]">
+          <button
+            type="button"
+            @click="closeTypeModal"
+            class="h-9 px-4 rounded-xl bg-[#2563EB] text-[12.5px] font-bold text-white shadow-2xs hover:bg-[#1D4ED8] cursor-pointer"
+          >
+            Selesai
+          </button>
+        </div>
+      </div>
+    </AppModal>
+
+    <!-- Modal Konfirmasi Hapus Tipe -->
+    <AppModal
+      :is-open="showDeleteTypeModal"
+      title="Hapus Tipe Aset GA"
+      size="sm"
+      @close="closeDeleteTypeModal"
+    >
+      <div class="space-y-4">
+        <p class="text-[13px] text-[#475569]">
+          Apakah Anda yakin ingin menghapus tipe
+          <strong class="text-[#0F172A]">{{ typeToDelete?.nama_tipe }}</strong>?
+        </p>
+
+        <div
+          v-if="typeToDelete && typeToDelete.total_aset > 0"
+          class="p-2.5 bg-amber-50 border border-amber-200 rounded-xl text-amber-800 text-[11.5px] flex items-start gap-2"
+        >
+          <span class="material-symbols-outlined text-[16px] text-amber-600 shrink-0 mt-0.5">warning</span>
+          <span>
+            Tipe ini saat ini digunakan oleh <strong>{{ typeToDelete.total_aset }} unit aset GA</strong>.
+          </span>
+        </div>
+
+        <div class="flex items-center justify-end gap-2 pt-3 border-t border-[#E2E8F0]">
+          <button
+            type="button"
+            @click="closeDeleteTypeModal"
+            class="h-9 px-4 rounded-xl border border-[#E2E8F0] text-[12.5px] font-semibold text-[#64748B] hover:bg-[#F8FAFC] cursor-pointer"
+          >
+            Batal
+          </button>
+          <button
+            type="button"
+            :disabled="isSubmittingType"
+            @click="confirmDeleteType"
+            class="h-9 px-4 rounded-xl bg-rose-600 text-[12.5px] font-bold text-white shadow-2xs hover:bg-rose-700 disabled:opacity-50 flex items-center gap-1.5 cursor-pointer"
+          >
+            <span
+              v-if="isSubmittingType"
+              class="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"
+              aria-hidden="true"
+            ></span>
+            <span>{{ isSubmittingType ? 'Menghapus...' : 'Ya, Hapus Tipe' }}</span>
+          </button>
+        </div>
+      </div>
+    </AppModal>
   </div>
 </template>
 

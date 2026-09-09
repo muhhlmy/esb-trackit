@@ -276,3 +276,194 @@ export async function deleteGaAsset(req, res) {
     res.status(500).json({ error: "Gagal menghapus Aset GA." });
   }
 }
+
+export async function listGaAssetTypes(req, res) {
+  try {
+    const result = await pool.query(`
+      SELECT t.id, t.nama_tipe, t.deskripsi, t.created_at,
+             COUNT(a.id)::int AS total_aset
+      FROM tipe_aset_ga t
+      LEFT JOIN aset_ga a ON LOWER(a.tipe_fasilitas) = LOWER(t.nama_tipe) AND a.deleted_at IS NULL
+      WHERE t.deleted_at IS NULL
+      GROUP BY t.id, t.nama_tipe, t.deskripsi, t.created_at
+      ORDER BY t.nama_tipe ASC
+    `);
+    res.json(result.rows);
+  } catch (error) {
+    console.error("Error listing GA asset types:", error);
+    res.status(500).json({ error: "Gagal memuat daftar Tipe Aset GA." });
+  }
+}
+
+export async function addGaAssetType(req, res) {
+  try {
+    const body = req.body || {};
+    const namaTipe = cleanText(body.nama_tipe || body.nama || body.tipe);
+    const deskripsi = cleanText(body.deskripsi);
+
+    if (!namaTipe) throw createHttpError(400, "Nama tipe wajib diisi.");
+
+    const existing = await pool.query(
+      `SELECT id FROM tipe_aset_ga WHERE LOWER(nama_tipe) = LOWER($1) AND deleted_at IS NULL`,
+      [namaTipe]
+    );
+    if (existing.rowCount > 0) {
+      throw createHttpError(409, "Tipe Aset GA sudah terdaftar.");
+    }
+
+    const actor = requireAuditActor(req);
+
+    const inserted = await withTransaction(async (client) => {
+      const deletedRow = await client.query(
+        `SELECT id FROM tipe_aset_ga WHERE LOWER(nama_tipe) = LOWER($1) AND deleted_at IS NOT NULL`,
+        [namaTipe]
+      );
+
+      let record;
+      if (deletedRow.rowCount > 0) {
+        const reactivated = await client.query(
+          `UPDATE tipe_aset_ga
+           SET nama_tipe = $1, deskripsi = $2, deleted_at = NULL, updated_at = CURRENT_TIMESTAMP
+           WHERE id = $3
+           RETURNING id, nama_tipe, deskripsi, created_at, updated_at`,
+          [namaTipe, deskripsi, deletedRow.rows[0].id]
+        );
+        record = reactivated.rows[0];
+      } else {
+        const resQuery = await client.query(
+          `INSERT INTO tipe_aset_ga (nama_tipe, deskripsi)
+           VALUES ($1, $2)
+           RETURNING id, nama_tipe, deskripsi, created_at, updated_at`,
+          [namaTipe, deskripsi]
+        );
+        record = resQuery.rows[0];
+      }
+
+      await recordAssetLog(
+        client,
+        record.id,
+        `Tipe Aset GA: ${record.nama_tipe}`,
+        'TAMBAH',
+        `Menambahkan Tipe Aset GA baru: ${record.nama_tipe}`,
+        actor
+      );
+
+      return record;
+    });
+
+    res.status(201).json({ ...inserted, total_aset: 0 });
+  } catch (error) {
+    if (error.statusCode) return res.status(error.statusCode).json({ error: error.message });
+    console.error("Error adding GA asset type:", error);
+    res.status(500).json({ error: "Gagal menambahkan Tipe Aset GA." });
+  }
+}
+
+export async function updateGaAssetType(req, res) {
+  try {
+    const id = parseInt(req.params.id, 10);
+    if (isNaN(id) || id <= 0) throw createHttpError(400, "ID Tipe Aset GA tidak valid.");
+
+    const body = req.body || {};
+    const namaTipe = cleanText(body.nama_tipe || body.nama || body.tipe);
+    const deskripsi = cleanText(body.deskripsi);
+
+    if (!namaTipe) throw createHttpError(400, "Nama tipe wajib diisi.");
+
+    const existingRes = await pool.query(
+      `SELECT * FROM tipe_aset_ga WHERE id = $1 AND deleted_at IS NULL`,
+      [id]
+    );
+    if (existingRes.rowCount === 0) throw createHttpError(404, "Tipe Aset GA tidak ditemukan.");
+    const oldType = existingRes.rows[0];
+
+    const duplicateCheck = await pool.query(
+      `SELECT id FROM tipe_aset_ga WHERE LOWER(nama_tipe) = LOWER($1) AND id <> $2 AND deleted_at IS NULL`,
+      [namaTipe, id]
+    );
+    if (duplicateCheck.rowCount > 0) {
+      throw createHttpError(409, "Tipe Aset GA dengan nama tersebut sudah ada.");
+    }
+
+    const actor = requireAuditActor(req);
+
+    const updated = await withTransaction(async (client) => {
+      const resQuery = await client.query(
+        `UPDATE tipe_aset_ga
+         SET nama_tipe = $1, deskripsi = $2, updated_at = CURRENT_TIMESTAMP
+         WHERE id = $3
+         RETURNING id, nama_tipe, deskripsi, created_at, updated_at`,
+        [namaTipe, deskripsi, id]
+      );
+
+      if (oldType.nama_tipe !== namaTipe) {
+        await client.query(
+          `UPDATE aset_ga
+           SET tipe_fasilitas = $1
+           WHERE LOWER(tipe_fasilitas) = LOWER($2) AND deleted_at IS NULL`,
+          [namaTipe, oldType.nama_tipe]
+        );
+      }
+
+      await recordAssetLog(
+        client,
+        id,
+        `Tipe Aset GA: ${namaTipe}`,
+        'UBAH',
+        `Mengubah Tipe Aset GA: "${oldType.nama_tipe}" -> "${namaTipe}"`,
+        actor
+      );
+
+      return resQuery.rows[0];
+    });
+
+    const countRes = await pool.query(
+      `SELECT COUNT(*)::int AS total FROM aset_ga WHERE LOWER(tipe_fasilitas) = LOWER($1) AND deleted_at IS NULL`,
+      [updated.nama_tipe]
+    );
+
+    res.json({ ...updated, total_aset: countRes.rows[0]?.total || 0 });
+  } catch (error) {
+    if (error.statusCode) return res.status(error.statusCode).json({ error: error.message });
+    console.error("Error updating GA asset type:", error);
+    res.status(500).json({ error: "Gagal memperbarui Tipe Aset GA." });
+  }
+}
+
+export async function deleteGaAssetType(req, res) {
+  try {
+    const id = parseInt(req.params.id, 10);
+    if (isNaN(id) || id <= 0) throw createHttpError(400, "ID Tipe Aset GA tidak valid.");
+
+    const existingRes = await pool.query(
+      `SELECT * FROM tipe_aset_ga WHERE id = $1 AND deleted_at IS NULL`,
+      [id]
+    );
+    if (existingRes.rowCount === 0) throw createHttpError(404, "Tipe Aset GA tidak ditemukan.");
+    const target = existingRes.rows[0];
+
+    const actor = requireAuditActor(req);
+
+    await withTransaction(async (client) => {
+      await client.query(
+        `UPDATE tipe_aset_ga SET deleted_at = CURRENT_TIMESTAMP WHERE id = $1`,
+        [id]
+      );
+
+      await recordAssetLog(
+        client,
+        id,
+        `Tipe Aset GA: ${target.nama_tipe}`,
+        'HAPUS',
+        `Menghapus Tipe Aset GA: ${target.nama_tipe}`,
+        actor
+      );
+    });
+
+    res.json({ message: "Tipe Aset GA berhasil dihapus." });
+  } catch (error) {
+    if (error.statusCode) return res.status(error.statusCode).json({ error: error.message });
+    console.error("Error deleting GA asset type:", error);
+    res.status(500).json({ error: "Gagal menghapus Tipe Aset GA." });
+  }
+}

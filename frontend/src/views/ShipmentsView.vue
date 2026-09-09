@@ -26,6 +26,11 @@ const canWriteShipments = computed(() => isSuperAdmin.value || hasWritePermissio
 const shipments = ref([])
 const summary = ref({
   total: 0,
+  menunggu_pickup: 0,
+  di_pickup: 0,
+  dalam_pengiriman: 0,
+  terkirim: 0,
+  dibatalkan: 0,
   belum_dikirim: 0,
   pending: 0,
   sedang_dikirim: 0,
@@ -50,11 +55,11 @@ const filterDateTo = ref('')
 
 const STATUS_OPTIONS = [
   { value: '', label: 'Semua Status' },
-  { value: 'belum_dikirim', label: 'Belum Dikirim' },
-  { value: 'pending', label: 'Pending' },
-  { value: 'sedang_dikirim', label: 'Sedang Dikirim' },
-  { value: 'diterima', label: 'Diterima' },
-  { value: 'cancel', label: 'Cancel' },
+  { value: 'Menunggu Pickup', label: 'Menunggu Pickup' },
+  { value: 'Di Pickup', label: 'Di Pickup' },
+  { value: 'Dalam Pengiriman', label: 'Dalam Pengiriman' },
+  { value: 'Terkirim', label: 'Terkirim' },
+  { value: 'Dibatalkan', label: 'Dibatalkan' },
 ]
 
 function getTodayString() {
@@ -69,26 +74,47 @@ const selectedShipment = ref(null)
 
 const emptyForm = () => ({
   request_date: getTodayString(),
+  sender_name: '',
+  sender_address: '',
   recipient_name: '',
+  recipient_address: '',
   item_description: '',
-  destination: '',
-  tracking_number: '',
-  status: 'belum_dikirim',
-  delivery_proof_url: '',
+  status: 'Menunggu Pickup',
+  awb_number: '',
 })
 
 const form = ref(emptyForm())
 
+const isAwbRequired = computed(() => {
+  return ['Di Pickup', 'Dalam Pengiriman', 'Terkirim'].includes(form.value.status)
+})
+
+const isAwbVisible = computed(() => {
+  if (['Di Pickup', 'Dalam Pengiriman', 'Terkirim'].includes(form.value.status)) {
+    return true
+  }
+  // In edit mode or if AWB has a value, show it
+  if (modalMode.value === 'edit' && Boolean(form.value.awb_number)) {
+    return true
+  }
+  return false
+})
+
 function getStatusBadgeType(status) {
   switch (status) {
+    case 'Menunggu Pickup':
     case 'belum_dikirim':
       return 'default'
+    case 'Di Pickup':
     case 'pending':
       return 'warning'
+    case 'Dalam Pengiriman':
     case 'sedang_dikirim':
       return 'info'
+    case 'Terkirim':
     case 'diterima':
       return 'success'
+    case 'Dibatalkan':
     case 'cancel':
       return 'danger'
     default:
@@ -98,16 +124,21 @@ function getStatusBadgeType(status) {
 
 function getStatusLabel(status) {
   switch (status) {
+    case 'Menunggu Pickup':
     case 'belum_dikirim':
-      return 'Belum Dikirim'
+      return 'Menunggu Pickup'
+    case 'Di Pickup':
     case 'pending':
-      return 'Pending'
+      return 'Di Pickup'
+    case 'Dalam Pengiriman':
     case 'sedang_dikirim':
-      return 'Sedang Dikirim'
+      return 'Dalam Pengiriman'
+    case 'Terkirim':
     case 'diterima':
-      return 'Diterima'
+      return 'Terkirim'
+    case 'Dibatalkan':
     case 'cancel':
-      return 'Cancel'
+      return 'Dibatalkan'
     default:
       return status || '-'
   }
@@ -204,12 +235,13 @@ function openEdit(item) {
   selectedShipment.value = item
   form.value = {
     request_date: item.request_date || getTodayString(),
+    sender_name: item.sender_name || '',
+    sender_address: item.sender_address || '',
     recipient_name: item.recipient_name || '',
-    item_description: item.item_description || '',
-    destination: item.destination || '',
-    tracking_number: item.tracking_number || '',
-    status: item.status || 'belum_dikirim',
-    delivery_proof_url: item.delivery_proof_url || '',
+    recipient_address: item.recipient_address || item.destination || '',
+    item_description: item.item_detail || item.item_description || '',
+    status: getStatusLabel(item.status),
+    awb_number: item.awb_number || item.tracking_number || '',
   }
   modalError.value = ''
   showFormModal.value = true
@@ -237,24 +269,33 @@ async function saveShipment() {
     modalError.value = 'Tanggal request wajib diisi.'
     return
   }
+  if (!form.value.sender_name?.trim()) {
+    modalError.value = 'Nama pengirim wajib diisi.'
+    return
+  }
+  if (!form.value.sender_address?.trim()) {
+    modalError.value = 'Alamat pengirim wajib diisi.'
+    return
+  }
   if (!form.value.recipient_name?.trim()) {
     modalError.value = 'Nama penerima wajib diisi.'
     return
   }
+  if (!form.value.recipient_address?.trim()) {
+    modalError.value = 'Alamat penerima wajib diisi.'
+    return
+  }
   if (!form.value.item_description?.trim()) {
-    modalError.value = 'Deskripsi barang wajib diisi.'
+    modalError.value = 'Detail barang wajib diisi.'
     return
   }
-  if (!form.value.destination?.trim()) {
-    modalError.value = 'Tujuan pengiriman wajib diisi.'
+  if (!form.value.status) {
+    modalError.value = 'Status wajib dipilih.'
     return
   }
-  if (form.value.delivery_proof_url?.trim()) {
-    const trimmedUrl = form.value.delivery_proof_url.trim()
-    if (!trimmedUrl.startsWith('http://') && !trimmedUrl.startsWith('https://')) {
-      modalError.value = 'Link bukti pengiriman harus diawali dengan http:// atau https://.'
-      return
-    }
+  if (isAwbRequired.value && !form.value.awb_number?.trim()) {
+    modalError.value = `No. AWB / Resi wajib diisi untuk status ${form.value.status}.`
+    return
   }
 
   isSubmitting.value = true
@@ -262,12 +303,16 @@ async function saveShipment() {
   try {
     const payload = {
       request_date: form.value.request_date,
+      sender_name: form.value.sender_name.trim(),
+      sender_address: form.value.sender_address.trim(),
       recipient_name: form.value.recipient_name.trim(),
+      recipient_address: form.value.recipient_address.trim(),
+      destination: form.value.recipient_address.trim(),
       item_description: form.value.item_description.trim(),
-      destination: form.value.destination.trim(),
-      tracking_number: form.value.tracking_number?.trim() || null,
-      status: form.value.status || 'belum_dikirim',
-      delivery_proof_url: form.value.delivery_proof_url?.trim() || null,
+      item_detail: form.value.item_description.trim(),
+      status: form.value.status || 'Menunggu Pickup',
+      awb_number: form.value.awb_number?.trim() || null,
+      tracking_number: form.value.awb_number?.trim() || null,
     }
 
     if (modalMode.value === 'add') {
@@ -363,12 +408,12 @@ onMounted(() => {
             v-model="searchQuery"
             aria-label="Cari pengiriman"
             type="text"
-            placeholder="Cari penerima, barang, tujuan, atau no resi..."
+            placeholder="Cari penerima, pengirim, barang, tujuan, atau no AWB/resi..."
             class="h-10 w-full rounded-xl border border-[#E2E8F0] bg-white pl-9 pr-3 text-xs text-[#0F172A] placeholder-[#94A3B8] focus:border-[#2563EB] focus:outline-none transition-all shadow-2xs"
           />
         </div>
 
-        <div class="min-w-0 lg:w-[160px]">
+        <div class="min-w-0 lg:w-[180px]">
           <select
             v-model="filterStatus"
             aria-label="Filter status pengiriman"
@@ -439,11 +484,11 @@ onMounted(() => {
           <Package class="w-5 h-5" />
         </div>
         <div class="min-w-0">
-          <p class="text-[11px] font-semibold text-[#64748B] uppercase tracking-wider">
+          <p class="text-[11px] font-semibold text-[#64748B] uppercase tracking-wider" title="Menunggu Pickup (Belum Dikirim)">
             Belum Dikirim
           </p>
           <p class="text-xl sm:text-2xl font-bold text-[#0F172A] mt-0.5">
-            {{ summary.belum_dikirim }}
+            {{ summary.menunggu_pickup ?? summary.belum_dikirim ?? 0 }}
           </p>
         </div>
       </div>
@@ -457,11 +502,11 @@ onMounted(() => {
           <Truck class="w-5 h-5" />
         </div>
         <div class="min-w-0">
-          <p class="text-[11px] font-semibold text-[#64748B] uppercase tracking-wider">
+          <p class="text-[11px] font-semibold text-[#64748B] uppercase tracking-wider" title="Dalam Pengiriman / Sedang Dikirim">
             Sedang Dikirim
           </p>
           <p class="text-xl sm:text-2xl font-bold text-[#0F172A] mt-0.5">
-            {{ summary.sedang_dikirim }}
+            {{ summary.dalam_pengiriman ?? summary.sedang_dikirim ?? 0 }}
           </p>
         </div>
       </div>
@@ -475,9 +520,9 @@ onMounted(() => {
           <Truck class="w-5 h-5" />
         </div>
         <div class="min-w-0">
-          <p class="text-[11px] font-semibold text-[#64748B] uppercase tracking-wider">Diterima</p>
+          <p class="text-[11px] font-semibold text-[#64748B] uppercase tracking-wider" title="Terkirim / Diterima">Diterima</p>
           <p class="text-xl sm:text-2xl font-bold text-[#0F172A] mt-0.5">
-            {{ summary.diterima }}
+            {{ summary.terkirim ?? summary.diterima ?? 0 }}
           </p>
         </div>
       </div>
@@ -515,18 +560,9 @@ onMounted(() => {
               : 'Tidak ada data pengiriman yang cocok dengan filter yang dipilih.'
           }}
         </p>
-        <button
-          v-if="canWriteShipments"
-          type="button"
-          @click="openAdd"
-          class="mt-4 inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-[#2563EB] text-white text-xs font-semibold hover:bg-[#1D4ED8] transition-all cursor-pointer shadow-2xs"
-        >
-          <Plus class="w-4 h-4" />
-          <span>Tambah Pengiriman</span>
-        </button>
       </div>
 
-      <div v-else class="w-full max-w-full overflow-hidden">
+      <div v-else>
         <!-- Desktop Table (>= lg) -->
         <div class="hidden lg:block overflow-x-auto">
           <table class="w-full text-left border-collapse">
@@ -535,9 +571,10 @@ onMounted(() => {
                 class="border-b border-[#E2E8F0] bg-[#F8FAFC] text-[11px] font-bold text-[#64748B] uppercase tracking-wider"
               >
                 <th class="py-3 px-4">Tanggal Request</th>
+                <th class="py-3 px-4">Pengirim</th>
                 <th class="py-3 px-4">Nama Penerima</th>
-                <th class="py-3 px-4">Deskripsi Barang</th>
                 <th class="py-3 px-4">Tujuan Pengiriman</th>
+                <th class="py-3 px-4">Deskripsi Barang</th>
                 <th class="py-3 px-4">No Resi</th>
                 <th class="py-3 px-4">Status</th>
                 <th class="py-3 px-4 text-center">Bukti</th>
@@ -553,20 +590,30 @@ onMounted(() => {
                 <td class="py-3 px-4 whitespace-nowrap text-[#475569]">
                   {{ formatDate(item.request_date) }}
                 </td>
+                <td class="py-3 px-4">
+                  <div class="font-semibold text-[#0F172A]">{{ item.sender_name || '—' }}</div>
+                  <div
+                    v-if="item.sender_address"
+                    class="text-[11px] text-[#64748B] truncate max-w-[180px]"
+                    :title="item.sender_address"
+                  >
+                    {{ item.sender_address }}
+                  </div>
+                </td>
                 <td class="py-3 px-4 font-semibold text-[#0F172A]">
                   {{ item.recipient_name }}
                 </td>
-                <td class="py-3 px-4 max-w-[240px] truncate" :title="item.item_description">
-                  {{ item.item_description }}
-                </td>
                 <td
                   class="py-3 px-4 max-w-[200px] truncate text-[#475569]"
-                  :title="item.destination"
+                  :title="item.recipient_address || item.destination"
                 >
-                  {{ item.destination }}
+                  {{ item.recipient_address || item.destination || '—' }}
+                </td>
+                <td class="py-3 px-4 max-w-[240px] truncate" :title="item.item_detail || item.item_description">
+                  {{ item.item_detail || item.item_description }}
                 </td>
                 <td class="py-3 px-4 font-mono text-[11px] text-[#475569]">
-                  {{ item.tracking_number || '-' }}
+                  {{ item.awb_number || item.tracking_number || '-' }}
                 </td>
                 <td class="py-3 px-4">
                   <AppBadge
@@ -626,7 +673,7 @@ onMounted(() => {
               <div>
                 <p class="text-sm font-bold text-[#0F172A]">{{ item.recipient_name }}</p>
                 <p class="text-[11px] text-[#64748B] mt-0.5">
-                  {{ formatDate(item.request_date) }} &bull; {{ item.destination }}
+                  {{ formatDate(item.request_date) }} &bull; {{ item.recipient_address || item.destination }}
                 </p>
               </div>
               <AppBadge
@@ -635,14 +682,24 @@ onMounted(() => {
               />
             </div>
 
+            <div
+              v-if="item.sender_name"
+              class="text-xs text-[#475569] bg-slate-50 p-2 rounded-lg flex flex-col gap-0.5 border border-slate-100"
+            >
+              <span class="text-[10px] font-bold text-[#64748B] uppercase">Pengirim</span>
+              <span class="font-medium text-[#0F172A]">{{ item.sender_name }}</span>
+              <span v-if="item.sender_address" class="text-[11px] text-[#64748B]">{{ item.sender_address }}</span>
+            </div>
+
             <p class="text-xs text-[#334155] bg-slate-50 p-2 rounded-lg">
-              {{ item.item_description }}
+              <span class="text-[10px] font-bold text-[#64748B] uppercase block mb-0.5">Detail Barang</span>
+              {{ item.item_detail || item.item_description }}
             </p>
 
             <div class="flex items-center justify-between text-xs text-[#64748B] pt-1">
               <div class="flex items-center gap-1.5 font-mono text-[11px]">
-                <span class="text-[#94A3B8]">Resi:</span>
-                <span>{{ item.tracking_number || '-' }}</span>
+                <span class="text-[#94A3B8]">AWB / Resi:</span>
+                <span>{{ item.awb_number || item.tracking_number || '-' }}</span>
               </div>
 
               <a
@@ -666,7 +723,7 @@ onMounted(() => {
                 @click="openEdit(item)"
                 class="px-2.5 py-1 text-xs font-semibold text-[#2563EB] hover:bg-blue-50 rounded-md transition-colors flex items-center gap-1"
               >
-                <Pencil class="w-3 h-3" />
+                <Pencil class="w-3.5 h-3.5" />
                 <span>Edit</span>
               </button>
               <button
@@ -674,7 +731,7 @@ onMounted(() => {
                 @click="openDelete(item)"
                 class="px-2.5 py-1 text-xs font-semibold text-rose-600 hover:bg-rose-50 rounded-md transition-colors flex items-center gap-1"
               >
-                <Trash2 class="w-3 h-3" />
+                <Trash2 class="w-3.5 h-3.5" />
                 <span>Hapus</span>
               </button>
             </div>
@@ -707,37 +764,50 @@ onMounted(() => {
           {{ modalError }}
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-          <div>
-            <label class="block text-xs font-bold text-[#0F172A] mb-1">
-              Tanggal Request <span class="text-rose-500">*</span>
-            </label>
-            <input
-              v-model="form.request_date"
-              type="date"
-              required
-              class="h-10 w-full rounded-xl border border-[#CBD5E1] px-3 text-xs text-[#0F172A] focus:border-[#2563EB] focus:outline-none"
-            />
-          </div>
-
-          <div>
-            <label class="block text-xs font-bold text-[#0F172A] mb-1">
-              Status <span class="text-rose-500">*</span>
-            </label>
-            <select
-              v-model="form.status"
-              required
-              class="h-10 w-full rounded-xl border border-[#CBD5E1] px-3 text-xs text-[#0F172A] focus:border-[#2563EB] focus:outline-none cursor-pointer"
-            >
-              <option value="belum_dikirim">Belum Dikirim</option>
-              <option value="pending">Pending</option>
-              <option value="sedang_dikirim">Sedang Dikirim</option>
-              <option value="diterima">Diterima</option>
-              <option value="cancel">Cancel</option>
-            </select>
-          </div>
+        <!-- 1. Tanggal Request -->
+        <div>
+          <label class="block text-xs font-bold text-[#0F172A] mb-1">
+            Tanggal Request <span class="text-rose-500">*</span>
+          </label>
+          <input
+            v-model="form.request_date"
+            type="date"
+            required
+            class="h-10 w-full rounded-xl border border-[#CBD5E1] px-3 text-xs text-[#0F172A] focus:border-[#2563EB] focus:outline-none"
+          />
         </div>
 
+        <!-- 2. Nama Pengirim -->
+        <div>
+          <label class="block text-xs font-bold text-[#0F172A] mb-1">
+            Nama Pengirim <span class="text-rose-500">*</span>
+          </label>
+          <input
+            v-model="form.sender_name"
+            type="text"
+            required
+            maxlength="150"
+            placeholder="Contoh: PT ESB Solo / John Doe"
+            class="h-10 w-full rounded-xl border border-[#CBD5E1] px-3 text-xs text-[#0F172A] focus:border-[#2563EB] focus:outline-none"
+          />
+        </div>
+
+        <!-- 3. Alamat Pengirim -->
+        <div>
+          <label class="block text-xs font-bold text-[#0F172A] mb-1">
+            Alamat Pengirim <span class="text-rose-500">*</span>
+          </label>
+          <textarea
+            v-model="form.sender_address"
+            rows="2"
+            required
+            maxlength="5000"
+            placeholder="Contoh: Kantor Solo, Jl. Slamet Riyadi No. 123"
+            class="w-full rounded-xl border border-[#CBD5E1] p-3 text-xs text-[#0F172A] focus:border-[#2563EB] focus:outline-none"
+          ></textarea>
+        </div>
+
+        <!-- 4. Nama Penerima -->
         <div>
           <label class="block text-xs font-bold text-[#0F172A] mb-1">
             Nama Penerima <span class="text-rose-500">*</span>
@@ -752,9 +822,25 @@ onMounted(() => {
           />
         </div>
 
+        <!-- 5. Alamat Penerima -->
         <div>
           <label class="block text-xs font-bold text-[#0F172A] mb-1">
-            Deskripsi Barang <span class="text-rose-500">*</span>
+            Alamat Penerima <span class="text-rose-500">*</span>
+          </label>
+          <textarea
+            v-model="form.recipient_address"
+            rows="2"
+            required
+            maxlength="5000"
+            placeholder="Contoh: Kantor Surabaya, Jl. Pemuda No. 45"
+            class="w-full rounded-xl border border-[#CBD5E1] p-3 text-xs text-[#0F172A] focus:border-[#2563EB] focus:outline-none"
+          ></textarea>
+        </div>
+
+        <!-- 6. Detail Barang -->
+        <div>
+          <label class="block text-xs font-bold text-[#0F172A] mb-1">
+            Detail Barang <span class="text-rose-500">*</span>
           </label>
           <textarea
             v-model="form.item_description"
@@ -766,46 +852,40 @@ onMounted(() => {
           ></textarea>
         </div>
 
+        <!-- 7. Status Pengiriman -->
         <div>
           <label class="block text-xs font-bold text-[#0F172A] mb-1">
-            Tujuan Pengiriman <span class="text-rose-500">*</span>
+            Status Pengiriman <span class="text-rose-500">*</span>
           </label>
-          <input
-            v-model="form.destination"
-            type="text"
+          <select
+            v-model="form.status"
             required
-            maxlength="255"
-            placeholder="Contoh: Kantor Cabang Surabaya / Alamat Penerima"
-            class="h-10 w-full rounded-xl border border-[#CBD5E1] px-3 text-xs text-[#0F172A] focus:border-[#2563EB] focus:outline-none"
-          />
+            class="h-10 w-full rounded-xl border border-[#CBD5E1] px-3 text-xs text-[#0F172A] focus:border-[#2563EB] focus:outline-none cursor-pointer"
+          >
+            <option value="Menunggu Pickup">Menunggu Pickup</option>
+            <option value="Di Pickup">Di Pickup</option>
+            <option value="Dalam Pengiriman">Dalam Pengiriman</option>
+            <option value="Terkirim">Terkirim</option>
+            <option value="Dibatalkan">Dibatalkan</option>
+          </select>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-          <div>
-            <label class="block text-xs font-bold text-[#0F172A] mb-1">
-              No Resi <span class="text-[#94A3B8] font-normal">(Opsional)</span>
-            </label>
-            <input
-              v-model="form.tracking_number"
-              type="text"
-              maxlength="100"
-              placeholder="Contoh: JNE-01234567"
-              class="h-10 w-full rounded-xl border border-[#CBD5E1] px-3 text-xs text-[#0F172A] focus:border-[#2563EB] focus:outline-none"
-            />
-          </div>
-
-          <div>
-            <label class="block text-xs font-bold text-[#0F172A] mb-1">
-              Link Bukti Pengiriman <span class="text-[#94A3B8] font-normal">(Opsional)</span>
-            </label>
-            <input
-              v-model="form.delivery_proof_url"
-              type="url"
-              maxlength="2048"
-              placeholder="https://example.com/bukti.jpg"
-              class="h-10 w-full rounded-xl border border-[#CBD5E1] px-3 text-xs text-[#0F172A] focus:border-[#2563EB] focus:outline-none"
-            />
-          </div>
+        <!-- 8. No. AWB / Resi (Conditional) -->
+        <div v-if="isAwbVisible" class="transition-all">
+          <label class="block text-xs font-bold text-[#0F172A] mb-1">
+            No. AWB / Resi <span v-if="isAwbRequired" class="text-rose-500">*</span>
+          </label>
+          <input
+            v-model="form.awb_number"
+            type="text"
+            :required="isAwbRequired"
+            maxlength="100"
+            placeholder="Contoh: JNE-0192837465 / SPXID098234"
+            class="h-10 w-full rounded-xl border border-[#CBD5E1] px-3 text-xs text-[#0F172A] focus:border-[#2563EB] focus:outline-none"
+          />
+          <p v-if="isAwbRequired" class="text-[11px] text-amber-600 mt-1">
+            Wajib diisi saat status telah mencapai tahap pickup atau pengiriman.
+          </p>
         </div>
 
         <div class="flex items-center justify-end gap-2 pt-3 border-t border-[#F1F5F9]">
@@ -819,9 +899,14 @@ onMounted(() => {
           <button
             type="submit"
             :disabled="isSubmitting"
-            class="h-9 rounded-lg bg-[#2563EB] px-4 text-xs font-semibold text-white hover:bg-[#1D4ED8] disabled:opacity-50 cursor-pointer"
+            class="h-9 rounded-lg bg-[#2563EB] px-4 text-xs font-semibold text-white hover:bg-[#1D4ED8] disabled:opacity-50 flex items-center gap-1.5 cursor-pointer"
           >
-            {{ isSubmitting ? 'Menyimpan...' : 'Simpan' }}
+            <span
+              v-if="isSubmitting"
+              class="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"
+              aria-hidden="true"
+            ></span>
+            <span>{{ isSubmitting ? 'Menyimpan...' : 'Simpan' }}</span>
           </button>
         </div>
       </form>

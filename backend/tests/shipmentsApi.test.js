@@ -152,9 +152,11 @@ test('Modul Tracker Pengiriman — Shipments API Test Suite', async (t) => {
       headers: { Authorization: `Bearer ${tokenNoPerm}` },
       body: {
         request_date: '2026-09-08',
+        sender_name: 'PT ESB Solo',
+        sender_address: 'Jl. Slamet Riyadi No. 123, Solo',
         recipient_name: 'Budi Santoso',
+        recipient_address: 'Kantor Cabang Surabaya',
         item_description: 'Laptop ThinkPad X1',
-        destination: 'Kantor Cabang Surabaya',
       },
     })
     assert.equal(res.status, 403)
@@ -175,9 +177,11 @@ test('Modul Tracker Pengiriman — Shipments API Test Suite', async (t) => {
       headers: { Authorization: `Bearer ${tokenReadOnly}` },
       body: {
         request_date: '2026-09-08',
+        sender_name: 'PT ESB Solo',
+        sender_address: 'Jl. Slamet Riyadi No. 123, Solo',
         recipient_name: 'Budi Santoso',
+        recipient_address: 'Kantor Cabang Surabaya',
         item_description: 'Laptop ThinkPad X1',
-        destination: 'Kantor Cabang Surabaya',
       },
     })
     assert.equal(res.status, 403)
@@ -191,21 +195,25 @@ test('Modul Tracker Pengiriman — Shipments API Test Suite', async (t) => {
       headers: { Authorization: `Bearer ${tokenFull}` },
       body: {
         request_date: '2026-09-08',
+        sender_name: 'PT ESB Solo',
+        sender_address: 'Jl. Slamet Riyadi No. 123, Solo',
         recipient_name: 'Ahmad Dahlan',
+        recipient_address: 'Jl. Sudirman Kav 25, Jakarta Selatan',
         item_description: 'Monitor Dell 27 Inch 4K',
-        destination: 'Jl. Sudirman Kav 25, Jakarta Selatan',
         tracking_number: 'JNE-12345678',
-        status: 'belum_dikirim',
+        status: 'Menunggu Pickup',
         delivery_proof_url: 'https://cdn.example.com/proof/receipt-01.jpg',
       },
     })
     assert.equal(res.status, 201)
     assert.ok(res.json?.id)
+    assert.equal(res.json?.sender_name, 'PT ESB Solo')
+    assert.equal(res.json?.sender_address, 'Jl. Slamet Riyadi No. 123, Solo')
     assert.equal(res.json?.recipient_name, 'Ahmad Dahlan')
     assert.equal(res.json?.item_description, 'Monitor Dell 27 Inch 4K')
     assert.equal(res.json?.destination, 'Jl. Sudirman Kav 25, Jakarta Selatan')
     assert.equal(res.json?.tracking_number, 'JNE-12345678')
-    assert.equal(res.json?.status, 'belum_dikirim')
+    assert.equal(res.json?.status, 'Menunggu Pickup')
     assert.equal(res.json?.delivery_proof_url, 'https://cdn.example.com/proof/receipt-01.jpg')
     assert.equal(res.json?.created_by, userFullId)
     assert.equal(res.json?.created_by_name, 'User Full')
@@ -218,7 +226,7 @@ test('Modul Tracker Pengiriman — Shipments API Test Suite', async (t) => {
     const res = await makeRequest(server, `/api/shipments/${testShipmentId}`, {
       method: 'PUT',
       headers: { Authorization: `Bearer ${tokenReadOnly}` },
-      body: { status: 'sedang_dikirim' },
+      body: { status: 'Dalam Pengiriman' },
     })
     assert.equal(res.status, 403)
   })
@@ -236,12 +244,12 @@ test('Modul Tracker Pengiriman — Shipments API Test Suite', async (t) => {
       method: 'PUT',
       headers: { Authorization: `Bearer ${tokenFull}` },
       body: {
-        status: 'sedang_dikirim',
+        status: 'Dalam Pengiriman',
         tracking_number: 'JNE-87654321',
       },
     })
     assert.equal(res.status, 200)
-    assert.equal(res.json?.status, 'sedang_dikirim')
+    assert.equal(res.json?.status, 'Dalam Pengiriman')
     assert.equal(res.json?.tracking_number, 'JNE-87654321')
   })
 
@@ -256,9 +264,11 @@ test('Modul Tracker Pengiriman — Shipments API Test Suite', async (t) => {
       headers: { Authorization: `Bearer ${tokenSuperadmin}` },
       body: {
         request_date: '2026-09-08',
+        sender_name: 'PT ESB Jakarta',
+        sender_address: 'Gedung Cyber 2 Lt. 5',
         recipient_name: 'Siti Rahma',
+        recipient_address: 'Gedung Cyber 2 Lt. 10',
         item_description: 'Keyboard & Mouse Wireless',
-        destination: 'Gedung Cyber 2 Lt. 10',
       },
     })
     assert.equal(createRes.status, 201)
@@ -280,9 +290,11 @@ test('Modul Tracker Pengiriman — Shipments API Test Suite', async (t) => {
       headers: { Authorization: `Bearer ${tokenFull}` },
       body: {
         request_date: '2026-09-08',
+        sender_name: 'PT ESB',
+        sender_address: 'Jakarta',
         recipient_name: 'Testing User',
+        recipient_address: 'Jakarta',
         item_description: 'Barang Tes',
-        destination: 'Jakarta',
         status: 'arbitrary_status_yang_salah',
       },
     })
@@ -295,9 +307,11 @@ test('Modul Tracker Pengiriman — Shipments API Test Suite', async (t) => {
       headers: { Authorization: `Bearer ${tokenFull}` },
       body: {
         request_date: 'invalid-date',
+        sender_name: 'PT ESB',
+        sender_address: 'Jakarta',
         recipient_name: 'Testing User',
+        recipient_address: 'Jakarta',
         item_description: 'Barang Tes',
-        destination: 'Jakarta',
       },
     })
     assert.equal(res1.status, 400)
@@ -308,9 +322,11 @@ test('Modul Tracker Pengiriman — Shipments API Test Suite', async (t) => {
       headers: { Authorization: `Bearer ${tokenFull}` },
       body: {
         request_date: '2026-02-31',
+        sender_name: 'PT ESB',
+        sender_address: 'Jakarta',
         recipient_name: 'Testing User',
+        recipient_address: 'Jakarta',
         item_description: 'Barang Tes',
-        destination: 'Jakarta',
       },
     })
     assert.equal(res2.status, 400)
@@ -323,8 +339,10 @@ test('Modul Tracker Pengiriman — Shipments API Test Suite', async (t) => {
       headers: { Authorization: `Bearer ${tokenFull}` },
       body: {
         request_date: '2026-09-08',
+        sender_name: 'PT ESB',
+        sender_address: 'Jakarta',
+        recipient_address: 'Jakarta',
         item_description: 'Barang',
-        destination: 'Jakarta',
       },
     })
     assert.equal(res1.status, 400)
@@ -335,23 +353,41 @@ test('Modul Tracker Pengiriman — Shipments API Test Suite', async (t) => {
       headers: { Authorization: `Bearer ${tokenFull}` },
       body: {
         request_date: '2026-09-08',
+        sender_name: 'PT ESB',
+        sender_address: 'Jakarta',
         recipient_name: 'Budi',
-        destination: 'Jakarta',
+        recipient_address: 'Jakarta',
       },
     })
     assert.equal(res2.status, 400)
 
-    // Missing destination
+    // Missing sender name
     const res3 = await makeRequest(server, '/api/shipments', {
       method: 'POST',
       headers: { Authorization: `Bearer ${tokenFull}` },
       body: {
         request_date: '2026-09-08',
+        sender_address: 'Jakarta',
         recipient_name: 'Budi',
+        recipient_address: 'Jakarta',
         item_description: 'Barang',
       },
     })
     assert.equal(res3.status, 400)
+
+    // Missing sender address
+    const res4 = await makeRequest(server, '/api/shipments', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${tokenFull}` },
+      body: {
+        request_date: '2026-09-08',
+        sender_name: 'PT ESB',
+        recipient_name: 'Budi',
+        recipient_address: 'Jakarta',
+        item_description: 'Barang',
+      },
+    })
+    assert.equal(res4.status, 400)
   })
 
   await t.test('2.4 Dangerous protocol in delivery_proof_url is rejected (javascript:, data:)', async () => {
@@ -360,9 +396,11 @@ test('Modul Tracker Pengiriman — Shipments API Test Suite', async (t) => {
       headers: { Authorization: `Bearer ${tokenFull}` },
       body: {
         request_date: '2026-09-08',
+        sender_name: 'PT ESB',
+        sender_address: 'Jakarta',
         recipient_name: 'Budi',
+        recipient_address: 'Jakarta',
         item_description: 'Barang',
-        destination: 'Jakarta',
         delivery_proof_url: 'javascript:alert(1)',
       },
     })
@@ -373,9 +411,11 @@ test('Modul Tracker Pengiriman — Shipments API Test Suite', async (t) => {
       headers: { Authorization: `Bearer ${tokenFull}` },
       body: {
         request_date: '2026-09-08',
+        sender_name: 'PT ESB',
+        sender_address: 'Jakarta',
         recipient_name: 'Budi',
+        recipient_address: 'Jakarta',
         item_description: 'Barang',
-        destination: 'Jakarta',
         delivery_proof_url: 'data:text/html,<script>alert(1)</script>',
       },
     })
@@ -388,9 +428,11 @@ test('Modul Tracker Pengiriman — Shipments API Test Suite', async (t) => {
       headers: { Authorization: `Bearer ${tokenFull}` },
       body: {
         request_date: '2026-09-08',
+        sender_name: 'PT ESB',
+        sender_address: 'Jakarta',
         recipient_name: 'Budi',
+        recipient_address: 'Jakarta',
         item_description: 'Barang',
-        destination: 'Jakarta',
         tracking_number: 'A'.repeat(101),
       },
     })
@@ -403,9 +445,11 @@ test('Modul Tracker Pengiriman — Shipments API Test Suite', async (t) => {
       headers: { Authorization: `Bearer ${tokenFull}` },
       body: {
         request_date: '2026-09-08',
+        sender_name: 'PT ESB',
+        sender_address: 'Jakarta',
         recipient_name: 'Budi',
+        recipient_address: 'Jakarta',
         item_description: 'Barang',
-        destination: 'Jakarta',
         malicious_extra_field: 'hacked',
       },
     })
@@ -420,9 +464,11 @@ test('Modul Tracker Pengiriman — Shipments API Test Suite', async (t) => {
       headers: { Authorization: `Bearer ${tokenFull}` },
       body: {
         request_date: '2026-09-08',
+        sender_name: 'PT ESB',
+        sender_address: 'Jakarta',
         recipient_name: 'Spoof Test',
+        recipient_address: 'Jakarta',
         item_description: 'Barang Tes Spoof',
-        destination: 'Jakarta',
         created_by: 99999, // Attempt spoofing
       },
     })
@@ -455,13 +501,13 @@ test('Modul Tracker Pengiriman — Shipments API Test Suite', async (t) => {
   })
 
   await t.test('4.2 Status filter filters accurately', async () => {
-    const res = await makeRequest(server, '/api/shipments?status=sedang_dikirim', {
+    const res = await makeRequest(server, '/api/shipments?status=dalam%20pengiriman', {
       headers: { Authorization: `Bearer ${tokenReadOnly}` },
     })
     assert.equal(res.status, 200)
     assert.ok(Array.isArray(res.json?.data))
     for (const item of res.json.data) {
-      assert.equal(item.status, 'sedang_dikirim')
+      assert.ok(item.status === 'Dalam Pengiriman' || item.status === 'sedang_dikirim')
     }
   })
 
@@ -499,5 +545,234 @@ test('Modul Tracker Pengiriman — Shipments API Test Suite', async (t) => {
       headers: { Authorization: `Bearer ${tokenFull}` },
     })
     assert.equal(getRes.status, 404)
+  })
+
+  // ── 5. Spesifikasi Bisnis 10 Skenario Pengiriman & AWB ──
+
+  let scenarioShipmentId
+
+  await t.test('5.1 (Req 1) Create pengiriman dengan status Menunggu Pickup tanpa AWB berhasil', async () => {
+    const res = await makeRequest(server, '/api/shipments', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${tokenFull}` },
+      body: {
+        request_date: '2026-09-09',
+        sender_name: 'PT ESB Solo',
+        sender_address: 'Jl. Slamet Riyadi No. 123, Solo',
+        recipient_name: 'Budi Santoso',
+        recipient_address: 'Kantor Cabang Surabaya, Jl. Pemuda No. 45',
+        item_description: '1 Unit Laptop ThinkPad X1 Carbon',
+        status: 'Menunggu Pickup',
+      },
+    })
+    assert.equal(res.status, 201)
+    assert.equal(res.json?.status, 'Menunggu Pickup')
+    assert.equal(res.json?.awb_number, null)
+    scenarioShipmentId = res.json?.id
+    createdShipmentIds.push(scenarioShipmentId)
+  })
+
+  await t.test('5.2 (Req 2) Status Di Pickup tanpa AWB ditolak (400)', async () => {
+    const res = await makeRequest(server, '/api/shipments', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${tokenFull}` },
+      body: {
+        request_date: '2026-09-09',
+        sender_name: 'PT ESB Solo',
+        sender_address: 'Jl. Slamet Riyadi No. 123, Solo',
+        recipient_name: 'Budi Santoso',
+        recipient_address: 'Kantor Cabang Surabaya, Jl. Pemuda No. 45',
+        item_description: '1 Unit Laptop ThinkPad X1 Carbon',
+        status: 'Di Pickup',
+      },
+    })
+    assert.equal(res.status, 400)
+    assert.ok(res.json?.message?.includes('No. AWB / Resi wajib diisi'))
+  })
+
+  await t.test('5.3 (Req 3) Status Di Pickup dengan AWB berhasil (201)', async () => {
+    const res = await makeRequest(server, '/api/shipments', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${tokenFull}` },
+      body: {
+        request_date: '2026-09-09',
+        sender_name: 'PT ESB Solo',
+        sender_address: 'Jl. Slamet Riyadi No. 123, Solo',
+        recipient_name: 'Dewi Lestari',
+        recipient_address: 'Jl. Merdeka No. 10, Bandung',
+        item_description: 'MacBook Air M2',
+        status: 'Di Pickup',
+        awb_number: 'AWB-PICKUP-001',
+      },
+    })
+    assert.equal(res.status, 201)
+    assert.equal(res.json?.status, 'Di Pickup')
+    assert.equal(res.json?.awb_number, 'AWB-PICKUP-001')
+    assert.equal(res.json?.tracking_number, 'AWB-PICKUP-001')
+    createdShipmentIds.push(res.json?.id)
+  })
+
+  await t.test('5.4 (Req 4) Status Dalam Pengiriman membutuhkan AWB', async () => {
+    // Tanpa AWB -> 400
+    const failRes = await makeRequest(server, '/api/shipments', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${tokenFull}` },
+      body: {
+        request_date: '2026-09-09',
+        sender_name: 'PT ESB Solo',
+        sender_address: 'Jl. Slamet Riyadi No. 123, Solo',
+        recipient_name: 'Rudi Hartono',
+        recipient_address: 'Semarang',
+        item_description: 'Docking Station USB-C',
+        status: 'Dalam Pengiriman',
+      },
+    })
+    assert.equal(failRes.status, 400)
+
+    // Dengan AWB -> 201
+    const passRes = await makeRequest(server, '/api/shipments', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${tokenFull}` },
+      body: {
+        request_date: '2026-09-09',
+        sender_name: 'PT ESB Solo',
+        sender_address: 'Jl. Slamet Riyadi No. 123, Solo',
+        recipient_name: 'Rudi Hartono',
+        recipient_address: 'Semarang',
+        item_description: 'Docking Station USB-C',
+        status: 'Dalam Pengiriman',
+        awb_number: 'AWB-OTW-999',
+      },
+    })
+    assert.equal(passRes.status, 201)
+    assert.equal(passRes.json?.status, 'Dalam Pengiriman')
+    assert.equal(passRes.json?.awb_number, 'AWB-OTW-999')
+    createdShipmentIds.push(passRes.json?.id)
+  })
+
+  await t.test('5.5 (Req 5) Status Terkirim membutuhkan AWB', async () => {
+    // Tanpa AWB -> 400
+    const failRes = await makeRequest(server, '/api/shipments', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${tokenFull}` },
+      body: {
+        request_date: '2026-09-09',
+        sender_name: 'PT ESB Solo',
+        sender_address: 'Jl. Slamet Riyadi No. 123, Solo',
+        recipient_name: 'Siti Aminah',
+        recipient_address: 'Yogyakarta',
+        item_description: 'Headset Jabra Evolve',
+        status: 'Terkirim',
+      },
+    })
+    assert.equal(failRes.status, 400)
+
+    // Dengan AWB -> 201
+    const passRes = await makeRequest(server, '/api/shipments', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${tokenFull}` },
+      body: {
+        request_date: '2026-09-09',
+        sender_name: 'PT ESB Solo',
+        sender_address: 'Jl. Slamet Riyadi No. 123, Solo',
+        recipient_name: 'Siti Aminah',
+        recipient_address: 'Yogyakarta',
+        item_description: 'Headset Jabra Evolve',
+        status: 'Terkirim',
+        awb_number: 'AWB-DELIV-777',
+      },
+    })
+    assert.equal(passRes.status, 201)
+    assert.equal(passRes.json?.status, 'Terkirim')
+    createdShipmentIds.push(passRes.json?.id)
+  })
+
+  await t.test('5.6 (Req 6) AWB existing tetap tersimpan saat update field lain', async () => {
+    // 1. Update scenarioShipmentId to 'Di Pickup' with AWB
+    const pickupRes = await makeRequest(server, `/api/shipments/${scenarioShipmentId}`, {
+      method: 'PUT',
+      headers: { Authorization: `Bearer ${tokenFull}` },
+      body: {
+        status: 'Di Pickup',
+        awb_number: 'AWB-SCENARIO-12345',
+      },
+    })
+    assert.equal(pickupRes.status, 200)
+    assert.equal(pickupRes.json?.status, 'Di Pickup')
+    assert.equal(pickupRes.json?.awb_number, 'AWB-SCENARIO-12345')
+
+    // 2. Update status ke 'Dalam Pengiriman' tanpa mengirimkan field awb_number
+    const transitionRes = await makeRequest(server, `/api/shipments/${scenarioShipmentId}`, {
+      method: 'PUT',
+      headers: { Authorization: `Bearer ${tokenFull}` },
+      body: {
+        status: 'Dalam Pengiriman',
+      },
+    })
+    assert.equal(transitionRes.status, 200)
+    assert.equal(transitionRes.json?.status, 'Dalam Pengiriman')
+    assert.equal(transitionRes.json?.awb_number, 'AWB-SCENARIO-12345')
+
+    // 3. Update field lain saja (sender_name) -> AWB must remain unchanged!
+    const editOtherRes = await makeRequest(server, `/api/shipments/${scenarioShipmentId}`, {
+      method: 'PUT',
+      headers: { Authorization: `Bearer ${tokenFull}` },
+      body: {
+        sender_name: 'PT ESB Solo Central',
+      },
+    })
+    assert.equal(editOtherRes.status, 200)
+    assert.equal(editOtherRes.json?.sender_name, 'PT ESB Solo Central')
+    assert.equal(editOtherRes.json?.awb_number, 'AWB-SCENARIO-12345')
+  })
+
+  await t.test('5.7 (Req 7) Invalid status ditolak (400)', async () => {
+    const res = await makeRequest(server, `/api/shipments/${scenarioShipmentId}`, {
+      method: 'PUT',
+      headers: { Authorization: `Bearer ${tokenFull}` },
+      body: {
+        status: 'status_yang_pasti_salah',
+      },
+    })
+    assert.equal(res.status, 400)
+  })
+
+  await t.test('5.8 (Req 8) User tanpa permission Pengiriman tetap tidak dapat create/update data', async () => {
+    const createRes = await makeRequest(server, '/api/shipments', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${tokenReadOnly}` },
+      body: {
+        request_date: '2026-09-09',
+        sender_name: 'PT ESB Solo',
+        sender_address: 'Solo',
+        recipient_name: 'Budi',
+        recipient_address: 'Surabaya',
+        item_description: 'Laptop',
+      },
+    })
+    assert.equal(createRes.status, 403)
+
+    const updateRes = await makeRequest(server, `/api/shipments/${scenarioShipmentId}`, {
+      method: 'PUT',
+      headers: { Authorization: `Bearer ${tokenReadOnly}` },
+      body: {
+        sender_name: 'Hacked Name',
+      },
+    })
+    assert.equal(updateRes.status, 403)
+  })
+
+  await t.test('5.9 (Req 9) Update status kembali ke Menunggu Pickup tidak menghapus AWB existing', async () => {
+    const res = await makeRequest(server, `/api/shipments/${scenarioShipmentId}`, {
+      method: 'PUT',
+      headers: { Authorization: `Bearer ${tokenFull}` },
+      body: {
+        status: 'Menunggu Pickup',
+      },
+    })
+    assert.equal(res.status, 200)
+    assert.equal(res.json?.status, 'Menunggu Pickup')
+    // AWB tetap ada di database
+    assert.equal(res.json?.awb_number, 'AWB-SCENARIO-12345')
   })
 })

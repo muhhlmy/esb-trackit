@@ -141,4 +141,67 @@ test('Modul Tracker Pengiriman — Frontend Architecture & UI Test Suite', async
       'Tombol create/edit/delete harus terproteksi canWriteShipments',
     )
   })
+
+  await t.test('6. (Req 9) Form modal implements 8 fields in order with conditional AWB field on Di Pickup', () => {
+    const modalFormIdx = shipmentsViewSrc.indexOf('<form @submit.prevent="saveShipment"')
+    assert.ok(modalFormIdx !== -1, 'Modal form harus ditemukan di ShipmentsView.vue')
+    const modalFormContent = shipmentsViewSrc.slice(modalFormIdx)
+
+    // Order verification strictly inside the modal form
+    const reqDateIdx = modalFormContent.indexOf('Tanggal Request')
+    const senderNameIdx = modalFormContent.indexOf('Nama Pengirim')
+    const senderAddrIdx = modalFormContent.indexOf('Alamat Pengirim')
+    const recipNameIdx = modalFormContent.indexOf('Nama Penerima')
+    const recipAddrIdx = modalFormContent.indexOf('Alamat Penerima')
+    const itemDetailIdx = modalFormContent.indexOf('Detail Barang')
+    const statusIdx = modalFormContent.indexOf('Status Pengiriman')
+    const awbIdx = modalFormContent.indexOf('No. AWB / Resi')
+
+    assert.ok(reqDateIdx !== -1, 'Modal harus memiliki Tanggal Request')
+    assert.ok(senderNameIdx !== -1, 'Modal harus memiliki Nama Pengirim')
+    assert.ok(senderAddrIdx !== -1, 'Modal harus memiliki Alamat Pengirim')
+    assert.ok(recipNameIdx !== -1, 'Modal harus memiliki Nama Penerima')
+    assert.ok(recipAddrIdx !== -1, 'Modal harus memiliki Alamat Penerima')
+    assert.ok(itemDetailIdx !== -1, 'Modal harus memiliki Detail Barang')
+    assert.ok(statusIdx !== -1, 'Modal harus memiliki Status Pengiriman')
+    assert.ok(awbIdx !== -1, 'Modal harus memiliki No. AWB / Resi')
+
+    assert.ok(
+      reqDateIdx < senderNameIdx &&
+      senderNameIdx < senderAddrIdx &&
+      senderAddrIdx < recipNameIdx &&
+      recipNameIdx < recipAddrIdx &&
+      recipAddrIdx < itemDetailIdx &&
+      itemDetailIdx < statusIdx &&
+      statusIdx < awbIdx,
+      'Urutan 8 field di modal harus sesuai spesifikasi (Tanggal Request -> Nama Pengirim -> Alamat Pengirim -> Nama Penerima -> Alamat Penerima -> Detail Barang -> Status Pengiriman -> No. AWB / Resi)',
+    )
+
+    // Conditional visibility & requirement
+    assert.ok(shipmentsViewSrc.includes('isAwbVisible'), 'Harus memiliki computed isAwbVisible')
+    assert.ok(shipmentsViewSrc.includes('isAwbRequired'), 'Harus memiliki computed isAwbRequired')
+    assert.ok(shipmentsViewSrc.includes("'Di Pickup'"), "Status harus menyertakan opsi 'Di Pickup'")
+    assert.ok(shipmentsViewSrc.includes("'Dalam Pengiriman'"), "Status harus menyertakan opsi 'Dalam Pengiriman'")
+    assert.ok(shipmentsViewSrc.includes("'Terkirim'"), "Status harus menyertakan opsi 'Terkirim'")
+    assert.ok(shipmentsViewSrc.includes("'Menunggu Pickup'"), "Default status harus 'Menunggu Pickup'")
+  })
+
+  await t.test('7. (Req 10) Modal Edit loads existing data including AWB correctly', () => {
+    assert.ok(
+      shipmentsViewSrc.includes('openEdit'),
+      'Komponen harus memiliki fungsi openEdit',
+    )
+    assert.ok(
+      shipmentsViewSrc.includes('item.awb_number || item.tracking_number'),
+      'openEdit harus mengisi form.awb_number dengan nilai AWB existing',
+    )
+    assert.ok(
+      shipmentsViewSrc.includes('item.sender_name'),
+      'openEdit harus mengisi form.sender_name',
+    )
+    assert.ok(
+      shipmentsViewSrc.includes('item.sender_address'),
+      'openEdit harus mengisi form.sender_address',
+    )
+  })
 })

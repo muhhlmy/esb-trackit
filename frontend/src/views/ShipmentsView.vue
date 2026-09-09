@@ -8,7 +8,6 @@ import AppBadge from '../components/ui/AppBadge.vue'
 import AppPagination from '../components/ui/AppPagination.vue'
 import SkeletonTable from '../components/ui/skeleton/SkeletonTable.vue'
 import {
-  ExternalLink,
   FilterX,
   Package,
   Pencil,
@@ -89,16 +88,7 @@ const isAwbRequired = computed(() => {
   return ['Di Pickup', 'Dalam Pengiriman', 'Terkirim'].includes(form.value.status)
 })
 
-const isAwbVisible = computed(() => {
-  if (['Di Pickup', 'Dalam Pengiriman', 'Terkirim'].includes(form.value.status)) {
-    return true
-  }
-  // In edit mode or if AWB has a value, show it
-  if (modalMode.value === 'edit' && Boolean(form.value.awb_number)) {
-    return true
-  }
-  return false
-})
+const isAwbVisible = computed(() => isAwbRequired.value)
 
 function getStatusBadgeType(status) {
   switch (status) {
@@ -360,7 +350,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div data-testid="page-ready" class="space-y-4 sm:space-y-6 pb-12 select-none">
+  <div data-testid="page-ready" class="space-y-4 sm:space-y-6 pb-12 min-w-0">
     <!-- Notification Toast -->
     <Transition name="fade">
       <div
@@ -564,21 +554,20 @@ onMounted(() => {
 
       <div v-else>
         <!-- Desktop Table (>= lg) -->
-        <div class="hidden lg:block overflow-x-auto">
-          <table class="w-full text-left border-collapse">
+        <div class="shipment-table-scroll hidden lg:block overflow-x-auto" tabindex="0" role="region" aria-label="Tabel pengiriman, geser untuk melihat semua kolom">
+          <table class="shipment-table w-full text-left border-collapse">
             <thead>
               <tr
                 class="border-b border-[#E2E8F0] bg-[#F8FAFC] text-[11px] font-bold text-[#64748B] uppercase tracking-wider"
               >
-                <th class="py-3 px-4">Tanggal Request</th>
-                <th class="py-3 px-4">Pengirim</th>
-                <th class="py-3 px-4">Nama Penerima</th>
-                <th class="py-3 px-4">Tujuan Pengiriman</th>
-                <th class="py-3 px-4">Deskripsi Barang</th>
-                <th class="py-3 px-4">No Resi</th>
-                <th class="py-3 px-4">Status</th>
-                <th class="py-3 px-4 text-center">Bukti</th>
-                <th v-if="canWriteShipments" class="py-3 px-4 text-right">Aksi</th>
+                <th scope="col" class="py-3 px-4">Tanggal Request</th>
+                <th scope="col" class="py-3 px-4">Pengirim</th>
+                <th scope="col" class="py-3 px-4">Nama Penerima</th>
+                <th scope="col" class="py-3 px-4">Tujuan Pengiriman</th>
+                <th scope="col" class="py-3 px-4">Deskripsi Barang</th>
+                <th scope="col" class="py-3 px-4">No Resi</th>
+                <th scope="col" class="py-3 px-4">Status</th>
+                <th scope="col" v-if="canWriteShipments" class="py-3 px-4 text-right">Aksi</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-[#E2E8F0] text-xs text-[#0F172A]">
@@ -594,7 +583,7 @@ onMounted(() => {
                   <div class="font-semibold text-[#0F172A]">{{ item.sender_name || '—' }}</div>
                   <div
                     v-if="item.sender_address"
-                    class="text-[11px] text-[#64748B] truncate max-w-[180px]"
+                    class="mt-1 text-[11px] leading-relaxed text-[#64748B] break-words"
                     :title="item.sender_address"
                   >
                     {{ item.sender_address }}
@@ -604,12 +593,12 @@ onMounted(() => {
                   {{ item.recipient_name }}
                 </td>
                 <td
-                  class="py-3 px-4 max-w-[200px] truncate text-[#475569]"
+                  class="py-3 px-4 text-[#475569]"
                   :title="item.recipient_address || item.destination"
                 >
                   {{ item.recipient_address || item.destination || '—' }}
                 </td>
-                <td class="py-3 px-4 max-w-[240px] truncate" :title="item.item_detail || item.item_description">
+                <td class="py-3 px-4" :title="item.item_detail || item.item_description">
                   {{ item.item_detail || item.item_description }}
                 </td>
                 <td class="py-3 px-4 font-mono text-[11px] text-[#475569]">
@@ -620,20 +609,6 @@ onMounted(() => {
                     :type="getStatusBadgeType(item.status)"
                     :text="getStatusLabel(item.status)"
                   />
-                </td>
-                <td class="py-3 px-4 text-center">
-                  <a
-                    v-if="item.delivery_proof_url"
-                    :href="item.delivery_proof_url"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="inline-flex items-center gap-1 text-[11.5px] font-bold text-[#2563EB] hover:text-[#1D4ED8] hover:underline"
-                    title="Buka link bukti pengiriman di tab baru"
-                  >
-                    <span>Lihat Bukti</span>
-                    <ExternalLink class="w-3 h-3" />
-                  </a>
-                  <span v-else class="text-[#94A3B8]">-</span>
                 </td>
                 <td v-if="canWriteShipments" class="py-3 px-4 text-right whitespace-nowrap">
                   <div class="flex items-center justify-end gap-1">
@@ -701,17 +676,6 @@ onMounted(() => {
                 <span class="text-[#94A3B8]">AWB / Resi:</span>
                 <span>{{ item.awb_number || item.tracking_number || '-' }}</span>
               </div>
-
-              <a
-                v-if="item.delivery_proof_url"
-                :href="item.delivery_proof_url"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="inline-flex items-center gap-1 text-[11px] font-bold text-[#2563EB]"
-              >
-                <span>Lihat Bukti</span>
-                <ExternalLink class="w-3 h-3" />
-              </a>
             </div>
 
             <div
@@ -949,3 +913,60 @@ onMounted(() => {
     </AppModal>
   </div>
 </template>
+
+<style scoped>
+.shipment-table-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 #f8fafc;
+}
+.shipment-table-scroll:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: -2px;
+}
+.shipment-table {
+  table-layout: fixed;
+  min-width: 1220px;
+}
+.shipment-table th {
+  padding: 15px 18px;
+  font-size: 10px;
+  letter-spacing: .045em;
+  white-space: nowrap;
+}
+.shipment-table th:nth-child(1) { width: 140px; }
+.shipment-table th:nth-child(2) { width: 180px; }
+.shipment-table th:nth-child(3) { width: 155px; }
+.shipment-table th:nth-child(4) { width: 200px; }
+.shipment-table th:nth-child(5) { width: 200px; }
+.shipment-table th:nth-child(6) { width: 150px; }
+.shipment-table th:nth-child(7) { width: 175px; }
+.shipment-table th:nth-child(8) { width: 100px; }
+.shipment-table td {
+  padding: 18px;
+  vertical-align: top;
+  line-height: 1.65;
+  overflow-wrap: anywhere;
+}
+.shipment-table tbody tr:nth-child(even) { background-color: #fbfcfe; }
+.shipment-table tbody tr:hover { background-color: #f1f5f9; }
+.shipment-table td:nth-child(1) { font-variant-numeric: tabular-nums; }
+.shipment-table td:nth-child(7) :deep(span.inline-flex) {
+  white-space: nowrap;
+  padding: 4px 9px;
+  font-size: 10px;
+}
+.shipment-table td:nth-child(7) :deep(span[aria-hidden]) { flex-shrink: 0; }
+.shipment-table td:last-child button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid #e2e8f0;
+  background-color: white;
+}
+.shipment-table td:last-child button:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+</style>

@@ -202,7 +202,6 @@ test('Modul Tracker Pengiriman — Shipments API Test Suite', async (t) => {
         item_description: 'Monitor Dell 27 Inch 4K',
         tracking_number: 'JNE-12345678',
         status: 'Menunggu Pickup',
-        delivery_proof_url: 'https://cdn.example.com/proof/receipt-01.jpg',
       },
     })
     assert.equal(res.status, 201)
@@ -214,7 +213,7 @@ test('Modul Tracker Pengiriman — Shipments API Test Suite', async (t) => {
     assert.equal(res.json?.destination, 'Jl. Sudirman Kav 25, Jakarta Selatan')
     assert.equal(res.json?.tracking_number, 'JNE-12345678')
     assert.equal(res.json?.status, 'Menunggu Pickup')
-    assert.equal(res.json?.delivery_proof_url, 'https://cdn.example.com/proof/receipt-01.jpg')
+    assert.equal(Object.hasOwn(res.json, 'delivery_proof_url'), false)
     assert.equal(res.json?.created_by, userFullId)
     assert.equal(res.json?.created_by_name, 'User Full')
 
@@ -390,7 +389,7 @@ test('Modul Tracker Pengiriman — Shipments API Test Suite', async (t) => {
     assert.equal(res4.status, 400)
   })
 
-  await t.test('2.4 Dangerous protocol in delivery_proof_url is rejected (javascript:, data:)', async () => {
+  await t.test('2.4 Removed delivery_proof_url field is rejected on create and update', async () => {
     const resJs = await makeRequest(server, '/api/shipments', {
       method: 'POST',
       headers: { Authorization: `Bearer ${tokenFull}` },
@@ -401,13 +400,13 @@ test('Modul Tracker Pengiriman — Shipments API Test Suite', async (t) => {
         recipient_name: 'Budi',
         recipient_address: 'Jakarta',
         item_description: 'Barang',
-        delivery_proof_url: 'javascript:alert(1)',
+        delivery_proof_url: 'https://example.com/proof.jpg',
       },
     })
     assert.equal(resJs.status, 400)
 
-    const resData = await makeRequest(server, '/api/shipments', {
-      method: 'POST',
+    const resData = await makeRequest(server, '/api/shipments/1', {
+      method: 'PATCH',
       headers: { Authorization: `Bearer ${tokenFull}` },
       body: {
         request_date: '2026-09-08',
@@ -416,7 +415,7 @@ test('Modul Tracker Pengiriman — Shipments API Test Suite', async (t) => {
         recipient_name: 'Budi',
         recipient_address: 'Jakarta',
         item_description: 'Barang',
-        delivery_proof_url: 'data:text/html,<script>alert(1)</script>',
+        delivery_proof_url: 'https://example.com/proof.jpg',
       },
     })
     assert.equal(resData.status, 400)

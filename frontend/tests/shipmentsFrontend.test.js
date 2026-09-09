@@ -125,14 +125,10 @@ test('Modul Tracker Pengiriman — Frontend Architecture & UI Test Suite', async
     assert.ok(shipmentsViewSrc.includes('Tujuan Pengiriman'), 'Tabel harus memiliki kolom Tujuan Pengiriman')
     assert.ok(shipmentsViewSrc.includes('No Resi'), 'Tabel harus memiliki kolom No Resi')
 
-    // Delivery proof security
+    // Removed delivery proof field
     assert.ok(
-      shipmentsViewSrc.includes('target="_blank"'),
-      'Link bukti pengiriman harus menggunakan target="_blank"',
-    )
-    assert.ok(
-      shipmentsViewSrc.includes('rel="noopener noreferrer"'),
-      'Link bukti pengiriman harus menggunakan rel="noopener noreferrer"',
+      !shipmentsViewSrc.includes('delivery_proof_url'),
+      'Bukti pengiriman tidak lagi ditampilkan',
     )
 
     // Permission-gated actions

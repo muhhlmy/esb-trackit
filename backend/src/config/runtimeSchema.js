@@ -269,7 +269,6 @@ const REQUIRED_RUNTIME_SCHEMA = Object.freeze({
     tracking_number: optional('varchar'),
     awb_number: optional('varchar'),
     status: nn('varchar'),
-    delivery_proof_url: optional('text'),
     created_by: optional('int4'),
     created_at: nn('timestamp'),
     updated_at: nn('timestamp'),

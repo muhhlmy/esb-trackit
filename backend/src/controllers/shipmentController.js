@@ -57,7 +57,6 @@ const MAX_RECIPIENT_ADDRESS_LENGTH = 5000
 const MAX_ITEM_DESCRIPTION_LENGTH = 5000
 const MAX_DESTINATION_LENGTH = 255
 const MAX_TRACKING_NUMBER_LENGTH = 100
-const MAX_URL_LENGTH = 2048
 
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/
 
@@ -73,7 +72,6 @@ const SHIPMENT_CREATE_FIELDS = new Set([
   'tracking_number',
   'awb_number',
   'status',
-  'delivery_proof_url',
 ])
 
 const SHIPMENT_UPDATE_FIELDS = new Set([
@@ -88,7 +86,6 @@ const SHIPMENT_UPDATE_FIELDS = new Set([
   'tracking_number',
   'awb_number',
   'status',
-  'delivery_proof_url',
 ])
 
 function isValidCalendarDate(dateString) {
@@ -238,30 +235,6 @@ function normalizeStatus(value, { defaultStatus = 'Menunggu Pickup' } = {}) {
   return normalized
 }
 
-function normalizeDeliveryProofUrl(value) {
-  if (value === undefined || value === null || value === '') return null
-  if (typeof value !== 'string') throw createHttpError(400, 'Link bukti pengiriman wajib berupa teks.')
-  const trimmed = value.trim()
-  if (!trimmed) return null
-  if (trimmed.length > MAX_URL_LENGTH) {
-    throw createHttpError(400, `Link bukti pengiriman maksimal ${MAX_URL_LENGTH} karakter.`)
-  }
-  assertNoActiveMarkup(trimmed, 'Link bukti pengiriman')
-
-  let parsedUrl
-  try {
-    parsedUrl = new URL(trimmed)
-  } catch {
-    throw createHttpError(400, 'Format link bukti pengiriman tidak valid. Harus URL web lengkap.')
-  }
-
-  if (parsedUrl.protocol !== 'http:' && parsedUrl.protocol !== 'https:') {
-    throw createHttpError(400, 'Link bukti pengiriman harus menggunakan protokol http:// atau https://.')
-  }
-
-  return trimmed
-}
-
 function mapShipmentRow(row) {
   if (!row) return null
   const recipientAddr = row.recipient_address || row.destination || ''
@@ -282,7 +255,6 @@ function mapShipmentRow(row) {
     tracking_number: awb,
     awb_number: awb,
     status: row.status,
-    delivery_proof_url: row.delivery_proof_url || null,
     created_by: row.created_by ? Number(row.created_by) : null,
     created_by_name: row.created_by_name || null,
     created_at: row.created_at,
@@ -303,7 +275,6 @@ const SHIPMENT_SELECT_FIELDS = `
   s.tracking_number,
   s.awb_number,
   s.status,
-  s.delivery_proof_url,
   s.created_by,
   u.nama AS created_by_name,
   s.created_at,
@@ -471,7 +442,6 @@ export async function createShipment(req, res) {
   const awbNumber = normalizeAwbNumber(rawAwb, { required: isAwbRequired, statusName: status })
   const trackingNumber = awbNumber
 
-  const deliveryProofUrl = normalizeDeliveryProofUrl(req.body.delivery_proof_url)
   const createdBy = req.user?.id || null
 
   const result = await pool.query(
@@ -487,12 +457,11 @@ export async function createShipment(req, res) {
        tracking_number,
        awb_number,
        status,
-       delivery_proof_url,
        created_by,
        created_at,
        updated_at
      )
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
      RETURNING id`,
     [
       requestDate,
@@ -506,7 +475,6 @@ export async function createShipment(req, res) {
       trackingNumber,
       awbNumber,
       status,
-      deliveryProofUrl,
       createdBy,
     ],
   )
@@ -614,12 +582,6 @@ export async function updateShipment(req, res) {
     updates.push(`tracking_number = $${values.length}`)
   } else if (isAwbRequired && !existingAwb) {
     throw createHttpError(400, `No. AWB / Resi wajib diisi untuk status ${effectiveStatus}.`)
-  }
-
-  if (req.body.delivery_proof_url !== undefined) {
-    const deliveryProofUrl = normalizeDeliveryProofUrl(req.body.delivery_proof_url)
-    values.push(deliveryProofUrl)
-    updates.push(`delivery_proof_url = $${values.length}`)
   }
 
   if (updates.length === 0) {

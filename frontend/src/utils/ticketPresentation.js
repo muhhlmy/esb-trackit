@@ -79,4 +79,3 @@ export function getPriorityInfo(prioritas) {
     icon: 'arrow_downward',
   }
 }
-

@@ -5,6 +5,11 @@ const currentLang = ref(savedLang === 'en' ? 'en' : 'id')
 
 const dictionaries = {
   id: {
+    account_menu: 'Menu akun',
+    clear_search: 'Bersihkan pencarian',
+    articles_loading: 'Memuat artikel…',
+    knowledge_guides: 'Panduan & pengetahuan',
+    articles_empty: 'Artikel belum tersedia. Silakan jelajahi kategori atau hubungi helpdesk.',
     // Navbar
     help_center: 'Help Center',
     search_placeholder_nav: 'Cari panduan & artikel...',
@@ -59,6 +64,11 @@ const dictionaries = {
     work_hours: '08:30 - 17:30',
   },
   en: {
+    account_menu: 'Account menu',
+    clear_search: 'Clear search',
+    articles_loading: 'Loading articles…',
+    knowledge_guides: 'Guides & knowledge',
+    articles_empty: 'No articles available yet. Browse a topic or contact the helpdesk.',
     // Navbar
     help_center: 'Help Center',
     search_placeholder_nav: 'Search guides & articles...',

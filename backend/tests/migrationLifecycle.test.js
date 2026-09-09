@@ -4,8 +4,8 @@ import { loadVersionedMigrations, buildMigrationPlan, assertMigrationAuthorizati
 
 test('canonical migrations load PLpgSQL safely and detect applied checksum drift', async () => {
   const migrations = await loadVersionedMigrations()
-  assert.deepEqual(migrations.map(({ version }) => version), [1, 2])
-  assert.equal(buildMigrationPlan(migrations, []).length, 2)
+  assert.deepEqual(migrations.map(({ version }) => version), [1, 2, 3, 4, 5])
+  assert.equal(buildMigrationPlan(migrations, []).length, 5)
   assert.equal(buildMigrationPlan(migrations, migrations).length, 0)
   assert.throws(() => buildMigrationPlan(migrations, [{ ...migrations[0], checksum: 'modified' }]), /Checksum/)
   assert.ok(migrations.every(({ sql }) => !/DROP TABLE|INSERT INTO users|admin123/.test(sql)))

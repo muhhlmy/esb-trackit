@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed, onMounted, nextTick } from 'vue'
-import { useRouter } from 'vue-router'
+import { RouterLink, useRouter } from 'vue-router'
 import { useCases } from '@/composables/useCases'
 import { useKbCategories } from '@/composables/useKbCategories'
 import { useAuth } from '@/composables/useAuth'
@@ -23,13 +23,12 @@ import {
   ArrowRight,
   Ticket,
   HelpCircle,
-  Send,
   Clock,
   TrendingUp,
 } from 'lucide-vue-next'
 
 const router = useRouter()
-const { cases, setSearch, setCategory, hasNoSearchResult, fetchCases } = useCases()
+const { cases, isLoading, setSearch, setCategory, hasNoSearchResult, fetchCases } = useCases()
 const { publishedCategories, fetchPublicCategories } = useKbCategories()
 const { isAuthenticated, isAdmin } = useAuth()
 const { t } = useLanguage()
@@ -39,6 +38,10 @@ const isInputFocused = ref(false)
 const openFaqId = ref(null)
 const dbFaqs = ref([])
 const popularSearches = ref([])
+
+function handleSearchFocusOut(event) {
+  if (!event.currentTarget.contains(event.relatedTarget)) isInputFocused.value = false
+}
 
 const defaultPopularSearches = ['Password Reset', 'VPN Setup', 'Hardware Request']
 const displayPopularSearches = computed(() => {
@@ -334,485 +337,934 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div
-    ref="mainScope"
-    class="page-home-unified-container min-h-screen bg-[#F8FAFC] dark:bg-slate-950 text-[#0F172A] dark:text-slate-100 py-6 sm:py-8 lg:py-10 px-3.5 sm:px-6 lg:px-8 transition-colors duration-200"
-  >
-    <!-- SHARED UNIFIED CONTAINER SYSTEM (max-w-[1200px] mx-auto w-full) -->
-    <main class="max-w-[1200px] mx-auto w-full flex flex-col gap-8 sm:gap-10 lg:gap-14">
-      <!-- 1. HERO SECTION: FOCAL SEARCH -->
-      <section class="flex flex-col items-center text-center w-full pt-1 pb-1 sm:pt-2 sm:pb-2">
-        <div
-          class="text-[10.5px] sm:text-xs font-black uppercase tracking-widest text-[#5D87FF] dark:text-indigo-400 mb-1.5 sm:mb-2 gsap-hero-el"
-        >
-          {{ t('hero_tag', 'Help Center') }}
-        </div>
+  <div ref="mainScope" class="help-home page-home-unified-container">
+    <main class="help-container">
+      <section class="help-hero" aria-labelledby="help-title">
+        <div class="hero-copy">
+          <span class="eyebrow gsap-hero-el"
+            ><span class="eyebrow-line"></span>{{ t('hero_tag') }}</span
+          >
+          <h1 id="help-title" class="gsap-hero-el">{{ t('hero_title') }}</h1>
+          <p class="hero-description gsap-hero-el">{{ t('hero_subtitle') }}</p>
 
-        <h1
-          class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-[#0F172A] dark:text-white tracking-tight leading-tight max-w-2xl px-1 gsap-hero-el"
-        >
-          {{ t('hero_title', 'What can we help you find?') }}
-        </h1>
-
-        <p
-          class="text-xs sm:text-sm text-[#64748B] dark:text-slate-400 font-medium leading-relaxed mt-2 max-w-md px-2 gsap-hero-el"
-        >
-          {{
-            t(
-              'hero_subtitle',
-              'Search our articles, troubleshooting guides, and IT knowledge base.',
-            )
-          }}
-        </p>
-
-        <!-- Focal Search Input Bar -->
-        <div class="w-full relative mt-5 sm:mt-6 max-w-2xl gsap-hero-el">
-          <form @submit.prevent="handleSearchSubmit" class="relative flex items-center">
-            <Search
-              class="absolute left-3.5 sm:left-4 w-4 h-4 sm:w-5 sm:h-5 text-[#5D87FF] pointer-events-none"
-            />
-            <input
-              v-model="localSearch"
-              @focus="isInputFocused = true"
-              type="text"
-              class="w-full h-12 sm:h-14 pl-10 sm:pl-12 pr-20 sm:pr-28 bg-white dark:bg-slate-900 border border-[#E5EAEF] dark:border-slate-800 rounded-xl text-xs sm:text-sm font-bold text-[#0F172A] dark:text-white placeholder-[#94A3B8] focus:border-[#5D87FF] focus:ring-2 focus:ring-[#5D87FF]/15 focus:outline-none transition-all shadow-sm"
-              :placeholder="t('search_placeholder', 'Search the knowledge base...')"
-              autocomplete="off"
-            />
-            <div
-              class="absolute right-1.5 sm:right-2 top-1/2 -translate-y-1/2 flex items-center gap-1"
-            >
+          <div
+            class="search-area gsap-hero-el"
+            @focusout="handleSearchFocusOut"
+            @keydown.esc="isInputFocused = false"
+          >
+            <form class="help-search" role="search" @submit.prevent="handleSearchSubmit">
+              <Search :size="21" aria-hidden="true" />
+              <input
+                v-model="localSearch"
+                type="search"
+                :aria-label="t('search_placeholder')"
+                :placeholder="t('search_placeholder')"
+                autocomplete="off"
+                @focus="isInputFocused = true"
+              />
               <button
                 v-if="localSearch"
                 type="button"
+                class="clear-search"
+                :aria-label="t('clear_search')"
                 @click="localSearch = ''"
-                class="p-1 text-[#7C8BAC] hover:text-[#0F172A] dark:hover:text-white rounded cursor-pointer"
               >
-                <X class="w-4 h-4" />
+                <X :size="18" />
               </button>
+              <button type="submit" class="search-submit">
+                {{ t('search_btn') }}<ArrowRight :size="16" aria-hidden="true" />
+              </button>
+            </form>
+            <div v-if="liveSuggestions.length && isInputFocused" class="search-suggestions">
               <button
-                type="submit"
-                class="h-8 sm:h-9 px-3.5 sm:px-5 bg-[#5D87FF] hover:bg-[#4570EA] text-white font-extrabold text-xs rounded-lg transition-colors cursor-pointer shadow-2xs active:scale-95 touch-manipulation"
+                v-for="suggestion in liveSuggestions"
+                :key="suggestion.id"
+                type="button"
+                @click="handlePopularClick(suggestion.title)"
               >
-                {{ t('search_btn', 'Search') }}
+                <Search :size="16" aria-hidden="true" />
+                <span>{{ suggestion.title }}</span
+                ><ArrowRight :size="16" aria-hidden="true" />
               </button>
             </div>
-          </form>
-
-          <!-- Live Command Autocomplete Dropdown -->
-          <div
-            v-if="liveSuggestions.length > 0 && isInputFocused"
-            class="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-slate-900 text-[#0F172A] dark:text-white rounded-xl shadow-xl overflow-hidden z-30 text-left divide-y divide-[#F1F5F9] dark:divide-slate-800 border border-[#E5EAEF] dark:border-slate-800"
-          >
-            <button
-              v-for="sug in liveSuggestions"
-              :key="sug.id"
-              @mousedown="
-                ($event) => {
-                  setSearch(sug.title)
-                  router.push('/cases')
-                }
-              "
-              class="w-full p-3 sm:p-3.5 hover:bg-[#ECF2FF] dark:hover:bg-slate-800 flex items-center justify-between text-xs transition-colors cursor-pointer"
-            >
-              <div class="flex items-center gap-2.5 truncate mr-2 min-w-0">
-                <Search class="w-4 h-4 text-[#5D87FF] shrink-0" />
-                <span class="font-extrabold truncate">{{ sug.title }}</span>
-              </div>
-              <span
-                class="px-2 py-0.5 rounded text-[9.5px] bg-[#ECF2FF] text-[#5D87FF] dark:bg-slate-800 dark:text-indigo-300 font-extrabold uppercase shrink-0"
+          </div>
+          <div class="popular-searches">
+            <span><TrendingUp :size="14" aria-hidden="true" />{{ t('popular_searches') }}</span>
+            <div>
+              <button
+                v-for="term in displayPopularSearches"
+                :key="term"
+                type="button"
+                @click="handlePopularClick(term)"
               >
-                {{ sug.category }}
-              </span>
-            </button>
+                {{ term }}
+              </button>
+            </div>
           </div>
         </div>
-
-        <!-- Popular Searches: Clean, Balanced Mobile & Desktop Layout -->
-        <div
-          class="w-full mt-2.5 sm:mt-4 flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-2 px-2"
-        >
-          <!-- Label with Trending Icon -->
-          <div
-            class="flex items-center gap-1.5 text-[11px] sm:text-xs font-semibold text-[#7C8BAC] dark:text-slate-400 shrink-0"
-          >
-            <TrendingUp class="w-3.5 h-3.5 text-[#5D87FF] shrink-0" />
-            <span>{{ t('popular_searches', 'Popular searches') }}:</span>
+        <aside class="hero-help gsap-assistance">
+          <div class="support-icon">
+            <Ticket :size="25" :stroke-width="1.6" aria-hidden="true" />
           </div>
-
-          <!-- Chips Pill Group -->
-          <div class="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 max-w-full">
-            <button
-              v-for="term in displayPopularSearches"
-              :key="term"
-              @click="handlePopularClick(term)"
-              class="inline-flex items-center px-2.5 sm:px-3 py-1 rounded-full bg-slate-100/90 dark:bg-slate-800/90 hover:bg-[#ECF2FF] dark:hover:bg-[#5D87FF]/20 border border-slate-200/80 dark:border-slate-700/60 text-[#475569] dark:text-slate-300 hover:text-[#5D87FF] dark:hover:text-[#5D87FF] hover:border-[#5D87FF]/40 text-[11px] sm:text-xs font-semibold shadow-2xs active:scale-95 transition-all cursor-pointer touch-manipulation"
-            >
-              <span>{{ term }}</span>
-            </button>
-          </div>
-        </div>
-      </section>
-
-      <!-- 2. BROWSE TOPICS: 3-COLUMN CARD GRID -->
-      <section class="space-y-3.5 sm:space-y-4 w-full">
-        <div
-          class="flex items-center justify-between gap-2 border-b border-[#E5EAEF] dark:border-slate-800 pb-2.5 sm:pb-3"
-        >
-          <h2
-            class="text-xs font-black uppercase tracking-wider text-[#7C8BAC] dark:text-slate-400 truncate"
-          >
-            {{ t('browse_topics', 'Browse topics') }}
-          </h2>
-          <button
-            @click="router.push('/cases')"
-            class="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-[11px] sm:text-xs font-extrabold text-[#5D87FF] bg-[#ECF2FF] dark:bg-slate-800 dark:text-indigo-300 hover:bg-[#5D87FF] hover:text-white dark:hover:bg-[#5D87FF] dark:hover:text-white transition-all duration-200 cursor-pointer shadow-2xs group shrink-0 active:scale-95 touch-manipulation"
-          >
-            <span>{{ t('view_all_articles', 'Lihat Semua Artikel') }}</span>
-            <ArrowRight class="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+          <h2>{{ t('need_assistance_title') }}</h2>
+          <p>{{ t('need_assistance_desc') }}</p>
+          <button class="support-button" type="button" @click="handleSupportTicketAction">
+            {{
+              !isAuthenticated
+                ? t('sign_in_to_submit')
+                : isAdmin
+                  ? t('go_to_dashboard')
+                  : t('submit_ticket')
+            }}
+            <ArrowRight :size="17" aria-hidden="true" />
           </button>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-6 w-full">
-          <div
-            v-for="card in topicCards"
-            :key="card.title"
-            @click="handleCategoryNavigate(card.id)"
-            :class="[
-              card.isFeatured
-                ? 'bg-[#5D87FF] text-white shadow-lg shadow-[#5D87FF]/25 border border-[#5D87FF]'
-                : 'bg-white dark:bg-slate-900 border border-[#E5EAEF] dark:border-slate-800 text-[#0F172A] dark:text-white shadow-2xs hover:shadow-md hover:border-[#5D87FF]',
-              'rounded-2xl p-4.5 sm:p-7 text-center flex flex-col items-center justify-between gap-3.5 sm:gap-5 transition-all duration-200 cursor-pointer group hover:scale-[1.01] active:scale-[0.99] touch-manipulation gsap-topic-card',
-            ]"
-          >
-            <!-- Icon Box -->
-            <div
-              :class="[
-                card.isFeatured
-                  ? 'bg-white/20 text-white'
-                  : 'bg-[#ECF2FF] dark:bg-slate-800 text-[#5D87FF] dark:text-indigo-400 group-hover:bg-[#5D87FF] group-hover:text-white',
-                'w-11 h-11 sm:w-12 sm:h-12 rounded-full flex items-center justify-center transition-colors shrink-0',
-              ]"
+          <div class="support-hours">
+            <Clock :size="14" aria-hidden="true" /><span
+              >{{ t('work_days') }} · {{ t('work_hours') }}</span
             >
-              <component :is="card.icon" class="w-5 h-5 sm:w-6 sm:h-6" />
-            </div>
-
-            <!-- Title & Description -->
-            <div class="space-y-1 sm:space-y-1.5 max-w-xs">
-              <h3
-                :class="[
-                  card.isFeatured
-                    ? 'text-white'
-                    : 'text-[#0F172A] dark:text-white group-hover:text-[#5D87FF]',
-                  'text-sm sm:text-base font-extrabold transition-colors',
-                ]"
-              >
-                {{ card.title }}
-              </h3>
-              <p
-                :class="[
-                  card.isFeatured ? 'text-white/90' : 'text-[#64748B] dark:text-slate-400',
-                  'text-xs font-medium leading-relaxed',
-                ]"
-              >
-                {{ card.description }}
-              </p>
-            </div>
-
-            <!-- Learn More Link -->
-            <div
-              :class="[
-                card.isFeatured ? 'text-white' : 'text-[#5D87FF]',
-                'text-xs font-black inline-flex items-center gap-1.5 group-hover:translate-x-1 transition-transform min-h-[32px]',
-              ]"
-            >
-              <span>{{ t('learn_more', 'Learn More') }}</span>
-              <ArrowRight class="w-3.5 h-3.5" />
-            </div>
           </div>
-        </div>
+        </aside>
       </section>
 
-      <!-- 3. FEATURED CONTENT: NUMBERED EDITORIAL ARTICLE LIST -->
-      <section v-if="featuredSopList.length > 0" class="space-y-3 w-full">
-        <div
-          class="flex items-center justify-between gap-2 border-b border-[#E5EAEF] dark:border-slate-800 pb-2.5 sm:pb-3"
-        >
-          <h2
-            class="text-xs font-black uppercase tracking-wider text-[#7C8BAC] dark:text-slate-400 truncate"
-          >
-            {{ t('featured_articles', 'Featured Articles') }}
-          </h2>
-          <button
-            @click="router.push('/cases')"
-            class="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-[11px] sm:text-xs font-extrabold text-[#5D87FF] bg-[#ECF2FF] dark:bg-slate-800 dark:text-indigo-300 hover:bg-[#5D87FF] hover:text-white dark:hover:bg-[#5D87FF] dark:hover:text-white transition-all duration-200 cursor-pointer shadow-2xs group shrink-0 active:scale-95 touch-manipulation"
-          >
-            <span>{{ t('view_all_articles', 'View all Articles') }}</span>
-            <ArrowRight class="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
-          </button>
-        </div>
-
-        <div
-          class="bg-white dark:bg-slate-900 border border-[#E5EAEF] dark:border-slate-800 rounded-2xl divide-y divide-[#F1F5F9] dark:divide-slate-800 shadow-2xs overflow-hidden w-full"
-        >
-          <div
-            v-for="sop in featuredSopList"
-            :key="sop.id"
-            @click="
-              ($event) => {
-                setSearch(sop.title)
-                router.push('/cases')
-              }
-            "
-            class="p-3.5 sm:p-5 hover:bg-[#F8FAFC] dark:hover:bg-slate-800/60 transition-colors flex items-center justify-between gap-3 sm:gap-4 cursor-pointer group gsap-sop-item active:bg-slate-50 dark:active:bg-slate-800/80 touch-manipulation"
-          >
-            <div class="flex items-center gap-2.5 sm:gap-3.5 min-w-0 flex-1">
-              <span
-                class="text-xs font-mono font-bold text-[#94A3B8] dark:text-slate-500 shrink-0 w-5"
-                >{{ sop.num }}</span
-              >
-              <div class="min-w-0 flex-1">
-                <h3
-                  class="text-xs sm:text-sm font-extrabold text-[#0F172A] dark:text-white group-hover:text-[#5D87FF] transition-colors leading-snug break-words"
-                >
-                  {{ sop.title }}
-                </h3>
-                <div
-                  class="flex items-center gap-2 text-xs text-[#64748B] dark:text-slate-400 font-medium mt-1"
-                >
-                  <span
-                    class="px-1.5 py-0.2 rounded text-[10px] font-extrabold uppercase bg-[#ECF2FF] text-[#5D87FF] dark:bg-indigo-950/60 dark:text-indigo-300 truncate max-w-[140px]"
-                  >
-                    {{ sop.category }}
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            <ArrowRight
-              class="w-4 h-4 text-[#7C8BAC] group-hover:text-[#5D87FF] group-hover:translate-x-1 transition-all shrink-0"
-            />
-          </div>
-        </div>
-      </section>
-
-      <!-- 4. FAQ: MODERN MINIMALIST SAAS-STYLE ACCORDION -->
-      <section class="space-y-3.5 sm:space-y-4 w-full">
-        <div
-          class="flex items-center justify-between border-b border-[#E5EAEF] dark:border-slate-800 pb-2.5 sm:pb-3"
-        >
+      <section aria-labelledby="topics-title" class="topics-section">
+        <div class="section-heading">
           <div>
-            <div
-              class="text-[10px] sm:text-[11px] font-black uppercase tracking-widest text-[#5D87FF] dark:text-indigo-400"
-            >
-              {{ t('faq_tag', 'FREQUENTLY ASKED QUESTIONS') }}
-            </div>
-            <h2
-              class="text-lg sm:text-2xl font-black text-[#0F172A] dark:text-white tracking-tight mt-0.5"
-            >
-              {{ t('faq_title', 'Pertanyaan Umum & Troubleshooting') }}
-            </h2>
+            <span class="section-kicker">{{ t('help_center') }}</span>
+            <h2 id="topics-title">{{ t('browse_topics') }}</h2>
           </div>
+          <RouterLink to="/cases" class="text-link"
+            >{{ t('view_all_articles') }}<ArrowRight :size="16" aria-hidden="true"
+          /></RouterLink>
         </div>
-
-        <div
-          class="bg-white dark:bg-slate-900 border border-[#E5EAEF] dark:border-slate-800 rounded-2xl p-1.5 sm:p-6 shadow-2xs divide-y divide-[#F1F5F9] dark:divide-slate-800 w-full"
-        >
-          <div
-            v-for="faq in faqs"
-            :key="faq.id"
-            class="py-3.5 sm:py-5 px-2.5 sm:px-4 transition-colors"
+        <div class="topic-grid">
+          <button
+            v-for="(card, index) in topicCards"
+            :key="card.id"
+            type="button"
+            class="topic-card gsap-topic-card"
+            :class="{ 'topic-featured': card.isFeatured }"
+            @click="handleCategoryNavigate(card.id)"
           >
-            <button
-              @click="toggleFaq(faq.id)"
-              class="w-full flex justify-between items-start sm:items-center text-left group cursor-pointer focus:outline-none min-h-[44px] gap-2 touch-manipulation"
+            <span class="topic-icon" :class="`topic-tone-${index % 3}`"
+              ><component :is="card.icon" :size="23" :stroke-width="1.7" aria-hidden="true"
+            /></span>
+            <span class="topic-copy"
+              ><span class="topic-title">{{ card.title }}</span
+              ><span class="topic-description">{{ card.description }}</span></span
             >
-              <div
-                class="flex items-start sm:items-center gap-2.5 sm:gap-3.5 pr-2 sm:pr-4 min-w-0 flex-1"
-              >
-                <span
-                  class="w-6 h-6 rounded-lg bg-[#ECF2FF] dark:bg-slate-800 text-[#5D87FF] dark:text-indigo-300 font-mono font-extrabold text-xs flex items-center justify-center shrink-0 mt-0.5 sm:mt-0 group-hover:bg-[#5D87FF] group-hover:text-white transition-colors"
-                >
-                  {{ faq.num }}
-                </span>
-                <span
-                  class="text-xs sm:text-sm font-extrabold text-[#0F172A] dark:text-white group-hover:text-[#5D87FF] transition-colors leading-snug break-words"
-                >
-                  {{ faq.question }}
-                </span>
-              </div>
+            <ArrowRight :size="18" class="topic-arrow" aria-hidden="true" />
+          </button>
+        </div>
+      </section>
 
-              <div
-                :class="[
-                  openFaqId === faq.id
-                    ? 'bg-[#5D87FF] text-white rotate-180'
-                    : 'bg-[#F8FAFC] dark:bg-slate-800 text-[#7C8BAC] group-hover:bg-[#ECF2FF] group-hover:text-[#5D87FF]',
-                  'w-7 h-7 rounded-full flex items-center justify-center shrink-0 transition-all duration-200 mt-0.5 sm:mt-0',
-                ]"
-              >
-                <ChevronDown class="w-4 h-4 transition-transform duration-200" />
+      <div class="knowledge-grid">
+        <section class="articles-section" aria-labelledby="articles-title">
+          <div class="section-heading">
+            <div>
+              <span class="section-kicker">{{ t('knowledge_guides') }}</span>
+              <h2 id="articles-title">{{ t('featured_articles') }}</h2>
+            </div>
+          </div>
+          <div class="article-list">
+            <RouterLink
+              v-for="article in featuredSopList"
+              :key="article.id"
+              to="/cases"
+              @click="setSearch(article.title)"
+              class="article-row gsap-sop-item"
+            >
+              <span class="article-number">{{ article.num }}</span>
+              <div class="article-copy">
+                <span class="article-category">{{ article.category }}</span>
+                <h3>{{ article.title }}</h3>
+                <p v-if="article.summary">{{ article.summary }}</p>
               </div>
-            </button>
-
+              <ArrowRight :size="18" class="article-arrow" aria-hidden="true" />
+            </RouterLink>
             <div
-              v-if="openFaqId === faq.id"
-              class="mt-3 pl-3 sm:pl-9 pr-1 sm:pr-2 text-xs sm:text-sm text-[#475569] dark:text-slate-300 space-y-2.5 sm:space-y-3 font-medium border-l-2 border-[#5D87FF]/30 ml-2.5 sm:ml-3 pt-1"
+              v-if="isLoading && !featuredSopList.length"
+              class="article-empty"
+              role="status"
+              aria-busy="true"
             >
-              <p
-                v-if="faq.summary"
-                class="leading-relaxed font-bold text-[#0F172A] dark:text-slate-200 text-xs sm:text-sm"
-              >
-                {{ faq.summary }}
-              </p>
+              <p>{{ t('articles_loading') }}</p>
+            </div>
+            <div v-else-if="!featuredSopList.length" class="article-empty">
+              <HelpCircle :size="26" aria-hidden="true" />
+              <p>{{ t('articles_empty') }}</p>
+            </div>
+          </div>
+          <RouterLink class="all-articles" to="/cases"
+            >{{ t('view_all_sops') }}<ArrowRight :size="16" aria-hidden="true"
+          /></RouterLink>
+        </section>
 
-              <ol v-if="faq.steps" class="space-y-2 leading-relaxed text-xs">
-                <li
-                  v-for="(step, idx) in faq.steps"
-                  :key="idx"
-                  class="flex items-start gap-2 sm:gap-2.5"
+        <section class="faq-section" aria-labelledby="faq-title">
+          <div class="section-heading">
+            <div>
+              <span class="section-kicker">{{ t('faq_tag') }}</span>
+              <h2 id="faq-title">{{ t('faq_title') }}</h2>
+            </div>
+          </div>
+          <div class="faq-list">
+            <div
+              v-for="faq in faqs"
+              :key="faq.id"
+              class="faq-item"
+              :class="{ 'faq-open': openFaqId === faq.id }"
+            >
+              <h3>
+                <button
+                  type="button"
+                  :id="`question-${faq.id}`"
+                  :aria-expanded="openFaqId === faq.id"
+                  :aria-controls="`answer-${faq.id}`"
+                  @click="toggleFaq(faq.id)"
                 >
-                  <span
-                    class="w-4 h-4 rounded-full bg-[#ECF2FF] dark:bg-slate-800 text-[#5D87FF] font-extrabold text-[10px] flex items-center justify-center shrink-0 mt-0.5"
+                  <span>{{ faq.question }}</span
+                  ><ChevronDown :size="18" aria-hidden="true" />
+                </button>
+              </h3>
+              <div
+                v-if="openFaqId === faq.id"
+                :id="`answer-${faq.id}`"
+                role="region"
+                :aria-labelledby="`question-${faq.id}`"
+                class="faq-answer"
+              >
+                <p v-if="faq.summary">{{ faq.summary }}</p>
+                <ol v-if="faq.steps">
+                  <li v-for="(step, index) in faq.steps" :key="index">{{ step }}</li>
+                </ol>
+                <pre v-if="faq.code"><code>{{ faq.code }}</code></pre>
+                <div v-if="faq.isEmergency" class="faq-emergency">
+                  <strong
+                    ><AlertTriangle :size="16" aria-hidden="true" />{{ faq.emergencyTitle }}</strong
                   >
-                    {{ idx + 1 }}
-                  </span>
-                  <span class="flex-1 text-[#334155] dark:text-slate-300 font-medium break-words">{{
-                    step
-                  }}</span>
-                </li>
-              </ol>
-
-              <div
-                v-if="faq.code"
-                class="p-2.5 sm:p-3 bg-[#0F172A] text-emerald-400 rounded-xl font-mono text-[11px] sm:text-xs shadow-inner flex items-center justify-between gap-2 overflow-x-auto"
-              >
-                <code class="break-all sm:break-normal">{{ faq.code }}</code>
-                <span class="text-[9.5px] text-slate-500 font-bold uppercase shrink-0"
-                  >Command</span
-                >
-              </div>
-
-              <div
-                v-if="faq.isEmergency"
-                class="bg-rose-50 dark:bg-rose-950/40 text-rose-900 dark:text-rose-200 p-3 sm:p-4 rounded-xl border-l-4 border-rose-500 shadow-2xs space-y-1 text-xs"
-              >
-                <div
-                  class="flex items-center gap-1.5 font-black uppercase text-rose-600 dark:text-rose-400 text-[10.5px] sm:text-[11px] tracking-wider"
-                >
-                  <AlertTriangle class="w-4 h-4 shrink-0" />
-                  <span>{{ faq.emergencyTitle }}</span>
+                  <p>{{ faq.emergencyText }}</p>
+                  <p v-if="faq.details">{{ faq.details }}</p>
                 </div>
-                <p class="leading-relaxed font-bold text-xs">{{ faq.emergencyText }}</p>
-                <p
-                  v-if="faq.details"
-                  class="text-[11px] text-rose-700 dark:text-rose-300 font-medium opacity-90"
-                >
-                  {{ faq.details }}
-                </p>
-              </div>
-
-              <div v-if="faq.actionLink" class="pt-1">
                 <a
+                  v-if="faq.actionLink"
                   :href="faq.actionLink"
                   target="_blank"
                   rel="noopener noreferrer"
-                  class="bg-[#5D87FF] hover:bg-[#4570EA] text-white px-3.5 sm:px-4 py-2 rounded-xl text-xs font-extrabold inline-flex items-center gap-1.5 shadow-2xs transition-colors min-h-[40px] touch-manipulation active:scale-95"
-                >
-                  <span>{{ faq.actionText }}</span>
-                  <ExternalLink class="w-3.5 h-3.5" />
-                </a>
+                  class="text-link"
+                  >{{ faq.actionText }}<ExternalLink :size="14" aria-hidden="true"
+                /></a>
               </div>
             </div>
           </div>
-        </div>
-      </section>
-
-      <!-- 5. NEED PERSONAL ASSISTANCE SECTION (MINIMALIST SAAS STYLE) -->
-      <section
-        class="relative overflow-hidden bg-white dark:bg-slate-900 border border-[#E5EAEF] dark:border-slate-800 rounded-2xl sm:rounded-3xl p-5 sm:p-8 lg:p-10 shadow-2xs flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-6 sm:gap-8 w-full group hover:border-[#5D87FF]/30 transition-all duration-300 gsap-assistance"
-      >
-        <!-- Subtle Ambient Radial Light -->
-        <div
-          class="absolute -top-24 -right-24 w-72 h-72 bg-[#5D87FF]/5 dark:bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"
-        ></div>
-
-        <!-- Left Text & Action -->
-        <div class="flex-1 space-y-3.5 sm:space-y-4 max-w-xl text-left z-10">
-          <h2
-            class="text-xl sm:text-2xl lg:text-3xl font-extrabold text-[#0F172A] dark:text-white tracking-tight leading-tight"
-          >
-            {{ t('need_assistance_title', 'Need Personal Assistance?') }}
-          </h2>
-          <p
-            class="text-xs sm:text-sm text-[#64748B] dark:text-slate-400 font-medium leading-relaxed"
-          >
-            {{
-              t(
-                'need_assistance_desc',
-                "If you couldn't find the information you need, our IT support team is ready to assist you. Submit a ticket to contact support right away.",
-              )
-            }}
-          </p>
-
-          <div class="flex items-center pt-0.5 sm:pt-1">
-            <button
-              @click="handleSupportTicketAction"
-              class="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-6 py-3 rounded-xl bg-[#5D87FF] hover:bg-[#4570EA] text-white text-xs font-extrabold shadow-md shadow-[#5D87FF]/20 hover:shadow-lg hover:shadow-[#5D87FF]/30 active:scale-[0.98] transition-all duration-200 cursor-pointer group/btn min-h-[44px] touch-manipulation"
-            >
-              <Ticket class="w-4 h-4 group-hover/btn:rotate-12 transition-transform duration-200" />
-              <span>{{
-                !isAuthenticated
-                  ? t('sign_in_to_submit', 'Sign In to Submit a Ticket')
-                  : isAdmin
-                    ? t('go_to_dashboard', 'Go to Dashboard')
-                    : t('submit_ticket', 'Submit a Ticket')
-              }}</span>
-              <ArrowRight
-                class="w-3.5 h-3.5 group-hover/btn:translate-x-1 transition-transform duration-200"
-              />
-            </button>
-          </div>
-        </div>
-
-        <!-- Right Support Info Box (Sleek Minimalist SaaS Card, No Badges) -->
-        <div class="w-full lg:w-72 shrink-0 z-10">
-          <div
-            class="relative w-full bg-[#F8FAFC] dark:bg-slate-800/60 border border-[#E5EAEF] dark:border-slate-800 rounded-2xl p-4 sm:p-5 flex flex-col justify-between gap-3.5 sm:gap-5 group-hover:border-[#5D87FF]/30 transition-all duration-200"
-          >
-            <div class="flex items-center justify-between">
-              <div
-                class="w-10 h-10 rounded-xl bg-[#ECF2FF] dark:bg-slate-700/60 text-[#5D87FF] dark:text-indigo-300 flex items-center justify-center shadow-2xs shrink-0"
-              >
-                <Send class="w-5 h-5" />
-              </div>
-              <div
-                class="flex items-center gap-1.5 text-xs font-extrabold text-[#5D87FF] dark:text-indigo-300"
-              >
-                <span class="w-2 h-2 rounded-full bg-[#5D87FF] animate-pulse"></span>
-                <span>{{ t('active_support', 'Active Support') }}</span>
-              </div>
-            </div>
-
-            <div class="space-y-1 text-left">
-              <div class="text-xs font-extrabold text-[#0F172A] dark:text-white">
-                {{ t('it_helpdesk', 'IT Helpdesk Support') }}
-              </div>
-              <div
-                class="text-[11px] font-medium text-[#64748B] dark:text-slate-400 flex items-center gap-1.5"
-              >
-                <Clock class="w-3.5 h-3.5 text-[#5D87FF] shrink-0" />
-                <span>{{ t('work_days', 'Mon - Fri') }}</span>
-              </div>
-              <div
-                class="text-[11px] font-medium text-[#64748B] dark:text-slate-400 flex items-center gap-1.5"
-              >
-                <Clock class="w-3.5 h-3.5 text-[#5D87FF] shrink-0" />
-                <span>{{ t('work_hours', '08:30 - 17:30') }}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+        </section>
+      </div>
+      <footer class="help-footer">
+        <span>ESB TrackIT <span aria-hidden="true">/</span> {{ t('help_center') }}</span
+        ><span>{{ t('it_helpdesk') }}</span>
+      </footer>
     </main>
   </div>
 </template>
+
+<style scoped>
+.help-home {
+  --ink: #172b4d;
+  --muted: #64748b;
+  --line: #e1e7ef;
+  --surface: #fff;
+  --canvas: #f5f7fb;
+  --blue: #2563eb;
+  background: var(--canvas);
+  color: var(--ink);
+  padding: 28px 24px 0;
+}
+.help-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.help-home :is(button, a, input):focus-visible {
+  outline: 3px solid #60a5fa;
+  outline-offset: 4px;
+}
+.help-home button {
+  cursor: pointer;
+}
+.help-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 290px;
+  gap: 48px;
+  padding: 40px;
+  border-radius: 24px;
+  background: #142d52;
+  color: white;
+}
+.hero-copy {
+  min-width: 0;
+}
+.eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #b9cef2;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.eyebrow-line {
+  width: 24px;
+  height: 2px;
+  background: #7faaff;
+}
+.help-hero h1 {
+  max-width: 570px;
+  font-size: clamp(30px, 3.5vw, 46px);
+  line-height: 1.15;
+  font-weight: 750;
+  letter-spacing: -0.045em;
+  margin: 16px 0 12px;
+}
+.hero-description {
+  max-width: 470px;
+  font-size: 14px;
+  line-height: 1.75;
+  color: #bdcce1;
+}
+.search-area {
+  position: relative;
+  margin-top: 24px;
+  z-index: 10;
+}
+.help-search {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 7px 7px 7px 17px;
+  border-radius: 12px;
+  background: white;
+  color: #64748b;
+  box-shadow: 0 8px 24px #071b3726;
+}
+.help-search > svg {
+  flex-shrink: 0;
+}
+.help-search input {
+  min-width: 0;
+  flex: 1;
+  height: 42px;
+  color: #172b4d;
+  font-size: 14px;
+  outline: none;
+  background: transparent;
+}
+.help-search input::-webkit-search-cancel-button {
+  display: none;
+}
+.help-search:focus-within {
+  outline: 3px solid #8cb4ff;
+  outline-offset: 3px;
+}
+.help-search input:focus-visible {
+  outline: none;
+}
+.search-submit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 18px;
+  background: #2563eb;
+  color: white;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 650;
+}
+.search-submit:hover {
+  background: #1d4ed8;
+}
+.clear-search {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 28px;
+  height: 40px;
+}
+.search-suggestions {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 0;
+  right: 0;
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 6px;
+  box-shadow: 0 18px 35px #071b3726;
+}
+.search-suggestions button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 48px;
+  text-align: left;
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 13px;
+}
+.search-suggestions button:hover {
+  background: var(--canvas);
+}
+.search-suggestions span {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.search-suggestions svg {
+  flex-shrink: 0;
+}
+.popular-searches {
+  margin-top: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  font-size: 11px;
+  color: #bdcce1;
+}
+.popular-searches > span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.popular-searches > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.popular-searches button {
+  padding: 6px 10px;
+  border: 1px solid #ffffff26;
+  border-radius: 6px;
+  color: #dfebff;
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+.popular-searches button:hover {
+  background: #ffffff12;
+  border-color: #8cb4ff;
+}
+.hero-help {
+  border-left: 1px solid #ffffff26;
+  padding-left: 32px;
+  align-self: center;
+}
+.support-icon {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border: 1px solid #ffffff30;
+  border-radius: 14px;
+  color: #abc9ff;
+  margin-bottom: 18px;
+}
+.hero-help h2 {
+  font-size: 19px;
+  line-height: 1.4;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+}
+.hero-help p {
+  font-size: 12px;
+  line-height: 1.8;
+  color: #bdcce1;
+  margin: 10px 0 18px;
+}
+.support-button {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid #6b8bb8;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 650;
+  text-align: left;
+}
+.support-button:hover {
+  background: #ffffff10;
+}
+.support-button svg {
+  flex-shrink: 0;
+}
+.support-hours {
+  display: flex;
+  gap: 7px;
+  align-items: center;
+  font-size: 11px;
+  color: #bdcce1;
+  margin-top: 13px;
+}
+.topics-section {
+  margin-top: 32px;
+}
+.section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 18px;
+}
+.section-kicker {
+  display: block;
+  font-size: 10px;
+  font-weight: 650;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.section-heading h2 {
+  font-size: 21px;
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  line-height: 1.35;
+}
+.text-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--blue);
+  font-size: 12px;
+  font-weight: 650;
+  min-height: 44px;
+}
+.text-link svg {
+  flex-shrink: 0;
+}
+.text-link:hover {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.topic-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+.topic-card {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  text-align: left;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  padding: 22px;
+  border-radius: 14px;
+  transition:
+    border-color 0.18s,
+    box-shadow 0.18s;
+}
+.topic-card:hover {
+  border-color: #93b4f2;
+  box-shadow: 0 5px 18px #172b4d09;
+}
+.topic-featured {
+  border-top: 3px solid #7c9def;
+  padding-top: 20px;
+}
+.topic-icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  flex-shrink: 0;
+}
+.topic-tone-0 {
+  background: #edf3ff;
+  color: #2563eb;
+}
+.topic-tone-1 {
+  background: #f1edff;
+  color: #7754c4;
+}
+.topic-tone-2 {
+  background: #e9f6f2;
+  color: #19836c;
+}
+.topic-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  padding-right: 4px;
+}
+.topic-title {
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.45;
+}
+.topic-description {
+  font-size: 12px;
+  line-height: 1.8;
+  color: var(--muted);
+}
+.topic-arrow {
+  position: absolute;
+  right: 14px;
+  top: 16px;
+  color: #8fa2ba;
+  width: 14px;
+}
+.knowledge-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: start;
+  gap: 36px;
+  margin-top: 38px;
+}
+.article-list {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  overflow: hidden;
+}
+.article-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 21px;
+  border-bottom: 1px solid var(--line);
+}
+.article-row:last-child {
+  border-bottom: 0;
+}
+.article-row:hover {
+  background: var(--canvas);
+}
+.article-number {
+  font-size: 12px;
+  font-weight: 550;
+  color: #8c9bb0;
+  font-variant-numeric: tabular-nums;
+  padding-top: 3px;
+}
+.article-copy {
+  min-width: 0;
+  flex: 1;
+}
+.article-category {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--blue);
+  font-weight: 600;
+}
+.article-copy h3 {
+  font-size: 14px;
+  line-height: 1.6;
+  font-weight: 650;
+  margin-top: 4px;
+  overflow-wrap: anywhere;
+}
+.article-copy p {
+  font-size: 12px;
+  line-height: 1.7;
+  color: var(--muted);
+  margin-top: 5px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.article-arrow {
+  margin-top: 18px;
+  color: #8fa2ba;
+  flex-shrink: 0;
+}
+.article-empty {
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  padding: 36px 20px;
+  color: var(--muted);
+  font-size: 13px;
+  text-align: center;
+}
+.all-articles {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  color: var(--blue);
+  font-size: 12px;
+  font-weight: 650;
+  margin-top: 8px;
+  border-radius: 8px;
+}
+.all-articles:hover {
+  background: var(--surface);
+}
+.faq-list {
+  border-top: 1px solid var(--line);
+}
+.faq-item {
+  border-bottom: 1px solid var(--line);
+}
+.faq-item h3 {
+  margin: 0;
+}
+.faq-item h3 button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  width: 100%;
+  padding: 22px 0;
+  text-align: left;
+  font-size: 13px;
+  line-height: 1.7;
+  font-weight: 600;
+}
+.faq-item h3 svg {
+  flex-shrink: 0;
+  color: #8092ab;
+  transition: transform 0.2s;
+}
+.faq-open h3 button {
+  color: var(--blue);
+}
+.faq-open h3 svg {
+  transform: rotate(180deg);
+}
+.faq-answer {
+  padding: 0 6px 22px 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.8;
+  overflow-wrap: anywhere;
+}
+.faq-answer > * + * {
+  margin-top: 14px;
+}
+.faq-answer ol {
+  list-style: decimal;
+  padding-left: 20px;
+}
+.faq-answer li + li {
+  margin-top: 9px;
+}
+.faq-answer pre {
+  background: #142d52;
+  color: #c5f2e1;
+  padding: 13px;
+  border-radius: 8px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.faq-emergency {
+  background: #fff1f2;
+  color: #9f1239;
+  border-radius: 10px;
+  padding: 14px;
+}
+.faq-emergency strong {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.faq-emergency p {
+  margin-top: 6px;
+}
+.help-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 24px 0;
+  margin-top: 36px;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 11px;
+}
+.help-footer span span {
+  margin: 0 9px;
+  color: #a3b0c0;
+}
+:global(.dark) .help-home {
+  --ink: #e2e8f0;
+  --muted: #a3b1c6;
+  --line: #2a3b53;
+  --surface: #142136;
+  --canvas: #0d1728;
+  --blue: #93b4ff;
+}
+.help-home :is(section, aside) {
+  min-width: 0;
+}
+@media (max-width: 1050px) {
+  .help-hero {
+    gap: 28px;
+    padding: 30px;
+    grid-template-columns: minmax(0, 1fr) 240px;
+  }
+  .hero-help {
+    padding-left: 25px;
+  }
+  .topic-card {
+    flex-direction: column;
+    padding: 20px;
+  }
+  .topic-featured {
+    padding-top: 18px;
+  }
+  .knowledge-grid {
+    gap: 26px;
+  }
+}
+@media (max-width: 767px) {
+  .help-home {
+    padding: 18px 16px 0;
+  }
+  .help-hero {
+    grid-template-columns: 1fr;
+    padding: 25px 22px;
+    border-radius: 18px;
+    gap: 26px;
+  }
+  .hero-help {
+    border-left: 0;
+    border-top: 1px solid #ffffff26;
+    padding: 20px 0 0;
+  }
+  .support-icon,
+  .hero-help p {
+    display: none;
+  }
+  .hero-help h2 {
+    font-size: 15px;
+    margin-bottom: 12px;
+  }
+  .support-button {
+    width: auto;
+    min-width: 200px;
+  }
+  .help-hero h1 {
+    font-size: 34px;
+    max-width: 450px;
+  }
+  .hero-description {
+    font-size: 13px;
+  }
+  .help-search {
+    gap: 7px;
+    padding-left: 11px;
+  }
+  .help-search input {
+    font-size: 16px;
+    width: 100%;
+  }
+  .search-submit {
+    padding: 0 13px;
+  }
+  .search-submit svg {
+    display: none;
+  }
+  .popular-searches {
+    gap: 10px;
+  }
+  .popular-searches button {
+    min-height: 36px;
+  }
+  .topic-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  .topic-card {
+    flex-direction: row;
+    padding: 18px;
+    gap: 14px;
+  }
+  .topic-featured {
+    border-top: 1px solid var(--line);
+    border-left: 3px solid #7c9def;
+    padding-left: 16px;
+  }
+  .topic-description {
+    font-size: 12px;
+  }
+  .topic-title {
+    padding-right: 12px;
+  }
+  .topic-arrow {
+    top: 22px;
+  }
+  .knowledge-grid {
+    grid-template-columns: 1fr;
+    gap: 30px;
+    margin-top: 30px;
+  }
+  .section-heading {
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+  .section-heading h2 {
+    font-size: 19px;
+  }
+  .section-heading > .text-link {
+    font-size: 11px;
+    max-width: 135px;
+    line-height: 1.5;
+  }
+  .section-kicker {
+    font-size: 9px;
+  }
+  .topics-section {
+    margin-top: 26px;
+  }
+  .article-row {
+    padding: 18px;
+    gap: 13px;
+  }
+  .help-footer {
+    flex-wrap: wrap;
+    margin-top: 26px;
+    padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+  }
+}
+@media (max-width: 380px) {
+  .help-home {
+    padding: 12px 12px 0;
+  }
+  .help-hero {
+    padding: 22px 16px;
+  }
+  .help-hero h1 {
+    font-size: 30px;
+  }
+  .help-search > svg {
+    width: 17px;
+  }
+  .search-submit {
+    padding: 0 10px;
+  }
+  .topic-icon {
+    width: 38px;
+    height: 38px;
+  }
+  .topic-card {
+    gap: 11px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .help-home *,
+  .help-home *::before {
+    transition: none !important;
+  }
+}
+</style>

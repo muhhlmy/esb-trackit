@@ -1,6 +1,6 @@
 <script setup>
 defineOptions({ name: 'AppNavbar' })
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, watch, onMounted, onUnmounted } from 'vue'
 import { useRouter, useRoute, RouterLink } from 'vue-router'
 import { useAuth } from '@/composables/useAuth'
 import { useLanguage } from '@/composables/useLanguage'
@@ -8,7 +8,6 @@ import {
   Search,
   LogIn,
   LogOut,
-  ShieldCheck,
   Ticket,
   LayoutDashboard,
   ChevronDown,
@@ -20,266 +19,487 @@ const router = useRouter()
 const route = useRoute()
 const { isAuthenticated, user, isAdmin, logout } = useAuth()
 const { currentLang, setLanguage, t } = useLanguage()
-
 const isProfileOpen = ref(false)
-
-function handleLogoClick() {
-  router.push('/')
-}
-
-function toggleProfileMenu() {
-  isProfileOpen.value = !isProfileOpen.value
-}
+const profileRoot = ref(null)
+const profileTrigger = ref(null)
 
 function closeProfileMenu() {
   isProfileOpen.value = false
 }
-
 function handleLogout() {
   closeProfileMenu()
   logout()
   router.push('/login')
 }
-
-function handleKeydown(e) {
-  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
-    e.preventDefault()
+function handlePointerDown(event) {
+  if (!profileRoot.value?.contains(event.target)) closeProfileMenu()
+}
+function handleProfileFocusOut(event) {
+  if (!event.currentTarget.contains(event.relatedTarget)) closeProfileMenu()
+}
+function handleKeydown(event) {
+  if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
+    event.preventDefault()
     router.push('/cases')
-  } else if (e.key === 'Escape') {
+  } else if (event.key === 'Escape' && isProfileOpen.value) {
     closeProfileMenu()
+    profileTrigger.value?.focus()
   }
 }
-
+watch(() => route.fullPath, closeProfileMenu)
 onMounted(() => {
   window.addEventListener('keydown', handleKeydown)
+  document.addEventListener('pointerdown', handlePointerDown)
 })
-
 onUnmounted(() => {
   window.removeEventListener('keydown', handleKeydown)
+  document.removeEventListener('pointerdown', handlePointerDown)
 })
 </script>
 
 <template>
-  <header
-    class="sticky top-0 z-40 w-full border-b border-[#E5EAEF] dark:border-slate-800 bg-white/95 dark:bg-[#0F172A]/95 backdrop-blur-md text-[#0F172A] dark:text-white transition-colors duration-200 px-4 sm:px-6 lg:px-8 select-none"
-  >
-    <div class="max-w-[1200px] mx-auto w-full h-16 flex items-center justify-between gap-4">
-      <!-- Left Branding: ESB TrackIT Help Center -->
-      <div class="flex items-center gap-4 min-w-0">
-        <button
-          @click="handleLogoClick"
-          class="flex items-center gap-2 sm:gap-2.5 group focus:outline-none select-none text-left cursor-pointer min-w-0"
+  <header class="help-navbar">
+    <nav class="navbar-inner" aria-label="Help Center">
+      <RouterLink to="/" class="navbar-brand" aria-label="ESB TrackIT Help Center">
+        <img src="/ESB Logo Only.svg" alt="" class="brand-logo" />
+        <span class="brand-wordmark"
+          >TrackIT<span class="brand-mobile-caption">Help Center</span></span
         >
-          <img
-            src="/ESB Logo Only.svg"
-            alt="ESB Logo"
-            class="h-5 w-auto object-contain shrink-0 group-hover:scale-105 transition-transform"
-          />
-          <div class="flex items-center gap-1.5 sm:gap-2 min-w-0">
-            <span
-              class="font-extrabold text-[#0F172A] dark:text-white tracking-tight text-xs sm:text-sm group-hover:text-[#5D87FF] transition-colors truncate"
-              >ESB TrackIT</span
-            >
-            <span
-              class="hidden sm:inline-block text-[10px] text-[#64748B] dark:text-slate-400 font-extrabold uppercase tracking-wider bg-[#F1F5F9] dark:bg-slate-800 px-2 py-0.5 rounded border border-[#E5EAEF] dark:border-slate-700/80 shrink-0"
-            >
-              Help Center
-            </span>
-          </div>
-        </button>
-      </div>
+        <span class="brand-divider" aria-hidden="true"></span>
+        <span class="brand-caption">Help Center</span>
+      </RouterLink>
 
-      <!-- Right Actions: Quick Search, Auth Profile / Sign In, Theme Toggle -->
-      <div class="flex items-center gap-2 sm:gap-3 shrink-0">
-        <!-- Search Trigger Hint -->
-        <RouterLink
-          to="/cases"
-          class="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#F8FAFC] dark:bg-slate-800/80 border border-[#E5EAEF] dark:border-slate-700 text-[#64748B] dark:text-slate-400 text-xs hover:border-[#5D87FF] transition-all"
-        >
-          <Search class="w-3.5 h-3.5" />
-          <span>{{ t('search_placeholder_nav', 'Cari panduan & artikel...') }}</span>
-          <kbd
-            class="px-1.5 py-0.5 text-[10px] font-mono font-bold bg-white dark:bg-slate-700 rounded border border-[#E5EAEF] dark:border-slate-600 text-[#64748B] dark:text-slate-300"
-            >Ctrl K</kbd
-          >
+      <div class="navbar-actions">
+        <RouterLink to="/cases" class="navbar-search" :aria-label="t('search_placeholder_nav')">
+          <Search :size="17" aria-hidden="true" />
+          <span>{{ t('search_placeholder_nav') }}</span>
+          <kbd>Ctrl K</kbd>
         </RouterLink>
-
-        <!-- Dashboard -->
+        <label v-if="route.path === '/'" class="navbar-language">
+          <Globe :size="16" aria-hidden="true" />
+          <span class="sr-only">Bahasa / Language</span>
+          <select :value="currentLang" @change="setLanguage($event.target.value)">
+            <option value="id">ID</option>
+            <option value="en">EN</option>
+          </select>
+          <ChevronDown :size="12" class="language-chevron" aria-hidden="true" />
+        </label>
+        <span class="action-divider" aria-hidden="true"></span>
         <RouterLink
-          v-if="isAuthenticated"
-          :to="isAdmin ? '/dashboard' : '/my-assets'"
-          class="hidden md:flex p-2 rounded-xl text-[#64748B] dark:text-slate-400 hover:bg-[#F1F5F9] dark:hover:bg-slate-800 hover:text-[#5D87FF] transition-colors cursor-pointer min-h-[38px] min-w-[38px] items-center justify-center touch-manipulation"
-          :title="t('dashboard', 'Dashboard')"
+          v-if="!isAuthenticated"
+          :to="{ path: '/login', query: { redirect: route.fullPath } }"
+          class="navbar-signin"
         >
-          <LayoutDashboard class="w-4 h-4" />
+          <span>{{ t('sign_in') }}</span
+          ><LogIn :size="16" aria-hidden="true" />
         </RouterLink>
-
-        <!-- AUTH STATE DEPENDENT PROFILE / SIGN IN BUTTON -->
-
-        <!-- 1. VISITOR / NOT LOGGED IN: Sign In Button -->
-        <template v-if="!isAuthenticated">
-          <RouterLink
-            :to="{ path: '/login', query: { redirect: route.fullPath } }"
-            class="px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-xs font-extrabold bg-[#5D87FF] hover:bg-[#4570EA] text-white shadow-md shadow-[#5D87FF]/20 hover:shadow-lg transition-all flex items-center gap-1.5 cursor-pointer min-h-[38px] touch-manipulation active:scale-95"
+        <div v-else ref="profileRoot" class="navbar-profile" @focusout="handleProfileFocusOut">
+          <button
+            ref="profileTrigger"
+            type="button"
+            class="profile-trigger"
+            :aria-label="t('account_menu')"
+            :aria-expanded="isProfileOpen"
+            aria-controls="navbar-account"
+            @click="isProfileOpen = !isProfileOpen"
           >
-            <LogIn class="w-3.5 h-3.5" />
-            <span>{{ t('sign_in', 'Sign In') }}</span>
-          </RouterLink>
-        </template>
-
-        <!-- 2. AUTHENTICATED USER / ADMIN: Identity Dropdown -->
-        <template v-else>
-          <div class="relative">
-            <button
-              @click="toggleProfileMenu"
-              class="flex items-center gap-2 p-1 sm:p-1.5 pr-2 sm:pr-2.5 rounded-full border border-slate-200/80 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 hover:bg-slate-50 dark:hover:bg-slate-800/90 hover:border-slate-300 dark:hover:border-slate-700 shadow-2xs hover:shadow-xs transition-all duration-200 cursor-pointer text-xs group min-h-[38px]"
-            >
-              <!-- Avatar Circle -->
-              <div
-                class="w-6 h-6 rounded-full bg-gradient-to-tr from-[#5D87FF] to-[#3662E3] text-white text-[11px] font-black flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform shrink-0"
-              >
-                {{
-                  user?.nama || user?.name
-                    ? (user?.nama || user?.name).charAt(0).toUpperCase()
-                    : 'U'
-                }}
-              </div>
-
-              <span
-                class="font-semibold text-slate-800 dark:text-slate-200 max-w-[130px] truncate hidden sm:inline-block tracking-tight"
-              >
-                {{ user?.nama || user?.name || 'User' }}
-              </span>
-
-              <!-- Admin Indicator Badge -->
-              <span
-                v-if="isAdmin"
-                class="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20 dark:border-amber-400/20"
-              >
-                <ShieldCheck class="w-2.5 h-2.5" />
-                <span>Admin</span>
-              </span>
-
-              <ChevronDown
-                class="w-3.5 h-3.5 text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-transform duration-200"
-                :class="isProfileOpen ? 'rotate-180 text-[#5D87FF]' : ''"
-              />
-            </button>
-
-            <!-- Profile Dropdown Menu -->
-            <div
-              v-if="isProfileOpen"
-              class="absolute right-0 mt-2.5 w-60 rounded-2xl bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border border-slate-200/90 dark:border-slate-800/90 shadow-2xl shadow-slate-900/10 p-1.5 z-50 text-xs animate-in fade-in slide-in-from-top-2 duration-150"
-            >
-              <!-- User Identity Header -->
-              <div
-                class="p-3 rounded-xl bg-slate-50/80 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800/80 mb-1 space-y-0.5"
-              >
-                <p
-                  class="font-extrabold text-xs text-slate-900 dark:text-white truncate tracking-tight"
-                >
-                  {{ user?.nama || user?.name }}
-                </p>
-                <p
-                  class="text-[11px] font-medium text-slate-500 dark:text-slate-400 truncate leading-tight"
-                >
-                  {{ user?.email }}
-                </p>
-                <div class="pt-1.5 flex items-center gap-1">
-                  <span
-                    class="px-2 py-0.5 rounded-md text-[9.5px] font-black tracking-wider uppercase inline-block"
-                    :class="
-                      isAdmin
-                        ? 'bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20'
-                        : 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20'
-                    "
-                  >
-                    Role: {{ user?.role || 'User' }}
-                  </span>
-                </div>
-              </div>
-
-              <!-- Menu Items -->
-              <div class="space-y-0.5 py-1">
-                <!-- Regular User: My Asset & My Tickets -->
-                <RouterLink
-                  v-if="!isAdmin"
-                  to="/my-assets"
-                  @click="closeProfileMenu"
-                  class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100/90 dark:hover:bg-slate-800/80 hover:text-slate-900 dark:hover:text-white transition-all duration-150 group"
-                >
-                  <Laptop
-                    class="w-4 h-4 text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-200 group-hover:scale-110 transition-transform"
-                  />
-                  <span>{{ t('my_asset', 'My Asset') }}</span>
-                </RouterLink>
-
-                <RouterLink
-                  v-if="!isAdmin"
-                  to="/tickets"
-                  @click="closeProfileMenu"
-                  class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100/90 dark:hover:bg-slate-800/80 hover:text-slate-900 dark:hover:text-white transition-all duration-150 group"
-                >
-                  <Ticket
-                    class="w-4 h-4 text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-200 group-hover:scale-110 transition-transform"
-                  />
-                  <span>{{ t('my_tickets', 'My Tickets') }}</span>
-                </RouterLink>
-              </div>
-
-              <!-- Sign Out -->
-              <div class="pt-1 mt-0.5 border-t border-slate-100 dark:border-slate-800/80">
-                <button
-                  @click="handleLogout"
-                  class="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-500/10 hover:text-rose-700 dark:hover:text-rose-300 transition-all duration-150 cursor-pointer text-left group"
-                >
-                  <LogOut class="w-4 h-4 group-hover:scale-110 transition-transform" />
-                  <span>{{ t('sign_out', 'Sign Out') }}</span>
-                </button>
-              </div>
+            <span class="profile-avatar">{{
+              (user?.nama || user?.name || 'U').charAt(0).toUpperCase()
+            }}</span>
+            <span class="profile-name">{{ user?.nama || user?.name || 'User' }}</span>
+            <ChevronDown
+              :size="14"
+              class="profile-chevron"
+              :class="{ 'is-open': isProfileOpen }"
+              aria-hidden="true"
+            />
+          </button>
+          <div v-if="isProfileOpen" id="navbar-account" class="profile-dropdown">
+            <div class="profile-identity">
+              <strong>{{ user?.nama || user?.name || 'User' }}</strong>
+              <span>{{ user?.email }}</span>
+              <small>{{ user?.role || 'User' }}</small>
             </div>
-
-            <!-- Click Outside Overlay -->
-            <div v-if="isProfileOpen" @click="closeProfileMenu" class="fixed inset-0 z-40"></div>
+            <div class="profile-links">
+              <RouterLink v-if="isAdmin" to="/dashboard" @click="closeProfileMenu"
+                ><LayoutDashboard :size="17" aria-hidden="true" />{{ t('dashboard') }}</RouterLink
+              >
+              <template v-else>
+                <RouterLink to="/my-assets" @click="closeProfileMenu"
+                  ><Laptop :size="17" aria-hidden="true" />{{ t('my_asset') }}</RouterLink
+                >
+                <RouterLink to="/tickets" @click="closeProfileMenu"
+                  ><Ticket :size="17" aria-hidden="true" />{{ t('my_tickets') }}</RouterLink
+                >
+              </template>
+            </div>
+            <button type="button" class="profile-logout" @click="handleLogout">
+              <LogOut :size="17" aria-hidden="true" />{{ t('sign_out') }}
+            </button>
           </div>
-        </template>
+        </div>
       </div>
-    </div>
+    </nav>
   </header>
-
-  <!-- Floating Bottom-Right Language Switcher Pill -->
-  <div
-    v-if="route.path === '/'"
-    class="fixed bottom-[4.75rem] md:bottom-6 right-3.5 sm:right-6 z-40 flex items-center p-1 sm:p-1.5 rounded-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border border-[#E5EAEF] dark:border-slate-800 shadow-xl shadow-slate-900/15 text-xs font-black transition-all hover:scale-[1.03] select-none"
-  >
-    <div class="flex items-center gap-1.5 pl-2 pr-1.5 text-[#5D87FF] shrink-0">
-      <Globe class="w-4 h-4" />
-    </div>
-    <div class="flex items-center p-0.5 rounded-full bg-[#F1F5F9] dark:bg-slate-800">
-      <button
-        @click="setLanguage('id')"
-        class="px-2.5 py-1 rounded-full transition-all cursor-pointer text-[11px] min-h-[30px] flex items-center justify-center touch-manipulation"
-        :class="
-          currentLang === 'id'
-            ? 'bg-[#5D87FF] text-white shadow-2xs'
-            : 'text-[#64748B] dark:text-slate-400 hover:text-[#0F172A] dark:hover:text-white'
-        "
-        title="Bahasa Indonesia"
-      >
-        ID
-      </button>
-      <button
-        @click="setLanguage('en')"
-        class="px-2.5 py-1 rounded-full transition-all cursor-pointer text-[11px] min-h-[30px] flex items-center justify-center touch-manipulation"
-        :class="
-          currentLang === 'en'
-            ? 'bg-[#5D87FF] text-white shadow-2xs'
-            : 'text-[#64748B] dark:text-slate-400 hover:text-[#0F172A] dark:hover:text-white'
-        "
-        title="English"
-      >
-        EN
-      </button>
-    </div>
-  </div>
 </template>
+
+<style scoped>
+.help-navbar {
+  --nav-ink: #172b4d;
+  --nav-muted: #687a92;
+  --nav-line: #e5eaf1;
+  --nav-surface: #fff;
+  --nav-hover: #f4f7fb;
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  padding: 0 24px;
+  border-bottom: 1px solid var(--nav-line);
+  background: var(--nav-surface);
+  color: var(--nav-ink);
+}
+.navbar-inner {
+  max-width: 1200px;
+  min-height: 76px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 28px;
+}
+.help-navbar :is(a, button, select):focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 4px;
+}
+.navbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  flex-shrink: 0;
+  min-height: 44px;
+  border-radius: 6px;
+}
+.brand-logo {
+  width: 36px;
+  height: 28px;
+  object-fit: contain;
+}
+.brand-wordmark {
+  font-size: 19px;
+  line-height: 1.2;
+  letter-spacing: -0.05em;
+  font-weight: 750;
+}
+.brand-divider {
+  width: 1px;
+  height: 22px;
+  background: var(--nav-line);
+  margin: 0 6px;
+}
+.brand-caption {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--nav-muted);
+}
+.brand-mobile-caption {
+  display: none;
+}
+.navbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  min-width: 0;
+}
+.navbar-search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 40px;
+  padding: 0 12px;
+  border: 1px solid var(--nav-line);
+  border-radius: 8px;
+  background: var(--nav-hover);
+  color: var(--nav-muted);
+  font-size: 12px;
+  transition: border-color 0.15s;
+}
+.navbar-search:hover {
+  border-color: #96b3df;
+  color: var(--nav-ink);
+}
+.navbar-search span {
+  max-width: 210px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.navbar-search svg {
+  flex-shrink: 0;
+}
+.navbar-search kbd {
+  border: 1px solid var(--nav-line);
+  border-radius: 4px;
+  background: var(--nav-surface);
+  padding: 2px 5px;
+  font-size: 10px;
+  white-space: nowrap;
+}
+.navbar-language {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--nav-muted);
+  flex-shrink: 0;
+}
+.navbar-language select {
+  appearance: none;
+  min-height: 44px;
+  padding: 0 17px 0 5px;
+  background: transparent;
+  color: var(--nav-ink);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 6px;
+}
+.navbar-language option {
+  color: var(--nav-ink);
+  background: var(--nav-surface);
+}
+.language-chevron {
+  position: absolute;
+  right: 0;
+  pointer-events: none;
+}
+.action-divider {
+  width: 1px;
+  height: 24px;
+  background: var(--nav-line);
+  flex-shrink: 0;
+}
+.navbar-signin {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 42px;
+  padding: 0 17px;
+  border-radius: 8px;
+  background: #172f52;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.navbar-signin:hover {
+  background: #244673;
+}
+.navbar-profile {
+  position: relative;
+  flex-shrink: 0;
+}
+.profile-trigger {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 44px;
+  padding: 4px 0 4px 4px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.profile-trigger:hover {
+  background: var(--nav-hover);
+}
+.profile-avatar {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #e8effa;
+  color: #234b83;
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.profile-name {
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12px;
+  font-weight: 600;
+}
+.profile-chevron {
+  color: var(--nav-muted);
+  transition: transform 0.15s;
+}
+.profile-chevron.is-open {
+  transform: rotate(180deg);
+}
+.profile-dropdown {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 12px);
+  width: 264px;
+  max-width: calc(100vw - 32px);
+  padding: 7px;
+  border: 1px solid var(--nav-line);
+  border-radius: 12px;
+  background: var(--nav-surface);
+  box-shadow: 0 12px 35px #172b4d1a;
+}
+.profile-identity {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px;
+  border-bottom: 1px solid var(--nav-line);
+  overflow-wrap: anywhere;
+}
+.profile-identity strong {
+  font-size: 13px;
+  font-weight: 650;
+}
+.profile-identity span {
+  font-size: 11px;
+  color: var(--nav-muted);
+}
+.profile-identity small {
+  font-size: 10px;
+  color: var(--nav-muted);
+  text-transform: capitalize;
+  margin-top: 4px;
+}
+.profile-links {
+  padding: 5px 0;
+}
+.profile-links a,
+.profile-logout {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 12px;
+  border-radius: 7px;
+  text-align: left;
+}
+.profile-links a:hover {
+  background: var(--nav-hover);
+}
+.profile-logout {
+  color: #c2414b;
+  cursor: pointer;
+  border-top: 1px solid var(--nav-line);
+}
+.profile-logout:hover {
+  background: #fff1f2;
+}
+:global(.dark) .help-navbar {
+  --nav-ink: #e2e8f0;
+  --nav-muted: #a3b1c6;
+  --nav-line: #2a3b53;
+  --nav-surface: #142136;
+  --nav-hover: #1c2e48;
+}
+@media (max-width: 1023px) {
+  .navbar-inner {
+    gap: 20px;
+  }
+  .navbar-actions {
+    gap: 12px;
+  }
+  .navbar-search span {
+    max-width: 150px;
+  }
+  .navbar-search kbd {
+    display: none;
+  }
+  .brand-caption,
+  .brand-divider {
+    display: none;
+  }
+  .profile-name {
+    max-width: 100px;
+  }
+}
+@media (max-width: 767px) {
+  .help-navbar {
+    padding: 0 16px;
+  }
+  .navbar-inner {
+    min-height: 64px;
+    gap: 12px;
+  }
+  .navbar-brand {
+    gap: 8px;
+  }
+  .brand-logo {
+    width: 30px;
+    height: 24px;
+  }
+  .brand-wordmark {
+    font-size: 16px;
+  }
+  .brand-mobile-caption {
+    display: block;
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    color: var(--nav-muted);
+    margin-top: 4px;
+  }
+  .navbar-actions {
+    gap: 10px;
+  }
+  .navbar-search {
+    width: 40px;
+    min-height: 44px;
+    border: 0;
+    background: transparent;
+    padding: 0;
+    justify-content: center;
+  }
+  .navbar-search span,
+  .action-divider,
+  .profile-name,
+  .profile-chevron {
+    display: none;
+  }
+  .navbar-language > svg:first-child {
+    display: none;
+  }
+  .navbar-language select {
+    padding-left: 7px;
+  }
+  .navbar-signin {
+    min-height: 44px;
+    padding: 0 13px;
+    gap: 7px;
+  }
+  .navbar-signin svg {
+    display: none;
+  }
+  .profile-trigger {
+    min-width: 44px;
+    justify-content: center;
+    padding: 0;
+  }
+}
+@media (max-width: 420px) {
+  .navbar-search {
+    display: none;
+  }
+  .navbar-actions {
+    gap: 9px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .help-navbar * {
+    transition: none !important;
+  }
+}
+</style>

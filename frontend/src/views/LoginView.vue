@@ -1,6 +1,7 @@
 <script setup>
-import { ref, onMounted, onUnmounted, nextTick, watch } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, onMounted, onUnmounted, nextTick } from 'vue'
+import { RouterLink, useRouter } from 'vue-router'
+import { ArrowLeft, ArrowRight, Laptop, Ticket, BookOpen, CircleAlert, Mail, LockKeyhole, Eye, EyeOff, LoaderCircle } from 'lucide-vue-next'
 import { useAuth } from '@/composables/useAuth'
 import { useApi } from '@/composables/useApi'
 import { findFirstAllowedRoute } from '@/utils/permissionAccess.js'
@@ -10,7 +11,6 @@ const router = useRouter()
 const { login, user } = useAuth()
 const { post } = useApi()
 
-const isMounting = ref(true)
 const email = ref('')
 const password = ref('')
 const rememberMe = ref(false)
@@ -42,31 +42,11 @@ let expiryInterval = null
 const otpInputRefs = ref([])
 
 onMounted(() => {
-  const img = new Image()
-  img.src = '/ESB Logo.svg'
-  const finishMounting = () => {
-    setTimeout(() => {
-      isMounting.value = false
-    }, 120)
-  }
-  img.onload = finishMounting
-  img.onerror = finishMounting
-
-  setTimeout(() => {
-    if (isMounting.value) isMounting.value = false
-  }, 800)
+  if (window.matchMedia('(min-width: 768px) and (pointer: fine)').matches) emailInput.value?.focus()
 })
-
 onUnmounted(() => {
   clearInterval(resendInterval)
   clearInterval(expiryInterval)
-})
-
-watch(isMounting, async (mounting) => {
-  if (!mounting) {
-    await nextTick()
-    emailInput.value?.focus()
-  }
 })
 
 const EMAIL_FORMAT_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -296,325 +276,58 @@ const finishResetAndLogin = () => {
 </script>
 
 <template>
-  <!-- Outer Container - Exact 100dvh viewport on desktop, scrollable min-h-dvh on mobile -->
-  <div
-    class="min-h-screen min-h-dvh md:h-screen md:h-dvh w-full overflow-y-auto md:overflow-hidden bg-[#FAFAFA] font-sans antialiased text-slate-900 flex flex-col md:flex-row select-none relative"
-  >
-    <!-- ── Skeleton Loading State ── -->
-    <template v-if="isMounting">
-      <!-- Left Branding Skeleton -->
-      <div
-        class="hidden md:flex md:w-[42%] lg:w-[40%] xl:w-[38%] bg-[#F4F6F9] border-r border-slate-200/60 p-8 lg:p-14 flex-col justify-between animate-pulse"
-      >
-        <div class="flex items-center justify-between">
-          <div class="h-8 w-28 bg-slate-200/80 rounded-lg"></div>
-          <div class="h-5 w-24 bg-slate-200/60 rounded-full"></div>
-        </div>
-        <div class="space-y-4 max-w-sm my-auto">
-          <div class="h-10 w-44 bg-slate-200/80 rounded-xl"></div>
-          <div class="h-4 w-full bg-slate-200/60 rounded-lg"></div>
-          <div class="h-4 w-4/5 bg-slate-200/60 rounded-lg"></div>
-        </div>
-        <div class="h-4 w-36 bg-slate-200/60 rounded"></div>
-      </div>
-
-      <!-- Right Form Skeleton -->
-      <div class="flex-1 flex items-center justify-center p-4 sm:p-8 md:p-10 lg:p-14 bg-white">
-        <div class="w-full max-w-[380px] sm:max-w-[400px] space-y-6 animate-pulse">
-          <div class="space-y-2">
-            <div class="h-7 w-56 bg-slate-200 rounded-lg"></div>
-            <div class="h-4 w-40 bg-slate-100 rounded"></div>
-          </div>
-          <div class="space-y-4 pt-2">
-            <div class="h-11 w-full bg-slate-100 rounded-xl"></div>
-            <div class="h-11 w-full bg-slate-100 rounded-xl"></div>
-            <div class="h-4 w-28 bg-slate-100 rounded"></div>
-            <div class="h-11 w-full bg-slate-200 rounded-xl"></div>
+  <div class="login-page">
+    <header class="login-header">
+      <RouterLink to="/" class="login-brand" aria-label="ESB TrackIT — Pusat Bantuan">
+        <img src="/ESB Logo Only.svg" alt="" width="36" height="28" />
+        <span>TrackIT</span>
+      </RouterLink>
+      <RouterLink to="/" class="back-help"><ArrowLeft :size="16" aria-hidden="true" /><span>Pusat Bantuan</span></RouterLink>
+    </header>
+    <main class="login-main">
+      <aside class="login-story" aria-labelledby="story-title">
+        <div class="story-top"><span class="story-mark"></span>ESB PEOPLE TECHNOLOGY</div>
+        <div class="story-content">
+          <span class="story-eyebrow">RUANG KERJA ANDA</span>
+          <h2 id="story-title">Aset terkelola.<br />Kerja lebih mudah.</h2>
+          <p>Akses inventaris perangkat dan bantuan tim support dalam satu tempat.</p>
+          <div class="story-features">
+            <div><span class="feature-icon"><Laptop :size="21" aria-hidden="true" /></span><span><strong>Aset & perangkat</strong><small>Lihat inventaris dan penempatan aset.</small></span></div>
+            <div><span class="feature-icon"><Ticket :size="21" aria-hidden="true" /></span><span><strong>Tiket bantuan</strong><small>Ajukan kendala dan pantau penanganannya.</small></span></div>
+            <div><span class="feature-icon"><BookOpen :size="21" aria-hidden="true" /></span><span><strong>Panduan kerja</strong><small>Temukan artikel dan solusi di Help Center.</small></span></div>
           </div>
         </div>
-      </div>
-    </template>
-
-    <!-- ── Actual Content ── -->
-    <template v-else>
-      <!-- ── Left Column: Brand Presentation Panel (Desktop) ── -->
-      <div
-        class="hidden md:flex md:w-[42%] lg:w-[40%] xl:w-[38%] bg-[#F8FAFC] border-r border-slate-200/70 p-8 lg:p-12 xl:p-14 flex-col justify-between relative overflow-hidden shrink-0"
-      >
-        <!-- Subtle Ambient Radial Light -->
-        <div
-          class="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-[#0892F5]/[0.035] blur-3xl pointer-events-none"
-        ></div>
-        <div
-          class="absolute bottom-0 right-0 w-80 h-80 rounded-full bg-[#0A51B0]/[0.025] blur-3xl pointer-events-none"
-        ></div>
-
-        <!-- Ultra-subtle Enterprise Grid Pattern -->
-        <svg
-          class="absolute inset-0 w-full h-full stroke-slate-300/[0.25] pointer-events-none [mask-image:radial-gradient(ellipse_at_center,white_30%,transparent_85%)]"
-          aria-hidden="true"
-        >
-          <defs>
-            <pattern id="brand-grid-pattern" width="32" height="32" patternUnits="userSpaceOnUse">
-              <path d="M0 32V.5H32" fill="none" stroke-dasharray="2 2" />
-            </pattern>
-          </defs>
-          <rect width="100%" height="100%" stroke-width="0" fill="url(#brand-grid-pattern)" />
-        </svg>
-
-        <!-- Top Header: Brand Logo -->
-        <div class="relative z-10 flex items-center justify-between">
-          <router-link to="/" aria-label="Kembali ke Help Center">
-            <img
-              src="/ESB Logo.svg"
-              alt="ESB People Technology Logo"
-              class="h-7 lg:h-8 w-auto object-contain cursor-pointer"
-            />
-          </router-link>
-        </div>
-
-        <!-- Middle Focal Point: Brand Statement & Typography -->
-        <div class="relative z-10 max-w-sm space-y-6 my-auto py-8 transition-all duration-300">
-          <div class="space-y-2">
-            <div
-              class="inline-flex items-center gap-1.5 text-xs font-semibold text-[#1D4ED8] tracking-wide uppercase"
-            >
-              <span>IT Assets Monitoring</span>
+        <div class="story-footer">ESB TrackIT <span>Helpdesk & Asset Management</span></div>
+      </aside>
+      <section class="login-form-panel" aria-labelledby="login-title">
+        <div class="login-form-inner">
+          <span class="login-eyebrow">MASUK KE TRACKIT</span>
+          <h1 id="login-title">Selamat datang kembali.</h1>
+          <p class="login-intro">Gunakan email akun Anda untuk melanjutkan.</p>
+          <div v-if="errorMessage" id="login-error" class="login-error" role="alert"><CircleAlert :size="18" aria-hidden="true" /><span>{{ errorMessage }}</span></div>
+          <form class="login-form" :aria-busy="isLoading" @submit.prevent="handleLogin">
+            <div class="login-field">
+              <label for="email">Alamat email</label>
+              <div class="input-wrap"><Mail :size="18" aria-hidden="true" /><input id="email" ref="emailInput" v-model="email" type="email" inputmode="email" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="nama@esb.co.id" required :disabled="isLoading" :aria-describedby="errorMessage ? 'login-error' : undefined" /></div>
             </div>
-            <h1
-              class="text-4xl lg:text-5xl font-extrabold tracking-tight text-slate-900 leading-[1.1]"
-            >
-              TrackIT
-            </h1>
-          </div>
-
-          <p class="text-sm lg:text-base text-slate-700 font-normal leading-relaxed">
-            Platform terpadu untuk pengawasan aset IT, inventarisasi perangkat, dan manajemen tiket
-            support secara real-time.
-          </p>
-
-          <!-- Minimal Feature Badges -->
-          <div class="pt-2 flex flex-wrap gap-2 text-xs font-medium text-slate-700">
-            <div
-              class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/90 border border-slate-300/80 text-slate-800 shadow-[0_1px_2px_rgba(0,0,0,0.03)]"
-            >
-              <span aria-hidden="true" class="material-symbols-outlined text-[15px] text-[#1D4ED8]"
-                >inventory_2</span
-              >
-              <span>Asset Control</span>
+            <div class="login-field">
+              <label for="password">Kata sandi</label>
+              <div class="input-wrap"><LockKeyhole :size="18" aria-hidden="true" /><input id="password" v-model="password" :type="showPassword ? 'text' : 'password'" autocomplete="current-password" placeholder="Masukkan kata sandi" required :disabled="isLoading" :aria-describedby="errorMessage ? 'login-error' : undefined" /><button type="button" class="password-toggle" :aria-label="showPassword ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'" :aria-pressed="showPassword" @click="showPassword = !showPassword"><EyeOff v-if="showPassword" :size="18" /><Eye v-else :size="18" /></button></div>
             </div>
-            <div
-              class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/90 border border-slate-300/80 text-slate-800 shadow-[0_1px_2px_rgba(0,0,0,0.03)]"
-            >
-              <span aria-hidden="true" class="material-symbols-outlined text-[15px] text-[#1D4ED8]"
-                >devices</span
-              >
-              <span>Health Monitoring</span>
-            </div>
-            <div
-              class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/90 border border-slate-300/80 text-slate-800 shadow-[0_1px_2px_rgba(0,0,0,0.03)]"
-            >
-              <span aria-hidden="true" class="material-symbols-outlined text-[15px] text-[#1D4ED8]"
-                >confirmation_number</span
-              >
-              <span>Support Desk</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Bottom Footer -->
-        <div
-          class="relative z-10 flex items-center justify-between text-xs text-slate-600 font-medium"
-        >
-          <span>&copy; 2026 ESB People Technology</span>
-          <span class="text-[11px] text-slate-600 font-medium">#AhlinyaBisnisKuliner</span>
-        </div>
-      </div>
-
-      <!-- ── Right Column: Login Panel ── -->
-      <div
-        class="flex-1 flex flex-col justify-between p-4 sm:p-8 md:p-10 lg:p-14 bg-white relative z-10 overflow-y-auto md:overflow-hidden min-h-full"
-      >
-        <!-- Mobile Header (Visible on small screens) -->
-        <div
-          class="flex md:hidden items-center justify-between pb-3.5 sm:pb-4 border-b border-slate-100 mb-3 sm:mb-4 shrink-0"
-        >
-          <router-link
-            to="/"
-            aria-label="Kembali ke Help Center"
-            class="inline-flex items-center gap-2"
-          >
-            <img
-              src="/ESB Logo.svg"
-              alt="ESB People Technology Logo"
-              class="h-6 sm:h-7 w-auto object-contain cursor-pointer"
-            />
-          </router-link>
-
-          <router-link
-            to="/"
-            class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-[#2563EB] bg-slate-50 hover:bg-blue-50/70 border border-slate-200/80 hover:border-blue-200 px-2.5 py-1.5 rounded-lg transition-all active:scale-95 cursor-pointer touch-manipulation"
-          >
-            <span class="material-symbols-outlined text-[15px]">arrow_back</span>
-            <span>Pusat Bantuan</span>
-          </router-link>
-        </div>
-
-        <!-- Form Container -->
-        <div
-          class="w-full max-w-[380px] sm:max-w-[400px] mx-auto my-auto py-2 sm:py-6 flex flex-col justify-center animate-fade-in"
-        >
-          <!-- Heading Section -->
-          <div class="mb-5 sm:mb-7 md:mb-8">
-            <h2 class="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight text-slate-900">
-              Selamat datang kembali
-            </h2>
-            <p class="mt-1 text-xs sm:text-sm text-slate-600 font-medium leading-relaxed">
-              Masuk dengan akun enterprise Anda untuk melanjutkan.
-            </p>
-          </div>
-
-          <!-- Error Alert -->
-          <div
-            v-if="errorMessage"
-            class="mb-4 sm:mb-5 rounded-xl bg-red-50 p-3.5 border border-red-200 flex items-start gap-2.5 transition-all"
-            role="alert"
-          >
-            <span
-              aria-hidden="true"
-              class="material-symbols-outlined text-red-700 text-[18px] mt-0.5 shrink-0"
-              >error</span
-            >
-            <p class="text-xs font-semibold text-red-800 leading-relaxed">{{ errorMessage }}</p>
-          </div>
-
-          <!-- Authentication Form -->
-          <form @submit.prevent="handleLogin" class="space-y-3.5 sm:space-y-4">
-            <!-- Email / Username Input -->
-            <div class="space-y-1.5">
-              <label for="email" class="block text-xs font-bold text-slate-800">
-                Email atau nama pengguna
-              </label>
-              <div class="relative">
-                <span
-                  class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none flex items-center"
-                >
-                  <span aria-hidden="true" class="material-symbols-outlined text-[18px]">mail</span>
-                </span>
-                <input
-                  id="email"
-                  ref="emailInput"
-                  v-model="email"
-                  type="text"
-                  required
-                  autocomplete="username"
-                  placeholder="admin@esb.co.id"
-                  class="h-11 sm:h-12 w-full rounded-xl border border-slate-300 bg-slate-50/50 pl-10 pr-4 text-sm text-slate-900 transition-all duration-150 placeholder:text-slate-500 focus:border-[#2563EB] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#2563EB]/10"
-                />
-              </div>
-            </div>
-
-            <!-- Password Input -->
-            <div class="space-y-1.5">
-              <label for="password" class="block text-xs font-bold text-slate-800">
-                Kata sandi
-              </label>
-              <div class="relative">
-                <span
-                  class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none flex items-center"
-                >
-                  <span aria-hidden="true" class="material-symbols-outlined text-[18px]">lock</span>
-                </span>
-                <input
-                  id="password"
-                  v-model="password"
-                  :type="showPassword ? 'text' : 'password'"
-                  required
-                  autocomplete="current-password"
-                  placeholder="••••••••"
-                  class="h-11 sm:h-12 w-full rounded-xl border border-slate-300 bg-slate-50/50 pl-10 pr-11 text-sm text-slate-900 transition-all duration-150 placeholder:text-slate-500 focus:border-[#2563EB] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#2563EB]/10"
-                />
-                <button
-                  type="button"
-                  @click="showPassword = !showPassword"
-                  class="absolute right-1.5 top-1/2 -translate-y-1/2 w-8 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors focus:outline-none cursor-pointer touch-manipulation"
-                  :aria-label="showPassword ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'"
-                  tabindex="-1"
-                >
-                  <span aria-hidden="true" class="material-symbols-outlined text-[18px] block">
-                    {{ showPassword ? 'visibility_off' : 'visibility' }}
-                  </span>
-                </button>
-              </div>
-            </div>
-
-            <!-- Remember Me & Forgot Password Controls -->
-            <div class="flex items-center justify-between pt-0.5 gap-2">
-              <label class="flex items-center gap-2 cursor-pointer select-none group min-h-[36px]">
-                <input
-                  v-model="rememberMe"
-                  type="checkbox"
-                  class="w-4 h-4 rounded border-slate-300 text-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/20 accent-[#2563EB] cursor-pointer"
-                />
-                <span
-                  class="text-xs sm:text-sm font-semibold text-slate-700 group-hover:text-slate-900 transition-colors"
-                >
-                  Ingat saya
-                </span>
-              </label>
-
-              <!-- Link Lupa Password -->
-              <button
-                type="button"
-                @click="openForgotModal"
-                class="text-xs sm:text-sm font-semibold text-[#2563EB] hover:text-[#1D4ED8] hover:underline transition-all cursor-pointer focus:outline-none min-h-[36px] flex items-center shrink-0 touch-manipulation"
-              >
-                Aktivasi akun / Lupa kata sandi?
-              </button>
-            </div>
-
-            <!-- Primary Submit Button -->
-            <button
-              type="submit"
-              :disabled="isLoading"
-              class="w-full h-11 sm:h-12 mt-2 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-semibold text-sm transition-all duration-150 shadow-xs active:scale-[0.98] disabled:opacity-60 disabled:pointer-events-none flex items-center justify-center gap-2 group cursor-pointer touch-manipulation"
-            >
-              <span v-if="isLoading" class="flex items-center gap-2">
-                <span aria-hidden="true" class="material-symbols-outlined animate-spin text-[18px]"
-                  >progress_activity</span
-                >
-                <span>Masuk...</span>
-              </span>
-              <template v-else>
-                <span>Masuk</span>
-                <span
-                  aria-hidden="true"
-                  class="material-symbols-outlined text-[18px] transition-transform duration-150 group-hover:translate-x-0.5"
-                  >arrow_forward</span
-                >
-              </template>
-            </button>
+            <div class="login-options"><label><input v-model="rememberMe" type="checkbox" :disabled="isLoading" /><span>Ingat saya</span></label><button type="button" :disabled="isLoading" @click="openForgotModal">Lupa kata sandi?</button></div>
+            <button type="submit" class="login-submit" :disabled="isLoading"><LoaderCircle v-if="isLoading" :size="18" class="login-spinner" aria-hidden="true" /><span>{{ isLoading ? 'Sedang masuk…' : 'Masuk' }}</span><ArrowRight v-if="!isLoading" :size="18" aria-hidden="true" /></button>
           </form>
-
-          <!-- Form Footer (Mobile & Subtle baseline) -->
-          <div class="mt-6 sm:mt-8 text-center text-xs text-slate-400 font-normal md:hidden pb-2">
-            &copy; 2026 ESB People Technology
-          </div>
+          <div class="activation-note"><span>Belum mengaktifkan akun?</span><button type="button" @click="openForgotModal">Aktivasi akun<ArrowRight :size="14" aria-hidden="true" /></button></div>
         </div>
-
-        <!-- Whitespace Spacer for Desktop layout balancing -->
-        <div class="hidden sm:block shrink-0 h-4"></div>
-      </div>
-    </template>
-
-    <!-- ══════════════════════════════════════════════════════════ -->
-    <!-- ── MODAL LUPA PASSWORD / RESET PASSWORD DENGAN OTP ── -->
-    <!-- ══════════════════════════════════════════════════════════ -->
+        <p class="form-help">Butuh panduan? <RouterLink to="/">Kunjungi Pusat Bantuan</RouterLink></p>
+      </section>
+    </main>
+    <footer class="login-footer">&copy; {{ new Date().getFullYear() }} ESB People Technology</footer>
     <Teleport to="body">
       <Transition name="modal-fade">
         <div
           v-if="showForgotModal"
-          class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/50 backdrop-blur-sm select-none"
+          class="login-reset fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/50 backdrop-blur-sm select-none"
         >
           <div
             role="dialog"
@@ -909,7 +622,7 @@ const finishResetAndLogin = () => {
                         type="button"
                         @click="showNewPassword = !showNewPassword"
                         class="absolute right-1.5 top-1/2 -translate-y-1/2 w-8 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors focus:outline-none cursor-pointer touch-manipulation"
-                        tabindex="-1"
+                        :aria-label="showNewPassword ? 'Sembunyikan kata sandi baru' : 'Tampilkan kata sandi baru'"
                       >
                         <span class="material-symbols-outlined text-[18px] block">
                           {{ showNewPassword ? 'visibility_off' : 'visibility' }}

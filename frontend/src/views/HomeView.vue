@@ -341,9 +341,7 @@ onMounted(async () => {
     <main class="help-container">
       <section class="help-hero" aria-labelledby="help-title">
         <div class="hero-copy">
-          <span class="eyebrow gsap-hero-el"
-            ><span class="eyebrow-line"></span>{{ t('hero_tag') }}</span
-          >
+          <span class="eyebrow gsap-hero-el">{{ t('hero_tag') }}</span>
           <h1 id="help-title" class="gsap-hero-el">{{ t('hero_title') }}</h1>
           <p class="hero-description gsap-hero-el">{{ t('hero_subtitle') }}</p>
 

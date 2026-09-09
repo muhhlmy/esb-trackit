@@ -1,14 +1,14 @@
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount, watch, nextTick } from 'vue';
-import { useRoute, useRouter, RouterLink } from 'vue-router';
-import { useCases } from '@/composables/useCases';
-import { useToast } from '@/composables/useToast';
-import DocEditorInspector from '@/components/admin/DocEditorInspector.vue';
-import { sanitizeRichTextHtml } from '@/utils/htmlSanitizer';
-import { useEditor, EditorContent } from '@tiptap/vue-3';
-import StarterKit from '@tiptap/starter-kit';
-import Placeholder from '@tiptap/extension-placeholder';
-import ImageExtension from '@tiptap/extension-image';
+import { ref, computed, onMounted, onBeforeUnmount, watch, nextTick } from 'vue'
+import { useRoute, useRouter, RouterLink } from 'vue-router'
+import { useCases } from '@/composables/useCases'
+import { useToast } from '@/composables/useToast'
+import DocEditorInspector from '@/components/admin/DocEditorInspector.vue'
+import { sanitizeRichTextHtml } from '@/utils/htmlSanitizer'
+import { useEditor, EditorContent } from '@tiptap/vue-3'
+import StarterKit from '@tiptap/starter-kit'
+import Placeholder from '@tiptap/extension-placeholder'
+import ImageExtension from '@tiptap/extension-image'
 import {
   Undo,
   Redo,
@@ -23,82 +23,73 @@ import {
   AlertTriangle,
   Eye,
   Plus,
-  Trash2,
-  ExternalLink,
-  ChevronDown,
-  Save,
   CheckCircle2,
   X,
   PanelRight,
-  Heading1,
-  Heading2,
-  Heading3,
   List,
   ListOrdered,
   Quote,
   ArrowLeft,
-  ChevronRight,
-  FileText
-} from 'lucide-vue-next';
+} from 'lucide-vue-next'
 
-const route = useRoute();
-const router = useRouter();
-const { cases, saveCase, fetchAllCases } = useCases();
-const { showToast } = useToast();
+const route = useRoute()
+const router = useRouter()
+const { cases, saveCase, fetchAllCases } = useCases()
+const { showToast } = useToast()
 
-const isMobileInspectorOpen = ref(false);
-const isDesktopInspectorOpen = ref(true);
-const isMobile = ref(typeof window !== 'undefined' ? window.innerWidth < 1024 : false);
+const isMobileInspectorOpen = ref(false)
+const isDesktopInspectorOpen = ref(true)
+const isMobile = ref(typeof window !== 'undefined' ? window.innerWidth < 1024 : false)
 
 function updateWindowWidth() {
   if (typeof window !== 'undefined') {
-    isMobile.value = window.innerWidth < 1024;
+    isMobile.value = window.innerWidth < 1024
     if (!isMobile.value && isMobileInspectorOpen.value) {
-      isMobileInspectorOpen.value = false;
+      isMobileInspectorOpen.value = false
     }
   }
 }
 
 onMounted(() => {
-  window.addEventListener('resize', updateWindowWidth);
-  updateWindowWidth();
-});
+  window.addEventListener('resize', updateWindowWidth)
+  updateWindowWidth()
+})
 
 onBeforeUnmount(() => {
-  window.removeEventListener('resize', updateWindowWidth);
-});
+  window.removeEventListener('resize', updateWindowWidth)
+})
 
 function toggleInspector() {
   if (isMobile.value) {
-    isMobileInspectorOpen.value = !isMobileInspectorOpen.value;
+    isMobileInspectorOpen.value = !isMobileInspectorOpen.value
   } else {
-    isDesktopInspectorOpen.value = !isDesktopInspectorOpen.value;
+    isDesktopInspectorOpen.value = !isDesktopInspectorOpen.value
   }
 }
 
 const isInspectorActive = computed(() => {
-  return isMobile.value ? isMobileInspectorOpen.value : isDesktopInspectorOpen.value;
-});
+  return isMobile.value ? isMobileInspectorOpen.value : isDesktopInspectorOpen.value
+})
 
-const isPreviewModalOpen = ref(false);
-const isSaving = ref(false);
-const saveStatus = ref('Tersimpan'); // 'Tersimpan' | 'Belum disimpan' | 'Menyimpan...'
+const isPreviewModalOpen = ref(false)
+const isSaving = ref(false)
+const saveStatus = ref('Tersimpan') // 'Tersimpan' | 'Belum disimpan' | 'Menyimpan...'
 
 // Sanitasi output editor sebelum dirender via v-html (preview) — pertahanan
 // terhadap XSS bila konten DB/editor mengandung payload berbahaya.
-const safePreviewHtml = computed(() => sanitizeRichTextHtml(editor?.value?.getHTML() || ''));
+const safePreviewHtml = computed(() => sanitizeRichTextHtml(editor?.value?.getHTML() || ''))
 
 // Dialog input URL tautan (pengganti window.prompt yang tidak aksesibel).
-const showLinkDialog = ref(false);
-const linkDialogInput = ref(null);
-const linkDialogUrl = ref('');
-const linkDialogMode = ref('set'); // 'set' | 'clear'
-const linkDialogError = ref('');
+const showLinkDialog = ref(false)
+const linkDialogInput = ref(null)
+const linkDialogUrl = ref('')
+const linkDialogMode = ref('set') // 'set' | 'clear'
+const linkDialogError = ref('')
 
 // Fokus ke input saat dialog terbuka (aksesibilitas keyboard).
 watch(showLinkDialog, (open) => {
-  if (open) nextTick(() => linkDialogInput.value?.focus());
-});
+  if (open) nextTick(() => linkDialogInput.value?.focus())
+})
 
 // Active Document Metadata Model
 const doc = ref({
@@ -107,34 +98,36 @@ const doc = ref({
   category: 'workplace',
   severity: 'medium',
   tags: ['okta', 'password-reset', 'active-directory'],
-  summary: 'Short guide for employees to reset their Windows/Domain credentials using Okta self-service.',
-  problemContext: 'If you find yourself locked out of your workstation or need to proactively update your credentials, follow these steps to securely reset your password through our SSO provider.',
+  summary:
+    'Short guide for employees to reset their Windows/Domain credentials using Okta self-service.',
+  problemContext:
+    'If you find yourself locked out of your workstation or need to proactively update your credentials, follow these steps to securely reset your password through our SSO provider.',
   actionSteps: [
     'Step 1: Open web browser and navigate to the company SSO portal (sso.company.example).',
     'Step 2: Click on "Need help signing in?" at the bottom of the login widget, then select "Forgot password?".',
     'Step 3: Enter your username or employee ID, then verify via Authenticator app or SMS code.',
-    'Step 4: Create a new password meeting the 16-character minimum requirement and confirm.'
+    'Step 4: Create a new password meeting the 16-character minimum requirement and confirm.',
   ],
   dosAndDonts: {
     dos: [
       'Always ensure you are connected to the corporate VPN before resetting credentials remotely.',
-      'Use a strong passphrase combining words, symbols, and numbers.'
+      'Use a strong passphrase combining words, symbols, and numbers.',
     ],
     donts: [
       'Do not share temporary OTP verification codes with anyone over chat or phone.',
-      'Do not reuse previous passwords across non-work accounts.'
-    ]
+      'Do not reuse previous passwords across non-work accounts.',
+    ],
   },
   snippets: [
     {
       label: 'Direct SSO Portal Link',
-      code: 'https://sso.company.example/signin/forgot-password'
-    }
+      code: 'https://sso.company.example/signin/forgot-password',
+    },
   ],
   isCustom: true,
   status: 'DRAFT',
-  contentHtml: ''
-});
+  contentHtml: '',
+})
 
 // Initial editor default HTML
 const initialEditorContent = `
@@ -152,7 +145,7 @@ const initialEditorContent = `
 
 <pre><code>Portal Gateway: https://sso.company.example/
 Password Rule: Min 16 chars, 1 uppercase, 1 symbol, 1 digit</code></pre>
-`;
+`
 
 // TipTap Editor Instance
 const editor = useEditor({
@@ -160,173 +153,178 @@ const editor = useEditor({
   extensions: [
     StarterKit.configure({
       heading: {
-        levels: [1, 2, 3]
+        levels: [1, 2, 3],
       },
       link: {
         openOnClick: false,
         HTMLAttributes: {
-          class: 'text-[#2563EB] underline font-medium'
-        }
-      }
+          class: 'text-[#2563EB] underline font-medium',
+        },
+      },
     }),
     Placeholder.configure({
-      placeholder: 'Tulis panduan, langkah resolusi, atau catatan teknis di sini...'
+      placeholder: 'Tulis panduan, langkah resolusi, atau catatan teknis di sini...',
     }),
     ImageExtension.configure({
       inline: false,
       allowBase64: true,
       HTMLAttributes: {
-        class: 'rounded-xl max-w-full my-4 border border-slate-200 dark:border-slate-800 shadow-sm mx-auto block object-contain max-h-[500px]'
-      }
-    })
+        class:
+          'rounded-xl max-w-full my-4 border border-slate-200 dark:border-slate-800 shadow-sm mx-auto block object-contain max-h-[500px]',
+      },
+    }),
   ],
   onUpdate: ({ editor }) => {
-    doc.value.contentHtml = editor.getHTML();
-    saveStatus.value = 'Belum disimpan';
-  }
-});
+    doc.value.contentHtml = editor.getHTML()
+    saveStatus.value = 'Belum disimpan'
+  },
+})
 
 // Image Insertion Modal State & Methods
-const isImageModalOpen = ref(false);
-const imageInputTab = ref('upload'); // 'upload' | 'url'
-const imageUrlInput = ref('');
-const imageCaptionInput = ref('');
-const selectedFilePreview = ref('');
-const imageFileInputRef = ref(null);
+const isImageModalOpen = ref(false)
+const imageInputTab = ref('upload') // 'upload' | 'url'
+const imageUrlInput = ref('')
+const imageCaptionInput = ref('')
+const selectedFilePreview = ref('')
+const imageFileInputRef = ref(null)
 
 function openImageModal() {
-  imageInputTab.value = 'upload';
-  imageUrlInput.value = '';
-  imageCaptionInput.value = '';
-  selectedFilePreview.value = '';
-  isImageModalOpen.value = true;
+  imageInputTab.value = 'upload'
+  imageUrlInput.value = ''
+  imageCaptionInput.value = ''
+  selectedFilePreview.value = ''
+  isImageModalOpen.value = true
 }
 
 function handleImageFileSelect(event) {
-  const file = event.target.files?.[0];
-  if (!file) return;
+  const file = event.target.files?.[0]
+  if (!file) return
 
   if (file.size > 5 * 1024 * 1024) {
-    showToast('Ukuran gambar maksimal 5MB.', 'error');
-    return;
+    showToast('Ukuran gambar maksimal 5MB.', 'error')
+    return
   }
 
-  const reader = new FileReader();
+  const reader = new FileReader()
   reader.onload = (e) => {
-    selectedFilePreview.value = e.target.result;
-  };
-  reader.readAsDataURL(file);
+    selectedFilePreview.value = e.target.result
+  }
+  reader.readAsDataURL(file)
 }
 
 function handleDropImage(event) {
-  const file = event.dataTransfer?.files?.[0];
-  if (!file) return;
+  const file = event.dataTransfer?.files?.[0]
+  if (!file) return
   if (!file.type.startsWith('image/')) {
-    showToast('Harap upload file berupa gambar (JPG, PNG, WebP, GIF, SVG).', 'error');
-    return;
+    showToast('Harap upload file berupa gambar (JPG, PNG, WebP, GIF, SVG).', 'error')
+    return
   }
   if (file.size > 5 * 1024 * 1024) {
-    showToast('Ukuran gambar maksimal 5MB.', 'error');
-    return;
+    showToast('Ukuran gambar maksimal 5MB.', 'error')
+    return
   }
-  const reader = new FileReader();
+  const reader = new FileReader()
   reader.onload = (e) => {
-    selectedFilePreview.value = e.target.result;
-  };
-  reader.readAsDataURL(file);
+    selectedFilePreview.value = e.target.result
+  }
+  reader.readAsDataURL(file)
 }
 
 function confirmInsertImage() {
-  let src = '';
+  let src
   if (imageInputTab.value === 'upload') {
-    src = selectedFilePreview.value;
+    src = selectedFilePreview.value
   } else {
-    src = imageUrlInput.value.trim();
+    src = imageUrlInput.value.trim()
   }
 
   if (!src) {
-    showToast('Harap pilih file gambar atau masukkan URL gambar valid.', 'error');
-    return;
+    showToast('Harap pilih file gambar atau masukkan URL gambar valid.', 'error')
+    return
   }
 
-  editor.value?.chain().focus().setImage({
-    src,
-    alt: imageCaptionInput.value.trim() || 'Gambar Dokumen',
-    title: imageCaptionInput.value.trim() || ''
-  }).run();
+  editor.value
+    ?.chain()
+    .focus()
+    .setImage({
+      src,
+      alt: imageCaptionInput.value.trim() || 'Gambar Dokumen',
+      title: imageCaptionInput.value.trim() || '',
+    })
+    .run()
 
-  isImageModalOpen.value = false;
-  showToast('Gambar berhasil disisipkan!', 'success');
+  isImageModalOpen.value = false
+  showToast('Gambar berhasil disisipkan!', 'success')
 }
 
-const isSelectionMenuOpen = ref(false);
-const selectionMenuPos = ref({ x: 0, y: 0 });
+const isSelectionMenuOpen = ref(false)
+const selectionMenuPos = ref({ x: 0, y: 0 })
 
 function handleEditorSelection() {
-  const sel = window.getSelection();
+  const sel = window.getSelection()
   if (sel && !sel.isCollapsed && sel.toString().trim().length > 0) {
-    const range = sel.getRangeAt(0);
-    const rect = range.getBoundingClientRect();
+    const range = sel.getRangeAt(0)
+    const rect = range.getBoundingClientRect()
     selectionMenuPos.value = {
       x: Math.max(10, rect.left + rect.width / 2),
-      y: Math.max(10, rect.top - 8)
-    };
-    isSelectionMenuOpen.value = true;
+      y: Math.max(10, rect.top - 8),
+    }
+    isSelectionMenuOpen.value = true
   } else {
-    isSelectionMenuOpen.value = false;
+    isSelectionMenuOpen.value = false
   }
 }
 
 onMounted(async () => {
-  document.addEventListener('selectionchange', handleEditorSelection);
-  await fetchAllCases();
-  const caseId = route.params.id;
+  document.addEventListener('selectionchange', handleEditorSelection)
+  await fetchAllCases()
+  const caseId = route.params.id
 
   if (caseId) {
-    const existing = cases.value.find((c) => String(c.id) === String(caseId));
+    const existing = cases.value.find((c) => String(c.id) === String(caseId))
     if (existing) {
-      doc.value = JSON.parse(JSON.stringify(existing));
-      
-      let htmlContent = existing.contentHtml || existing.content_html || '';
+      doc.value = JSON.parse(JSON.stringify(existing))
+
+      let htmlContent = existing.contentHtml || existing.content_html || ''
       if (!htmlContent) {
         if (existing.problemContext) {
-          htmlContent += `<p>${existing.problemContext}</p>`;
+          htmlContent += `<p>${existing.problemContext}</p>`
         }
         if (existing.summary && existing.summary !== doc.value.problemContext) {
-          htmlContent += `<blockquote>${existing.summary}</blockquote>`;
+          htmlContent += `<blockquote>${existing.summary}</blockquote>`
         }
         if (existing.actionSteps && existing.actionSteps.length) {
-          htmlContent += '<h3>Prosedur / Langkah-langkah:</h3><ol>';
+          htmlContent += '<h3>Prosedur / Langkah-langkah:</h3><ol>'
           existing.actionSteps.forEach((s) => {
-            htmlContent += `<li>${s}</li>`;
-          });
-          htmlContent += '</ol>';
+            htmlContent += `<li>${s}</li>`
+          })
+          htmlContent += '</ol>'
         }
         if (existing.dosAndDonts) {
           if (existing.dosAndDonts.dos && existing.dosAndDonts.dos.length) {
-            htmlContent += '<h3>Do\'s (Yang Wajib Dilakukan):</h3><ul>';
+            htmlContent += "<h3>Do's (Yang Wajib Dilakukan):</h3><ul>"
             existing.dosAndDonts.dos.forEach((d) => {
-              htmlContent += `<li>✅ ${d}</li>`;
-            });
-            htmlContent += '</ul>';
+              htmlContent += `<li>✅ ${d}</li>`
+            })
+            htmlContent += '</ul>'
           }
           if (existing.dosAndDonts.donts && existing.dosAndDonts.donts.length) {
-            htmlContent += '<h3>Don\'ts (Yang Dilarang):</h3><ul>';
+            htmlContent += "<h3>Don'ts (Yang Dilarang):</h3><ul>"
             existing.dosAndDonts.donts.forEach((d) => {
-              htmlContent += `<li>❌ ${d}</li>`;
-            });
-            htmlContent += '</ul>';
+              htmlContent += `<li>❌ ${d}</li>`
+            })
+            htmlContent += '</ul>'
           }
         }
         if (existing.snippets && existing.snippets.length) {
           existing.snippets.forEach((snip) => {
-            htmlContent += `<pre><code>${snip.label || 'Snippet'}:\n${snip.code || ''}</code></pre>`;
-          });
+            htmlContent += `<pre><code>${snip.label || 'Snippet'}:\n${snip.code || ''}</code></pre>`
+          })
         }
       }
 
       if (editor.value) {
-        editor.value.commands.setContent(htmlContent || '<p></p>');
+        editor.value.commands.setContent(htmlContent || '<p></p>')
       }
     }
   } else {
@@ -344,17 +342,17 @@ onMounted(async () => {
       snippets: [],
       isCustom: true,
       status: 'DRAFT',
-      contentHtml: ''
-    };
+      contentHtml: '',
+    }
     if (editor.value) {
-      editor.value.commands.setContent('<p></p>');
+      editor.value.commands.setContent('<p></p>')
     }
   }
-});
+})
 
 onBeforeUnmount(() => {
-  editor.value?.destroy();
-});
+  editor.value?.destroy()
+})
 
 const currentHeadingLevel = computed(() => {
   if (!editor.value) return '0'
@@ -367,114 +365,133 @@ const currentHeadingLevel = computed(() => {
 // Formatting Actions
 function setHeading(level) {
   if (level === 0) {
-    editor.value?.chain().focus().setParagraph().run();
+    editor.value?.chain().focus().setParagraph().run()
   } else {
-    editor.value?.chain().focus().toggleHeading({ level }).run();
+    editor.value?.chain().focus().toggleHeading({ level }).run()
   }
 }
 
 function setLink() {
-  const previousUrl = editor.value?.getAttributes('link').href;
+  const previousUrl = editor.value?.getAttributes('link').href
   // Dialog aksesibel menggantikan window.prompt (screen reader friendly).
-  linkDialogUrl.value = previousUrl || '';
-  linkDialogMode.value = 'set';
-  linkDialogError.value = '';
-  showLinkDialog.value = true;
+  linkDialogUrl.value = previousUrl || ''
+  linkDialogMode.value = 'set'
+  linkDialogError.value = ''
+  showLinkDialog.value = true
 }
 
 function confirmLinkDialog() {
-  const url = linkDialogUrl.value.trim();
+  const url = linkDialogUrl.value.trim()
   if (!url) {
     // URL kosong = hapus tautan dari seleksi.
-    editor.value?.chain().focus().extendMarkRange('link').unsetLink().run();
-    showLinkDialog.value = false;
-    return;
+    editor.value?.chain().focus().extendMarkRange('link').unsetLink().run()
+    showLinkDialog.value = false
+    return
   }
 
-  let parsed;
+  let parsed
   try {
-    parsed = new URL(url, window.location.origin);
+    parsed = new URL(url, window.location.origin)
   } catch {
-    linkDialogError.value = 'URL tidak valid. Contoh: https://portal.esb.co.id';
-    return;
+    linkDialogError.value = 'URL tidak valid. Contoh: https://portal.esb.co.id'
+    return
   }
 
   // Blokir skema berbahaya (javascript:, data:, vbscript:).
   if (!['http:', 'https:', 'mailto:'].includes(parsed.protocol)) {
-    linkDialogError.value = 'Hanya URL http(s) atau mailto yang diizinkan.';
-    return;
+    linkDialogError.value = 'Hanya URL http(s) atau mailto yang diizinkan.'
+    return
   }
 
-  editor.value?.chain().focus().extendMarkRange('link').setLink({ href: url }).run();
-  showLinkDialog.value = false;
+  editor.value?.chain().focus().extendMarkRange('link').setLink({ href: url }).run()
+  showLinkDialog.value = false
 }
 
 function cancelLinkDialog() {
-  showLinkDialog.value = false;
+  showLinkDialog.value = false
 }
 
 function insertInfoCallout() {
-  editor.value?.chain().focus().insertContent(`
+  editor.value
+    ?.chain()
+    .focus()
+    .insertContent(
+      `
     <blockquote>ℹ️ <strong>Catatan Penting:</strong> Pastikan Anda terhubung ke jaringan VPN kantor sebelum melakukan sinkronisasi.</blockquote>
-  `).run();
+  `,
+    )
+    .run()
 }
 
 function insertWarningCallout() {
-  editor.value?.chain().focus().insertContent(`
+  editor.value
+    ?.chain()
+    .focus()
+    .insertContent(
+      `
     <blockquote>⚠️ <strong>Peringatan Darurat:</strong> Jika perangkat hilang atau dicuri, segera hubungi Security Operations Center (SOC).</blockquote>
-  `).run();
+  `,
+    )
+    .run()
 }
 
 function insertStep() {
-  editor.value?.chain().focus().insertContent(`
+  editor.value
+    ?.chain()
+    .focus()
+    .insertContent(
+      `
     <ol><li><strong>Step Baru:</strong> Lakukan langkah konfigurasi berikut...</li></ol>
-  `).run();
+  `,
+    )
+    .run()
 }
 
 // Save & Publish
 async function handleSaveDraft() {
-  isSaving.value = true;
-  saveStatus.value = 'Menyimpan...';
+  isSaving.value = true
+  saveStatus.value = 'Menyimpan...'
   try {
-    await saveCase({ ...doc.value, status: 'DRAFT' });
-    saveStatus.value = 'Tersimpan';
-    showToast('Draft artikel berhasil disimpan!', 'info');
-  } catch (err) {
-    saveStatus.value = 'Belum disimpan';
-    showToast('Gagal menyimpan draft.', 'error');
+    await saveCase({ ...doc.value, status: 'DRAFT' })
+    saveStatus.value = 'Tersimpan'
+    showToast('Draft artikel berhasil disimpan!', 'info')
+  } catch {
+    saveStatus.value = 'Belum disimpan'
+    showToast('Gagal menyimpan draft.', 'error')
   } finally {
-    isSaving.value = false;
+    isSaving.value = false
   }
 }
 
 async function handlePublish() {
-  isSaving.value = true;
-  saveStatus.value = 'Menyimpan...';
+  isSaving.value = true
+  saveStatus.value = 'Menyimpan...'
   try {
-    await saveCase({ ...doc.value, status: 'PUBLISHED' });
-    saveStatus.value = 'Tersimpan';
-    showToast('Artikel berhasil dipublikasikan!', 'success');
-  } catch (err) {
-    showToast('Gagal mempublikasikan artikel.', 'error');
+    await saveCase({ ...doc.value, status: 'PUBLISHED' })
+    saveStatus.value = 'Tersimpan'
+    showToast('Artikel berhasil dipublikasikan!', 'success')
+  } catch {
+    showToast('Gagal mempublikasikan artikel.', 'error')
   } finally {
-    isSaving.value = false;
+    isSaving.value = false
   }
 }
 
 function goToAdminCases() {
-  router.push('/admin/cases');
+  router.push('/admin/cases')
 }
 </script>
 
 <template>
-  <div class="min-h-screen bg-[#F8FAFC] dark:bg-slate-950 text-[#1E293B] dark:text-slate-100 flex flex-col font-sans selection:bg-[#2563EB] selection:text-white transition-colors duration-200">
-
+  <div
+    class="min-h-screen bg-[#F8FAFC] dark:bg-slate-950 text-[#1E293B] dark:text-slate-100 flex flex-col font-sans selection:bg-[#2563EB] selection:text-white transition-colors duration-200"
+  >
     <!-- 1. TOP APP BAR HEADER -->
-    <header class="h-14 bg-white dark:bg-slate-900 border-b border-[#E2E8F0] dark:border-slate-800 px-3 sm:px-6 sticky top-0 z-50 flex items-center justify-between">
-
+    <header
+      class="h-14 bg-white dark:bg-slate-900 border-b border-[#E2E8F0] dark:border-slate-800 px-3 sm:px-6 sticky top-0 z-50 flex items-center justify-between"
+    >
       <!-- Left: Back Button, Title, Status -->
       <div class="flex items-center gap-2 sm:gap-4 min-w-0">
-
         <!-- Back to Admin CMS -->
         <RouterLink
           to="/admin/cases"
@@ -488,20 +505,29 @@ function goToAdminCases() {
         <div class="h-4 w-px bg-[#E2E8F0] dark:bg-slate-800 shrink-0"></div>
 
         <div class="flex items-center gap-1.5 min-w-0">
-          <span class="font-bold text-[#1E293B] dark:text-white text-xs sm:text-sm tracking-tight truncate max-w-[100px] sm:max-w-none">
+          <span
+            class="font-bold text-[#1E293B] dark:text-white text-xs sm:text-sm tracking-tight truncate max-w-[100px] sm:max-w-none"
+          >
             Article Editor
           </span>
         </div>
 
         <!-- Status Badges (Desktop) -->
-        <div class="hidden md:flex items-center gap-2 pl-2 border-l border-[#E2E8F0] dark:border-slate-800">
+        <div
+          class="hidden md:flex items-center gap-2 pl-2 border-l border-[#E2E8F0] dark:border-slate-800"
+        >
           <span
             class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold"
-            :class="doc.status === 'PUBLISHED'
-              ? 'bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-200/50'
-              : 'bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-300 border border-amber-200/50'"
+            :class="
+              doc.status === 'PUBLISHED'
+                ? 'bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-200/50'
+                : 'bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-300 border border-amber-200/50'
+            "
           >
-            <span class="w-1.5 h-1.5 rounded-full" :class="doc.status === 'PUBLISHED' ? 'bg-emerald-500' : 'bg-amber-500'"></span>
+            <span
+              class="w-1.5 h-1.5 rounded-full"
+              :class="doc.status === 'PUBLISHED' ? 'bg-emerald-500' : 'bg-amber-500'"
+            ></span>
             {{ doc.status || 'DRAFT' }}
           </span>
 
@@ -513,7 +539,6 @@ function goToAdminCases() {
 
       <!-- Right: Action Buttons -->
       <div class="flex items-center gap-1 sm:gap-2 shrink-0">
-
         <!-- Preview as Employee (Available on mobile as icon button, with text on sm+) -->
         <button
           @click="isPreviewModalOpen = true"
@@ -553,7 +578,6 @@ function goToAdminCases() {
         >
           <PanelRight class="w-4 h-4" />
         </button>
-
       </div>
     </header>
 
@@ -563,7 +587,9 @@ function goToAdminCases() {
       class="sticky top-14 z-40 bg-white dark:bg-slate-900 border-b border-[#E2E8F0] dark:border-slate-800 px-3 sm:px-6 py-1.5 flex items-center gap-1 sm:gap-1.5 overflow-x-auto no-scrollbar text-xs select-none touch-manipulation shadow-2xs"
     >
       <!-- Undo / Redo -->
-      <div class="flex items-center gap-0.5 border-r border-[#E2E8F0] dark:border-slate-800 pr-1.5 sm:pr-2 mr-0.5 sm:mr-1 shrink-0">
+      <div
+        class="flex items-center gap-0.5 border-r border-[#E2E8F0] dark:border-slate-800 pr-1.5 sm:pr-2 mr-0.5 sm:mr-1 shrink-0"
+      >
         <button
           @click="editor.chain().focus().undo().run()"
           :disabled="!editor.can().undo()"
@@ -583,7 +609,9 @@ function goToAdminCases() {
       </div>
 
       <!-- Text Style Selector (Paragraph / H1 / H2 / H3) -->
-      <div class="flex items-center gap-1 border-r border-[#E2E8F0] dark:border-slate-800 pr-1.5 sm:pr-2 mr-0.5 sm:mr-1 shrink-0">
+      <div
+        class="flex items-center gap-1 border-r border-[#E2E8F0] dark:border-slate-800 pr-1.5 sm:pr-2 mr-0.5 sm:mr-1 shrink-0"
+      >
         <select
           :value="currentHeadingLevel"
           @change="setHeading(Number($event.target.value))"
@@ -597,11 +625,17 @@ function goToAdminCases() {
       </div>
 
       <!-- Formatting (B, I, U) -->
-      <div class="flex items-center gap-0.5 border-r border-[#E2E8F0] dark:border-slate-800 pr-1.5 sm:pr-2 mr-0.5 sm:mr-1 shrink-0">
+      <div
+        class="flex items-center gap-0.5 border-r border-[#E2E8F0] dark:border-slate-800 pr-1.5 sm:pr-2 mr-0.5 sm:mr-1 shrink-0"
+      >
         <button
           @click="editor.chain().focus().toggleBold().run()"
           class="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-lg transition-colors cursor-pointer active:scale-95 touch-manipulation"
-          :class="editor.isActive('bold') ? 'bg-[#2563EB] text-white shadow-2xs' : 'text-[#64748B] dark:text-slate-400 hover:bg-[#F1F5F9] dark:hover:bg-slate-800'"
+          :class="
+            editor.isActive('bold')
+              ? 'bg-[#2563EB] text-white shadow-2xs'
+              : 'text-[#64748B] dark:text-slate-400 hover:bg-[#F1F5F9] dark:hover:bg-slate-800'
+          "
           title="Bold (Ctrl+B)"
         >
           <BoldIcon class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
@@ -610,7 +644,11 @@ function goToAdminCases() {
         <button
           @click="editor.chain().focus().toggleItalic().run()"
           class="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-lg transition-colors italic cursor-pointer active:scale-95 touch-manipulation"
-          :class="editor.isActive('italic') ? 'bg-[#2563EB] text-white shadow-2xs' : 'text-[#64748B] dark:text-slate-400 hover:bg-[#F1F5F9] dark:hover:bg-slate-800'"
+          :class="
+            editor.isActive('italic')
+              ? 'bg-[#2563EB] text-white shadow-2xs'
+              : 'text-[#64748B] dark:text-slate-400 hover:bg-[#F1F5F9] dark:hover:bg-slate-800'
+          "
           title="Italic (Ctrl+I)"
         >
           <ItalicIcon class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
@@ -619,7 +657,11 @@ function goToAdminCases() {
         <button
           @click="editor.chain().focus().toggleUnderline().run()"
           class="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-lg transition-colors underline cursor-pointer active:scale-95 touch-manipulation"
-          :class="editor.isActive('underline') ? 'bg-[#2563EB] text-white shadow-2xs' : 'text-[#64748B] dark:text-slate-400 hover:bg-[#F1F5F9] dark:hover:bg-slate-800'"
+          :class="
+            editor.isActive('underline')
+              ? 'bg-[#2563EB] text-white shadow-2xs'
+              : 'text-[#64748B] dark:text-slate-400 hover:bg-[#F1F5F9] dark:hover:bg-slate-800'
+          "
           title="Underline (Ctrl+U)"
         >
           <UnderlineIcon class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
@@ -627,11 +669,17 @@ function goToAdminCases() {
       </div>
 
       <!-- Lists & Code Blocks -->
-      <div class="flex items-center gap-0.5 border-r border-[#E2E8F0] dark:border-slate-800 pr-1.5 sm:pr-2 mr-0.5 sm:mr-1 shrink-0">
+      <div
+        class="flex items-center gap-0.5 border-r border-[#E2E8F0] dark:border-slate-800 pr-1.5 sm:pr-2 mr-0.5 sm:mr-1 shrink-0"
+      >
         <button
           @click="editor.chain().focus().toggleBulletList().run()"
           class="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-lg transition-colors cursor-pointer active:scale-95 touch-manipulation"
-          :class="editor.isActive('bulletList') ? 'bg-blue-50 dark:bg-blue-950/40 text-[#2563EB] dark:text-blue-400' : 'text-[#64748B] dark:text-slate-400 hover:bg-[#F1F5F9] dark:hover:bg-slate-800'"
+          :class="
+            editor.isActive('bulletList')
+              ? 'bg-blue-50 dark:bg-blue-950/40 text-[#2563EB] dark:text-blue-400'
+              : 'text-[#64748B] dark:text-slate-400 hover:bg-[#F1F5F9] dark:hover:bg-slate-800'
+          "
           title="Bullet List"
         >
           <List class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
@@ -640,7 +688,11 @@ function goToAdminCases() {
         <button
           @click="editor.chain().focus().toggleOrderedList().run()"
           class="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-lg transition-colors cursor-pointer active:scale-95 touch-manipulation"
-          :class="editor.isActive('orderedList') ? 'bg-blue-50 dark:bg-blue-950/40 text-[#2563EB] dark:text-blue-400' : 'text-[#64748B] dark:text-slate-400 hover:bg-[#F1F5F9] dark:hover:bg-slate-800'"
+          :class="
+            editor.isActive('orderedList')
+              ? 'bg-blue-50 dark:bg-blue-950/40 text-[#2563EB] dark:text-blue-400'
+              : 'text-[#64748B] dark:text-slate-400 hover:bg-[#F1F5F9] dark:hover:bg-slate-800'
+          "
           title="Numbered List"
         >
           <ListOrdered class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
@@ -649,7 +701,11 @@ function goToAdminCases() {
         <button
           @click="editor.chain().focus().toggleBlockquote().run()"
           class="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-lg transition-colors cursor-pointer active:scale-95 touch-manipulation"
-          :class="editor.isActive('blockquote') ? 'bg-blue-50 dark:bg-blue-950/40 text-[#2563EB] dark:text-blue-400' : 'text-[#64748B] dark:text-slate-400 hover:bg-[#F1F5F9] dark:hover:bg-slate-800'"
+          :class="
+            editor.isActive('blockquote')
+              ? 'bg-blue-50 dark:bg-blue-950/40 text-[#2563EB] dark:text-blue-400'
+              : 'text-[#64748B] dark:text-slate-400 hover:bg-[#F1F5F9] dark:hover:bg-slate-800'
+          "
           title="Blockquote"
         >
           <Quote class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
@@ -658,7 +714,11 @@ function goToAdminCases() {
         <button
           @click="editor.chain().focus().toggleCodeBlock().run()"
           class="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-lg transition-colors cursor-pointer active:scale-95 touch-manipulation"
-          :class="editor.isActive('codeBlock') ? 'bg-[#2563EB] text-white shadow-2xs' : 'text-[#64748B] dark:text-slate-400 hover:bg-[#F1F5F9] dark:hover:bg-slate-800'"
+          :class="
+            editor.isActive('codeBlock')
+              ? 'bg-[#2563EB] text-white shadow-2xs'
+              : 'text-[#64748B] dark:text-slate-400 hover:bg-[#F1F5F9] dark:hover:bg-slate-800'
+          "
           title="Code Block"
         >
           <Code class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
@@ -667,7 +727,11 @@ function goToAdminCases() {
         <button
           @click="setLink"
           class="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-lg transition-colors cursor-pointer active:scale-95 touch-manipulation"
-          :class="editor.isActive('link') ? 'bg-[#2563EB] text-white shadow-2xs' : 'text-[#64748B] dark:text-slate-400 hover:bg-[#F1F5F9] dark:hover:bg-slate-800'"
+          :class="
+            editor.isActive('link')
+              ? 'bg-[#2563EB] text-white shadow-2xs'
+              : 'text-[#64748B] dark:text-slate-400 hover:bg-[#F1F5F9] dark:hover:bg-slate-800'
+          "
           title="Insert Link"
         >
           <LinkIcon class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
@@ -716,26 +780,28 @@ function goToAdminCases() {
           <span>Step</span>
         </button>
       </div>
-
     </div>
 
     <!-- 3. MAIN WORKSPACE (CENTRAL SHEET CANVAS + INSPECTOR) -->
     <div class="flex-1 flex relative pt-2">
-
       <!-- Central Canvas Scroll Area -->
       <main class="flex-1 flex justify-center pb-24 overflow-y-auto px-2 sm:px-6">
-
         <!-- Live Document Sheet (White Sheet Paper) -->
-        <article class="bg-white dark:bg-slate-900 rounded-2xl border border-[#E2E8F0] dark:border-slate-800 shadow-xs w-full max-w-[840px] min-h-[600px] sm:min-h-[900px] mt-3 sm:mt-6 mb-8 sm:mb-12 p-3.5 sm:p-10 relative space-y-4 sm:space-y-6 transition-all">
-
+        <article
+          class="bg-white dark:bg-slate-900 rounded-2xl border border-[#E2E8F0] dark:border-slate-800 shadow-xs w-full max-w-[840px] min-h-[600px] sm:min-h-[900px] mt-3 sm:mt-6 mb-8 sm:mb-12 p-3.5 sm:p-10 relative space-y-4 sm:space-y-6 transition-all"
+        >
           <!-- Document Breadcrumbs & Category Bar -->
-          <div class="flex flex-wrap items-center justify-between gap-2 text-xs text-[#64748B] dark:text-slate-400 pb-2.5 sm:pb-3 border-b border-[#F1F5F9] dark:border-slate-800">
+          <div
+            class="flex flex-wrap items-center justify-between gap-2 text-xs text-[#64748B] dark:text-slate-400 pb-2.5 sm:pb-3 border-b border-[#F1F5F9] dark:border-slate-800"
+          >
             <div class="flex items-center gap-1.5 font-semibold text-[11px] sm:text-xs">
               <span>Knowledge Base</span>
               <span class="text-slate-300 dark:text-slate-600">/</span>
               <span class="capitalize text-[#2563EB] dark:text-blue-400">{{ doc.category }}</span>
             </div>
-            <span class="px-2 py-0.5 rounded-md text-[9.5px] sm:text-[10px] uppercase font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 tracking-wider">
+            <span
+              class="px-2 py-0.5 rounded-md text-[9.5px] sm:text-[10px] uppercase font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 tracking-wider"
+            >
               {{ doc.severity }} priority
             </span>
           </div>
@@ -749,8 +815,12 @@ function goToAdminCases() {
           />
 
           <!-- Summary Box -->
-          <div class="bg-[#F8FAFC] dark:bg-slate-800/50 border border-[#E2E8F0] dark:border-slate-700/60 rounded-xl p-3 sm:p-4">
-            <label class="block text-[10.5px] sm:text-[11px] font-bold uppercase tracking-wide text-[#64748B] dark:text-slate-400 mb-1">
+          <div
+            class="bg-[#F8FAFC] dark:bg-slate-800/50 border border-[#E2E8F0] dark:border-slate-700/60 rounded-xl p-3 sm:p-4"
+          >
+            <label
+              class="block text-[10.5px] sm:text-[11px] font-bold uppercase tracking-wide text-[#64748B] dark:text-slate-400 mb-1"
+            >
               Ringkasan
             </label>
             <textarea
@@ -777,7 +847,9 @@ function goToAdminCases() {
             <button
               @click="editor.chain().focus().toggleItalic().run()"
               class="w-7 h-7 flex items-center justify-center rounded-md hover:bg-[#F1F5F9] dark:hover:bg-slate-800 text-xs italic"
-              :class="{ 'text-[#2563EB] bg-blue-50 dark:bg-blue-950/40': editor.isActive('italic') }"
+              :class="{
+                'text-[#2563EB] bg-blue-50 dark:bg-blue-950/40': editor.isActive('italic'),
+              }"
             >
               I
             </button>
@@ -785,14 +857,22 @@ function goToAdminCases() {
             <button
               @click="editor.chain().focus().toggleHeading({ level: 1 }).run()"
               class="px-1.5 py-1 rounded-md hover:bg-[#F1F5F9] dark:hover:bg-slate-800 text-xs font-semibold"
-              :class="{ 'text-[#2563EB] bg-blue-50 dark:bg-blue-950/40': editor.isActive('heading', { level: 1 }) }"
+              :class="{
+                'text-[#2563EB] bg-blue-50 dark:bg-blue-950/40': editor.isActive('heading', {
+                  level: 1,
+                }),
+              }"
             >
               H1
             </button>
             <button
               @click="editor.chain().focus().toggleHeading({ level: 2 }).run()"
               class="px-1.5 py-1 rounded-md hover:bg-[#F1F5F9] dark:hover:bg-slate-800 text-xs font-semibold"
-              :class="{ 'text-[#2563EB] bg-blue-50 dark:bg-blue-950/40': editor.isActive('heading', { level: 2 }) }"
+              :class="{
+                'text-[#2563EB] bg-blue-50 dark:bg-blue-950/40': editor.isActive('heading', {
+                  level: 2,
+                }),
+              }"
             >
               H2
             </button>
@@ -821,7 +901,6 @@ function goToAdminCases() {
               class="prose prose-slate max-w-none text-[#1E293B] dark:text-slate-200"
             />
           </div>
-
         </article>
       </main>
 
@@ -844,12 +923,18 @@ function goToAdminCases() {
           class="lg:hidden fixed inset-0 z-[60] flex justify-end bg-slate-950/40 backdrop-blur-xs transition-opacity"
           @click.self="isMobileInspectorOpen = false"
         >
-          <div class="relative w-full max-w-sm sm:max-w-md h-full bg-white dark:bg-slate-900 shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-right duration-200">
+          <div
+            class="relative w-full max-w-sm sm:max-w-md h-full bg-white dark:bg-slate-900 shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-right duration-200"
+          >
             <!-- Mobile Drawer Header -->
-            <div class="flex items-center justify-between px-4 py-3 border-b border-[#E2E8F0] dark:border-slate-800 bg-[#FAFBFC] dark:bg-slate-900/80 shrink-0">
+            <div
+              class="flex items-center justify-between px-4 py-3 border-b border-[#E2E8F0] dark:border-slate-800 bg-[#FAFBFC] dark:bg-slate-900/80 shrink-0"
+            >
               <div class="flex items-center gap-2">
                 <PanelRight class="w-4 h-4 text-[#2563EB]" />
-                <span class="text-xs font-bold text-[#0F172A] dark:text-white uppercase tracking-wider">
+                <span
+                  class="text-xs font-bold text-[#0F172A] dark:text-white uppercase tracking-wider"
+                >
                   Pengaturan Artikel
                 </span>
               </div>
@@ -874,7 +959,6 @@ function goToAdminCases() {
           </div>
         </div>
       </Teleport>
-
     </div>
 
     <!-- 4. EMPLOYEE LIVE PREVIEW MODAL -->
@@ -882,22 +966,40 @@ function goToAdminCases() {
       v-if="isPreviewModalOpen"
       class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/50 backdrop-blur-sm"
     >
-      <div class="relative w-full max-w-4xl max-h-[90vh] bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 rounded-xl shadow-xl overflow-hidden flex flex-col">
-        <div class="px-6 py-3.5 border-b border-[#E2E8F0] dark:border-slate-800 flex items-center justify-between">
-          <div class="flex items-center gap-2 text-xs font-semibold text-[#2563EB] dark:text-blue-400">
+      <div
+        class="relative w-full max-w-4xl max-h-[90vh] bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 rounded-xl shadow-xl overflow-hidden flex flex-col"
+      >
+        <div
+          class="px-6 py-3.5 border-b border-[#E2E8F0] dark:border-slate-800 flex items-center justify-between"
+        >
+          <div
+            class="flex items-center gap-2 text-xs font-semibold text-[#2563EB] dark:text-blue-400"
+          >
             <Eye class="w-4 h-4" />
             <span>Preview Tampilan Employee</span>
           </div>
-          <button @click="isPreviewModalOpen = false" class="p-1 rounded-lg text-[#64748B] hover:bg-[#F1F5F9] dark:hover:bg-slate-800 transition-colors cursor-pointer">
+          <button
+            @click="isPreviewModalOpen = false"
+            class="p-1 rounded-lg text-[#64748B] hover:bg-[#F1F5F9] dark:hover:bg-slate-800 transition-colors cursor-pointer"
+          >
             <X class="w-5 h-5" />
           </button>
         </div>
 
         <div class="flex-1 overflow-y-auto p-8 space-y-6">
-          <h1 class="text-2xl font-bold text-[#1E293B] dark:text-slate-100 tracking-tight">{{ doc.title }}</h1>
-          <p class="text-xs sm:text-sm text-[#334155] dark:text-slate-300 p-4 rounded-lg bg-[#F8FAFC] dark:bg-slate-800/50 border border-[#E2E8F0] dark:border-slate-700/60 leading-relaxed">{{ doc.summary }}</p>
+          <h1 class="text-2xl font-bold text-[#1E293B] dark:text-slate-100 tracking-tight">
+            {{ doc.title }}
+          </h1>
+          <p
+            class="text-xs sm:text-sm text-[#334155] dark:text-slate-300 p-4 rounded-lg bg-[#F8FAFC] dark:bg-slate-800/50 border border-[#E2E8F0] dark:border-slate-700/60 leading-relaxed"
+          >
+            {{ doc.summary }}
+          </p>
 
-          <div class="doc-preview prose prose-slate dark:prose-invert max-w-none text-[#1E293B] dark:text-slate-200" v-html="safePreviewHtml"></div>
+          <div
+            class="doc-preview prose prose-slate dark:prose-invert max-w-none text-[#1E293B] dark:text-slate-200"
+            v-html="safePreviewHtml"
+          ></div>
         </div>
       </div>
     </div>
@@ -911,11 +1013,19 @@ function goToAdminCases() {
       aria-labelledby="link-dialog-title"
       @keydown.esc="cancelLinkDialog"
     >
-      <div class="relative w-full max-w-md bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 rounded-xl shadow-2xl p-5">
-        <h2 id="link-dialog-title" class="text-sm font-bold text-[#0F172A] dark:text-slate-100 mb-3">
+      <div
+        class="relative w-full max-w-md bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 rounded-xl shadow-2xl p-5"
+      >
+        <h2
+          id="link-dialog-title"
+          class="text-sm font-bold text-[#0F172A] dark:text-slate-100 mb-3"
+        >
           Tautan URL
         </h2>
-        <label for="link-dialog-url" class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">
+        <label
+          for="link-dialog-url"
+          class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5"
+        >
           Alamat tautan (kosongkan untuk menghapus tautan)
         </label>
         <input
@@ -927,7 +1037,11 @@ function goToAdminCases() {
           placeholder="https://portal.esb.co.id"
           class="w-full rounded-lg border border-[#E2E8F0] dark:border-slate-700 bg-white dark:bg-slate-950 px-3 py-2 text-sm text-[#0F172A] dark:text-slate-100 focus:outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/20"
         />
-        <p v-if="linkDialogError" class="mt-2 text-xs font-medium text-rose-600 dark:text-rose-400" role="alert">
+        <p
+          v-if="linkDialogError"
+          class="mt-2 text-xs font-medium text-rose-600 dark:text-rose-400"
+          role="alert"
+        >
           {{ linkDialogError }}
         </p>
         <div class="mt-4 flex justify-end gap-2">
@@ -957,10 +1071,16 @@ function goToAdminCases() {
       aria-label="Sisipkan Gambar"
       class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm animate-in fade-in duration-150"
     >
-      <div class="relative w-full max-w-md bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 rounded-2xl shadow-2xl overflow-hidden flex flex-col">
+      <div
+        class="relative w-full max-w-md bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 rounded-2xl shadow-2xl overflow-hidden flex flex-col"
+      >
         <!-- Modal Header -->
-        <div class="px-5 py-4 border-b border-[#E2E8F0] dark:border-slate-800 flex items-center justify-between">
-          <div class="flex items-center gap-2 text-xs font-extrabold text-[#0F172A] dark:text-white">
+        <div
+          class="px-5 py-4 border-b border-[#E2E8F0] dark:border-slate-800 flex items-center justify-between"
+        >
+          <div
+            class="flex items-center gap-2 text-xs font-extrabold text-[#0F172A] dark:text-white"
+          >
             <ImageIcon class="w-4 h-4 text-[#5D87FF]" />
             <span>Sisipkan Gambar</span>
           </div>
@@ -975,18 +1095,28 @@ function goToAdminCases() {
         <!-- Modal Body & Tab Switcher -->
         <div class="p-5 space-y-4">
           <!-- Tabs: Upload File vs URL -->
-          <div class="flex items-center p-1 bg-[#F1F5F9] dark:bg-slate-800 rounded-xl text-xs font-bold">
+          <div
+            class="flex items-center p-1 bg-[#F1F5F9] dark:bg-slate-800 rounded-xl text-xs font-bold"
+          >
             <button
               @click="imageInputTab = 'upload'"
               class="flex-1 py-1.5 rounded-lg transition-all cursor-pointer text-center"
-              :class="imageInputTab === 'upload' ? 'bg-white dark:bg-slate-900 text-[#5D87FF] shadow-2xs' : 'text-[#64748B] dark:text-slate-400'"
+              :class="
+                imageInputTab === 'upload'
+                  ? 'bg-white dark:bg-slate-900 text-[#5D87FF] shadow-2xs'
+                  : 'text-[#64748B] dark:text-slate-400'
+              "
             >
               Upload Local File
             </button>
             <button
               @click="imageInputTab = 'url'"
               class="flex-1 py-1.5 rounded-lg transition-all cursor-pointer text-center"
-              :class="imageInputTab === 'url' ? 'bg-white dark:bg-slate-900 text-[#5D87FF] shadow-2xs' : 'text-[#64748B] dark:text-slate-400'"
+              :class="
+                imageInputTab === 'url'
+                  ? 'bg-white dark:bg-slate-900 text-[#5D87FF] shadow-2xs'
+                  : 'text-[#64748B] dark:text-slate-400'
+              "
             >
               URL Gambar Web
             </button>
@@ -1009,16 +1139,28 @@ function goToAdminCases() {
               />
 
               <template v-if="selectedFilePreview">
-                <img :src="selectedFilePreview" alt="Preview Upload" class="max-h-36 rounded-lg object-contain shadow-sm border border-slate-200 dark:border-slate-700" />
-                <span class="text-[11px] font-bold text-[#5D87FF] group-hover:underline">Klik untuk mengganti gambar</span>
+                <img
+                  :src="selectedFilePreview"
+                  alt="Preview Upload"
+                  class="max-h-36 rounded-lg object-contain shadow-sm border border-slate-200 dark:border-slate-700"
+                />
+                <span class="text-[11px] font-bold text-[#5D87FF] group-hover:underline"
+                  >Klik untuk mengganti gambar</span
+                >
               </template>
               <template v-else>
-                <div class="w-10 h-10 rounded-full bg-[#ECF2FF] dark:bg-slate-800 text-[#5D87FF] flex items-center justify-center group-hover:scale-110 transition-transform">
+                <div
+                  class="w-10 h-10 rounded-full bg-[#ECF2FF] dark:bg-slate-800 text-[#5D87FF] flex items-center justify-center group-hover:scale-110 transition-transform"
+                >
                   <Upload class="w-5 h-5" />
                 </div>
                 <div>
-                  <p class="text-xs font-extrabold text-[#0F172A] dark:text-white">Klik atau Tarik File Gambar ke Sini</p>
-                  <p class="text-[10px] text-[#64748B] dark:text-slate-400 font-medium">PNG, JPG, WebP, GIF, SVG (Maksimal 5MB)</p>
+                  <p class="text-xs font-extrabold text-[#0F172A] dark:text-white">
+                    Klik atau Tarik File Gambar ke Sini
+                  </p>
+                  <p class="text-[10px] text-[#64748B] dark:text-slate-400 font-medium">
+                    PNG, JPG, WebP, GIF, SVG (Maksimal 5MB)
+                  </p>
                 </div>
               </template>
             </div>
@@ -1026,7 +1168,10 @@ function goToAdminCases() {
 
           <!-- Tab 2: URL Input Area -->
           <div v-else class="space-y-2">
-            <label class="block text-[11px] font-extrabold uppercase text-[#64748B] dark:text-slate-400">URL Gambar (HTTPS):</label>
+            <label
+              class="block text-[11px] font-extrabold uppercase text-[#64748B] dark:text-slate-400"
+              >URL Gambar (HTTPS):</label
+            >
             <div class="relative flex items-center">
               <LinkIcon class="absolute left-3 w-4 h-4 text-[#7C8BAC]" />
               <input
@@ -1037,13 +1182,21 @@ function goToAdminCases() {
               />
             </div>
             <div v-if="imageUrlInput" class="pt-2 text-center">
-              <img :src="imageUrlInput" alt="Preview URL" class="max-h-32 rounded-lg mx-auto object-contain border border-slate-200 dark:border-slate-700 shadow-sm" @error="showToast('URL Gambar tidak valid atau tidak dapat dimuat.', 'error')" />
+              <img
+                :src="imageUrlInput"
+                alt="Preview URL"
+                class="max-h-32 rounded-lg mx-auto object-contain border border-slate-200 dark:border-slate-700 shadow-sm"
+                @error="showToast('URL Gambar tidak valid atau tidak dapat dimuat.', 'error')"
+              />
             </div>
           </div>
 
           <!-- Caption Input -->
           <div class="space-y-1">
-            <label class="block text-[11px] font-extrabold uppercase text-[#64748B] dark:text-slate-400">Keterangan Gambar / Caption (Opsional):</label>
+            <label
+              class="block text-[11px] font-extrabold uppercase text-[#64748B] dark:text-slate-400"
+              >Keterangan Gambar / Caption (Opsional):</label
+            >
             <input
               v-model="imageCaptionInput"
               type="text"
@@ -1054,7 +1207,9 @@ function goToAdminCases() {
         </div>
 
         <!-- Modal Footer -->
-        <div class="px-5 py-3.5 bg-[#F8FAFC] dark:bg-slate-800/60 border-t border-[#E2E8F0] dark:border-slate-800 flex items-center justify-end gap-2">
+        <div
+          class="px-5 py-3.5 bg-[#F8FAFC] dark:bg-slate-800/60 border-t border-[#E2E8F0] dark:border-slate-800 flex items-center justify-end gap-2"
+        >
           <button
             @click="isImageModalOpen = false"
             class="px-4 py-2 rounded-xl text-xs font-extrabold text-[#64748B] hover:bg-[#F1F5F9] dark:hover:bg-slate-800 transition-colors cursor-pointer"
@@ -1071,7 +1226,6 @@ function goToAdminCases() {
         </div>
       </div>
     </div>
-
   </div>
 </template>
 
@@ -1184,7 +1338,9 @@ function goToAdminCases() {
   border-radius: 0.75rem !important;
   margin: 1.5rem auto !important;
   display: block !important;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1) !important;
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -2px rgba(0, 0, 0, 0.1) !important;
   border: 1px solid #e2e8f0 !important;
 }
 
@@ -1311,5 +1467,4 @@ function goToAdminCases() {
   background-color: #1e293b;
   color: #f8fafc;
 }
-
 </style>

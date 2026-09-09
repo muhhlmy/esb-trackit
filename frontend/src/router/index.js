@@ -40,7 +40,11 @@ const routes = [
     path: '/cases',
     name: 'cases',
     component: () => import('../views/CasesView.vue'),
-    meta: { title: 'Cases & Artikel', subtitle: 'Kumpulan Artikel & Playbook Insiden', public: true },
+    meta: {
+      title: 'Cases & Artikel',
+      subtitle: 'Kumpulan Artikel & Playbook Insiden',
+      public: true,
+    },
   },
   {
     path: '/cases/:id',
@@ -59,7 +63,11 @@ const routes = [
     alias: '/analytics',
     name: 'kb-analytics',
     component: () => import('../views/AnalyticsView.vue'),
-    meta: { title: 'Help Center Analytics', subtitle: 'Metrik & Tren Pencarian Artikel', public: true },
+    meta: {
+      title: 'Help Center Analytics',
+      subtitle: 'Metrik & Tren Pencarian Artikel',
+      public: true,
+    },
   },
 
   // Auth Route
@@ -214,7 +222,11 @@ const routes = [
     path: '/forbidden',
     name: 'forbidden',
     component: () => import('../views/AccessDeniedView.vue'),
-    meta: { title: 'Akses Ditolak', subtitle: 'Anda tidak memiliki izin untuk halaman ini', public: true },
+    meta: {
+      title: 'Akses Ditolak',
+      subtitle: 'Anda tidak memiliki izin untuk halaman ini',
+      public: true,
+    },
   },
   {
     path: '/:pathMatch(.*)*',

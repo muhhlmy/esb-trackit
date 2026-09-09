@@ -258,7 +258,7 @@ async function fetchQueues() {
     const data = await get('/api/ticket-queues')
     if (Array.isArray(data)) queues.value = data
   } catch (err) {
-    showNotification('error', 'Gagal memuat data antrean unit: ' + (err.message || 'Kesalahan jaringan'))
+    toast('Gagal memuat data antrean unit: ' + (err.message || 'Kesalahan jaringan'), 'error')
   } finally {
     isQueuesLoading.value = false
   }
@@ -267,8 +267,7 @@ async function fetchQueues() {
 const unitOptions = computed(() => {
   const itQueues = queues.value.filter(
     (q) =>
-      (q.kode || '').toUpperCase().includes('IT') ||
-      (q.nama || '').toUpperCase().includes('IT'),
+      (q.kode || '').toUpperCase().includes('IT') || (q.nama || '').toUpperCase().includes('IT'),
   )
   const hrQueues = queues.value.filter(
     (q) =>
@@ -343,7 +342,7 @@ async function fetchUsers() {
   pageError.value = ''
   try {
     const response = await get('/api/users?limit=500')
-    const data = Array.isArray(response) ? response : (response?.data || [])
+    const data = Array.isArray(response) ? response : response?.data || []
     if (!Array.isArray(data)) throw new Error('Format data pengguna dari server tidak valid.')
     users.value = data
   } catch (e) {
@@ -362,7 +361,7 @@ async function fetchEmployees() {
     const data = await get('/api/karyawan?all=true')
     if (Array.isArray(data)) employees.value = data
   } catch (err) {
-    showNotification('error', 'Gagal memuat data karyawan: ' + (err.message || 'Kesalahan jaringan'))
+    toast('Gagal memuat data karyawan: ' + (err.message || 'Kesalahan jaringan'), 'error')
   } finally {
     isEmployeesLoading.value = false
   }
@@ -491,7 +490,8 @@ async function saveUser() {
   }
   const PASSWORD_COMPLEXITY_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[\d\W_]).{8,}$/
   if (form.value.password && !PASSWORD_COMPLEXITY_REGEX.test(form.value.password)) {
-    modalError.value = 'Password minimal 8 karakter dan harus mengandung kombinasi huruf besar, huruf kecil, serta angka atau simbol.'
+    modalError.value =
+      'Password minimal 8 karakter dan harus mengandung kombinasi huruf besar, huruf kecil, serta angka atau simbol.'
     isSubmitting.value = false
     return
   }
@@ -625,7 +625,9 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
       <!-- Row 1: Page Title & Primary CTA -->
       <div class="flex items-center justify-between gap-2 sm:gap-3">
         <div class="min-w-0">
-          <h2 class="text-base sm:text-lg font-bold text-[#0F172A] tracking-tight">Data Pengguna</h2>
+          <h2 class="text-base sm:text-lg font-bold text-[#0F172A] tracking-tight">
+            Data Pengguna
+          </h2>
           <p class="text-[11px] sm:text-xs text-[#64748B] mt-0.5 leading-normal">
             Pengelolaan akun, role, dan hak akses pengguna sistem
           </p>
@@ -644,7 +646,9 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
       </div>
 
       <!-- Row 2: Search & Filters -->
-      <div class="flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-2 w-full min-w-0 pt-2 border-t border-[#F1F5F9]">
+      <div
+        class="flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-2 w-full min-w-0 pt-2 border-t border-[#F1F5F9]"
+      >
         <div class="relative w-full sm:flex-1 sm:min-w-[200px]">
           <span
             aria-hidden="true"
@@ -706,7 +710,11 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
         </div>
         <!-- Mobile Skeleton -->
         <div class="md:hidden flex flex-col gap-3 p-3.5">
-          <div v-for="i in 4" :key="'skel-user-' + i" class="rounded-xl border border-[#F1F5F9] bg-[#FAFCFF] p-3.5 flex flex-col gap-3 animate-pulse">
+          <div
+            v-for="i in 4"
+            :key="'skel-user-' + i"
+            class="rounded-xl border border-[#F1F5F9] bg-[#FAFCFF] p-3.5 flex flex-col gap-3 animate-pulse"
+          >
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-2.5">
                 <div class="h-9 w-9 rounded-lg bg-[#E2E8F0]"></div>
@@ -742,7 +750,11 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
 
       <template v-else>
         <!-- ═══ Desktop Table (>= md / 768px) ═══ -->
-        <div class="hidden md:block w-full max-w-full overflow-hidden" tabindex="0" aria-label="Tabel pengguna">
+        <div
+          class="hidden md:block w-full max-w-full overflow-hidden"
+          tabindex="0"
+          aria-label="Tabel pengguna"
+        >
           <table class="w-full max-w-full text-left border-collapse table-fixed">
             <caption class="sr-only">
               Daftar pengguna sistem
@@ -831,7 +843,10 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
                   >
                     Semua Unit (Superadmin)
                   </div>
-                  <div v-else-if="user.queues && user.queues.length > 0" class="flex flex-wrap gap-1 min-w-0">
+                  <div
+                    v-else-if="user.queues && user.queues.length > 0"
+                    class="flex flex-wrap gap-1 min-w-0"
+                  >
                     <span
                       v-for="q in user.queues"
                       :key="q.id"
@@ -839,7 +854,9 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
                       >{{ q.kode }}</span
                     >
                   </div>
-                  <span v-else class="text-[11.5px] text-[#94A3B8] italic truncate block">Tidak ada unit</span>
+                  <span v-else class="text-[11.5px] text-[#94A3B8] italic truncate block"
+                    >Tidak ada unit</span
+                  >
                 </td>
 
                 <!-- Hak Akses Fitur Count Badge -->
@@ -895,7 +912,9 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
           <!-- Empty State -->
           <div v-if="filteredUsers.length === 0" class="px-4 py-10 text-center">
             <div class="flex flex-col items-center gap-2">
-              <span aria-hidden="true" class="material-symbols-outlined text-[36px] text-[#D1D5DB]">group</span>
+              <span aria-hidden="true" class="material-symbols-outlined text-[36px] text-[#D1D5DB]"
+                >group</span
+              >
               <p class="text-[13px] text-[#9CA3AF]">Tidak ada pengguna yang sesuai pencarian.</p>
               <button
                 v-if="searchQuery || filterRole"
@@ -922,13 +941,16 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
                     :class="{
                       'bg-purple-600': isRoleSuperAdmin(user.role),
                       'bg-[#2563EB]': user.role === 'admin' && !isRoleSuperAdmin(user.role),
-                      'bg-[#64748B]': user.role === 'user' || (!user.role),
+                      'bg-[#64748B]': user.role === 'user' || !user.role,
                     }"
                   >
                     {{ getInitials(user.nama) }}
                   </div>
                   <div class="min-w-0 flex-1">
-                    <p class="text-[13px] font-bold text-[#0F172A] leading-snug truncate" :title="user.nama">
+                    <p
+                      class="text-[13px] font-bold text-[#0F172A] leading-snug truncate"
+                      :title="user.nama"
+                    >
                       {{ user.nama }}
                     </p>
                     <p class="text-[11px] text-[#64748B] truncate" :title="user.email">
@@ -945,7 +967,9 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
               <div class="grid grid-cols-2 gap-2">
                 <!-- Role -->
                 <div class="flex flex-col gap-0.5 rounded-lg bg-[#F8FAFC] px-2.5 py-2">
-                  <span class="text-[9px] font-semibold uppercase tracking-wider text-[#94A3B8]">Role</span>
+                  <span class="text-[9px] font-semibold uppercase tracking-wider text-[#94A3B8]"
+                    >Role</span
+                  >
                   <AppBadge
                     :type="getRoleBadgeType(user.role)"
                     :text="(user.role || 'user').toUpperCase()"
@@ -954,7 +978,9 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
 
                 <!-- Status -->
                 <div class="flex flex-col gap-0.5 rounded-lg bg-[#F8FAFC] px-2.5 py-2">
-                  <span class="text-[9px] font-semibold uppercase tracking-wider text-[#94A3B8]">Status</span>
+                  <span class="text-[9px] font-semibold uppercase tracking-wider text-[#94A3B8]"
+                    >Status</span
+                  >
                   <AppBadge
                     :type="user.is_active === false ? 'danger' : 'success'"
                     :text="user.is_active === false ? 'NONAKTIF' : 'AKTIF'"
@@ -963,23 +989,34 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
 
                 <!-- Unit Ditangani -->
                 <div class="flex flex-col gap-1 rounded-lg bg-[#F8FAFC] px-2.5 py-2">
-                  <span class="text-[9px] font-semibold uppercase tracking-wider text-[#94A3B8]">Unit</span>
-                  <div v-if="isRoleSuperAdmin(user.role)" class="text-[10.5px] font-semibold text-[#2563EB] leading-tight">
+                  <span class="text-[9px] font-semibold uppercase tracking-wider text-[#94A3B8]"
+                    >Unit</span
+                  >
+                  <div
+                    v-if="isRoleSuperAdmin(user.role)"
+                    class="text-[10.5px] font-semibold text-[#2563EB] leading-tight"
+                  >
                     Semua Unit
                   </div>
-                  <div v-else-if="user.queues && user.queues.length > 0" class="flex flex-wrap gap-1">
+                  <div
+                    v-else-if="user.queues && user.queues.length > 0"
+                    class="flex flex-wrap gap-1"
+                  >
                     <span
                       v-for="q in user.queues"
                       :key="'mq-' + q.id"
                       class="inline-flex items-center rounded bg-[#EFF6FF] px-1.5 py-0.5 text-[9.5px] font-semibold text-[#2563EB]"
-                    >{{ q.kode }}</span>
+                      >{{ q.kode }}</span
+                    >
                   </div>
                   <span v-else class="text-[10.5px] text-[#94A3B8] italic leading-tight">—</span>
                 </div>
 
                 <!-- Hak Akses -->
                 <div class="flex flex-col gap-0.5 rounded-lg bg-[#F8FAFC] px-2.5 py-2">
-                  <span class="text-[9px] font-semibold uppercase tracking-wider text-[#94A3B8]">Hak Akses</span>
+                  <span class="text-[9px] font-semibold uppercase tracking-wider text-[#94A3B8]"
+                    >Hak Akses</span
+                  >
                   <AppBadge
                     :type="getPermissionBadge(user).type"
                     :text="getPermissionBadge(user).text"
@@ -1346,14 +1383,18 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
         </label>
 
         <!-- 6. Sticky Footer -->
-        <div class="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-2.5 sm:gap-3 pt-3 border-t border-[#F1F5F9]">
+        <div
+          class="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-2.5 sm:gap-3 pt-3 border-t border-[#F1F5F9]"
+        >
           <div class="min-w-0">
             <p v-if="modalError" class="text-xs font-semibold text-rose-600">
               {{ modalError }}
             </p>
           </div>
 
-          <div class="flex flex-col-reverse sm:flex-row items-stretch sm:items-center gap-2 shrink-0">
+          <div
+            class="flex flex-col-reverse sm:flex-row items-stretch sm:items-center gap-2 shrink-0"
+          >
             <button
               type="button"
               :disabled="isSubmitting"

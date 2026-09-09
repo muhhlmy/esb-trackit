@@ -232,6 +232,9 @@ export function printAssetLabel(hostname) {
   }
 
   const html = buildAssetLabelHtml(cleanHostname)
-  const ok = printHtmlDocument(html, 'Pop-up terblokir. Harap izinkan pop-up untuk mencetak label aset.')
+  const ok = printHtmlDocument(
+    html,
+    'Pop-up terblokir. Harap izinkan pop-up untuk mencetak label aset.',
+  )
   return { success: ok }
 }

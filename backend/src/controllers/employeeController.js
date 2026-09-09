@@ -1,6 +1,5 @@
 import { pool, withTransaction } from "../config/database.js";
-import { env } from "../config/env.js";
-import { hashPassword } from "../security/passwordService.js";
+import { createEnrollmentCredential } from "../security/passwordService.js";
 import { normalizeLocation } from "../utils/locationNormalizer.js";
 import { parsePaginationQuery, setPaginationHeaders } from "../security/requestValidation.js";
 
@@ -258,8 +257,6 @@ export async function storeEmployee(req, res) {
       );
 
       if (existingUser.rowCount === 0) {
-              const defaultPassword = env.auth.defaultUserPassword
-              const defaultPasswordHash = await hashPassword(defaultPassword)
               const defaultPermissions = JSON.stringify({
           dashboard: "none",
           assets: "none",
@@ -275,7 +272,7 @@ export async function storeEmployee(req, res) {
         await client.query(
           `INSERT INTO users (nama, email, password_hash, role, permissions, is_active)
            VALUES ($1, $2, $3, 'user', $4::jsonb, true)`,
-          [nama_karyawan, email_kantor, defaultPasswordHash, defaultPermissions],
+          [nama_karyawan, email_kantor, createEnrollmentCredential(), defaultPermissions],
         );
       }
 

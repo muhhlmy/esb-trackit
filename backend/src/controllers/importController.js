@@ -1,7 +1,6 @@
 import crypto from 'node:crypto';
 import { pool, withTransaction } from "../config/database.js";
-import { env } from "../config/env.js";
-import { hashPassword } from "../security/passwordService.js";
+import { createEnrollmentCredential } from "../security/passwordService.js";
 import { normalizeLocation } from "../utils/locationNormalizer.js";
 
 export function cleanText(value) {
@@ -294,9 +293,7 @@ export async function importExcelData(req, res) {
       });
     }
 
-    // ── Phase 2: Hash Default Password HANYA SEKALI sebelum loop ──
-        const defaultPassword = env.auth.defaultUserPassword
-        const defaultPasswordHash = await hashPassword(defaultPassword)
+    // New accounts enroll through the email OTP password reset flow.
 
     // ── Phase 3: Proses Karyawan, User & Aset dalam SATU Database Transaction ──
     await withTransaction(async (client) => {
@@ -360,7 +357,7 @@ export async function importExcelData(req, res) {
                           await client.query(
                             `INSERT INTO users (nama, email, password_hash, role, permissions, is_active)
                              VALUES ($1, $2, $3, 'user', $4::jsonb, true)`,
-                            [emp.nama, emp.email, defaultPasswordHash, DEFAULT_IMPORT_PERMISSIONS]
+                            [emp.nama, emp.email, createEnrollmentCredential(), DEFAULT_IMPORT_PERMISSIONS]
                 );
                 createdUserCount++;
                 dbUserEmailsSet.add(normEmail);

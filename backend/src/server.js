@@ -1,7 +1,7 @@
 import { app } from "./app.js";
 import { pool, query } from "./config/database.js";
 import { env } from "./config/env.js";
-import { bootstrapSchema } from "./config/bootstrapSchema.js";
+import { drainHttpServer } from "./services/shutdownService.js";
 import { verifyRuntimeSchema } from "./config/runtimeSchema.js";
 import { closeAllSseClients } from "./services/realtimeService.js";
 import { appendRotatingLog } from "./utils/logRotator.js";
@@ -43,21 +43,11 @@ async function handleShutdown(signal) {
   // 1. Stop HTTP listener (tidak menerima koneksi baru)
   if (server) {
     try {
-      await new Promise((resolve, reject) => {
-        server.close((err) => (err ? reject(err) : resolve()));
-      });
+      await drainHttpServer(server, () => closeAllSseClients('Server sedang dimatikan.'));
       console.log('HTTP server berhasil ditutup.');
     } catch (error) {
       console.error('Gagal menutup HTTP server:', error.message);
     }
-  }
-
-  // 2. Putuskan semua koneksi realtime SSE dengan pesan penutupan bersih
-  try {
-    closeAllSseClients('Server sedang dimatikan (graceful shutdown).');
-    console.log('Koneksi realtime SSE berhasil ditutup.');
-  } catch (error) {
-    console.error('Gagal menutup klien SSE:', error.message);
   }
 
   // 3. Tutup connection pool database PostgreSQL
@@ -78,7 +68,6 @@ process.on('SIGTERM', () => handleShutdown('SIGTERM'));
 try {
   // Coba koneksi sebelum menjalankan server
   await query('SELECT 1');
-  await bootstrapSchema();
   await verifyRuntimeSchema(pool);
 } catch (error) {
   console.error("Database belum siap digunakan:", error.message);

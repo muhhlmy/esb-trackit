@@ -1,7 +1,7 @@
 import { chromium } from '@playwright/test'
 
 const BASE = 'http://localhost:5173'
-const API = 'http://localhost:5000'
+const API = process.env.E2E_API_URL || 'http://localhost:3000'
 const results = []
 let browser, page
 
@@ -101,15 +101,11 @@ async function run() {
     log('Logout redirects to login', page.url().includes('/login'), page.url())
   } else {
     // Try API logout then clear storage
-    const token = await page.evaluate(() => localStorage.getItem('token') || sessionStorage.getItem('token'))
-    if (token) {
-      await page.evaluate(async () => {
-        const t = localStorage.getItem('token') || sessionStorage.getItem('token')
-        if (t) {
-          await fetch('http://localhost:5000/api/auth/logout', { method: 'POST', headers: { 'Authorization': `Bearer ${t}` } })
-        }
-      })
-    }
+    const logoutStatus = await page.evaluate(async () => {
+      const response = await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' })
+      return response.status
+    })
+    log('Logout API succeeded', logoutStatus === 200, String(logoutStatus))
     await page.evaluate(() => { localStorage.clear(); sessionStorage.clear() })
     await page.goto(`${BASE}/login`, { waitUntil: 'domcontentloaded' })
     log('Logout via API + storage clear', page.url().includes('/login'), page.url())

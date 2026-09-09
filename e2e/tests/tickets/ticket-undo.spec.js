@@ -13,7 +13,7 @@ test.describe('Ticket Status Undo', () => {
     await ticketItem.click()
 
     // Find and click status dropdown
-    const statusBtn = page.getByRole('button', { name: /status|open|in progress|pending/i })
+    const statusBtn = page.getByRole('button', { name: 'Ubah status tiket', exact: true })
     if (await statusBtn.isVisible({ timeout: 5000 })) {
       await statusBtn.click()
 
@@ -43,7 +43,7 @@ test.describe('Ticket Status Undo', () => {
     await expect(ticketItem).toBeVisible({ timeout: 10000 })
     await ticketItem.click()
 
-    const statusBtn = page.getByRole('button', { name: /status|open|in progress|pending/i })
+    const statusBtn = page.getByRole('button', { name: 'Ubah status tiket', exact: true })
     if (await statusBtn.isVisible({ timeout: 5000 })) {
       await statusBtn.click()
 

@@ -136,4 +136,3 @@ export const api = {
     return del(`/api/shipments/${id}`)
   },
 }
-

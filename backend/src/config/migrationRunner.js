@@ -66,10 +66,12 @@ export async function loadVersionedMigrations(
 
     const sql = await readFile(new URL(name, directory), 'utf8')
     if (!sql.trim()) throw new Error(`Migration kosong: ${name}`)
-    if (TRANSACTION_CONTROL_PATTERN.test(sql)) {
+    // Ignore comments and quoted SQL/PLpgSQL bodies when checking top-level control.
+    const executable = sql.replace(/\$([a-zA-Z_][a-zA-Z0-9_]*)?\$[\s\S]*?\$\1\$/g, ' ').replace(/'(?:''|[^'])*'/g, ' ').replace(/--[^\n]*|\/\*[\s\S]*?\*\//g, ' ')
+    if (TRANSACTION_CONTROL_PATTERN.test(executable)) {
       throw new Error(`Migration tidak boleh mengatur transaction sendiri: ${name}`)
     }
-    if (PSQL_META_COMMAND_PATTERN.test(sql)) {
+    if (PSQL_META_COMMAND_PATTERN.test(executable)) {
       throw new Error(`Migration tidak boleh berisi psql meta-command: ${name}`)
     }
 

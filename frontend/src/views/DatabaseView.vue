@@ -1,13 +1,11 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useApi } from '@/composables/useApi'
-import { useAuth } from '@/composables/useAuth'
 import { clearAuthSession } from '@/utils/authStorage.js'
 import AppModal from '@/components/ui/AppModal.vue'
 import SkeletonCard from '@/components/ui/skeleton/SkeletonCard.vue'
 
 const api = useApi()
-const { isSuperAdmin } = useAuth()
 
 // ========== State ==========
 const isLoading = ref(true)
@@ -38,8 +36,6 @@ const isLoadingBackups = ref(false)
 
 // Restore
 const restoreFile = ref(null)
-const isUploading = ref(false)
-const isRestoring = ref(false)
 const restoreValidation = ref(null)
 const restoreStep = ref('upload') // 'upload' | 'validating' | 'review' | 'restoring' | 'done'
 const restoreError = ref('')
@@ -91,20 +87,6 @@ function formatDate(dateStr) {
   })
 }
 
-function formatTimeAgo(dateStr) {
-  if (!dateStr) return '-'
-  const now = new Date()
-  const d = new Date(dateStr)
-  const diff = now - d
-  const mins = Math.floor(diff / 60000)
-  if (mins < 1) return 'Baru saja'
-  if (mins < 60) return `${mins} menit lalu`
-  const hrs = Math.floor(mins / 60)
-  if (hrs < 24) return `${hrs} jam lalu`
-  const days = Math.floor(hrs / 24)
-  return `${days} hari lalu`
-}
-
 function statusLabel(status) {
   return status === 'success' ? 'Berhasil' : status === 'failed' ? 'Gagal' : 'Proses'
 }
@@ -140,7 +122,7 @@ async function fetchDatabaseStatus() {
   try {
     const res = await api.get('/api/admin/database/status')
     dbStatus.value = res.data || res
-  } catch (err) {
+  } catch {
     showToast('Gagal memuat status database.', 'error')
   }
 }
@@ -151,7 +133,7 @@ async function fetchBackupHistory(page = 1) {
     const res = await api.get(`/api/admin/database/backups?page=${page}&pageSize=20`)
     backups.value = res.data || []
     if (res.pagination) backupPagination.value = res.pagination
-  } catch (err) {
+  } catch {
     showToast('Gagal memuat riwayat backup.', 'error')
   } finally {
     isLoadingBackups.value = false
@@ -164,7 +146,7 @@ async function fetchAuditLogs(page = 1) {
     const res = await api.get(`/api/admin/database/audit-logs?page=${page}&pageSize=50`)
     auditLogs.value = res.data || []
     if (res.pagination) auditPagination.value = res.pagination
-  } catch (err) {
+  } catch {
     showToast('Gagal memuat audit log.', 'error')
   } finally {
     isLoadingAudit.value = false
@@ -238,11 +220,6 @@ async function handleDeleteConfirm() {
   } finally {
     isDeleting.value = false
   }
-}
-
-function handleRestoreFromHistory(backup) {
-  // Switch to restore tab with pre-selected
-  activeTab.value = 'restore'
 }
 
 // ========== Restore Flow ==========

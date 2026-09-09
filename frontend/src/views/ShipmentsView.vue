@@ -20,9 +20,7 @@ import {
 } from 'lucide-vue-next'
 
 const { isSuperAdmin, hasWritePermission } = useAuth()
-const canWriteShipments = computed(
-  () => isSuperAdmin.value || hasWritePermission('shipments'),
-)
+const canWriteShipments = computed(() => isSuperAdmin.value || hasWritePermission('shipments'))
 
 // ── State Utama ──────────────────────────────────────────────
 const shipments = ref([])
@@ -334,9 +332,7 @@ onMounted(() => {
       <!-- Row 1: Title and Actions -->
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 class="text-lg sm:text-xl font-bold text-[#0F172A] tracking-tight">
-            Pengiriman
-          </h1>
+          <h1 class="text-lg sm:text-xl font-bold text-[#0F172A] tracking-tight">Pengiriman</h1>
           <p class="text-[13px] text-[#64748B] mt-0.5 leading-normal">
             Pantau proses pengiriman barang dan aset kantor.
           </p>
@@ -378,11 +374,7 @@ onMounted(() => {
             aria-label="Filter status pengiriman"
             class="h-10 w-full rounded-xl border border-[#E2E8F0] bg-white px-3 text-xs text-[#0F172A] focus:border-[#2563EB] focus:outline-none transition-all cursor-pointer shadow-2xs"
           >
-            <option
-              v-for="opt in STATUS_OPTIONS"
-              :key="opt.value"
-              :value="opt.value"
-            >
+            <option v-for="opt in STATUS_OPTIONS" :key="opt.value" :value="opt.value">
               {{ opt.label }}
             </option>
           </select>
@@ -483,9 +475,7 @@ onMounted(() => {
           <Truck class="w-5 h-5" />
         </div>
         <div class="min-w-0">
-          <p class="text-[11px] font-semibold text-[#64748B] uppercase tracking-wider">
-            Diterima
-          </p>
+          <p class="text-[11px] font-semibold text-[#64748B] uppercase tracking-wider">Diterima</p>
           <p class="text-xl sm:text-2xl font-bold text-[#0F172A] mt-0.5">
             {{ summary.diterima }}
           </p>
@@ -511,10 +501,7 @@ onMounted(() => {
         </button>
       </div>
 
-      <div
-        v-else-if="shipments.length === 0"
-        class="px-4 py-12 text-center text-[#64748B]"
-      >
+      <div v-else-if="shipments.length === 0" class="px-4 py-12 text-center text-[#64748B]">
         <div
           class="mx-auto w-12 h-12 rounded-2xl bg-slate-100 flex items-center justify-center text-[#94A3B8] mb-3"
         >
@@ -544,7 +531,9 @@ onMounted(() => {
         <div class="hidden lg:block overflow-x-auto">
           <table class="w-full text-left border-collapse">
             <thead>
-              <tr class="border-b border-[#E2E8F0] bg-[#F8FAFC] text-[11px] font-bold text-[#64748B] uppercase tracking-wider">
+              <tr
+                class="border-b border-[#E2E8F0] bg-[#F8FAFC] text-[11px] font-bold text-[#64748B] uppercase tracking-wider"
+              >
                 <th class="py-3 px-4">Tanggal Request</th>
                 <th class="py-3 px-4">Nama Penerima</th>
                 <th class="py-3 px-4">Deskripsi Barang</th>
@@ -570,7 +559,10 @@ onMounted(() => {
                 <td class="py-3 px-4 max-w-[240px] truncate" :title="item.item_description">
                   {{ item.item_description }}
                 </td>
-                <td class="py-3 px-4 max-w-[200px] truncate text-[#475569]" :title="item.destination">
+                <td
+                  class="py-3 px-4 max-w-[200px] truncate text-[#475569]"
+                  :title="item.destination"
+                >
                   {{ item.destination }}
                 </td>
                 <td class="py-3 px-4 font-mono text-[11px] text-[#475569]">
@@ -836,11 +828,7 @@ onMounted(() => {
     </AppModal>
 
     <!-- Delete Confirmation Modal -->
-    <AppModal
-      :is-open="showDeleteModal"
-      title="Hapus Data Pengiriman"
-      @close="closeModal"
-    >
+    <AppModal :is-open="showDeleteModal" title="Hapus Data Pengiriman" @close="closeModal">
       <div class="space-y-4">
         <div
           v-if="modalError"
@@ -850,8 +838,9 @@ onMounted(() => {
         </div>
 
         <p class="text-xs text-[#475569] leading-relaxed">
-          Data pengiriman untuk <strong class="text-[#0F172A]">{{ selectedShipment?.recipient_name }}</strong> akan dihapus.
-          Tindakan ini tidak dapat dibatalkan.
+          Data pengiriman untuk
+          <strong class="text-[#0F172A]">{{ selectedShipment?.recipient_name }}</strong> akan
+          dihapus. Tindakan ini tidak dapat dibatalkan.
         </p>
 
         <div class="flex items-center justify-end gap-2 pt-3 border-t border-[#F1F5F9]">

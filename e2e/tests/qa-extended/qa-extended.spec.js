@@ -6,25 +6,26 @@ import AxeBuilder from '@axe-core/playwright'
 import fs from 'node:fs'
 
 const BASE = process.env.E2E_BASE_URL || 'http://localhost:5173'
-const API = process.env.E2E_API_URL || 'http://localhost:5000'
+const API = process.env.E2E_API_URL || 'http://localhost:3000'
 
-// Get superadmin auth token via API
-async function getSuperadminToken() {
-  const resp = await fetch(`${API}/api/auth/login`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email: 'superadmin@admin.com', password: 'admin123' }),
-  })
-  const data = await resp.json()
-  return data.token
+// Auth state comes from global setup and includes server-issued HttpOnly cookies.
+function getSuperadminState() {
+  return JSON.parse(fs.readFileSync('e2e/auth/superadmin.json', 'utf8'))
+}
+
+async function restoreSession(page, state) {
+  await page.context().addCookies(state.cookies)
+  const response = await page.request.get(API + '/api/auth/me')
+  expect(response.ok()).toBeTruthy()
+  await page.goto(BASE + '/login', { waitUntil: 'domcontentloaded' })
 }
 
 // Pages to test
 const PAGES = [
-  { path: '/', name: 'Dashboard' },
+  { path: '/dashboard', name: 'Dashboard' },
   { path: '/assets', name: 'Asset TI' },
-  { path: '/ga-assets', name: 'Asset GA' },
-  { path: '/ops-assets', name: 'Asset OPS' },
+  { path: '/assets-ga', name: 'Asset GA' },
+  { path: '/assets-ops', name: 'Asset OPS' },
   { path: '/tickets', name: 'Tickets' },
   { path: '/users', name: 'Users' },
   { path: '/export', name: 'Export' },
@@ -41,7 +42,7 @@ test.describe('QA Extended: Accessibility & Responsive', () => {
   let token
 
   test.beforeAll(async () => {
-    token = await getSuperadminToken()
+    token = await getSuperadminState()
   })
 
   // ── ACCESSIBILITY TESTS ────────────────────────────────────────
@@ -49,16 +50,10 @@ test.describe('QA Extended: Accessibility & Responsive', () => {
     test(`Accessibility: ${pg.name} (${pg.path}) - no critical axe violations`, async ({ page }) => {
       // Inject auth state
       await page.goto(`${BASE}/login`)
-      await page.evaluate((tk) => {
-        localStorage.setItem('token', tk)
-        localStorage.setItem('user', JSON.stringify({ id: 1, role: 'superadmin', nama: 'Super Administrator',
-          email: 'superadmin@admin.com',
-          permissions: { dashboard: 'full', assets: 'full', assets_ga: 'full', assets_ops: 'full',
-            my_assets: 'full', tickets: 'full', users: 'full', logs: 'full', karyawan: 'full', export: 'full' } }))
-      }, token)
+      await restoreSession(page, token)
 
       await page.goto(`${BASE}${pg.path}`, { waitUntil: 'domcontentloaded' })
-      await page.waitForLoadState('networkidle')
+      await page.waitForLoadState('domcontentloaded')
 
       const results = await new AxeBuilder({ page })
         .withTags(['wcag2a', 'wcag2aa'])
@@ -102,16 +97,10 @@ test.describe('QA Extended: Accessibility & Responsive', () => {
     test(`Responsive [${vp.name} ${vp.width}x${vp.height}]: Dashboard renders without overflow`, async ({ page }) => {
       await page.setViewportSize({ width: vp.width, height: vp.height })
       await page.goto(`${BASE}/login`)
-      await page.evaluate((tk) => {
-        localStorage.setItem('token', tk)
-        localStorage.setItem('user', JSON.stringify({ id: 1, role: 'superadmin', nama: 'Super Administrator',
-          email: 'superadmin@admin.com',
-          permissions: { dashboard: 'full', assets: 'full', assets_ga: 'full', assets_ops: 'full',
-            my_assets: 'full', tickets: 'full', users: 'full', logs: 'full', karyawan: 'full', export: 'full' } }))
-      }, token)
+      await restoreSession(page, token)
 
       await page.goto(`${BASE}/`, { waitUntil: 'domcontentloaded' })
-      await page.waitForLoadState('networkidle')
+      await page.waitForLoadState('domcontentloaded')
 
       // Check for horizontal overflow
       const overflow = await page.evaluate(() => {
@@ -162,23 +151,17 @@ test.describe('QA Extended: Accessibility & Responsive', () => {
     await page.locator('#password').fill('wrongpass')
     await page.locator('#password').press('Enter')
     // Wait for error response
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('domcontentloaded')
     const errorVisible = await page.locator('[role="alert"], .error, [class*="error"]').count() > 0
     console.log('[UI] Error shown on wrong credentials:', errorVisible)
   })
 
   test('UI: Navigation sidebar links work correctly', async ({ page }) => {
     await page.goto(`${BASE}/login`)
-    await page.evaluate((tk) => {
-      localStorage.setItem('token', tk)
-      localStorage.setItem('user', JSON.stringify({ id: 1, role: 'superadmin', nama: 'Super Administrator',
-        email: 'superadmin@admin.com',
-        permissions: { dashboard: 'full', assets: 'full', assets_ga: 'full', assets_ops: 'full',
-          my_assets: 'full', tickets: 'full', users: 'full', logs: 'full', karyawan: 'full', export: 'full' } }))
-    }, token)
+    await restoreSession(page, token)
 
     await page.goto(`${BASE}/`, { waitUntil: 'domcontentloaded' })
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('domcontentloaded')
 
     // Check sidebar exists
     const sidebar = page.locator('nav, aside, [role="navigation"]').first()
@@ -195,7 +178,7 @@ test.describe('QA Extended: Accessibility & Responsive', () => {
     const navLinks = ['/assets', '/tickets', '/users', '/export']
     for (const link of navLinks) {
       await page.goto(`${BASE}${link}`, { waitUntil: 'domcontentloaded' })
-      await page.waitForLoadState('networkidle')
+      await page.waitForLoadState('domcontentloaded')
       const currentURL = page.url()
       console.log(`[UI] Nav to ${link}: landed on ${currentURL.replace(BASE, '')}`)
     }
@@ -205,16 +188,10 @@ test.describe('QA Extended: Accessibility & Responsive', () => {
 
   test('UI: Form validation shows errors for empty required fields', async ({ page }) => {
     await page.goto(`${BASE}/login`)
-    await page.evaluate((tk) => {
-      localStorage.setItem('token', tk)
-      localStorage.setItem('user', JSON.stringify({ id: 1, role: 'superadmin', nama: 'Super Administrator',
-        email: 'superadmin@admin.com',
-        permissions: { dashboard: 'full', assets: 'full', assets_ga: 'full', assets_ops: 'full',
-          my_assets: 'full', tickets: 'full', users: 'full', logs: 'full', karyawan: 'full', export: 'full' } }))
-    }, token)
+    await restoreSession(page, token)
 
     await page.goto(`${BASE}/assets`, { waitUntil: 'domcontentloaded' })
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('domcontentloaded')
 
     // Open add asset modal
     const addBtn = page.getByRole('button', { name: /tambah aset/i }).first()
@@ -228,7 +205,7 @@ test.describe('QA Extended: Accessibility & Responsive', () => {
       if (await submitBtn.isVisible()) {
         await submitBtn.click()
         // Wait for validation response
-        await page.waitForLoadState('networkidle')
+        await page.waitForLoadState('domcontentloaded')
 
         // Check for validation messages
         const hasValidation = await page.locator('[class*="error"], [role="alert"], .text-red-500, .invalid-feedback').count() > 0
@@ -245,7 +222,7 @@ test.describe('QA Extended: Accessibility & Responsive', () => {
     await page.locator('#password').fill('wrongpassword123')
     await page.getByRole('button', { name: /masuk/i }).click()
     // Wait for error response
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('domcontentloaded')
 
     // Check for toast/notification
     const toast = page.locator('[role="alert"], [class*="toast"], [class*="notification"]')
@@ -255,7 +232,7 @@ test.describe('QA Extended: Accessibility & Responsive', () => {
 
   test('UI: 404/Forbidden page renders correctly', async ({ page }) => {
     await page.goto(`${BASE}/nonexistent-page-xyz123`, { waitUntil: 'domcontentloaded' })
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('domcontentloaded')
     const bodyText = await page.locator('body').innerText()
     const has404 = bodyText.includes('404') || bodyText.includes('Tidak Ditemukan') || bodyText.includes('halaman')
     console.log('[UI] 404 page shows appropriate content:', has404)

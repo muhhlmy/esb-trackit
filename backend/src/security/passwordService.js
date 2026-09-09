@@ -1,4 +1,5 @@
 import bcrypt from 'bcryptjs'
+import { randomBytes } from 'node:crypto'
 import { env } from '../config/env.js'
 
 const BCRYPT_HASH_PATTERN = /^\$2[aby]\$\d{2}\$[./A-Za-z0-9]{53}$/
@@ -9,6 +10,12 @@ export function isBcryptPasswordHash(value) {
 
 export async function hashPassword(password) {
   return bcrypt.hash(password, env.password.bcryptRounds)
+}
+
+// Deliberately not a bcrypt hash: no submitted password can authenticate until
+// the email owner completes the existing OTP reset flow and enrolls a password.
+export function createEnrollmentCredential() {
+  return `!enrollment:${randomBytes(32).toString('hex')}`
 }
 
 /**

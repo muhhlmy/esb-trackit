@@ -4,7 +4,9 @@ import { TEST_USERS } from './users.js'
 
 async function ensureAuthenticated(page, userCred, baseURL) {
   const targetBase = baseURL || 'http://localhost:5173'
-  await page.goto(`${targetBase}/login`, { waitUntil: 'networkidle' })
+  const session = await page.request.get(`${targetBase}/api/auth/me`)
+  if (session.ok()) return
+  await page.goto(`${targetBase}/login`, { waitUntil: 'domcontentloaded' })
 
   if (page.url().includes('/login')) {
     await page.locator('#email').fill(userCred.email)
@@ -12,7 +14,7 @@ async function ensureAuthenticated(page, userCred, baseURL) {
     await page.getByRole('button', { name: /masuk/i }).click()
 
     try {
-      await page.waitForURL((url) => !url.href.includes('/login'), { timeout: 10000 })
+      await page.waitForURL((url) => !url.href.includes('/login'), { timeout: 10000, waitUntil: 'domcontentloaded' })
     } catch {
       // Timeout — tetap di /login
     }
@@ -32,9 +34,9 @@ export const test = base.extend({
     const storageStatePath = path.join(process.cwd(), 'e2e', 'auth', 'superadmin.json')
     let context
     try {
-      context = await browser.newContext({ storageState: storageStatePath })
+      context = await browser.newContext({ storageState: storageStatePath, baseURL })
     } catch {
-      context = await browser.newContext()
+      context = await browser.newContext({ baseURL })
     }
     const page = await context.newPage()
     await ensureAuthenticated(page, TEST_USERS.superadmin, baseURL)
@@ -47,9 +49,9 @@ export const test = base.extend({
     const storageStatePath = path.join(process.cwd(), 'e2e', 'auth', 'admin.json')
     let context
     try {
-      context = await browser.newContext({ storageState: storageStatePath })
+      context = await browser.newContext({ storageState: storageStatePath, baseURL })
     } catch {
-      context = await browser.newContext()
+      context = await browser.newContext({ baseURL })
     }
     const page = await context.newPage()
     await ensureAuthenticated(page, TEST_USERS.admin, baseURL)
@@ -62,9 +64,9 @@ export const test = base.extend({
     const storageStatePath = path.join(process.cwd(), 'e2e', 'auth', 'user.json')
     let context
     try {
-      context = await browser.newContext({ storageState: storageStatePath })
+      context = await browser.newContext({ storageState: storageStatePath, baseURL })
     } catch {
-      context = await browser.newContext()
+      context = await browser.newContext({ baseURL })
     }
     const page = await context.newPage()
     await ensureAuthenticated(page, TEST_USERS.user, baseURL)

@@ -136,42 +136,26 @@ describe('Backup Retention', () => {
 
 // ========== DATABASE STATUS TESTS ==========
 
-describe('Database Status Endpoint', () => {
-  it('should return 401 when unauthenticated', async () => {
-    const baseUrl = process.env.TEST_API_URL || 'http://localhost:3000'
-    try {
-      const response = await fetch(`${baseUrl}/api/admin/database/status`)
-      assert.equal(response.status, 401)
-    } catch {
-      // Server not running — skip integration test
-      console.log('[SKIP] Server not available for integration test')
-    }
+describe('Database Status Endpoint (explicit live test target)', () => {
+  it('returns 401 when unauthenticated', async (t) => {
+    if (!process.env.TEST_API_URL) return t.skip('TEST_API_URL not configured')
+    const response = await fetch(process.env.TEST_API_URL + '/api/admin/database/status')
+    assert.equal(response.status, 401)
   })
 
-  it('should return 403 for non-superadmin user', async () => {
-    const baseUrl = process.env.TEST_API_URL || 'http://localhost:3000'
-    try {
-      // Login as regular user
-      const loginRes = await fetch(`${baseUrl}/api/auth/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: 'superadmin@admin.com',
-          password: 'admin123',
-        }),
-      })
-      
-      if (loginRes.status === 200) {
-        const { token } = await loginRes.json()
-        const res = await fetch(`${baseUrl}/api/admin/database/status`, {
-          headers: { Authorization: `Bearer ${token}` },
-        })
-        // superadmin should get 200, not 403
-        assert.ok(res.status === 200)
-      }
-    } catch {
-      console.log('[SKIP] Server not available for integration test')
+  it('returns 403 for an authenticated regular user', async (t) => {
+    if (!process.env.TEST_API_URL || !process.env.TEST_USER_EMAIL || !process.env.TEST_USER_PASSWORD) {
+      return t.skip('Explicit regular-user test credentials and TEST_API_URL required')
     }
+    const login = await fetch(process.env.TEST_API_URL + '/api/auth/login', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: process.env.TEST_USER_EMAIL, password: process.env.TEST_USER_PASSWORD }),
+    })
+    assert.equal(login.status, 200)
+    const cookie = login.headers.getSetCookie().map(value => value.split(';')[0]).join('; ')
+    assert.ok(cookie.includes('esb_session='))
+    const response = await fetch(process.env.TEST_API_URL + '/api/admin/database/status', { headers: { Cookie: cookie } })
+    assert.equal(response.status, 403)
   })
 })
 

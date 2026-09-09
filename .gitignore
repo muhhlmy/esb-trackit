@@ -38,3 +38,7 @@ pnpm-debug.log*
 .DS_Store
 Thumbs.db
 Desktop.ini
+
+# Database backups must never enter source control
+backend/storage/backups/
+*.dump

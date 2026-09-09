@@ -73,12 +73,15 @@ export function sanitizeUserForStorage(user) {
     nama: typeof nama === 'string' ? nama : '',
     email: typeof email === 'string' ? email : '',
     role: typeof role === 'string' ? role : '',
-    permissions: permissions && typeof permissions === 'object' && !Array.isArray(permissions) ? permissions : {},
+    permissions:
+      permissions && typeof permissions === 'object' && !Array.isArray(permissions)
+        ? permissions
+        : {},
     nik: typeof nik === 'string' ? nik : '',
     departemen: typeof departemen === 'string' ? departemen : '',
     directorate: typeof directorate === 'string' ? directorate : '',
     lokasi_kerja: typeof lokasi_kerja === 'string' ? lokasi_kerja : '',
-    title: typeof title === 'string' ? title : (typeof jabatan === 'string' ? jabatan : ''),
+    title: typeof title === 'string' ? title : typeof jabatan === 'string' ? jabatan : '',
   }
 }
 

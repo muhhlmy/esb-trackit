@@ -1,11 +1,9 @@
-const API_BASE_URL = process.env.E2E_API_URL || 'http://localhost:5000'
+const API_BASE_URL = process.env.E2E_API_URL || 'http://localhost:3000'
 
-export async function cleanupE2ETestData(request, token) {
-  if (!token) return
+export async function cleanupE2ETestData(request) {
 
   try {
     const assetsRes = await request.get(`${API_BASE_URL}/api/assets`, {
-      headers: { Authorization: `Bearer ${token}` },
     })
 
     if (assetsRes.ok()) {
@@ -20,7 +18,6 @@ export async function cleanupE2ETestData(request, token) {
 
         for (const asset of e2eAssets) {
           await request.delete(`${API_BASE_URL}/api/assets/${asset.id}`, {
-            headers: { Authorization: `Bearer ${token}` },
           })
         }
       }

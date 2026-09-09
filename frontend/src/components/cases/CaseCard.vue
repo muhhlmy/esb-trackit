@@ -1,42 +1,44 @@
 <script setup>
-import { computed } from 'vue';
-import { useBookmarks } from '@/composables/useBookmarks';
-import { AlertCircle, Tag, Bookmark, ChevronRight } from 'lucide-vue-next';
+import { computed } from 'vue'
+import { useBookmarks } from '@/composables/useBookmarks'
+import { AlertCircle, Tag, Bookmark } from 'lucide-vue-next'
 
 const props = defineProps({
   caseItem: {
     type: Object,
-    required: true
+    required: true,
   },
   isActive: {
     type: Boolean,
-    default: false
-  }
-});
+    default: false,
+  },
+})
 
-defineEmits(['select']);
+defineEmits(['select'])
 
-const { isBookmarked, toggleBookmark } = useBookmarks();
+const { isBookmarked, toggleBookmark } = useBookmarks()
 
 const severityClass = computed(() => {
   switch (props.caseItem.severity?.toLowerCase()) {
     case 'high':
-      return 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20';
+      return 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20'
     case 'medium':
-      return 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20';
+      return 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20'
     default:
-      return 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20';
+      return 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20'
   }
-});
+})
 </script>
 
 <template>
   <div
     @click="$emit('select', caseItem.id)"
     class="p-4 rounded-xl border transition-all cursor-pointer text-left relative group select-none shadow-2xs"
-    :class="isActive
-      ? 'bg-[#f2f1ff] dark:bg-indigo-950/40 border-[#0040e5] dark:border-indigo-500 ring-1 ring-[#0040e5] dark:ring-indigo-500/50'
-      : 'bg-white dark:bg-slate-900/60 hover:bg-[#f9f9fb] dark:hover:bg-slate-900 border-[#e2e2e4] dark:border-slate-800'"
+    :class="
+      isActive
+        ? 'bg-[#f2f1ff] dark:bg-indigo-950/40 border-[#0040e5] dark:border-indigo-500 ring-1 ring-[#0040e5] dark:ring-indigo-500/50'
+        : 'bg-white dark:bg-slate-900/60 hover:bg-[#f9f9fb] dark:hover:bg-slate-900 border-[#e2e2e4] dark:border-slate-800'
+    "
   >
     <!-- Header: Severity, Category, Bookmark -->
     <div class="flex items-center justify-between gap-2 mb-2">
@@ -66,7 +68,11 @@ const severityClass = computed(() => {
     <!-- Title -->
     <h3
       class="text-sm font-semibold transition-colors line-clamp-2"
-      :class="isActive ? 'text-[#0040e5] dark:text-indigo-300' : 'text-[#1a1c1d] dark:text-slate-200 group-hover:text-[#0040e5] dark:group-hover:text-white'"
+      :class="
+        isActive
+          ? 'text-[#0040e5] dark:text-indigo-300'
+          : 'text-[#1a1c1d] dark:text-slate-200 group-hover:text-[#0040e5] dark:group-hover:text-white'
+      "
     >
       {{ caseItem.title }}
     </h3>
@@ -77,7 +83,10 @@ const severityClass = computed(() => {
     </p>
 
     <!-- Footer: Tags -->
-    <div v-if="caseItem.tags && caseItem.tags.length" class="mt-3 flex flex-wrap items-center gap-1">
+    <div
+      v-if="caseItem.tags && caseItem.tags.length"
+      class="mt-3 flex flex-wrap items-center gap-1"
+    >
       <span
         v-for="tag in caseItem.tags.slice(0, 3)"
         :key="tag"

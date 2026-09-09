@@ -4,6 +4,7 @@ import { useRoute } from 'vue-router'
 import { useApi } from '../composables/useApi.js'
 import { useAuth } from '@/composables/useAuth'
 import { onTicketEvent } from '../composables/useTicketRealtime.js'
+import { getStatusDotInfo, getPriorityInfo } from '../utils/ticketPresentation.js'
 import { validateAttachmentFile } from '../utils/attachmentPolicy.js'
 import AppModal from '../components/ui/AppModal.vue'
 import AppRowActions from '../components/ui/AppRowActions.vue'
@@ -200,25 +201,6 @@ const selectedTicket = ref(null)
 const modalError = ref('')
 const activeFormTab = ref('kendala')
 
-function nextTicketStep() {
-  if (activeFormTab.value === 'kendala') {
-    if (!form.value.judul || !form.value.judul.trim()) {
-      modalError.value = 'Judul kendala wajib diisi.'
-      return
-    }
-    activeFormTab.value = 'penanganan'
-  } else if (activeFormTab.value === 'penanganan') {
-    if (!form.value.queue_id) {
-      modalError.value = 'Unit tujuan wajib dipilih.'
-      return
-    }
-    activeFormTab.value = 'lampiran'
-  }
-  modalError.value = ''
-}
-
-
-
 const activeDetailTab = ref('detail')
 const ticketHistory = ref([])
 const isHistoryLoading = ref(false)
@@ -248,48 +230,32 @@ const emptyForm = () => ({
 
 const form = ref(emptyForm())
 
-const hasTicketValidationErrors = computed(() => {
-  if (activeFormTab.value === 'kendala') {
-    return !form.value.judul || !form.value.judul.trim()
-  }
-  if (activeFormTab.value === 'penanganan') {
-    return !form.value.queue_id
-  }
-  if (activeFormTab.value === 'lampiran') {
-    return !form.value.judul || !form.value.judul.trim() || !form.value.queue_id
-  }
-  return false
-})
-
 const selectedSupportUnit = ref('IT')
 
 const itQueue = computed(
   () =>
     queues.value.find(
       (q) =>
-        (q.kode || '').toUpperCase().includes('IT') ||
-        (q.nama || '').toUpperCase().includes('IT'),
+        (q.kode || '').toUpperCase().includes('IT') || (q.nama || '').toUpperCase().includes('IT'),
     ) || queues.value[0],
 )
 
-const hrQueue = computed(
-  () =>
-    queues.value.find(
-      (q) =>
-        (q.kode || '').toUpperCase().includes('HR') ||
-        (q.nama || '').toUpperCase().includes('HR') ||
-        (q.nama || '').toUpperCase().includes('HUMAN'),
-    ),
+const hrQueue = computed(() =>
+  queues.value.find(
+    (q) =>
+      (q.kode || '').toUpperCase().includes('HR') ||
+      (q.nama || '').toUpperCase().includes('HR') ||
+      (q.nama || '').toUpperCase().includes('HUMAN'),
+  ),
 )
 
-const gaQueue = computed(
-  () =>
-    queues.value.find(
-      (q) =>
-        (q.kode || '').toUpperCase().includes('GA') ||
-        (q.nama || '').toUpperCase().includes('GA') ||
-        (q.nama || '').toUpperCase().includes('GENERAL'),
-    ),
+const gaQueue = computed(() =>
+  queues.value.find(
+    (q) =>
+      (q.kode || '').toUpperCase().includes('GA') ||
+      (q.nama || '').toUpperCase().includes('GA') ||
+      (q.nama || '').toUpperCase().includes('GENERAL'),
+  ),
 )
 
 function setSupportUnit(unit) {
@@ -314,7 +280,8 @@ function getQueueIcon(ticket) {
   const code = (ticket?.queue_kode || '').toUpperCase()
   const name = (ticket?.queue_nama || '').toUpperCase()
   if (code.includes('HR') || name.includes('HR') || name.includes('HUMAN')) return 'badge'
-  if (code.includes('GA') || name.includes('GA') || name.includes('GENERAL')) return 'corporate_fare'
+  if (code.includes('GA') || name.includes('GA') || name.includes('GENERAL'))
+    return 'corporate_fare'
   return 'computer'
 }
 
@@ -423,7 +390,8 @@ function getAttachmentIcon(attachment, fileNameHint = '') {
   let mimeOrData = ''
 
   if (typeof attachment === 'object' && attachment !== null) {
-    name = attachment.name || attachment.nama || attachment.filename || attachment.attachment_name || ''
+    name =
+      attachment.name || attachment.nama || attachment.filename || attachment.attachment_name || ''
     mimeOrData = attachment.data || attachment.attachment || ''
   } else if (typeof attachment === 'string') {
     if (attachment.startsWith('data:')) {
@@ -474,9 +442,19 @@ function getAttachmentIcon(attachment, fileNameHint = '') {
     if (mimeHeader.includes('image')) return 'image'
     if (mimeHeader.includes('pdf')) return 'picture_as_pdf'
     if (mimeHeader.includes('word') || mimeHeader.includes('wordprocessingml')) return 'description'
-    if (mimeHeader.includes('excel') || mimeHeader.includes('spreadsheet') || mimeHeader.includes('csv')) return 'table_chart'
+    if (
+      mimeHeader.includes('excel') ||
+      mimeHeader.includes('spreadsheet') ||
+      mimeHeader.includes('csv')
+    )
+      return 'table_chart'
     if (mimeHeader.includes('presentation') || mimeHeader.includes('powerpoint')) return 'slideshow'
-    if (mimeHeader.includes('zip') || mimeHeader.includes('compressed') || mimeHeader.includes('rar')) return 'folder_zip'
+    if (
+      mimeHeader.includes('zip') ||
+      mimeHeader.includes('compressed') ||
+      mimeHeader.includes('rar')
+    )
+      return 'folder_zip'
     if (mimeHeader.includes('text/plain')) return 'article'
   }
 
@@ -529,15 +507,14 @@ function removeCommentAttachment() {
   commentAttachmentName.value = null
 }
 
-
-
 const filteredTickets = computed(() => {
   return tickets.value.filter((t) => {
     const matchStatus = !filterStatus.value || t.status_tiket === filterStatus.value
     const matchPrioritas = !filterPrioritas.value || t.prioritas === filterPrioritas.value
     const matchQueue = !filterQueue.value || t.queue_id === Number(filterQueue.value)
     const matchKategori =
-      !filterKategori.value || (t.kategori || '').toLowerCase() === filterKategori.value.toLowerCase()
+      !filterKategori.value ||
+      (t.kategori || '').toLowerCase() === filterKategori.value.toLowerCase()
     return matchStatus && matchPrioritas && matchQueue && matchKategori
   })
 })
@@ -549,7 +526,7 @@ const hasActiveFilters = computed(() => {
     filterPrioritas.value ||
     filterQueue.value ||
     filterKategori.value ||
-    (sortOrder.value && sortOrder.value !== 'terbaru')
+    (sortOrder.value && sortOrder.value !== 'terbaru'),
   )
 })
 
@@ -812,7 +789,7 @@ async function openCommentsTab() {
 }
 
 // Realtime chat comments are delivered via SSE (COMMENT_CREATED events)
-function startChatPoll(_ticketId) {
+function startChatPoll() {
   // Realtime updates handled via SSE
 }
 function stopChatPoll() {
@@ -894,7 +871,8 @@ async function assignTicket(ticket, targetUserId) {
         ...tickets.value[idx],
         assigned_to_user_id: targetUserId,
         assigned_to: null,
-        assigned_to_nama: getAdminsForQueue(ticket.queue_id).find((a) => a.id === targetUserId)?.nama || '',
+        assigned_to_nama:
+          getAdminsForQueue(ticket.queue_id).find((a) => a.id === targetUserId)?.nama || '',
       }
     }
     if (selectedTicket.value?.id === ticket.id) {
@@ -944,7 +922,11 @@ function openEdit(ticket) {
   const queueName = (ticket.queue_nama || '').toUpperCase()
   if (queueCode.includes('HR') || queueName.includes('HR') || queueName.includes('HUMAN')) {
     selectedSupportUnit.value = 'HR'
-  } else if (queueCode.includes('GA') || queueName.includes('GA') || queueName.includes('GENERAL')) {
+  } else if (
+    queueCode.includes('GA') ||
+    queueName.includes('GA') ||
+    queueName.includes('GENERAL')
+  ) {
     selectedSupportUnit.value = 'GA'
   } else {
     selectedSupportUnit.value = 'IT'
@@ -1123,7 +1105,8 @@ async function saveTicket() {
       payload.attachments = form.value.attachments || []
       if (isAdmin.value || isSuperAdmin.value) {
         const reporterId = form.value.pelapor_user_id
-        payload.pelapor_user_id = reporterId === '' || reporterId == null ? null : Number(reporterId)
+        payload.pelapor_user_id =
+          reporterId === '' || reporterId == null ? null : Number(reporterId)
       }
       await post('/api/tickets', payload)
       toast('Tiket baru berhasil dibuat.')
@@ -1210,72 +1193,6 @@ function formatRelativeTime(iso) {
   return date.toLocaleDateString('id-ID', { day: '2-digit', month: 'short' })
 }
 
-function getStatusDotInfo(status) {
-  const s = (status || '').toLowerCase()
-  if (s === 'open')
-    return {
-      dotClass: 'bg-emerald-500',
-      textClass: 'text-emerald-700 font-semibold',
-      badgeClass: 'bg-emerald-50/90 text-emerald-700 border-emerald-200/80',
-      label: 'Open',
-    }
-  if (s === 'in progress')
-    return {
-      dotClass: 'bg-blue-500',
-      textClass: 'text-blue-700 font-semibold',
-      badgeClass: 'bg-blue-50/90 text-blue-700 border-blue-200/80',
-      label: 'In Progress',
-    }
-  if (s === 'pending')
-    return {
-      dotClass: 'bg-amber-500',
-      textClass: 'text-amber-700 font-semibold',
-      badgeClass: 'bg-amber-50/90 text-amber-700 border-amber-200/80',
-      label: 'Pending',
-    }
-  if (s === 'resolved')
-    return {
-      dotClass: 'bg-teal-500',
-      textClass: 'text-teal-700 font-semibold',
-      badgeClass: 'bg-teal-50/90 text-teal-700 border-teal-200/80',
-      label: 'Resolved',
-    }
-  if (s === 'closed')
-    return {
-      dotClass: 'bg-slate-400',
-      textClass: 'text-slate-600 font-medium',
-      badgeClass: 'bg-slate-100 text-slate-600 border-slate-200/80',
-      label: 'Closed',
-    }
-  if (s === 'cancelled')
-    return {
-      dotClass: 'bg-rose-500',
-      textClass: 'text-rose-600 font-medium',
-      badgeClass: 'bg-rose-50/90 text-rose-700 border-rose-200/80',
-      label: 'Cancelled',
-    }
-  return {
-    dotClass: 'bg-slate-400',
-    textClass: 'text-slate-600 font-medium',
-    badgeClass: 'bg-slate-100 text-slate-600 border-slate-200/80',
-    label: status || 'Open',
-  }
-}
-
-function getPriorityInfo(prioritas) {
-  const p = (prioritas || '').toLowerCase()
-  if (p.includes('critical') || p.includes('urgent')) {
-    return { label: 'Critical', class: 'text-rose-700 font-bold bg-rose-50 border-rose-200/80', icon: 'warning' }
-  }
-  if (p.includes('high')) {
-    return { label: 'High', class: 'text-amber-800 font-semibold bg-amber-50 border-amber-200/80', icon: 'priority_high' }
-  }
-  if (p.includes('medium')) {
-    return { label: 'Medium', class: 'text-slate-700 font-medium bg-slate-100/90 border-slate-200/80', icon: 'remove' }
-  }
-  return { label: 'Low', class: 'text-slate-600 font-medium bg-slate-50 border-slate-200/60', icon: 'arrow_downward' }
-}
-
 function getTicketActions(ticket) {
   const actions = [
     {
@@ -1344,7 +1261,11 @@ function toast(message, type = 'success') {
       button-text="Sign In to Access Tickets"
     />
   </div>
-  <div v-else class="flex min-w-0 flex-col gap-5" :data-testid="!isLoading ? 'page-ready' : undefined">
+  <div
+    v-else
+    class="flex min-w-0 flex-col gap-5"
+    :data-testid="!isLoading ? 'page-ready' : undefined"
+  >
     <!-- Toast Notification -->
     <Transition name="slide-right">
       <div
@@ -1386,11 +1307,15 @@ function toast(message, type = 'success') {
     </div>
 
     <!-- ── 2. Integrated Control Bar & Workspace Navigation ─ -->
-    <div class="flex flex-col gap-3 bg-white p-3.5 sm:p-4 rounded-2xl border border-[#E2E8F0]/80 shadow-2xs">
+    <div
+      class="flex flex-col gap-3 bg-white p-3.5 sm:p-4 rounded-2xl border border-[#E2E8F0]/80 shadow-2xs"
+    >
       <!-- Top Row: Queue Tabs -->
       <div class="border-b border-[#F1F5F9] pb-3">
         <!-- Ticket Queue Navigation (Tabs) -->
-        <div class="flex items-center gap-1.5 overflow-x-auto scrollbar-none [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden py-0.5 w-full">
+        <div
+          class="flex items-center gap-1.5 overflow-x-auto scrollbar-none [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden py-0.5 w-full"
+        >
           <button
             v-for="tab in !isAdmin && !isSuperAdmin
               ? [
@@ -1579,7 +1504,10 @@ function toast(message, type = 'success') {
       </div>
 
       <!-- Error State -->
-      <div v-else-if="pageError" class="rounded-xl bg-rose-50 p-5 text-[13px] font-semibold text-rose-600 border border-rose-200">
+      <div
+        v-else-if="pageError"
+        class="rounded-xl bg-rose-50 p-5 text-[13px] font-semibold text-rose-600 border border-rose-200"
+      >
         {{ pageError }}
       </div>
 
@@ -1595,7 +1523,9 @@ function toast(message, type = 'success') {
           >
             <!-- TOP ROW: Subtle Ticket ID (Left) | Status Badge & Chevron (Right) -->
             <div class="flex items-center justify-between gap-3 min-w-0">
-              <span class="text-[11.5px] font-mono font-medium text-slate-400 tracking-wide truncate">
+              <span
+                class="text-[11.5px] font-mono font-medium text-slate-400 tracking-wide truncate"
+              >
                 {{ ticket.nomor_tiket || `TCK-${ticket.id}` }}
               </span>
 
@@ -1621,23 +1551,36 @@ function toast(message, type = 'success') {
 
             <!-- MAIN CONTENT: Prominent Title & Short Description -->
             <div class="flex flex-col gap-0.5 min-w-0">
-              <h3 class="text-[14.5px] sm:text-[15px] font-bold text-slate-900 group-hover:text-blue-600 transition-colors leading-snug line-clamp-2 sm:line-clamp-1">
+              <h3
+                class="text-[14.5px] sm:text-[15px] font-bold text-slate-900 group-hover:text-blue-600 transition-colors leading-snug line-clamp-2 sm:line-clamp-1"
+              >
                 {{ ticket.judul }}
               </h3>
-              <p v-if="ticket.deskripsi" class="text-[12px] sm:text-[12.5px] font-normal text-slate-500 line-clamp-2 sm:line-clamp-1 leading-relaxed">
+              <p
+                v-if="ticket.deskripsi"
+                class="text-[12px] sm:text-[12.5px] font-normal text-slate-500 line-clamp-2 sm:line-clamp-1 leading-relaxed"
+              >
                 {{ ticket.deskripsi }}
               </p>
             </div>
 
             <!-- METADATA & FOOTER ROW: Unit, Category, Priority, & Timestamp -->
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-3 text-[12px] pt-2 border-t border-slate-100">
+            <div
+              class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-3 text-[12px] pt-2 border-t border-slate-100"
+            >
               <div class="flex items-center gap-x-3 gap-y-1.5 flex-wrap text-slate-600">
                 <!-- Unit / Queue -->
-                <span class="flex items-center gap-1.5 font-medium text-slate-700" title="Unit Tujuan">
+                <span
+                  class="flex items-center gap-1.5 font-medium text-slate-700"
+                  title="Unit Tujuan"
+                >
                   <span class="material-symbols-outlined text-[15px] text-slate-400">
                     {{ getQueueIcon(ticket) }}
                   </span>
-                  <span>{{ ticket.queue_nama || (ticket.queue_kode ? `${ticket.queue_kode} Support` : 'IT Support') }}</span>
+                  <span>{{
+                    ticket.queue_nama ||
+                    (ticket.queue_kode ? `${ticket.queue_kode} Support` : 'IT Support')
+                  }}</span>
                 </span>
 
                 <!-- Category -->
@@ -1660,13 +1603,21 @@ function toast(message, type = 'success') {
               </div>
 
               <!-- Secondary Information (Timestamp, Comments, Attachments) -->
-              <div class="flex items-center gap-3 text-[11.5px] text-slate-400 shrink-0 font-normal self-end sm:self-auto">
+              <div
+                class="flex items-center gap-3 text-[11.5px] text-slate-400 shrink-0 font-normal self-end sm:self-auto"
+              >
                 <span class="flex items-center gap-1">
                   <span class="material-symbols-outlined text-[13.5px]">schedule</span>
-                  <span>{{ formatRelativeTime(ticket.diperbarui_pada || ticket.dibuat_pada) }}</span>
+                  <span>{{
+                    formatRelativeTime(ticket.diperbarui_pada || ticket.dibuat_pada)
+                  }}</span>
                 </span>
 
-                <span v-if="ticket.total_komentar > 0" class="flex items-center gap-1" title="Komentar">
+                <span
+                  v-if="ticket.total_komentar > 0"
+                  class="flex items-center gap-1"
+                  title="Komentar"
+                >
                   <span class="material-symbols-outlined text-[13.5px]">chat_bubble_outline</span>
                   <span>{{ ticket.total_komentar }}</span>
                 </span>
@@ -1689,7 +1640,9 @@ function toast(message, type = 'success') {
           >
             <!-- TOP ROW: Subtle Ticket ID (Left) | Status Badge & Row Action Menu (Right) -->
             <div class="flex items-center justify-between gap-3 min-w-0">
-              <span class="text-[11.5px] font-mono font-medium text-slate-400 tracking-wide truncate">
+              <span
+                class="text-[11.5px] font-mono font-medium text-slate-400 tracking-wide truncate"
+              >
                 {{ ticket.nomor_tiket || `TCK-${ticket.id}` }}
               </span>
 
@@ -1713,28 +1666,44 @@ function toast(message, type = 'success') {
 
             <!-- MAIN CONTENT: Prominent Title & Short Description -->
             <div class="flex flex-col gap-0.5 min-w-0">
-              <h3 class="text-[14.5px] sm:text-[15px] font-bold text-slate-900 group-hover:text-blue-600 transition-colors leading-snug line-clamp-2 sm:line-clamp-1">
+              <h3
+                class="text-[14.5px] sm:text-[15px] font-bold text-slate-900 group-hover:text-blue-600 transition-colors leading-snug line-clamp-2 sm:line-clamp-1"
+              >
                 {{ ticket.judul }}
               </h3>
-              <p v-if="ticket.deskripsi" class="text-[12px] sm:text-[12.5px] font-normal text-slate-500 line-clamp-2 sm:line-clamp-1 leading-relaxed">
+              <p
+                v-if="ticket.deskripsi"
+                class="text-[12px] sm:text-[12.5px] font-normal text-slate-500 line-clamp-2 sm:line-clamp-1 leading-relaxed"
+              >
                 {{ ticket.deskripsi }}
               </p>
             </div>
 
             <!-- METADATA ROW 1: Requester, Unit, Category (Plain Text + Icons) -->
-            <div class="flex items-center gap-x-3 sm:gap-x-4 gap-y-1 flex-wrap text-[12px] text-slate-600">
+            <div
+              class="flex items-center gap-x-3 sm:gap-x-4 gap-y-1 flex-wrap text-[12px] text-slate-600"
+            >
               <!-- Requester / Pelapor -->
-              <span class="flex items-center gap-1.5 font-medium text-slate-700" title="Pelapor / Requester">
+              <span
+                class="flex items-center gap-1.5 font-medium text-slate-700"
+                title="Pelapor / Requester"
+              >
                 <span class="material-symbols-outlined text-[15px] text-slate-400">person</span>
                 <span>{{ ticket.pelapor_nama || ticket.pelapor || 'User' }}</span>
               </span>
 
               <!-- Support Unit / Queue -->
-              <span class="flex items-center gap-1.5 font-medium text-slate-700" title="Unit Tujuan">
+              <span
+                class="flex items-center gap-1.5 font-medium text-slate-700"
+                title="Unit Tujuan"
+              >
                 <span class="material-symbols-outlined text-[15px] text-slate-400">
                   {{ getQueueIcon(ticket) }}
                 </span>
-                <span>{{ ticket.queue_nama || (ticket.queue_kode ? `${ticket.queue_kode} Support` : 'IT Support') }}</span>
+                <span>{{
+                  ticket.queue_nama ||
+                  (ticket.queue_kode ? `${ticket.queue_kode} Support` : 'IT Support')
+                }}</span>
               </span>
 
               <!-- Category -->
@@ -1745,7 +1714,9 @@ function toast(message, type = 'success') {
             </div>
 
             <!-- METADATA ROW 2 & FOOTER: Priority Badge, Assignee, & Timestamp -->
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-3 text-[12px] pt-2 border-t border-slate-100">
+            <div
+              class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-3 text-[12px] pt-2 border-t border-slate-100"
+            >
               <div class="flex items-center gap-x-3 gap-y-1.5 flex-wrap text-slate-600">
                 <!-- Priority (Subtle Badge) -->
                 <span
@@ -1762,27 +1733,47 @@ function toast(message, type = 'success') {
                 <!-- Assignee -->
                 <span
                   class="flex items-center gap-1 font-medium"
-                  :class="ticket.assigned_to_nama || ticket.assigned_to ? 'text-slate-700' : 'text-amber-700 font-semibold'"
+                  :class="
+                    ticket.assigned_to_nama || ticket.assigned_to
+                      ? 'text-slate-700'
+                      : 'text-amber-700 font-semibold'
+                  "
                   title="Penanggung Jawab / Assignee"
                 >
                   <span
                     class="material-symbols-outlined text-[15px]"
-                    :class="ticket.assigned_to_nama || ticket.assigned_to ? 'text-slate-400' : 'text-amber-500'"
+                    :class="
+                      ticket.assigned_to_nama || ticket.assigned_to
+                        ? 'text-slate-400'
+                        : 'text-amber-500'
+                    "
                   >
                     {{ ticket.assigned_to_nama || ticket.assigned_to ? 'person_pin' : 'warning' }}
                   </span>
-                  <span>{{ ticket.assigned_to_nama || ticket.assigned_to ? getAssigneeName(ticket.assigned_to_nama || ticket.assigned_to) : 'Unassigned' }}</span>
+                  <span>{{
+                    ticket.assigned_to_nama || ticket.assigned_to
+                      ? getAssigneeName(ticket.assigned_to_nama || ticket.assigned_to)
+                      : 'Unassigned'
+                  }}</span>
                 </span>
               </div>
 
               <!-- Secondary Information (Timestamp, Comments, Attachments) -->
-              <div class="flex items-center gap-3 text-[11.5px] text-slate-400 shrink-0 font-normal self-end sm:self-auto">
+              <div
+                class="flex items-center gap-3 text-[11.5px] text-slate-400 shrink-0 font-normal self-end sm:self-auto"
+              >
                 <span class="flex items-center gap-1">
                   <span class="material-symbols-outlined text-[13.5px]">schedule</span>
-                  <span>{{ formatRelativeTime(ticket.diperbarui_pada || ticket.dibuat_pada) }}</span>
+                  <span>{{
+                    formatRelativeTime(ticket.diperbarui_pada || ticket.dibuat_pada)
+                  }}</span>
                 </span>
 
-                <span v-if="ticket.total_komentar > 0" class="flex items-center gap-1" title="Komentar">
+                <span
+                  v-if="ticket.total_komentar > 0"
+                  class="flex items-center gap-1"
+                  title="Komentar"
+                >
                   <span class="material-symbols-outlined text-[13.5px]">chat_bubble_outline</span>
                   <span>{{ ticket.total_komentar }}</span>
                 </span>
@@ -1796,7 +1787,10 @@ function toast(message, type = 'success') {
         </template>
 
         <!-- ── EMPTY STATES ── -->
-        <div v-if="filteredTickets.length === 0" class="py-16 text-center bg-white rounded-2xl border border-slate-200/80 shadow-2xs">
+        <div
+          v-if="filteredTickets.length === 0"
+          class="py-16 text-center bg-white rounded-2xl border border-slate-200/80 shadow-2xs"
+        >
           <div class="mx-auto flex max-w-sm flex-col items-center justify-center text-center">
             <div
               class="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#F1F5F9] text-[#94A3B8] mb-3"
@@ -1906,7 +1900,8 @@ function toast(message, type = 'success') {
               class="w-full"
             />
             <span class="text-[10.5px] text-[#7C8BAC]"
-              >Kosongkan untuk membuat tiket atas nama sendiri ({{ user?.nama || 'Anda' }}), atau pilih user lain.</span
+              >Kosongkan untuk membuat tiket atas nama sendiri ({{ user?.nama || 'Anda' }}), atau
+              pilih user lain.</span
             >
           </label>
 
@@ -1956,13 +1951,21 @@ function toast(message, type = 'success') {
               >
                 <div
                   class="flex h-7 w-7 sm:h-9 sm:w-9 shrink-0 items-center justify-center rounded-lg"
-                  :class="selectedSupportUnit === 'IT' ? 'bg-[#5D87FF] text-white' : 'bg-[#F1F5F9] text-[#7C8BAC]'"
+                  :class="
+                    selectedSupportUnit === 'IT'
+                      ? 'bg-[#5D87FF] text-white'
+                      : 'bg-[#F1F5F9] text-[#7C8BAC]'
+                  "
                 >
                   <span class="material-symbols-outlined text-[16px] sm:text-[18px]">computer</span>
                 </div>
                 <div class="min-w-0">
-                  <p class="text-[11px] sm:text-[12.5px] font-bold leading-tight truncate">IT Support</p>
-                  <p class="hidden sm:block text-[10.5px] text-[#7C8BAC] leading-tight mt-0.5">Perangkat & Network</p>
+                  <p class="text-[11px] sm:text-[12.5px] font-bold leading-tight truncate">
+                    IT Support
+                  </p>
+                  <p class="hidden sm:block text-[10.5px] text-[#7C8BAC] leading-tight mt-0.5">
+                    Perangkat & Network
+                  </p>
                 </div>
               </button>
 
@@ -1978,13 +1981,21 @@ function toast(message, type = 'success') {
               >
                 <div
                   class="flex h-7 w-7 sm:h-9 sm:w-9 shrink-0 items-center justify-center rounded-lg"
-                  :class="selectedSupportUnit === 'HR' ? 'bg-[#5D87FF] text-white' : 'bg-[#F1F5F9] text-[#7C8BAC]'"
+                  :class="
+                    selectedSupportUnit === 'HR'
+                      ? 'bg-[#5D87FF] text-white'
+                      : 'bg-[#F1F5F9] text-[#7C8BAC]'
+                  "
                 >
                   <span class="material-symbols-outlined text-[16px] sm:text-[18px]">badge</span>
                 </div>
                 <div class="min-w-0">
-                  <p class="text-[11px] sm:text-[12.5px] font-bold leading-tight truncate">HR Support</p>
-                  <p class="hidden sm:block text-[10.5px] text-[#7C8BAC] leading-tight mt-0.5">Kepegawaian & Dokumen</p>
+                  <p class="text-[11px] sm:text-[12.5px] font-bold leading-tight truncate">
+                    HR Support
+                  </p>
+                  <p class="hidden sm:block text-[10.5px] text-[#7C8BAC] leading-tight mt-0.5">
+                    Kepegawaian & Dokumen
+                  </p>
                 </div>
               </button>
 
@@ -2000,13 +2011,23 @@ function toast(message, type = 'success') {
               >
                 <div
                   class="flex h-7 w-7 sm:h-9 sm:w-9 shrink-0 items-center justify-center rounded-lg"
-                  :class="selectedSupportUnit === 'GA' ? 'bg-[#5D87FF] text-white' : 'bg-[#F1F5F9] text-[#7C8BAC]'"
+                  :class="
+                    selectedSupportUnit === 'GA'
+                      ? 'bg-[#5D87FF] text-white'
+                      : 'bg-[#F1F5F9] text-[#7C8BAC]'
+                  "
                 >
-                  <span class="material-symbols-outlined text-[16px] sm:text-[18px]">corporate_fare</span>
+                  <span class="material-symbols-outlined text-[16px] sm:text-[18px]"
+                    >corporate_fare</span
+                  >
                 </div>
                 <div class="min-w-0">
-                  <p class="text-[11px] sm:text-[12.5px] font-bold leading-tight truncate">GA Support</p>
-                  <p class="hidden sm:block text-[10.5px] text-[#7C8BAC] leading-tight mt-0.5">Fasilitas & Gedung</p>
+                  <p class="text-[11px] sm:text-[12.5px] font-bold leading-tight truncate">
+                    GA Support
+                  </p>
+                  <p class="hidden sm:block text-[10.5px] text-[#7C8BAC] leading-tight mt-0.5">
+                    Fasilitas & Gedung
+                  </p>
                 </div>
               </button>
             </div>
@@ -2031,14 +2052,18 @@ function toast(message, type = 'success') {
                 "
               >
                 <div class="flex items-center justify-center sm:justify-between w-full">
-                  <span class="text-[11.5px] sm:text-[12px] font-bold truncate">{{ cat.title }}</span>
+                  <span class="text-[11.5px] sm:text-[12px] font-bold truncate">{{
+                    cat.title
+                  }}</span>
                   <span
                     v-if="form.kategori === cat.value"
                     class="hidden sm:inline material-symbols-outlined text-[15px] text-[#5D87FF]"
                     >check_circle</span
                   >
                 </div>
-                <span class="hidden sm:block text-[10px] text-[#7C8BAC] leading-tight truncate">{{ cat.desc }}</span>
+                <span class="hidden sm:block text-[10px] text-[#7C8BAC] leading-tight truncate">{{
+                  cat.desc
+                }}</span>
               </button>
             </div>
           </div>
@@ -2126,10 +2151,14 @@ function toast(message, type = 'success') {
                   <div
                     class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#ECF2FF] text-[#2563EB]"
                   >
-                    <span class="material-symbols-outlined text-[20px]">{{ getAttachmentIcon(att.data, att.name) }}</span>
+                    <span class="material-symbols-outlined text-[20px]">{{
+                      getAttachmentIcon(att.data, att.name)
+                    }}</span>
                   </div>
                   <div class="min-w-0">
-                    <p class="text-[12px] font-bold text-[#2A3547] truncate">{{ att.name || 'Lampiran' }}</p>
+                    <p class="text-[12px] font-bold text-[#2A3547] truncate">
+                      {{ att.name || 'Lampiran' }}
+                    </p>
                     <p class="text-[10.5px] text-[#7C8BAC] truncate mt-0.5">
                       Siap diunggah bersama tiket
                     </p>
@@ -2164,7 +2193,9 @@ function toast(message, type = 'success') {
             :disabled="isSubmitting"
             class="inline-flex h-9 items-center gap-1.5 rounded-lg bg-[#5D87FF] px-4 text-[12px] font-bold text-white hover:bg-[#4A73E0] transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            <span v-if="isSubmitting" class="material-symbols-outlined text-[14px] animate-spin">progress_activity</span>
+            <span v-if="isSubmitting" class="material-symbols-outlined text-[14px] animate-spin"
+              >progress_activity</span
+            >
             <span>{{
               isSubmitting
                 ? 'Menyimpan...'
@@ -2183,7 +2214,10 @@ function toast(message, type = 'success') {
     <AppModal
       :is-open="showDetailModal"
       :title="selectedTicket?.nomor_tiket || 'Detail Tiket'"
-      :subtitle="selectedTicket?.queue_nama || (selectedTicket?.queue_kode ? `${selectedTicket.queue_kode} Support` : 'Support Ticket')"
+      :subtitle="
+        selectedTicket?.queue_nama ||
+        (selectedTicket?.queue_kode ? `${selectedTicket.queue_kode} Support` : 'Support Ticket')
+      "
       icon="confirmation_number"
       size="xl"
       @close="closeModal"
@@ -2230,7 +2264,15 @@ function toast(message, type = 'success') {
                 : 'text-[#64748B] hover:bg-[#DBEAFE] hover:text-[#1D4ED8] hover:shadow-sm hover:ring-1 hover:ring-[#2563EB]/30 hover:-translate-y-px'
             "
           >
-            <span class="material-symbols-outlined text-[15px] transition-colors duration-200" :class="activeDetailTab === 'detail' ? 'text-[#2563EB]' : 'text-[#64748B] group-hover:text-[#1D4ED8]'">info</span>
+            <span
+              class="material-symbols-outlined text-[15px] transition-colors duration-200"
+              :class="
+                activeDetailTab === 'detail'
+                  ? 'text-[#2563EB]'
+                  : 'text-[#64748B] group-hover:text-[#1D4ED8]'
+              "
+              >info</span
+            >
             <span>Overview</span>
           </button>
 
@@ -2244,11 +2286,23 @@ function toast(message, type = 'success') {
                 : 'text-[#64748B] hover:bg-[#DBEAFE] hover:text-[#1D4ED8] hover:shadow-sm hover:ring-1 hover:ring-[#2563EB]/30 hover:-translate-y-px'
             "
           >
-            <span class="material-symbols-outlined text-[15px] transition-colors duration-200" :class="activeDetailTab === 'history' ? 'text-[#2563EB]' : 'text-[#64748B] group-hover:text-[#1D4ED8]'">history</span>
+            <span
+              class="material-symbols-outlined text-[15px] transition-colors duration-200"
+              :class="
+                activeDetailTab === 'history'
+                  ? 'text-[#2563EB]'
+                  : 'text-[#64748B] group-hover:text-[#1D4ED8]'
+              "
+              >history</span
+            >
             <span>Activity</span>
             <span
               class="ml-0.5 rounded-full px-1.5 py-0.2 text-[10px] font-medium"
-              :class="activeDetailTab === 'history' ? 'bg-[#2563EB]/10 text-[#2563EB]' : 'bg-[#E2E8F0]/70 text-[#475569]'"
+              :class="
+                activeDetailTab === 'history'
+                  ? 'bg-[#2563EB]/10 text-[#2563EB]'
+                  : 'bg-[#E2E8F0]/70 text-[#475569]'
+              "
             >
               {{ ticketHistory.length }}
             </span>
@@ -2264,11 +2318,23 @@ function toast(message, type = 'success') {
                 : 'text-[#64748B] hover:bg-[#DBEAFE] hover:text-[#1D4ED8] hover:shadow-sm hover:ring-1 hover:ring-[#2563EB]/30 hover:-translate-y-px'
             "
           >
-            <span class="material-symbols-outlined text-[15px] transition-colors duration-200" :class="activeDetailTab === 'comments' ? 'text-[#2563EB]' : 'text-[#64748B] group-hover:text-[#1D4ED8]'">forum</span>
+            <span
+              class="material-symbols-outlined text-[15px] transition-colors duration-200"
+              :class="
+                activeDetailTab === 'comments'
+                  ? 'text-[#2563EB]'
+                  : 'text-[#64748B] group-hover:text-[#1D4ED8]'
+              "
+              >forum</span
+            >
             <span>Discussion</span>
             <span
               class="ml-0.5 rounded-full px-1.5 py-0.2 text-[10px] font-medium"
-              :class="activeDetailTab === 'comments' ? 'bg-[#2563EB]/10 text-[#2563EB]' : 'bg-[#E2E8F0]/70 text-[#475569]'"
+              :class="
+                activeDetailTab === 'comments'
+                  ? 'bg-[#2563EB]/10 text-[#2563EB]'
+                  : 'bg-[#E2E8F0]/70 text-[#475569]'
+              "
             >
               {{ ticketComments.length }}
             </span>
@@ -2376,7 +2442,9 @@ function toast(message, type = 'success') {
                 class="text-[11px] font-semibold uppercase tracking-wider text-[#94A3B8] flex items-center gap-1"
               >
                 <span class="material-symbols-outlined text-[15px]">attach_file</span> Lampiran
-                <span class="text-[#CBD5E1] font-normal">({{ selectedTicket.attachments.length }})</span>
+                <span class="text-[#CBD5E1] font-normal"
+                  >({{ selectedTicket.attachments.length }})</span
+                >
               </h3>
               <ul class="space-y-2 max-h-[240px] overflow-y-auto pr-1">
                 <li
@@ -2388,7 +2456,9 @@ function toast(message, type = 'success') {
                     <div
                       class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#ECF2FF] text-[#2563EB]"
                     >
-                      <span class="material-symbols-outlined text-[20px]">{{ getAttachmentIcon(att.attachment, att.name) }}</span>
+                      <span class="material-symbols-outlined text-[20px]">{{
+                        getAttachmentIcon(att.attachment, att.name)
+                      }}</span>
                     </div>
                     <div class="min-w-0">
                       <p class="text-[12px] font-bold text-[#2A3547] truncate">
@@ -2396,13 +2466,20 @@ function toast(message, type = 'success') {
                       </p>
                       <p class="text-[10.5px] text-[#7C8BAC] truncate mt-0.5">
                         {{ att.nama_pengguna || 'Pengguna' }}
-                        <template v-if="att.dibuat_pada"> · {{ formatDateTime(att.dibuat_pada) }}</template>
+                        <template v-if="att.dibuat_pada">
+                          · {{ formatDateTime(att.dibuat_pada) }}</template
+                        >
                       </p>
                     </div>
                   </div>
                   <button
                     type="button"
-                    @click="downloadAttachment(att.attachment, att.name || 'lampiran-' + selectedTicket.nomor_tiket + '-' + (i + 1))"
+                    @click="
+                      downloadAttachment(
+                        att.attachment,
+                        att.name || 'lampiran-' + selectedTicket.nomor_tiket + '-' + (i + 1),
+                      )
+                    "
                     class="flex h-8 items-center gap-1.5 rounded-lg border border-[#E2E8F0] bg-white px-3 text-[11px] font-bold text-[#2563EB] hover:bg-[#EFF6FF] hover:border-[#2563EB] transition-all cursor-pointer shadow-2xs shrink-0"
                   >
                     <span class="material-symbols-outlined text-[16px]">download</span>
@@ -2474,10 +2551,7 @@ function toast(message, type = 'success') {
           </div>
 
           <!-- TAB 3: DISCUSSION THREAD -->
-          <div
-            v-else-if="activeDetailTab === 'comments'"
-            class="flex flex-col gap-3 min-h-0"
-          >
+          <div v-else-if="activeDetailTab === 'comments'" class="flex flex-col gap-3 min-h-0">
             <!-- Messages Container (scrollable inside the chat area) -->
             <div
               ref="chatContainer"
@@ -2497,7 +2571,9 @@ function toast(message, type = 'success') {
                 v-else-if="ticketComments.length === 0"
                 class="flex flex-col items-center justify-center py-6 gap-1.5 text-center text-[#94A3B8] my-auto"
               >
-                <span class="material-symbols-outlined text-[24px] text-[#94A3B8]">chat_bubble_outline</span>
+                <span class="material-symbols-outlined text-[24px] text-[#94A3B8]"
+                  >chat_bubble_outline</span
+                >
                 <p class="text-xs font-semibold text-[#334155]">
                   Belum ada diskusi pada ticket ini.
                 </p>
@@ -2546,14 +2622,25 @@ function toast(message, type = 'success') {
                     class="mt-2 flex items-center justify-between gap-2 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] p-2"
                   >
                     <div class="flex items-center gap-2 min-w-0">
-                      <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-[#ECF2FF] text-[#2563EB]">
-                        <span class="material-symbols-outlined text-[16px]">{{ getAttachmentIcon(c.attachment, c.attachment_name) }}</span>
+                      <div
+                        class="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-[#ECF2FF] text-[#2563EB]"
+                      >
+                        <span class="material-symbols-outlined text-[16px]">{{
+                          getAttachmentIcon(c.attachment, c.attachment_name)
+                        }}</span>
                       </div>
-                      <span class="text-[11px] font-semibold text-[#334155] truncate">{{ c.attachment_name || 'Lampiran diskusi' }}</span>
+                      <span class="text-[11px] font-semibold text-[#334155] truncate">{{
+                        c.attachment_name || 'Lampiran diskusi'
+                      }}</span>
                     </div>
                     <button
                       type="button"
-                      @click="downloadAttachment(c.attachment, c.attachment_name || 'lampiran-diskusi-' + c.id)"
+                      @click="
+                        downloadAttachment(
+                          c.attachment,
+                          c.attachment_name || 'lampiran-diskusi-' + c.id,
+                        )
+                      "
                       class="flex h-7 items-center gap-1 rounded-md border border-[#E2E8F0] bg-white px-2 text-[10px] font-bold text-[#2563EB] hover:bg-[#EFF6FF] hover:border-[#2563EB] transition-all cursor-pointer shrink-0"
                     >
                       <span class="material-symbols-outlined text-[14px]">download</span>
@@ -2576,18 +2663,25 @@ function toast(message, type = 'success') {
               >
             </div>
 
-            <div v-else class="flex shrink-0 flex-col gap-2 rounded-xl border border-[#E2E8F0] bg-white p-3">
+            <div
+              v-else
+              class="flex shrink-0 flex-col gap-2 rounded-xl border border-[#E2E8F0] bg-white p-3"
+            >
               <div
                 v-if="commentAttachment"
                 class="flex items-center justify-between gap-2 rounded-lg bg-[#F8FAFC] p-2 border border-[#E2E8F0]"
               >
                 <div class="flex items-center gap-2 min-w-0">
-                  <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#ECF2FF] text-[#2563EB]">
-                    <span class="material-symbols-outlined text-[16px]">{{ getAttachmentIcon(commentAttachment, commentAttachmentName) }}</span>
-                  </div>
-                  <span class="text-xs font-bold text-[#0F172A] truncate"
-                    >{{ commentAttachmentName || 'File lampiran siap dikirim' }}</span
+                  <div
+                    class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#ECF2FF] text-[#2563EB]"
                   >
+                    <span class="material-symbols-outlined text-[16px]">{{
+                      getAttachmentIcon(commentAttachment, commentAttachmentName)
+                    }}</span>
+                  </div>
+                  <span class="text-xs font-bold text-[#0F172A] truncate">{{
+                    commentAttachmentName || 'File lampiran siap dikirim'
+                  }}</span>
                 </div>
                 <button
                   type="button"
@@ -2619,7 +2713,9 @@ function toast(message, type = 'success') {
                     class="w-[18px] h-[18px] min-w-[18px] min-h-[18px] shrink-0 text-slate-500 group-hover/btn:text-blue-600 transition-colors"
                     aria-hidden="true"
                   >
-                    <path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/>
+                    <path
+                      d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"
+                    />
                   </svg>
                   <input
                     type="file"
@@ -2655,7 +2751,9 @@ function toast(message, type = 'success') {
           v-if="isAdmin || isSuperAdmin"
           class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-4 border-t border-[#F1F5F9] pt-4 mt-6"
         >
-          <div class="grid grid-cols-1 xs:grid-cols-2 sm:flex sm:items-center gap-2 w-full sm:w-auto">
+          <div
+            class="grid grid-cols-1 xs:grid-cols-2 sm:flex sm:items-center gap-2 w-full sm:w-auto"
+          >
             <!-- Custom Modern & Minimalist Status Selector Dropdown -->
             <div
               v-if="!['Closed', 'Resolved', 'Cancelled'].includes(selectedTicket.status_tiket)"
@@ -2677,7 +2775,9 @@ function toast(message, type = 'success') {
                   ></span>
                   <span>{{ getStatusDotInfo(selectedTicket.status_tiket).label }}</span>
                 </div>
-                <span class="material-symbols-outlined text-[16px] text-[#7C8BAC]">expand_more</span>
+                <span class="material-symbols-outlined text-[16px] text-[#7C8BAC]"
+                  >expand_more</span
+                >
               </button>
 
               <!-- Dropdown Menu Popover -->
@@ -2698,7 +2798,11 @@ function toast(message, type = 'success') {
                     type="button"
                     @click="selectStatus(selectedTicket, st.value)"
                     class="flex h-8 w-full items-center justify-between rounded-lg px-2.5 text-xs font-medium text-[#2A3547] hover:bg-[#F8FAFC] transition-colors cursor-pointer"
-                    :class="selectedTicket.status_tiket === st.value ? 'bg-[#ECF2FF] font-bold text-[#5D87FF]' : ''"
+                    :class="
+                      selectedTicket.status_tiket === st.value
+                        ? 'bg-[#ECF2FF] font-bold text-[#5D87FF]'
+                        : ''
+                    "
                   >
                     <div class="flex items-center gap-2">
                       <span class="h-2 w-2 rounded-full" :class="st.dot"></span>
@@ -2735,7 +2839,10 @@ function toast(message, type = 'success') {
             <div v-if="isSuperAdmin" class="relative w-full sm:w-auto text-left">
               <button
                 type="button"
-                :disabled="isReassigning || ['Closed', 'Resolved', 'Cancelled'].includes(selectedTicket.status_tiket)"
+                :disabled="
+                  isReassigning ||
+                  ['Closed', 'Resolved', 'Cancelled'].includes(selectedTicket.status_tiket)
+                "
                 @click="toggleReassignDropdown"
                 aria-label="Assign tiket ke admin unit"
                 aria-haspopup="true"
@@ -2743,10 +2850,14 @@ function toast(message, type = 'success') {
                 class="inline-flex h-9 w-full sm:w-auto items-center justify-between sm:justify-center gap-1.5 rounded-xl border border-[#E5EAEF] bg-white px-3.5 text-xs font-bold text-[#2A3547] shadow-2xs hover:bg-[#F8FAFC] hover:border-[#5D87FF] transition-all cursor-pointer disabled:opacity-50 whitespace-nowrap active:scale-95"
               >
                 <div class="flex items-center gap-1.5">
-                  <span class="material-symbols-outlined text-[16px] text-[#2563EB]">assignment_ind</span>
+                  <span class="material-symbols-outlined text-[16px] text-[#2563EB]"
+                    >assignment_ind</span
+                  >
                   <span>Assign ke Admin</span>
                 </div>
-                <span class="material-symbols-outlined text-[16px] text-[#7C8BAC]">expand_more</span>
+                <span class="material-symbols-outlined text-[16px] text-[#7C8BAC]"
+                  >expand_more</span
+                >
               </button>
 
               <Transition name="fade">
@@ -2754,7 +2865,9 @@ function toast(message, type = 'success') {
                   v-if="showReassignDropdown"
                   class="absolute bottom-full left-0 mb-1.5 w-full sm:w-64 rounded-xl border border-[#E5EAEF] bg-white p-1.5 shadow-lg z-50"
                 >
-                  <p class="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-[#94A3B8]">
+                  <p
+                    class="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-[#94A3B8]"
+                  >
                     Admin unit {{ selectedTicket.queue_nama || selectedTicket.queue_kode || '—' }}
                   </p>
                   <button
@@ -2764,7 +2877,11 @@ function toast(message, type = 'success') {
                     :disabled="isReassigning"
                     @click="assignTicket(selectedTicket, admin.id)"
                     class="flex h-8 w-full items-center justify-between rounded-lg px-2.5 text-xs font-medium text-[#2A3547] hover:bg-[#F8FAFC] transition-colors cursor-pointer disabled:opacity-50"
-                    :class="selectedTicket.assigned_to_user_id === admin.id ? 'bg-[#ECF2FF] font-bold text-[#5D87FF]' : ''"
+                    :class="
+                      selectedTicket.assigned_to_user_id === admin.id
+                        ? 'bg-[#ECF2FF] font-bold text-[#5D87FF]'
+                        : ''
+                    "
                   >
                     <span class="truncate">{{ admin.nama }}</span>
                     <span

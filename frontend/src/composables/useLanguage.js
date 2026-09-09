@@ -1,7 +1,7 @@
-import { ref } from 'vue';
+import { ref } from 'vue'
 
-const savedLang = (typeof localStorage !== 'undefined' && localStorage.getItem('esb_lang')) || 'id';
-const currentLang = ref(savedLang === 'en' ? 'en' : 'id');
+const savedLang = (typeof localStorage !== 'undefined' && localStorage.getItem('esb_lang')) || 'id'
+const currentLang = ref(savedLang === 'en' ? 'en' : 'id')
 
 const dictionaries = {
   id: {
@@ -29,11 +29,14 @@ const dictionaries = {
 
     // Topic Cards (fallback & translations)
     topic_it_title: 'IT Support',
-    topic_it_desc: 'Pelajari dasar penyiapan profil IT, permintaan laptop, software, dan koneksi jaringan.',
+    topic_it_desc:
+      'Pelajari dasar penyiapan profil IT, permintaan laptop, software, dan koneksi jaringan.',
     topic_hr_title: 'Human Resources (HR)',
-    topic_hr_desc: 'Kelola preferensi akun, Google Workspace, onboarding karyawan, 2SV, dan hak akses.',
+    topic_hr_desc:
+      'Kelola preferensi akun, Google Workspace, onboarding karyawan, 2SV, dan hak akses.',
     topic_ga_title: 'General Affairs (GA)',
-    topic_ga_desc: 'Layanan operasional kantor, pengadaan aset fasilitas GA, inventaris gedung, dan kebutuhan kerja.',
+    topic_ga_desc:
+      'Layanan operasional kantor, pengadaan aset fasilitas GA, inventaris gedung, dan kebutuhan kerja.',
 
     // Featured Articles
     featured_articles: 'Artikel Unggulan',
@@ -45,7 +48,8 @@ const dictionaries = {
 
     // Assistance section
     need_assistance_title: 'Butuh Bantuan Personal?',
-    need_assistance_desc: 'Jika Anda belum menemukan informasi yang dibutuhkan, tim IT Support kami siap membantu Anda secara langsung.',
+    need_assistance_desc:
+      'Jika Anda belum menemukan informasi yang dibutuhkan, tim IT Support kami siap membantu Anda secara langsung.',
     submit_ticket: 'Kirim Tiket',
     sign_in_to_submit: 'Masuk untuk Kirim Tiket',
     go_to_dashboard: 'Buka Dashboard',
@@ -79,11 +83,14 @@ const dictionaries = {
 
     // Topic Cards (fallback & translations)
     topic_it_title: 'IT Support',
-    topic_it_desc: 'Learn the basics of setting up your IT profile, laptop requests, software, and connecting network tools.',
+    topic_it_desc:
+      'Learn the basics of setting up your IT profile, laptop requests, software, and connecting network tools.',
     topic_hr_title: 'Human Resources (HR)',
-    topic_hr_desc: 'Customize your experience with account settings, Google Workspace, onboarding, 2SV, and permissions.',
+    topic_hr_desc:
+      'Customize your experience with account settings, Google Workspace, onboarding, 2SV, and permissions.',
     topic_ga_title: 'General Affairs (GA)',
-    topic_ga_desc: 'Office facility management, physical asset requests, building maintenance, and operational tools.',
+    topic_ga_desc:
+      'Office facility management, physical asset requests, building maintenance, and operational tools.',
 
     // Featured Articles
     featured_articles: 'Featured Articles',
@@ -95,7 +102,8 @@ const dictionaries = {
 
     // Assistance section
     need_assistance_title: 'Need Personal Assistance?',
-    need_assistance_desc: "If you couldn't find the information you need, our IT support team is ready to assist you. Submit a ticket to contact support right away.",
+    need_assistance_desc:
+      "If you couldn't find the information you need, our IT support team is ready to assist you. Submit a ticket to contact support right away.",
     submit_ticket: 'Submit a Ticket',
     sign_in_to_submit: 'Sign In to Submit a Ticket',
     go_to_dashboard: 'Go to Dashboard',
@@ -103,25 +111,25 @@ const dictionaries = {
     it_helpdesk: 'IT Helpdesk Support',
     work_days: 'Mon - Fri',
     work_hours: '08:30 - 17:30',
-  }
-};
+  },
+}
 
 export function useLanguage() {
   function setLanguage(lang) {
-    if (lang !== 'id' && lang !== 'en') return;
-    currentLang.value = lang;
+    if (lang !== 'id' && lang !== 'en') return
+    currentLang.value = lang
     if (typeof localStorage !== 'undefined') {
-      localStorage.setItem('esb_lang', lang);
+      localStorage.setItem('esb_lang', lang)
     }
   }
 
   function toggleLanguage() {
-    setLanguage(currentLang.value === 'id' ? 'en' : 'id');
+    setLanguage(currentLang.value === 'id' ? 'en' : 'id')
   }
 
   function t(key, fallback = '') {
-    const dict = dictionaries[currentLang.value] || dictionaries.id;
-    return dict[key] || fallback || key;
+    const dict = dictionaries[currentLang.value] || dictionaries.id
+    return dict[key] || fallback || key
   }
 
   return {
@@ -129,5 +137,5 @@ export function useLanguage() {
     setLanguage,
     toggleLanguage,
     t,
-  };
+  }
 }

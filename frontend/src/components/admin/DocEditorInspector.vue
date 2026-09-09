@@ -1,30 +1,22 @@
 <script setup>
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
-import {
-  Info,
-  Tag as TagIcon,
-  X,
-  ExternalLink,
-  ChevronDown
-} from 'lucide-vue-next';
+import { ref } from 'vue'
+import { Info, Tag as TagIcon, X, ExternalLink, ChevronDown } from 'lucide-vue-next'
 
 const props = defineProps({
   modelValue: {
     type: Object,
-    required: true
+    required: true,
   },
   isOpen: {
     type: Boolean,
-    default: true
-  }
-});
+    default: true,
+  },
+})
 
-const emit = defineEmits(['update:modelValue', 'close', 'viewPortal']);
+const emit = defineEmits(['update:modelValue', 'close', 'viewPortal'])
 
-const router = useRouter();
-const activeTab = ref('meta'); // 'meta' | 'tags'
-const newTagInput = ref('');
+const activeTab = ref('meta') // 'meta' | 'tags'
+const newTagInput = ref('')
 
 const categories = [
   { id: 'hardware', label: 'Hardware & Equipment' },
@@ -33,27 +25,27 @@ const categories = [
   { id: 'workplace', label: 'Access & Security' },
   { id: 'environment', label: 'Network & Connectivity' },
   { id: 'backend', label: 'Backend & Database' },
-  { id: 'devops', label: 'Policies & SLAs' }
-];
+  { id: 'devops', label: 'Policies & SLAs' },
+]
 
 const severities = [
   { id: 'high', label: 'High Priority' },
   { id: 'medium', label: 'Medium Priority' },
-  { id: 'low', label: 'Low Priority' }
-];
+  { id: 'low', label: 'Low Priority' },
+]
 
 function addTag() {
-  const val = newTagInput.value.trim().toLowerCase();
+  const val = newTagInput.value.trim().toLowerCase()
   if (val && !props.modelValue.tags?.includes(val)) {
-    const updated = [...(props.modelValue.tags || []), val];
-    emit('update:modelValue', { ...props.modelValue, tags: updated });
-    newTagInput.value = '';
+    const updated = [...(props.modelValue.tags || []), val]
+    emit('update:modelValue', { ...props.modelValue, tags: updated })
+    newTagInput.value = ''
   }
 }
 
 function removeTag(tagToRemove) {
-  const updated = (props.modelValue.tags || []).filter((t) => t !== tagToRemove);
-  emit('update:modelValue', { ...props.modelValue, tags: updated });
+  const updated = (props.modelValue.tags || []).filter((t) => t !== tagToRemove)
+  emit('update:modelValue', { ...props.modelValue, tags: updated })
 }
 </script>
 
@@ -62,9 +54,13 @@ function removeTag(tagToRemove) {
     class="h-full flex flex-col w-80 bg-white dark:bg-slate-900 border-l border-[#E2E8F0] dark:border-slate-800 transition-all text-[#1E293B] dark:text-slate-100 select-none overflow-y-auto"
   >
     <!-- Inspector Header -->
-    <div class="p-4 border-b border-[#E2E8F0] dark:border-slate-800 bg-[#F8FAFC] dark:bg-slate-950/60">
+    <div
+      class="p-4 border-b border-[#E2E8F0] dark:border-slate-800 bg-[#F8FAFC] dark:bg-slate-950/60"
+    >
       <div class="flex items-center justify-between mb-1">
-        <h2 class="text-xs sm:text-sm font-semibold text-[#1E293B] dark:text-slate-100 flex items-center gap-1.5">
+        <h2
+          class="text-xs sm:text-sm font-semibold text-[#1E293B] dark:text-slate-100 flex items-center gap-1.5"
+        >
           <Info class="w-4 h-4 text-[#2563EB]" />
           <span>Inspector</span>
         </h2>
@@ -76,17 +72,23 @@ function removeTag(tagToRemove) {
           <X class="w-4 h-4" />
         </button>
       </div>
-      <p class="text-[11px] font-medium text-[#64748B] dark:text-slate-400">Metadata &amp; tag artikel</p>
+      <p class="text-[11px] font-medium text-[#64748B] dark:text-slate-400">
+        Metadata &amp; tag artikel
+      </p>
     </div>
 
     <!-- Tab Navigation -->
-    <nav class="flex border-b border-[#E2E8F0] dark:border-slate-800 px-2 bg-white dark:bg-slate-900 text-xs">
+    <nav
+      class="flex border-b border-[#E2E8F0] dark:border-slate-800 px-2 bg-white dark:bg-slate-900 text-xs"
+    >
       <button
         @click="activeTab = 'meta'"
         class="flex-1 py-3 px-1 text-center font-medium flex flex-col items-center gap-1 transition-all cursor-pointer"
-        :class="activeTab === 'meta'
-          ? 'border-b-2 border-[#2563EB] text-[#2563EB] dark:text-blue-400'
-          : 'text-[#64748B] dark:text-slate-400 hover:text-[#1E293B] border-b-2 border-transparent'"
+        :class="
+          activeTab === 'meta'
+            ? 'border-b-2 border-[#2563EB] text-[#2563EB] dark:text-blue-400'
+            : 'text-[#64748B] dark:text-slate-400 hover:text-[#1E293B] border-b-2 border-transparent'
+        "
       >
         <Info class="w-4 h-4" />
         <span>Meta</span>
@@ -95,9 +97,11 @@ function removeTag(tagToRemove) {
       <button
         @click="activeTab = 'tags'"
         class="flex-1 py-3 px-1 text-center font-medium flex flex-col items-center gap-1 transition-all cursor-pointer"
-        :class="activeTab === 'tags'
-          ? 'border-b-2 border-[#2563EB] text-[#2563EB] dark:text-blue-400'
-          : 'text-[#64748B] dark:text-slate-400 hover:text-[#1E293B] border-b-2 border-transparent'"
+        :class="
+          activeTab === 'tags'
+            ? 'border-b-2 border-[#2563EB] text-[#2563EB] dark:text-blue-400'
+            : 'text-[#64748B] dark:text-slate-400 hover:text-[#1E293B] border-b-2 border-transparent'
+        "
       >
         <TagIcon class="w-4 h-4" />
         <span>Tag</span>
@@ -106,12 +110,13 @@ function removeTag(tagToRemove) {
 
     <!-- Tab Content -->
     <div class="flex-1 p-4 space-y-5 overflow-y-auto text-xs">
-
       <!-- TAB 1: META -->
       <div v-if="activeTab === 'meta'" class="space-y-4">
         <!-- Category -->
         <div class="space-y-1.5">
-          <label class="block text-[11px] font-medium uppercase tracking-wide text-[#64748B] dark:text-slate-400">
+          <label
+            class="block text-[11px] font-medium uppercase tracking-wide text-[#64748B] dark:text-slate-400"
+          >
             Kategori
           </label>
           <div class="relative">
@@ -124,13 +129,17 @@ function removeTag(tagToRemove) {
                 {{ c.label }}
               </option>
             </select>
-            <ChevronDown class="w-4 h-4 text-[#64748B] absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <ChevronDown
+              class="w-4 h-4 text-[#64748B] absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none"
+            />
           </div>
         </div>
 
         <!-- Severity -->
         <div class="space-y-1.5">
-          <label class="block text-[11px] font-medium uppercase tracking-wide text-[#64748B] dark:text-slate-400">
+          <label
+            class="block text-[11px] font-medium uppercase tracking-wide text-[#64748B] dark:text-slate-400"
+          >
             Severity / Priority
           </label>
           <div class="relative">
@@ -143,29 +152,43 @@ function removeTag(tagToRemove) {
                 {{ s.label }}
               </option>
             </select>
-            <ChevronDown class="w-4 h-4 text-[#64748B] absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <ChevronDown
+              class="w-4 h-4 text-[#64748B] absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none"
+            />
           </div>
         </div>
 
         <!-- Document Status Indicator -->
-        <div class="p-3 rounded-lg bg-[#F8FAFC] dark:bg-slate-800/50 border border-[#E2E8F0] dark:border-slate-700/60 text-xs space-y-1">
-          <span class="font-semibold text-[#1E293B] dark:text-slate-200 block">Status Artikel:</span>
+        <div
+          class="p-3 rounded-lg bg-[#F8FAFC] dark:bg-slate-800/50 border border-[#E2E8F0] dark:border-slate-700/60 text-xs space-y-1"
+        >
+          <span class="font-semibold text-[#1E293B] dark:text-slate-200 block"
+            >Status Artikel:</span
+          >
           <p class="text-[11px] text-[#64748B] dark:text-slate-400 leading-relaxed">
-            {{ modelValue.isCustom ? 'Custom — dapat diedit & dihapus admin.' : 'Built-in — template bawaan korporat.' }}
+            {{
+              modelValue.isCustom
+                ? 'Custom — dapat diedit & dihapus admin.'
+                : 'Built-in — template bawaan korporat.'
+            }}
           </p>
         </div>
       </div>
 
       <!-- TAB 2: TAGS -->
       <div v-if="activeTab === 'tags'" class="space-y-3">
-        <label class="block text-[11px] font-medium uppercase tracking-wide text-[#64748B] dark:text-slate-400">
+        <label
+          class="block text-[11px] font-medium uppercase tracking-wide text-[#64748B] dark:text-slate-400"
+        >
           Tag Artikel
         </label>
 
         <!-- Tag Chips -->
-        <div class="flex flex-wrap gap-1.5 min-h-12 p-2.5 rounded-lg bg-[#F8FAFC] dark:bg-slate-800 border border-[#E2E8F0] dark:border-slate-700">
+        <div
+          class="flex flex-wrap gap-1.5 min-h-12 p-2.5 rounded-lg bg-[#F8FAFC] dark:bg-slate-800 border border-[#E2E8F0] dark:border-slate-700"
+        >
           <span
-            v-for="tag in (modelValue.tags || [])"
+            v-for="tag in modelValue.tags || []"
             :key="tag"
             class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-mono font-medium bg-white dark:bg-slate-700 border border-[#E2E8F0] dark:border-slate-600 text-[#1E293B] dark:text-slate-200"
           >
@@ -177,7 +200,10 @@ function removeTag(tagToRemove) {
               <X class="w-3.5 h-3.5" />
             </button>
           </span>
-          <span v-if="!modelValue.tags || !modelValue.tags.length" class="text-[11px] text-[#94A3B8] italic py-1">
+          <span
+            v-if="!modelValue.tags || !modelValue.tags.length"
+            class="text-[11px] text-[#94A3B8] italic py-1"
+          >
             Belum ada tag...
           </span>
         </div>
@@ -199,11 +225,12 @@ function removeTag(tagToRemove) {
           </button>
         </div>
       </div>
-
     </div>
 
     <!-- Inspector Bottom Action -->
-    <div class="p-3.5 border-t border-[#E2E8F0] dark:border-slate-800 bg-[#F8FAFC] dark:bg-slate-950">
+    <div
+      class="p-3.5 border-t border-[#E2E8F0] dark:border-slate-800 bg-[#F8FAFC] dark:bg-slate-950"
+    >
       <button
         @click="$emit('viewPortal')"
         class="w-full bg-white dark:bg-slate-800 border border-[#E2E8F0] dark:border-slate-700 hover:bg-[#F1F5F9] dark:hover:bg-slate-700 text-[#1E293B] dark:text-slate-200 font-semibold py-2 px-4 rounded-lg transition-colors text-xs flex justify-center items-center gap-2 cursor-pointer"

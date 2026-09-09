@@ -48,8 +48,7 @@ export async function createSession(userId, { ttlHours = 12, queryable = pool } 
   const issuedAt = new Date(nowMs)
   const expiresAt = new Date(nowMs + ttlHours * 3600 * 1000)
 
-  // Ensure table exists
-  await ensureUserSessionsTable(queryable)
+  // Schema is provisioned by versioned migrations before application startup.
 
   const result = await queryable.query(
     `INSERT INTO user_sessions (session_id, user_id, issued_at, expires_at, created_at, updated_at)

@@ -1,10 +1,10 @@
 <script setup>
-import { RouterLink, useRouter } from 'vue-router';
-import { useAuth } from '@/composables/useAuth';
-import { Home, Ticket, LogIn, LayoutDashboard } from 'lucide-vue-next';
+import { RouterLink, useRouter } from 'vue-router'
+import { useAuth } from '@/composables/useAuth'
+import { Home, Ticket, LogIn, LayoutDashboard } from 'lucide-vue-next'
 
-const router = useRouter();
-const { isAuthenticated, isAdmin, user } = useAuth();
+const router = useRouter()
+const { isAuthenticated, isAdmin } = useAuth()
 </script>
 
 <template>

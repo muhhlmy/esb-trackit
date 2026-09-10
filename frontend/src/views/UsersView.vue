@@ -1067,134 +1067,139 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
       <form
         id="admin-user-form"
         @submit.prevent="saveUser"
-        class="admin-entry-form flex flex-col gap-4"
+        class="admin-entry-form user-entry-form flex flex-col gap-4"
       >
-        <!-- 1. Employee Selection (Searchable Combobox) -->
-        <div v-if="modalMode === 'add' && employees.length > 0" class="flex flex-col gap-1.5">
-          <label class="text-xs font-semibold text-[#333333]">Karyawan</label>
-          <SearchableSelect
-            v-model="selectedEmployeeId"
-            :options="employeeOptions"
-            value-key="id_karyawan"
-            label-key="nama_karyawan"
-            secondary-label-key="detail"
-            placeholder="Pilih karyawan yang akan diberikan akses..."
-            search-placeholder="Cari nama, NIK, jabatan, atau departemen..."
-            aria-label="Pilih karyawan"
-            clearable
-            @update:modelValue="handleEmployeeSelect"
-          />
+        <section class="user-entry-section">
+          <h3 class="user-entry-title">Identitas & akun</h3>
+          <p class="user-entry-hint">
+            Lengkapi profil pengguna dan informasi untuk masuk ke aplikasi.
+          </p>
+          <!-- 1. Employee Selection (Searchable Combobox) -->
+          <div v-if="modalMode === 'add' && employees.length > 0" class="flex flex-col gap-1.5">
+            <label class="text-xs font-semibold text-[#333333]">Karyawan</label>
+            <SearchableSelect
+              v-model="selectedEmployeeId"
+              :options="employeeOptions"
+              value-key="id_karyawan"
+              label-key="nama_karyawan"
+              secondary-label-key="detail"
+              placeholder="Pilih karyawan yang akan diberikan akses..."
+              search-placeholder="Cari nama, NIK, jabatan, atau departemen..."
+              aria-label="Pilih karyawan"
+              clearable
+              @update:modelValue="handleEmployeeSelect"
+            />
 
-          <!-- Compact Selected Employee Summary Card -->
-          <div
-            v-if="selectedEmployee"
-            class="flex items-center justify-between gap-3 p-2.5 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] mt-0.5"
-          >
-            <div class="flex items-center gap-2.5 min-w-0">
-              <div
-                class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#EFF6FF] text-[#333333] font-bold text-xs select-none"
+            <!-- Compact Selected Employee Summary Card -->
+            <div
+              v-if="selectedEmployee"
+              class="flex items-center justify-between gap-3 p-2.5 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] mt-0.5"
+            >
+              <div class="flex items-center gap-2.5 min-w-0">
+                <div
+                  class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#EFF6FF] text-[#333333] font-bold text-xs select-none"
+                >
+                  {{ getInitials(selectedEmployee.nama_karyawan) }}
+                </div>
+                <div class="min-w-0">
+                  <p class="text-xs font-bold text-[#333333] leading-snug truncate">
+                    {{ selectedEmployee.nama_karyawan }}
+                  </p>
+                  <p class="text-[11px] text-[#64748B] truncate">
+                    {{ selectedEmployee.email_kantor || 'Tanpa Email' }} • NIK:
+                    {{ selectedEmployee.nik }}
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                @click="clearSelectedEmployee"
+                class="text-xs text-[#94A3B8] hover:text-[#E11D48] font-medium cursor-pointer"
               >
-                {{ getInitials(selectedEmployee.nama_karyawan) }}
-              </div>
-              <div class="min-w-0">
-                <p class="text-xs font-bold text-[#333333] leading-snug truncate">
-                  {{ selectedEmployee.nama_karyawan }}
-                </p>
-                <p class="text-[11px] text-[#64748B] truncate">
-                  {{ selectedEmployee.email_kantor || 'Tanpa Email' }} • NIK:
-                  {{ selectedEmployee.nik }}
-                </p>
-              </div>
+                Batal
+              </button>
             </div>
-            <button
-              type="button"
-              @click="clearSelectedEmployee"
-              class="text-xs text-[#94A3B8] hover:text-[#E11D48] font-medium cursor-pointer"
-            >
-              Batal
-            </button>
-          </div>
-        </div>
-
-        <!-- 2. Form Fields (2-Column Grid on Desktop) -->
-        <div class="grid grid-cols-1 gap-3.5 sm:grid-cols-2">
-          <!-- Nama Lengkap -->
-          <div class="flex flex-col gap-1">
-            <label for="user-name" class="text-xs font-semibold text-[#333333]"
-              >Nama Lengkap *</label
-            >
-            <input
-              id="user-name"
-              v-model="form.nama"
-              required
-              autofocus
-              type="text"
-              autocomplete="name"
-              :disabled="modalMode === 'edit' && !isSuperAdmin"
-              placeholder="Nama lengkap pengguna"
-              class="h-9 w-full rounded-xl border border-[#E2E8F0] bg-white px-3 text-xs text-[#333333] placeholder-[#94A3B8] focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs disabled:bg-[#F8FAFC] disabled:opacity-60 disabled:cursor-not-allowed"
-            />
           </div>
 
-          <!-- Email -->
-          <div class="flex flex-col gap-1">
-            <label for="user-email" class="text-xs font-semibold text-[#333333]">Email *</label>
-            <input
-              id="user-email"
-              v-model="form.email"
-              required
-              type="email"
-              autocomplete="email"
-              :disabled="modalMode === 'edit' && !isSuperAdmin"
-              placeholder="email@perusahaan.com"
-              class="h-9 w-full rounded-xl border border-[#E2E8F0] bg-white px-3 text-xs text-[#333333] placeholder-[#94A3B8] focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs disabled:bg-[#F8FAFC] disabled:opacity-60 disabled:cursor-not-allowed"
-            />
-          </div>
+          <!-- 2. Form Fields (2-Column Grid on Desktop) -->
+          <div class="grid grid-cols-1 gap-3.5 sm:grid-cols-2">
+            <!-- Nama Lengkap -->
+            <div class="flex flex-col gap-1">
+              <label for="user-name" class="text-xs font-semibold text-[#333333]"
+                >Nama Lengkap *</label
+              >
+              <input
+                id="user-name"
+                v-model="form.nama"
+                required
+                autofocus
+                type="text"
+                autocomplete="name"
+                :disabled="modalMode === 'edit' && !isSuperAdmin"
+                placeholder="Nama lengkap pengguna"
+                class="h-9 w-full rounded-xl border border-[#E2E8F0] bg-white px-3 text-xs text-[#333333] placeholder-[#94A3B8] focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs disabled:bg-[#F8FAFC] disabled:opacity-60 disabled:cursor-not-allowed"
+              />
+            </div>
 
-          <!-- Password -->
-          <div class="flex flex-col gap-1">
-            <label for="user-password" class="text-xs font-semibold text-[#333333]">
-              {{ modalMode === 'add' ? 'Password *' : 'Password Baru' }}
-            </label>
-            <input
-              id="user-password"
-              v-model="form.password"
-              :required="modalMode === 'add'"
-              minlength="8"
-              type="password"
-              autocomplete="new-password"
-              :placeholder="
-                modalMode === 'add' ? 'Minimal 8 karakter' : 'Kosongkan jika tidak diubah'
-              "
-              class="h-9 w-full rounded-xl border border-[#E2E8F0] bg-white px-3 text-xs text-[#333333] placeholder-[#94A3B8] focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
-            />
-          </div>
+            <!-- Email -->
+            <div class="flex flex-col gap-1">
+              <label for="user-email" class="text-xs font-semibold text-[#333333]">Email *</label>
+              <input
+                id="user-email"
+                v-model="form.email"
+                required
+                type="email"
+                autocomplete="email"
+                :disabled="modalMode === 'edit' && !isSuperAdmin"
+                placeholder="email@perusahaan.com"
+                class="h-9 w-full rounded-xl border border-[#E2E8F0] bg-white px-3 text-xs text-[#333333] placeholder-[#94A3B8] focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs disabled:bg-[#F8FAFC] disabled:opacity-60 disabled:cursor-not-allowed"
+              />
+            </div>
 
-          <!-- Role -->
-          <div class="flex flex-col gap-1">
-            <label class="text-xs font-semibold text-[#333333]">Role Akses *</label>
-            <CustomSelect
-              v-model="form.role"
-              :options="formattedRoleOptions"
-              aria-label="Role Akses"
-              placeholder="Pilih role"
-              :block="true"
-              height-class="h-9"
-              :disabled="
-                modalMode === 'edit' &&
-                (!isSuperAdmin || Number(selectedUser?.id) === Number(currentUser?.id))
-              "
-              @change="handleRoleChange"
-            />
-            <p
-              v-if="modalMode === 'edit' && Number(selectedUser?.id) === Number(currentUser?.id)"
-              class="text-[11px] font-normal text-amber-600"
-            >
-              Role tidak dapat diubah untuk akun milik sendiri.
-            </p>
-          </div>
-        </div>
+            <!-- Password -->
+            <div class="flex flex-col gap-1">
+              <label for="user-password" class="text-xs font-semibold text-[#333333]">
+                {{ modalMode === 'add' ? 'Password *' : 'Password Baru' }}
+              </label>
+              <input
+                id="user-password"
+                v-model="form.password"
+                :required="modalMode === 'add'"
+                minlength="8"
+                type="password"
+                autocomplete="new-password"
+                :placeholder="
+                  modalMode === 'add' ? 'Minimal 8 karakter' : 'Kosongkan jika tidak diubah'
+                "
+                class="h-9 w-full rounded-xl border border-[#E2E8F0] bg-white px-3 text-xs text-[#333333] placeholder-[#94A3B8] focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
+              />
+            </div>
 
+            <!-- Role -->
+            <div class="flex flex-col gap-1">
+              <label class="text-xs font-semibold text-[#333333]">Role Akses *</label>
+              <CustomSelect
+                v-model="form.role"
+                :options="formattedRoleOptions"
+                aria-label="Role Akses"
+                placeholder="Pilih role"
+                :block="true"
+                height-class="h-9"
+                :disabled="
+                  modalMode === 'edit' &&
+                  (!isSuperAdmin || Number(selectedUser?.id) === Number(currentUser?.id))
+                "
+                @change="handleRoleChange"
+              />
+              <p
+                v-if="modalMode === 'edit' && Number(selectedUser?.id) === Number(currentUser?.id)"
+                class="text-[11px] font-normal text-amber-600"
+              >
+                Role tidak dapat diubah untuk akun milik sendiri.
+              </p>
+            </div>
+          </div>
+        </section>
         <!-- 3. Unit Tiket yang Ditangani (Queue Selection - Hanya untuk Admin/Teknisi) -->
         <div v-if="form.role !== 'user'" class="flex flex-col gap-2 pt-2 border-t border-[#F1F5F9]">
           <div>
@@ -1246,7 +1251,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
         </div>
 
         <!-- 4. Granular RBAC Permissions Section (Grouped & Compact Settings Panel) -->
-        <div class="flex flex-col gap-3 pt-3 border-t border-[#F1F5F9]">
+        <div class="user-permission-section flex flex-col gap-3">
           <div class="flex items-center justify-between gap-3 flex-wrap">
             <div>
               <h3 class="text-xs font-semibold text-[#333333]">Hak Akses</h3>
@@ -1261,7 +1266,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
                 @click="selectAllPermissions('full')"
                 class="font-semibold text-[#059669] hover:underline cursor-pointer"
               >
-                Semua Full
+                Akses penuh semua
               </button>
               <span class="text-[#CBD5E1]">•</span>
               <button
@@ -1269,7 +1274,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
                 @click="selectAllPermissions('read_only')"
                 class="font-semibold text-[#333333] hover:underline cursor-pointer"
               >
-                Semua Read
+                Baca saja semua
               </button>
               <span class="text-[#CBD5E1]">•</span>
               <button
@@ -1304,7 +1309,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
                 <div
                   v-for="f in OPERATIONAL_FEATURES"
                   :key="f.key"
-                  class="flex items-center justify-between gap-2 sm:gap-3 px-3 sm:px-3.5 py-2.5 hover:bg-[#F8FAFC] transition-colors"
+                  class="user-permission-row flex items-center justify-between gap-2 sm:gap-3 px-3 sm:px-3.5 py-2.5 hover:bg-[#F8FAFC] transition-colors"
                 >
                   <div class="flex items-center gap-2.5 min-w-0 flex-1">
                     <span class="material-symbols-outlined text-[18px] text-[#64748B] shrink-0">{{
@@ -1318,6 +1323,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
 
                   <select
                     v-model="form.permissions[f.key]"
+                    :aria-label="'Hak akses ' + f.label"
                     class="h-8 rounded-lg border px-2.5 text-xs font-semibold focus:outline-none transition-all cursor-pointer shadow-2xs select-none shrink-0"
                     :class="
                       form.permissions[f.key] === 'full'
@@ -1327,9 +1333,9 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
                           : 'bg-[#F8FAFC] text-[#64748B] border-[#E2E8F0]'
                     "
                   >
-                    <option value="none">None</option>
-                    <option value="read_only">Read Only</option>
-                    <option value="full">Full Access</option>
+                    <option value="none">Tanpa akses</option>
+                    <option value="read_only">Baca saja</option>
+                    <option value="full">Akses penuh</option>
                   </select>
                 </div>
               </div>
@@ -1346,7 +1352,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
                 <div
                   v-for="f in ADMINISTRATIVE_FEATURES"
                   :key="f.key"
-                  class="flex items-center justify-between gap-2 sm:gap-3 px-3 sm:px-3.5 py-2.5 hover:bg-[#F8FAFC] transition-colors"
+                  class="user-permission-row flex items-center justify-between gap-2 sm:gap-3 px-3 sm:px-3.5 py-2.5 hover:bg-[#F8FAFC] transition-colors"
                 >
                   <div class="flex items-center gap-2.5 min-w-0 flex-1">
                     <span class="material-symbols-outlined text-[18px] text-[#64748B] shrink-0">{{
@@ -1360,6 +1366,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
 
                   <select
                     v-model="form.permissions[f.key]"
+                    :aria-label="'Hak akses ' + f.label"
                     class="h-8 rounded-lg border px-2.5 text-xs font-semibold focus:outline-none transition-all cursor-pointer shadow-2xs select-none shrink-0"
                     :class="
                       form.permissions[f.key] === 'full'
@@ -1369,9 +1376,9 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
                           : 'bg-[#F8FAFC] text-[#64748B] border-[#E2E8F0]'
                     "
                   >
-                    <option value="none">None</option>
-                    <option value="read_only">Read Only</option>
-                    <option value="full">Full Access</option>
+                    <option value="none">Tanpa akses</option>
+                    <option value="read_only">Baca saja</option>
+                    <option value="full">Akses penuh</option>
                   </select>
                 </div>
               </div>
@@ -1519,3 +1526,102 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
 </template>
 
 <style scoped src="../assets/admin-workspace.css"></style>
+
+<style scoped>
+.user-entry-form {
+  gap: 22px;
+  padding: 0;
+}
+.user-entry-section,
+.user-permission-section {
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 20px;
+}
+.user-entry-title,
+.user-permission-section h3 {
+  font-size: 14px;
+  font-weight: 650;
+  color: #333;
+}
+.user-entry-hint {
+  margin-top: 6px;
+  margin-bottom: 20px;
+  font-size: 12px;
+  line-height: 1.7;
+  color: #71829b;
+}
+.user-entry-section > div + div {
+  margin-top: 18px;
+}
+.user-entry-section > .grid {
+  gap: 18px;
+}
+.user-entry-form label {
+  font-size: 12px;
+  font-weight: 500;
+}
+.user-entry-form input:not([type='checkbox']) {
+  min-height: 44px;
+  background: #fafbfd;
+  font-size: 13px;
+  font-weight: 400;
+}
+.user-entry-form :deep(button[aria-haspopup='listbox']) {
+  min-height: 44px;
+  border-radius: 8px;
+}
+.user-permission-section > div:first-child > div:last-child {
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.user-permission-section > div:first-child button {
+  min-height: 36px;
+  padding: 6px 9px;
+  border: 1px solid #e2e8f0;
+  border-radius: 7px;
+  font-size: 11px;
+  text-decoration: none;
+}
+.user-permission-row {
+  padding: 14px;
+  gap: 16px;
+}
+.user-permission-row p {
+  white-space: normal;
+  line-height: 1.6;
+}
+.user-permission-row select {
+  min-height: 42px;
+  width: 140px;
+  font-size: 12px;
+  border-radius: 8px;
+}
+.user-entry-form input:disabled {
+  background: #f1f5f9;
+  color: #71829b;
+}
+@media (max-width: 639px) {
+  .user-entry-section,
+  .user-permission-section {
+    padding: 16px;
+  }
+  .user-entry-form input:not([type='checkbox']),
+  .user-entry-form :deep(button[aria-haspopup='listbox']) {
+    font-size: 16px;
+  }
+  .user-permission-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+  .user-permission-row select {
+    width: 100%;
+    min-height: 44px;
+    font-size: 16px;
+  }
+  .user-permission-section > div:first-child button {
+    min-height: 44px;
+  }
+}
+</style>

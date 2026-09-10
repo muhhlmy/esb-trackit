@@ -1097,24 +1097,26 @@ onMounted(() => {
     <AppModal
       :is-open="showResetModal"
       title="Reset & Kosongkan Database"
-      subtitle="Tindakan berbahaya ini akan membersihkan seluruh tabel data."
+      subtitle="Tinjau dampaknya sebelum mengonfirmasi reset."
       icon="warning"
       size="md"
       @close="closeResetModal"
     >
-      <div class="export-modal space-y-4 text-[#333333] wrap-anywhere">
-        <div class="rounded-xl bg-rose-50 p-4 border border-rose-200 flex items-start gap-3">
+      <div class="reset-database-content export-modal space-y-4 text-[#333333] wrap-anywhere">
+        <div
+          class="reset-impact rounded-xl bg-rose-50 p-4 border border-rose-200 flex items-start gap-3"
+        >
           <span class="material-symbols-outlined text-rose-600 text-[22px] shrink-0 mt-0.5"
             >error</span
           >
           <div class="text-xs text-rose-900 space-y-1">
-            <p class="font-bold text-sm">Peringatan Keamanan Database</p>
+            <p class="font-bold text-sm">Data akan dihapus permanen</p>
             <p class="leading-relaxed text-rose-800">
-              Tindakan ini <strong>TIDAK DAPAT DIBATALKAN</strong>. Seluruh data aset TI/GA/OPS,
+              Tindakan ini <strong>tidak dapat dibatalkan</strong>. Seluruh data aset TI/GA/OPS,
               tiket bantuan, riwayat log audit, karyawan, dan sesi pengguna akan dihapus secara
               permanen.
             </p>
-            <p class="text-[11px] text-rose-700">
+            <p class="reset-after-note text-[11px] text-rose-700">
               Setelah reset, akun Superadmin (<code class="font-mono font-semibold"
                 >superadmin@admin.com</code
               >
@@ -1124,7 +1126,7 @@ onMounted(() => {
           </div>
         </div>
 
-        <div class="space-y-2 pt-1">
+        <div class="reset-confirmation space-y-2 pt-1">
           <label for="confirm-reset-input" class="block text-xs font-bold text-slate-800">
             Ketik
             <span class="font-mono text-rose-700 bg-rose-100 px-1.5 py-0.5 rounded font-bold"
@@ -1136,17 +1138,23 @@ onMounted(() => {
             id="confirm-reset-input"
             v-model="confirmResetInput"
             type="text"
-            placeholder="RESET"
+            autocomplete="off"
+            :spellcheck="false"
+            aria-describedby="reset-confirmation-hint"
+            placeholder="Ketik RESET"
             class="h-10 w-full rounded-xl border border-slate-300 bg-white px-3.5 text-xs text-slate-900 font-mono tracking-wider focus:border-rose-500 focus:outline-none focus:ring-2 focus:ring-rose-500/20"
             @keydown.enter="
               confirmResetInput.trim().toUpperCase() === 'RESET' && handleConfirmResetDatabase()
             "
           />
+          <p id="reset-confirmation-hint" class="reset-confirmation-hint">
+            Tombol reset aktif setelah kata konfirmasi sesuai.
+          </p>
         </div>
       </div>
       <template #footer>
         <div
-          class="admin-modal-actions grid grid-cols-1 sm:flex sm:items-center sm:justify-end gap-2.5 pt-3 border-t border-[#F1F5F9]"
+          class="reset-database-actions admin-modal-actions grid grid-cols-1 sm:flex sm:items-center sm:justify-end gap-2.5 pt-3 border-t border-[#F1F5F9]"
         >
           <button
             type="button"
@@ -1165,7 +1173,7 @@ onMounted(() => {
               >progress_activity</span
             >
             <span v-else class="material-symbols-outlined text-[16px]">restart_alt</span>
-            <span>{{ isResetting ? 'Me-reset...' : 'Reset Database Sekarang' }}</span>
+            <span>{{ isResetting ? 'Me-reset...' : 'Reset database' }}</span>
           </button>
         </div>
       </template>
@@ -1205,3 +1213,100 @@ onMounted(() => {
 </style>
 
 <style scoped src="../assets/admin-workspace.css"></style>
+
+<style scoped>
+.reset-database-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.reset-database-content > * {
+  margin: 0;
+}
+.reset-impact {
+  padding: 18px;
+  border-radius: 12px;
+  background: #fff5f5;
+  border-color: #fecdd3;
+  gap: 12px;
+}
+.reset-impact > span {
+  font-size: 22px;
+}
+.reset-impact p:first-child {
+  font-size: 14px;
+  font-weight: 650;
+  line-height: 1.5;
+}
+.reset-impact p {
+  font-size: 12px;
+  line-height: 1.8;
+}
+.reset-impact .reset-after-note {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid #fecdd3;
+  font-size: 11px;
+  line-height: 1.8;
+}
+.reset-after-note code {
+  overflow-wrap: anywhere;
+}
+.reset-confirmation {
+  padding: 18px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: #fafbfd;
+}
+.reset-confirmation label {
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.8;
+}
+.reset-confirmation input {
+  min-height: 46px;
+  border-radius: 8px;
+  background: white;
+  font-size: 15px;
+}
+.reset-confirmation-hint {
+  margin-top: 8px;
+  font-size: 11px;
+  color: #71829b;
+  line-height: 1.6;
+}
+.reset-database-actions {
+  gap: 10px;
+}
+.reset-database-actions button {
+  min-height: 44px;
+  font-size: 12px;
+  border-radius: 8px;
+  justify-content: center;
+}
+.reset-database-actions button:last-child {
+  background: #dc2626;
+}
+.reset-database-actions button:last-child:hover {
+  background: #b91c1c;
+}
+.reset-database-actions button:disabled {
+  opacity: 0.45;
+}
+@media (max-width: 639px) {
+  .reset-impact,
+  .reset-confirmation {
+    padding: 16px;
+  }
+  .reset-confirmation input {
+    font-size: 16px;
+  }
+  .reset-database-actions {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr);
+  }
+  .reset-database-actions button {
+    padding-inline: 10px;
+  }
+}
+</style>

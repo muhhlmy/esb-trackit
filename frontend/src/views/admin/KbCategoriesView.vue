@@ -1,4 +1,5 @@
 <script setup>
+import AppModal from '../../components/ui/AppModal.vue'
 import { ref, computed, onMounted, nextTick } from 'vue'
 import { RouterLink } from 'vue-router'
 import { useKbCategories } from '@/composables/useKbCategories'
@@ -658,189 +659,171 @@ function clearFilters() {
     <!-- Backdrop for Action Menu -->
     <div v-if="actionMenu" @click="closeActionMenu" class="fixed inset-0 z-40 bg-transparent"></div>
 
-    <!-- Create/Edit Drawer -->
-    <Teleport to="body">
-      <Transition name="fade">
-        <div
-          v-if="isDrawerOpen"
-          @click="closeDrawer"
-          class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm"
-        ></div>
-      </Transition>
-      <Transition name="slide">
-        <div
-          v-if="isDrawerOpen && editingCategory"
-          role="dialog"
-          aria-modal="true"
-          :aria-label="drawerMode === 'create' ? 'Kategori Baru' : 'Edit Kategori'"
-          class="kb-category-drawer fixed top-0 right-0 bottom-0 z-50 w-full max-w-md bg-white dark:bg-slate-900 border-l border-[#E2E8F0] dark:border-slate-800 shadow-2xl flex flex-col overflow-hidden"
-        >
-          <!-- Drawer Header -->
-          <div
-            class="px-4 sm:px-6 py-3.5 sm:py-4 border-b border-[#E2E8F0] dark:border-slate-800 flex items-center justify-between shrink-0 bg-[#FAFBFC] dark:bg-slate-900/80"
-          >
-            <h2 class="text-sm sm:text-base font-bold text-[#333333] dark:text-white">
-              {{ drawerMode === 'create' ? 'Kategori Baru' : 'Edit Kategori' }}
-            </h2>
-            <button
-              @click="closeDrawer"
-              class="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer active:scale-95 touch-manipulation"
-              title="Tutup drawer"
+    <AppModal
+      :is-open="isDrawerOpen && Boolean(editingCategory)"
+      :title="drawerMode === 'create' ? 'Kategori Baru' : 'Edit Kategori'"
+      subtitle="Atur identitas dan tampilan kategori di Help Center."
+      icon="category"
+      size="lg"
+      @close="closeDrawer"
+    >
+      <template v-if="editingCategory">
+        <!-- Drawer Body Scrollable -->
+        <div class="category-form">
+          <!-- Title -->
+          <h3 class="category-section-title">Identitas kategori</h3>
+          <div class="space-y-1.5">
+            <label class="text-xs font-semibold text-[#475569] dark:text-slate-300"
+              >Judul Kategori</label
             >
-              <X class="w-4 h-4" />
-            </button>
+            <input
+              id="category-title"
+              aria-label="Judul kategori"
+              v-model="editingCategory.title"
+              @input="handleTitleInput"
+              type="text"
+              placeholder="mis. Network & VPN"
+              class="w-full bg-white dark:bg-slate-950 border border-[#E2E8F0] dark:border-slate-700 rounded-lg px-3 py-2 text-xs sm:text-sm text-[#333333] dark:text-white placeholder-[#94A3B8] focus:outline-none focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 transition-all"
+            />
           </div>
 
-          <!-- Drawer Body Scrollable -->
-          <div class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 sm:space-y-5">
-            <!-- Title -->
-            <div class="space-y-1.5">
-              <label class="text-xs font-semibold text-[#475569] dark:text-slate-300"
-                >Judul Kategori</label
-              >
-              <input
-                v-model="editingCategory.title"
-                @input="handleTitleInput"
-                type="text"
-                placeholder="mis. Network & VPN"
-                class="w-full bg-white dark:bg-slate-950 border border-[#E2E8F0] dark:border-slate-700 rounded-lg px-3 py-2 text-xs sm:text-sm text-[#333333] dark:text-white placeholder-[#94A3B8] focus:outline-none focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 transition-all"
-              />
-            </div>
-
-            <!-- Key (slug) -->
-            <div class="space-y-1.5">
-              <label class="text-xs font-semibold text-[#475569] dark:text-slate-300"
-                >Key (slug)</label
-              >
-              <input
-                v-model="editingCategory.key"
-                type="text"
-                placeholder="mis. network-vpn"
-                class="w-full bg-white dark:bg-slate-950 border border-[#E2E8F0] dark:border-slate-700 rounded-lg px-3 py-2 text-xs sm:text-sm font-mono text-[#333333] dark:text-white placeholder-[#94A3B8] focus:outline-none focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 transition-all"
-              />
-              <p class="text-[11px] text-[#94A3B8] dark:text-slate-500">
-                Huruf kecil, angka, dan tanda hubung. Digunakan untuk filter kategori di Help
-                Center.
-              </p>
-            </div>
-
-            <!-- Description -->
-            <div class="space-y-1.5">
-              <label class="text-xs font-semibold text-[#475569] dark:text-slate-300"
-                >Deskripsi</label
-              >
-              <textarea
-                v-model="editingCategory.description"
-                rows="3"
-                placeholder="Deskripsi singkat yang tampil pada kartu topik..."
-                class="w-full bg-white dark:bg-slate-950 border border-[#E2E8F0] dark:border-slate-700 rounded-lg px-3 py-2 text-xs sm:text-sm text-[#333333] dark:text-white placeholder-[#94A3B8] focus:outline-none focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 transition-all resize-none"
-              ></textarea>
-            </div>
-
-            <!-- Icon Picker -->
-            <div class="space-y-1.5">
-              <label class="text-xs font-semibold text-[#475569] dark:text-slate-300">Icon</label>
-              <div class="grid grid-cols-4 gap-1.5 sm:gap-2">
-                <button
-                  v-for="opt in ICON_OPTIONS"
-                  :key="opt.name"
-                  type="button"
-                  @click="editingCategory.icon = opt.name"
-                  class="flex flex-col items-center gap-1.5 p-2 sm:p-2.5 rounded-lg border transition-all cursor-pointer active:scale-95 touch-manipulation"
-                  :class="
-                    editingCategory.icon === opt.name
-                      ? 'border-[#0A51B0] bg-[#ECF2FF] dark:bg-indigo-950/50 text-[#333333] dark:text-indigo-300 font-bold'
-                      : 'border-[#E2E8F0] dark:border-slate-700 text-[#64748B] dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-600'
-                  "
-                >
-                  <component :is="opt.component" class="w-4 h-4" />
-                  <span class="text-[9px] font-medium leading-none truncate max-w-full">{{
-                    opt.name
-                  }}</span>
-                </button>
-              </div>
-            </div>
-
-            <!-- Sort Order & Status -->
-            <div class="grid grid-cols-2 gap-2.5 sm:gap-3">
-              <div class="space-y-1.5">
-                <label class="text-xs font-semibold text-[#475569] dark:text-slate-300"
-                  >Urutan</label
-                >
-                <input
-                  v-model.number="editingCategory.sort_order"
-                  type="number"
-                  min="0"
-                  class="w-full bg-white dark:bg-slate-950 border border-[#E2E8F0] dark:border-slate-700 rounded-lg px-3 py-2 text-xs sm:text-sm text-[#333333] dark:text-white focus:outline-none focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 transition-all"
-                />
-              </div>
-              <div class="space-y-1.5">
-                <label class="text-xs font-semibold text-[#475569] dark:text-slate-300"
-                  >Status</label
-                >
-                <select
-                  v-model="editingCategory.status"
-                  class="w-full bg-white dark:bg-slate-950 border border-[#E2E8F0] dark:border-slate-700 rounded-lg px-3 py-2 text-xs sm:text-sm text-[#333333] dark:text-white focus:outline-none focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 cursor-pointer transition-all"
-                >
-                  <option value="PUBLISHED">Published</option>
-                  <option value="DRAFT">Draft</option>
-                </select>
-              </div>
-            </div>
-
-            <!-- Featured Toggle -->
-            <label
-              class="flex items-center justify-between p-3 rounded-lg border border-[#E2E8F0] dark:border-slate-700 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
+          <!-- Key (slug) -->
+          <div class="space-y-1.5">
+            <label class="text-xs font-semibold text-[#475569] dark:text-slate-300"
+              >Key (slug)</label
             >
-              <div class="pr-2">
-                <div class="text-xs font-semibold text-[#333333] dark:text-white">
-                  Featured Card
-                </div>
-                <div class="text-[11px] text-[#94A3B8] dark:text-slate-500 mt-0.5 leading-tight">
-                  Tampilkan dengan highlight warna utama di halaman Help Center.
-                </div>
-              </div>
+            <input
+              id="category-key"
+              aria-label="Key kategori"
+              v-model="editingCategory.key"
+              type="text"
+              placeholder="mis. network-vpn"
+              class="w-full bg-white dark:bg-slate-950 border border-[#E2E8F0] dark:border-slate-700 rounded-lg px-3 py-2 text-xs sm:text-sm font-mono text-[#333333] dark:text-white placeholder-[#94A3B8] focus:outline-none focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 transition-all"
+            />
+            <p class="text-[11px] text-[#94A3B8] dark:text-slate-500">
+              Huruf kecil, angka, dan tanda hubung. Digunakan untuk filter kategori di Help Center.
+            </p>
+          </div>
+
+          <!-- Description -->
+          <div class="space-y-1.5">
+            <label class="text-xs font-semibold text-[#475569] dark:text-slate-300"
+              >Deskripsi</label
+            >
+            <textarea
+              id="category-description"
+              aria-label="Deskripsi kategori"
+              v-model="editingCategory.description"
+              rows="3"
+              placeholder="Deskripsi singkat yang tampil pada kartu topik..."
+              class="w-full bg-white dark:bg-slate-950 border border-[#E2E8F0] dark:border-slate-700 rounded-lg px-3 py-2 text-xs sm:text-sm text-[#333333] dark:text-white placeholder-[#94A3B8] focus:outline-none focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 transition-all resize-none"
+            ></textarea>
+          </div>
+
+          <!-- Icon Picker -->
+          <h3 class="category-section-title">Tampilan kategori</h3>
+          <div class="space-y-1.5">
+            <label class="text-xs font-semibold text-[#475569] dark:text-slate-300">Icon</label>
+            <div class="category-icon-grid grid grid-cols-4 gap-1.5 sm:gap-2">
               <button
+                v-for="opt in ICON_OPTIONS"
+                :key="opt.name"
                 type="button"
-                @click.prevent="editingCategory.is_featured = !editingCategory.is_featured"
-                class="relative w-9 h-5 rounded-full transition-colors shrink-0 cursor-pointer"
+                @click="editingCategory.icon = opt.name"
+                :aria-pressed="editingCategory.icon === opt.name"
+                :aria-label="'Pilih ikon ' + opt.name"
+                class="flex flex-col items-center gap-1.5 p-2 sm:p-2.5 rounded-lg border transition-all cursor-pointer active:scale-95 touch-manipulation"
                 :class="
-                  editingCategory.is_featured ? 'bg-[#0A51B0]' : 'bg-slate-300 dark:bg-slate-700'
+                  editingCategory.icon === opt.name
+                    ? 'border-[#0A51B0] bg-[#ECF2FF] dark:bg-indigo-950/50 text-[#333333] dark:text-indigo-300 font-bold'
+                    : 'border-[#E2E8F0] dark:border-slate-700 text-[#64748B] dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-600'
                 "
               >
-                <span
-                  class="absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform"
-                  :class="
-                    editingCategory.is_featured
-                      ? 'translate-x-[18px] left-0'
-                      : 'translate-x-0.5 left-0'
-                  "
-                ></span>
+                <component :is="opt.component" class="w-4 h-4" />
+                <span class="text-[9px] font-medium leading-none truncate max-w-full">{{
+                  opt.name
+                }}</span>
               </button>
-            </label>
+            </div>
           </div>
 
-          <!-- Drawer Footer Sticky -->
-          <div
-            class="px-4 sm:px-6 py-3 border-t border-[#E2E8F0] dark:border-slate-800 bg-[#FAFBFC] dark:bg-slate-900/80 flex items-center justify-end gap-2 shrink-0"
-          >
-            <button
-              @click="closeDrawer"
-              class="px-4 py-2 rounded-lg text-xs font-semibold text-[#333333] dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer active:scale-95 touch-manipulation"
-            >
-              Batal
-            </button>
-            <button
-              @click="handleSave"
-              :disabled="isSaving || !editingCategory.title || !editingCategory.key"
-              class="px-4 py-2 rounded-lg text-xs font-bold bg-[#0A51B0] hover:bg-[#0A4391] text-white shadow-xs transition-colors cursor-pointer active:scale-95 touch-manipulation disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {{ isSaving ? 'Menyimpan...' : 'Simpan Kategori' }}
-            </button>
+          <!-- Sort Order & Status -->
+          <h3 class="category-section-title">Pengaturan publikasi</h3>
+          <div class="grid grid-cols-2 gap-2.5 sm:gap-3">
+            <div class="space-y-1.5">
+              <label class="text-xs font-semibold text-[#475569] dark:text-slate-300">Urutan</label>
+              <input
+                id="category-sort_order"
+                aria-label="Urutan kategori"
+                v-model.number="editingCategory.sort_order"
+                type="number"
+                min="0"
+                class="w-full bg-white dark:bg-slate-950 border border-[#E2E8F0] dark:border-slate-700 rounded-lg px-3 py-2 text-xs sm:text-sm text-[#333333] dark:text-white focus:outline-none focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 transition-all"
+              />
+            </div>
+            <div class="space-y-1.5">
+              <label class="text-xs font-semibold text-[#475569] dark:text-slate-300">Status</label>
+              <select
+                id="category-status"
+                aria-label="Status kategori"
+                v-model="editingCategory.status"
+                class="w-full bg-white dark:bg-slate-950 border border-[#E2E8F0] dark:border-slate-700 rounded-lg px-3 py-2 text-xs sm:text-sm text-[#333333] dark:text-white focus:outline-none focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 cursor-pointer transition-all"
+              >
+                <option value="PUBLISHED">Published</option>
+                <option value="DRAFT">Draft</option>
+              </select>
+            </div>
           </div>
+
+          <!-- Featured Toggle -->
+          <label
+            class="flex items-center justify-between p-3 rounded-lg border border-[#E2E8F0] dark:border-slate-700 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
+          >
+            <div class="pr-2">
+              <div class="text-xs font-semibold text-[#333333] dark:text-white">
+                Kategori unggulan
+              </div>
+              <div class="text-[11px] text-[#94A3B8] dark:text-slate-500 mt-0.5 leading-tight">
+                Tampilkan dengan highlight warna utama di halaman Help Center.
+              </div>
+            </div>
+            <button
+              type="button"
+              role="switch"
+              aria-label="Kategori unggulan"
+              :aria-checked="Boolean(editingCategory.is_featured)"
+              @click.prevent="editingCategory.is_featured = !editingCategory.is_featured"
+              class="relative w-9 h-5 rounded-full transition-colors shrink-0 cursor-pointer"
+              :class="
+                editingCategory.is_featured ? 'bg-[#0A51B0]' : 'bg-slate-300 dark:bg-slate-700'
+              "
+            >
+              <span
+                class="absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform"
+                :class="
+                  editingCategory.is_featured
+                    ? 'translate-x-[18px] left-0'
+                    : 'translate-x-0.5 left-0'
+                "
+              ></span>
+            </button>
+          </label>
         </div>
-      </Transition>
-    </Teleport>
+      </template>
+      <template #footer>
+        <div class="category-footer">
+          <button type="button" :disabled="isSaving" @click="closeDrawer">Batal</button>
+          <button
+            type="button"
+            class="category-save"
+            :disabled="isSaving || !editingCategory?.title || !editingCategory?.key"
+            @click="handleSave"
+          >
+            {{ isSaving ? 'Menyimpan...' : 'Simpan kategori' }}
+          </button>
+        </div>
+      </template>
+    </AppModal>
 
     <!-- Delete Confirmation Modal -->
     <Transition name="fade">
@@ -975,6 +958,107 @@ function clearFilters() {
     padding: 20px 16px;
   }
   .kb-category-drawer > div:last-child button {
+    flex: 1;
+  }
+}
+</style>
+
+<style scoped>
+.category-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+.category-section-title {
+  grid-column: 1 / -1;
+  color: #333;
+  font-size: 13px;
+  font-weight: 650;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #edf1f6;
+  margin-top: 6px;
+}
+.category-form > div:has(textarea),
+.category-form > div:has(.category-icon-grid),
+.category-form > .grid,
+.category-form > label {
+  grid-column: 1 / -1;
+}
+.category-form label {
+  font-size: 12px;
+  font-weight: 500;
+}
+.category-form :is(input, select, textarea) {
+  min-height: 44px;
+  font-size: 13px;
+  border-radius: 8px;
+  background: #fafbfd;
+}
+.category-form textarea {
+  min-height: 96px;
+  resize: vertical;
+  line-height: 1.7;
+}
+.category-form p {
+  line-height: 1.6;
+}
+.category-icon-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+.category-icon-grid button {
+  min-height: 62px;
+  padding: 12px 6px;
+}
+.category-icon-grid button[aria-pressed='true'] {
+  background: #edf5ff;
+  border-color: #0a51b0;
+  color: #0a51b0;
+}
+.category-icon-grid button span {
+  font-size: 10px;
+}
+.category-form > label {
+  padding: 16px;
+  background: #f8fafc;
+}
+.category-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+.category-footer button {
+  min-height: 44px;
+  padding: 0 20px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.category-footer .category-save {
+  background: #0a51b0;
+  border-color: #0a51b0;
+  color: white;
+}
+.category-footer button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.category-form button:focus-visible,
+.category-footer button:focus-visible {
+  outline: 2px solid #097cde;
+  outline-offset: 3px;
+}
+@media (max-width: 639px) {
+  .category-form {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+  .category-form :is(input, select, textarea) {
+    font-size: 16px;
+  }
+  .category-footer button {
     flex: 1;
   }
 }

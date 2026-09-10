@@ -32,9 +32,11 @@ const FAQ_CATEGORIES = [
   'General & Policies',
 ]
 
+const categoryOptions = FAQ_CATEGORIES.map((cat) => ({ value: cat, label: cat }))
+
 const categoryFilterOptions = computed(() => [
   { value: 'all', label: 'All Categories' },
-  ...FAQ_CATEGORIES.map((cat) => ({ value: cat, label: cat })),
+  ...categoryOptions,
 ])
 
 const faqStatusFormOptions = [
@@ -672,92 +674,98 @@ onMounted(fetchFaqs)
     <!-- Add / Edit Form Modal -->
     <AppModal
       :is-open="showFormModal"
-      :title="modalMode === 'add' ? 'Add New FAQ' : 'Edit FAQ Entry'"
-      subtitle="Content & Category Settings for Help Center"
+      :title="modalMode === 'add' ? 'Tambah FAQ' : 'Edit FAQ'"
+      subtitle="Tulis pertanyaan dan jawaban yang membantu pengguna Help Center."
       icon="quiz"
       size="lg"
       @close="closeFormModal"
     >
-      <form id="faq-entry" @submit.prevent="saveFaq" class="admin-entry-form space-y-4 pt-1">
-        <div>
-          <label
-            for="faq-question"
-            class="mb-1.5 block text-xs font-bold text-[#333333] dark:text-slate-200"
-            >Question</label
-          >
-          <input
-            id="faq-question"
-            v-model="form.question"
-            required
-            type="text"
-            placeholder="e.g. How do I reset my account password?"
-            class="w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] dark:bg-slate-800 px-3.5 py-2.5 text-xs font-semibold text-[#333333] dark:text-slate-100 placeholder-[#94A3B8] focus:border-[#0A51B0] focus:outline-none transition-all"
-          />
-        </div>
-
-        <div>
-          <label
-            for="faq-answer"
-            class="mb-1.5 block text-xs font-bold text-[#333333] dark:text-slate-200"
-            >Answer (HTML or Markdown supported)</label
-          >
-          <textarea
-            id="faq-answer"
-            v-model="form.answer"
-            required
-            rows="5"
-            placeholder="Provide clear, concise instructions..."
-            class="w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] dark:bg-slate-800 p-3.5 text-xs font-medium text-[#333333] dark:text-slate-100 placeholder-[#94A3B8] focus:border-[#0A51B0] focus:outline-none transition-all resize-none"
-          ></textarea>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+      <form id="faq-entry" @submit.prevent="saveFaq" class="admin-entry-form faq-content-form">
+        <section class="faq-content-section">
+          <h3>Konten FAQ</h3>
+          <p class="faq-section-hint">Kolom bertanda * wajib diisi.</p>
           <div>
-            <label class="mb-1.5 block text-xs font-bold text-[#333333] dark:text-slate-200"
-              >Category</label
+            <label
+              for="faq-question"
+              class="mb-1.5 block text-xs font-bold text-[#333333] dark:text-slate-200"
+              >Pertanyaan <span class="text-rose-600">*</span></label
             >
-            <CustomSelect
-              v-model="form.category"
-              :options="categoryOptions"
-              aria-label="FAQ Category"
-              placeholder="Select category"
-              :block="true"
-              height-class="h-10"
-            />
-          </div>
-
-          <div>
-            <label class="mb-1.5 block text-xs font-bold text-[#333333] dark:text-slate-200"
-              >Status</label
-            >
-            <CustomSelect
-              v-model="form.status"
-              :options="faqStatusFormOptions"
-              aria-label="FAQ Status"
-              placeholder="Select status"
-              :block="true"
-              height-class="h-10"
+            <input
+              id="faq-question"
+              v-model="form.question"
+              required
+              type="text"
+              placeholder="Contoh: Bagaimana cara mereset kata sandi akun?"
+              class="w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] dark:bg-slate-800 px-3.5 py-2.5 text-xs font-semibold text-[#333333] dark:text-slate-100 placeholder-[#94A3B8] focus:border-[#0A51B0] focus:outline-none transition-all"
             />
           </div>
 
           <div>
             <label
-              for="faq-sort-order"
+              for="faq-answer"
               class="mb-1.5 block text-xs font-bold text-[#333333] dark:text-slate-200"
-              >Sort Order</label
+              >Jawaban <span class="text-rose-600">*</span></label
             >
-            <input
-              id="faq-sort-order"
-              v-model.number="form.sort_order"
-              type="number"
-              min="0"
-              step="1"
-              class="w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] dark:bg-slate-800 px-3.5 py-2.5 text-xs font-semibold text-[#333333] dark:text-slate-100 focus:border-[#0A51B0] focus:outline-none transition-all"
-            />
+            <textarea
+              id="faq-answer"
+              v-model="form.answer"
+              required
+              rows="5"
+              placeholder="Tuliskan jawaban atau langkah penyelesaian yang mudah diikuti..."
+              class="w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] dark:bg-slate-800 p-3.5 text-xs font-medium text-[#333333] dark:text-slate-100 placeholder-[#94A3B8] focus:border-[#0A51B0] focus:outline-none transition-all resize-none"
+            ></textarea>
           </div>
-        </div>
+        </section>
+        <section class="faq-settings-section">
+          <h3>Pengaturan publikasi</h3>
+          <div class="faq-settings-grid grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+            <div>
+              <label class="mb-1.5 block text-xs font-bold text-[#333333] dark:text-slate-200"
+                >Kategori</label
+              >
+              <CustomSelect
+                v-model="form.category"
+                :options="categoryOptions"
+                aria-label="Kategori FAQ"
+                placeholder="Pilih kategori"
+                :block="true"
+                height-class="h-10"
+              />
+            </div>
 
+            <div>
+              <label class="mb-1.5 block text-xs font-bold text-[#333333] dark:text-slate-200"
+                >Status</label
+              >
+              <CustomSelect
+                v-model="form.status"
+                :options="faqStatusFormOptions"
+                aria-label="Status FAQ"
+                placeholder="Pilih status"
+                :block="true"
+                height-class="h-10"
+              />
+            </div>
+
+            <div>
+              <label
+                for="faq-sort-order"
+                class="mb-1.5 block text-xs font-bold text-[#333333] dark:text-slate-200"
+                >Urutan</label
+              >
+              <input
+                id="faq-sort-order"
+                v-model.number="form.sort_order"
+                type="number"
+                min="0"
+                step="1"
+                class="w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] dark:bg-slate-800 px-3.5 py-2.5 text-xs font-semibold text-[#333333] dark:text-slate-100 focus:border-[#0A51B0] focus:outline-none transition-all"
+              />
+            </div>
+          </div>
+        </section>
         <p
+          role="alert"
           v-if="modalError"
           class="text-xs font-bold text-rose-600 bg-rose-50 dark:bg-rose-950/40 p-3 rounded-xl border border-rose-200"
         >
@@ -765,7 +773,9 @@ onMounted(fetchFaqs)
         </p>
       </form>
       <template #footer>
-        <div class="admin-modal-actions flex flex-col-reverse sm:flex-row justify-end gap-2 pt-2">
+        <div
+          class="admin-modal-actions faq-form-footer flex flex-col-reverse sm:flex-row justify-end gap-2 pt-2"
+        >
           <button
             type="button"
             @click="closeFormModal"
@@ -890,6 +900,92 @@ onMounted(fetchFaqs)
     padding: 20px 16px;
   }
   .kb-category-drawer > div:last-child button {
+    flex: 1;
+  }
+}
+</style>
+
+<style scoped>
+.faq-content-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 0;
+}
+.faq-content-section,
+.faq-settings-section {
+  padding: 20px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+}
+.faq-content-form h3 {
+  font-size: 13px;
+  font-weight: 650;
+  color: #333;
+  margin-bottom: 8px;
+}
+.faq-section-hint {
+  color: #8291a7;
+  font-size: 11px;
+  margin-bottom: 18px;
+}
+.faq-content-section > div + div {
+  margin-top: 18px;
+}
+.faq-content-form label {
+  font-size: 12px;
+  font-weight: 500;
+  margin-bottom: 7px;
+}
+.faq-content-form :is(input, textarea) {
+  background: #fafbfd;
+  font-weight: 400;
+  border-color: #dce4ef;
+  border-radius: 8px;
+  font-size: 13px;
+}
+.faq-content-form textarea {
+  min-height: 180px;
+  line-height: 1.8;
+  resize: vertical;
+}
+.faq-settings-grid {
+  margin-top: 18px;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 0.7fr);
+}
+.faq-settings-grid > div {
+  min-width: 0;
+}
+.faq-content-form :deep(button[aria-haspopup='listbox']) {
+  min-height: 44px;
+  font-size: 13px;
+}
+.faq-form-footer {
+  flex-direction: row;
+}
+.faq-form-footer button {
+  min-height: 44px;
+}
+@media (max-width: 639px) {
+  .faq-content-section,
+  .faq-settings-section {
+    padding: 16px;
+  }
+  .faq-settings-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .faq-settings-grid > div:first-child {
+    grid-column: 1 / -1;
+  }
+  .faq-content-form :is(input, textarea),
+  .faq-content-form :deep(button[aria-haspopup='listbox']) {
+    font-size: 16px;
+  }
+  .faq-content-form textarea {
+    min-height: 200px;
+  }
+  .faq-form-footer button {
+    width: auto;
     flex: 1;
   }
 }

@@ -726,118 +726,138 @@ onMounted(() => {
           {{ modalError }}
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-          <div>
-            <label for="shipment-request_date" class="block text-xs font-bold text-[#333333] mb-1">
-              Tanggal Request <span class="text-rose-500">*</span>
-            </label>
-            <input
-              id="shipment-request_date"
-              v-model="form.request_date"
-              type="date"
-              required
-              class="h-10 w-full rounded-xl border border-[#CBD5E1] px-3 text-xs text-[#333333] focus:border-[#0A51B0] focus:outline-none"
-            />
+        <section class="shipment-entry-section">
+          <h3><span>01</span>Informasi pengiriman</h3>
+          <p class="shipment-entry-hint">Tentukan tanggal pengajuan dan status pengiriman.</p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            <div>
+              <label
+                for="shipment-request_date"
+                class="block text-xs font-bold text-[#333333] mb-1"
+              >
+                Tanggal pengajuan <span class="text-rose-500">*</span>
+              </label>
+              <input
+                id="shipment-request_date"
+                v-model="form.request_date"
+                type="date"
+                required
+                class="h-10 w-full rounded-xl border border-[#CBD5E1] px-3 text-xs text-[#333333] focus:border-[#0A51B0] focus:outline-none"
+              />
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-[#333333] mb-1">
+                Status <span class="text-rose-500">*</span>
+              </label>
+              <CustomSelect
+                v-model="form.status"
+                :options="FORM_STATUS_OPTIONS"
+                aria-label="Status pengiriman"
+                placeholder="Pilih status"
+                :block="true"
+                height-class="h-10"
+              />
+            </div>
           </div>
-
-          <div>
-            <label class="block text-xs font-bold text-[#333333] mb-1">
-              Status <span class="text-rose-500">*</span>
-            </label>
-            <CustomSelect
-              v-model="form.status"
-              :options="FORM_STATUS_OPTIONS"
-              aria-label="Status pengiriman"
-              placeholder="Pilih status"
-              :block="true"
-              height-class="h-10"
-            />
-          </div>
-        </div>
-
-        <div>
-          <label for="shipment-recipient_name" class="block text-xs font-bold text-[#333333] mb-1">
-            Nama Penerima <span class="text-rose-500">*</span>
-          </label>
-          <input
-            id="shipment-recipient_name"
-            v-model="form.recipient_name"
-            type="text"
-            required
-            maxlength="150"
-            placeholder="Contoh: Budi Santoso"
-            class="h-10 w-full rounded-xl border border-[#CBD5E1] px-3 text-xs text-[#333333] focus:border-[#0A51B0] focus:outline-none"
-          />
-        </div>
-
-        <div>
-          <label
-            for="shipment-item_description"
-            class="block text-xs font-bold text-[#333333] mb-1"
-          >
-            Deskripsi Barang <span class="text-rose-500">*</span>
-          </label>
-          <textarea
-            id="shipment-item_description"
-            v-model="form.item_description"
-            rows="3"
-            required
-            maxlength="5000"
-            placeholder="Contoh: 1 Unit Laptop ThinkPad X1 Carbon + Charger & Mouse"
-            class="w-full rounded-xl border border-[#CBD5E1] p-3 text-xs text-[#333333] focus:border-[#0A51B0] focus:outline-none"
-          ></textarea>
-        </div>
-
-        <div>
-          <label for="shipment-destination" class="block text-xs font-bold text-[#333333] mb-1">
-            Tujuan Pengiriman <span class="text-rose-500">*</span>
-          </label>
-          <input
-            id="shipment-destination"
-            v-model="form.destination"
-            type="text"
-            required
-            maxlength="255"
-            placeholder="Contoh: Kantor Cabang Surabaya / Alamat Penerima"
-            class="h-10 w-full rounded-xl border border-[#CBD5E1] px-3 text-xs text-[#333333] focus:border-[#0A51B0] focus:outline-none"
-          />
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+        </section>
+        <section class="shipment-entry-section shipment-recipient-section">
+          <h3><span>02</span>Penerima & barang</h3>
+          <p class="shipment-entry-hint">
+            Lengkapi penerima, tujuan, dan rincian barang yang dikirim.
+          </p>
           <div>
             <label
-              for="shipment-tracking_number"
+              for="shipment-recipient_name"
               class="block text-xs font-bold text-[#333333] mb-1"
             >
-              No Resi <span class="text-[#94A3B8] font-normal">(Opsional)</span>
+              Nama Penerima <span class="text-rose-500">*</span>
             </label>
             <input
-              id="shipment-tracking_number"
-              v-model="form.tracking_number"
+              id="shipment-recipient_name"
+              v-model="form.recipient_name"
               type="text"
-              maxlength="100"
-              placeholder="Contoh: JNE-01234567"
+              required
+              maxlength="150"
+              placeholder="Contoh: Budi Santoso"
               class="h-10 w-full rounded-xl border border-[#CBD5E1] px-3 text-xs text-[#333333] focus:border-[#0A51B0] focus:outline-none"
             />
           </div>
 
           <div>
             <label
-              for="shipment-delivery_proof_url"
+              for="shipment-item_description"
               class="block text-xs font-bold text-[#333333] mb-1"
             >
-              Link Bukti Pengiriman <span class="text-[#94A3B8] font-normal">(Opsional)</span>
+              Deskripsi Barang <span class="text-rose-500">*</span>
+            </label>
+            <textarea
+              id="shipment-item_description"
+              v-model="form.item_description"
+              rows="3"
+              required
+              maxlength="5000"
+              placeholder="Contoh: 1 Unit Laptop ThinkPad X1 Carbon + Charger & Mouse"
+              class="w-full rounded-xl border border-[#CBD5E1] p-3 text-xs text-[#333333] focus:border-[#0A51B0] focus:outline-none"
+            ></textarea>
+          </div>
+
+          <div>
+            <label for="shipment-destination" class="block text-xs font-bold text-[#333333] mb-1">
+              Tujuan Pengiriman <span class="text-rose-500">*</span>
             </label>
             <input
-              id="shipment-delivery_proof_url"
-              v-model="form.delivery_proof_url"
-              type="url"
-              maxlength="2048"
-              placeholder="https://example.com/bukti.jpg"
+              id="shipment-destination"
+              v-model="form.destination"
+              type="text"
+              required
+              maxlength="255"
+              placeholder="Contoh: Kantor Cabang Surabaya / Alamat Penerima"
               class="h-10 w-full rounded-xl border border-[#CBD5E1] px-3 text-xs text-[#333333] focus:border-[#0A51B0] focus:outline-none"
             />
           </div>
-        </div>
+        </section>
+        <section class="shipment-entry-section">
+          <h3><span>03</span>Pelacakan & bukti</h3>
+          <p class="shipment-entry-hint">
+            Opsional. Lengkapi setelah nomor resi atau bukti tersedia.
+          </p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            <div>
+              <label
+                for="shipment-tracking_number"
+                class="block text-xs font-bold text-[#333333] mb-1"
+              >
+                No Resi <span class="text-[#94A3B8] font-normal">(Opsional)</span>
+              </label>
+              <input
+                id="shipment-tracking_number"
+                v-model="form.tracking_number"
+                type="text"
+                maxlength="100"
+                placeholder="Contoh: JNE-01234567"
+                class="h-10 w-full rounded-xl border border-[#CBD5E1] px-3 text-xs text-[#333333] focus:border-[#0A51B0] focus:outline-none"
+              />
+            </div>
+
+            <div>
+              <label
+                for="shipment-delivery_proof_url"
+                class="block text-xs font-bold text-[#333333] mb-1"
+              >
+                Link Bukti Pengiriman <span class="text-[#94A3B8] font-normal">(Opsional)</span>
+              </label>
+              <input
+                id="shipment-delivery_proof_url"
+                v-model="form.delivery_proof_url"
+                type="url"
+                maxlength="2048"
+                placeholder="https://example.com/bukti.jpg"
+                class="h-10 w-full rounded-xl border border-[#CBD5E1] px-3 text-xs text-[#333333] focus:border-[#0A51B0] focus:outline-none"
+              />
+            </div>
+          </div>
+        </section>
       </form>
       <template #footer>
         <div
@@ -856,7 +876,13 @@ onMounted(() => {
             :disabled="isSubmitting"
             class="h-9 rounded-lg bg-[#0A51B0] px-4 text-xs font-semibold text-white hover:bg-[#0A4391] disabled:opacity-50 cursor-pointer"
           >
-            {{ isSubmitting ? 'Menyimpan...' : 'Simpan' }}
+            {{
+              isSubmitting
+                ? 'Menyimpan...'
+                : modalMode === 'add'
+                  ? 'Tambah pengiriman'
+                  : 'Simpan perubahan'
+            }}
           </button>
         </div>
       </template>
@@ -925,7 +951,7 @@ onMounted(() => {
   margin-bottom: 24px;
 }
 .shipment-toolbar > div:first-child button {
-  background: #0A51B0;
+  background: #0a51b0;
   min-height: 42px;
   box-shadow: none;
 }
@@ -1078,8 +1104,8 @@ onMounted(() => {
 }
 .shipment-form :is(input, textarea):focus {
   background: white;
-  border-color: #097CDE;
-  box-shadow: 0 0 0 3px #097CDE10;
+  border-color: #097cde;
+  box-shadow: 0 0 0 3px #097cde10;
 }
 .shipment-form-actions {
   padding: 0;
@@ -1092,7 +1118,7 @@ onMounted(() => {
   border-radius: 8px;
 }
 .shipment-form-actions button[type='submit'] {
-  background: #0A51B0;
+  background: #0a51b0;
 }
 .shipment-form-actions button:disabled {
   opacity: 0.5;
@@ -1100,7 +1126,7 @@ onMounted(() => {
 }
 .shipments-page button:focus-visible,
 .shipment-form-actions button:focus-visible {
-  outline: 2px solid #097CDE;
+  outline: 2px solid #097cde;
   outline-offset: 3px;
 }
 @media (min-width: 768px) and (max-width: 1279px) {
@@ -1157,5 +1183,91 @@ onMounted(() => {
 .shipment-table td:nth-child(6) {
   white-space: nowrap;
   overflow-wrap: normal;
+}
+</style>
+
+<style scoped>
+.shipment-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 0;
+}
+.shipment-form > * {
+  margin: 0;
+}
+.shipment-entry-section {
+  padding: 20px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+}
+.shipment-entry-section h3 {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 13px;
+  font-weight: 650;
+  color: #333;
+}
+.shipment-entry-section h3 > span {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+  background: #edf5ff;
+  color: #0a51b0;
+  font-size: 10px;
+}
+.shipment-entry-hint {
+  margin: 7px 0 18px;
+  font-size: 11px;
+  line-height: 1.7;
+  color: #71829b;
+}
+.shipment-entry-section > .grid {
+  gap: 18px;
+}
+.shipment-recipient-section > div + div {
+  margin-top: 18px;
+}
+.shipment-entry-section label {
+  font-size: 12px;
+  font-weight: 500;
+}
+.shipment-entry-section :is(input, textarea) {
+  font-size: 13px;
+  min-height: 44px;
+  background: #fafbfd;
+}
+.shipment-entry-section textarea {
+  min-height: 120px;
+  line-height: 1.8;
+}
+.shipment-entry-section :deep(button[aria-haspopup='listbox']) {
+  min-height: 44px;
+  background: #fafbfd;
+}
+.shipment-form-actions {
+  gap: 10px;
+}
+.shipment-form-actions button {
+  font-weight: 600;
+  min-height: 44px;
+}
+@media (max-width: 639px) {
+  .shipment-entry-section {
+    padding: 16px;
+  }
+  .shipment-entry-section :is(input, textarea),
+  .shipment-entry-section :deep(button[aria-haspopup='listbox']) {
+    font-size: 16px;
+  }
+  .shipment-entry-hint {
+    margin-bottom: 16px;
+  }
+  .shipment-form-actions button {
+    padding-inline: 12px;
+  }
 }
 </style>

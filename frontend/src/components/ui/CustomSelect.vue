@@ -4,7 +4,7 @@ import { computed, onBeforeUnmount, onMounted, ref, useId } from 'vue'
 
 const props = defineProps({
   modelValue: { type: [String, Number, null], default: null },
-  options: { type: Array, required: true },
+  options: { type: Array, default: () => [] },
   placeholder: { type: String, default: 'Pilih opsi' },
   disabled: { type: Boolean, default: false },
   ariaLabel: { type: String, default: '' },
@@ -27,7 +27,7 @@ const containerRef = ref(null)
 
 // Normalisasi opsi ke { value, label, dot }
 const normalizedOptions = computed(() =>
-  props.options.map((opt) => {
+  (props.options || []).map((opt) => {
     if (opt && typeof opt === 'object' && !Array.isArray(opt)) {
       return {
         value: opt[props.valueKey],

@@ -1109,6 +1109,17 @@ onMounted(async () => {
       size="lg"
       @close="closeModal"
     >
+      <div class="it-entry-summary">
+        <span class="it-entry-icon material-symbols-outlined" aria-hidden="true">devices</span>
+        <div>
+          <strong>{{ form.hostname || 'Perangkat baru' }}</strong>
+          <p>
+            {{
+              form.tipe_perangkat || 'Lengkapi identitas, penempatan, dan spesifikasi perangkat.'
+            }}
+          </p>
+        </div>
+      </div>
       <nav class="it-create-steps" aria-label="Langkah pengisian aset">
         <button
           v-for="(step, index) in [
@@ -1160,12 +1171,12 @@ onMounted(async () => {
             <span class="text-[11px] font-medium text-[#64748B]">Langkah 1 dari 3</span>
           </div>
 
+          <p class="it-entry-guidance">Mulai dengan identitas yang tertera pada perangkat.</p>
           <fieldset class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
             <!-- Hostname Input -->
             <div class="flex flex-col gap-1.5">
               <label class="text-[12px] font-bold text-[#333333] flex items-center justify-between">
                 <span>Hostname / Label Aset <span class="text-[#DC2626]">*</span></span>
-                <span class="text-[10px] font-normal text-[#64748B]">Maks. 100 karakter</span>
               </label>
               <div class="relative flex items-center">
                 <span
@@ -1188,7 +1199,6 @@ onMounted(async () => {
             <div class="flex flex-col gap-1.5">
               <label class="text-[12px] font-bold text-[#333333] flex items-center justify-between">
                 <span>Serial Number (S/N) <span class="text-[#DC2626]">*</span></span>
-                <span class="text-[10px] font-normal text-[#64748B]">Nomor seri fisik</span>
               </label>
               <div class="relative flex items-center">
                 <span
@@ -1252,6 +1262,7 @@ onMounted(async () => {
             <span class="text-[11px] font-medium text-[#64748B]">Langkah 2 dari 3</span>
           </div>
 
+          <p class="it-entry-guidance">Tentukan pengguna dan lokasi penyimpanan perangkat.</p>
           <fieldset class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
             <!-- Pemegang Aset SearchableSelect -->
             <div class="flex flex-col gap-1.5 col-span-1 sm:col-span-2">
@@ -1378,6 +1389,7 @@ onMounted(async () => {
             <span class="text-[11px] font-medium text-[#64748B]">Langkah 3 dari 3</span>
           </div>
 
+          <p class="it-entry-guidance">Lengkapi spesifikasi dan kondisi sebelum menyimpan.</p>
           <fieldset class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
             <!-- Brand / Merek -->
             <div class="flex flex-col gap-1.5">
@@ -2070,7 +2082,7 @@ onMounted(async () => {
   background: #fff;
   border-color: #dfe7f1;
   color: #333333;
-  box-shadow: 0 2px 4px #0A51B005;
+  box-shadow: 0 2px 4px #0a51b005;
 }
 .it-create-step-number {
   display: grid;
@@ -2084,7 +2096,7 @@ onMounted(async () => {
   font-weight: 650;
 }
 .it-create-steps button[aria-current='step'] .it-create-step-number {
-  background: #0A51B0;
+  background: #0a51b0;
   color: #fff;
 }
 .it-create-step-label {
@@ -2149,7 +2161,7 @@ onMounted(async () => {
   min-height: 44px;
 }
 .it-create-steps button:focus-visible {
-  outline: 2px solid #097CDE;
+  outline: 2px solid #097cde;
   outline-offset: 2px;
 }
 @media (max-width: 639px) {
@@ -2196,6 +2208,164 @@ onMounted(async () => {
   }
   .it-create-actions > div {
     width: 100%;
+  }
+}
+</style>
+
+<style scoped>
+.it-entry-summary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+  border-radius: 12px;
+  background: #edf5ff;
+  border: 1px solid #dceafb;
+}
+.it-entry-icon {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  background: white;
+  color: #0a51b0;
+  font-size: 23px;
+}
+.it-entry-summary > div {
+  min-width: 0;
+}
+.it-entry-summary strong {
+  display: block;
+  overflow-wrap: anywhere;
+  font-size: 14px;
+  font-weight: 650;
+  color: #333;
+}
+.it-entry-summary p {
+  font-size: 11px;
+  line-height: 1.7;
+  color: #64748b;
+  margin-top: 3px;
+}
+.it-create-steps {
+  padding: 0;
+  background: transparent;
+  gap: 10px;
+  margin-bottom: 22px;
+}
+.it-create-steps button {
+  min-height: 62px;
+  border: 1px solid #e2e8f0;
+  padding: 10px;
+  border-radius: 10px;
+}
+.it-create-steps button[aria-current='step'] {
+  background: #edf5ff;
+  border-color: #0a51b0;
+  box-shadow: none;
+}
+.it-create-step-number {
+  background: #f1f5f9;
+}
+.it-create-panel {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+}
+.it-create-panel > div:first-child {
+  border: 0;
+  padding: 0;
+}
+.it-create-panel > div:first-child > div > span:first-child {
+  display: none;
+}
+.it-create-panel > div:first-child > div > span:last-child {
+  font-size: 15px;
+  font-weight: 650;
+}
+.it-entry-guidance {
+  font-size: 12px;
+  line-height: 1.7;
+  color: #71829b;
+  margin-top: 5px;
+  margin-bottom: 20px;
+}
+.it-create-form fieldset {
+  gap: 20px;
+  padding: 0;
+}
+.it-create-form label {
+  font-weight: 500;
+  font-size: 12px;
+}
+.it-create-form input {
+  background: #fafbfd;
+  min-height: 44px;
+  font-size: 13px;
+}
+.it-create-form input:focus {
+  background: white;
+}
+.it-create-form :deep(button[aria-haspopup='listbox']) {
+  min-height: 44px;
+  background: #fafbfd;
+}
+.it-create-form fieldset > div:has(> p) {
+  border: 0;
+  background: #f8fafc;
+  border-radius: 9px;
+}
+.it-create-actions {
+  flex-direction: row;
+  align-items: center;
+}
+.it-create-actions > button {
+  min-width: 82px;
+}
+.it-create-actions > div {
+  width: auto;
+}
+@media (max-width: 639px) {
+  .it-entry-summary {
+    padding: 14px;
+  }
+  .it-create-steps {
+    gap: 6px;
+  }
+  .it-create-steps button {
+    min-height: 76px;
+    padding: 9px 3px;
+  }
+  .it-create-form fieldset {
+    gap: 18px;
+  }
+  .it-create-form input,
+  .it-create-form :deep(button[aria-haspopup='listbox']) {
+    font-size: 16px;
+  }
+  .it-create-form label.flex {
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  .it-create-actions {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .it-create-actions > button {
+    width: auto;
+    min-width: 72px;
+    padding-inline: 12px;
+  }
+  .it-create-actions > div {
+    flex: 1;
+    min-width: 0;
+    gap: 6px;
+  }
+  .it-create-actions > div > button {
+    padding-inline: 10px;
   }
 }
 </style>

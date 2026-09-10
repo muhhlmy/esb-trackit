@@ -2156,7 +2156,11 @@ function toast(message, type = 'success') {
       size="lg"
       @close="closeModal"
     >
-      <form class="flex flex-col space-y-5" @submit.prevent="saveTicket">
+      <form
+        id="ticket-create-form"
+        class="ticket-entry-form flex flex-col space-y-5"
+        @submit.prevent="saveTicket"
+      >
         <!-- Error Banner -->
         <div
           v-if="modalError"
@@ -2167,8 +2171,9 @@ function toast(message, type = 'success') {
           <span>{{ modalError }}</span>
         </div>
 
-        <!-- All inputs in a single flat list (no per-category grouping) -->
-        <div class="space-y-4">
+        <!-- Ticket field groups -->
+        <div class="ticket-entry-fields space-y-4">
+          <h3 class="ticket-entry-heading">Rincian kendala</h3>
           <!-- Pelapor (hanya untuk admin/superadmin saat buat tiket baru) -->
           <label
             v-if="modalMode === 'add' && (isAdmin || isSuperAdmin)"
@@ -2220,6 +2225,7 @@ function toast(message, type = 'success') {
             ></textarea>
           </label>
 
+          <h3 class="ticket-entry-heading">Penanganan tiket</h3>
           <!-- Unit Support Target -->
           <div class="flex flex-col gap-1.5">
             <span class="text-[12px] font-semibold text-[#2A3547]"
@@ -2229,6 +2235,7 @@ function toast(message, type = 'success') {
               <button
                 type="button"
                 @click="setSupportUnit('IT')"
+                :aria-pressed="selectedSupportUnit === 'IT'"
                 class="flex h-[72px] sm:h-[60px] flex-col sm:flex-row items-center justify-center sm:justify-start gap-1.5 sm:gap-3 rounded-xl border p-2 sm:p-3 text-center sm:text-left transition-all cursor-pointer select-none active:scale-95"
                 :class="
                   selectedSupportUnit === 'IT'
@@ -2259,6 +2266,7 @@ function toast(message, type = 'success') {
               <button
                 type="button"
                 @click="setSupportUnit('HR')"
+                :aria-pressed="selectedSupportUnit === 'HR'"
                 class="flex h-[72px] sm:h-[60px] flex-col sm:flex-row items-center justify-center sm:justify-start gap-1.5 sm:gap-3 rounded-xl border p-2 sm:p-3 text-center sm:text-left transition-all cursor-pointer select-none active:scale-95"
                 :class="
                   selectedSupportUnit === 'HR'
@@ -2289,6 +2297,7 @@ function toast(message, type = 'success') {
               <button
                 type="button"
                 @click="setSupportUnit('GA')"
+                :aria-pressed="selectedSupportUnit === 'GA'"
                 class="flex h-[72px] sm:h-[60px] flex-col sm:flex-row items-center justify-center sm:justify-start gap-1.5 sm:gap-3 rounded-xl border p-2 sm:p-3 text-center sm:text-left transition-all cursor-pointer select-none active:scale-95"
                 :class="
                   selectedSupportUnit === 'GA'
@@ -2331,6 +2340,7 @@ function toast(message, type = 'success') {
                 :key="cat.value"
                 type="button"
                 @click="form.kategori = cat.value"
+                :aria-pressed="form.kategori === cat.value"
                 class="flex h-[56px] sm:h-[68px] flex-col items-center sm:items-start justify-center sm:justify-between rounded-xl border p-2 sm:p-2.5 text-center sm:text-left transition-all cursor-pointer select-none active:scale-95"
                 :class="
                   form.kategori === cat.value
@@ -2460,9 +2470,10 @@ function toast(message, type = 'success') {
             </ul>
           </div>
         </div>
-
+      </form>
+      <template #footer>
         <!-- Footer Action Bar -->
-        <div class="flex items-center justify-between pt-4 mt-5 border-t border-[#E5EAEF]">
+        <div class="ticket-entry-footer">
           <button
             type="button"
             :disabled="isSubmitting"
@@ -2474,6 +2485,7 @@ function toast(message, type = 'success') {
 
           <button
             type="submit"
+            form="ticket-create-form"
             :disabled="isSubmitting"
             class="inline-flex h-9 items-center gap-1.5 rounded-lg bg-[#0A51B0] px-4 text-[12px] font-bold text-white hover:bg-[#4A73E0] transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
           >
@@ -2491,7 +2503,7 @@ function toast(message, type = 'success') {
             }}</span>
           </button>
         </div>
-      </form>
+      </template>
     </AppModal>
 
     <!-- ── Detail Ticket Modal (Modern SaaS Ticket Workspace) ─ -->
@@ -3270,12 +3282,12 @@ function toast(message, type = 'success') {
   box-shadow: none;
 }
 .ticket-card-list .tck-list-item:focus-visible {
-  outline: 2px solid #097CDE;
+  outline: 2px solid #097cde;
   outline-offset: 3px;
 }
 .ticket-card-list .tck-list-item:hover {
-  border-color: #B8D4F5;
-  box-shadow: 0 3px 12px #0A51B008;
+  border-color: #b8d4f5;
+  box-shadow: 0 3px 12px #0a51b008;
 }
 .ticket-card-list h4 {
   font-size: 14px;
@@ -3413,6 +3425,109 @@ function toast(message, type = 'success') {
 @media (max-width: 639px) {
   .ticket-card-list .tck-list-item {
     padding: 16px;
+  }
+}
+</style>
+
+<style scoped>
+.ticket-entry-form {
+  padding: 0;
+}
+.ticket-entry-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.ticket-entry-fields > * {
+  margin: 0;
+}
+.ticket-entry-heading {
+  font-size: 14px;
+  font-weight: 650;
+  color: #333;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #edf1f6;
+}
+.ticket-entry-heading:not(:first-child) {
+  margin-top: 6px;
+}
+.ticket-entry-form input:not([type='file']),
+.ticket-entry-form textarea {
+  background: #fafbfd;
+  border-color: #dce4ef;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 400;
+  min-height: 44px;
+}
+.ticket-entry-form textarea {
+  min-height: 150px;
+  max-height: 360px;
+  padding: 14px;
+  line-height: 1.8;
+}
+.ticket-entry-form :deep(button[aria-haspopup='listbox']) {
+  min-height: 44px;
+  border-radius: 8px;
+  font-size: 13px;
+}
+.ticket-entry-form button[aria-pressed] {
+  box-shadow: none;
+  min-height: 64px;
+  border-radius: 10px;
+}
+.ticket-entry-form button[aria-pressed='true'] {
+  background: #edf5ff;
+  border-color: #0a51b0;
+  outline: none;
+  --tw-ring-shadow: 0 0 #0000;
+}
+.ticket-entry-form button[aria-pressed] p {
+  font-weight: 550;
+}
+.ticket-entry-form li button {
+  min-width: 40px;
+  min-height: 44px;
+}
+.ticket-entry-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+.ticket-entry-footer button {
+  min-height: 44px;
+  border-radius: 8px;
+  padding: 0 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.ticket-entry-footer button[type='submit'] {
+  background: #0a51b0;
+}
+.ticket-entry-footer button[type='submit']:hover {
+  background: #0a4391;
+}
+.ticket-entry-form button:focus-visible,
+.ticket-entry-footer button:focus-visible {
+  outline: 2px solid #097cde;
+  outline-offset: 3px;
+}
+@media (max-width: 639px) {
+  .ticket-entry-form input:not([type='file']),
+  .ticket-entry-form textarea,
+  .ticket-entry-form :deep(button[aria-haspopup='listbox']) {
+    font-size: 16px;
+  }
+  .ticket-entry-form textarea {
+    min-height: 170px;
+  }
+  .ticket-entry-form button[aria-pressed] {
+    padding: 10px 5px;
+    min-height: 72px;
+  }
+  .ticket-entry-footer button {
+    flex: 1;
+    justify-content: center;
   }
 }
 </style>

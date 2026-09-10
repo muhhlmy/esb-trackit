@@ -347,17 +347,17 @@ onUnmounted(() => {
       </div>
 
       <!-- Row 2: Monthly Trend (8 col) + Status Donut (4 col) Skeleton -->
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-3.5">
-        <div class="lg:col-span-8">
+      <div class="grid grid-cols-1 xl:grid-cols-12 gap-3.5">
+        <div class="xl:col-span-8">
           <SkeletonChart type="line" height="260px" />
         </div>
-        <div class="lg:col-span-4">
+        <div class="xl:col-span-4">
           <SkeletonChart type="donut" height="260px" />
         </div>
       </div>
 
       <!-- Row 3: Asset Type (6 col) + Condition (6 col) Skeleton -->
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-3.5">
+      <div class="grid grid-cols-1 xl:grid-cols-12 gap-3.5">
         <div class="lg:col-span-6">
           <SkeletonChart type="bar" height="240px" />
         </div>
@@ -378,7 +378,7 @@ onUnmounted(() => {
           </div>
 
           <!-- Mobile Skeleton (Cards) -->
-          <div class="block md:hidden space-y-3">
+          <div class="block xl:hidden space-y-3">
             <div
               v-for="r in 3"
               :key="'recent-asset-mob-skel-' + r"
@@ -402,7 +402,7 @@ onUnmounted(() => {
           </div>
 
           <!-- Desktop Skeleton (Table) -->
-          <div class="hidden md:block overflow-x-auto">
+          <div class="hidden xl:block overflow-x-auto">
             <table class="w-full text-left min-w-[760px]">
               <thead class="bg-slate-50/60 border-b border-slate-100">
                 <tr>
@@ -479,7 +479,7 @@ onUnmounted(() => {
           </div>
 
           <!-- Mobile Skeleton (Cards) -->
-          <div class="block md:hidden space-y-3">
+          <div class="block xl:hidden space-y-3">
             <div
               v-for="r in 3"
               :key="'recent-ticket-mob-skel-' + r"
@@ -501,7 +501,7 @@ onUnmounted(() => {
           </div>
 
           <!-- Desktop Skeleton (Table) -->
-          <div class="hidden md:block overflow-x-auto">
+          <div class="hidden xl:block overflow-x-auto">
             <table class="w-full text-left min-w-[780px]">
               <thead class="bg-slate-50/60 border-b border-slate-100">
                 <tr>
@@ -594,7 +594,7 @@ onUnmounted(() => {
       <div class="dashboard-intro">
         <div>
           <p class="dashboard-eyebrow">RINGKASAN OPERASIONAL</p>
-          <h2>Inventaris & layanan</h2>
+          <h2>Dashboard operasional</h2>
           <p>Pantau penggunaan aset, kondisi perangkat, dan permintaan terbaru.</p>
         </div>
         <button v-if="canWriteAssets" type="button" class="dashboard-add" @click="goToAddAsset">
@@ -657,8 +657,8 @@ onUnmounted(() => {
       </div>
 
       <!-- ─── ROW 2: Line Chart (8 col) + Donut Chart (4 col) ── -->
-      <div class="dashboard-chart-grid grid grid-cols-1 lg:grid-cols-12">
-        <div class="lg:col-span-8 dashboard-panel">
+      <div class="dashboard-chart-grid grid grid-cols-1 xl:grid-cols-12">
+        <div class="xl:col-span-8 dashboard-panel">
           <div class="flex items-center justify-between mb-3">
             <h3 class="text-sm font-bold text-[#333333]">Tren Aset Bulanan</h3>
             <span class="text-[10px] font-medium text-[#64748B] bg-[#F1F5F9] px-2 py-0.5 rounded-md"
@@ -672,7 +672,7 @@ onUnmounted(() => {
             :error="error"
           />
         </div>
-        <div class="lg:col-span-4 dashboard-panel">
+        <div class="xl:col-span-4 dashboard-panel">
           <div class="flex items-center justify-between mb-3">
             <h3 class="text-sm font-bold text-[#333333]">Status Aset</h3>
             <span class="text-[10px] font-medium text-[#64748B] bg-[#F1F5F9] px-2 py-0.5 rounded-md"
@@ -737,7 +737,7 @@ onUnmounted(() => {
       </div>
 
       <!-- ─── ROW 3: Bar Chart (7 col) + Pie Chart (5 col) ── -->
-      <div class="dashboard-chart-grid grid grid-cols-1 lg:grid-cols-12">
+      <div class="dashboard-chart-grid grid grid-cols-1 xl:grid-cols-12">
         <div class="lg:col-span-7 dashboard-panel">
           <div class="flex items-center justify-between mb-4">
             <h3 class="text-sm font-semibold text-[#333333]">Aset Per Tipe</h3>
@@ -838,7 +838,7 @@ onUnmounted(() => {
         </div>
 
         <!-- Mobile Card List View (Clean, Readable & Zero Horizontal Scroll on < md) -->
-        <div class="block md:hidden divide-y divide-[#F1F5F9]">
+        <div class="dashboard-recent-cards block xl:hidden divide-y divide-[#F1F5F9]">
           <div
             v-for="asset in recentAssets"
             :key="'mob-asset-' + asset.id_aset"
@@ -921,7 +921,7 @@ onUnmounted(() => {
         </div>
 
         <!-- Desktop Table View (>= md) -->
-        <div class="hidden md:block overflow-x-auto">
+        <div class="hidden xl:block overflow-x-auto">
           <table class="w-full text-left min-w-[760px]">
             <thead class="bg-slate-50/60 border-b border-slate-100">
               <tr>
@@ -1076,7 +1076,7 @@ onUnmounted(() => {
         </div>
 
         <!-- Mobile Card List View (Clean, Readable & Zero Horizontal Scroll on < md) -->
-        <div class="block md:hidden divide-y divide-[#F1F5F9]">
+        <div class="block xl:hidden divide-y divide-[#F1F5F9]">
           <div
             v-for="ticket in recentTickets"
             :key="'mob-ticket-' + ticket.id"
@@ -1140,7 +1140,7 @@ onUnmounted(() => {
         </div>
 
         <!-- Desktop Table View (>= md) -->
-        <div class="hidden md:block overflow-x-auto">
+        <div class="hidden xl:block overflow-x-auto">
           <table class="w-full text-left min-w-[780px]">
             <thead class="bg-slate-50/60 border-b border-slate-100">
               <tr>
@@ -1303,14 +1303,14 @@ onUnmounted(() => {
   min-height: 42px;
   padding: 0 16px;
   border-radius: 8px;
-  background: #0A51B0;
+  background: #0a51b0;
   color: white;
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
 }
 .dashboard-add:hover {
-  background: #0A4391;
+  background: #0a4391;
 }
 .dashboard-add span {
   font-size: 18px;
@@ -1357,8 +1357,8 @@ onUnmounted(() => {
   color: #bdcce1;
 }
 .stat-total {
-  background: #0A51B0;
-  border-color: #0A51B0;
+  background: #0a51b0;
+  border-color: #0a51b0;
 }
 .stat-total .stat-number {
   color: white;
@@ -1572,6 +1572,213 @@ onUnmounted(() => {
 @media (prefers-reduced-motion: reduce) {
   .dashboard-view * {
     transition: none !important;
+  }
+}
+</style>
+
+<style scoped>
+.dashboard-view {
+  gap: 24px;
+}
+.dashboard-intro {
+  padding: 24px;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  background: #fff;
+}
+.dashboard-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 10px;
+  color: #64748b;
+}
+.dashboard-eyebrow::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ff4f1b;
+}
+.dashboard-intro h2 {
+  font-size: 26px;
+  font-weight: 650;
+  color: #333;
+}
+.dashboard-intro h2 + p {
+  font-size: 12px;
+  max-width: 520px;
+}
+.dashboard-add {
+  background: #0a51b0;
+  min-height: 44px;
+  padding-inline: 18px;
+}
+.dashboard-stats {
+  gap: 14px;
+}
+.dash-stat-card {
+  padding: 22px;
+  border-radius: 14px;
+}
+.stat-label {
+  font-size: 12px;
+  font-weight: 500;
+}
+.stat-label > span {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  background: #f8fafc;
+}
+.stat-number {
+  margin: 16px 0;
+  font-size: 34px;
+}
+.stat-total {
+  background: linear-gradient(125deg, #0a51b0, #097cde);
+  border-color: #0a51b0;
+}
+.stat-total .stat-label > span {
+  background: #ffffff18;
+}
+.stat-total .stat-label,
+.stat-total .stat-caption {
+  color: #e5f1ff;
+}
+.stat-caption {
+  font-size: 11px;
+}
+.stat-bottom {
+  font-size: 11px;
+}
+.stat-blue {
+  --stat-color: #0a51b0;
+}
+.stat-amber {
+  --stat-color: #b45309;
+}
+.dashboard-panel {
+  padding: 24px;
+  border-radius: 14px;
+}
+.dashboard-panel h3,
+.dashboard-table h3 {
+  font-size: 15px;
+  font-weight: 600;
+  color: #333;
+}
+.dashboard-panel > div:first-child {
+  margin-bottom: 24px;
+}
+.location-card {
+  background: #fafbfd;
+  padding: 16px;
+  border-radius: 10px;
+}
+.dashboard-table > div:first-child {
+  padding: 20px 22px;
+}
+.dashboard-table > div:first-child :is(h3, p) {
+  white-space: normal;
+}
+.dashboard-table > div:first-child a {
+  color: #0a51b0;
+  font-size: 12px;
+  min-height: 44px;
+}
+.dashboard-table table th {
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 11px;
+  font-weight: 500;
+}
+.dashboard-table table td {
+  padding-block: 18px;
+}
+.dashboard-recent-cards > div {
+  padding: 18px;
+  gap: 12px;
+}
+.dashboard-recent-cards > div > div:first-child {
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.dashboard-view :is(button, a):focus-visible {
+  outline: 2px solid #097cde;
+  outline-offset: 3px;
+}
+@media (min-width: 768px) and (max-width: 1279px) {
+  .dashboard-stats {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  .stat-total {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+  }
+  .stat-total .stat-number {
+    margin: 0;
+  }
+  .dash-stat-card {
+    padding: 18px;
+  }
+  .dashboard-recent-cards {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .dashboard-recent-cards > div {
+    border: 1px solid #edf1f6;
+  }
+}
+@media (max-width: 767px) {
+  .dashboard-view {
+    gap: 18px;
+  }
+  .dashboard-intro {
+    padding: 20px;
+    gap: 18px;
+  }
+  .dashboard-intro h2 {
+    font-size: 23px;
+  }
+  .dashboard-intro h2 + p {
+    max-width: none;
+    font-size: 12px;
+  }
+  .dashboard-add {
+    width: 100%;
+    font-size: 12px;
+  }
+  .dash-stat-card {
+    padding: 16px;
+  }
+  .stat-label {
+    font-size: 11px;
+  }
+  .stat-number {
+    font-size: 30px;
+  }
+  .stat-total .stat-number {
+    margin: 0;
+  }
+  .dashboard-panel {
+    padding: 18px;
+  }
+  .dashboard-table > div:first-child {
+    padding: 16px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .dashboard-table > div:first-child > div {
+    padding-right: 0;
+  }
+  .dashboard-recent-cards > div {
+    padding: 16px;
   }
 }
 </style>

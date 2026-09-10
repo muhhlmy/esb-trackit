@@ -301,10 +301,6 @@ const finishResetAndLogin = () => {
     <main class="login-main">
       <aside class="login-story" aria-labelledby="story-title">
         <div class="story-content">
-          <div class="story-tag">
-            <span class="story-tag-dot"></span>
-            <span>IT & Asset Management</span>
-          </div>
           <h2 id="story-title">Aset terkelola.<br />Kerja lebih mudah.</h2>
           <p>Akses inventaris perangkat dan bantuan tim support dalam satu tempat.</p>
           <div class="story-features">
@@ -983,7 +979,8 @@ const finishResetAndLogin = () => {
   background: linear-gradient(90deg, #FF4F1B 0%, #FAA425 100%);
 }
 .story-content {
-  padding: 40px 0;
+  padding: 0;
+  margin: auto 0;
   position: relative;
   z-index: 1;
 }
@@ -1331,10 +1328,11 @@ const finishResetAndLogin = () => {
   }
   .login-story {
     padding: 28px 36px;
-    overflow-y: auto;
+    overflow: hidden;
   }
   .story-content {
-    padding: 28px 0;
+    padding: 0;
+    margin: auto 0;
   }
   .story-content h2 {
     font-size: 36px;
@@ -1370,19 +1368,33 @@ const finishResetAndLogin = () => {
   .login-main {
     flex-basis: 520px;
   }
-  .login-story,
+  .login-story {
+    padding: 20px 28px;
+    overflow: hidden;
+  }
   .login-form-panel {
-    padding: 22px 30px;
+    padding: 20px 28px;
   }
   .story-content {
-    padding: 20px 0;
+    padding: 0;
+    margin: auto 0;
   }
   .story-content h2 {
-    font-size: 32px;
+    font-size: 28px;
+    line-height: 1.22;
+  }
+  .story-content > p {
+    margin-top: 8px;
+    font-size: 12px;
+    line-height: 1.6;
   }
   .story-features {
-    margin-top: 20px;
-    gap: 14px;
+    margin-top: 16px;
+    gap: 12px;
+  }
+  .feature-icon {
+    width: 36px;
+    height: 36px;
   }
   .login-eyebrow {
     margin-bottom: 8px;

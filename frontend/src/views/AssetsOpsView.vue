@@ -376,10 +376,13 @@ function formatDate(dateStr) {
 </script>
 
 <template>
-  <div class="space-y-4" :data-testid="!isLoading ? 'page-ready' : undefined">
+  <div
+    class="asset-workspace asset-inventory space-y-4"
+    :data-testid="!isLoading ? 'page-ready' : undefined"
+  >
     <!-- Simplified SaaS Header & Toolbar Container -->
     <div
-      class="flex flex-col gap-3 sm:gap-3.5 bg-white p-3.5 sm:p-4.5 rounded-2xl border border-[#E2E8F0]/80 shadow-2xs"
+      class="asset-toolbar flex flex-col gap-3 sm:gap-3.5 bg-white p-3.5 sm:p-4.5 rounded-2xl border border-[#E2E8F0]/80 shadow-2xs"
     >
       <!-- Row 1: Page Title & Primary CTA -->
       <div class="flex items-center justify-between gap-2.5">
@@ -491,6 +494,14 @@ function formatDate(dateStr) {
 
     <!-- ─── MODERN ENTERPRISE SAAS DATA MANAGEMENT CONTAINER ──────────────── -->
     <div>
+      <div v-if="!isLoading && !pageError" class="it-list-heading" aria-live="polite">
+        <div>
+          <h3>
+            Daftar aset Ops <span>{{ filteredAssets.length }}</span>
+          </h3>
+          <p>Inventaris operasional perusahaan</p>
+        </div>
+      </div>
       <!-- Error Alert -->
       <div
         v-if="pageError"
@@ -509,10 +520,10 @@ function formatDate(dateStr) {
         <div
           v-for="r in 6"
           :key="'ops-skel-' + r"
-          class="ops-row-grid gap-3 md:gap-4 rounded-xl border border-[#E2E8F0]/80 bg-white p-3.5 sm:p-4 shadow-2xs select-none"
+          class="ops-row-grid gap-3 xl:gap-4 rounded-xl border border-[#E2E8F0]/80 bg-white p-3.5 sm:p-4 shadow-2xs select-none"
         >
           <!-- Mobile Skeleton Structure (< 768px) -->
-          <div class="flex items-start justify-between gap-2.5 min-w-0 md:hidden">
+          <div class="flex items-start justify-between gap-2.5 min-w-0 xl:hidden">
             <div class="flex items-center gap-2.5 min-w-0 flex-1">
               <SkeletonAvatar size="40px" shape="rounded" class="shrink-0" />
               <div class="flex flex-col gap-1.5 min-w-0 flex-1">
@@ -526,9 +537,9 @@ function formatDate(dateStr) {
             </div>
           </div>
 
-          <div class="border-t border-[#F1F5F9] my-0.5 md:hidden"></div>
+          <div class="border-t border-[#F1F5F9] my-0.5 xl:hidden"></div>
 
-          <div class="grid grid-cols-2 gap-2.5 md:hidden">
+          <div class="grid grid-cols-2 gap-2.5 xl:hidden">
             <div class="flex flex-col gap-1 min-w-0">
               <BaseSkeleton width="65px" height="10px" radius="sm" />
               <BaseSkeleton width="85px" height="13px" radius="md" />
@@ -550,7 +561,7 @@ function formatDate(dateStr) {
 
           <!-- Desktop Skeleton Structure (>= 768px) -->
           <!-- 1. Identity -->
-          <div class="hidden md:flex items-center gap-3.5 min-w-0">
+          <div class="hidden xl:flex items-center gap-3.5 min-w-0">
             <SkeletonAvatar size="40px" shape="rounded" class="shrink-0" />
             <div class="flex flex-col gap-1.5 min-w-0">
               <BaseSkeleton width="130px" height="15px" radius="md" />
@@ -558,28 +569,28 @@ function formatDate(dateStr) {
             </div>
           </div>
           <!-- 2. Kategori & PIC -->
-          <div class="hidden md:flex flex-col gap-1 min-w-0">
+          <div class="hidden xl:flex flex-col gap-1 min-w-0">
             <BaseSkeleton width="60px" height="10px" radius="sm" />
             <BaseSkeleton width="90px" height="13px" radius="md" />
             <BaseSkeleton width="70px" height="11px" radius="sm" />
           </div>
           <!-- 3. Lokasi -->
-          <div class="hidden md:flex flex-col gap-1 min-w-0">
+          <div class="hidden xl:flex flex-col gap-1 min-w-0">
             <BaseSkeleton width="45px" height="10px" radius="sm" />
             <BaseSkeleton width="80px" height="13px" radius="md" />
             <BaseSkeleton width="70px" height="11px" radius="sm" />
           </div>
           <!-- 4. Amount -->
-          <div class="hidden md:flex flex-col gap-1 min-w-0">
+          <div class="hidden xl:flex flex-col gap-1 min-w-0">
             <BaseSkeleton width="55px" height="10px" radius="sm" />
             <BaseSkeleton width="95px" height="13px" radius="md" />
           </div>
           <!-- 5. Status -->
-          <div class="hidden md:flex items-center">
+          <div class="hidden xl:flex items-center">
             <BaseSkeleton width="75px" height="22px" radius="full" />
           </div>
           <!-- 6. Action -->
-          <div class="hidden md:flex justify-end">
+          <div class="hidden xl:flex justify-end">
             <BaseSkeleton width="18px" height="18px" radius="md" />
           </div>
         </div>
@@ -613,242 +624,55 @@ function formatDate(dateStr) {
         </div>
       </div>
 
-      <!-- PRIMARY VIEW: SaaS Row Cards -->
-      <div v-else class="space-y-2.5">
+      <!-- Asset list -->
+      <div v-else class="asset-card-list laptop-list">
         <div
           v-for="asset in paginatedAssets"
           :key="asset.id"
+          class="laptop-row"
+          tabindex="0"
+          :aria-label="'Lihat detail ' + (asset.nama_asset || 'aset')"
           @click="openDetails(asset)"
-          class="ops-row-grid group relative gap-3 md:gap-4 rounded-xl border border-[#E2E8F0]/80 bg-white p-3.5 sm:p-4 shadow-2xs hover:border-[#2563EB]/40 hover:shadow-sm transition-all duration-200 cursor-pointer select-none"
+          @keydown.enter.self="openDetails(asset)"
+          @keydown.space.prevent.self="openDetails(asset)"
         >
-          <!-- ── MOBILE LAYOUT (< 768px / md:hidden) ─────────────────── -->
-          <!-- Mobile Header: Icon + Identity + Status Pill + Actions -->
-          <div class="flex items-start justify-between gap-2.5 min-w-0 md:hidden">
-            <div class="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
-              <div
-                class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#EFF6FF] text-[#2563EB] group-hover:scale-105 transition-transform"
-              >
-                <span class="material-symbols-outlined text-[20px]">{{
-                  getOpsIcon(asset.kategori)
-                }}</span>
-              </div>
-              <div class="flex flex-col min-w-0 flex-1">
-                <span
-                  class="text-[13.5px] font-bold text-[#0F172A] leading-tight group-hover:text-[#2563EB] transition-colors truncate block"
-                  :title="asset.nama_asset || '—'"
-                >
-                  {{ asset.nama_asset || '—' }}
-                </span>
-                <span
-                  class="font-mono text-[11px] font-normal text-[#64748B] mt-0.5 tracking-tight truncate block"
-                  :title="asset.hostname || '—'"
-                >
-                  {{ asset.hostname || '—' }}
-                </span>
-              </div>
+          <div class="laptop-identity">
+            <div class="laptop-icon" aria-hidden="true">
+              <span class="material-symbols-outlined">{{ getOpsIcon(asset.kategori) }}</span>
             </div>
-
-            <!-- Mobile Status & Action Menu -->
-            <div class="flex items-center gap-1.5 shrink-0 self-start">
-              <div
-                class="flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-bold"
-                :class="[
-                  formatStatusPillOps(asset.status).bg,
-                  formatStatusPillOps(asset.status).text,
-                ]"
-              >
-                <span
-                  class="h-1.5 w-1.5 rounded-full shrink-0"
-                  :class="formatStatusPillOps(asset.status).dot"
-                ></span>
-                <span class="truncate max-w-[85px] xs:max-w-none">{{ asset.status }}</span>
-              </div>
-              <div @click.stop class="shrink-0">
-                <AppRowActions :actions="getOpsActions(asset)" />
-              </div>
+            <div class="laptop-identity-text">
+              <h4 :title="asset.nama_asset">{{ asset.nama_asset || '—' }}</h4>
+              <p :title="asset.kategori">{{ asset.kategori || '—' }}</p>
+              <span class="laptop-serial" :title="asset.hostname">{{ asset.hostname || '—' }}</span>
             </div>
           </div>
-
-          <!-- Mobile Divider -->
-          <div class="border-t border-[#F1F5F9] my-0.5 md:hidden"></div>
-
-          <!-- Mobile 2x2 Metadata Grid -->
-          <div class="grid grid-cols-2 gap-2.5 md:hidden text-left">
-            <!-- 1. Kategori -->
-            <div class="flex flex-col min-w-0 overflow-hidden">
-              <span class="text-[10px] font-semibold uppercase text-[#94A3B8] tracking-wider"
-                >Kategori</span
-              >
-              <span
-                class="text-[12px] font-semibold text-[#1E293B] mt-0.5 truncate block"
-                :title="asset.kategori || '—'"
-              >
-                {{ asset.kategori || '—' }}
-              </span>
-            </div>
-
-            <!-- 2. PIC -->
-            <div class="flex flex-col min-w-0 overflow-hidden">
-              <span class="text-[10px] font-semibold uppercase text-[#94A3B8] tracking-wider"
-                >PIC</span
-              >
-              <span
-                class="text-[12px] mt-0.5 truncate block"
-                :class="
-                  asset.pic ? 'font-medium text-[#1E293B]' : 'text-[#94A3B8] italic font-normal'
-                "
-                :title="asset.pic || 'Belum ada PIC'"
-              >
-                {{ asset.pic || 'Belum ada PIC' }}
-              </span>
-            </div>
-
-            <!-- 3. Lokasi & Tanggal Beli -->
-            <div class="flex flex-col min-w-0 overflow-hidden">
-              <span class="text-[10px] font-semibold uppercase text-[#94A3B8] tracking-wider"
-                >Lokasi</span
-              >
-              <span
-                class="text-[12px] font-normal text-[#1E293B] mt-0.5 truncate block"
-                :title="asset.lokasi || '—'"
-              >
-                {{ asset.lokasi || '—' }}
-              </span>
-              <span
-                v-if="asset.tanggal_beli"
-                class="text-[11px] font-normal text-[#64748B] mt-0.5 truncate block"
-                :title="formatDate(asset.tanggal_beli)"
-              >
-                Beli: {{ formatDate(asset.tanggal_beli) }}
-              </span>
-            </div>
-
-            <!-- 4. Total Amount -->
-            <div class="flex flex-col min-w-0 overflow-hidden">
-              <span class="text-[10px] font-semibold uppercase text-[#94A3B8] tracking-wider"
-                >Total Amount</span
-              >
-              <span
-                class="text-[12px] font-bold text-[#0F172A] mt-0.5 truncate block"
-                :title="formatCurrency(asset.total_asset_amount)"
-              >
-                {{ formatCurrency(asset.total_asset_amount) }}
-              </span>
-            </div>
+          <div class="laptop-holder laptop-field">
+            <span class="laptop-label">Penanggung jawab</span>
+            <strong>{{ asset.pic || 'Belum ditetapkan' }}</strong>
           </div>
-
-          <!-- ── DESKTOP LAYOUT (>= 768px / hidden md:flex) ──────────── -->
-          <!-- 1. Asset Identity -->
-          <div class="hidden md:flex items-center gap-3.5 min-w-0 overflow-hidden">
-            <div
-              class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#EFF6FF] text-[#2563EB] group-hover:scale-105 transition-transform"
+          <div class="laptop-location laptop-field">
+            <span class="laptop-label">Lokasi</span>
+            <strong :title="asset.lokasi">{{ asset.lokasi || '—' }}</strong>
+            <span v-if="asset.tanggal_beli" class="laptop-secondary"
+              >Beli: {{ formatDate(asset.tanggal_beli) }}</span
             >
-              <span class="material-symbols-outlined text-[20px]">{{
-                getOpsIcon(asset.kategori)
-              }}</span>
-            </div>
-            <div class="flex flex-col min-w-0 overflow-hidden">
-              <span
-                class="text-[14px] font-bold text-[#0F172A] leading-snug group-hover:text-[#2563EB] transition-colors truncate block w-full"
-                :title="asset.nama_asset || '—'"
-              >
-                {{ asset.nama_asset || '—' }}
-              </span>
-              <span
-                class="font-mono text-[11px] font-normal text-[#64748B] mt-0.5 tracking-tight truncate block w-full"
-                :title="asset.hostname || '—'"
-              >
-                {{ asset.hostname || '—' }}
-              </span>
-            </div>
           </div>
-
-          <!-- 2. Kategori & PIC -->
-          <div class="hidden md:flex flex-col min-w-0 overflow-hidden">
-            <span class="text-[10px] font-semibold uppercase text-[#94A3B8] tracking-wider"
-              >Kategori & PIC</span
-            >
+          <div class="laptop-state">
             <span
-              class="text-[12.5px] font-semibold text-[#1E293B] mt-0.5 truncate block w-full"
-              :title="asset.kategori || '—'"
+              class="laptop-status"
+              :class="[formatStatusPillOps(asset.status).bg, formatStatusPillOps(asset.status).text]"
             >
-              {{ asset.kategori || '—' }}
+              <span class="laptop-dot" :class="formatStatusPillOps(asset.status).dot"></span
+              >{{ asset.status || '—' }}
             </span>
+            <span class="laptop-secondary">{{ asset.kondisi || '—' }}</span>
             <span
-              class="text-[11.5px] mt-0.5 truncate block w-full"
-              :class="
-                asset.pic ? 'font-medium text-[#64748B]' : 'text-[#94A3B8] italic font-normal'
-              "
-              :title="asset.pic || 'Belum ada PIC'"
+              class="laptop-secondary"
+              :title="'Total nilai: ' + formatCurrency(asset.total_asset_amount)"
+              >{{ formatCurrency(asset.total_asset_amount) }}</span
             >
-              {{ asset.pic ? 'PIC: ' + asset.pic : 'Belum ada PIC' }}
-            </span>
           </div>
-
-          <!-- 3. Lokasi & Tanggal Beli -->
-          <div class="hidden md:flex flex-col min-w-0 overflow-hidden">
-            <span class="text-[10px] font-semibold uppercase text-[#94A3B8] tracking-wider"
-              >Lokasi</span
-            >
-            <span
-              class="text-[12.5px] font-normal text-[#1E293B] mt-0.5 truncate block w-full"
-              :title="asset.lokasi || '—'"
-            >
-              {{ asset.lokasi || '—' }}
-            </span>
-            <span
-              v-if="asset.tanggal_beli"
-              class="text-[11.5px] font-normal text-[#64748B] mt-0.5 truncate block w-full"
-              :title="formatDate(asset.tanggal_beli)"
-            >
-              Beli: {{ formatDate(asset.tanggal_beli) }}
-            </span>
-          </div>
-
-          <!-- 4. Total Asset Amount -->
-          <div class="hidden md:flex flex-col min-w-0 overflow-hidden">
-            <span class="text-[10px] font-semibold uppercase text-[#94A3B8] tracking-wider"
-              >Total Amount</span
-            >
-            <span
-              class="text-[12.5px] font-bold text-[#0F172A] mt-0.5 truncate block w-full"
-              :title="formatCurrency(asset.total_asset_amount)"
-            >
-              {{ formatCurrency(asset.total_asset_amount) }}
-            </span>
-          </div>
-
-          <!-- 5. Status & Kondisi Component Block -->
-          <div class="hidden md:flex flex-col items-start min-w-0 overflow-hidden select-none">
-            <!-- Primary Status Line -->
-            <div
-              class="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold"
-              :class="[
-                formatStatusPillOps(asset.status).bg,
-                formatStatusPillOps(asset.status).text,
-              ]"
-            >
-              <span
-                class="h-1.5 w-1.5 rounded-full shrink-0"
-                :class="formatStatusPillOps(asset.status).dot"
-              ></span>
-              <span class="truncate">{{ asset.status }}</span>
-            </div>
-            <!-- Secondary Condition Line -->
-            <div
-              v-if="asset.kondisi"
-              class="flex items-center gap-1 text-[11px] mt-1 text-[#64748B] truncate max-w-full"
-            >
-              <span class="h-1 w-1 rounded-full shrink-0 bg-[#94A3B8]"></span>
-              <span class="truncate">Kondisi {{ asset.kondisi }}</span>
-            </div>
-          </div>
-
-          <!-- 6. Action Menu -->
-          <div
-            @click.stop
-            class="hidden md:flex items-center justify-end w-8 shrink-0 justify-self-end"
-          >
+          <div class="laptop-actions" @click.stop>
             <AppRowActions :actions="getOpsActions(asset)" />
           </div>
         </div>
@@ -856,6 +680,8 @@ function formatDate(dateStr) {
 
       <!-- Pagination -->
       <AppPagination
+        asset-style
+        mobile-compact
         v-if="!isLoading && !pageError"
         v-model:currentPage="currentPage"
         :total-items="filteredAssets.length"
@@ -867,10 +693,10 @@ function formatDate(dateStr) {
     <AppModal
       :is-open="showFormModal"
       :title="modalMode === 'add' ? 'Tambah Aset OPS Baru' : 'Edit Aset OPS'"
-      size="md"
+      size="lg"
       @close="closeModal"
     >
-      <form @submit.prevent="submitForm" class="space-y-4">
+      <form @submit.prevent="submitForm" id="crud-AssetsOpsView" class="asset-crud-form space-y-4">
         <div
           v-if="modalError"
           class="p-3 bg-[#FEF2F2] border border-[#FECACA] rounded-xl text-[#991B1B] text-[12px]"
@@ -1014,11 +840,15 @@ function formatDate(dateStr) {
             </select>
           </div>
         </div>
-
+      </form>
+      <template #footer>
         <!-- Submit Footer -->
-        <div class="flex items-center justify-end gap-3 pt-3 border-t border-[#E2E8F0]">
+        <div
+          class="asset-crud-actions flex items-center justify-end gap-3 pt-3 border-t border-[#E2E8F0]"
+        >
           <button
             type="button"
+            :disabled="isSubmitting"
             @click="closeModal"
             class="h-10 px-4 rounded-xl border border-[#E2E8F0] text-[12.5px] font-semibold text-[#64748B] hover:bg-[#F8FAFC]"
           >
@@ -1026,6 +856,7 @@ function formatDate(dateStr) {
           </button>
           <button
             type="submit"
+            form="crud-AssetsOpsView"
             :disabled="isSubmitting"
             class="h-10 px-5 rounded-xl bg-[#2563EB] text-[12.5px] font-bold text-white shadow-2xs hover:bg-[#1D4ED8] disabled:opacity-50 flex items-center gap-2"
           >
@@ -1033,22 +864,26 @@ function formatDate(dateStr) {
             <span>{{ isSubmitting ? 'Menyimpan...' : 'Simpan Aset OPS' }}</span>
           </button>
         </div>
-      </form>
+      </template>
     </AppModal>
 
     <!-- Modal Confirm Delete -->
     <AppModal :is-open="showDeleteModal" title="Hapus Aset OPS" size="sm" @close="closeModal">
-      <div class="space-y-4">
+      <div class="asset-delete-content space-y-4">
         <p class="text-[13px] text-[#475569]">
           Apakah Anda yakin ingin menghapus Aset OPS
           <strong class="text-[#0F172A]">{{ selectedAsset?.nama_asset }}</strong> ({{
             selectedAsset?.hostname
           }})?
         </p>
-
-        <div class="flex items-center justify-end gap-3 pt-3 border-t border-[#E2E8F0]">
+      </div>
+      <template #footer>
+        <div
+          class="asset-crud-actions asset-delete-actions flex items-center justify-end gap-3 pt-3 border-t border-[#E2E8F0]"
+        >
           <button
             type="button"
+            :disabled="isSubmitting"
             @click="closeModal"
             class="h-10 px-4 rounded-xl border border-[#E2E8F0] text-[12.5px] font-semibold text-[#64748B] hover:bg-[#F8FAFC]"
           >
@@ -1063,13 +898,15 @@ function formatDate(dateStr) {
             {{ isSubmitting ? 'Menghapus...' : 'Ya, Hapus' }}
           </button>
         </div>
-      </div>
+      </template>
     </AppModal>
 
     <!-- Modal Details View -->
-    <AppModal :is-open="showDetailsModal" title="Detail Aset OPS" size="md" @close="closeModal">
-      <div v-if="selectedAsset" class="space-y-4">
-        <div class="flex items-center gap-3 p-3 bg-[#F8FAFC] rounded-xl border border-[#E2E8F0]">
+    <AppModal :is-open="showDetailsModal" title="Detail Aset OPS" size="lg" @close="closeModal">
+      <div v-if="selectedAsset" class="asset-detail space-y-4">
+        <div
+          class="asset-detail-identity flex items-center gap-3 p-3 bg-[#F8FAFC] rounded-xl border border-[#E2E8F0]"
+        >
           <div
             class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#EFF6FF] text-[#2563EB]"
           >
@@ -1083,7 +920,7 @@ function formatDate(dateStr) {
           </div>
         </div>
 
-        <div class="grid grid-cols-2 gap-4 text-[12.5px]">
+        <div class="asset-detail-fields">
           <div>
             <span class="text-[#64748B] block text-[11px] font-medium">Kategori</span>
             <span class="font-semibold text-[#1E293B]">{{ selectedAsset.kategori }}</span>
@@ -1137,10 +974,9 @@ function formatDate(dateStr) {
             {{ selectedAsset.kondisi || 'Baik' }}
           </p>
         </div>
-
       </div>
       <template #footer>
-        <div class="flex justify-end">
+        <div class="asset-detail-footer">
           <button
             type="button"
             @click="closeModal"
@@ -1167,7 +1003,7 @@ function formatDate(dateStr) {
   flex-direction: column;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 1280px) {
   .ops-row-grid {
     display: grid;
     grid-template-columns:
@@ -1177,3 +1013,5 @@ function formatDate(dateStr) {
   }
 }
 </style>
+
+<style scoped src="../assets/asset-workspace.css"></style>

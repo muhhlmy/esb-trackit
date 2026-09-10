@@ -5,6 +5,7 @@ const props = defineProps({
   currentPage: { type: Number, required: true, default: 1 },
   totalItems: { type: Number, required: true, default: 0 },
   mobileCompact: { type: Boolean, default: false },
+  assetStyle: { type: Boolean, default: false },
   itemsPerPage: { type: Number, default: 10 },
 })
 
@@ -51,7 +52,7 @@ function goToPage(page) {
 
 <template>
   <div
-    :class="{ 'mobile-compact': mobileCompact }"
+    :class="{ 'mobile-compact': mobileCompact, 'asset-pagination': assetStyle }"
     class="flex flex-col sm:flex-row items-center justify-between gap-3 px-5 py-4 border-t border-[#F1F5F9] text-[11.5px] text-[#475569] select-none"
   >
     <div class="flex items-center gap-1 font-medium">
@@ -73,7 +74,7 @@ function goToPage(page) {
       <button
         type="button"
         @click="goToPage(currentPage - 1)"
-        :disabled="currentPage === 1"
+        :disabled="currentPage <= 1"
         aria-label="Halaman Sebelumnya"
         title="Halaman Sebelumnya"
         class="flex h-8 w-8 items-center justify-center rounded-lg border border-[#CBD5E1] bg-white text-[#334155] shadow-2xs hover:bg-[#F8FAFC] hover:text-[#0F172A] transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
@@ -113,7 +114,7 @@ function goToPage(page) {
       <button
         type="button"
         @click="goToPage(currentPage + 1)"
-        :disabled="currentPage === totalPages"
+        :disabled="currentPage >= totalPages"
         aria-label="Halaman Selanjutnya"
         title="Halaman Selanjutnya"
         class="flex h-8 w-8 items-center justify-center rounded-lg border border-[#CBD5E1] bg-white text-[#334155] shadow-2xs hover:bg-[#F8FAFC] hover:text-[#0F172A] transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
@@ -125,6 +126,63 @@ function goToPage(page) {
 </template>
 
 <style scoped>
+.asset-pagination {
+  margin-top: 16px;
+  padding: 16px 20px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: white;
+  gap: 16px;
+  color: #71829b;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+.asset-pagination > div:first-child {
+  flex-wrap: wrap;
+  gap: 5px;
+}
+.asset-pagination [role='navigation'] {
+  gap: 6px;
+}
+.asset-pagination button {
+  min-width: 38px;
+  height: 38px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  box-shadow: none;
+  font-weight: 600;
+}
+.asset-pagination button[aria-current='page'] {
+  background: #172f52;
+  border-color: #172f52;
+  color: white;
+}
+.asset-pagination button:focus-visible,
+.asset-pagination select:focus-visible {
+  outline: 2px solid #5285d8;
+  outline-offset: 3px;
+}
+@media (width < 40rem) {
+  .asset-pagination {
+    padding: 16px;
+    gap: 14px;
+  }
+  .asset-pagination [role='navigation'] {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .asset-pagination select {
+    flex: 1;
+    max-width: 180px;
+    min-height: 44px;
+    border-color: #e2e8f0;
+    text-align: center;
+    font-size: 16px;
+    border-radius: 8px;
+  }
+}
 @media (width < 40rem) {
   .mobile-compact {
     padding-inline: 0.75rem;

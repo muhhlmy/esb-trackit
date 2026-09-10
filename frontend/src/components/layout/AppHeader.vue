@@ -939,6 +939,8 @@ onBeforeUnmount(() => {
               <!-- Loading State -->
               <div
                 v-if="isFetchingSearch"
+                role="status"
+                aria-live="polite"
                 class="flex items-center justify-center gap-2 py-8 text-[12px] text-[#94A3B8]"
               >
                 <div
@@ -1208,6 +1210,7 @@ onBeforeUnmount(() => {
                 <button
                   type="button"
                   @click="submitSearch"
+                  :disabled="!searchQuery.trim() || isFetchingSearch"
                   class="text-[#2563EB] hover:text-[#1D4ED8] hover:underline font-bold transition-colors cursor-pointer touch-manipulation ml-auto"
                 >
                   Lihat Hasil Lengkap →
@@ -1720,6 +1723,31 @@ onBeforeUnmount(() => {
   min-height: 36px;
   font-size: 11px;
   font-weight: 600;
+}
+.search-popup-footer button:disabled {
+  color: #94a3b8;
+  cursor: default;
+  text-decoration: none;
+}
+.header-search-panel > div {
+  min-height: 0;
+}
+.search-result-list button > div > div:last-child {
+  flex: 1;
+  min-width: 0;
+}
+@media (min-width: 768px) and (max-width: 1023px) {
+  .header-search-panel.header-search-panel {
+    width: 100%;
+    min-width: 0;
+  }
+  .search-filter-tabs.search-filter-tabs {
+    flex-wrap: wrap;
+  }
+  .search-filter-tab {
+    flex-basis: auto;
+    min-width: 0;
+  }
 }
 .header-search-panel :is(button, input):focus-visible {
   outline: 2px solid #5285d8;

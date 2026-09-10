@@ -708,10 +708,13 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="space-y-4" :data-testid="!isLoading ? 'page-ready' : undefined">
+  <div
+    class="asset-workspace asset-inventory space-y-4"
+    :data-testid="!isLoading ? 'page-ready' : undefined"
+  >
     <!-- Simplified SaaS Header & Toolbar Container -->
     <div
-      class="flex flex-col gap-3 sm:gap-3.5 bg-white p-3.5 sm:p-4.5 rounded-2xl border border-[#E2E8F0]/80 shadow-2xs"
+      class="asset-toolbar flex flex-col gap-3 sm:gap-3.5 bg-white p-3.5 sm:p-4.5 rounded-2xl border border-[#E2E8F0]/80 shadow-2xs"
     >
       <!-- Row 1: Page Title & Primary CTA -->
       <div class="flex items-center justify-between gap-2.5">
@@ -760,12 +763,7 @@ onMounted(async () => {
           <button
             v-if="searchQuery"
             type="button"
-            @click="
-              ($event) => {
-                searchQuery = ''
-                resetFilters()
-              }
-            "
+            @click="searchQuery = ''"
             aria-label="Bersihkan pencarian"
             class="absolute right-2 top-1/2 -translate-y-1/2 flex h-5 w-5 items-center justify-center rounded-full text-[#94A3B8] hover:bg-[#F1F5F9] hover:text-[#0F172A] transition-all cursor-pointer touch-manipulation"
             title="Bersihkan"
@@ -784,7 +782,6 @@ onMounted(async () => {
                 :options="filterStatusOptions"
                 aria-label="Filter status"
                 :block="true"
-                @change="fetchData"
               />
             </div>
 
@@ -829,15 +826,35 @@ onMounted(async () => {
     </div>
     <!-- ─── MODERN ENTERPRISE SAAS DATA MANAGEMENT CONTAINER ──────────────── -->
     <div>
+      <div v-if="!isLoading && !pageError" class="it-list-heading" aria-live="polite">
+        <div>
+          <h3>
+            Daftar perangkat <span>{{ filteredAssets.length }}</span>
+          </h3>
+          <p>
+            {{
+              searchQuery || filterStatus || filterTipe
+                ? 'Hasil sesuai pencarian dan filter Anda'
+                : 'Inventaris perangkat IT perusahaan'
+            }}
+          </p>
+        </div>
+        <span v-if="filteredAssets.length" class="it-result-range"
+          >{{ (currentPage - 1) * itemsPerPage + 1 }}–{{
+            Math.min(currentPage * itemsPerPage, filteredAssets.length)
+          }}
+          dari {{ filteredAssets.length }} aset</span
+        >
+      </div>
       <!-- Loading State Skeleton -->
       <div v-if="isLoading" aria-busy="true" class="space-y-2.5">
         <div
           v-for="r in 6"
           :key="'asset-skel-' + r"
-          class="asset-row-grid gap-3 md:gap-4 rounded-xl border border-[#E2E8F0]/80 bg-white p-3.5 sm:p-4 shadow-2xs select-none"
+          class="asset-row-grid gap-3 xl:gap-4 rounded-xl border border-[#E2E8F0]/80 bg-white p-3.5 sm:p-4 shadow-2xs select-none"
         >
           <!-- Mobile Skeleton Structure (< 768px) -->
-          <div class="flex items-start justify-between gap-2.5 min-w-0 md:hidden">
+          <div class="flex items-start justify-between gap-2.5 min-w-0 xl:hidden">
             <div class="flex items-center gap-2.5 min-w-0 flex-1">
               <SkeletonAvatar size="40px" shape="rounded" class="shrink-0" />
               <div class="flex flex-col gap-1.5 min-w-0 flex-1">
@@ -851,9 +868,9 @@ onMounted(async () => {
             </div>
           </div>
 
-          <div class="border-t border-[#F1F5F9] my-0.5 md:hidden"></div>
+          <div class="border-t border-[#F1F5F9] my-0.5 xl:hidden"></div>
 
-          <div class="grid grid-cols-2 gap-2.5 md:hidden">
+          <div class="grid grid-cols-2 gap-2.5 xl:hidden">
             <div class="flex flex-col gap-1 min-w-0">
               <BaseSkeleton width="65px" height="10px" radius="sm" />
               <BaseSkeleton width="85px" height="13px" radius="md" />
@@ -875,7 +892,7 @@ onMounted(async () => {
 
           <!-- Desktop Skeleton Structure -->
           <!-- 1. Asset Identity -->
-          <div class="hidden md:flex items-center gap-3.5 min-w-0">
+          <div class="hidden xl:flex items-center gap-3.5 min-w-0">
             <SkeletonAvatar size="40px" shape="rounded" class="shrink-0" />
             <div class="flex flex-col gap-1.5 min-w-0">
               <BaseSkeleton width="130px" height="15px" radius="md" />
@@ -883,28 +900,28 @@ onMounted(async () => {
             </div>
           </div>
           <!-- 2. Perangkat -->
-          <div class="hidden md:flex flex-col gap-1 min-w-0">
+          <div class="hidden xl:flex flex-col gap-1 min-w-0">
             <BaseSkeleton width="50px" height="10px" radius="sm" />
             <BaseSkeleton width="100px" height="13px" radius="md" />
             <BaseSkeleton width="80px" height="11px" radius="sm" />
           </div>
           <!-- 3. Penanggung Jawab -->
-          <div class="hidden md:flex flex-col gap-1 min-w-0">
+          <div class="hidden xl:flex flex-col gap-1 min-w-0">
             <BaseSkeleton width="85px" height="10px" radius="sm" />
             <BaseSkeleton width="120px" height="13px" radius="md" />
             <BaseSkeleton width="70px" height="11px" radius="sm" />
           </div>
           <!-- 4. Lokasi -->
-          <div class="hidden md:flex flex-col gap-1 min-w-0">
+          <div class="hidden xl:flex flex-col gap-1 min-w-0">
             <BaseSkeleton width="45px" height="10px" radius="sm" />
             <BaseSkeleton width="80px" height="13px" radius="md" />
           </div>
           <!-- 5. Status -->
-          <div class="hidden md:flex items-center">
+          <div class="hidden xl:flex items-center">
             <BaseSkeleton width="75px" height="22px" radius="full" />
           </div>
           <!-- 6. Action -->
-          <div class="hidden md:flex justify-end">
+          <div class="hidden xl:flex justify-end">
             <BaseSkeleton width="18px" height="18px" radius="md" />
           </div>
         </div>
@@ -951,264 +968,77 @@ onMounted(async () => {
         </div>
       </div>
 
-      <!-- PRIMARY VIEW: SaaS Row Cards -->
-      <div v-else class="space-y-2.5">
+      <!-- Responsive inventory list -->
+      <div v-else class="asset-card-list laptop-list">
         <div
           v-for="asset in paginatedAssets"
           :key="asset.id_aset"
+          class="laptop-row"
+          tabindex="0"
+          :aria-label="'Lihat detail ' + (asset.hostname || asset.label_aset || 'aset')"
           @click="openDetails(asset)"
-          class="asset-row-grid group relative gap-3 md:gap-4 rounded-xl border border-[#E2E8F0]/80 bg-white p-3.5 sm:p-4 shadow-2xs hover:border-[#2563EB]/40 hover:shadow-sm transition-all duration-200 cursor-pointer select-none"
+          @keydown.enter.self="openDetails(asset)"
+          @keydown.space.prevent.self="openDetails(asset)"
         >
-          <!-- ── MOBILE LAYOUT (< 768px / md:hidden) ─────────────────── -->
-          <!-- Mobile Header: Icon + Device Info + Status Badge + Actions -->
-          <div class="flex items-start justify-between gap-2.5 min-w-0 md:hidden">
-            <div class="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
-              <div
-                class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#EFF6FF] text-[#2563EB] group-hover:scale-105 transition-transform"
-              >
-                <span class="material-symbols-outlined text-[20px]">{{
-                  getDeviceIcon(asset.tipe_perangkat)
-                }}</span>
-              </div>
-              <div class="flex flex-col min-w-0 flex-1">
-                <span
-                  class="text-[13.5px] font-bold text-[#0F172A] leading-tight group-hover:text-[#2563EB] transition-colors truncate block"
-                  :title="asset.hostname || asset.label_aset || '—'"
-                >
-                  {{ asset.hostname || asset.label_aset || '—' }}
-                </span>
-                <span
-                  class="font-mono text-[11px] font-normal text-[#64748B] mt-0.5 tracking-tight truncate block"
-                  :title="asset.serial_number || asset.nomor_seri || '—'"
-                >
-                  {{ asset.serial_number || asset.nomor_seri || '—' }}
-                </span>
-              </div>
-            </div>
-
-            <!-- Mobile Status & Action Menu -->
-            <div class="flex items-center gap-1.5 shrink-0 self-start">
-              <div
-                class="flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-bold"
-                :class="[
-                  formatStatusPill(asset.status_aset).bg,
-                  formatStatusPill(asset.status_aset).text,
-                ]"
-              >
-                <span
-                  class="h-1.5 w-1.5 rounded-full shrink-0"
-                  :class="formatStatusPill(asset.status_aset).dot"
-                ></span>
-                <span class="truncate max-w-[85px] xs:max-w-none">{{
-                  formatStatusPill(asset.status_aset).label
-                }}</span>
-              </div>
-              <div @click.stop class="shrink-0">
-                <AppRowActions :actions="getAssetActions(asset)" />
-              </div>
-            </div>
-          </div>
-
-          <!-- Mobile Divider -->
-          <div class="border-t border-[#F1F5F9] my-0.5 md:hidden"></div>
-
-          <!-- Mobile 2x2 Metadata Grid -->
-          <div class="grid grid-cols-2 gap-2.5 md:hidden text-left">
-            <!-- 1. Perangkat -->
-            <div class="flex flex-col min-w-0 overflow-hidden">
-              <span class="text-[10px] font-semibold uppercase text-[#94A3B8] tracking-wider"
-                >Perangkat</span
-              >
-              <span
-                class="text-[12px] font-semibold text-[#1E293B] mt-0.5 truncate block"
-                :title="asset.tipe_perangkat || '—'"
-              >
-                {{ asset.tipe_perangkat || '—' }}
-              </span>
-              <span
-                class="text-[11px] font-normal text-[#64748B] mt-0.5 truncate block"
-                :title="
-                  [asset.merek || asset.brand_merek, asset.model].filter(Boolean).join(' ') || '—'
-                "
-              >
-                {{
-                  [asset.merek || asset.brand_merek, asset.model].filter(Boolean).join(' ') || '—'
-                }}
-              </span>
-            </div>
-
-            <!-- 2. Penanggung Jawab -->
-            <div class="flex flex-col min-w-0 overflow-hidden">
-              <span class="text-[10px] font-semibold uppercase text-[#94A3B8] tracking-wider"
-                >Penanggung Jawab</span
-              >
-              <span
-                class="text-[12px] mt-0.5 truncate block"
-                :class="
-                  asset.nama_karyawan
-                    ? 'font-semibold text-[#1E293B]'
-                    : 'text-[#94A3B8] italic font-normal'
-                "
-                :title="asset.nama_karyawan || 'Belum ditetapkan'"
-              >
-                {{ asset.nama_karyawan || 'Belum ditetapkan' }}
-              </span>
-              <span
-                v-if="asset.nama_karyawan && asset.nik"
-                class="font-mono text-[10.5px] text-[#64748B] mt-0.5 truncate block"
-                :title="'NIK: ' + asset.nik"
-              >
-                NIK: {{ asset.nik }}
-              </span>
-            </div>
-
-            <!-- 3. Lokasi -->
-            <div class="flex flex-col min-w-0 overflow-hidden">
-              <span class="text-[10px] font-semibold uppercase text-[#94A3B8] tracking-wider"
-                >Lokasi</span
-              >
-              <span
-                class="text-[12px] font-normal text-[#1E293B] mt-0.5 truncate block"
-                :title="asset.lokasi_kerja || asset.lokasi_aset || '—'"
-              >
-                {{ asset.lokasi_kerja || asset.lokasi_aset || '—' }}
-              </span>
-            </div>
-
-            <!-- 4. Kondisi -->
-            <div class="flex flex-col min-w-0 overflow-hidden">
-              <span class="text-[10px] font-semibold uppercase text-[#94A3B8] tracking-wider"
-                >Kondisi</span
-              >
-              <div
-                class="flex items-center gap-1 text-[11.5px] mt-0.5 truncate max-w-full"
-                :class="formatKondisiStyle(asset.kondisi_aset)"
-              >
-                <span
-                  class="h-1.5 w-1.5 rounded-full shrink-0"
-                  :class="formatKondisiDot(asset.kondisi_aset)"
-                ></span>
-                <span class="truncate">{{ formatKondisiText(asset.kondisi_aset) }}</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- ── DESKTOP LAYOUT (>= 768px / hidden md:flex) ──────────── -->
-          <!-- 1. Asset Identity (Code & SN + Device Icon) -->
-          <div class="hidden md:flex items-center gap-3.5 min-w-0 overflow-hidden">
-            <div
-              class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#EFF6FF] text-[#2563EB] group-hover:scale-105 transition-transform"
-            >
-              <span class="material-symbols-outlined text-[20px]">{{
+          <div class="laptop-identity">
+            <div class="laptop-icon" aria-hidden="true">
+              <span class="material-symbols-outlined">{{
                 getDeviceIcon(asset.tipe_perangkat)
               }}</span>
             </div>
-            <div class="flex flex-col min-w-0 overflow-hidden">
-              <span
-                class="text-[14px] font-bold text-[#0F172A] leading-snug group-hover:text-[#2563EB] transition-colors truncate block w-full"
-                :title="asset.hostname || asset.label_aset || '—'"
-              >
+            <div class="laptop-identity-text">
+              <h4 :title="asset.hostname || asset.label_aset">
                 {{ asset.hostname || asset.label_aset || '—' }}
-              </span>
-              <span
-                class="font-mono text-[11px] font-normal text-[#64748B] mt-0.5 tracking-tight truncate block w-full"
-                :title="asset.serial_number || asset.nomor_seri || '—'"
+              </h4>
+              <p :title="[asset.merek || asset.brand_merek, asset.model].filter(Boolean).join(' ')">
+                {{
+                  [asset.merek || asset.brand_merek, asset.model].filter(Boolean).join(' ') ||
+                  asset.tipe_perangkat ||
+                  '—'
+                }}
+              </p>
+              <span class="laptop-serial" :title="asset.serial_number || asset.nomor_seri"
+                >SN: {{ asset.serial_number || asset.nomor_seri || '—' }}</span
               >
-                {{ asset.serial_number || asset.nomor_seri || '—' }}
-              </span>
             </div>
           </div>
-
-          <!-- 2. Perangkat & Model -->
-          <div class="hidden md:flex flex-col min-w-0 overflow-hidden">
-            <span class="text-[10px] font-semibold uppercase text-[#94A3B8] tracking-wider"
-              >Perangkat</span
-            >
-            <span
-              class="text-[12.5px] font-semibold text-[#1E293B] mt-0.5 truncate block w-full"
-              :title="asset.tipe_perangkat || '—'"
-            >
-              {{ asset.tipe_perangkat || '—' }}
-            </span>
-            <span
-              class="text-[11.5px] font-normal text-[#64748B] mt-0.5 truncate block w-full"
-              :title="
-                [asset.merek || asset.brand_merek, asset.model].filter(Boolean).join(' ') || '—'
-              "
-            >
-              {{ [asset.merek || asset.brand_merek, asset.model].filter(Boolean).join(' ') || '—' }}
-            </span>
-          </div>
-
-          <!-- 3. Penanggung Jawab -->
-          <div class="hidden md:flex flex-col min-w-0 overflow-hidden">
-            <span class="text-[10px] font-semibold uppercase text-[#94A3B8] tracking-wider"
-              >Penanggung Jawab</span
-            >
-            <span
-              class="text-[12.5px] mt-0.5 truncate block w-full"
-              :class="
-                asset.nama_karyawan
-                  ? 'font-semibold text-[#1E293B]'
-                  : 'text-[#94A3B8] italic font-normal'
-              "
+          <div class="laptop-holder laptop-field">
+            <span class="laptop-label">Pengguna</span>
+            <strong
+              :class="{ 'laptop-unassigned': !asset.nama_karyawan }"
               :title="asset.nama_karyawan || 'Belum ditetapkan'"
+              >{{ asset.nama_karyawan || 'Belum ditetapkan' }}</strong
             >
-              {{ asset.nama_karyawan || 'Belum ditetapkan' }}
-            </span>
             <span
               v-if="asset.nama_karyawan && asset.nik"
-              class="font-mono text-[11px] text-[#64748B] mt-0.5 truncate block w-full"
+              class="laptop-secondary"
               :title="'NIK: ' + asset.nik"
+              >NIK: {{ asset.nik }}</span
             >
-              NIK: {{ asset.nik }}
-            </span>
           </div>
-
-          <!-- 4. Lokasi -->
-          <div class="hidden md:flex flex-col min-w-0 overflow-hidden">
-            <span class="text-[10px] font-semibold uppercase text-[#94A3B8] tracking-wider"
-              >Lokasi</span
-            >
+          <div class="laptop-location laptop-field">
+            <span class="laptop-label">Lokasi</span>
+            <strong :title="asset.lokasi_kerja || asset.lokasi_aset">{{
+              asset.lokasi_kerja || asset.lokasi_aset || '—'
+            }}</strong>
+          </div>
+          <div class="laptop-state">
             <span
-              class="text-[12.5px] font-normal text-[#1E293B] mt-0.5 truncate block w-full"
-              :title="asset.lokasi_kerja || asset.lokasi_aset || '—'"
+              class="laptop-status"
+              :class="[
+                formatStatusPill(asset.status_aset).bg,
+                formatStatusPill(asset.status_aset).text,
+              ]"
             >
-              {{ asset.lokasi_kerja || asset.lokasi_aset || '—' }}
+              <span class="laptop-dot" :class="formatStatusPill(asset.status_aset).dot"></span>
+              {{ formatStatusPill(asset.status_aset).label }}
+            </span>
+            <span class="laptop-condition" :class="formatKondisiStyle(asset.kondisi_aset)">
+              <span class="laptop-dot" :class="formatKondisiDot(asset.kondisi_aset)"></span>
+              {{ formatKondisiText(asset.kondisi_aset) }}
             </span>
           </div>
-
-          <!-- 5. Unified Status & Kondisi Component Block -->
-          <div class="hidden md:flex flex-col items-start min-w-0 overflow-hidden select-none">
-            <!-- Primary Status Line -->
-            <div
-              class="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold max-w-full"
-              :class="[formatStatusPill(asset.status_aset).bg, formatStatusPill(asset.status_aset).text]"
-            >
-              <span
-                class="h-1.5 w-1.5 rounded-full shrink-0"
-                :class="formatStatusPill(asset.status_aset).dot"
-              ></span>
-              <span class="truncate">{{ formatStatusPill(asset.status_aset).label }}</span>
-            </div>
-            <!-- Secondary Condition Line -->
-            <div
-              class="flex items-center gap-1 text-[11px] mt-1.5 truncate max-w-full"
-              :class="formatKondisiStyle(asset.kondisi_aset)"
-            >
-              <span
-                class="h-1 w-1 rounded-full shrink-0 opacity-60"
-                :class="formatKondisiDot(asset.kondisi_aset)"
-              ></span>
-              <span class="truncate">{{ formatKondisiText(asset.kondisi_aset) }}</span>
-            </div>
-          </div>
-
-          <!-- 6. Action Menu -->
-          <div
-            @click.stop
-            class="hidden md:flex items-center justify-end w-8 shrink-0 justify-self-end"
-          >
+          <div class="laptop-actions" @click.stop>
             <AppRowActions :actions="getAssetActions(asset)" />
           </div>
         </div>
@@ -1216,6 +1046,8 @@ onMounted(async () => {
 
       <!-- Pagination Footer -->
       <AppPagination
+        asset-style
+        mobile-compact
         v-if="!isLoading && !pageError"
         v-model:currentPage="currentPage"
         :total-items="filteredAssets.length"
@@ -1245,12 +1077,12 @@ onMounted(async () => {
             type="button"
             @click="activeTab = 'info'"
             class="flex items-center gap-1 sm:gap-1.5 transition-colors cursor-pointer select-none"
-            :class="activeTab === 'info' ? 'text-[#5D87FF]' : 'text-[#7C8BAC] hover:text-[#2A3547]'"
+            :class="activeTab === 'info' ? 'text-[#2563EB]' : 'text-[#7C8BAC] hover:text-[#2A3547]'"
           >
             <span
               class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] font-extrabold"
               :class="
-                activeTab === 'info' ? 'bg-[#5D87FF] text-white' : 'bg-[#E5EAEF] text-[#7C8BAC]'
+                activeTab === 'info' ? 'bg-[#2563EB] text-white' : 'bg-[#E5EAEF] text-[#7C8BAC]'
               "
             >
               1
@@ -1266,14 +1098,14 @@ onMounted(async () => {
             @click="activeTab = 'placement'"
             class="flex items-center gap-1 sm:gap-1.5 transition-colors cursor-pointer select-none"
             :class="
-              activeTab === 'placement' ? 'text-[#5D87FF]' : 'text-[#7C8BAC] hover:text-[#2A3547]'
+              activeTab === 'placement' ? 'text-[#2563EB]' : 'text-[#7C8BAC] hover:text-[#2A3547]'
             "
           >
             <span
               class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] font-extrabold"
               :class="
                 activeTab === 'placement'
-                  ? 'bg-[#5D87FF] text-white'
+                  ? 'bg-[#2563EB] text-white'
                   : 'bg-[#E5EAEF] text-[#7C8BAC]'
               "
             >
@@ -1291,7 +1123,7 @@ onMounted(async () => {
             class="flex items-center gap-1 sm:gap-1.5 transition-colors cursor-pointer select-none"
             :class="
               activeTab === 'specifications'
-                ? 'text-[#5D87FF]'
+                ? 'text-[#2563EB]'
                 : 'text-[#7C8BAC] hover:text-[#2A3547]'
             "
           >
@@ -1299,7 +1131,7 @@ onMounted(async () => {
               class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] font-extrabold"
               :class="
                 activeTab === 'specifications'
-                  ? 'bg-[#5D87FF] text-white'
+                  ? 'bg-[#2563EB] text-white'
                   : 'bg-[#E5EAEF] text-[#7C8BAC]'
               "
             >
@@ -1311,7 +1143,7 @@ onMounted(async () => {
       </div>
 
       <!-- Form Content -->
-      <form class="flex flex-col" @submit.prevent="saveAsset">
+      <form id="crud-AssetsView" class="asset-crud-form flex flex-col" @submit.prevent="saveAsset">
         <div
           v-if="modalError"
           role="alert"
@@ -1339,7 +1171,7 @@ onMounted(async () => {
                 maxlength="100"
                 aria-label="Hostname Aset"
                 placeholder="Laptop-HR-01 atau SN-ABC123"
-                class="h-10 w-full rounded-lg border border-[#E5EAEF] bg-white px-3 text-[12px] font-medium text-[#2A3547] placeholder-[#94A3B8] focus:border-[#5D87FF] focus:outline-none transition-all shadow-2xs"
+                class="h-10 w-full rounded-lg border border-[#E5EAEF] bg-white px-3 text-[12px] font-medium text-[#2A3547] placeholder-[#94A3B8] focus:border-[#2563EB] focus:outline-none transition-all shadow-2xs"
               />
             </label>
 
@@ -1353,7 +1185,7 @@ onMounted(async () => {
                 maxlength="100"
                 aria-label="Serial Number Aset"
                 placeholder="Nomor seri perangkat"
-                class="h-10 w-full rounded-lg border border-[#E5EAEF] bg-white px-3 text-[12px] font-medium text-[#2A3547] placeholder-[#94A3B8] focus:border-[#5D87FF] focus:outline-none transition-all shadow-2xs"
+                class="h-10 w-full rounded-lg border border-[#E5EAEF] bg-white px-3 text-[12px] font-medium text-[#2A3547] placeholder-[#94A3B8] focus:border-[#2563EB] focus:outline-none transition-all shadow-2xs"
               />
             </label>
 
@@ -1364,7 +1196,7 @@ onMounted(async () => {
               <select
                 v-model="form.tipe_perangkat"
                 aria-label="Tipe Perangkat Aset"
-                class="h-10 w-full rounded-lg border border-[#E5EAEF] bg-white px-3 text-[12px] font-medium text-[#2A3547] focus:border-[#5D87FF] focus:outline-none transition-all appearance-none cursor-pointer shadow-2xs"
+                class="h-10 w-full rounded-lg border border-[#E5EAEF] bg-white px-3 text-[12px] font-medium text-[#2A3547] focus:border-[#2563EB] focus:outline-none transition-all appearance-none cursor-pointer shadow-2xs"
               >
                 <option value="">Pilih tipe perangkat</option>
                 <option v-for="type in availableTipeOptions" :key="type">{{ type }}</option>
@@ -1466,7 +1298,7 @@ onMounted(async () => {
                 v-model="form.model"
                 maxlength="100"
                 placeholder="Model perangkat (e.g. ThinkPad X1)"
-                class="h-10 w-full rounded-lg border border-[#E5EAEF] bg-white px-3 text-[12px] font-medium text-[#2A3547] placeholder-[#94A3B8] focus:border-[#5D87FF] focus:outline-none transition-all shadow-2xs"
+                class="h-10 w-full rounded-lg border border-[#E5EAEF] bg-white px-3 text-[12px] font-medium text-[#2A3547] placeholder-[#94A3B8] focus:border-[#2563EB] focus:outline-none transition-all shadow-2xs"
               />
             </label>
 
@@ -1476,7 +1308,7 @@ onMounted(async () => {
               >
               <select
                 v-model="form.status"
-                class="h-10 w-full rounded-lg border border-[#E5EAEF] bg-white px-3 text-[12px] font-medium text-[#2A3547] focus:border-[#5D87FF] focus:outline-none transition-all appearance-none cursor-pointer shadow-2xs"
+                class="h-10 w-full rounded-lg border border-[#E5EAEF] bg-white px-3 text-[12px] font-medium text-[#2A3547] focus:border-[#2563EB] focus:outline-none transition-all appearance-none cursor-pointer shadow-2xs"
               >
                 <option v-for="s in ASSET_STATUSES" :key="s.value" :value="s.value">
                   {{ s.label }}
@@ -1490,7 +1322,7 @@ onMounted(async () => {
               >
               <select
                 v-model="form.kondisi"
-                class="h-10 w-full rounded-lg border border-[#E5EAEF] bg-white px-3 text-[12px] font-medium text-[#2A3547] focus:border-[#5D87FF] focus:outline-none transition-all appearance-none cursor-pointer shadow-2xs"
+                class="h-10 w-full rounded-lg border border-[#E5EAEF] bg-white px-3 text-[12px] font-medium text-[#2A3547] focus:border-[#2563EB] focus:outline-none transition-all appearance-none cursor-pointer shadow-2xs"
               >
                 <option v-for="condition in availableKondisiOptions" :key="condition">
                   {{ condition }}
@@ -1504,7 +1336,7 @@ onMounted(async () => {
                 v-model="form.spesifikasi"
                 rows="2"
                 placeholder="CPU, RAM, Storage, OS, dll."
-                class="min-h-[52px] max-h-[80px] w-full rounded-lg border border-[#E5EAEF] bg-white p-2.5 text-[12px] font-medium text-[#2A3547] placeholder-[#94A3B8] focus:border-[#5D87FF] focus:outline-none transition-all resize-y shadow-2xs"
+                class="min-h-[52px] max-h-[80px] w-full rounded-lg border border-[#E5EAEF] bg-white p-2.5 text-[12px] font-medium text-[#2A3547] placeholder-[#94A3B8] focus:border-[#2563EB] focus:outline-none transition-all resize-y shadow-2xs"
               ></textarea>
             </label>
 
@@ -1514,18 +1346,20 @@ onMounted(async () => {
                 v-model="form.note_asset"
                 rows="2"
                 placeholder="Catatan tambahan untuk aset ini"
-                class="min-h-[52px] max-h-[80px] w-full rounded-lg border border-[#E5EAEF] bg-white p-2.5 text-[12px] font-medium text-[#2A3547] placeholder-[#94A3B8] focus:border-[#5D87FF] focus:outline-none transition-all resize-y shadow-2xs"
+                class="min-h-[52px] max-h-[80px] w-full rounded-lg border border-[#E5EAEF] bg-white p-2.5 text-[12px] font-medium text-[#2A3547] placeholder-[#94A3B8] focus:border-[#2563EB] focus:outline-none transition-all resize-y shadow-2xs"
               ></textarea>
             </label>
           </fieldset>
         </div>
-
+      </form>
+      <template #footer>
         <!-- Footer Action Bar -->
         <div
-          class="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-2.5 pt-3.5 mt-4 border-t border-[#E5EAEF]"
+          class="asset-crud-actions flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-2.5 pt-3.5 mt-4 border-t border-[#E5EAEF]"
         >
           <button
             type="button"
+            :disabled="isSubmitting"
             @click="closeModal"
             class="h-9 w-full sm:w-auto rounded-lg border border-[#E5EAEF] px-3.5 text-[12px] font-bold text-[#7C8BAC] hover:bg-[#F8FAFC] hover:text-[#2A3547] active:scale-95 transition-all cursor-pointer touch-manipulation"
           >
@@ -1548,7 +1382,7 @@ onMounted(async () => {
               type="button"
               @click="nextStep"
               :disabled="isSubmitting || hasValidationErrors"
-              class="h-9 flex-1 sm:flex-initial rounded-lg bg-[#5D87FF] px-4 text-[12px] font-bold text-white shadow-sm hover:bg-[#4570EA] disabled:opacity-50 active:scale-95 transition-all flex items-center justify-center gap-1 cursor-pointer touch-manipulation"
+              class="h-9 flex-1 sm:flex-initial rounded-lg bg-[#2563EB] px-4 text-[12px] font-bold text-white shadow-sm hover:bg-[#1D4ED8] disabled:opacity-50 active:scale-95 transition-all flex items-center justify-center gap-1 cursor-pointer touch-manipulation"
             >
               <span>Lanjutkan</span>
               <span class="material-symbols-outlined text-[15px]">arrow_forward</span>
@@ -1557,8 +1391,9 @@ onMounted(async () => {
             <button
               v-else
               type="submit"
+              form="crud-AssetsView"
               :disabled="isSubmitting || !canWriteAssets || hasValidationErrors"
-              class="h-9 flex-1 sm:flex-initial rounded-lg bg-[#5D87FF] px-4 text-[12px] font-bold text-white shadow-sm hover:bg-[#4570EA] disabled:opacity-50 active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer touch-manipulation"
+              class="h-9 flex-1 sm:flex-initial rounded-lg bg-[#2563EB] px-4 text-[12px] font-bold text-white shadow-sm hover:bg-[#1D4ED8] disabled:opacity-50 active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer touch-manipulation"
             >
               <span
                 v-if="isSubmitting"
@@ -1574,11 +1409,11 @@ onMounted(async () => {
             </button>
           </div>
         </div>
-      </form>
+      </template>
     </AppModal>
 
     <AppModal :is-open="showDeleteModal" title="Hapus Aset IT" size="sm" @close="closeModal">
-      <div class="flex flex-col items-center gap-4 text-center">
+      <div class="asset-delete-content flex flex-col items-center gap-4 text-center">
         <div
           v-if="modalError"
           role="alert"
@@ -1595,7 +1430,9 @@ onMounted(async () => {
           </h4>
           <p class="mt-1 text-[12px] text-[#9CA3AF]">Data aset akan dihapus permanen.</p>
         </div>
-        <div class="flex w-full gap-3">
+      </div>
+      <template #footer>
+        <div class="asset-crud-actions asset-delete-actions flex w-full gap-3">
           <button
             type="button"
             :disabled="isSubmitting"
@@ -1612,7 +1449,7 @@ onMounted(async () => {
             {{ isSubmitting ? 'Menghapus...' : 'Ya, Hapus' }}
           </button>
         </div>
-      </div>
+      </template>
     </AppModal>
 
     <AppModal
@@ -1650,7 +1487,6 @@ onMounted(async () => {
             {{ selectedAsset.spesifikasi || 'Belum ada informasi spesifikasi untuk aset ini.' }}
           </div>
         </div>
-
       </div>
       <template #footer>
         <div class="flex justify-end">
@@ -1666,9 +1502,9 @@ onMounted(async () => {
     </AppModal>
 
     <AppModal :is-open="showDetailsModal" title="Detail Aset" size="lg" @close="closeModal">
-      <div v-if="selectedAsset" class="flex flex-col gap-0">
+      <div v-if="selectedAsset" class="asset-detail flex flex-col gap-0">
         <!-- Header Aset -->
-        <div class="flex items-center gap-3 pb-4">
+        <div class="asset-detail-identity flex items-center gap-3 pb-4">
           <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-brand text-white">
             <span class="material-symbols-outlined">{{
               getDeviceIcon(selectedAsset.tipe_perangkat)
@@ -1683,7 +1519,7 @@ onMounted(async () => {
         </div>
 
         <!-- Tab Navigation -->
-        <div class="flex flex-wrap border-b border-[#E2E8F0]/80 mb-4">
+        <div class="asset-detail-tabs flex flex-wrap border-b border-[#E2E8F0]/80 mb-4">
           <button
             type="button"
             @click="detailsTab = 'info'"
@@ -1721,7 +1557,7 @@ onMounted(async () => {
 
         <!-- Tab 1: Info Detail -->
         <div v-if="detailsTab === 'info'" class="space-y-4">
-          <dl class="grid grid-cols-1 gap-4 rounded-2xl border border-[#F3F4F6] p-4 sm:grid-cols-2">
+          <dl class="asset-detail-fields">
             <div
               v-for="item in [
                 ['Nomor Seri', selectedAsset.nomor_seri],
@@ -1910,7 +1746,7 @@ onMounted(async () => {
         <!-- Footer -->
       </div>
       <template #footer>
-        <div class="flex justify-end">
+        <div class="asset-detail-footer">
           <button
             type="button"
             @click="closeModal"
@@ -2042,7 +1878,7 @@ onMounted(async () => {
   flex-direction: column;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 1280px) {
   .asset-row-grid {
     display: grid;
     grid-template-columns:
@@ -2068,3 +1904,5 @@ onMounted(async () => {
   box-shadow: 0 0 0 3px rgb(9 124 222 / 10%);
 }
 </style>
+
+<style scoped src="../assets/asset-workspace.css"></style>

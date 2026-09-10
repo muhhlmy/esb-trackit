@@ -74,13 +74,25 @@ export default defineConfig(({ mode = 'development' }) => {
   const env = loadEnv(mode, fileURLToPath(new URL('.', import.meta.url)), 'VITE_')
   const proxyTarget = resolveApiProxyTarget(env)
   const port = Number(env.VITE_PORT || 5173)
-  const allowedHosts = (env.VITE_ALLOWED_HOSTS || '').split(',').map((host) => host.trim()).filter(Boolean)
-  const hmrHosts = new Set(['localhost', '127.0.0.1', ...allowedHosts.filter((host) => !host.startsWith('.'))])
+  const rawAllowedHosts = env.VITE_ALLOWED_HOSTS || process.env.VITE_ALLOWED_HOSTS || ''
+  const parsedAllowedHosts = rawAllowedHosts
+    ? rawAllowedHosts.split(',').map((host) => host.trim()).filter(Boolean)
+    : []
+  const allowedHosts =
+    rawAllowedHosts === 'true' || rawAllowedHosts === '*'
+      ? true
+      : Array.from(new Set(['.trycloudflare.com', ...parsedAllowedHosts]))
+
+  const hostList = Array.isArray(allowedHosts) ? allowedHosts : []
+  const hmrHosts = new Set(['localhost', '127.0.0.1', ...hostList.filter((host) => !host.startsWith('.'))])
   if (env.VITE_HOST && !['0.0.0.0', '::'].includes(env.VITE_HOST)) hmrHosts.add(env.VITE_HOST)
   const hmrOrigins = [...hmrHosts].flatMap((host) => ['ws', 'wss'].map((scheme) => scheme + '://' + host + ':' + port))
   const devHeaders = {
     ...FRONTEND_SECURITY_HEADERS,
-    'Content-Security-Policy': FRONTEND_SECURITY_HEADERS['Content-Security-Policy'].replace("connect-src 'self';", "connect-src 'self' " + hmrOrigins.join(' ') + ';'),
+    'Content-Security-Policy': FRONTEND_SECURITY_HEADERS['Content-Security-Policy'].replace(
+      "connect-src 'self';",
+      "connect-src 'self' https://*.trycloudflare.com wss://*.trycloudflare.com " + hmrOrigins.join(' ') + ';',
+    ),
   }
 
   return {

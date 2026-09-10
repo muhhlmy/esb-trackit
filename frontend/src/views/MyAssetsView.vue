@@ -542,13 +542,18 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="flex min-w-0 flex-col gap-5" :data-testid="!isLoading ? 'page-ready' : undefined">
+  <div
+    class="employee-assets-page flex min-w-0 flex-col gap-5"
+    :data-testid="!isLoading ? 'page-ready' : undefined"
+  >
     <!-- ═══════════════════════════════════════════════════════════════════════
          LEVEL 1 — MAIN "ASET KARYAWAN" PAGE
     ════════════════════════════════════════════════════════════════════════ -->
     <template v-if="currentLevel === 1">
       <!-- Enterprise Header & Title -->
-      <div class="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+      <div
+        class="employee-assets-heading flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between"
+      >
         <div>
           <h1 class="text-lg sm:text-xl font-bold tracking-tight text-[#0F172A]">Aset Karyawan</h1>
           <p class="mt-0.5 text-xs text-[#64748B]">
@@ -557,91 +562,45 @@ onMounted(() => {
         </div>
       </div>
 
-      <!-- KPI Summary Cards Grid (Compact & Responsive) -->
-      <div class="grid grid-cols-1 gap-2.5 sm:gap-3.5 sm:grid-cols-3">
-        <!-- KPI Card 1: Karyawan dengan Aset -->
+      <div class="employee-kpis">
         <div
-          class="relative flex flex-col justify-between rounded-xl border border-[#E2E8F0] bg-white p-3.5 sm:p-4 shadow-2xs transition-all hover:border-[#CBD5E1]"
+          v-for="(item, index) in [
+            {
+              label: 'Karyawan dengan aset',
+              value: totalEmployeesHoldingAssets,
+              caption: 'Pemegang aktif',
+              icon: 'badge',
+            },
+            {
+              label: 'Aset ditugaskan',
+              value: totalAssignedAssetsCount,
+              caption: 'Unit digunakan',
+              icon: 'devices',
+            },
+            {
+              label: 'Penugasan baru',
+              value: recentlyAssignedCount,
+              caption: '30 hari terakhir',
+              icon: 'assignment_turned_in',
+            },
+          ]"
+          :key="item.label"
+          class="employee-kpi"
+          :class="{ 'employee-kpi-primary': index === 0 }"
         >
-          <div class="flex items-center justify-between">
-            <span class="text-[11px] font-semibold tracking-wide uppercase text-[#64748B]"
-              >Karyawan dengan Aset</span
-            >
-            <div
-              class="flex h-7 w-7 items-center justify-center rounded-lg bg-[#EFF6FF] text-[#2563EB]"
-            >
-              <span class="material-symbols-outlined text-[16px]">badge</span>
-            </div>
+          <div class="employee-kpi-label">
+            {{ item.label
+            }}<span class="material-symbols-outlined" aria-hidden="true">{{ item.icon }}</span>
           </div>
-          <div class="mt-2.5 sm:mt-3 flex items-baseline justify-between">
-            <span class="text-xl sm:text-2xl font-bold tracking-tight text-[#0F172A]">{{
-              totalEmployeesHoldingAssets
-            }}</span>
-            <span
-              class="inline-flex items-center rounded-full bg-[#EFF6FF] px-2 py-0.5 text-[10.5px] font-semibold text-[#2563EB]"
-            >
-              Pemegang Aktif
-            </span>
-          </div>
-        </div>
-
-        <!-- KPI Card 2: Total Aset Terassigned -->
-        <div
-          class="relative flex flex-col justify-between rounded-xl border border-[#E2E8F0] bg-white p-3.5 sm:p-4 shadow-2xs transition-all hover:border-[#CBD5E1]"
-        >
-          <div class="flex items-center justify-between">
-            <span class="text-[11px] font-semibold tracking-wide uppercase text-[#64748B]"
-              >Total Aset Terassigned</span
-            >
-            <div
-              class="flex h-7 w-7 items-center justify-center rounded-lg bg-[#ECFDF5] text-[#059669]"
-            >
-              <span class="material-symbols-outlined text-[16px]">devices</span>
-            </div>
-          </div>
-          <div class="mt-2.5 sm:mt-3 flex items-baseline justify-between">
-            <span class="text-xl sm:text-2xl font-bold tracking-tight text-[#0F172A]">{{
-              totalAssignedAssetsCount
-            }}</span>
-            <span
-              class="inline-flex items-center rounded-full bg-[#ECFDF5] px-2 py-0.5 text-[10.5px] font-semibold text-[#059669]"
-            >
-              Unit Dipakai
-            </span>
-          </div>
-        </div>
-
-        <!-- KPI Card 3: Baru Ditugaskan -->
-        <div
-          class="relative flex flex-col justify-between rounded-xl border border-[#E2E8F0] bg-white p-3.5 sm:p-4 shadow-2xs transition-all hover:border-[#CBD5E1]"
-        >
-          <div class="flex items-center justify-between">
-            <span class="text-[11px] font-semibold tracking-wide uppercase text-[#64748B]"
-              >Baru Ditugaskan</span
-            >
-            <div
-              class="flex h-7 w-7 items-center justify-center rounded-lg bg-[#FAF5FF] text-[#7C3AED]"
-            >
-              <span class="material-symbols-outlined text-[16px]">assignment_turned_in</span>
-            </div>
-          </div>
-          <div class="mt-2.5 sm:mt-3 flex items-baseline justify-between">
-            <span class="text-xl sm:text-2xl font-bold tracking-tight text-[#0F172A]">{{
-              recentlyAssignedCount
-            }}</span>
-            <span
-              class="inline-flex items-center rounded-full bg-[#FAF5FF] px-2 py-0.5 text-[10.5px] font-semibold text-[#7C3AED]"
-            >
-              30 Hari Terakhir
-            </span>
-          </div>
+          <strong>{{ item.value }}</strong
+          ><span class="employee-kpi-caption">{{ item.caption }}</span>
         </div>
       </div>
 
       <!-- Toolbar: Elegant Single Search & Compact Filters -->
       <div
         v-if="isAdmin"
-        class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 rounded-xl border border-[#E2E8F0] bg-white p-3 shadow-2xs"
+        class="employee-assets-toolbar flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 rounded-xl border border-[#E2E8F0] bg-white p-3 shadow-2xs"
       >
         <div class="relative w-full sm:flex-1 sm:min-w-[200px]">
           <label for="emp-search" class="sr-only">Cari karyawan dengan aset</label>
@@ -702,7 +661,9 @@ onMounted(() => {
       </div>
 
       <!-- Main Hybrid Employee Table/List -->
-      <div class="rounded-xl border border-[#E2E8F0] bg-white shadow-2xs overflow-hidden">
+      <div
+        class="employee-list rounded-xl border border-[#E2E8F0] bg-white shadow-2xs overflow-hidden"
+      >
         <!-- Loading State -->
         <div v-if="isLoadingEmployees" aria-busy="true">
           <SkeletonTable preset="employees" :rows="5" />
@@ -733,8 +694,8 @@ onMounted(() => {
 
         <!-- Data Presentation (Responsive: Desktop Table >= 768px, Mobile Cards < 768px) -->
         <div v-else class="w-full max-w-full">
-          <!-- Desktop Table (>= 768px / hidden md:block) -->
-          <div class="hidden md:block w-full max-w-full overflow-hidden">
+          <!-- Desktop Table (>= 768px / hidden xl:block) -->
+          <div class="hidden xl:block w-full max-w-full overflow-hidden">
             <table class="w-full max-w-full text-left border-collapse table-fixed">
               <colgroup>
                 <col class="w-[27%]" />
@@ -866,8 +827,8 @@ onMounted(() => {
             </table>
           </div>
 
-          <!-- Mobile Card List (< 768px / md:hidden) -->
-          <div class="md:hidden divide-y divide-[#F1F5F9]">
+          <!-- Mobile Card List (< 768px / xl:hidden) -->
+          <div class="xl:hidden divide-y divide-[#F1F5F9]">
             <div
               v-for="(employee, idx) in paginatedEmployees"
               :key="'mob-' + (employee.id_karyawan || employee.nik)"
@@ -1037,7 +998,7 @@ onMounted(() => {
 
       <!-- Employee Hero Profile Identity Header -->
       <div
-        class="rounded-xl border border-[#E2E8F0] bg-white p-3.5 sm:p-5 shadow-2xs flex flex-col gap-3.5 sm:flex-row sm:items-center sm:justify-between"
+        class="employee-profile rounded-xl border border-[#E2E8F0] bg-white p-3.5 sm:p-5 shadow-2xs flex flex-col gap-3.5 sm:flex-row sm:items-center sm:justify-between"
       >
         <div class="flex items-start sm:items-center gap-3 sm:gap-4 min-w-0">
           <div
@@ -1124,7 +1085,7 @@ onMounted(() => {
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5">
           <div class="flex items-center gap-2">
             <span class="material-symbols-outlined text-[20px] text-[#2563EB]">inventory_2</span>
-            <h3 class="text-sm font-bold text-[#0F172A]">Aset Terassigned</h3>
+            <h3 class="text-sm font-bold text-[#0F172A]">Aset yang ditugaskan</h3>
             <span class="rounded-full bg-[#EFF6FF] px-2.5 py-0.5 text-xs font-bold text-[#2563EB]">
               {{ myAssets.length }}
             </span>
@@ -1202,19 +1163,26 @@ onMounted(() => {
           class="flex flex-col items-center justify-center gap-2 py-12 px-4 text-center rounded-xl border border-[#E2E8F0] bg-white"
         >
           <span class="material-symbols-outlined text-[32px] text-[#CBD5E1]">devices_off</span>
-          <h4 class="text-sm font-semibold text-[#0F172A]">Belum Ada Aset Terassigned</h4>
+          <h4 class="text-sm font-semibold text-[#0F172A]">Belum Ada Aset yang ditugaskan</h4>
           <p class="max-w-xs text-xs text-[#64748B]">
             Tidak ada aset IT yang terdaftar atas nama {{ selectedEmployee.nama_karyawan }}.
           </p>
         </div>
 
         <!-- Assigned Asset Cards Grid -->
-        <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-4">
+        <div
+          v-else
+          class="assigned-assets-grid grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3.5 sm:gap-4"
+        >
           <div
             v-for="asset in paginatedAssets"
             :key="asset.id_aset"
             @click="goToLevel3(asset)"
-            class="group relative flex flex-col justify-between rounded-xl border border-[#E2E8F0] bg-white p-3.5 sm:p-4 shadow-2xs hover:border-[#2563EB] hover:shadow-md active:scale-[0.99] transition-all duration-200 cursor-pointer touch-manipulation"
+            tabindex="0"
+            @keydown.enter.self="goToLevel3(asset)"
+            @keydown.space.prevent.self="goToLevel3(asset)"
+            aria-label="Lihat detail dan riwayat aset"
+            class="assigned-asset-card group relative flex flex-col justify-between rounded-xl border border-[#E2E8F0] bg-white p-3.5 sm:p-4 shadow-2xs hover:border-[#2563EB] hover:shadow-md active:scale-[0.99] transition-all duration-200 cursor-pointer touch-manipulation"
           >
             <div>
               <!-- Top Row: Device Icon & Status Pill -->
@@ -1284,7 +1252,7 @@ onMounted(() => {
             <div
               class="mt-3.5 pt-2.5 border-t border-[#F1F5F9] flex items-center justify-between text-xs font-semibold text-[#2563EB]"
             >
-              <span>Lihat Audit History</span>
+              <span>Lihat detail & riwayat</span>
               <span
                 class="material-symbols-outlined text-[16px] group-hover:translate-x-1 transition-transform"
                 >arrow_forward</span
@@ -1362,7 +1330,7 @@ onMounted(() => {
 
       <!-- Asset Title Header Banner -->
       <div
-        class="rounded-xl border border-[#E2E8F0] bg-white p-4 sm:p-5 shadow-2xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3.5"
+        class="asset-profile-banner rounded-xl border border-[#E2E8F0] bg-white p-4 sm:p-5 shadow-2xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3.5"
       >
         <div class="flex items-start sm:items-center gap-3.5 min-w-0">
           <div
@@ -1418,7 +1386,7 @@ onMounted(() => {
       </div>
 
       <!-- Main Two-Column View: Specs Grid (Left) & Audit Timeline (Right) -->
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5 items-start">
+      <div class="asset-audit-layout grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5 items-start">
         <!-- LEFT COLUMN: Asset Metadata Grid (lg:col-span-6) -->
         <div class="lg:col-span-6 flex flex-col gap-4">
           <!-- Information Card -->
@@ -1634,7 +1602,6 @@ onMounted(() => {
             }}
           </div>
         </div>
-
       </div>
       <template #footer>
         <div class="flex justify-end">
@@ -1650,3 +1617,246 @@ onMounted(() => {
     </AppModal>
   </div>
 </template>
+
+<style scoped>
+.employee-assets-page {
+  width: 100%;
+  max-width: 1500px;
+  margin: 0 auto;
+  color: #172b4d;
+  padding-bottom: 12px;
+}
+.employee-assets-heading {
+  padding: 4px 0;
+}
+.employee-assets-heading h1 {
+  font-size: 25px;
+  letter-spacing: -0.04em;
+  font-weight: 650;
+}
+.employee-assets-heading p {
+  margin-top: 7px;
+  color: #71829b;
+  line-height: 1.7;
+}
+.employee-kpis {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+.employee-kpi {
+  padding: 22px;
+  border: 1px solid #e2e8f0;
+  border-radius: 13px;
+  background: white;
+}
+.employee-kpi-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 12px;
+  color: #64748b;
+  font-weight: 500;
+}
+.employee-kpi-label span {
+  font-size: 19px;
+  color: #6486b5;
+}
+.employee-kpi strong {
+  display: block;
+  font-size: 32px;
+  line-height: 1.2;
+  font-weight: 650;
+  letter-spacing: -0.04em;
+  margin: 16px 0 8px;
+  font-variant-numeric: tabular-nums;
+}
+.employee-kpi-caption {
+  font-size: 11px;
+  color: #71829b;
+}
+.employee-kpi-primary {
+  background: #172f52;
+  border-color: #172f52;
+  color: white;
+}
+.employee-kpi-primary :is(.employee-kpi-label, .employee-kpi-caption, .employee-kpi-label span) {
+  color: #c0d1eb;
+}
+.employee-assets-toolbar {
+  padding: 16px;
+  border-radius: 12px;
+  box-shadow: none;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.employee-assets-toolbar input {
+  height: 42px;
+  border-radius: 8px;
+}
+.employee-assets-toolbar > div:first-child {
+  flex-basis: 260px;
+}
+.employee-assets-toolbar > div:last-child > button {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+  color: #64748b;
+}
+.employee-list {
+  border-radius: 13px;
+  box-shadow: none;
+}
+.employee-list th {
+  font-size: 10px;
+  font-weight: 600;
+  color: #71829b;
+}
+.employee-list td {
+  padding-top: 18px;
+  padding-bottom: 18px;
+}
+.employee-list tr {
+  border-color: #edf1f6;
+}
+.employee-list tbody tr:hover {
+  background: #f7f9fc;
+}
+.employee-profile,
+.asset-profile-banner {
+  padding: 24px;
+  border-radius: 13px;
+  box-shadow: none;
+  background: #fff;
+}
+.employee-profile h2,
+.asset-profile-banner h2 {
+  font-weight: 650;
+  font-size: 21px;
+  letter-spacing: -0.03em;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.assigned-asset-card {
+  padding: 22px;
+  box-shadow: none;
+  border-radius: 13px;
+}
+.assigned-asset-card:hover {
+  border-color: #9fb8da;
+  box-shadow: 0 3px 12px #172b4d08;
+  transform: none;
+}
+.assigned-asset-card h4 {
+  font-size: 15px;
+  line-height: 1.6;
+  font-weight: 650;
+}
+.assigned-asset-card h4 + div {
+  flex-wrap: wrap;
+  gap: 7px;
+}
+.assigned-asset-card > div:last-child {
+  color: #345e99;
+  padding-top: 15px;
+  margin-top: 20px;
+  min-height: 44px;
+}
+.asset-audit-layout > div {
+  min-width: 0;
+}
+.asset-audit-layout > div > div {
+  border-radius: 13px;
+  box-shadow: none;
+}
+.asset-audit-layout dl {
+  gap: 18px;
+}
+.asset-audit-layout dl > div {
+  min-width: 0;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #edf1f6;
+}
+.asset-audit-layout dd {
+  overflow-wrap: anywhere;
+  line-height: 1.7;
+}
+.asset-audit-layout dt {
+  color: #71829b;
+  font-weight: 500;
+  text-transform: none;
+}
+.asset-audit-layout h3 {
+  text-transform: none;
+  font-size: 14px;
+  font-weight: 650;
+  letter-spacing: -0.015em;
+}
+.employee-assets-page [tabindex='0']:focus-visible {
+  outline: 2px solid #5285d8;
+  outline-offset: 3px;
+}
+@media (max-width: 767px) {
+  .employee-assets-heading h1 {
+    font-size: 22px;
+  }
+  .employee-kpis {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+  .employee-kpi {
+    padding: 16px;
+  }
+  .employee-kpi-primary {
+    grid-column: 1/-1;
+  }
+  .employee-kpi-primary strong {
+    margin-top: 12px;
+  }
+  .employee-kpi-label {
+    font-size: 11px;
+    align-items: flex-start;
+  }
+  .employee-kpi-label span {
+    font-size: 17px;
+  }
+  .employee-kpi strong {
+    font-size: 28px;
+  }
+  .employee-kpi-caption {
+    font-size: 10px;
+  }
+  .employee-assets-toolbar {
+    padding: 14px;
+  }
+  .employee-assets-toolbar > div:first-child {
+    flex-basis: auto;
+  }
+  .employee-assets-toolbar input {
+    font-size: 16px;
+    min-height: 44px;
+  }
+  .employee-profile,
+  .asset-profile-banner {
+    padding: 18px;
+  }
+  .employee-profile h2,
+  .asset-profile-banner h2 {
+    font-size: 18px;
+  }
+  .assigned-asset-card {
+    padding: 18px;
+  }
+  .asset-profile-banner > button {
+    min-height: 44px;
+  }
+  .asset-audit-layout dl {
+    gap: 14px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .assigned-asset-card {
+    transition: none;
+  }
+}
+</style>

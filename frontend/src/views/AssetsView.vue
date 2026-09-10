@@ -775,7 +775,7 @@ onMounted(async () => {
           v-if="canWriteAssets"
           type="button"
           @click="openAdd"
-          class="h-9 shrink-0 whitespace-nowrap rounded-lg bg-[#2563EB] px-3 sm:px-3.5 text-xs font-semibold text-white shadow-2xs hover:bg-[#1D4ED8] active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer touch-manipulation"
+          class="h-9 shrink-0 whitespace-nowrap rounded-lg bg-[#172F52] px-3 sm:px-3.5 text-xs font-semibold text-white shadow-2xs hover:bg-[#1D4ED8] active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer touch-manipulation"
           title="Tambah aset baru"
         >
           <span class="material-symbols-outlined text-[16px]">add</span>
@@ -798,7 +798,7 @@ onMounted(async () => {
             type="text"
             aria-label="Cari aset, serial number, atau pemegang"
             placeholder="Cari aset, serial number, atau pemegang..."
-            class="h-9 w-full rounded-lg border border-[#E2E8F0] bg-white pl-8 pr-8 text-xs text-[#0F172A] placeholder-[#94A3B8] focus:border-[#2563EB] focus:outline-none transition-all shadow-2xs"
+            class="h-9 w-full rounded-lg border border-[#E2E8F0] bg-white pl-8 pr-8 text-xs text-[#0F172A] placeholder-[#94A3B8] focus:border-[#172F52] focus:outline-none transition-all shadow-2xs"
           />
           <!-- Inline Clear Button -->
           <button
@@ -1001,7 +1001,7 @@ onMounted(async () => {
             v-if="canWriteAssets"
             type="button"
             @click="openAdd"
-            class="mt-2 h-9 rounded-lg bg-[#2563EB] px-4 text-[12px] font-semibold text-white shadow-2xs hover:bg-[#1D4ED8] transition-all flex items-center gap-1.5 cursor-pointer"
+            class="mt-2 h-9 rounded-lg bg-[#172F52] px-4 text-[12px] font-semibold text-white shadow-2xs hover:bg-[#1D4ED8] transition-all flex items-center gap-1.5 cursor-pointer"
           >
             <span class="material-symbols-outlined text-[16px]">add</span>
             <span>Tambah Aset</span>

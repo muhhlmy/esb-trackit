@@ -118,7 +118,7 @@ watch(
       class="flex flex-col items-center justify-center gap-0.5 px-2 py-1 rounded-xl transition-colors cursor-pointer min-w-[52px] min-h-[44px] touch-manipulation active:scale-95"
       :class="
         isLainnyaOpen || isLainnyaActive
-          ? 'text-[#2563EB] font-bold'
+          ? 'text-[#172F52] font-bold'
           : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
       "
     >
@@ -164,8 +164,8 @@ watch(
           class="flex flex-col items-center justify-center gap-1.5 px-2 py-3 rounded-xl transition-colors text-center active:scale-95"
           :class="
             isLainnyaItemActive(item.to)
-              ? 'text-[#2563EB] bg-[#2563EB]/10 dark:bg-[#2563EB]/20 font-bold'
-              : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-[#2563EB]'
+              ? 'text-[#172F52] bg-[#172F52]/10 dark:bg-[#172F52]/20 font-bold'
+              : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-[#172F52]'
           "
         >
           <component :is="item.icon" class="w-5 h-5" />

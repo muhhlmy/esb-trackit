@@ -29,7 +29,7 @@ const { isAuthenticated, isAdmin } = useAuth()
         to="/tickets"
         aria-label="Daftar Tiket"
         class="flex flex-col items-center justify-center gap-0.5 px-3 py-1 rounded-xl text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors min-w-[56px] min-h-[44px] touch-manipulation active:scale-95"
-        active-class="text-[#2563EB] dark:text-indigo-400 font-bold"
+        active-class="text-[#172F52] dark:text-indigo-400 font-bold"
       >
         <Ticket class="w-4 h-4" />
         <span class="text-[10px]">Tickets</span>
@@ -39,7 +39,7 @@ const { isAuthenticated, isAdmin } = useAuth()
         :to="isAdmin ? '/dashboard' : '/my-assets'"
         aria-label="Dashboard"
         class="flex flex-col items-center justify-center gap-0.5 px-3 py-1 rounded-xl text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors min-w-[56px] min-h-[44px] touch-manipulation active:scale-95"
-        active-class="text-[#2563EB] dark:text-indigo-400 font-bold"
+        active-class="text-[#172F52] dark:text-indigo-400 font-bold"
       >
         <LayoutDashboard class="w-4 h-4" />
         <span class="text-[10px]">Dashboard</span>
@@ -52,7 +52,7 @@ const { isAuthenticated, isAdmin } = useAuth()
       type="button"
       aria-label="Masuk ke Akun"
       @click="router.push('/login')"
-      class="flex flex-col items-center justify-center gap-0.5 px-3 py-1 rounded-xl text-[#2563EB] font-bold hover:text-[#4570EA] transition-colors cursor-pointer min-w-[56px] min-h-[44px] touch-manipulation active:scale-95"
+      class="flex flex-col items-center justify-center gap-0.5 px-3 py-1 rounded-xl text-[#172F52] font-bold hover:text-[#4570EA] transition-colors cursor-pointer min-w-[56px] min-h-[44px] touch-manipulation active:scale-95"
     >
       <LogIn class="w-4 h-4" />
       <span class="text-[10px]">Sign In</span>

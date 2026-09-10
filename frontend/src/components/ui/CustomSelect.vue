@@ -97,10 +97,10 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside))
       aria-haspopup="listbox"
       :aria-expanded="isOpen"
       @click="toggle"
-      class="inline-flex w-full items-center justify-between gap-1.5 rounded-xl border bg-white px-3 text-xs font-bold text-[#2A3547] shadow-2xs hover:bg-[#F8FAFC] hover:border-[#5D87FF] transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+      class="inline-flex w-full items-center justify-between gap-1.5 rounded-xl border bg-white px-3 text-xs font-bold text-[#2A3547] shadow-2xs hover:bg-[#F8FAFC] hover:border-[#172F52] transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
       :class="[
         heightClass,
-        isOpen ? 'border-[#5D87FF] ring-2 ring-[#5D87FF]/15' : 'border-[#E5EAEF]',
+        isOpen ? 'border-[#172F52] ring-2 ring-[#172F52]/15' : 'border-[#E5EAEF]',
       ]"
     >
       <div class="flex items-center gap-1.5 min-w-0 flex-1">
@@ -116,7 +116,7 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside))
       </div>
       <span
         class="material-symbols-outlined text-[16px] text-[#7C8BAC] shrink-0 transition-transform duration-200"
-        :class="{ 'rotate-180 text-[#5D87FF]': isOpen }"
+        :class="{ 'rotate-180 text-[#172F52]': isOpen }"
         >expand_more</span
       >
     </button>
@@ -150,7 +150,7 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside))
           role="option"
           :aria-selected="opt.value === modelValue"
           class="flex h-8 w-full items-center justify-between rounded-lg px-2.5 text-xs font-medium text-[#2A3547] hover:bg-[#F8FAFC] transition-colors cursor-pointer"
-          :class="opt.value === modelValue ? 'bg-[#ECF2FF] font-bold text-[#5D87FF]' : ''"
+          :class="opt.value === modelValue ? 'bg-[#ECF2FF] font-bold text-[#172F52]' : ''"
           @click="select(opt)"
         >
           <div class="flex items-center gap-2 min-w-0">
@@ -159,7 +159,7 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside))
           </div>
           <span
             v-if="opt.value === modelValue"
-            class="material-symbols-outlined text-[15px] text-[#5D87FF] shrink-0"
+            class="material-symbols-outlined text-[15px] text-[#172F52] shrink-0"
             >check</span
           >
         </button>

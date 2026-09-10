@@ -283,7 +283,7 @@
 .asset-crud-form :is(input, select, textarea):focus {
   border-color: #7c9ecf;
   outline: none;
-  box-shadow: 0 0 0 3px #2563eb0d;
+  box-shadow: 0 0 0 3px #172F520d;
 }
 .asset-crud-form fieldset {
   gap: 18px;
@@ -314,12 +314,12 @@
   color: #52647e;
 }
 .asset-crud-actions button[type='submit'],
-.asset-crud-actions button.bg-\[\#2563EB\] {
+.asset-crud-actions button.bg-\[\#172F52\] {
   background: #172f52;
   color: white;
 }
 .asset-crud-actions button[type='submit']:hover,
-.asset-crud-actions button.bg-\[\#2563EB\]:hover {
+.asset-crud-actions button.bg-\[\#172F52\]:hover {
   background: #244673;
 }
 .asset-crud-actions button:disabled {

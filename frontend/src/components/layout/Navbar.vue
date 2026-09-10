@@ -168,7 +168,7 @@ onUnmounted(() => {
   gap: 28px;
 }
 .help-navbar :is(a, button, select):focus-visible {
-  outline: 2px solid #2563eb;
+  outline: 2px solid #172F52;
   outline-offset: 4px;
 }
 .navbar-brand {

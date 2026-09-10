@@ -31,12 +31,12 @@ const moduleIcon = computed(() => {
     >
       <!-- Top Decorative Accent -->
       <div
-        class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#2563EB] via-[#6366F1] to-[#3B82F6]"
+        class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#172F52] via-[#6366F1] to-[#3B82F6]"
       ></div>
 
       <!-- Icon Badge -->
       <div
-        class="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#EFF6FF] text-[#2563EB] shadow-2xs"
+        class="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#EFF6FF] text-[#172F52] shadow-2xs"
       >
         <span class="material-symbols-outlined text-[32px]">{{ moduleIcon }}</span>
       </div>
@@ -64,7 +64,7 @@ const moduleIcon = computed(() => {
         <button
           type="button"
           @click="router.push('/assets')"
-          class="h-9 px-4 rounded-lg bg-[#2563EB] text-xs font-semibold text-white hover:bg-[#1D4ED8] transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs"
+          class="h-9 px-4 rounded-lg bg-[#172F52] text-xs font-semibold text-white hover:bg-[#1D4ED8] transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs"
         >
           <span class="material-symbols-outlined text-[16px]">devices</span>
           <span>Buka Aset IT</span>

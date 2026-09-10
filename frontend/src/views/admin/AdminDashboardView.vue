@@ -1,4 +1,5 @@
 <script setup>
+import AppModal from '../../components/ui/AppModal.vue'
 import { ref, computed, onMounted, nextTick } from 'vue'
 import { useRouter, RouterLink } from 'vue-router'
 import { useCases } from '@/composables/useCases'
@@ -15,7 +16,6 @@ import {
   Sparkles,
   X,
   ChevronRight,
-  AlertTriangle,
   FolderOpen,
   MoreVertical,
   LayoutGrid,
@@ -152,7 +152,7 @@ function getCategoryBadgeClass(category) {
 </script>
 
 <template>
-  <div ref="mainScope" class="w-full max-w-7xl mx-auto space-y-4 sm:space-y-6 font-sans">
+  <div ref="mainScope" class="cms-page w-full max-w-7xl mx-auto space-y-4 sm:space-y-6 font-sans">
     <!-- Header Card -->
     <div
       class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3.5 sm:gap-4 bg-white dark:bg-slate-900 border border-[#E5EAEF] dark:border-slate-800 p-4 sm:p-6 rounded-2xl shadow-sm gsap-admin-el"
@@ -164,12 +164,12 @@ function getCategoryBadgeClass(category) {
         >
           <RouterLink
             to="/dashboard"
-            class="hover:text-[#5D87FF] transition-colors flex items-center gap-1"
+            class="hover:text-[#172F52] transition-colors flex items-center gap-1"
           >
             <span>Dashboard</span>
           </RouterLink>
           <ChevronRight class="w-3 h-3 sm:w-3.5 sm:h-3.5 text-slate-400" />
-          <span class="text-[#5D87FF] font-bold">Admin CMS</span>
+          <span class="text-[#172F52] font-bold">Admin CMS</span>
         </div>
 
         <h1
@@ -177,7 +177,7 @@ function getCategoryBadgeClass(category) {
         >
           <span>Knowledge Base</span>
           <span
-            class="text-[10.5px] sm:text-xs px-2 sm:px-2.5 py-0.5 rounded-full font-bold bg-[#ECF2FF] dark:bg-indigo-950/80 text-[#5D87FF] dark:text-indigo-300 border border-[#5D87FF]/20"
+            class="text-[10.5px] sm:text-xs px-2 sm:px-2.5 py-0.5 rounded-full font-bold bg-[#ECF2FF] dark:bg-indigo-950/80 text-[#172F52] dark:text-indigo-300 border border-[#172F52]/20"
           >
             Admin CMS
           </span>
@@ -190,7 +190,7 @@ function getCategoryBadgeClass(category) {
 
       <button
         @click="createNewDoc"
-        class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-[#5D87FF] hover:bg-[#4570EA] text-white shadow-md shadow-[#5D87FF]/25 hover:shadow-lg transition-all cursor-pointer active:scale-95 shrink-0 touch-manipulation"
+        class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-[#172F52] hover:bg-[#4570EA] text-white shadow-md shadow-[#172F52]/25 hover:shadow-lg transition-all cursor-pointer active:scale-95 shrink-0 touch-manipulation"
       >
         <Plus class="w-4 h-4" />
         <span>Dokumen Baru</span>
@@ -201,11 +201,11 @@ function getCategoryBadgeClass(category) {
     <div class="gsap-admin-el">
       <RouterLink
         to="/admin/kb-categories"
-        class="flex items-center justify-between p-3.5 sm:p-4 rounded-xl bg-white dark:bg-slate-900 border border-[#E5EAEF] dark:border-slate-800 hover:border-[#5D87FF] dark:hover:border-[#5D87FF] transition-colors group shadow-2xs"
+        class="flex items-center justify-between p-3.5 sm:p-4 rounded-xl bg-white dark:bg-slate-900 border border-[#E5EAEF] dark:border-slate-800 hover:border-[#172F52] dark:hover:border-[#172F52] transition-colors group shadow-2xs"
       >
         <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
           <div
-            class="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-[#ECF2FF] dark:bg-slate-800 text-[#5D87FF] dark:text-indigo-300 flex items-center justify-center group-hover:bg-[#5D87FF] group-hover:text-white transition-colors shrink-0"
+            class="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-[#ECF2FF] dark:bg-slate-800 text-[#172F52] dark:text-indigo-300 flex items-center justify-center group-hover:bg-[#172F52] group-hover:text-white transition-colors shrink-0"
           >
             <LayoutGrid class="w-4 h-4" />
           </div>
@@ -221,7 +221,7 @@ function getCategoryBadgeClass(category) {
           </div>
         </div>
         <ChevronRight
-          class="w-4 h-4 text-[#94A3B8] group-hover:text-[#5D87FF] group-hover:translate-x-0.5 transition-all shrink-0 ml-2"
+          class="w-4 h-4 text-[#94A3B8] group-hover:text-[#172F52] group-hover:translate-x-0.5 transition-all shrink-0 ml-2"
         />
       </RouterLink>
     </div>
@@ -308,7 +308,7 @@ function getCategoryBadgeClass(category) {
           v-model="searchQuery"
           type="text"
           placeholder="Cari judul, deskripsi, atau tag..."
-          class="w-full bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-700 rounded-xl pl-9 pr-9 py-2 sm:py-2.5 text-xs sm:text-sm font-normal text-[#1E293B] dark:text-white placeholder-[#94A3B8] dark:placeholder-slate-500 focus:outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/10 transition-all shadow-2xs"
+          class="w-full bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-700 rounded-xl pl-9 pr-9 py-2 sm:py-2.5 text-xs sm:text-sm font-normal text-[#1E293B] dark:text-white placeholder-[#94A3B8] dark:placeholder-slate-500 focus:outline-none focus:border-[#172F52] focus:ring-2 focus:ring-[#172F52]/10 transition-all shadow-2xs"
         />
         <button
           v-if="searchQuery"
@@ -373,7 +373,7 @@ function getCategoryBadgeClass(category) {
       class="bg-white dark:bg-slate-900 rounded-xl border border-[#E2E8F0] dark:border-slate-800 overflow-hidden gsap-admin-el shadow-sm"
     >
       <!-- MOBILE CARD VIEW (< md) -->
-      <div class="md:hidden divide-y divide-[#F1F5F9] dark:divide-slate-800/60">
+      <div class="cms-cards xl:hidden divide-y divide-[#F1F5F9] dark:divide-slate-800/60">
         <!-- Mobile Empty State -->
         <div v-if="filteredCases.length === 0" class="py-12 px-4 text-center">
           <div
@@ -431,7 +431,7 @@ function getCategoryBadgeClass(category) {
             <div class="flex items-center gap-1 shrink-0">
               <button
                 @click="editDoc(c.id)"
-                class="flex items-center justify-center h-7 px-2.5 gap-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-[#5D87FF] hover:text-white text-[11px] font-semibold transition-all active:scale-95 touch-manipulation cursor-pointer"
+                class="flex items-center justify-center h-7 px-2.5 gap-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-[#172F52] hover:text-white text-[11px] font-semibold transition-all active:scale-95 touch-manipulation cursor-pointer"
                 title="Edit Dokumen"
               >
                 <Edit3 class="w-3 h-3" />
@@ -450,7 +450,7 @@ function getCategoryBadgeClass(category) {
           <!-- Card Body: Title & Summary -->
           <div class="cursor-pointer" @click="editDoc(c.id)">
             <h3
-              class="text-[13px] font-bold text-[#1E293B] dark:text-slate-100 hover:text-[#2563EB] transition-colors leading-snug"
+              class="text-[13px] font-bold text-[#1E293B] dark:text-slate-100 hover:text-[#172F52] transition-colors leading-snug"
             >
               {{ c.title }}
             </h3>
@@ -503,7 +503,7 @@ function getCategoryBadgeClass(category) {
       </div>
 
       <!-- DESKTOP TABLE VIEW (>= md) -->
-      <div class="hidden md:block overflow-x-auto">
+      <div class="hidden xl:block overflow-x-auto">
         <table class="w-full text-left text-sm border-collapse">
           <thead
             class="border-b border-[#E2E8F0] dark:border-slate-800 text-[#64748B] dark:text-slate-400 font-medium text-xs"
@@ -552,7 +552,7 @@ function getCategoryBadgeClass(category) {
               <!-- Title & Summary -->
               <td class="py-3.5 px-5">
                 <div
-                  class="font-medium text-[#1E293B] dark:text-slate-100 text-[13px] max-w-md group-hover:text-[#2563EB] transition-colors leading-snug"
+                  class="font-medium text-[#1E293B] dark:text-slate-100 text-[13px] max-w-md group-hover:text-[#172F52] transition-colors leading-snug"
                 >
                   {{ c.title }}
                 </div>
@@ -625,7 +625,7 @@ function getCategoryBadgeClass(category) {
               <td class="py-3.5 px-5 text-right">
                 <button
                   @click="toggleActionMenu(c.id, $event)"
-                  class="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB]"
+                  class="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#172F52]"
                   title="Aksi"
                   aria-label="Aksi dokumen"
                 >
@@ -676,45 +676,22 @@ function getCategoryBadgeClass(category) {
     <!-- Backdrop for Action Menu -->
     <div v-if="actionMenu" @click="closeActionMenu" class="fixed inset-0 z-40 bg-transparent"></div>
 
-    <!-- Delete Confirmation Modal -->
-    <Transition name="fade">
-      <div
-        v-if="deleteConfirmId"
-        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm"
+    <AppModal
+      :is-open="Boolean(deleteConfirmId)"
+      title="Hapus dokumen?"
+      icon="delete"
+      @close="deleteConfirmId = null"
+    >
+      <p class="text-sm text-slate-500 leading-relaxed">
+        Dokumen ini akan dihapus permanen. Tindakan ini tidak dapat dibatalkan.
+      </p>
+      <template #footer
+        ><div class="cms-dialog-actions">
+          <button type="button" @click="deleteConfirmId = null">Batal</button
+          ><button type="button" class="cms-danger" @click="executeDelete">Hapus dokumen</button>
+        </div></template
       >
-        <div
-          class="bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 rounded-2xl p-5 sm:p-6 max-w-sm w-full shadow-xl space-y-4"
-        >
-          <div
-            class="w-10 h-10 rounded-xl bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center"
-          >
-            <AlertTriangle class="w-5 h-5" />
-          </div>
-          <div>
-            <h3 class="text-sm sm:text-base font-bold text-[#1E293B] dark:text-white">
-              Hapus dokumen?
-            </h3>
-            <p class="text-xs text-[#64748B] dark:text-slate-400 mt-1 leading-relaxed font-normal">
-              Dokumen ini akan dihapus permanen. Tindakan ini tidak dapat dibatalkan.
-            </p>
-          </div>
-          <div class="flex items-center justify-end gap-2 pt-1">
-            <button
-              @click="deleteConfirmId = null"
-              class="px-4 py-2.5 rounded-xl text-xs font-bold text-[#1E293B] dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer active:scale-95 touch-manipulation"
-            >
-              Batal
-            </button>
-            <button
-              @click="executeDelete"
-              class="px-4 py-2.5 rounded-xl text-xs font-bold bg-rose-600 hover:bg-rose-700 text-white transition-colors cursor-pointer active:scale-95 touch-manipulation shadow-sm shadow-rose-600/20"
-            >
-              Hapus
-            </button>
-          </div>
-        </div>
-      </div>
-    </Transition>
+    </AppModal>
   </div>
 </template>
 
@@ -726,5 +703,89 @@ function getCategoryBadgeClass(category) {
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
+}
+</style>
+
+<style scoped>
+.cms-page {
+  max-width: 1500px;
+}
+.cms-page > div:first-child {
+  background: transparent;
+  border: 0;
+  padding: 4px 0 12px;
+  box-shadow: none;
+}
+.cms-page h1 {
+  font-size: 25px;
+  font-weight: 650;
+  letter-spacing: -0.04em;
+}
+.cms-page button {
+  min-height: 40px;
+  box-shadow: none;
+}
+.cms-page table th {
+  font-weight: 500;
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 11px;
+  padding-block: 16px;
+}
+.cms-page table td {
+  padding-block: 20px;
+}
+.cms-page table td:first-child {
+  width: 36%;
+}
+.cms-page table td:first-child :is(h3, p) {
+  white-space: normal;
+}
+.cms-cards > div {
+  padding: 20px;
+  gap: 16px;
+}
+.cms-cards h3 {
+  font-size: 15px;
+  line-height: 1.6;
+}
+.cms-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+.cms-dialog-actions button {
+  min-height: 44px;
+  padding: 0 18px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 12px;
+  cursor: pointer;
+}
+.cms-dialog-actions .cms-danger {
+  background: #dc2626;
+  border-color: #dc2626;
+  color: white;
+}
+@media (min-width: 768px) and (max-width: 1279px) {
+  .cms-cards {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .cms-cards > div {
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+  }
+}
+@media (max-width: 639px) {
+  .cms-page h1 {
+    font-size: 23px;
+  }
+  .cms-page button {
+    min-height: 44px;
+  }
+  .cms-dialog-actions button {
+    flex: 1;
+  }
 }
 </style>

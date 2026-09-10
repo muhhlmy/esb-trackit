@@ -1,6 +1,6 @@
 export function useChartTheme() {
   const chartColors = {
-    primary: '#5D87FF',
+    primary: '#172F52',
     primaryLight: 'rgba(93, 135, 255, 0.15)',
     secondary: '#49BEFF',
     success: '#13DEB9',
@@ -15,7 +15,7 @@ export function useChartTheme() {
   }
 
   const palette = [
-    '#5D87FF',
+    '#172F52',
     '#FC841B',
     '#13DEB9',
     '#FFAE1F',

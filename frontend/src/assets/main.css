@@ -5,9 +5,9 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-  --color-primary: #2563eb;
-  --color-primary-hover: #1d4ed8;
-  --color-primary-light: #ecf2ff;
+  --color-primary: #172F52;
+  --color-primary-hover: #244673;
+  --color-primary-light: #edf3fc;
   --color-secondary: #0284c7;
   --color-secondary-light: #e8f7ff;
   --color-success: #059669;
@@ -21,9 +21,9 @@
   --color-esb-primary-dark: #b45309;
   --color-esb-primary-light: #fff2e7;
 
-  --color-brand: #2563eb;
-  --color-brand-dark: #1d4ed8;
-  --color-brand-light: #ecf2ff;
+  --color-brand: #172F52;
+  --color-brand-dark: #244673;
+  --color-brand-light: #edf3fc;
   --color-brand-secondary: #0284c7;
   --color-brand-accent: #059669;
   --color-bg: #f4f6f9;
@@ -49,7 +49,7 @@ html.light {
 }
 
 :focus-visible {
-  outline: 2px solid #2563eb;
+  outline: 2px solid #172F52;
   outline-offset: 2px;
 }
 
@@ -117,11 +117,11 @@ textarea {
 
 ::selection {
   color: #ffffff;
-  background: #5d87ff;
+  background: #172F52;
 }
 
 :focus-visible {
-  outline: 2px solid #5d87ff;
+  outline: 2px solid #172F52;
   outline-offset: 2px;
 }
 
@@ -265,7 +265,7 @@ input[class*='pr-12'] {
   .form-control:focus
 ) {
   background: #ffffff;
-  border-color: #5d87ff !important;
+  border-color: #172F52 !important;
   box-shadow: 0 0 0 3px rgba(93, 135, 255, 0.12) !important;
   outline: none;
 }
@@ -298,7 +298,7 @@ label > span:first-child,
 
 /* ── Modernize Buttons Design System ── */
 .btn-primary {
-  background-color: #5d87ff;
+  background-color: #172F52;
   color: #ffffff;
   font-weight: 700;
   font-size: 0.75rem;
@@ -342,8 +342,8 @@ label > span:first-child,
 
 .btn-secondary:hover {
   background-color: #f2f6fa;
-  border-color: #5d87ff;
-  color: #5d87ff;
+  border-color: #172F52;
+  color: #172F52;
 }
 
 .btn-secondary:active {
@@ -384,11 +384,11 @@ label > span:first-child,
   justify-content: center;
   border-radius: 0.5rem;
   background-color: #ecf2ff;
-  color: #5d87ff;
+  color: #172F52;
   transition: all 150ms ease;
 }
 .btn-icon-view:hover {
-  background-color: #5d87ff;
+  background-color: #172F52;
   color: #ffffff;
 }
 
@@ -435,7 +435,7 @@ label > span:first-child,
 
 .icon-badge-primary {
   background-color: #ecf2ff;
-  color: #5d87ff;
+  color: #172F52;
 }
 .icon-badge-secondary {
   background-color: #e8f7ff;
@@ -472,7 +472,7 @@ div.relative > button.text-left.h-10.w-full {
 }
 
 div.relative > button.text-left:focus {
-  border-color: #5d87ff !important;
+  border-color: #172F52 !important;
   box-shadow: 0 0 0 3px rgba(93, 135, 255, 0.12) !important;
 }
 

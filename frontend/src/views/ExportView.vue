@@ -404,7 +404,7 @@ onMounted(() => {
           <span class="text-[11px] font-medium text-[#94A3B8] uppercase tracking-wider"
             >Total Record</span
           >
-          <span class="text-xl font-bold text-[#2563EB] font-mono">
+          <span class="text-xl font-bold text-[#172F52] font-mono">
             {{ isLoading ? '...' : totalDbRecords.toLocaleString('id-ID') }}
           </span>
         </div>
@@ -477,7 +477,7 @@ onMounted(() => {
         >
           <span class="material-symbols-outlined text-[18px] text-[#64748B]">tune</span>
           <span>Ekspor Kustom</span>
-          <span class="rounded-md bg-[#EFF6FF] px-1.5 py-0.2 text-[10px] font-medium text-[#2563EB]"
+          <span class="rounded-md bg-[#EFF6FF] px-1.5 py-0.2 text-[10px] font-medium text-[#172F52]"
             >Advanced</span
           >
         </button>
@@ -501,7 +501,7 @@ onMounted(() => {
       <button
         type="button"
         @click="fetchTablesMetadata"
-        class="flex items-center justify-center shrink-0 gap-1.5 text-xs font-medium text-[#64748B] hover:text-[#2563EB] transition-colors cursor-pointer"
+        class="flex items-center justify-center shrink-0 gap-1.5 text-xs font-medium text-[#64748B] hover:text-[#172F52] transition-colors cursor-pointer"
       >
         <span class="material-symbols-outlined text-[16px]">refresh</span>
         <span>Refresh Stats</span>
@@ -527,7 +527,7 @@ onMounted(() => {
           <div class="space-y-3">
             <div class="flex items-center justify-between gap-2">
               <div
-                class="flex h-8 w-8 items-center justify-center rounded-lg bg-[#F8FAFC] border border-[#E2E8F0] text-[#475569] group-hover:text-[#2563EB] group-hover:border-[#BFDBFE] transition-colors"
+                class="flex h-8 w-8 items-center justify-center rounded-lg bg-[#F8FAFC] border border-[#E2E8F0] text-[#475569] group-hover:text-[#172F52] group-hover:border-[#BFDBFE] transition-colors"
               >
                 <span class="material-symbols-outlined text-[18px]">{{ table.icon }}</span>
               </div>
@@ -540,7 +540,7 @@ onMounted(() => {
 
             <div>
               <h3
-                class="font-bold text-[#0F172A] text-sm group-hover:text-[#2563EB] transition-colors"
+                class="font-bold text-[#0F172A] text-sm group-hover:text-[#172F52] transition-colors"
               >
                 {{ table.label }}
               </h3>
@@ -604,7 +604,7 @@ onMounted(() => {
           >
             <h2 class="text-sm font-bold text-[#0F172A] flex items-center gap-2">
               <span
-                class="flex h-5 w-5 items-center justify-center rounded-full bg-[#2563EB] text-white text-[10px]"
+                class="flex h-5 w-5 items-center justify-center rounded-full bg-[#172F52] text-white text-[10px]"
                 >1</span
               >
               <span>Pilih Tabel Utama Database</span>
@@ -623,13 +623,13 @@ onMounted(() => {
               class="flex min-w-0 flex-col p-3 rounded-xl border text-left transition-all cursor-pointer"
               :class="
                 selectedTableKey === tbl.tableName
-                  ? 'border-[#2563EB] bg-[#EFF6FF] text-[#1E3A8A]'
+                  ? 'border-[#172F52] bg-[#EFF6FF] text-[#1E3A8A]'
                   : 'border-[#E2E8F0] hover:border-[#CBD5E1] hover:bg-[#F8FAFC] text-[#0F172A]'
               "
             >
               <span
                 class="material-symbols-outlined text-[18px] mb-1"
-                :class="selectedTableKey === tbl.tableName ? 'text-[#2563EB]' : 'text-[#64748B]'"
+                :class="selectedTableKey === tbl.tableName ? 'text-[#172F52]' : 'text-[#64748B]'"
               >
                 {{ tbl.icon }}
               </span>
@@ -646,7 +646,7 @@ onMounted(() => {
           >
             <h2 class="text-sm font-bold text-[#0F172A] flex items-center gap-2">
               <span
-                class="flex h-5 w-5 items-center justify-center rounded-full bg-[#2563EB] text-white text-[10px]"
+                class="flex h-5 w-5 items-center justify-center rounded-full bg-[#172F52] text-white text-[10px]"
                 >2</span
               >
               <span>Pilih Kolom (Field Selector)</span>
@@ -655,7 +655,7 @@ onMounted(() => {
               <button
                 type="button"
                 @click="selectAllColumns"
-                class="text-xs font-semibold text-[#2563EB] hover:underline cursor-pointer"
+                class="text-xs font-semibold text-[#172F52] hover:underline cursor-pointer"
               >
                 Pilih Semua
               </button>
@@ -688,7 +688,7 @@ onMounted(() => {
                 :value="col.name"
                 :aria-label="`Pilih kolom ${col.label || col.name}`"
                 v-model="selectedColumns"
-                class="h-4 w-4 rounded-md border-[#CBD5E1] text-[#2563EB] focus:ring-[#2563EB]"
+                class="h-4 w-4 rounded-md border-[#CBD5E1] text-[#172F52] focus:ring-[#172F52]"
               />
               <div class="min-w-0 flex-1">
                 <p class="text-xs whitespace-normal sm:truncate leading-relaxed">{{ col.label }}</p>
@@ -710,7 +710,7 @@ onMounted(() => {
         <div class="rounded-2xl border border-[#E2E8F0] bg-white p-3.5 sm:p-5 space-y-4">
           <h2 class="text-sm font-bold text-[#0F172A] flex items-center gap-2">
             <span
-              class="flex h-5 w-5 items-center justify-center rounded-full bg-[#2563EB] text-white text-[10px]"
+              class="flex h-5 w-5 items-center justify-center rounded-full bg-[#172F52] text-white text-[10px]"
               >3</span
             >
             <span>Filter & Batas Baris Data</span>
@@ -726,7 +726,7 @@ onMounted(() => {
                 type="date"
                 aria-label="Tanggal Mulai Ekspor"
                 v-model="startDate"
-                class="min-w-0 max-w-full w-full rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-2 text-xs font-medium text-[#0F172A] focus:border-[#2563EB] focus:bg-white focus:outline-none"
+                class="min-w-0 max-w-full w-full rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-2 text-xs font-medium text-[#0F172A] focus:border-[#172F52] focus:bg-white focus:outline-none"
               />
             </div>
             <div>
@@ -738,7 +738,7 @@ onMounted(() => {
                 type="date"
                 aria-label="Tanggal Selesai Ekspor"
                 v-model="endDate"
-                class="min-w-0 max-w-full w-full rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-2 text-xs font-medium text-[#0F172A] focus:border-[#2563EB] focus:bg-white focus:outline-none"
+                class="min-w-0 max-w-full w-full rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-2 text-xs font-medium text-[#0F172A] focus:border-[#172F52] focus:bg-white focus:outline-none"
               />
             </div>
             <div>
@@ -773,7 +773,7 @@ onMounted(() => {
                   v-model="searchQuery"
                   maxlength="200"
                   placeholder="Cari kata kunci data..."
-                  class="min-w-0 max-w-full w-full rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] pl-9 pr-3 py-2 text-xs font-medium text-[#0F172A] focus:border-[#2563EB] focus:bg-white focus:outline-none"
+                  class="min-w-0 max-w-full w-full rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] pl-9 pr-3 py-2 text-xs font-medium text-[#0F172A] focus:border-[#172F52] focus:bg-white focus:outline-none"
                 />
               </div>
             </div>
@@ -790,7 +790,7 @@ onMounted(() => {
                 v-model="statusFilter"
                 maxlength="100"
                 placeholder="misal: Digunakan, Rusak, Resolved..."
-                class="min-w-0 max-w-full w-full rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-2 text-xs font-medium text-[#0F172A] focus:border-[#2563EB] focus:bg-white focus:outline-none"
+                class="min-w-0 max-w-full w-full rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-2 text-xs font-medium text-[#0F172A] focus:border-[#172F52] focus:bg-white focus:outline-none"
               />
             </div>
           </div>
@@ -804,7 +804,7 @@ onMounted(() => {
         >
           <h2 class="text-sm font-bold text-[#0F172A] flex items-center gap-2">
             <span
-              class="flex h-5 w-5 items-center justify-center rounded-full bg-[#2563EB] text-white text-[10px]"
+              class="flex h-5 w-5 items-center justify-center rounded-full bg-[#172F52] text-white text-[10px]"
               >4</span
             >
             <span>Format & Unduh File</span>
@@ -818,7 +818,7 @@ onMounted(() => {
                 class="flex cursor-pointer items-center justify-between rounded-xl border p-2.5 transition-all"
                 :class="
                   exportFormat === 'csv'
-                    ? 'border-[#2563EB] bg-[#EFF6FF] text-[#2563EB] font-bold'
+                    ? 'border-[#172F52] bg-[#EFF6FF] text-[#172F52] font-bold'
                     : 'border-[#E2E8F0] text-[#334155]'
                 "
               >
@@ -826,7 +826,7 @@ onMounted(() => {
                   <span class="material-symbols-outlined text-[18px]">csv</span>
                   <span class="text-xs">CSV</span>
                 </div>
-                <input type="radio" v-model="exportFormat" value="csv" class="accent-[#2563EB]" />
+                <input type="radio" v-model="exportFormat" value="csv" class="accent-[#172F52]" />
               </label>
 
               <label
@@ -913,7 +913,7 @@ onMounted(() => {
               type="button"
               @click="handleExecuteCustomExport"
               :disabled="isExporting || selectedColumns.length === 0"
-              class="w-full flex items-center justify-center gap-2 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] py-3 text-xs font-bold text-white shadow-2xs transition-all cursor-pointer disabled:opacity-50"
+              class="w-full flex items-center justify-center gap-2 rounded-xl bg-[#172F52] hover:bg-[#1D4ED8] py-3 text-xs font-bold text-white shadow-2xs transition-all cursor-pointer disabled:opacity-50"
             >
               <span class="material-symbols-outlined text-[18px]">download</span>
               <span>{{ isExporting ? 'Proses Ekspor...' : 'Unduh Berkas Ekspor' }}</span>
@@ -932,7 +932,7 @@ onMounted(() => {
         >
           <div class="space-y-2">
             <div
-              class="flex h-8 w-8 items-center justify-center rounded-lg bg-[#EFF6FF] text-[#2563EB]"
+              class="flex h-8 w-8 items-center justify-center rounded-lg bg-[#EFF6FF] text-[#172F52]"
             >
               <span class="material-symbols-outlined text-[18px]">devices_other</span>
             </div>
@@ -944,7 +944,7 @@ onMounted(() => {
           <button
             type="button"
             @click="applyPreset('assets_active')"
-            class="mt-4 w-full rounded-xl border border-[#DBEAFE] bg-[#EFF6FF] hover:bg-[#2563EB] hover:text-white text-[#2563EB] py-2 text-xs font-bold transition-all cursor-pointer"
+            class="mt-4 w-full rounded-xl border border-[#DBEAFE] bg-[#EFF6FF] hover:bg-[#172F52] hover:text-white text-[#172F52] py-2 text-xs font-bold transition-all cursor-pointer"
           >
             Gunakan Templat Ini
           </button>
@@ -1085,7 +1085,7 @@ onMounted(() => {
           <button
             type="button"
             @click="handleConfirmExportModal"
-            class="rounded-xl bg-[#2563EB] px-4 py-2 text-xs font-bold text-white hover:bg-[#1D4ED8]"
+            class="rounded-xl bg-[#172F52] px-4 py-2 text-xs font-bold text-white hover:bg-[#1D4ED8]"
           >
             Unduh Sekarang
           </button>

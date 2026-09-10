@@ -15,7 +15,7 @@ test('AssetTrendLineChart maps labels and count/added flexibly', async () => {
 test('AssetConditionPieChart defines distinct colors for all 5 asset conditions', async () => {
   const source = await readFile(pieChartUrl, 'utf8')
   assert.match(source, /baru:\s*'#13DEB9'/)
-  assert.match(source, /normal:\s*'#5D87FF'/)
+  assert.match(source, /normal:\s*'#172F52'/)
   assert.match(source, /'rusak ringan':\s*'#FFAE1F'/)
   assert.match(source, /'rusak sedang':\s*'#E855A2'/)
   assert.match(source, /'rusak berat':\s*'#FA896B'/)

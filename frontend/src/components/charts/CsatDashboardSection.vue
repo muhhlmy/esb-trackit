@@ -263,7 +263,7 @@ onMounted(() => {
           <!-- Loading Skeleton -->
           <div v-if="isLoading" class="flex flex-col items-center gap-2 text-[#7C8BAC]">
             <div
-              class="h-8 w-8 animate-spin rounded-full border-3 border-[#E5EAEF] border-t-[#5D87FF]"
+              class="h-8 w-8 animate-spin rounded-full border-3 border-[#E5EAEF] border-t-[#172F52]"
             ></div>
             <span class="text-[12px] font-medium">Memuat data grafik...</span>
           </div>

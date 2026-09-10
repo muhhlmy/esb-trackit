@@ -353,7 +353,7 @@ onMounted(() => {
           <button
             type="button"
             @click="openAdd"
-            class="h-10 sm:h-9 shrink-0 whitespace-nowrap rounded-lg bg-[#2563EB] px-4 text-xs font-semibold text-white shadow-2xs hover:bg-[#1D4ED8] transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+            class="h-10 sm:h-9 shrink-0 whitespace-nowrap rounded-lg bg-[#172F52] px-4 text-xs font-semibold text-white shadow-2xs hover:bg-[#1D4ED8] transition-all flex items-center justify-center gap-1.5 cursor-pointer"
             title="Tambah pengiriman baru"
           >
             <Plus class="w-4 h-4" />
@@ -375,7 +375,7 @@ onMounted(() => {
             aria-label="Cari pengiriman"
             type="text"
             placeholder="Cari penerima, barang, tujuan, atau no resi..."
-            class="h-10 w-full rounded-xl border border-[#E2E8F0] bg-white pl-9 pr-3 text-xs text-[#0F172A] placeholder-[#94A3B8] focus:border-[#2563EB] focus:outline-none transition-all shadow-2xs"
+            class="h-10 w-full rounded-xl border border-[#E2E8F0] bg-white pl-9 pr-3 text-xs text-[#0F172A] placeholder-[#94A3B8] focus:border-[#172F52] focus:outline-none transition-all shadow-2xs"
           />
         </div>
 
@@ -396,7 +396,7 @@ onMounted(() => {
             type="date"
             aria-label="Tanggal Dari"
             title="Tanggal Dari"
-            class="h-10 w-full sm:w-[140px] rounded-xl border border-[#E2E8F0] bg-white px-2.5 text-xs text-[#0F172A] focus:border-[#2563EB] focus:outline-none transition-all shadow-2xs"
+            class="h-10 w-full sm:w-[140px] rounded-xl border border-[#E2E8F0] bg-white px-2.5 text-xs text-[#0F172A] focus:border-[#172F52] focus:outline-none transition-all shadow-2xs"
           />
           <span class="text-xs text-[#94A3B8]">-</span>
           <input
@@ -404,7 +404,7 @@ onMounted(() => {
             type="date"
             aria-label="Tanggal Sampai"
             title="Tanggal Sampai"
-            class="h-10 w-full sm:w-[140px] rounded-xl border border-[#E2E8F0] bg-white px-2.5 text-xs text-[#0F172A] focus:border-[#2563EB] focus:outline-none transition-all shadow-2xs"
+            class="h-10 w-full sm:w-[140px] rounded-xl border border-[#E2E8F0] bg-white px-2.5 text-xs text-[#0F172A] focus:border-[#172F52] focus:outline-none transition-all shadow-2xs"
           />
         </div>
 
@@ -426,7 +426,7 @@ onMounted(() => {
         class="rounded-2xl border border-[#E2E8F0] bg-white p-4 shadow-2xs flex items-center gap-3.5"
       >
         <div
-          class="h-11 w-11 rounded-xl bg-blue-50 text-[#2563EB] flex items-center justify-center shrink-0"
+          class="h-11 w-11 rounded-xl bg-blue-50 text-[#172F52] flex items-center justify-center shrink-0"
         >
           <Package class="w-5 h-5" />
         </div>
@@ -531,7 +531,7 @@ onMounted(() => {
           v-if="canWriteShipments"
           type="button"
           @click="openAdd"
-          class="mt-4 inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-[#2563EB] text-white text-xs font-semibold hover:bg-[#1D4ED8] transition-all cursor-pointer shadow-2xs"
+          class="mt-4 inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-[#172F52] text-white text-xs font-semibold hover:bg-[#1D4ED8] transition-all cursor-pointer shadow-2xs"
         >
           <Plus class="w-4 h-4" />
           <span>Tambah Pengiriman</span>
@@ -593,7 +593,7 @@ onMounted(() => {
                     :href="item.delivery_proof_url"
                     target="_blank"
                     rel="noopener noreferrer"
-                    class="inline-flex items-center gap-1 text-[11.5px] font-bold text-[#2563EB] hover:text-[#1D4ED8] hover:underline"
+                    class="inline-flex items-center gap-1 text-[11.5px] font-bold text-[#172F52] hover:text-[#1D4ED8] hover:underline"
                     title="Buka link bukti pengiriman di tab baru"
                   >
                     <span>Lihat Bukti</span>
@@ -606,7 +606,7 @@ onMounted(() => {
                     <button
                       type="button"
                       @click="openEdit(item)"
-                      class="p-1.5 rounded-lg text-[#64748B] hover:text-[#2563EB] hover:bg-[#F1F5F9] transition-colors cursor-pointer"
+                      class="p-1.5 rounded-lg text-[#64748B] hover:text-[#172F52] hover:bg-[#F1F5F9] transition-colors cursor-pointer"
                       title="Edit pengiriman"
                       aria-label="Edit pengiriman"
                     >
@@ -663,7 +663,7 @@ onMounted(() => {
                 :href="item.delivery_proof_url"
                 target="_blank"
                 rel="noopener noreferrer"
-                class="inline-flex items-center gap-1 text-[11px] font-bold text-[#2563EB]"
+                class="inline-flex items-center gap-1 text-[11px] font-bold text-[#172F52]"
               >
                 <span>Lihat Bukti</span>
                 <ExternalLink class="w-3 h-3" />
@@ -677,7 +677,7 @@ onMounted(() => {
               <button
                 type="button"
                 @click="openEdit(item)"
-                class="px-2.5 py-1 text-xs font-semibold text-[#2563EB] hover:bg-blue-50 rounded-md transition-colors flex items-center gap-1"
+                class="px-2.5 py-1 text-xs font-semibold text-[#172F52] hover:bg-blue-50 rounded-md transition-colors flex items-center gap-1"
               >
                 <Pencil class="w-3 h-3" />
                 <span>Edit</span>
@@ -736,7 +736,7 @@ onMounted(() => {
               v-model="form.request_date"
               type="date"
               required
-              class="h-10 w-full rounded-xl border border-[#CBD5E1] px-3 text-xs text-[#0F172A] focus:border-[#2563EB] focus:outline-none"
+              class="h-10 w-full rounded-xl border border-[#CBD5E1] px-3 text-xs text-[#0F172A] focus:border-[#172F52] focus:outline-none"
             />
           </div>
 
@@ -766,7 +766,7 @@ onMounted(() => {
             required
             maxlength="150"
             placeholder="Contoh: Budi Santoso"
-            class="h-10 w-full rounded-xl border border-[#CBD5E1] px-3 text-xs text-[#0F172A] focus:border-[#2563EB] focus:outline-none"
+            class="h-10 w-full rounded-xl border border-[#CBD5E1] px-3 text-xs text-[#0F172A] focus:border-[#172F52] focus:outline-none"
           />
         </div>
 
@@ -784,7 +784,7 @@ onMounted(() => {
             required
             maxlength="5000"
             placeholder="Contoh: 1 Unit Laptop ThinkPad X1 Carbon + Charger & Mouse"
-            class="w-full rounded-xl border border-[#CBD5E1] p-3 text-xs text-[#0F172A] focus:border-[#2563EB] focus:outline-none"
+            class="w-full rounded-xl border border-[#CBD5E1] p-3 text-xs text-[#0F172A] focus:border-[#172F52] focus:outline-none"
           ></textarea>
         </div>
 
@@ -799,7 +799,7 @@ onMounted(() => {
             required
             maxlength="255"
             placeholder="Contoh: Kantor Cabang Surabaya / Alamat Penerima"
-            class="h-10 w-full rounded-xl border border-[#CBD5E1] px-3 text-xs text-[#0F172A] focus:border-[#2563EB] focus:outline-none"
+            class="h-10 w-full rounded-xl border border-[#CBD5E1] px-3 text-xs text-[#0F172A] focus:border-[#172F52] focus:outline-none"
           />
         </div>
 
@@ -817,7 +817,7 @@ onMounted(() => {
               type="text"
               maxlength="100"
               placeholder="Contoh: JNE-01234567"
-              class="h-10 w-full rounded-xl border border-[#CBD5E1] px-3 text-xs text-[#0F172A] focus:border-[#2563EB] focus:outline-none"
+              class="h-10 w-full rounded-xl border border-[#CBD5E1] px-3 text-xs text-[#0F172A] focus:border-[#172F52] focus:outline-none"
             />
           </div>
 
@@ -834,7 +834,7 @@ onMounted(() => {
               type="url"
               maxlength="2048"
               placeholder="https://example.com/bukti.jpg"
-              class="h-10 w-full rounded-xl border border-[#CBD5E1] px-3 text-xs text-[#0F172A] focus:border-[#2563EB] focus:outline-none"
+              class="h-10 w-full rounded-xl border border-[#CBD5E1] px-3 text-xs text-[#0F172A] focus:border-[#172F52] focus:outline-none"
             />
           </div>
         </div>
@@ -854,7 +854,7 @@ onMounted(() => {
             type="submit"
             form="shipment-form"
             :disabled="isSubmitting"
-            class="h-9 rounded-lg bg-[#2563EB] px-4 text-xs font-semibold text-white hover:bg-[#1D4ED8] disabled:opacity-50 cursor-pointer"
+            class="h-9 rounded-lg bg-[#172F52] px-4 text-xs font-semibold text-white hover:bg-[#1D4ED8] disabled:opacity-50 cursor-pointer"
           >
             {{ isSubmitting ? 'Menyimpan...' : 'Simpan' }}
           </button>

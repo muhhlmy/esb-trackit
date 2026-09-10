@@ -30,7 +30,7 @@
   border-radius: 8px;
   box-shadow: none;
 }
-.admin-page-header button:is(.bg-\[\#2563EB\], .bg-\[\#5D87FF\], .bg-brand) {
+.admin-page-header button:is(.bg-\[\#172F52\], .bg-\[\#172F52\], .bg-brand) {
   background: #172f52;
 }
 .admin-page-header > div:nth-child(2):has(input) {

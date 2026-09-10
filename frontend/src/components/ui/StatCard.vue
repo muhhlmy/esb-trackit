@@ -24,7 +24,7 @@ defineProps({
       <div
         class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg"
         :class="{
-          'bg-[#EFF6FF] text-[#2563EB]': color === 'primary',
+          'bg-[#EFF6FF] text-[#172F52]': color === 'primary',
           'bg-[#ECFDF5] text-[#059669]': color === 'success',
           'bg-[#FFFBEB] text-[#D97706]': color === 'warning',
           'bg-[#FEF2F2] text-[#DC2626]': color === 'danger',

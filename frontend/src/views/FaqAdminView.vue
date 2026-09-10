@@ -231,21 +231,21 @@ onMounted(fetchFaqs)
 </script>
 
 <template>
-  <div class="max-w-7xl mx-auto space-y-6 select-none font-sans">
+  <div class="kb-management admin-workspace max-w-7xl mx-auto space-y-6 select-none font-sans">
     <!-- Top Navigation & Header Card -->
     <div
-      class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3.5 sm:gap-4 bg-white dark:bg-slate-900 border border-[#E5EAEF] dark:border-slate-800 p-4 sm:p-6 rounded-xl sm:rounded-2xl shadow-xs"
+      class="admin-page-header flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3.5 sm:gap-4 bg-white dark:bg-slate-900 border border-[#E5EAEF] dark:border-slate-800 p-4 sm:p-6 rounded-xl sm:rounded-2xl shadow-xs"
     >
       <div class="space-y-1 sm:space-y-1.5 w-full sm:w-auto">
         <!-- Breadcrumb -->
         <div
           class="flex items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs font-semibold text-[#64748B] dark:text-slate-400"
         >
-          <RouterLink to="/" class="hover:text-[#5D87FF] transition-colors flex items-center gap-1">
+          <RouterLink to="/" class="hover:text-[#172F52] transition-colors flex items-center gap-1">
             <span>Help Center</span>
           </RouterLink>
           <ChevronRight class="w-3 h-3 text-slate-400" />
-          <span class="text-[#5D87FF] font-bold">FAQ Management</span>
+          <span class="text-[#172F52] font-bold">FAQ Management</span>
         </div>
 
         <h1
@@ -253,7 +253,7 @@ onMounted(fetchFaqs)
         >
           <span>FAQ Management</span>
           <span
-            class="text-[10px] sm:text-xs px-2 sm:px-2.5 py-0.5 rounded-full font-bold bg-[#ECF2FF] dark:bg-indigo-950/80 text-[#5D87FF] dark:text-indigo-300 border border-[#5D87FF]/20"
+            class="text-[10px] sm:text-xs px-2 sm:px-2.5 py-0.5 rounded-full font-bold bg-[#ECF2FF] dark:bg-indigo-950/80 text-[#172F52] dark:text-indigo-300 border border-[#172F52]/20"
           >
             Admin CMS
           </span>
@@ -268,7 +268,7 @@ onMounted(fetchFaqs)
 
       <button
         @click="openAdd"
-        class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-[#5D87FF] hover:bg-[#4570EA] text-white shadow-sm shadow-[#5D87FF]/25 hover:shadow-md transition-all cursor-pointer active:scale-95 touch-manipulation shrink-0"
+        class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-[#172F52] hover:bg-[#4570EA] text-white shadow-sm shadow-[#172F52]/25 hover:shadow-md transition-all cursor-pointer active:scale-95 touch-manipulation shrink-0"
       >
         <Plus class="w-4 h-4" />
         <span>Add New FAQ</span>
@@ -279,7 +279,7 @@ onMounted(fetchFaqs)
     <div class="grid grid-cols-3 gap-2 sm:gap-4">
       <!-- Total Questions -->
       <div
-        class="p-3 sm:p-5 rounded-xl sm:rounded-2xl bg-white dark:bg-slate-900 border border-[#E5EAEF] dark:border-slate-800 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1.5 sm:gap-2 group hover:border-[#5D87FF]/40 transition-all"
+        class="p-3 sm:p-5 rounded-xl sm:rounded-2xl bg-white dark:bg-slate-900 border border-[#E5EAEF] dark:border-slate-800 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1.5 sm:gap-2 group hover:border-[#172F52]/40 transition-all"
       >
         <div class="space-y-0.5 sm:space-y-1 min-w-0">
           <span
@@ -298,7 +298,7 @@ onMounted(fetchFaqs)
           </span>
         </div>
         <div
-          class="w-7 h-7 sm:w-12 sm:h-12 rounded-lg sm:rounded-2xl bg-[#ECF2FF] dark:bg-indigo-950/60 text-[#5D87FF] dark:text-indigo-400 flex items-center justify-center border border-[#5D87FF]/20 group-hover:scale-105 transition-transform shrink-0 self-start sm:self-auto"
+          class="w-7 h-7 sm:w-12 sm:h-12 rounded-lg sm:rounded-2xl bg-[#ECF2FF] dark:bg-indigo-950/60 text-[#172F52] dark:text-indigo-400 flex items-center justify-center border border-[#172F52]/20 group-hover:scale-105 transition-transform shrink-0 self-start sm:self-auto"
         >
           <HelpCircle class="w-3.5 h-3.5 sm:w-6 sm:h-6" />
         </div>
@@ -387,7 +387,7 @@ onMounted(fetchFaqs)
           type="text"
           aria-label="Cari pertanyaan atau jawaban FAQ"
           placeholder="Search questions or answer keywords..."
-          class="w-full bg-[#F8FAFC] dark:bg-slate-800/80 border border-[#E5EAEF] dark:border-slate-700 rounded-xl pl-9 sm:pl-10 pr-9 py-2 text-xs sm:text-sm font-medium text-[#0F172A] dark:text-white placeholder-[#94A3B8] focus:outline-none focus:border-[#5D87FF] focus:bg-white dark:focus:bg-slate-900 transition-all"
+          class="w-full bg-[#F8FAFC] dark:bg-slate-800/80 border border-[#E5EAEF] dark:border-slate-700 rounded-xl pl-9 sm:pl-10 pr-9 py-2 text-xs sm:text-sm font-medium text-[#0F172A] dark:text-white placeholder-[#94A3B8] focus:outline-none focus:border-[#172F52] focus:bg-white dark:focus:bg-slate-900 transition-all"
         />
         <button
           v-if="searchQuery"
@@ -416,7 +416,7 @@ onMounted(fetchFaqs)
             class="flex-1 sm:flex-none px-2.5 sm:px-3 py-1.5 rounded-lg font-bold transition-all cursor-pointer text-center active:scale-95 touch-manipulation"
             :class="
               selectedStatus === st.key
-                ? 'bg-white dark:bg-slate-900 text-[#5D87FF] dark:text-indigo-400 shadow-2xs'
+                ? 'bg-white dark:bg-slate-900 text-[#172F52] dark:text-indigo-400 shadow-2xs'
                 : 'text-[#64748B] dark:text-slate-400 hover:text-[#0F172A] dark:hover:text-white'
             "
           >
@@ -457,7 +457,7 @@ onMounted(fetchFaqs)
         v-if="isLoading"
         class="py-12 px-6 text-center text-xs font-bold text-[#64748B] dark:text-slate-400 flex items-center justify-center gap-2"
       >
-        <RefreshCw class="w-4 h-4 animate-spin text-[#5D87FF]" />
+        <RefreshCw class="w-4 h-4 animate-spin text-[#172F52]" />
         <span>Loading FAQ entries...</span>
       </div>
       <!-- Table / Cards Content -->
@@ -478,7 +478,7 @@ onMounted(fetchFaqs)
             </p>
             <button
               @click="clearFilters"
-              class="mt-3 px-4 py-2 rounded-xl text-xs font-bold bg-[#ECF2FF] dark:bg-indigo-950 text-[#5D87FF] hover:bg-[#5D87FF] hover:text-white transition-all cursor-pointer active:scale-95 touch-manipulation"
+              class="mt-3 px-4 py-2 rounded-xl text-xs font-bold bg-[#ECF2FF] dark:bg-indigo-950 text-[#172F52] hover:bg-[#172F52] hover:text-white transition-all cursor-pointer active:scale-95 touch-manipulation"
             >
               Reset All Filters
             </button>
@@ -487,7 +487,7 @@ onMounted(fetchFaqs)
 
         <template v-else>
           <!-- MOBILE CARD VIEW (< md) -->
-          <div class="md:hidden divide-y divide-[#E5EAEF] dark:divide-slate-800">
+          <div class="xl:hidden divide-y divide-[#E5EAEF] dark:divide-slate-800">
             <div
               v-for="f in filteredFaqs"
               :key="'mob-' + f.id"
@@ -522,7 +522,7 @@ onMounted(fetchFaqs)
                 <div class="flex items-center gap-1.5 shrink-0">
                   <button
                     @click="openEdit(f)"
-                    class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-bold bg-[#5D87FF] hover:bg-[#4570EA] text-white transition-all cursor-pointer shadow-xs active:scale-95 touch-manipulation"
+                    class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-bold bg-[#172F52] hover:bg-[#4570EA] text-white transition-all cursor-pointer shadow-xs active:scale-95 touch-manipulation"
                     title="Edit FAQ"
                   >
                     <Edit3 class="w-3 h-3" />
@@ -566,7 +566,7 @@ onMounted(fetchFaqs)
           </div>
 
           <!-- DESKTOP TABLE VIEW (>= md) -->
-          <div class="hidden md:block overflow-x-auto">
+          <div class="hidden xl:block overflow-x-auto">
             <table class="w-full text-left text-xs border-collapse">
               <thead
                 class="bg-[#F8FAFC] dark:bg-slate-950/80 border-b border-[#E5EAEF] dark:border-slate-800 text-[#64748B] dark:text-slate-400 font-extrabold uppercase tracking-wider text-[10.5px]"
@@ -589,7 +589,7 @@ onMounted(fetchFaqs)
                   <!-- Question & Answer Snippet -->
                   <td class="py-4 px-6">
                     <div
-                      class="font-extrabold text-[#0F172A] dark:text-white text-xs max-w-md group-hover:text-[#5D87FF] transition-colors"
+                      class="font-extrabold text-[#0F172A] dark:text-white text-xs max-w-md group-hover:text-[#172F52] transition-colors"
                     >
                       {{ f.question }}
                     </div>
@@ -645,7 +645,7 @@ onMounted(fetchFaqs)
                     <div class="flex items-center justify-end gap-2">
                       <button
                         @click="openEdit(f)"
-                        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-[#5D87FF] hover:bg-[#4570EA] text-white transition-all cursor-pointer shadow-xs active:scale-95"
+                        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-[#172F52] hover:bg-[#4570EA] text-white transition-all cursor-pointer shadow-xs active:scale-95"
                         title="Edit FAQ"
                       >
                         <Edit3 class="w-3.5 h-3.5" />
@@ -678,7 +678,7 @@ onMounted(fetchFaqs)
       size="lg"
       @close="closeFormModal"
     >
-      <form @submit.prevent="saveFaq" class="space-y-4 pt-1">
+      <form id="faq-entry" @submit.prevent="saveFaq" class="admin-entry-form space-y-4 pt-1">
         <div>
           <label
             for="faq-question"
@@ -691,7 +691,7 @@ onMounted(fetchFaqs)
             required
             type="text"
             placeholder="e.g. How do I reset my account password?"
-            class="w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] dark:bg-slate-800 px-3.5 py-2.5 text-xs font-semibold text-[#0F172A] dark:text-slate-100 placeholder-[#94A3B8] focus:border-[#5D87FF] focus:outline-none transition-all"
+            class="w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] dark:bg-slate-800 px-3.5 py-2.5 text-xs font-semibold text-[#0F172A] dark:text-slate-100 placeholder-[#94A3B8] focus:border-[#172F52] focus:outline-none transition-all"
           />
         </div>
 
@@ -707,14 +707,13 @@ onMounted(fetchFaqs)
             required
             rows="5"
             placeholder="Provide clear, concise instructions..."
-            class="w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] dark:bg-slate-800 p-3.5 text-xs font-medium text-[#0F172A] dark:text-slate-100 placeholder-[#94A3B8] focus:border-[#5D87FF] focus:outline-none transition-all resize-none"
+            class="w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] dark:bg-slate-800 p-3.5 text-xs font-medium text-[#0F172A] dark:text-slate-100 placeholder-[#94A3B8] focus:border-[#172F52] focus:outline-none transition-all resize-none"
           ></textarea>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
           <div>
-            <label
-              class="mb-1.5 block text-xs font-bold text-[#0F172A] dark:text-slate-200"
+            <label class="mb-1.5 block text-xs font-bold text-[#0F172A] dark:text-slate-200"
               >Category</label
             >
             <CustomSelect
@@ -728,8 +727,7 @@ onMounted(fetchFaqs)
           </div>
 
           <div>
-            <label
-              class="mb-1.5 block text-xs font-bold text-[#0F172A] dark:text-slate-200"
+            <label class="mb-1.5 block text-xs font-bold text-[#0F172A] dark:text-slate-200"
               >Status</label
             >
             <CustomSelect
@@ -754,7 +752,7 @@ onMounted(fetchFaqs)
               type="number"
               min="0"
               step="1"
-              class="w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] dark:bg-slate-800 px-3.5 py-2.5 text-xs font-semibold text-[#0F172A] dark:text-slate-100 focus:border-[#5D87FF] focus:outline-none transition-all"
+              class="w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] dark:bg-slate-800 px-3.5 py-2.5 text-xs font-semibold text-[#0F172A] dark:text-slate-100 focus:border-[#172F52] focus:outline-none transition-all"
             />
           </div>
         </div>
@@ -765,55 +763,134 @@ onMounted(fetchFaqs)
         >
           {{ modalError }}
         </p>
-
-        <div class="flex flex-col-reverse sm:flex-row justify-end gap-2 pt-2">
+      </form>
+      <template #footer>
+        <div class="admin-modal-actions flex flex-col-reverse sm:flex-row justify-end gap-2 pt-2">
           <button
             type="button"
             @click="closeFormModal"
             class="w-full sm:w-auto rounded-xl border border-[#E5EAEF] dark:border-slate-700 px-4 py-2.5 sm:py-2 text-xs font-bold text-[#475569] dark:text-slate-300 hover:bg-[#F8FAFC] dark:hover:bg-slate-800 transition-colors cursor-pointer active:scale-95 touch-manipulation text-center"
           >
-            Cancel
+            Batal
           </button>
           <button
             type="submit"
+            form="faq-entry"
             :disabled="isSubmitting"
-            class="w-full sm:w-auto rounded-xl bg-[#5D87FF] hover:bg-[#4570EA] px-5 py-2.5 sm:py-2 text-xs font-bold text-white shadow-md shadow-[#5D87FF]/20 transition-all disabled:opacity-50 cursor-pointer active:scale-95 touch-manipulation text-center"
+            class="w-full sm:w-auto rounded-xl bg-[#172F52] hover:bg-[#4570EA] px-5 py-2.5 sm:py-2 text-xs font-bold text-white shadow-md shadow-[#172F52]/20 transition-all disabled:opacity-50 cursor-pointer active:scale-95 touch-manipulation text-center"
           >
-            {{ isSubmitting ? 'Saving...' : 'Save FAQ' }}
+            {{ isSubmitting ? 'Menyimpan...' : 'Simpan FAQ' }}
           </button>
         </div>
-      </form>
+      </template>
     </AppModal>
 
     <!-- Delete Confirmation Modal -->
     <AppModal
       :is-open="showDeleteModal"
-      title="Delete FAQ Entry?"
+      title="Hapus FAQ?"
       icon="delete"
       size="sm"
       @close="closeDeleteModal"
     >
       <div class="space-y-4 pt-1">
         <p class="text-xs font-medium text-[#475569] dark:text-slate-300 leading-relaxed">
-          Are you sure you want to delete this FAQ entry? It will be permanently removed from the
-          Help Center.
+          FAQ ini akan dihapus permanen dari Help Center. Tindakan ini tidak dapat dibatalkan.
         </p>
-        <div class="flex flex-col-reverse sm:flex-row justify-end gap-2 pt-2">
+      </div>
+      <template #footer>
+        <div class="admin-modal-actions flex flex-col-reverse sm:flex-row justify-end gap-2 pt-2">
           <button
             @click="closeDeleteModal"
             class="w-full sm:w-auto rounded-xl border border-[#E5EAEF] dark:border-slate-700 px-4 py-2.5 sm:py-2 text-xs font-bold text-[#475569] dark:text-slate-300 hover:bg-[#F8FAFC] dark:hover:bg-slate-800 transition-colors cursor-pointer active:scale-95 touch-manipulation text-center"
           >
-            Cancel
+            Batal
           </button>
           <button
             @click="confirmDelete"
             :disabled="isSubmitting"
             class="w-full sm:w-auto rounded-xl bg-rose-600 hover:bg-rose-700 px-5 py-2.5 sm:py-2 text-xs font-bold text-white shadow-xs disabled:opacity-50 cursor-pointer active:scale-95 touch-manipulation text-center"
           >
-            Delete
+            Hapus
           </button>
         </div>
-      </div>
+      </template>
     </AppModal>
   </div>
 </template>
+
+<style scoped src="../assets/admin-workspace.css"></style>
+
+<style scoped>
+.kb-management table td:first-child {
+  width: 38%;
+}
+.kb-management table td:first-child :is(p, h3) {
+  white-space: normal;
+  line-height: 1.7;
+}
+.kb-management table td:first-child h3 {
+  font-size: 14px;
+  font-weight: 650;
+}
+.kb-management table th {
+  background: #f8fafc;
+}
+.kb-management .xl\:hidden > div {
+  padding: 20px;
+  gap: 14px;
+}
+.kb-management .xl\:hidden h3 {
+  font-size: 15px;
+  line-height: 1.6;
+}
+.kb-management .xl\:hidden p {
+  line-height: 1.7;
+}
+.kb-category-drawer {
+  max-width: 520px;
+}
+.kb-category-drawer > div:first-child {
+  padding: 20px 24px;
+}
+.kb-category-drawer > div:nth-child(2) {
+  padding: 24px;
+}
+.kb-category-drawer :is(input, textarea, select) {
+  min-height: 44px;
+  border-radius: 8px;
+  font-size: 13px;
+  border-color: #dce4ef;
+}
+.kb-category-drawer label {
+  font-size: 12px;
+  font-weight: 500;
+}
+.kb-category-drawer > div:last-child {
+  padding: 16px 24px;
+}
+.kb-category-drawer button {
+  min-height: 40px;
+}
+.kb-category-drawer > div:last-child button {
+  min-height: 44px;
+  border-radius: 8px;
+}
+@media (max-width: 639px) {
+  .kb-management .xl\:hidden > div {
+    padding: 16px;
+  }
+  .kb-management button {
+    min-height: 44px;
+  }
+  .kb-category-drawer :is(input, textarea, select) {
+    font-size: 16px;
+  }
+  .kb-category-drawer > div:nth-child(2) {
+    padding: 20px 16px;
+  }
+  .kb-category-drawer > div:last-child button {
+    flex: 1;
+  }
+}
+</style>

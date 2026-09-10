@@ -364,7 +364,7 @@ function switchTab(tab) {
       <div class="flex flex-col sm:flex-row sm:items-center gap-2">
         <button
           :disabled="isBackingUp || !dbStatus.pgDumpAvailable"
-          class="inline-flex items-center gap-2 rounded-lg bg-[#2563EB] px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all hover:bg-[#1D4ED8] disabled:cursor-not-allowed disabled:opacity-50"
+          class="inline-flex items-center gap-2 rounded-lg bg-[#172F52] px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all hover:bg-[#1D4ED8] disabled:cursor-not-allowed disabled:opacity-50"
           @click="handleBackupNow"
         >
           <span
@@ -587,7 +587,7 @@ function switchTab(tab) {
               <button
                 v-if="backup.status === 'success'"
                 type="button"
-                class="flex items-center justify-center gap-2 rounded-lg border border-[#E5EAEF] px-3 py-2 text-sm font-medium text-[#2563EB] hover:bg-[#F8FAFC]"
+                class="flex items-center justify-center gap-2 rounded-lg border border-[#E5EAEF] px-3 py-2 text-sm font-medium text-[#172F52] hover:bg-[#F8FAFC]"
                 @click="handleDownload(backup)"
               >
                 <span aria-hidden="true" class="material-symbols-outlined text-lg">download</span
@@ -662,7 +662,7 @@ function switchTab(tab) {
                   <div class="flex items-center justify-end gap-1">
                     <button
                       v-if="backup.status === 'success'"
-                      class="rounded-lg p-1.5 text-[#64748B] hover:bg-[#F1F5F9] hover:text-[#2563EB] transition-colors"
+                      class="rounded-lg p-1.5 text-[#64748B] hover:bg-[#F1F5F9] hover:text-[#172F52] transition-colors"
                       title="Download"
                       @click="handleDownload(backup)"
                     >
@@ -708,7 +708,7 @@ function switchTab(tab) {
         <div v-if="restoreStep === 'upload' || restoreStep === 'validating'">
           <h3 class="mb-4 text-base font-semibold text-[#1E293B]">Upload File Backup</h3>
           <div
-            class="rounded-lg border-2 border-dashed border-[#CBD5E1] p-4 sm:p-8 text-center transition-colors hover:border-[#2563EB]"
+            class="rounded-lg border-2 border-dashed border-[#CBD5E1] p-4 sm:p-8 text-center transition-colors hover:border-[#172F52]"
           >
             <input
               id="restoreFileInput"
@@ -719,7 +719,7 @@ function switchTab(tab) {
             />
             <label
               for="restoreFileInput"
-              class="block cursor-pointer rounded-lg peer-focus-visible:outline-2 peer-focus-visible:outline-offset-4 peer-focus-visible:outline-[#2563EB]"
+              class="block cursor-pointer rounded-lg peer-focus-visible:outline-2 peer-focus-visible:outline-offset-4 peer-focus-visible:outline-[#172F52]"
             >
               <span class="material-symbols-outlined mb-2 block text-4xl text-[#94A3B8]"
                 >upload_file</span
@@ -746,7 +746,7 @@ function switchTab(tab) {
 
           <button
             :disabled="!restoreFile || restoreStep === 'validating'"
-            class="mt-4 inline-flex items-center gap-2 rounded-lg bg-[#2563EB] px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all hover:bg-[#1D4ED8] disabled:cursor-not-allowed disabled:opacity-50"
+            class="mt-4 inline-flex items-center gap-2 rounded-lg bg-[#172F52] px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all hover:bg-[#1D4ED8] disabled:cursor-not-allowed disabled:opacity-50"
             @click="handleValidateRestore"
           >
             <span
@@ -852,7 +852,7 @@ function switchTab(tab) {
             Safety backup ID: {{ restoreResult.safetyBackupId }}
           </p>
           <button
-            class="mt-4 rounded-lg bg-[#2563EB] px-4 py-2 text-sm font-semibold text-white hover:bg-[#1D4ED8]"
+            class="mt-4 rounded-lg bg-[#172F52] px-4 py-2 text-sm font-semibold text-white hover:bg-[#1D4ED8]"
             @click="resetRestore"
           >
             Restore Lagi

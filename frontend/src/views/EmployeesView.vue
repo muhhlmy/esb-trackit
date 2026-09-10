@@ -460,7 +460,7 @@ onMounted(() => {
           <button
             type="button"
             @click="openAdd"
-            class="h-11 sm:h-9 shrink-0 whitespace-nowrap rounded-lg bg-[#2563EB] px-4 text-xs font-semibold text-white shadow-2xs hover:bg-[#1D4ED8] transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+            class="h-11 sm:h-9 shrink-0 whitespace-nowrap rounded-lg bg-[#172F52] px-4 text-xs font-semibold text-white shadow-2xs hover:bg-[#1D4ED8] transition-all flex items-center justify-center gap-1.5 cursor-pointer"
             title="Tambah karyawan baru"
           >
             <span class="material-symbols-outlined text-[16px]">person_add</span>
@@ -483,7 +483,7 @@ onMounted(() => {
             aria-label="Cari karyawan"
             type="text"
             placeholder="Cari NIK, nama, email, jabatan, atau departemen..."
-            class="h-11 sm:h-10 w-full rounded-xl border border-[#E2E8F0] bg-white pl-9.5 pr-3 text-base sm:text-xs text-[#0F172A] placeholder-[#94A3B8] focus:border-[#2563EB] focus:outline-none transition-all shadow-2xs"
+            class="h-11 sm:h-10 w-full rounded-xl border border-[#E2E8F0] bg-white pl-9.5 pr-3 text-base sm:text-xs text-[#0F172A] placeholder-[#94A3B8] focus:border-[#172F52] focus:outline-none transition-all shadow-2xs"
           />
         </div>
 
@@ -722,7 +722,7 @@ onMounted(() => {
               <td class="py-4 pl-5 pr-4 overflow-hidden">
                 <div class="flex flex-col min-w-0">
                   <span
-                    class="text-[13.5px] font-bold text-[#0F172A] leading-snug truncate group-hover:text-[#2563EB] transition-colors block"
+                    class="text-[13.5px] font-bold text-[#0F172A] leading-snug truncate group-hover:text-[#172F52] transition-colors block"
                     :title="emp.nama_karyawan"
                   >
                     {{ emp.nama_karyawan }}
@@ -839,7 +839,7 @@ onMounted(() => {
               type="text"
               required
               placeholder="Contoh: 2026001"
-              class="min-w-0 min-h-11 sm:min-h-0 w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-base sm:text-[13px] text-[#2A3547] focus:outline-none focus:border-[#5D87FF]"
+              class="min-w-0 min-h-11 sm:min-h-0 w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-base sm:text-[13px] text-[#2A3547] focus:outline-none focus:border-[#172F52]"
             />
           </div>
 
@@ -855,7 +855,7 @@ onMounted(() => {
               type="text"
               required
               placeholder="Nama lengkap"
-              class="min-w-0 min-h-11 sm:min-h-0 w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-base sm:text-[13px] text-[#2A3547] focus:outline-none focus:border-[#5D87FF]"
+              class="min-w-0 min-h-11 sm:min-h-0 w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-base sm:text-[13px] text-[#2A3547] focus:outline-none focus:border-[#172F52]"
             />
           </div>
         </div>
@@ -873,7 +873,7 @@ onMounted(() => {
               type="email"
               required
               placeholder="nama@esb.co.id"
-              class="min-w-0 min-h-11 sm:min-h-0 w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-base sm:text-[13px] text-[#2A3547] focus:outline-none focus:border-[#5D87FF]"
+              class="min-w-0 min-h-11 sm:min-h-0 w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-base sm:text-[13px] text-[#2A3547] focus:outline-none focus:border-[#172F52]"
             />
           </div>
 
@@ -889,7 +889,7 @@ onMounted(() => {
               type="text"
               required
               placeholder="Contoh: JKT, Solo, BSD"
-              class="min-w-0 min-h-11 sm:min-h-0 w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-base sm:text-[13px] text-[#2A3547] focus:outline-none focus:border-[#5D87FF]"
+              class="min-w-0 min-h-11 sm:min-h-0 w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-base sm:text-[13px] text-[#2A3547] focus:outline-none focus:border-[#172F52]"
             />
           </div>
         </div>
@@ -907,7 +907,7 @@ onMounted(() => {
               type="text"
               required
               placeholder="Contoh: Software Engineer"
-              class="min-w-0 min-h-11 sm:min-h-0 w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-base sm:text-[13px] text-[#2A3547] focus:outline-none focus:border-[#5D87FF]"
+              class="min-w-0 min-h-11 sm:min-h-0 w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-base sm:text-[13px] text-[#2A3547] focus:outline-none focus:border-[#172F52]"
             />
           </div>
 
@@ -940,7 +940,7 @@ onMounted(() => {
               type="text"
               required
               placeholder="Contoh: Technology"
-              class="min-w-0 min-h-11 sm:min-h-0 w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-base sm:text-[13px] text-[#2A3547] focus:outline-none focus:border-[#5D87FF]"
+              class="min-w-0 min-h-11 sm:min-h-0 w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-base sm:text-[13px] text-[#2A3547] focus:outline-none focus:border-[#172F52]"
             />
           </div>
 
@@ -956,7 +956,7 @@ onMounted(() => {
               type="text"
               required
               placeholder="Contoh: Technology"
-              class="min-w-0 min-h-11 sm:min-h-0 w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-base sm:text-[13px] text-[#2A3547] focus:outline-none focus:border-[#5D87FF]"
+              class="min-w-0 min-h-11 sm:min-h-0 w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-base sm:text-[13px] text-[#2A3547] focus:outline-none focus:border-[#172F52]"
             />
           </div>
         </div>
@@ -1041,7 +1041,7 @@ onMounted(() => {
             type="submit"
             form="admin-employee-form"
             :disabled="isSubmitting"
-            class="min-h-11 sm:min-h-0 rounded-xl bg-[#5D87FF] px-4 py-2 text-[12px] font-bold text-white shadow-md hover:bg-[#4570EA] transition-all cursor-pointer disabled:opacity-60"
+            class="min-h-11 sm:min-h-0 rounded-xl bg-[#172F52] px-4 py-2 text-[12px] font-bold text-white shadow-md hover:bg-[#4570EA] transition-all cursor-pointer disabled:opacity-60"
           >
             {{ isSubmitting ? 'Menyimpan...' : 'Simpan Data' }}
           </button>

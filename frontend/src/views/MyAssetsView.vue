@@ -522,7 +522,7 @@ function getInitials(name) {
 
 function getAvatarGradient(index) {
   const gradients = [
-    'from-[#2563EB] to-[#1D4ED8]',
+    'from-[#172F52] to-[#1D4ED8]',
     'from-[#0D9488] to-[#0F766E]',
     'from-[#6366F1] to-[#4F46E5]',
     'from-[#D97706] to-[#B45309]',
@@ -613,7 +613,7 @@ onMounted(() => {
             v-model="employeeSearch"
             type="text"
             placeholder="Cari nama karyawan, NIK, atau departemen..."
-            class="h-9 w-full rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] pl-9 pr-8 text-xs text-[#0F172A] placeholder-[#94A3B8] focus:border-[#2563EB] focus:bg-white focus:outline-none transition-all"
+            class="h-9 w-full rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] pl-9 pr-8 text-xs text-[#0F172A] placeholder-[#94A3B8] focus:border-[#172F52] focus:bg-white focus:outline-none transition-all"
           />
           <!-- Inline Clear Button -->
           <button
@@ -735,7 +735,7 @@ onMounted(() => {
                       </div>
                       <div class="flex flex-col min-w-0">
                         <span
-                          class="text-xs font-semibold text-[#0F172A] group-hover:text-[#2563EB] transition-colors truncate block"
+                          class="text-xs font-semibold text-[#0F172A] group-hover:text-[#172F52] transition-colors truncate block"
                           :title="employee.nama_karyawan"
                         >
                           {{ employee.nama_karyawan }}
@@ -781,7 +781,7 @@ onMounted(() => {
                           class="inline-flex items-center gap-1 rounded-md bg-[#F1F5F9] px-1.5 py-0.5 text-[10px] font-medium text-[#475569] border border-[#E2E8F0] shrink min-w-0 overflow-hidden"
                         >
                           <span
-                            class="material-symbols-outlined text-[12px] text-[#2563EB] shrink-0"
+                            class="material-symbols-outlined text-[12px] text-[#172F52] shrink-0"
                             >{{ getDeviceIcon(tipe) }}</span
                           >
                           <span class="truncate">{{ tipe }}</span>
@@ -800,7 +800,7 @@ onMounted(() => {
                   <!-- Total Aset Badge -->
                   <td class="py-3.5 px-2 text-center overflow-hidden">
                     <span
-                      class="inline-flex items-center justify-center rounded-full bg-[#EFF6FF] px-2 py-0.5 text-[11px] font-bold text-[#2563EB] border border-[#BFDBFE]/60 whitespace-nowrap"
+                      class="inline-flex items-center justify-center rounded-full bg-[#EFF6FF] px-2 py-0.5 text-[11px] font-bold text-[#172F52] border border-[#BFDBFE]/60 whitespace-nowrap"
                     >
                       {{ employee.jumlah_aset || 0 }} Aset
                     </span>
@@ -818,7 +818,7 @@ onMounted(() => {
                   <!-- Action Chevron -->
                   <td class="py-3.5 pr-5 pl-4 text-center overflow-hidden">
                     <span
-                      class="material-symbols-outlined text-[18px] text-[#94A3B8] group-hover:text-[#2563EB] group-hover:translate-x-0.5 transition-all inline-block"
+                      class="material-symbols-outlined text-[18px] text-[#94A3B8] group-hover:text-[#172F52] group-hover:translate-x-0.5 transition-all inline-block"
                       >chevron_right</span
                     >
                   </td>
@@ -856,7 +856,7 @@ onMounted(() => {
 
                 <div class="flex items-center gap-1.5 shrink-0">
                   <span
-                    class="inline-flex items-center justify-center rounded-full bg-[#EFF6FF] px-2 py-0.5 text-[10.5px] font-bold text-[#2563EB] border border-[#BFDBFE]/60 whitespace-nowrap"
+                    class="inline-flex items-center justify-center rounded-full bg-[#EFF6FF] px-2 py-0.5 text-[10.5px] font-bold text-[#172F52] border border-[#BFDBFE]/60 whitespace-nowrap"
                   >
                     {{ employee.jumlah_aset || 0 }} Aset
                   </span>
@@ -915,7 +915,7 @@ onMounted(() => {
                         class="inline-flex items-center gap-1 rounded-md bg-[#F1F5F9] px-1.5 py-0.5 text-[10px] font-medium text-[#475569] border border-[#E2E8F0] shrink min-w-0 overflow-hidden"
                       >
                         <span
-                          class="material-symbols-outlined text-[12px] text-[#2563EB] shrink-0"
+                          class="material-symbols-outlined text-[12px] text-[#172F52] shrink-0"
                           >{{ getDeviceIcon(tipe) }}</span
                         >
                         <span class="truncate">{{ tipe }}</span>
@@ -971,7 +971,7 @@ onMounted(() => {
             v-if="isAdmin"
             type="button"
             @click="goToLevel1"
-            class="font-medium text-[#64748B] hover:text-[#2563EB] transition-colors shrink-0"
+            class="font-medium text-[#64748B] hover:text-[#172F52] transition-colors shrink-0"
           >
             Aset Karyawan
           </button>
@@ -1002,7 +1002,7 @@ onMounted(() => {
       >
         <div class="flex items-start sm:items-center gap-3 sm:gap-4 min-w-0">
           <div
-            class="flex h-11 w-11 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#2563EB] to-[#1D4ED8] text-sm font-bold text-white shadow-2xs"
+            class="flex h-11 w-11 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#172F52] to-[#1D4ED8] text-sm font-bold text-white shadow-2xs"
           >
             {{ getInitials(selectedEmployee.nama_karyawan) }}
           </div>
@@ -1063,7 +1063,7 @@ onMounted(() => {
             class="rounded-lg bg-[#F8FAFC] px-3 py-2 border border-[#E2E8F0] text-center sm:text-right"
           >
             <span class="block text-[10px] font-semibold uppercase text-[#64748B]">Total Aset</span>
-            <span class="text-base font-bold text-[#2563EB] mt-0.5 block"
+            <span class="text-base font-bold text-[#172F52] mt-0.5 block"
               >{{ myAssets.length }} Unit</span
             >
           </div>
@@ -1084,9 +1084,9 @@ onMounted(() => {
       <div class="flex flex-col gap-3">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5">
           <div class="flex items-center gap-2">
-            <span class="material-symbols-outlined text-[20px] text-[#2563EB]">inventory_2</span>
+            <span class="material-symbols-outlined text-[20px] text-[#172F52]">inventory_2</span>
             <h3 class="text-sm font-bold text-[#0F172A]">Aset yang ditugaskan</h3>
-            <span class="rounded-full bg-[#EFF6FF] px-2.5 py-0.5 text-xs font-bold text-[#2563EB]">
+            <span class="rounded-full bg-[#EFF6FF] px-2.5 py-0.5 text-xs font-bold text-[#172F52]">
               {{ myAssets.length }}
             </span>
           </div>
@@ -1101,7 +1101,7 @@ onMounted(() => {
               v-model="assetSearch"
               type="text"
               placeholder="Cari label / serial..."
-              class="h-8.5 w-full rounded-lg border border-[#E2E8F0] bg-white pl-8 pr-8 text-xs text-[#0F172A] focus:border-[#2563EB] focus:outline-none shadow-2xs"
+              class="h-8.5 w-full rounded-lg border border-[#E2E8F0] bg-white pl-8 pr-8 text-xs text-[#0F172A] focus:border-[#172F52] focus:outline-none shadow-2xs"
             />
             <button
               v-if="assetSearch"
@@ -1121,7 +1121,7 @@ onMounted(() => {
           class="flex flex-col items-center justify-center py-12 text-[#64748B] rounded-xl border border-[#E2E8F0] bg-white"
         >
           <div
-            class="h-6 w-6 animate-spin rounded-full border-2 border-[#2563EB] border-t-transparent mb-2"
+            class="h-6 w-6 animate-spin rounded-full border-2 border-[#172F52] border-t-transparent mb-2"
           ></div>
           <p class="text-xs font-semibold">Memuat aset terassigned...</p>
         </div>
@@ -1182,13 +1182,13 @@ onMounted(() => {
             @keydown.enter.self="goToLevel3(asset)"
             @keydown.space.prevent.self="goToLevel3(asset)"
             aria-label="Lihat detail dan riwayat aset"
-            class="assigned-asset-card group relative flex flex-col justify-between rounded-xl border border-[#E2E8F0] bg-white p-3.5 sm:p-4 shadow-2xs hover:border-[#2563EB] hover:shadow-md active:scale-[0.99] transition-all duration-200 cursor-pointer touch-manipulation"
+            class="assigned-asset-card group relative flex flex-col justify-between rounded-xl border border-[#E2E8F0] bg-white p-3.5 sm:p-4 shadow-2xs hover:border-[#172F52] hover:shadow-md active:scale-[0.99] transition-all duration-200 cursor-pointer touch-manipulation"
           >
             <div>
               <!-- Top Row: Device Icon & Status Pill -->
               <div class="flex items-center justify-between gap-2 mb-3">
                 <div
-                  class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#EFF6FF] text-[#2563EB]"
+                  class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#EFF6FF] text-[#172F52]"
                 >
                   <span class="material-symbols-outlined text-[20px]">{{
                     getDeviceIcon(asset.tipe_perangkat)
@@ -1212,7 +1212,7 @@ onMounted(() => {
 
               <!-- Asset Label & Serial Number -->
               <h4
-                class="text-sm font-bold text-[#0F172A] leading-snug group-hover:text-[#2563EB] transition-colors truncate"
+                class="text-sm font-bold text-[#0F172A] leading-snug group-hover:text-[#172F52] transition-colors truncate"
               >
                 {{
                   asset.label_aset ||
@@ -1250,7 +1250,7 @@ onMounted(() => {
 
             <!-- Bottom Trigger link -->
             <div
-              class="mt-3.5 pt-2.5 border-t border-[#F1F5F9] flex items-center justify-between text-xs font-semibold text-[#2563EB]"
+              class="mt-3.5 pt-2.5 border-t border-[#F1F5F9] flex items-center justify-between text-xs font-semibold text-[#172F52]"
             >
               <span>Lihat detail & riwayat</span>
               <span
@@ -1285,14 +1285,14 @@ onMounted(() => {
             v-if="isAdmin"
             type="button"
             @click="goToLevel1"
-            class="font-medium text-[#64748B] hover:text-[#2563EB] transition-colors shrink-0"
+            class="font-medium text-[#64748B] hover:text-[#172F52] transition-colors shrink-0"
           >
             Aset Karyawan
           </button>
           <button
             type="button"
             @click="currentLevel = 2"
-            class="font-medium text-[#64748B] hover:text-[#2563EB] transition-colors shrink-0"
+            class="font-medium text-[#64748B] hover:text-[#172F52] transition-colors shrink-0"
           >
             {{ selectedEmployee.nama_karyawan }}
           </button>
@@ -1312,7 +1312,7 @@ onMounted(() => {
         <button
           type="button"
           @click="currentLevel = 2"
-          class="sm:hidden flex items-center gap-1 text-xs font-semibold text-[#2563EB] truncate"
+          class="sm:hidden flex items-center gap-1 text-xs font-semibold text-[#172F52] truncate"
         >
           <span class="material-symbols-outlined text-[16px]">arrow_back</span>
           <span class="truncate">Kembali ke {{ selectedEmployee.nama_karyawan }}</span>
@@ -1334,7 +1334,7 @@ onMounted(() => {
       >
         <div class="flex items-start sm:items-center gap-3.5 min-w-0">
           <div
-            class="flex h-11 w-11 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-xl bg-[#EFF6FF] text-[#2563EB]"
+            class="flex h-11 w-11 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-xl bg-[#EFF6FF] text-[#172F52]"
           >
             <span class="material-symbols-outlined text-[24px]">{{
               getDeviceIcon(selectedAsset.tipe_perangkat)
@@ -1378,7 +1378,7 @@ onMounted(() => {
         <button
           type="button"
           @click="openSpecification(selectedAsset)"
-          class="w-full sm:w-auto h-9 inline-flex items-center justify-center gap-1.5 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-3.5 text-xs font-semibold text-[#2563EB] hover:bg-[#EFF6FF] active:scale-95 cursor-pointer transition-colors shadow-2xs touch-manipulation shrink-0"
+          class="w-full sm:w-auto h-9 inline-flex items-center justify-center gap-1.5 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-3.5 text-xs font-semibold text-[#172F52] hover:bg-[#EFF6FF] active:scale-95 cursor-pointer transition-colors shadow-2xs touch-manipulation shrink-0"
         >
           <span class="material-symbols-outlined text-[16px]">description</span>
           <span>Lihat Spesifikasi</span>
@@ -1392,7 +1392,7 @@ onMounted(() => {
           <!-- Information Card -->
           <div class="rounded-xl border border-[#E2E8F0] bg-white p-3.5 sm:p-4 shadow-2xs">
             <div class="flex items-center gap-2 pb-2.5 mb-3 border-b border-[#F1F5F9]">
-              <span class="material-symbols-outlined text-[18px] text-[#2563EB]">info</span>
+              <span class="material-symbols-outlined text-[18px] text-[#172F52]">info</span>
               <h3 class="text-xs font-bold uppercase tracking-wider text-[#0F172A]">
                 Informasi Perangkat
               </h3>
@@ -1479,7 +1479,7 @@ onMounted(() => {
 
             <div class="flex items-center gap-3">
               <div
-                class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-[#2563EB] to-[#1D4ED8] text-xs font-bold text-white shadow-2xs"
+                class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-[#172F52] to-[#1D4ED8] text-xs font-bold text-white shadow-2xs"
               >
                 {{ getInitials(selectedEmployee.nama_karyawan) }}
               </div>
@@ -1531,7 +1531,7 @@ onMounted(() => {
                 class="absolute -left-[21.5px] top-1.5 h-2.5 w-2.5 rounded-full border-2 border-white ring-2 ring-white"
                 :class="[
                   log.type === 'assignment'
-                    ? 'bg-[#2563EB]'
+                    ? 'bg-[#172F52]'
                     : log.type === 'relocation'
                       ? 'bg-[#D97706]'
                       : log.type === 'creation'
@@ -1573,7 +1573,7 @@ onMounted(() => {
       <div v-if="activeModalAsset" class="space-y-4">
         <div class="flex items-center gap-3 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] p-3">
           <div
-            class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#EFF6FF] text-[#2563EB]"
+            class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#EFF6FF] text-[#172F52]"
           >
             <span class="material-symbols-outlined text-[20px]">{{
               getDeviceIcon(activeModalAsset.tipe_perangkat)
@@ -1607,7 +1607,7 @@ onMounted(() => {
         <div class="flex justify-end">
           <button
             type="button"
-            class="h-8 rounded-lg bg-[#2563EB] px-4 text-xs font-semibold text-white hover:bg-[#1D4ED8] cursor-pointer transition-colors"
+            class="h-8 rounded-lg bg-[#172F52] px-4 text-xs font-semibold text-white hover:bg-[#1D4ED8] cursor-pointer transition-colors"
             @click="closeModal"
           >
             Tutup

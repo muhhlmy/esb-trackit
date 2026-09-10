@@ -570,7 +570,7 @@ onMounted(async () => {
   --line: #e1e7ef;
   --surface: #fff;
   --canvas: #f5f7fb;
-  --blue: #2563eb;
+  --blue: #172F52;
   background: var(--canvas);
   color: var(--ink);
   padding: 28px 24px 0;
@@ -671,7 +671,7 @@ onMounted(async () => {
   gap: 8px;
   min-height: 44px;
   padding: 0 18px;
-  background: #2563eb;
+  background: #172F52;
   color: white;
   border-radius: 8px;
   font-size: 13px;
@@ -885,7 +885,7 @@ onMounted(async () => {
 }
 .topic-tone-0 {
   background: #edf3ff;
-  color: #2563eb;
+  color: #172F52;
 }
 .topic-tone-1 {
   background: #f1edff;

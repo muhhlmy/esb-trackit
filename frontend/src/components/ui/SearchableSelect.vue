@@ -227,10 +227,10 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside))
       aria-haspopup="listbox"
       :aria-expanded="isOpen"
       :aria-controls="listboxId"
-      class="flex w-full items-center justify-between gap-2 rounded-xl border bg-white px-3.5 text-left text-xs font-bold text-[#2A3547] shadow-2xs hover:bg-[#F8FAFC] hover:border-[#5D87FF] transition-all cursor-pointer"
+      class="flex w-full items-center justify-between gap-2 rounded-xl border bg-white px-3.5 text-left text-xs font-bold text-[#2A3547] shadow-2xs hover:bg-[#F8FAFC] hover:border-[#172F52] transition-all cursor-pointer"
       :class="[
         heightClass,
-        isOpen ? 'border-[#5D87FF] ring-2 ring-[#5D87FF]/15' : 'border-[#E5EAEF]',
+        isOpen ? 'border-[#172F52] ring-2 ring-[#172F52]/15' : 'border-[#E5EAEF]',
         clearable && selectedOption ? 'pr-14' : '',
         triggerClass,
       ]"
@@ -254,7 +254,7 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside))
       <span
         aria-hidden="true"
         class="material-symbols-outlined shrink-0 text-[16px] text-[#7C8BAC] transition-transform duration-200"
-        :class="{ 'rotate-180 text-[#5D87FF]': isOpen }"
+        :class="{ 'rotate-180 text-[#172F52]': isOpen }"
         >expand_more</span
       >
     </button>
@@ -291,7 +291,7 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside))
           :aria-controls="listboxId"
           :aria-activedescendant="activeDescendant"
           :placeholder="searchPlaceholder"
-          class="h-8 w-full rounded-lg border border-[#E5EAEF] bg-[#F8FAFC] pl-8 pr-2.5 text-xs font-medium text-[#2A3547] placeholder-[#94A3B8] focus:bg-white focus:border-[#5D87FF] focus:outline-none focus:ring-2 focus:ring-[#5D87FF]/15 transition-all"
+          class="h-8 w-full rounded-lg border border-[#E5EAEF] bg-[#F8FAFC] pl-8 pr-2.5 text-xs font-medium text-[#2A3547] placeholder-[#94A3B8] focus:bg-white focus:border-[#172F52] focus:outline-none focus:ring-2 focus:ring-[#172F52]/15 transition-all"
           @keydown.stop="handleSearchKeydown"
         />
       </div>
@@ -315,8 +315,8 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside))
             :aria-selected="option[valueKey] === modelValue"
             class="flex cursor-pointer items-center justify-between rounded-lg px-2.5 py-1.5 text-xs font-medium text-[#2A3547] hover:bg-[#F8FAFC] transition-colors"
             :class="{
-              'bg-[#ECF2FF] font-bold text-[#5D87FF]': option[valueKey] === modelValue,
-              'ring-1 ring-inset ring-[#5D87FF]/30': activeIndex === index && option[valueKey] !== modelValue,
+              'bg-[#ECF2FF] font-bold text-[#172F52]': option[valueKey] === modelValue,
+              'ring-1 ring-inset ring-[#172F52]/30': activeIndex === index && option[valueKey] !== modelValue,
             }"
             @mouseenter="activeIndex = index"
             @mousedown.prevent
@@ -331,7 +331,7 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside))
               <div class="min-w-0 flex-1">
                 <div
                   class="truncate text-xs"
-                  :class="{ 'font-bold text-[#5D87FF]': option[valueKey] === modelValue }"
+                  :class="{ 'font-bold text-[#172F52]': option[valueKey] === modelValue }"
                 >
                   {{ option[labelKey] }}
                 </div>
@@ -345,7 +345,7 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside))
             </div>
             <span
               v-if="option[valueKey] === modelValue"
-              class="material-symbols-outlined text-[15px] text-[#5D87FF] shrink-0 ml-2"
+              class="material-symbols-outlined text-[15px] text-[#172F52] shrink-0 ml-2"
               >check</span
             >
           </li>

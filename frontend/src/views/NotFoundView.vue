@@ -9,7 +9,7 @@
       </p>
       <router-link
         to="/"
-        class="inline-flex items-center gap-2 rounded-xl bg-[#2563EB] px-5 py-2.5 text-[13px] font-semibold text-white hover:bg-[#1D4ED8] transition-all"
+        class="inline-flex items-center gap-2 rounded-xl bg-[#172F52] px-5 py-2.5 text-[13px] font-semibold text-white hover:bg-[#1D4ED8] transition-all"
       >
         <span class="material-symbols-outlined text-[18px]">home</span>
         Kembali ke Beranda

@@ -391,7 +391,7 @@ function formatKondisiPill(kondisi) {
           v-if="canWriteAssets"
           type="button"
           @click="openAdd"
-          class="h-9 shrink-0 whitespace-nowrap rounded-lg bg-[#2563EB] px-3 sm:px-3.5 text-xs font-semibold text-white shadow-2xs hover:bg-[#1D4ED8] active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer touch-manipulation"
+          class="h-9 shrink-0 whitespace-nowrap rounded-lg bg-[#172F52] px-3 sm:px-3.5 text-xs font-semibold text-white shadow-2xs hover:bg-[#1D4ED8] active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer touch-manipulation"
           title="Tambah Aset GA baru"
         >
           <span class="material-symbols-outlined text-[16px]">add</span>
@@ -413,7 +413,7 @@ function formatKondisiPill(kondisi) {
             v-model="searchQuery"
             type="text"
             placeholder="Cari hostname, nama asset, detail, lokasi..."
-            class="h-9 w-full rounded-lg border border-[#E2E8F0] bg-white pl-8 pr-8 text-xs text-[#0F172A] placeholder-[#94A3B8] focus:border-[#2563EB] focus:outline-none transition-all shadow-2xs"
+            class="h-9 w-full rounded-lg border border-[#E2E8F0] bg-white pl-8 pr-8 text-xs text-[#0F172A] placeholder-[#94A3B8] focus:border-[#172F52] focus:outline-none transition-all shadow-2xs"
           />
           <!-- Inline Clear Button -->
           <button
@@ -605,7 +605,7 @@ function formatKondisiPill(kondisi) {
             v-if="canWriteAssets"
             type="button"
             @click="openAdd"
-            class="mt-2 h-9 rounded-lg bg-[#2563EB] px-4 text-[12px] font-semibold text-white shadow-2xs hover:bg-[#1D4ED8] transition-all flex items-center gap-1.5 cursor-pointer"
+            class="mt-2 h-9 rounded-lg bg-[#172F52] px-4 text-[12px] font-semibold text-white shadow-2xs hover:bg-[#1D4ED8] transition-all flex items-center gap-1.5 cursor-pointer"
           >
             <span class="material-symbols-outlined text-[16px]">add</span>
             <span>Tambah Aset GA</span>
@@ -717,7 +717,7 @@ function formatKondisiPill(kondisi) {
               type="text"
               required
               placeholder="Contoh: GA-PL-001"
-              class="w-full h-10 px-3 text-[12.5px] rounded-xl border border-[#E2E8F0] bg-white focus:border-[#2563EB] focus:outline-none"
+              class="w-full h-10 px-3 text-[12.5px] rounded-xl border border-[#E2E8F0] bg-white focus:border-[#172F52] focus:outline-none"
             />
           </div>
 
@@ -732,7 +732,7 @@ function formatKondisiPill(kondisi) {
               type="text"
               required
               placeholder="Contoh: Meja Kerja Kayu Jati"
-              class="w-full h-10 px-3 text-[12.5px] rounded-xl border border-[#E2E8F0] bg-white focus:border-[#2563EB] focus:outline-none"
+              class="w-full h-10 px-3 text-[12.5px] rounded-xl border border-[#E2E8F0] bg-white focus:border-[#172F52] focus:outline-none"
             />
           </div>
         </div>
@@ -750,7 +750,7 @@ function formatKondisiPill(kondisi) {
               type="number"
               min="1"
               required
-              class="w-full h-10 px-3 text-[12.5px] rounded-xl border border-[#E2E8F0] bg-white focus:border-[#2563EB] focus:outline-none"
+              class="w-full h-10 px-3 text-[12.5px] rounded-xl border border-[#E2E8F0] bg-white focus:border-[#172F52] focus:outline-none"
             />
           </div>
 
@@ -810,7 +810,7 @@ function formatKondisiPill(kondisi) {
               v-model="form.lokasi_detail"
               type="text"
               placeholder="Contoh: Lantai 2 / Ruang Rapat Utama"
-              class="w-full h-10 px-3 text-[12.5px] rounded-xl border border-[#E2E8F0] bg-white focus:border-[#2563EB] focus:outline-none"
+              class="w-full h-10 px-3 text-[12.5px] rounded-xl border border-[#E2E8F0] bg-white focus:border-[#172F52] focus:outline-none"
             />
           </div>
         </div>
@@ -827,7 +827,7 @@ function formatKondisiPill(kondisi) {
               v-model="form.ukuran"
               type="text"
               placeholder="Contoh: 120x60x75 cm / 2 PK"
-              class="w-full h-10 px-3 text-[12.5px] rounded-xl border border-[#E2E8F0] bg-white focus:border-[#2563EB] focus:outline-none"
+              class="w-full h-10 px-3 text-[12.5px] rounded-xl border border-[#E2E8F0] bg-white focus:border-[#172F52] focus:outline-none"
             />
           </div>
 
@@ -841,7 +841,7 @@ function formatKondisiPill(kondisi) {
               v-model="form.detail"
               type="text"
               placeholder="Contoh: Warna Hitam, Daikin Inverter"
-              class="w-full h-10 px-3 text-[12.5px] rounded-xl border border-[#E2E8F0] bg-white focus:border-[#2563EB] focus:outline-none"
+              class="w-full h-10 px-3 text-[12.5px] rounded-xl border border-[#E2E8F0] bg-white focus:border-[#172F52] focus:outline-none"
             />
           </div>
         </div>
@@ -863,7 +863,7 @@ function formatKondisiPill(kondisi) {
             type="submit"
             form="crud-AssetsGaView"
             :disabled="isSubmitting"
-            class="h-10 px-5 rounded-xl bg-[#2563EB] text-[12.5px] font-bold text-white shadow-2xs hover:bg-[#1D4ED8] disabled:opacity-50 flex items-center gap-2"
+            class="h-10 px-5 rounded-xl bg-[#172F52] text-[12.5px] font-bold text-white shadow-2xs hover:bg-[#1D4ED8] disabled:opacity-50 flex items-center gap-2"
           >
             <span v-if="isSubmitting" class="animate-spin text-[16px]">hourglass_empty</span>
             <span>{{ isSubmitting ? 'Menyimpan...' : 'Simpan Aset GA' }}</span>
@@ -913,7 +913,7 @@ function formatKondisiPill(kondisi) {
           class="asset-detail-identity flex items-center gap-3 p-3 bg-[#F8FAFC] rounded-xl border border-[#E2E8F0]"
         >
           <div
-            class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#EFF6FF] text-[#2563EB]"
+            class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#EFF6FF] text-[#172F52]"
           >
             <span class="material-symbols-outlined text-[22px]">{{
               getGaIcon(selectedAsset.tipe_fasilitas)
@@ -985,7 +985,7 @@ function formatKondisiPill(kondisi) {
           <button
             type="button"
             @click="closeModal"
-            class="h-10 px-5 rounded-xl bg-[#2563EB] text-[12.5px] font-bold text-white shadow-2xs hover:bg-[#1D4ED8]"
+            class="h-10 px-5 rounded-xl bg-[#172F52] text-[12.5px] font-bold text-white shadow-2xs hover:bg-[#1D4ED8]"
           >
             Tutup
           </button>

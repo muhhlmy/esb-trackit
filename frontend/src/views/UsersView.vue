@@ -648,7 +648,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
           v-if="canWriteUsers"
           type="button"
           @click="openAdd"
-          class="h-9 shrink-0 rounded-lg bg-[#2563EB] px-2.5 sm:px-3.5 text-xs font-semibold text-white shadow-2xs hover:bg-[#1D4ED8] active:scale-[0.98] transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+          class="h-9 shrink-0 rounded-lg bg-[#172F52] px-2.5 sm:px-3.5 text-xs font-semibold text-white shadow-2xs hover:bg-[#1D4ED8] active:scale-[0.98] transition-all flex items-center justify-center gap-1.5 cursor-pointer"
           title="Tambah admin baru atau promosikan akses"
         >
           <span aria-hidden="true" class="material-symbols-outlined text-[16px]">person_add</span>
@@ -672,7 +672,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
             type="search"
             autocomplete="off"
             placeholder="Cari nama atau email pengguna..."
-            class="h-9 w-full rounded-lg border border-[#E2E8F0] bg-white pl-8 text-xs text-[#0F172A] placeholder-[#94A3B8] focus:border-[#2563EB] focus:outline-none transition-all shadow-2xs"
+            class="h-9 w-full rounded-lg border border-[#E2E8F0] bg-white pl-8 text-xs text-[#0F172A] placeholder-[#94A3B8] focus:border-[#172F52] focus:outline-none transition-all shadow-2xs"
             :class="searchQuery ? 'pr-8' : 'pr-2.5'"
           />
           <button
@@ -824,7 +824,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
                 <td class="py-4 pl-5 pr-4 overflow-hidden">
                   <div class="flex flex-col min-w-0">
                     <span
-                      class="text-[13.5px] font-bold text-[#0F172A] leading-snug truncate group-hover:text-[#2563EB] transition-colors block"
+                      class="text-[13.5px] font-bold text-[#0F172A] leading-snug truncate group-hover:text-[#172F52] transition-colors block"
                       :title="user.nama"
                     >
                       {{ user.nama }}
@@ -850,7 +850,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
                 <td class="py-4 px-4 overflow-hidden">
                   <div
                     v-if="isRoleSuperAdmin(user.role)"
-                    class="text-[11.5px] font-semibold text-[#2563EB] truncate block"
+                    class="text-[11.5px] font-semibold text-[#172F52] truncate block"
                   >
                     Semua Unit (Superadmin)
                   </div>
@@ -861,7 +861,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
                     <span
                       v-for="q in user.queues"
                       :key="q.id"
-                      class="inline-flex items-center rounded-md bg-[#EFF6FF] px-2 py-0.5 text-[10.5px] font-semibold text-[#2563EB] shrink-0"
+                      class="inline-flex items-center rounded-md bg-[#EFF6FF] px-2 py-0.5 text-[10.5px] font-semibold text-[#172F52] shrink-0"
                       >{{ q.kode }}</span
                     >
                   </div>
@@ -951,7 +951,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
                     class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-[11px] font-bold text-white select-none"
                     :class="{
                       'bg-purple-600': isRoleSuperAdmin(user.role),
-                      'bg-[#2563EB]': user.role === 'admin' && !isRoleSuperAdmin(user.role),
+                      'bg-[#172F52]': user.role === 'admin' && !isRoleSuperAdmin(user.role),
                       'bg-[#64748B]': user.role === 'user' || !user.role,
                     }"
                   >
@@ -1005,7 +1005,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
                   >
                   <div
                     v-if="isRoleSuperAdmin(user.role)"
-                    class="text-[10.5px] font-semibold text-[#2563EB] leading-tight"
+                    class="text-[10.5px] font-semibold text-[#172F52] leading-tight"
                   >
                     Semua Unit
                   </div>
@@ -1016,7 +1016,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
                     <span
                       v-for="q in user.queues"
                       :key="'mq-' + q.id"
-                      class="inline-flex items-center rounded bg-[#EFF6FF] px-1.5 py-0.5 text-[9.5px] font-semibold text-[#2563EB]"
+                      class="inline-flex items-center rounded bg-[#EFF6FF] px-1.5 py-0.5 text-[9.5px] font-semibold text-[#172F52]"
                       >{{ q.kode }}</span
                     >
                   </div>
@@ -1092,7 +1092,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
           >
             <div class="flex items-center gap-2.5 min-w-0">
               <div
-                class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#EFF6FF] text-[#2563EB] font-bold text-xs select-none"
+                class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#EFF6FF] text-[#172F52] font-bold text-xs select-none"
               >
                 {{ getInitials(selectedEmployee.nama_karyawan) }}
               </div>
@@ -1132,7 +1132,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
               autocomplete="name"
               :disabled="modalMode === 'edit' && !isSuperAdmin"
               placeholder="Nama lengkap pengguna"
-              class="h-9 w-full rounded-xl border border-[#E2E8F0] bg-white px-3 text-xs text-[#0F172A] placeholder-[#94A3B8] focus:border-[#2563EB] focus:outline-none transition-all shadow-2xs disabled:bg-[#F8FAFC] disabled:opacity-60 disabled:cursor-not-allowed"
+              class="h-9 w-full rounded-xl border border-[#E2E8F0] bg-white px-3 text-xs text-[#0F172A] placeholder-[#94A3B8] focus:border-[#172F52] focus:outline-none transition-all shadow-2xs disabled:bg-[#F8FAFC] disabled:opacity-60 disabled:cursor-not-allowed"
             />
           </div>
 
@@ -1147,7 +1147,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
               autocomplete="email"
               :disabled="modalMode === 'edit' && !isSuperAdmin"
               placeholder="email@perusahaan.com"
-              class="h-9 w-full rounded-xl border border-[#E2E8F0] bg-white px-3 text-xs text-[#0F172A] placeholder-[#94A3B8] focus:border-[#2563EB] focus:outline-none transition-all shadow-2xs disabled:bg-[#F8FAFC] disabled:opacity-60 disabled:cursor-not-allowed"
+              class="h-9 w-full rounded-xl border border-[#E2E8F0] bg-white px-3 text-xs text-[#0F172A] placeholder-[#94A3B8] focus:border-[#172F52] focus:outline-none transition-all shadow-2xs disabled:bg-[#F8FAFC] disabled:opacity-60 disabled:cursor-not-allowed"
             />
           </div>
 
@@ -1166,7 +1166,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
               :placeholder="
                 modalMode === 'add' ? 'Minimal 8 karakter' : 'Kosongkan jika tidak diubah'
               "
-              class="h-9 w-full rounded-xl border border-[#E2E8F0] bg-white px-3 text-xs text-[#0F172A] placeholder-[#94A3B8] focus:border-[#2563EB] focus:outline-none transition-all shadow-2xs"
+              class="h-9 w-full rounded-xl border border-[#E2E8F0] bg-white px-3 text-xs text-[#0F172A] placeholder-[#94A3B8] focus:border-[#172F52] focus:outline-none transition-all shadow-2xs"
             />
           </div>
 
@@ -1208,7 +1208,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
 
           <div
             v-if="form.role === 'superadmin'"
-            class="text-xs font-semibold text-[#2563EB] bg-[#EFF6FF] p-2.5 rounded-xl border border-[#BFDBFE]"
+            class="text-xs font-semibold text-[#172F52] bg-[#EFF6FF] p-2.5 rounded-xl border border-[#BFDBFE]"
           >
             ⚡ Superadmin memiliki akses otomatis ke seluruh unit (HR, IT, GA, OPS).
           </div>
@@ -1220,7 +1220,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
               class="flex items-center gap-3 p-3 rounded-xl border bg-white cursor-pointer transition-all shadow-2xs select-none"
               :class="
                 isUnitSelected(unit)
-                  ? 'border-[#2563EB] bg-[#EFF6FF]/50 text-[#2563EB] ring-1 ring-[#2563EB]/30'
+                  ? 'border-[#172F52] bg-[#EFF6FF]/50 text-[#172F52] ring-1 ring-[#172F52]/30'
                   : 'border-[#E2E8F0] text-[#0F172A] hover:bg-[#F8FAFC]'
               "
             >
@@ -1228,12 +1228,12 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
                 type="checkbox"
                 :checked="isUnitSelected(unit)"
                 @click.stop="toggleUnit(unit)"
-                class="h-4 w-4 rounded border-gray-300 text-[#2563EB] focus:ring-[#2563EB] cursor-pointer shrink-0"
+                class="h-4 w-4 rounded border-gray-300 text-[#172F52] focus:ring-[#172F52] cursor-pointer shrink-0"
               />
               <div class="flex items-center gap-2 min-w-0">
                 <span
                   class="material-symbols-outlined text-[20px] shrink-0"
-                  :class="isUnitSelected(unit) ? 'text-[#2563EB]' : 'text-[#64748B]'"
+                  :class="isUnitSelected(unit) ? 'text-[#172F52]' : 'text-[#64748B]'"
                   >{{ unit.icon }}</span
                 >
                 <div class="min-w-0">
@@ -1267,7 +1267,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
               <button
                 type="button"
                 @click="selectAllPermissions('read_only')"
-                class="font-semibold text-[#2563EB] hover:underline cursor-pointer"
+                class="font-semibold text-[#172F52] hover:underline cursor-pointer"
               >
                 Semua Read
               </button>
@@ -1285,7 +1285,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
           <!-- Superadmin Notice -->
           <div
             v-if="form.role === 'superadmin'"
-            class="rounded-xl bg-[#EFF6FF] p-3 text-xs font-semibold text-[#2563EB] border border-[#BFDBFE] flex items-center gap-2"
+            class="rounded-xl bg-[#EFF6FF] p-3 text-xs font-semibold text-[#172F52] border border-[#BFDBFE] flex items-center gap-2"
           >
             <span class="material-symbols-outlined text-[18px]">verified_user</span>
             <span>Superadmin memiliki akses penuh ke seluruh fitur sistem secara otomatis.</span>
@@ -1323,7 +1323,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
                       form.permissions[f.key] === 'full'
                         ? 'bg-[#ECFDF5] text-[#059669] border-[#A7F3D0]'
                         : form.permissions[f.key] === 'read_only'
-                          ? 'bg-[#EFF6FF] text-[#2563EB] border-[#BFDBFE]'
+                          ? 'bg-[#EFF6FF] text-[#172F52] border-[#BFDBFE]'
                           : 'bg-[#F8FAFC] text-[#64748B] border-[#E2E8F0]'
                     "
                   >
@@ -1365,7 +1365,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
                       form.permissions[f.key] === 'full'
                         ? 'bg-[#ECFDF5] text-[#059669] border-[#A7F3D0]'
                         : form.permissions[f.key] === 'read_only'
-                          ? 'bg-[#EFF6FF] text-[#2563EB] border-[#BFDBFE]'
+                          ? 'bg-[#EFF6FF] text-[#172F52] border-[#BFDBFE]'
                           : 'bg-[#F8FAFC] text-[#64748B] border-[#E2E8F0]'
                     "
                   >
@@ -1393,7 +1393,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
           <input
             v-model="form.is_active"
             type="checkbox"
-            class="h-4 w-4 shrink-0 accent-[#2563EB]"
+            class="h-4 w-4 shrink-0 accent-[#172F52]"
           />
         </label>
       </form>
@@ -1424,7 +1424,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
               type="submit"
               form="admin-user-form"
               :disabled="isSubmitting || !canWriteUsers"
-              class="h-9 w-full sm:w-auto px-4 rounded-lg bg-[#2563EB] text-xs font-semibold text-white shadow-2xs hover:bg-[#1D4ED8] disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer"
+              class="h-9 w-full sm:w-auto px-4 rounded-lg bg-[#172F52] text-xs font-semibold text-white shadow-2xs hover:bg-[#1D4ED8] disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer"
             >
               <span
                 v-if="isSubmitting"

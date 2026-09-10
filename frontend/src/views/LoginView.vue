@@ -433,7 +433,7 @@ const finishResetAndLogin = () => {
             >
               <div class="flex items-center gap-2.5">
                 <div
-                  class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-blue-50 text-[#2563EB] flex items-center justify-center font-bold shrink-0"
+                  class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-blue-50 text-[#172F52] flex items-center justify-center font-bold shrink-0"
                 >
                   <span class="material-symbols-outlined text-[18px] sm:text-[20px]"
                     >lock_reset</span
@@ -466,12 +466,12 @@ const finishResetAndLogin = () => {
             >
               <div
                 class="flex items-center gap-1 sm:gap-1.5 text-[11px] sm:text-xs font-semibold"
-                :class="forgotStep >= 1 ? 'text-[#2563EB]' : 'text-slate-400'"
+                :class="forgotStep >= 1 ? 'text-[#172F52]' : 'text-slate-400'"
               >
                 <span
                   class="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0"
                   :class="
-                    forgotStep >= 1 ? 'bg-[#2563EB] text-white' : 'bg-slate-100 text-slate-500'
+                    forgotStep >= 1 ? 'bg-[#172F52] text-white' : 'bg-slate-100 text-slate-500'
                   "
                   >1</span
                 >
@@ -479,16 +479,16 @@ const finishResetAndLogin = () => {
               </div>
               <div
                 class="flex-1 max-w-[20px] sm:max-w-[28px] h-0.5 bg-slate-200 shrink-0"
-                :class="{ 'bg-[#2563EB]': forgotStep >= 2 }"
+                :class="{ 'bg-[#172F52]': forgotStep >= 2 }"
               ></div>
               <div
                 class="flex items-center gap-1 sm:gap-1.5 text-[11px] sm:text-xs font-semibold"
-                :class="forgotStep >= 2 ? 'text-[#2563EB]' : 'text-slate-400'"
+                :class="forgotStep >= 2 ? 'text-[#172F52]' : 'text-slate-400'"
               >
                 <span
                   class="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0"
                   :class="
-                    forgotStep >= 2 ? 'bg-[#2563EB] text-white' : 'bg-slate-100 text-slate-500'
+                    forgotStep >= 2 ? 'bg-[#172F52] text-white' : 'bg-slate-100 text-slate-500'
                   "
                   >2</span
                 >
@@ -499,16 +499,16 @@ const finishResetAndLogin = () => {
               </div>
               <div
                 class="flex-1 max-w-[20px] sm:max-w-[28px] h-0.5 bg-slate-200 shrink-0"
-                :class="{ 'bg-[#2563EB]': forgotStep >= 3 }"
+                :class="{ 'bg-[#172F52]': forgotStep >= 3 }"
               ></div>
               <div
                 class="flex items-center gap-1 sm:gap-1.5 text-[11px] sm:text-xs font-semibold"
-                :class="forgotStep >= 3 ? 'text-[#2563EB]' : 'text-slate-400'"
+                :class="forgotStep >= 3 ? 'text-[#172F52]' : 'text-slate-400'"
               >
                 <span
                   class="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0"
                   :class="
-                    forgotStep >= 3 ? 'bg-[#2563EB] text-white' : 'bg-slate-100 text-slate-500'
+                    forgotStep >= 3 ? 'bg-[#172F52] text-white' : 'bg-slate-100 text-slate-500'
                   "
                   >3</span
                 >
@@ -572,7 +572,7 @@ const finishResetAndLogin = () => {
                         type="email"
                         required
                         placeholder="nama@esb.co.id"
-                        class="h-11 sm:h-12 w-full rounded-xl border border-slate-300 bg-slate-50/50 pl-10 pr-4 text-sm text-slate-900 transition-all placeholder:text-slate-400 focus:border-[#2563EB] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#2563EB]/10"
+                        class="h-11 sm:h-12 w-full rounded-xl border border-slate-300 bg-slate-50/50 pl-10 pr-4 text-sm text-slate-900 transition-all placeholder:text-slate-400 focus:border-[#172F52] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#172F52]/10"
                       />
                     </div>
                   </div>
@@ -580,7 +580,7 @@ const finishResetAndLogin = () => {
                   <button
                     type="submit"
                     :disabled="forgotLoading"
-                    class="w-full h-11 sm:h-12 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-semibold text-sm transition-all shadow-xs flex items-center justify-center gap-2 disabled:opacity-60 cursor-pointer active:scale-[0.98] touch-manipulation"
+                    class="w-full h-11 sm:h-12 rounded-xl bg-[#172F52] hover:bg-[#1D4ED8] text-white font-semibold text-sm transition-all shadow-xs flex items-center justify-center gap-2 disabled:opacity-60 cursor-pointer active:scale-[0.98] touch-manipulation"
                   >
                     <span v-if="forgotLoading" class="flex items-center gap-2">
                       <span class="material-symbols-outlined animate-spin text-[18px]"
@@ -632,7 +632,7 @@ const finishResetAndLogin = () => {
                       autocomplete="one-time-code"
                       :aria-label="`Digit OTP ${idx + 1}`"
                       maxlength="1"
-                      class="w-9 h-11 sm:w-11 sm:h-12 text-center text-lg sm:text-xl font-bold rounded-lg sm:rounded-xl border border-slate-300 bg-slate-50/50 text-slate-900 focus:border-[#2563EB] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#2563EB]/10 transition-all shrink-0"
+                      class="w-9 h-11 sm:w-11 sm:h-12 text-center text-lg sm:text-xl font-bold rounded-lg sm:rounded-xl border border-slate-300 bg-slate-50/50 text-slate-900 focus:border-[#172F52] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#172F52]/10 transition-all shrink-0"
                       @input="handleOtpInput(idx, $event)"
                       @keydown="handleOtpKeyDown(idx, $event)"
                     />
@@ -647,7 +647,7 @@ const finishResetAndLogin = () => {
                       forgotLoading || otpDigits.join('').length !== 6 || otpExpirySeconds <= 0
                     "
                     @click="handleVerifyOtp"
-                    class="w-full h-11 sm:h-12 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-semibold text-sm transition-all shadow-xs flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer active:scale-[0.98] touch-manipulation"
+                    class="w-full h-11 sm:h-12 rounded-xl bg-[#172F52] hover:bg-[#1D4ED8] text-white font-semibold text-sm transition-all shadow-xs flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer active:scale-[0.98] touch-manipulation"
                   >
                     <span v-if="forgotLoading" class="flex items-center gap-2">
                       <span class="material-symbols-outlined animate-spin text-[18px]"
@@ -674,7 +674,7 @@ const finishResetAndLogin = () => {
                       type="button"
                       :disabled="resendCooldown > 0 || forgotLoading"
                       @click="handleResendOtp"
-                      class="font-semibold text-[#2563EB] hover:text-[#1D4ED8] disabled:text-slate-400 disabled:cursor-not-allowed cursor-pointer transition-colors py-1 touch-manipulation"
+                      class="font-semibold text-[#172F52] hover:text-[#1D4ED8] disabled:text-slate-400 disabled:cursor-not-allowed cursor-pointer transition-colors py-1 touch-manipulation"
                     >
                       <span v-if="resendCooldown > 0">Kirim ulang dalam {{ resendCooldown }}s</span>
                       <span v-else>Kirim Ulang Kode OTP</span>
@@ -707,7 +707,7 @@ const finishResetAndLogin = () => {
                         :type="showNewPassword ? 'text' : 'password'"
                         required
                         placeholder="Minimal 8 karakter"
-                        class="h-11 sm:h-12 w-full rounded-xl border border-slate-300 bg-slate-50/50 pl-10 pr-11 text-sm text-slate-900 transition-all placeholder:text-slate-400 focus:border-[#2563EB] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#2563EB]/10"
+                        class="h-11 sm:h-12 w-full rounded-xl border border-slate-300 bg-slate-50/50 pl-10 pr-11 text-sm text-slate-900 transition-all placeholder:text-slate-400 focus:border-[#172F52] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#172F52]/10"
                       />
                       <button
                         type="button"
@@ -743,7 +743,7 @@ const finishResetAndLogin = () => {
                         :type="showConfirmPassword ? 'text' : 'password'"
                         required
                         placeholder="Ketik ulang kata sandi baru"
-                        class="h-11 sm:h-12 w-full rounded-xl border border-slate-300 bg-slate-50/50 pl-10 pr-11 text-sm text-slate-900 transition-all placeholder:text-slate-400 focus:border-[#2563EB] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#2563EB]/10"
+                        class="h-11 sm:h-12 w-full rounded-xl border border-slate-300 bg-slate-50/50 pl-10 pr-11 text-sm text-slate-900 transition-all placeholder:text-slate-400 focus:border-[#172F52] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#172F52]/10"
                       />
                       <button
                         type="button"
@@ -799,7 +799,7 @@ const finishResetAndLogin = () => {
                       forgotNewPassword.length < 8 ||
                       forgotNewPassword !== forgotConfirmPassword
                     "
-                    class="w-full h-11 sm:h-12 mt-2 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-semibold text-sm transition-all shadow-xs flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer active:scale-[0.98] touch-manipulation"
+                    class="w-full h-11 sm:h-12 mt-2 rounded-xl bg-[#172F52] hover:bg-[#1D4ED8] text-white font-semibold text-sm transition-all shadow-xs flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer active:scale-[0.98] touch-manipulation"
                   >
                     <span v-if="forgotLoading" class="flex items-center gap-2">
                       <span class="material-symbols-outlined animate-spin text-[18px]"
@@ -838,7 +838,7 @@ const finishResetAndLogin = () => {
                 <button
                   type="button"
                   @click="finishResetAndLogin"
-                  class="w-full h-11 sm:h-12 mt-3 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-semibold text-sm transition-all shadow-xs flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98] touch-manipulation"
+                  class="w-full h-11 sm:h-12 mt-3 rounded-xl bg-[#172F52] hover:bg-[#1D4ED8] text-white font-semibold text-sm transition-all shadow-xs flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98] touch-manipulation"
                 >
                   <span>Masuk ke Akun Anda</span>
                   <span class="material-symbols-outlined text-[18px]">login</span>
@@ -893,7 +893,7 @@ const finishResetAndLogin = () => {
   font-weight: 550;
 }
 .back-help:hover {
-  color: #2563eb;
+  color: #172F52;
 }
 .login-main {
   display: grid;
@@ -1064,7 +1064,7 @@ const finishResetAndLogin = () => {
 }
 .input-wrap:focus-within {
   border-color: #5285d8;
-  box-shadow: 0 0 0 3px #2563eb12;
+  box-shadow: 0 0 0 3px #172F5212;
 }
 .input-wrap input {
   width: 100%;
@@ -1092,7 +1092,7 @@ const finishResetAndLogin = () => {
   cursor: pointer;
 }
 .password-toggle:hover {
-  color: #2563eb;
+  color: #172F52;
   background: #f5f7fb;
 }
 .login-options {
@@ -1115,10 +1115,10 @@ const finishResetAndLogin = () => {
 .login-options input {
   width: 16px;
   height: 16px;
-  accent-color: #2563eb;
+  accent-color: #172F52;
 }
 .login-options button {
-  color: #2563eb;
+  color: #172F52;
   min-height: 44px;
   font-weight: 550;
   cursor: pointer;
@@ -1131,7 +1131,7 @@ const finishResetAndLogin = () => {
   width: 100%;
   min-height: 49px;
   border-radius: 9px;
-  background: #2563eb;
+  background: #172F52;
   color: white;
   font-size: 13px;
   font-weight: 600;
@@ -1164,7 +1164,7 @@ const finishResetAndLogin = () => {
   min-height: 44px;
   font-size: 11px;
   font-weight: 600;
-  color: #2563eb;
+  color: #172F52;
   cursor: pointer;
 }
 .form-help {

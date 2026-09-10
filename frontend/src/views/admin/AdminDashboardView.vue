@@ -4,6 +4,7 @@ import { useRouter, RouterLink } from 'vue-router'
 import { useCases } from '@/composables/useCases'
 import gsap from 'gsap'
 import { isReducedMotion } from '@/composables/useGsap'
+import CustomSelect from '@/components/ui/CustomSelect.vue'
 import {
   FileText,
   Plus,
@@ -26,6 +27,17 @@ const { cases, deleteCase, fetchAllCases } = useCases()
 const searchQuery = ref('')
 const selectedCategory = ref('all')
 const selectedStatus = ref('all') // 'all', 'PUBLISHED', 'DRAFT'
+
+const CATEGORY_OPTIONS = [
+  { value: 'all', label: 'Semua Kategori' },
+  { value: 'hardware', label: 'Hardware' },
+  { value: 'software', label: 'Software' },
+  { value: 'git', label: 'Git' },
+  { value: 'workplace', label: 'Workplace' },
+  { value: 'environment', label: 'Environment' },
+  { value: 'backend', label: 'Backend' },
+]
+
 const deleteConfirmId = ref(null)
 const actionMenu = ref(null) // { id, top, left }
 const mainScope = ref(null)
@@ -334,18 +346,16 @@ function getCategoryBadgeClass(category) {
         </div>
 
         <!-- Category Select -->
-        <select
-          v-model="selectedCategory"
-          class="flex-1 sm:flex-none min-w-[120px] bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-700 rounded-lg pl-2.5 sm:pl-3 pr-7 sm:pr-8 py-1.5 text-xs font-medium text-[#1E293B] dark:text-white focus:outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/10 cursor-pointer transition-all shadow-2xs"
-        >
-          <option value="all">Semua Kategori</option>
-          <option value="hardware">Hardware</option>
-          <option value="software">Software</option>
-          <option value="git">Git</option>
-          <option value="workplace">Workplace</option>
-          <option value="environment">Environment</option>
-          <option value="backend">Backend</option>
-        </select>
+        <div class="flex-1 sm:flex-none sm:w-44">
+          <CustomSelect
+            v-model="selectedCategory"
+            :options="CATEGORY_OPTIONS"
+            aria-label="Kategori"
+            placeholder="Semua Kategori"
+            :block="true"
+            height-class="h-9"
+          />
+        </div>
 
         <!-- Clear Filters -->
         <button

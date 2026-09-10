@@ -219,7 +219,7 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside))
 </script>
 
 <template>
-  <div ref="containerRef" class="relative w-full">
+  <div ref="containerRef" class="relative w-full text-left">
     <button
       ref="triggerRef"
       type="button"
@@ -227,30 +227,35 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside))
       aria-haspopup="listbox"
       :aria-expanded="isOpen"
       :aria-controls="listboxId"
-      class="flex h-10 w-full items-center justify-between rounded-lg border border-[#E5EAEF] bg-white px-3 text-left text-[12px] font-medium text-[#2A3547] shadow-2xs focus:border-[#5D87FF] focus:outline-none focus:ring-1 focus:ring-[#5D87FF]/20 transition-all cursor-pointer"
+      class="flex w-full items-center justify-between gap-2 rounded-xl border bg-white px-3.5 text-left text-xs font-bold text-[#2A3547] shadow-2xs hover:bg-[#F8FAFC] hover:border-[#5D87FF] transition-all cursor-pointer"
       :class="[
         heightClass,
-        {
-          'border-[#5D87FF] ring-1 ring-[#5D87FF]/20': isOpen,
-          'pr-14': clearable && selectedOption,
-        },
+        isOpen ? 'border-[#5D87FF] ring-2 ring-[#5D87FF]/15' : 'border-[#E5EAEF]',
+        clearable && selectedOption ? 'pr-14' : '',
         triggerClass,
       ]"
       @click="toggleDropdown"
       @keydown="handleTriggerKeydown"
     >
-      <span v-if="selectedOption" class="truncate text-[12px]">
-        {{ selectedOption[labelKey] }}
-        <span v-if="secondaryLabelKey" class="font-mono text-[10px] text-[#7C8BAC]">
-          ({{ selectedOption[secondaryLabelKey] }})
+      <div class="flex items-center gap-2 min-w-0 flex-1">
+        <span
+          v-if="selectedOption && selectedOption.dot"
+          class="h-2 w-2 rounded-full shrink-0"
+          :class="selectedOption.dot"
+        ></span>
+        <span v-if="selectedOption" class="truncate text-xs text-[#2A3547]">
+          {{ selectedOption[labelKey] }}
+          <span v-if="secondaryLabelKey && selectedOption[secondaryLabelKey]" class="font-mono text-[10px] text-[#7C8BAC]">
+            ({{ selectedOption[secondaryLabelKey] }})
+          </span>
         </span>
-      </span>
-      <span v-else class="truncate text-[12px] text-[#94A3B8]">{{ placeholder }}</span>
+        <span v-else class="truncate text-xs text-[#94A3B8] font-normal">{{ placeholder }}</span>
+      </div>
       <span
         aria-hidden="true"
-        class="material-symbols-outlined shrink-0 text-[18px] text-[#7C8BAC] transition-transform duration-200"
-        :class="{ 'rotate-180': isOpen }"
-        >keyboard_arrow_down</span
+        class="material-symbols-outlined shrink-0 text-[16px] text-[#7C8BAC] transition-transform duration-200"
+        :class="{ 'rotate-180 text-[#5D87FF]': isOpen }"
+        >expand_more</span
       >
     </button>
 
@@ -258,7 +263,7 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside))
       v-if="clearable && selectedOption"
       type="button"
       :aria-label="`Hapus pilihan ${selectedOption[labelKey]}`"
-      class="absolute right-7 top-1/2 z-10 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-md text-[#475569] transition-colors hover:bg-red-50 hover:text-[#DC2626]"
+      class="absolute right-7 top-1/2 z-10 flex h-5 w-5 -translate-y-1/2 items-center justify-center rounded-md text-[#475569] transition-colors hover:bg-red-50 hover:text-[#DC2626]"
       @click.stop="clearSelection"
     >
       <span aria-hidden="true" class="material-symbols-outlined text-[14px]">close</span>
@@ -266,13 +271,13 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside))
 
     <div
       v-if="isOpen"
-      class="absolute left-0 right-0 z-50 flex flex-col rounded-lg border border-[#E8EDF3] bg-white shadow-xl animate-fade-in"
-      :class="dropDirection === 'up' ? 'bottom-full mb-1' : 'top-full mt-1'"
+      class="absolute left-0 right-0 z-50 flex flex-col rounded-xl border border-[#E5EAEF] bg-white p-1.5 shadow-lg animate-fade-in"
+      :class="dropDirection === 'up' ? 'bottom-full mb-1.5' : 'top-full mt-1.5'"
     >
-      <div class="relative border-b border-[#F1F5F9] p-1.5">
+      <div class="relative mb-1 pb-1 border-b border-[#F1F5F9]">
         <span
           aria-hidden="true"
-          class="material-symbols-outlined pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-[15px] text-[#94A3B8]"
+          class="material-symbols-outlined pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[16px] text-[#7C8BAC]"
           >search</span
         >
         <input
@@ -286,7 +291,7 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside))
           :aria-controls="listboxId"
           :aria-activedescendant="activeDescendant"
           :placeholder="searchPlaceholder"
-          class="h-7 w-full rounded-md border border-[#EBEFF5] bg-[#F8FAFC] pl-8 pr-2.5 text-[11px] font-medium text-[#334155] placeholder-[#94A3B8] focus:border-brand focus:outline-none"
+          class="h-8 w-full rounded-lg border border-[#E5EAEF] bg-[#F8FAFC] pl-8 pr-2.5 text-xs font-medium text-[#2A3547] placeholder-[#94A3B8] focus:bg-white focus:border-[#5D87FF] focus:outline-none focus:ring-2 focus:ring-[#5D87FF]/15 transition-all"
           @keydown.stop="handleSearchKeydown"
         />
       </div>
@@ -295,7 +300,7 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside))
         :id="listboxId"
         role="listbox"
         :aria-label="ariaLabel || placeholder"
-        class="max-h-48 overflow-y-auto p-1"
+        class="max-h-52 overflow-y-auto space-y-0.5"
         :aria-busy="loading"
       >
         <template v-if="loading">
@@ -308,29 +313,46 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside))
             :key="option[valueKey]"
             role="option"
             :aria-selected="option[valueKey] === modelValue"
-            class="flex cursor-pointer flex-col rounded-md px-2.5 py-1.5 text-left transition-colors hover:bg-brand-light"
+            class="flex cursor-pointer items-center justify-between rounded-lg px-2.5 py-1.5 text-xs font-medium text-[#2A3547] hover:bg-[#F8FAFC] transition-colors"
             :class="{
-              'bg-brand-light font-bold text-brand': option[valueKey] === modelValue,
-              'ring-1 ring-inset ring-brand/40': activeIndex === index,
+              'bg-[#ECF2FF] font-bold text-[#5D87FF]': option[valueKey] === modelValue,
+              'ring-1 ring-inset ring-[#5D87FF]/30': activeIndex === index && option[valueKey] !== modelValue,
             }"
             @mouseenter="activeIndex = index"
             @mousedown.prevent
             @click.stop.prevent="selectOption(option)"
           >
+            <div class="flex items-center gap-2 min-w-0 flex-1">
+              <span
+                v-if="option.dot"
+                class="h-2 w-2 rounded-full shrink-0"
+                :class="option.dot"
+              ></span>
+              <div class="min-w-0 flex-1">
+                <div
+                  class="truncate text-xs"
+                  :class="{ 'font-bold text-[#5D87FF]': option[valueKey] === modelValue }"
+                >
+                  {{ option[labelKey] }}
+                </div>
+                <div
+                  v-if="secondaryLabelKey && option[secondaryLabelKey]"
+                  class="mt-0.5 font-mono text-[10px] text-[#7C8BAC] truncate"
+                >
+                  {{ option[secondaryLabelKey] }}
+                </div>
+              </div>
+            </div>
             <span
-              class="text-[11px] text-[#172033]"
-              :class="{ 'font-bold text-brand': option[valueKey] === modelValue }"
+              v-if="option[valueKey] === modelValue"
+              class="material-symbols-outlined text-[15px] text-[#5D87FF] shrink-0 ml-2"
+              >check</span
             >
-              {{ option[labelKey] }}
-            </span>
-            <span v-if="secondaryLabelKey" class="mt-0.5 font-mono text-[9px] text-[#94A3B8]">
-              {{ option[secondaryLabelKey] }}
-            </span>
           </li>
           <li
             v-if="filteredOptions.length === 0"
             role="status"
-            class="px-3 py-4 text-center text-[11px] text-[#9CA3AF]"
+            class="px-3 py-4 text-center text-xs text-[#94A3B8]"
           >
             Tidak ada hasil ditemukan.
           </li>

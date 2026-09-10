@@ -5,6 +5,7 @@ import { useAuth } from '@/composables/useAuth'
 import { exportToCsv, exportToJson, exportToExcel, exportToPdf } from '@/utils/exportEngine'
 import SkeletonCard from '@/components/ui/skeleton/SkeletonCard.vue'
 import AppModal from '@/components/ui/AppModal.vue'
+import CustomSelect from '@/components/ui/CustomSelect.vue'
 
 const api = useApi()
 const { isSuperAdmin } = useAuth()
@@ -13,6 +14,13 @@ const { isSuperAdmin } = useAuth()
 const showResetModal = ref(false)
 const confirmResetInput = ref('')
 const isResetting = ref(false)
+
+const ROW_LIMIT_OPTIONS = [
+  { value: 50, label: '50 Baris Pertama' },
+  { value: 100, label: '100 Baris Pertama' },
+  { value: 500, label: '500 Baris Pertama' },
+  { value: 1000, label: '1000 Baris Pertama' },
+]
 
 function openResetModal() {
   confirmResetInput.value = ''
@@ -734,20 +742,17 @@ onMounted(() => {
               />
             </div>
             <div>
-              <label for="export-row-limit" class="block text-xs font-medium text-[#64748B] mb-1"
-                >Batas Maksimal Baris</label
+              <span class="block text-xs font-medium text-[#64748B] mb-1"
+                >Batas Maksimal Baris</span
               >
-              <select
-                id="export-row-limit"
-                aria-label="Batas Maksimal Baris"
+              <CustomSelect
                 v-model="rowLimit"
-                class="min-w-0 max-w-full w-full rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-2 text-xs font-semibold text-[#0F172A] focus:border-[#2563EB] focus:bg-white focus:outline-none cursor-pointer"
-              >
-                <option :value="50">50 Baris Pertama</option>
-                <option :value="100">100 Baris Pertama</option>
-                <option :value="500">500 Baris Pertama</option>
-                <option :value="1000">1000 Baris Pertama</option>
-              </select>
+                :options="ROW_LIMIT_OPTIONS"
+                aria-label="Batas Maksimal Baris"
+                placeholder="Pilih batas baris"
+                :block="true"
+                height-class="h-10"
+              />
             </div>
           </div>
 

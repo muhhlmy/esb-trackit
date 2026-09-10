@@ -1189,19 +1189,19 @@ onMounted(async () => {
               />
             </label>
 
-            <label class="flex flex-col gap-1.5 col-span-1 sm:col-span-2">
+            <div class="flex flex-col gap-1.5 col-span-1 sm:col-span-2">
               <span class="text-[12px] font-semibold text-[#2A3547]"
                 >Tipe Perangkat <span class="text-[#FA896B]">*</span></span
               >
-              <select
+              <CustomSelect
                 v-model="form.tipe_perangkat"
+                :options="availableTipeOptions"
                 aria-label="Tipe Perangkat Aset"
-                class="h-10 w-full rounded-lg border border-[#E5EAEF] bg-white px-3 text-[12px] font-medium text-[#2A3547] focus:border-[#2563EB] focus:outline-none transition-all appearance-none cursor-pointer shadow-2xs"
-              >
-                <option value="">Pilih tipe perangkat</option>
-                <option v-for="type in availableTipeOptions" :key="type">{{ type }}</option>
-              </select>
-            </label>
+                placeholder="Pilih tipe perangkat"
+                :block="true"
+                height-class="h-10"
+              />
+            </div>
           </fieldset>
         </div>
 
@@ -1302,33 +1302,33 @@ onMounted(async () => {
               />
             </label>
 
-            <label class="flex flex-col gap-1.5">
+            <div class="flex flex-col gap-1.5">
               <span class="text-[12px] font-semibold text-[#2A3547]"
                 >Status Aset <span class="text-[#FA896B]">*</span></span
               >
-              <select
+              <CustomSelect
                 v-model="form.status"
-                class="h-10 w-full rounded-lg border border-[#E5EAEF] bg-white px-3 text-[12px] font-medium text-[#2A3547] focus:border-[#2563EB] focus:outline-none transition-all appearance-none cursor-pointer shadow-2xs"
-              >
-                <option v-for="s in ASSET_STATUSES" :key="s.value" :value="s.value">
-                  {{ s.label }}
-                </option>
-              </select>
-            </label>
+                :options="ASSET_STATUSES"
+                aria-label="Status Aset"
+                placeholder="Pilih status"
+                :block="true"
+                height-class="h-10"
+              />
+            </div>
 
-            <label class="flex flex-col gap-1.5">
+            <div class="flex flex-col gap-1.5">
               <span class="text-[12px] font-semibold text-[#2A3547]"
                 >Kondisi Aset <span class="text-[#FA896B]">*</span></span
               >
-              <select
+              <CustomSelect
                 v-model="form.kondisi"
-                class="h-10 w-full rounded-lg border border-[#E5EAEF] bg-white px-3 text-[12px] font-medium text-[#2A3547] focus:border-[#2563EB] focus:outline-none transition-all appearance-none cursor-pointer shadow-2xs"
-              >
-                <option v-for="condition in availableKondisiOptions" :key="condition">
-                  {{ condition }}
-                </option>
-              </select>
-            </label>
+                :options="availableKondisiOptions"
+                aria-label="Kondisi Aset"
+                placeholder="Pilih kondisi"
+                :block="true"
+                height-class="h-10"
+              />
+            </div>
 
             <label class="flex flex-col gap-1.5 col-span-1 sm:col-span-2">
               <span class="text-[12px] font-semibold text-[#2A3547]">Spesifikasi Detail</span>
@@ -1811,28 +1811,32 @@ onMounted(async () => {
         </fieldset>
 
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <label class="flex flex-col gap-1.5">
+          <div class="flex flex-col gap-1.5">
             <span class="text-[11px] font-bold uppercase tracking-wider text-[#374151]"
               >Filter Status</span
             >
-            <select v-model="exportStatus" class="form-control">
-              <option value="">Semua Status</option>
-              <option v-for="status in availableStatusOptions" :key="status" :value="status">
-                {{ status }}
-              </option>
-            </select>
-          </label>
-          <label class="flex flex-col gap-1.5">
+            <CustomSelect
+              v-model="exportStatus"
+              :options="[{ value: '', label: 'Semua Status' }, ...availableStatusOptions.map(s => ({ value: s, label: s }))]"
+              aria-label="Filter Status"
+              placeholder="Semua Status"
+              :block="true"
+              height-class="h-10"
+            />
+          </div>
+          <div class="flex flex-col gap-1.5">
             <span class="text-[11px] font-bold uppercase tracking-wider text-[#374151]"
               >Filter Tipe Perangkat</span
             >
-            <select v-model="exportTipe" class="form-control">
-              <option value="">Semua Tipe</option>
-              <option v-for="tipe in availableTipeOptions" :key="tipe" :value="tipe">
-                {{ tipe }}
-              </option>
-            </select>
-          </label>
+            <CustomSelect
+              v-model="exportTipe"
+              :options="[{ value: '', label: 'Semua Tipe' }, ...availableTipeOptions.map(t => ({ value: t, label: t }))]"
+              aria-label="Filter Tipe Perangkat"
+              placeholder="Semua Tipe"
+              :block="true"
+              height-class="h-10"
+            />
+          </div>
         </div>
 
         <div

@@ -42,3 +42,6 @@ Desktop.ini
 # Database backups must never enter source control
 backend/storage/backups/
 *.dump
+
+# Others
+Design.md

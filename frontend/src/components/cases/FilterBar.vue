@@ -1,6 +1,6 @@
 <script setup>
 import { useCases } from '@/composables/useCases'
-import { ShieldAlert } from 'lucide-vue-next'
+import CustomSelect from '@/components/ui/CustomSelect.vue'
 
 const { selectedCategory, selectedSeverity, setCategory, setSeverity, filteredCases } = useCases()
 
@@ -14,11 +14,11 @@ const categories = [
   { id: 'devops', label: 'DevOps' },
 ]
 
-const severities = [
-  { id: 'all', label: 'All Severities' },
-  { id: 'high', label: 'High' },
-  { id: 'medium', label: 'Medium' },
-  { id: 'low', label: 'Low' },
+const severityOptions = [
+  { value: 'all', label: 'All Severities' },
+  { value: 'high', label: 'High', dot: 'bg-rose-500' },
+  { value: 'medium', label: 'Medium', dot: 'bg-amber-500' },
+  { value: 'low', label: 'Low', dot: 'bg-emerald-500' },
 ]
 </script>
 
@@ -50,19 +50,16 @@ const severities = [
 
       <!-- Severity Filter & Count -->
       <div class="flex items-center justify-between w-full md:w-auto gap-3">
-        <div class="relative flex items-center">
-          <ShieldAlert
-            class="absolute left-2.5 w-3.5 h-3.5 text-[#575d7a] dark:text-slate-400 pointer-events-none"
+        <div class="w-40">
+          <CustomSelect
+            :model-value="selectedSeverity"
+            :options="severityOptions"
+            aria-label="Severity"
+            placeholder="All Severities"
+            :block="true"
+            height-class="h-9"
+            @update:model-value="setSeverity"
           />
-          <select
-            :value="selectedSeverity"
-            @change="setSeverity($event.target.value)"
-            class="bg-[#f3f3f5] dark:bg-slate-900 border border-[#e2e2e4] dark:border-slate-800 rounded-lg pl-8 pr-7 py-1.5 text-xs text-[#1a1c1d] dark:text-slate-200 focus:outline-none focus:border-[#0040e5] transition-colors appearance-none cursor-pointer"
-          >
-            <option v-for="sev in severities" :key="sev.id" :value="sev.id">
-              {{ sev.label }}
-            </option>
-          </select>
         </div>
 
         <span class="text-xs text-[#575d7a] dark:text-slate-400 font-mono">

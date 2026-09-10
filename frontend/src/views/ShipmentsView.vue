@@ -6,6 +6,7 @@ import { animateStagger } from '../composables/useGsap.js'
 import AppModal from '../components/ui/AppModal.vue'
 import AppBadge from '../components/ui/AppBadge.vue'
 import AppPagination from '../components/ui/AppPagination.vue'
+import CustomSelect from '../components/ui/CustomSelect.vue'
 import SkeletonTable from '../components/ui/skeleton/SkeletonTable.vue'
 import {
   ExternalLink,
@@ -50,11 +51,19 @@ const filterDateTo = ref('')
 
 const STATUS_OPTIONS = [
   { value: '', label: 'Semua Status' },
-  { value: 'belum_dikirim', label: 'Belum Dikirim' },
-  { value: 'pending', label: 'Pending' },
-  { value: 'sedang_dikirim', label: 'Sedang Dikirim' },
-  { value: 'diterima', label: 'Diterima' },
-  { value: 'cancel', label: 'Cancel' },
+  { value: 'belum_dikirim', label: 'Belum Dikirim', dot: 'bg-slate-400' },
+  { value: 'pending', label: 'Pending', dot: 'bg-amber-500' },
+  { value: 'sedang_dikirim', label: 'Sedang Dikirim', dot: 'bg-blue-500' },
+  { value: 'diterima', label: 'Diterima', dot: 'bg-emerald-500' },
+  { value: 'cancel', label: 'Cancel', dot: 'bg-rose-500' },
+]
+
+const FORM_STATUS_OPTIONS = [
+  { value: 'belum_dikirim', label: 'Belum Dikirim', dot: 'bg-slate-400' },
+  { value: 'pending', label: 'Pending', dot: 'bg-amber-500' },
+  { value: 'sedang_dikirim', label: 'Sedang Dikirim', dot: 'bg-blue-500' },
+  { value: 'diterima', label: 'Diterima', dot: 'bg-emerald-500' },
+  { value: 'cancel', label: 'Cancel', dot: 'bg-rose-500' },
 ]
 
 function getTodayString() {
@@ -368,16 +377,15 @@ onMounted(() => {
           />
         </div>
 
-        <div class="min-w-0 lg:w-[160px]">
-          <select
+        <div class="min-w-0 sm:w-[160px]">
+          <CustomSelect
             v-model="filterStatus"
+            :options="STATUS_OPTIONS"
             aria-label="Filter status pengiriman"
-            class="h-10 w-full rounded-xl border border-[#E2E8F0] bg-white px-3 text-xs text-[#0F172A] focus:border-[#2563EB] focus:outline-none transition-all cursor-pointer shadow-2xs"
-          >
-            <option v-for="opt in STATUS_OPTIONS" :key="opt.value" :value="opt.value">
-              {{ opt.label }}
-            </option>
-          </select>
+            placeholder="Semua Status"
+            :block="true"
+            height-class="h-10"
+          />
         </div>
 
         <div class="flex items-center gap-1.5 min-w-0">
@@ -724,17 +732,14 @@ onMounted(() => {
             <label class="block text-xs font-bold text-[#0F172A] mb-1">
               Status <span class="text-rose-500">*</span>
             </label>
-            <select
+            <CustomSelect
               v-model="form.status"
-              required
-              class="h-10 w-full rounded-xl border border-[#CBD5E1] px-3 text-xs text-[#0F172A] focus:border-[#2563EB] focus:outline-none cursor-pointer"
-            >
-              <option value="belum_dikirim">Belum Dikirim</option>
-              <option value="pending">Pending</option>
-              <option value="sedang_dikirim">Sedang Dikirim</option>
-              <option value="diterima">Diterima</option>
-              <option value="cancel">Cancel</option>
-            </select>
+              :options="FORM_STATUS_OPTIONS"
+              aria-label="Status pengiriman"
+              placeholder="Pilih status"
+              :block="true"
+              height-class="h-10"
+            />
           </div>
         </div>
 

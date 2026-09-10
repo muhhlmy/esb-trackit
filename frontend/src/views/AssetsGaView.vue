@@ -431,7 +431,7 @@ function formatKondisiPill(kondisi) {
         <!-- Filter Cluster -->
         <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
           <!-- Filter Lokasi -->
-          <div class="flex-1 min-w-[120px] sm:w-[140px] sm:flex-initial">
+          <div class="flex-1 min-w-[145px] sm:w-[155px] sm:flex-initial">
             <CustomSelect
               v-model="selectedLocation"
               :options="locationFilterOptions"
@@ -443,7 +443,7 @@ function formatKondisiPill(kondisi) {
           </div>
 
           <!-- Filter Tipe Fasilitas -->
-          <div class="flex-1 min-w-[120px] sm:w-[145px] sm:flex-initial">
+          <div class="flex-1 min-w-[155px] sm:w-[170px] sm:flex-initial">
             <CustomSelect
               v-model="selectedTipe"
               :options="tipeFilterOptions"
@@ -455,7 +455,7 @@ function formatKondisiPill(kondisi) {
           </div>
 
           <!-- Filter Kondisi -->
-          <div class="flex-1 min-w-[110px] sm:w-[135px] sm:flex-initial">
+          <div class="flex-1 min-w-[145px] sm:w-[155px] sm:flex-initial">
             <CustomSelect
               v-model="selectedKondisi"
               :options="kondisiFilterOptions"
@@ -761,16 +761,17 @@ function formatKondisiPill(kondisi) {
 
           <!-- Kondisi -->
           <div>
-            <label for="ga-kondisi" class="block text-[12px] font-bold text-[#1E293B] mb-1">
+            <label class="block text-[12px] font-bold text-[#1E293B] mb-1">
               Kondisi <span class="text-rose-500">*</span>
             </label>
-            <select
-              id="ga-kondisi"
+            <CustomSelect
               v-model="form.kondisi"
-              class="w-full h-10 px-3 text-[12.5px] rounded-xl border border-[#E2E8F0] bg-white focus:border-[#2563EB] focus:outline-none cursor-pointer"
-            >
-              <option v-for="k in kondisiOptions" :key="k" :value="k">{{ k }}</option>
-            </select>
+              :options="kondisiOptions"
+              aria-label="Kondisi GA"
+              placeholder="Pilih kondisi"
+              :block="true"
+              height-class="h-10"
+            />
           </div>
         </div>
 

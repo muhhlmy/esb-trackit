@@ -1,6 +1,5 @@
 <script setup>
-// CustomSelect.vue — Dropdown custom dengan gaya konsisten (mirip status selector
-// di Detail Ticket). Khusus dipakai untuk dropdown FILTERING di seluruh project.
+// CustomSelect.vue — Dropdown custom dengan gaya konsisten (Design.md Bagian 13)
 import { computed, onBeforeUnmount, onMounted, ref, useId } from 'vue'
 
 const props = defineProps({
@@ -17,6 +16,7 @@ const props = defineProps({
   heightClass: { type: String, default: 'h-9' },
   align: { type: String, default: 'left' },
   block: { type: Boolean, default: false },
+  dropDirection: { type: String, default: 'down' }, // 'down' | 'up'
 })
 
 const emit = defineEmits(['update:modelValue', 'change'])
@@ -60,6 +60,19 @@ function clear() {
   isOpen.value = false
 }
 
+function handleKeydown(event) {
+  if (props.disabled) return
+  if (event.key === 'Escape') {
+    isOpen.value = false
+  } else if (event.key === 'ArrowDown' && !isOpen.value) {
+    event.preventDefault()
+    isOpen.value = true
+  } else if (event.key === 'ArrowUp' && !isOpen.value) {
+    event.preventDefault()
+    isOpen.value = true
+  }
+}
+
 function handleClickOutside(event) {
   if (containerRef.value && !containerRef.value.contains(event.target)) {
     isOpen.value = false
@@ -75,6 +88,7 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside))
     ref="containerRef"
     class="relative text-left"
     :class="block ? 'block w-full' : 'inline-block'"
+    @keydown="handleKeydown"
   >
     <button
       type="button"
@@ -83,18 +97,28 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside))
       aria-haspopup="listbox"
       :aria-expanded="isOpen"
       @click="toggle"
-      class="inline-flex w-full items-center gap-2 rounded-xl border border-[#E5EAEF] bg-white px-3.5 text-xs font-bold text-[#2A3547] shadow-2xs hover:bg-[#F8FAFC] hover:border-[#5D87FF] transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-      :class="heightClass"
+      class="inline-flex w-full items-center justify-between gap-1.5 rounded-xl border bg-white px-3 text-xs font-bold text-[#2A3547] shadow-2xs hover:bg-[#F8FAFC] hover:border-[#5D87FF] transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+      :class="[
+        heightClass,
+        isOpen ? 'border-[#5D87FF] ring-2 ring-[#5D87FF]/15' : 'border-[#E5EAEF]',
+      ]"
     >
+      <div class="flex items-center gap-1.5 min-w-0 flex-1">
+        <span
+          v-if="selectedOption && selectedOption.dot"
+          class="h-2 w-2 rounded-full shrink-0"
+          :class="selectedOption.dot"
+        ></span>
+        <span
+          class="truncate"
+          :title="selectedOption ? selectedOption.label : placeholder"
+        >{{ selectedOption ? selectedOption.label : placeholder }}</span>
+      </div>
       <span
-        v-if="selectedOption && selectedOption.dot"
-        class="h-2 w-2 rounded-full shrink-0"
-        :class="selectedOption.dot"
-      ></span>
-      <span class="min-w-0 flex-1 truncate">{{
-        selectedOption ? selectedOption.label : placeholder
-      }}</span>
-      <span class="material-symbols-outlined text-[16px] text-[#7C8BAC] shrink-0">expand_more</span>
+        class="material-symbols-outlined text-[16px] text-[#7C8BAC] shrink-0 transition-transform duration-200"
+        :class="{ 'rotate-180 text-[#5D87FF]': isOpen }"
+        >expand_more</span
+      >
     </button>
 
     <button
@@ -112,8 +136,12 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside))
         v-if="isOpen"
         :id="listboxId"
         role="listbox"
-        class="absolute top-full z-50 mt-1.5 max-h-64 overflow-y-auto rounded-xl border border-[#E5EAEF] bg-white p-1.5 shadow-lg"
-        :class="[widthClass, align === 'right' ? 'right-0' : 'left-0']"
+        class="absolute z-50 max-h-64 overflow-y-auto rounded-xl border border-[#E5EAEF] bg-white p-1.5 shadow-lg"
+        :class="[
+          widthClass === 'w-full' ? 'min-w-full w-max max-w-[340px]' : widthClass,
+          align === 'right' ? 'right-0' : 'left-0',
+          dropDirection === 'up' ? 'bottom-full mb-1.5' : 'top-full mt-1.5',
+        ]"
       >
         <button
           v-for="opt in normalizedOptions"

@@ -12,6 +12,7 @@ import AppPagination from '../components/ui/AppPagination.vue'
 import StatCard from '../components/ui/StatCard.vue'
 import SkeletonTable from '../components/ui/skeleton/SkeletonTable.vue'
 import CustomSelect from '../components/ui/CustomSelect.vue'
+import SearchableSelect from '../components/ui/SearchableSelect.vue'
 
 const { get, post, put, del } = useApi()
 const { isAdmin, isSuperAdmin, hasWritePermission } = useAuth()
@@ -69,6 +70,29 @@ const jobLevelOptions = [
   'Freelance',
   'Intern',
 ]
+
+const statusKaryawanFormOptions = [
+  { value: 'Active', label: 'Active', dot: 'bg-emerald-500' },
+  { value: 'Outsource', label: 'Outsource', dot: 'bg-blue-500' },
+  { value: 'Resigned', label: 'Resigned', dot: 'bg-rose-500' },
+]
+
+const statusKepegawaianFormOptions = [
+  { value: 'Permanent', label: 'Permanent', dot: 'bg-emerald-500' },
+  { value: 'Contract', label: 'Contract', dot: 'bg-amber-500' },
+  { value: 'Freelance', label: 'Freelance', dot: 'bg-blue-500' },
+  { value: 'Intern', label: 'Intern', dot: 'bg-purple-500' },
+]
+
+const atasanOptions = computed(() => [
+  { nik: '', displayLabel: '-- Tanpa Atasan / Tidak Ada --' },
+  ...employees.value
+    .filter((emp) => emp.nik !== form.value.nik)
+    .map((e) => ({
+      nik: e.nik,
+      displayLabel: `${e.nik} - ${e.nama_karyawan} (${e.jabatan || e.title || 'Staff'})`,
+    })),
+])
 
 const departemenOptions = [
   'Account Management',
@@ -471,7 +495,7 @@ onMounted(() => {
             ...availableDepartemenOptions.map((dep) => ({ value: dep, label: dep })),
           ]"
           placeholder="Semua Departemen"
-          class="min-w-0 xl:w-[155px]"
+          class="min-w-0 xl:w-[175px]"
           width-class="w-full"
           height-class="min-h-11 sm:min-h-10"
           @change="currentPage = 1"
@@ -485,7 +509,7 @@ onMounted(() => {
             ...availableLokasiOptions.map((loc) => ({ value: loc, label: loc })),
           ]"
           placeholder="Semua Lokasi"
-          class="min-w-0 xl:w-[135px]"
+          class="min-w-0 xl:w-[155px]"
           width-class="w-full"
           height-class="min-h-11 sm:min-h-10"
           @change="currentPage = 1"
@@ -501,7 +525,7 @@ onMounted(() => {
             { value: 'Resigned', label: 'Resigned' },
           ]"
           placeholder="Semua Status"
-          class="min-w-0 xl:w-[130px]"
+          class="min-w-0 xl:w-[145px]"
           width-class="w-full"
           height-class="min-h-11 sm:min-h-10"
           @change="currentPage = 1"
@@ -884,18 +908,17 @@ onMounted(() => {
 
           <div>
             <label
-              for="employee-tingkat_jabatan"
               class="block text-xs sm:text-[11px] font-bold uppercase tracking-wider text-[#7C8BAC] mb-1"
               >Job Level *</label
             >
-            <select
-              id="employee-tingkat_jabatan"
+            <CustomSelect
               v-model="form.tingkat_jabatan"
-              required
-              class="min-w-0 min-h-11 sm:min-h-0 w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-base sm:text-[13px] text-[#2A3547] focus:outline-none"
-            >
-              <option v-for="lvl in jobLevelOptions" :key="lvl" :value="lvl">{{ lvl }}</option>
-            </select>
+              :options="jobLevelOptions"
+              aria-label="Job Level"
+              placeholder="Pilih level"
+              :block="true"
+              height-class="h-10"
+            />
           </div>
         </div>
 
@@ -936,39 +959,32 @@ onMounted(() => {
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div>
             <label
-              for="employee-status_karyawan"
               class="block text-xs sm:text-[11px] font-bold uppercase tracking-wider text-[#7C8BAC] mb-1"
               >Status Karyawan *</label
             >
-            <select
-              id="employee-status_karyawan"
+            <CustomSelect
               v-model="form.status_karyawan"
-              required
-              class="min-w-0 min-h-11 sm:min-h-0 w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-base sm:text-[13px] text-[#2A3547] focus:outline-none"
-            >
-              <option value="Active">Active</option>
-              <option value="Outsource">Outsource</option>
-              <option value="Resigned">Resigned</option>
-            </select>
+              :options="statusKaryawanFormOptions"
+              aria-label="Status Karyawan"
+              placeholder="Pilih status"
+              :block="true"
+              height-class="h-10"
+            />
           </div>
 
           <div>
             <label
-              for="employee-status_kepegawaian"
               class="block text-xs sm:text-[11px] font-bold uppercase tracking-wider text-[#7C8BAC] mb-1"
               >Status Kepegawaian *</label
             >
-            <select
-              id="employee-status_kepegawaian"
+            <CustomSelect
               v-model="form.status_kepegawaian"
-              required
-              class="min-w-0 min-h-11 sm:min-h-0 w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-base sm:text-[13px] text-[#2A3547] focus:outline-none"
-            >
-              <option value="Permanent">Permanent</option>
-              <option value="Contract">Contract</option>
-              <option value="Freelance">Freelance</option>
-              <option value="Intern">Intern</option>
-            </select>
+              :options="statusKepegawaianFormOptions"
+              aria-label="Status Kepegawaian"
+              placeholder="Pilih status"
+              :block="true"
+              height-class="h-10"
+            />
           </div>
 
           <div>
@@ -989,24 +1005,20 @@ onMounted(() => {
 
         <div>
           <label
-            for="employee-nik_atasan_langsung"
             class="block text-xs sm:text-[11px] font-bold uppercase tracking-wider text-[#7C8BAC] mb-1"
             >NIK Atasan Langsung</label
           >
-          <select
-            id="employee-nik_atasan_langsung"
+          <SearchableSelect
             v-model="form.nik_atasan_langsung"
-            class="min-w-0 min-h-11 sm:min-h-0 w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-base sm:text-[13px] text-[#2A3547] focus:outline-none"
-          >
-            <option value="">-- Tanpa Atasan / Tidak Ada --</option>
-            <option
-              v-for="e in employees.filter((emp) => emp.nik !== form.nik)"
-              :key="e.nik"
-              :value="e.nik"
-            >
-              {{ e.nik }} - {{ e.nama_karyawan }} ({{ e.jabatan || e.title || 'Staff' }})
-            </option>
-          </select>
+            :options="atasanOptions"
+            value-key="nik"
+            label-key="displayLabel"
+            placeholder="-- Tanpa Atasan / Tidak Ada --"
+            search-placeholder="Cari NIK, nama, atau posisi atasan..."
+            aria-label="NIK Atasan Langsung"
+            height-class="h-10"
+            :clearable="true"
+          />
         </div>
 
         <div

@@ -5,6 +5,7 @@ import { RouterLink } from 'vue-router'
 import { useApi } from '../composables/useApi.js'
 import { useToast } from '../composables/useToast.js'
 import AppModal from '../components/ui/AppModal.vue'
+import CustomSelect from '../components/ui/CustomSelect.vue'
 import {
   Plus,
   Edit3,
@@ -28,7 +29,17 @@ const FAQ_CATEGORIES = [
   'Network & VPN',
   'Software & Applications',
   'Security & Compliance',
-  'General IT Support',
+  'General & Policies',
+]
+
+const categoryFilterOptions = computed(() => [
+  { value: 'all', label: 'All Categories' },
+  ...FAQ_CATEGORIES.map((cat) => ({ value: cat, label: cat })),
+])
+
+const faqStatusFormOptions = [
+  { value: 'DRAFT', label: 'Draft', dot: 'bg-amber-500' },
+  { value: 'PUBLISHED', label: 'Published', dot: 'bg-emerald-500' },
 ]
 
 const faqs = ref([])
@@ -414,14 +425,15 @@ onMounted(fetchFaqs)
         </div>
 
         <!-- Category Select -->
-        <div class="relative flex-1 sm:flex-none">
-          <select
+        <div class="relative flex-1 sm:flex-none sm:w-44">
+          <CustomSelect
             v-model="selectedCategory"
-            class="w-full bg-[#F8FAFC] dark:bg-slate-800 border border-[#E5EAEF] dark:border-slate-700 rounded-xl pl-3 pr-8 py-1.5 sm:py-2 text-xs font-semibold text-[#0F172A] dark:text-white focus:outline-none focus:border-[#5D87FF] cursor-pointer truncate"
-          >
-            <option value="all">All Categories</option>
-            <option v-for="cat in FAQ_CATEGORIES" :key="cat" :value="cat">{{ cat }}</option>
-          </select>
+            :options="categoryFilterOptions"
+            aria-label="Filter category"
+            placeholder="All Categories"
+            :block="true"
+            height-class="h-9"
+          />
         </div>
 
         <!-- Clear Filters Button -->
@@ -702,35 +714,32 @@ onMounted(fetchFaqs)
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
           <div>
             <label
-              for="faq-category"
               class="mb-1.5 block text-xs font-bold text-[#0F172A] dark:text-slate-200"
               >Category</label
             >
-            <select
-              id="faq-category"
+            <CustomSelect
               v-model="form.category"
-              class="w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] dark:bg-slate-800 px-3.5 py-2.5 text-xs font-semibold text-[#0F172A] dark:text-slate-100 focus:border-[#5D87FF] focus:outline-none transition-all cursor-pointer capitalize"
-            >
-              <option v-for="cat in categoryOptions" :key="cat" :value="cat">
-                {{ cat }}
-              </option>
-            </select>
+              :options="categoryOptions"
+              aria-label="FAQ Category"
+              placeholder="Select category"
+              :block="true"
+              height-class="h-10"
+            />
           </div>
 
           <div>
             <label
-              for="faq-status"
               class="mb-1.5 block text-xs font-bold text-[#0F172A] dark:text-slate-200"
               >Status</label
             >
-            <select
-              id="faq-status"
+            <CustomSelect
               v-model="form.status"
-              class="w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] dark:bg-slate-800 px-3.5 py-2.5 text-xs font-semibold text-[#0F172A] dark:text-slate-100 focus:border-[#5D87FF] focus:outline-none transition-all cursor-pointer"
-            >
-              <option value="DRAFT">Draft</option>
-              <option value="PUBLISHED">Published</option>
-            </select>
+              :options="faqStatusFormOptions"
+              aria-label="FAQ Status"
+              placeholder="Select status"
+              :block="true"
+              height-class="h-10"
+            />
           </div>
 
           <div>

@@ -21,6 +21,21 @@ const route = useRoute()
 const { get, post, put, del } = useApi()
 const { user, isAuthenticated, isSuperAdmin, isAdmin, hasWritePermission } = useAuth()
 
+const TICKET_PRIORITY_OPTIONS = [
+  { value: 'Low', label: 'Low', dot: 'bg-emerald-500' },
+  { value: 'Medium', label: 'Medium', dot: 'bg-blue-500' },
+  { value: 'High', label: 'High', dot: 'bg-amber-500' },
+  { value: 'Critical', label: 'Critical', dot: 'bg-rose-500' },
+]
+
+const TICKET_STATUS_OPTIONS = [
+  { value: 'Open', label: 'Open', dot: 'bg-emerald-500' },
+  { value: 'In Progress', label: 'In Progress', dot: 'bg-blue-500' },
+  { value: 'Pending', label: 'Pending', dot: 'bg-amber-500' },
+  { value: 'Resolved', label: 'Resolved', dot: 'bg-teal-500' },
+  { value: 'Closed', label: 'Closed', dot: 'bg-slate-400' },
+]
+
 const nowTick = ref(Date.now())
 let tickerInterval = null
 
@@ -1357,10 +1372,10 @@ function toast(message, type = 'success') {
         </div>
       </div>
 
-      <!-- Bottom Row: Toolbar (Search + Filters) -->
-      <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
-        <!-- Search Input with Inline Clear (X) -->
-        <div class="relative w-full lg:flex-1 lg:min-w-[220px]">
+      <!-- Bottom Row: Toolbar (Search on Top Row, Filters on Bottom Row) -->
+      <div class="flex flex-col gap-2.5 w-full">
+        <!-- Baris Atas: Search Input with Inline Clear (X) -->
+        <div class="relative w-full">
           <span
             class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[18px] text-[#94A3B8] pointer-events-none"
             >search</span
@@ -1383,13 +1398,13 @@ function toast(message, type = 'success') {
           </button>
         </div>
 
-        <!-- Filter Options Cluster -->
-        <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto">
-          <div class="flex-1 min-w-[130px] sm:w-[135px] sm:flex-initial">
+        <!-- Baris Bawah: Filter Options Cluster -->
+        <div class="flex flex-wrap items-center gap-2.5 w-full">
+          <div class="flex-1 min-w-[145px]">
             <CustomSelect
               v-model="filterStatus"
               :options="[
-                { value: '', label: 'Status: Semua' },
+                { value: '', label: 'Semua Status' },
                 { value: 'Open', label: 'Open' },
                 { value: 'In Progress', label: 'In Progress' },
                 { value: 'Pending', label: 'Pending' },
@@ -1402,11 +1417,11 @@ function toast(message, type = 'success') {
             />
           </div>
 
-          <div class="flex-1 min-w-[130px] sm:w-[135px] sm:flex-initial">
+          <div class="flex-1 min-w-[145px]">
             <CustomSelect
               v-model="filterPrioritas"
               :options="[
-                { value: '', label: 'Priority: Semua' },
+                { value: '', label: 'Semua Prioritas' },
                 { value: 'Critical', label: 'Critical' },
                 { value: 'High', label: 'High' },
                 { value: 'Medium', label: 'Medium' },
@@ -1418,11 +1433,11 @@ function toast(message, type = 'success') {
             />
           </div>
 
-          <div class="flex-1 min-w-[130px] sm:w-[140px] sm:flex-initial">
+          <div class="flex-1 min-w-[145px]">
             <CustomSelect
               v-model="filterQueue"
               :options="[
-                { value: '', label: 'Unit: Semua' },
+                { value: '', label: 'Semua Unit' },
                 ...queues.map((q) => ({ value: q.id, label: `${q.kode} — ${q.nama}` })),
               ]"
               aria-label="Filter unit"
@@ -1431,11 +1446,11 @@ function toast(message, type = 'success') {
             />
           </div>
 
-          <div class="flex-1 min-w-[130px] sm:w-[140px] sm:flex-initial">
+          <div class="flex-1 min-w-[145px]">
             <CustomSelect
               v-model="filterKategori"
               :options="[
-                { value: '', label: 'Kategori: Semua' },
+                { value: '', label: 'Semua Kategori' },
                 { value: 'Request', label: 'Request' },
                 { value: 'Support', label: 'Support' },
                 { value: 'Incident', label: 'Incident' },
@@ -1447,7 +1462,7 @@ function toast(message, type = 'success') {
             />
           </div>
 
-          <div class="flex-1 min-w-[110px] sm:w-[115px] sm:flex-initial">
+          <div class="flex-1 min-w-[145px]">
             <CustomSelect
               v-model="sortOrder"
               :options="[
@@ -1466,11 +1481,11 @@ function toast(message, type = 'success') {
             v-if="hasActiveFilters"
             type="button"
             @click="resetFilters"
-            class="flex-1 min-w-[110px] sm:w-auto sm:flex-initial h-9 rounded-xl border border-[#E2E8F0] bg-slate-50 px-3 text-xs font-semibold text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-all flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 shrink-0"
+            class="h-9 shrink-0 whitespace-nowrap rounded-xl border border-[#E2E8F0] bg-slate-50 px-3 text-xs font-semibold text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-all flex items-center justify-center gap-1.5 cursor-pointer active:scale-95"
             title="Reset semua filter"
           >
             <span class="material-symbols-outlined text-[15px]">filter_alt_off</span>
-            <span>Reset Filter</span>
+            <span>Reset</span>
           </button>
         </div>
       </div>
@@ -2074,33 +2089,30 @@ function toast(message, type = 'success') {
             :class="modalMode === 'edit' ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1'"
           >
             <!-- Prioritas -->
-            <label class="flex flex-col gap-1.5 w-full">
+            <div class="flex flex-col gap-1.5 w-full">
               <span class="text-[12px] font-semibold text-[#2A3547]">Prioritas</span>
-              <select
+              <CustomSelect
                 v-model="form.prioritas"
-                class="h-10 w-full rounded-lg border border-[#E5EAEF] bg-white px-3 text-[12px] font-medium text-[#2A3547] focus:border-[#5D87FF] focus:outline-none transition-all appearance-none cursor-pointer shadow-2xs"
-              >
-                <option value="Low">Low</option>
-                <option value="Medium">Medium</option>
-                <option value="High">High</option>
-                <option value="Critical">Critical</option>
-              </select>
-            </label>
+                :options="TICKET_PRIORITY_OPTIONS"
+                aria-label="Prioritas"
+                placeholder="Pilih prioritas"
+                :block="true"
+                height-class="h-10"
+              />
+            </div>
 
             <!-- Status Tiket (Edit Mode Only) -->
-            <label v-if="modalMode === 'edit'" class="flex flex-col gap-1.5 w-full">
+            <div v-if="modalMode === 'edit'" class="flex flex-col gap-1.5 w-full">
               <span class="text-[12px] font-semibold text-[#2A3547]">Status Tiket</span>
-              <select
+              <CustomSelect
                 v-model="form.status_tiket"
-                class="h-10 w-full rounded-lg border border-[#E5EAEF] bg-white px-3 text-[12px] font-medium text-[#2A3547] focus:border-[#5D87FF] focus:outline-none transition-all appearance-none cursor-pointer shadow-2xs"
-              >
-                <option value="Open">Open</option>
-                <option value="In Progress">In Progress</option>
-                <option value="Pending">Pending</option>
-                <option value="Resolved">Resolved</option>
-                <option value="Closed">Closed</option>
-              </select>
-            </label>
+                :options="TICKET_STATUS_OPTIONS"
+                aria-label="Status Tiket"
+                placeholder="Pilih status"
+                :block="true"
+                height-class="h-10"
+              />
+            </div>
           </div>
 
           <!-- Lampiran -->
@@ -2767,7 +2779,8 @@ function toast(message, type = 'success') {
                 aria-label="Ubah status tiket"
                 aria-haspopup="true"
                 :aria-expanded="showStatusDropdown"
-                class="inline-flex h-9 w-full sm:w-auto items-center justify-between sm:justify-center gap-2 rounded-xl border border-[#E5EAEF] bg-white px-3.5 text-xs font-bold text-[#2A3547] shadow-2xs hover:bg-[#F8FAFC] hover:border-[#5D87FF] transition-all cursor-pointer disabled:opacity-50 active:scale-95"
+                class="inline-flex h-9 w-full sm:w-auto items-center justify-between sm:justify-center gap-2 rounded-xl border bg-white px-3.5 text-xs font-bold text-[#2A3547] shadow-2xs hover:bg-[#F8FAFC] hover:border-[#5D87FF] transition-all cursor-pointer disabled:opacity-50 active:scale-95"
+                :class="showStatusDropdown ? 'border-[#5D87FF] ring-2 ring-[#5D87FF]/15' : 'border-[#E5EAEF]'"
               >
                 <div class="flex items-center gap-2">
                   <span
@@ -2776,7 +2789,9 @@ function toast(message, type = 'success') {
                   ></span>
                   <span>{{ getStatusDotInfo(selectedTicket.status_tiket).label }}</span>
                 </div>
-                <span class="material-symbols-outlined text-[16px] text-[#7C8BAC]"
+                <span
+                  class="material-symbols-outlined text-[16px] text-[#7C8BAC] transition-transform duration-200"
+                  :class="{ 'rotate-180 text-[#5D87FF]': showStatusDropdown }"
                   >expand_more</span
                 >
               </button>

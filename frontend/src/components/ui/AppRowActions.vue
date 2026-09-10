@@ -123,8 +123,8 @@ onBeforeUnmount(() => {
       @click.stop="toggleDropdown"
       aria-label="Opsi Aksi"
       title="Opsi Aksi"
-      class="flex h-7 w-7 items-center justify-center rounded-lg text-[#334155] hover:bg-[#F1F5F9] hover:text-[#0F172A] transition-all cursor-pointer"
-      :class="isOpen ? 'bg-[#F1F5F9] text-[#0F172A]' : ''"
+      class="flex h-7 w-7 items-center justify-center rounded-lg text-[#7C8BAC] hover:bg-[#F8FAFC] hover:text-[#5D87FF] transition-all cursor-pointer"
+      :class="isOpen ? 'bg-[#ECF2FF] text-[#5D87FF]' : ''"
     >
       <span aria-hidden="true" class="material-symbols-outlined text-[18px]">more_horiz</span>
     </button>
@@ -149,7 +149,7 @@ onBeforeUnmount(() => {
                   ? 'opacity-40 cursor-not-allowed text-gray-500'
                   : act.danger
                     ? 'text-rose-700 hover:bg-rose-50'
-                    : 'text-[#0F172A] hover:bg-[#EFF6FF] hover:text-[#1D4ED8]',
+                    : 'text-[#2A3547] hover:bg-[#ECF2FF] hover:text-[#5D87FF]',
               ]"
             >
               <span

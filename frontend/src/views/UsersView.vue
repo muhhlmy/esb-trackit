@@ -171,6 +171,14 @@ const availableRoleOptions = computed(() => {
   return ['user']
 })
 
+const formattedRoleOptions = computed(() =>
+  availableRoleOptions.value.map((r) => ({
+    value: r,
+    label: r.toUpperCase(),
+    dot: r === 'superadmin' ? 'bg-purple-500' : r === 'admin' ? 'bg-blue-500' : 'bg-slate-400',
+  })),
+)
+
 function canManageUser(target) {
   if (!canWriteUsers.value || !target) return false
   if (isSuperAdmin.value) return true
@@ -1155,22 +1163,20 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
 
           <!-- Role -->
           <div class="flex flex-col gap-1">
-            <label for="user-role" class="text-xs font-semibold text-[#0F172A]">Role Akses *</label>
-            <select
-              id="user-role"
+            <label class="text-xs font-semibold text-[#0F172A]">Role Akses *</label>
+            <CustomSelect
               v-model="form.role"
-              @change="handleRoleChange"
-              required
+              :options="formattedRoleOptions"
+              aria-label="Role Akses"
+              placeholder="Pilih role"
+              :block="true"
+              height-class="h-9"
               :disabled="
                 modalMode === 'edit' &&
                 (!isSuperAdmin || Number(selectedUser?.id) === Number(currentUser?.id))
               "
-              class="h-9 w-full rounded-xl border border-[#E2E8F0] bg-white px-3 text-xs text-[#0F172A] focus:border-[#2563EB] focus:outline-none transition-all cursor-pointer shadow-2xs disabled:bg-[#F8FAFC] disabled:opacity-60 disabled:cursor-not-allowed"
-            >
-              <option v-for="r in availableRoleOptions" :key="r" :value="r">
-                {{ r.toUpperCase() }}
-              </option>
-            </select>
+              @change="handleRoleChange"
+            />
             <p
               v-if="modalMode === 'edit' && Number(selectedUser?.id) === Number(currentUser?.id)"
               class="text-[11px] font-normal text-amber-600"

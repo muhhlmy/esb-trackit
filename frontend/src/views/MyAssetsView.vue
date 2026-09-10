@@ -629,7 +629,7 @@ onMounted(() => {
         </div>
 
         <div class="flex items-center gap-2 flex-wrap w-full sm:w-auto">
-          <div class="flex-1 min-w-[130px] sm:w-[150px] sm:flex-initial">
+          <div class="flex-1 min-w-[170px] sm:w-[175px] sm:flex-initial">
             <CustomSelect
               v-model="filterDepartemen"
               :options="departemenFilterOptions"
@@ -639,7 +639,7 @@ onMounted(() => {
             />
           </div>
 
-          <div class="flex-1 min-w-[120px] sm:w-[140px] sm:flex-initial">
+          <div class="flex-1 min-w-[145px] sm:w-[155px] sm:flex-initial">
             <CustomSelect
               v-model="filterLokasi"
               :options="lokasiFilterOptions"

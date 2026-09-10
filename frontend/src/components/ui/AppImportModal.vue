@@ -411,7 +411,7 @@ async function submitImport() {
         <button
           type="button"
           @click="downloadTemplate"
-          class="flex min-h-11 sm:min-h-0 justify-center items-center gap-2 rounded-xl bg-[#172F52] px-4 py-2 text-[12px] font-bold text-white shadow-md hover:bg-[#4570EA] transition-all cursor-pointer shrink-0"
+          class="flex min-h-11 sm:min-h-0 justify-center items-center gap-2 rounded-xl bg-[#0A51B0] px-4 py-2 text-[12px] font-bold text-white shadow-md hover:bg-[#0A4391] transition-all cursor-pointer shrink-0"
         >
           <span class="material-symbols-outlined text-[16px]">download</span>
           <span>Unduh Template (.xlsx)</span>
@@ -427,7 +427,7 @@ async function submitImport() {
         @keydown.space.prevent="fileInputRef?.click()"
         @dragover.prevent
         @drop="onDropFile"
-        class="relative flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-[#DFE5EF] bg-[#F8FAFC] p-6 text-center hover:border-[#172F52] hover:bg-[#ECF2FF]/40 transition-all cursor-pointer"
+        class="relative flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-[#DFE5EF] bg-[#F8FAFC] p-6 text-center hover:border-[#0A51B0] hover:bg-[#ECF2FF]/40 transition-all cursor-pointer"
         @click="fileInputRef?.click()"
       >
         <input
@@ -439,16 +439,16 @@ async function submitImport() {
         />
 
         <div
-          class="flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-[#172F52] shadow-sm mb-2"
+          class="flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-[#333333] shadow-sm mb-2"
         >
           <span class="material-symbols-outlined text-[28px]">upload_file</span>
         </div>
 
         <p v-if="!selectedFile" class="text-[13px] font-bold text-[#2A3547]">
           Tarik &amp; lepas file Excel di sini, atau
-          <span class="text-[#172F52] underline">pilih file</span>
+          <span class="text-[#333333] underline">pilih file</span>
         </p>
-        <p v-else class="text-[13px] font-bold text-[#172F52] max-w-full wrap-anywhere sm:max-w-md">
+        <p v-else class="text-[13px] font-bold text-[#333333] max-w-full wrap-anywhere sm:max-w-md">
           📄 {{ selectedFile.name }} ({{ (selectedFile.size / 1024).toFixed(1) }} KB)
         </p>
 
@@ -459,8 +459,8 @@ async function submitImport() {
 
       <!-- Parsed Data Preview -->
       <div v-if="isParsing" class="py-4 space-y-2" aria-busy="true">
-        <p class="text-[11px] font-semibold text-[#172F52] flex items-center gap-1.5">
-          <span class="w-2 h-2 rounded-full bg-[#172F52] animate-ping"></span>
+        <p class="text-[11px] font-semibold text-[#333333] flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-[#0A51B0] animate-ping"></span>
           Membaca dan memproses isi file Excel...
         </p>
         <SkeletonTable :rows="4" :cols="5" :show-actions="false" />
@@ -478,7 +478,7 @@ async function submitImport() {
             class="flex min-h-11 sm:min-h-0 items-center gap-2 rounded-xl px-4 py-2 text-[12px] font-bold transition-all cursor-pointer"
             :class="
               activeTab === 'karyawan'
-                ? 'bg-[#172F52] text-white shadow-sm'
+                ? 'bg-[#0A51B0] text-white shadow-sm'
                 : 'text-[#7C8BAC] hover:bg-[#F8FAFC]'
             "
           >
@@ -492,7 +492,7 @@ async function submitImport() {
             class="flex min-h-11 sm:min-h-0 items-center gap-2 rounded-xl px-4 py-2 text-[12px] font-bold transition-all cursor-pointer"
             :class="
               activeTab === 'assets'
-                ? 'bg-[#172F52] text-white shadow-sm'
+                ? 'bg-[#0A51B0] text-white shadow-sm'
                 : 'text-[#7C8BAC] hover:bg-[#F8FAFC]'
             "
           >
@@ -648,7 +648,7 @@ async function submitImport() {
                       ) || '—'
                     }}
                   </td>
-                  <td class="p-2 font-semibold text-[#172F52]">
+                  <td class="p-2 font-semibold text-[#333333]">
                     {{ row.Status || row.status || row.status_aset || '—' }}
                   </td>
                 </tr>
@@ -685,7 +685,7 @@ async function submitImport() {
             isSubmitting || (parsedKaryawanRows.length === 0 && parsedAssetRows.length === 0)
           "
           @click="submitImport"
-          class="flex min-h-11 sm:min-h-0 justify-center items-center gap-2 rounded-xl bg-[#172F52] px-5 py-2 text-[12px] font-bold text-white shadow-md hover:bg-[#4570EA] transition-all cursor-pointer disabled:opacity-50"
+          class="flex min-h-11 sm:min-h-0 justify-center items-center gap-2 rounded-xl bg-[#0A51B0] px-5 py-2 text-[12px] font-bold text-white shadow-md hover:bg-[#0A4391] transition-all cursor-pointer disabled:opacity-50"
         >
           <span
             v-if="isSubmitting"

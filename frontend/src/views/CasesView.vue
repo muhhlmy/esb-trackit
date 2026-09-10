@@ -42,7 +42,7 @@ onMounted(() => {
 
 <template>
   <div
-    class="w-full flex-1 flex flex-col items-center bg-[#F8FAFC] dark:bg-slate-950 text-[#0F172A] dark:text-slate-100 py-6 px-4 sm:px-6 lg:px-8 transition-colors duration-200"
+    class="w-full flex-1 flex flex-col items-center bg-[#F8FAFC] dark:bg-slate-950 text-[#333333] dark:text-slate-100 py-6 px-4 sm:px-6 lg:px-8 transition-colors duration-200"
   >
     <div
       class="max-w-[1200px] mx-auto w-full h-[calc(100vh-7rem)] overflow-hidden flex relative rounded-2xl border border-[#E5EAEF] dark:border-slate-800 bg-white dark:bg-slate-950 shadow-xs"

@@ -440,7 +440,7 @@ onMounted(() => {
       <!-- Row 1: Page Title & Primary/Secondary Action Bar -->
       <div class="flex flex-col items-stretch justify-between gap-3 lg:flex-row lg:items-center">
         <div>
-          <h2 class="text-xl font-bold text-[#0F172A] tracking-tight">Data Karyawan</h2>
+          <h2 class="text-xl font-bold text-[#333333] tracking-tight">Data Karyawan</h2>
           <p class="text-[13px] text-[#64748B] mt-0.5 leading-normal">
             Pengelolaan dan integrasi data karyawan perusahaan
           </p>
@@ -450,7 +450,7 @@ onMounted(() => {
           <button
             type="button"
             @click="showImportModal = true"
-            class="h-11 sm:h-9 shrink-0 whitespace-nowrap rounded-lg border border-[#CBD5E1] bg-white px-3.5 text-xs font-semibold text-[#334155] hover:bg-[#F8FAFC] hover:text-[#0F172A] transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs"
+            class="h-11 sm:h-9 shrink-0 whitespace-nowrap rounded-lg border border-[#CBD5E1] bg-white px-3.5 text-xs font-semibold text-[#334155] hover:bg-[#F8FAFC] hover:text-[#333333] transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs"
             title="Import data karyawan dari Excel"
           >
             <span class="material-symbols-outlined text-[16px] text-[#64748B]">file_upload</span>
@@ -460,7 +460,7 @@ onMounted(() => {
           <button
             type="button"
             @click="openAdd"
-            class="h-11 sm:h-9 shrink-0 whitespace-nowrap rounded-lg bg-[#172F52] px-4 text-xs font-semibold text-white shadow-2xs hover:bg-[#1D4ED8] transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+            class="h-11 sm:h-9 shrink-0 whitespace-nowrap rounded-lg bg-[#0A51B0] px-4 text-xs font-semibold text-white shadow-2xs hover:bg-[#0A4391] transition-all flex items-center justify-center gap-1.5 cursor-pointer"
             title="Tambah karyawan baru"
           >
             <span class="material-symbols-outlined text-[16px]">person_add</span>
@@ -483,7 +483,7 @@ onMounted(() => {
             aria-label="Cari karyawan"
             type="text"
             placeholder="Cari NIK, nama, email, jabatan, atau departemen..."
-            class="h-11 sm:h-10 w-full rounded-xl border border-[#E2E8F0] bg-white pl-9.5 pr-3 text-base sm:text-xs text-[#0F172A] placeholder-[#94A3B8] focus:border-[#172F52] focus:outline-none transition-all shadow-2xs"
+            class="h-11 sm:h-10 w-full rounded-xl border border-[#E2E8F0] bg-white pl-9.5 pr-3 text-base sm:text-xs text-[#333333] placeholder-[#94A3B8] focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
           />
         </div>
 
@@ -583,7 +583,7 @@ onMounted(() => {
         class="px-4 py-8 sm:p-12 text-center text-[#64748B]"
       >
         <span class="material-symbols-outlined text-[44px] text-[#CBD5E1]">person_off</span>
-        <p class="mt-2 font-bold text-[13.5px] text-[#0F172A]">Tidak Ada Data Karyawan</p>
+        <p class="mt-2 font-bold text-[13.5px] text-[#333333]">Tidak Ada Data Karyawan</p>
         <p class="text-[11.5px] text-[#64748B]">
           Cobalah untuk mengosongkan filter atau menambah karyawan baru.
         </p>
@@ -597,7 +597,7 @@ onMounted(() => {
             class="min-w-0 p-4 space-y-3 wrap-anywhere"
           >
             <div class="space-y-1">
-              <h3 class="text-sm font-bold leading-snug text-[#0F172A]">{{ emp.nama_karyawan }}</h3>
+              <h3 class="text-sm font-bold leading-snug text-[#333333]">{{ emp.nama_karyawan }}</h3>
               <p class="text-[13px] leading-relaxed text-[#64748B]">
                 {{ emp.email_kantor || '—' }}
               </p>
@@ -615,23 +615,23 @@ onMounted(() => {
             <dl class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-[13px] leading-relaxed">
               <div>
                 <dt class="text-xs text-[#64748B]">NIK</dt>
-                <dd class="font-mono font-semibold text-[#0F172A]">{{ emp.nik }}</dd>
+                <dd class="font-mono font-semibold text-[#333333]">{{ emp.nik }}</dd>
               </div>
               <div>
                 <dt class="text-xs text-[#64748B]">Title / Jabatan</dt>
-                <dd class="text-[#1E293B]">{{ emp.jabatan || emp.title || '—' }}</dd>
+                <dd class="text-[#333333]">{{ emp.jabatan || emp.title || '—' }}</dd>
               </div>
               <div>
                 <dt class="text-xs text-[#64748B]">Departemen</dt>
-                <dd class="text-[#1E293B]">{{ emp.departemen || '—' }}</dd>
+                <dd class="text-[#333333]">{{ emp.departemen || '—' }}</dd>
               </div>
               <div>
                 <dt class="text-xs text-[#64748B]">Direktorat</dt>
-                <dd class="text-[#1E293B]">{{ emp.direktorat || emp.directorate || '—' }}</dd>
+                <dd class="text-[#333333]">{{ emp.direktorat || emp.directorate || '—' }}</dd>
               </div>
               <div>
                 <dt class="text-xs text-[#64748B]">Lokasi Kerja</dt>
-                <dd class="text-[#1E293B]">
+                <dd class="text-[#333333]">
                   {{ normalizeLocation(emp.lokasi_kerja || emp.work_location) || '—' }}
                 </dd>
               </div>
@@ -722,7 +722,7 @@ onMounted(() => {
               <td class="py-4 pl-5 pr-4 overflow-hidden">
                 <div class="flex flex-col min-w-0">
                   <span
-                    class="text-[13.5px] font-bold text-[#0F172A] leading-snug truncate group-hover:text-[#172F52] transition-colors block"
+                    class="text-[13.5px] font-bold text-[#333333] leading-snug truncate group-hover:text-[#333333] transition-colors block"
                     :title="emp.nama_karyawan"
                   >
                     {{ emp.nama_karyawan }}
@@ -737,14 +737,14 @@ onMounted(() => {
               </td>
 
               <td
-                class="py-4 px-4 font-mono text-[11.5px] font-semibold text-[#0F172A] overflow-hidden"
+                class="py-4 px-4 font-mono text-[11.5px] font-semibold text-[#333333] overflow-hidden"
               >
                 <span class="truncate block" :title="emp.nik">{{ emp.nik }}</span>
               </td>
 
               <td class="py-4 px-4 overflow-hidden">
                 <span
-                  class="text-[12.5px] font-medium text-[#1E293B] truncate block"
+                  class="text-[12.5px] font-medium text-[#333333] truncate block"
                   :title="emp.jabatan || emp.title || '—'"
                   >{{ emp.jabatan || emp.title || '—' }}</span
                 >
@@ -753,7 +753,7 @@ onMounted(() => {
               <td class="py-4 px-4 overflow-hidden">
                 <div class="flex flex-col min-w-0">
                   <span
-                    class="text-[12.5px] font-medium text-[#1E293B] leading-snug truncate block"
+                    class="text-[12.5px] font-medium text-[#333333] leading-snug truncate block"
                     :title="emp.departemen || '—'"
                   >
                     {{ emp.departemen || '—' }}
@@ -779,7 +779,7 @@ onMounted(() => {
                   :text="emp.status_karyawan || emp.status || 'Active'"
                 />
               </td>
-              <td class="py-4 px-4 text-[12.5px] font-normal text-[#1E293B] overflow-hidden">
+              <td class="py-4 px-4 text-[12.5px] font-normal text-[#333333] overflow-hidden">
                 <span
                   class="truncate block"
                   :title="normalizeLocation(emp.lokasi_kerja || emp.work_location) || '—'"
@@ -839,7 +839,7 @@ onMounted(() => {
               type="text"
               required
               placeholder="Contoh: 2026001"
-              class="min-w-0 min-h-11 sm:min-h-0 w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-base sm:text-[13px] text-[#2A3547] focus:outline-none focus:border-[#172F52]"
+              class="min-w-0 min-h-11 sm:min-h-0 w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-base sm:text-[13px] text-[#2A3547] focus:outline-none focus:border-[#0A51B0]"
             />
           </div>
 
@@ -855,7 +855,7 @@ onMounted(() => {
               type="text"
               required
               placeholder="Nama lengkap"
-              class="min-w-0 min-h-11 sm:min-h-0 w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-base sm:text-[13px] text-[#2A3547] focus:outline-none focus:border-[#172F52]"
+              class="min-w-0 min-h-11 sm:min-h-0 w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-base sm:text-[13px] text-[#2A3547] focus:outline-none focus:border-[#0A51B0]"
             />
           </div>
         </div>
@@ -873,7 +873,7 @@ onMounted(() => {
               type="email"
               required
               placeholder="nama@esb.co.id"
-              class="min-w-0 min-h-11 sm:min-h-0 w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-base sm:text-[13px] text-[#2A3547] focus:outline-none focus:border-[#172F52]"
+              class="min-w-0 min-h-11 sm:min-h-0 w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-base sm:text-[13px] text-[#2A3547] focus:outline-none focus:border-[#0A51B0]"
             />
           </div>
 
@@ -889,7 +889,7 @@ onMounted(() => {
               type="text"
               required
               placeholder="Contoh: JKT, Solo, BSD"
-              class="min-w-0 min-h-11 sm:min-h-0 w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-base sm:text-[13px] text-[#2A3547] focus:outline-none focus:border-[#172F52]"
+              class="min-w-0 min-h-11 sm:min-h-0 w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-base sm:text-[13px] text-[#2A3547] focus:outline-none focus:border-[#0A51B0]"
             />
           </div>
         </div>
@@ -907,7 +907,7 @@ onMounted(() => {
               type="text"
               required
               placeholder="Contoh: Software Engineer"
-              class="min-w-0 min-h-11 sm:min-h-0 w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-base sm:text-[13px] text-[#2A3547] focus:outline-none focus:border-[#172F52]"
+              class="min-w-0 min-h-11 sm:min-h-0 w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-base sm:text-[13px] text-[#2A3547] focus:outline-none focus:border-[#0A51B0]"
             />
           </div>
 
@@ -940,7 +940,7 @@ onMounted(() => {
               type="text"
               required
               placeholder="Contoh: Technology"
-              class="min-w-0 min-h-11 sm:min-h-0 w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-base sm:text-[13px] text-[#2A3547] focus:outline-none focus:border-[#172F52]"
+              class="min-w-0 min-h-11 sm:min-h-0 w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-base sm:text-[13px] text-[#2A3547] focus:outline-none focus:border-[#0A51B0]"
             />
           </div>
 
@@ -956,7 +956,7 @@ onMounted(() => {
               type="text"
               required
               placeholder="Contoh: Technology"
-              class="min-w-0 min-h-11 sm:min-h-0 w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-base sm:text-[13px] text-[#2A3547] focus:outline-none focus:border-[#172F52]"
+              class="min-w-0 min-h-11 sm:min-h-0 w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-base sm:text-[13px] text-[#2A3547] focus:outline-none focus:border-[#0A51B0]"
             />
           </div>
         </div>
@@ -1041,7 +1041,7 @@ onMounted(() => {
             type="submit"
             form="admin-employee-form"
             :disabled="isSubmitting"
-            class="min-h-11 sm:min-h-0 rounded-xl bg-[#172F52] px-4 py-2 text-[12px] font-bold text-white shadow-md hover:bg-[#4570EA] transition-all cursor-pointer disabled:opacity-60"
+            class="min-h-11 sm:min-h-0 rounded-xl bg-[#0A51B0] px-4 py-2 text-[12px] font-bold text-white shadow-md hover:bg-[#0A4391] transition-all cursor-pointer disabled:opacity-60"
           >
             {{ isSubmitting ? 'Menyimpan...' : 'Simpan Data' }}
           </button>

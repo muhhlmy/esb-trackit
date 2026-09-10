@@ -636,7 +636,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
       <!-- Row 1: Page Title & Primary CTA -->
       <div class="flex items-center justify-between gap-2 sm:gap-3">
         <div class="min-w-0">
-          <h2 class="text-base sm:text-lg font-bold text-[#0F172A] tracking-tight">
+          <h2 class="text-base sm:text-lg font-bold text-[#333333] tracking-tight">
             Data Pengguna
           </h2>
           <p class="text-[11px] sm:text-xs text-[#64748B] mt-0.5 leading-normal">
@@ -648,7 +648,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
           v-if="canWriteUsers"
           type="button"
           @click="openAdd"
-          class="h-9 shrink-0 rounded-lg bg-[#172F52] px-2.5 sm:px-3.5 text-xs font-semibold text-white shadow-2xs hover:bg-[#1D4ED8] active:scale-[0.98] transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+          class="h-9 shrink-0 rounded-lg bg-[#0A51B0] px-2.5 sm:px-3.5 text-xs font-semibold text-white shadow-2xs hover:bg-[#0A4391] active:scale-[0.98] transition-all flex items-center justify-center gap-1.5 cursor-pointer"
           title="Tambah admin baru atau promosikan akses"
         >
           <span aria-hidden="true" class="material-symbols-outlined text-[16px]">person_add</span>
@@ -672,14 +672,14 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
             type="search"
             autocomplete="off"
             placeholder="Cari nama atau email pengguna..."
-            class="h-9 w-full rounded-lg border border-[#E2E8F0] bg-white pl-8 text-xs text-[#0F172A] placeholder-[#94A3B8] focus:border-[#172F52] focus:outline-none transition-all shadow-2xs"
+            class="h-9 w-full rounded-lg border border-[#E2E8F0] bg-white pl-8 text-xs text-[#333333] placeholder-[#94A3B8] focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
             :class="searchQuery ? 'pr-8' : 'pr-2.5'"
           />
           <button
             v-if="searchQuery"
             type="button"
             @click="searchQuery = ''"
-            class="absolute right-2 top-1/2 -translate-y-1/2 flex h-5 w-5 items-center justify-center rounded-full bg-[#E2E8F0] text-[#64748B] hover:bg-[#CBD5E1] hover:text-[#0F172A] transition-colors cursor-pointer"
+            class="absolute right-2 top-1/2 -translate-y-1/2 flex h-5 w-5 items-center justify-center rounded-full bg-[#E2E8F0] text-[#64748B] hover:bg-[#CBD5E1] hover:text-[#333333] transition-colors cursor-pointer"
             title="Hapus pencarian"
           >
             <span class="material-symbols-outlined text-[13px]">close</span>
@@ -824,7 +824,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
                 <td class="py-4 pl-5 pr-4 overflow-hidden">
                   <div class="flex flex-col min-w-0">
                     <span
-                      class="text-[13.5px] font-bold text-[#0F172A] leading-snug truncate group-hover:text-[#172F52] transition-colors block"
+                      class="text-[13.5px] font-bold text-[#333333] leading-snug truncate group-hover:text-[#333333] transition-colors block"
                       :title="user.nama"
                     >
                       {{ user.nama }}
@@ -850,7 +850,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
                 <td class="py-4 px-4 overflow-hidden">
                   <div
                     v-if="isRoleSuperAdmin(user.role)"
-                    class="text-[11.5px] font-semibold text-[#172F52] truncate block"
+                    class="text-[11.5px] font-semibold text-[#333333] truncate block"
                   >
                     Semua Unit (Superadmin)
                   </div>
@@ -861,7 +861,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
                     <span
                       v-for="q in user.queues"
                       :key="q.id"
-                      class="inline-flex items-center rounded-md bg-[#EFF6FF] px-2 py-0.5 text-[10.5px] font-semibold text-[#172F52] shrink-0"
+                      class="inline-flex items-center rounded-md bg-[#EFF6FF] px-2 py-0.5 text-[10.5px] font-semibold text-[#333333] shrink-0"
                       >{{ q.kode }}</span
                     >
                   </div>
@@ -951,7 +951,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
                     class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-[11px] font-bold text-white select-none"
                     :class="{
                       'bg-purple-600': isRoleSuperAdmin(user.role),
-                      'bg-[#172F52]': user.role === 'admin' && !isRoleSuperAdmin(user.role),
+                      'bg-[#0A51B0]': user.role === 'admin' && !isRoleSuperAdmin(user.role),
                       'bg-[#64748B]': user.role === 'user' || !user.role,
                     }"
                   >
@@ -959,7 +959,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
                   </div>
                   <div class="min-w-0 flex-1">
                     <p
-                      class="text-[13px] font-bold text-[#0F172A] leading-snug truncate"
+                      class="text-[13px] font-bold text-[#333333] leading-snug truncate"
                       :title="user.nama"
                     >
                       {{ user.nama }}
@@ -1005,7 +1005,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
                   >
                   <div
                     v-if="isRoleSuperAdmin(user.role)"
-                    class="text-[10.5px] font-semibold text-[#172F52] leading-tight"
+                    class="text-[10.5px] font-semibold text-[#333333] leading-tight"
                   >
                     Semua Unit
                   </div>
@@ -1016,7 +1016,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
                     <span
                       v-for="q in user.queues"
                       :key="'mq-' + q.id"
-                      class="inline-flex items-center rounded bg-[#EFF6FF] px-1.5 py-0.5 text-[9.5px] font-semibold text-[#172F52]"
+                      class="inline-flex items-center rounded bg-[#EFF6FF] px-1.5 py-0.5 text-[9.5px] font-semibold text-[#333333]"
                       >{{ q.kode }}</span
                     >
                   </div>
@@ -1071,7 +1071,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
       >
         <!-- 1. Employee Selection (Searchable Combobox) -->
         <div v-if="modalMode === 'add' && employees.length > 0" class="flex flex-col gap-1.5">
-          <label class="text-xs font-semibold text-[#0F172A]">Karyawan</label>
+          <label class="text-xs font-semibold text-[#333333]">Karyawan</label>
           <SearchableSelect
             v-model="selectedEmployeeId"
             :options="employeeOptions"
@@ -1092,12 +1092,12 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
           >
             <div class="flex items-center gap-2.5 min-w-0">
               <div
-                class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#EFF6FF] text-[#172F52] font-bold text-xs select-none"
+                class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#EFF6FF] text-[#333333] font-bold text-xs select-none"
               >
                 {{ getInitials(selectedEmployee.nama_karyawan) }}
               </div>
               <div class="min-w-0">
-                <p class="text-xs font-bold text-[#0F172A] leading-snug truncate">
+                <p class="text-xs font-bold text-[#333333] leading-snug truncate">
                   {{ selectedEmployee.nama_karyawan }}
                 </p>
                 <p class="text-[11px] text-[#64748B] truncate">
@@ -1120,7 +1120,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
         <div class="grid grid-cols-1 gap-3.5 sm:grid-cols-2">
           <!-- Nama Lengkap -->
           <div class="flex flex-col gap-1">
-            <label for="user-name" class="text-xs font-semibold text-[#0F172A]"
+            <label for="user-name" class="text-xs font-semibold text-[#333333]"
               >Nama Lengkap *</label
             >
             <input
@@ -1132,13 +1132,13 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
               autocomplete="name"
               :disabled="modalMode === 'edit' && !isSuperAdmin"
               placeholder="Nama lengkap pengguna"
-              class="h-9 w-full rounded-xl border border-[#E2E8F0] bg-white px-3 text-xs text-[#0F172A] placeholder-[#94A3B8] focus:border-[#172F52] focus:outline-none transition-all shadow-2xs disabled:bg-[#F8FAFC] disabled:opacity-60 disabled:cursor-not-allowed"
+              class="h-9 w-full rounded-xl border border-[#E2E8F0] bg-white px-3 text-xs text-[#333333] placeholder-[#94A3B8] focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs disabled:bg-[#F8FAFC] disabled:opacity-60 disabled:cursor-not-allowed"
             />
           </div>
 
           <!-- Email -->
           <div class="flex flex-col gap-1">
-            <label for="user-email" class="text-xs font-semibold text-[#0F172A]">Email *</label>
+            <label for="user-email" class="text-xs font-semibold text-[#333333]">Email *</label>
             <input
               id="user-email"
               v-model="form.email"
@@ -1147,13 +1147,13 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
               autocomplete="email"
               :disabled="modalMode === 'edit' && !isSuperAdmin"
               placeholder="email@perusahaan.com"
-              class="h-9 w-full rounded-xl border border-[#E2E8F0] bg-white px-3 text-xs text-[#0F172A] placeholder-[#94A3B8] focus:border-[#172F52] focus:outline-none transition-all shadow-2xs disabled:bg-[#F8FAFC] disabled:opacity-60 disabled:cursor-not-allowed"
+              class="h-9 w-full rounded-xl border border-[#E2E8F0] bg-white px-3 text-xs text-[#333333] placeholder-[#94A3B8] focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs disabled:bg-[#F8FAFC] disabled:opacity-60 disabled:cursor-not-allowed"
             />
           </div>
 
           <!-- Password -->
           <div class="flex flex-col gap-1">
-            <label for="user-password" class="text-xs font-semibold text-[#0F172A]">
+            <label for="user-password" class="text-xs font-semibold text-[#333333]">
               {{ modalMode === 'add' ? 'Password *' : 'Password Baru' }}
             </label>
             <input
@@ -1166,13 +1166,13 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
               :placeholder="
                 modalMode === 'add' ? 'Minimal 8 karakter' : 'Kosongkan jika tidak diubah'
               "
-              class="h-9 w-full rounded-xl border border-[#E2E8F0] bg-white px-3 text-xs text-[#0F172A] placeholder-[#94A3B8] focus:border-[#172F52] focus:outline-none transition-all shadow-2xs"
+              class="h-9 w-full rounded-xl border border-[#E2E8F0] bg-white px-3 text-xs text-[#333333] placeholder-[#94A3B8] focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
             />
           </div>
 
           <!-- Role -->
           <div class="flex flex-col gap-1">
-            <label class="text-xs font-semibold text-[#0F172A]">Role Akses *</label>
+            <label class="text-xs font-semibold text-[#333333]">Role Akses *</label>
             <CustomSelect
               v-model="form.role"
               :options="formattedRoleOptions"
@@ -1198,7 +1198,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
         <!-- 3. Unit Tiket yang Ditangani (Queue Selection - Hanya untuk Admin/Teknisi) -->
         <div v-if="form.role !== 'user'" class="flex flex-col gap-2 pt-2 border-t border-[#F1F5F9]">
           <div>
-            <span class="block text-xs font-semibold text-[#0F172A]"
+            <span class="block text-xs font-semibold text-[#333333]"
               >Unit Tiket yang Ditangani</span
             >
             <span class="block text-[11px] text-[#64748B]"
@@ -1208,7 +1208,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
 
           <div
             v-if="form.role === 'superadmin'"
-            class="text-xs font-semibold text-[#172F52] bg-[#EFF6FF] p-2.5 rounded-xl border border-[#BFDBFE]"
+            class="text-xs font-semibold text-[#333333] bg-[#EFF6FF] p-2.5 rounded-xl border border-[#BFDBFE]"
           >
             ⚡ Superadmin memiliki akses otomatis ke seluruh unit (HR, IT, GA, OPS).
           </div>
@@ -1220,20 +1220,20 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
               class="flex items-center gap-3 p-3 rounded-xl border bg-white cursor-pointer transition-all shadow-2xs select-none"
               :class="
                 isUnitSelected(unit)
-                  ? 'border-[#172F52] bg-[#EFF6FF]/50 text-[#172F52] ring-1 ring-[#172F52]/30'
-                  : 'border-[#E2E8F0] text-[#0F172A] hover:bg-[#F8FAFC]'
+                  ? 'border-[#0A51B0] bg-[#EFF6FF]/50 text-[#333333] ring-1 ring-[#0A51B0]/30'
+                  : 'border-[#E2E8F0] text-[#333333] hover:bg-[#F8FAFC]'
               "
             >
               <input
                 type="checkbox"
                 :checked="isUnitSelected(unit)"
                 @click.stop="toggleUnit(unit)"
-                class="h-4 w-4 rounded border-gray-300 text-[#172F52] focus:ring-[#172F52] cursor-pointer shrink-0"
+                class="h-4 w-4 rounded border-gray-300 text-[#333333] focus:ring-[#0A51B0] cursor-pointer shrink-0"
               />
               <div class="flex items-center gap-2 min-w-0">
                 <span
                   class="material-symbols-outlined text-[20px] shrink-0"
-                  :class="isUnitSelected(unit) ? 'text-[#172F52]' : 'text-[#64748B]'"
+                  :class="isUnitSelected(unit) ? 'text-[#333333]' : 'text-[#64748B]'"
                   >{{ unit.icon }}</span
                 >
                 <div class="min-w-0">
@@ -1249,7 +1249,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
         <div class="flex flex-col gap-3 pt-3 border-t border-[#F1F5F9]">
           <div class="flex items-center justify-between gap-3 flex-wrap">
             <div>
-              <h3 class="text-xs font-semibold text-[#0F172A]">Hak Akses</h3>
+              <h3 class="text-xs font-semibold text-[#333333]">Hak Akses</h3>
               <p class="text-[11px] text-[#64748B]">
                 Tentukan level akses pengguna untuk setiap fitur
               </p>
@@ -1267,7 +1267,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
               <button
                 type="button"
                 @click="selectAllPermissions('read_only')"
-                class="font-semibold text-[#172F52] hover:underline cursor-pointer"
+                class="font-semibold text-[#333333] hover:underline cursor-pointer"
               >
                 Semua Read
               </button>
@@ -1285,7 +1285,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
           <!-- Superadmin Notice -->
           <div
             v-if="form.role === 'superadmin'"
-            class="rounded-xl bg-[#EFF6FF] p-3 text-xs font-semibold text-[#172F52] border border-[#BFDBFE] flex items-center gap-2"
+            class="rounded-xl bg-[#EFF6FF] p-3 text-xs font-semibold text-[#333333] border border-[#BFDBFE] flex items-center gap-2"
           >
             <span class="material-symbols-outlined text-[18px]">verified_user</span>
             <span>Superadmin memiliki akses penuh ke seluruh fitur sistem secara otomatis.</span>
@@ -1311,7 +1311,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
                       f.icon
                     }}</span>
                     <div class="min-w-0">
-                      <p class="text-xs font-semibold text-[#0F172A] truncate">{{ f.label }}</p>
+                      <p class="text-xs font-semibold text-[#333333] truncate">{{ f.label }}</p>
                       <p class="text-[11px] text-[#64748B] truncate">{{ f.desc }}</p>
                     </div>
                   </div>
@@ -1323,7 +1323,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
                       form.permissions[f.key] === 'full'
                         ? 'bg-[#ECFDF5] text-[#059669] border-[#A7F3D0]'
                         : form.permissions[f.key] === 'read_only'
-                          ? 'bg-[#EFF6FF] text-[#172F52] border-[#BFDBFE]'
+                          ? 'bg-[#EFF6FF] text-[#333333] border-[#BFDBFE]'
                           : 'bg-[#F8FAFC] text-[#64748B] border-[#E2E8F0]'
                     "
                   >
@@ -1353,7 +1353,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
                       f.icon
                     }}</span>
                     <div class="min-w-0">
-                      <p class="text-xs font-semibold text-[#0F172A] truncate">{{ f.label }}</p>
+                      <p class="text-xs font-semibold text-[#333333] truncate">{{ f.label }}</p>
                       <p class="text-[11px] text-[#64748B] truncate">{{ f.desc }}</p>
                     </div>
                   </div>
@@ -1365,7 +1365,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
                       form.permissions[f.key] === 'full'
                         ? 'bg-[#ECFDF5] text-[#059669] border-[#A7F3D0]'
                         : form.permissions[f.key] === 'read_only'
-                          ? 'bg-[#EFF6FF] text-[#172F52] border-[#BFDBFE]'
+                          ? 'bg-[#EFF6FF] text-[#333333] border-[#BFDBFE]'
                           : 'bg-[#F8FAFC] text-[#64748B] border-[#E2E8F0]'
                     "
                   >
@@ -1385,7 +1385,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
           class="flex items-center justify-between gap-4 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3.5 py-2.5 cursor-pointer select-none"
         >
           <div>
-            <span class="block text-xs font-semibold text-[#0F172A]">Status Akun Aktif</span>
+            <span class="block text-xs font-semibold text-[#333333]">Status Akun Aktif</span>
             <span class="block text-[11px] text-[#64748B]"
               >Pengguna nonaktif tidak dapat login ke dalam sistem.</span
             >
@@ -1393,7 +1393,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
           <input
             v-model="form.is_active"
             type="checkbox"
-            class="h-4 w-4 shrink-0 accent-[#172F52]"
+            class="h-4 w-4 shrink-0 accent-[#0A51B0]"
           />
         </label>
       </form>
@@ -1415,7 +1415,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
               type="button"
               :disabled="isSubmitting"
               @click="requestCloseModal"
-              class="h-9 w-full sm:w-auto px-4 rounded-lg border border-[#E2E8F0] bg-white text-xs font-semibold text-[#475569] hover:bg-[#F8FAFC] hover:text-[#0F172A] active:scale-[0.98] transition-all cursor-pointer shadow-2xs"
+              class="h-9 w-full sm:w-auto px-4 rounded-lg border border-[#E2E8F0] bg-white text-xs font-semibold text-[#475569] hover:bg-[#F8FAFC] hover:text-[#333333] active:scale-[0.98] transition-all cursor-pointer shadow-2xs"
             >
               Batal
             </button>
@@ -1424,7 +1424,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
               type="submit"
               form="admin-user-form"
               :disabled="isSubmitting || !canWriteUsers"
-              class="h-9 w-full sm:w-auto px-4 rounded-lg bg-[#172F52] text-xs font-semibold text-white shadow-2xs hover:bg-[#1D4ED8] disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer"
+              class="h-9 w-full sm:w-auto px-4 rounded-lg bg-[#0A51B0] text-xs font-semibold text-white shadow-2xs hover:bg-[#0A4391] disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer"
             >
               <span
                 v-if="isSubmitting"

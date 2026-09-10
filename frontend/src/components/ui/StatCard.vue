@@ -24,7 +24,7 @@ defineProps({
       <div
         class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg"
         :class="{
-          'bg-[#EFF6FF] text-[#172F52]': color === 'primary',
+          'bg-[#EFF6FF] text-[#333333]': color === 'primary',
           'bg-[#ECFDF5] text-[#059669]': color === 'success',
           'bg-[#FFFBEB] text-[#D97706]': color === 'warning',
           'bg-[#FEF2F2] text-[#DC2626]': color === 'danger',
@@ -38,7 +38,7 @@ defineProps({
 
     <div class="mt-2.5">
       <span
-        class="font-num block text-[24px] sm:text-[26px] font-bold leading-none tracking-tight text-[#0F172A]"
+        class="font-num block text-[24px] sm:text-[26px] font-bold leading-none tracking-tight text-[#333333]"
         >{{ value }}</span
       >
       <span v-if="subtitle" class="mt-1 block truncate text-[10px] font-medium text-[#94A3B8]">{{

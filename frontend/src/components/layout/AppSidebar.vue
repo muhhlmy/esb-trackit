@@ -450,7 +450,7 @@ function closeSubmenuAndMobile() {
             type="button"
             aria-label="Perluas Sidebar"
             title="Perluas Sidebar"
-            class="flex h-6 w-6 items-center justify-center rounded-md text-[#71829B] hover:bg-[#ECF2FF] hover:text-[#172F52] transition-all cursor-pointer shrink-0"
+            class="flex h-6 w-6 items-center justify-center rounded-md text-[#71829B] hover:bg-[#ECF2FF] hover:text-[#333333] transition-all cursor-pointer shrink-0"
             @click="emit('toggle-collapse')"
           >
             <span aria-hidden="true" class="material-symbols-outlined text-[16px]"
@@ -467,7 +467,7 @@ function closeSubmenuAndMobile() {
         type="button"
         aria-label="Ciutkan Sidebar"
         title="Ciutkan Sidebar"
-        class="hidden lg:flex h-7 w-7 items-center justify-center rounded-lg text-[#71829B] hover:bg-[#ECF2FF] hover:text-[#172F52] transition-all cursor-pointer shrink-0"
+        class="hidden lg:flex h-7 w-7 items-center justify-center rounded-lg text-[#71829B] hover:bg-[#ECF2FF] hover:text-[#333333] transition-all cursor-pointer shrink-0"
         @click="emit('toggle-collapse')"
       >
         <span aria-hidden="true" class="material-symbols-outlined text-[18px]">menu_open</span>
@@ -478,7 +478,7 @@ function closeSubmenuAndMobile() {
         type="button"
         aria-label="Tutup navigasi mobile"
         title="Tutup Navigasi"
-        class="flex lg:hidden h-7 w-7 items-center justify-center rounded-lg text-[#71829B] hover:bg-[#ECF2FF] hover:text-[#172F52] transition-all cursor-pointer shrink-0"
+        class="flex lg:hidden h-7 w-7 items-center justify-center rounded-lg text-[#71829B] hover:bg-[#ECF2FF] hover:text-[#333333] transition-all cursor-pointer shrink-0"
         @click="emit('close-mobile')"
       >
         <span aria-hidden="true" class="material-symbols-outlined text-[18px]">close</span>
@@ -523,7 +523,7 @@ function closeSubmenuAndMobile() {
                     : 'w-full gap-2.5 rounded-lg px-2.5 py-2 text-[12.5px]',
                   route.path === item.to
                     ? 'bg-[#EAF1FC] text-[#234B83] font-semibold'
-                    : 'text-[#2A3547] hover:bg-[#ECF2FF] hover:text-[#172F52] font-medium',
+                    : 'text-[#2A3547] hover:bg-[#ECF2FF] hover:text-[#333333] font-medium',
                 ]"
                 @click="emit('close-mobile')"
               >
@@ -534,7 +534,7 @@ function closeSubmenuAndMobile() {
                     isEffectiveCollapsed ? 'text-[20px]' : 'text-[18px]',
                     route.path === item.to
                       ? 'text-[#234B83]'
-                      : 'text-[#71829B] group-hover:text-[#172F52]',
+                      : 'text-[#71829B] group-hover:text-[#333333]',
                   ]"
                 >
                   {{ item.icon }}
@@ -553,7 +553,7 @@ function closeSubmenuAndMobile() {
                   :class="
                     route.path === item.to
                       ? 'bg-white/20 text-white'
-                      : 'bg-[#ECF2FF] text-[#172F52]'
+                      : 'bg-[#ECF2FF] text-[#333333]'
                   "
                 >
                   {{ item.badge }}
@@ -591,9 +591,9 @@ function closeSubmenuAndMobile() {
                     : 'w-full gap-2.5 rounded-lg px-2.5 py-2 text-[12.5px] font-semibold justify-between',
                   parent.items.some((child) => route.path === child.to)
                     ? isEffectiveCollapsed
-                      ? 'bg-[#ECF2FF] text-[#172F52]'
+                      ? 'bg-[#ECF2FF] text-[#333333]'
                       : 'text-[#2A3547] bg-[#F8FAFC]'
-                    : 'text-[#2A3547] hover:bg-[#F8FAFC] hover:text-[#172F52]',
+                    : 'text-[#2A3547] hover:bg-[#F8FAFC] hover:text-[#333333]',
                 ]"
                 @click="handleParentClick(parent, $event)"
               >
@@ -607,8 +607,8 @@ function closeSubmenuAndMobile() {
                     :class="[
                       isEffectiveCollapsed ? 'text-[20px]' : 'text-[18px]',
                       parent.items.some((child) => route.path === child.to)
-                        ? 'text-[#172F52]'
-                        : 'text-[#71829B] group-hover:text-[#172F52]',
+                        ? 'text-[#333333]'
+                        : 'text-[#71829B] group-hover:text-[#333333]',
                     ]"
                   >
                     {{ parent.icon }}
@@ -648,8 +648,8 @@ function closeSubmenuAndMobile() {
                   class="group flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-[12px] transition-all duration-150 relative"
                   :class="
                     route.path === sub.to
-                      ? 'bg-[#ECF2FF] text-[#172F52] font-bold shadow-2xs border-l-2 border-[#172F52] rounded-r-lg'
-                      : 'text-[#64748B] hover:bg-[#F8FAFC] hover:text-[#172F52] font-medium'
+                      ? 'bg-[#ECF2FF] text-[#333333] font-bold shadow-2xs border-l-2 border-[#0A51B0] rounded-r-lg'
+                      : 'text-[#64748B] hover:bg-[#F8FAFC] hover:text-[#333333] font-medium'
                   "
                   @click="emit('close-mobile')"
                 >
@@ -658,8 +658,8 @@ function closeSubmenuAndMobile() {
                     class="material-symbols-outlined text-[16px] transition-colors shrink-0"
                     :class="
                       route.path === sub.to
-                        ? 'text-[#172F52]'
-                        : 'text-[#94A3B8] group-hover:text-[#172F52]'
+                        ? 'text-[#333333]'
+                        : 'text-[#94A3B8] group-hover:text-[#333333]'
                     "
                   >
                     {{ sub.icon }}
@@ -700,8 +700,8 @@ function closeSubmenuAndMobile() {
           class="group flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-[11.5px] transition-all cursor-pointer"
           :class="
             route.path === sub.to
-              ? 'bg-[#EFF6FF] text-[#172F52] font-bold'
-              : 'text-[#2A3547] hover:bg-[#F8FAFC] hover:text-[#172F52] font-medium'
+              ? 'bg-[#EFF6FF] text-[#333333] font-bold'
+              : 'text-[#2A3547] hover:bg-[#F8FAFC] hover:text-[#333333] font-medium'
           "
           @click="closeSubmenuAndMobile"
         >
@@ -709,7 +709,7 @@ function closeSubmenuAndMobile() {
             aria-hidden="true"
             class="material-symbols-outlined text-[16px] shrink-0"
             :class="
-              route.path === sub.to ? 'text-[#172F52]' : 'text-[#71829B] group-hover:text-[#172F52]'
+              route.path === sub.to ? 'text-[#333333]' : 'text-[#71829B] group-hover:text-[#333333]'
             "
           >
             {{ sub.icon }}
@@ -733,7 +733,7 @@ function closeSubmenuAndMobile() {
 <style scoped>
 .clean-sidebar {
   border-color: #e3e9f1;
-  color: #172b4d;
+  color: #333333;
 }
 .sidebar-brand {
   border-color: #edf1f6;
@@ -743,7 +743,7 @@ function closeSubmenuAndMobile() {
   font-size: 18px;
   font-weight: 700;
   letter-spacing: -0.045em;
-  color: #172b4d;
+  color: #333333;
 }
 .sidebar-menu {
   scrollbar-width: thin;
@@ -770,7 +770,7 @@ function closeSubmenuAndMobile() {
   font-weight: 500;
 }
 .clean-sidebar :is(a, button):focus-visible {
-  outline: 2px solid #5285d8;
+  outline: 2px solid #097CDE;
   outline-offset: 2px;
 }
 @media (max-width: 1023px) {

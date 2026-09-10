@@ -51,7 +51,7 @@ function removeTag(tagToRemove) {
 
 <template>
   <aside
-    class="h-full flex flex-col w-80 bg-white dark:bg-slate-900 border-l border-[#E2E8F0] dark:border-slate-800 transition-all text-[#1E293B] dark:text-slate-100 select-none overflow-y-auto"
+    class="h-full flex flex-col w-80 bg-white dark:bg-slate-900 border-l border-[#E2E8F0] dark:border-slate-800 transition-all text-[#333333] dark:text-slate-100 select-none overflow-y-auto"
   >
     <!-- Inspector Header -->
     <div
@@ -59,9 +59,9 @@ function removeTag(tagToRemove) {
     >
       <div class="flex items-center justify-between mb-1">
         <h2
-          class="text-xs sm:text-sm font-semibold text-[#1E293B] dark:text-slate-100 flex items-center gap-1.5"
+          class="text-xs sm:text-sm font-semibold text-[#333333] dark:text-slate-100 flex items-center gap-1.5"
         >
-          <Info class="w-4 h-4 text-[#172F52]" />
+          <Info class="w-4 h-4 text-[#333333]" />
           <span>Inspector</span>
         </h2>
         <button
@@ -86,8 +86,8 @@ function removeTag(tagToRemove) {
         class="flex-1 py-3 px-1 text-center font-medium flex flex-col items-center gap-1 transition-all cursor-pointer"
         :class="
           activeTab === 'meta'
-            ? 'border-b-2 border-[#172F52] text-[#172F52] dark:text-blue-400'
-            : 'text-[#64748B] dark:text-slate-400 hover:text-[#1E293B] border-b-2 border-transparent'
+            ? 'border-b-2 border-[#0A51B0] text-[#333333] dark:text-blue-400'
+            : 'text-[#64748B] dark:text-slate-400 hover:text-[#333333] border-b-2 border-transparent'
         "
       >
         <Info class="w-4 h-4" />
@@ -99,8 +99,8 @@ function removeTag(tagToRemove) {
         class="flex-1 py-3 px-1 text-center font-medium flex flex-col items-center gap-1 transition-all cursor-pointer"
         :class="
           activeTab === 'tags'
-            ? 'border-b-2 border-[#172F52] text-[#172F52] dark:text-blue-400'
-            : 'text-[#64748B] dark:text-slate-400 hover:text-[#1E293B] border-b-2 border-transparent'
+            ? 'border-b-2 border-[#0A51B0] text-[#333333] dark:text-blue-400'
+            : 'text-[#64748B] dark:text-slate-400 hover:text-[#333333] border-b-2 border-transparent'
         "
       >
         <TagIcon class="w-4 h-4" />
@@ -123,7 +123,7 @@ function removeTag(tagToRemove) {
             <select
               :value="modelValue.category"
               @change="$emit('update:modelValue', { ...modelValue, category: $event.target.value })"
-              class="w-full bg-[#F8FAFC] dark:bg-slate-800 border border-[#E2E8F0] dark:border-slate-700 rounded-lg py-2 pl-3 pr-8 text-xs font-medium text-[#1E293B] dark:text-slate-100 appearance-none focus:outline-none focus:border-[#172F52] cursor-pointer"
+              class="w-full bg-[#F8FAFC] dark:bg-slate-800 border border-[#E2E8F0] dark:border-slate-700 rounded-lg py-2 pl-3 pr-8 text-xs font-medium text-[#333333] dark:text-slate-100 appearance-none focus:outline-none focus:border-[#0A51B0] cursor-pointer"
             >
               <option v-for="c in categories" :key="c.id" :value="c.id">
                 {{ c.label }}
@@ -146,7 +146,7 @@ function removeTag(tagToRemove) {
             <select
               :value="modelValue.severity"
               @change="$emit('update:modelValue', { ...modelValue, severity: $event.target.value })"
-              class="w-full bg-[#F8FAFC] dark:bg-slate-800 border border-[#E2E8F0] dark:border-slate-700 rounded-lg py-2 pl-3 pr-8 text-xs font-medium text-[#1E293B] dark:text-slate-100 appearance-none focus:outline-none focus:border-[#172F52] cursor-pointer"
+              class="w-full bg-[#F8FAFC] dark:bg-slate-800 border border-[#E2E8F0] dark:border-slate-700 rounded-lg py-2 pl-3 pr-8 text-xs font-medium text-[#333333] dark:text-slate-100 appearance-none focus:outline-none focus:border-[#0A51B0] cursor-pointer"
             >
               <option v-for="s in severities" :key="s.id" :value="s.id">
                 {{ s.label }}
@@ -162,7 +162,7 @@ function removeTag(tagToRemove) {
         <div
           class="p-3 rounded-lg bg-[#F8FAFC] dark:bg-slate-800/50 border border-[#E2E8F0] dark:border-slate-700/60 text-xs space-y-1"
         >
-          <span class="font-semibold text-[#1E293B] dark:text-slate-200 block"
+          <span class="font-semibold text-[#333333] dark:text-slate-200 block"
             >Status Artikel:</span
           >
           <p class="text-[11px] text-[#64748B] dark:text-slate-400 leading-relaxed">
@@ -190,7 +190,7 @@ function removeTag(tagToRemove) {
           <span
             v-for="tag in modelValue.tags || []"
             :key="tag"
-            class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-mono font-medium bg-white dark:bg-slate-700 border border-[#E2E8F0] dark:border-slate-600 text-[#1E293B] dark:text-slate-200"
+            class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-mono font-medium bg-white dark:bg-slate-700 border border-[#E2E8F0] dark:border-slate-600 text-[#333333] dark:text-slate-200"
           >
             <span>#{{ tag }}</span>
             <button
@@ -215,11 +215,11 @@ function removeTag(tagToRemove) {
             @keydown.enter.prevent="addTag"
             type="text"
             placeholder="Tambah tag baru..."
-            class="flex-1 bg-white dark:bg-slate-800 border border-[#E2E8F0] dark:border-slate-700 rounded-lg px-3 py-1.5 text-xs font-medium text-[#1E293B] dark:text-slate-100 focus:outline-none focus:border-[#172F52]"
+            class="flex-1 bg-white dark:bg-slate-800 border border-[#E2E8F0] dark:border-slate-700 rounded-lg px-3 py-1.5 text-xs font-medium text-[#333333] dark:text-slate-100 focus:outline-none focus:border-[#0A51B0]"
           />
           <button
             @click="addTag"
-            class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-[#172F52] text-white hover:bg-[#1D4ED8] transition-colors cursor-pointer"
+            class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-[#0A51B0] text-white hover:bg-[#0A4391] transition-colors cursor-pointer"
           >
             Tambah
           </button>
@@ -233,10 +233,10 @@ function removeTag(tagToRemove) {
     >
       <button
         @click="$emit('viewPortal')"
-        class="w-full bg-white dark:bg-slate-800 border border-[#E2E8F0] dark:border-slate-700 hover:bg-[#F1F5F9] dark:hover:bg-slate-700 text-[#1E293B] dark:text-slate-200 font-semibold py-2 px-4 rounded-lg transition-colors text-xs flex justify-center items-center gap-2 cursor-pointer"
+        class="w-full bg-white dark:bg-slate-800 border border-[#E2E8F0] dark:border-slate-700 hover:bg-[#F1F5F9] dark:hover:bg-slate-700 text-[#333333] dark:text-slate-200 font-semibold py-2 px-4 rounded-lg transition-colors text-xs flex justify-center items-center gap-2 cursor-pointer"
       >
         <span>Kembali ke Admin CMS</span>
-        <ExternalLink class="w-3.5 h-3.5 text-[#172F52] dark:text-blue-400" />
+        <ExternalLink class="w-3.5 h-3.5 text-[#333333] dark:text-blue-400" />
       </button>
     </div>
   </aside>

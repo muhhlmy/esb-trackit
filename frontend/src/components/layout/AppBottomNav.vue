@@ -118,7 +118,7 @@ watch(
       class="flex flex-col items-center justify-center gap-0.5 px-2 py-1 rounded-xl transition-colors cursor-pointer min-w-[52px] min-h-[44px] touch-manipulation active:scale-95"
       :class="
         isLainnyaOpen || isLainnyaActive
-          ? 'text-[#172F52] font-bold'
+          ? 'text-[#333333] font-bold'
           : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
       "
     >
@@ -164,8 +164,8 @@ watch(
           class="flex flex-col items-center justify-center gap-1.5 px-2 py-3 rounded-xl transition-colors text-center active:scale-95"
           :class="
             isLainnyaItemActive(item.to)
-              ? 'text-[#172F52] bg-[#172F52]/10 dark:bg-[#172F52]/20 font-bold'
-              : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-[#172F52]'
+              ? 'text-[#333333] bg-[#0A51B0]/10 dark:bg-[#0A51B0]/20 font-bold'
+              : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-[#333333]'
           "
         >
           <component :is="item.icon" class="w-5 h-5" />
@@ -210,7 +210,7 @@ watch(
   letter-spacing: 0;
   font-size: 13px;
   font-weight: 650;
-  color: #172b4d;
+  color: #333333;
 }
 .clean-more-menu button {
   min-width: 44px;
@@ -223,7 +223,7 @@ watch(
 }
 .clean-bottom-nav :is(a, button):focus-visible,
 .clean-more-menu :is(a, button):focus-visible {
-  outline: 2px solid #5285d8;
+  outline: 2px solid #097CDE;
   outline-offset: 2px;
 }
 :global(.dark) .clean-bottom-nav {

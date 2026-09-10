@@ -343,7 +343,7 @@ onMounted(() => {
       <!-- Row 1: Title and Actions -->
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 class="text-lg sm:text-xl font-bold text-[#0F172A] tracking-tight">Pengiriman</h1>
+          <h1 class="text-lg sm:text-xl font-bold text-[#333333] tracking-tight">Pengiriman</h1>
           <p class="text-[13px] text-[#64748B] mt-0.5 leading-normal">
             Pantau proses pengiriman barang dan aset kantor.
           </p>
@@ -353,7 +353,7 @@ onMounted(() => {
           <button
             type="button"
             @click="openAdd"
-            class="h-10 sm:h-9 shrink-0 whitespace-nowrap rounded-lg bg-[#172F52] px-4 text-xs font-semibold text-white shadow-2xs hover:bg-[#1D4ED8] transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+            class="h-10 sm:h-9 shrink-0 whitespace-nowrap rounded-lg bg-[#0A51B0] px-4 text-xs font-semibold text-white shadow-2xs hover:bg-[#0A4391] transition-all flex items-center justify-center gap-1.5 cursor-pointer"
             title="Tambah pengiriman baru"
           >
             <Plus class="w-4 h-4" />
@@ -375,7 +375,7 @@ onMounted(() => {
             aria-label="Cari pengiriman"
             type="text"
             placeholder="Cari penerima, barang, tujuan, atau no resi..."
-            class="h-10 w-full rounded-xl border border-[#E2E8F0] bg-white pl-9 pr-3 text-xs text-[#0F172A] placeholder-[#94A3B8] focus:border-[#172F52] focus:outline-none transition-all shadow-2xs"
+            class="h-10 w-full rounded-xl border border-[#E2E8F0] bg-white pl-9 pr-3 text-xs text-[#333333] placeholder-[#94A3B8] focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
           />
         </div>
 
@@ -396,7 +396,7 @@ onMounted(() => {
             type="date"
             aria-label="Tanggal Dari"
             title="Tanggal Dari"
-            class="h-10 w-full sm:w-[140px] rounded-xl border border-[#E2E8F0] bg-white px-2.5 text-xs text-[#0F172A] focus:border-[#172F52] focus:outline-none transition-all shadow-2xs"
+            class="h-10 w-full sm:w-[140px] rounded-xl border border-[#E2E8F0] bg-white px-2.5 text-xs text-[#333333] focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
           />
           <span class="text-xs text-[#94A3B8]">-</span>
           <input
@@ -404,14 +404,14 @@ onMounted(() => {
             type="date"
             aria-label="Tanggal Sampai"
             title="Tanggal Sampai"
-            class="h-10 w-full sm:w-[140px] rounded-xl border border-[#E2E8F0] bg-white px-2.5 text-xs text-[#0F172A] focus:border-[#172F52] focus:outline-none transition-all shadow-2xs"
+            class="h-10 w-full sm:w-[140px] rounded-xl border border-[#E2E8F0] bg-white px-2.5 text-xs text-[#333333] focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
           />
         </div>
 
         <button
           type="button"
           @click="resetFilters"
-          class="h-10 shrink-0 whitespace-nowrap rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-semibold text-[#64748B] hover:bg-[#F1F5F9] hover:text-[#0F172A] transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs"
+          class="h-10 shrink-0 whitespace-nowrap rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-semibold text-[#64748B] hover:bg-[#F1F5F9] hover:text-[#333333] transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs"
           title="Reset filter pencarian"
         >
           <FilterX class="w-3.5 h-3.5" />
@@ -426,7 +426,7 @@ onMounted(() => {
         class="rounded-2xl border border-[#E2E8F0] bg-white p-4 shadow-2xs flex items-center gap-3.5"
       >
         <div
-          class="h-11 w-11 rounded-xl bg-blue-50 text-[#172F52] flex items-center justify-center shrink-0"
+          class="h-11 w-11 rounded-xl bg-blue-50 text-[#333333] flex items-center justify-center shrink-0"
         >
           <Package class="w-5 h-5" />
         </div>
@@ -434,7 +434,7 @@ onMounted(() => {
           <p class="text-[11px] font-semibold text-[#64748B] uppercase tracking-wider">
             Total Pengiriman
           </p>
-          <p class="text-xl sm:text-2xl font-bold text-[#0F172A] mt-0.5">
+          <p class="text-xl sm:text-2xl font-bold text-[#333333] mt-0.5">
             {{ summary.total }}
           </p>
         </div>
@@ -452,7 +452,7 @@ onMounted(() => {
           <p class="text-[11px] font-semibold text-[#64748B] uppercase tracking-wider">
             Belum Dikirim
           </p>
-          <p class="text-xl sm:text-2xl font-bold text-[#0F172A] mt-0.5">
+          <p class="text-xl sm:text-2xl font-bold text-[#333333] mt-0.5">
             {{ summary.belum_dikirim }}
           </p>
         </div>
@@ -470,7 +470,7 @@ onMounted(() => {
           <p class="text-[11px] font-semibold text-[#64748B] uppercase tracking-wider">
             Sedang Dikirim
           </p>
-          <p class="text-xl sm:text-2xl font-bold text-[#0F172A] mt-0.5">
+          <p class="text-xl sm:text-2xl font-bold text-[#333333] mt-0.5">
             {{ summary.sedang_dikirim }}
           </p>
         </div>
@@ -486,7 +486,7 @@ onMounted(() => {
         </div>
         <div class="min-w-0">
           <p class="text-[11px] font-semibold text-[#64748B] uppercase tracking-wider">Diterima</p>
-          <p class="text-xl sm:text-2xl font-bold text-[#0F172A] mt-0.5">
+          <p class="text-xl sm:text-2xl font-bold text-[#333333] mt-0.5">
             {{ summary.diterima }}
           </p>
         </div>
@@ -519,7 +519,7 @@ onMounted(() => {
         >
           <Package class="w-6 h-6" />
         </div>
-        <p class="font-bold text-sm text-[#0F172A]">Belum ada data pengiriman.</p>
+        <p class="font-bold text-sm text-[#333333]">Belum ada data pengiriman.</p>
         <p class="text-xs text-[#64748B] mt-1 max-w-sm mx-auto">
           {{
             canWriteShipments
@@ -531,7 +531,7 @@ onMounted(() => {
           v-if="canWriteShipments"
           type="button"
           @click="openAdd"
-          class="mt-4 inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-[#172F52] text-white text-xs font-semibold hover:bg-[#1D4ED8] transition-all cursor-pointer shadow-2xs"
+          class="mt-4 inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-[#0A51B0] text-white text-xs font-semibold hover:bg-[#0A4391] transition-all cursor-pointer shadow-2xs"
         >
           <Plus class="w-4 h-4" />
           <span>Tambah Pengiriman</span>
@@ -556,7 +556,7 @@ onMounted(() => {
                 <th v-if="canWriteShipments" class="py-3 px-4 text-right">Aksi</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-[#E2E8F0] text-xs text-[#0F172A]">
+            <tbody class="divide-y divide-[#E2E8F0] text-xs text-[#333333]">
               <tr
                 v-for="item in shipments"
                 :key="item.id"
@@ -565,7 +565,7 @@ onMounted(() => {
                 <td class="py-3 px-4 whitespace-nowrap text-[#475569]">
                   {{ formatDate(item.request_date) }}
                 </td>
-                <td class="py-3 px-4 font-semibold text-[#0F172A]">
+                <td class="py-3 px-4 font-semibold text-[#333333]">
                   {{ item.recipient_name }}
                 </td>
                 <td class="py-3 px-4 max-w-[240px] truncate" :title="item.item_description">
@@ -593,7 +593,7 @@ onMounted(() => {
                     :href="item.delivery_proof_url"
                     target="_blank"
                     rel="noopener noreferrer"
-                    class="inline-flex items-center gap-1 text-[11.5px] font-bold text-[#172F52] hover:text-[#1D4ED8] hover:underline"
+                    class="inline-flex items-center gap-1 text-[11.5px] font-bold text-[#333333] hover:text-[#0A4391] hover:underline"
                     title="Buka link bukti pengiriman di tab baru"
                   >
                     <span>Lihat Bukti</span>
@@ -606,7 +606,7 @@ onMounted(() => {
                     <button
                       type="button"
                       @click="openEdit(item)"
-                      class="p-1.5 rounded-lg text-[#64748B] hover:text-[#172F52] hover:bg-[#F1F5F9] transition-colors cursor-pointer"
+                      class="p-1.5 rounded-lg text-[#64748B] hover:text-[#333333] hover:bg-[#F1F5F9] transition-colors cursor-pointer"
                       title="Edit pengiriman"
                       aria-label="Edit pengiriman"
                     >
@@ -637,7 +637,7 @@ onMounted(() => {
           >
             <div class="flex items-start justify-between gap-2">
               <div>
-                <p class="text-sm font-bold text-[#0F172A]">{{ item.recipient_name }}</p>
+                <p class="text-sm font-bold text-[#333333]">{{ item.recipient_name }}</p>
                 <p class="text-[11px] text-[#64748B] mt-0.5">
                   {{ formatDate(item.request_date) }} &bull; {{ item.destination }}
                 </p>
@@ -663,7 +663,7 @@ onMounted(() => {
                 :href="item.delivery_proof_url"
                 target="_blank"
                 rel="noopener noreferrer"
-                class="inline-flex items-center gap-1 text-[11px] font-bold text-[#172F52]"
+                class="inline-flex items-center gap-1 text-[11px] font-bold text-[#333333]"
               >
                 <span>Lihat Bukti</span>
                 <ExternalLink class="w-3 h-3" />
@@ -677,7 +677,7 @@ onMounted(() => {
               <button
                 type="button"
                 @click="openEdit(item)"
-                class="px-2.5 py-1 text-xs font-semibold text-[#172F52] hover:bg-blue-50 rounded-md transition-colors flex items-center gap-1"
+                class="px-2.5 py-1 text-xs font-semibold text-[#333333] hover:bg-blue-50 rounded-md transition-colors flex items-center gap-1"
               >
                 <Pencil class="w-3 h-3" />
                 <span>Edit</span>
@@ -728,7 +728,7 @@ onMounted(() => {
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
           <div>
-            <label for="shipment-request_date" class="block text-xs font-bold text-[#0F172A] mb-1">
+            <label for="shipment-request_date" class="block text-xs font-bold text-[#333333] mb-1">
               Tanggal Request <span class="text-rose-500">*</span>
             </label>
             <input
@@ -736,12 +736,12 @@ onMounted(() => {
               v-model="form.request_date"
               type="date"
               required
-              class="h-10 w-full rounded-xl border border-[#CBD5E1] px-3 text-xs text-[#0F172A] focus:border-[#172F52] focus:outline-none"
+              class="h-10 w-full rounded-xl border border-[#CBD5E1] px-3 text-xs text-[#333333] focus:border-[#0A51B0] focus:outline-none"
             />
           </div>
 
           <div>
-            <label class="block text-xs font-bold text-[#0F172A] mb-1">
+            <label class="block text-xs font-bold text-[#333333] mb-1">
               Status <span class="text-rose-500">*</span>
             </label>
             <CustomSelect
@@ -756,7 +756,7 @@ onMounted(() => {
         </div>
 
         <div>
-          <label for="shipment-recipient_name" class="block text-xs font-bold text-[#0F172A] mb-1">
+          <label for="shipment-recipient_name" class="block text-xs font-bold text-[#333333] mb-1">
             Nama Penerima <span class="text-rose-500">*</span>
           </label>
           <input
@@ -766,14 +766,14 @@ onMounted(() => {
             required
             maxlength="150"
             placeholder="Contoh: Budi Santoso"
-            class="h-10 w-full rounded-xl border border-[#CBD5E1] px-3 text-xs text-[#0F172A] focus:border-[#172F52] focus:outline-none"
+            class="h-10 w-full rounded-xl border border-[#CBD5E1] px-3 text-xs text-[#333333] focus:border-[#0A51B0] focus:outline-none"
           />
         </div>
 
         <div>
           <label
             for="shipment-item_description"
-            class="block text-xs font-bold text-[#0F172A] mb-1"
+            class="block text-xs font-bold text-[#333333] mb-1"
           >
             Deskripsi Barang <span class="text-rose-500">*</span>
           </label>
@@ -784,12 +784,12 @@ onMounted(() => {
             required
             maxlength="5000"
             placeholder="Contoh: 1 Unit Laptop ThinkPad X1 Carbon + Charger & Mouse"
-            class="w-full rounded-xl border border-[#CBD5E1] p-3 text-xs text-[#0F172A] focus:border-[#172F52] focus:outline-none"
+            class="w-full rounded-xl border border-[#CBD5E1] p-3 text-xs text-[#333333] focus:border-[#0A51B0] focus:outline-none"
           ></textarea>
         </div>
 
         <div>
-          <label for="shipment-destination" class="block text-xs font-bold text-[#0F172A] mb-1">
+          <label for="shipment-destination" class="block text-xs font-bold text-[#333333] mb-1">
             Tujuan Pengiriman <span class="text-rose-500">*</span>
           </label>
           <input
@@ -799,7 +799,7 @@ onMounted(() => {
             required
             maxlength="255"
             placeholder="Contoh: Kantor Cabang Surabaya / Alamat Penerima"
-            class="h-10 w-full rounded-xl border border-[#CBD5E1] px-3 text-xs text-[#0F172A] focus:border-[#172F52] focus:outline-none"
+            class="h-10 w-full rounded-xl border border-[#CBD5E1] px-3 text-xs text-[#333333] focus:border-[#0A51B0] focus:outline-none"
           />
         </div>
 
@@ -807,7 +807,7 @@ onMounted(() => {
           <div>
             <label
               for="shipment-tracking_number"
-              class="block text-xs font-bold text-[#0F172A] mb-1"
+              class="block text-xs font-bold text-[#333333] mb-1"
             >
               No Resi <span class="text-[#94A3B8] font-normal">(Opsional)</span>
             </label>
@@ -817,14 +817,14 @@ onMounted(() => {
               type="text"
               maxlength="100"
               placeholder="Contoh: JNE-01234567"
-              class="h-10 w-full rounded-xl border border-[#CBD5E1] px-3 text-xs text-[#0F172A] focus:border-[#172F52] focus:outline-none"
+              class="h-10 w-full rounded-xl border border-[#CBD5E1] px-3 text-xs text-[#333333] focus:border-[#0A51B0] focus:outline-none"
             />
           </div>
 
           <div>
             <label
               for="shipment-delivery_proof_url"
-              class="block text-xs font-bold text-[#0F172A] mb-1"
+              class="block text-xs font-bold text-[#333333] mb-1"
             >
               Link Bukti Pengiriman <span class="text-[#94A3B8] font-normal">(Opsional)</span>
             </label>
@@ -834,7 +834,7 @@ onMounted(() => {
               type="url"
               maxlength="2048"
               placeholder="https://example.com/bukti.jpg"
-              class="h-10 w-full rounded-xl border border-[#CBD5E1] px-3 text-xs text-[#0F172A] focus:border-[#172F52] focus:outline-none"
+              class="h-10 w-full rounded-xl border border-[#CBD5E1] px-3 text-xs text-[#333333] focus:border-[#0A51B0] focus:outline-none"
             />
           </div>
         </div>
@@ -854,7 +854,7 @@ onMounted(() => {
             type="submit"
             form="shipment-form"
             :disabled="isSubmitting"
-            class="h-9 rounded-lg bg-[#172F52] px-4 text-xs font-semibold text-white hover:bg-[#1D4ED8] disabled:opacity-50 cursor-pointer"
+            class="h-9 rounded-lg bg-[#0A51B0] px-4 text-xs font-semibold text-white hover:bg-[#0A4391] disabled:opacity-50 cursor-pointer"
           >
             {{ isSubmitting ? 'Menyimpan...' : 'Simpan' }}
           </button>
@@ -875,7 +875,7 @@ onMounted(() => {
 
         <p class="text-xs text-[#475569] leading-relaxed">
           Data pengiriman untuk
-          <strong class="text-[#0F172A]">{{ selectedShipment?.recipient_name }}</strong> akan
+          <strong class="text-[#333333]">{{ selectedShipment?.recipient_name }}</strong> akan
           dihapus. Tindakan ini tidak dapat dibatalkan.
         </p>
       </div>
@@ -908,7 +908,7 @@ onMounted(() => {
 .shipments-page {
   max-width: 1600px;
   margin-inline: auto;
-  color: #172f52;
+  color: #333333;
 }
 .shipment-toolbar {
   background: transparent;
@@ -925,7 +925,7 @@ onMounted(() => {
   margin-bottom: 24px;
 }
 .shipment-toolbar > div:first-child button {
-  background: #172f52;
+  background: #0A51B0;
   min-height: 42px;
   box-shadow: none;
 }
@@ -988,7 +988,7 @@ onMounted(() => {
   white-space: normal;
 }
 .shipment-table td:nth-child(2) {
-  color: #172f52;
+  color: #333333;
   font-weight: 600;
 }
 .shipment-table button {
@@ -1019,7 +1019,7 @@ onMounted(() => {
 .shipment-cards > li > div:first-child p:first-child {
   font-size: 14px;
   font-weight: 650;
-  color: #172f52;
+  color: #333333;
 }
 .shipment-cards > li > div:first-child p:last-child {
   line-height: 1.7;
@@ -1078,8 +1078,8 @@ onMounted(() => {
 }
 .shipment-form :is(input, textarea):focus {
   background: white;
-  border-color: #5285d8;
-  box-shadow: 0 0 0 3px #5285d810;
+  border-color: #097CDE;
+  box-shadow: 0 0 0 3px #097CDE10;
 }
 .shipment-form-actions {
   padding: 0;
@@ -1092,7 +1092,7 @@ onMounted(() => {
   border-radius: 8px;
 }
 .shipment-form-actions button[type='submit'] {
-  background: #172f52;
+  background: #0A51B0;
 }
 .shipment-form-actions button:disabled {
   opacity: 0.5;
@@ -1100,7 +1100,7 @@ onMounted(() => {
 }
 .shipments-page button:focus-visible,
 .shipment-form-actions button:focus-visible {
-  outline: 2px solid #5285d8;
+  outline: 2px solid #097CDE;
   outline-offset: 3px;
 }
 @media (min-width: 768px) and (max-width: 1279px) {

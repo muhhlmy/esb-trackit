@@ -190,17 +190,17 @@ export function exportToPdf(
       <title>${safeTitle} - ${safeTableName}</title>
       <style>
         @page { size: A4 landscape; margin: 12mm 15mm; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; color: #1e293b; margin: 0; padding: 0; font-size: 10px; line-height: 1.4; }
-        .header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 3px solid #172F52; padding-bottom: 12px; margin-bottom: 15px; }
-        .title h1 { margin: 0; font-size: 18px; color: #1e293b; font-weight: 800; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; color: #333333; margin: 0; padding: 0; font-size: 10px; line-height: 1.4; }
+        .header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 3px solid #0A51B0; padding-bottom: 12px; margin-bottom: 15px; }
+        .title h1 { margin: 0; font-size: 18px; color: #333333; font-weight: 800; }
         .title p { margin: 3px 0 0 0; color: #64748b; font-size: 10px; }
         .meta { text-align: right; font-size: 9px; color: #64748b; }
         .stats-bar { display: flex; gap: 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 12px; margin-bottom: 15px; }
         .stat-item { flex: 1; }
         .stat-label { font-size: 8px; font-weight: bold; text-transform: uppercase; color: #94a3b8; }
-        .stat-value { font-size: 12px; font-weight: bold; color: #0f172a; }
+        .stat-value { font-size: 12px; font-weight: bold; color: #333333; }
         table.data-table { width: 100%; border-collapse: collapse; margin-top: 5px; }
-        table.data-table th { background: #172F52; color: #ffffff; text-transform: uppercase; font-size: 8px; font-weight: 700; padding: 7px 8px; text-align: left; letter-spacing: 0.03em; }
+        table.data-table th { background: #0A51B0; color: #ffffff; text-transform: uppercase; font-size: 8px; font-weight: 700; padding: 7px 8px; text-align: left; letter-spacing: 0.03em; }
         table.data-table td { padding: 6px 8px; border-bottom: 1px solid #e2e8f0; vertical-align: top; font-size: 9px; word-break: break-word; }
         table.data-table tr.even { background: #ffffff; }
         table.data-table tr.odd { background: #f8fafc; }

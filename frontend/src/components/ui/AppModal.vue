@@ -130,7 +130,7 @@ onBeforeUnmount(() => {
           >
             <div class="flex items-center gap-2.5 min-w-0">
               <span
-                class="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-[#EDF3FC] text-[#172F52] border border-[#A4BBDF]/30"
+                class="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-[#EDF5FF] text-[#333333] border border-[#B8D4F5]/30"
               >
                 <span aria-hidden="true" class="material-symbols-outlined text-[18px]">{{
                   icon || 'devices'
@@ -139,7 +139,7 @@ onBeforeUnmount(() => {
               <div class="min-w-0">
                 <h2
                   :id="titleId"
-                  class="text-sm font-bold text-[#0F172A] leading-tight wrap-anywhere sm:truncate"
+                  class="text-sm font-bold text-[#333333] leading-tight wrap-anywhere sm:truncate"
                 >
                   {{ title }}
                 </h2>
@@ -155,7 +155,7 @@ onBeforeUnmount(() => {
               type="button"
               aria-label="Tutup dialog"
               @click="close"
-              class="flex h-11 w-11 sm:h-7 sm:w-7 shrink-0 items-center justify-center rounded-lg text-[#475569] transition-colors hover:bg-[#F8FAFC] hover:text-[#0F172A] cursor-pointer"
+              class="flex h-11 w-11 sm:h-7 sm:w-7 shrink-0 items-center justify-center rounded-lg text-[#475569] transition-colors hover:bg-[#F8FAFC] hover:text-[#333333] cursor-pointer"
             >
               <span aria-hidden="true" class="material-symbols-outlined text-[18px]">close</span>
             </button>

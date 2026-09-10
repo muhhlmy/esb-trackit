@@ -5,10 +5,11 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-  --color-primary: #172F52;
-  --color-primary-hover: #244673;
-  --color-primary-light: #edf3fc;
-  --color-secondary: #0284c7;
+  --color-brand-orange: #FF4F1B;
+  --color-primary: #0A51B0;
+  --color-primary-hover: #0A4391;
+  --color-primary-light: #EDF5FF;
+  --color-secondary: #0892F5;
   --color-secondary-light: #e8f7ff;
   --color-success: #059669;
   --color-success-light: #edfbf7;
@@ -17,19 +18,22 @@
   --color-danger: #dc2626;
   --color-danger-light: #fdede8;
 
-  --color-esb-primary: #d97706;
-  --color-esb-primary-dark: #b45309;
-  --color-esb-primary-light: #fff2e7;
+  --color-esb-primary: #FF4F1B;
+  --color-esb-primary-dark: #B83A10;
+  --color-esb-primary-light: #FFF2E7;
+  --color-brand-orange-dark: #B83A10;
+  --color-brand-orange-light: #FFF2E7;
+  --color-esb-gold: #FAA425;
 
-  --color-brand: #172F52;
-  --color-brand-dark: #244673;
-  --color-brand-light: #edf3fc;
-  --color-brand-secondary: #0284c7;
-  --color-brand-accent: #059669;
+  --color-brand: #0A51B0;
+  --color-brand-dark: #0A4391;
+  --color-brand-light: #EDF5FF;
+  --color-brand-secondary: #0892F5;
+  --color-brand-accent: #FF4F1B;
   --color-bg: #f4f6f9;
   --color-surface: #ffffff;
   --color-border: #e2e8f0;
-  --color-text: #0f172a;
+  --color-text: #333333;
   --color-text-muted: #475569;
   --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
 }
@@ -49,7 +53,7 @@ html.light {
 }
 
 :focus-visible {
-  outline: 2px solid #172F52;
+  outline: 2px solid #0A51B0;
   outline-offset: 2px;
 }
 
@@ -117,11 +121,11 @@ textarea {
 
 ::selection {
   color: #ffffff;
-  background: #172F52;
+  background: #0A51B0;
 }
 
 :focus-visible {
-  outline: 2px solid #172F52;
+  outline: 2px solid #0A51B0;
   outline-offset: 2px;
 }
 
@@ -265,7 +269,7 @@ input[class*='pr-12'] {
   .form-control:focus
 ) {
   background: #ffffff;
-  border-color: #172F52 !important;
+  border-color: #0A51B0 !important;
   box-shadow: 0 0 0 3px rgba(93, 135, 255, 0.12) !important;
   outline: none;
 }
@@ -298,7 +302,7 @@ label > span:first-child,
 
 /* ── Modernize Buttons Design System ── */
 .btn-primary {
-  background-color: #172F52;
+  background-color: #0A51B0;
   color: #ffffff;
   font-weight: 700;
   font-size: 0.75rem;
@@ -315,7 +319,7 @@ label > span:first-child,
 }
 
 .btn-primary:hover {
-  background-color: #4570ea;
+  background-color: #0A4391;
   box-shadow: 0 4px 12px rgba(69, 112, 234, 0.3);
 }
 
@@ -342,8 +346,8 @@ label > span:first-child,
 
 .btn-secondary:hover {
   background-color: #f2f6fa;
-  border-color: #172F52;
-  color: #172F52;
+  border-color: #0A51B0;
+  color: #333333;
 }
 
 .btn-secondary:active {
@@ -384,11 +388,11 @@ label > span:first-child,
   justify-content: center;
   border-radius: 0.5rem;
   background-color: #ecf2ff;
-  color: #172F52;
+  color: #333333;
   transition: all 150ms ease;
 }
 .btn-icon-view:hover {
-  background-color: #172F52;
+  background-color: #0A51B0;
   color: #ffffff;
 }
 
@@ -435,7 +439,7 @@ label > span:first-child,
 
 .icon-badge-primary {
   background-color: #ecf2ff;
-  color: #172F52;
+  color: #333333;
 }
 .icon-badge-secondary {
   background-color: #e8f7ff;
@@ -472,7 +476,7 @@ div.relative > button.text-left.h-10.w-full {
 }
 
 div.relative > button.text-left:focus {
-  border-color: #172F52 !important;
+  border-color: #0A51B0 !important;
   box-shadow: 0 0 0 3px rgba(93, 135, 255, 0.12) !important;
 }
 

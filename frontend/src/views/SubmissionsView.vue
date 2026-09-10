@@ -634,12 +634,12 @@ onMounted(fetchData)
     >
       <div class="min-w-0 flex items-center gap-3">
         <div
-          class="flex h-10 w-10 sm:h-11 sm:w-11 shrink-0 items-center justify-center rounded-xl bg-[#EDF3FC] text-[#345E99] border border-[#A4BBDF]/40"
+          class="flex h-10 w-10 sm:h-11 sm:w-11 shrink-0 items-center justify-center rounded-xl bg-[#EDF5FF] text-[#0A5DBD] border border-[#B8D4F5]/40"
         >
           <span class="material-symbols-outlined text-[22px] sm:text-[24px]">assignment</span>
         </div>
         <div class="min-w-0">
-          <h1 class="text-lg sm:text-xl font-bold text-[#0F172A] tracking-tight truncate">
+          <h1 class="text-lg sm:text-xl font-bold text-[#333333] tracking-tight truncate">
             Formulir Serah Terima Aset
           </h1>
           <p class="text-xs font-normal text-[#64748B] mt-0.5 truncate">
@@ -651,7 +651,7 @@ onMounted(fetchData)
       <button
         type="button"
         @click="generatePdf"
-        class="h-9.5 shrink-0 whitespace-nowrap rounded-xl bg-[#172F52] px-3.5 sm:px-4 text-xs font-bold text-white shadow-2xs hover:bg-[#244673] active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+        class="h-9.5 shrink-0 whitespace-nowrap rounded-xl bg-[#0A51B0] px-3.5 sm:px-4 text-xs font-bold text-white shadow-2xs hover:bg-[#0A4391] active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
         title="Cetak formulir PDF"
       >
         <span class="material-symbols-outlined text-[16px]">picture_as_pdf</span>
@@ -794,12 +794,12 @@ onMounted(fetchData)
         <div class="flex items-center justify-between gap-2 border-b border-[#F1F5F9] pb-3.5">
           <div class="flex items-center gap-2.5">
             <span
-              class="flex h-6 w-6 items-center justify-center rounded-lg bg-[#EDF3FC] text-[#172F52] text-[11px] font-bold"
+              class="flex h-6 w-6 items-center justify-center rounded-lg bg-[#EDF5FF] text-[#333333] text-[11px] font-bold"
             >
               01
             </span>
             <div>
-              <h2 class="text-[14px] sm:text-[15px] font-bold text-[#0F172A]">
+              <h2 class="text-[14px] sm:text-[15px] font-bold text-[#333333]">
                 Profil Pihak Terkait
               </h2>
               <p class="text-[11.5px] text-[#64748B]">
@@ -815,10 +815,10 @@ onMounted(fetchData)
             class="flex flex-col gap-3.5 rounded-xl sm:rounded-2xl border border-slate-200/80 bg-slate-50/50 p-4"
           >
             <div class="flex items-center gap-2">
-              <span class="material-symbols-outlined text-[18px] text-[#172F52]"
+              <span class="material-symbols-outlined text-[18px] text-[#333333]"
                 >person_outline</span
               >
-              <h3 class="text-xs font-bold uppercase tracking-wider text-[#172F52]">
+              <h3 class="text-xs font-bold uppercase tracking-wider text-[#333333]">
                 Pihak Pemberi (Karyawan)
               </h3>
             </div>
@@ -887,7 +887,7 @@ onMounted(fetchData)
                   v-model="form.isPenerimaLainnya"
                   type="checkbox"
                   aria-label="Penerima Non-Karyawan (Vendor/Lainnya)"
-                  class="rounded border-slate-300 accent-[#172F52] h-4 w-4 cursor-pointer"
+                  class="rounded border-slate-300 accent-[#0A51B0] h-4 w-4 cursor-pointer"
                 />
                 <span class="text-[11px] font-bold text-[#475569]"
                   >Non-Karyawan (Vendor/Lainnya)</span
@@ -918,7 +918,7 @@ onMounted(fetchData)
                 required
                 type="text"
                 aria-label="Nama Lengkap / Vendor Penerima"
-                class="h-10 w-full rounded-xl border border-[#E2E8F0] bg-white px-3 text-xs font-medium text-[#0F172A] placeholder-[#94A3B8] focus:border-[#172F52] focus:ring-2 focus:ring-[#172F52]/10 focus:outline-none transition-all"
+                class="h-10 w-full rounded-xl border border-[#E2E8F0] bg-white px-3 text-xs font-medium text-[#333333] placeholder-[#94A3B8] focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 focus:outline-none transition-all"
                 placeholder="Tulis nama lengkap penerima atau vendor..."
               />
             </div>
@@ -959,7 +959,7 @@ onMounted(fetchData)
                   :class="
                     !form.isPenerimaLainnya
                       ? 'border-slate-200 bg-slate-100/70 text-slate-600 cursor-default'
-                      : 'border-[#E2E8F0] bg-white text-[#0F172A] placeholder-[#94A3B8] focus:border-[#172F52] focus:ring-2 focus:ring-[#172F52]/10'
+                      : 'border-[#E2E8F0] bg-white text-[#333333] placeholder-[#94A3B8] focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10'
                   "
                   :readonly="!form.isPenerimaLainnya"
                   :placeholder="
@@ -981,12 +981,12 @@ onMounted(fetchData)
         <div class="flex items-center justify-between gap-2 border-b border-[#F1F5F9] pb-3.5">
           <div class="flex items-center gap-2.5">
             <span
-              class="flex h-6 w-6 items-center justify-center rounded-lg bg-[#EDF3FC] text-[#172F52] text-[11px] font-bold"
+              class="flex h-6 w-6 items-center justify-center rounded-lg bg-[#EDF5FF] text-[#333333] text-[11px] font-bold"
             >
               02
             </span>
             <div>
-              <h2 class="text-[14px] sm:text-[15px] font-bold text-[#0F172A]">
+              <h2 class="text-[14px] sm:text-[15px] font-bold text-[#333333]">
                 Tujuan Serah Terima Aset
               </h2>
               <p class="text-[11.5px] text-[#64748B]">
@@ -1003,7 +1003,7 @@ onMounted(fetchData)
                 key: 'baru',
                 label: 'Serah Terima Baru',
                 icon: 'fiber_new',
-                color: 'text-[#172F52] bg-[#EDF3FC]',
+                color: 'text-[#333333] bg-[#EDF5FF]',
               },
               {
                 key: 'peminjaman',
@@ -1046,20 +1046,20 @@ onMounted(fetchData)
             class="flex cursor-pointer items-center justify-between min-h-[48px] rounded-xl border p-3 transition-all active:scale-[0.99] select-none"
             :class="
               form.tujuan === t.key
-                ? 'border-[#172F52] bg-[#EDF3FC]/60 ring-2 ring-[#172F52]/15 shadow-2xs'
+                ? 'border-[#0A51B0] bg-[#EDF5FF]/60 ring-2 ring-[#0A51B0]/15 shadow-2xs'
                 : 'border-[#E2E8F0] bg-white hover:bg-slate-50 hover:border-slate-300'
             "
           >
             <div class="flex items-center gap-2.5 min-w-0 pr-2">
               <span
                 class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-[16px]"
-                :class="form.tujuan === t.key ? 'bg-white text-[#172F52] shadow-2xs' : t.color"
+                :class="form.tujuan === t.key ? 'bg-white text-[#333333] shadow-2xs' : t.color"
               >
                 <span class="material-symbols-outlined text-[16px]">{{ t.icon }}</span>
               </span>
               <span
                 class="text-xs font-bold truncate"
-                :class="form.tujuan === t.key ? 'text-[#172F52]' : 'text-[#334155]'"
+                :class="form.tujuan === t.key ? 'text-[#333333]' : 'text-[#334155]'"
               >
                 {{ t.label }}
               </span>
@@ -1070,7 +1070,7 @@ onMounted(fetchData)
               name="tujuan"
               :value="t.key"
               :aria-label="t.label"
-              class="accent-[#172F52] cursor-pointer shrink-0 h-4 w-4"
+              class="accent-[#0A51B0] cursor-pointer shrink-0 h-4 w-4"
             />
           </label>
         </div>
@@ -1084,7 +1084,7 @@ onMounted(fetchData)
             required
             type="text"
             aria-label="Keterangan Tujuan Serah Terima Lainnya"
-            class="h-10 w-full rounded-xl border border-[#E2E8F0] bg-white px-3 text-xs font-medium text-[#0F172A] placeholder-[#94A3B8] focus:border-[#172F52] focus:ring-2 focus:ring-[#172F52]/10 focus:outline-none transition-all"
+            class="h-10 w-full rounded-xl border border-[#E2E8F0] bg-white px-3 text-xs font-medium text-[#333333] placeholder-[#94A3B8] focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 focus:outline-none transition-all"
             placeholder="Tuliskan tujuan serah terima aset lainnya..."
           />
         </div>
@@ -1099,12 +1099,12 @@ onMounted(fetchData)
           <div class="flex items-center justify-between gap-2 border-b border-[#F1F5F9] pb-3.5">
             <div class="flex items-center gap-2.5 min-w-0">
               <span
-                class="flex h-6 w-6 items-center justify-center rounded-lg bg-[#EDF3FC] text-[#172F52] text-[11px] font-bold shrink-0"
+                class="flex h-6 w-6 items-center justify-center rounded-lg bg-[#EDF5FF] text-[#333333] text-[11px] font-bold shrink-0"
               >
                 03
               </span>
               <div class="min-w-0">
-                <h2 class="text-[14px] sm:text-[15px] font-bold text-[#0F172A] truncate">
+                <h2 class="text-[14px] sm:text-[15px] font-bold text-[#333333] truncate">
                   Aset Baru (Diserahkan)
                 </h2>
                 <p class="text-[11.5px] text-[#64748B] truncate">
@@ -1116,7 +1116,7 @@ onMounted(fetchData)
             <button
               type="button"
               @click="addAssetBaruRow"
-              class="h-8.5 shrink-0 whitespace-nowrap rounded-xl bg-[#172F52] px-3 text-xs font-bold text-white shadow-2xs hover:bg-[#244673] active:scale-95 transition-all flex items-center justify-center gap-1 cursor-pointer"
+              class="h-8.5 shrink-0 whitespace-nowrap rounded-xl bg-[#0A51B0] px-3 text-xs font-bold text-white shadow-2xs hover:bg-[#0A4391] active:scale-95 transition-all flex items-center justify-center gap-1 cursor-pointer"
             >
               <span class="material-symbols-outlined text-[15px]">add</span>
               <span>Tambah Unit</span>
@@ -1134,7 +1134,7 @@ onMounted(fetchData)
                 class="flex items-center justify-between border-b border-slate-200/60 pb-2 mb-0.5"
               >
                 <span
-                  class="inline-flex items-center gap-1.5 rounded-lg bg-[#EDF3FC] px-2.5 py-0.5 text-[11px] font-bold text-[#172F52] border border-[#A4BBDF]/40"
+                  class="inline-flex items-center gap-1.5 rounded-lg bg-[#EDF5FF] px-2.5 py-0.5 text-[11px] font-bold text-[#333333] border border-[#B8D4F5]/40"
                 >
                   <span class="material-symbols-outlined text-[14px]">devices</span>
                   Unit Baru #{{ index + 1 }}
@@ -1190,7 +1190,7 @@ onMounted(fetchData)
                     type="number"
                     min="1"
                     :aria-label="`Jumlah (Qty) Aset Baru Baris ${index + 1}`"
-                    class="h-9.5 w-full rounded-xl border border-[#E2E8F0] bg-white px-2.5 text-[11.5px] font-bold text-center text-[#0F172A] focus:border-[#172F52] focus:ring-2 focus:ring-[#172F52]/10 focus:outline-none transition-all"
+                    class="h-9.5 w-full rounded-xl border border-[#E2E8F0] bg-white px-2.5 text-[11.5px] font-bold text-center text-[#333333] focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 focus:outline-none transition-all"
                   />
                 </label>
               </div>
@@ -1224,7 +1224,7 @@ onMounted(fetchData)
                 04
               </span>
               <div class="min-w-0">
-                <h2 class="text-[14px] sm:text-[15px] font-bold text-[#0F172A] truncate">
+                <h2 class="text-[14px] sm:text-[15px] font-bold text-[#333333] truncate">
                   Aset Lama (Dikembalikan)
                 </h2>
                 <p class="text-[11.5px] text-[#64748B] truncate">
@@ -1314,7 +1314,7 @@ onMounted(fetchData)
                     type="number"
                     min="1"
                     :aria-label="`Jumlah (Qty) Aset Lama Baris ${index + 1}`"
-                    class="h-9.5 w-full rounded-xl border border-[#E2E8F0] bg-white px-2.5 text-[11.5px] font-bold text-center text-[#0F172A] focus:border-[#172F52] focus:ring-2 focus:ring-[#172F52]/10 focus:outline-none transition-all"
+                    class="h-9.5 w-full rounded-xl border border-[#E2E8F0] bg-white px-2.5 text-[11.5px] font-bold text-center text-[#333333] focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 focus:outline-none transition-all"
                   />
                 </label>
               </div>
@@ -1343,7 +1343,7 @@ onMounted(fetchData)
       >
         <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
           <span
-            class="text-xs font-bold text-[#0F172A] whitespace-nowrap flex items-center gap-1.5"
+            class="text-xs font-bold text-[#333333] whitespace-nowrap flex items-center gap-1.5"
           >
             <span class="material-symbols-outlined text-[18px] text-slate-400">calendar_today</span>
             Tanggal Serah Terima:
@@ -1353,13 +1353,13 @@ onMounted(fetchData)
             required
             type="date"
             aria-label="Tanggal Formulir Serah Terima"
-            class="h-10 w-full sm:w-48 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-medium text-[#0F172A] focus:border-[#172F52] focus:bg-white focus:ring-2 focus:ring-[#172F52]/10 focus:outline-none transition-all cursor-pointer"
+            class="h-10 w-full sm:w-48 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-medium text-[#333333] focus:border-[#0A51B0] focus:bg-white focus:ring-2 focus:ring-[#0A51B0]/10 focus:outline-none transition-all cursor-pointer"
           />
         </div>
 
         <button
           type="submit"
-          class="h-11 w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-[#172F52] px-6 text-xs font-bold text-white shadow-2xs hover:bg-[#244673] active:scale-95 transition-all cursor-pointer"
+          class="h-11 w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-[#0A51B0] px-6 text-xs font-bold text-white shadow-2xs hover:bg-[#0A4391] active:scale-95 transition-all cursor-pointer"
         >
           <span class="material-symbols-outlined text-[18px]">picture_as_pdf</span>
           <span>Cetak Formulir Serah Terima (PDF)</span>
@@ -1404,8 +1404,8 @@ onMounted(fetchData)
   height: 28px;
   flex-shrink: 0;
   border-radius: 8px;
-  color: #345e99;
-  background: #edf3fc;
+  color: #0A5DBD;
+  background: #EDF5FF;
   font-size: 11px;
   font-weight: 650;
 }

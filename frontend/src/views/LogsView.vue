@@ -219,7 +219,7 @@ function parsePerubahan(perubahan, aksi) {
       class="admin-page-header flex flex-col gap-3.5 bg-white p-3.5 sm:p-4.5 rounded-2xl border border-[#E2E8F0]/80 shadow-2xs"
     >
       <div>
-        <h2 class="text-lg font-bold text-[#0F172A] tracking-tight">
+        <h2 class="text-lg font-bold text-[#333333] tracking-tight">
           Audit Log &amp; Riwayat Aktivitas
         </h2>
         <p class="text-xs text-[#64748B] mt-0.5 leading-normal">

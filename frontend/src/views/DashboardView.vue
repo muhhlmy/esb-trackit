@@ -660,7 +660,7 @@ onUnmounted(() => {
       <div class="dashboard-chart-grid grid grid-cols-1 lg:grid-cols-12">
         <div class="lg:col-span-8 dashboard-panel">
           <div class="flex items-center justify-between mb-3">
-            <h3 class="text-sm font-bold text-[#1E293B]">Tren Aset Bulanan</h3>
+            <h3 class="text-sm font-bold text-[#333333]">Tren Aset Bulanan</h3>
             <span class="text-[10px] font-medium text-[#64748B] bg-[#F1F5F9] px-2 py-0.5 rounded-md"
               >Per Bulan</span
             >
@@ -674,7 +674,7 @@ onUnmounted(() => {
         </div>
         <div class="lg:col-span-4 dashboard-panel">
           <div class="flex items-center justify-between mb-3">
-            <h3 class="text-sm font-bold text-[#1E293B]">Status Aset</h3>
+            <h3 class="text-sm font-bold text-[#333333]">Status Aset</h3>
             <span class="text-[10px] font-medium text-[#64748B] bg-[#F1F5F9] px-2 py-0.5 rounded-md"
               >Distribusi</span
             >
@@ -722,7 +722,7 @@ onUnmounted(() => {
                     <span class="text-xs font-semibold text-[#475569] truncate">{{
                       item.status
                     }}</span>
-                    <span class="text-xs font-bold text-[#1E293B] font-num">{{ item.count }}</span>
+                    <span class="text-xs font-bold text-[#333333] font-num">{{ item.count }}</span>
                   </div>
                   <div class="flex items-center justify-between gap-2 mt-1">
                     <span class="text-[10px] text-[#94A3B8]"
@@ -740,7 +740,7 @@ onUnmounted(() => {
       <div class="dashboard-chart-grid grid grid-cols-1 lg:grid-cols-12">
         <div class="lg:col-span-7 dashboard-panel">
           <div class="flex items-center justify-between mb-4">
-            <h3 class="text-sm font-semibold text-[#1E293B]">Aset Per Tipe</h3>
+            <h3 class="text-sm font-semibold text-[#333333]">Aset Per Tipe</h3>
             <span class="text-xs font-medium text-[#64748B] bg-[#F1F5F9] px-2.5 py-1 rounded-lg"
               >Kategori</span
             >
@@ -754,7 +754,7 @@ onUnmounted(() => {
         </div>
         <div class="lg:col-span-5 dashboard-panel">
           <div class="flex items-center justify-between mb-4">
-            <h3 class="text-sm font-semibold text-[#1E293B]">Kondisi Aset</h3>
+            <h3 class="text-sm font-semibold text-[#333333]">Kondisi Aset</h3>
             <span class="text-xs font-medium text-[#64748B] bg-[#F1F5F9] px-2.5 py-1 rounded-lg"
               >Persentase</span
             >
@@ -775,7 +775,7 @@ onUnmounted(() => {
       <div class="dashboard-panel location-panel">
         <div class="flex items-center justify-between mb-5 pb-4 border-b border-[#F1F5F9]">
           <div>
-            <h3 class="text-sm font-semibold text-[#1E293B]">Sebaran Lokasi Aset</h3>
+            <h3 class="text-sm font-semibold text-[#333333]">Sebaran Lokasi Aset</h3>
             <p class="text-xs text-[#64748B] mt-1">Lokasi penempatan perangkat saat ini</p>
           </div>
           <span
@@ -794,7 +794,7 @@ onUnmounted(() => {
         >
           <div v-for="location in locationBreakdown" :key="location.label" class="location-card">
             <div class="flex items-center justify-between gap-3 mb-3">
-              <span class="truncate text-sm font-semibold text-[#1E293B]" :title="location.label">
+              <span class="truncate text-sm font-semibold text-[#333333]" :title="location.label">
                 {{ location.label }}
               </span>
               <span class="shrink-0 text-sm font-bold text-[#3B82F6] font-num">{{
@@ -863,7 +863,7 @@ onUnmounted(() => {
                   </span>
                 </div>
                 <div class="min-w-0">
-                  <p class="text-xs sm:text-sm font-bold text-[#1E293B] truncate leading-tight">
+                  <p class="text-xs sm:text-sm font-bold text-[#333333] truncate leading-tight">
                     {{ asset.label_aset }}
                   </p>
                   <p class="text-[11px] text-[#64748B] font-mono mt-0.5">ID #{{ asset.id_aset }}</p>
@@ -885,7 +885,7 @@ onUnmounted(() => {
                 <span class="block text-[10px] uppercase font-semibold text-[#94A3B8]"
                   >Merek &amp; Tipe</span
                 >
-                <span class="font-medium text-[#1E293B] truncate block text-[11.5px]">
+                <span class="font-medium text-[#333333] truncate block text-[11.5px]">
                   {{ asset.merek || '—' }}
                   <span v-if="asset.tipe_perangkat" class="text-slate-400 font-normal"
                     >({{ asset.tipe_perangkat }})</span
@@ -904,7 +904,7 @@ onUnmounted(() => {
             <div class="flex items-center justify-between text-[11px] text-[#64748B] pt-0.5">
               <div class="flex items-center gap-1.5">
                 <span class="text-[#94A3B8]">Kondisi:</span>
-                <span class="font-semibold text-[#1E293B]">{{
+                <span class="font-semibold text-[#333333]">{{
                   asset.kondisi_aset || 'Normal'
                 }}</span>
               </div>
@@ -1106,7 +1106,7 @@ onUnmounted(() => {
 
             <!-- Mid: Judul Tiket -->
             <div>
-              <p class="text-xs sm:text-sm font-bold text-[#1E293B] leading-snug">
+              <p class="text-xs sm:text-sm font-bold text-[#333333] leading-snug">
                 {{ ticket.judul }}
               </p>
             </div>
@@ -1266,7 +1266,7 @@ onUnmounted(() => {
   max-width: 1500px;
   margin: 0 auto;
   padding: 4px 0 16px;
-  color: #172b4d;
+  color: #333333;
 }
 .dashboard-intro {
   display: flex;
@@ -1303,14 +1303,14 @@ onUnmounted(() => {
   min-height: 42px;
   padding: 0 16px;
   border-radius: 8px;
-  background: #172f52;
+  background: #0A51B0;
   color: white;
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
 }
 .dashboard-add:hover {
-  background: #244673;
+  background: #0A4391;
 }
 .dashboard-add span {
   font-size: 18px;
@@ -1349,7 +1349,7 @@ onUnmounted(() => {
   font-weight: 650;
   letter-spacing: -0.05em;
   font-variant-numeric: tabular-nums;
-  color: #172b4d;
+  color: #333333;
   margin: 18px 0 13px;
 }
 .stat-caption {
@@ -1357,8 +1357,8 @@ onUnmounted(() => {
   color: #bdcce1;
 }
 .stat-total {
-  background: #172f52;
-  border-color: #172f52;
+  background: #0A51B0;
+  border-color: #0A51B0;
 }
 .stat-total .stat-number {
   color: white;

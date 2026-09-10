@@ -164,20 +164,20 @@ function getCategoryBadgeClass(category) {
         >
           <RouterLink
             to="/dashboard"
-            class="hover:text-[#172F52] transition-colors flex items-center gap-1"
+            class="hover:text-[#333333] transition-colors flex items-center gap-1"
           >
             <span>Dashboard</span>
           </RouterLink>
           <ChevronRight class="w-3 h-3 sm:w-3.5 sm:h-3.5 text-slate-400" />
-          <span class="text-[#172F52] font-bold">Admin CMS</span>
+          <span class="text-[#333333] font-bold">Admin CMS</span>
         </div>
 
         <h1
-          class="text-xl sm:text-3xl font-extrabold text-[#0F172A] dark:text-white tracking-tight flex items-center gap-2"
+          class="text-xl sm:text-3xl font-extrabold text-[#333333] dark:text-white tracking-tight flex items-center gap-2"
         >
           <span>Knowledge Base</span>
           <span
-            class="text-[10.5px] sm:text-xs px-2 sm:px-2.5 py-0.5 rounded-full font-bold bg-[#ECF2FF] dark:bg-indigo-950/80 text-[#172F52] dark:text-indigo-300 border border-[#172F52]/20"
+            class="text-[10.5px] sm:text-xs px-2 sm:px-2.5 py-0.5 rounded-full font-bold bg-[#ECF2FF] dark:bg-indigo-950/80 text-[#333333] dark:text-indigo-300 border border-[#0A51B0]/20"
           >
             Admin CMS
           </span>
@@ -190,7 +190,7 @@ function getCategoryBadgeClass(category) {
 
       <button
         @click="createNewDoc"
-        class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-[#172F52] hover:bg-[#4570EA] text-white shadow-md shadow-[#172F52]/25 hover:shadow-lg transition-all cursor-pointer active:scale-95 shrink-0 touch-manipulation"
+        class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-[#0A51B0] hover:bg-[#0A4391] text-white shadow-md shadow-[#0A51B0]/25 hover:shadow-lg transition-all cursor-pointer active:scale-95 shrink-0 touch-manipulation"
       >
         <Plus class="w-4 h-4" />
         <span>Dokumen Baru</span>
@@ -201,16 +201,16 @@ function getCategoryBadgeClass(category) {
     <div class="gsap-admin-el">
       <RouterLink
         to="/admin/kb-categories"
-        class="flex items-center justify-between p-3.5 sm:p-4 rounded-xl bg-white dark:bg-slate-900 border border-[#E5EAEF] dark:border-slate-800 hover:border-[#172F52] dark:hover:border-[#172F52] transition-colors group shadow-2xs"
+        class="flex items-center justify-between p-3.5 sm:p-4 rounded-xl bg-white dark:bg-slate-900 border border-[#E5EAEF] dark:border-slate-800 hover:border-[#0A51B0] dark:hover:border-[#0A51B0] transition-colors group shadow-2xs"
       >
         <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
           <div
-            class="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-[#ECF2FF] dark:bg-slate-800 text-[#172F52] dark:text-indigo-300 flex items-center justify-center group-hover:bg-[#172F52] group-hover:text-white transition-colors shrink-0"
+            class="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-[#ECF2FF] dark:bg-slate-800 text-[#333333] dark:text-indigo-300 flex items-center justify-center group-hover:bg-[#0A51B0] group-hover:text-white transition-colors shrink-0"
           >
             <LayoutGrid class="w-4 h-4" />
           </div>
           <div class="min-w-0">
-            <div class="text-xs sm:text-sm font-semibold text-[#0F172A] dark:text-white truncate">
+            <div class="text-xs sm:text-sm font-semibold text-[#333333] dark:text-white truncate">
               Kategori Knowledge Base
             </div>
             <div
@@ -221,7 +221,7 @@ function getCategoryBadgeClass(category) {
           </div>
         </div>
         <ChevronRight
-          class="w-4 h-4 text-[#94A3B8] group-hover:text-[#172F52] group-hover:translate-x-0.5 transition-all shrink-0 ml-2"
+          class="w-4 h-4 text-[#94A3B8] group-hover:text-[#333333] group-hover:translate-x-0.5 transition-all shrink-0 ml-2"
         />
       </RouterLink>
     </div>
@@ -244,7 +244,7 @@ function getCategoryBadgeClass(category) {
           >
         </div>
         <p
-          class="text-lg sm:text-2xl font-bold text-[#1E293B] dark:text-white tracking-tight tabular-nums"
+          class="text-lg sm:text-2xl font-bold text-[#333333] dark:text-white tracking-tight tabular-nums"
         >
           {{ stats.total }}
         </p>
@@ -266,7 +266,7 @@ function getCategoryBadgeClass(category) {
           >
         </div>
         <p
-          class="text-lg sm:text-2xl font-bold text-[#1E293B] dark:text-white tracking-tight tabular-nums"
+          class="text-lg sm:text-2xl font-bold text-[#333333] dark:text-white tracking-tight tabular-nums"
         >
           {{ stats.published }}
         </p>
@@ -288,7 +288,7 @@ function getCategoryBadgeClass(category) {
           >
         </div>
         <p
-          class="text-lg sm:text-2xl font-bold text-[#1E293B] dark:text-white tracking-tight tabular-nums"
+          class="text-lg sm:text-2xl font-bold text-[#333333] dark:text-white tracking-tight tabular-nums"
         >
           {{ stats.custom }}
         </p>
@@ -308,7 +308,7 @@ function getCategoryBadgeClass(category) {
           v-model="searchQuery"
           type="text"
           placeholder="Cari judul, deskripsi, atau tag..."
-          class="w-full bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-700 rounded-xl pl-9 pr-9 py-2 sm:py-2.5 text-xs sm:text-sm font-normal text-[#1E293B] dark:text-white placeholder-[#94A3B8] dark:placeholder-slate-500 focus:outline-none focus:border-[#172F52] focus:ring-2 focus:ring-[#172F52]/10 transition-all shadow-2xs"
+          class="w-full bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-700 rounded-xl pl-9 pr-9 py-2 sm:py-2.5 text-xs sm:text-sm font-normal text-[#333333] dark:text-white placeholder-[#94A3B8] dark:placeholder-slate-500 focus:outline-none focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 transition-all shadow-2xs"
         />
         <button
           v-if="searchQuery"
@@ -337,8 +337,8 @@ function getCategoryBadgeClass(category) {
             class="px-2.5 sm:px-3 py-1.5 rounded-md font-semibold text-[11px] sm:text-xs transition-all cursor-pointer focus:outline-none active:scale-95 touch-manipulation"
             :class="
               selectedStatus === st.key
-                ? 'bg-white dark:bg-slate-900 text-[#1E293B] dark:text-white shadow-xs'
-                : 'text-[#64748B] dark:text-slate-400 hover:text-[#1E293B] dark:hover:text-slate-200'
+                ? 'bg-white dark:bg-slate-900 text-[#333333] dark:text-white shadow-xs'
+                : 'text-[#64748B] dark:text-slate-400 hover:text-[#333333] dark:hover:text-slate-200'
             "
           >
             {{ st.label }}
@@ -381,13 +381,13 @@ function getCategoryBadgeClass(category) {
           >
             <FolderOpen class="w-5 h-5" />
           </div>
-          <p class="text-sm font-semibold text-[#1E293B] dark:text-slate-200">Tidak ada dokumen</p>
+          <p class="text-sm font-semibold text-[#333333] dark:text-slate-200">Tidak ada dokumen</p>
           <p class="text-xs text-[#64748B] dark:text-slate-400 font-normal mt-0.5">
             Tidak ada dokumen yang cocok dengan filter atau pencarian.
           </p>
           <button
             @click="clearFilters"
-            class="mt-3 px-4 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-[#1E293B] dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+            class="mt-3 px-4 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-[#333333] dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors cursor-pointer"
           >
             Reset Filter
           </button>
@@ -431,7 +431,7 @@ function getCategoryBadgeClass(category) {
             <div class="flex items-center gap-1 shrink-0">
               <button
                 @click="editDoc(c.id)"
-                class="flex items-center justify-center h-7 px-2.5 gap-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-[#172F52] hover:text-white text-[11px] font-semibold transition-all active:scale-95 touch-manipulation cursor-pointer"
+                class="flex items-center justify-center h-7 px-2.5 gap-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-[#0A51B0] hover:text-white text-[11px] font-semibold transition-all active:scale-95 touch-manipulation cursor-pointer"
                 title="Edit Dokumen"
               >
                 <Edit3 class="w-3 h-3" />
@@ -450,7 +450,7 @@ function getCategoryBadgeClass(category) {
           <!-- Card Body: Title & Summary -->
           <div class="cursor-pointer" @click="editDoc(c.id)">
             <h3
-              class="text-[13px] font-bold text-[#1E293B] dark:text-slate-100 hover:text-[#172F52] transition-colors leading-snug"
+              class="text-[13px] font-bold text-[#333333] dark:text-slate-100 hover:text-[#333333] transition-colors leading-snug"
             >
               {{ c.title }}
             </h3>
@@ -527,7 +527,7 @@ function getCategoryBadgeClass(category) {
                   >
                     <FolderOpen class="w-5 h-5" />
                   </div>
-                  <p class="text-sm font-semibold text-[#1E293B] dark:text-slate-200">
+                  <p class="text-sm font-semibold text-[#333333] dark:text-slate-200">
                     Tidak ada dokumen
                   </p>
                   <p class="text-xs text-[#64748B] dark:text-slate-400 font-normal">
@@ -535,7 +535,7 @@ function getCategoryBadgeClass(category) {
                   </p>
                   <button
                     @click="clearFilters"
-                    class="mt-3 px-4 py-2 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-[#1E293B] dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+                    class="mt-3 px-4 py-2 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-[#333333] dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors cursor-pointer"
                   >
                     Reset Filter
                   </button>
@@ -552,7 +552,7 @@ function getCategoryBadgeClass(category) {
               <!-- Title & Summary -->
               <td class="py-3.5 px-5">
                 <div
-                  class="font-medium text-[#1E293B] dark:text-slate-100 text-[13px] max-w-md group-hover:text-[#172F52] transition-colors leading-snug"
+                  class="font-medium text-[#333333] dark:text-slate-100 text-[13px] max-w-md group-hover:text-[#333333] transition-colors leading-snug"
                 >
                   {{ c.title }}
                 </div>
@@ -625,7 +625,7 @@ function getCategoryBadgeClass(category) {
               <td class="py-3.5 px-5 text-right">
                 <button
                   @click="toggleActionMenu(c.id, $event)"
-                  class="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#172F52]"
+                  class="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0A51B0]"
                   title="Aksi"
                   aria-label="Aksi dokumen"
                 >
@@ -652,7 +652,7 @@ function getCategoryBadgeClass(category) {
               closeActionMenu()
             }
           "
-          class="w-full flex items-center gap-2 px-3 py-2 text-xs font-medium text-[#1E293B] dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-md transition-colors cursor-pointer"
+          class="w-full flex items-center gap-2 px-3 py-2 text-xs font-medium text-[#333333] dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-md transition-colors cursor-pointer"
         >
           <Edit3 class="w-3.5 h-3.5 text-[#64748B] dark:text-slate-400" />
           <span>Edit</span>

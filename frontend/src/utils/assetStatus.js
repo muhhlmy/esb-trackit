@@ -16,8 +16,8 @@ export const ASSET_STATUS_MAP = {
   'In Use': {
     label: 'Digunakan',
     bg: 'bg-[#EFF6FF]',
-    text: 'text-[#172F52]',
-    dot: 'bg-[#172F52]',
+    text: 'text-[#333333]',
+    dot: 'bg-[#0A51B0]',
     border: 'border-[#BFDBFE]/60',
   },
   Stock: {

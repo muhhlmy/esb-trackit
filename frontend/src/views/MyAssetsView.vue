@@ -522,7 +522,7 @@ function getInitials(name) {
 
 function getAvatarGradient(index) {
   const gradients = [
-    'from-[#172F52] to-[#1D4ED8]',
+    'from-[#0A51B0] to-[#0A4391]',
     'from-[#0D9488] to-[#0F766E]',
     'from-[#6366F1] to-[#4F46E5]',
     'from-[#D97706] to-[#B45309]',
@@ -555,7 +555,7 @@ onMounted(() => {
         class="employee-assets-heading flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between"
       >
         <div>
-          <h1 class="text-lg sm:text-xl font-bold tracking-tight text-[#0F172A]">Aset Karyawan</h1>
+          <h1 class="text-lg sm:text-xl font-bold tracking-tight text-[#333333]">Aset Karyawan</h1>
           <p class="mt-0.5 text-xs text-[#64748B]">
             Karyawan yang sedang memegang aset IT perusahaan
           </p>
@@ -613,7 +613,7 @@ onMounted(() => {
             v-model="employeeSearch"
             type="text"
             placeholder="Cari nama karyawan, NIK, atau departemen..."
-            class="h-9 w-full rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] pl-9 pr-8 text-xs text-[#0F172A] placeholder-[#94A3B8] focus:border-[#172F52] focus:bg-white focus:outline-none transition-all"
+            class="h-9 w-full rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] pl-9 pr-8 text-xs text-[#333333] placeholder-[#94A3B8] focus:border-[#0A51B0] focus:bg-white focus:outline-none transition-all"
           />
           <!-- Inline Clear Button -->
           <button
@@ -621,7 +621,7 @@ onMounted(() => {
             type="button"
             @click="employeeSearch = ''"
             aria-label="Bersihkan pencarian"
-            class="absolute right-2 top-1/2 -translate-y-1/2 flex h-5 w-5 items-center justify-center rounded-full text-[#94A3B8] hover:bg-[#F1F5F9] hover:text-[#0F172A] transition-all cursor-pointer touch-manipulation"
+            class="absolute right-2 top-1/2 -translate-y-1/2 flex h-5 w-5 items-center justify-center rounded-full text-[#94A3B8] hover:bg-[#F1F5F9] hover:text-[#333333] transition-all cursor-pointer touch-manipulation"
             title="Bersihkan"
           >
             <span class="material-symbols-outlined text-[15px]">close</span>
@@ -684,7 +684,7 @@ onMounted(() => {
         <!-- Empty State -->
         <div v-else-if="filteredEmployees.length === 0" class="p-12 text-center text-[#64748B]">
           <span class="material-symbols-outlined text-[36px] text-[#CBD5E1]">person_search</span>
-          <h3 class="mt-2 font-semibold text-sm text-[#0F172A]">
+          <h3 class="mt-2 font-semibold text-sm text-[#333333]">
             Tidak Ada Karyawan Memegang Aset
           </h3>
           <p class="text-xs text-[#64748B] mt-1 max-w-sm mx-auto">
@@ -735,7 +735,7 @@ onMounted(() => {
                       </div>
                       <div class="flex flex-col min-w-0">
                         <span
-                          class="text-xs font-semibold text-[#0F172A] group-hover:text-[#172F52] transition-colors truncate block"
+                          class="text-xs font-semibold text-[#333333] group-hover:text-[#333333] transition-colors truncate block"
                           :title="employee.nama_karyawan"
                         >
                           {{ employee.nama_karyawan }}
@@ -753,7 +753,7 @@ onMounted(() => {
                   <td class="py-3.5 px-3 overflow-hidden">
                     <div class="flex flex-col min-w-0">
                       <span
-                        class="font-semibold text-[#1E293B] truncate block"
+                        class="font-semibold text-[#333333] truncate block"
                         :title="employee.departemen || '—'"
                         >{{ employee.departemen || '—' }}</span
                       >
@@ -781,7 +781,7 @@ onMounted(() => {
                           class="inline-flex items-center gap-1 rounded-md bg-[#F1F5F9] px-1.5 py-0.5 text-[10px] font-medium text-[#475569] border border-[#E2E8F0] shrink min-w-0 overflow-hidden"
                         >
                           <span
-                            class="material-symbols-outlined text-[12px] text-[#172F52] shrink-0"
+                            class="material-symbols-outlined text-[12px] text-[#333333] shrink-0"
                             >{{ getDeviceIcon(tipe) }}</span
                           >
                           <span class="truncate">{{ tipe }}</span>
@@ -800,7 +800,7 @@ onMounted(() => {
                   <!-- Total Aset Badge -->
                   <td class="py-3.5 px-2 text-center overflow-hidden">
                     <span
-                      class="inline-flex items-center justify-center rounded-full bg-[#EFF6FF] px-2 py-0.5 text-[11px] font-bold text-[#172F52] border border-[#BFDBFE]/60 whitespace-nowrap"
+                      class="inline-flex items-center justify-center rounded-full bg-[#EFF6FF] px-2 py-0.5 text-[11px] font-bold text-[#333333] border border-[#BFDBFE]/60 whitespace-nowrap"
                     >
                       {{ employee.jumlah_aset || 0 }} Aset
                     </span>
@@ -818,7 +818,7 @@ onMounted(() => {
                   <!-- Action Chevron -->
                   <td class="py-3.5 pr-5 pl-4 text-center overflow-hidden">
                     <span
-                      class="material-symbols-outlined text-[18px] text-[#94A3B8] group-hover:text-[#172F52] group-hover:translate-x-0.5 transition-all inline-block"
+                      class="material-symbols-outlined text-[18px] text-[#94A3B8] group-hover:text-[#333333] group-hover:translate-x-0.5 transition-all inline-block"
                       >chevron_right</span
                     >
                   </td>
@@ -845,7 +845,7 @@ onMounted(() => {
                     {{ getInitials(employee.nama_karyawan) }}
                   </div>
                   <div class="flex flex-col min-w-0 flex-1">
-                    <span class="text-[13.5px] font-bold text-[#0F172A] truncate block">
+                    <span class="text-[13.5px] font-bold text-[#333333] truncate block">
                       {{ employee.nama_karyawan }}
                     </span>
                     <span class="font-mono text-[11px] text-[#64748B] truncate block">
@@ -856,7 +856,7 @@ onMounted(() => {
 
                 <div class="flex items-center gap-1.5 shrink-0">
                   <span
-                    class="inline-flex items-center justify-center rounded-full bg-[#EFF6FF] px-2 py-0.5 text-[10.5px] font-bold text-[#172F52] border border-[#BFDBFE]/60 whitespace-nowrap"
+                    class="inline-flex items-center justify-center rounded-full bg-[#EFF6FF] px-2 py-0.5 text-[10.5px] font-bold text-[#333333] border border-[#BFDBFE]/60 whitespace-nowrap"
                   >
                     {{ employee.jumlah_aset || 0 }} Aset
                   </span>
@@ -877,7 +877,7 @@ onMounted(() => {
                     >Departemen</span
                   >
                   <span
-                    class="text-[12px] font-semibold text-[#1E293B] mt-0.5 truncate block"
+                    class="text-[12px] font-semibold text-[#333333] mt-0.5 truncate block"
                     :title="employee.departemen || '—'"
                   >
                     {{ employee.departemen || '—' }}
@@ -890,7 +890,7 @@ onMounted(() => {
                     >Lokasi</span
                   >
                   <span
-                    class="text-[12px] font-normal text-[#1E293B] mt-0.5 truncate flex items-center gap-1"
+                    class="text-[12px] font-normal text-[#333333] mt-0.5 truncate flex items-center gap-1"
                     :title="normalizeLocation(employee.lokasi_kerja) || '—'"
                   >
                     <span class="material-symbols-outlined text-[12px] text-[#94A3B8] shrink-0"
@@ -915,7 +915,7 @@ onMounted(() => {
                         class="inline-flex items-center gap-1 rounded-md bg-[#F1F5F9] px-1.5 py-0.5 text-[10px] font-medium text-[#475569] border border-[#E2E8F0] shrink min-w-0 overflow-hidden"
                       >
                         <span
-                          class="material-symbols-outlined text-[12px] text-[#172F52] shrink-0"
+                          class="material-symbols-outlined text-[12px] text-[#333333] shrink-0"
                           >{{ getDeviceIcon(tipe) }}</span
                         >
                         <span class="truncate">{{ tipe }}</span>
@@ -971,7 +971,7 @@ onMounted(() => {
             v-if="isAdmin"
             type="button"
             @click="goToLevel1"
-            class="font-medium text-[#64748B] hover:text-[#172F52] transition-colors shrink-0"
+            class="font-medium text-[#64748B] hover:text-[#333333] transition-colors shrink-0"
           >
             Aset Karyawan
           </button>
@@ -979,7 +979,7 @@ onMounted(() => {
           <span class="material-symbols-outlined text-[14px] text-[#CBD5E1] shrink-0"
             >chevron_right</span
           >
-          <span class="font-bold text-[#0F172A] truncate">{{
+          <span class="font-bold text-[#333333] truncate">{{
             selectedEmployee.nama_karyawan
           }}</span>
         </nav>
@@ -988,7 +988,7 @@ onMounted(() => {
           v-if="isAdmin"
           type="button"
           @click="goToLevel1"
-          class="flex items-center gap-1 shrink-0 rounded-lg border border-[#E2E8F0] bg-white px-2.5 sm:px-3 py-1.5 text-xs font-semibold text-[#475569] hover:bg-[#F8FAFC] hover:text-[#0F172A] active:scale-95 transition-all cursor-pointer shadow-2xs touch-manipulation"
+          class="flex items-center gap-1 shrink-0 rounded-lg border border-[#E2E8F0] bg-white px-2.5 sm:px-3 py-1.5 text-xs font-semibold text-[#475569] hover:bg-[#F8FAFC] hover:text-[#333333] active:scale-95 transition-all cursor-pointer shadow-2xs touch-manipulation"
           title="Kembali ke Daftar Karyawan"
         >
           <span class="material-symbols-outlined text-[16px]">arrow_back</span>
@@ -1002,13 +1002,13 @@ onMounted(() => {
       >
         <div class="flex items-start sm:items-center gap-3 sm:gap-4 min-w-0">
           <div
-            class="flex h-11 w-11 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#172F52] to-[#1D4ED8] text-sm font-bold text-white shadow-2xs"
+            class="flex h-11 w-11 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#0A51B0] to-[#0A4391] text-sm font-bold text-white shadow-2xs"
           >
             {{ getInitials(selectedEmployee.nama_karyawan) }}
           </div>
           <div class="min-w-0 flex-1">
             <div class="flex items-center gap-2 flex-wrap">
-              <h2 class="text-base sm:text-lg font-bold text-[#0F172A] tracking-tight truncate">
+              <h2 class="text-base sm:text-lg font-bold text-[#333333] tracking-tight truncate">
                 {{ selectedEmployee.nama_karyawan }}
               </h2>
               <AppBadge
@@ -1026,7 +1026,7 @@ onMounted(() => {
             </p>
             <div class="mt-2 flex flex-wrap items-center gap-1.5 text-[11px] text-[#64748B]">
               <span
-                class="inline-flex items-center font-mono font-medium px-2 py-0.5 rounded-md bg-[#F1F5F9] text-[#1E293B]"
+                class="inline-flex items-center font-mono font-medium px-2 py-0.5 rounded-md bg-[#F1F5F9] text-[#333333]"
               >
                 NIK: {{ selectedEmployee.nik }}
               </span>
@@ -1063,7 +1063,7 @@ onMounted(() => {
             class="rounded-lg bg-[#F8FAFC] px-3 py-2 border border-[#E2E8F0] text-center sm:text-right"
           >
             <span class="block text-[10px] font-semibold uppercase text-[#64748B]">Total Aset</span>
-            <span class="text-base font-bold text-[#172F52] mt-0.5 block"
+            <span class="text-base font-bold text-[#333333] mt-0.5 block"
               >{{ myAssets.length }} Unit</span
             >
           </div>
@@ -1073,7 +1073,7 @@ onMounted(() => {
             <span class="block text-[10px] font-semibold uppercase text-[#64748B]"
               >Penugasan Awal</span
             >
-            <span class="text-xs font-semibold text-[#0F172A] mt-1 block truncate">{{
+            <span class="text-xs font-semibold text-[#333333] mt-1 block truncate">{{
               employeeAssignedSince
             }}</span>
           </div>
@@ -1084,9 +1084,9 @@ onMounted(() => {
       <div class="flex flex-col gap-3">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5">
           <div class="flex items-center gap-2">
-            <span class="material-symbols-outlined text-[20px] text-[#172F52]">inventory_2</span>
-            <h3 class="text-sm font-bold text-[#0F172A]">Aset yang ditugaskan</h3>
-            <span class="rounded-full bg-[#EFF6FF] px-2.5 py-0.5 text-xs font-bold text-[#172F52]">
+            <span class="material-symbols-outlined text-[20px] text-[#333333]">inventory_2</span>
+            <h3 class="text-sm font-bold text-[#333333]">Aset yang ditugaskan</h3>
+            <span class="rounded-full bg-[#EFF6FF] px-2.5 py-0.5 text-xs font-bold text-[#333333]">
               {{ myAssets.length }}
             </span>
           </div>
@@ -1101,14 +1101,14 @@ onMounted(() => {
               v-model="assetSearch"
               type="text"
               placeholder="Cari label / serial..."
-              class="h-8.5 w-full rounded-lg border border-[#E2E8F0] bg-white pl-8 pr-8 text-xs text-[#0F172A] focus:border-[#172F52] focus:outline-none shadow-2xs"
+              class="h-8.5 w-full rounded-lg border border-[#E2E8F0] bg-white pl-8 pr-8 text-xs text-[#333333] focus:border-[#0A51B0] focus:outline-none shadow-2xs"
             />
             <button
               v-if="assetSearch"
               type="button"
               @click="assetSearch = ''"
               aria-label="Bersihkan"
-              class="absolute right-2 top-1/2 -translate-y-1/2 flex h-5 w-5 items-center justify-center rounded-full text-[#94A3B8] hover:bg-[#F1F5F9] hover:text-[#0F172A] cursor-pointer"
+              class="absolute right-2 top-1/2 -translate-y-1/2 flex h-5 w-5 items-center justify-center rounded-full text-[#94A3B8] hover:bg-[#F1F5F9] hover:text-[#333333] cursor-pointer"
             >
               <span class="material-symbols-outlined text-[14px]">close</span>
             </button>
@@ -1121,7 +1121,7 @@ onMounted(() => {
           class="flex flex-col items-center justify-center py-12 text-[#64748B] rounded-xl border border-[#E2E8F0] bg-white"
         >
           <div
-            class="h-6 w-6 animate-spin rounded-full border-2 border-[#172F52] border-t-transparent mb-2"
+            class="h-6 w-6 animate-spin rounded-full border-2 border-[#0A51B0] border-t-transparent mb-2"
           ></div>
           <p class="text-xs font-semibold">Memuat aset terassigned...</p>
         </div>
@@ -1163,7 +1163,7 @@ onMounted(() => {
           class="flex flex-col items-center justify-center gap-2 py-12 px-4 text-center rounded-xl border border-[#E2E8F0] bg-white"
         >
           <span class="material-symbols-outlined text-[32px] text-[#CBD5E1]">devices_off</span>
-          <h4 class="text-sm font-semibold text-[#0F172A]">Belum Ada Aset yang ditugaskan</h4>
+          <h4 class="text-sm font-semibold text-[#333333]">Belum Ada Aset yang ditugaskan</h4>
           <p class="max-w-xs text-xs text-[#64748B]">
             Tidak ada aset IT yang terdaftar atas nama {{ selectedEmployee.nama_karyawan }}.
           </p>
@@ -1182,13 +1182,13 @@ onMounted(() => {
             @keydown.enter.self="goToLevel3(asset)"
             @keydown.space.prevent.self="goToLevel3(asset)"
             aria-label="Lihat detail dan riwayat aset"
-            class="assigned-asset-card group relative flex flex-col justify-between rounded-xl border border-[#E2E8F0] bg-white p-3.5 sm:p-4 shadow-2xs hover:border-[#172F52] hover:shadow-md active:scale-[0.99] transition-all duration-200 cursor-pointer touch-manipulation"
+            class="assigned-asset-card group relative flex flex-col justify-between rounded-xl border border-[#E2E8F0] bg-white p-3.5 sm:p-4 shadow-2xs hover:border-[#0A51B0] hover:shadow-md active:scale-[0.99] transition-all duration-200 cursor-pointer touch-manipulation"
           >
             <div>
               <!-- Top Row: Device Icon & Status Pill -->
               <div class="flex items-center justify-between gap-2 mb-3">
                 <div
-                  class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#EFF6FF] text-[#172F52]"
+                  class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#EFF6FF] text-[#333333]"
                 >
                   <span class="material-symbols-outlined text-[20px]">{{
                     getDeviceIcon(asset.tipe_perangkat)
@@ -1212,7 +1212,7 @@ onMounted(() => {
 
               <!-- Asset Label & Serial Number -->
               <h4
-                class="text-sm font-bold text-[#0F172A] leading-snug group-hover:text-[#172F52] transition-colors truncate"
+                class="text-sm font-bold text-[#333333] leading-snug group-hover:text-[#333333] transition-colors truncate"
               >
                 {{
                   asset.label_aset ||
@@ -1233,7 +1233,7 @@ onMounted(() => {
               <div class="mt-3 pt-3 border-t border-[#F1F5F9] grid grid-cols-2 gap-2 text-xs">
                 <div>
                   <span class="block text-[10px] font-semibold uppercase text-[#94A3B8]">Tipe</span>
-                  <span class="font-medium text-[#1E293B] truncate block mt-0.5">{{
+                  <span class="font-medium text-[#333333] truncate block mt-0.5">{{
                     asset.tipe_perangkat || '—'
                   }}</span>
                 </div>
@@ -1241,7 +1241,7 @@ onMounted(() => {
                   <span class="block text-[10px] font-semibold uppercase text-[#94A3B8]"
                     >Merek / Model</span
                   >
-                  <span class="font-medium text-[#1E293B] truncate block mt-0.5">{{
+                  <span class="font-medium text-[#333333] truncate block mt-0.5">{{
                     [asset.merek, asset.model].filter(Boolean).join(' ') || '—'
                   }}</span>
                 </div>
@@ -1250,7 +1250,7 @@ onMounted(() => {
 
             <!-- Bottom Trigger link -->
             <div
-              class="mt-3.5 pt-2.5 border-t border-[#F1F5F9] flex items-center justify-between text-xs font-semibold text-[#172F52]"
+              class="mt-3.5 pt-2.5 border-t border-[#F1F5F9] flex items-center justify-between text-xs font-semibold text-[#333333]"
             >
               <span>Lihat detail & riwayat</span>
               <span
@@ -1285,21 +1285,21 @@ onMounted(() => {
             v-if="isAdmin"
             type="button"
             @click="goToLevel1"
-            class="font-medium text-[#64748B] hover:text-[#172F52] transition-colors shrink-0"
+            class="font-medium text-[#64748B] hover:text-[#333333] transition-colors shrink-0"
           >
             Aset Karyawan
           </button>
           <button
             type="button"
             @click="currentLevel = 2"
-            class="font-medium text-[#64748B] hover:text-[#172F52] transition-colors shrink-0"
+            class="font-medium text-[#64748B] hover:text-[#333333] transition-colors shrink-0"
           >
             {{ selectedEmployee.nama_karyawan }}
           </button>
           <span class="material-symbols-outlined text-[14px] text-[#CBD5E1] shrink-0"
             >chevron_right</span
           >
-          <span class="font-bold text-[#0F172A] truncate">{{
+          <span class="font-bold text-[#333333] truncate">{{
             selectedAsset.label_aset || selectedAsset.nomor_seri
           }}</span>
           <span class="material-symbols-outlined text-[14px] text-[#CBD5E1] shrink-0"
@@ -1312,7 +1312,7 @@ onMounted(() => {
         <button
           type="button"
           @click="currentLevel = 2"
-          class="sm:hidden flex items-center gap-1 text-xs font-semibold text-[#172F52] truncate"
+          class="sm:hidden flex items-center gap-1 text-xs font-semibold text-[#333333] truncate"
         >
           <span class="material-symbols-outlined text-[16px]">arrow_back</span>
           <span class="truncate">Kembali ke {{ selectedEmployee.nama_karyawan }}</span>
@@ -1321,7 +1321,7 @@ onMounted(() => {
         <button
           type="button"
           @click="currentLevel = 2"
-          class="hidden sm:flex items-center gap-1.5 rounded-lg border border-[#E2E8F0] bg-white px-3 py-1.5 text-xs font-semibold text-[#475569] hover:bg-[#F8FAFC] hover:text-[#0F172A] active:scale-95 transition-all cursor-pointer shadow-2xs touch-manipulation shrink-0"
+          class="hidden sm:flex items-center gap-1.5 rounded-lg border border-[#E2E8F0] bg-white px-3 py-1.5 text-xs font-semibold text-[#475569] hover:bg-[#F8FAFC] hover:text-[#333333] active:scale-95 transition-all cursor-pointer shadow-2xs touch-manipulation shrink-0"
         >
           <span class="material-symbols-outlined text-[16px]">arrow_back</span>
           <span>Kembali ke Detail Karyawan</span>
@@ -1334,7 +1334,7 @@ onMounted(() => {
       >
         <div class="flex items-start sm:items-center gap-3.5 min-w-0">
           <div
-            class="flex h-11 w-11 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-xl bg-[#EFF6FF] text-[#172F52]"
+            class="flex h-11 w-11 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-xl bg-[#EFF6FF] text-[#333333]"
           >
             <span class="material-symbols-outlined text-[24px]">{{
               getDeviceIcon(selectedAsset.tipe_perangkat)
@@ -1342,7 +1342,7 @@ onMounted(() => {
           </div>
           <div class="min-w-0 flex-1">
             <div class="flex items-center gap-2 flex-wrap">
-              <h2 class="text-base sm:text-lg font-bold text-[#0F172A] tracking-tight truncate">
+              <h2 class="text-base sm:text-lg font-bold text-[#333333] tracking-tight truncate">
                 {{
                   selectedAsset.label_aset ||
                   [selectedAsset.merek, selectedAsset.model].filter(Boolean).join(' ') ||
@@ -1356,7 +1356,7 @@ onMounted(() => {
             </div>
             <div class="mt-2 flex flex-wrap items-center gap-1.5 text-[11px] text-[#64748B]">
               <span
-                class="inline-flex items-center font-mono font-medium px-2 py-0.5 rounded-md bg-[#F1F5F9] text-[#0F172A]"
+                class="inline-flex items-center font-mono font-medium px-2 py-0.5 rounded-md bg-[#F1F5F9] text-[#333333]"
               >
                 AST-IT-{{ String(selectedAsset.id_aset).padStart(5, '0') }}
               </span>
@@ -1378,7 +1378,7 @@ onMounted(() => {
         <button
           type="button"
           @click="openSpecification(selectedAsset)"
-          class="w-full sm:w-auto h-9 inline-flex items-center justify-center gap-1.5 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-3.5 text-xs font-semibold text-[#172F52] hover:bg-[#EFF6FF] active:scale-95 cursor-pointer transition-colors shadow-2xs touch-manipulation shrink-0"
+          class="w-full sm:w-auto h-9 inline-flex items-center justify-center gap-1.5 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-3.5 text-xs font-semibold text-[#333333] hover:bg-[#EFF6FF] active:scale-95 cursor-pointer transition-colors shadow-2xs touch-manipulation shrink-0"
         >
           <span class="material-symbols-outlined text-[16px]">description</span>
           <span>Lihat Spesifikasi</span>
@@ -1392,8 +1392,8 @@ onMounted(() => {
           <!-- Information Card -->
           <div class="rounded-xl border border-[#E2E8F0] bg-white p-3.5 sm:p-4 shadow-2xs">
             <div class="flex items-center gap-2 pb-2.5 mb-3 border-b border-[#F1F5F9]">
-              <span class="material-symbols-outlined text-[18px] text-[#172F52]">info</span>
-              <h3 class="text-xs font-bold uppercase tracking-wider text-[#0F172A]">
+              <span class="material-symbols-outlined text-[18px] text-[#333333]">info</span>
+              <h3 class="text-xs font-bold uppercase tracking-wider text-[#333333]">
                 Informasi Perangkat
               </h3>
             </div>
@@ -1401,42 +1401,42 @@ onMounted(() => {
             <dl class="grid grid-cols-2 gap-3 text-xs">
               <div>
                 <dt class="text-[10px] font-semibold uppercase text-[#94A3B8]">Tipe Perangkat</dt>
-                <dd class="mt-0.5 font-semibold text-[#0F172A] truncate">
+                <dd class="mt-0.5 font-semibold text-[#333333] truncate">
                   {{ selectedAsset.tipe_perangkat || '—' }}
                 </dd>
               </div>
 
               <div>
                 <dt class="text-[10px] font-semibold uppercase text-[#94A3B8]">Brand / Merek</dt>
-                <dd class="mt-0.5 font-semibold text-[#0F172A] truncate">
+                <dd class="mt-0.5 font-semibold text-[#333333] truncate">
                   {{ selectedAsset.merek || '—' }}
                 </dd>
               </div>
 
               <div>
                 <dt class="text-[10px] font-semibold uppercase text-[#94A3B8]">Model</dt>
-                <dd class="mt-0.5 font-semibold text-[#0F172A] truncate">
+                <dd class="mt-0.5 font-semibold text-[#333333] truncate">
                   {{ selectedAsset.model || '—' }}
                 </dd>
               </div>
 
               <div>
                 <dt class="text-[10px] font-semibold uppercase text-[#94A3B8]">Serial Number</dt>
-                <dd class="mt-0.5 font-mono font-medium text-[#0F172A] truncate">
+                <dd class="mt-0.5 font-mono font-medium text-[#333333] truncate">
                   {{ selectedAsset.nomor_seri || '—' }}
                 </dd>
               </div>
 
               <div>
                 <dt class="text-[10px] font-semibold uppercase text-[#94A3B8]">Kode / ID Aset</dt>
-                <dd class="mt-0.5 font-mono font-medium text-[#0F172A] truncate">
+                <dd class="mt-0.5 font-mono font-medium text-[#333333] truncate">
                   AST-IT-{{ String(selectedAsset.id_aset).padStart(5, '0') }}
                 </dd>
               </div>
 
               <div>
                 <dt class="text-[10px] font-semibold uppercase text-[#94A3B8]">Lokasi Aset</dt>
-                <dd class="mt-0.5 font-semibold text-[#0F172A] truncate">
+                <dd class="mt-0.5 font-semibold text-[#333333] truncate">
                   {{ selectedAsset.lokasi_aset || selectedEmployee.lokasi_kerja || '—' }}
                 </dd>
               </div>
@@ -1455,7 +1455,7 @@ onMounted(() => {
                 <dt class="text-[10px] font-semibold uppercase text-[#94A3B8]">
                   Kondisi Perangkat
                 </dt>
-                <dd class="mt-0.5 font-semibold text-[#0F172A] truncate">
+                <dd class="mt-0.5 font-semibold text-[#333333] truncate">
                   {{ selectedAsset.kondisi_aset || 'Normal' }}
                 </dd>
               </div>
@@ -1467,7 +1467,7 @@ onMounted(() => {
             <div class="flex items-center justify-between pb-2.5 mb-3 border-b border-[#F1F5F9]">
               <div class="flex items-center gap-2">
                 <span class="material-symbols-outlined text-[18px] text-[#059669]">person_pin</span>
-                <h3 class="text-xs font-bold uppercase tracking-wider text-[#0F172A]">
+                <h3 class="text-xs font-bold uppercase tracking-wider text-[#333333]">
                   Pemegang Aktif saat ini
                 </h3>
               </div>
@@ -1479,12 +1479,12 @@ onMounted(() => {
 
             <div class="flex items-center gap-3">
               <div
-                class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-[#172F52] to-[#1D4ED8] text-xs font-bold text-white shadow-2xs"
+                class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-[#0A51B0] to-[#0A4391] text-xs font-bold text-white shadow-2xs"
               >
                 {{ getInitials(selectedEmployee.nama_karyawan) }}
               </div>
               <div class="min-w-0 flex-1 text-xs">
-                <h4 class="font-bold text-[#0F172A] truncate">
+                <h4 class="font-bold text-[#333333] truncate">
                   {{ selectedEmployee.nama_karyawan }}
                 </h4>
                 <p class="text-[#64748B] font-medium text-[11px] truncate">
@@ -1506,7 +1506,7 @@ onMounted(() => {
           <div class="flex items-center justify-between pb-2.5 mb-3.5 border-b border-[#F1F5F9]">
             <div class="flex items-center gap-2">
               <span class="material-symbols-outlined text-[18px] text-[#7C3AED]">history</span>
-              <h3 class="text-xs font-bold uppercase tracking-wider text-[#0F172A]">
+              <h3 class="text-xs font-bold uppercase tracking-wider text-[#333333]">
                 Audit Timeline & Log History
               </h3>
             </div>
@@ -1531,7 +1531,7 @@ onMounted(() => {
                 class="absolute -left-[21.5px] top-1.5 h-2.5 w-2.5 rounded-full border-2 border-white ring-2 ring-white"
                 :class="[
                   log.type === 'assignment'
-                    ? 'bg-[#172F52]'
+                    ? 'bg-[#0A51B0]'
                     : log.type === 'relocation'
                       ? 'bg-[#D97706]'
                       : log.type === 'creation'
@@ -1549,7 +1549,7 @@ onMounted(() => {
                   <span class="font-semibold text-[#475569] truncate">Oleh: {{ log.actor }}</span>
                 </div>
 
-                <h4 class="font-bold text-[#0F172A] leading-snug">
+                <h4 class="font-bold text-[#333333] leading-snug">
                   {{ log.action }}
                 </h4>
 
@@ -1573,14 +1573,14 @@ onMounted(() => {
       <div v-if="activeModalAsset" class="space-y-4">
         <div class="flex items-center gap-3 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] p-3">
           <div
-            class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#EFF6FF] text-[#172F52]"
+            class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#EFF6FF] text-[#333333]"
           >
             <span class="material-symbols-outlined text-[20px]">{{
               getDeviceIcon(activeModalAsset.tipe_perangkat)
             }}</span>
           </div>
           <div class="min-w-0">
-            <h4 class="font-bold text-xs text-[#0F172A] truncate">
+            <h4 class="font-bold text-xs text-[#333333] truncate">
               {{ activeModalAsset.label_aset || activeModalAsset.merek || 'Aset IT' }}
             </h4>
             <p class="font-mono text-[11px] text-[#64748B] mt-0.5">
@@ -1594,7 +1594,7 @@ onMounted(() => {
             Spesifikasi Detail
           </label>
           <div
-            class="min-h-24 whitespace-pre-wrap rounded-lg border border-[#E2E8F0] bg-white p-3 text-xs text-[#1E293B] leading-relaxed"
+            class="min-h-24 whitespace-pre-wrap rounded-lg border border-[#E2E8F0] bg-white p-3 text-xs text-[#333333] leading-relaxed"
           >
             {{
               activeModalAsset.spesifikasi ||
@@ -1607,7 +1607,7 @@ onMounted(() => {
         <div class="flex justify-end">
           <button
             type="button"
-            class="h-8 rounded-lg bg-[#172F52] px-4 text-xs font-semibold text-white hover:bg-[#1D4ED8] cursor-pointer transition-colors"
+            class="h-8 rounded-lg bg-[#0A51B0] px-4 text-xs font-semibold text-white hover:bg-[#0A4391] cursor-pointer transition-colors"
             @click="closeModal"
           >
             Tutup
@@ -1623,7 +1623,7 @@ onMounted(() => {
   width: 100%;
   max-width: 1500px;
   margin: 0 auto;
-  color: #172b4d;
+  color: #333333;
   padding-bottom: 12px;
 }
 .employee-assets-heading {
@@ -1677,8 +1677,8 @@ onMounted(() => {
   color: #71829b;
 }
 .employee-kpi-primary {
-  background: #172f52;
-  border-color: #172f52;
+  background: #0A51B0;
+  border-color: #0A51B0;
   color: white;
 }
 .employee-kpi-primary :is(.employee-kpi-label, .employee-kpi-caption, .employee-kpi-label span) {
@@ -1757,7 +1757,7 @@ onMounted(() => {
   gap: 7px;
 }
 .assigned-asset-card > div:last-child {
-  color: #345e99;
+  color: #0A5DBD;
   padding-top: 15px;
   margin-top: 20px;
   min-height: 44px;
@@ -1793,7 +1793,7 @@ onMounted(() => {
   letter-spacing: -0.015em;
 }
 .employee-assets-page [tabindex='0']:focus-visible {
-  outline: 2px solid #5285d8;
+  outline: 2px solid #097CDE;
   outline-offset: 3px;
 }
 @media (max-width: 767px) {

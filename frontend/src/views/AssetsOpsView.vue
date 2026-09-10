@@ -387,7 +387,7 @@ function formatDate(dateStr) {
       <!-- Row 1: Page Title & Primary CTA -->
       <div class="flex items-center justify-between gap-2.5">
         <div class="min-w-0">
-          <h2 class="text-base sm:text-lg font-bold text-[#0F172A] tracking-tight truncate">
+          <h2 class="text-base sm:text-lg font-bold text-[#333333] tracking-tight truncate">
             Aset OPS
           </h2>
           <p
@@ -402,7 +402,7 @@ function formatDate(dateStr) {
           v-if="canWriteAssets"
           type="button"
           @click="openAdd"
-          class="h-9 shrink-0 whitespace-nowrap rounded-lg bg-[#172F52] px-3 sm:px-3.5 text-xs font-semibold text-white shadow-2xs hover:bg-[#1D4ED8] active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer touch-manipulation"
+          class="h-9 shrink-0 whitespace-nowrap rounded-lg bg-[#0A51B0] px-3 sm:px-3.5 text-xs font-semibold text-white shadow-2xs hover:bg-[#0A4391] active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer touch-manipulation"
           title="Tambah Aset OPS baru"
         >
           <span class="material-symbols-outlined text-[16px]">add</span>
@@ -424,7 +424,7 @@ function formatDate(dateStr) {
             v-model="searchQuery"
             type="text"
             placeholder="Cari hostname, nama asset, PIC, lokasi..."
-            class="h-9 w-full rounded-lg border border-[#E2E8F0] bg-white pl-8 pr-8 text-xs text-[#0F172A] placeholder-[#94A3B8] focus:border-[#172F52] focus:outline-none transition-all shadow-2xs"
+            class="h-9 w-full rounded-lg border border-[#E2E8F0] bg-white pl-8 pr-8 text-xs text-[#333333] placeholder-[#94A3B8] focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
           />
           <!-- Inline Clear Button -->
           <button
@@ -432,7 +432,7 @@ function formatDate(dateStr) {
             type="button"
             @click="searchQuery = ''"
             aria-label="Bersihkan pencarian"
-            class="absolute right-2 top-1/2 -translate-y-1/2 flex h-5 w-5 items-center justify-center rounded-full text-[#94A3B8] hover:bg-[#F1F5F9] hover:text-[#0F172A] transition-all cursor-pointer touch-manipulation"
+            class="absolute right-2 top-1/2 -translate-y-1/2 flex h-5 w-5 items-center justify-center rounded-full text-[#94A3B8] hover:bg-[#F1F5F9] hover:text-[#333333] transition-all cursor-pointer touch-manipulation"
             title="Bersihkan"
           >
             <span class="material-symbols-outlined text-[15px]">close</span>
@@ -482,7 +482,7 @@ function formatDate(dateStr) {
             v-if="searchQuery || selectedLocation || selectedKategori || selectedStatus"
             type="button"
             @click="resetFilters"
-            class="h-9 shrink-0 whitespace-nowrap rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-medium text-[#64748B] hover:text-[#0F172A] active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs touch-manipulation"
+            class="h-9 shrink-0 whitespace-nowrap rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-medium text-[#64748B] hover:text-[#333333] active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs touch-manipulation"
             title="Reset filter"
           >
             <span class="material-symbols-outlined text-[16px]">restart_alt</span>
@@ -607,7 +607,7 @@ function formatDate(dateStr) {
           >
             <span class="material-symbols-outlined text-[24px]">precision_manufacturing</span>
           </span>
-          <h3 class="text-[14px] font-bold text-[#0F172A] mt-1">Belum Ada Aset OPS</h3>
+          <h3 class="text-[14px] font-bold text-[#333333] mt-1">Belum Ada Aset OPS</h3>
           <p class="text-[11.5px] text-[#64748B] leading-relaxed">
             Belum ada perangkat operasional yang terdaftar dalam inventaris atau sesuai dengan kata
             kunci pencarian.
@@ -616,7 +616,7 @@ function formatDate(dateStr) {
             v-if="canWriteAssets"
             type="button"
             @click="openAdd"
-            class="mt-2 h-9 rounded-lg bg-[#172F52] px-4 text-[12px] font-semibold text-white shadow-2xs hover:bg-[#1D4ED8] transition-all flex items-center gap-1.5 cursor-pointer"
+            class="mt-2 h-9 rounded-lg bg-[#0A51B0] px-4 text-[12px] font-semibold text-white shadow-2xs hover:bg-[#0A4391] transition-all flex items-center gap-1.5 cursor-pointer"
           >
             <span class="material-symbols-outlined text-[16px]">add</span>
             <span>Tambah Aset OPS</span>
@@ -718,7 +718,7 @@ function formatDate(dateStr) {
           <h3 class="asset-form-section-title"><span>01</span>Identitas aset</h3>
           <!-- Hostname -->
           <div>
-            <label for="ops-hostname" class="block text-[12px] font-bold text-[#1E293B] mb-1">
+            <label for="ops-hostname" class="block text-[12px] font-bold text-[#333333] mb-1">
               Hostname / Kode Aset <span class="text-rose-500">*</span>
             </label>
             <input
@@ -727,13 +727,13 @@ function formatDate(dateStr) {
               type="text"
               required
               placeholder="Contoh: OPS-PL-001"
-              class="w-full h-10 px-3 text-[12.5px] rounded-xl border border-[#E2E8F0] bg-white focus:border-[#172F52] focus:outline-none"
+              class="w-full h-10 px-3 text-[12.5px] rounded-xl border border-[#E2E8F0] bg-white focus:border-[#0A51B0] focus:outline-none"
             />
           </div>
 
           <!-- Nama Asset -->
           <div>
-            <label for="ops-nama-asset" class="block text-[12px] font-bold text-[#1E293B] mb-1">
+            <label for="ops-nama-asset" class="block text-[12px] font-bold text-[#333333] mb-1">
               Nama Asset <span class="text-rose-500">*</span>
             </label>
             <input
@@ -742,7 +742,7 @@ function formatDate(dateStr) {
               type="text"
               required
               placeholder="Contoh: KIOSK Self Service Station"
-              class="w-full h-10 px-3 text-[12.5px] rounded-xl border border-[#E2E8F0] bg-white focus:border-[#172F52] focus:outline-none"
+              class="w-full h-10 px-3 text-[12.5px] rounded-xl border border-[#E2E8F0] bg-white focus:border-[#0A51B0] focus:outline-none"
             />
           </div>
         </div>
@@ -751,7 +751,7 @@ function formatDate(dateStr) {
           <h3 class="asset-form-section-title"><span>02</span>Kategori & penempatan</h3>
           <!-- Kategori -->
           <div>
-            <label class="block text-[12px] font-bold text-[#1E293B] mb-1">
+            <label class="block text-[12px] font-bold text-[#333333] mb-1">
               Kategori <span class="text-rose-500">*</span>
             </label>
             <SearchableSelect
@@ -765,7 +765,7 @@ function formatDate(dateStr) {
 
           <!-- Lokasi Utama -->
           <div>
-            <label class="block text-[12px] font-bold text-[#1E293B] mb-1">
+            <label class="block text-[12px] font-bold text-[#333333] mb-1">
               Lokasi Utama <span class="text-rose-500">*</span>
             </label>
             <SearchableSelect
@@ -782,7 +782,7 @@ function formatDate(dateStr) {
           <h3 class="asset-form-section-title"><span>03</span>Penanggung jawab & pembelian</h3>
           <!-- PIC Penanggung Jawab -->
           <div>
-            <label for="ops-pic" class="block text-[12px] font-bold text-[#1E293B] mb-1"
+            <label for="ops-pic" class="block text-[12px] font-bold text-[#333333] mb-1"
               >PIC (Penanggung Jawab)</label
             >
             <input
@@ -790,20 +790,20 @@ function formatDate(dateStr) {
               v-model="form.pic"
               type="text"
               placeholder="Contoh: Store Manager / Spv Kasir"
-              class="w-full h-10 px-3 text-[12.5px] rounded-xl border border-[#E2E8F0] bg-white focus:border-[#172F52] focus:outline-none"
+              class="w-full h-10 px-3 text-[12.5px] rounded-xl border border-[#E2E8F0] bg-white focus:border-[#0A51B0] focus:outline-none"
             />
           </div>
 
           <!-- Tanggal Beli -->
           <div>
-            <label for="ops-tanggal-beli" class="block text-[12px] font-bold text-[#1E293B] mb-1"
+            <label for="ops-tanggal-beli" class="block text-[12px] font-bold text-[#333333] mb-1"
               >Tanggal Pembelian</label
             >
             <input
               id="ops-tanggal-beli"
               v-model="form.tanggal_beli"
               type="date"
-              class="w-full h-10 px-3 text-[12.5px] rounded-xl border border-[#E2E8F0] bg-white focus:border-[#172F52] focus:outline-none"
+              class="w-full h-10 px-3 text-[12.5px] rounded-xl border border-[#E2E8F0] bg-white focus:border-[#0A51B0] focus:outline-none"
             />
           </div>
         </div>
@@ -812,7 +812,7 @@ function formatDate(dateStr) {
           <h3 class="asset-form-section-title"><span>04</span>Nilai & kondisi</h3>
           <!-- Total Asset Amount -->
           <div>
-            <label for="ops-total-amount" class="block text-[12px] font-bold text-[#1E293B] mb-1"
+            <label for="ops-total-amount" class="block text-[12px] font-bold text-[#333333] mb-1"
               >Total Amount (Rp)</label
             >
             <input
@@ -822,13 +822,13 @@ function formatDate(dateStr) {
               min="0"
               step="1000"
               placeholder="0"
-              class="w-full h-10 px-3 text-[12.5px] rounded-xl border border-[#E2E8F0] bg-white focus:border-[#172F52] focus:outline-none"
+              class="w-full h-10 px-3 text-[12.5px] rounded-xl border border-[#E2E8F0] bg-white focus:border-[#0A51B0] focus:outline-none"
             />
           </div>
 
           <!-- Kondisi -->
           <div>
-            <label class="block text-[12px] font-bold text-[#1E293B] mb-1">Kondisi</label>
+            <label class="block text-[12px] font-bold text-[#333333] mb-1">Kondisi</label>
             <CustomSelect
               v-model="form.kondisi"
               :options="kondisiOptions"
@@ -841,7 +841,7 @@ function formatDate(dateStr) {
 
           <!-- Status -->
           <div>
-            <label class="block text-[12px] font-bold text-[#1E293B] mb-1"
+            <label class="block text-[12px] font-bold text-[#333333] mb-1"
               >Status Operasional</label
             >
             <CustomSelect
@@ -872,7 +872,7 @@ function formatDate(dateStr) {
             type="submit"
             form="crud-AssetsOpsView"
             :disabled="isSubmitting"
-            class="h-10 px-5 rounded-xl bg-[#172F52] text-[12.5px] font-bold text-white shadow-2xs hover:bg-[#1D4ED8] disabled:opacity-50 flex items-center gap-2"
+            class="h-10 px-5 rounded-xl bg-[#0A51B0] text-[12.5px] font-bold text-white shadow-2xs hover:bg-[#0A4391] disabled:opacity-50 flex items-center gap-2"
           >
             <span v-if="isSubmitting" class="animate-spin text-[16px]">hourglass_empty</span>
             <span>{{ isSubmitting ? 'Menyimpan...' : 'Simpan Aset OPS' }}</span>
@@ -886,7 +886,7 @@ function formatDate(dateStr) {
       <div class="asset-delete-content space-y-4">
         <p class="text-[13px] text-[#475569]">
           Apakah Anda yakin ingin menghapus Aset OPS
-          <strong class="text-[#0F172A]">{{ selectedAsset?.nama_asset }}</strong> ({{
+          <strong class="text-[#333333]">{{ selectedAsset?.nama_asset }}</strong> ({{
             selectedAsset?.hostname
           }})?
         </p>
@@ -922,14 +922,14 @@ function formatDate(dateStr) {
           class="asset-detail-identity flex items-center gap-3 p-3 bg-[#F8FAFC] rounded-xl border border-[#E2E8F0]"
         >
           <div
-            class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#EFF6FF] text-[#172F52]"
+            class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#EFF6FF] text-[#333333]"
           >
             <span class="material-symbols-outlined text-[22px]">{{
               getOpsIcon(selectedAsset.kategori)
             }}</span>
           </div>
           <div>
-            <h3 class="font-bold text-[#0F172A] text-[14px]">{{ selectedAsset.nama_asset }}</h3>
+            <h3 class="font-bold text-[#333333] text-[14px]">{{ selectedAsset.nama_asset }}</h3>
             <p class="font-mono text-[11px] text-[#64748B]">{{ selectedAsset.hostname }}</p>
           </div>
         </div>
@@ -937,29 +937,29 @@ function formatDate(dateStr) {
         <div class="asset-detail-fields">
           <div>
             <span class="text-[#64748B] block text-[11px] font-medium">Kategori</span>
-            <span class="font-semibold text-[#1E293B]">{{ selectedAsset.kategori }}</span>
+            <span class="font-semibold text-[#333333]">{{ selectedAsset.kategori }}</span>
           </div>
 
           <div>
             <span class="text-[#64748B] block text-[11px] font-medium">Lokasi</span>
-            <span class="font-semibold text-[#1E293B]">{{ selectedAsset.lokasi }}</span>
+            <span class="font-semibold text-[#333333]">{{ selectedAsset.lokasi }}</span>
           </div>
 
           <div>
             <span class="text-[#64748B] block text-[11px] font-medium">PIC / Penanggung Jawab</span>
-            <span class="text-[#1E293B] font-medium">{{
+            <span class="text-[#333333] font-medium">{{
               selectedAsset.pic || 'Belum ditetapkan'
             }}</span>
           </div>
 
           <div>
             <span class="text-[#64748B] block text-[11px] font-medium">Tanggal Pembelian</span>
-            <span class="text-[#1E293B]">{{ formatDate(selectedAsset.tanggal_beli) }}</span>
+            <span class="text-[#333333]">{{ formatDate(selectedAsset.tanggal_beli) }}</span>
           </div>
 
           <div>
             <span class="text-[#64748B] block text-[11px] font-medium">Total Asset Amount</span>
-            <span class="font-bold text-[#0F172A] text-[13.5px]">{{
+            <span class="font-bold text-[#333333] text-[13.5px]">{{
               formatCurrency(selectedAsset.total_asset_amount)
             }}</span>
           </div>
@@ -984,7 +984,7 @@ function formatDate(dateStr) {
 
         <div class="pt-2 border-t border-[#E2E8F0]">
           <span class="text-[#64748B] block text-[11px] font-medium">Kondisi Perangkat</span>
-          <p class="text-[12.5px] text-[#1E293B] font-semibold mt-0.5">
+          <p class="text-[12.5px] text-[#333333] font-semibold mt-0.5">
             {{ selectedAsset.kondisi || 'Baik' }}
           </p>
         </div>
@@ -994,7 +994,7 @@ function formatDate(dateStr) {
           <button
             type="button"
             @click="closeModal"
-            class="h-10 px-5 rounded-xl bg-[#172F52] text-[12.5px] font-bold text-white shadow-2xs hover:bg-[#1D4ED8]"
+            class="h-10 px-5 rounded-xl bg-[#0A51B0] text-[12.5px] font-bold text-white shadow-2xs hover:bg-[#0A4391]"
           >
             Tutup
           </button>

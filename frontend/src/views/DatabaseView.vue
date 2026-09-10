@@ -358,13 +358,13 @@ function switchTab(tab) {
       class="admin-page-header flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
     >
       <div>
-        <h1 class="text-xl font-bold tracking-tight text-[#1E293B]">Database</h1>
+        <h1 class="text-xl font-bold tracking-tight text-[#333333]">Database</h1>
         <p class="text-sm text-[#64748B]">Backup & restore database PostgreSQL</p>
       </div>
       <div class="flex flex-col sm:flex-row sm:items-center gap-2">
         <button
           :disabled="isBackingUp || !dbStatus.pgDumpAvailable"
-          class="inline-flex items-center gap-2 rounded-lg bg-[#172F52] px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all hover:bg-[#1D4ED8] disabled:cursor-not-allowed disabled:opacity-50"
+          class="inline-flex items-center gap-2 rounded-lg bg-[#0A51B0] px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all hover:bg-[#0A4391] disabled:cursor-not-allowed disabled:opacity-50"
           @click="handleBackupNow"
         >
           <span
@@ -393,7 +393,7 @@ function switchTab(tab) {
         class="flex min-w-0 items-center justify-center gap-1.5 rounded-lg px-2 sm:px-3.5 py-1.5 text-sm font-medium transition-all"
         :class="
           activeTab === tab.key
-            ? 'bg-white text-[#1E293B] shadow-sm'
+            ? 'bg-white text-[#333333] shadow-sm'
             : 'text-[#64748B] hover:text-[#334155]'
         "
         :aria-pressed="activeTab === tab.key"
@@ -423,7 +423,7 @@ function switchTab(tab) {
               class="inline-block h-2.5 w-2.5 rounded-full"
               :class="dbStatus.connected ? 'bg-emerald-500' : 'bg-red-500'"
             ></span>
-            <span class="text-lg font-semibold text-[#1E293B]">{{
+            <span class="text-lg font-semibold text-[#333333]">{{
               dbStatus.connected ? 'Connected' : 'Disconnected'
             }}</span>
           </div>
@@ -440,7 +440,7 @@ function switchTab(tab) {
               class="inline-block h-2.5 w-2.5 rounded-full"
               :class="dbStatus.schemaHealthy ? 'bg-emerald-500' : 'bg-amber-500'"
             ></span>
-            <span class="text-lg font-semibold text-[#1E293B]">{{
+            <span class="text-lg font-semibold text-[#333333]">{{
               dbStatus.schemaHealthy ? 'Healthy' : 'Incomplete'
             }}</span>
           </div>
@@ -498,7 +498,7 @@ function switchTab(tab) {
               class="inline-block h-2.5 w-2.5 rounded-full"
               :class="dbStatus.backupStorageAvailable ? 'bg-emerald-500' : 'bg-red-500'"
             ></span>
-            <span class="text-lg font-semibold text-[#1E293B]">{{
+            <span class="text-lg font-semibold text-[#333333]">{{
               dbStatus.backupStorageAvailable ? 'Available' : 'Unavailable'
             }}</span>
           </div>
@@ -559,7 +559,7 @@ function switchTab(tab) {
         </p>
         <ul v-else class="divide-y divide-[#F1F5F9] lg:hidden" aria-label="Riwayat backup">
           <li v-for="backup in backups" :key="backup.id" class="min-w-0 space-y-3 p-4">
-            <h3 class="text-sm font-semibold text-[#1E293B]">{{ backup.filename }}</h3>
+            <h3 class="text-sm font-semibold text-[#333333]">{{ backup.filename }}</h3>
             <span
               class="inline-flex rounded-full border px-2 py-0.5 text-xs font-medium"
               :class="statusClass(backup.status)"
@@ -587,7 +587,7 @@ function switchTab(tab) {
               <button
                 v-if="backup.status === 'success'"
                 type="button"
-                class="flex items-center justify-center gap-2 rounded-lg border border-[#E5EAEF] px-3 py-2 text-sm font-medium text-[#172F52] hover:bg-[#F8FAFC]"
+                class="flex items-center justify-center gap-2 rounded-lg border border-[#E5EAEF] px-3 py-2 text-sm font-medium text-[#333333] hover:bg-[#F8FAFC]"
                 @click="handleDownload(backup)"
               >
                 <span aria-hidden="true" class="material-symbols-outlined text-lg">download</span
@@ -632,7 +632,7 @@ function switchTab(tab) {
                 class="hover:bg-[#F8FAFC] transition-colors"
               >
                 <td
-                  class="px-4 py-3 font-medium text-[#1E293B] max-w-[220px] truncate"
+                  class="px-4 py-3 font-medium text-[#333333] max-w-[220px] truncate"
                   :title="backup.filename"
                 >
                   {{ backup.filename }}
@@ -662,7 +662,7 @@ function switchTab(tab) {
                   <div class="flex items-center justify-end gap-1">
                     <button
                       v-if="backup.status === 'success'"
-                      class="rounded-lg p-1.5 text-[#64748B] hover:bg-[#F1F5F9] hover:text-[#172F52] transition-colors"
+                      class="rounded-lg p-1.5 text-[#64748B] hover:bg-[#F1F5F9] hover:text-[#333333] transition-colors"
                       title="Download"
                       @click="handleDownload(backup)"
                     >
@@ -706,9 +706,9 @@ function switchTab(tab) {
 
         <!-- Step 1: Upload -->
         <div v-if="restoreStep === 'upload' || restoreStep === 'validating'">
-          <h3 class="mb-4 text-base font-semibold text-[#1E293B]">Upload File Backup</h3>
+          <h3 class="mb-4 text-base font-semibold text-[#333333]">Upload File Backup</h3>
           <div
-            class="rounded-lg border-2 border-dashed border-[#CBD5E1] p-4 sm:p-8 text-center transition-colors hover:border-[#172F52]"
+            class="rounded-lg border-2 border-dashed border-[#CBD5E1] p-4 sm:p-8 text-center transition-colors hover:border-[#0A51B0]"
           >
             <input
               id="restoreFileInput"
@@ -719,7 +719,7 @@ function switchTab(tab) {
             />
             <label
               for="restoreFileInput"
-              class="block cursor-pointer rounded-lg peer-focus-visible:outline-2 peer-focus-visible:outline-offset-4 peer-focus-visible:outline-[#172F52]"
+              class="block cursor-pointer rounded-lg peer-focus-visible:outline-2 peer-focus-visible:outline-offset-4 peer-focus-visible:outline-[#0A51B0]"
             >
               <span class="material-symbols-outlined mb-2 block text-4xl text-[#94A3B8]"
                 >upload_file</span
@@ -746,7 +746,7 @@ function switchTab(tab) {
 
           <button
             :disabled="!restoreFile || restoreStep === 'validating'"
-            class="mt-4 inline-flex items-center gap-2 rounded-lg bg-[#172F52] px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all hover:bg-[#1D4ED8] disabled:cursor-not-allowed disabled:opacity-50"
+            class="mt-4 inline-flex items-center gap-2 rounded-lg bg-[#0A51B0] px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all hover:bg-[#0A4391] disabled:cursor-not-allowed disabled:opacity-50"
             @click="handleValidateRestore"
           >
             <span
@@ -760,29 +760,29 @@ function switchTab(tab) {
 
         <!-- Step 2: Review -->
         <div v-if="restoreStep === 'review' || restoreStep === 'restoring'">
-          <h3 class="mb-4 text-base font-semibold text-[#1E293B]">Informasi Backup</h3>
+          <h3 class="mb-4 text-base font-semibold text-[#333333]">Informasi Backup</h3>
           <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div class="rounded-lg bg-[#F8FAFC] p-3">
               <div class="text-xs text-[#94A3B8]">Format</div>
-              <div class="text-sm font-medium text-[#1E293B]">
+              <div class="text-sm font-medium text-[#333333]">
                 {{ restoreValidation?.format || '-' }}
               </div>
             </div>
             <div class="rounded-lg bg-[#F8FAFC] p-3">
               <div class="text-xs text-[#94A3B8]">Database</div>
-              <div class="text-sm font-medium text-[#1E293B]">
+              <div class="text-sm font-medium text-[#333333]">
                 {{ restoreValidation?.databaseName || '-' }}
               </div>
             </div>
             <div class="rounded-lg bg-[#F8FAFC] p-3">
               <div class="text-xs text-[#94A3B8]">Size</div>
-              <div class="text-sm font-medium text-[#1E293B]">
+              <div class="text-sm font-medium text-[#333333]">
                 {{ formatBytes(restoreValidation?.fileSize) }}
               </div>
             </div>
             <div class="rounded-lg bg-[#F8FAFC] p-3">
               <div class="text-xs text-[#94A3B8]">Checksum</div>
-              <div class="text-sm font-mono font-medium text-[#1E293B] truncate">
+              <div class="text-sm font-mono font-medium text-[#333333] truncate">
                 {{ restoreValidation?.checksum?.slice(0, 24) || '-' }}
               </div>
             </div>
@@ -844,7 +844,7 @@ function switchTab(tab) {
         <!-- Step 3: Done -->
         <div v-if="restoreStep === 'done'" class="text-center">
           <span class="material-symbols-outlined mb-3 text-5xl text-emerald-500">check_circle</span>
-          <h3 class="text-lg font-semibold text-[#1E293B]">Restore Berhasil</h3>
+          <h3 class="text-lg font-semibold text-[#333333]">Restore Berhasil</h3>
           <p class="mt-1 text-sm text-[#64748B]">
             Database telah diverifikasi dan berjalan normal.
           </p>
@@ -852,7 +852,7 @@ function switchTab(tab) {
             Safety backup ID: {{ restoreResult.safetyBackupId }}
           </p>
           <button
-            class="mt-4 rounded-lg bg-[#172F52] px-4 py-2 text-sm font-semibold text-white hover:bg-[#1D4ED8]"
+            class="mt-4 rounded-lg bg-[#0A51B0] px-4 py-2 text-sm font-semibold text-white hover:bg-[#0A4391]"
             @click="resetRestore"
           >
             Restore Lagi
@@ -873,7 +873,7 @@ function switchTab(tab) {
         </p>
         <ul v-else class="divide-y divide-[#F1F5F9] lg:hidden" aria-label="Audit database">
           <li v-for="log in auditLogs" :key="log.id" class="min-w-0 space-y-3 p-4">
-            <h3 class="text-sm font-semibold text-[#1E293B]">
+            <h3 class="text-sm font-semibold text-[#333333]">
               {{ operationLabel(log.operation) }}
             </h3>
             <span
@@ -990,7 +990,7 @@ function switchTab(tab) {
         <div>
           <label
             for="confirm-restore-input"
-            class="mb-1.5 block text-sm font-medium text-[#1E293B]"
+            class="mb-1.5 block text-sm font-medium text-[#333333]"
           >
             Ketik
             <code class="rounded bg-[#F1F5F9] px-1.5 py-0.5 font-mono text-xs text-red-600"

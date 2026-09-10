@@ -168,7 +168,7 @@ onUnmounted(() => {
   gap: 28px;
 }
 .help-navbar :is(a, button, select):focus-visible {
-  outline: 2px solid #172F52;
+  outline: 2px solid #0A51B0;
   outline-offset: 4px;
 }
 .navbar-brand {
@@ -286,14 +286,14 @@ onUnmounted(() => {
   min-height: 42px;
   padding: 0 17px;
   border-radius: 8px;
-  background: #172f52;
+  background: #0A51B0;
   color: #fff;
   font-size: 12px;
   font-weight: 600;
   white-space: nowrap;
 }
 .navbar-signin:hover {
-  background: #244673;
+  background: #0A4391;
 }
 .navbar-profile {
   position: relative;

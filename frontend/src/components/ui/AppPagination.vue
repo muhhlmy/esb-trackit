@@ -57,11 +57,11 @@ function goToPage(page) {
   >
     <div class="flex items-center gap-1 font-medium">
       <span>Menampilkan</span>
-      <span class="font-bold text-[#0F172A]">{{ startIndex }}</span>
+      <span class="font-bold text-[#333333]">{{ startIndex }}</span>
       <span>–</span>
-      <span class="font-bold text-[#0F172A]">{{ endIndex }}</span>
+      <span class="font-bold text-[#333333]">{{ endIndex }}</span>
       <span>dari</span>
-      <span class="font-bold text-[#0F172A]">{{ totalItems }}</span>
+      <span class="font-bold text-[#333333]">{{ totalItems }}</span>
       <span>data</span>
     </div>
 
@@ -77,7 +77,7 @@ function goToPage(page) {
         :disabled="currentPage <= 1"
         aria-label="Halaman Sebelumnya"
         title="Halaman Sebelumnya"
-        class="flex h-8 w-8 items-center justify-center rounded-lg border border-[#CBD5E1] bg-white text-[#334155] shadow-2xs hover:bg-[#F8FAFC] hover:text-[#0F172A] transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+        class="flex h-8 w-8 items-center justify-center rounded-lg border border-[#CBD5E1] bg-white text-[#334155] shadow-2xs hover:bg-[#F8FAFC] hover:text-[#333333] transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
       >
         <span aria-hidden="true" class="material-symbols-outlined text-[18px]">chevron_left</span>
       </button>
@@ -103,8 +103,8 @@ function goToPage(page) {
           :class="[
             mobileCompact ? 'hidden sm:flex' : '',
             page === currentPage
-              ? 'bg-[#1D4ED8] text-white shadow-2xs'
-              : 'border border-[#CBD5E1] bg-white text-[#334155] hover:bg-[#F8FAFC] hover:text-[#0F172A]',
+              ? 'bg-[#0A4391] text-white shadow-2xs'
+              : 'border border-[#CBD5E1] bg-white text-[#334155] hover:bg-[#F8FAFC] hover:text-[#333333]',
           ]"
         >
           {{ page }}
@@ -117,7 +117,7 @@ function goToPage(page) {
         :disabled="currentPage >= totalPages"
         aria-label="Halaman Selanjutnya"
         title="Halaman Selanjutnya"
-        class="flex h-8 w-8 items-center justify-center rounded-lg border border-[#CBD5E1] bg-white text-[#334155] shadow-2xs hover:bg-[#F8FAFC] hover:text-[#0F172A] transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+        class="flex h-8 w-8 items-center justify-center rounded-lg border border-[#CBD5E1] bg-white text-[#334155] shadow-2xs hover:bg-[#F8FAFC] hover:text-[#333333] transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
       >
         <span aria-hidden="true" class="material-symbols-outlined text-[18px]">chevron_right</span>
       </button>
@@ -153,13 +153,13 @@ function goToPage(page) {
   font-weight: 600;
 }
 .asset-pagination button[aria-current='page'] {
-  background: #172f52;
-  border-color: #172f52;
+  background: #0A51B0;
+  border-color: #0A51B0;
   color: white;
 }
 .asset-pagination button:focus-visible,
 .asset-pagination select:focus-visible {
-  outline: 2px solid #5285d8;
+  outline: 2px solid #097CDE;
   outline-offset: 3px;
 }
 @media (width < 40rem) {

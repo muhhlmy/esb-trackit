@@ -760,7 +760,7 @@ onMounted(async () => {
       <!-- Row 1: Page Title & Primary CTA -->
       <div class="flex items-center justify-between gap-2.5">
         <div class="min-w-0">
-          <h2 class="text-base sm:text-lg font-bold text-[#0F172A] tracking-tight truncate">
+          <h2 class="text-base sm:text-lg font-bold text-[#333333] tracking-tight truncate">
             Aset IT
           </h2>
           <p
@@ -775,7 +775,7 @@ onMounted(async () => {
           v-if="canWriteAssets"
           type="button"
           @click="openAdd"
-          class="h-9 shrink-0 whitespace-nowrap rounded-lg bg-[#172F52] px-3 sm:px-3.5 text-xs font-semibold text-white shadow-2xs hover:bg-[#1D4ED8] active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer touch-manipulation"
+          class="h-9 shrink-0 whitespace-nowrap rounded-lg bg-[#0A51B0] px-3 sm:px-3.5 text-xs font-semibold text-white shadow-2xs hover:bg-[#0A4391] active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer touch-manipulation"
           title="Tambah aset baru"
         >
           <span class="material-symbols-outlined text-[16px]">add</span>
@@ -798,7 +798,7 @@ onMounted(async () => {
             type="text"
             aria-label="Cari aset, serial number, atau pemegang"
             placeholder="Cari aset, serial number, atau pemegang..."
-            class="h-9 w-full rounded-lg border border-[#E2E8F0] bg-white pl-8 pr-8 text-xs text-[#0F172A] placeholder-[#94A3B8] focus:border-[#172F52] focus:outline-none transition-all shadow-2xs"
+            class="h-9 w-full rounded-lg border border-[#E2E8F0] bg-white pl-8 pr-8 text-xs text-[#333333] placeholder-[#94A3B8] focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
           />
           <!-- Inline Clear Button -->
           <button
@@ -806,7 +806,7 @@ onMounted(async () => {
             type="button"
             @click="searchQuery = ''"
             aria-label="Bersihkan pencarian"
-            class="absolute right-2 top-1/2 -translate-y-1/2 flex h-5 w-5 items-center justify-center rounded-full text-[#94A3B8] hover:bg-[#F1F5F9] hover:text-[#0F172A] transition-all cursor-pointer touch-manipulation"
+            class="absolute right-2 top-1/2 -translate-y-1/2 flex h-5 w-5 items-center justify-center rounded-full text-[#94A3B8] hover:bg-[#F1F5F9] hover:text-[#333333] transition-all cursor-pointer touch-manipulation"
             title="Bersihkan"
           >
             <span class="material-symbols-outlined text-[15px]">close</span>
@@ -831,7 +831,7 @@ onMounted(async () => {
               v-if="searchQuery || filterStatus || filterTipe"
               type="button"
               @click="resetFilters"
-              class="h-9 shrink-0 whitespace-nowrap rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-medium text-[#64748B] hover:text-[#0F172A] active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs touch-manipulation"
+              class="h-9 shrink-0 whitespace-nowrap rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-medium text-[#64748B] hover:text-[#333333] active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs touch-manipulation"
               title="Reset filter"
             >
               <span class="material-symbols-outlined text-[16px]">restart_alt</span>
@@ -844,7 +844,7 @@ onMounted(async () => {
             <button
               type="button"
               @click="openExport"
-              class="h-9 flex-1 sm:flex-initial shrink-0 whitespace-nowrap rounded-lg border border-[#E2E8F0] bg-white px-3.5 text-xs font-medium text-[#475569] hover:bg-[#F8FAFC] hover:text-[#0F172A] active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs touch-manipulation"
+              class="h-9 flex-1 sm:flex-initial shrink-0 whitespace-nowrap rounded-lg border border-[#E2E8F0] bg-white px-3.5 text-xs font-medium text-[#475569] hover:bg-[#F8FAFC] hover:text-[#333333] active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs touch-manipulation"
               title="Ekspor laporan data aset"
             >
               <span class="material-symbols-outlined text-[16px] text-[#64748B]">download</span>
@@ -855,7 +855,7 @@ onMounted(async () => {
               v-if="canWriteAssets"
               type="button"
               @click="showImportModal = true"
-              class="h-9 flex-1 sm:flex-initial shrink-0 whitespace-nowrap rounded-lg border border-[#E2E8F0] bg-white px-3.5 text-xs font-medium text-[#475569] hover:bg-[#F8FAFC] hover:text-[#0F172A] active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs touch-manipulation"
+              class="h-9 flex-1 sm:flex-initial shrink-0 whitespace-nowrap rounded-lg border border-[#E2E8F0] bg-white px-3.5 text-xs font-medium text-[#475569] hover:bg-[#F8FAFC] hover:text-[#333333] active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs touch-manipulation"
               title="Impor data dari file Excel"
             >
               <span class="material-symbols-outlined text-[16px] text-[#64748B]">file_upload</span>
@@ -992,7 +992,7 @@ onMounted(async () => {
           >
             <span class="material-symbols-outlined text-[24px]">devices_off</span>
           </span>
-          <h3 class="text-[14px] font-bold text-[#0F172A] mt-1">Belum Ada Aset IT</h3>
+          <h3 class="text-[14px] font-bold text-[#333333] mt-1">Belum Ada Aset IT</h3>
           <p class="text-[11.5px] text-[#64748B] leading-relaxed">
             Belum ada aset IT yang terdaftar dalam inventaris atau sesuai dengan kata kunci
             pencarian.
@@ -1001,7 +1001,7 @@ onMounted(async () => {
             v-if="canWriteAssets"
             type="button"
             @click="openAdd"
-            class="mt-2 h-9 rounded-lg bg-[#172F52] px-4 text-[12px] font-semibold text-white shadow-2xs hover:bg-[#1D4ED8] transition-all flex items-center gap-1.5 cursor-pointer"
+            class="mt-2 h-9 rounded-lg bg-[#0A51B0] px-4 text-[12px] font-semibold text-white shadow-2xs hover:bg-[#0A4391] transition-all flex items-center gap-1.5 cursor-pointer"
           >
             <span class="material-symbols-outlined text-[16px]">add</span>
             <span>Tambah Aset</span>
@@ -1149,11 +1149,11 @@ onMounted(async () => {
           <div class="flex items-center justify-between border-b border-[#E2E8F0] pb-2">
             <div class="flex items-center gap-2">
               <span
-                class="flex h-6 w-6 items-center justify-center rounded-md bg-[#EDF3FC] text-[#172F52]"
+                class="flex h-6 w-6 items-center justify-center rounded-md bg-[#EDF5FF] text-[#333333]"
               >
                 <span class="material-symbols-outlined text-[15px]">devices</span>
               </span>
-              <span class="text-[11.5px] font-bold text-[#172F52] uppercase tracking-wider">
+              <span class="text-[11.5px] font-bold text-[#333333] uppercase tracking-wider">
                 Identitas perangkat
               </span>
             </div>
@@ -1163,7 +1163,7 @@ onMounted(async () => {
           <fieldset class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
             <!-- Hostname Input -->
             <div class="flex flex-col gap-1.5">
-              <label class="text-[12px] font-bold text-[#172F52] flex items-center justify-between">
+              <label class="text-[12px] font-bold text-[#333333] flex items-center justify-between">
                 <span>Hostname / Label Aset <span class="text-[#DC2626]">*</span></span>
                 <span class="text-[10px] font-normal text-[#64748B]">Maks. 100 karakter</span>
               </label>
@@ -1179,14 +1179,14 @@ onMounted(async () => {
                   maxlength="100"
                   aria-label="Hostname Aset"
                   placeholder="cth: LAPTOP-IT-04 atau WS-FINANCE-01"
-                  class="h-10 w-full rounded-lg border border-[#E2E8F0] bg-white pl-9 pr-3 text-[12px] font-medium text-[#1E293B] placeholder-[#94A3B8] focus:border-[#172F52] focus:ring-2 focus:ring-[#172F52]/10 focus:outline-none transition-all shadow-2xs"
+                  class="h-10 w-full rounded-lg border border-[#E2E8F0] bg-white pl-9 pr-3 text-[12px] font-medium text-[#333333] placeholder-[#94A3B8] focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 focus:outline-none transition-all shadow-2xs"
                 />
               </div>
             </div>
 
             <!-- Serial Number Input -->
             <div class="flex flex-col gap-1.5">
-              <label class="text-[12px] font-bold text-[#172F52] flex items-center justify-between">
+              <label class="text-[12px] font-bold text-[#333333] flex items-center justify-between">
                 <span>Serial Number (S/N) <span class="text-[#DC2626]">*</span></span>
                 <span class="text-[10px] font-normal text-[#64748B]">Nomor seri fisik</span>
               </label>
@@ -1202,14 +1202,14 @@ onMounted(async () => {
                   maxlength="100"
                   aria-label="Serial Number Aset"
                   placeholder="cth: PF3ABCDE atau 5CD1234XYZ"
-                  class="h-10 w-full rounded-lg border border-[#E2E8F0] bg-white pl-9 pr-3 text-[12px] font-medium text-[#1E293B] placeholder-[#94A3B8] focus:border-[#172F52] focus:ring-2 focus:ring-[#172F52]/10 focus:outline-none transition-all shadow-2xs"
+                  class="h-10 w-full rounded-lg border border-[#E2E8F0] bg-white pl-9 pr-3 text-[12px] font-medium text-[#333333] placeholder-[#94A3B8] focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 focus:outline-none transition-all shadow-2xs"
                 />
               </div>
             </div>
 
             <!-- Tipe Perangkat -->
             <div class="flex flex-col gap-1.5 col-span-1 sm:col-span-2">
-              <label class="text-[12px] font-bold text-[#172F52]">
+              <label class="text-[12px] font-bold text-[#333333]">
                 Tipe Perangkat <span class="text-[#DC2626]">*</span>
               </label>
               <CustomSelect
@@ -1224,12 +1224,12 @@ onMounted(async () => {
 
             <!-- Tip Info Banner -->
             <div
-              class="flex items-start gap-2.5 rounded-xl bg-[#EDF3FC]/70 border border-[#A4BBDF]/40 p-3 col-span-1 sm:col-span-2"
+              class="flex items-start gap-2.5 rounded-xl bg-[#EDF5FF]/70 border border-[#B8D4F5]/40 p-3 col-span-1 sm:col-span-2"
             >
-              <span class="material-symbols-outlined text-[17px] text-[#172F52] mt-0.5 shrink-0"
+              <span class="material-symbols-outlined text-[17px] text-[#333333] mt-0.5 shrink-0"
                 >info</span
               >
-              <p class="text-[11.5px] leading-relaxed text-[#244673]">
+              <p class="text-[11.5px] leading-relaxed text-[#0A4391]">
                 Gunakan hostname dan serial number yang tertera pada perangkat.
               </p>
             </div>
@@ -1241,11 +1241,11 @@ onMounted(async () => {
           <div class="flex items-center justify-between border-b border-[#E2E8F0] pb-2">
             <div class="flex items-center gap-2">
               <span
-                class="flex h-6 w-6 items-center justify-center rounded-md bg-[#EDF3FC] text-[#172F52]"
+                class="flex h-6 w-6 items-center justify-center rounded-md bg-[#EDF5FF] text-[#333333]"
               >
                 <span class="material-symbols-outlined text-[15px]">badge</span>
               </span>
-              <span class="text-[11.5px] font-bold text-[#172F52] uppercase tracking-wider">
+              <span class="text-[11.5px] font-bold text-[#333333] uppercase tracking-wider">
                 Pengguna dan lokasi
               </span>
             </div>
@@ -1256,7 +1256,7 @@ onMounted(async () => {
             <!-- Pemegang Aset SearchableSelect -->
             <div class="flex flex-col gap-1.5 col-span-1 sm:col-span-2">
               <div class="flex items-center justify-between">
-                <label class="text-[12px] font-bold text-[#172F52]"
+                <label class="text-[12px] font-bold text-[#333333]"
                   >Pemegang Aset / User Penanggung Jawab</label
                 >
                 <span class="text-[11px] font-medium text-[#64748B]">Opsional</span>
@@ -1277,21 +1277,21 @@ onMounted(async () => {
             <!-- State 1: Karyawan Terpilih (Rich Employee Card) -->
             <div
               v-if="form.nik_pemegang_asset"
-              class="col-span-1 sm:col-span-2 flex items-center justify-between gap-3 rounded-xl border border-[#A4BBDF]/60 bg-gradient-to-r from-[#EDF3FC]/90 to-[#F8FAFC] p-3 shadow-2xs transition-all"
+              class="col-span-1 sm:col-span-2 flex items-center justify-between gap-3 rounded-xl border border-[#B8D4F5]/60 bg-gradient-to-r from-[#EDF5FF]/90 to-[#F8FAFC] p-3 shadow-2xs transition-all"
             >
               <div class="flex items-center gap-3 min-w-0">
                 <div
-                  class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#172F52] text-white font-bold text-[12px] shadow-xs"
+                  class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#0A51B0] text-white font-bold text-[12px] shadow-xs"
                 >
                   {{ getEmployeeInitials(form.nama_karyawan_pemegang_asset) }}
                 </div>
                 <div class="min-w-0 flex-1">
                   <div class="flex items-center gap-2 flex-wrap">
-                    <span class="text-[13px] font-bold text-[#172F52] truncate">
+                    <span class="text-[13px] font-bold text-[#333333] truncate">
                       {{ form.nama_karyawan_pemegang_asset || 'Karyawan Terpilih' }}
                     </span>
                     <span
-                      class="inline-flex items-center gap-1 rounded-full bg-[#345E99]/15 px-2 py-0.5 text-[10.5px] font-bold text-[#244673]"
+                      class="inline-flex items-center gap-1 rounded-full bg-[#0A5DBD]/15 px-2 py-0.5 text-[10.5px] font-bold text-[#0A4391]"
                     >
                       <span class="material-symbols-outlined text-[12px]">business</span>
                       {{ form.departemen_pemegang_asset || 'Umum' }}
@@ -1300,7 +1300,7 @@ onMounted(async () => {
                   <div class="flex items-center gap-2 mt-0.5 text-[11px] text-[#64748B]">
                     <span
                       >NIK:
-                      <strong class="text-[#244673]">{{ form.nik_pemegang_asset }}</strong></span
+                      <strong class="text-[#0A4391]">{{ form.nik_pemegang_asset }}</strong></span
                     >
                     <span>•</span>
                     <span class="flex items-center gap-0.5 text-[#059669] font-semibold">
@@ -1326,12 +1326,12 @@ onMounted(async () => {
               class="col-span-1 sm:col-span-2 flex items-center gap-3 rounded-xl border border-dashed border-[#CBD5E1] bg-[#F8FAFC] p-3 text-[#64748B]"
             >
               <div
-                class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white border border-[#E2E8F0] text-[#172F52] shadow-2xs"
+                class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white border border-[#E2E8F0] text-[#333333] shadow-2xs"
               >
                 <span class="material-symbols-outlined text-[18px]">inventory_2</span>
               </div>
               <div class="text-[11.5px] leading-snug">
-                <p class="font-bold text-[#172F52]">Status Unit: Stok Tersedia (Stock)</p>
+                <p class="font-bold text-[#333333]">Status Unit: Stok Tersedia (Stock)</p>
                 <p class="text-[#64748B] text-[11px] mt-0.5">
                   Perangkat tidak terikat ke karyawan mana pun dan tersimpan di pool inventaris IT.
                 </p>
@@ -1341,7 +1341,7 @@ onMounted(async () => {
             <!-- Lokasi Penempatan Aset -->
             <div class="flex flex-col gap-1.5 col-span-1 sm:col-span-2">
               <div class="flex items-center justify-between">
-                <label class="text-[12px] font-bold text-[#172F52]">
+                <label class="text-[12px] font-bold text-[#333333]">
                   Lokasi Penempatan Aset <span class="text-[#DC2626]">*</span>
                 </label>
                 <span class="text-[10.5px] text-[#64748B]">Kantor cabang atau area fisik</span>
@@ -1367,11 +1367,11 @@ onMounted(async () => {
           <div class="flex items-center justify-between border-b border-[#E2E8F0] pb-2">
             <div class="flex items-center gap-2">
               <span
-                class="flex h-6 w-6 items-center justify-center rounded-md bg-[#EDF3FC] text-[#172F52]"
+                class="flex h-6 w-6 items-center justify-center rounded-md bg-[#EDF5FF] text-[#333333]"
               >
                 <span class="material-symbols-outlined text-[15px]">tune</span>
               </span>
-              <span class="text-[11.5px] font-bold text-[#172F52] uppercase tracking-wider">
+              <span class="text-[11.5px] font-bold text-[#333333] uppercase tracking-wider">
                 Spesifikasi & Kondisi Teknis
               </span>
             </div>
@@ -1381,7 +1381,7 @@ onMounted(async () => {
           <fieldset class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
             <!-- Brand / Merek -->
             <div class="flex flex-col gap-1.5">
-              <label class="text-[12px] font-bold text-[#172F52]">Brand / Merek</label>
+              <label class="text-[12px] font-bold text-[#333333]">Brand / Merek</label>
               <SearchableSelect
                 v-model="form.brand_merek"
                 :options="brandSelectOptions"
@@ -1398,7 +1398,7 @@ onMounted(async () => {
 
             <!-- Model -->
             <div class="flex flex-col gap-1.5">
-              <label class="text-[12px] font-bold text-[#172F52]">Model / Seri</label>
+              <label class="text-[12px] font-bold text-[#333333]">Model / Seri</label>
               <div class="relative flex items-center">
                 <span
                   class="material-symbols-outlined absolute left-3 text-[17px] text-[#94A3B8] pointer-events-none"
@@ -1409,14 +1409,14 @@ onMounted(async () => {
                   v-model="form.model"
                   maxlength="100"
                   placeholder="cth: ThinkPad T14 Gen 3"
-                  class="h-10 w-full rounded-lg border border-[#E2E8F0] bg-white pl-9 pr-3 text-[12px] font-medium text-[#1E293B] placeholder-[#94A3B8] focus:border-[#172F52] focus:ring-2 focus:ring-[#172F52]/10 focus:outline-none transition-all shadow-2xs"
+                  class="h-10 w-full rounded-lg border border-[#E2E8F0] bg-white pl-9 pr-3 text-[12px] font-medium text-[#333333] placeholder-[#94A3B8] focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 focus:outline-none transition-all shadow-2xs"
                 />
               </div>
             </div>
 
             <!-- Status Aset -->
             <div class="flex flex-col gap-1.5">
-              <label class="text-[12px] font-bold text-[#172F52]">
+              <label class="text-[12px] font-bold text-[#333333]">
                 Status Aset <span class="text-[#DC2626]">*</span>
               </label>
               <CustomSelect
@@ -1431,7 +1431,7 @@ onMounted(async () => {
 
             <!-- Kondisi Aset -->
             <div class="flex flex-col gap-1.5">
-              <label class="text-[12px] font-bold text-[#172F52]">
+              <label class="text-[12px] font-bold text-[#333333]">
                 Kondisi Fisik <span class="text-[#DC2626]">*</span>
               </label>
               <CustomSelect
@@ -1447,28 +1447,28 @@ onMounted(async () => {
             <!-- Spesifikasi Detail -->
             <div class="flex flex-col gap-1.5 col-span-1 sm:col-span-2">
               <div class="flex items-center justify-between">
-                <label class="text-[12px] font-bold text-[#172F52]">Spesifikasi Teknis</label>
+                <label class="text-[12px] font-bold text-[#333333]">Spesifikasi Teknis</label>
                 <span class="text-[10.5px] text-[#64748B]">CPU, RAM, SSD, OS, dll.</span>
               </div>
               <textarea
                 v-model="form.spesifikasi"
                 rows="2"
                 placeholder="cth: Intel Core i7-12700H, 16GB DDR5, 512GB NVMe SSD, Windows 11 Pro"
-                class="min-h-[56px] max-h-[100px] w-full rounded-lg border border-[#E2E8F0] bg-white p-2.5 text-[12px] font-medium text-[#1E293B] placeholder-[#94A3B8] focus:border-[#172F52] focus:ring-2 focus:ring-[#172F52]/10 focus:outline-none transition-all resize-y shadow-2xs"
+                class="min-h-[56px] max-h-[100px] w-full rounded-lg border border-[#E2E8F0] bg-white p-2.5 text-[12px] font-medium text-[#333333] placeholder-[#94A3B8] focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 focus:outline-none transition-all resize-y shadow-2xs"
               ></textarea>
             </div>
 
             <!-- Catatan Aset -->
             <div class="flex flex-col gap-1.5 col-span-1 sm:col-span-2">
               <div class="flex items-center justify-between">
-                <label class="text-[12px] font-bold text-[#172F52]">Catatan Tambahan</label>
+                <label class="text-[12px] font-bold text-[#333333]">Catatan Tambahan</label>
                 <span class="text-[10.5px] text-[#64748B]">Kelengkapan atau riwayat khusus</span>
               </div>
               <textarea
                 v-model="form.note_asset"
                 rows="2"
                 placeholder="cth: Lengkap dengan charger original 65W USB-C dan tas laptop"
-                class="min-h-[56px] max-h-[100px] w-full rounded-lg border border-[#E2E8F0] bg-white p-2.5 text-[12px] font-medium text-[#1E293B] placeholder-[#94A3B8] focus:border-[#172F52] focus:ring-2 focus:ring-[#172F52]/10 focus:outline-none transition-all resize-y shadow-2xs"
+                class="min-h-[56px] max-h-[100px] w-full rounded-lg border border-[#E2E8F0] bg-white p-2.5 text-[12px] font-medium text-[#333333] placeholder-[#94A3B8] focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 focus:outline-none transition-all resize-y shadow-2xs"
               ></textarea>
             </div>
           </fieldset>
@@ -1484,7 +1484,7 @@ onMounted(async () => {
             type="button"
             :disabled="isSubmitting"
             @click="closeModal"
-            class="h-9.5 px-4 rounded-lg border border-[#E2E8F0] bg-white text-[12px] font-bold text-[#64748B] hover:bg-[#F8FAFC] hover:text-[#172F52] hover:border-[#CBD5E1] active:scale-95 transition-all cursor-pointer touch-manipulation flex items-center justify-center gap-1.5"
+            class="h-9.5 px-4 rounded-lg border border-[#E2E8F0] bg-white text-[12px] font-bold text-[#64748B] hover:bg-[#F8FAFC] hover:text-[#333333] hover:border-[#CBD5E1] active:scale-95 transition-all cursor-pointer touch-manipulation flex items-center justify-center gap-1.5"
           >
             <span>Batal</span>
           </button>
@@ -1494,7 +1494,7 @@ onMounted(async () => {
               v-if="activeTab !== 'info'"
               type="button"
               @click="activeTab = activeTab === 'specifications' ? 'placement' : 'info'"
-              class="h-9.5 flex-1 sm:flex-initial rounded-lg border border-[#E2E8F0] bg-white px-3.5 text-[12px] font-bold text-[#244673] hover:bg-[#EDF3FC] hover:border-[#A4BBDF] active:scale-95 transition-all flex items-center justify-center gap-1 cursor-pointer touch-manipulation shadow-2xs"
+              class="h-9.5 flex-1 sm:flex-initial rounded-lg border border-[#E2E8F0] bg-white px-3.5 text-[12px] font-bold text-[#0A4391] hover:bg-[#EDF5FF] hover:border-[#B8D4F5] active:scale-95 transition-all flex items-center justify-center gap-1 cursor-pointer touch-manipulation shadow-2xs"
             >
               <span class="material-symbols-outlined text-[16px]">arrow_back</span>
               <span>Kembali</span>
@@ -1505,7 +1505,7 @@ onMounted(async () => {
               type="button"
               @click="nextStep"
               :disabled="isSubmitting || hasValidationErrors"
-              class="h-9.5 flex-1 sm:flex-initial rounded-lg bg-[#172F52] hover:bg-[#244673] active:bg-[#0F1F38] px-4.5 text-[12px] font-bold text-white shadow-sm disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer touch-manipulation"
+              class="h-9.5 flex-1 sm:flex-initial rounded-lg bg-[#0A51B0] hover:bg-[#0A4391] active:bg-[#0F1F38] px-4.5 text-[12px] font-bold text-white shadow-sm disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer touch-manipulation"
             >
               <span>Lanjutkan</span>
               <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
@@ -1516,7 +1516,7 @@ onMounted(async () => {
               type="submit"
               form="crud-AssetsView"
               :disabled="isSubmitting || !canWriteAssets || hasValidationErrors"
-              class="h-9.5 flex-1 sm:flex-initial rounded-lg bg-[#172F52] hover:bg-[#244673] active:bg-[#0F1F38] px-5 text-[12px] font-bold text-white shadow-sm disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer touch-manipulation"
+              class="h-9.5 flex-1 sm:flex-initial rounded-lg bg-[#0A51B0] hover:bg-[#0A4391] active:bg-[#0F1F38] px-5 text-[12px] font-bold text-white shadow-sm disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer touch-manipulation"
             >
               <span
                 v-if="isSubmitting"
@@ -2069,8 +2069,8 @@ onMounted(async () => {
 .it-create-steps button[aria-current='step'] {
   background: #fff;
   border-color: #dfe7f1;
-  color: #172f52;
-  box-shadow: 0 2px 4px #172f5205;
+  color: #333333;
+  box-shadow: 0 2px 4px #0A51B005;
 }
 .it-create-step-number {
   display: grid;
@@ -2084,7 +2084,7 @@ onMounted(async () => {
   font-weight: 650;
 }
 .it-create-steps button[aria-current='step'] .it-create-step-number {
-  background: #172f52;
+  background: #0A51B0;
   color: #fff;
 }
 .it-create-step-label {
@@ -2149,7 +2149,7 @@ onMounted(async () => {
   min-height: 44px;
 }
 .it-create-steps button:focus-visible {
-  outline: 2px solid #5285d8;
+  outline: 2px solid #097CDE;
   outline-offset: 2px;
 }
 @media (max-width: 639px) {

@@ -19,8 +19,8 @@ const isEmpty = computed(() => !props.data || props.data.length === 0)
 
 const conditionColorMap = {
   baru: '#13DEB9',
-  normal: '#172F52',
-  baik: '#172F52',
+  normal: '#0A51B0',
+  baik: '#0A51B0',
   'rusak ringan': '#FFAE1F',
   'rusak sedang': '#E855A2',
   'rusak berat': '#FA896B',

@@ -1331,14 +1331,14 @@ function toast(message, type = 'success') {
       >
         <div class="min-w-0 flex items-center gap-3">
           <div
-            class="flex h-10 w-10 sm:h-11 sm:w-11 shrink-0 items-center justify-center rounded-xl bg-[#EDF3FC] text-[#345E99] border border-[#A4BBDF]/40"
+            class="flex h-10 w-10 sm:h-11 sm:w-11 shrink-0 items-center justify-center rounded-xl bg-[#EDF5FF] text-[#0A5DBD] border border-[#B8D4F5]/40"
           >
             <span class="material-symbols-outlined text-[22px] sm:text-[24px]"
               >confirmation_number</span
             >
           </div>
           <div class="min-w-0">
-            <h1 class="text-lg sm:text-xl font-bold text-[#0F172A] tracking-tight truncate">
+            <h1 class="text-lg sm:text-xl font-bold text-[#333333] tracking-tight truncate">
               {{ isAdmin || isSuperAdmin ? 'Ticket Inbox' : 'Tiket' }}
             </h1>
             <p class="text-xs font-normal text-[#64748B] mt-0.5 truncate">
@@ -1354,7 +1354,7 @@ function toast(message, type = 'success') {
         <button
           type="button"
           @click="openAdd"
-          class="h-9.5 shrink-0 whitespace-nowrap rounded-xl bg-[#172F52] px-3.5 sm:px-4 text-xs font-bold text-white shadow-2xs hover:bg-[#244673] active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+          class="h-9.5 shrink-0 whitespace-nowrap rounded-xl bg-[#0A51B0] px-3.5 sm:px-4 text-xs font-bold text-white shadow-2xs hover:bg-[#0A4391] active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
           :title="isAdmin || isSuperAdmin ? 'Buat tiket baru' : 'Request ticket baru'"
         >
           <span class="material-symbols-outlined text-[16px]">add</span>
@@ -1375,7 +1375,7 @@ function toast(message, type = 'success') {
           </div>
           <div class="min-w-0">
             <span class="text-[11px] font-medium text-[#64748B] block truncate">Total Tiket</span>
-            <span class="text-base sm:text-lg font-bold text-[#0F172A] tabular-nums">{{
+            <span class="text-base sm:text-lg font-bold text-[#333333] tabular-nums">{{
               stats.totalTickets ?? 0
             }}</span>
           </div>
@@ -1401,7 +1401,7 @@ function toast(message, type = 'success') {
             }}</span>
             <span
               class="text-base sm:text-lg font-bold tabular-nums"
-              :class="(stats.unassignedTickets || 0) > 0 ? 'text-amber-600' : 'text-[#0F172A]'"
+              :class="(stats.unassignedTickets || 0) > 0 ? 'text-amber-600' : 'text-[#333333]'"
               >{{ stats.unassignedTickets ?? 0 }}</span
             >
           </div>
@@ -1412,7 +1412,7 @@ function toast(message, type = 'success') {
           class="flex items-center gap-3 p-3.5 sm:p-4 rounded-2xl bg-white border border-[#E2E8F0]/80 shadow-2xs hover:border-[#CBD5E1] transition-all"
         >
           <div
-            class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#EDF3FC] text-[#172F52] border border-[#A4BBDF]/40"
+            class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#EDF5FF] text-[#333333] border border-[#B8D4F5]/40"
           >
             <span class="material-symbols-outlined text-[20px]">pending_actions</span>
           </div>
@@ -1420,7 +1420,7 @@ function toast(message, type = 'success') {
             <span class="text-[11px] font-medium text-[#64748B] block truncate"
               >Sedang Diproses</span
             >
-            <span class="text-base sm:text-lg font-bold text-[#172F52] tabular-nums">{{
+            <span class="text-base sm:text-lg font-bold text-[#333333] tabular-nums">{{
               (stats.openTickets || 0) + (stats.pendingTickets || 0)
             }}</span>
           </div>
@@ -1473,8 +1473,8 @@ function toast(message, type = 'success') {
             class="flex items-center gap-2 rounded-xl px-3.5 py-2 text-xs font-bold transition-all whitespace-nowrap cursor-pointer shrink-0 active:scale-95"
             :class="
               activeTab === tab.key
-                ? 'bg-[#172F52] text-white shadow-2xs'
-                : 'text-[#64748B] bg-slate-50 hover:bg-slate-100 hover:text-[#0F172A] border border-slate-200/60'
+                ? 'bg-[#0A51B0] text-white shadow-2xs'
+                : 'text-[#64748B] bg-slate-50 hover:bg-slate-100 hover:text-[#333333] border border-slate-200/60'
             "
           >
             <span>{{ tab.label }}</span>
@@ -1508,7 +1508,7 @@ function toast(message, type = 'success') {
             type="search"
             aria-label="Cari tiket, judul, nomor, atau pelapor"
             placeholder="Cari tiket, judul kendala, nomor tiket, atau pelapor..."
-            class="h-10 w-full rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] pl-10 pr-9 text-xs font-medium text-[#0F172A] placeholder-[#94A3B8] focus:border-[#172F52] focus:bg-white focus:ring-2 focus:ring-[#172F52]/10 focus:outline-none transition-all"
+            class="h-10 w-full rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] pl-10 pr-9 text-xs font-medium text-[#333333] placeholder-[#94A3B8] focus:border-[#0A51B0] focus:bg-white focus:ring-2 focus:ring-[#0A51B0]/10 focus:outline-none transition-all"
           />
           <button
             v-if="searchQuery"
@@ -1617,9 +1617,9 @@ function toast(message, type = 'success') {
     <!-- ── 3. List Heading & Counter ──────────────────────── -->
     <div class="flex items-center justify-between gap-3 px-1">
       <div class="flex items-center gap-2">
-        <h2 class="text-[14px] font-bold text-[#0F172A]">Daftar Tiket Kendala</h2>
+        <h2 class="text-[14px] font-bold text-[#333333]">Daftar Tiket Kendala</h2>
         <span
-          class="inline-flex items-center justify-center rounded-md bg-[#EDF3FC] px-2 py-0.5 text-[11px] font-bold text-[#172F52] tabular-nums"
+          class="inline-flex items-center justify-center rounded-md bg-[#EDF5FF] px-2 py-0.5 text-[11px] font-bold text-[#333333] tabular-nums"
         >
           {{ filteredTickets.length }}
         </span>
@@ -1737,7 +1737,7 @@ function toast(message, type = 'success') {
           :aria-label="'Lihat tiket ' + ticket.judul"
           @keydown.enter.self="openDetail(ticket)"
           @keydown.space.prevent.self="openDetail(ticket)"
-          class="tck-list-item group relative bg-white rounded-xl border border-[#E2E8F0] hover:border-[#A4BBDF] hover:shadow-[0_3px_12px_rgba(23,43,77,0.06)] p-4 lg:px-5 lg:py-4 transition-all duration-150 cursor-pointer select-none active:scale-[0.997]"
+          class="tck-list-item group relative bg-white rounded-xl border border-[#E2E8F0] hover:border-[#B8D4F5] hover:shadow-[0_3px_12px_rgba(23,43,77,0.06)] p-4 lg:px-5 lg:py-4 transition-all duration-150 cursor-pointer select-none active:scale-[0.997]"
         >
           <!-- ── DESKTOP VIEW (>= 1024px / lg) ── -->
           <!-- 5-Column SaaS Grid: Identitas (2.3fr) | Pelapor (1.2fr) | Penanggung Jawab (1.2fr) | Status & Prioritas (1.3fr) | Aksi (36px) -->
@@ -1748,7 +1748,7 @@ function toast(message, type = 'success') {
             <div class="ticket-identity flex items-center gap-3 min-w-0">
               <!-- Avatar Box 42x42 -->
               <div
-                class="flex h-[42px] w-[42px] shrink-0 items-center justify-center rounded-[11px] bg-[#EDF3FC] text-[#345E99] border border-[#A4BBDF]/30 transition-transform group-hover:scale-105"
+                class="flex h-[42px] w-[42px] shrink-0 items-center justify-center rounded-[11px] bg-[#EDF5FF] text-[#0A5DBD] border border-[#B8D4F5]/30 transition-transform group-hover:scale-105"
                 :class="getQueueTheme(ticket).badgeClass"
               >
                 <span class="material-symbols-outlined text-[22px]">{{
@@ -1761,7 +1761,7 @@ function toast(message, type = 'success') {
                 <!-- Badges / Tags Baris Atas -->
                 <div class="ticket-tags flex items-center gap-1.5 flex-wrap min-w-0">
                   <span
-                    class="font-mono text-[10.5px] font-bold text-[#172F52] bg-[#EDF3FC] px-2 py-0.5 rounded border border-[#A4BBDF]/30 tracking-wider shrink-0"
+                    class="font-mono text-[10.5px] font-bold text-[#333333] bg-[#EDF5FF] px-2 py-0.5 rounded border border-[#B8D4F5]/30 tracking-wider shrink-0"
                   >
                     {{ ticket.nomor_tiket || `TCK-${ticket.id}` }}
                   </span>
@@ -1784,7 +1784,7 @@ function toast(message, type = 'success') {
 
                 <!-- Judul Kendala -->
                 <h4
-                  class="text-[14px] font-[650] text-[#172F52] group-hover:text-[#244673] transition-colors leading-snug truncate"
+                  class="text-[14px] font-[650] text-[#333333] group-hover:text-[#0A4391] transition-colors leading-snug truncate"
                   :title="ticket.judul"
                 >
                   {{ ticket.judul }}
@@ -1898,7 +1898,7 @@ function toast(message, type = 'success') {
                 </span>
                 <span
                   v-if="ticket.total_komentar > 0"
-                  class="flex items-center gap-1 text-[#345E99] font-medium"
+                  class="flex items-center gap-1 text-[#0A5DBD] font-medium"
                   title="Komentar"
                 >
                   <span class="material-symbols-outlined text-[12px]">chat_bubble_outline</span>
@@ -1927,7 +1927,7 @@ function toast(message, type = 'success') {
             <div class="flex items-center justify-between gap-2 min-w-0">
               <div class="flex items-center gap-2 min-w-0">
                 <div
-                  class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-[#EDF3FC] text-[#345E99] border border-[#A4BBDF]/30"
+                  class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-[#EDF5FF] text-[#0A5DBD] border border-[#B8D4F5]/30"
                   :class="getQueueTheme(ticket).badgeClass"
                 >
                   <span class="material-symbols-outlined text-[18px]">{{
@@ -1935,7 +1935,7 @@ function toast(message, type = 'success') {
                   }}</span>
                 </div>
                 <span
-                  class="font-mono text-[10.5px] font-bold text-[#172F52] bg-[#EDF3FC] px-2 py-0.5 rounded border border-[#A4BBDF]/30 truncate"
+                  class="font-mono text-[10.5px] font-bold text-[#333333] bg-[#EDF5FF] px-2 py-0.5 rounded border border-[#B8D4F5]/30 truncate"
                 >
                   {{ ticket.nomor_tiket || `TCK-${ticket.id}` }}
                 </span>
@@ -1956,7 +1956,7 @@ function toast(message, type = 'success') {
             <!-- Baris 2: Judul Kendala & Deskripsi Singkat -->
             <div class="flex flex-col gap-0.5 min-w-0">
               <h4
-                class="text-[14px] font-[650] text-[#172F52] group-hover:text-[#244673] transition-colors leading-snug line-clamp-2"
+                class="text-[14px] font-[650] text-[#333333] group-hover:text-[#0A4391] transition-colors leading-snug line-clamp-2"
               >
                 {{ ticket.judul }}
               </h4>
@@ -1978,7 +1978,7 @@ function toast(message, type = 'success') {
                   >Pelapor</span
                 >
                 <strong
-                  class="text-[12px] font-semibold text-[#172F52] truncate block"
+                  class="text-[12px] font-semibold text-[#333333] truncate block"
                   :title="ticket.pelapor_nama || ticket.pelapor || 'User'"
                 >
                   {{ ticket.pelapor_nama || ticket.pelapor || '—' }}
@@ -2056,7 +2056,7 @@ function toast(message, type = 'success') {
                 </span>
                 <span
                   v-if="ticket.total_komentar > 0"
-                  class="flex items-center gap-1 text-[#345E99] font-medium"
+                  class="flex items-center gap-1 text-[#0A5DBD] font-medium"
                 >
                   <span class="material-symbols-outlined text-[12px]">chat_bubble_outline</span>
                   <span>{{ ticket.total_komentar }}</span>
@@ -2082,7 +2082,7 @@ function toast(message, type = 'success') {
             </div>
 
             <!-- Empty state title -->
-            <h3 class="text-base font-bold text-[#0F172A]">
+            <h3 class="text-base font-bold text-[#333333]">
               {{
                 searchQuery || filterStatus || filterPrioritas || filterQueue || filterKategori
                   ? 'Tidak ada tiket yang cocok'
@@ -2113,7 +2113,7 @@ function toast(message, type = 'success') {
               "
               type="button"
               @click="openAdd"
-              class="mt-4 inline-flex items-center gap-1.5 rounded-xl bg-[#172F52] px-4 py-2 text-xs font-bold text-white shadow-2xs hover:bg-[#244673] transition-all cursor-pointer active:scale-95"
+              class="mt-4 inline-flex items-center gap-1.5 rounded-xl bg-[#0A51B0] px-4 py-2 text-xs font-bold text-white shadow-2xs hover:bg-[#0A4391] transition-all cursor-pointer active:scale-95"
             >
               <span class="material-symbols-outlined text-[16px]">add</span>
               <span>{{
@@ -2204,7 +2204,7 @@ function toast(message, type = 'success') {
               maxlength="150"
               aria-label="Judul Tiket"
               placeholder="Contoh: Laptop tidak dapat terhubung ke Wi-Fi"
-              class="h-10 w-full rounded-lg border border-[#E5EAEF] bg-white px-3 text-[12px] font-medium text-[#2A3547] placeholder-[#94A3B8] focus:border-[#172F52] focus:outline-none transition-all shadow-2xs"
+              class="h-10 w-full rounded-lg border border-[#E5EAEF] bg-white px-3 text-[12px] font-medium text-[#2A3547] placeholder-[#94A3B8] focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
             />
           </label>
 
@@ -2216,7 +2216,7 @@ function toast(message, type = 'success') {
               rows="3"
               aria-label="Deskripsi Kendala Tiket"
               placeholder="Jelaskan kendala secara singkat dan detail agar tim dapat membantu..."
-              class="min-h-[80px] max-h-[140px] w-full rounded-lg border border-[#E5EAEF] bg-white p-2.5 text-[12px] font-medium text-[#2A3547] placeholder-[#94A3B8] focus:border-[#172F52] focus:outline-none transition-all resize-y shadow-2xs"
+              class="min-h-[80px] max-h-[140px] w-full rounded-lg border border-[#E5EAEF] bg-white p-2.5 text-[12px] font-medium text-[#2A3547] placeholder-[#94A3B8] focus:border-[#0A51B0] focus:outline-none transition-all resize-y shadow-2xs"
             ></textarea>
           </label>
 
@@ -2232,7 +2232,7 @@ function toast(message, type = 'success') {
                 class="flex h-[72px] sm:h-[60px] flex-col sm:flex-row items-center justify-center sm:justify-start gap-1.5 sm:gap-3 rounded-xl border p-2 sm:p-3 text-center sm:text-left transition-all cursor-pointer select-none active:scale-95"
                 :class="
                   selectedSupportUnit === 'IT'
-                    ? 'border-[#172F52] bg-[#ECF2FF] text-[#172F52] ring-2 ring-[#172F52]/20 shadow-xs'
+                    ? 'border-[#0A51B0] bg-[#ECF2FF] text-[#333333] ring-2 ring-[#0A51B0]/20 shadow-xs'
                     : 'border-[#E5EAEF] bg-white text-[#2A3547] hover:bg-[#F8FAFC] hover:border-[#CBD5E1]'
                 "
               >
@@ -2240,7 +2240,7 @@ function toast(message, type = 'success') {
                   class="flex h-7 w-7 sm:h-9 sm:w-9 shrink-0 items-center justify-center rounded-lg"
                   :class="
                     selectedSupportUnit === 'IT'
-                      ? 'bg-[#172F52] text-white'
+                      ? 'bg-[#0A51B0] text-white'
                       : 'bg-[#F1F5F9] text-[#7C8BAC]'
                   "
                 >
@@ -2262,7 +2262,7 @@ function toast(message, type = 'success') {
                 class="flex h-[72px] sm:h-[60px] flex-col sm:flex-row items-center justify-center sm:justify-start gap-1.5 sm:gap-3 rounded-xl border p-2 sm:p-3 text-center sm:text-left transition-all cursor-pointer select-none active:scale-95"
                 :class="
                   selectedSupportUnit === 'HR'
-                    ? 'border-[#172F52] bg-[#ECF2FF] text-[#172F52] ring-2 ring-[#172F52]/20 shadow-xs'
+                    ? 'border-[#0A51B0] bg-[#ECF2FF] text-[#333333] ring-2 ring-[#0A51B0]/20 shadow-xs'
                     : 'border-[#E5EAEF] bg-white text-[#2A3547] hover:bg-[#F8FAFC] hover:border-[#CBD5E1]'
                 "
               >
@@ -2270,7 +2270,7 @@ function toast(message, type = 'success') {
                   class="flex h-7 w-7 sm:h-9 sm:w-9 shrink-0 items-center justify-center rounded-lg"
                   :class="
                     selectedSupportUnit === 'HR'
-                      ? 'bg-[#172F52] text-white'
+                      ? 'bg-[#0A51B0] text-white'
                       : 'bg-[#F1F5F9] text-[#7C8BAC]'
                   "
                 >
@@ -2292,7 +2292,7 @@ function toast(message, type = 'success') {
                 class="flex h-[72px] sm:h-[60px] flex-col sm:flex-row items-center justify-center sm:justify-start gap-1.5 sm:gap-3 rounded-xl border p-2 sm:p-3 text-center sm:text-left transition-all cursor-pointer select-none active:scale-95"
                 :class="
                   selectedSupportUnit === 'GA'
-                    ? 'border-[#172F52] bg-[#ECF2FF] text-[#172F52] ring-2 ring-[#172F52]/20 shadow-xs'
+                    ? 'border-[#0A51B0] bg-[#ECF2FF] text-[#333333] ring-2 ring-[#0A51B0]/20 shadow-xs'
                     : 'border-[#E5EAEF] bg-white text-[#2A3547] hover:bg-[#F8FAFC] hover:border-[#CBD5E1]'
                 "
               >
@@ -2300,7 +2300,7 @@ function toast(message, type = 'success') {
                   class="flex h-7 w-7 sm:h-9 sm:w-9 shrink-0 items-center justify-center rounded-lg"
                   :class="
                     selectedSupportUnit === 'GA'
-                      ? 'bg-[#172F52] text-white'
+                      ? 'bg-[#0A51B0] text-white'
                       : 'bg-[#F1F5F9] text-[#7C8BAC]'
                   "
                 >
@@ -2334,7 +2334,7 @@ function toast(message, type = 'success') {
                 class="flex h-[56px] sm:h-[68px] flex-col items-center sm:items-start justify-center sm:justify-between rounded-xl border p-2 sm:p-2.5 text-center sm:text-left transition-all cursor-pointer select-none active:scale-95"
                 :class="
                   form.kategori === cat.value
-                    ? 'border-[#172F52] bg-[#ECF2FF] text-[#172F52] ring-2 ring-[#172F52]/20 shadow-xs'
+                    ? 'border-[#0A51B0] bg-[#ECF2FF] text-[#333333] ring-2 ring-[#0A51B0]/20 shadow-xs'
                     : 'border-[#E5EAEF] bg-white text-[#2A3547] hover:bg-[#F8FAFC] hover:border-[#CBD5E1]'
                 "
               >
@@ -2344,7 +2344,7 @@ function toast(message, type = 'success') {
                   }}</span>
                   <span
                     v-if="form.kategori === cat.value"
-                    class="hidden sm:inline material-symbols-outlined text-[15px] text-[#172F52]"
+                    class="hidden sm:inline material-symbols-outlined text-[15px] text-[#333333]"
                     >check_circle</span
                   >
                 </div>
@@ -2392,9 +2392,9 @@ function toast(message, type = 'success') {
             <span class="text-[12px] font-semibold text-[#2A3547]">Lampiran (Opsional)</span>
             <div class="flex items-center gap-3 flex-wrap">
               <label
-                class="inline-flex h-10 items-center gap-2 rounded-lg border border-[#E5EAEF] bg-white px-3.5 text-[12px] font-bold text-[#2A3547] hover:bg-[#F8FAFC] hover:border-[#172F52] transition-all cursor-pointer select-none shadow-2xs"
+                class="inline-flex h-10 items-center gap-2 rounded-lg border border-[#E5EAEF] bg-white px-3.5 text-[12px] font-bold text-[#2A3547] hover:bg-[#F8FAFC] hover:border-[#0A51B0] transition-all cursor-pointer select-none shadow-2xs"
               >
-                <span class="material-symbols-outlined text-[18px] text-[#172F52]"
+                <span class="material-symbols-outlined text-[18px] text-[#333333]"
                   >attach_file</span
                 >
                 <span>Pilih File Lampiran</span>
@@ -2411,7 +2411,7 @@ function toast(message, type = 'success') {
               >
               <span
                 v-if="isTicketAttachmentLoading"
-                class="text-[11px] font-medium text-[#172F52] flex items-center gap-1"
+                class="text-[11px] font-medium text-[#333333] flex items-center gap-1"
               >
                 <span class="material-symbols-outlined text-[14px] animate-spin"
                   >progress_activity</span
@@ -2433,7 +2433,7 @@ function toast(message, type = 'success') {
               >
                 <div class="flex items-center gap-3 min-w-0">
                   <div
-                    class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#ECF2FF] text-[#172F52]"
+                    class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#ECF2FF] text-[#333333]"
                   >
                     <span class="material-symbols-outlined text-[20px]">{{
                       getAttachmentIcon(att.data, att.name)
@@ -2475,7 +2475,7 @@ function toast(message, type = 'success') {
           <button
             type="submit"
             :disabled="isSubmitting"
-            class="inline-flex h-9 items-center gap-1.5 rounded-lg bg-[#172F52] px-4 text-[12px] font-bold text-white hover:bg-[#4A73E0] transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+            class="inline-flex h-9 items-center gap-1.5 rounded-lg bg-[#0A51B0] px-4 text-[12px] font-bold text-white hover:bg-[#4A73E0] transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
           >
             <span v-if="isSubmitting" class="material-symbols-outlined text-[14px] animate-spin"
               >progress_activity</span
@@ -2506,7 +2506,7 @@ function toast(message, type = 'success') {
       size="xl"
       @close="closeModal"
     >
-      <div v-if="selectedTicket" class="flex min-w-0 flex-col text-[#0F172A] wrap-anywhere">
+      <div v-if="selectedTicket" class="flex min-w-0 flex-col text-[#333333] wrap-anywhere">
         <!-- HEADER AREA (Compact SaaS Title Block) -->
         <div
           class="flex items-center justify-between gap-4 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] p-4 mb-4"
@@ -2533,7 +2533,7 @@ function toast(message, type = 'success') {
               </div>
             </div>
             <h2
-              class="text-base sm:text-[17px] font-bold text-[#0F172A] leading-relaxed wrap-anywhere"
+              class="text-base sm:text-[17px] font-bold text-[#333333] leading-relaxed wrap-anywhere"
             >
               {{ selectedTicket.judul }}
             </h2>
@@ -2545,19 +2545,19 @@ function toast(message, type = 'success') {
           <button
             type="button"
             @click="activeDetailTab = 'detail'"
-            class="group flex min-w-0 flex-wrap items-center justify-center gap-1.5 rounded-lg px-2 py-2.5 text-[11px] sm:text-xs font-semibold transition-colors cursor-pointer select-none focus-visible:outline-2 focus-visible:outline-[#172F52]"
+            class="group flex min-w-0 flex-wrap items-center justify-center gap-1.5 rounded-lg px-2 py-2.5 text-[11px] sm:text-xs font-semibold transition-colors cursor-pointer select-none focus-visible:outline-2 focus-visible:outline-[#0A51B0]"
             :class="
               activeDetailTab === 'detail'
-                ? 'bg-white text-[#172F52] shadow-xs'
-                : 'text-[#64748B] hover:bg-white/70 hover:text-[#172F52]'
+                ? 'bg-white text-[#333333] shadow-xs'
+                : 'text-[#64748B] hover:bg-white/70 hover:text-[#333333]'
             "
           >
             <span
               class="material-symbols-outlined text-[15px] transition-colors duration-200"
               :class="
                 activeDetailTab === 'detail'
-                  ? 'text-[#172F52]'
-                  : 'text-[#64748B] group-hover:text-[#172F52]'
+                  ? 'text-[#333333]'
+                  : 'text-[#64748B] group-hover:text-[#333333]'
               "
               >info</span
             >
@@ -2567,19 +2567,19 @@ function toast(message, type = 'success') {
           <button
             type="button"
             @click="activeDetailTab = 'history'"
-            class="group flex min-w-0 flex-wrap items-center justify-center gap-1.5 rounded-lg px-2 py-2.5 text-[11px] sm:text-xs font-semibold transition-colors cursor-pointer select-none focus-visible:outline-2 focus-visible:outline-[#172F52]"
+            class="group flex min-w-0 flex-wrap items-center justify-center gap-1.5 rounded-lg px-2 py-2.5 text-[11px] sm:text-xs font-semibold transition-colors cursor-pointer select-none focus-visible:outline-2 focus-visible:outline-[#0A51B0]"
             :class="
               activeDetailTab === 'history'
-                ? 'bg-white text-[#172F52] shadow-xs'
-                : 'text-[#64748B] hover:bg-white/70 hover:text-[#172F52]'
+                ? 'bg-white text-[#333333] shadow-xs'
+                : 'text-[#64748B] hover:bg-white/70 hover:text-[#333333]'
             "
           >
             <span
               class="material-symbols-outlined text-[15px] transition-colors duration-200"
               :class="
                 activeDetailTab === 'history'
-                  ? 'text-[#172F52]'
-                  : 'text-[#64748B] group-hover:text-[#172F52]'
+                  ? 'text-[#333333]'
+                  : 'text-[#64748B] group-hover:text-[#333333]'
               "
               >history</span
             >
@@ -2588,7 +2588,7 @@ function toast(message, type = 'success') {
               class="ml-0.5 rounded-full px-1.5 py-0.5 text-[10px] font-medium"
               :class="
                 activeDetailTab === 'history'
-                  ? 'bg-[#EDF3FC] text-[#172F52]'
+                  ? 'bg-[#EDF5FF] text-[#333333]'
                   : 'bg-[#E2E8F0]/70 text-[#475569]'
               "
             >
@@ -2599,19 +2599,19 @@ function toast(message, type = 'success') {
           <button
             type="button"
             @click="openCommentsTab"
-            class="group flex min-w-0 flex-wrap items-center justify-center gap-1.5 rounded-lg px-2 py-2.5 text-[11px] sm:text-xs font-semibold transition-colors cursor-pointer select-none focus-visible:outline-2 focus-visible:outline-[#172F52]"
+            class="group flex min-w-0 flex-wrap items-center justify-center gap-1.5 rounded-lg px-2 py-2.5 text-[11px] sm:text-xs font-semibold transition-colors cursor-pointer select-none focus-visible:outline-2 focus-visible:outline-[#0A51B0]"
             :class="
               activeDetailTab === 'comments'
-                ? 'bg-white text-[#172F52] shadow-xs'
-                : 'text-[#64748B] hover:bg-white/70 hover:text-[#172F52]'
+                ? 'bg-white text-[#333333] shadow-xs'
+                : 'text-[#64748B] hover:bg-white/70 hover:text-[#333333]'
             "
           >
             <span
               class="material-symbols-outlined text-[15px] transition-colors duration-200"
               :class="
                 activeDetailTab === 'comments'
-                  ? 'text-[#172F52]'
-                  : 'text-[#64748B] group-hover:text-[#172F52]'
+                  ? 'text-[#333333]'
+                  : 'text-[#64748B] group-hover:text-[#333333]'
               "
               >forum</span
             >
@@ -2620,7 +2620,7 @@ function toast(message, type = 'success') {
               class="ml-0.5 rounded-full px-1.5 py-0.5 text-[10px] font-medium"
               :class="
                 activeDetailTab === 'comments'
-                  ? 'bg-[#EDF3FC] text-[#172F52]'
+                  ? 'bg-[#EDF5FF] text-[#333333]'
                   : 'bg-[#E2E8F0]/70 text-[#475569]'
               "
             >
@@ -2652,7 +2652,7 @@ function toast(message, type = 'success') {
                 <!-- Pelapor -->
                 <div class="flex min-w-0 flex-col gap-1">
                   <span class="text-[11px] font-medium text-[#94A3B8]">Pelapor</span>
-                  <span class="font-semibold text-[#0F172A]">{{
+                  <span class="font-semibold text-[#333333]">{{
                     selectedTicket.pelapor_nama || selectedTicket.pelapor || '—'
                   }}</span>
                   <span
@@ -2671,7 +2671,7 @@ function toast(message, type = 'success') {
                     class="font-semibold"
                     :class="
                       selectedTicket.assigned_to_nama || selectedTicket.assigned_to
-                        ? 'text-[#0F172A]'
+                        ? 'text-[#333333]'
                         : 'text-[#94A3B8] italic'
                     "
                   >
@@ -2687,7 +2687,7 @@ function toast(message, type = 'success') {
                 <!-- Kategori -->
                 <div class="flex min-w-0 flex-col gap-1">
                   <span class="text-[11px] font-medium text-[#94A3B8]">Kategori</span>
-                  <span class="font-medium text-[#0F172A]">{{
+                  <span class="font-medium text-[#333333]">{{
                     selectedTicket.kategori || 'Support'
                   }}</span>
                 </div>
@@ -2695,7 +2695,7 @@ function toast(message, type = 'success') {
                 <!-- Priority -->
                 <div class="flex min-w-0 flex-col gap-1">
                   <span class="text-[11px] font-medium text-[#94A3B8]">Prioritas</span>
-                  <span class="font-medium text-[#0F172A]">
+                  <span class="font-medium text-[#333333]">
                     {{ getPriorityInfo(selectedTicket.prioritas).label }}
                   </span>
                 </div>
@@ -2703,7 +2703,7 @@ function toast(message, type = 'success') {
                 <!-- Unit Tujuan -->
                 <div class="flex min-w-0 flex-col gap-1">
                   <span class="text-[11px] font-medium text-[#94A3B8]">Unit Tujuan</span>
-                  <span class="font-medium text-[#0F172A]">{{
+                  <span class="font-medium text-[#333333]">{{
                     selectedTicket.queue_nama || selectedTicket.queue_kode || 'IT Support'
                   }}</span>
                 </div>
@@ -2742,7 +2742,7 @@ function toast(message, type = 'success') {
                 >
                   <div class="flex items-center gap-3 min-w-0">
                     <div
-                      class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#ECF2FF] text-[#172F52]"
+                      class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#ECF2FF] text-[#333333]"
                     >
                       <span class="material-symbols-outlined text-[20px]">{{
                         getAttachmentIcon(att.attachment, att.name)
@@ -2768,7 +2768,7 @@ function toast(message, type = 'success') {
                         att.name || 'lampiran-' + selectedTicket.nomor_tiket + '-' + (i + 1),
                       )
                     "
-                    class="flex h-8 items-center gap-1.5 rounded-lg border border-[#E2E8F0] bg-white px-3 text-[11px] font-bold text-[#172F52] hover:bg-[#EFF6FF] hover:border-[#172F52] transition-all cursor-pointer shadow-2xs shrink-0"
+                    class="flex h-8 items-center gap-1.5 rounded-lg border border-[#E2E8F0] bg-white px-3 text-[11px] font-bold text-[#333333] hover:bg-[#EFF6FF] hover:border-[#0A51B0] transition-all cursor-pointer shadow-2xs shrink-0"
                   >
                     <span class="material-symbols-outlined text-[16px]">download</span>
                     <span>Unduh</span>
@@ -2812,12 +2812,12 @@ function toast(message, type = 'success') {
                 class="relative flex flex-col gap-1 text-xs"
               >
                 <!-- Dot on Timeline -->
-                <div class="absolute -left-5 top-1 h-2 w-2 rounded-full bg-[#172F52]"></div>
+                <div class="absolute -left-5 top-1 h-2 w-2 rounded-full bg-[#0A51B0]"></div>
 
                 <!-- Event Header & Actor -->
                 <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
                   <div class="flex flex-wrap items-center gap-1.5">
-                    <span class="font-semibold text-[#0F172A]">{{ log.aksi }}</span>
+                    <span class="font-semibold text-[#333333]">{{ log.aksi }}</span>
                     <span class="text-[11px] text-[#64748B]"
                       >oleh <strong>{{ log.oleh_pengguna || 'Sistem' }}</strong></span
                     >
@@ -2849,7 +2849,7 @@ function toast(message, type = 'success') {
                 v-if="isCommentsLoading"
                 class="flex flex-col items-center justify-center py-6 gap-2 text-[#94A3B8]"
               >
-                <span class="material-symbols-outlined text-[24px] animate-spin text-[#172F52]"
+                <span class="material-symbols-outlined text-[24px] animate-spin text-[#333333]"
                   >progress_activity</span
                 >
                 <span class="text-xs font-medium">Memuat percakapan...</span>
@@ -2891,7 +2891,7 @@ function toast(message, type = 'success') {
                   :class="
                     c.nama_pengguna === user?.nama
                       ? 'bg-[#EFF6FF] border border-[#DBEAFE] text-[#1E3A8A] rounded-br-xs'
-                      : 'bg-[#F8FAFC] text-[#0F172A] border border-[#E2E8F0] rounded-bl-xs'
+                      : 'bg-[#F8FAFC] text-[#333333] border border-[#E2E8F0] rounded-bl-xs'
                   "
                 >
                   <p class="whitespace-pre-wrap">{{ c.pesan }}</p>
@@ -2913,7 +2913,7 @@ function toast(message, type = 'success') {
                   >
                     <div class="flex items-center gap-2 min-w-0">
                       <div
-                        class="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-[#ECF2FF] text-[#172F52]"
+                        class="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-[#ECF2FF] text-[#333333]"
                       >
                         <span class="material-symbols-outlined text-[16px]">{{
                           getAttachmentIcon(c.attachment, c.attachment_name)
@@ -2931,7 +2931,7 @@ function toast(message, type = 'success') {
                           c.attachment_name || 'lampiran-diskusi-' + c.id,
                         )
                       "
-                      class="flex h-7 items-center gap-1 rounded-md border border-[#E2E8F0] bg-white px-2 text-[10px] font-bold text-[#172F52] hover:bg-[#EFF6FF] hover:border-[#172F52] transition-all cursor-pointer shrink-0"
+                      class="flex h-7 items-center gap-1 rounded-md border border-[#E2E8F0] bg-white px-2 text-[10px] font-bold text-[#333333] hover:bg-[#EFF6FF] hover:border-[#0A51B0] transition-all cursor-pointer shrink-0"
                     >
                       <span class="material-symbols-outlined text-[14px]">download</span>
                       <span>Unduh</span>
@@ -2962,13 +2962,13 @@ function toast(message, type = 'success') {
               >
                 <div class="flex items-center gap-2 min-w-0">
                   <div
-                    class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#ECF2FF] text-[#172F52]"
+                    class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#ECF2FF] text-[#333333]"
                   >
                     <span class="material-symbols-outlined text-[16px]">{{
                       getAttachmentIcon(commentAttachment, commentAttachmentName)
                     }}</span>
                   </div>
-                  <span class="text-xs font-bold text-[#0F172A] truncate">{{
+                  <span class="text-xs font-bold text-[#333333] truncate">{{
                     commentAttachmentName || 'File lampiran siap dikirim'
                   }}</span>
                 </div>
@@ -3019,13 +3019,13 @@ function toast(message, type = 'success') {
                   type="text"
                   aria-label="Tulis komentar tiket"
                   placeholder="Tulis komentar atau catatan perbaikan..."
-                  class="h-10 flex-1 min-w-0 rounded-xl border border-slate-200 bg-slate-50/70 px-3.5 text-xs font-medium text-slate-900 placeholder-slate-400 outline-none transition-all focus:bg-white focus:border-[#172F52] focus:ring-1 focus:ring-[#172F52]/20"
+                  class="h-10 flex-1 min-w-0 rounded-xl border border-slate-200 bg-slate-50/70 px-3.5 text-xs font-medium text-slate-900 placeholder-slate-400 outline-none transition-all focus:bg-white focus:border-[#0A51B0] focus:ring-1 focus:ring-[#0A51B0]/20"
                 />
 
                 <button
                   type="submit"
                   :disabled="isSubmittingComment || (!newCommentText.trim() && !commentAttachment)"
-                  class="flex h-10 px-3.5 sm:px-4 items-center justify-center gap-1.5 rounded-xl bg-[#172F52] text-xs font-bold text-white shadow-2xs hover:bg-[#244673] disabled:opacity-40 transition-all cursor-pointer shrink-0 active:scale-95"
+                  class="flex h-10 px-3.5 sm:px-4 items-center justify-center gap-1.5 rounded-xl bg-[#0A51B0] text-xs font-bold text-white shadow-2xs hover:bg-[#0A4391] disabled:opacity-40 transition-all cursor-pointer shrink-0 active:scale-95"
                 >
                   <span class="material-symbols-outlined text-[16px]">send</span>
                   <span class="hidden sm:inline">Kirim</span>
@@ -3058,10 +3058,10 @@ function toast(message, type = 'success') {
                 aria-label="Ubah status tiket"
                 aria-haspopup="true"
                 :aria-expanded="showStatusDropdown"
-                class="inline-flex h-9 w-full sm:w-auto items-center justify-between sm:justify-center gap-2 rounded-xl border bg-white px-3.5 text-xs font-bold text-[#2A3547] shadow-2xs hover:bg-[#F8FAFC] hover:border-[#172F52] transition-all cursor-pointer disabled:opacity-50 active:scale-95"
+                class="inline-flex h-9 w-full sm:w-auto items-center justify-between sm:justify-center gap-2 rounded-xl border bg-white px-3.5 text-xs font-bold text-[#2A3547] shadow-2xs hover:bg-[#F8FAFC] hover:border-[#0A51B0] transition-all cursor-pointer disabled:opacity-50 active:scale-95"
                 :class="
                   showStatusDropdown
-                    ? 'border-[#172F52] ring-2 ring-[#172F52]/15'
+                    ? 'border-[#0A51B0] ring-2 ring-[#0A51B0]/15'
                     : 'border-[#E5EAEF]'
                 "
               >
@@ -3074,7 +3074,7 @@ function toast(message, type = 'success') {
                 </div>
                 <span
                   class="material-symbols-outlined text-[16px] text-[#7C8BAC] transition-transform duration-200"
-                  :class="{ 'rotate-180 text-[#172F52]': showStatusDropdown }"
+                  :class="{ 'rotate-180 text-[#333333]': showStatusDropdown }"
                   >expand_more</span
                 >
               </button>
@@ -3099,7 +3099,7 @@ function toast(message, type = 'success') {
                     class="flex h-8 w-full items-center justify-between rounded-lg px-2.5 text-xs font-medium text-[#2A3547] hover:bg-[#F8FAFC] transition-colors cursor-pointer"
                     :class="
                       selectedTicket.status_tiket === st.value
-                        ? 'bg-[#ECF2FF] font-bold text-[#172F52]'
+                        ? 'bg-[#ECF2FF] font-bold text-[#333333]'
                         : ''
                     "
                   >
@@ -3109,7 +3109,7 @@ function toast(message, type = 'success') {
                     </div>
                     <span
                       v-if="selectedTicket.status_tiket === st.value"
-                      class="material-symbols-outlined text-[15px] text-[#172F52]"
+                      class="material-symbols-outlined text-[15px] text-[#333333]"
                       >check</span
                     >
                   </button>
@@ -3126,7 +3126,7 @@ function toast(message, type = 'success') {
               type="button"
               @click="claimTicket(selectedTicket)"
               :disabled="isClaiming === selectedTicket.id"
-              class="h-9 w-full sm:w-auto inline-flex items-center justify-center gap-1.5 rounded-xl bg-[#172F52] px-3.5 text-xs font-bold text-white shadow-2xs hover:bg-[#4570EA] disabled:opacity-50 transition-all cursor-pointer whitespace-nowrap active:scale-95"
+              class="h-9 w-full sm:w-auto inline-flex items-center justify-center gap-1.5 rounded-xl bg-[#0A51B0] px-3.5 text-xs font-bold text-white shadow-2xs hover:bg-[#0A4391] disabled:opacity-50 transition-all cursor-pointer whitespace-nowrap active:scale-95"
             >
               <span class="material-symbols-outlined text-[16px]">person_add</span>
               <span>{{
@@ -3146,10 +3146,10 @@ function toast(message, type = 'success') {
                 aria-label="Assign tiket ke admin unit"
                 aria-haspopup="true"
                 :aria-expanded="showReassignDropdown"
-                class="inline-flex h-9 w-full sm:w-auto items-center justify-between sm:justify-center gap-1.5 rounded-xl border border-[#E5EAEF] bg-white px-3.5 text-xs font-bold text-[#2A3547] shadow-2xs hover:bg-[#F8FAFC] hover:border-[#172F52] transition-all cursor-pointer disabled:opacity-50 whitespace-nowrap active:scale-95"
+                class="inline-flex h-9 w-full sm:w-auto items-center justify-between sm:justify-center gap-1.5 rounded-xl border border-[#E5EAEF] bg-white px-3.5 text-xs font-bold text-[#2A3547] shadow-2xs hover:bg-[#F8FAFC] hover:border-[#0A51B0] transition-all cursor-pointer disabled:opacity-50 whitespace-nowrap active:scale-95"
               >
                 <div class="flex items-center gap-1.5">
-                  <span class="material-symbols-outlined text-[16px] text-[#172F52]"
+                  <span class="material-symbols-outlined text-[16px] text-[#333333]"
                     >assignment_ind</span
                   >
                   <span>Assign ke Admin</span>
@@ -3178,14 +3178,14 @@ function toast(message, type = 'success') {
                     class="flex h-8 w-full items-center justify-between rounded-lg px-2.5 text-xs font-medium text-[#2A3547] hover:bg-[#F8FAFC] transition-colors cursor-pointer disabled:opacity-50"
                     :class="
                       selectedTicket.assigned_to_user_id === admin.id
-                        ? 'bg-[#ECF2FF] font-bold text-[#172F52]'
+                        ? 'bg-[#ECF2FF] font-bold text-[#333333]'
                         : ''
                     "
                   >
                     <span class="truncate">{{ admin.nama }}</span>
                     <span
                       v-if="selectedTicket.assigned_to_user_id === admin.id"
-                      class="material-symbols-outlined text-[15px] text-[#172F52]"
+                      class="material-symbols-outlined text-[15px] text-[#333333]"
                       >check</span
                     >
                   </button>
@@ -3206,7 +3206,7 @@ function toast(message, type = 'success') {
           <button
             type="button"
             @click="closeModal"
-            class="h-10 w-full sm:w-auto rounded-xl bg-[#172F52] px-5 text-xs font-semibold text-white hover:bg-[#1D4ED8] transition-colors cursor-pointer active:scale-95"
+            class="h-10 w-full sm:w-auto rounded-xl bg-[#0A51B0] px-5 text-xs font-semibold text-white hover:bg-[#0A4391] transition-colors cursor-pointer active:scale-95"
           >
             Tutup
           </button>
@@ -3270,12 +3270,12 @@ function toast(message, type = 'success') {
   box-shadow: none;
 }
 .ticket-card-list .tck-list-item:focus-visible {
-  outline: 2px solid #5285d8;
+  outline: 2px solid #097CDE;
   outline-offset: 3px;
 }
 .ticket-card-list .tck-list-item:hover {
-  border-color: #a4bbdf;
-  box-shadow: 0 3px 12px #172f5208;
+  border-color: #B8D4F5;
+  box-shadow: 0 3px 12px #0A51B008;
 }
 .ticket-card-list h4 {
   font-size: 14px;

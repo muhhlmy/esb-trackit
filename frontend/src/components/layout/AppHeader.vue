@@ -735,7 +735,7 @@ onBeforeUnmount(() => {
         aria-controls="app-navigation"
         aria-label="Buka Navigasi Mobile"
         title="Buka Navigasi Mobile"
-        class="flex lg:hidden h-9 w-9 md:h-8 md:w-8 shrink-0 items-center justify-center rounded-lg text-[#2A3547] hover:bg-[#EDF3FC] hover:text-[#172F52] transition-all cursor-pointer active:scale-95 touch-manipulation"
+        class="flex lg:hidden h-9 w-9 md:h-8 md:w-8 shrink-0 items-center justify-center rounded-lg text-[#2A3547] hover:bg-[#EDF5FF] hover:text-[#333333] transition-all cursor-pointer active:scale-95 touch-manipulation"
         @click="$emit('toggle-mobile')"
       >
         <span aria-hidden="true" class="material-symbols-outlined text-[20px]">menu</span>
@@ -743,7 +743,7 @@ onBeforeUnmount(() => {
 
       <div class="min-w-0">
         <h1
-          class="text-sm wrap-anywhere md:truncate md:text-[15px] font-semibold tracking-tight text-[#0F172A] leading-tight"
+          class="text-sm wrap-anywhere md:truncate md:text-[15px] font-semibold tracking-tight text-[#333333] leading-tight"
         >
           {{ pageTitle }}
         </h1>
@@ -782,7 +782,7 @@ onBeforeUnmount(() => {
             autocomplete="off"
             @focus="initGlobalSearchData"
             :placeholder="searchPlaceholder"
-            class="h-11 md:h-9 w-full rounded-lg md:rounded-lg border border-[#DFE5EF] bg-[#F8FAFC] pl-10 md:pl-9 pr-12 md:pr-20 text-[11px] sm:text-xs font-medium text-[#0F172A] placeholder-[#64748B] outline-none transition-all focus:bg-white focus:border-[#172F52] focus:ring-2 focus:ring-[#172F52]/20 [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden"
+            class="h-11 md:h-9 w-full rounded-lg md:rounded-lg border border-[#DFE5EF] bg-[#F8FAFC] pl-10 md:pl-9 pr-12 md:pr-20 text-[11px] sm:text-xs font-medium text-[#333333] placeholder-[#64748B] outline-none transition-all focus:bg-white focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/20 [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden"
           />
 
           <!-- Action Buttons / Hotkey Indicator -->
@@ -792,7 +792,7 @@ onBeforeUnmount(() => {
               type="button"
               @click="clearSearch"
               aria-label="Bersihkan pencarian"
-              class="flex h-11 w-11 md:h-6 md:w-6 items-center justify-center rounded-full text-[#475569] hover:bg-[#F1F5F9] hover:text-[#0F172A] transition-all cursor-pointer touch-manipulation"
+              class="flex h-11 w-11 md:h-6 md:w-6 items-center justify-center rounded-full text-[#475569] hover:bg-[#F1F5F9] hover:text-[#333333] transition-all cursor-pointer touch-manipulation"
               title="Bersihkan Pencarian"
             >
               <span aria-hidden="true" class="material-symbols-outlined text-[15px]">close</span>
@@ -802,7 +802,7 @@ onBeforeUnmount(() => {
               type="submit"
               :disabled="!searchQuery.trim()"
               v-if="searchQuery.trim()"
-              class="hidden md:flex items-center gap-1 rounded-lg bg-[#EFF6FF] px-2.5 py-1 text-[10px] font-extrabold text-[#1D4ED8] hover:bg-[#1D4ED8] hover:text-white disabled:opacity-40 transition-all cursor-pointer"
+              class="hidden md:flex items-center gap-1 rounded-lg bg-[#EFF6FF] px-2.5 py-1 text-[10px] font-extrabold text-[#0A4391] hover:bg-[#0A4391] hover:text-white disabled:opacity-40 transition-all cursor-pointer"
             >
               Cari
             </button>
@@ -841,7 +841,7 @@ onBeforeUnmount(() => {
                 <!-- Dedicated Mobile Search Input -->
                 <div class="relative flex flex-1 items-center min-w-0">
                   <span
-                    class="material-symbols-outlined absolute left-3 text-[17px] text-[#172F52] pointer-events-none"
+                    class="material-symbols-outlined absolute left-3 text-[17px] text-[#333333] pointer-events-none"
                   >
                     search
                   </span>
@@ -856,7 +856,7 @@ onBeforeUnmount(() => {
                     autocapitalize="off"
                     spellcheck="false"
                     placeholder="Cari aset, tiket, karyawan, user..."
-                    class="h-11 w-full rounded-xl border border-[#DFE5EF] bg-[#F8FAFC] pl-9 pr-11 text-xs font-medium text-[#0F172A] placeholder-[#64748B] outline-none transition-all focus:bg-white focus:border-[#172F52] focus:ring-2 focus:ring-[#172F52]/20 [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden"
+                    class="h-11 w-full rounded-xl border border-[#DFE5EF] bg-[#F8FAFC] pl-9 pr-11 text-xs font-medium text-[#333333] placeholder-[#64748B] outline-none transition-all focus:bg-white focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/20 [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden"
                   />
                   <button
                     v-if="searchQuery"
@@ -874,7 +874,7 @@ onBeforeUnmount(() => {
                   type="button"
                   @click="submitSearch"
                   :disabled="!searchQuery.trim()"
-                  class="flex min-h-11 shrink-0 items-center px-2 py-1 text-xs font-bold text-[#172F52] disabled:opacity-30 active:scale-95 touch-manipulation cursor-pointer"
+                  class="flex min-h-11 shrink-0 items-center px-2 py-1 text-xs font-bold text-[#333333] disabled:opacity-30 active:scale-95 touch-manipulation cursor-pointer"
                 >
                   Cari
                 </button>
@@ -917,8 +917,8 @@ onBeforeUnmount(() => {
                   class="search-filter-tab flex min-h-11 md:min-h-0 items-center gap-1 shrink-0 rounded-lg px-2 sm:px-2.5 py-1 text-[11px] font-bold transition-all cursor-pointer touch-manipulation active:scale-95"
                   :class="
                     searchTabFilter === tab.key
-                      ? 'bg-[#172F52] text-white shadow-xs'
-                      : 'text-[#64748B] hover:bg-[#ECF2FF] hover:text-[#172F52]'
+                      ? 'bg-[#0A51B0] text-white shadow-xs'
+                      : 'text-[#64748B] hover:bg-[#ECF2FF] hover:text-[#333333]'
                   "
                 >
                   <span class="material-symbols-outlined text-[14px]">{{ tab.icon }}</span>
@@ -944,7 +944,7 @@ onBeforeUnmount(() => {
                 class="flex items-center justify-center gap-2 py-8 text-[12px] text-[#94A3B8]"
               >
                 <div
-                  class="w-4 h-4 border-2 border-[#E2E8F0] border-t-[#172F52] rounded-full animate-spin"
+                  class="w-4 h-4 border-2 border-[#E2E8F0] border-t-[#0A51B0] rounded-full animate-spin"
                 ></div>
                 Memuat data pencarian...
               </div>
@@ -963,21 +963,21 @@ onBeforeUnmount(() => {
                   <button
                     type="button"
                     @click="quickSearchPreset('Laptop', 'ASSETS')"
-                    class="rounded-full border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-1.5 text-[11px] font-semibold text-[#475569] hover:border-[#172F52] hover:text-[#172F52] transition-all cursor-pointer active:scale-95 touch-manipulation shadow-2xs"
+                    class="rounded-full border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-1.5 text-[11px] font-semibold text-[#475569] hover:border-[#0A51B0] hover:text-[#333333] transition-all cursor-pointer active:scale-95 touch-manipulation shadow-2xs"
                   >
                     Laptop
                   </button>
                   <button
                     type="button"
                     @click="quickSearchPreset('Tiket', 'TICKETS')"
-                    class="rounded-full border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-1.5 text-[11px] font-semibold text-[#475569] hover:border-[#172F52] hover:text-[#172F52] transition-all cursor-pointer active:scale-95 touch-manipulation shadow-2xs"
+                    class="rounded-full border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-1.5 text-[11px] font-semibold text-[#475569] hover:border-[#0A51B0] hover:text-[#333333] transition-all cursor-pointer active:scale-95 touch-manipulation shadow-2xs"
                   >
                     Tiket
                   </button>
                   <button
                     type="button"
                     @click="quickSearchPreset('Active', 'KARYAWAN')"
-                    class="rounded-full border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-1.5 text-[11px] font-semibold text-[#475569] hover:border-[#172F52] hover:text-[#172F52] transition-all cursor-pointer active:scale-95 touch-manipulation shadow-2xs"
+                    class="rounded-full border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-1.5 text-[11px] font-semibold text-[#475569] hover:border-[#0A51B0] hover:text-[#333333] transition-all cursor-pointer active:scale-95 touch-manipulation shadow-2xs"
                   >
                     Karyawan aktif
                   </button>
@@ -1022,7 +1022,7 @@ onBeforeUnmount(() => {
                   "
                 >
                   <div
-                    class="px-3.5 sm:px-4 py-1.5 bg-[#F8FAFC] text-[10px] font-extrabold uppercase tracking-wider text-[#172F52] flex items-center justify-between"
+                    class="px-3.5 sm:px-4 py-1.5 bg-[#F8FAFC] text-[10px] font-extrabold uppercase tracking-wider text-[#333333] flex items-center justify-between"
                   >
                     <span>Aset IT ({{ searchResults.assets.length }})</span>
                   </div>
@@ -1035,13 +1035,13 @@ onBeforeUnmount(() => {
                   >
                     <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
                       <div
-                        class="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-[#ECF2FF] text-[#172F52] group-hover:bg-[#172F52] group-hover:text-white transition-all"
+                        class="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-[#ECF2FF] text-[#333333] group-hover:bg-[#0A51B0] group-hover:text-white transition-all"
                       >
                         <span class="material-symbols-outlined text-[17px]">devices</span>
                       </div>
                       <div class="min-w-0">
                         <p
-                          class="text-[12px] font-bold text-[#2A3547] truncate group-hover:text-[#172F52]"
+                          class="text-[12px] font-bold text-[#2A3547] truncate group-hover:text-[#333333]"
                         >
                           {{ item.label_aset || item.hostname || 'Aset' }}
                         </p>
@@ -1056,7 +1056,7 @@ onBeforeUnmount(() => {
                       </div>
                     </div>
                     <span
-                      class="material-symbols-outlined text-[16px] text-[#CBD5E1] group-hover:text-[#172F52] shrink-0"
+                      class="material-symbols-outlined text-[16px] text-[#CBD5E1] group-hover:text-[#333333] shrink-0"
                       >chevron_right</span
                     >
                   </button>
@@ -1211,7 +1211,7 @@ onBeforeUnmount(() => {
                   type="button"
                   @click="submitSearch"
                   :disabled="!searchQuery.trim() || isFetchingSearch"
-                  class="text-[#172F52] hover:text-[#1D4ED8] hover:underline font-bold transition-colors cursor-pointer touch-manipulation ml-auto"
+                  class="text-[#333333] hover:text-[#0A4391] hover:underline font-bold transition-colors cursor-pointer touch-manipulation ml-auto"
                 >
                   Lihat Hasil Lengkap →
                 </button>
@@ -1236,7 +1236,7 @@ onBeforeUnmount(() => {
         @click="initGlobalSearchData"
         aria-label="Cari Global"
         title="Cari Global (Aset, Tiket, Karyawan, User)"
-        class="flex md:hidden h-9 w-9 items-center justify-center rounded-xl text-[#64748B] hover:bg-[#F8FAFC] hover:text-[#172F52] transition-all cursor-pointer select-none active:scale-95 touch-manipulation"
+        class="flex md:hidden h-9 w-9 items-center justify-center rounded-xl text-[#64748B] hover:bg-[#F8FAFC] hover:text-[#333333] transition-all cursor-pointer select-none active:scale-95 touch-manipulation"
       >
         <span aria-hidden="true" class="material-symbols-outlined text-[20px]">search</span>
       </button>
@@ -1251,8 +1251,8 @@ onBeforeUnmount(() => {
           type="button"
           :title="unreadCount > 0 ? `Notifikasi (${unreadCount})` : 'Notifikasi'"
           @click="toggleNotif"
-          class="relative flex h-9 w-9 items-center justify-center rounded-xl text-[#64748B] hover:bg-[#F8FAFC] hover:text-[#0F172A] transition-all cursor-pointer select-none active:scale-95 touch-manipulation"
-          :class="isNotifOpen ? 'bg-[#EDF3FC] text-[#172F52]' : ''"
+          class="relative flex h-9 w-9 items-center justify-center rounded-xl text-[#64748B] hover:bg-[#F8FAFC] hover:text-[#333333] transition-all cursor-pointer select-none active:scale-95 touch-manipulation"
+          :class="isNotifOpen ? 'bg-[#EDF5FF] text-[#333333]' : ''"
         >
           <span aria-hidden="true" class="material-symbols-outlined text-[20px]"
             >notifications</span
@@ -1260,7 +1260,7 @@ onBeforeUnmount(() => {
           <Transition name="badge-pop">
             <span
               v-if="unreadCount > 0"
-              class="absolute -top-0.5 -right-0.5 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-[#172F52] px-1 text-[9.5px] font-bold text-white shadow-2xs"
+              class="absolute -top-0.5 -right-0.5 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-[#0A51B0] px-1 text-[9.5px] font-bold text-white shadow-2xs"
               >{{ unreadCount > 9 ? '9+' : unreadCount }}</span
             >
           </Transition>
@@ -1279,13 +1279,13 @@ onBeforeUnmount(() => {
               class="flex items-center justify-between px-4 py-3 border-b border-[#F1F5F9] bg-white"
             >
               <div class="flex items-center gap-2">
-                <span class="material-symbols-outlined text-[18px] text-[#172F52]"
+                <span class="material-symbols-outlined text-[18px] text-[#333333]"
                   >notifications</span
                 >
-                <h3 class="text-xs font-bold text-[#0F172A]">Notifikasi</h3>
+                <h3 class="text-xs font-bold text-[#333333]">Notifikasi</h3>
                 <span
                   v-if="unreadCount > 0"
-                  class="inline-flex h-4 min-w-[16px] items-center justify-center rounded-full bg-[#EFF6FF] px-1.5 text-[10px] font-bold text-[#172F52] border border-[#BFDBFE]"
+                  class="inline-flex h-4 min-w-[16px] items-center justify-center rounded-full bg-[#EFF6FF] px-1.5 text-[10px] font-bold text-[#333333] border border-[#BFDBFE]"
                   >{{ unreadCount }}</span
                 >
               </div>
@@ -1311,15 +1311,15 @@ onBeforeUnmount(() => {
                 class="flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs transition-all cursor-pointer select-none whitespace-nowrap"
                 :class="
                   notifFilter === tab.key
-                    ? 'bg-[#EFF6FF] text-[#172F52] font-semibold border border-[#BFDBFE]/60'
-                    : 'text-[#64748B] hover:text-[#0F172A] hover:bg-white font-medium'
+                    ? 'bg-[#EFF6FF] text-[#333333] font-semibold border border-[#BFDBFE]/60'
+                    : 'text-[#64748B] hover:text-[#333333] hover:bg-white font-medium'
                 "
               >
                 <span>{{ tab.label }}</span>
                 <span
                   v-if="tab.count > 0"
                   class="text-[10px] px-1 rounded-md"
-                  :class="notifFilter === tab.key ? 'text-[#172F52] font-bold' : 'text-[#94A3B8]'"
+                  :class="notifFilter === tab.key ? 'text-[#333333] font-bold' : 'text-[#94A3B8]'"
                   >{{ tab.count }}</span
                 >
               </button>
@@ -1345,7 +1345,7 @@ onBeforeUnmount(() => {
                 <span class="material-symbols-outlined text-[32px] text-[#CBD5E1]"
                   >notifications_off</span
                 >
-                <p class="text-xs font-semibold text-[#0F172A]">Tidak ada notifikasi</p>
+                <p class="text-xs font-semibold text-[#333333]">Tidak ada notifikasi</p>
                 <p class="text-[11px] text-[#64748B]">Belum ada aktivitas baru di kategori ini.</p>
               </div>
 
@@ -1360,16 +1360,16 @@ onBeforeUnmount(() => {
               >
                 <!-- Unread indicator dot -->
                 <div class="mt-1.5 flex h-2 w-2 shrink-0 items-center justify-center">
-                  <span v-if="!notif.isRead" class="h-1.5 w-1.5 rounded-full bg-[#172F52]"></span>
+                  <span v-if="!notif.isRead" class="h-1.5 w-1.5 rounded-full bg-[#0A51B0]"></span>
                 </div>
 
                 <!-- Content Block -->
                 <div class="min-w-0 flex-1">
                   <!-- Primary Title / Event -->
                   <p
-                    class="text-xs truncate leading-snug transition-colors group-hover:text-[#172F52]"
+                    class="text-xs truncate leading-snug transition-colors group-hover:text-[#333333]"
                     :class="
-                      !notif.isRead ? 'font-bold text-[#0F172A]' : 'font-semibold text-[#334155]'
+                      !notif.isRead ? 'font-bold text-[#333333]' : 'font-semibold text-[#334155]'
                     "
                   >
                     {{ notif.title }}
@@ -1406,7 +1406,7 @@ onBeforeUnmount(() => {
 
                 <!-- Action Chevron -->
                 <span
-                  class="material-symbols-outlined text-[16px] text-[#CBD5E1] group-hover:text-[#172F52] shrink-0 mt-0.5 transition-colors"
+                  class="material-symbols-outlined text-[16px] text-[#CBD5E1] group-hover:text-[#333333] shrink-0 mt-0.5 transition-colors"
                 >
                   chevron_right
                 </span>
@@ -1418,7 +1418,7 @@ onBeforeUnmount(() => {
               <button
                 type="button"
                 @click="goToAllTickets"
-                class="inline-flex items-center gap-1 text-xs font-semibold text-[#172F52] hover:text-[#1D4ED8] hover:underline cursor-pointer transition-colors"
+                class="inline-flex items-center gap-1 text-xs font-semibold text-[#333333] hover:text-[#0A4391] hover:underline cursor-pointer transition-colors"
               >
                 <span>Lihat semua aktivitas</span>
                 <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
@@ -1445,12 +1445,12 @@ onBeforeUnmount(() => {
           :class="isProfileOpen ? 'bg-[#F8FAFC]' : ''"
         >
           <div
-            class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#172F52] text-xs font-bold text-white shadow-2xs"
+            class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#0A51B0] text-xs font-bold text-white shadow-2xs"
           >
             {{ (user && user.nama ? user.nama.charAt(0) : 'U').toUpperCase() }}
           </div>
           <div class="hidden text-left lg:block">
-            <p class="text-xs font-bold text-[#0F172A] leading-tight truncate max-w-[140px]">
+            <p class="text-xs font-bold text-[#333333] leading-tight truncate max-w-[140px]">
               {{ user ? user.nama : 'Pengguna' }}
             </p>
             <p
@@ -1475,7 +1475,7 @@ onBeforeUnmount(() => {
           >
             <!-- Account Header -->
             <div class="px-3 py-2 border-b border-[#F1F5F9] mb-1">
-              <p class="text-xs font-bold text-[#0F172A] truncate">
+              <p class="text-xs font-bold text-[#333333] truncate">
                 {{ user ? user.nama : 'Pengguna' }}
               </p>
               <p class="text-[11px] font-normal text-[#64748B] truncate capitalize mt-0.5">
@@ -1491,7 +1491,7 @@ onBeforeUnmount(() => {
               <button
                 type="button"
                 @click="openMyAssets"
-                class="w-full flex items-center gap-2 rounded-xl px-2.5 py-1.5 text-xs font-medium text-[#334155] hover:bg-[#F8FAFC] hover:text-[#0F172A] transition-colors text-left cursor-pointer"
+                class="w-full flex items-center gap-2 rounded-xl px-2.5 py-1.5 text-xs font-medium text-[#334155] hover:bg-[#F8FAFC] hover:text-[#333333] transition-colors text-left cursor-pointer"
               >
                 <span class="material-symbols-outlined text-[16px] text-[#64748B]">badge</span>
                 <span>Aset Saya</span>
@@ -1500,7 +1500,7 @@ onBeforeUnmount(() => {
               <button
                 type="button"
                 @click="openChangePassword"
-                class="w-full flex items-center gap-2 rounded-xl px-2.5 py-1.5 text-xs font-medium text-[#334155] hover:bg-[#F8FAFC] hover:text-[#0F172A] transition-colors text-left cursor-pointer"
+                class="w-full flex items-center gap-2 rounded-xl px-2.5 py-1.5 text-xs font-medium text-[#334155] hover:bg-[#F8FAFC] hover:text-[#333333] transition-colors text-left cursor-pointer"
               >
                 <span
                   aria-hidden="true"
@@ -1576,7 +1576,7 @@ onBeforeUnmount(() => {
           type="password"
           required
           placeholder="Masukkan password Anda saat ini"
-          class="w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-[13px] text-[#2A3547] focus:outline-none focus:border-[#172F52]"
+          class="w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-[13px] text-[#2A3547] focus:outline-none focus:border-[#0A51B0]"
         />
       </div>
 
@@ -1594,7 +1594,7 @@ onBeforeUnmount(() => {
           required
           minlength="8"
           placeholder="Masukkan password baru"
-          class="w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-[13px] text-[#2A3547] focus:outline-none focus:border-[#172F52]"
+          class="w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-[13px] text-[#2A3547] focus:outline-none focus:border-[#0A51B0]"
         />
       </div>
 
@@ -1612,7 +1612,7 @@ onBeforeUnmount(() => {
           required
           minlength="8"
           placeholder="Ketik ulang password baru"
-          class="w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-[13px] text-[#2A3547] focus:outline-none focus:border-[#172F52]"
+          class="w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-[13px] text-[#2A3547] focus:outline-none focus:border-[#0A51B0]"
         />
       </div>
 
@@ -1629,7 +1629,7 @@ onBeforeUnmount(() => {
         <button
           type="submit"
           :disabled="isSubmittingPassword"
-          class="rounded-xl bg-[#172F52] px-4 py-2 text-[12px] font-bold text-white shadow-md hover:bg-[#4570EA] transition-all cursor-pointer disabled:opacity-60"
+          class="rounded-xl bg-[#0A51B0] px-4 py-2 text-[12px] font-bold text-white shadow-md hover:bg-[#0A4391] transition-all cursor-pointer disabled:opacity-60"
         >
           {{ isSubmittingPassword ? 'Menyimpan...' : 'Simpan Password Baru' }}
         </button>
@@ -1708,7 +1708,7 @@ onBeforeUnmount(() => {
 }
 .search-result-list button p:first-child {
   font-weight: 600;
-  color: #172b4d;
+  color: #333333;
   font-size: 12px;
 }
 .search-result-list button p + p {
@@ -1721,7 +1721,7 @@ onBeforeUnmount(() => {
 }
 .search-result-list button > div > div:first-child {
   border-radius: 9px;
-  background: #edf3fc;
+  background: #EDF5FF;
   color: #527bad;
 }
 .search-popup-footer {
@@ -1760,7 +1760,7 @@ onBeforeUnmount(() => {
   }
 }
 .header-search-panel :is(button, input):focus-visible {
-  outline: 2px solid #5285d8;
+  outline: 2px solid #097CDE;
   outline-offset: -2px;
 }
 @media (min-width: 768px) {

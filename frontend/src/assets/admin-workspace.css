@@ -2,7 +2,7 @@
   width: 100%;
   max-width: 1600px;
   margin-inline: auto;
-  color: #172f52;
+  color: #333333;
 }
 .admin-workspace .admin-page-header {
   padding: 4px 0 8px;
@@ -30,8 +30,8 @@
   border-radius: 8px;
   box-shadow: none;
 }
-.admin-page-header button:is(.bg-\[\#172F52\], .bg-\[\#172F52\], .bg-brand) {
-  background: #172f52;
+.admin-page-header button:is(.bg-\[\#0A51B0\], .bg-\[\#0A51B0\], .bg-brand) {
+  background: #0A51B0;
 }
 .admin-page-header > div:nth-child(2):has(input) {
   padding: 16px;
@@ -115,8 +115,8 @@
 }
 .admin-tabs button[aria-pressed='true'] {
   background: white;
-  color: #172f52;
-  box-shadow: 0 1px 4px #172f5208;
+  color: #333333;
+  box-shadow: 0 1px 4px #0A51B008;
 }
 .admin-log-list {
   display: flex;
@@ -139,7 +139,7 @@
   gap: 20px;
 }
 .admin-export-cards h3 {
-  color: #172f52;
+  color: #333333;
   font-weight: 650;
 }
 .admin-export-cards button {
@@ -187,7 +187,7 @@
   font-weight: 600;
 }
 .admin-modal-actions button[type='submit'] {
-  background: #172f52;
+  background: #0A51B0;
   color: white;
 }
 .admin-modal-actions button:disabled {
@@ -196,7 +196,7 @@
 }
 .admin-workspace button:focus-visible,
 .admin-modal-actions button:focus-visible {
-  outline: 2px solid #5285d8;
+  outline: 2px solid #097CDE;
   outline-offset: 3px;
 }
 .database-modal {

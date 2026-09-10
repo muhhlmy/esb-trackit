@@ -241,19 +241,19 @@ onMounted(fetchFaqs)
         <div
           class="flex items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs font-semibold text-[#64748B] dark:text-slate-400"
         >
-          <RouterLink to="/" class="hover:text-[#172F52] transition-colors flex items-center gap-1">
+          <RouterLink to="/" class="hover:text-[#333333] transition-colors flex items-center gap-1">
             <span>Help Center</span>
           </RouterLink>
           <ChevronRight class="w-3 h-3 text-slate-400" />
-          <span class="text-[#172F52] font-bold">FAQ Management</span>
+          <span class="text-[#333333] font-bold">FAQ Management</span>
         </div>
 
         <h1
-          class="text-xl sm:text-3xl font-extrabold text-[#0F172A] dark:text-white tracking-tight flex items-center gap-2 flex-wrap"
+          class="text-xl sm:text-3xl font-extrabold text-[#333333] dark:text-white tracking-tight flex items-center gap-2 flex-wrap"
         >
           <span>FAQ Management</span>
           <span
-            class="text-[10px] sm:text-xs px-2 sm:px-2.5 py-0.5 rounded-full font-bold bg-[#ECF2FF] dark:bg-indigo-950/80 text-[#172F52] dark:text-indigo-300 border border-[#172F52]/20"
+            class="text-[10px] sm:text-xs px-2 sm:px-2.5 py-0.5 rounded-full font-bold bg-[#ECF2FF] dark:bg-indigo-950/80 text-[#333333] dark:text-indigo-300 border border-[#0A51B0]/20"
           >
             Admin CMS
           </span>
@@ -268,7 +268,7 @@ onMounted(fetchFaqs)
 
       <button
         @click="openAdd"
-        class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-[#172F52] hover:bg-[#4570EA] text-white shadow-sm shadow-[#172F52]/25 hover:shadow-md transition-all cursor-pointer active:scale-95 touch-manipulation shrink-0"
+        class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-[#0A51B0] hover:bg-[#0A4391] text-white shadow-sm shadow-[#0A51B0]/25 hover:shadow-md transition-all cursor-pointer active:scale-95 touch-manipulation shrink-0"
       >
         <Plus class="w-4 h-4" />
         <span>Add New FAQ</span>
@@ -279,7 +279,7 @@ onMounted(fetchFaqs)
     <div class="grid grid-cols-3 gap-2 sm:gap-4">
       <!-- Total Questions -->
       <div
-        class="p-3 sm:p-5 rounded-xl sm:rounded-2xl bg-white dark:bg-slate-900 border border-[#E5EAEF] dark:border-slate-800 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1.5 sm:gap-2 group hover:border-[#172F52]/40 transition-all"
+        class="p-3 sm:p-5 rounded-xl sm:rounded-2xl bg-white dark:bg-slate-900 border border-[#E5EAEF] dark:border-slate-800 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1.5 sm:gap-2 group hover:border-[#0A51B0]/40 transition-all"
       >
         <div class="space-y-0.5 sm:space-y-1 min-w-0">
           <span
@@ -287,7 +287,7 @@ onMounted(fetchFaqs)
             >Total Questions</span
           >
           <p
-            class="text-lg sm:text-3xl font-extrabold text-[#0F172A] dark:text-white tracking-tight tabular-nums"
+            class="text-lg sm:text-3xl font-extrabold text-[#333333] dark:text-white tracking-tight tabular-nums"
           >
             {{ stats.total }}
           </p>
@@ -298,7 +298,7 @@ onMounted(fetchFaqs)
           </span>
         </div>
         <div
-          class="w-7 h-7 sm:w-12 sm:h-12 rounded-lg sm:rounded-2xl bg-[#ECF2FF] dark:bg-indigo-950/60 text-[#172F52] dark:text-indigo-400 flex items-center justify-center border border-[#172F52]/20 group-hover:scale-105 transition-transform shrink-0 self-start sm:self-auto"
+          class="w-7 h-7 sm:w-12 sm:h-12 rounded-lg sm:rounded-2xl bg-[#ECF2FF] dark:bg-indigo-950/60 text-[#333333] dark:text-indigo-400 flex items-center justify-center border border-[#0A51B0]/20 group-hover:scale-105 transition-transform shrink-0 self-start sm:self-auto"
         >
           <HelpCircle class="w-3.5 h-3.5 sm:w-6 sm:h-6" />
         </div>
@@ -314,7 +314,7 @@ onMounted(fetchFaqs)
             >Published</span
           >
           <p
-            class="text-lg sm:text-3xl font-extrabold text-[#0F172A] dark:text-white tracking-tight tabular-nums"
+            class="text-lg sm:text-3xl font-extrabold text-[#333333] dark:text-white tracking-tight tabular-nums"
           >
             {{ stats.published }}
           </p>
@@ -387,7 +387,7 @@ onMounted(fetchFaqs)
           type="text"
           aria-label="Cari pertanyaan atau jawaban FAQ"
           placeholder="Search questions or answer keywords..."
-          class="w-full bg-[#F8FAFC] dark:bg-slate-800/80 border border-[#E5EAEF] dark:border-slate-700 rounded-xl pl-9 sm:pl-10 pr-9 py-2 text-xs sm:text-sm font-medium text-[#0F172A] dark:text-white placeholder-[#94A3B8] focus:outline-none focus:border-[#172F52] focus:bg-white dark:focus:bg-slate-900 transition-all"
+          class="w-full bg-[#F8FAFC] dark:bg-slate-800/80 border border-[#E5EAEF] dark:border-slate-700 rounded-xl pl-9 sm:pl-10 pr-9 py-2 text-xs sm:text-sm font-medium text-[#333333] dark:text-white placeholder-[#94A3B8] focus:outline-none focus:border-[#0A51B0] focus:bg-white dark:focus:bg-slate-900 transition-all"
         />
         <button
           v-if="searchQuery"
@@ -416,8 +416,8 @@ onMounted(fetchFaqs)
             class="flex-1 sm:flex-none px-2.5 sm:px-3 py-1.5 rounded-lg font-bold transition-all cursor-pointer text-center active:scale-95 touch-manipulation"
             :class="
               selectedStatus === st.key
-                ? 'bg-white dark:bg-slate-900 text-[#172F52] dark:text-indigo-400 shadow-2xs'
-                : 'text-[#64748B] dark:text-slate-400 hover:text-[#0F172A] dark:hover:text-white'
+                ? 'bg-white dark:bg-slate-900 text-[#333333] dark:text-indigo-400 shadow-2xs'
+                : 'text-[#64748B] dark:text-slate-400 hover:text-[#333333] dark:hover:text-white'
             "
           >
             {{ st.label }}
@@ -457,7 +457,7 @@ onMounted(fetchFaqs)
         v-if="isLoading"
         class="py-12 px-6 text-center text-xs font-bold text-[#64748B] dark:text-slate-400 flex items-center justify-center gap-2"
       >
-        <RefreshCw class="w-4 h-4 animate-spin text-[#172F52]" />
+        <RefreshCw class="w-4 h-4 animate-spin text-[#333333]" />
         <span>Loading FAQ entries...</span>
       </div>
       <!-- Table / Cards Content -->
@@ -470,7 +470,7 @@ onMounted(fetchFaqs)
             >
               <FolderOpen class="w-6 h-6" />
             </div>
-            <p class="text-sm font-extrabold text-[#0F172A] dark:text-white">
+            <p class="text-sm font-extrabold text-[#333333] dark:text-white">
               No FAQ entries found
             </p>
             <p class="text-xs text-[#64748B] dark:text-slate-400">
@@ -478,7 +478,7 @@ onMounted(fetchFaqs)
             </p>
             <button
               @click="clearFilters"
-              class="mt-3 px-4 py-2 rounded-xl text-xs font-bold bg-[#ECF2FF] dark:bg-indigo-950 text-[#172F52] hover:bg-[#172F52] hover:text-white transition-all cursor-pointer active:scale-95 touch-manipulation"
+              class="mt-3 px-4 py-2 rounded-xl text-xs font-bold bg-[#ECF2FF] dark:bg-indigo-950 text-[#333333] hover:bg-[#0A51B0] hover:text-white transition-all cursor-pointer active:scale-95 touch-manipulation"
             >
               Reset All Filters
             </button>
@@ -522,7 +522,7 @@ onMounted(fetchFaqs)
                 <div class="flex items-center gap-1.5 shrink-0">
                   <button
                     @click="openEdit(f)"
-                    class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-bold bg-[#172F52] hover:bg-[#4570EA] text-white transition-all cursor-pointer shadow-xs active:scale-95 touch-manipulation"
+                    class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-bold bg-[#0A51B0] hover:bg-[#0A4391] text-white transition-all cursor-pointer shadow-xs active:scale-95 touch-manipulation"
                     title="Edit FAQ"
                   >
                     <Edit3 class="w-3 h-3" />
@@ -540,7 +540,7 @@ onMounted(fetchFaqs)
 
               <!-- Question Title -->
               <h3
-                class="text-xs sm:text-sm font-extrabold text-[#0F172A] dark:text-white leading-snug break-words"
+                class="text-xs sm:text-sm font-extrabold text-[#333333] dark:text-white leading-snug break-words"
               >
                 {{ f.question }}
               </h3>
@@ -558,7 +558,7 @@ onMounted(fetchFaqs)
               >
                 <span class="font-mono text-slate-500 dark:text-slate-400">
                   Order:
-                  <strong class="text-[#0F172A] dark:text-white">#{{ f.sort_order || 0 }}</strong>
+                  <strong class="text-[#333333] dark:text-white">#{{ f.sort_order || 0 }}</strong>
                 </span>
                 <span> Updated {{ formatDate(f.updated_at) }} </span>
               </div>
@@ -589,7 +589,7 @@ onMounted(fetchFaqs)
                   <!-- Question & Answer Snippet -->
                   <td class="py-4 px-6">
                     <div
-                      class="font-extrabold text-[#0F172A] dark:text-white text-xs max-w-md group-hover:text-[#172F52] transition-colors"
+                      class="font-extrabold text-[#333333] dark:text-white text-xs max-w-md group-hover:text-[#333333] transition-colors"
                     >
                       {{ f.question }}
                     </div>
@@ -645,7 +645,7 @@ onMounted(fetchFaqs)
                     <div class="flex items-center justify-end gap-2">
                       <button
                         @click="openEdit(f)"
-                        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-[#172F52] hover:bg-[#4570EA] text-white transition-all cursor-pointer shadow-xs active:scale-95"
+                        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-[#0A51B0] hover:bg-[#0A4391] text-white transition-all cursor-pointer shadow-xs active:scale-95"
                         title="Edit FAQ"
                       >
                         <Edit3 class="w-3.5 h-3.5" />
@@ -682,7 +682,7 @@ onMounted(fetchFaqs)
         <div>
           <label
             for="faq-question"
-            class="mb-1.5 block text-xs font-bold text-[#0F172A] dark:text-slate-200"
+            class="mb-1.5 block text-xs font-bold text-[#333333] dark:text-slate-200"
             >Question</label
           >
           <input
@@ -691,14 +691,14 @@ onMounted(fetchFaqs)
             required
             type="text"
             placeholder="e.g. How do I reset my account password?"
-            class="w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] dark:bg-slate-800 px-3.5 py-2.5 text-xs font-semibold text-[#0F172A] dark:text-slate-100 placeholder-[#94A3B8] focus:border-[#172F52] focus:outline-none transition-all"
+            class="w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] dark:bg-slate-800 px-3.5 py-2.5 text-xs font-semibold text-[#333333] dark:text-slate-100 placeholder-[#94A3B8] focus:border-[#0A51B0] focus:outline-none transition-all"
           />
         </div>
 
         <div>
           <label
             for="faq-answer"
-            class="mb-1.5 block text-xs font-bold text-[#0F172A] dark:text-slate-200"
+            class="mb-1.5 block text-xs font-bold text-[#333333] dark:text-slate-200"
             >Answer (HTML or Markdown supported)</label
           >
           <textarea
@@ -707,13 +707,13 @@ onMounted(fetchFaqs)
             required
             rows="5"
             placeholder="Provide clear, concise instructions..."
-            class="w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] dark:bg-slate-800 p-3.5 text-xs font-medium text-[#0F172A] dark:text-slate-100 placeholder-[#94A3B8] focus:border-[#172F52] focus:outline-none transition-all resize-none"
+            class="w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] dark:bg-slate-800 p-3.5 text-xs font-medium text-[#333333] dark:text-slate-100 placeholder-[#94A3B8] focus:border-[#0A51B0] focus:outline-none transition-all resize-none"
           ></textarea>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
           <div>
-            <label class="mb-1.5 block text-xs font-bold text-[#0F172A] dark:text-slate-200"
+            <label class="mb-1.5 block text-xs font-bold text-[#333333] dark:text-slate-200"
               >Category</label
             >
             <CustomSelect
@@ -727,7 +727,7 @@ onMounted(fetchFaqs)
           </div>
 
           <div>
-            <label class="mb-1.5 block text-xs font-bold text-[#0F172A] dark:text-slate-200"
+            <label class="mb-1.5 block text-xs font-bold text-[#333333] dark:text-slate-200"
               >Status</label
             >
             <CustomSelect
@@ -743,7 +743,7 @@ onMounted(fetchFaqs)
           <div>
             <label
               for="faq-sort-order"
-              class="mb-1.5 block text-xs font-bold text-[#0F172A] dark:text-slate-200"
+              class="mb-1.5 block text-xs font-bold text-[#333333] dark:text-slate-200"
               >Sort Order</label
             >
             <input
@@ -752,7 +752,7 @@ onMounted(fetchFaqs)
               type="number"
               min="0"
               step="1"
-              class="w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] dark:bg-slate-800 px-3.5 py-2.5 text-xs font-semibold text-[#0F172A] dark:text-slate-100 focus:border-[#172F52] focus:outline-none transition-all"
+              class="w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] dark:bg-slate-800 px-3.5 py-2.5 text-xs font-semibold text-[#333333] dark:text-slate-100 focus:border-[#0A51B0] focus:outline-none transition-all"
             />
           </div>
         </div>
@@ -777,7 +777,7 @@ onMounted(fetchFaqs)
             type="submit"
             form="faq-entry"
             :disabled="isSubmitting"
-            class="w-full sm:w-auto rounded-xl bg-[#172F52] hover:bg-[#4570EA] px-5 py-2.5 sm:py-2 text-xs font-bold text-white shadow-md shadow-[#172F52]/20 transition-all disabled:opacity-50 cursor-pointer active:scale-95 touch-manipulation text-center"
+            class="w-full sm:w-auto rounded-xl bg-[#0A51B0] hover:bg-[#0A4391] px-5 py-2.5 sm:py-2 text-xs font-bold text-white shadow-md shadow-[#0A51B0]/20 transition-all disabled:opacity-50 cursor-pointer active:scale-95 touch-manipulation text-center"
           >
             {{ isSubmitting ? 'Menyimpan...' : 'Simpan FAQ' }}
           </button>

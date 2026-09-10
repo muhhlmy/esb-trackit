@@ -570,7 +570,7 @@ onMounted(async () => {
   --line: #e1e7ef;
   --surface: #fff;
   --canvas: #f5f7fb;
-  --blue: #172F52;
+  --blue: #0A51B0;
   background: var(--canvas);
   color: var(--ink);
   padding: 28px 24px 0;
@@ -649,7 +649,7 @@ onMounted(async () => {
   min-width: 0;
   flex: 1;
   height: 42px;
-  color: #172b4d;
+  color: #333333;
   font-size: 14px;
   outline: none;
   background: transparent;
@@ -671,14 +671,14 @@ onMounted(async () => {
   gap: 8px;
   min-height: 44px;
   padding: 0 18px;
-  background: #172F52;
+  background: #0A51B0;
   color: white;
   border-radius: 8px;
   font-size: 13px;
   font-weight: 650;
 }
 .search-submit:hover {
-  background: #1d4ed8;
+  background: #0A4391;
 }
 .clear-search {
   display: grid;
@@ -885,7 +885,7 @@ onMounted(async () => {
 }
 .topic-tone-0 {
   background: #edf3ff;
-  color: #172F52;
+  color: #333333;
 }
 .topic-tone-1 {
   background: #f1edff;

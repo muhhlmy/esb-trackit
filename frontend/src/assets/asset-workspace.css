@@ -1,7 +1,7 @@
 .asset-workspace {
   max-width: 1600px;
   margin: 0 auto;
-  color: #172b4d;
+  color: #333333;
 }
 .asset-toolbar {
   border-radius: 14px;
@@ -24,14 +24,14 @@
   color: #71829b;
 }
 .asset-toolbar > div:first-child > button {
-  background: #172f52;
+  background: #0A51B0;
   min-height: 42px;
   padding: 0 16px;
   border-radius: 8px;
   box-shadow: none;
 }
 .asset-toolbar > div:first-child > button:hover {
-  background: #244673;
+  background: #0A4391;
 }
 .asset-toolbar > div:nth-child(2) {
   flex-wrap: wrap;
@@ -58,20 +58,20 @@
   box-shadow: none;
 }
 .asset-card-list > div:hover {
-  border-color: #a4bbdf;
+  border-color: #B8D4F5;
   box-shadow: 0 3px 12px #172b4d06;
 }
 .asset-card-list > div:focus-visible {
-  outline: 2px solid #5285d8;
+  outline: 2px solid #097CDE;
   outline-offset: 3px;
 }
 .asset-card-list > div > div:first-child > div:first-child > div:first-child {
-  background: #edf3fc;
-  color: #345e99;
+  background: #EDF5FF;
+  color: #0A5DBD;
   border-radius: 10px;
 }
 .asset-detail {
-  color: #172b4d;
+  color: #333333;
   overflow-wrap: anywhere;
 }
 .asset-detail-identity {
@@ -87,7 +87,7 @@
   height: 46px;
   flex-shrink: 0;
   background: #e8effa;
-  color: #345e99;
+  color: #0A5DBD;
   border-radius: 12px;
 }
 .asset-detail-identity > div:last-child {
@@ -97,7 +97,7 @@
   font-size: 18px;
   line-height: 1.5;
   font-weight: 650;
-  color: #172b4d;
+  color: #333333;
   letter-spacing: -0.025em;
 }
 .asset-detail-identity p {
@@ -126,7 +126,7 @@
   margin-bottom: 6px;
 }
 .asset-detail-fields dd {
-  color: #172b4d;
+  color: #333333;
   font-size: 13px;
   line-height: 1.7;
   font-weight: 550;
@@ -164,7 +164,7 @@
 .asset-detail-footer button {
   min-height: 42px;
   padding: 0 22px;
-  background: #172f52;
+  background: #0A51B0;
   color: white;
   border-radius: 8px;
   border: 0;
@@ -173,7 +173,7 @@
   cursor: pointer;
 }
 .asset-detail-footer button:hover {
-  background: #244673;
+  background: #0A4391;
 }
 @media (min-width: 768px) and (max-width: 1279px) {
   .asset-card-list {
@@ -248,7 +248,7 @@
 }
 .asset-crud-form {
   padding: 4px;
-  color: #172b4d;
+  color: #333333;
 }
 .asset-crud-form > .grid {
   gap: 20px;
@@ -267,7 +267,7 @@
   border: 1px solid #dce4ef;
   border-radius: 8px;
   background: white;
-  color: #172b4d;
+  color: #333333;
   font-size: 13px;
   box-shadow: none;
 }
@@ -283,7 +283,7 @@
 .asset-crud-form :is(input, select, textarea):focus {
   border-color: #7c9ecf;
   outline: none;
-  box-shadow: 0 0 0 3px #172F520d;
+  box-shadow: 0 0 0 3px #0A51B00d;
 }
 .asset-crud-form fieldset {
   gap: 18px;
@@ -314,13 +314,13 @@
   color: #52647e;
 }
 .asset-crud-actions button[type='submit'],
-.asset-crud-actions button.bg-\[\#172F52\] {
-  background: #172f52;
+.asset-crud-actions button.bg-\[\#0A51B0\] {
+  background: #0A51B0;
   color: white;
 }
 .asset-crud-actions button[type='submit']:hover,
-.asset-crud-actions button.bg-\[\#172F52\]:hover {
-  background: #244673;
+.asset-crud-actions button.bg-\[\#0A51B0\]:hover {
+  background: #0A4391;
 }
 .asset-crud-actions button:disabled {
   opacity: 0.5;
@@ -336,7 +336,7 @@
 .asset-delete-content h4 {
   font-size: 17px;
   font-weight: 650;
-  color: #172b4d;
+  color: #333333;
 }
 .asset-delete-actions button:last-child {
   background: #dc3545;
@@ -346,7 +346,7 @@
   background: #ba2838;
 }
 .asset-crud-actions button:focus-visible {
-  outline: 2px solid #5285d8;
+  outline: 2px solid #097CDE;
   outline-offset: 2px;
 }
 @media (max-width: 767px) {
@@ -417,14 +417,14 @@
   gap: 9px;
   font-size: 14px;
   font-weight: 650;
-  color: #172b4d;
+  color: #333333;
 }
 .it-list-heading h3 span {
   min-width: 25px;
   padding: 2px 7px;
   border-radius: 6px;
   background: #eaf1fc;
-  color: #345e99;
+  color: #0A5DBD;
   font-size: 11px;
   font-variant-numeric: tabular-nums;
   text-align: center;
@@ -538,8 +538,8 @@
   height: 42px;
   flex-shrink: 0;
   border-radius: 11px;
-  background: #edf3fc;
-  color: #345e99;
+  background: #EDF5FF;
+  color: #0A5DBD;
 }
 .laptop-icon span {
   font-size: 22px;
@@ -549,7 +549,7 @@
 }
 .laptop-identity h4 {
   margin: 0;
-  color: #172f52;
+  color: #333333;
   font-size: 14px;
   font-weight: 650;
   line-height: 1.5;
@@ -695,7 +695,7 @@
   align-items: center;
   gap: 9px;
   margin: 0 0 2px;
-  color: #172f52;
+  color: #333333;
   font-size: 13px;
   font-weight: 650;
 }
@@ -704,8 +704,8 @@
   place-items: center;
   width: 26px;
   height: 26px;
-  background: #edf3fc;
-  color: #345e99;
+  background: #EDF5FF;
+  color: #0A5DBD;
   border-radius: 7px;
   font-size: 10px;
   font-weight: 650;
@@ -762,10 +762,10 @@
 }
 .asset-entry-stepper button[aria-current='step'] {
   background: #fff;
-  box-shadow: 0 1px 4px #172f520a;
+  box-shadow: 0 1px 4px #0A51B00a;
 }
 .asset-entry-stepper button:focus-visible {
-  outline: 2px solid #5285d8;
+  outline: 2px solid #097CDE;
   outline-offset: 2px;
 }
 @media (max-width: 639px) {

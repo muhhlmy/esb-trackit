@@ -116,7 +116,7 @@ watch(
   <div class="rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] p-4 text-xs transition-all">
     <!-- Loading State -->
     <div v-if="isLoading" class="flex items-center gap-2 py-2 text-[#64748B]">
-      <span class="material-symbols-outlined text-[16px] animate-spin text-[#172F52]"
+      <span class="material-symbols-outlined text-[16px] animate-spin text-[#333333]"
         >progress_activity</span
       >
       <span>Memeriksa status penilaian CASP...</span>
@@ -125,7 +125,7 @@ watch(
     <!-- Rating Sudah Dikirim (Submitted Result) -->
     <div v-else-if="existingRating" class="flex flex-col gap-2">
       <div class="flex items-center justify-between">
-        <h4 class="text-xs font-bold text-[#0F172A]">
+        <h4 class="text-xs font-bold text-[#333333]">
           {{ isUserReporter && !isAdmin && !isSuperAdmin ? 'Penilaian Anda' : 'CASP Assessment' }}
         </h4>
         <span
@@ -137,7 +137,7 @@ watch(
 
       <div class="flex items-center gap-2">
         <CsatStars :value="existingRating.value" size="18px" />
-        <span class="text-xs font-bold text-[#0F172A]">
+        <span class="text-xs font-bold text-[#333333]">
           {{ existingRating.label }}
         </span>
       </div>
@@ -170,7 +170,7 @@ watch(
     <!-- Form Input Rating (User & Eligible) -->
     <div v-else-if="isEligible" class="flex flex-col gap-3">
       <div>
-        <h4 class="text-xs font-bold text-[#0F172A]">Penilaian Layanan</h4>
+        <h4 class="text-xs font-bold text-[#333333]">Penilaian Layanan</h4>
         <p class="text-[11.5px] font-normal text-[#64748B] mt-0.5">
           Bagaimana pengalaman Anda terhadap penanganan ticket ini?
         </p>
@@ -197,7 +197,7 @@ watch(
             </span>
           </button>
         </div>
-        <span class="text-xs font-bold text-[#172F52]">
+        <span class="text-xs font-bold text-[#333333]">
           {{ ratingLabels[hoverRating || selectedRating] }}
         </span>
       </div>
@@ -208,7 +208,7 @@ watch(
           v-model="feedback"
           rows="2"
           placeholder="Tulis feedback atau masukan Anda... (opsional)"
-          class="w-full rounded-xl border border-[#E2E8F0] bg-white p-3 text-xs font-medium text-[#0F172A] focus:border-[#172F52] focus:outline-none transition-all placeholder-[#94A3B8]"
+          class="w-full rounded-xl border border-[#E2E8F0] bg-white p-3 text-xs font-medium text-[#333333] focus:border-[#0A51B0] focus:outline-none transition-all placeholder-[#94A3B8]"
         ></textarea>
       </div>
 
@@ -221,7 +221,7 @@ watch(
           type="button"
           @click="submitCasp"
           :disabled="isSubmitting || !selectedRating"
-          class="inline-flex items-center gap-1.5 rounded-xl bg-[#172F52] px-4 py-2 text-xs font-bold text-white shadow-2xs hover:bg-[#1D4ED8] transition-all cursor-pointer disabled:opacity-50"
+          class="inline-flex items-center gap-1.5 rounded-xl bg-[#0A51B0] px-4 py-2 text-xs font-bold text-white shadow-2xs hover:bg-[#0A4391] transition-all cursor-pointer disabled:opacity-50"
         >
           <span v-if="isSubmitting" class="material-symbols-outlined text-[16px] animate-spin"
             >progress_activity</span

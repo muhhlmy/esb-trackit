@@ -724,7 +724,7 @@ onBeforeUnmount(() => {
 
 <template>
   <header
-    class="app-header relative z-30 grid h-28 grid-cols-[minmax(0,1fr)_auto] grid-rows-2 gap-x-2 gap-y-2 py-2 shrink-0 items-center border-b border-[#E5EAEF] bg-white/95 px-3 md:flex md:h-[64px] md:justify-between md:gap-0 md:py-0 md:px-5 md:backdrop-blur-md"
+    class="app-header relative z-30 flex h-14 md:h-[64px] items-center justify-between px-3 md:px-5 shrink-0 border-b border-[#E5EAEF] bg-white/95 backdrop-blur-md"
   >
     <!-- 1. LEFT: Navigation Drawer Toggle & Page Titles -->
     <div class="flex items-center gap-2 md:gap-2.5 md:shrink-0 min-w-0">
@@ -735,7 +735,7 @@ onBeforeUnmount(() => {
         aria-controls="app-navigation"
         aria-label="Buka Navigasi Mobile"
         title="Buka Navigasi Mobile"
-        class="flex lg:hidden h-11 w-11 md:h-8 md:w-8 shrink-0 items-center justify-center rounded-lg text-[#2A3547] hover:bg-[#ECF2FF] hover:text-[#2563EB] transition-all cursor-pointer active:scale-95 touch-manipulation"
+        class="flex lg:hidden h-9 w-9 md:h-8 md:w-8 shrink-0 items-center justify-center rounded-lg text-[#2A3547] hover:bg-[#EDF3FC] hover:text-[#172F52] transition-all cursor-pointer active:scale-95 touch-manipulation"
         @click="$emit('toggle-mobile')"
       >
         <span aria-hidden="true" class="material-symbols-outlined text-[20px]">menu</span>
@@ -755,16 +755,16 @@ onBeforeUnmount(() => {
       </div>
     </div>
 
-    <!-- 2. CENTER: Main Global Search Bar -->
+    <!-- 2. CENTER: Main Global Search Bar (Desktop Only) -->
     <div
-      class="order-3 col-span-2 w-full md:order-none md:flex-1 md:max-w-lg md:mx-4 relative flex justify-center z-40 min-w-0"
+      ref="searchContainerRef"
+      class="contents md:flex md:flex-1 md:max-w-md lg:max-w-lg md:mx-4 relative justify-center z-40 min-w-0"
     >
-      <div ref="searchContainerRef" class="relative w-full md:max-w-md">
-        <form
-          role="search"
-          @submit.prevent="submitSearch"
-          class="relative flex items-center w-full"
-        >
+      <form
+        role="search"
+        @submit.prevent="submitSearch"
+        class="hidden md:flex relative items-center w-full"
+      >
           <label for="global-main-search" class="sr-only">Cari Global</label>
 
           <span
@@ -1226,11 +1226,21 @@ onBeforeUnmount(() => {
           class="hidden md:block fixed inset-0 z-40 bg-transparent"
           @click="closeSearch"
         ></div>
-      </div>
     </div>
 
-    <!-- 4. RIGHT: Actions (Notification Bell & Profile Menu) -->
-    <div class="flex shrink-0 items-center gap-1 md:gap-2.5 z-40">
+    <!-- 3. RIGHT: Actions (Mobile Search, Notification Bell & Profile Menu) -->
+    <div class="flex shrink-0 items-center gap-1 sm:gap-1.5 md:gap-2.5 z-40">
+      <!-- Mobile Search Trigger Button (md:hidden) -->
+      <button
+        type="button"
+        @click="initGlobalSearchData"
+        aria-label="Cari Global"
+        title="Cari Global (Aset, Tiket, Karyawan, User)"
+        class="flex md:hidden h-9 w-9 items-center justify-center rounded-xl text-[#64748B] hover:bg-[#F8FAFC] hover:text-[#172F52] transition-all cursor-pointer select-none active:scale-95 touch-manipulation"
+      >
+        <span aria-hidden="true" class="material-symbols-outlined text-[20px]">search</span>
+      </button>
+
       <!-- Notification Bell -->
       <div class="relative">
         <button
@@ -1241,8 +1251,8 @@ onBeforeUnmount(() => {
           type="button"
           :title="unreadCount > 0 ? `Notifikasi (${unreadCount})` : 'Notifikasi'"
           @click="toggleNotif"
-          class="relative flex h-11 w-11 md:h-9 md:w-9 items-center justify-center rounded-xl text-[#64748B] hover:bg-[#F8FAFC] hover:text-[#0F172A] transition-all cursor-pointer select-none active:scale-95 touch-manipulation"
-          :class="isNotifOpen ? 'bg-[#EFF6FF] text-[#2563EB]' : ''"
+          class="relative flex h-9 w-9 items-center justify-center rounded-xl text-[#64748B] hover:bg-[#F8FAFC] hover:text-[#0F172A] transition-all cursor-pointer select-none active:scale-95 touch-manipulation"
+          :class="isNotifOpen ? 'bg-[#EDF3FC] text-[#172F52]' : ''"
         >
           <span aria-hidden="true" class="material-symbols-outlined text-[20px]"
             >notifications</span
@@ -1250,7 +1260,7 @@ onBeforeUnmount(() => {
           <Transition name="badge-pop">
             <span
               v-if="unreadCount > 0"
-              class="absolute -top-0.5 -right-0.5 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-[#2563EB] px-1 text-[9.5px] font-bold text-white shadow-2xs"
+              class="absolute -top-0.5 -right-0.5 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-[#172F52] px-1 text-[9.5px] font-bold text-white shadow-2xs"
               >{{ unreadCount > 9 ? '9+' : unreadCount }}</span
             >
           </Transition>
@@ -1261,7 +1271,7 @@ onBeforeUnmount(() => {
           <div
             v-if="isNotifOpen"
             id="header-notifications"
-            class="header-popover fixed left-3 right-3 top-[7.5rem] max-h-[calc(100dvh-8.25rem)] flex flex-col md:max-h-[calc(100dvh-4.5rem)] md:absolute md:left-auto md:top-auto md:right-0 md:mt-2 md:w-96 rounded-2xl border border-[#E2E8F0] bg-white shadow-xl z-50 overflow-hidden outline-none"
+            class="header-popover fixed left-3 right-3 top-[4rem] max-h-[calc(100dvh-4.75rem)] flex flex-col md:max-h-[calc(100dvh-4.5rem)] md:absolute md:left-auto md:top-auto md:right-0 md:mt-2 md:w-96 rounded-2xl border border-[#E2E8F0] bg-white shadow-xl z-50 overflow-hidden outline-none"
             @click.stop
           >
             <!-- 1. Header -->
@@ -1460,7 +1470,7 @@ onBeforeUnmount(() => {
           <div
             v-if="isProfileOpen"
             id="header-profile"
-            class="header-popover fixed left-3 right-3 top-[7.5rem] max-h-[calc(100dvh-8.25rem)] overflow-y-auto md:absolute md:left-auto md:top-auto md:right-0 md:mt-2 md:w-56 rounded-2xl border border-[#E2E8F0] bg-white p-1.5 shadow-xl z-50 outline-none"
+            class="header-popover fixed left-3 right-3 top-[4rem] max-h-[calc(100dvh-4.75rem)] overflow-y-auto md:absolute md:left-auto md:top-auto md:right-0 md:mt-2 md:w-56 rounded-2xl border border-[#E2E8F0] bg-white p-1.5 shadow-xl z-50 outline-none"
             @click.stop
           >
             <!-- Account Header -->

@@ -130,10 +130,10 @@ onBeforeUnmount(() => {
           >
             <div class="flex items-center gap-2.5 min-w-0">
               <span
-                class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#EFF6FF] text-[#2563EB]"
+                class="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-[#EDF3FC] text-[#172F52] border border-[#A4BBDF]/30"
               >
-                <span aria-hidden="true" class="material-symbols-outlined text-[17px]">{{
-                  icon || 'confirmation_number'
+                <span aria-hidden="true" class="material-symbols-outlined text-[18px]">{{
+                  icon || 'devices'
                 }}</span>
               </span>
               <div class="min-w-0">

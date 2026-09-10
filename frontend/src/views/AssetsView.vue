@@ -194,28 +194,86 @@ const filteredAssets = computed(() => {
   })
 })
 
+const isStep1Valid = computed(() => {
+  return Boolean(
+    form.value.hostname &&
+      form.value.hostname.trim() &&
+      form.value.serial_number &&
+      form.value.serial_number.trim() &&
+      form.value.tipe_perangkat,
+  )
+})
+
+const isStep2Valid = computed(() => {
+  return Boolean(form.value.lokasi_asset)
+})
+
+const isStep3Valid = computed(() => {
+  return isStep1Valid.value && isStep2Valid.value && Boolean(form.value.status && form.value.kondisi)
+})
+
+const selectedEmployee = computed(() => {
+  if (!form.value.nik_pemegang_asset) return null
+  return employees.value.find((e) => e.nik === form.value.nik_pemegang_asset) || null
+})
+
+function getEmployeeInitials(name) {
+  if (!name) return 'IT'
+  return name
+    .split(' ')
+    .filter(Boolean)
+    .map((w) => w[0])
+    .slice(0, 2)
+    .join('')
+    .toUpperCase()
+}
+
+function clearEmployee() {
+  form.value.nik_pemegang_asset = ''
+  form.value.nama_karyawan_pemegang_asset = ''
+  form.value.departemen_pemegang_asset = ''
+}
+
+function selectStep(targetStep) {
+  if (targetStep === 'info') {
+    activeTab.value = 'info'
+    modalError.value = ''
+    return
+  }
+  if (targetStep === 'placement') {
+    if (!isStep1Valid.value) {
+      modalError.value = 'Mohon lengkapi Hostname, Serial Number, dan Tipe Perangkat terlebih dahulu.'
+      return
+    }
+    activeTab.value = 'placement'
+    modalError.value = ''
+    return
+  }
+  if (targetStep === 'specifications') {
+    if (!isStep1Valid.value) {
+      modalError.value = 'Mohon lengkapi data Informasi Perangkat terlebih dahulu.'
+      activeTab.value = 'info'
+      return
+    }
+    if (!isStep2Valid.value) {
+      modalError.value = 'Lokasi penempatan aset wajib dipilih terlebih dahulu.'
+      activeTab.value = 'placement'
+      return
+    }
+    activeTab.value = 'specifications'
+    modalError.value = ''
+  }
+}
+
 const hasValidationErrors = computed(() => {
   if (activeTab.value === 'info') {
-    return (
-      !form.value.hostname ||
-      !form.value.hostname.trim() ||
-      !form.value.serial_number ||
-      !form.value.serial_number.trim() ||
-      !form.value.tipe_perangkat
-    )
+    return !isStep1Valid.value
   }
   if (activeTab.value === 'placement') {
-    return !form.value.lokasi_asset
+    return !isStep2Valid.value
   }
   if (activeTab.value === 'specifications') {
-    return (
-      !form.value.hostname ||
-      !form.value.hostname.trim() ||
-      !form.value.serial_number ||
-      !form.value.serial_number.trim() ||
-      !form.value.tipe_perangkat ||
-      !form.value.lokasi_asset
-    )
+    return !isStep1Valid.value || !isStep2Valid.value || !form.value.status || !form.value.kondisi
   }
   return false
 })
@@ -393,30 +451,21 @@ function buildPayload() {
 }
 
 async function nextStep() {
-  // Validation sebelum pindah step
   if (activeTab.value === 'info') {
-    if (!form.value.hostname) {
-      modalError.value = 'Hostname wajib diisi.'
+    if (!isStep1Valid.value) {
+      modalError.value = 'Hostname, Serial Number, dan Tipe Perangkat wajib diisi.'
       return
     }
-    if (!form.value.serial_number) {
-      modalError.value = 'Serial Number wajib diisi.'
-      return
-    }
-    if (!form.value.tipe_perangkat) {
-      modalError.value = 'Tipe Perangkat harus dipilih.'
-      return
-    }
-  }
-
-  // Pindah ke step berikutnya
-  if (activeTab.value === 'info') {
     activeTab.value = 'placement'
+    modalError.value = ''
   } else if (activeTab.value === 'placement') {
+    if (!isStep2Valid.value) {
+      modalError.value = 'Lokasi penempatan aset wajib dipilih.'
+      return
+    }
     activeTab.value = 'specifications'
+    modalError.value = ''
   }
-
-  modalError.value = ''
 }
 
 async function saveAsset() {
@@ -1055,89 +1104,122 @@ onMounted(async () => {
       />
     </div>
 
-    <!-- ── Modal Form Tambah / Edit Aset IT (Modern SaaS UI) ── -->
+    <!-- ── Modal Form Tambah / Edit Aset IT (Modern Brand Navy SaaS UI) ── -->
     <AppModal
       :is-open="showFormModal"
       :title="modalMode === 'add' ? 'Tambah Aset IT' : 'Edit Aset IT'"
       :subtitle="
         modalMode === 'add'
-          ? 'Tambahkan perangkat baru ke inventaris.'
-          : 'Perbarui informasi dan konfigurasi aset.'
+          ? 'Tambahkan perangkat baru ke dalam database inventaris IT.'
+          : 'Perbarui spesifikasi dan konfigurasi unit aset IT.'
       "
+      :icon="modalMode === 'add' ? 'devices' : 'edit_note'"
       size="lg"
       @close="closeModal"
     >
-      <!-- Step Indicator Bar -->
-      <div class="mb-4 rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] p-2 sm:p-2.5">
-        <div
-          class="flex items-center justify-between max-w-lg mx-auto text-[10.5px] sm:text-[11.5px] font-bold"
-        >
-          <!-- Step 1 -->
+      <!-- Step Indicator Bar (Brand Navy Stepper) -->
+      <div class="mb-4.5 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] p-2 sm:p-2.5 shadow-2xs">
+        <div class="flex items-center justify-between max-w-xl mx-auto">
+          <!-- Step 1: Informasi -->
           <button
             type="button"
-            @click="activeTab = 'info'"
-            class="flex items-center gap-1 sm:gap-1.5 transition-colors cursor-pointer select-none"
-            :class="activeTab === 'info' ? 'text-[#2563EB]' : 'text-[#7C8BAC] hover:text-[#2A3547]'"
+            @click="selectStep('info')"
+            class="group flex items-center gap-1.5 sm:gap-2.5 transition-all cursor-pointer select-none text-left"
           >
             <span
-              class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] font-extrabold"
+              class="flex h-6 w-6 sm:h-7 sm:w-7 shrink-0 items-center justify-center rounded-lg text-[11px] sm:text-[12px] font-extrabold transition-all"
               :class="
-                activeTab === 'info' ? 'bg-[#2563EB] text-white' : 'bg-[#E5EAEF] text-[#7C8BAC]'
+                activeTab === 'info'
+                  ? 'bg-[#172F52] text-white shadow-sm ring-2 ring-[#172F52]/20'
+                  : isStep1Valid
+                    ? 'bg-[#EDF3FC] text-[#172F52] border border-[#A4BBDF]/70'
+                    : 'bg-white text-[#94A3B8] border border-[#E2E8F0]'
               "
             >
-              1
+              <span v-if="activeTab !== 'info' && isStep1Valid" class="material-symbols-outlined text-[15px] sm:text-[16px]">check</span>
+              <span v-else>1</span>
             </span>
-            <span class="truncate">Informasi</span>
+            <div class="flex flex-col">
+              <span
+                class="text-[11px] sm:text-[12px] font-bold leading-tight transition-colors"
+                :class="activeTab === 'info' ? 'text-[#172F52]' : isStep1Valid ? 'text-[#244673]' : 'text-[#64748B]'"
+              >
+                Informasi
+              </span>
+              <span class="hidden sm:inline text-[9.5px] text-[#94A3B8] leading-tight">Data Perangkat</span>
+            </div>
           </button>
 
-          <div class="flex-1 h-px bg-[#E5EAEF] mx-1.5 sm:mx-3 min-w-[10px]"></div>
+          <!-- Divider 1 -> 2 -->
+          <div
+            class="flex-1 h-0.5 mx-2 sm:mx-3 transition-all rounded-full"
+            :class="isStep1Valid ? 'bg-[#172F52]' : 'bg-[#E2E8F0]'"
+          ></div>
 
-          <!-- Step 2 -->
+          <!-- Step 2: Penempatan -->
           <button
             type="button"
-            @click="activeTab = 'placement'"
-            class="flex items-center gap-1 sm:gap-1.5 transition-colors cursor-pointer select-none"
-            :class="
-              activeTab === 'placement' ? 'text-[#2563EB]' : 'text-[#7C8BAC] hover:text-[#2A3547]'
-            "
+            @click="selectStep('placement')"
+            class="group flex items-center gap-1.5 sm:gap-2.5 transition-all cursor-pointer select-none text-left"
           >
             <span
-              class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] font-extrabold"
+              class="flex h-6 w-6 sm:h-7 sm:w-7 shrink-0 items-center justify-center rounded-lg text-[11px] sm:text-[12px] font-extrabold transition-all"
               :class="
                 activeTab === 'placement'
-                  ? 'bg-[#2563EB] text-white'
-                  : 'bg-[#E5EAEF] text-[#7C8BAC]'
+                  ? 'bg-[#172F52] text-white shadow-sm ring-2 ring-[#172F52]/20'
+                  : isStep2Valid
+                    ? 'bg-[#EDF3FC] text-[#172F52] border border-[#A4BBDF]/70'
+                    : 'bg-white text-[#94A3B8] border border-[#E2E8F0]'
               "
             >
-              2
+              <span v-if="activeTab !== 'placement' && isStep2Valid" class="material-symbols-outlined text-[15px] sm:text-[16px]">check</span>
+              <span v-else>2</span>
             </span>
-            <span class="truncate">Penempatan</span>
+            <div class="flex flex-col">
+              <span
+                class="text-[11px] sm:text-[12px] font-bold leading-tight transition-colors"
+                :class="activeTab === 'placement' ? 'text-[#172F52]' : isStep2Valid ? 'text-[#244673]' : 'text-[#64748B]'"
+              >
+                Penempatan
+              </span>
+              <span class="hidden sm:inline text-[9.5px] text-[#94A3B8] leading-tight">User & Lokasi</span>
+            </div>
           </button>
 
-          <div class="flex-1 h-px bg-[#E5EAEF] mx-1.5 sm:mx-3 min-w-[10px]"></div>
+          <!-- Divider 2 -> 3 -->
+          <div
+            class="flex-1 h-0.5 mx-2 sm:mx-3 transition-all rounded-full"
+            :class="isStep2Valid ? 'bg-[#172F52]' : 'bg-[#E2E8F0]'"
+          ></div>
 
-          <!-- Step 3 -->
+          <!-- Step 3: Spesifikasi -->
           <button
             type="button"
-            @click="activeTab = 'specifications'"
-            class="flex items-center gap-1 sm:gap-1.5 transition-colors cursor-pointer select-none"
-            :class="
-              activeTab === 'specifications'
-                ? 'text-[#2563EB]'
-                : 'text-[#7C8BAC] hover:text-[#2A3547]'
-            "
+            @click="selectStep('specifications')"
+            class="group flex items-center gap-1.5 sm:gap-2.5 transition-all cursor-pointer select-none text-left"
           >
             <span
-              class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] font-extrabold"
+              class="flex h-6 w-6 sm:h-7 sm:w-7 shrink-0 items-center justify-center rounded-lg text-[11px] sm:text-[12px] font-extrabold transition-all"
               :class="
                 activeTab === 'specifications'
-                  ? 'bg-[#2563EB] text-white'
-                  : 'bg-[#E5EAEF] text-[#7C8BAC]'
+                  ? 'bg-[#172F52] text-white shadow-sm ring-2 ring-[#172F52]/20'
+                  : isStep3Valid
+                    ? 'bg-[#EDF3FC] text-[#172F52] border border-[#A4BBDF]/70'
+                    : 'bg-white text-[#94A3B8] border border-[#E2E8F0]'
               "
             >
-              3
+              <span v-if="isStep3Valid" class="material-symbols-outlined text-[15px] sm:text-[16px]">check</span>
+              <span v-else>3</span>
             </span>
-            <span class="truncate">Spesifikasi</span>
+            <div class="flex flex-col">
+              <span
+                class="text-[11px] sm:text-[12px] font-bold leading-tight transition-colors"
+                :class="activeTab === 'specifications' ? 'text-[#172F52]' : isStep3Valid ? 'text-[#244673]' : 'text-[#64748B]'"
+              >
+                Spesifikasi
+              </span>
+              <span class="hidden sm:inline text-[9.5px] text-[#94A3B8] leading-tight">Merek & Detail</span>
+            </div>
           </button>
         </div>
       </div>
@@ -1147,233 +1229,336 @@ onMounted(async () => {
         <div
           v-if="modalError"
           role="alert"
-          class="mb-3 rounded-lg bg-rose-50 border border-rose-200 px-3.5 py-2 text-[11.5px] font-semibold text-rose-600 shadow-2xs"
+          class="mb-3.5 flex items-center gap-2 rounded-xl bg-rose-50 border border-rose-200 px-3.5 py-2.5 text-[12px] font-semibold text-rose-700 shadow-2xs"
         >
-          {{ modalError }}
+          <span class="material-symbols-outlined text-[18px] text-rose-500 shrink-0">error</span>
+          <span class="flex-1">{{ modalError }}</span>
         </div>
 
         <!-- Step 1: Informasi Perangkat -->
         <div v-show="activeTab === 'info'" class="space-y-3.5">
-          <div class="flex items-center gap-2 border-b border-[#F1F5F9] pb-1.5">
-            <span class="text-[10px] font-extrabold uppercase tracking-wider text-[#7C8BAC]"
-              >Basic Information</span
-            >
+          <div class="flex items-center justify-between border-b border-[#E2E8F0] pb-2">
+            <div class="flex items-center gap-2">
+              <span class="flex h-6 w-6 items-center justify-center rounded-md bg-[#EDF3FC] text-[#172F52]">
+                <span class="material-symbols-outlined text-[15px]">devices</span>
+              </span>
+              <span class="text-[11.5px] font-bold text-[#172F52] uppercase tracking-wider">
+                Informasi Dasar Perangkat
+              </span>
+            </div>
+            <span class="text-[11px] font-medium text-[#64748B]">Langkah 1 dari 3</span>
           </div>
 
-          <fieldset class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <label class="flex flex-col gap-1.5">
-              <span class="text-[12px] font-semibold text-[#2A3547]"
-                >Hostname <span class="text-[#FA896B]">*</span></span
-              >
-              <input
-                v-model="form.hostname"
-                required
-                maxlength="100"
-                aria-label="Hostname Aset"
-                placeholder="Laptop-HR-01 atau SN-ABC123"
-                class="h-10 w-full rounded-lg border border-[#E5EAEF] bg-white px-3 text-[12px] font-medium text-[#2A3547] placeholder-[#94A3B8] focus:border-[#2563EB] focus:outline-none transition-all shadow-2xs"
-              />
-            </label>
+          <fieldset class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            <!-- Hostname Input -->
+            <div class="flex flex-col gap-1.5">
+              <label class="text-[12px] font-bold text-[#172F52] flex items-center justify-between">
+                <span>Hostname / Label Aset <span class="text-[#DC2626]">*</span></span>
+                <span class="text-[10px] font-normal text-[#64748B]">Maks. 100 karakter</span>
+              </label>
+              <div class="relative flex items-center">
+                <span class="material-symbols-outlined absolute left-3 text-[17px] text-[#94A3B8] pointer-events-none">
+                  computer
+                </span>
+                <input
+                  v-model="form.hostname"
+                  required
+                  maxlength="100"
+                  aria-label="Hostname Aset"
+                  placeholder="cth: LAPTOP-IT-04 atau WS-FINANCE-01"
+                  class="h-10 w-full rounded-lg border border-[#E2E8F0] bg-white pl-9 pr-3 text-[12px] font-medium text-[#1E293B] placeholder-[#94A3B8] focus:border-[#172F52] focus:ring-2 focus:ring-[#172F52]/10 focus:outline-none transition-all shadow-2xs"
+                />
+              </div>
+            </div>
 
-            <label class="flex flex-col gap-1.5">
-              <span class="text-[12px] font-semibold text-[#2A3547]"
-                >Serial Number <span class="text-[#FA896B]">*</span></span
-              >
-              <input
-                v-model="form.serial_number"
-                required
-                maxlength="100"
-                aria-label="Serial Number Aset"
-                placeholder="Nomor seri perangkat"
-                class="h-10 w-full rounded-lg border border-[#E5EAEF] bg-white px-3 text-[12px] font-medium text-[#2A3547] placeholder-[#94A3B8] focus:border-[#2563EB] focus:outline-none transition-all shadow-2xs"
-              />
-            </label>
+            <!-- Serial Number Input -->
+            <div class="flex flex-col gap-1.5">
+              <label class="text-[12px] font-bold text-[#172F52] flex items-center justify-between">
+                <span>Serial Number (S/N) <span class="text-[#DC2626]">*</span></span>
+                <span class="text-[10px] font-normal text-[#64748B]">Nomor seri fisik</span>
+              </label>
+              <div class="relative flex items-center">
+                <span class="material-symbols-outlined absolute left-3 text-[17px] text-[#94A3B8] pointer-events-none">
+                  tag
+                </span>
+                <input
+                  v-model="form.serial_number"
+                  required
+                  maxlength="100"
+                  aria-label="Serial Number Aset"
+                  placeholder="cth: PF3ABCDE atau 5CD1234XYZ"
+                  class="h-10 w-full rounded-lg border border-[#E2E8F0] bg-white pl-9 pr-3 text-[12px] font-medium text-[#1E293B] placeholder-[#94A3B8] focus:border-[#172F52] focus:ring-2 focus:ring-[#172F52]/10 focus:outline-none transition-all shadow-2xs"
+                />
+              </div>
+            </div>
 
+            <!-- Tipe Perangkat -->
             <div class="flex flex-col gap-1.5 col-span-1 sm:col-span-2">
-              <span class="text-[12px] font-semibold text-[#2A3547]"
-                >Tipe Perangkat <span class="text-[#FA896B]">*</span></span
-              >
+              <label class="text-[12px] font-bold text-[#172F52]">
+                Tipe Perangkat <span class="text-[#DC2626]">*</span>
+              </label>
               <CustomSelect
                 v-model="form.tipe_perangkat"
                 :options="availableTipeOptions"
                 aria-label="Tipe Perangkat Aset"
-                placeholder="Pilih tipe perangkat"
+                placeholder="Pilih jenis/tipe perangkat (Laptop, Desktop, Server, dll.)"
                 :block="true"
                 height-class="h-10"
               />
+            </div>
+
+            <!-- Tip Info Banner -->
+            <div class="flex items-start gap-2.5 rounded-xl bg-[#EDF3FC]/70 border border-[#A4BBDF]/40 p-3 col-span-1 sm:col-span-2">
+              <span class="material-symbols-outlined text-[17px] text-[#172F52] mt-0.5 shrink-0">info</span>
+              <p class="text-[11.5px] leading-relaxed text-[#244673]">
+                Pastikan <strong>Hostname</strong> dan <strong>Serial Number</strong> sesuai dengan stiker barcode atau fisik perangkat agar mempermudah proses audit dan scan barcode inventaris.
+              </p>
             </div>
           </fieldset>
         </div>
 
         <!-- Step 2: Penempatan & Pemegang -->
         <div v-show="activeTab === 'placement'" class="space-y-3.5">
-          <div class="flex items-center gap-2 border-b border-[#F1F5F9] pb-1.5">
-            <span class="text-[10px] font-extrabold uppercase tracking-wider text-[#7C8BAC]"
-              >Assignment & Placement</span
-            >
+          <div class="flex items-center justify-between border-b border-[#E2E8F0] pb-2">
+            <div class="flex items-center gap-2">
+              <span class="flex h-6 w-6 items-center justify-center rounded-md bg-[#EDF3FC] text-[#172F52]">
+                <span class="material-symbols-outlined text-[15px]">badge</span>
+              </span>
+              <span class="text-[11.5px] font-bold text-[#172F52] uppercase tracking-wider">
+                Penugasan & Penempatan
+              </span>
+            </div>
+            <span class="text-[11px] font-medium text-[#64748B]">Langkah 2 dari 3</span>
           </div>
 
-          <fieldset class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <label class="flex flex-col gap-1.5 col-span-1 sm:col-span-2">
-              <span class="text-[12px] font-semibold text-[#2A3547]">Pemegang Aset (Opsional)</span>
+          <fieldset class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            <!-- Pemegang Aset SearchableSelect -->
+            <div class="flex flex-col gap-1.5 col-span-1 sm:col-span-2">
+              <div class="flex items-center justify-between">
+                <label class="text-[12px] font-bold text-[#172F52]">Pemegang Aset / User Penanggung Jawab</label>
+                <span class="text-[11px] font-medium text-[#64748B]">Opsional</span>
+              </div>
               <SearchableSelect
                 v-model="form.nik_pemegang_asset"
                 :options="employees"
                 value-key="nik"
                 label-key="nama_karyawan"
                 secondary-label-key="nik"
-                placeholder="Pilih pemegang aset (Kosongkan jika Stock)"
-                search-placeholder="Cari nama atau NIK..."
+                placeholder="Pilih karyawan pemegang (Biarkan kosong jika disimpan sebagai Stok IT)"
+                search-placeholder="Cari berdasarkan nama atau NIK karyawan..."
                 clearable
                 class="w-full"
               />
-            </label>
+            </div>
 
-            <label class="flex flex-col gap-1.5">
-              <span class="text-[12px] font-semibold text-[#7C8BAC]">Nama Pemegang</span>
-              <input
-                :value="form.nama_karyawan_pemegang_asset || '— (Stock)'"
-                readonly
-                class="h-10 w-full cursor-not-allowed rounded-lg border border-[#E5EAEF] bg-[#F8FAFC] px-3 text-[12px] font-medium text-[#7C8BAC]"
-              />
-            </label>
-
-            <label class="flex flex-col gap-1.5">
-              <span class="text-[12px] font-semibold text-[#7C8BAC]">Departemen</span>
-              <input
-                :value="form.departemen_pemegang_asset || '—'"
-                readonly
-                class="h-10 w-full cursor-not-allowed rounded-lg border border-[#E5EAEF] bg-[#F8FAFC] px-3 text-[12px] font-medium text-[#7C8BAC]"
-              />
-            </label>
-
-            <label class="flex flex-col gap-1.5 col-span-1 sm:col-span-2">
-              <span class="text-[12px] font-semibold text-[#2A3547]"
-                >Lokasi Aset <span class="text-[#FA896B]">*</span></span
+            <!-- State 1: Karyawan Terpilih (Rich Employee Card) -->
+            <div
+              v-if="form.nik_pemegang_asset"
+              class="col-span-1 sm:col-span-2 flex items-center justify-between gap-3 rounded-xl border border-[#A4BBDF]/60 bg-gradient-to-r from-[#EDF3FC]/90 to-[#F8FAFC] p-3 shadow-2xs transition-all"
+            >
+              <div class="flex items-center gap-3 min-w-0">
+                <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#172F52] text-white font-bold text-[12px] shadow-xs">
+                  {{ getEmployeeInitials(form.nama_karyawan_pemegang_asset) }}
+                </div>
+                <div class="min-w-0 flex-1">
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <span class="text-[13px] font-bold text-[#172F52] truncate">
+                      {{ form.nama_karyawan_pemegang_asset || 'Karyawan Terpilih' }}
+                    </span>
+                    <span class="inline-flex items-center gap-1 rounded-full bg-[#345E99]/15 px-2 py-0.5 text-[10.5px] font-bold text-[#244673]">
+                      <span class="material-symbols-outlined text-[12px]">business</span>
+                      {{ form.departemen_pemegang_asset || 'Umum' }}
+                    </span>
+                  </div>
+                  <div class="flex items-center gap-2 mt-0.5 text-[11px] text-[#64748B]">
+                    <span>NIK: <strong class="text-[#244673]">{{ form.nik_pemegang_asset }}</strong></span>
+                    <span>•</span>
+                    <span class="flex items-center gap-0.5 text-[#059669] font-semibold">
+                      <span class="material-symbols-outlined text-[13px]">check_circle</span>
+                      Akan ditugaskan
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <button
+                type="button"
+                @click="clearEmployee"
+                class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-[#E2E8F0] bg-white text-[#64748B] hover:text-[#DC2626] hover:bg-rose-50 hover:border-rose-200 transition-colors cursor-pointer"
+                title="Batal pilih karyawan (Jadikan Stock)"
               >
+                <span class="material-symbols-outlined text-[16px]">close</span>
+              </button>
+            </div>
+
+            <!-- State 2: Unit Sebagai Stock IT -->
+            <div
+              v-else
+              class="col-span-1 sm:col-span-2 flex items-center gap-3 rounded-xl border border-dashed border-[#CBD5E1] bg-[#F8FAFC] p-3 text-[#64748B]"
+            >
+              <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white border border-[#E2E8F0] text-[#172F52] shadow-2xs">
+                <span class="material-symbols-outlined text-[18px]">inventory_2</span>
+              </div>
+              <div class="text-[11.5px] leading-snug">
+                <p class="font-bold text-[#172F52]">Status Unit: Stok Tersedia (Stock)</p>
+                <p class="text-[#64748B] text-[11px] mt-0.5">Perangkat tidak terikat ke karyawan mana pun dan tersimpan di pool inventaris IT.</p>
+              </div>
+            </div>
+
+            <!-- Lokasi Penempatan Aset -->
+            <div class="flex flex-col gap-1.5 col-span-1 sm:col-span-2">
+              <div class="flex items-center justify-between">
+                <label class="text-[12px] font-bold text-[#172F52]">
+                  Lokasi Penempatan Aset <span class="text-[#DC2626]">*</span>
+                </label>
+                <span class="text-[10.5px] text-[#64748B]">Kantor cabang atau area fisik</span>
+              </div>
               <SearchableSelect
                 v-model="form.lokasi_asset"
                 :options="locationOptions"
                 value-key="value"
                 label-key="label"
-                placeholder="Pilih atau ketik lokasi penempatan aset"
+                placeholder="Pilih atau ketik lokasi (cth: Solo, Pluit, Gudang IT)"
                 search-placeholder="Cari atau ketik lokasi baru..."
                 allow-custom
                 custom-label-prefix="+ Gunakan lokasi baru"
                 drop-direction="up"
                 class="w-full"
               />
-            </label>
+            </div>
           </fieldset>
         </div>
 
         <!-- Step 3: Spesifikasi & Details -->
         <div v-show="activeTab === 'specifications'" class="space-y-3.5">
-          <div class="flex items-center gap-2 border-b border-[#F1F5F9] pb-1.5">
-            <span class="text-[10px] font-extrabold uppercase tracking-wider text-[#7C8BAC]"
-              >Brand, Status & Details</span
-            >
+          <div class="flex items-center justify-between border-b border-[#E2E8F0] pb-2">
+            <div class="flex items-center gap-2">
+              <span class="flex h-6 w-6 items-center justify-center rounded-md bg-[#EDF3FC] text-[#172F52]">
+                <span class="material-symbols-outlined text-[15px]">tune</span>
+              </span>
+              <span class="text-[11.5px] font-bold text-[#172F52] uppercase tracking-wider">
+                Spesifikasi & Kondisi Teknis
+              </span>
+            </div>
+            <span class="text-[11px] font-medium text-[#64748B]">Langkah 3 dari 3</span>
           </div>
 
-          <fieldset class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <label class="flex flex-col gap-1.5">
-              <span class="text-[12px] font-semibold text-[#2A3547]">Brand / Merek</span>
+          <fieldset class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            <!-- Brand / Merek -->
+            <div class="flex flex-col gap-1.5">
+              <label class="text-[12px] font-bold text-[#172F52]">Brand / Merek</label>
               <SearchableSelect
                 v-model="form.brand_merek"
                 :options="brandSelectOptions"
                 value-key="value"
                 label-key="label"
                 placeholder="Pilih atau ketik merek"
-                search-placeholder="Cari merek..."
+                search-placeholder="Cari merek (Lenovo, Dell, HP, Apple)..."
                 allow-custom
                 custom-label-prefix="+ Gunakan merek baru"
                 clearable
                 class="w-full"
               />
-            </label>
+            </div>
 
-            <label class="flex flex-col gap-1.5">
-              <span class="text-[12px] font-semibold text-[#2A3547]">Model</span>
-              <input
-                v-model="form.model"
-                maxlength="100"
-                placeholder="Model perangkat (e.g. ThinkPad X1)"
-                class="h-10 w-full rounded-lg border border-[#E5EAEF] bg-white px-3 text-[12px] font-medium text-[#2A3547] placeholder-[#94A3B8] focus:border-[#2563EB] focus:outline-none transition-all shadow-2xs"
-              />
-            </label>
-
+            <!-- Model -->
             <div class="flex flex-col gap-1.5">
-              <span class="text-[12px] font-semibold text-[#2A3547]"
-                >Status Aset <span class="text-[#FA896B]">*</span></span
-              >
+              <label class="text-[12px] font-bold text-[#172F52]">Model / Seri</label>
+              <div class="relative flex items-center">
+                <span class="material-symbols-outlined absolute left-3 text-[17px] text-[#94A3B8] pointer-events-none">
+                  memory
+                </span>
+                <input
+                  v-model="form.model"
+                  maxlength="100"
+                  placeholder="cth: ThinkPad T14 Gen 3"
+                  class="h-10 w-full rounded-lg border border-[#E2E8F0] bg-white pl-9 pr-3 text-[12px] font-medium text-[#1E293B] placeholder-[#94A3B8] focus:border-[#172F52] focus:ring-2 focus:ring-[#172F52]/10 focus:outline-none transition-all shadow-2xs"
+                />
+              </div>
+            </div>
+
+            <!-- Status Aset -->
+            <div class="flex flex-col gap-1.5">
+              <label class="text-[12px] font-bold text-[#172F52]">
+                Status Aset <span class="text-[#DC2626]">*</span>
+              </label>
               <CustomSelect
                 v-model="form.status"
                 :options="ASSET_STATUSES"
                 aria-label="Status Aset"
-                placeholder="Pilih status"
+                placeholder="Pilih status aset"
                 :block="true"
                 height-class="h-10"
               />
             </div>
 
+            <!-- Kondisi Aset -->
             <div class="flex flex-col gap-1.5">
-              <span class="text-[12px] font-semibold text-[#2A3547]"
-                >Kondisi Aset <span class="text-[#FA896B]">*</span></span
-              >
+              <label class="text-[12px] font-bold text-[#172F52]">
+                Kondisi Fisik <span class="text-[#DC2626]">*</span>
+              </label>
               <CustomSelect
                 v-model="form.kondisi"
                 :options="availableKondisiOptions"
                 aria-label="Kondisi Aset"
-                placeholder="Pilih kondisi"
+                placeholder="Pilih kondisi aset"
                 :block="true"
                 height-class="h-10"
               />
             </div>
 
-            <label class="flex flex-col gap-1.5 col-span-1 sm:col-span-2">
-              <span class="text-[12px] font-semibold text-[#2A3547]">Spesifikasi Detail</span>
+            <!-- Spesifikasi Detail -->
+            <div class="flex flex-col gap-1.5 col-span-1 sm:col-span-2">
+              <div class="flex items-center justify-between">
+                <label class="text-[12px] font-bold text-[#172F52]">Spesifikasi Teknis</label>
+                <span class="text-[10.5px] text-[#64748B]">CPU, RAM, SSD, OS, dll.</span>
+              </div>
               <textarea
                 v-model="form.spesifikasi"
                 rows="2"
-                placeholder="CPU, RAM, Storage, OS, dll."
-                class="min-h-[52px] max-h-[80px] w-full rounded-lg border border-[#E5EAEF] bg-white p-2.5 text-[12px] font-medium text-[#2A3547] placeholder-[#94A3B8] focus:border-[#2563EB] focus:outline-none transition-all resize-y shadow-2xs"
+                placeholder="cth: Intel Core i7-12700H, 16GB DDR5, 512GB NVMe SSD, Windows 11 Pro"
+                class="min-h-[56px] max-h-[100px] w-full rounded-lg border border-[#E2E8F0] bg-white p-2.5 text-[12px] font-medium text-[#1E293B] placeholder-[#94A3B8] focus:border-[#172F52] focus:ring-2 focus:ring-[#172F52]/10 focus:outline-none transition-all resize-y shadow-2xs"
               ></textarea>
-            </label>
+            </div>
 
-            <label class="flex flex-col gap-1.5 col-span-1 sm:col-span-2">
-              <span class="text-[12px] font-semibold text-[#2A3547]">Catatan Aset</span>
+            <!-- Catatan Aset -->
+            <div class="flex flex-col gap-1.5 col-span-1 sm:col-span-2">
+              <div class="flex items-center justify-between">
+                <label class="text-[12px] font-bold text-[#172F52]">Catatan Tambahan</label>
+                <span class="text-[10.5px] text-[#64748B]">Kelengkapan atau riwayat khusus</span>
+              </div>
               <textarea
                 v-model="form.note_asset"
                 rows="2"
-                placeholder="Catatan tambahan untuk aset ini"
-                class="min-h-[52px] max-h-[80px] w-full rounded-lg border border-[#E5EAEF] bg-white p-2.5 text-[12px] font-medium text-[#2A3547] placeholder-[#94A3B8] focus:border-[#2563EB] focus:outline-none transition-all resize-y shadow-2xs"
+                placeholder="cth: Lengkap dengan charger original 65W USB-C dan tas laptop"
+                class="min-h-[56px] max-h-[100px] w-full rounded-lg border border-[#E2E8F0] bg-white p-2.5 text-[12px] font-medium text-[#1E293B] placeholder-[#94A3B8] focus:border-[#172F52] focus:ring-2 focus:ring-[#172F52]/10 focus:outline-none transition-all resize-y shadow-2xs"
               ></textarea>
-            </label>
+            </div>
           </fieldset>
         </div>
       </form>
+
       <template #footer>
         <!-- Footer Action Bar -->
         <div
-          class="asset-crud-actions flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-2.5 pt-3.5 mt-4 border-t border-[#E5EAEF]"
+          class="asset-crud-actions flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-2.5 pt-3.5 mt-4 border-t border-[#E2E8F0]"
         >
           <button
             type="button"
             :disabled="isSubmitting"
             @click="closeModal"
-            class="h-9 w-full sm:w-auto rounded-lg border border-[#E5EAEF] px-3.5 text-[12px] font-bold text-[#7C8BAC] hover:bg-[#F8FAFC] hover:text-[#2A3547] active:scale-95 transition-all cursor-pointer touch-manipulation"
+            class="h-9.5 px-4 rounded-lg border border-[#E2E8F0] bg-white text-[12px] font-bold text-[#64748B] hover:bg-[#F8FAFC] hover:text-[#172F52] hover:border-[#CBD5E1] active:scale-95 transition-all cursor-pointer touch-manipulation flex items-center justify-center gap-1.5"
           >
-            Batal
+            <span>Batal</span>
           </button>
 
-          <div class="flex items-center gap-2 w-full sm:w-auto">
+          <div class="flex items-center gap-2.5 w-full sm:w-auto">
             <button
               v-if="activeTab !== 'info'"
               type="button"
               @click="activeTab = activeTab === 'specifications' ? 'placement' : 'info'"
-              class="h-9 flex-1 sm:flex-initial rounded-lg border border-[#E5EAEF] bg-white px-3.5 text-[12px] font-bold text-[#2A3547] hover:bg-[#F8FAFC] active:scale-95 transition-all flex items-center justify-center gap-1 cursor-pointer touch-manipulation"
+              class="h-9.5 flex-1 sm:flex-initial rounded-lg border border-[#E2E8F0] bg-white px-3.5 text-[12px] font-bold text-[#244673] hover:bg-[#EDF3FC] hover:border-[#A4BBDF] active:scale-95 transition-all flex items-center justify-center gap-1 cursor-pointer touch-manipulation shadow-2xs"
             >
-              <span class="material-symbols-outlined text-[15px]">arrow_back</span>
+              <span class="material-symbols-outlined text-[16px]">arrow_back</span>
               <span>Kembali</span>
             </button>
 
@@ -1382,10 +1567,10 @@ onMounted(async () => {
               type="button"
               @click="nextStep"
               :disabled="isSubmitting || hasValidationErrors"
-              class="h-9 flex-1 sm:flex-initial rounded-lg bg-[#2563EB] px-4 text-[12px] font-bold text-white shadow-sm hover:bg-[#1D4ED8] disabled:opacity-50 active:scale-95 transition-all flex items-center justify-center gap-1 cursor-pointer touch-manipulation"
+              class="h-9.5 flex-1 sm:flex-initial rounded-lg bg-[#172F52] hover:bg-[#244673] active:bg-[#0F1F38] px-4.5 text-[12px] font-bold text-white shadow-sm disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer touch-manipulation"
             >
               <span>Lanjutkan</span>
-              <span class="material-symbols-outlined text-[15px]">arrow_forward</span>
+              <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
             </button>
 
             <button
@@ -1393,12 +1578,15 @@ onMounted(async () => {
               type="submit"
               form="crud-AssetsView"
               :disabled="isSubmitting || !canWriteAssets || hasValidationErrors"
-              class="h-9 flex-1 sm:flex-initial rounded-lg bg-[#2563EB] px-4 text-[12px] font-bold text-white shadow-sm hover:bg-[#1D4ED8] disabled:opacity-50 active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer touch-manipulation"
+              class="h-9.5 flex-1 sm:flex-initial rounded-lg bg-[#172F52] hover:bg-[#244673] active:bg-[#0F1F38] px-5 text-[12px] font-bold text-white shadow-sm disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer touch-manipulation"
             >
               <span
                 v-if="isSubmitting"
                 class="animate-spin h-3.5 w-3.5 border-2 border-white border-t-transparent rounded-full"
               ></span>
+              <span v-else class="material-symbols-outlined text-[17px]">
+                {{ modalMode === 'add' ? 'add_circle' : 'check_circle' }}
+              </span>
               <span>{{
                 isSubmitting
                   ? 'Menyimpan...'

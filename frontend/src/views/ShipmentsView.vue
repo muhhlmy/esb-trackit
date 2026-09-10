@@ -324,7 +324,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div data-testid="page-ready" class="space-y-4 sm:space-y-6 pb-12 select-none">
+  <div data-testid="page-ready" class="shipments-page space-y-4 sm:space-y-6 pb-12">
     <!-- Notification Toast -->
     <Transition name="fade">
       <div
@@ -337,7 +337,9 @@ onMounted(() => {
     </Transition>
 
     <!-- Top Card: Header & Search/Filters Bar -->
-    <div class="rounded-2xl border border-[#E2E8F0] bg-white p-4 sm:p-5 shadow-2xs space-y-4">
+    <div
+      class="shipment-toolbar rounded-2xl border border-[#E2E8F0] bg-white p-4 sm:p-5 shadow-2xs space-y-4"
+    >
       <!-- Row 1: Title and Actions -->
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
@@ -492,7 +494,9 @@ onMounted(() => {
     </div>
 
     <!-- Main Content: Table & List -->
-    <div class="rounded-2xl border border-[#E2E8F0]/80 bg-white shadow-2xs overflow-hidden">
+    <div
+      class="shipment-list-surface rounded-2xl border border-[#E2E8F0]/80 bg-white shadow-2xs overflow-hidden"
+    >
       <div v-if="isLoading" aria-busy="true">
         <SkeletonTable preset="assets" :rows="6" />
       </div>
@@ -536,7 +540,7 @@ onMounted(() => {
 
       <div v-else class="w-full max-w-full overflow-hidden">
         <!-- Desktop Table (>= lg) -->
-        <div class="hidden lg:block overflow-x-auto">
+        <div class="shipment-table hidden xl:block overflow-x-auto">
           <table class="w-full text-left border-collapse">
             <thead>
               <tr
@@ -578,6 +582,7 @@ onMounted(() => {
                 </td>
                 <td class="py-3 px-4">
                   <AppBadge
+                    class="shipment-status"
                     :type="getStatusBadgeType(item.status)"
                     :text="getStatusLabel(item.status)"
                   />
@@ -624,7 +629,7 @@ onMounted(() => {
         </div>
 
         <!-- Mobile Card List (< lg) -->
-        <ul class="divide-y divide-[#E2E8F0] lg:hidden" aria-label="Daftar pengiriman">
+        <ul class="shipment-cards xl:hidden" aria-label="Daftar pengiriman">
           <li
             v-for="item in shipments"
             :key="item.id"
@@ -690,8 +695,10 @@ onMounted(() => {
         </ul>
 
         <!-- Pagination Bar -->
-        <div class="border-t border-[#E2E8F0] p-3 sm:p-4">
+        <div class="shipment-pagination">
           <AppPagination
+            asset-style
+            mobile-compact
             :current-page="currentPage"
             :total-items="totalRecords"
             :items-per-page="itemsPerPage"
@@ -705,11 +712,15 @@ onMounted(() => {
     <AppModal
       :is-open="showFormModal"
       :title="modalMode === 'add' ? 'Tambah Pengiriman' : 'Edit Pengiriman'"
+      size="lg"
+      icon="local_shipping"
+      subtitle="Lengkapi penerima, barang, dan tujuan. Kolom bertanda * wajib diisi."
       @close="closeModal"
     >
-      <form @submit.prevent="saveShipment" class="space-y-4">
+      <form id="shipment-form" @submit.prevent="saveShipment" class="shipment-form space-y-4">
         <div
           v-if="modalError"
+          role="alert"
           class="rounded-xl border border-rose-200 bg-rose-50 p-3 text-xs text-rose-700 font-semibold"
         >
           {{ modalError }}
@@ -717,10 +728,11 @@ onMounted(() => {
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
           <div>
-            <label class="block text-xs font-bold text-[#0F172A] mb-1">
+            <label for="shipment-request_date" class="block text-xs font-bold text-[#0F172A] mb-1">
               Tanggal Request <span class="text-rose-500">*</span>
             </label>
             <input
+              id="shipment-request_date"
               v-model="form.request_date"
               type="date"
               required
@@ -744,10 +756,11 @@ onMounted(() => {
         </div>
 
         <div>
-          <label class="block text-xs font-bold text-[#0F172A] mb-1">
+          <label for="shipment-recipient_name" class="block text-xs font-bold text-[#0F172A] mb-1">
             Nama Penerima <span class="text-rose-500">*</span>
           </label>
           <input
+            id="shipment-recipient_name"
             v-model="form.recipient_name"
             type="text"
             required
@@ -758,10 +771,14 @@ onMounted(() => {
         </div>
 
         <div>
-          <label class="block text-xs font-bold text-[#0F172A] mb-1">
+          <label
+            for="shipment-item_description"
+            class="block text-xs font-bold text-[#0F172A] mb-1"
+          >
             Deskripsi Barang <span class="text-rose-500">*</span>
           </label>
           <textarea
+            id="shipment-item_description"
             v-model="form.item_description"
             rows="3"
             required
@@ -772,10 +789,11 @@ onMounted(() => {
         </div>
 
         <div>
-          <label class="block text-xs font-bold text-[#0F172A] mb-1">
+          <label for="shipment-destination" class="block text-xs font-bold text-[#0F172A] mb-1">
             Tujuan Pengiriman <span class="text-rose-500">*</span>
           </label>
           <input
+            id="shipment-destination"
             v-model="form.destination"
             type="text"
             required
@@ -787,10 +805,14 @@ onMounted(() => {
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
           <div>
-            <label class="block text-xs font-bold text-[#0F172A] mb-1">
+            <label
+              for="shipment-tracking_number"
+              class="block text-xs font-bold text-[#0F172A] mb-1"
+            >
               No Resi <span class="text-[#94A3B8] font-normal">(Opsional)</span>
             </label>
             <input
+              id="shipment-tracking_number"
               v-model="form.tracking_number"
               type="text"
               maxlength="100"
@@ -800,10 +822,14 @@ onMounted(() => {
           </div>
 
           <div>
-            <label class="block text-xs font-bold text-[#0F172A] mb-1">
+            <label
+              for="shipment-delivery_proof_url"
+              class="block text-xs font-bold text-[#0F172A] mb-1"
+            >
               Link Bukti Pengiriman <span class="text-[#94A3B8] font-normal">(Opsional)</span>
             </label>
             <input
+              id="shipment-delivery_proof_url"
               v-model="form.delivery_proof_url"
               type="url"
               maxlength="2048"
@@ -812,8 +838,11 @@ onMounted(() => {
             />
           </div>
         </div>
-
-        <div class="flex items-center justify-end gap-2 pt-3 border-t border-[#F1F5F9]">
+      </form>
+      <template #footer>
+        <div
+          class="shipment-form-actions flex items-center justify-end gap-2 pt-3 border-t border-[#F1F5F9]"
+        >
           <button
             type="button"
             @click="closeModal"
@@ -823,13 +852,14 @@ onMounted(() => {
           </button>
           <button
             type="submit"
+            form="shipment-form"
             :disabled="isSubmitting"
             class="h-9 rounded-lg bg-[#2563EB] px-4 text-xs font-semibold text-white hover:bg-[#1D4ED8] disabled:opacity-50 cursor-pointer"
           >
             {{ isSubmitting ? 'Menyimpan...' : 'Simpan' }}
           </button>
         </div>
-      </form>
+      </template>
     </AppModal>
 
     <!-- Delete Confirmation Modal -->
@@ -837,6 +867,7 @@ onMounted(() => {
       <div class="space-y-4">
         <div
           v-if="modalError"
+          role="alert"
           class="rounded-xl border border-rose-200 bg-rose-50 p-3 text-xs text-rose-700 font-semibold"
         >
           {{ modalError }}
@@ -847,8 +878,11 @@ onMounted(() => {
           <strong class="text-[#0F172A]">{{ selectedShipment?.recipient_name }}</strong> akan
           dihapus. Tindakan ini tidak dapat dibatalkan.
         </p>
-
-        <div class="flex items-center justify-end gap-2 pt-3 border-t border-[#F1F5F9]">
+      </div>
+      <template #footer>
+        <div
+          class="shipment-form-actions shipment-delete-actions flex items-center justify-end gap-2 pt-3 border-t border-[#F1F5F9]"
+        >
           <button
             type="button"
             @click="closeModal"
@@ -865,7 +899,263 @@ onMounted(() => {
             {{ isSubmitting ? 'Menghapus...' : 'Hapus Data' }}
           </button>
         </div>
-      </div>
+      </template>
     </AppModal>
   </div>
 </template>
+
+<style scoped>
+.shipments-page {
+  max-width: 1600px;
+  margin-inline: auto;
+  color: #172f52;
+}
+.shipment-toolbar {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  box-shadow: none;
+}
+.shipment-toolbar h1 {
+  font-size: 26px;
+  font-weight: 650;
+  letter-spacing: -0.04em;
+}
+.shipment-toolbar > div:first-child {
+  margin-bottom: 24px;
+}
+.shipment-toolbar > div:first-child button {
+  background: #172f52;
+  min-height: 42px;
+  box-shadow: none;
+}
+.shipment-toolbar > div:nth-child(2) {
+  padding: 16px;
+  border: 1px solid #e2e8f0;
+  background: white;
+  border-radius: 12px;
+  gap: 12px;
+}
+.shipment-toolbar input {
+  min-height: 42px;
+  background: #fafbfd;
+  border-color: #e2e8f0;
+}
+.shipment-list-surface {
+  border: 0;
+  background: transparent;
+  overflow: visible;
+  box-shadow: none;
+}
+.shipment-list-surface > div:last-child {
+  overflow: visible;
+}
+.shipment-table {
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  background: white;
+}
+.shipment-table table {
+  table-layout: fixed;
+}
+.shipment-table th {
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 11px;
+  font-weight: 500;
+  color: #8291a7;
+  padding: 16px 12px;
+}
+.shipment-table td {
+  padding: 20px 12px;
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+.shipment-table th:nth-child(3) {
+  width: 19%;
+}
+.shipment-table th:nth-child(4) {
+  width: 16%;
+}
+.shipment-table th:nth-child(7) {
+  width: 9%;
+}
+.shipment-table th:nth-child(8) {
+  width: 8%;
+}
+.shipment-table td:nth-child(3),
+.shipment-table td:nth-child(4) {
+  white-space: normal;
+}
+.shipment-table td:nth-child(2) {
+  color: #172f52;
+  font-weight: 600;
+}
+.shipment-table button {
+  min-width: 32px;
+  min-height: 36px;
+  display: grid;
+  place-items: center;
+}
+.shipment-cards {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 14px;
+}
+.shipment-cards > li {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 13px;
+  padding: 20px;
+  min-width: 0;
+}
+.shipment-cards > li > div:first-child {
+  gap: 12px;
+}
+.shipment-cards > li > div:first-child > div {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.shipment-cards > li > div:first-child p:first-child {
+  font-size: 14px;
+  font-weight: 650;
+  color: #172f52;
+}
+.shipment-cards > li > div:first-child p:last-child {
+  line-height: 1.7;
+  margin-top: 6px;
+}
+.shipment-cards > li > p {
+  padding: 12px;
+  line-height: 1.7;
+  margin-top: 14px;
+  margin-bottom: 14px;
+  overflow-wrap: anywhere;
+}
+.shipment-cards > li > div:nth-of-type(2) {
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.shipment-cards > li > div:nth-of-type(2) > div {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.shipment-cards button,
+.shipment-cards a {
+  min-height: 44px;
+}
+.shipment-cards button {
+  padding-inline: 14px;
+  cursor: pointer;
+}
+.shipment-form {
+  padding: 2px;
+}
+.shipment-form > div:not([role='alert']) {
+  min-width: 0;
+}
+.shipment-form label {
+  font-size: 12px;
+  font-weight: 500;
+  color: #52647e;
+  margin-bottom: 7px;
+}
+.shipment-form :is(input, textarea) {
+  min-height: 44px;
+  font-size: 13px;
+  border-radius: 8px;
+  border-color: #dce4ef;
+  background: #fafbfd;
+}
+.shipment-form textarea {
+  resize: vertical;
+  min-height: 96px;
+  line-height: 1.7;
+}
+.shipment-form :deep(button[aria-haspopup='listbox']) {
+  min-height: 44px;
+  border-radius: 8px;
+}
+.shipment-form :is(input, textarea):focus {
+  background: white;
+  border-color: #5285d8;
+  box-shadow: 0 0 0 3px #5285d810;
+}
+.shipment-form-actions {
+  padding: 0;
+  border: 0;
+  gap: 10px;
+}
+.shipment-form-actions button {
+  min-height: 44px;
+  padding-inline: 20px;
+  border-radius: 8px;
+}
+.shipment-form-actions button[type='submit'] {
+  background: #172f52;
+}
+.shipment-form-actions button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.shipments-page button:focus-visible,
+.shipment-form-actions button:focus-visible {
+  outline: 2px solid #5285d8;
+  outline-offset: 3px;
+}
+@media (min-width: 768px) and (max-width: 1279px) {
+  .shipment-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (min-width: 1280px) {
+  .shipment-cards {
+    display: none;
+  }
+}
+@media (max-width: 639px) {
+  .shipment-toolbar h1 {
+    font-size: 23px;
+  }
+  .shipment-toolbar > div:first-child button {
+    width: 100%;
+    min-height: 44px;
+  }
+  .shipment-toolbar > div:nth-child(2) {
+    padding: 14px;
+  }
+  .shipment-cards > li {
+    padding: 16px;
+  }
+  .shipment-form :is(input, textarea),
+  .shipment-form :deep(button[aria-haspopup='listbox']) {
+    font-size: 16px;
+  }
+  .shipment-form-actions button {
+    flex: 1;
+  }
+}
+
+.shipment-pagination {
+  margin-top: 14px;
+  padding: 0;
+  border: 0;
+}
+.shipment-pagination :deep(.asset-pagination) {
+  margin-top: 0;
+}
+.shipment-status {
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.shipment-status :deep(span) {
+  flex-shrink: 0;
+}
+.shipment-table th:nth-child(6) {
+  width: 132px;
+}
+.shipment-table td:nth-child(6) {
+  white-space: nowrap;
+  overflow-wrap: normal;
+}
+</style>

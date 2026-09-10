@@ -343,7 +343,7 @@ onMounted(() => {
 
 <template>
   <div
-    class="export-page min-w-0 space-y-4 sm:space-y-6 text-[#0F172A] wrap-anywhere"
+    class="admin-workspace export-page min-w-0 space-y-4 sm:space-y-6 text-[#0F172A] wrap-anywhere"
     :data-testid="!isLoading ? 'page-ready' : undefined"
   >
     <!-- Notification Toast -->
@@ -378,7 +378,7 @@ onMounted(() => {
 
     <!-- Header SaaS Section -->
     <div
-      class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white border border-[#E2E8F0] rounded-2xl p-3.5 sm:p-5 shadow-2xs"
+      class="admin-page-header flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white border border-[#E2E8F0] rounded-2xl p-3.5 sm:p-5 shadow-2xs"
     >
       <div class="space-y-1">
         <div class="flex items-center gap-1.5 text-xs text-[#94A3B8] font-medium">
@@ -512,13 +512,13 @@ onMounted(() => {
     <div v-if="activeTab === 'quick'" class="space-y-4">
       <div
         v-if="isLoading"
-        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"
+        class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4"
         aria-busy="true"
       >
         <SkeletonCard v-for="i in 8" :key="i" variant="simple" />
       </div>
 
-      <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div v-else class="admin-export-cards grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
         <div
           v-for="table in tables"
           :key="table.tableName"
@@ -925,7 +925,7 @@ onMounted(() => {
 
     <!-- TAB 3: TEMPLAT LAPORAN POPULER -->
     <div v-if="activeTab === 'presets'" class="space-y-4">
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
         <!-- Preset 1 -->
         <div
           class="rounded-2xl border border-[#E2E8F0] bg-white p-4 transition-all flex flex-col justify-between hover:border-[#CBD5E1]"
@@ -1072,7 +1072,6 @@ onMounted(() => {
             </tbody>
           </table>
         </div>
-
       </div>
       <template #footer>
         <div class="grid grid-cols-1 gap-2 sm:flex sm:justify-end">
@@ -1144,9 +1143,10 @@ onMounted(() => {
             "
           />
         </div>
-
+      </div>
+      <template #footer>
         <div
-          class="grid grid-cols-1 sm:flex sm:items-center sm:justify-end gap-2.5 pt-3 border-t border-[#F1F5F9]"
+          class="admin-modal-actions grid grid-cols-1 sm:flex sm:items-center sm:justify-end gap-2.5 pt-3 border-t border-[#F1F5F9]"
         >
           <button
             type="button"
@@ -1168,7 +1168,7 @@ onMounted(() => {
             <span>{{ isResetting ? 'Me-reset...' : 'Reset Database Sekarang' }}</span>
           </button>
         </div>
-      </div>
+      </template>
     </AppModal>
   </div>
 </template>
@@ -1203,3 +1203,5 @@ onMounted(() => {
   opacity: 0;
 }
 </style>
+
+<style scoped src="../assets/admin-workspace.css"></style>

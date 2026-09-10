@@ -610,7 +610,10 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
 </script>
 
 <template>
-  <div class="flex min-w-0 flex-col gap-5" :data-testid="!isLoading ? 'page-ready' : undefined">
+  <div
+    class="admin-workspace flex min-w-0 flex-col gap-5"
+    :data-testid="!isLoading ? 'page-ready' : undefined"
+  >
     <!-- ── Toast Notifikasi ──────────────────────────────── -->
     <Transition name="slide-right">
       <div
@@ -628,7 +631,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
 
     <!-- Simplified SaaS Header & Toolbar Container -->
     <div
-      class="flex flex-col gap-3.5 bg-white p-3.5 sm:p-4.5 rounded-2xl border border-[#E2E8F0]/80 shadow-2xs"
+      class="admin-page-header flex flex-col gap-3.5 bg-white p-3.5 sm:p-4.5 rounded-2xl border border-[#E2E8F0]/80 shadow-2xs"
     >
       <!-- Row 1: Page Title & Primary CTA -->
       <div class="flex items-center justify-between gap-2 sm:gap-3">
@@ -713,11 +716,11 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
       <!-- Loading -->
       <div v-if="isLoading" role="status" aria-busy="true">
         <!-- Desktop Skeleton -->
-        <div class="hidden md:block">
+        <div class="hidden xl:block">
           <SkeletonTable preset="users" :rows="5" />
         </div>
         <!-- Mobile Skeleton -->
-        <div class="md:hidden flex flex-col gap-3 p-3.5">
+        <div class="xl:hidden flex flex-col gap-3 p-3.5">
           <div
             v-for="i in 4"
             :key="'skel-user-' + i"
@@ -759,7 +762,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
       <template v-else>
         <!-- ═══ Desktop Table (>= md / 768px) ═══ -->
         <div
-          class="hidden md:block w-full max-w-full overflow-hidden"
+          class="hidden xl:block w-full max-w-full overflow-hidden"
           tabindex="0"
           aria-label="Tabel pengguna"
         >
@@ -916,7 +919,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
         </div>
 
         <!-- ═══ Mobile Card List (< md / < 768px) ═══ -->
-        <div class="md:hidden">
+        <div class="xl:hidden">
           <!-- Empty State -->
           <div v-if="filteredUsers.length === 0" class="px-4 py-10 text-center">
             <div class="flex flex-col items-center gap-2">
@@ -935,7 +938,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
           </div>
 
           <!-- User Cards -->
-          <div v-else class="flex flex-col gap-3 p-3.5">
+          <div v-else class="admin-person-cards flex flex-col gap-3 p-3.5">
             <div
               v-for="user in paginatedUsers"
               :key="'m-' + user.id"
@@ -1038,6 +1041,8 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
 
       <!-- Footer Pagination -->
       <AppPagination
+        asset-style
+        mobile-compact
         v-if="!isLoading && !pageError"
         v-model:currentPage="currentPage"
         :total-items="filteredUsers.length"
@@ -1059,7 +1064,11 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
       size="xl"
       @close="requestCloseModal"
     >
-      <form @submit.prevent="saveUser" class="flex flex-col gap-4">
+      <form
+        id="admin-user-form"
+        @submit.prevent="saveUser"
+        class="admin-entry-form flex flex-col gap-4"
+      >
         <!-- 1. Employee Selection (Searchable Combobox) -->
         <div v-if="modalMode === 'add' && employees.length > 0" class="flex flex-col gap-1.5">
           <label class="text-xs font-semibold text-[#0F172A]">Karyawan</label>
@@ -1387,10 +1396,11 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
             class="h-4 w-4 shrink-0 accent-[#2563EB]"
           />
         </label>
-
+      </form>
+      <template #footer>
         <!-- 6. Sticky Footer -->
         <div
-          class="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-2.5 sm:gap-3 pt-3 border-t border-[#F1F5F9]"
+          class="admin-modal-actions flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-2.5 sm:gap-3 pt-3 border-t border-[#F1F5F9]"
         >
           <div class="min-w-0">
             <p v-if="modalError" class="text-xs font-semibold text-rose-600">
@@ -1412,6 +1422,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
 
             <button
               type="submit"
+              form="admin-user-form"
               :disabled="isSubmitting || !canWriteUsers"
               class="h-9 w-full sm:w-auto px-4 rounded-lg bg-[#2563EB] text-xs font-semibold text-white shadow-2xs hover:bg-[#1D4ED8] disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer"
             >
@@ -1429,7 +1440,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
             </button>
           </div>
         </div>
-      </form>
+      </template>
     </AppModal>
 
     <!-- ═══════════════════════════════════════════════════════
@@ -1478,8 +1489,9 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
             />
           </div>
         </div>
-
-        <div class="flex gap-3 w-full">
+      </div>
+      <template #footer>
+        <div class="admin-modal-actions flex gap-3 w-full">
           <button
             type="button"
             :disabled="isSubmitting"
@@ -1501,7 +1513,9 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
             {{ isSubmitting ? 'Menghapus...' : 'Ya, Hapus' }}
           </button>
         </div>
-      </div>
+      </template>
     </AppModal>
   </div>
 </template>
+
+<style scoped src="../assets/admin-workspace.css"></style>

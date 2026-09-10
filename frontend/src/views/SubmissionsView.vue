@@ -624,10 +624,13 @@ onMounted(fetchData)
 </script>
 
 <template>
-  <div class="flex min-w-0 flex-col gap-5" :data-testid="!isLoading ? 'page-ready' : undefined">
+  <div
+    class="submissions-page flex min-w-0 flex-col gap-5"
+    :data-testid="!isLoading ? 'page-ready' : undefined"
+  >
     <!-- ── Page Header ─────────────────────────────────────────── -->
     <div
-      class="flex flex-row items-center justify-between gap-3 bg-white p-4 sm:p-5 rounded-2xl border border-[#E2E8F0]/80 shadow-2xs"
+      class="submission-page-header flex flex-row items-center justify-between gap-3 bg-white p-4 sm:p-5 rounded-2xl border border-[#E2E8F0]/80 shadow-2xs"
     >
       <div class="min-w-0 flex items-center gap-3">
         <div
@@ -649,7 +652,7 @@ onMounted(fetchData)
         type="button"
         @click="generatePdf"
         class="h-9.5 shrink-0 whitespace-nowrap rounded-xl bg-[#172F52] px-3.5 sm:px-4 text-xs font-bold text-white shadow-2xs hover:bg-[#244673] active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
-        title="Cetak Formulir Serah Terima (PDF)"
+        title="Cetak formulir PDF"
       >
         <span class="material-symbols-outlined text-[16px]">picture_as_pdf</span>
         <span class="hidden xs:inline">Cetak BAST</span>
@@ -657,10 +660,18 @@ onMounted(fetchData)
       </button>
     </div>
 
+    <ol class="submission-steps" aria-label="Tahapan pengisian">
+      <li><span>1</span>Pihak terkait</li>
+      <li><span>2</span>Tujuan</li>
+      <li><span>3</span>Daftar aset</li>
+      <li><span>4</span>Cetak PDF</li>
+    </ol>
     <!-- Loading Form Skeleton -->
     <div v-if="isLoading" role="status" aria-busy="true" class="flex flex-col gap-5 select-none">
       <!-- Section 1 Skeleton: Profil Pihak Terkait -->
-      <div class="rounded-2xl border border-[#E2E8F0]/80 bg-white p-4 sm:p-6 shadow-2xs flex flex-col gap-4">
+      <div
+        class="rounded-2xl border border-[#E2E8F0]/80 bg-white p-4 sm:p-6 shadow-2xs flex flex-col gap-4"
+      >
         <div class="flex items-center gap-2.5 border-b border-[#F1F5F9] pb-3.5">
           <BaseSkeleton width="24px" height="24px" radius="md" />
           <div class="flex flex-col gap-1">
@@ -669,7 +680,9 @@ onMounted(fetchData)
           </div>
         </div>
         <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
-          <div class="flex flex-col gap-3.5 rounded-2xl border border-slate-200/80 bg-slate-50/50 p-4">
+          <div
+            class="flex flex-col gap-3.5 rounded-2xl border border-slate-200/80 bg-slate-50/50 p-4"
+          >
             <BaseSkeleton width="150px" height="14px" radius="md" />
             <BaseSkeleton width="100%" height="40px" radius="xl" />
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -677,7 +690,9 @@ onMounted(fetchData)
               <BaseSkeleton width="100%" height="40px" radius="xl" />
             </div>
           </div>
-          <div class="flex flex-col gap-3.5 rounded-2xl border border-slate-200/80 bg-slate-50/50 p-4">
+          <div
+            class="flex flex-col gap-3.5 rounded-2xl border border-slate-200/80 bg-slate-50/50 p-4"
+          >
             <BaseSkeleton width="150px" height="14px" radius="md" />
             <BaseSkeleton width="100%" height="40px" radius="xl" />
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -689,7 +704,9 @@ onMounted(fetchData)
       </div>
 
       <!-- Section 2 Skeleton: Tujuan Serah Terima Aset -->
-      <div class="rounded-2xl border border-[#E2E8F0]/80 bg-white p-4 sm:p-6 shadow-2xs flex flex-col gap-4">
+      <div
+        class="rounded-2xl border border-[#E2E8F0]/80 bg-white p-4 sm:p-6 shadow-2xs flex flex-col gap-4"
+      >
         <div class="flex items-center gap-2.5 border-b border-[#F1F5F9] pb-3.5">
           <BaseSkeleton width="24px" height="24px" radius="md" />
           <div class="flex flex-col gap-1">
@@ -711,14 +728,18 @@ onMounted(fetchData)
 
       <!-- Section 3 Skeleton: Data Unit -->
       <div class="grid grid-cols-1 gap-5 lg:grid-cols-2">
-        <div class="rounded-2xl border border-[#E2E8F0]/80 bg-white p-4 sm:p-6 shadow-2xs flex flex-col gap-4">
+        <div
+          class="rounded-2xl border border-[#E2E8F0]/80 bg-white p-4 sm:p-6 shadow-2xs flex flex-col gap-4"
+        >
           <div class="flex items-center gap-2.5 border-b border-[#F1F5F9] pb-3.5">
             <BaseSkeleton width="24px" height="24px" radius="md" />
             <BaseSkeleton width="190px" height="16px" radius="md" />
           </div>
           <BaseSkeleton width="100%" height="120px" radius="xl" />
         </div>
-        <div class="rounded-2xl border border-[#E2E8F0]/80 bg-white p-4 sm:p-6 shadow-2xs flex flex-col gap-4">
+        <div
+          class="rounded-2xl border border-[#E2E8F0]/80 bg-white p-4 sm:p-6 shadow-2xs flex flex-col gap-4"
+        >
           <div class="flex items-center gap-2.5 border-b border-[#F1F5F9] pb-3.5">
             <BaseSkeleton width="24px" height="24px" radius="md" />
             <BaseSkeleton width="190px" height="16px" radius="md" />
@@ -778,8 +799,12 @@ onMounted(fetchData)
               01
             </span>
             <div>
-              <h2 class="text-[14px] sm:text-[15px] font-bold text-[#0F172A]">Profil Pihak Terkait</h2>
-              <p class="text-[11.5px] text-[#64748B]">Tentukan identitas pihak pemberi dan penerima aset</p>
+              <h2 class="text-[14px] sm:text-[15px] font-bold text-[#0F172A]">
+                Profil Pihak Terkait
+              </h2>
+              <p class="text-[11.5px] text-[#64748B]">
+                Tentukan identitas pihak pemberi dan penerima aset
+              </p>
             </div>
           </div>
         </div>
@@ -790,7 +815,9 @@ onMounted(fetchData)
             class="flex flex-col gap-3.5 rounded-xl sm:rounded-2xl border border-slate-200/80 bg-slate-50/50 p-4"
           >
             <div class="flex items-center gap-2">
-              <span class="material-symbols-outlined text-[18px] text-[#172F52]">person_outline</span>
+              <span class="material-symbols-outlined text-[18px] text-[#172F52]"
+                >person_outline</span
+              >
               <h3 class="text-xs font-bold uppercase tracking-wider text-[#172F52]">
                 Pihak Pemberi (Karyawan)
               </h3>
@@ -812,7 +839,9 @@ onMounted(fetchData)
 
             <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <label class="flex flex-col gap-1.5">
-                <span class="text-[10px] font-bold uppercase text-[#64748B]">Nama Lengkap (Auto)</span>
+                <span class="text-[10px] font-bold uppercase text-[#64748B]"
+                  >Nama Lengkap (Auto)</span
+                >
                 <input
                   v-model="form.pemberiNama"
                   required
@@ -825,7 +854,9 @@ onMounted(fetchData)
               </label>
 
               <label class="flex flex-col gap-1.5">
-                <span class="text-[10px] font-bold uppercase text-[#64748B]">Direktorat (Auto)</span>
+                <span class="text-[10px] font-bold uppercase text-[#64748B]"
+                  >Direktorat (Auto)</span
+                >
                 <input
                   v-model="form.pemberiDirektorat"
                   required
@@ -858,7 +889,9 @@ onMounted(fetchData)
                   aria-label="Penerima Non-Karyawan (Vendor/Lainnya)"
                   class="rounded border-slate-300 accent-[#172F52] h-4 w-4 cursor-pointer"
                 />
-                <span class="text-[11px] font-bold text-[#475569]">Non-Karyawan (Vendor/Lainnya)</span>
+                <span class="text-[11px] font-bold text-[#475569]"
+                  >Non-Karyawan (Vendor/Lainnya)</span
+                >
               </label>
             </div>
 
@@ -877,7 +910,9 @@ onMounted(fetchData)
             </label>
 
             <div v-else class="flex flex-col gap-1.5">
-              <span class="text-[10.5px] font-bold uppercase text-[#475569]">Nama Lengkap / Vendor *</span>
+              <span class="text-[10.5px] font-bold uppercase text-[#475569]"
+                >Nama Lengkap / Vendor *</span
+              >
               <input
                 v-model="form.penerimaNama"
                 required
@@ -890,7 +925,9 @@ onMounted(fetchData)
 
             <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <label v-if="!form.isPenerimaLainnya" class="flex flex-col gap-1.5">
-                <span class="text-[10px] font-bold uppercase text-[#64748B]">Nama Lengkap (Auto)</span>
+                <span class="text-[10px] font-bold uppercase text-[#64748B]"
+                  >Nama Lengkap (Auto)</span
+                >
                 <input
                   v-model="form.penerimaNama"
                   required
@@ -949,8 +986,12 @@ onMounted(fetchData)
               02
             </span>
             <div>
-              <h2 class="text-[14px] sm:text-[15px] font-bold text-[#0F172A]">Tujuan Serah Terima Aset</h2>
-              <p class="text-[11.5px] text-[#64748B]">Pilih salah satu keperluan serah terima perangkat</p>
+              <h2 class="text-[14px] sm:text-[15px] font-bold text-[#0F172A]">
+                Tujuan Serah Terima Aset
+              </h2>
+              <p class="text-[11.5px] text-[#64748B]">
+                Pilih salah satu keperluan serah terima perangkat
+              </p>
             </div>
           </div>
         </div>
@@ -958,13 +999,48 @@ onMounted(fetchData)
         <div class="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3">
           <label
             v-for="t in [
-              { key: 'baru', label: 'Serah Terima Baru', icon: 'fiber_new', color: 'text-[#172F52] bg-[#EDF3FC]' },
-              { key: 'peminjaman', label: 'Peminjaman', icon: 'handshake', color: 'text-amber-600 bg-amber-50' },
-              { key: 'pengembalian', label: 'Pengembalian', icon: 'keyboard_return', color: 'text-indigo-600 bg-indigo-50' },
-              { key: 'perbaikan', label: 'Perbaikan', icon: 'build', color: 'text-rose-600 bg-rose-50' },
-              { key: 'penggantian', label: 'Penggantian', icon: 'swap_horiz', color: 'text-purple-600 bg-purple-50' },
-              { key: 'disposal', label: 'Disposal Aset', icon: 'delete_sweep', color: 'text-slate-600 bg-slate-100' },
-              { key: 'lainnya', label: 'Lainnya', icon: 'more_horiz', color: 'text-teal-600 bg-teal-50' },
+              {
+                key: 'baru',
+                label: 'Serah Terima Baru',
+                icon: 'fiber_new',
+                color: 'text-[#172F52] bg-[#EDF3FC]',
+              },
+              {
+                key: 'peminjaman',
+                label: 'Peminjaman',
+                icon: 'handshake',
+                color: 'text-amber-600 bg-amber-50',
+              },
+              {
+                key: 'pengembalian',
+                label: 'Pengembalian',
+                icon: 'keyboard_return',
+                color: 'text-indigo-600 bg-indigo-50',
+              },
+              {
+                key: 'perbaikan',
+                label: 'Perbaikan',
+                icon: 'build',
+                color: 'text-rose-600 bg-rose-50',
+              },
+              {
+                key: 'penggantian',
+                label: 'Penggantian',
+                icon: 'swap_horiz',
+                color: 'text-purple-600 bg-purple-50',
+              },
+              {
+                key: 'disposal',
+                label: 'Disposal Aset',
+                icon: 'delete_sweep',
+                color: 'text-slate-600 bg-slate-100',
+              },
+              {
+                key: 'lainnya',
+                label: 'Lainnya',
+                icon: 'more_horiz',
+                color: 'text-teal-600 bg-teal-50',
+              },
             ]"
             :key="t.key"
             class="flex cursor-pointer items-center justify-between min-h-[48px] rounded-xl border p-3 transition-all active:scale-[0.99] select-none"
@@ -1000,7 +1076,9 @@ onMounted(fetchData)
         </div>
 
         <div v-if="form.tujuan === 'lainnya'" class="mt-1 flex flex-col gap-1.5">
-          <span class="text-[10px] font-bold uppercase text-[#475569]">Keterangan Tujuan Lainnya *</span>
+          <span class="text-[10px] font-bold uppercase text-[#475569]"
+            >Keterangan Tujuan Lainnya *</span
+          >
           <input
             v-model="form.tujuanLainnya"
             required
@@ -1029,7 +1107,9 @@ onMounted(fetchData)
                 <h2 class="text-[14px] sm:text-[15px] font-bold text-[#0F172A] truncate">
                   Aset Baru (Diserahkan)
                 </h2>
-                <p class="text-[11.5px] text-[#64748B] truncate">Perangkat yang diserahkan ke penerima</p>
+                <p class="text-[11.5px] text-[#64748B] truncate">
+                  Perangkat yang diserahkan ke penerima
+                </p>
               </div>
             </div>
 
@@ -1047,10 +1127,12 @@ onMounted(fetchData)
             <div
               v-for="(row, index) in asetBaruList"
               :key="index"
-              class="flex flex-col gap-3 rounded-xl sm:rounded-2xl border border-slate-200/80 bg-slate-50/50 p-3.5 sm:p-4 transition-all"
+              class="submission-unit flex flex-col gap-3 rounded-xl sm:rounded-2xl border border-slate-200/80 bg-slate-50/50 p-3.5 sm:p-4 transition-all"
             >
               <!-- Card Unit Header -->
-              <div class="flex items-center justify-between border-b border-slate-200/60 pb-2 mb-0.5">
+              <div
+                class="flex items-center justify-between border-b border-slate-200/60 pb-2 mb-0.5"
+              >
                 <span
                   class="inline-flex items-center gap-1.5 rounded-lg bg-[#EDF3FC] px-2.5 py-0.5 text-[11px] font-bold text-[#172F52] border border-[#A4BBDF]/40"
                 >
@@ -1087,7 +1169,9 @@ onMounted(fetchData)
 
               <div class="grid grid-cols-1 sm:grid-cols-4 gap-2.5 sm:gap-2">
                 <label class="flex flex-col gap-1.5 sm:col-span-3">
-                  <span class="text-[9.5px] font-bold uppercase text-[#64748B]">Deskripsi / Tipe (Auto)</span>
+                  <span class="text-[9.5px] font-bold uppercase text-[#64748B]"
+                    >Deskripsi / Tipe (Auto)</span
+                  >
                   <input
                     v-model="row.tipe"
                     type="text"
@@ -1112,7 +1196,9 @@ onMounted(fetchData)
               </div>
 
               <label class="flex flex-col gap-1.5">
-                <span class="text-[9.5px] font-bold uppercase text-[#64748B]">Spesifikasi Lengkap (Auto)</span>
+                <span class="text-[9.5px] font-bold uppercase text-[#64748B]"
+                  >Spesifikasi Lengkap (Auto)</span
+                >
                 <input
                   v-model="row.spesifikasi"
                   type="text"
@@ -1141,7 +1227,9 @@ onMounted(fetchData)
                 <h2 class="text-[14px] sm:text-[15px] font-bold text-[#0F172A] truncate">
                   Aset Lama (Dikembalikan)
                 </h2>
-                <p class="text-[11.5px] text-[#64748B] truncate">Perangkat lama jika ada penggantian</p>
+                <p class="text-[11.5px] text-[#64748B] truncate">
+                  Perangkat lama jika ada penggantian
+                </p>
               </div>
             </div>
 
@@ -1159,14 +1247,18 @@ onMounted(fetchData)
             <div
               v-for="(row, index) in asetLamaList"
               :key="index"
-              class="flex flex-col gap-3 rounded-xl sm:rounded-2xl border border-slate-200/80 bg-slate-50/50 p-3.5 sm:p-4 transition-all"
+              class="submission-unit flex flex-col gap-3 rounded-xl sm:rounded-2xl border border-slate-200/80 bg-slate-50/50 p-3.5 sm:p-4 transition-all"
             >
               <!-- Card Unit Header -->
-              <div class="flex items-center justify-between border-b border-slate-200/60 pb-2 mb-0.5">
+              <div
+                class="flex items-center justify-between border-b border-slate-200/60 pb-2 mb-0.5"
+              >
                 <span
                   class="inline-flex items-center gap-1.5 rounded-lg bg-amber-50 px-2.5 py-0.5 text-[11px] font-bold text-amber-700 border border-amber-200/60"
                 >
-                  <span class="material-symbols-outlined text-[14px]">history_toggle_drop_down</span>
+                  <span class="material-symbols-outlined text-[14px]"
+                    >history_toggle_drop_down</span
+                  >
                   Unit Lama #{{ index + 1 }}
                 </span>
 
@@ -1183,7 +1275,9 @@ onMounted(fetchData)
               </div>
 
               <label class="flex flex-col gap-1.5">
-                <span class="text-[10px] font-bold uppercase text-[#475569]">Aset IT Lama (Opsional)</span>
+                <span class="text-[10px] font-bold uppercase text-[#475569]"
+                  >Aset IT Lama (Opsional)</span
+                >
                 <SearchableSelect
                   v-model="row.id_aset"
                   :options="assets"
@@ -1199,7 +1293,9 @@ onMounted(fetchData)
 
               <div class="grid grid-cols-1 sm:grid-cols-4 gap-2.5 sm:gap-2">
                 <label class="flex flex-col gap-1.5 sm:col-span-3">
-                  <span class="text-[9.5px] font-bold uppercase text-[#64748B]">Deskripsi / Tipe (Auto)</span>
+                  <span class="text-[9.5px] font-bold uppercase text-[#64748B]"
+                    >Deskripsi / Tipe (Auto)</span
+                  >
                   <input
                     v-model="row.tipe"
                     type="text"
@@ -1224,7 +1320,9 @@ onMounted(fetchData)
               </div>
 
               <label class="flex flex-col gap-1.5">
-                <span class="text-[9.5px] font-bold uppercase text-[#64748B]">Spesifikasi Lengkap (Auto)</span>
+                <span class="text-[9.5px] font-bold uppercase text-[#64748B]"
+                  >Spesifikasi Lengkap (Auto)</span
+                >
                 <input
                   v-model="row.spesifikasi"
                   type="text"
@@ -1244,7 +1342,9 @@ onMounted(fetchData)
         class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 rounded-2xl border border-[#E2E8F0]/80 bg-white p-4 sm:p-5 shadow-2xs"
       >
         <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
-          <span class="text-xs font-bold text-[#0F172A] whitespace-nowrap flex items-center gap-1.5">
+          <span
+            class="text-xs font-bold text-[#0F172A] whitespace-nowrap flex items-center gap-1.5"
+          >
             <span class="material-symbols-outlined text-[18px] text-slate-400">calendar_today</span>
             Tanggal Serah Terima:
           </span>
@@ -1268,3 +1368,69 @@ onMounted(fetchData)
     </form>
   </div>
 </template>
+
+<style scoped>
+.submissions-page {
+  width: 100%;
+  max-width: 1440px;
+  margin-inline: auto;
+}
+.submission-steps {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+  padding: 16px 20px;
+  list-style: none;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: #fff;
+}
+.submission-steps li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #64748b;
+  font-weight: 500;
+}
+.submission-steps li > span {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  border-radius: 8px;
+  color: #345e99;
+  background: #edf3fc;
+  font-size: 11px;
+  font-weight: 650;
+}
+.submission-page-header h1,
+.submission-page-header p {
+  white-space: normal;
+  overflow: visible;
+}
+@media (max-width: 639px) {
+  .submission-page-header {
+    flex-wrap: wrap;
+    gap: 14px;
+  }
+  .submission-page-header > button {
+    width: 100%;
+    min-height: 44px;
+  }
+  .submission-steps {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px 10px;
+    padding: 14px;
+  }
+  .submission-steps li {
+    font-size: 11px;
+    gap: 8px;
+  }
+}
+</style>

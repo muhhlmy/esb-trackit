@@ -660,7 +660,10 @@ function formatDate(dateStr) {
           <div class="laptop-state">
             <span
               class="laptop-status"
-              :class="[formatStatusPillOps(asset.status).bg, formatStatusPillOps(asset.status).text]"
+              :class="[
+                formatStatusPillOps(asset.status).bg,
+                formatStatusPillOps(asset.status).text,
+              ]"
             >
               <span class="laptop-dot" :class="formatStatusPillOps(asset.status).dot"></span
               >{{ asset.status || '—' }}
@@ -693,18 +696,26 @@ function formatDate(dateStr) {
     <AppModal
       :is-open="showFormModal"
       :title="modalMode === 'add' ? 'Tambah Aset OPS Baru' : 'Edit Aset OPS'"
+      subtitle="Lengkapi data aset. Kolom bertanda * wajib diisi."
+      icon="precision_manufacturing"
       size="lg"
       @close="closeModal"
     >
-      <form @submit.prevent="submitForm" id="crud-AssetsOpsView" class="asset-crud-form space-y-4">
+      <form
+        @submit.prevent="submitForm"
+        id="crud-AssetsOpsView"
+        class="asset-crud-form asset-entry-form space-y-4"
+      >
         <div
           v-if="modalError"
+          role="alert"
           class="p-3 bg-[#FEF2F2] border border-[#FECACA] rounded-xl text-[#991B1B] text-[12px]"
         >
           {{ modalError }}
         </div>
 
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <h3 class="asset-form-section-title"><span>01</span>Identitas aset</h3>
           <!-- Hostname -->
           <div>
             <label for="ops-hostname" class="block text-[12px] font-bold text-[#1E293B] mb-1">
@@ -737,6 +748,7 @@ function formatDate(dateStr) {
         </div>
 
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <h3 class="asset-form-section-title"><span>02</span>Kategori & penempatan</h3>
           <!-- Kategori -->
           <div>
             <label class="block text-[12px] font-bold text-[#1E293B] mb-1">
@@ -767,6 +779,7 @@ function formatDate(dateStr) {
         </div>
 
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <h3 class="asset-form-section-title"><span>03</span>Penanggung jawab & pembelian</h3>
           <!-- PIC Penanggung Jawab -->
           <div>
             <label for="ops-pic" class="block text-[12px] font-bold text-[#1E293B] mb-1"
@@ -796,6 +809,7 @@ function formatDate(dateStr) {
         </div>
 
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <h3 class="asset-form-section-title"><span>04</span>Nilai & kondisi</h3>
           <!-- Total Asset Amount -->
           <div>
             <label for="ops-total-amount" class="block text-[12px] font-bold text-[#1E293B] mb-1"
@@ -814,9 +828,7 @@ function formatDate(dateStr) {
 
           <!-- Kondisi -->
           <div>
-            <label class="block text-[12px] font-bold text-[#1E293B] mb-1"
-              >Kondisi</label
-            >
+            <label class="block text-[12px] font-bold text-[#1E293B] mb-1">Kondisi</label>
             <CustomSelect
               v-model="form.kondisi"
               :options="kondisiOptions"

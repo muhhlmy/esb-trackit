@@ -211,12 +211,12 @@ function parsePerubahan(perubahan, aksi) {
 
 <template>
   <div
-    class="logs-page flex min-w-0 flex-col gap-4"
+    class="admin-workspace logs-page flex min-w-0 flex-col gap-4"
     :data-testid="!isLoading ? 'page-ready' : undefined"
   >
     <!-- Simplified SaaS Header Container -->
     <div
-      class="flex flex-col gap-3.5 bg-white p-3.5 sm:p-4.5 rounded-2xl border border-[#E2E8F0]/80 shadow-2xs"
+      class="admin-page-header flex flex-col gap-3.5 bg-white p-3.5 sm:p-4.5 rounded-2xl border border-[#E2E8F0]/80 shadow-2xs"
     >
       <div>
         <h2 class="text-lg font-bold text-[#0F172A] tracking-tight">
@@ -251,7 +251,7 @@ function parsePerubahan(perubahan, aksi) {
 
     <!-- Tab Selection Navigation -->
     <div
-      class="grid sm:flex border-b border-[#E2E8F0]/80"
+      class="admin-tabs grid sm:flex border-b border-[#E2E8F0]/80"
       :class="isSuperAdmin ? 'grid-cols-2' : 'grid-cols-1'"
       aria-label="Jenis log"
     >
@@ -384,7 +384,7 @@ function parsePerubahan(perubahan, aksi) {
         </div>
 
         <!-- Timeline Log Cards -->
-        <div v-else class="divide-y divide-[#F3F4F6]">
+        <div v-else class="admin-log-list">
           <div
             v-for="log in paginatedAssetLogs"
             :key="log.id"
@@ -512,6 +512,7 @@ function parsePerubahan(perubahan, aksi) {
 
         <!-- Footer Pagination Assets -->
         <AppPagination
+          asset-style
           mobile-compact
           v-if="filteredAssetLogs.length > 0"
           v-model:currentPage="currentPageAssets"
@@ -623,6 +624,7 @@ function parsePerubahan(perubahan, aksi) {
 
         <!-- Footer Pagination Audit -->
         <AppPagination
+          asset-style
           mobile-compact
           v-if="filteredAuditLogs.length > 0"
           v-model:currentPage="currentPageAudit"
@@ -650,3 +652,5 @@ function parsePerubahan(perubahan, aksi) {
   }
 }
 </style>
+
+<style scoped src="../assets/admin-workspace.css"></style>

@@ -350,11 +350,13 @@ function switchTab(tab) {
 
 <template>
   <div
-    class="database-page flex min-w-0 flex-col gap-4 sm:gap-5 wrap-anywhere"
+    class="admin-workspace database-page flex min-w-0 flex-col gap-4 sm:gap-5 wrap-anywhere"
     :data-testid="!isLoading ? 'page-ready' : undefined"
   >
     <!-- Page Header -->
-    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <div
+      class="admin-page-header flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
+    >
       <div>
         <h1 class="text-xl font-bold tracking-tight text-[#1E293B]">Database</h1>
         <p class="text-sm text-[#64748B]">Backup & restore database PostgreSQL</p>
@@ -377,7 +379,7 @@ function switchTab(tab) {
 
     <!-- Tab Navigation -->
     <div
-      class="grid grid-cols-2 sm:flex gap-1 rounded-xl bg-[#F1F5F9] p-1 w-full sm:w-fit"
+      class="admin-tabs grid grid-cols-2 sm:flex gap-1 rounded-xl bg-[#F1F5F9] p-1 w-full sm:w-fit"
       aria-label="Navigasi database"
     >
       <button
@@ -1005,8 +1007,9 @@ function switchTab(tab) {
             @keyup.enter="handleConfirmRestore"
           />
         </div>
-
-        <div class="grid grid-cols-1 sm:flex sm:justify-end gap-3 pt-2">
+      </div>
+      <template #footer>
+        <div class="admin-modal-actions grid grid-cols-1 sm:flex sm:justify-end gap-3 pt-2">
           <button
             class="rounded-lg border border-[#E5EAEF] px-4 py-2 text-sm font-medium text-[#64748B] hover:bg-[#F8FAFC]"
             @click="showRestoreConfirm = false"
@@ -1021,7 +1024,7 @@ function switchTab(tab) {
             Continue Restore
           </button>
         </div>
-      </div>
+      </template>
     </AppModal>
 
     <!-- ===== DELETE CONFIRMATION MODAL ===== -->
@@ -1031,7 +1034,9 @@ function switchTab(tab) {
           Anda yakin ingin menghapus backup <strong>{{ deleteTargetName }}</strong
           >? Tindakan ini tidak dapat dibatalkan.
         </p>
-        <div class="grid grid-cols-1 sm:flex sm:justify-end gap-3">
+      </div>
+      <template #footer>
+        <div class="admin-modal-actions grid grid-cols-1 sm:flex sm:justify-end gap-3">
           <button
             class="rounded-lg border border-[#E5EAEF] px-4 py-2 text-sm font-medium text-[#64748B] hover:bg-[#F8FAFC]"
             @click="showDeleteConfirm = false"
@@ -1046,7 +1051,7 @@ function switchTab(tab) {
             {{ isDeleting ? 'Deleting...' : 'Delete' }}
           </button>
         </div>
-      </div>
+      </template>
     </AppModal>
 
     <!-- Toast -->
@@ -1109,3 +1114,5 @@ function switchTab(tab) {
   transform: translateY(20px);
 }
 </style>
+
+<style scoped src="../assets/admin-workspace.css"></style>

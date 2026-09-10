@@ -686,18 +686,26 @@ function formatKondisiPill(kondisi) {
     <AppModal
       :is-open="showFormModal"
       :title="modalMode === 'add' ? 'Tambah Aset GA Baru' : 'Edit Aset GA'"
+      subtitle="Lengkapi data aset. Kolom bertanda * wajib diisi."
+      icon="inventory_2"
       size="lg"
       @close="closeModal"
     >
-      <form @submit.prevent="submitForm" id="crud-AssetsGaView" class="asset-crud-form space-y-4">
+      <form
+        @submit.prevent="submitForm"
+        id="crud-AssetsGaView"
+        class="asset-crud-form asset-entry-form space-y-4"
+      >
         <div
           v-if="modalError"
+          role="alert"
           class="p-3 bg-[#FEF2F2] border border-[#FECACA] rounded-xl text-[#991B1B] text-[12px]"
         >
           {{ modalError }}
         </div>
 
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <h3 class="asset-form-section-title"><span>01</span>Identitas aset</h3>
           <!-- Hostname -->
           <div>
             <label for="ga-hostname" class="block text-[12px] font-bold text-[#1E293B] mb-1">
@@ -730,6 +738,7 @@ function formatKondisiPill(kondisi) {
         </div>
 
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <h3 class="asset-form-section-title"><span>02</span>Jumlah & kondisi</h3>
           <!-- Quantity -->
           <div>
             <label for="ga-quantity" class="block text-[12px] font-bold text-[#1E293B] mb-1">
@@ -776,6 +785,7 @@ function formatKondisiPill(kondisi) {
         </div>
 
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <h3 class="asset-form-section-title"><span>03</span>Penempatan</h3>
           <!-- Lokasi Utama -->
           <div>
             <label class="block text-[12px] font-bold text-[#1E293B] mb-1">
@@ -806,6 +816,7 @@ function formatKondisiPill(kondisi) {
         </div>
 
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <h3 class="asset-form-section-title"><span>04</span>Spesifikasi tambahan</h3>
           <!-- Ukuran -->
           <div>
             <label for="ga-ukuran" class="block text-[12px] font-bold text-[#1E293B] mb-1"

@@ -416,7 +416,7 @@ onMounted(() => {
 
 <template>
   <div
-    class="employees-page flex min-w-0 flex-col gap-4 sm:gap-5"
+    class="admin-workspace employees-page flex min-w-0 flex-col gap-4 sm:gap-5"
     :data-testid="!isLoading ? 'page-ready' : undefined"
   >
     <!-- Notification Toast -->
@@ -435,7 +435,7 @@ onMounted(() => {
 
     <!-- Modern SaaS Header & Control Bar Container -->
     <div
-      class="flex min-w-0 flex-col gap-4 bg-white p-3.5 sm:p-5 rounded-2xl border border-[#E2E8F0] shadow-2xs"
+      class="admin-page-header flex min-w-0 flex-col gap-4 bg-white p-3.5 sm:p-5 rounded-2xl border border-[#E2E8F0] shadow-2xs"
     >
       <!-- Row 1: Page Title & Primary/Secondary Action Bar -->
       <div class="flex flex-col items-stretch justify-between gap-3 lg:flex-row lg:items-center">
@@ -590,7 +590,7 @@ onMounted(() => {
       </div>
 
       <div v-else class="w-full max-w-full overflow-hidden">
-        <ul class="divide-y divide-[#E2E8F0] lg:hidden" aria-label="Daftar karyawan">
+        <ul class="admin-person-cards xl:hidden" aria-label="Daftar karyawan">
           <li
             v-for="emp in paginatedEmployees"
             :key="emp.id_karyawan || emp.nik"
@@ -661,7 +661,7 @@ onMounted(() => {
             </div>
           </li>
         </ul>
-        <table class="hidden lg:table w-full max-w-full text-left border-collapse table-fixed">
+        <table class="hidden xl:table w-full max-w-full text-left border-collapse table-fixed">
           <colgroup>
             <col :class="canWriteKaryawan ? 'w-[22%]' : 'w-[24%]'" />
             <col :class="canWriteKaryawan ? 'w-[11%]' : 'w-[12%]'" />
@@ -798,6 +798,7 @@ onMounted(() => {
         </table>
 
         <AppPagination
+          asset-style
           mobile-compact
           v-model:currentPage="currentPage"
           :total-items="filteredEmployees.length"
@@ -813,7 +814,11 @@ onMounted(() => {
       size="lg"
       @close="closeModal"
     >
-      <form @submit.prevent="saveEmployee" class="employee-modal-content space-y-4 wrap-anywhere">
+      <form
+        id="admin-employee-form"
+        @submit.prevent="saveEmployee"
+        class="admin-entry-form employee-modal-content space-y-4 wrap-anywhere"
+      >
         <div
           v-if="modalError"
           class="rounded-xl bg-rose-50 p-3 text-[12px] font-semibold text-rose-600"
@@ -1020,9 +1025,10 @@ onMounted(() => {
             :clearable="true"
           />
         </div>
-
+      </form>
+      <template #footer>
         <div
-          class="grid grid-cols-1 sm:flex sm:items-center sm:justify-end gap-2 pt-4 border-t border-[#E5EAEF]"
+          class="admin-modal-actions grid grid-cols-1 sm:flex sm:items-center sm:justify-end gap-2 pt-4 border-t border-[#E5EAEF]"
         >
           <button
             type="button"
@@ -1033,13 +1039,14 @@ onMounted(() => {
           </button>
           <button
             type="submit"
+            form="admin-employee-form"
             :disabled="isSubmitting"
             class="min-h-11 sm:min-h-0 rounded-xl bg-[#5D87FF] px-4 py-2 text-[12px] font-bold text-white shadow-md hover:bg-[#4570EA] transition-all cursor-pointer disabled:opacity-60"
           >
             {{ isSubmitting ? 'Menyimpan...' : 'Simpan Data' }}
           </button>
         </div>
-      </form>
+      </template>
     </AppModal>
 
     <!-- Modal Hapus Karyawan -->
@@ -1072,9 +1079,10 @@ onMounted(() => {
             </p>
           </div>
         </div>
-
+      </div>
+      <template #footer>
         <div
-          class="grid grid-cols-1 sm:flex sm:items-center sm:justify-end gap-2 pt-4 border-t border-[#E5EAEF]"
+          class="admin-modal-actions grid grid-cols-1 sm:flex sm:items-center sm:justify-end gap-2 pt-4 border-t border-[#E5EAEF]"
         >
           <button
             type="button"
@@ -1092,7 +1100,7 @@ onMounted(() => {
             {{ isSubmitting ? 'Menghapus...' : 'Ya, Hapus Karyawan' }}
           </button>
         </div>
-      </div>
+      </template>
     </AppModal>
 
     <!-- Modal Import Excel -->
@@ -1150,3 +1158,5 @@ onMounted(() => {
   opacity: 0;
 }
 </style>
+
+<style scoped src="../assets/admin-workspace.css"></style>

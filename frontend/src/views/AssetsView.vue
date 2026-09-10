@@ -197,24 +197,15 @@ const filteredAssets = computed(() => {
 const isStep1Valid = computed(() => {
   return Boolean(
     form.value.hostname &&
-      form.value.hostname.trim() &&
-      form.value.serial_number &&
-      form.value.serial_number.trim() &&
-      form.value.tipe_perangkat,
+    form.value.hostname.trim() &&
+    form.value.serial_number &&
+    form.value.serial_number.trim() &&
+    form.value.tipe_perangkat,
   )
 })
 
 const isStep2Valid = computed(() => {
   return Boolean(form.value.lokasi_asset)
-})
-
-const isStep3Valid = computed(() => {
-  return isStep1Valid.value && isStep2Valid.value && Boolean(form.value.status && form.value.kondisi)
-})
-
-const selectedEmployee = computed(() => {
-  if (!form.value.nik_pemegang_asset) return null
-  return employees.value.find((e) => e.nik === form.value.nik_pemegang_asset) || null
 })
 
 function getEmployeeInitials(name) {
@@ -242,7 +233,8 @@ function selectStep(targetStep) {
   }
   if (targetStep === 'placement') {
     if (!isStep1Valid.value) {
-      modalError.value = 'Mohon lengkapi Hostname, Serial Number, dan Tipe Perangkat terlebih dahulu.'
+      modalError.value =
+        'Mohon lengkapi Hostname, Serial Number, dan Tipe Perangkat terlebih dahulu.'
       return
     }
     activeTab.value = 'placement'
@@ -1110,122 +1102,39 @@ onMounted(async () => {
       :title="modalMode === 'add' ? 'Tambah Aset IT' : 'Edit Aset IT'"
       :subtitle="
         modalMode === 'add'
-          ? 'Tambahkan perangkat baru ke dalam database inventaris IT.'
+          ? 'Lengkapi data perangkat. Kolom bertanda * wajib diisi.'
           : 'Perbarui spesifikasi dan konfigurasi unit aset IT.'
       "
       :icon="modalMode === 'add' ? 'devices' : 'edit_note'"
       size="lg"
       @close="closeModal"
     >
-      <!-- Step Indicator Bar (Brand Navy Stepper) -->
-      <div class="mb-4.5 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] p-2 sm:p-2.5 shadow-2xs">
-        <div class="flex items-center justify-between max-w-xl mx-auto">
-          <!-- Step 1: Informasi -->
-          <button
-            type="button"
-            @click="selectStep('info')"
-            class="group flex items-center gap-1.5 sm:gap-2.5 transition-all cursor-pointer select-none text-left"
+      <nav class="it-create-steps" aria-label="Langkah pengisian aset">
+        <button
+          v-for="(step, index) in [
+            { key: 'info', label: 'Perangkat', hint: 'Identitas utama' },
+            { key: 'placement', label: 'Penempatan', hint: 'Pengguna & lokasi' },
+            { key: 'specifications', label: 'Spesifikasi', hint: 'Detail & kondisi' },
+          ]"
+          :key="step.key"
+          type="button"
+          :aria-current="activeTab === step.key ? 'step' : undefined"
+          @click="selectStep(step.key)"
+        >
+          <span class="it-create-step-number">{{ index + 1 }}</span>
+          <span class="it-create-step-label"
+            ><strong>{{ step.label }}</strong
+            ><small>{{ step.hint }}</small></span
           >
-            <span
-              class="flex h-6 w-6 sm:h-7 sm:w-7 shrink-0 items-center justify-center rounded-lg text-[11px] sm:text-[12px] font-extrabold transition-all"
-              :class="
-                activeTab === 'info'
-                  ? 'bg-[#172F52] text-white shadow-sm ring-2 ring-[#172F52]/20'
-                  : isStep1Valid
-                    ? 'bg-[#EDF3FC] text-[#172F52] border border-[#A4BBDF]/70'
-                    : 'bg-white text-[#94A3B8] border border-[#E2E8F0]'
-              "
-            >
-              <span v-if="activeTab !== 'info' && isStep1Valid" class="material-symbols-outlined text-[15px] sm:text-[16px]">check</span>
-              <span v-else>1</span>
-            </span>
-            <div class="flex flex-col">
-              <span
-                class="text-[11px] sm:text-[12px] font-bold leading-tight transition-colors"
-                :class="activeTab === 'info' ? 'text-[#172F52]' : isStep1Valid ? 'text-[#244673]' : 'text-[#64748B]'"
-              >
-                Informasi
-              </span>
-              <span class="hidden sm:inline text-[9.5px] text-[#94A3B8] leading-tight">Data Perangkat</span>
-            </div>
-          </button>
-
-          <!-- Divider 1 -> 2 -->
-          <div
-            class="flex-1 h-0.5 mx-2 sm:mx-3 transition-all rounded-full"
-            :class="isStep1Valid ? 'bg-[#172F52]' : 'bg-[#E2E8F0]'"
-          ></div>
-
-          <!-- Step 2: Penempatan -->
-          <button
-            type="button"
-            @click="selectStep('placement')"
-            class="group flex items-center gap-1.5 sm:gap-2.5 transition-all cursor-pointer select-none text-left"
-          >
-            <span
-              class="flex h-6 w-6 sm:h-7 sm:w-7 shrink-0 items-center justify-center rounded-lg text-[11px] sm:text-[12px] font-extrabold transition-all"
-              :class="
-                activeTab === 'placement'
-                  ? 'bg-[#172F52] text-white shadow-sm ring-2 ring-[#172F52]/20'
-                  : isStep2Valid
-                    ? 'bg-[#EDF3FC] text-[#172F52] border border-[#A4BBDF]/70'
-                    : 'bg-white text-[#94A3B8] border border-[#E2E8F0]'
-              "
-            >
-              <span v-if="activeTab !== 'placement' && isStep2Valid" class="material-symbols-outlined text-[15px] sm:text-[16px]">check</span>
-              <span v-else>2</span>
-            </span>
-            <div class="flex flex-col">
-              <span
-                class="text-[11px] sm:text-[12px] font-bold leading-tight transition-colors"
-                :class="activeTab === 'placement' ? 'text-[#172F52]' : isStep2Valid ? 'text-[#244673]' : 'text-[#64748B]'"
-              >
-                Penempatan
-              </span>
-              <span class="hidden sm:inline text-[9.5px] text-[#94A3B8] leading-tight">User & Lokasi</span>
-            </div>
-          </button>
-
-          <!-- Divider 2 -> 3 -->
-          <div
-            class="flex-1 h-0.5 mx-2 sm:mx-3 transition-all rounded-full"
-            :class="isStep2Valid ? 'bg-[#172F52]' : 'bg-[#E2E8F0]'"
-          ></div>
-
-          <!-- Step 3: Spesifikasi -->
-          <button
-            type="button"
-            @click="selectStep('specifications')"
-            class="group flex items-center gap-1.5 sm:gap-2.5 transition-all cursor-pointer select-none text-left"
-          >
-            <span
-              class="flex h-6 w-6 sm:h-7 sm:w-7 shrink-0 items-center justify-center rounded-lg text-[11px] sm:text-[12px] font-extrabold transition-all"
-              :class="
-                activeTab === 'specifications'
-                  ? 'bg-[#172F52] text-white shadow-sm ring-2 ring-[#172F52]/20'
-                  : isStep3Valid
-                    ? 'bg-[#EDF3FC] text-[#172F52] border border-[#A4BBDF]/70'
-                    : 'bg-white text-[#94A3B8] border border-[#E2E8F0]'
-              "
-            >
-              <span v-if="isStep3Valid" class="material-symbols-outlined text-[15px] sm:text-[16px]">check</span>
-              <span v-else>3</span>
-            </span>
-            <div class="flex flex-col">
-              <span
-                class="text-[11px] sm:text-[12px] font-bold leading-tight transition-colors"
-                :class="activeTab === 'specifications' ? 'text-[#172F52]' : isStep3Valid ? 'text-[#244673]' : 'text-[#64748B]'"
-              >
-                Spesifikasi
-              </span>
-              <span class="hidden sm:inline text-[9.5px] text-[#94A3B8] leading-tight">Merek & Detail</span>
-            </div>
-          </button>
-        </div>
-      </div>
+        </button>
+      </nav>
 
       <!-- Form Content -->
-      <form id="crud-AssetsView" class="asset-crud-form flex flex-col" @submit.prevent="saveAsset">
+      <form
+        id="crud-AssetsView"
+        class="asset-crud-form asset-entry-form it-create-form flex flex-col"
+        @submit.prevent="saveAsset"
+      >
         <div
           v-if="modalError"
           role="alert"
@@ -1236,14 +1145,16 @@ onMounted(async () => {
         </div>
 
         <!-- Step 1: Informasi Perangkat -->
-        <div v-show="activeTab === 'info'" class="space-y-3.5">
+        <div v-show="activeTab === 'info'" class="it-create-panel space-y-3.5">
           <div class="flex items-center justify-between border-b border-[#E2E8F0] pb-2">
             <div class="flex items-center gap-2">
-              <span class="flex h-6 w-6 items-center justify-center rounded-md bg-[#EDF3FC] text-[#172F52]">
+              <span
+                class="flex h-6 w-6 items-center justify-center rounded-md bg-[#EDF3FC] text-[#172F52]"
+              >
                 <span class="material-symbols-outlined text-[15px]">devices</span>
               </span>
               <span class="text-[11.5px] font-bold text-[#172F52] uppercase tracking-wider">
-                Informasi Dasar Perangkat
+                Identitas perangkat
               </span>
             </div>
             <span class="text-[11px] font-medium text-[#64748B]">Langkah 1 dari 3</span>
@@ -1257,7 +1168,9 @@ onMounted(async () => {
                 <span class="text-[10px] font-normal text-[#64748B]">Maks. 100 karakter</span>
               </label>
               <div class="relative flex items-center">
-                <span class="material-symbols-outlined absolute left-3 text-[17px] text-[#94A3B8] pointer-events-none">
+                <span
+                  class="material-symbols-outlined absolute left-3 text-[17px] text-[#94A3B8] pointer-events-none"
+                >
                   computer
                 </span>
                 <input
@@ -1278,7 +1191,9 @@ onMounted(async () => {
                 <span class="text-[10px] font-normal text-[#64748B]">Nomor seri fisik</span>
               </label>
               <div class="relative flex items-center">
-                <span class="material-symbols-outlined absolute left-3 text-[17px] text-[#94A3B8] pointer-events-none">
+                <span
+                  class="material-symbols-outlined absolute left-3 text-[17px] text-[#94A3B8] pointer-events-none"
+                >
                   tag
                 </span>
                 <input
@@ -1308,24 +1223,30 @@ onMounted(async () => {
             </div>
 
             <!-- Tip Info Banner -->
-            <div class="flex items-start gap-2.5 rounded-xl bg-[#EDF3FC]/70 border border-[#A4BBDF]/40 p-3 col-span-1 sm:col-span-2">
-              <span class="material-symbols-outlined text-[17px] text-[#172F52] mt-0.5 shrink-0">info</span>
+            <div
+              class="flex items-start gap-2.5 rounded-xl bg-[#EDF3FC]/70 border border-[#A4BBDF]/40 p-3 col-span-1 sm:col-span-2"
+            >
+              <span class="material-symbols-outlined text-[17px] text-[#172F52] mt-0.5 shrink-0"
+                >info</span
+              >
               <p class="text-[11.5px] leading-relaxed text-[#244673]">
-                Pastikan <strong>Hostname</strong> dan <strong>Serial Number</strong> sesuai dengan stiker barcode atau fisik perangkat agar mempermudah proses audit dan scan barcode inventaris.
+                Gunakan hostname dan serial number yang tertera pada perangkat.
               </p>
             </div>
           </fieldset>
         </div>
 
         <!-- Step 2: Penempatan & Pemegang -->
-        <div v-show="activeTab === 'placement'" class="space-y-3.5">
+        <div v-show="activeTab === 'placement'" class="it-create-panel space-y-3.5">
           <div class="flex items-center justify-between border-b border-[#E2E8F0] pb-2">
             <div class="flex items-center gap-2">
-              <span class="flex h-6 w-6 items-center justify-center rounded-md bg-[#EDF3FC] text-[#172F52]">
+              <span
+                class="flex h-6 w-6 items-center justify-center rounded-md bg-[#EDF3FC] text-[#172F52]"
+              >
                 <span class="material-symbols-outlined text-[15px]">badge</span>
               </span>
               <span class="text-[11.5px] font-bold text-[#172F52] uppercase tracking-wider">
-                Penugasan & Penempatan
+                Pengguna dan lokasi
               </span>
             </div>
             <span class="text-[11px] font-medium text-[#64748B]">Langkah 2 dari 3</span>
@@ -1335,7 +1256,9 @@ onMounted(async () => {
             <!-- Pemegang Aset SearchableSelect -->
             <div class="flex flex-col gap-1.5 col-span-1 sm:col-span-2">
               <div class="flex items-center justify-between">
-                <label class="text-[12px] font-bold text-[#172F52]">Pemegang Aset / User Penanggung Jawab</label>
+                <label class="text-[12px] font-bold text-[#172F52]"
+                  >Pemegang Aset / User Penanggung Jawab</label
+                >
                 <span class="text-[11px] font-medium text-[#64748B]">Opsional</span>
               </div>
               <SearchableSelect
@@ -1357,7 +1280,9 @@ onMounted(async () => {
               class="col-span-1 sm:col-span-2 flex items-center justify-between gap-3 rounded-xl border border-[#A4BBDF]/60 bg-gradient-to-r from-[#EDF3FC]/90 to-[#F8FAFC] p-3 shadow-2xs transition-all"
             >
               <div class="flex items-center gap-3 min-w-0">
-                <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#172F52] text-white font-bold text-[12px] shadow-xs">
+                <div
+                  class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#172F52] text-white font-bold text-[12px] shadow-xs"
+                >
                   {{ getEmployeeInitials(form.nama_karyawan_pemegang_asset) }}
                 </div>
                 <div class="min-w-0 flex-1">
@@ -1365,13 +1290,18 @@ onMounted(async () => {
                     <span class="text-[13px] font-bold text-[#172F52] truncate">
                       {{ form.nama_karyawan_pemegang_asset || 'Karyawan Terpilih' }}
                     </span>
-                    <span class="inline-flex items-center gap-1 rounded-full bg-[#345E99]/15 px-2 py-0.5 text-[10.5px] font-bold text-[#244673]">
+                    <span
+                      class="inline-flex items-center gap-1 rounded-full bg-[#345E99]/15 px-2 py-0.5 text-[10.5px] font-bold text-[#244673]"
+                    >
                       <span class="material-symbols-outlined text-[12px]">business</span>
                       {{ form.departemen_pemegang_asset || 'Umum' }}
                     </span>
                   </div>
                   <div class="flex items-center gap-2 mt-0.5 text-[11px] text-[#64748B]">
-                    <span>NIK: <strong class="text-[#244673]">{{ form.nik_pemegang_asset }}</strong></span>
+                    <span
+                      >NIK:
+                      <strong class="text-[#244673]">{{ form.nik_pemegang_asset }}</strong></span
+                    >
                     <span>•</span>
                     <span class="flex items-center gap-0.5 text-[#059669] font-semibold">
                       <span class="material-symbols-outlined text-[13px]">check_circle</span>
@@ -1395,12 +1325,16 @@ onMounted(async () => {
               v-else
               class="col-span-1 sm:col-span-2 flex items-center gap-3 rounded-xl border border-dashed border-[#CBD5E1] bg-[#F8FAFC] p-3 text-[#64748B]"
             >
-              <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white border border-[#E2E8F0] text-[#172F52] shadow-2xs">
+              <div
+                class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white border border-[#E2E8F0] text-[#172F52] shadow-2xs"
+              >
                 <span class="material-symbols-outlined text-[18px]">inventory_2</span>
               </div>
               <div class="text-[11.5px] leading-snug">
                 <p class="font-bold text-[#172F52]">Status Unit: Stok Tersedia (Stock)</p>
-                <p class="text-[#64748B] text-[11px] mt-0.5">Perangkat tidak terikat ke karyawan mana pun dan tersimpan di pool inventaris IT.</p>
+                <p class="text-[#64748B] text-[11px] mt-0.5">
+                  Perangkat tidak terikat ke karyawan mana pun dan tersimpan di pool inventaris IT.
+                </p>
               </div>
             </div>
 
@@ -1429,10 +1363,12 @@ onMounted(async () => {
         </div>
 
         <!-- Step 3: Spesifikasi & Details -->
-        <div v-show="activeTab === 'specifications'" class="space-y-3.5">
+        <div v-show="activeTab === 'specifications'" class="it-create-panel space-y-3.5">
           <div class="flex items-center justify-between border-b border-[#E2E8F0] pb-2">
             <div class="flex items-center gap-2">
-              <span class="flex h-6 w-6 items-center justify-center rounded-md bg-[#EDF3FC] text-[#172F52]">
+              <span
+                class="flex h-6 w-6 items-center justify-center rounded-md bg-[#EDF3FC] text-[#172F52]"
+              >
                 <span class="material-symbols-outlined text-[15px]">tune</span>
               </span>
               <span class="text-[11.5px] font-bold text-[#172F52] uppercase tracking-wider">
@@ -1464,7 +1400,9 @@ onMounted(async () => {
             <div class="flex flex-col gap-1.5">
               <label class="text-[12px] font-bold text-[#172F52]">Model / Seri</label>
               <div class="relative flex items-center">
-                <span class="material-symbols-outlined absolute left-3 text-[17px] text-[#94A3B8] pointer-events-none">
+                <span
+                  class="material-symbols-outlined absolute left-3 text-[17px] text-[#94A3B8] pointer-events-none"
+                >
                   memory
                 </span>
                 <input
@@ -1540,7 +1478,7 @@ onMounted(async () => {
       <template #footer>
         <!-- Footer Action Bar -->
         <div
-          class="asset-crud-actions flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-2.5 pt-3.5 mt-4 border-t border-[#E2E8F0]"
+          class="asset-crud-actions it-create-actions flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-2.5 pt-3.5 mt-4 border-t border-[#E2E8F0]"
         >
           <button
             type="button"
@@ -2005,7 +1943,10 @@ onMounted(async () => {
             >
             <CustomSelect
               v-model="exportStatus"
-              :options="[{ value: '', label: 'Semua Status' }, ...availableStatusOptions.map(s => ({ value: s, label: s }))]"
+              :options="[
+                { value: '', label: 'Semua Status' },
+                ...availableStatusOptions.map((s) => ({ value: s, label: s })),
+              ]"
               aria-label="Filter Status"
               placeholder="Semua Status"
               :block="true"
@@ -2018,7 +1959,10 @@ onMounted(async () => {
             >
             <CustomSelect
               v-model="exportTipe"
-              :options="[{ value: '', label: 'Semua Tipe' }, ...availableTipeOptions.map(t => ({ value: t, label: t }))]"
+              :options="[
+                { value: '', label: 'Semua Tipe' },
+                ...availableTipeOptions.map((t) => ({ value: t, label: t })),
+              ]"
               aria-label="Filter Tipe Perangkat"
               placeholder="Semua Tipe"
               :block="true"
@@ -2098,3 +2042,160 @@ onMounted(async () => {
 </style>
 
 <style scoped src="../assets/asset-workspace.css"></style>
+
+<style scoped>
+.it-create-steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+  margin-bottom: 22px;
+  padding: 6px;
+  border-radius: 12px;
+  background: #f1f5f9;
+}
+.it-create-steps button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  min-height: 60px;
+  padding: 10px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  text-align: left;
+  cursor: pointer;
+  color: #71829b;
+}
+.it-create-steps button[aria-current='step'] {
+  background: #fff;
+  border-color: #dfe7f1;
+  color: #172f52;
+  box-shadow: 0 2px 4px #172f5205;
+}
+.it-create-step-number {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: #e7edf5;
+  font-size: 12px;
+  font-weight: 650;
+}
+.it-create-steps button[aria-current='step'] .it-create-step-number {
+  background: #172f52;
+  color: #fff;
+}
+.it-create-step-label {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 3px;
+}
+.it-create-step-label strong {
+  font-size: 12px;
+  font-weight: 600;
+}
+.it-create-step-label small {
+  font-size: 10px;
+  color: #8291a7;
+}
+.it-create-panel {
+  padding: 20px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: white;
+}
+.it-create-panel > div:first-child {
+  gap: 12px;
+  align-items: center;
+  padding-bottom: 14px;
+  border-color: #edf1f6;
+}
+.it-create-panel > div:first-child > div > span:last-child {
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 13px;
+  font-weight: 600;
+}
+.it-create-panel > div:first-child > span {
+  flex-shrink: 0;
+  font-size: 10px;
+  color: #8291a7;
+}
+.it-create-form fieldset {
+  gap: 18px;
+  padding-top: 4px;
+}
+.it-create-form label {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 550;
+}
+.it-create-form input {
+  min-height: 44px;
+  border-radius: 8px;
+  background: #fafbfd;
+}
+.it-create-form :deep(button[aria-haspopup='listbox']) {
+  min-height: 44px;
+  background: #fafbfd;
+}
+.it-create-actions {
+  justify-content: space-between;
+}
+.it-create-actions button {
+  min-height: 44px;
+}
+.it-create-steps button:focus-visible {
+  outline: 2px solid #5285d8;
+  outline-offset: 2px;
+}
+@media (max-width: 639px) {
+  .it-create-steps {
+    gap: 4px;
+    padding: 4px;
+    margin-bottom: 16px;
+  }
+  .it-create-steps button {
+    flex-direction: column;
+    gap: 7px;
+    padding: 9px 2px;
+    min-height: 72px;
+    text-align: center;
+  }
+  .it-create-step-label strong {
+    font-size: 11px;
+  }
+  .it-create-step-label small {
+    display: none;
+  }
+  .it-create-panel {
+    padding: 14px;
+  }
+  .it-create-panel > div:first-child {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .it-create-panel fieldset > div > div.flex.items-center.justify-between {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .it-create-form input,
+  .it-create-form :deep(button[aria-haspopup='listbox']) {
+    font-size: 16px;
+  }
+  .it-create-actions {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+  .it-create-actions > button {
+    width: 100%;
+  }
+  .it-create-actions > div {
+    width: 100%;
+  }
+}
+</style>

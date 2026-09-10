@@ -1,0 +1,259 @@
+.admin-workspace {
+  width: 100%;
+  max-width: 1600px;
+  margin-inline: auto;
+  color: #172f52;
+}
+.admin-workspace .admin-page-header {
+  padding: 4px 0 8px;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  gap: 20px;
+}
+.admin-page-header :is(h1, h2) {
+  font-size: 25px;
+  font-weight: 650;
+  letter-spacing: -0.04em;
+  line-height: 1.4;
+}
+.admin-page-header p {
+  font-size: 12px;
+  line-height: 1.8;
+  color: #71829b;
+}
+.admin-page-header > div:first-child {
+  gap: 16px;
+}
+.admin-page-header button {
+  min-height: 42px;
+  border-radius: 8px;
+  box-shadow: none;
+}
+.admin-page-header button:is(.bg-\[\#2563EB\], .bg-\[\#5D87FF\], .bg-brand) {
+  background: #172f52;
+}
+.admin-page-header > div:nth-child(2):has(input) {
+  padding: 16px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: white;
+  gap: 12px;
+}
+.admin-workspace input:not([type='checkbox']):not([type='radio']):not([type='file']),
+.admin-entry-form input:not([type='checkbox']):not([type='radio']),
+.admin-entry-form select,
+.admin-entry-form textarea {
+  min-width: 0;
+  min-height: 42px;
+  border-color: #dce4ef;
+  border-radius: 8px;
+  font-size: 13px;
+  box-shadow: none;
+}
+.admin-workspace table th {
+  color: #8291a7;
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: none;
+  letter-spacing: 0;
+  padding-block: 15px;
+}
+.admin-workspace table td {
+  padding-block: 18px;
+  font-size: 12px;
+}
+.admin-workspace table tbody tr {
+  border-color: #edf1f6;
+}
+.admin-workspace table button {
+  min-width: 34px;
+  min-height: 36px;
+}
+.admin-workspace .admin-person-cards {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 12px;
+  padding: 14px;
+}
+.admin-person-cards > :is(li, div) {
+  padding: 18px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: white;
+  box-shadow: none;
+  min-width: 0;
+}
+.admin-person-cards strong {
+  font-weight: 600;
+}
+.admin-person-cards .uppercase {
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 500;
+  color: #8291a7;
+}
+.admin-person-cards :deep(button) {
+  min-width: 40px;
+  min-height: 44px;
+}
+.admin-tabs {
+  border: 1px solid #e2e8f0;
+  padding: 5px;
+  border-radius: 11px;
+  gap: 5px;
+  background: #f1f5f9;
+}
+.admin-tabs button {
+  min-height: 42px;
+  padding: 10px 16px;
+  margin: 0;
+  border: 0;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 550;
+}
+.admin-tabs button[aria-pressed='true'] {
+  background: white;
+  color: #172f52;
+  box-shadow: 0 1px 4px #172f5208;
+}
+.admin-log-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px;
+}
+.admin-log-list > div {
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 18px;
+  background: white;
+}
+.admin-log-list p {
+  line-height: 1.7;
+}
+.admin-export-cards > div {
+  border-radius: 13px;
+  padding: 20px;
+  gap: 20px;
+}
+.admin-export-cards h3 {
+  color: #172f52;
+  font-weight: 650;
+}
+.admin-export-cards button {
+  min-height: 40px;
+  border-radius: 8px;
+}
+.admin-entry-form {
+  padding: 2px;
+  gap: 20px;
+}
+.admin-entry-form label {
+  font-size: 12px;
+  color: #52647e;
+  font-weight: 550;
+  text-transform: none;
+  letter-spacing: 0;
+}
+.admin-entry-form > .grid {
+  gap: 18px;
+}
+.admin-entry-form :deep(button[aria-haspopup='listbox']) {
+  min-height: 42px;
+  border-radius: 8px;
+  font-size: 13px;
+}
+.admin-entry-form :deep([role='option']) {
+  min-height: 40px;
+}
+.admin-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  width: 100%;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.admin-modal-actions button {
+  min-height: 44px;
+  border-radius: 8px;
+  padding-inline: 18px;
+  box-shadow: none;
+  font-size: 12px;
+  font-weight: 600;
+}
+.admin-modal-actions button[type='submit'] {
+  background: #172f52;
+  color: white;
+}
+.admin-modal-actions button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.admin-workspace button:focus-visible,
+.admin-modal-actions button:focus-visible {
+  outline: 2px solid #5285d8;
+  outline-offset: 3px;
+}
+.database-modal {
+  font-size: 13px;
+  line-height: 1.7;
+}
+@media (min-width: 768px) and (max-width: 1279px) {
+  .admin-workspace .admin-person-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (min-width: 1280px) {
+  .admin-workspace ul.admin-person-cards {
+    display: none;
+  }
+}
+@media (max-width: 639px) {
+  .admin-page-header :is(h1, h2) {
+    font-size: 23px;
+  }
+  .admin-page-header > div:first-child {
+    flex-wrap: wrap;
+  }
+  .admin-page-header button {
+    min-height: 44px;
+  }
+  .admin-workspace input:not([type='checkbox']):not([type='radio']):not([type='file']),
+  .admin-entry-form input:not([type='checkbox']):not([type='radio']),
+  .admin-entry-form select,
+  .admin-entry-form textarea,
+  .admin-entry-form :deep(button[aria-haspopup='listbox']) {
+    min-height: 44px;
+    font-size: 16px;
+  }
+  .admin-person-cards > :is(li, div) {
+    padding: 16px;
+  }
+  .admin-tabs button {
+    padding: 10px 8px;
+    font-size: 11px;
+  }
+  .admin-modal-actions {
+    flex-wrap: wrap;
+    align-items: stretch;
+  }
+  .admin-modal-actions > button {
+    flex: 1;
+  }
+  .admin-modal-actions > div {
+    width: 100%;
+  }
+  .admin-modal-actions > div:last-child {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+  }
+  .admin-modal-actions > div:last-child > button {
+    flex: 1;
+  }
+}

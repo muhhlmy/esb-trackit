@@ -565,7 +565,7 @@ onMounted(async () => {
 
 <style scoped>
 .help-home {
-  --ink: #172b4d;
+  --ink: #333333;
   --muted: #64748b;
   --line: #e1e7ef;
   --surface: #fff;
@@ -580,7 +580,7 @@ onMounted(async () => {
   margin: 0 auto;
 }
 .help-home :is(button, a, input):focus-visible {
-  outline: 3px solid #60a5fa;
+  outline: 3px solid #0892F5;
   outline-offset: 4px;
 }
 .help-home button {
@@ -592,17 +592,43 @@ onMounted(async () => {
   gap: 48px;
   padding: 40px;
   border-radius: 24px;
-  background: #142d52;
+  background: linear-gradient(145deg, #0A51B0 0%, #0A5DBD 40%, #074797 75%, #052F66 100%);
+  position: relative;
+  overflow: hidden;
   color: white;
+}
+.help-hero::before {
+  content: '';
+  position: absolute;
+  top: -60px;
+  right: -60px;
+  width: 280px;
+  height: 280px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(8, 146, 245, 0.3) 0%, transparent 70%);
+  pointer-events: none;
+}
+.help-hero::after {
+  content: '';
+  position: absolute;
+  bottom: -40px;
+  left: 20%;
+  width: 240px;
+  height: 240px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 79, 27, 0.12) 0%, transparent 70%);
+  pointer-events: none;
 }
 .hero-copy {
   min-width: 0;
+  position: relative;
+  z-index: 1;
 }
 .eyebrow {
   display: flex;
   align-items: center;
   gap: 10px;
-  color: #b9cef2;
+  color: #cfe2f8;
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.14em;
@@ -610,8 +636,9 @@ onMounted(async () => {
 }
 .eyebrow-line {
   width: 24px;
-  height: 2px;
-  background: #7faaff;
+  height: 3px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #FF4F1B 0%, #FAA425 100%);
 }
 .help-hero h1 {
   max-width: 570px;
@@ -625,7 +652,7 @@ onMounted(async () => {
   max-width: 470px;
   font-size: 14px;
   line-height: 1.75;
-  color: #bdcce1;
+  color: #e1ecfa;
 }
 .search-area {
   position: relative;
@@ -658,7 +685,7 @@ onMounted(async () => {
   display: none;
 }
 .help-search:focus-within {
-  outline: 3px solid #8cb4ff;
+  outline: 3px solid #0892F5;
   outline-offset: 3px;
 }
 .help-search input:focus-visible {
@@ -671,14 +698,18 @@ onMounted(async () => {
   gap: 8px;
   min-height: 44px;
   padding: 0 18px;
-  background: #0A51B0;
+  background: linear-gradient(135deg, #0A51B0 0%, #0A5DBD 50%, #0892F5 100%);
   color: white;
   border-radius: 8px;
   font-size: 13px;
   font-weight: 650;
+  box-shadow: 0 4px 12px rgba(10, 81, 176, 0.25);
+  transition: all 0.2s ease;
 }
 .search-submit:hover {
-  background: #0A4391;
+  background: linear-gradient(135deg, #0A4391 0%, #094f9e 50%, #0779d1 100%);
+  box-shadow: 0 6px 16px rgba(10, 81, 176, 0.35);
+  transform: translateY(-1px);
 }
 .clear-search {
   display: grid;
@@ -728,7 +759,7 @@ onMounted(async () => {
   align-items: center;
   gap: 8px 12px;
   font-size: 11px;
-  color: #bdcce1;
+  color: #cfe2f8;
 }
 .popular-searches > span {
   display: flex;
@@ -749,22 +780,25 @@ onMounted(async () => {
   overflow-wrap: anywhere;
 }
 .popular-searches button:hover {
-  background: #ffffff12;
-  border-color: #8cb4ff;
+  background: rgba(255, 255, 255, 0.16);
+  border-color: #0892F5;
 }
 .hero-help {
   border-left: 1px solid #ffffff26;
   padding-left: 32px;
   align-self: center;
+  position: relative;
+  z-index: 1;
 }
 .support-icon {
   display: grid;
   place-items: center;
   width: 48px;
   height: 48px;
-  border: 1px solid #ffffff30;
+  border: 1px solid rgba(8, 146, 245, 0.4);
+  background: rgba(8, 146, 245, 0.15);
   border-radius: 14px;
-  color: #abc9ff;
+  color: #0892F5;
   margin-bottom: 18px;
 }
 .hero-help h2 {
@@ -776,7 +810,7 @@ onMounted(async () => {
 .hero-help p {
   font-size: 12px;
   line-height: 1.8;
-  color: #bdcce1;
+  color: #cfe2f8;
   margin: 10px 0 18px;
 }
 .support-button {
@@ -787,14 +821,17 @@ onMounted(async () => {
   min-height: 44px;
   width: 100%;
   padding: 10px 14px;
-  border: 1px solid #6b8bb8;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.1);
   border-radius: 8px;
   font-size: 12px;
   font-weight: 650;
   text-align: left;
+  transition: all 0.2s ease;
 }
 .support-button:hover {
-  background: #ffffff10;
+  background: rgba(255, 255, 255, 0.2);
+  border-color: #0892F5;
 }
 .support-button svg {
   flex-shrink: 0;
@@ -804,7 +841,7 @@ onMounted(async () => {
   gap: 7px;
   align-items: center;
   font-size: 11px;
-  color: #bdcce1;
+  color: #cfe2f8;
   margin-top: 13px;
 }
 .topics-section {
@@ -865,14 +902,16 @@ onMounted(async () => {
   border-radius: 14px;
   transition:
     border-color 0.18s,
-    box-shadow 0.18s;
+    box-shadow 0.18s,
+    transform 0.18s;
 }
 .topic-card:hover {
-  border-color: #93b4f2;
-  box-shadow: 0 5px 18px #172b4d09;
+  border-color: #0A51B0;
+  box-shadow: 0 6px 20px rgba(10, 81, 176, 0.08);
+  transform: translateY(-1px);
 }
 .topic-featured {
-  border-top: 3px solid #7c9def;
+  border-top: 3px solid #0A51B0;
   padding-top: 20px;
 }
 .topic-icon {
@@ -884,16 +923,16 @@ onMounted(async () => {
   flex-shrink: 0;
 }
 .topic-tone-0 {
-  background: #edf3ff;
-  color: #333333;
+  background: #edf5ff;
+  color: #0A51B0;
 }
 .topic-tone-1 {
-  background: #f1edff;
-  color: #7754c4;
+  background: #fff2e7;
+  color: #b83a10;
 }
 .topic-tone-2 {
-  background: #e9f6f2;
-  color: #19836c;
+  background: #e8f7ff;
+  color: #0892F5;
 }
 .topic-copy {
   display: flex;
@@ -1059,7 +1098,8 @@ onMounted(async () => {
   margin-top: 9px;
 }
 .faq-answer pre {
-  background: #142d52;
+  background: #072652;
+  border: 1px solid #0A4391;
   color: #c5f2e1;
   padding: 13px;
   border-radius: 8px;

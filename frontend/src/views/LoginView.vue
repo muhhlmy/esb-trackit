@@ -301,6 +301,10 @@ const finishResetAndLogin = () => {
     <main class="login-main">
       <aside class="login-story" aria-labelledby="story-title">
         <div class="story-content">
+          <div class="story-tag">
+            <span class="story-tag-dot"></span>
+            <span>IT & Asset Management</span>
+          </div>
           <h2 id="story-title">Aset terkelola.<br />Kerja lebih mudah.</h2>
           <p>Akses inventaris perangkat dan bantuan tim support dalam satu tempat.</p>
           <div class="story-features">
@@ -863,7 +867,7 @@ const finishResetAndLogin = () => {
 }
 .login-header {
   width: 100%;
-  max-width: 1120px;
+  max-width: 1040px;
   margin: 0 auto;
   min-height: 88px;
   display: flex;
@@ -899,12 +903,12 @@ const finishResetAndLogin = () => {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   width: 100%;
-  max-width: 1120px;
+  max-width: 1040px;
   margin: auto;
   border: 1px solid #e3e9f1;
   border-radius: 24px;
   background: white;
-  box-shadow: 0 16px 50px #142d5206;
+  box-shadow: 0 16px 50px rgba(10, 81, 176, 0.08);
   overflow: hidden;
 }
 .login-story {
@@ -913,8 +917,55 @@ const finishResetAndLogin = () => {
   justify-content: space-between;
   padding: 38px 44px;
   color: #fff;
-  background: #142d52;
+  background: linear-gradient(150deg, #0A51B0 0%, #0A5DBD 35%, #074797 70%, #052F66 100%);
+  position: relative;
+  overflow: hidden;
   min-width: 0;
+}
+.login-story::before {
+  content: '';
+  position: absolute;
+  top: -60px;
+  right: -60px;
+  width: 240px;
+  height: 240px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(8, 146, 245, 0.3) 0%, transparent 70%);
+  pointer-events: none;
+}
+.login-story::after {
+  content: '';
+  position: absolute;
+  bottom: -40px;
+  left: -40px;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 79, 27, 0.12) 0%, transparent 70%);
+  pointer-events: none;
+}
+.story-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  font-size: 11px;
+  font-weight: 650;
+  letter-spacing: 0.04em;
+  color: #ffffff;
+  margin-bottom: 18px;
+  backdrop-filter: blur(8px);
+  width: fit-content;
+}
+.story-tag-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #FF4F1B 0%, #FAA425 100%);
+  box-shadow: 0 0 8px rgba(255, 79, 27, 0.6);
 }
 .story-top {
   display: flex;
@@ -923,21 +974,24 @@ const finishResetAndLogin = () => {
   font-size: 10px;
   font-weight: 600;
   letter-spacing: 0.13em;
-  color: #b7c9e3;
+  color: #cfe2f8;
 }
 .story-mark {
-  width: 20px;
-  height: 2px;
-  background: #8eaff0;
+  width: 28px;
+  height: 3px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #FF4F1B 0%, #FAA425 100%);
 }
 .story-content {
-  padding: 50px 0;
+  padding: 40px 0;
+  position: relative;
+  z-index: 1;
 }
 .story-eyebrow {
   display: block;
   font-size: 10px;
   letter-spacing: 0.12em;
-  color: #9cbae4;
+  color: #a4c7f0;
   font-weight: 600;
   margin-bottom: 16px;
 }
@@ -950,15 +1004,15 @@ const finishResetAndLogin = () => {
 .story-content > p {
   font-size: 13px;
   line-height: 1.8;
-  color: #bdcce1;
-  margin-top: 18px;
+  color: #e1ecfa;
+  margin-top: 14px;
   max-width: 330px;
 }
 .story-features {
   display: flex;
   flex-direction: column;
-  gap: 22px;
-  margin-top: 36px;
+  gap: 20px;
+  margin-top: 32px;
 }
 .story-features > div {
   display: flex;
@@ -970,22 +1024,24 @@ const finishResetAndLogin = () => {
   place-items: center;
   width: 42px;
   height: 42px;
-  background: #ffffff08;
-  border: 1px solid #ffffff22;
-  color: #b9d2fa;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  color: #ffffff;
   border-radius: 11px;
   flex-shrink: 0;
+  backdrop-filter: blur(8px);
 }
 .story-features strong {
   display: block;
   font-size: 12px;
   font-weight: 600;
+  color: #ffffff;
 }
 .story-features small {
   display: block;
   font-size: 11px;
   line-height: 1.65;
-  color: #adbfda;
+  color: #cfe2f8;
   margin-top: 4px;
 }
 .story-footer {
@@ -993,13 +1049,15 @@ const finishResetAndLogin = () => {
   flex-wrap: wrap;
   gap: 8px 16px;
   justify-content: space-between;
-  border-top: 1px solid #ffffff22;
+  border-top: 1px solid rgba(255, 255, 255, 0.18);
   padding-top: 18px;
   font-size: 10px;
-  color: #b7c9e3;
+  color: #cfe2f8;
+  position: relative;
+  z-index: 1;
 }
 .story-footer span {
-  color: #93aace;
+  color: #a4c7f0;
 }
 .login-form-panel {
   min-width: 0;
@@ -1016,9 +1074,9 @@ const finishResetAndLogin = () => {
 .login-eyebrow {
   display: block;
   font-size: 10px;
-  font-weight: 650;
-  letter-spacing: 0.1em;
-  color: #71829b;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: #0A51B0;
   margin-bottom: 14px;
 }
 .login-form-panel h1 {
@@ -1063,8 +1121,8 @@ const finishResetAndLogin = () => {
   flex-shrink: 0;
 }
 .input-wrap:focus-within {
-  border-color: #097CDE;
-  box-shadow: 0 0 0 3px #0A51B012;
+  border-color: #0892F5;
+  box-shadow: 0 0 0 3px rgba(10, 81, 176, 0.12);
 }
 .input-wrap input {
   width: 100%;
@@ -1092,7 +1150,7 @@ const finishResetAndLogin = () => {
   cursor: pointer;
 }
 .password-toggle:hover {
-  color: #333333;
+  color: #0A51B0;
   background: #f5f7fb;
 }
 .login-options {
@@ -1118,10 +1176,13 @@ const finishResetAndLogin = () => {
   accent-color: #0A51B0;
 }
 .login-options button {
-  color: #333333;
+  color: #0A51B0;
   min-height: 44px;
-  font-weight: 550;
+  font-weight: 600;
   cursor: pointer;
+}
+.login-options button:hover {
+  color: #0892F5;
 }
 .login-submit {
   display: flex;
@@ -1131,15 +1192,21 @@ const finishResetAndLogin = () => {
   width: 100%;
   min-height: 49px;
   border-radius: 9px;
-  background: #0A51B0;
+  background: linear-gradient(135deg, #0A51B0 0%, #0A5DBD 50%, #0892F5 100%);
   color: white;
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 650;
   cursor: pointer;
-  transition: background 0.15s;
+  box-shadow: 0 4px 14px rgba(10, 81, 176, 0.22);
+  transition: all 0.2s ease;
 }
 .login-submit:hover {
-  background: #0A4391;
+  background: linear-gradient(135deg, #0A4391 0%, #094f9e 50%, #0779d1 100%);
+  box-shadow: 0 6px 18px rgba(10, 81, 176, 0.32);
+  transform: translateY(-1px);
+}
+.login-submit:active {
+  transform: translateY(0);
 }
 .login-form :disabled {
   opacity: 0.6;
@@ -1163,9 +1230,12 @@ const finishResetAndLogin = () => {
   gap: 5px;
   min-height: 44px;
   font-size: 11px;
-  font-weight: 600;
-  color: #333333;
+  font-weight: 650;
+  color: #0A51B0;
   cursor: pointer;
+}
+.activation-note button:hover {
+  color: #0892F5;
 }
 .form-help {
   margin: 26px auto 0;
@@ -1175,9 +1245,12 @@ const finishResetAndLogin = () => {
   line-height: 1.8;
 }
 .form-help a {
-  color: #52647e;
+  color: #0A51B0;
   text-decoration: underline;
   text-underline-offset: 3px;
+}
+.form-help a:hover {
+  color: #0892F5;
 }
 .login-error {
   display: flex;
@@ -1203,7 +1276,7 @@ const finishResetAndLogin = () => {
   font-size: 10px;
 }
 .login-page :is(a, button, input):focus-visible {
-  outline: 2px solid #097CDE;
+  outline: 2px solid #0892F5;
   outline-offset: 4px;
 }
 .input-wrap input:focus-visible {
@@ -1221,7 +1294,7 @@ const finishResetAndLogin = () => {
   font-size: 16px;
 }
 .login-reset button:focus-visible {
-  outline: 2px solid #097CDE;
+  outline: 2px solid #0892F5;
   outline-offset: 2px;
 }
 @media (max-width: 1023px) {

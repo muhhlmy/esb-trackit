@@ -779,7 +779,7 @@ onUnmounted(() => {
             <p class="text-xs text-[#64748B] mt-1">Lokasi penempatan perangkat saat ini</p>
           </div>
           <span
-            class="inline-flex items-center gap-1.5 text-xs font-semibold text-[#3B82F6] bg-[#EFF6FF] px-3 py-1.5 rounded-full"
+            class="inline-flex items-center gap-1.5 text-xs font-semibold text-[#0A51B0] bg-[#EDF5FF] px-3 py-1.5 rounded-full"
           >
             <span class="material-symbols-outlined text-[16px]" style="opacity: 0.7"
               >location_on</span
@@ -797,13 +797,13 @@ onUnmounted(() => {
               <span class="truncate text-sm font-semibold text-[#333333]" :title="location.label">
                 {{ location.label }}
               </span>
-              <span class="shrink-0 text-sm font-bold text-[#3B82F6] font-num">{{
+              <span class="shrink-0 text-sm font-bold text-[#0A51B0] font-num">{{
                 location.count
               }}</span>
             </div>
             <div class="h-1.5 overflow-hidden rounded-full bg-[#E2E8F0] mb-2">
               <div
-                class="h-full rounded-full bg-[#638dcc]"
+                class="h-full rounded-full bg-[#0A51B0]"
                 :style="{ width: `${location.pct}%` }"
               ></div>
             </div>
@@ -848,7 +848,7 @@ onUnmounted(() => {
             <div class="flex items-start justify-between gap-2">
               <div class="flex items-center gap-2.5 min-w-0">
                 <div
-                  class="w-8 h-8 rounded-lg bg-blue-50 text-[#3B82F6] flex items-center justify-center shrink-0"
+                  class="w-8 h-8 rounded-lg bg-blue-50 text-[#0A51B0] flex items-center justify-center shrink-0"
                 >
                   <span class="material-symbols-outlined text-[18px]">
                     {{
@@ -1085,7 +1085,7 @@ onUnmounted(() => {
             <!-- Top Row: No. Tiket + Badges (Prioritas & Status) -->
             <div class="flex items-center justify-between gap-2">
               <span
-                class="font-mono text-xs font-bold text-[#3B82F6] bg-blue-50/70 border border-blue-100 px-2 py-0.5 rounded-md shrink-0 whitespace-nowrap"
+                class="font-mono text-xs font-bold text-[#0A51B0] bg-blue-50/70 border border-blue-100 px-2 py-0.5 rounded-md shrink-0 whitespace-nowrap"
               >
                 {{ ticket.nomor_tiket || `TCK-#${ticket.id}` }}
               </span>

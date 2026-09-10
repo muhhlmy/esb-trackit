@@ -18,6 +18,17 @@
   --color-danger: #dc2626;
   --color-danger-light: #fdede8;
 
+  /* ESB Brand Logo Palette Stops */
+  --color-esb-blue-start: #0A51B0;
+  --color-esb-blue-mid1: #0A5DBD;
+  --color-esb-blue-mid2: #097CDE;
+  --color-esb-blue-end: #0892F5;
+
+  --color-esb-orange-start: #FF4F1B;
+  --color-esb-orange-mid1: #FE5B1C;
+  --color-esb-orange-mid2: #FC7C20;
+  --color-esb-orange-end: #FAA425;
+
   --color-esb-primary: #FF4F1B;
   --color-esb-primary-dark: #B83A10;
   --color-esb-primary-light: #FFF2E7;
@@ -42,6 +53,31 @@
   font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
+
+  /* Official ESB Brand Gradients from Logo */
+  --gradient-esb-blue: linear-gradient(135deg, #0A51B0 0%, #0A5DBD 26%, #097CDE 72%, #0892F5 100%);
+  --gradient-esb-blue-hero: linear-gradient(145deg, #0A51B0 0%, #084391 40%, #062b5e 100%);
+  --gradient-esb-orange: linear-gradient(135deg, #FF4F1B 0%, #FE5B1C 21%, #FC7C20 60%, #FAA425 100%);
+}
+
+.bg-gradient-esb-blue {
+  background: linear-gradient(135deg, #0A51B0 0%, #0A5DBD 26%, #097CDE 72%, #0892F5 100%);
+}
+
+.bg-gradient-esb-orange {
+  background: linear-gradient(135deg, #FF4F1B 0%, #FE5B1C 21%, #FC7C20 60%, #FAA425 100%);
+}
+
+.text-gradient-esb-blue {
+  background: linear-gradient(135deg, #0A51B0 0%, #0892F5 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-gradient-esb-orange {
+  background: linear-gradient(135deg, #FF4F1B 0%, #FAA425 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 html.dark {
   background-color: #020617;

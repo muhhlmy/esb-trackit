@@ -31,21 +31,21 @@ const moduleIcon = computed(() => {
     >
       <!-- Top Decorative Accent -->
       <div
-        class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#0A51B0] via-[#6366F1] to-[#3B82F6]"
+        class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#0A51B0] via-[#097CDE] to-[#0892F5]"
       ></div>
 
       <!-- Icon Badge -->
       <div
-        class="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#EFF6FF] text-[#333333] shadow-2xs"
+        class="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#EDF5FF] text-[#0A51B0] shadow-2xs"
       >
         <span class="material-symbols-outlined text-[32px]">{{ moduleIcon }}</span>
       </div>
 
       <!-- Status Pill -->
       <span
-        class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold bg-[#EEF2FF] text-[#4F46E5] border border-[#C7D2FE] mb-3"
+        class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold bg-[#EDF5FF] text-[#0A51B0] border border-[#BFDBFE] mb-3"
       >
-        <span class="h-1.5 w-1.5 rounded-full bg-[#4F46E5] animate-ping"></span>
+        <span class="h-1.5 w-1.5 rounded-full bg-[#0892F5] animate-ping"></span>
         <span>Dalam Pengembangan (Coming Soon)</span>
       </span>
 

@@ -300,6 +300,35 @@ function getQueueIcon(ticket) {
   return 'computer'
 }
 
+function getQueueTheme(ticket) {
+  const code = (ticket?.queue_kode || '').toUpperCase()
+  const name = (ticket?.queue_nama || '').toUpperCase()
+  if (code.includes('HR') || name.includes('HR') || name.includes('HUMAN')) {
+    return {
+      badgeClass: 'bg-purple-50 text-purple-600 border border-purple-200/80',
+      pillClass: 'bg-purple-50/80 text-purple-700 border-purple-200/80',
+      icon: 'badge',
+      label: ticket?.queue_nama || 'HR Support',
+    }
+  }
+  if (code.includes('GA') || name.includes('GA') || name.includes('GENERAL')) {
+    return {
+      badgeClass: 'bg-amber-50 text-amber-700 border border-amber-200/80',
+      pillClass: 'bg-amber-50/80 text-amber-700 border-amber-200/80',
+      icon: 'corporate_fare',
+      label: ticket?.queue_nama || 'GA Support',
+    }
+  }
+  return {
+    badgeClass: 'bg-blue-50 text-blue-600 border border-blue-200/80',
+    pillClass: 'bg-blue-50/80 text-blue-700 border-blue-200/80',
+    icon: 'computer',
+    label:
+      ticket?.queue_nama ||
+      (ticket?.queue_kode ? `${ticket.queue_kode} Support` : 'IT Support'),
+  }
+}
+
 const availableCategories = computed(() => {
   if (selectedSupportUnit.value === 'HR') {
     return [
@@ -1295,41 +1324,122 @@ function toast(message, type = 'success') {
       </div>
     </Transition>
 
-    <!-- ── 1. Page Header ───────────────────────────────── -->
-    <div
-      class="flex flex-row items-center justify-between gap-3 bg-white p-4 sm:p-5 rounded-2xl border border-[#E2E8F0]/80 shadow-2xs"
-    >
-      <div class="min-w-0">
-        <h1 class="text-lg sm:text-xl font-bold text-[#0F172A] tracking-tight truncate">
-          {{ isAdmin || isSuperAdmin ? 'Ticket Inbox' : 'Tiket' }}
-        </h1>
-        <p class="text-xs font-normal text-[#64748B] mt-0.5 truncate">
-          {{
-            isAdmin || isSuperAdmin ? 'Kelola pengajuan dan kendala IT' : 'Pengajuan dan layanan IT'
-          }}
-        </p>
+    <!-- ── 1. Page Header & Quick KPI Stat Cards ───────── -->
+    <div class="flex flex-col gap-3.5">
+      <!-- Title Bar -->
+      <div
+        class="flex flex-row items-center justify-between gap-3 bg-white p-4 sm:p-5 rounded-2xl border border-[#E2E8F0]/80 shadow-2xs"
+      >
+        <div class="min-w-0 flex items-center gap-3">
+          <div
+            class="flex h-10 w-10 sm:h-11 sm:w-11 shrink-0 items-center justify-center rounded-xl bg-[#EDF3FC] text-[#345E99] border border-[#A4BBDF]/40"
+          >
+            <span class="material-symbols-outlined text-[22px] sm:text-[24px]">confirmation_number</span>
+          </div>
+          <div class="min-w-0">
+            <h1 class="text-lg sm:text-xl font-bold text-[#0F172A] tracking-tight truncate">
+              {{ isAdmin || isSuperAdmin ? 'Ticket Inbox' : 'Tiket' }}
+            </h1>
+            <p class="text-xs font-normal text-[#64748B] mt-0.5 truncate">
+              {{
+                isAdmin || isSuperAdmin
+                  ? 'Kelola pengajuan dan penanganan kendala IT'
+                  : 'Pengajuan dan layanan IT'
+              }}
+            </p>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          @click="openAdd"
+          class="h-9.5 shrink-0 whitespace-nowrap rounded-xl bg-[#172F52] px-3.5 sm:px-4 text-xs font-bold text-white shadow-2xs hover:bg-[#244673] active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+          :title="isAdmin || isSuperAdmin ? 'Buat tiket baru' : 'Request ticket baru'"
+        >
+          <span class="material-symbols-outlined text-[16px]">add</span>
+          <span>{{ isAdmin || isSuperAdmin ? 'Buat Tiket' : 'Request Ticket' }}</span>
+        </button>
       </div>
 
-      <button
-        type="button"
-        @click="openAdd"
-        class="h-9 shrink-0 whitespace-nowrap rounded-xl bg-[#2563EB] px-3.5 sm:px-4 text-xs font-bold text-white shadow-2xs hover:bg-[#1D4ED8] active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
-        :title="isAdmin || isSuperAdmin ? 'Buat tiket baru' : 'Request ticket baru'"
-      >
-        <span class="material-symbols-outlined text-[16px]">add</span>
-        <span>{{ isAdmin || isSuperAdmin ? 'Buat Tiket' : 'Request Ticket' }}</span>
-      </button>
+      <!-- Quick KPI Stat Cards (4 Cards) -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3.5">
+        <!-- 1. Total Tiket -->
+        <div
+          class="flex items-center gap-3 p-3.5 sm:p-4 rounded-2xl bg-white border border-[#E2E8F0]/80 shadow-2xs hover:border-[#CBD5E1] transition-all"
+        >
+          <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-slate-700">
+            <span class="material-symbols-outlined text-[20px]">inbox</span>
+          </div>
+          <div class="min-w-0">
+            <span class="text-[11px] font-medium text-[#64748B] block truncate">Total Tiket</span>
+            <span class="text-base sm:text-lg font-bold text-[#0F172A] tabular-nums">{{ stats.totalTickets ?? 0 }}</span>
+          </div>
+        </div>
+
+        <!-- 2. Belum Ditugaskan / Unassigned -->
+        <div
+          class="flex items-center gap-3 p-3.5 sm:p-4 rounded-2xl bg-white border border-[#E2E8F0]/80 shadow-2xs hover:border-[#CBD5E1] transition-all"
+        >
+          <div
+            class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl"
+            :class="
+              (stats.unassignedTickets || 0) > 0
+                ? 'bg-amber-50 text-amber-600 border border-amber-200/60'
+                : 'bg-slate-100 text-slate-500'
+            "
+          >
+            <span class="material-symbols-outlined text-[20px]">assignment_late</span>
+          </div>
+          <div class="min-w-0">
+            <span class="text-[11px] font-medium text-[#64748B] block truncate">{{
+              isAdmin || isSuperAdmin ? 'Belum Diambil' : 'Menunggu Respon'
+            }}</span>
+            <span
+              class="text-base sm:text-lg font-bold tabular-nums"
+              :class="(stats.unassignedTickets || 0) > 0 ? 'text-amber-600' : 'text-[#0F172A]'"
+              >{{ stats.unassignedTickets ?? 0 }}</span
+            >
+          </div>
+        </div>
+
+        <!-- 3. Sedang Diproses -->
+        <div
+          class="flex items-center gap-3 p-3.5 sm:p-4 rounded-2xl bg-white border border-[#E2E8F0]/80 shadow-2xs hover:border-[#CBD5E1] transition-all"
+        >
+          <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#EDF3FC] text-[#172F52] border border-[#A4BBDF]/40">
+            <span class="material-symbols-outlined text-[20px]">pending_actions</span>
+          </div>
+          <div class="min-w-0">
+            <span class="text-[11px] font-medium text-[#64748B] block truncate">Sedang Diproses</span>
+            <span class="text-base sm:text-lg font-bold text-[#172F52] tabular-nums">{{
+              (stats.openTickets || 0) + (stats.pendingTickets || 0)
+            }}</span>
+          </div>
+        </div>
+
+        <!-- 4. Selesai / Resolved -->
+        <div
+          class="flex items-center gap-3 p-3.5 sm:p-4 rounded-2xl bg-white border border-[#E2E8F0]/80 shadow-2xs hover:border-[#CBD5E1] transition-all"
+        >
+          <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-200/60">
+            <span class="material-symbols-outlined text-[20px]">task_alt</span>
+          </div>
+          <div class="min-w-0">
+            <span class="text-[11px] font-medium text-[#64748B] block truncate">Tiket Selesai</span>
+            <span class="text-base sm:text-lg font-bold text-emerald-600 tabular-nums">{{ stats.closedTickets ?? 0 }}</span>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- ── 2. Integrated Control Bar & Workspace Navigation ─ -->
     <div
-      class="flex flex-col gap-3 bg-white p-3.5 sm:p-4 rounded-2xl border border-[#E2E8F0]/80 shadow-2xs"
+      class="flex flex-col gap-3.5 bg-white p-4 sm:p-5 rounded-2xl border border-[#E2E8F0]/80 shadow-2xs"
     >
-      <!-- Top Row: Queue Tabs -->
-      <div class="border-b border-[#F1F5F9] pb-3">
-        <!-- Ticket Queue Navigation (Tabs) -->
+      <!-- Top Row: Queue Tabs Switcher -->
+      <div class="border-b border-[#F1F5F9] pb-3.5">
         <div
-          class="flex items-center gap-1.5 overflow-x-auto scrollbar-none [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden py-0.5 w-full"
+          class="flex items-center gap-2 overflow-x-auto scrollbar-none [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden py-0.5 w-full"
         >
           <button
             v-for="tab in !isAdmin && !isSuperAdmin
@@ -1347,23 +1457,23 @@ function toast(message, type = 'success') {
             :key="tab.key"
             type="button"
             @click="switchTab(tab.key)"
-            class="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition-all whitespace-nowrap cursor-pointer shrink-0 active:scale-95"
+            class="flex items-center gap-2 rounded-xl px-3.5 py-2 text-xs font-bold transition-all whitespace-nowrap cursor-pointer shrink-0 active:scale-95"
             :class="
               activeTab === tab.key
-                ? 'bg-[#2563EB] text-white shadow-2xs'
-                : 'text-[#64748B] hover:bg-[#F8FAFC] hover:text-[#0F172A]'
+                ? 'bg-[#172F52] text-white shadow-2xs'
+                : 'text-[#64748B] bg-slate-50 hover:bg-slate-100 hover:text-[#0F172A] border border-slate-200/60'
             "
           >
             <span>{{ tab.label }}</span>
             <span
               v-if="tab.count !== undefined"
-              class="inline-flex h-4 min-w-[16px] items-center justify-center rounded-full px-1.5 text-[10px] font-bold"
+              class="inline-flex h-4.5 min-w-[18px] items-center justify-center rounded-full px-1.5 text-[10px] font-bold"
               :class="
                 activeTab === tab.key
                   ? 'bg-white/20 text-white'
                   : tab.key === 'unassigned' && tab.count > 0
                     ? 'bg-rose-500 text-white'
-                    : 'bg-[#F1F5F9] text-[#64748B]'
+                    : 'bg-slate-200 text-[#475569]'
               "
             >
               {{ tab.count }}
@@ -1377,22 +1487,22 @@ function toast(message, type = 'success') {
         <!-- Baris Atas: Search Input with Inline Clear (X) -->
         <div class="relative w-full">
           <span
-            class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[18px] text-[#94A3B8] pointer-events-none"
+            class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-[18px] text-[#94A3B8] pointer-events-none"
             >search</span
           >
           <input
             v-model="searchQuery"
             type="search"
             aria-label="Cari tiket, judul, nomor, atau pelapor"
-            placeholder="Cari ticket, judul, nomor, pelapor..."
-            class="h-9 w-full rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] pl-9 pr-8 text-xs font-medium text-[#0F172A] placeholder-[#94A3B8] focus:border-[#2563EB] focus:bg-white focus:outline-none transition-all"
+            placeholder="Cari tiket, judul kendala, nomor tiket, atau pelapor..."
+            class="h-10 w-full rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] pl-10 pr-9 text-xs font-medium text-[#0F172A] placeholder-[#94A3B8] focus:border-[#172F52] focus:bg-white focus:ring-2 focus:ring-[#172F52]/10 focus:outline-none transition-all"
           />
           <button
             v-if="searchQuery"
             type="button"
             aria-label="Hapus pencarian"
             @click="searchQuery = ''"
-            class="absolute right-2.5 top-1/2 -translate-y-1/2 flex h-5 w-5 items-center justify-center rounded-full text-[#94A3B8] hover:bg-slate-200/60 hover:text-slate-600 transition-colors cursor-pointer"
+            class="absolute right-3 top-1/2 -translate-y-1/2 flex h-5 w-5 items-center justify-center rounded-full text-[#94A3B8] hover:bg-slate-200/60 hover:text-slate-600 transition-colors cursor-pointer"
           >
             <span class="material-symbols-outlined text-[14px]">close</span>
           </button>
@@ -1491,29 +1601,102 @@ function toast(message, type = 'success') {
       </div>
     </div>
 
-    <!-- ── 3. Ticket Inbox / Issue List Surface ───────────── -->
+    <!-- ── 3. List Heading & Counter ──────────────────────── -->
+    <div class="flex items-center justify-between gap-3 px-1">
+      <div class="flex items-center gap-2">
+        <h2 class="text-[14px] font-bold text-[#0F172A]">Daftar Tiket Kendala</h2>
+        <span
+          class="inline-flex items-center justify-center rounded-md bg-[#EDF3FC] px-2 py-0.5 text-[11px] font-bold text-[#172F52] tabular-nums"
+        >
+          {{ filteredTickets.length }}
+        </span>
+      </div>
+      <span class="text-xs font-normal text-[#64748B] tabular-nums">
+        Menampilkan
+        {{ paginatedTickets.length ? (currentPage - 1) * itemsPerPage + 1 : 0 }}–{{
+          Math.min(currentPage * itemsPerPage, filteredTickets.length)
+        }}
+        dari {{ filteredTickets.length }} tiket
+      </span>
+    </div>
+
+    <!-- ── 4. Ticket Inbox / Issue List Surface ───────────── -->
     <div class="flex flex-col gap-3">
-      <!-- Loading Skeleton (Matches refined compact card layout) -->
+      <!-- Loading Skeleton (Matches refined 5-column card row) -->
       <div v-if="isLoading" aria-busy="true" class="flex flex-col gap-2.5">
         <div
           v-for="r in 4"
           :key="'tck-skel-' + r"
-          class="flex flex-col gap-2.5 p-3.5 sm:p-4 rounded-xl border border-slate-200/80 bg-white select-none shadow-2xs"
+          class="bg-white rounded-xl border border-[#E2E8F0] p-4 lg:px-5 lg:py-4 select-none shadow-2xs"
         >
-          <div class="flex items-center justify-between">
-            <BaseSkeleton width="90px" height="14px" radius="sm" />
-            <BaseSkeleton width="80px" height="22px" radius="full" />
+          <!-- Desktop Skeleton (>= 1024px / lg) -->
+          <div class="hidden lg:grid lg:grid-cols-[minmax(0,2.3fr)_minmax(0,1.2fr)_minmax(0,1.2fr)_minmax(0,1.3fr)_36px] items-center gap-5 min-w-0">
+            <!-- 1. Identitas Skeleton -->
+            <div class="flex items-center gap-3 min-w-0">
+              <BaseSkeleton width="42px" height="42px" radius="md" class="shrink-0" />
+              <div class="flex flex-col gap-1.5 min-w-0 flex-1">
+                <div class="flex items-center gap-2">
+                  <BaseSkeleton width="85px" height="15px" radius="md" />
+                  <BaseSkeleton width="65px" height="15px" radius="md" />
+                </div>
+                <BaseSkeleton :width="r % 2 === 0 ? '60%' : '80%'" height="15px" radius="md" />
+                <BaseSkeleton :width="r % 2 === 0 ? '80%' : '55%'" height="12px" radius="sm" />
+              </div>
+            </div>
+            <!-- 2. Pelapor Skeleton -->
+            <div class="flex flex-col gap-1 min-w-0">
+              <BaseSkeleton width="45px" height="10px" radius="sm" />
+              <BaseSkeleton width="100px" height="13px" radius="md" />
+              <BaseSkeleton width="60px" height="10px" radius="sm" />
+            </div>
+            <!-- 3. Penanggung Jawab Skeleton -->
+            <div class="flex flex-col gap-1 min-w-0">
+              <BaseSkeleton width="85px" height="10px" radius="sm" />
+              <BaseSkeleton width="110px" height="13px" radius="md" />
+              <BaseSkeleton width="70px" height="10px" radius="sm" />
+            </div>
+            <!-- 4. Status & Prioritas Skeleton -->
+            <div class="flex flex-col gap-1.5 min-w-0">
+              <div class="flex items-center gap-2">
+                <BaseSkeleton width="75px" height="20px" radius="full" />
+                <BaseSkeleton width="60px" height="20px" radius="md" />
+              </div>
+              <BaseSkeleton width="85px" height="11px" radius="sm" />
+            </div>
+            <!-- 5. Action Skeleton -->
+            <div class="flex justify-end">
+              <BaseSkeleton width="24px" height="24px" radius="md" />
+            </div>
           </div>
 
-          <div class="flex flex-col gap-1">
-            <BaseSkeleton :width="r % 2 === 0 ? '55%' : '70%'" height="16px" radius="md" />
-            <BaseSkeleton :width="r % 2 === 0 ? '80%' : '60%'" height="13px" radius="sm" />
-          </div>
-
-          <div class="flex items-center gap-4 pt-1">
-            <BaseSkeleton width="90px" height="14px" radius="sm" />
-            <BaseSkeleton width="80px" height="14px" radius="sm" />
-            <BaseSkeleton width="70px" height="20px" radius="md" />
+          <!-- Mobile Skeleton (< 1024px / lg:hidden) -->
+          <div class="flex lg:hidden flex-col gap-3 min-w-0">
+            <div class="flex items-center justify-between gap-2">
+              <div class="flex items-center gap-2">
+                <BaseSkeleton width="38px" height="38px" radius="md" />
+                <BaseSkeleton width="80px" height="16px" radius="md" />
+                <BaseSkeleton width="60px" height="16px" radius="md" />
+              </div>
+              <BaseSkeleton width="20px" height="20px" radius="md" />
+            </div>
+            <div class="flex flex-col gap-1">
+              <BaseSkeleton width="90%" height="15px" radius="md" />
+              <BaseSkeleton width="70%" height="12px" radius="sm" />
+            </div>
+            <div class="grid grid-cols-2 gap-3 p-2.5 rounded-lg bg-slate-50 border border-slate-100">
+              <div class="flex flex-col gap-1">
+                <BaseSkeleton width="40px" height="10px" radius="sm" />
+                <BaseSkeleton width="80px" height="12px" radius="md" />
+              </div>
+              <div class="flex flex-col gap-1">
+                <BaseSkeleton width="65px" height="10px" radius="sm" />
+                <BaseSkeleton width="80px" height="12px" radius="md" />
+              </div>
+            </div>
+            <div class="flex items-center justify-between pt-2 border-t border-slate-100">
+              <BaseSkeleton width="80px" height="18px" radius="full" />
+              <BaseSkeleton width="65px" height="12px" radius="sm" />
+            </div>
           </div>
         </div>
       </div>
@@ -1521,333 +1704,321 @@ function toast(message, type = 'success') {
       <!-- Error State -->
       <div
         v-else-if="pageError"
-        class="rounded-xl bg-rose-50 p-5 text-[13px] font-semibold text-rose-600 border border-rose-200"
+        class="rounded-2xl bg-rose-50 p-5 text-[13px] font-semibold text-rose-600 border border-rose-200 shadow-2xs"
       >
         {{ pageError }}
       </div>
 
-      <!-- Content Surface (Refined Compact Ticket Cards) -->
+      <!-- Content Surface (Clean & Modern Card-Row Components) -->
       <div v-else class="flex flex-col gap-2.5">
-        <!-- ── USER ROLE TICKET CARDS ── -->
-        <template v-if="!isAdmin && !isSuperAdmin">
-          <div
-            v-for="ticket in paginatedTickets"
-            :key="ticket.id"
-            @click="openDetail(ticket)"
-            class="tck-list-item group relative flex flex-col bg-white rounded-xl border border-slate-200/80 hover:border-slate-300 hover:shadow-xs p-3.5 sm:p-4 transition-all duration-200 cursor-pointer select-none gap-2 active:scale-[0.99] active:bg-slate-50/60"
-          >
-            <!-- TOP ROW: Subtle Ticket ID (Left) | Status Badge & Chevron (Right) -->
-            <div class="flex items-center justify-between gap-3 min-w-0">
-              <span
-                class="text-[11.5px] font-mono font-medium text-slate-400 tracking-wide truncate"
+        <!-- ── UNIFIED TICKET CARDS (5-Column SaaS Card-Row based on Design.md Section 12) ── -->
+        <div
+          v-for="ticket in paginatedTickets"
+          :key="ticket.id"
+          @click="openDetail(ticket)"
+          class="tck-list-item group relative bg-white rounded-xl border border-[#E2E8F0] hover:border-[#A4BBDF] hover:shadow-[0_3px_12px_rgba(23,43,77,0.06)] p-4 lg:px-5 lg:py-4 transition-all duration-150 cursor-pointer select-none active:scale-[0.997]"
+        >
+          <!-- ── DESKTOP VIEW (>= 1024px / lg) ── -->
+          <!-- 5-Column SaaS Grid: Identitas (2.3fr) | Pelapor (1.2fr) | Penanggung Jawab (1.2fr) | Status & Prioritas (1.3fr) | Aksi (36px) -->
+          <div class="hidden lg:grid lg:grid-cols-[minmax(0,2.3fr)_minmax(0,1.2fr)_minmax(0,1.2fr)_minmax(0,1.3fr)_36px] items-center gap-5 min-w-0">
+            <!-- 1. Identitas Tiket & Kendala -->
+            <div class="flex items-center gap-3 min-w-0">
+              <!-- Avatar Box 42x42 -->
+              <div
+                class="flex h-[42px] w-[42px] shrink-0 items-center justify-center rounded-[11px] bg-[#EDF3FC] text-[#345E99] border border-[#A4BBDF]/30 transition-transform group-hover:scale-105"
+                :class="getQueueTheme(ticket).badgeClass"
               >
-                {{ ticket.nomor_tiket || `TCK-${ticket.id}` }}
-              </span>
+                <span class="material-symbols-outlined text-[22px]">{{ getQueueIcon(ticket) }}</span>
+              </div>
 
-              <div class="flex items-center gap-2 shrink-0">
-                <span
-                  class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11.5px] font-semibold border transition-all"
-                  :class="getStatusDotInfo(ticket.status_tiket).badgeClass"
-                >
+              <!-- Main Identitas Text -->
+              <div class="flex flex-col gap-1 min-w-0 flex-1">
+                <!-- Badges / Tags Baris Atas -->
+                <div class="flex items-center gap-1.5 flex-wrap min-w-0">
+                  <span class="font-mono text-[10.5px] font-bold text-[#172F52] bg-[#EDF3FC] px-2 py-0.5 rounded border border-[#A4BBDF]/30 tracking-wider shrink-0">
+                    {{ ticket.nomor_tiket || `TCK-${ticket.id}` }}
+                  </span>
                   <span
-                    class="h-1.5 w-1.5 rounded-full shrink-0"
-                    :class="getStatusDotInfo(ticket.status_tiket).dotClass"
-                  ></span>
-                  <span>{{ getStatusDotInfo(ticket.status_tiket).label }}</span>
-                </span>
+                    class="inline-flex items-center text-[10.5px] font-semibold px-2 py-0.5 rounded border shrink-0"
+                    :class="getQueueTheme(ticket).pillClass"
+                  >
+                    {{ ticket.queue_nama || (ticket.queue_kode ? `${ticket.queue_kode} Support` : 'IT Support') }}
+                  </span>
+                  <span class="inline-flex items-center gap-1 text-[10.5px] font-medium text-[#64748B] bg-slate-100 px-2 py-0.5 rounded shrink-0">
+                    <span class="material-symbols-outlined text-[12px] text-slate-400">label</span>
+                    {{ ticket.kategori || 'Support' }}
+                  </span>
+                </div>
 
-                <span
-                  class="material-symbols-outlined text-[18px] text-slate-300 group-hover:text-blue-600 group-hover:translate-x-0.5 transition-all"
+                <!-- Judul Kendala -->
+                <h4
+                  class="text-[14px] font-[650] text-[#172F52] group-hover:text-[#244673] transition-colors leading-snug truncate"
+                  :title="ticket.judul"
                 >
-                  chevron_right
+                  {{ ticket.judul }}
+                </h4>
+
+                <!-- Deskripsi Singkat -->
+                <p
+                  v-if="ticket.deskripsi"
+                  class="text-[12px] text-[#64748B] truncate leading-normal"
+                  :title="ticket.deskripsi"
+                >
+                  {{ ticket.deskripsi }}
+                </p>
+              </div>
+            </div>
+
+            <!-- 2. Pelapor (Sesuai Kolom Pengguna di Design.md Section 12) -->
+            <div class="flex flex-col min-w-0 gap-0.5">
+              <span class="text-[11px] font-medium text-[#8291A7] block leading-none mb-0.5">
+                Pelapor
+              </span>
+              <strong
+                class="text-[12px] font-[550] text-[#334155] truncate block"
+                :title="ticket.pelapor_nama || ticket.pelapor || 'User'"
+              >
+                {{ ticket.pelapor_nama || ticket.pelapor || '—' }}
+              </strong>
+              <span
+                class="text-[10.5px] text-[#8291A7] truncate block"
+                :title="[ticket.pelapor_jabatan, ticket.pelapor_nik ? 'NIK ' + ticket.pelapor_nik : ''].filter(Boolean).join(' · ')"
+              >
+                {{ [ticket.pelapor_jabatan, ticket.pelapor_nik ? 'NIK ' + ticket.pelapor_nik : ''].filter(Boolean).join(' · ') || 'Internal User' }}
+              </span>
+            </div>
+
+            <!-- 3. Penanggung Jawab / PIC -->
+            <div class="flex flex-col min-w-0 gap-0.5">
+              <span class="text-[11px] font-medium text-[#8291A7] block leading-none mb-0.5">
+                Penanggung Jawab
+              </span>
+              <div v-if="ticket.assigned_to_nama || ticket.assigned_to" class="flex flex-col min-w-0">
+                <strong
+                  class="text-[12px] font-[550] text-[#334155] truncate block"
+                  :title="getAssigneeName(ticket.assigned_to_nama || ticket.assigned_to)"
+                >
+                  {{ getAssigneeName(ticket.assigned_to_nama || ticket.assigned_to) }}
+                </strong>
+                <span class="text-[10.5px] text-[#8291A7] truncate block">
+                  {{ ticket.queue_kode ? `${ticket.queue_kode} Specialist` : 'Assigned Agent' }}
+                </span>
+              </div>
+              <div v-else>
+                <span
+                  class="inline-flex items-center gap-1 text-[10.5px] font-semibold px-2 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200/80"
+                  title="Belum ada teknisi yang menangani"
+                >
+                  <span class="material-symbols-outlined text-[12px] text-amber-500">assignment_late</span>
+                  <span>Belum Ditugaskan</span>
                 </span>
               </div>
             </div>
 
-            <!-- MAIN CONTENT: Prominent Title & Short Description -->
+            <!-- 4. Status & Prioritas (Sesuai Kolom Status & Kondisi di Design.md Section 12) -->
+            <div class="flex flex-col min-w-0 gap-1.5">
+              <div class="flex items-center gap-1.5 flex-wrap">
+                <!-- Status Pill -->
+                <span
+                  class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold border transition-all"
+                  :class="getStatusDotInfo(ticket.status_tiket).badgeClass"
+                >
+                  <span class="h-1.5 w-1.5 rounded-full shrink-0 animate-pulse" :class="getStatusDotInfo(ticket.status_tiket).dotClass"></span>
+                  <span>{{ getStatusDotInfo(ticket.status_tiket).label }}</span>
+                </span>
+
+                <!-- Priority Badge -->
+                <span
+                  class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10.5px] font-bold border"
+                  :class="getPriorityInfo(ticket.prioritas).class"
+                  title="Prioritas"
+                >
+                  <span class="material-symbols-outlined text-[12px]">{{ getPriorityInfo(ticket.prioritas).icon }}</span>
+                  <span>{{ getPriorityInfo(ticket.prioritas).label }}</span>
+                </span>
+              </div>
+
+              <!-- Time, Comments & Attachments -->
+              <div class="flex items-center gap-2.5 text-[11px] text-[#8291A7] font-normal">
+                <span class="flex items-center gap-1" title="Waktu pembaruan">
+                  <span class="material-symbols-outlined text-[12px]">schedule</span>
+                  <span>{{ formatRelativeTime(ticket.diperbarui_pada || ticket.dibuat_pada) }}</span>
+                </span>
+                <span v-if="ticket.total_komentar > 0" class="flex items-center gap-1 text-[#345E99] font-medium" title="Komentar">
+                  <span class="material-symbols-outlined text-[12px]">chat_bubble_outline</span>
+                  <span>{{ ticket.total_komentar }}</span>
+                </span>
+                <span v-if="ticket.has_attachment" class="flex items-center gap-0.5 text-slate-400" title="Lampiran">
+                  <span class="material-symbols-outlined text-[12px]">attach_file</span>
+                </span>
+              </div>
+            </div>
+
+            <!-- 5. Tombol Opsi / Aksi (36px) -->
+            <div class="flex justify-end items-center" @click.stop>
+              <AppRowActions :actions="getTicketActions(ticket)" />
+            </div>
+          </div>
+
+          <!-- ── MOBILE / TABLET VIEW (< 1024px / lg:hidden) ── -->
+          <!-- Sesuai Design.md Section 12B: Grid multi-baris rapi -->
+          <div class="flex lg:hidden flex-col gap-3 min-w-0">
+            <!-- Baris 1: Avatar + Nomor Monospace + Queue Pill + Tombol Aksi di Kanan Atas -->
+            <div class="flex items-center justify-between gap-2 min-w-0">
+              <div class="flex items-center gap-2 min-w-0">
+                <div
+                  class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-[#EDF3FC] text-[#345E99] border border-[#A4BBDF]/30"
+                  :class="getQueueTheme(ticket).badgeClass"
+                >
+                  <span class="material-symbols-outlined text-[18px]">{{ getQueueIcon(ticket) }}</span>
+                </div>
+                <span class="font-mono text-[10.5px] font-bold text-[#172F52] bg-[#EDF3FC] px-2 py-0.5 rounded border border-[#A4BBDF]/30 truncate">
+                  {{ ticket.nomor_tiket || `TCK-${ticket.id}` }}
+                </span>
+                <span
+                  class="inline-flex items-center text-[10.5px] font-semibold px-2 py-0.5 rounded border truncate"
+                  :class="getQueueTheme(ticket).pillClass"
+                >
+                  {{ ticket.queue_kode || ticket.queue_nama || 'IT' }}
+                </span>
+              </div>
+
+              <!-- Tombol Aksi di Kanan Atas -->
+              <div @click.stop class="shrink-0">
+                <AppRowActions :actions="getTicketActions(ticket)" />
+              </div>
+            </div>
+
+            <!-- Baris 2: Judul Kendala & Deskripsi Singkat -->
             <div class="flex flex-col gap-0.5 min-w-0">
-              <h3
-                class="text-[14.5px] sm:text-[15px] font-bold text-slate-900 group-hover:text-blue-600 transition-colors leading-snug line-clamp-2 sm:line-clamp-1"
-              >
+              <h4 class="text-[14px] font-[650] text-[#172F52] group-hover:text-[#244673] transition-colors leading-snug line-clamp-2">
                 {{ ticket.judul }}
-              </h3>
-              <p
-                v-if="ticket.deskripsi"
-                class="text-[12px] sm:text-[12.5px] font-normal text-slate-500 line-clamp-2 sm:line-clamp-1 leading-relaxed"
-              >
+              </h4>
+              <p v-if="ticket.deskripsi" class="text-[12px] text-[#64748B] line-clamp-2 leading-relaxed">
                 {{ ticket.deskripsi }}
               </p>
             </div>
 
-            <!-- METADATA & FOOTER ROW: Unit, Category, Priority, & Timestamp -->
-            <div
-              class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-3 text-[12px] pt-2 border-t border-slate-100"
-            >
-              <div class="flex items-center gap-x-3 gap-y-1.5 flex-wrap text-slate-600">
-                <!-- Unit / Queue -->
-                <span
-                  class="flex items-center gap-1.5 font-medium text-slate-700"
-                  title="Unit Tujuan"
-                >
-                  <span class="material-symbols-outlined text-[15px] text-slate-400">
-                    {{ getQueueIcon(ticket) }}
-                  </span>
-                  <span>{{
-                    ticket.queue_nama ||
-                    (ticket.queue_kode ? `${ticket.queue_kode} Support` : 'IT Support')
-                  }}</span>
-                </span>
-
-                <!-- Category -->
-                <span class="flex items-center gap-1.5 text-slate-500" title="Kategori Ticket">
-                  <span class="material-symbols-outlined text-[15px] text-slate-400">label</span>
-                  <span>{{ ticket.kategori || 'Support' }}</span>
-                </span>
-
-                <!-- Priority (Subtle Badge) -->
-                <span
-                  class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] border"
-                  :class="getPriorityInfo(ticket.prioritas).class"
-                  title="Prioritas"
-                >
-                  <span class="material-symbols-outlined text-[13px]">
-                    {{ getPriorityInfo(ticket.prioritas).icon }}
-                  </span>
-                  <span>Priority: {{ getPriorityInfo(ticket.prioritas).label }}</span>
+            <!-- Baris 3: Kolom Pemegang (Pelapor) & Penanggung Jawab Berdampingan Proporsional (Grid 2 Kolom) -->
+            <div class="grid grid-cols-2 gap-3 p-2.5 rounded-lg bg-[#F8FAFC] border border-[#E5EAEF] text-xs">
+              <!-- Kolom Kiri: Pelapor -->
+              <div class="flex flex-col min-w-0 gap-0.5">
+                <span class="text-[10px] font-bold uppercase text-[#8291A7] tracking-wider">Pelapor</span>
+                <strong class="text-[12px] font-semibold text-[#172F52] truncate block" :title="ticket.pelapor_nama || ticket.pelapor || 'User'">
+                  {{ ticket.pelapor_nama || ticket.pelapor || '—' }}
+                </strong>
+                <span class="text-[10.5px] text-[#8291A7] truncate block">
+                  {{ ticket.pelapor_jabatan || (ticket.pelapor_nik ? 'NIK ' + ticket.pelapor_nik : 'Internal User') }}
                 </span>
               </div>
 
-              <!-- Secondary Information (Timestamp, Comments, Attachments) -->
-              <div
-                class="flex items-center gap-3 text-[11.5px] text-slate-400 shrink-0 font-normal self-end sm:self-auto"
-              >
-                <span class="flex items-center gap-1">
-                  <span class="material-symbols-outlined text-[13.5px]">schedule</span>
-                  <span>{{
-                    formatRelativeTime(ticket.diperbarui_pada || ticket.dibuat_pada)
-                  }}</span>
-                </span>
-
-                <span
-                  v-if="ticket.total_komentar > 0"
-                  class="flex items-center gap-1"
-                  title="Komentar"
-                >
-                  <span class="material-symbols-outlined text-[13.5px]">chat_bubble_outline</span>
-                  <span>{{ ticket.total_komentar }}</span>
-                </span>
-
-                <span v-if="ticket.has_attachment" class="flex items-center gap-1" title="Lampiran">
-                  <span class="material-symbols-outlined text-[13.5px]">attach_file</span>
-                </span>
-              </div>
-            </div>
-          </div>
-        </template>
-
-        <!-- ── ADMIN / SUPERADMIN ROLE TICKET CARDS ── -->
-        <template v-else>
-          <div
-            v-for="ticket in paginatedTickets"
-            :key="ticket.id"
-            @click="openDetail(ticket)"
-            class="tck-list-item group relative flex flex-col bg-white rounded-xl border border-slate-200/80 hover:border-slate-300 hover:shadow-xs p-3.5 sm:p-4 transition-all duration-200 cursor-pointer select-none gap-2 active:scale-[0.99] active:bg-slate-50/60"
-          >
-            <!-- TOP ROW: Subtle Ticket ID (Left) | Status Badge & Row Action Menu (Right) -->
-            <div class="flex items-center justify-between gap-3 min-w-0">
-              <span
-                class="text-[11.5px] font-mono font-medium text-slate-400 tracking-wide truncate"
-              >
-                {{ ticket.nomor_tiket || `TCK-${ticket.id}` }}
-              </span>
-
-              <div class="flex items-center gap-2 shrink-0">
-                <span
-                  class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11.5px] font-semibold border transition-all"
-                  :class="getStatusDotInfo(ticket.status_tiket).badgeClass"
-                >
-                  <span
-                    class="h-1.5 w-1.5 rounded-full shrink-0"
-                    :class="getStatusDotInfo(ticket.status_tiket).dotClass"
-                  ></span>
-                  <span>{{ getStatusDotInfo(ticket.status_tiket).label }}</span>
-                </span>
-
-                <div @click.stop class="shrink-0">
-                  <AppRowActions :actions="getTicketActions(ticket)" />
+              <!-- Kolom Kanan: Penanggung Jawab -->
+              <div class="flex flex-col min-w-0 gap-0.5">
+                <span class="text-[10px] font-bold uppercase text-[#8291A7] tracking-wider">Penanggung Jawab</span>
+                <div v-if="ticket.assigned_to_nama || ticket.assigned_to" class="min-w-0">
+                  <strong class="text-[12px] font-semibold text-[#334155] truncate block">
+                    {{ getAssigneeName(ticket.assigned_to_nama || ticket.assigned_to) }}
+                  </strong>
+                  <span class="text-[10.5px] text-[#8291A7] truncate block">
+                    {{ ticket.queue_kode ? `${ticket.queue_kode} Support` : 'Petugas' }}
+                  </span>
+                </div>
+                <div v-else>
+                  <span class="inline-flex items-center gap-1 text-[10.5px] font-semibold text-amber-700">
+                    <span class="material-symbols-outlined text-[12px] text-amber-500">assignment_late</span>
+                    <span>Belum Ditugaskan</span>
+                  </span>
                 </div>
               </div>
             </div>
 
-            <!-- MAIN CONTENT: Prominent Title & Short Description -->
-            <div class="flex flex-col gap-0.5 min-w-0">
-              <h3
-                class="text-[14.5px] sm:text-[15px] font-bold text-slate-900 group-hover:text-blue-600 transition-colors leading-snug line-clamp-2 sm:line-clamp-1"
-              >
-                {{ ticket.judul }}
-              </h3>
-              <p
-                v-if="ticket.deskripsi"
-                class="text-[12px] sm:text-[12.5px] font-normal text-slate-500 line-clamp-2 sm:line-clamp-1 leading-relaxed"
-              >
-                {{ ticket.deskripsi }}
-              </p>
-            </div>
-
-            <!-- METADATA ROW 1: Requester, Unit, Category (Plain Text + Icons) -->
-            <div
-              class="flex items-center gap-x-3 sm:gap-x-4 gap-y-1 flex-wrap text-[12px] text-slate-600"
-            >
-              <!-- Requester / Pelapor -->
-              <span
-                class="flex items-center gap-1.5 font-medium text-slate-700"
-                title="Pelapor / Requester"
-              >
-                <span class="material-symbols-outlined text-[15px] text-slate-400">person</span>
-                <span>{{ ticket.pelapor_nama || ticket.pelapor || 'User' }}</span>
-              </span>
-
-              <!-- Support Unit / Queue -->
-              <span
-                class="flex items-center gap-1.5 font-medium text-slate-700"
-                title="Unit Tujuan"
-              >
-                <span class="material-symbols-outlined text-[15px] text-slate-400">
-                  {{ getQueueIcon(ticket) }}
-                </span>
-                <span>{{
-                  ticket.queue_nama ||
-                  (ticket.queue_kode ? `${ticket.queue_kode} Support` : 'IT Support')
-                }}</span>
-              </span>
-
-              <!-- Category -->
-              <span class="flex items-center gap-1.5 text-slate-500" title="Kategori Ticket">
-                <span class="material-symbols-outlined text-[15px] text-slate-400">label</span>
-                <span>{{ ticket.kategori || 'Support' }}</span>
-              </span>
-            </div>
-
-            <!-- METADATA ROW 2 & FOOTER: Priority Badge, Assignee, & Timestamp -->
-            <div
-              class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-3 text-[12px] pt-2 border-t border-slate-100"
-            >
-              <div class="flex items-center gap-x-3 gap-y-1.5 flex-wrap text-slate-600">
-                <!-- Priority (Subtle Badge) -->
+            <!-- Baris 4: Garis Pemisah Tipis + Status Pill & Prioritas di Kiri, Waktu & Komentar di Kanan -->
+            <div class="flex items-center justify-between gap-2 pt-2 border-t border-[#EDF1F6] text-[11px]">
+              <div class="flex items-center gap-1.5 flex-wrap">
+                <!-- Status -->
                 <span
-                  class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] border"
+                  class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10.5px] font-bold border transition-all"
+                  :class="getStatusDotInfo(ticket.status_tiket).badgeClass"
+                >
+                  <span class="h-1.5 w-1.5 rounded-full shrink-0" :class="getStatusDotInfo(ticket.status_tiket).dotClass"></span>
+                  <span>{{ getStatusDotInfo(ticket.status_tiket).label }}</span>
+                </span>
+
+                <!-- Priority -->
+                <span
+                  class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold border"
                   :class="getPriorityInfo(ticket.prioritas).class"
-                  title="Prioritas"
                 >
-                  <span class="material-symbols-outlined text-[13px]">
-                    {{ getPriorityInfo(ticket.prioritas).icon }}
-                  </span>
-                  <span>Priority: {{ getPriorityInfo(ticket.prioritas).label }}</span>
-                </span>
-
-                <!-- Assignee -->
-                <span
-                  class="flex items-center gap-1 font-medium"
-                  :class="
-                    ticket.assigned_to_nama || ticket.assigned_to
-                      ? 'text-slate-700'
-                      : 'text-amber-700 font-semibold'
-                  "
-                  title="Penanggung Jawab / Assignee"
-                >
-                  <span
-                    class="material-symbols-outlined text-[15px]"
-                    :class="
-                      ticket.assigned_to_nama || ticket.assigned_to
-                        ? 'text-slate-400'
-                        : 'text-amber-500'
-                    "
-                  >
-                    {{ ticket.assigned_to_nama || ticket.assigned_to ? 'person_pin' : 'warning' }}
-                  </span>
-                  <span>{{
-                    ticket.assigned_to_nama || ticket.assigned_to
-                      ? getAssigneeName(ticket.assigned_to_nama || ticket.assigned_to)
-                      : 'Unassigned'
-                  }}</span>
+                  <span class="material-symbols-outlined text-[11px]">{{ getPriorityInfo(ticket.prioritas).icon }}</span>
+                  <span>{{ getPriorityInfo(ticket.prioritas).label }}</span>
                 </span>
               </div>
 
-              <!-- Secondary Information (Timestamp, Comments, Attachments) -->
-              <div
-                class="flex items-center gap-3 text-[11.5px] text-slate-400 shrink-0 font-normal self-end sm:self-auto"
-              >
+              <!-- Secondary Meta: Time, Comments, Attachments -->
+              <div class="flex items-center gap-2 text-[#8291A7] font-normal">
                 <span class="flex items-center gap-1">
-                  <span class="material-symbols-outlined text-[13.5px]">schedule</span>
-                  <span>{{
-                    formatRelativeTime(ticket.diperbarui_pada || ticket.dibuat_pada)
-                  }}</span>
+                  <span class="material-symbols-outlined text-[12px]">schedule</span>
+                  <span>{{ formatRelativeTime(ticket.diperbarui_pada || ticket.dibuat_pada) }}</span>
                 </span>
-
-                <span
-                  v-if="ticket.total_komentar > 0"
-                  class="flex items-center gap-1"
-                  title="Komentar"
-                >
-                  <span class="material-symbols-outlined text-[13.5px]">chat_bubble_outline</span>
+                <span v-if="ticket.total_komentar > 0" class="flex items-center gap-1 text-[#345E99] font-medium">
+                  <span class="material-symbols-outlined text-[12px]">chat_bubble_outline</span>
                   <span>{{ ticket.total_komentar }}</span>
                 </span>
-
-                <span v-if="ticket.has_attachment" class="flex items-center gap-1" title="Lampiran">
-                  <span class="material-symbols-outlined text-[13.5px]">attach_file</span>
+                <span v-if="ticket.has_attachment" class="flex items-center gap-0.5 text-slate-400">
+                  <span class="material-symbols-outlined text-[12px]">attach_file</span>
                 </span>
               </div>
             </div>
           </div>
-        </template>
+        </div>
 
         <!-- ── EMPTY STATES ── -->
         <div
           v-if="filteredTickets.length === 0"
-          class="py-16 text-center bg-white rounded-2xl border border-slate-200/80 shadow-2xs"
+          class="py-16 px-4 text-center bg-white rounded-2xl border border-slate-200/80 shadow-2xs"
         >
           <div class="mx-auto flex max-w-sm flex-col items-center justify-center text-center">
             <div
-              class="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#F1F5F9] text-[#94A3B8] mb-3"
+              class="flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100 text-slate-400 mb-3.5"
             >
-              <span class="material-symbols-outlined text-[24px]">inbox</span>
+              <span class="material-symbols-outlined text-[28px]">inbox</span>
             </div>
 
             <!-- Empty state title -->
-            <h3 class="text-sm font-bold text-[#0F172A]">
+            <h3 class="text-base font-bold text-[#0F172A]">
               {{
-                searchQuery || filterStatus || filterPrioritas || filterQueue
-                  ? 'Tidak ada ticket yang cocok'
+                searchQuery || filterStatus || filterPrioritas || filterQueue || filterKategori
+                  ? 'Tidak ada tiket yang cocok'
                   : !isAdmin && !isSuperAdmin
-                    ? 'Belum ada request'
+                    ? 'Belum ada request tiket'
                     : activeTab === 'all'
-                      ? 'Inbox kosong'
-                      : 'Tidak ada ticket'
+                      ? 'Inbox tiket kosong'
+                      : 'Tidak ada tiket pada kategori ini'
               }}
             </h3>
 
             <!-- Empty state description -->
-            <p class="mt-1 text-xs text-[#64748B] max-w-xs">
+            <p class="mt-1 text-xs text-[#64748B] max-w-xs leading-relaxed">
               {{
-                searchQuery || filterStatus || filterPrioritas || filterQueue
-                  ? 'Coba ubah pencarian atau filter.'
+                searchQuery || filterStatus || filterPrioritas || filterQueue || filterKategori
+                  ? 'Coba ubah kata kunci pencarian atau sesuaikan filter Anda.'
                   : !isAdmin && !isSuperAdmin
-                    ? 'Pengajuan bantuan IT Anda akan muncul di sini.'
+                    ? 'Pengajuan kendala atau bantuan IT Anda akan muncul di sini.'
                     : activeTab === 'all'
-                      ? 'Tidak ada ticket yang menunggu penanganan.'
-                      : 'Belum ada ticket pada kategori ini.'
+                      ? 'Tidak ada tiket yang menunggu penanganan saat ini.'
+                      : 'Belum ada tiket pada tab yang dipilih.'
               }}
             </p>
 
             <button
-              v-if="!searchQuery && !filterStatus && !filterPrioritas && !filterQueue"
+              v-if="!searchQuery && !filterStatus && !filterPrioritas && !filterQueue && !filterKategori"
               type="button"
               @click="openAdd"
-              class="mt-4 inline-flex items-center gap-1.5 rounded-xl bg-[#2563EB] px-3.5 py-2 text-xs font-bold text-white shadow-2xs hover:bg-[#1D4ED8] transition-all cursor-pointer"
+              class="mt-4 inline-flex items-center gap-1.5 rounded-xl bg-[#172F52] px-4 py-2 text-xs font-bold text-white shadow-2xs hover:bg-[#244673] transition-all cursor-pointer active:scale-95"
             >
               <span class="material-symbols-outlined text-[16px]">add</span>
               <span>{{
-                !isAdmin && !isSuperAdmin ? 'Request Ticket Pertama' : 'Buat Tiket Baru'
+                !isAdmin && !isSuperAdmin ? 'Request Tiket Pertama' : 'Buat Tiket Baru'
               }}</span>
             </button>
           </div>
@@ -1860,6 +2031,8 @@ function toast(message, type = 'success') {
         v-model:currentPage="currentPage"
         :total-items="filteredTickets.length"
         :items-per-page="itemsPerPage"
+        asset-style
+        mobile-compact
       />
     </div>
 
@@ -2269,19 +2442,19 @@ function toast(message, type = 'success') {
           <button
             type="button"
             @click="activeDetailTab = 'detail'"
-            class="group flex min-w-0 flex-wrap items-center justify-center gap-1.5 rounded-lg px-2 py-2.5 text-[11px] sm:text-xs font-semibold transition-colors cursor-pointer select-none focus-visible:outline-2 focus-visible:outline-[#2563EB]"
+            class="group flex min-w-0 flex-wrap items-center justify-center gap-1.5 rounded-lg px-2 py-2.5 text-[11px] sm:text-xs font-semibold transition-colors cursor-pointer select-none focus-visible:outline-2 focus-visible:outline-[#172F52]"
             :class="
               activeDetailTab === 'detail'
-                ? 'bg-white text-[#2563EB] shadow-xs'
-                : 'text-[#64748B] hover:bg-white/70 hover:text-[#1D4ED8]'
+                ? 'bg-white text-[#172F52] shadow-xs'
+                : 'text-[#64748B] hover:bg-white/70 hover:text-[#172F52]'
             "
           >
             <span
               class="material-symbols-outlined text-[15px] transition-colors duration-200"
               :class="
                 activeDetailTab === 'detail'
-                  ? 'text-[#2563EB]'
-                  : 'text-[#64748B] group-hover:text-[#1D4ED8]'
+                  ? 'text-[#172F52]'
+                  : 'text-[#64748B] group-hover:text-[#172F52]'
               "
               >info</span
             >
@@ -2291,19 +2464,19 @@ function toast(message, type = 'success') {
           <button
             type="button"
             @click="activeDetailTab = 'history'"
-            class="group flex min-w-0 flex-wrap items-center justify-center gap-1.5 rounded-lg px-2 py-2.5 text-[11px] sm:text-xs font-semibold transition-colors cursor-pointer select-none focus-visible:outline-2 focus-visible:outline-[#2563EB]"
+            class="group flex min-w-0 flex-wrap items-center justify-center gap-1.5 rounded-lg px-2 py-2.5 text-[11px] sm:text-xs font-semibold transition-colors cursor-pointer select-none focus-visible:outline-2 focus-visible:outline-[#172F52]"
             :class="
               activeDetailTab === 'history'
-                ? 'bg-white text-[#2563EB] shadow-xs'
-                : 'text-[#64748B] hover:bg-white/70 hover:text-[#1D4ED8]'
+                ? 'bg-white text-[#172F52] shadow-xs'
+                : 'text-[#64748B] hover:bg-white/70 hover:text-[#172F52]'
             "
           >
             <span
               class="material-symbols-outlined text-[15px] transition-colors duration-200"
               :class="
                 activeDetailTab === 'history'
-                  ? 'text-[#2563EB]'
-                  : 'text-[#64748B] group-hover:text-[#1D4ED8]'
+                  ? 'text-[#172F52]'
+                  : 'text-[#64748B] group-hover:text-[#172F52]'
               "
               >history</span
             >
@@ -2312,7 +2485,7 @@ function toast(message, type = 'success') {
               class="ml-0.5 rounded-full px-1.5 py-0.5 text-[10px] font-medium"
               :class="
                 activeDetailTab === 'history'
-                  ? 'bg-[#2563EB]/10 text-[#2563EB]'
+                  ? 'bg-[#EDF3FC] text-[#172F52]'
                   : 'bg-[#E2E8F0]/70 text-[#475569]'
               "
             >
@@ -2323,19 +2496,19 @@ function toast(message, type = 'success') {
           <button
             type="button"
             @click="openCommentsTab"
-            class="group flex min-w-0 flex-wrap items-center justify-center gap-1.5 rounded-lg px-2 py-2.5 text-[11px] sm:text-xs font-semibold transition-colors cursor-pointer select-none focus-visible:outline-2 focus-visible:outline-[#2563EB]"
+            class="group flex min-w-0 flex-wrap items-center justify-center gap-1.5 rounded-lg px-2 py-2.5 text-[11px] sm:text-xs font-semibold transition-colors cursor-pointer select-none focus-visible:outline-2 focus-visible:outline-[#172F52]"
             :class="
               activeDetailTab === 'comments'
-                ? 'bg-white text-[#2563EB] shadow-xs'
-                : 'text-[#64748B] hover:bg-white/70 hover:text-[#1D4ED8]'
+                ? 'bg-white text-[#172F52] shadow-xs'
+                : 'text-[#64748B] hover:bg-white/70 hover:text-[#172F52]'
             "
           >
             <span
               class="material-symbols-outlined text-[15px] transition-colors duration-200"
               :class="
                 activeDetailTab === 'comments'
-                  ? 'text-[#2563EB]'
-                  : 'text-[#64748B] group-hover:text-[#1D4ED8]'
+                  ? 'text-[#172F52]'
+                  : 'text-[#64748B] group-hover:text-[#172F52]'
               "
               >forum</span
             >
@@ -2344,7 +2517,7 @@ function toast(message, type = 'success') {
               class="ml-0.5 rounded-full px-1.5 py-0.5 text-[10px] font-medium"
               :class="
                 activeDetailTab === 'comments'
-                  ? 'bg-[#2563EB]/10 text-[#2563EB]'
+                  ? 'bg-[#EDF3FC] text-[#172F52]'
                   : 'bg-[#E2E8F0]/70 text-[#475569]'
               "
             >
@@ -2536,7 +2709,7 @@ function toast(message, type = 'success') {
                 class="relative flex flex-col gap-1 text-xs"
               >
                 <!-- Dot on Timeline -->
-                <div class="absolute -left-5 top-1 h-2 w-2 rounded-full bg-[#2563EB]"></div>
+                <div class="absolute -left-5 top-1 h-2 w-2 rounded-full bg-[#172F52]"></div>
 
                 <!-- Event Header & Actor -->
                 <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
@@ -2742,13 +2915,13 @@ function toast(message, type = 'success') {
                   type="text"
                   aria-label="Tulis komentar tiket"
                   placeholder="Tulis komentar atau catatan perbaikan..."
-                  class="h-10 flex-1 min-w-0 rounded-xl border border-slate-200 bg-slate-50/70 px-3.5 text-xs font-medium text-slate-900 placeholder-slate-400 outline-none transition-all focus:bg-white focus:border-blue-600 focus:ring-1 focus:ring-blue-600/20"
+                  class="h-10 flex-1 min-w-0 rounded-xl border border-slate-200 bg-slate-50/70 px-3.5 text-xs font-medium text-slate-900 placeholder-slate-400 outline-none transition-all focus:bg-white focus:border-[#172F52] focus:ring-1 focus:ring-[#172F52]/20"
                 />
 
                 <button
                   type="submit"
                   :disabled="isSubmittingComment || (!newCommentText.trim() && !commentAttachment)"
-                  class="flex h-10 px-3.5 sm:px-4 items-center justify-center gap-1.5 rounded-xl bg-[#2563EB] text-xs font-bold text-white shadow-2xs hover:bg-[#1D4ED8] disabled:opacity-40 transition-all cursor-pointer shrink-0 active:scale-95"
+                  class="flex h-10 px-3.5 sm:px-4 items-center justify-center gap-1.5 rounded-xl bg-[#172F52] text-xs font-bold text-white shadow-2xs hover:bg-[#244673] disabled:opacity-40 transition-all cursor-pointer shrink-0 active:scale-95"
                 >
                   <span class="material-symbols-outlined text-[16px]">send</span>
                   <span class="hidden sm:inline">Kirim</span>

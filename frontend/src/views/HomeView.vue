@@ -28,7 +28,16 @@ import {
 } from 'lucide-vue-next'
 
 const router = useRouter()
-const { cases, isLoading, setSearch, setCategory, hasNoSearchResult, fetchCases } = useCases()
+const {
+  cases,
+  isLoading,
+  setSearch,
+  setCategory,
+  hasNoSearchResult,
+  fetchCases,
+  selectCase,
+  clearSearch,
+} = useCases()
 const { publishedCategories, fetchPublicCategories } = useKbCategories()
 const { isAuthenticated, isAdmin } = useAuth()
 const { t } = useLanguage()
@@ -62,16 +71,59 @@ const liveSuggestions = computed(() => {
     .slice(0, 5)
 })
 
+const DEFAULT_FEATURED_SOPS = [
+  {
+    num: '01',
+    id: 36,
+    title: 'SOP Setup Laptop Baru untuk New Joiner / Pergantian Perangkat',
+    summary:
+      'Panduan Operasional Standar (SOP) penyiapan unit laptop Windows baru bagi karyawan baru (new joiner) atau fasilitas penggantian unit kerja.',
+    category: 'hardware',
+  },
+  {
+    num: '02',
+    id: 37,
+    title: 'SOP Setup Laptop Re-use / Bekas untuk New Joiner / Pergantian Perangkat',
+    summary:
+      'Panduan Operasional Standar (SOP) penyiapan laptop pengembalian (re-use) untuk dialokasikan kembali kepada karyawan baru atau pergantian unit.',
+    category: 'hardware',
+  },
+  {
+    num: '03',
+    id: 38,
+    title: 'SOP Setup HP Baru untuk New Joiner / Replacement',
+    summary:
+      'Panduan Operasional Standar (SOP) konfigurasi smartphone / perangkat mobile baru bagi kebutuhan operasional karyawan.',
+    category: 'hardware',
+  },
+  {
+    num: '04',
+    id: 39,
+    title: 'SOP Setup HP Stock untuk New Joiner / Replacement',
+    summary:
+      'Panduan Operasional Standar (SOP) penyiapan unit smartphone stock / inventaris kantor untuk pergantian atau kebutuhan darurat.',
+    category: 'hardware',
+  },
+]
+
 // Featured Article list dari DB (4 pertama, published, diurutkan sesuai sort_order)
-const featuredSopList = computed(() =>
-  cases.value.slice(0, 4).map((c, idx) => ({
+const featuredSopList = computed(() => {
+  if (!cases.value.length) return DEFAULT_FEATURED_SOPS
+  return cases.value.slice(0, 4).map((c, idx) => ({
     num: String(idx + 1).padStart(2, '0'),
     id: c.id,
     title: c.title,
     summary: c.summary || '',
     category: c.category || 'general',
-  })),
-)
+  }))
+})
+
+function handleArticleClick(id) {
+  clearSearch()
+  if (id) {
+    selectCase(id)
+  }
+}
 
 function handleSearchSubmit() {
   if (localSearch.value.trim()) {
@@ -495,7 +547,7 @@ onMounted(async () => {
               v-for="article in featuredSopList"
               :key="article.id"
               to="/cases"
-              @click="setSearch(article.title)"
+              @click="handleArticleClick(article.id)"
               class="article-row gsap-sop-item"
             >
               <span class="article-number">{{ article.num }}</span>

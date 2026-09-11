@@ -105,10 +105,10 @@ test('H-1, M-1, M-2 — XSS Sanitization & Security Fixes Suite', async (t) => {
 
   t.after(async () => {
     for (const id of createdCaseIds) {
-      await pool.query('DELETE FROM incident_cases WHERE id = $1', [id]).catch(() => {})
+      await pool.query('DELETE FROM cases WHERE id = $1', [id]).catch(() => {})
     }
     for (const id of createdFaqIds) {
-      await pool.query('DELETE FROM faqs WHERE id = $1', [id]).catch(() => {})
+      await pool.query('DELETE FROM faq WHERE id = $1', [id]).catch(() => {})
     }
     if (superadminId) {
       await pool.query('DELETE FROM users WHERE id = $1', [superadminId]).catch(() => {})

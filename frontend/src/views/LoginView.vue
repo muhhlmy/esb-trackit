@@ -399,12 +399,6 @@ const finishResetAndLogin = () => {
               ><ArrowRight v-if="!isLoading" :size="18" aria-hidden="true" />
             </button>
           </form>
-          <div class="activation-note">
-            <span>Belum mengaktifkan akun?</span
-            ><button type="button" @click="openForgotModal">
-              Aktivasi akun<ArrowRight :size="14" aria-hidden="true" />
-            </button>
-          </div>
         </div>
         <p class="form-help">
           Butuh panduan? <RouterLink to="/">Kunjungi Pusat Bantuan</RouterLink>
@@ -854,28 +848,35 @@ const finishResetAndLogin = () => {
 
 <style scoped>
 .login-page {
-  min-height: 100dvh;
+  height: 100vh;
+  height: 100svh;
+  height: 100dvh;
+  max-height: 100dvh;
   display: flex;
   flex-direction: column;
   background: #f5f7fb;
   color: #333333;
-  padding: 0 32px;
+  padding: 0 clamp(16px, 3vw, 32px);
+  overflow: hidden;
+  box-sizing: border-box;
 }
 .login-header {
   width: 100%;
   max-width: 1040px;
   margin: 0 auto;
-  min-height: 88px;
+  height: clamp(52px, 7vh, 64px);
+  min-height: clamp(52px, 7vh, 64px);
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 20px;
+  flex-shrink: 0;
 }
 .login-brand {
   display: flex;
   align-items: center;
   gap: 10px;
-  min-height: 44px;
+  min-height: 40px;
   font-size: 20px;
   font-weight: 750;
   letter-spacing: -0.045em;
@@ -887,7 +888,7 @@ const finishResetAndLogin = () => {
   display: flex;
   align-items: center;
   gap: 8px;
-  min-height: 44px;
+  min-height: 40px;
   color: #64748b;
   font-size: 12px;
   font-weight: 550;
@@ -902,10 +903,11 @@ const finishResetAndLogin = () => {
   max-width: 1040px;
   margin: auto;
   border: 1px solid #e3e9f1;
-  border-radius: 24px;
+  border-radius: 20px;
   background: white;
   box-shadow: 0 16px 50px rgba(10, 81, 176, 0.08);
   overflow: hidden;
+  max-height: clamp(440px, 80vh, 560px);
 }
 .login-story {
   display: flex;
@@ -1209,33 +1211,8 @@ const finishResetAndLogin = () => {
   opacity: 0.6;
   cursor: wait;
 }
-.activation-note {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
-  gap: 0 6px;
-  font-size: 11px;
-  color: #71829b;
-  margin-top: 22px;
-  padding-top: 16px;
-  border-top: 1px solid #edf0f5;
-}
-.activation-note button {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  min-height: 44px;
-  font-size: 11px;
-  font-weight: 650;
-  color: #0A51B0;
-  cursor: pointer;
-}
-.activation-note button:hover {
-  color: #0892F5;
-}
 .form-help {
-  margin: 26px auto 0;
+  margin: 20px auto 0;
   text-align: center;
   color: #8795a9;
   font-size: 11px;
@@ -1268,9 +1245,10 @@ const finishResetAndLogin = () => {
 }
 .login-footer {
   text-align: center;
-  padding: 24px 0;
+  padding: clamp(8px, 1.2vh, 12px) 0;
   color: #8996a9;
-  font-size: 10px;
+  font-size: 11px;
+  flex-shrink: 0;
 }
 .login-page :is(a, button, input):focus-visible {
   outline: 2px solid #0892F5;
@@ -1321,7 +1299,7 @@ const finishResetAndLogin = () => {
     flex-shrink: 0;
   }
   .login-main {
-    flex: 0 1 590px;
+    flex: 0 1 540px;
     min-height: 0;
     max-width: 1040px;
     margin: auto;
@@ -1335,33 +1313,29 @@ const finishResetAndLogin = () => {
     margin: auto 0;
   }
   .story-content h2 {
-    font-size: 36px;
+    font-size: 34px;
   }
   .story-features {
-    margin-top: 26px;
-    gap: 18px;
+    margin-top: 24px;
+    gap: 16px;
   }
   .login-form-panel {
     padding: 28px 36px;
-    overflow-y: auto;
-    justify-content: flex-start;
+    overflow-y: visible;
+    justify-content: center;
   }
   .login-form {
-    margin-top: 22px;
+    margin-top: 20px;
   }
   .login-field + .login-field {
-    margin-top: 16px;
-  }
-  .activation-note {
-    margin-top: 16px;
-    padding-top: 10px;
+    margin-top: 14px;
   }
   .form-help {
     margin-top: 16px;
   }
   .login-footer {
     flex-shrink: 0;
-    padding: 14px 0;
+    padding: 10px 0;
   }
 }
 @media (min-width: 768px) and (max-height: 740px) {
@@ -1411,12 +1385,19 @@ const finishResetAndLogin = () => {
   .login-options {
     margin: 6px 0 10px;
   }
-  .activation-note {
-    margin-top: 10px;
-    padding-top: 4px;
-  }
   .form-help {
     margin-top: 10px;
+  }
+}
+@media (max-height: 520px) {
+  .login-page {
+    height: auto;
+    min-height: 100dvh;
+    max-height: none;
+    overflow-y: auto;
+  }
+  .login-main {
+    max-height: none;
   }
 }
 @media (max-width: 767px) {

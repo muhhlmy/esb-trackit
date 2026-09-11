@@ -188,10 +188,15 @@ const topicCards = computed(() => {
 const DEFAULT_FAQS = [
   {
     num: '01',
-    id: 'faq-1',
-    question: 'How do I reset my Google Workspace password?',
+    id: 'faq-3',
+    question: 'Bagaimana cara melakukan reset password akun Google Workspace?',
     summary:
-      'Anda dapat mereset kata sandi akun karyawan melalui Google Admin Console sesuai panduan resmi:',
+      'Anda dapat mereset kata sandi akun Google Workspace karyawan melalui Google Admin Console sesuai panduan resmi:\n' +
+      '1. Buka Google Admin Console di browser (admin.google.com).\n' +
+      '2. Cari nama atau email karyawan pada menu Directory > Users.\n' +
+      '3. Klik tombol "Reset Password" dan pilih opsi buat kata sandi secara manual.\n' +
+      '4. Gunakan format kata sandi sementara sesuai standar keamanan IT perusahaan.\n' +
+      '5. Pastikan mencentang "Ask user to change their password when they sign in" sebelum menyimpan.',
     steps: [
       'Buka Google Admin Console di browser (admin.google.com).',
       'Cari nama atau email karyawan pada menu Directory > Users.',
@@ -204,23 +209,14 @@ const DEFAULT_FAQS = [
   },
   {
     num: '02',
-    id: 'faq-2',
-    question: 'How do I bypass Microsoft OOBE on new laptops?',
+    id: 'faq-4',
+    question: 'Bagaimana cara meminta kode cadangan 2-Step Verification (2SV)?',
     summary:
-      'Untuk membuat akun lokal tanpa login akun Microsoft online saat layar koneksi jaringan:',
-    steps: [
-      'Tekan kombinasi tombol Shift + F10 (atau Fn + Shift + F10) di keyboard untuk membuka Command Prompt (CMD).',
-      'Ketikkan perintah oobe\\bypassnro lalu tekan Enter.',
-      'Laptop akan restart otomatis dan menampilkan opsi setup Local Account offline.',
-    ],
-    code: 'oobe\\bypassnro',
-  },
-  {
-    num: '03',
-    id: 'faq-3',
-    question: 'How do I request a 2SV backup code?',
-    summary:
-      'Untuk mendukung verifikasi tim setelah konfirmasi resmi dari pihak People & Culture (PBX):',
+      'Untuk mendukung verifikasi tim setelah konfirmasi resmi dari pihak People & Culture (PBX):\n' +
+      '1. Buka Google Admin Console dan cari profil pengguna yang bersangkutan.\n' +
+      '2. Masuk ke menu Security > 2-Step Verification > Get Backup Verification Codes.\n' +
+      '3. Salin minimal 2 (dua) kode verifikasi cadangan.\n' +
+      '4. Kirimkan kode tersebut secara aman via Direct Message kepada pihak PBX berwenang.',
     steps: [
       'Buka Google Admin Console dan cari profil pengguna yang bersangkutan.',
       'Masuk ke menu Security > 2-Step Verification > Get Backup Verification Codes.',
@@ -229,13 +225,44 @@ const DEFAULT_FAQS = [
     ],
   },
   {
+    num: '03',
+    id: 'faq-5',
+    question: 'Bagaimana cara bypass Microsoft OOBE pada laptop baru?',
+    summary:
+      'Untuk membuat akun lokal tanpa login akun Microsoft online saat layar koneksi jaringan:\n' +
+      '1. Tekan kombinasi tombol Shift + F10 (atau Fn + Shift + F10) di keyboard untuk membuka Command Prompt (CMD).\n' +
+      '2. Ketikkan perintah oobe\\bypassnro lalu tekan Enter.\n' +
+      '3. Laptop akan restart otomatis dan menampilkan opsi setup Local Account offline.',
+    steps: [
+      'Tekan kombinasi tombol Shift + F10 (atau Fn + Shift + F10) di keyboard untuk membuka Command Prompt (CMD).',
+      'Ketikkan perintah oobe\\bypassnro lalu tekan Enter.',
+      'Laptop akan restart otomatis dan menampilkan opsi setup Local Account offline.',
+    ],
+    code: 'oobe\\bypassnro',
+  },
+  {
     num: '04',
-    id: 'faq-4',
-    question: 'What should I do if my company laptop is lost?',
+    id: 'faq-8',
+    question: 'Bagaimana cara mengajukan lisensi software tambahan untuk kebutuhan kerja?',
+    summary:
+      'Pengajuan lisensi software berbayar (seperti Figma, JetBrains, Adobe Creative Cloud, atau tool produktivitas lainnya) memerlukan persetujuan atasan:\n' +
+      '1. Dapatkan persetujuan tertulis dari Head of Department (HOD) terkait alokasi budget.\n' +
+      '2. Buat tiket pengajuan pada kategori Software & Application dengan melampirkan bukti persetujuan HOD.\n' +
+      '3. Tim IT Procurement akan memproses lisensi dan memberikan akun aktivasi kepada Anda.',
+    steps: [
+      'Dapatkan persetujuan tertulis dari Head of Department (HOD) terkait alokasi budget.',
+      'Buat tiket pengajuan pada kategori Software & Application dengan melampirkan bukti persetujuan HOD.',
+      'Tim IT Procurement akan memproses lisensi dan memberikan akun aktivasi kepada Anda.',
+    ],
+  },
+  {
+    num: '05',
+    id: 'faq-9',
+    question: 'Apa yang harus dilakukan jika laptop perusahaan hilang atau dicuri?',
     isEmergency: true,
     emergencyTitle: 'Tindakan Darurat Diperlukan',
     emergencyText:
-      'Jika perangkat kerja hilang atau dicuri, segera laporkan ke Tim IT Support & Security Operations Center (SOC).',
+      'Jika perangkat kerja hilang atau dicuri, segera laporkan ke Tim IT Support & Security Operations Center (SOC) agar tim dapat melakukan remote lock dan penghapusan data perusahaan secara instan.',
   },
 ]
 
@@ -1086,6 +1113,9 @@ onMounted(async () => {
   font-size: 13px;
   line-height: 1.8;
   overflow-wrap: anywhere;
+}
+.faq-answer p {
+  white-space: pre-line;
 }
 .faq-answer > * + * {
   margin-top: 14px;

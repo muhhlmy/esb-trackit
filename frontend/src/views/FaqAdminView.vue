@@ -696,7 +696,7 @@ onMounted(fetchFaqs)
               required
               type="text"
               placeholder="Contoh: Bagaimana cara mereset kata sandi akun?"
-              class="w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] dark:bg-slate-800 px-3.5 py-2.5 text-xs font-semibold text-[#333333] dark:text-slate-100 placeholder-[#94A3B8] focus:border-[#0A51B0] focus:outline-none transition-all"
+              class="w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] dark:bg-slate-800 px-3.5 py-2.5 text-base sm:text-xs font-semibold text-[#333333] dark:text-slate-100 placeholder-[#94A3B8] focus:border-[#0A51B0] focus:outline-none transition-all"
             />
           </div>
 
@@ -712,16 +712,16 @@ onMounted(fetchFaqs)
               required
               rows="5"
               placeholder="Tuliskan jawaban atau langkah penyelesaian yang mudah diikuti..."
-              class="w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] dark:bg-slate-800 p-3.5 text-xs font-medium text-[#333333] dark:text-slate-100 placeholder-[#94A3B8] focus:border-[#0A51B0] focus:outline-none transition-all resize-none"
+              class="w-full min-h-[140px] resize-y rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] dark:bg-slate-800 p-3.5 text-base sm:text-xs font-medium leading-[1.8] text-[#333333] dark:text-slate-100 placeholder-[#94A3B8] focus:border-[#0A51B0] focus:outline-none transition-all"
             ></textarea>
           </div>
         </section>
         <section class="faq-settings-section">
           <h3>Pengaturan publikasi</h3>
-          <div class="faq-settings-grid grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
-            <div>
+          <div class="faq-settings-grid grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
+            <div class="col-span-2 sm:col-span-1">
               <label class="mb-1.5 block text-xs font-bold text-[#333333] dark:text-slate-200"
-                >Kategori</label
+                >Kategori <span class="text-rose-600">*</span></label
               >
               <CustomSelect
                 v-model="form.category"
@@ -733,7 +733,7 @@ onMounted(fetchFaqs)
               />
             </div>
 
-            <div>
+            <div class="col-span-1">
               <label class="mb-1.5 block text-xs font-bold text-[#333333] dark:text-slate-200"
                 >Status</label
               >
@@ -747,7 +747,7 @@ onMounted(fetchFaqs)
               />
             </div>
 
-            <div>
+            <div class="col-span-1">
               <label
                 for="faq-sort-order"
                 class="mb-1.5 block text-xs font-bold text-[#333333] dark:text-slate-200"
@@ -759,7 +759,7 @@ onMounted(fetchFaqs)
                 type="number"
                 min="0"
                 step="1"
-                class="w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] dark:bg-slate-800 px-3.5 py-2.5 text-xs font-semibold text-[#333333] dark:text-slate-100 focus:border-[#0A51B0] focus:outline-none transition-all"
+                class="w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] dark:bg-slate-800 px-3.5 py-2.5 text-base sm:text-xs font-semibold text-[#333333] dark:text-slate-100 focus:border-[#0A51B0] focus:outline-none transition-all"
               />
             </div>
           </div>

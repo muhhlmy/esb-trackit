@@ -345,6 +345,7 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside))
             </div>
             <span
               v-if="option[valueKey] === modelValue"
+              aria-hidden="true"
               class="material-symbols-outlined text-[15px] text-[#333333] shrink-0 ml-2"
               >check</span
             >

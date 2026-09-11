@@ -3,9 +3,12 @@ import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue';
 import { useRoute, useRouter, RouterLink } from 'vue-router';
 import { useCases } from '@/composables/useCases';
 import { useToast } from '@/composables/useToast';
+import { api } from '@/services/api';
 import DocEditorInspector from '@/components/admin/DocEditorInspector.vue';
 import CaseReader from '@/components/cases/CaseReader.vue';
 import { useEditor, EditorContent } from '@tiptap/vue-3';
+import { createDocument } from '@tiptap/core';
+import { EditorState } from '@tiptap/pm/state';
 import StarterKit from '@tiptap/starter-kit';
 import Underline from '@tiptap/extension-underline';
 import Link from '@tiptap/extension-link';
@@ -69,34 +72,30 @@ const isSaving = ref(false);
 const saveStatus = ref('Saved to cloud');
 const fileInputRef = ref(null);
 
+// Factory function for clean default document state
+function createDefaultDoc() {
+  return {
+    id: '',
+    title: '',
+    category: 'hardware',
+    tags: [],
+    summary: '',
+    problemContext: '',
+    actionSteps: [],
+    dosAndDonts: {
+      dos: [],
+      donts: []
+    },
+    snippets: [],
+    isCustom: true,
+    isFeaturedOnHome: false,
+    isPublished: true,
+    contentHtml: ''
+  };
+}
+
 // Active Document Metadata Model
-const doc = ref({
-  id: '',
-  title: 'SOP Setup Laptop Baru untuk New Joiner',
-  category: 'hardware',
-  tags: ['laptop-baru', 'oobe', 'windows-11'],
-  summary: 'Panduan Operasional Standar (SOP) penyiapan unit laptop Windows baru bagi karyawan baru.',
-  problemContext: 'Saat menyiapkan unit laptop baru, diperlukan bypass pembuatan akun online Microsoft saat OOBE.',
-  actionSteps: [
-    'Nyalakan unit laptop baru hingga masuk ke tampilan OOBE.',
-    'Tekan Shift + F10 untuk membuka Command Prompt (CMD).',
-    'Ketik oobe\\bypassnro lalu tekan Enter.'
-  ],
-  dosAndDonts: {
-    dos: ['Pastikan laptop terhubung daya sebelum update.'],
-    donts: ['Jangan hubungkan ke internet sebelum bypass NRO.']
-  },
-  snippets: [
-    {
-      label: 'Script Bypass OOBE',
-      code: 'oobe\\bypassnro'
-    }
-  ],
-  isCustom: true,
-  isFeaturedOnHome: false,
-  isPublished: true,
-  contentHtml: ''
-});
+const doc = ref(createDefaultDoc());
 
 // Real-time Case Item computed for 100% actual Employee Preview
 const previewCaseItem = computed(() => {
@@ -106,26 +105,6 @@ const previewCaseItem = computed(() => {
     contentHtml: rawHtml
   };
 });
-
-// Initial editor default HTML
-const initialEditorContent = `
-<div data-summary-block="" class="summary-block-card">
-  <p>Panduan Operasional Standar (SOP) penyiapan unit laptop Windows baru bagi karyawan baru (*new joiner*) atau fasilitas penggantian unit kerja.</p>
-</div>
-
-<p>Saat menyiapkan unit laptop baru dari distributor/vendor, diperlukan proses bypass pembuatan akun online Microsoft saat OOBE, penyiapan akun lokal standar perusahaan, penyesuaian opsi keamanan, serta instalasi paket aplikasi kerja wajib.</p>
-
-<div data-callout="info" class="callout-card callout-info">
-  <p><strong>Catatan Penting:</strong> Pastikan script installer dieksekusi dengan hak akses Administrator (<em>Run as Administrator</em>).</p>
-</div>
-
-<h3>Step-by-Step Instructions</h3>
-<ol>
-  <li><strong>Step 1:</strong> Nyalakan unit laptop baru hingga masuk ke tampilan Out-of-Box Experience (OOBE) pada tahap <em>"Let's connect you to a network"</em>.</li>
-  <li><strong>Step 2:</strong> Tekan kombinasi tombol <code>Shift + F10</code> (atau <code>Fn + Shift + F10</code>) pada keyboard untuk membuka Command Prompt.</li>
-  <li><strong>Step 3:</strong> Ketik perintah <code>oobe\\bypassnro</code> lalu tekan <strong>Enter</strong>.</li>
-</ol>
-`;
 
 // Helper to extract summary text from TipTap DOM
 function extractSummaryFromEditor(tiptapEditor) {
@@ -138,9 +117,9 @@ function extractSummaryFromEditor(tiptapEditor) {
   return '';
 }
 
-// TipTap Editor Instance
+// TipTap Editor Instance (initialized cleanly with empty content)
 const editor = useEditor({
-  content: initialEditorContent,
+  content: '',
   extensions: [
     StarterKit.configure({
       heading: {
@@ -236,12 +215,27 @@ function formatMarkdownToHtml(str) {
     .replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-[#0040e5] underline font-semibold">$1</a>');
 }
 
-onMounted(async () => {
-  document.addEventListener('selectionchange', handleEditorSelection);
-  window.addEventListener('keydown', handleGlobalKeydown);
-  await fetchCases();
-  const caseId = route.params.id;
+// Set editor content cleanly and reset ProseMirror history so undo stack starts at 0
+function setEditorContentClean(htmlContent = '') {
+  if (!editor.value) return;
 
+  // If setting empty content and editor is already clean with no undo history, skip
+  if (!htmlContent && editor.value.isEmpty && !editor.value.can().undo()) {
+    return;
+  }
+
+  const { schema, plugins } = editor.value.state;
+  const newDoc = createDocument(htmlContent || '', schema);
+  const newState = EditorState.create({
+    schema,
+    doc: newDoc,
+    plugins
+  });
+  editor.value.view.updateState(newState);
+  editor.value.view.dispatch(editor.value.view.state.tr.setMeta('addToHistory', false));
+}
+
+async function loadDocumentData(caseId) {
   if (caseId) {
     let existing = cases.value.find((c) => c.id === caseId);
     if (!existing) {
@@ -310,31 +304,30 @@ onMounted(async () => {
         }
       }
 
-      if (editor.value) {
-        editor.value.commands.setContent(htmlContent || initialEditorContent);
-      }
-    }
-  } else {
-    // New Article Mode
-    doc.value = {
-      id: '',
-      title: '',
-      category: 'hardware',
-      tags: [],
-      summary: '',
-      problemContext: '',
-      actionSteps: [],
-      dosAndDonts: { dos: [], donts: [] },
-      snippets: [],
-      isCustom: true,
-      isFeaturedOnHome: false,
-      isPublished: true,
-      contentHtml: ''
-    };
-    if (editor.value) {
-      editor.value.commands.setContent('');
+      setEditorContentClean(htmlContent || '');
+      saveStatus.value = 'Saved to cloud';
+      return;
     }
   }
+
+  // New Article Mode
+  doc.value = createDefaultDoc();
+  setEditorContentClean('');
+  saveStatus.value = 'Saved to cloud';
+}
+
+watch(
+  () => route.params.id,
+  (newId) => {
+    loadDocumentData(newId);
+  }
+);
+
+onMounted(async () => {
+  document.addEventListener('selectionchange', handleEditorSelection);
+  window.addEventListener('keydown', handleGlobalKeydown);
+  await fetchCases();
+  await loadDocumentData(route.params.id);
 });
 
 onBeforeUnmount(() => {
@@ -618,7 +611,7 @@ function goToPortal() {
         <button
           @click="performUndo"
           :disabled="!editor.can().undo()"
-          class="p-1 text-[#575d7a] dark:text-slate-400 hover:bg-[#f3f3f5] dark:hover:bg-slate-800 rounded-md disabled:opacity-30 cursor-pointer"
+          class="p-1 text-[#575d7a] dark:text-slate-400 hover:bg-[#f3f3f5] dark:hover:bg-slate-800 rounded-md disabled:opacity-30 disabled:cursor-not-allowed disabled:pointer-events-none cursor-pointer"
           title="Undo (Ctrl+Z)"
         >
           <Undo class="w-3.5 h-3.5" />
@@ -626,7 +619,7 @@ function goToPortal() {
         <button
           @click="performRedo"
           :disabled="!editor.can().redo()"
-          class="p-1 text-[#575d7a] dark:text-slate-400 hover:bg-[#f3f3f5] dark:hover:bg-slate-800 rounded-md disabled:opacity-30 cursor-pointer"
+          class="p-1 text-[#575d7a] dark:text-slate-400 hover:bg-[#f3f3f5] dark:hover:bg-slate-800 rounded-md disabled:opacity-30 disabled:cursor-not-allowed disabled:pointer-events-none cursor-pointer"
           title="Redo (Ctrl+Y)"
         >
           <Redo class="w-3.5 h-3.5" />

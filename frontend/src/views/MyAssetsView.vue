@@ -1026,28 +1026,28 @@ onMounted(() => {
             </p>
             <div class="mt-2 flex flex-wrap items-center gap-1.5 text-[11px] text-[#64748B]">
               <span
-                class="inline-flex items-center font-mono font-medium px-2 py-0.5 rounded-md bg-[#F1F5F9] text-[#333333]"
+                class="inline-flex items-center h-6 px-2.5 rounded-md bg-[#F8FAFC] border border-[#E2E8F0] font-mono font-medium text-[#333333] leading-none"
               >
                 NIK: {{ selectedEmployee.nik }}
               </span>
               <span
                 v-if="selectedEmployee.departemen"
-                class="inline-flex items-center px-2 py-0.5 rounded-md bg-[#F8FAFC] border border-[#E2E8F0] text-[#475569]"
+                class="inline-flex items-center h-6 px-2.5 rounded-md bg-[#F8FAFC] border border-[#E2E8F0] text-[#475569] leading-none"
               >
                 {{ selectedEmployee.departemen }}
               </span>
               <span
                 v-if="selectedEmployee.lokasi_kerja"
-                class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#F8FAFC] border border-[#E2E8F0] text-[#475569]"
+                class="inline-flex items-center gap-1 h-6 px-2.5 rounded-md bg-[#F8FAFC] border border-[#E2E8F0] text-[#475569] leading-none"
               >
-                <span class="material-symbols-outlined text-[12px] text-[#94A3B8]"
+                <span class="material-symbols-outlined text-[13px] text-[#94A3B8] leading-none shrink-0"
                   >location_on</span
                 >
                 {{ selectedEmployee.lokasi_kerja }}
               </span>
               <span
                 v-if="selectedEmployee.email_kantor"
-                class="inline-flex items-center px-2 py-0.5 rounded-md bg-[#F8FAFC] border border-[#E2E8F0] text-[#475569] truncate max-w-[200px]"
+                class="inline-flex items-center h-6 px-2.5 rounded-md bg-[#F8FAFC] border border-[#E2E8F0] text-[#475569] leading-none truncate max-w-[200px]"
               >
                 {{ selectedEmployee.email_kantor }}
               </span>
@@ -1057,23 +1057,23 @@ onMounted(() => {
 
         <!-- Employee Summary Stat Badges -->
         <div
-          class="grid grid-cols-2 sm:flex items-center gap-2.5 shrink-0 border-t border-[#F1F5F9] pt-3 sm:border-t-0 sm:pt-0"
+          class="grid grid-cols-2 sm:flex sm:items-stretch gap-2.5 shrink-0 border-t border-[#F1F5F9] pt-3 sm:border-t-0 sm:pt-0"
         >
           <div
-            class="rounded-lg bg-[#F8FAFC] px-3 py-2 border border-[#E2E8F0] text-center sm:text-right"
+            class="flex flex-col justify-center h-[54px] sm:h-[58px] min-w-[110px] sm:min-w-[125px] rounded-xl bg-[#F8FAFC] px-3.5 py-2 border border-[#E2E8F0] text-center sm:text-right shadow-2xs"
           >
-            <span class="block text-[10px] font-semibold uppercase text-[#64748B]">Total Aset</span>
-            <span class="text-base font-bold text-[#333333] mt-0.5 block"
+            <span class="block text-[10px] font-bold uppercase tracking-wider text-[#64748B] leading-tight">Total Aset</span>
+            <span class="font-num text-sm sm:text-base font-bold text-[#333333] leading-snug mt-0.5 block"
               >{{ myAssets.length }} Unit</span
             >
           </div>
           <div
-            class="rounded-lg bg-[#F8FAFC] px-3 py-2 border border-[#E2E8F0] text-center sm:text-right"
+            class="flex flex-col justify-center h-[54px] sm:h-[58px] min-w-[110px] sm:min-w-[125px] rounded-xl bg-[#F8FAFC] px-3.5 py-2 border border-[#E2E8F0] text-center sm:text-right shadow-2xs"
           >
-            <span class="block text-[10px] font-semibold uppercase text-[#64748B]"
+            <span class="block text-[10px] font-bold uppercase tracking-wider text-[#64748B] leading-tight"
               >Penugasan Awal</span
             >
-            <span class="text-xs font-semibold text-[#333333] mt-1 block truncate">{{
+            <span class="font-num text-xs sm:text-[13px] font-semibold text-[#333333] leading-snug mt-0.5 block truncate">{{
               employeeAssignedSince
             }}</span>
           </div>

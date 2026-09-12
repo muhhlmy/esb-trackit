@@ -12,33 +12,55 @@ export async function seedCases(queryable = pool) {
   const cases = JSON.parse(raw)
 
   let inserted = 0
+  let updated = 0
   for (const c of cases) {
-    const result = await queryable.query(
-      `INSERT INTO cases
-         (title, category, severity, tags, summary, problem_context,
-          action_steps, dos, donts, snippets, status, is_custom, sort_order)
-       SELECT $1, $2, $3, $4::jsonb, $5, $6, $7::jsonb, $8::jsonb, $9::jsonb, $10::jsonb,
-              'PUBLISHED', $11, 1
-       WHERE NOT EXISTS (SELECT 1 FROM cases WHERE title = $12)`,
-      [
-        c.title,
-        c.category,
-        c.severity,
-        JSON.stringify(c.tags),
-        c.summary,
-        c.problemContext,
-        JSON.stringify(c.actionSteps),
-        JSON.stringify(c.dos),
-        JSON.stringify(c.donts),
-        JSON.stringify(c.snippets),
-        c.isCustom === true,
-        c.title,
-      ],
-    )
-    if (result.rowCount > 0) inserted += 1
+    const existing = await queryable.query('SELECT id FROM cases WHERE title = $1', [c.title])
+    if (existing.rowCount === 0) {
+      await queryable.query(
+        `INSERT INTO cases
+           (title, category, severity, tags, summary, content_html,
+            problem_context, action_steps, dos, donts, snippets, status, is_custom, sort_order)
+         VALUES ($1, $2, $3, $4::jsonb, $5, $6, NULL, '[]'::jsonb, '[]'::jsonb, '[]'::jsonb, '[]'::jsonb, 'PUBLISHED', $7, 1)`,
+        [
+          c.title,
+          c.category,
+          c.severity,
+          JSON.stringify(c.tags || []),
+          c.summary,
+          c.contentHtml || '',
+          c.isCustom === true,
+        ],
+      )
+      inserted += 1
+    } else {
+      await queryable.query(
+        `UPDATE cases
+         SET category = $1,
+             severity = $2,
+             tags = $3::jsonb,
+             summary = $4,
+             content_html = $5,
+             problem_context = NULL,
+             action_steps = '[]'::jsonb,
+             dos = '[]'::jsonb,
+             donts = '[]'::jsonb,
+             snippets = '[]'::jsonb,
+             updated_at = CURRENT_TIMESTAMP
+         WHERE id = $6`,
+        [
+          c.category,
+          c.severity,
+          JSON.stringify(c.tags || []),
+          c.summary,
+          c.contentHtml || '',
+          existing.rows[0].id,
+        ],
+      )
+      updated += 1
+    }
   }
 
-  return { total: cases.length, inserted }
+  return { total: cases.length, inserted, updated }
 }
 
 const isRunDirectly = process.argv[1] === fileURLToPath(import.meta.url)

@@ -379,10 +379,10 @@ async function deleteEmployee() {
     const count = res?.affectedAssetsCount || 0
     if (count > 0) {
       toast(
-        `Data karyawan diubah ke Resigned. ${count} unit aset otomatis dialihkan menjadi Stock.`,
+        `Data karyawan berhasil dihapus. ${count} unit aset otomatis dialihkan menjadi Stock.`,
       )
     } else {
-      toast('Data karyawan berhasil diubah statusnya menjadi Resigned.')
+      toast('Data karyawan berhasil dihapus dari tabel.')
     }
     closeModal()
     await fetchData()
@@ -1075,7 +1075,7 @@ onMounted(() => {
             </p>
             <p class="font-normal text-[11px] text-amber-800 mt-0.5">
               Aset milik karyawan ini akan <strong>otomatis dialihkan menjadi Stock</strong> saat
-              karyawan di-delete / resigned.
+              karyawan dihapus.
             </p>
           </div>
         </div>

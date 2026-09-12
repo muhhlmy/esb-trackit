@@ -865,33 +865,64 @@ async function sendComment() {
 
 // ── Claim & Assign Ticket (dengan optimistic update) ──────────
 async function claimTicket(ticket) {
+  if (!ticket || isClaiming.value === ticket.id) return
   isClaiming.value = ticket.id
-  // Optimistic: update UI segera, jangan tunggu SSE/polling
+
   const idx = tickets.value.findIndex((t) => t.id === ticket.id)
+  const oldTicket = idx >= 0 ? { ...tickets.value[idx] } : null
+  const oldSelectedTicket =
+    selectedTicket.value?.id === ticket.id ? { ...selectedTicket.value } : null
+
+  const currentUserName = user.value?.nama || 'Saya'
+  const currentUserId = user.value?.id
+
+  const updatedFields = {
+    assigned_to_user_id: currentUserId,
+    assigned_to: currentUserName,
+    assigned_to_nama: currentUserName,
+    status_tiket: 'In Progress',
+  }
+
+  // Optimistic: update UI segera di list dan detail modal
   if (idx >= 0) {
     tickets.value[idx] = {
       ...tickets.value[idx],
-      assigned_to_user_id: user.value?.id,
-      assigned_to: user.value?.nama,
-      assigned_to_nama: user.value?.nama,
-      status_tiket: 'In Progress',
+      ...updatedFields,
     }
   }
+
+  if (selectedTicket.value?.id === ticket.id) {
+    selectedTicket.value = {
+      ...selectedTicket.value,
+      ...updatedFields,
+    }
+  }
+
   try {
-    await post(`/api/tickets/${ticket.id}/claim`, {})
+    const res = await post(`/api/tickets/${ticket.id}/claim`, {})
     toast(`Tiket '${ticket.judul}' berhasil diambil!`)
-    // Refetch stats untuk update counter (unassigned -1, dll)
+
+    if (selectedTicket.value?.id === ticket.id) {
+      selectedTicket.value = {
+        ...selectedTicket.value,
+        ...(res || {}),
+        assigned_to_user_id: currentUserId,
+        assigned_to: currentUserName,
+        assigned_to_nama: currentUserName,
+        status_tiket: res?.status_tiket || 'In Progress',
+      }
+      fetchTicketHistory(ticket.id)
+    }
+
+    await fetchTickets(true)
     scheduleStatsRefresh()
   } catch (err) {
     // Rollback optimistic update
-    if (idx >= 0) {
-      tickets.value[idx] = {
-        ...tickets.value[idx],
-        assigned_to_user_id: ticket.assigned_to_user_id,
-        assigned_to: ticket.assigned_to,
-        assigned_to_nama: ticket.assigned_to_nama,
-        status_tiket: ticket.status_tiket,
-      }
+    if (idx >= 0 && oldTicket) {
+      tickets.value[idx] = oldTicket
+    }
+    if (selectedTicket.value?.id === ticket.id && oldSelectedTicket) {
+      selectedTicket.value = oldSelectedTicket
     }
     toast(err.message || 'Gagal mengambil tiket.', 'error')
   } finally {

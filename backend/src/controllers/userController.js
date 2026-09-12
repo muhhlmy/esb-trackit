@@ -14,7 +14,7 @@ import {
   SUPERADMIN_PERMISSIONS,
   normalizePermissions,
 } from "../services/permissionService.js";
-import { hashPassword } from "../security/passwordService.js";
+import { hashPassword, DEFAULT_USER_PASSWORD } from "../security/passwordService.js";
 import {
   assertAllowedFields,
   assertPlainObject,
@@ -153,7 +153,10 @@ export async function storeUser(req, res) {
   const currentUserRole = normalizeUserManagementRole(req.user?.role);
   const nama = parseRequiredName(req.body.nama);
   const email = parseRequiredEmail(req.body.email);
-  const password = parseNewPassword(req.body.password, { required: true });
+  const rawPassword = (typeof req.body.password === 'string' && req.body.password.trim().length > 0)
+    ? req.body.password
+    : DEFAULT_USER_PASSWORD;
+  const password = parseNewPassword(rawPassword, { required: true });
   const requestedActive = parseOptionalBoolean(req.body.is_active, "is_active");
   const queueIds = parseQueueIds(req.body.queue_ids);
 

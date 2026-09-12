@@ -12,6 +12,8 @@ export async function hashPassword(password) {
   return bcrypt.hash(password, env.password.bcryptRounds)
 }
 
+export const DEFAULT_USER_PASSWORD = process.env.DEFAULT_USER_PASSWORD || 'Essensians@2026'
+
 // Deliberately not a bcrypt hash: no submitted password can authenticate until
 // the email owner completes the existing OTP reset flow and enrolls a password.
 export function createEnrollmentCredential() {

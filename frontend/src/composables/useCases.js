@@ -106,11 +106,11 @@ export function useCases() {
       const q = searchQuery.value.toLowerCase().trim()
       const matchTitle = (c.title || '').toLowerCase().includes(q)
       const matchSummary = (c.summary || '').toLowerCase().includes(q)
-      const matchContext = (c.problemContext || '').toLowerCase().includes(q)
+      const matchContent = (c.contentHtml || '').toLowerCase().includes(q)
       const matchTags =
         Array.isArray(c.tags) && c.tags.some((t) => (t || '').toLowerCase().includes(q))
 
-      return matchTitle || matchSummary || matchContext || matchTags
+      return matchTitle || matchSummary || matchContent || matchTags
     })
   })
 
@@ -186,27 +186,32 @@ export function useCases() {
     editingCase.value = null
   }
 
-  async function saveCase(formData) {
+  async function saveCase(formData, { showNotification = true } = {}) {
     const existingId = formData?.id ? Number(formData.id) : null
     const payload = toCasePayload(formData)
     try {
+      let saved
       if (existingId) {
-        const updated = normalizeCase(await api.updateCase(existingId, payload))
-        const idx = cases.value.findIndex((c) => c.id === updated.id)
-        if (idx !== -1) cases.value[idx] = updated
-        else cases.value.unshift(updated)
-        showToast('Perubahan Case berhasil disimpan!', 'success')
+        saved = normalizeCase(await api.updateCase(existingId, payload))
+        const idx = cases.value.findIndex((c) => c.id === saved.id)
+        if (idx !== -1) cases.value[idx] = saved
+        else cases.value.unshift(saved)
+        if (showNotification) {
+          showToast('Perubahan Case berhasil disimpan!', 'success')
+        }
       } else {
-        const created = normalizeCase(await api.createCase(payload))
-        cases.value.unshift(created)
-        activeCaseId.value = created.id
-        showToast('Case baru berhasil disimpan!', 'success')
+        saved = normalizeCase(await api.createCase(payload))
+        cases.value.unshift(saved)
+        activeCaseId.value = saved.id
+        if (showNotification) {
+          showToast('Case baru berhasil disimpan!', 'success')
+        }
       }
       closeDrawer()
-      return true
+      return saved
     } catch (err) {
       showToast(err.message || 'Gagal menyimpan case.', 'error')
-      return false
+      return null
     }
   }
 

@@ -91,65 +91,149 @@ watch(showLinkDialog, (open) => {
   if (open) nextTick(() => linkDialogInput.value?.focus())
 })
 
+function createEmptyDoc() {
+  return {
+    id: '',
+    title: '',
+    category: 'hardware',
+    severity: 'medium',
+    tags: [],
+    summary: '',
+    isCustom: true,
+    status: 'DRAFT',
+    contentHtml: '',
+  }
+}
+
 // Active Document Metadata Model
-const doc = ref({
-  id: '',
-  title: 'How do I reset my domain password via Okta?',
-  category: 'workplace',
-  severity: 'medium',
-  tags: ['okta', 'password-reset', 'active-directory'],
-  summary:
-    'Short guide for employees to reset their Windows/Domain credentials using Okta self-service.',
-  problemContext:
-    'If you find yourself locked out of your workstation or need to proactively update your credentials, follow these steps to securely reset your password through our SSO provider.',
-  actionSteps: [
-    'Step 1: Open web browser and navigate to the company SSO portal (sso.company.example).',
-    'Step 2: Click on "Need help signing in?" at the bottom of the login widget, then select "Forgot password?".',
-    'Step 3: Enter your username or employee ID, then verify via Authenticator app or SMS code.',
-    'Step 4: Create a new password meeting the 16-character minimum requirement and confirm.',
-  ],
-  dosAndDonts: {
-    dos: [
-      'Always ensure you are connected to the corporate VPN before resetting credentials remotely.',
-      'Use a strong passphrase combining words, symbols, and numbers.',
-    ],
-    donts: [
-      'Do not share temporary OTP verification codes with anyone over chat or phone.',
-      'Do not reuse previous passwords across non-work accounts.',
-    ],
+const doc = ref(createEmptyDoc())
+
+// Input refs for focus management
+const titleInputRef = ref(null)
+const summaryInputRef = ref(null)
+
+// Dedicated Field History Manager for text inputs (Title & Summary)
+function createFieldHistory(initialValue = '') {
+  const undoStack = ref([])
+  const redoStack = ref([])
+  const lastCommitted = ref(initialValue)
+  let debounceTimer = null
+
+  function pushState(newValue, onCommit) {
+    if (newValue === lastCommitted.value) return
+
+    clearTimeout(debounceTimer)
+    debounceTimer = setTimeout(() => {
+      if (newValue !== lastCommitted.value) {
+        undoStack.value.push(lastCommitted.value)
+        redoStack.value = []
+        lastCommitted.value = newValue
+        if (undoStack.value.length > 50) {
+          undoStack.value.shift()
+        }
+        if (onCommit) onCommit()
+      }
+    }, 400)
+  }
+
+  function hasUncommitted(currentValue) {
+    return (currentValue || '') !== lastCommitted.value
+  }
+
+  function undo(currentValue) {
+    clearTimeout(debounceTimer)
+    if (hasUncommitted(currentValue)) {
+      redoStack.value.push(currentValue)
+      const prev = lastCommitted.value
+      return prev
+    }
+    if (undoStack.value.length === 0) return currentValue
+
+    const prev = undoStack.value.pop()
+    redoStack.value.push(currentValue)
+    lastCommitted.value = prev
+    return prev
+  }
+
+  function redo(currentValue) {
+    clearTimeout(debounceTimer)
+    if (redoStack.value.length === 0) return currentValue
+
+    const next = redoStack.value.pop()
+    undoStack.value.push(currentValue)
+    lastCommitted.value = next
+    return next
+  }
+
+  function reset(val = '') {
+    clearTimeout(debounceTimer)
+    undoStack.value = []
+    redoStack.value = []
+    lastCommitted.value = val
+  }
+
+  function canUndo(currentValue) {
+    return hasUncommitted(currentValue) || undoStack.value.length > 0
+  }
+
+  function canRedo() {
+    return redoStack.value.length > 0
+  }
+
+  return {
+    undoStack,
+    redoStack,
+    lastCommitted,
+    pushState,
+    hasUncommitted,
+    undo,
+    redo,
+    reset,
+    canUndo,
+    canRedo,
+  }
+}
+
+const titleHistory = createFieldHistory('')
+const summaryHistory = createFieldHistory('')
+const lastActiveTarget = ref('editor') // 'title' | 'summary' | 'editor'
+const actionHistoryStack = ref([]) // array of 'title' | 'summary' | 'editor'
+const actionRedoStack = ref([])
+const isUndoingOrRedoing = ref(false)
+
+watch(
+  () => doc.value.title,
+  (newVal) => {
+    if (isUndoingOrRedoing.value) return
+    lastActiveTarget.value = 'title'
+    titleHistory.pushState(newVal, () => {
+      if (actionHistoryStack.value[actionHistoryStack.value.length - 1] !== 'title') {
+        actionHistoryStack.value.push('title')
+        actionRedoStack.value = []
+      }
+    })
+    saveStatus.value = 'Belum disimpan'
   },
-  snippets: [
-    {
-      label: 'Direct SSO Portal Link',
-      code: 'https://sso.company.example/signin/forgot-password',
-    },
-  ],
-  isCustom: true,
-  status: 'DRAFT',
-  contentHtml: '',
-})
+)
 
-// Initial editor default HTML
-const initialEditorContent = `
-<p>If you find yourself locked out of your workstation or need to proactively update your credentials, follow these steps to securely reset your password through our SSO provider.</p>
-
-<blockquote>[!] Always ensure you are on the corporate VPN if working remotely before attempting a credential sync.</blockquote>
-
-<h3>Step-by-Step Instructions</h3>
-<ol>
-  <li><strong>Step 1: Navigate to the Portal</strong><br/>Open your preferred web browser (Chrome or Edge recommended) and go to the Okta authentication gateway.</li>
-  <li><strong>Step 2: Initiate Reset</strong><br/>Click on the <em>"Need help signing in?"</em> link at the bottom of the widget, then select <em>"Forgot password?"</em>.</li>
-  <li><strong>Step 3: Verify Identity</strong><br/>Authenticate using push notification on the Okta Verify app or SMS token.</li>
-  <li><strong>Step 4: Set New Password</strong><br/>Enter a new password meeting the 16-character company security policy.</li>
-</ol>
-
-<pre><code>Portal Gateway: https://sso.company.example/
-Password Rule: Min 16 chars, 1 uppercase, 1 symbol, 1 digit</code></pre>
-`
+watch(
+  () => doc.value.summary,
+  (newVal) => {
+    if (isUndoingOrRedoing.value) return
+    lastActiveTarget.value = 'summary'
+    summaryHistory.pushState(newVal, () => {
+      if (actionHistoryStack.value[actionHistoryStack.value.length - 1] !== 'summary') {
+        actionHistoryStack.value.push('summary')
+        actionRedoStack.value = []
+      }
+    })
+    saveStatus.value = 'Belum disimpan'
+  },
+)
 
 // TipTap Editor Instance
 const editor = useEditor({
-  content: initialEditorContent,
+  content: '',
   extensions: [
     StarterKit.configure({
       heading: {
@@ -174,11 +258,186 @@ const editor = useEditor({
       },
     }),
   ],
+  onFocus: () => {
+    lastActiveTarget.value = 'editor'
+  },
   onUpdate: ({ editor }) => {
+    if (isUndoingOrRedoing.value) return
+    lastActiveTarget.value = 'editor'
     doc.value.contentHtml = editor.getHTML()
+    if (actionHistoryStack.value[actionHistoryStack.value.length - 1] !== 'editor') {
+      actionHistoryStack.value.push('editor')
+      actionRedoStack.value = []
+    }
     saveStatus.value = 'Belum disimpan'
   },
 })
+
+const canUndo = computed(() => {
+  return (
+    titleHistory.canUndo(doc.value.title) ||
+    summaryHistory.canUndo(doc.value.summary) ||
+    (editor.value?.can().undo() ?? false)
+  )
+})
+
+const canRedo = computed(() => {
+  return (
+    titleHistory.canRedo() ||
+    summaryHistory.canRedo() ||
+    (editor.value?.can().redo() ?? false)
+  )
+})
+
+function handleUndo() {
+  isUndoingOrRedoing.value = true
+  try {
+    // 1. If currently focused on or just edited Title and Title can undo
+    if (lastActiveTarget.value === 'title' && titleHistory.canUndo(doc.value.title)) {
+      doc.value.title = titleHistory.undo(doc.value.title)
+      actionRedoStack.value.push('title')
+      nextTick(() => titleInputRef.value?.focus())
+      return
+    }
+
+    // 2. If currently focused on or just edited Summary and Summary can undo
+    if (lastActiveTarget.value === 'summary' && summaryHistory.canUndo(doc.value.summary)) {
+      doc.value.summary = summaryHistory.undo(doc.value.summary)
+      actionRedoStack.value.push('summary')
+      nextTick(() => summaryInputRef.value?.focus())
+      return
+    }
+
+    // 3. If currently in Editor and Editor can undo
+    if (lastActiveTarget.value === 'editor' && (editor.value?.can().undo() ?? false)) {
+      editor.value?.chain().focus().undo().run()
+      actionRedoStack.value.push('editor')
+      return
+    }
+
+    // 4. Chronological fallback from actionHistoryStack
+    while (actionHistoryStack.value.length > 0) {
+      const target = actionHistoryStack.value.pop()
+      if (target === 'title' && titleHistory.canUndo(doc.value.title)) {
+        doc.value.title = titleHistory.undo(doc.value.title)
+        actionRedoStack.value.push('title')
+        lastActiveTarget.value = 'title'
+        nextTick(() => titleInputRef.value?.focus())
+        return
+      }
+      if (target === 'summary' && summaryHistory.canUndo(doc.value.summary)) {
+        doc.value.summary = summaryHistory.undo(doc.value.summary)
+        actionRedoStack.value.push('summary')
+        lastActiveTarget.value = 'summary'
+        nextTick(() => summaryInputRef.value?.focus())
+        return
+      }
+      if (target === 'editor' && (editor.value?.can().undo() ?? false)) {
+        editor.value?.chain().focus().undo().run()
+        actionRedoStack.value.push('editor')
+        lastActiveTarget.value = 'editor'
+        return
+      }
+    }
+
+    // 5. Ultimate fallback if stack was empty but a component still has undo
+    if (editor.value?.can().undo()) {
+      editor.value?.chain().focus().undo().run()
+      lastActiveTarget.value = 'editor'
+    } else if (summaryHistory.canUndo(doc.value.summary)) {
+      doc.value.summary = summaryHistory.undo(doc.value.summary)
+      lastActiveTarget.value = 'summary'
+      nextTick(() => summaryInputRef.value?.focus())
+    } else if (titleHistory.canUndo(doc.value.title)) {
+      doc.value.title = titleHistory.undo(doc.value.title)
+      lastActiveTarget.value = 'title'
+      nextTick(() => titleInputRef.value?.focus())
+    }
+  } finally {
+    nextTick(() => {
+      isUndoingOrRedoing.value = false
+    })
+  }
+}
+
+function handleRedo() {
+  isUndoingOrRedoing.value = true
+  try {
+    // 1. If currently focused on or just edited Title and Title can redo
+    if (lastActiveTarget.value === 'title' && titleHistory.canRedo()) {
+      doc.value.title = titleHistory.redo(doc.value.title)
+      actionHistoryStack.value.push('title')
+      nextTick(() => titleInputRef.value?.focus())
+      return
+    }
+
+    // 2. If currently focused on or just edited Summary and Summary can redo
+    if (lastActiveTarget.value === 'summary' && summaryHistory.canRedo()) {
+      doc.value.summary = summaryHistory.redo(doc.value.summary)
+      actionHistoryStack.value.push('summary')
+      nextTick(() => summaryInputRef.value?.focus())
+      return
+    }
+
+    // 3. If currently in Editor and Editor can redo
+    if (lastActiveTarget.value === 'editor' && (editor.value?.can().redo() ?? false)) {
+      editor.value?.chain().focus().redo().run()
+      actionHistoryStack.value.push('editor')
+      return
+    }
+
+    // 4. Chronological pop from actionRedoStack
+    while (actionRedoStack.value.length > 0) {
+      const target = actionRedoStack.value.pop()
+      if (target === 'title' && titleHistory.canRedo()) {
+        doc.value.title = titleHistory.redo(doc.value.title)
+        actionHistoryStack.value.push('title')
+        lastActiveTarget.value = 'title'
+        nextTick(() => titleInputRef.value?.focus())
+        return
+      }
+      if (target === 'summary' && summaryHistory.canRedo()) {
+        doc.value.summary = summaryHistory.redo(doc.value.summary)
+        actionHistoryStack.value.push('summary')
+        lastActiveTarget.value = 'summary'
+        nextTick(() => summaryInputRef.value?.focus())
+        return
+      }
+      if (target === 'editor' && (editor.value?.can().redo() ?? false)) {
+        editor.value?.chain().focus().redo().run()
+        actionHistoryStack.value.push('editor')
+        lastActiveTarget.value = 'editor'
+        return
+      }
+    }
+
+    // 5. Ultimate fallback:
+    if (editor.value?.can().redo()) {
+      editor.value?.chain().focus().redo().run()
+      lastActiveTarget.value = 'editor'
+    } else if (summaryHistory.canRedo()) {
+      doc.value.summary = summaryHistory.redo(doc.value.summary)
+      lastActiveTarget.value = 'summary'
+      nextTick(() => summaryInputRef.value?.focus())
+    } else if (titleHistory.canRedo()) {
+      doc.value.title = titleHistory.redo(doc.value.title)
+      lastActiveTarget.value = 'title'
+      nextTick(() => titleInputRef.value?.focus())
+    }
+  } finally {
+    nextTick(() => {
+      isUndoingOrRedoing.value = false
+    })
+  }
+}
+
+function resetAllHistory() {
+  titleHistory.reset(doc.value.title || '')
+  summaryHistory.reset(doc.value.summary || '')
+  actionHistoryStack.value = []
+  actionRedoStack.value = []
+  lastActiveTarget.value = 'editor'
+}
 
 // Image Insertion Modal State & Methods
 const isImageModalOpen = ref(false)
@@ -285,69 +544,34 @@ onMounted(async () => {
     if (existing) {
       doc.value = JSON.parse(JSON.stringify(existing))
 
-      let htmlContent = existing.contentHtml || existing.content_html || ''
-      if (!htmlContent) {
-        if (existing.problemContext) {
-          htmlContent += `<p>${existing.problemContext}</p>`
-        }
-        if (existing.summary && existing.summary !== doc.value.problemContext) {
-          htmlContent += `<blockquote>${existing.summary}</blockquote>`
-        }
-        if (existing.actionSteps && existing.actionSteps.length) {
-          htmlContent += '<h3>Prosedur / Langkah-langkah:</h3><ol>'
-          existing.actionSteps.forEach((s) => {
-            htmlContent += `<li>${s}</li>`
-          })
-          htmlContent += '</ol>'
-        }
-        if (existing.dosAndDonts) {
-          if (existing.dosAndDonts.dos && existing.dosAndDonts.dos.length) {
-            htmlContent += "<h3>Do's (Yang Wajib Dilakukan):</h3><ul>"
-            existing.dosAndDonts.dos.forEach((d) => {
-              htmlContent += `<li>✅ ${d}</li>`
-            })
-            htmlContent += '</ul>'
-          }
-          if (existing.dosAndDonts.donts && existing.dosAndDonts.donts.length) {
-            htmlContent += "<h3>Don'ts (Yang Dilarang):</h3><ul>"
-            existing.dosAndDonts.donts.forEach((d) => {
-              htmlContent += `<li>❌ ${d}</li>`
-            })
-            htmlContent += '</ul>'
-          }
-        }
-        if (existing.snippets && existing.snippets.length) {
-          existing.snippets.forEach((snip) => {
-            htmlContent += `<pre><code>${snip.label || 'Snippet'}:\n${snip.code || ''}</code></pre>`
-          })
-        }
-      }
+      const htmlContent = existing.contentHtml || existing.content_html || '<p></p>'
 
       if (editor.value) {
-        editor.value.commands.setContent(htmlContent || '<p></p>')
+        editor.value
+          .chain()
+          .setContent(htmlContent, { emitUpdate: false })
+          .command(({ tr }) => {
+            tr.setMeta('addToHistory', false)
+            return true
+          })
+          .run()
       }
     }
   } else {
     // Mode Dokumen Baru
-    doc.value = {
-      id: '',
-      title: '',
-      category: 'hardware',
-      severity: 'medium',
-      tags: [],
-      summary: '',
-      problemContext: '',
-      actionSteps: [],
-      dosAndDonts: { dos: [], donts: [] },
-      snippets: [],
-      isCustom: true,
-      status: 'DRAFT',
-      contentHtml: '',
-    }
-    if (editor.value) {
-      editor.value.commands.setContent('<p></p>')
+    doc.value = createEmptyDoc()
+    if (editor.value && editor.value.getText().trim() !== '') {
+      editor.value
+        .chain()
+        .setContent('<p></p>', { emitUpdate: false })
+        .command(({ tr }) => {
+          tr.setMeta('addToHistory', false)
+          return true
+        })
+        .run()
     }
   }
+  resetAllHistory()
 })
 
 onBeforeUnmount(() => {
@@ -449,29 +673,62 @@ function insertStep() {
 
 // Save & Publish
 async function handleSaveDraft() {
+  if (editor.value) {
+    doc.value.contentHtml = editor.value.getHTML()
+  }
+  if (!doc.value.title?.trim()) {
+    showToast('Judul artikel wajib diisi.', 'error')
+    return
+  }
+
   isSaving.value = true
   saveStatus.value = 'Menyimpan...'
   try {
-    await saveCase({ ...doc.value, status: 'DRAFT' })
-    saveStatus.value = 'Tersimpan'
-    showToast('Draft artikel berhasil disimpan!', 'info')
+    const saved = await saveCase({ ...doc.value, status: 'DRAFT' }, { showNotification: false })
+    if (saved) {
+      if (saved.id && !doc.value.id) {
+        doc.value.id = saved.id
+        router.replace(`/admin/editor/${saved.id}`)
+      }
+      doc.value.status = 'DRAFT'
+      saveStatus.value = 'Tersimpan'
+      showToast('Draft artikel berhasil disimpan!', 'info')
+    } else {
+      saveStatus.value = 'Belum disimpan'
+    }
   } catch {
     saveStatus.value = 'Belum disimpan'
-    showToast('Gagal menyimpan draft.', 'error')
   } finally {
     isSaving.value = false
   }
 }
 
 async function handlePublish() {
+  if (editor.value) {
+    doc.value.contentHtml = editor.value.getHTML()
+  }
+  if (!doc.value.title?.trim()) {
+    showToast('Judul artikel wajib diisi.', 'error')
+    return
+  }
+
   isSaving.value = true
   saveStatus.value = 'Menyimpan...'
   try {
-    await saveCase({ ...doc.value, status: 'PUBLISHED' })
-    saveStatus.value = 'Tersimpan'
-    showToast('Artikel berhasil dipublikasikan!', 'success')
+    const saved = await saveCase({ ...doc.value, status: 'PUBLISHED' }, { showNotification: false })
+    if (saved) {
+      if (saved.id && !doc.value.id) {
+        doc.value.id = saved.id
+        router.replace(`/admin/editor/${saved.id}`)
+      }
+      doc.value.status = 'PUBLISHED'
+      saveStatus.value = 'Tersimpan'
+      showToast('Artikel berhasil dipublikasikan!', 'success')
+    } else {
+      saveStatus.value = 'Belum disimpan'
+    }
   } catch {
-    showToast('Gagal mempublikasikan artikel.', 'error')
+    saveStatus.value = 'Belum disimpan'
   } finally {
     isSaving.value = false
   }
@@ -591,16 +848,18 @@ function goToAdminCases() {
         class="flex items-center gap-0.5 border-r border-[#E2E8F0] dark:border-slate-800 pr-1.5 sm:pr-2 mr-0.5 sm:mr-1 shrink-0"
       >
         <button
-          @click="editor.chain().focus().undo().run()"
-          :disabled="!editor.can().undo()"
+          @mousedown.prevent
+          @click="handleUndo"
+          :disabled="!canUndo"
           class="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center text-[#64748B] dark:text-slate-400 hover:bg-[#F1F5F9] dark:hover:bg-slate-800 rounded-lg disabled:opacity-30 cursor-pointer active:scale-95 touch-manipulation"
           title="Undo (Ctrl+Z)"
         >
           <Undo class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
         </button>
         <button
-          @click="editor.chain().focus().redo().run()"
-          :disabled="!editor.can().redo()"
+          @mousedown.prevent
+          @click="handleRedo"
+          :disabled="!canRedo"
           class="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center text-[#64748B] dark:text-slate-400 hover:bg-[#F1F5F9] dark:hover:bg-slate-800 rounded-lg disabled:opacity-30 cursor-pointer active:scale-95 touch-manipulation"
           title="Redo (Ctrl+Y)"
         >
@@ -736,14 +995,6 @@ function goToAdminCases() {
         >
           <LinkIcon class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
         </button>
-
-        <button
-          @click="openImageModal"
-          class="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-lg transition-colors cursor-pointer text-[#64748B] dark:text-slate-400 hover:bg-[#F1F5F9] dark:hover:bg-slate-800 active:scale-95 touch-manipulation"
-          title="Insert Gambar"
-        >
-          <ImageIcon class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#333333]" />
-        </button>
       </div>
 
       <!-- Inserter Components -->
@@ -808,7 +1059,15 @@ function goToAdminCases() {
 
           <!-- Document Title Field -->
           <input
+            ref="titleInputRef"
             v-model="doc.title"
+            @focus="lastActiveTarget = 'title'"
+            @keydown.ctrl.z.stop.prevent="handleUndo"
+            @keydown.meta.z.stop.prevent="handleUndo"
+            @keydown.ctrl.y.stop.prevent="handleRedo"
+            @keydown.meta.y.stop.prevent="handleRedo"
+            @keydown.ctrl.shift.z.stop.prevent="handleRedo"
+            @keydown.meta.shift.z.stop.prevent="handleRedo"
             aria-label="Judul artikel"
             type="text"
             class="w-full text-xl sm:text-3xl font-extrabold text-[#333333] dark:text-white bg-transparent border-none focus:outline-none focus:ring-0 p-0 placeholder:text-[#CBD5E1] tracking-tight"
@@ -825,7 +1084,15 @@ function goToAdminCases() {
               Ringkasan
             </label>
             <textarea
+              ref="summaryInputRef"
               v-model="doc.summary"
+              @focus="lastActiveTarget = 'summary'"
+              @keydown.ctrl.z.stop.prevent="handleUndo"
+              @keydown.meta.z.stop.prevent="handleUndo"
+              @keydown.ctrl.y.stop.prevent="handleRedo"
+              @keydown.meta.y.stop.prevent="handleRedo"
+              @keydown.ctrl.shift.z.stop.prevent="handleRedo"
+              @keydown.meta.shift.z.stop.prevent="handleRedo"
               aria-label="Ringkasan artikel"
               rows="2"
               class="w-full bg-transparent text-xs sm:text-sm text-[#334155] dark:text-slate-300 focus:outline-none resize-none leading-relaxed font-normal"

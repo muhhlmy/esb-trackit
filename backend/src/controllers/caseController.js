@@ -11,6 +11,7 @@ import { sanitizeRichTextHtml } from '../security/htmlSanitizer.js'
 const MAX_TITLE_LENGTH = 300
 const MAX_CATEGORY_LENGTH = 100
 const MAX_TEXT_LENGTH = 20000
+const MAX_CONTENT_HTML_LENGTH = 10 * 1024 * 1024 // 10MB to accommodate rich text and embedded images (matching Express body limit)
 const MAX_LIST_ITEMS = 100
 const MAX_LIST_ITEM_LENGTH = 2000
 const MAX_SNIPPET_ITEMS = 50
@@ -103,6 +104,16 @@ function normalizeOptionalText(value, label) {
   return text
 }
 
+function normalizeContentHtml(value) {
+  if (value === undefined || value === null) return ''
+  if (typeof value !== 'string') throw createHttpError(400, 'Content HTML wajib berupa teks.')
+  const text = value.trim()
+  if (text.length > MAX_CONTENT_HTML_LENGTH) {
+    throw createHttpError(400, `Content HTML melebihi batas maksimal (${Math.round(MAX_CONTENT_HTML_LENGTH / (1024 * 1024))}MB).`)
+  }
+  return sanitizeRichTextHtml(text)
+}
+
 function normalizeStringList(value, label) {
   if (value === undefined || value === null) return []
   if (!Array.isArray(value) || value.length > MAX_LIST_ITEMS) {
@@ -166,7 +177,7 @@ function validateCreateBody(body) {
     tags: normalizeStringList(body.tags, 'Tags'),
     summary: normalizeOptionalText(body.summary, 'Summary'),
     problem_context: normalizeOptionalText(body.problemContext, 'Problem context'),
-    content_html: sanitizeRichTextHtml(normalizeOptionalText(body.contentHtml, 'Content HTML')),
+    content_html: normalizeContentHtml(body.contentHtml),
     action_steps: normalizeStringList(body.actionSteps, 'Action steps'),
     dos: normalizeDosDonts(body.dosAndDonts, 'dos', 'Dos'),
     donts: normalizeDosDonts(body.dosAndDonts, 'donts', 'Donts'),
@@ -191,7 +202,7 @@ function validateUpdateBody(body) {
   if (has('tags')) out.tags = normalizeStringList(body.tags, 'Tags')
   if (has('summary')) out.summary = normalizeOptionalText(body.summary, 'Summary')
   if (has('problemContext')) out.problem_context = normalizeOptionalText(body.problemContext, 'Problem context')
-  if (has('contentHtml')) out.content_html = sanitizeRichTextHtml(normalizeOptionalText(body.contentHtml, 'Content HTML'))
+  if (has('contentHtml')) out.content_html = normalizeContentHtml(body.contentHtml)
   if (has('actionSteps')) out.action_steps = normalizeStringList(body.actionSteps, 'Action steps')
   if (has('dosAndDonts')) {
     out.dos = normalizeDosDonts(body.dosAndDonts, 'dos', 'Dos')

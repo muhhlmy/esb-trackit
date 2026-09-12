@@ -158,7 +158,7 @@ const superadminPermissions = () => ({
 const emptyForm = () => ({
   nama: '',
   email: '',
-  password: '',
+  password: 'Essensians@2026',
   role: 'user',
   permissions: defaultPermissions(),
   queue_ids: [],
@@ -492,9 +492,7 @@ async function saveUser() {
     return
   }
   if (modalMode.value === 'add' && !form.value.password) {
-    modalError.value = 'Password wajib diisi untuk pengguna baru.'
-    isSubmitting.value = false
-    return
+    form.value.password = 'Essensians@2026'
   }
   const PASSWORD_COMPLEXITY_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[\d\W_]).{8,}$/
   if (form.value.password && !PASSWORD_COMPLEXITY_REGEX.test(form.value.password)) {
@@ -1159,17 +1157,16 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
             <!-- Password -->
             <div class="flex flex-col gap-1">
               <label for="user-password" class="text-xs font-semibold text-[#333333]">
-                {{ modalMode === 'add' ? 'Password *' : 'Password Baru' }}
+                {{ modalMode === 'add' ? 'Password (Default: Essensians@2026)' : 'Password Baru' }}
               </label>
               <input
                 id="user-password"
                 v-model="form.password"
-                :required="modalMode === 'add'"
                 minlength="8"
                 type="password"
                 autocomplete="new-password"
                 :placeholder="
-                  modalMode === 'add' ? 'Minimal 8 karakter' : 'Kosongkan jika tidak diubah'
+                  modalMode === 'add' ? 'Default: Essensians@2026' : 'Kosongkan jika tidak diubah'
                 "
                 class="h-9 w-full rounded-xl border border-[#E2E8F0] bg-white px-3 text-xs text-[#333333] placeholder-[#94A3B8] focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
               />

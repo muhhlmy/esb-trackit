@@ -1,18 +1,12 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { computed } from 'vue'
 import { useAuth } from '@/composables/useAuth'
 import { useBookmarks } from '@/composables/useBookmarks'
-import { useToast } from '@/composables/useToast'
 import { sanitizeRichTextHtml } from '@/utils/htmlSanitizer'
 import {
   Bookmark,
   Edit3,
-  Copy,
-  Check,
-  CheckCircle,
-  XCircle,
   HelpCircle,
-  Terminal,
   MessageSquare,
   User,
   Lightbulb,
@@ -31,27 +25,10 @@ defineEmits(['edit', 'submitTicket'])
 
 const { isCrudUnlocked } = useAuth()
 const { isBookmarked, toggleBookmark } = useBookmarks()
-const { showToast } = useToast()
 
 // Sanitasi HTML rich-text sebelum v-html (pertahanan terhadap XSS dari konten
 // yang tersimpan di DB / output editor).
 const safeContentHtml = computed(() => sanitizeRichTextHtml(props.caseItem?.contentHtml || ''))
-
-const copiedSnippetIndex = ref(null)
-const checkedSteps = ref({})
-
-function copySnippet(code, index) {
-  navigator.clipboard.writeText(code)
-  copiedSnippetIndex.value = index
-  showToast('Snippet / Perintah disalin ke clipboard!', 'success')
-  setTimeout(() => {
-    copiedSnippetIndex.value = null
-  }, 2000)
-}
-
-function toggleStepCheck(idx) {
-  checkedSteps.value[idx] = !checkedSteps.value[idx]
-}
 
 const severityClass = computed(() => {
   switch (props.caseItem?.severity?.toLowerCase()) {
@@ -163,6 +140,7 @@ const severityClass = computed(() => {
 
       <!-- Notion Summary Callout Box -->
       <div
+        v-if="caseItem.summary"
         class="p-4 rounded-xl bg-white dark:bg-slate-900 border border-[#c4c5d9] dark:border-slate-800 shadow-2xs flex items-start gap-3"
       >
         <div
@@ -179,166 +157,18 @@ const severityClass = computed(() => {
       </div>
     </div>
 
-    <!-- TipTap Rich HTML Content Section (if available) -->
+    <!-- TipTap Rich HTML Content Section (Model Dokumen Bebas) -->
     <section
-      v-if="caseItem.contentHtml"
-      class="prose prose-slate dark:prose-invert max-w-none text-xs sm:text-sm leading-relaxed"
+      v-if="safeContentHtml"
+      class="doc-body prose prose-slate dark:prose-invert max-w-none text-xs sm:text-sm leading-relaxed"
       v-html="safeContentHtml"
     ></section>
-
-    <!-- Problem Context Section -->
-    <section v-else-if="caseItem.problemContext" class="space-y-2">
-      <h2 class="text-sm font-bold text-[#1a1c1d] dark:text-slate-200 uppercase tracking-wider">
-        Background &amp; Skenario Kendala
-      </h2>
-      <div
-        class="p-4 rounded-xl bg-[#f9f9fb] dark:bg-slate-900/60 border border-[#e2e2e4] dark:border-slate-800 text-xs sm:text-sm text-[#434656] dark:text-slate-300 leading-relaxed"
-      >
-        {{ caseItem.problemContext }}
-      </div>
-    </section>
-
-    <!-- Standard Operating Procedure Steps -->
-    <section v-if="caseItem.actionSteps && caseItem.actionSteps.length" class="space-y-4">
-      <div class="flex items-center justify-between">
-        <h2 class="text-base font-bold text-[#1a1c1d] dark:text-slate-200">
-          Langkah Penyelesaian (Action Steps)
-        </h2>
-        <span class="text-xs text-[#575d7a] dark:text-slate-400 font-mono">
-          {{ Object.values(checkedSteps).filter(Boolean).length }} /
-          {{ caseItem.actionSteps.length }} Selesai
-        </span>
-      </div>
-
-      <div class="space-y-2.5">
-        <div
-          v-for="(step, idx) in caseItem.actionSteps"
-          :key="idx"
-          @click="toggleStepCheck(idx)"
-          class="flex items-start gap-3.5 p-3.5 rounded-xl border transition-all cursor-pointer group"
-          :class="
-            checkedSteps[idx]
-              ? 'bg-[#f2f1ff] dark:bg-indigo-950/20 border-[#0040e5]/40 opacity-75'
-              : 'bg-white dark:bg-slate-900/80 border-[#c4c5d9] dark:border-slate-800 hover:border-[#0040e5] dark:hover:border-slate-700 shadow-2xs'
-          "
-        >
-          <!-- Checkbox / Number -->
-          <button
-            type="button"
-            class="shrink-0 mt-0.5 w-5 h-5 rounded-md border flex items-center justify-center transition-colors text-xs font-bold"
-            :class="
-              checkedSteps[idx]
-                ? 'bg-[#0040e5] border-[#0040e5] text-white'
-                : 'border-[#c4c5d9] dark:border-slate-700 bg-[#f9f9fb] dark:bg-slate-800 text-[#575d7a] dark:text-slate-400 group-hover:border-[#0040e5]'
-            "
-          >
-            <Check v-if="checkedSteps[idx]" class="w-3 h-3" />
-            <span v-else>{{ idx + 1 }}</span>
-          </button>
-
-          <!-- Step Content -->
-          <div
-            class="text-xs sm:text-sm leading-relaxed"
-            :class="
-              checkedSteps[idx]
-                ? 'line-through text-[#64748b]'
-                : 'text-[#1a1c1d] dark:text-slate-300'
-            "
-          >
-            {{ step }}
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- DOs & DON'Ts Comparison -->
-    <section
-      v-if="caseItem.dosAndDonts?.dos?.length || caseItem.dosAndDonts?.donts?.length"
-      class="grid grid-cols-1 sm:grid-cols-2 gap-4"
+    <div
+      v-else
+      class="p-8 rounded-xl bg-[#f9f9fb] dark:bg-slate-900 border border-[#e2e2e4] dark:border-slate-800 text-center text-xs text-[#575d7a] dark:text-slate-400"
     >
-      <!-- DOs -->
-      <div
-        v-if="caseItem.dosAndDonts?.dos?.length"
-        class="p-4 rounded-xl bg-emerald-500/10 dark:bg-emerald-950/20 border border-emerald-500/25 space-y-3"
-      >
-        <div
-          class="flex items-center gap-2 text-emerald-800 dark:text-emerald-400 font-bold text-xs uppercase tracking-wider"
-        >
-          <CheckCircle class="w-4 h-4" />
-          <span>Best Practices (DOs)</span>
-        </div>
-        <ul class="space-y-2 text-xs text-emerald-950 dark:text-emerald-200">
-          <li
-            v-for="(doItem, idx) in caseItem.dosAndDonts.dos"
-            :key="idx"
-            class="flex items-start gap-2"
-          >
-            <span class="text-emerald-600 font-bold">•</span>
-            <span>{{ doItem }}</span>
-          </li>
-        </ul>
-      </div>
-
-      <!-- DON'Ts -->
-      <div
-        v-if="caseItem.dosAndDonts?.donts?.length"
-        class="p-4 rounded-xl bg-rose-500/10 dark:bg-rose-950/20 border border-rose-500/25 space-y-3"
-      >
-        <div
-          class="flex items-center gap-2 text-rose-800 dark:text-rose-400 font-bold text-xs uppercase tracking-wider"
-        >
-          <XCircle class="w-4 h-4" />
-          <span>Peringatan (DON'Ts)</span>
-        </div>
-        <ul class="space-y-2 text-xs text-rose-950 dark:text-rose-200">
-          <li
-            v-for="(dontItem, idx) in caseItem.dosAndDonts.donts"
-            :key="idx"
-            class="flex items-start gap-2"
-          >
-            <span class="text-rose-600 font-bold">•</span>
-            <span>{{ dontItem }}</span>
-          </li>
-        </ul>
-      </div>
-    </section>
-
-    <!-- Code / Command Snippets -->
-    <section v-if="caseItem.snippets && caseItem.snippets.length" class="space-y-3">
-      <div class="flex items-center gap-2 text-[#1a1c1d] dark:text-slate-200 font-bold text-sm">
-        <Terminal class="w-4 h-4 text-[#0040e5] dark:text-indigo-400" />
-        <h2>Commands &amp; Code Blocks</h2>
-      </div>
-
-      <div
-        v-for="(snip, idx) in caseItem.snippets"
-        :key="idx"
-        class="rounded-xl border border-[#c4c5d9] dark:border-slate-800 bg-[#edeef0] dark:bg-slate-950 overflow-hidden shadow-2xs"
-      >
-        <div
-          class="flex items-center justify-between px-4 py-2 bg-white dark:bg-slate-900 border-b border-[#e2e2e4] dark:border-slate-800 text-xs text-[#575d7a] dark:text-slate-400"
-        >
-          <span class="font-mono font-semibold text-[#1a1c1d] dark:text-slate-300">{{
-            snip.label || 'Code Snippet'
-          }}</span>
-          <button
-            @click="copySnippet(snip.code, idx)"
-            class="flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#f3f3f5] hover:bg-[#e2e2e4] dark:bg-slate-800 dark:hover:bg-slate-700 text-[#1a1c1d] dark:text-slate-200 transition-colors cursor-pointer text-xs"
-          >
-            <Check
-              v-if="copiedSnippetIndex === idx"
-              class="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400"
-            />
-            <Copy v-else class="w-3.5 h-3.5" />
-            <span>{{ copiedSnippetIndex === idx ? 'Tersalin' : 'Copy' }}</span>
-          </button>
-        </div>
-        <pre
-          class="p-4 text-xs font-mono text-[#1a1c1d] dark:text-slate-200 overflow-x-auto whitespace-pre-wrap leading-relaxed"
-          >{{ snip.code }}</pre
-        >
-      </div>
-    </section>
+      Dokumen ini belum memiliki isi konten.
+    </div>
 
     <!-- Bottom Escalation Banner (CTA) -->
     <div
@@ -365,3 +195,157 @@ const severityClass = computed(() => {
     </div>
   </article>
 </template>
+
+<style>
+/* Rich Document Content Typography & Elements (Model Dokumen Bebas) */
+.doc-body h1 {
+  font-size: 1.875rem;
+  line-height: 2.25rem;
+  font-weight: 800;
+  margin-top: 1.75rem;
+  margin-bottom: 0.75rem;
+  color: #1a1c1d;
+}
+
+.doc-body h2 {
+  font-size: 1.5rem;
+  line-height: 2rem;
+  font-weight: 700;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+  color: #1a1c1d;
+}
+
+.doc-body h3 {
+  font-size: 1.2rem;
+  line-height: 1.75rem;
+  font-weight: 700;
+  margin-top: 1.25rem;
+  margin-bottom: 0.5rem;
+  color: #1a1c1d;
+}
+
+.doc-body p {
+  margin-top: 0.5rem;
+  margin-bottom: 0.75rem;
+  line-height: 1.75;
+}
+
+.doc-body ul {
+  list-style-type: disc;
+  padding-left: 1.5rem;
+  margin-top: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.doc-body ol {
+  list-style-type: decimal;
+  padding-left: 1.5rem;
+  margin-top: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.doc-body li {
+  margin-bottom: 0.375rem;
+  line-height: 1.6;
+}
+
+.doc-body blockquote {
+  border-left: 3px solid #0040e5;
+  background-color: #f8fafc;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  font-style: normal;
+  color: #475569;
+}
+
+.doc-body pre {
+  background-color: #0f172a;
+  color: #38bdf8;
+  padding: 1rem 1.25rem;
+  border-radius: 0.75rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.8125rem;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  overflow-x: auto;
+  line-height: 1.65;
+}
+
+.doc-body code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  background-color: #f1f5f9;
+  color: #1a1c1d;
+  padding: 0.125rem 0.375rem;
+  border-radius: 0.25rem;
+  font-size: 0.85em;
+}
+
+.doc-body pre code {
+  background-color: transparent;
+  color: inherit;
+  padding: 0;
+}
+
+.doc-body a {
+  color: #0040e5;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.doc-body img {
+  max-width: 100%;
+  border-radius: 0.75rem;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+.doc-body table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+.doc-body th,
+.doc-body td {
+  border: 1px solid #e2e2e4;
+  padding: 0.5rem 0.75rem;
+}
+
+.doc-body th {
+  background-color: #f8fafc;
+  font-weight: 600;
+}
+
+.dark .doc-body h1,
+.dark .doc-body h2,
+.dark .doc-body h3 {
+  color: #f8fafc;
+}
+
+.dark .doc-body blockquote {
+  background-color: rgba(30, 41, 59, 0.6);
+  color: #cbd5e1;
+}
+
+.dark .doc-body code {
+  background-color: #1e293b;
+  color: #f8fafc;
+}
+
+.dark .doc-body a {
+  color: #818cf8;
+}
+
+.dark .doc-body th,
+.dark .doc-body td {
+  border-color: #334155;
+}
+
+.dark .doc-body th {
+  background-color: #1e293b;
+}
+</style>

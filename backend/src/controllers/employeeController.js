@@ -1,5 +1,5 @@
 import { pool, withTransaction } from "../config/database.js";
-import { createEnrollmentCredential } from "../security/passwordService.js";
+import { createEnrollmentCredential, hashPassword, DEFAULT_USER_PASSWORD } from "../security/passwordService.js";
 import { normalizeLocation } from "../utils/locationNormalizer.js";
 import { parsePaginationQuery, setPaginationHeaders } from "../security/requestValidation.js";
 
@@ -269,10 +269,11 @@ export async function storeEmployee(req, res) {
           karyawan: "none",
         });
 
+        const defaultPasswordHash = await hashPassword(DEFAULT_USER_PASSWORD);
         await client.query(
           `INSERT INTO users (nama, email, password_hash, role, permissions, is_active)
            VALUES ($1, $2, $3, 'user', $4::jsonb, true)`,
-          [nama_karyawan, email_kantor, createEnrollmentCredential(), defaultPermissions],
+          [nama_karyawan, email_kantor, defaultPasswordHash, defaultPermissions],
         );
       }
 
@@ -489,7 +490,7 @@ export async function deleteEmployee(req, res) {
 
     const { employee, affectedAssetsCount } = await withTransaction(async (client) => {
       const empRes = await client.query(
-        `SELECT id, nik, nama_karyawan, status FROM karyawan WHERE id = $1 FOR UPDATE`,
+        `SELECT id, nik, nama_karyawan, email_kantor, status FROM karyawan WHERE id = $1 FOR UPDATE`,
         [id]
       );
       if (empRes.rowCount === 0) {
@@ -497,11 +498,7 @@ export async function deleteEmployee(req, res) {
       }
       const existingEmp = empRes.rows[0];
 
-      const updateRes = await client.query(
-        `UPDATE karyawan SET status = 'Resigned', updated_at = CURRENT_TIMESTAMP WHERE id = $1 RETURNING *`,
-        [id]
-      );
-
+      // 1. Alihkan aset yang dipegang menjadi Stock agar data inventaris tetap akurat
       const count = await convertEmployeeAssetsToStock(
         client,
         existingEmp.nik,
@@ -509,11 +506,31 @@ export async function deleteEmployee(req, res) {
         auditActor
       );
 
-      return { employee: updateRes.rows[0], affectedAssetsCount: count };
+      // 2. Lepaskan referensi atasan langsung jika ada karyawan lain yang dibawahi
+      await client.query(
+        `UPDATE karyawan SET nik_atasan_langsung = NULL WHERE nik_atasan_langsung = $1`,
+        [existingEmp.nik]
+      );
+
+      // 3. Nonaktifkan akun user login terkait jika ada
+      if (existingEmp.email_kantor) {
+        await client.query(
+          `UPDATE users SET is_active = false, updated_at = CURRENT_TIMESTAMP WHERE LOWER(TRIM(email)) = LOWER(TRIM($1)) AND role = 'user'`,
+          [existingEmp.email_kantor]
+        );
+      }
+
+      // 4. Hapus data karyawan secara permanen dari tabel karyawan (Hard Delete)
+      const deleteRes = await client.query(
+        `DELETE FROM karyawan WHERE id = $1 RETURNING *`,
+        [id]
+      );
+
+      return { employee: deleteRes.rows[0], affectedAssetsCount: count };
     });
 
     res.json({
-      message: "Data karyawan telah diubah statusnya menjadi Resigned.",
+      message: "Data karyawan berhasil dihapus dari tabel.",
       affectedAssetsCount,
       employee,
     });

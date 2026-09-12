@@ -12,36 +12,12 @@
       "windows"
     ],
     "summary": "Panduan Operasional Standar (SOP) penyiapan unit laptop Windows baru bagi karyawan baru (new joiner) atau fasilitas penggantian unit kerja.",
-    "problemContext": "Saat menyiapkan unit laptop baru dari distributor/vendor, diperlukan proses bypass pembuatan akun online Microsoft saat OOBE, penyiapan akun lokal standar perusahaan, penyesuaian opsi keamanan, serta instalasi paket aplikasi kerja wajib.",
-    "actionSteps": [
-      "Nyalakan unit laptop baru hingga masuk ke tampilan Out-of-Box Experience (OOBE) pada tahap \"Let's connect you to a network\".",
-      "Tekan kombinasi tombol Shift + F10 (atau Fn + Shift + F10) pada keyboard untuk membuka jendela Command Prompt (CMD).",
-      "Ketik perintah oobe\\bypassnro lalu tekan Enter. Laptop akan melakukan restart otomatis dan mengizinkan proses setup tanpa koneksi internet (Local Account mode).",
-      "Setelah berhasil masuk ke desktop Windows, buka aplikasi Notepad, lalu salin dan simpan script otomatisasi user sebagai file .bat (contoh: setup_user.bat).",
-      "Klik kanan pada file .bat tersebut lalu pilih Run as Administrator untuk membuat user ESB-User dengan password sementara sesuai SOP dan mengonfigurasi batas waktu password menjadi Never Expire.",
-      "Lakukan pengubahan nama perangkat (Rename This PC) sesuai standar penamaan label inventaris laptop perusahaan (contoh: LAPTOP-IT-01 atau ESB-DEPT-NAME).",
-      "Buka menu Settings > Windows Update, jalankan pembaruan sistem hingga selesai, dan aktifkan opsi \"Get the latest updates as soon as they're available\".",
-      "Matikan enkripsi perangkat melalui menu Settings > Privacy & Security > Device Encryption (setel status menjadi Off).",
-      "Hubungkan flashdisk instalasi IT, kemudian jalankan installer Ninite.",
-      "Verifikasi bahwa perangkat telah terpasang aplikasi wajib perusahaan: Google Chrome, AnyDesk, dan Microsoft Office suite.",
-      "Setelah seluruh proses setup selesai, buat dan lengkapi Form Serah Terima Laptop.",
-      "Proses setup selesai dan unit laptop siap diserahkan kepada User."
-    ],
-    "dos": [
-      "Pastikan script installer .bat dieksekusi dengan hak akses Administrator (Run as Administrator).",
-      "Verifikasi seluruh aplikasi wajib (Chrome, AnyDesk, MS Office) dapat terbuka dengan normal sebelum diserahkan.",
-      "Catat Serial Number dan label perangkat pada Formulir Serah Terima Perangkat."
-    ],
-    "donts": [
-      "Jangan menghubungkan laptop ke koneksi Wi-Fi/Internet pada tahap awal OOBE sebelum menjalankan perintah oobe\\bypassnro.",
-      "Jangan melewatkan penonaktifan Device Encryption untuk menghindari terkuncinya drive di kemudian hari."
-    ],
-    "snippets": [
-      {
-        "label": "Script Auto Setup User & Password Never Expire (.bat)",
-        "code": "@echo off\nREM Jalankan sebagai Administrator\nREM Membuat user baru\nnet user \"ESB-User\" <Password_Sementara_Sesuai_SOP> /add\n\nREM Set agar password tidak pernah expired via PowerShell\npowershell -Command \"Set-LocalUser -Name 'ESB-User' -PasswordNeverExpires $true\"\n\necho User ESB-User berhasil dibuat dengan password tidak pernah expired.\npause"
-      }
-    ],
+    "contentHtml": "<p>Saat menyiapkan unit laptop baru dari distributor/vendor, diperlukan proses bypass pembuatan akun online Microsoft saat OOBE, penyiapan akun lokal standar perusahaan, penyesuaian opsi keamanan, serta instalasi paket aplikasi kerja wajib.</p><h3>Prosedur / Langkah-langkah Penyelesaian:</h3><ol><li>Nyalakan unit laptop baru hingga masuk ke tampilan Out-of-Box Experience (OOBE) pada tahap &quot;Let's connect you to a network&quot;.</li><li>Tekan kombinasi tombol <strong>Shift + F10</strong> (atau <strong>Fn + Shift + F10</strong>) pada keyboard untuk membuka jendela Command Prompt (CMD).</li><li>Ketik perintah <code>oobe\\bypassnro</code> lalu tekan Enter. Laptop akan melakukan restart otomatis dan mengizinkan proses setup tanpa koneksi internet (Local Account mode).</li><li>Setelah berhasil masuk ke desktop Windows, buka aplikasi Notepad, lalu salin dan simpan script otomatisasi user sebagai file <code>.bat</code> (contoh: <code>setup_user.bat</code>).</li><li>Klik kanan pada file <code>.bat</code> tersebut lalu pilih <strong>Run as Administrator</strong> untuk membuat user <code>ESB-User</code> dengan password sementara sesuai SOP dan mengonfigurasi batas waktu password menjadi <em>Never Expire</em>.</li><li>Lakukan pengubahan nama perangkat (<em>Rename This PC</em>) sesuai standar penamaan label inventaris laptop perusahaan (contoh: <code>LAPTOP-IT-01</code> atau <code>ESB-DEPT-NAME</code>).</li><li>Buka menu <strong>Settings &gt; Windows Update</strong>, jalankan pembaruan sistem hingga selesai, dan aktifkan opsi <em>&quot;Get the latest updates as soon as they're available&quot;</em>.</li><li>Matikan enkripsi perangkat melalui menu <strong>Settings &gt; Privacy &amp; Security &gt; Device Encryption</strong> (setel status menjadi <em>Off</em>).</li><li>Hubungkan flashdisk instalasi IT, kemudian jalankan installer Ninite.</li><li>Verifikasi bahwa perangkat telah terpasang aplikasi wajib perusahaan: Google Chrome, AnyDesk, dan Microsoft Office suite.</li><li>Setelah seluruh proses setup selesai, buat dan lengkapi Form Serah Terima Laptop.</li><li>Proses setup selesai dan unit laptop siap diserahkan kepada User.</li></ol><h3>Script &amp; Perintah Pendukung:</h3><pre><code>@echo off\nREM Jalankan sebagai Administrator\nREM Membuat user baru\nnet user \"ESB-User\" &lt;Password_Sementara_Sesuai_SOP&gt; /add\n\nREM Set agar password tidak pernah expired via PowerShell\npowershell -Command \"Set-LocalUser -Name 'ESB-User' -PasswordNeverExpires $true\"\n\necho User ESB-User berhasil dibuat dengan password tidak pernah expired.\npause</code></pre><h3>Praktik Terbaik &amp; Peringatan (Do's &amp; Don'ts):</h3><p><strong>Do's (Yang Wajib Dilakukan):</strong></p><ul><li>Pastikan script installer .bat dieksekusi dengan hak akses Administrator (Run as Administrator).</li><li>Verifikasi seluruh aplikasi wajib (Chrome, AnyDesk, MS Office) dapat terbuka dengan normal sebelum diserahkan.</li><li>Catat Serial Number dan label perangkat pada Formulir Serah Terima Perangkat.</li></ul><p><strong>Don'ts (Peringatan &amp; Larangan):</strong></p><ul><li>Jangan menghubungkan laptop ke koneksi Wi-Fi/Internet pada tahap awal OOBE sebelum menjalankan perintah <code>oobe\\bypassnro</code>.</li><li>Jangan melewatkan penonaktifan Device Encryption untuk menghindari terkuncinya drive di kemudian hari.</li></ul>",
+    "problemContext": null,
+    "actionSteps": [],
+    "dos": [],
+    "donts": [],
+    "snippets": [],
     "isCustom": false
   },
   {
@@ -56,34 +32,12 @@
       "it-support"
     ],
     "summary": "Panduan Operasional Standar (SOP) penyiapan laptop pengembalian (re-use) untuk dialokasikan kembali kepada karyawan baru atau pergantian unit.",
-    "problemContext": "Perangkat laptop pengembalian eks-karyawan perlu melalui tahapan verifikasi kondisi perangkat keras (hardware check), pembersihan profil user lama, penyesuaian nama akun pengguna baru, serta konfigurasinya sebelum diserahterimakan.",
-    "actionSteps": [
-      "Siapkan unit laptop pengembalian yang akan dialokasikan untuk penyerahan atau penggantian perangkat.",
-      "Login menggunakan akun Administrator, lalu lakukan pengujian fungsi hardware mencakup: Keyboard, Microphone, Kamera/Webcam, dan Speaker.",
-      "Hapus akun/profil user lama jika ada, kemudian tambahkan akun lokal baru sesuai dengan nama pengguna (User Name) yang akan menerima laptop.",
-      "Gunakan kata sandi standar sementara sesuai kebijakan IT perusahaan untuk akun user baru tersebut.",
-      "Buka Command Prompt sebagai Administrator, lalu jalankan perintah berikut agar password tidak pernah kadaluarsa: powershell -Command \"Set-LocalUser -Name 'ESB-User' -PasswordNeverExpires $true\".",
-      "Ubah nama perangkat (Rename This PC) sesuai label registrasi inventaris yang diperuntukkan bagi laptop tersebut.",
-      "Buka menu Settings > Windows Update, periksa ketersediaan pembaruan sistem, dan nyalakan opsi \"Get the latest updates as soon as they're available\".",
-      "Matikan enkripsi perangkat pada menu Settings > Privacy & Security > Device Encryption (setel status menjadi Off).",
-      "Periksa dan lakukan instalasi aplikasi Google Chrome, AnyDesk, dan Microsoft Office jika belum terpasang pada sistem.",
-      "Setelah seluruh proses penyiapan selesai, buat dan lengkapi dokumen pada Form Serah Terima Laptop.",
-      "Proses penyiapan selesai dan unit laptop siap diserahkan kepada User."
-    ],
-    "dos": [
-      "Wajib melakukan pengujian fungsionalitas hardware (keyboard, webcam, mic, speaker) sebelum melangkah ke proses software.",
-      "Pastikan seluruh berkas pribadi dan data dari pengguna sebelumnya telah dihapus bersih dari sistem."
-    ],
-    "donts": [
-      "Jangan mempertahankan profil user atau nama PC lama pada unit laptop yang diserahterimakan ke karyawan baru.",
-      "Jangan menyerahkan laptop yang memiliki kendala fisik/hardware tanpa pemberitahuan atau perbaikan terlebih dahulu."
-    ],
-    "snippets": [
-      {
-        "label": "PowerShell Command - Set Password Never Expire",
-        "code": "powershell -Command \"Set-LocalUser -Name 'ESB-User' -PasswordNeverExpires $true\""
-      }
-    ],
+    "contentHtml": "<p>Perangkat laptop pengembalian eks-karyawan perlu melalui tahapan verifikasi kondisi perangkat keras (hardware check), pembersihan profil user lama, penyesuaian nama akun pengguna baru, serta konfigurasinya sebelum diserahterimakan.</p><h3>Prosedur / Langkah-langkah Penyelesaian:</h3><ol><li>Siapkan unit laptop pengembalian yang akan dialokasikan untuk penyerahan atau penggantian perangkat.</li><li>Login menggunakan akun Administrator, lalu lakukan pengujian fungsi hardware mencakup: Keyboard, Microphone, Kamera/Webcam, dan Speaker.</li><li>Hapus akun/profil user lama jika ada, kemudian tambahkan akun lokal baru sesuai dengan nama pengguna (User Name) yang akan menerima laptop.</li><li>Gunakan kata sandi standar sementara sesuai kebijakan IT perusahaan untuk akun user baru tersebut.</li><li>Buka Command Prompt sebagai Administrator, lalu jalankan perintah berikut agar password tidak pernah kadaluarsa: <code>powershell -Command &quot;Set-LocalUser -Name 'ESB-User' -PasswordNeverExpires $true&quot;</code>.</li><li>Ubah nama perangkat (<em>Rename This PC</em>) sesuai label registaris inventaris yang diperuntukkan bagi laptop tersebut.</li><li>Buka menu <strong>Settings &gt; Windows Update</strong>, periksa ketersediaan pembaruan sistem, dan nyalakan opsi <em>&quot;Get the latest updates as soon as they're available&quot;</em>.</li><li>Matikan enkripsi perangkat pada menu <strong>Settings &gt; Privacy &amp; Security &gt; Device Encryption</strong> (setel status menjadi <em>Off</em>).</li><li>Periksa dan lakukan instalasi aplikasi Google Chrome, AnyDesk, dan Microsoft Office jika belum terpasang pada sistem.</li><li>Setelah seluruh proses penyiapan selesai, buat dan lengkapi dokumen pada Form Serah Terima Laptop.</li><li>Proses penyiapan selesai dan unit laptop siap diserahkan kepada User.</li></ol><h3>Script &amp; Perintah Pendukung:</h3><pre><code>powershell -Command \"Set-LocalUser -Name 'ESB-User' -PasswordNeverExpires $true\"</code></pre><h3>Praktik Terbaik &amp; Peringatan (Do's &amp; Don'ts):</h3><p><strong>Do's (Yang Wajib Dilakukan):</strong></p><ul><li>Wajib melakukan pengujian fungsionalitas hardware (keyboard, webcam, mic, speaker) sebelum melangkah ke proses software.</li><li>Pastikan seluruh berkas pribadi dan data dari pengguna sebelumnya telah dihapus bersih dari sistem.</li></ul><p><strong>Don'ts (Peringatan &amp; Larangan):</strong></p><ul><li>Jangan mempertahankan profil user atau nama PC lama pada unit laptop yang diserahterimakan ke karyawan baru.</li><li>Jangan menyerahkan laptop yang memiliki kendala fisik/hardware tanpa pemberitahuan atau perbaikan terlebih dahulu.</li></ul>",
+    "problemContext": null,
+    "actionSteps": [],
+    "dos": [],
+    "donts": [],
+    "snippets": [],
     "isCustom": false
   },
   {
@@ -99,30 +53,12 @@
       "it-support"
     ],
     "summary": "Panduan Operasional Standar (SOP) penyiapan unit handphone (HP) baru bagi karyawan baru (new joiner) atau fasilitas penggantian unit kerja.",
-    "problemContext": "Saat menyiapkan unit HP baru dari distributor/vendor, diperlukan proses konfigurasi awal hingga halaman utama, pengecekan fungsi perangkat keras (layar, kamera, microphone, speaker), serta pencatatan penyerahan perangkat dan pembaruan data aset perusahaan.",
-    "actionSteps": [
-      "Buka kemasan HP baru, keluarkan unit perangkat, lalu nyalakan HP dengan menekan tombol power hingga menyala.",
-      "Lakukan konfigurasi awal (bahasa, koneksi Wi-Fi, akun, dsb.) hingga masuk ke halaman awal (home screen).",
-      "Cek fungsi perangkat keras: Layar, Kamera, Microphone, dan Speaker untuk memastikan seluruhnya berfungsi normal.",
-      "Setelah seluruh proses setup selesai, buat dan lengkapi Form Serah Terima HP.",
-      "Berikan Label pada Box HP dan belakang HP sesuai standar penamaan inventaris perusahaan.",
-      "Update Master Data Aset Management dengan informasi unit HP yang telah disiapkan.",
-      "Proses setup selesai dan unit HP siap diserahkan kepada User."
-    ],
-    "dos": [
-      "Pastikan seluruh fungsi perangkat keras (layar, kamera, mic, speaker) telah diuji sebelum diserahkan.",
-      "Catat Serial Number, IMEI, dan label perangkat pada Form Serah Terima dan Master Data Aset Management."
-    ],
-    "donts": [
-      "Jangan menyerahkan HP yang masih memiliki kendala pada layar, kamera, microphone, atau speaker tanpa perbaikan terlebih dahulu.",
-      "Jangan melewatkan pelabelan pada box dan belakang HP serta pembaruan Master Data Aset Management."
-    ],
-    "snippets": [
-      {
-        "label": "Link Form Serah Terima HP",
-        "code": "https://docs.google.com/document/d/1uDDbC77cmnm1J4yBDSQLW23pDkv4Y2R7h0myL_lkdbM/"
-      }
-    ],
+    "contentHtml": "<p>Saat menyiapkan unit HP baru dari distributor/vendor, diperlukan proses konfigurasi awal hingga halaman utama, pengecekan fungsi perangkat keras (layar, kamera, microphone, speaker), serta pencatatan penyerahan perangkat dan pembaruan data aset perusahaan.</p><h3>Prosedur / Langkah-langkah Penyelesaian:</h3><ol><li>Buka kemasan HP baru, keluarkan unit perangkat, lalu nyalakan HP dengan menekan tombol power hingga menyala.</li><li>Lakukan konfigurasi awal (bahasa, koneksi Wi-Fi, akun, dsb.) hingga masuk ke halaman awal (home screen).</li><li>Cek fungsi perangkat keras: Layar, Kamera, Microphone, dan Speaker untuk memastikan seluruhnya berfungsi normal.</li><li>Setelah seluruh proses setup selesai, buat dan lengkapi Form Serah Terima HP.</li><li>Berikan Label pada Box HP dan belakang HP sesuai standar penamaan inventaris perusahaan.</li><li>Update Master Data Aset Management dengan informasi unit HP yang telah disiapkan.</li><li>Proses setup selesai dan unit HP siap diserahkan kepada User.</li></ol><h3>Link Dokumen Pendukung:</h3><p>Akses Form Serah Terima HP: <a href=\"https://docs.google.com/document/d/1uDDbC77cmnm1J4yBDSQLW23pDkv4Y2R7h0myL_lkdbM/\" target=\"_blank\" rel=\"noopener noreferrer\">Form Serah Terima HP (Google Docs)</a></p><h3>Praktik Terbaik &amp; Peringatan (Do's &amp; Don'ts):</h3><p><strong>Do's (Yang Wajib Dilakukan):</strong></p><ul><li>Pastikan seluruh fungsi perangkat keras (layar, kamera, mic, speaker) telah diuji sebelum diserahkan.</li><li>Catat Serial Number, IMEI, dan label perangkat pada Form Serah Terima dan Master Data Aset Management.</li></ul><p><strong>Don'ts (Peringatan &amp; Larangan):</strong></p><ul><li>Jangan menyerahkan HP yang masih memiliki kendala pada layar, kamera, microphone, atau speaker tanpa perbaikan terlebih dahulu.</li><li>Jangan melewatkan pelabelan pada box dan belakang HP serta pembaruan Master Data Aset Management.</li></ul>",
+    "problemContext": null,
+    "actionSteps": [],
+    "dos": [],
+    "donts": [],
+    "snippets": [],
     "isCustom": false
   },
   {
@@ -139,31 +75,12 @@
       "it-support"
     ],
     "summary": "Panduan Operasional Standar (SOP) penyiapan unit handphone (HP) stok untuk dialokasikan kepada karyawan baru (new joiner) atau penggantian unit kerja.",
-    "problemContext": "Perangkat HP stok perlu melalui tahapan pengecekan kondisi perangkat keras (layar, kamera, microphone, speaker), proses factory reset untuk membersihkan data lama, serta konfigurasi ulang hingga halaman utama sebelum diserahterimakan dan dicatat pada data aset perusahaan.",
-    "actionSteps": [
-      "Nyalakan HP dengan menekan tombol power hingga menyala.",
-      "Cek fungsi perangkat keras: Layar, Kamera, Microphone, dan Speaker untuk memastikan seluruhnya berfungsi normal.",
-      "Lakukan Factory Reset pada HP tersebut untuk membersihkan seluruh data dan pengaturan lama.",
-      "Lakukan konfigurasi awal (bahasa, koneksi Wi-Fi, akun, dsb.) hingga masuk ke halaman awal (home screen).",
-      "Setelah seluruh proses setup selesai, buat dan lengkapi Form Serah Terima HP.",
-      "Berikan Label pada Box HP dan belakang HP sesuai standar penamaan inventaris perusahaan.",
-      "Update Master Data Aset Management dengan informasi unit HP yang telah disiapkan.",
-      "Proses setup selesai dan unit HP siap diserahkan kepada User."
-    ],
-    "dos": [
-      "Wajib melakukan pengujian fungsionalitas hardware (layar, kamera, mic, speaker) sebelum melangkah ke proses reset dan konfigurasi.",
-      "Pastikan seluruh data dari pengguna/pemakaian sebelumnya telah terhapus bersih melalui Factory Reset."
-    ],
-    "donts": [
-      "Jangan melewatkan proses Factory Reset sebelum melakukan konfigurasi ulang pada HP stok.",
-      "Jangan menyerahkan HP yang memiliki kendala fisik/hardware tanpa pemberitahuan atau perbaikan terlebih dahulu."
-    ],
-    "snippets": [
-      {
-        "label": "Link Form Serah Terima HP",
-        "code": "https://docs.google.com/document/d/1uDDbC77cmnm1J4yBDSQLW23pDkv4Y2R7h0myL_lkdbM/"
-      }
-    ],
+    "contentHtml": "<p>Perangkat HP stok perlu melalui tahapan pengecekan kondisi perangkat keras (layar, kamera, microphone, speaker), proses factory reset untuk membersihkan data lama, serta konfigurasi ulang hingga halaman utama sebelum diserahterimakan dan dicatat pada data aset perusahaan.</p><h3>Prosedur / Langkah-langkah Penyelesaian:</h3><ol><li>Nyalakan HP dengan menekan tombol power hingga menyala.</li><li>Cek fungsi perangkat keras: Layar, Kamera, Microphone, dan Speaker untuk memastikan seluruhnya berfungsi normal.</li><li>Lakukan Factory Reset pada HP tersebut untuk membersihkan seluruh data dan pengaturan lama.</li><li>Lakukan konfigurasi awal (bahasa, koneksi Wi-Fi, akun, dsb.) hingga masuk ke halaman awal (home screen).</li><li>Setelah seluruh proses setup selesai, buat dan lengkapi Form Serah Terima HP.</li><li>Berikan Label pada Box HP dan belakang HP sesuai standar penamaan inventaris perusahaan.</li><li>Update Master Data Aset Management dengan informasi unit HP yang telah disiapkan.</li><li>Proses setup selesai dan unit HP siap diserahkan kepada User.</li></ol><h3>Link Dokumen Pendukung:</h3><p>Akses Form Serah Terima HP: <a href=\"https://docs.google.com/document/d/1uDDbC77cmnm1J4yBDSQLW23pDkv4Y2R7h0myL_lkdbM/\" target=\"_blank\" rel=\"noopener noreferrer\">Form Serah Terima HP (Google Docs)</a></p><h3>Praktik Terbaik &amp; Peringatan (Do's &amp; Don'ts):</h3><p><strong>Do's (Yang Wajib Dilakukan):</strong></p><ul><li>Wajib melakukan pengujian fungsionalitas hardware (layar, kamera, mic, speaker) sebelum melangkah ke proses reset dan konfigurasi.</li><li>Pastikan seluruh data dari pengguna/pemakaian sebelumnya telah terhapus bersih melalui Factory Reset.</li></ul><p><strong>Don'ts (Peringatan &amp; Larangan):</strong></p><ul><li>Jangan melewatkan proses Factory Reset sebelum melakukan konfigurasi ulang pada HP stok.</li><li>Jangan menyerahkan HP yang memiliki kendala fisik/hardware tanpa pemberitahuan atau perbaikan terlebih dahulu.</li></ul>",
+    "problemContext": null,
+    "actionSteps": [],
+    "dos": [],
+    "donts": [],
+    "snippets": [],
     "isCustom": false
   },
   {
@@ -179,30 +96,12 @@
       "pbx"
     ],
     "summary": "Panduan Operasional Standar (SOP) penanganan permintaan kode cadangan verifikasi 2 langkah (2-Step Verification) akun Google Workspace atas permintaan PBX / People & Culture.",
-    "problemContext": "Tim People & Culture (PBX) atau atasan memohon kode verifikasi cadangan (Backup Verification Codes) untuk membantu akses masuk (login) akun Google Workspace milik anggota tim/subordinat yang mengalami kendala otentikasi.",
-    "actionSteps": [
-      "Buka dan login ke portal Google Admin Console menggunakan akun Administrator berwenang.",
-      "Cari nama atau alamat email pengguna (User) yang bersangkutan melalui kolom pencarian utama atau navigasi Directory > Users.",
-      "Klik profil akun pengguna tersebut, lalu pilih tab Security pada panel detail.",
-      "Pilih dan buka bagian 2-Step Verification.",
-      "Klik opsi \"Get Backup Verification Codes\" untuk menampilkan daftar kode cadangan otentikasi.",
-      "Salin minimal 2 (dua) kode verifikasi cadangan dari daftar yang tersedia.",
-      "Kirimkan kedua kode verifikasi cadangan tersebut secara aman kepada pihak PBX / pemohon berwenang."
-    ],
-    "dos": [
-      "Pastikan untuk selalu memverifikasi keabsahan permintaan dari pihak PBX / atasan sebelum menyerahkan kode cadangan.",
-      "Sertakan minimal 2 kode verifikasi cadangan agar user memiliki opsi cadangan jika satu kode gagal digunakan."
-    ],
-    "donts": [
-      "Jangan membagikan seluruh daftar kode backup sekaligus demi menjaga standar keamanan akun Google Workspace perusahaan.",
-      "Jangan memberikan kode backup ke pihak yang tidak dikenal tanpa konfirmasi resmi dari People & Culture (PBX)."
-    ],
-    "snippets": [
-      {
-        "label": "Link Direct Google Admin Console",
-        "code": "https://admin.google.com/"
-      }
-    ],
+    "contentHtml": "<p>Tim People &amp; Culture (PBX) atau atasan memohon kode verifikasi cadangan (Backup Verification Codes) untuk membantu akses masuk (login) akun Google Workspace milik anggota tim/subordinat yang mengalami kendala otentikasi.</p><h3>Prosedur / Langkah-langkah Penyelesaian:</h3><ol><li>Buka dan login ke portal <a href=\"https://admin.google.com/\" target=\"_blank\" rel=\"noopener noreferrer\">Google Admin Console</a> menggunakan akun Administrator berwenang.</li><li>Cari nama atau alamat email pengguna (User) yang bersangkutan melalui kolom pencarian utama atau navigasi <strong>Directory &gt; Users</strong>.</li><li>Klik profil akun pengguna tersebut, lalu pilih tab <strong>Security</strong> pada panel detail.</li><li>Pilih dan buka bagian <strong>2-Step Verification</strong>.</li><li>Klik opsi <em>&quot;Get Backup Verification Codes&quot;</em> untuk menampilkan daftar kode cadangan otentikasi.</li><li>Salin minimal 2 (dua) kode verifikasi cadangan dari daftar yang tersedia.</li><li>Kirimkan kedua kode verifikasi cadangan tersebut secara aman kepada pihak PBX / pemohon berwenang.</li></ol><h3>Portal Link:</h3><p>Direct Link: <a href=\"https://admin.google.com/\" target=\"_blank\" rel=\"noopener noreferrer\">https://admin.google.com/</a></p><h3>Praktik Terbaik &amp; Peringatan (Do's &amp; Don'ts):</h3><p><strong>Do's (Yang Wajib Dilakukan):</strong></p><ul><li>Pastikan untuk selalu memverifikasi keabsahan permintaan dari pihak PBX / atasan sebelum menyerahkan kode cadangan.</li><li>Sertakan minimal 2 kode verifikasi cadangan agar user memiliki opsi cadangan jika satu kode gagal digunakan.</li></ul><p><strong>Don'ts (Peringatan &amp; Larangan):</strong></p><ul><li>Jangan membagikan seluruh daftar kode backup sekaligus demi menjaga standar keamanan akun Google Workspace perusahaan.</li><li>Jangan memberikan kode backup ke pihak yang tidak dikenal tanpa konfirmasi resmi dari People &amp; Culture (PBX).</li></ul>",
+    "problemContext": null,
+    "actionSteps": [],
+    "dos": [],
+    "donts": [],
+    "snippets": [],
     "isCustom": false
   },
   {
@@ -218,30 +117,12 @@
       "default-password"
     ],
     "summary": "Panduan Operasional Standar (SOP) penanganan permintaan reset kata sandi (reset password) akun Google Workspace karyawan yang mengalami lupa password atau atas permintaan PBX.",
-    "problemContext": "Perwakilan People & Culture (PBX) atau atasan mengajukan permohonan reset kata sandi (password reset) untuk anggota tim/subordinat yang lupa password atau tidak bisa mengakses akun Google Workspace perusahaan.",
-    "actionSteps": [
-      "Buka dan login ke portal Google Admin Console menggunakan akun Administrator berwenang.",
-      "Cari nama atau alamat email pengguna (User) yang akan di-reset pada kolom pencarian utama atau navigasi Directory > Users.",
-      "Klik tombol Reset Password pada panel profil akun pengguna tersebut.",
-      "Pilih metode Create Password (buat kata sandi secara manual).",
-      "Masukkan kata sandi sementara yang ditentukan oleh kebijakan resmi IT perusahaan pada kolom password baru.",
-      "Pastikan untuk mencentang opsi \"Ask user to change their password when they sign in\" agar pengguna wajib memperbarui kata sandi saat pertama kali login kembali.",
-      "Klik tombol Reset untuk mengeksekusi perbaikan, kemudian kabarkan password sementara tersebut secara aman kepada pihak PBX / pemohon berwenang."
-    ],
-    "dos": [
-      "Wajib mencentang opsi Ask user to change their password when they sign in agar kata sandi baru segera diubah oleh pemilik akun.",
-      "Gunakan password sementara yang ditentukan oleh SOP resmi untuk konsistensi prosedur IT Support."
-    ],
-    "donts": [
-      "Jangan membagikan kata sandi baru pada grup obrolan publik; selalu kirimkan secara privat (Direct Message) kepada pihak PBX.",
-      "Jangan mengabaikan verifikasi pemohon; pastikan permintaan reset berasal dari saluran resmi PBX / People & Culture."
-    ],
-    "snippets": [
-      {
-        "label": "Default Password Reset & Console Link",
-        "code": "Portal: https://admin.google.com/\nDefault Temp Password: <Password_Sementara_Sesuai_SOP>"
-      }
-    ],
+    "contentHtml": "<p>Perwakilan People &amp; Culture (PBX) atau atasan mengajukan permohonan reset kata sandi (password reset) untuk anggota tim/subordinat yang lupa password atau tidak bisa mengakses akun Google Workspace perusahaan.</p><h3>Prosedur / Langkah-langkah Penyelesaian:</h3><ol><li>Buka dan login ke portal <a href=\"https://admin.google.com/\" target=\"_blank\" rel=\"noopener noreferrer\">Google Admin Console</a> menggunakan akun Administrator berwenang.</li><li>Cari nama atau alamat email pengguna (User) yang akan di-reset pada kolom pencarian utama atau navigasi <strong>Directory &gt; Users</strong>.</li><li>Klik tombol <strong>Reset Password</strong> pada panel profil akun pengguna tersebut.</li><li>Pilih metode <strong>Create Password</strong> (buat kata sandi secara manual).</li><li>Masukkan kata sandi sementara yang ditentukan oleh kebijakan resmi IT perusahaan pada kolom password baru.</li><li>Pastikan untuk mencentang opsi <em>&quot;Ask user to change their password when they sign in&quot;</em> agar pengguna wajib memperbarui kata sandi saat pertama kali login kembali.</li><li>Klik tombol <strong>Reset</strong> untuk mengeksekusi perbaikan, kemudian kabarkan password sementara tersebut secara aman kepada pihak PBX / pemohon berwenang.</li></ol><h3>Detail Akses &amp; Password Sementara:</h3><pre><code>Portal: https://admin.google.com/\nDefault Temp Password: &lt;Password_Sementara_Sesuai_SOP&gt;</code></pre><h3>Praktik Terbaik &amp; Peringatan (Do's &amp; Don'ts):</h3><p><strong>Do's (Yang Wajib Dilakukan):</strong></p><ul><li>Wajib mencentang opsi <em>Ask user to change their password when they sign in</em> agar kata sandi baru segera diubah oleh pemilik akun.</li><li>Gunakan password sementara yang ditentukan oleh SOP resmi untuk konsistensi prosedur IT Support.</li></ul><p><strong>Don'ts (Peringatan &amp; Larangan):</strong></p><ul><li>Jangan membagikan kata sandi baru pada grup obrolan publik; selalu kirimkan secara privat (Direct Message) kepada pihak PBX.</li><li>Jangan mengabaikan verifikasi pemohon; pastikan permintaan reset berasal dari saluran resmi PBX / People &amp; Culture.</li></ul>",
+    "problemContext": null,
+    "actionSteps": [],
+    "dos": [],
+    "donts": [],
+    "snippets": [],
     "isCustom": false
   }
 ]

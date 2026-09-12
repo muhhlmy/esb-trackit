@@ -25,6 +25,10 @@ const form = ref({
   penerimaNama: '',
   penerimaDirektorat: '',
   isPenerimaLainnya: false,
+  mengetahuiNik: '',
+  mengetahuiNama: '',
+  mengetahuiJabatan: 'People Business Partner atau Asset Management',
+  isMengetahuiKustom: false,
   tujuan: 'baru', // 'baru' | 'peminjaman' | 'perbaikan' | 'disposal' | 'lainnya'
   tujuanLainnya: '',
   tanggal: new Date().toISOString().substring(0, 10), // yyyy-mm-dd
@@ -132,6 +136,35 @@ watch(
     form.value.penerimaNik = ''
     form.value.penerimaNama = ''
     form.value.penerimaDirektorat = ''
+  },
+)
+
+// Autofill Pihak Mengetahui when selected
+watch(
+  () => form.value.mengetahuiNik,
+  (nik) => {
+    const emp = employees.value.find((e) => e.nik === nik)
+    if (emp) {
+      form.value.mengetahuiNama = emp.nama_karyawan || ''
+      form.value.mengetahuiJabatan =
+        emp.title || emp.jabatan || emp.departemen || 'People Business Partner atau Asset Management'
+    } else if (!form.value.isMengetahuiKustom) {
+      form.value.mengetahuiNama = ''
+      form.value.mengetahuiJabatan = 'People Business Partner atau Asset Management'
+    }
+  },
+)
+
+// Watch isMengetahuiKustom to reset fields
+watch(
+  () => form.value.isMengetahuiKustom,
+  (isKustom) => {
+    if (isKustom) {
+      form.value.mengetahuiNik = ''
+    } else {
+      form.value.mengetahuiNama = ''
+      form.value.mengetahuiJabatan = 'People Business Partner atau Asset Management'
+    }
   },
 )
 
@@ -606,8 +639,8 @@ function generatePdf() {
             <td>
               <div class="sig-title">Diketahui Oleh</div>
               <div style="height: 50px;"></div>
-              <div class="sig-name">&nbsp;</div>
-              <div class="sig-sub">People Business Partner atau Asset Management</div>
+              <div class="sig-name">${form.value.mengetahuiNama || '&nbsp;'}</div>
+              <div class="sig-sub">${form.value.mengetahuiJabatan || 'People Business Partner atau Asset Management'}</div>
             </td>
           </tr>
         </tbody>
@@ -651,7 +684,7 @@ onMounted(fetchData)
       <li><span>1</span>Pihak terkait</li>
       <li><span>2</span>Tujuan</li>
       <li><span>3</span>Daftar aset</li>
-      <li><span>4</span>Cetak PDF</li>
+      <li><span>4</span>Pengesahan & Cetak</li>
     </ol>
     <!-- Loading Form Skeleton -->
     <div v-if="isLoading" role="status" aria-busy="true" class="flex flex-col gap-5 select-none">
@@ -668,16 +701,8 @@ onMounted(fetchData)
         </div>
         <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
           <div
-            class="flex flex-col gap-3.5 rounded-2xl border border-slate-200/80 bg-slate-50/50 p-4"
-          >
-            <BaseSkeleton width="150px" height="14px" radius="md" />
-            <BaseSkeleton width="100%" height="40px" radius="xl" />
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <BaseSkeleton width="100%" height="40px" radius="xl" />
-              <BaseSkeleton width="100%" height="40px" radius="xl" />
-            </div>
-          </div>
-          <div
+            v-for="i in 2"
+            :key="'pihak-skel-' + i"
             class="flex flex-col gap-3.5 rounded-2xl border border-slate-200/80 bg-slate-50/50 p-4"
           >
             <BaseSkeleton width="150px" height="14px" radius="md" />
@@ -732,6 +757,24 @@ onMounted(fetchData)
             <BaseSkeleton width="190px" height="16px" radius="md" />
           </div>
           <BaseSkeleton width="100%" height="120px" radius="xl" />
+        </div>
+      </div>
+
+      <!-- Section 4 Skeleton: Diketahui Oleh -->
+      <div
+        class="rounded-2xl border border-[#E2E8F0]/80 bg-white p-4 sm:p-6 shadow-2xs flex flex-col gap-4"
+      >
+        <div class="flex items-center gap-2.5 border-b border-[#F1F5F9] pb-3.5">
+          <BaseSkeleton width="24px" height="24px" radius="md" />
+          <div class="flex flex-col gap-1">
+            <BaseSkeleton width="230px" height="16px" radius="md" />
+            <BaseSkeleton width="320px" height="12px" radius="sm" />
+          </div>
+        </div>
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <BaseSkeleton width="100%" height="40px" radius="xl" />
+          <BaseSkeleton width="100%" height="40px" radius="xl" />
+          <BaseSkeleton width="100%" height="40px" radius="xl" />
         </div>
       </div>
     </div>
@@ -1208,7 +1251,7 @@ onMounted(fetchData)
               <span
                 class="flex h-6 w-6 items-center justify-center rounded-lg bg-amber-50 text-amber-600 border border-amber-200/60 text-[11px] font-bold shrink-0"
               >
-                04
+                03
               </span>
               <div class="min-w-0">
                 <h2 class="text-[14px] sm:text-[15px] font-bold text-[#333333] truncate">
@@ -1320,6 +1363,100 @@ onMounted(fetchData)
                 />
               </label>
             </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 4: Lembar Tanda Tangan: Diketahui Oleh -->
+      <div
+        class="submission-section bg-white rounded-2xl border border-[#E2E8F0]/80 p-4 sm:p-6 shadow-2xs flex flex-col gap-4"
+      >
+        <div class="flex items-center justify-between gap-2 border-b border-[#F1F5F9] pb-3.5">
+          <div class="flex items-center gap-2.5">
+            <span
+              class="flex h-6 w-6 items-center justify-center rounded-lg bg-[#EDF5FF] text-[#333333] text-[11px] font-bold"
+            >
+              04
+            </span>
+            <div>
+              <h2 class="text-[14px] sm:text-[15px] font-bold text-[#333333]">Diketahui Oleh
+              </h2>
+              <p class="text-[11.5px] text-[#64748B]">
+                Pilih atau tulis identitas pihak yang mengetahui untuk dicantumkan pada lembar tanda tangan formulir
+              </p>
+            </div>
+          </div>
+
+          <label class="flex items-center gap-1.5 cursor-pointer select-none py-0.5">
+            <input
+              v-model="form.isMengetahuiKustom"
+              type="checkbox"
+              aria-label="Input Manual Pihak Mengetahui"
+              class="rounded border-slate-300 accent-[#0A51B0] h-4 w-4 cursor-pointer"
+            />
+            <span class="text-[11px] font-bold text-[#475569]">Input Manual</span>
+          </label>
+        </div>
+
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <!-- Pilih Karyawan / PBP -->
+          <div v-if="!form.isMengetahuiKustom" class="flex flex-col gap-1.5">
+            <div class="flex items-center justify-between">
+              <span class="text-[10.5px] font-bold uppercase text-[#475569]">Pilih Karyawan / PBP</span>
+              <span class="text-[10px] text-slate-400 font-medium">(Opsional)</span>
+            </div>
+            <SearchableSelect
+              v-model="form.mengetahuiNik"
+              :options="employees"
+              value-key="nik"
+              label-key="nama_karyawan"
+              secondary-label-key="nik"
+              placeholder="Pilih nama yang mengetahui..."
+              search-placeholder="Cari nama atau NIK..."
+              height-class="h-10"
+              :clearable="true"
+            />
+          </div>
+
+          <div v-else class="flex flex-col gap-1.5">
+            <span class="text-[10.5px] font-bold uppercase text-[#475569]">Nama Lengkap</span>
+            <input
+              v-model="form.mengetahuiNama"
+              type="text"
+              aria-label="Nama Lengkap yang Mengetahui"
+              class="h-10 w-full rounded-xl border border-[#E2E8F0] bg-white px-3 text-xs font-medium text-[#333333] placeholder-[#94A3B8] focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 focus:outline-none transition-all"
+              placeholder="Tulis nama lengkap yang mengetahui..."
+            />
+          </div>
+
+          <!-- Nama Terpilih (Auto) -->
+          <div v-if="!form.isMengetahuiKustom" class="flex flex-col gap-1.5">
+            <span class="text-[10px] font-bold uppercase text-[#64748B]">Nama Lengkap Terpilih</span>
+            <input
+              v-model="form.mengetahuiNama"
+              type="text"
+              aria-label="Nama Lengkap Mengetahui (Auto)"
+              class="h-10 w-full rounded-xl border border-slate-200 bg-slate-100/70 px-3 text-xs font-medium text-slate-600 outline-none cursor-default"
+              readonly
+              placeholder="Kosong (tanda tangan manual)"
+            />
+          </div>
+
+          <!-- Jabatan / Keterangan Tanda Tangan -->
+          <div
+            class="flex flex-col gap-1.5"
+            :class="form.isMengetahuiKustom ? 'sm:col-span-1 lg:col-span-2' : ''"
+          >
+            <span class="text-[10px] font-bold uppercase text-[#64748B]">
+              Jabatan / Unit Pada Dokumen
+            </span>
+            <input
+              v-model="form.mengetahuiJabatan"
+              type="text"
+              aria-label="Jabatan atau Unit yang Mengetahui"
+              class="h-10 w-full rounded-xl border border-[#E2E8F0] bg-white px-3 text-xs font-medium text-[#333333] placeholder-[#94A3B8] focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 focus:outline-none transition-all"
+              placeholder="People Business Partner atau Asset Management"
+            />
           </div>
         </div>
       </div>

@@ -630,34 +630,21 @@ onMounted(fetchData)
   >
     <!-- ── Page Header ─────────────────────────────────────────── -->
     <div
-      class="submission-page-header flex flex-row items-center justify-between gap-3 bg-white p-4 sm:p-5 rounded-2xl border border-[#E2E8F0]/80 shadow-2xs"
+      class="submission-page-header flex items-center gap-3 bg-white p-3.5 sm:p-4 rounded-2xl border border-[#E2E8F0]/80 shadow-2xs"
     >
-      <div class="min-w-0 flex items-center gap-3">
-        <div
-          class="flex h-10 w-10 sm:h-11 sm:w-11 shrink-0 items-center justify-center rounded-xl bg-[#EDF5FF] text-[#0A5DBD] border border-[#B8D4F5]/40"
-        >
-          <span class="material-symbols-outlined text-[22px] sm:text-[24px]">assignment</span>
-        </div>
-        <div class="min-w-0">
-          <h1 class="text-lg sm:text-xl font-bold text-[#333333] tracking-tight truncate">
-            Formulir Serah Terima Aset
-          </h1>
-          <p class="text-xs font-normal text-[#64748B] mt-0.5 truncate">
-            Dokumentasi & Berita Acara Serah Terima (BAST) perangkat IT & inventaris
-          </p>
-        </div>
-      </div>
-
-      <button
-        type="button"
-        @click="generatePdf"
-        class="h-9.5 shrink-0 whitespace-nowrap rounded-xl bg-[#0A51B0] px-3.5 sm:px-4 text-xs font-bold text-white shadow-2xs hover:bg-[#0A4391] active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
-        title="Cetak formulir PDF"
+      <div
+        class="flex h-9 w-9 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-xl bg-[#EDF5FF] text-[#0A5DBD] border border-[#B8D4F5]/40"
       >
-        <span class="material-symbols-outlined text-[16px]">picture_as_pdf</span>
-        <span class="hidden xs:inline">Cetak BAST</span>
-        <span class="xs:hidden">Cetak</span>
-      </button>
+        <span class="material-symbols-outlined text-[20px] sm:text-[22px]">assignment</span>
+      </div>
+      <div class="min-w-0">
+        <h1 class="text-base sm:text-lg font-bold text-[#333333] tracking-tight truncate">
+          Formulir Serah Terima Aset
+        </h1>
+        <p class="text-xs font-normal text-[#64748B] mt-0.5 truncate">
+          Dokumentasi &amp; Berita Acara Serah Terima (BAST) perangkat IT &amp; inventaris
+        </p>
+      </div>
     </div>
 
     <ol class="submission-steps" aria-label="Tahapan pengisian">
@@ -1415,14 +1402,6 @@ onMounted(fetchData)
   overflow: visible;
 }
 @media (max-width: 639px) {
-  .submission-page-header {
-    flex-wrap: wrap;
-    gap: 14px;
-  }
-  .submission-page-header > button {
-    width: 100%;
-    min-height: 44px;
-  }
   .submission-steps {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 14px 10px;

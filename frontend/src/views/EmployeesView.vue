@@ -536,11 +536,20 @@ onMounted(() => {
     <!-- ── Card Stats Karyawan ── -->
     <div
       v-if="!isLoading && stats"
-      class="employee-stats grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 sm:gap-3"
+      class="employee-stats grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3"
     >
       <StatCard title="Total Karyawan" :value="stats.totalKaryawan" icon="groups" color="primary" />
-      <StatCard title="Active" :value="stats.active" icon="check_circle" color="success" />
-      <StatCard title="Outsource" :value="stats.outsource" icon="contract" color="warning" />
+      <StatCard
+        title="Karyawan Aktif"
+        :value="stats.active"
+        icon="check_circle"
+        color="success"
+        :subtitle="
+          stats.totalKaryawan
+            ? Math.round((stats.active / stats.totalKaryawan) * 100) + '% dari total'
+            : ''
+        "
+      />
       <StatCard
         title="Resigned"
         :value="stats.resigned"
@@ -552,7 +561,6 @@ onMounted(() => {
             : ''
         "
       />
-      <StatCard title="Permanent" :value="stats.permanent" icon="badge" color="cyan" />
       <StatCard
         title="Departemen"
         :value="stats.totalDepartemen"

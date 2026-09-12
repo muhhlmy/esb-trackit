@@ -177,7 +177,6 @@ erDiagram
 it-monitoring-assets/
 ├── .github/workflows/       # CI/CD: ci.yml (backend+frontend CI), e2e-tests.yml (Playwright)
 ├── backend/                 # Node.js + Express 5 + PostgreSQL API Server
-│   ├── esb_trackit_db.sql   # File skema SQL PostgreSQL & seed data init
 │   ├── migrations/          # Versioned SQL migrations (001–004) + cases_seed.json
 │   ├── storage/             # Penyimpanan file (lampiran, backup)
 │   ├── src/
@@ -211,7 +210,7 @@ it-monitoring-assets/
 │   └── tests/               # auth, assets, tickets, rbac, dashboard, negative,
 │                            #   accessibility, qa-extended
 ├── deploy/                  # Konfigurasi deployment (nginx-esb-trackit.conf)
-├── docs/                    # Dokumentasi project, QA prompts & QA reports
+├── docs/                    # Dokumentasi project, audits, presentation, QA prompts & reports
 ├── scripts/qa/              # Reusable QA utility scripts (report generator, a11y, db integrity)
 ├── qa-reports/              # Hasil laporan QA
 ├── playwright.config.js     # Global Playwright configuration (auto-start backend+frontend)
@@ -233,17 +232,12 @@ it-monitoring-assets/
    ```sql
    CREATE DATABASE esb_trackit;
    ```
-2. Eksekusi file SQL skema `backend/esb_trackit_db.sql`:
-   ```bash
-   psql -U postgres -d esb_trackit -f backend/esb_trackit_db.sql
-   ```
-   Alternatif: gunakan skrip setup otomatis:
+2. Jalankan skema & migrasi versioned canonical:
    ```bash
    cd backend
-   npm run db:migrate:plan  # Lihat docs/AUDIT-5746c2f-REMEDIATION.md untuk konfigurasi target
-   npm run db:migrate:apply # Hanya setelah target dan recovery proof diverifikasi
+   npm run db:migrate:plan
+   npm run db:migrate:apply
    npm run db:check
-   npm run db:check    # Verifikasi skema
    ```
 3. (Opsional) Seed data awal Knowledge Base:
    ```bash

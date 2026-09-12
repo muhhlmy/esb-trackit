@@ -16,7 +16,7 @@ function loadStoredBookmarks() {
 }
 
 // Bookmark disimpan sebagai array of case_id (number) agar kompatibel
-// dengan konsumen yang sudah ada: CaseCard, CaseReader, NotionTreeSidebar.
+// dengan konsumen yang sudah ada: CaseReader, NotionTreeSidebar.
 const bookmarks = ref(loadStoredBookmarks())
 
 // Anti double-fetch & anti double-toggle (race guard per case_id)

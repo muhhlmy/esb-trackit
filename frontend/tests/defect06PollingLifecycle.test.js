@@ -33,11 +33,19 @@ test('DEFECT-06 — SPA Polling & Request Lifecycle Audit Suite', async (t) => {
     )
   })
 
-  await t.test('TEST 4 — useRequestCancellation.js helper exists and implements abort logic', () => {
-    const cancellationPath = resolve(process.cwd(), 'src/composables/useRequestCancellation.js')
-    const content = readFileSync(cancellationPath, 'utf8')
-    assert.ok(content.includes('AbortController'), 'useRequestCancellation must use AbortController')
-    assert.ok(content.includes('onUnmounted'), 'useRequestCancellation must abort on unmount')
+  await t.test('TEST 4 — request cancellation via AbortController is supported in client layer', () => {
+    const apiPath = resolve(process.cwd(), 'src/composables/useApi.js')
+    const ssePath = resolve(process.cwd(), 'src/composables/useTicketEvents.js')
+    const apiContent = readFileSync(apiPath, 'utf8')
+    const sseContent = readFileSync(ssePath, 'utf8')
+    assert.ok(
+      apiContent.includes('signal') || apiContent.includes('AbortError'),
+      'useApi must support AbortController signals and handle abort state',
+    )
+    assert.ok(
+      sseContent.includes('AbortController'),
+      'useTicketEvents must manage AbortController lifecycle',
+    )
   })
 
   await t.test('TEST 5 — useTicketEvents.js handles visibility change state', () => {

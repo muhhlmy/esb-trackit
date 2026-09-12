@@ -73,7 +73,7 @@ Copy file konfigurasi `.env.e2e.example`:
 cp .env.e2e.example .env.e2e
 ```
 
-Pastikan server PostgreSQL memiliki database `assets_monitoring` yang telah di-seed dengan skema `backend/esb_trackit_db.sql`.
+Pastikan server PostgreSQL memiliki database `assets_monitoring` yang telah dimigrasi dengan skema canonical (`npm --prefix backend run db:migrate:apply`).
 
 ---
 

@@ -905,7 +905,7 @@ async function claimTicket(ticket) {
     if (selectedTicket.value?.id === ticket.id) {
       selectedTicket.value = {
         ...selectedTicket.value,
-        ...(res || {}),
+        ...res,
         assigned_to_user_id: currentUserId,
         assigned_to: currentUserName,
         assigned_to_nama: currentUserName,

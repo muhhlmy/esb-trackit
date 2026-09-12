@@ -5,6 +5,7 @@ node_modules
 storage
 *.dump
 *.log
+*.pid
 dist
 coverage
 tests

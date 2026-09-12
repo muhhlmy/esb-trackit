@@ -354,17 +354,17 @@ const availableCategories = computed(() => {
       {
         value: 'Request',
         title: 'Request',
-        desc: 'Permintaan Fasilitas, Perbaikan & Perlengkapan GA',
+        desc: 'Permintaan Fasilitas & Perbaikan',
       },
       {
         value: 'Support',
         title: 'Support',
-        desc: 'Kendala Fasilitas, Ruangan & AC / Maintenance',
+        desc: 'Kendala Fasilitas, Ruangan & AC',
       },
       {
         value: 'Incident',
         title: 'Incident',
-        desc: 'Insiden Darurat & Damage Gedung/Fasilitas',
+        desc: 'Kerusakan & Insiden Gedung',
       },
     ]
   }
@@ -373,17 +373,17 @@ const availableCategories = computed(() => {
     {
       value: 'Request',
       title: 'Request',
-      desc: 'Permintaan Akses, Hardware & Software',
+      desc: 'Permintaan Akses & Perangkat',
     },
     {
       value: 'Support',
       title: 'Support',
-      desc: 'Kendala Teknis, PC/Laptop & Wi-Fi',
+      desc: 'Kendala PC, Laptop & Wi-Fi',
     },
     {
       value: 'Incident',
       title: 'Incident',
-      desc: 'Insiden Critical System / Network Down',
+      desc: 'Gangguan Sistem & Jaringan',
     },
   ]
 })

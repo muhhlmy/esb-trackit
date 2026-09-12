@@ -1212,7 +1212,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
             v-if="form.role === 'superadmin'"
             class="text-xs font-semibold text-[#333333] bg-[#EFF6FF] p-2.5 rounded-xl border border-[#BFDBFE]"
           >
-            ⚡ Superadmin memiliki akses otomatis ke seluruh unit (HR, IT, GA, OPS).
+            ⚡ Superadmin memiliki akses otomatis ke seluruh unit (IT, HR, GA).
           </div>
           <div v-else class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
             <div

@@ -929,12 +929,9 @@ export async function resetDatabaseHandler(req, res, next) {
     // Re-seed default ticket queues
     await client.query(`
       INSERT INTO ticket_queues (kode, nama, deskripsi) VALUES
-        ('IT-Help', 'IT Helpdesk', 'General IT support requests'),
-        ('IT-Network', 'Network Team', 'Network infrastructure issues'),
-        ('IT-Software', 'Software Support', 'Software licensing and installation'),
-        ('IT-Hardware', 'Hardware Support', 'Hardware repair and replacement'),
+        ('GA', 'GA Support', 'General Affairs support & facilities'),
         ('HR', 'HR Support', 'Human Resources support & services'),
-        ('GA', 'GA Support', 'General Affairs support & facilities')
+        ('IT', 'IT Support', 'IT support & services')
     `)
 
     await client.query('COMMIT')

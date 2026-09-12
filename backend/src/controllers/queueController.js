@@ -53,6 +53,22 @@ async function ensureDefaultQueuesExist() {
         `INSERT INTO ticket_queues (kode, nama, deskripsi) VALUES ('GA', 'GA Support', 'General Affairs support & facilities')`
       )
     }
+
+    // Pastikan hanya GA, HR, dan IT yang ada di ticket_queues
+    const itQueueRes = await pool.query(`SELECT id FROM ticket_queues WHERE UPPER(kode) = 'IT' LIMIT 1`)
+    const itQueueId = itQueueRes.rows[0]?.id
+    if (itQueueId) {
+      await pool.query(
+        `UPDATE tickets SET queue_id = $1 WHERE queue_id IN (SELECT id FROM ticket_queues WHERE kode NOT IN ('GA', 'HR', 'IT'))`,
+        [itQueueId]
+      )
+    }
+    await pool.query(
+      `DELETE FROM user_ticket_queues WHERE queue_id IN (SELECT id FROM ticket_queues WHERE kode NOT IN ('GA', 'HR', 'IT'))`
+    )
+    await pool.query(
+      `DELETE FROM ticket_queues WHERE kode NOT IN ('GA', 'HR', 'IT')`
+    )
   } catch (_err) {
     // Ignore seed race conditions
   }

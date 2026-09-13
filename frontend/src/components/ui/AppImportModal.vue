@@ -105,47 +105,13 @@ function downloadTemplate() {
     },
   ]
 
-  const sampleAssets = [
-    {
-      Hostname: 'ESB-LAP-001',
-      'Serial Number': 'PF3X90B',
-      Spesifikasi: 'Intel Core i7 16GB RAM 512GB SSD',
-      'NIK Pemegang': '2026001',
-      'Nama Karyawan Pemegang': 'Budi Santoso',
-      'Departemen Pemegang': 'Technology',
-      'Lokasi Aset': 'JKT',
-      'Tipe Perangkat': 'Laptop',
-      'Brand/Merek': 'Lenovo',
-      Model: 'ThinkPad T14',
-      Status: 'In Use',
-      Kondisi: 'Normal',
-      'Note Asset': 'Laptop utama pengembang',
-    },
-    {
-      Hostname: 'ESB-MON-002',
-      'Serial Number': 'MON-88491',
-      Spesifikasi: '27 inch 4K Display',
-      'NIK Pemegang': '2026002',
-      'Nama Karyawan Pemegang': 'Siti Rahma',
-      'Departemen Pemegang': 'Account Management',
-      'Lokasi Aset': 'BDG',
-      'Tipe Perangkat': 'Monitor',
-      'Brand/Merek': 'Dell',
-      Model: 'UltraSharp U2720Q',
-      Status: 'In Use',
-      Kondisi: 'Normal',
-      'Note Asset': 'Monitor kerja tambahan',
-    },
-  ]
 
   const wb = XLSX.utils.book_new()
   const wsKaryawan = XLSX.utils.json_to_sheet(sampleKaryawan)
-  const wsAsset = XLSX.utils.json_to_sheet(sampleAssets)
 
   XLSX.utils.book_append_sheet(wb, wsKaryawan, 'Table Karyawan')
-  XLSX.utils.book_append_sheet(wb, wsAsset, 'Table Asset')
 
-  XLSX.writeFile(wb, 'Template_Import_Karyawan_dan_Aset.xlsx')
+  XLSX.writeFile(wb, 'Template_Import_Karyawan.xlsx')
 }
 
 // ── Parse Excel File ─────────────────────────────────────────────────────────
@@ -295,7 +261,7 @@ async function submitImport() {
 <template>
   <AppModal
     :is-open="isOpen"
-    title="Import Data Karyawan & Aset IT (Excel)"
+    title="Import Data Karyawan (Excel)"
     size="xl"
     @close="handleClose"
   >
@@ -404,8 +370,7 @@ async function submitImport() {
         <div>
           <h4 class="text-[13px] font-bold text-[#2A3547]">Format / Template Import Excel</h4>
           <p class="text-[11px] text-[#7C8BAC] mt-0.5">
-            Gunakan template Excel resmi yang berisi Sheet <code>Table Karyawan</code> &amp;
-            <code>Table Asset</code>.
+            Gunakan template Excel resmi dengan Sheet <code>Table Karyawan</code>.
           </p>
         </div>
         <button

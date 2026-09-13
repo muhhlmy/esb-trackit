@@ -24,6 +24,7 @@ const isParsing = ref(false)
 const importMode = ref('append')
 const replaceScope = ref('assets')
 const replaceConfirmation = ref('')
+const includeEmployees = ref(false)
 
 const fields = {
   it: [
@@ -62,7 +63,9 @@ const sheetLabel = computed(() => `Data Aset ${typeLabel.value}`)
 const previewColumns = computed(() => Object.keys(rows.value[0] || {}).slice(0, 6))
 const previewRows = computed(() => rows.value.slice(0, 5))
 const requiredFields = computed(() => {
-  if (props.assetType === 'it') return 'Sheet Karyawan: NIK, Nama Karyawan · Sheet Asset: Hostname, Serial Number'
+  if (props.assetType === 'it') return includeEmployees.value
+    ? 'Sheet Karyawan: NIK, Nama Karyawan · Sheet Asset: Hostname, Serial Number'
+    : 'Sheet Table Asset: Hostname, Serial Number'
   return props.assetType === 'ga'
     ? 'Hostname, Tipe Fasilitas, Nama Asset, Lokasi'
     : 'Hostname, Nama Asset, Kategori, Lokasi'
@@ -71,7 +74,7 @@ const requiredFields = computed(() => {
 function downloadTemplate() {
   const wb = XLSX.utils.book_new()
   if (props.assetType === 'it') {
-    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet([{
+    if (includeEmployees.value) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet([{
       NIK: '2026001',
       'Nama Karyawan': 'Budi Santoso',
       Status: 'Active',
@@ -113,7 +116,7 @@ function hasColumn(row, names) {
 function validateWorkbook(workbook) {
   const names = workbook.SheetNames.map((name) => name.trim().toLowerCase())
   const expected = props.assetType === 'it'
-    ? ['table karyawan', 'table asset']
+    ? (includeEmployees.value ? ['table karyawan', 'table asset'] : ['table asset'])
     : [`data aset ${props.assetType}`]
   const missing = expected.filter((name) => !names.includes(name))
   if (missing.length) {
@@ -121,12 +124,14 @@ function validateWorkbook(workbook) {
   }
 
   if (props.assetType === 'it') {
-    const employeeSheet = workbook.Sheets[workbook.SheetNames[names.indexOf('table karyawan')]]
     const assetSheet = workbook.Sheets[workbook.SheetNames[names.indexOf('table asset')]]
-    const employeeData = XLSX.utils.sheet_to_json(employeeSheet)
     const assetData = XLSX.utils.sheet_to_json(assetSheet)
-    if (!hasColumn(employeeData[0], ['nik']) || !hasColumn(employeeData[0], ['nama karyawan', 'nama'])) {
-      throw new Error('Sheet Table Karyawan tidak sesuai template Aset IT.')
+    if (includeEmployees.value) {
+      const employeeSheet = workbook.Sheets[workbook.SheetNames[names.indexOf('table karyawan')]]
+      const employeeData = XLSX.utils.sheet_to_json(employeeSheet)
+      if (!hasColumn(employeeData[0], ['nik']) || !hasColumn(employeeData[0], ['nama karyawan', 'nama'])) {
+        throw new Error('Sheet Table Karyawan tidak sesuai template Aset IT.')
+      }
     }
     if (!hasColumn(assetData[0], ['hostname']) || !hasColumn(assetData[0], ['serial number', 'serial_number'])) {
       throw new Error('Sheet Table Asset tidak sesuai template Aset IT.')
@@ -163,8 +168,10 @@ function parseFile(selectedFile) {
       const workbook = XLSX.read(new Uint8Array(event.target.result), { type: 'array', cellDates: true })
       validateWorkbook(workbook)
       if (props.assetType === 'it') {
-        employeeRows.value = workbook.SheetNames.filter((name) => name.toLowerCase().includes('karyawan')).flatMap((name) => XLSX.utils.sheet_to_json(workbook.Sheets[name]))
-        assetRows.value = workbook.SheetNames.filter((name) => name.toLowerCase().includes('asset') || name.toLowerCase().includes('aset')).flatMap((name) => XLSX.utils.sheet_to_json(workbook.Sheets[name]))
+        employeeRows.value = includeEmployees.value
+          ? XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames.find((name) => name.trim().toLowerCase() === 'table karyawan')])
+          : []
+        assetRows.value = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames.find((name) => name.trim().toLowerCase() === 'table asset')])
         rows.value = assetRows.value
       } else {
         const sheetName = workbook.SheetNames.find((name) => name.trim().toLowerCase() === `data aset ${props.assetType}`)
@@ -230,6 +237,7 @@ function close() {
   importMode.value = 'append'
   replaceScope.value = 'assets'
   replaceConfirmation.value = ''
+  includeEmployees.value = false
   if (fileInput.value) fileInput.value.value = ''
   emit('close')
 }
@@ -279,6 +287,11 @@ watch(() => props.isOpen, (open) => {
           <span class="material-symbols-outlined text-[17px]">download</span>
           Unduh Template
         </button>
+      </div>
+
+      <div v-if="assetType === 'it'" class="rounded-xl border border-amber-200 bg-amber-50 px-3 py-2.5 text-[11px] leading-relaxed text-amber-800">
+        <b>Untuk link pemegang aset:</b> import Karyawan dahulu dari halaman Karyawan. Isi <b>NIK Pemegang</b> dengan NIK yang sudah terdaftar. Pilih opsi lengkap hanya untuk import awal Karyawan dan Aset IT bersamaan.
+        <label class="mt-2 flex cursor-pointer items-center gap-2 font-semibold text-slate-700"><input v-model="includeEmployees" type="checkbox" @change="removeFile" /> Import lengkap: Karyawan + Aset IT</label>
       </div>
 
       <div class="flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2.5 text-[11px] text-amber-800">

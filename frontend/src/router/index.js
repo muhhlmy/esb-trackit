@@ -277,8 +277,8 @@ router.beforeEach((to) => {
     return { name: firstAllowed?.name || 'forbidden' }
   }
 
-  // /my-assets dan /dashboard selalu diizinkan untuk user yang sudah login
-  if (to.name === 'my-assets' || to.name === 'dashboard') return
+  // Akses halaman tetap mengikuti permission user.
+  // Karyawan hanya punya my_assets dan tickets dari hasil import.
 
   // Evaluasi RBAC untuk fitur manajemen TrackIT
   if (to.meta.permission && !canAccess(to.meta.permission)) {

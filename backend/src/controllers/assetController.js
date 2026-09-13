@@ -50,7 +50,7 @@ export async function replaceAsset(req, res) {
 
     async function updateInsideTransaction(databaseClient) {
       const lockResult = await databaseClient.query(
-        "SELECT * FROM aset_ti WHERE id = $1 AND deleted_at IS NULL FOR UPDATE", [id]
+        "SELECT * FROM aset_ti WHERE id = $1 FOR UPDATE", [id]
       );
 
       if (lockResult.rowCount === 0) throw createHttpError(404, "Aset tidak ditemukan.");
@@ -132,8 +132,8 @@ export async function deleteAsset(req, res) {
     }
 
     await withTransaction(async (databaseClient) => {
-      await databaseClient.query("UPDATE aset_ti SET deleted_at = CURRENT_TIMESTAMP WHERE id = $1", [id]);
       await recordAssetLog(databaseClient, id, asset.hostname, 'HAPUS', `Aset ${asset.hostname} (${asset.serial_number}) dihapus dari sistem.`, auditActor);
+      await databaseClient.query("DELETE FROM aset_ti WHERE id = $1", [id]);
     });
     res.status(204).send();
   } catch (error) {
@@ -295,7 +295,7 @@ const assetColumns = `
 async function findAssetById(id, databaseClient) {
   if (!databaseClient) databaseClient = pool;
 
-  const sql = "SELECT " + assetColumns + " FROM aset_ti WHERE id = $1 AND deleted_at IS NULL";
+  const sql = "SELECT " + assetColumns + " FROM aset_ti WHERE id = $1";
   const result = await databaseClient.query(sql, [id]);
 
   if (result.rowCount === 0) return null;
@@ -326,7 +326,7 @@ export async function listMyAssets(req, res) {
   try {
     if (!req.user?.id) return res.status(401).json({ error: "Unauthorized" });
     
-    let sql = `SELECT ` + assetColumns + ` FROM aset_ti WHERE deleted_at IS NULL`;
+    let sql = `SELECT ` + assetColumns + ` FROM aset_ti WHERE 1 = 1`;
     const params = [];
 
     const queryNik = req.query.nik;
@@ -368,7 +368,7 @@ export async function showAssetStats(req, res) {
   try {
     // 1. Total Assets
     const totalResult = await pool.query(`
-      SELECT COUNT(*)::int AS total FROM aset_ti WHERE deleted_at IS NULL
+      SELECT COUNT(*)::int AS total FROM aset_ti
     `);
     const totalAssets = totalResult.rows[0]?.total || 0;
 
@@ -376,7 +376,6 @@ export async function showAssetStats(req, res) {
     const statusResult = await pool.query(`
       SELECT status, COUNT(*)::int AS count
       FROM aset_ti
-      WHERE deleted_at IS NULL
       GROUP BY status
     `);
     const byStatus = statusResult.rows.map((r) => ({ status: r.status, count: r.count }));
@@ -385,7 +384,6 @@ export async function showAssetStats(req, res) {
     const typeResult = await pool.query(`
       SELECT COALESCE(tipe_perangkat, 'Lainnya') AS type, COUNT(*)::int AS count
       FROM aset_ti
-      WHERE deleted_at IS NULL
       GROUP BY tipe_perangkat
     `);
     const byType = typeResult.rows.map((r) => ({
@@ -399,7 +397,6 @@ export async function showAssetStats(req, res) {
     const conditionResult = await pool.query(`
       SELECT COALESCE(kondisi, 'Normal') AS condition, COUNT(*)::int AS count
       FROM aset_ti
-      WHERE deleted_at IS NULL
       GROUP BY kondisi
     `);
     const byCondition = conditionResult.rows.map((r) => ({ condition: r.condition, count: r.count }));
@@ -408,7 +405,6 @@ export async function showAssetStats(req, res) {
     const locationResult = await pool.query(`
       SELECT lokasi_asset, COUNT(*)::int AS count
       FROM aset_ti
-      WHERE deleted_at IS NULL
       GROUP BY lokasi_asset
     `);
     const locationMap = new Map();
@@ -428,7 +424,6 @@ export async function showAssetStats(req, res) {
              departemen_pemegang_asset AS departemen, lokasi_asset AS lokasi_kerja,
              created_at AS dibuat_pada
       FROM aset_ti
-      WHERE deleted_at IS NULL
       ORDER BY created_at DESC
       LIMIT 5
     `);
@@ -453,7 +448,6 @@ export async function showAssetStats(req, res) {
       FROM months m
       LEFT JOIN aset_ti a 
         ON DATE_TRUNC('month', a.created_at) = m.month_date 
-        AND a.deleted_at IS NULL
       GROUP BY m.month_date
       ORDER BY m.month_date ASC
     `);
@@ -541,14 +535,12 @@ export async function listAssets(req, res) {
       const countRes = await pool.query(`
         SELECT COUNT(*)::int AS count
         FROM aset_ti
-        WHERE deleted_at IS NULL
       `)
       totalCount = countRes.rows[0]?.count || 0
 
       results = await pool.query(
         `SELECT ` + assetColumns + `
          FROM aset_ti
-         WHERE deleted_at IS NULL
          ORDER BY created_at DESC, id DESC`
       )
     } else {
@@ -557,14 +549,12 @@ export async function listAssets(req, res) {
       const countRes = await pool.query(`
         SELECT COUNT(*)::int AS count
         FROM aset_ti
-        WHERE deleted_at IS NULL
       `)
       totalCount = countRes.rows[0]?.count || 0
 
       results = await pool.query(
         `SELECT ` + assetColumns + `
          FROM aset_ti
-         WHERE deleted_at IS NULL
          ORDER BY created_at DESC, id DESC
          LIMIT $1 OFFSET $2`,
         [limit, offset]

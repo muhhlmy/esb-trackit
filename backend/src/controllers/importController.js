@@ -344,7 +344,7 @@ export async function importExcelData(req, res) {
             } else {
               try {
                 const DEFAULT_IMPORT_PERMISSIONS = JSON.stringify({
-                            dashboard: 'read_only',
+                            dashboard: 'none',
                             assets: 'none',
                             my_assets: 'read_only',
                             tickets: 'read_only',
@@ -509,5 +509,49 @@ export async function importExcelData(req, res) {
   } catch (error) {
     console.error('[Import Excel Error]', error);
     res.status(500).json({ error: 'Gagal memproses import data Excel. Silakan periksa format file Anda atau hubungi administrator.' });
+  }
+}
+
+export async function importCategoryAssets(req, res) {
+  const { assetType, rows } = req.body || {};
+  if (!['ga', 'ops'].includes(assetType) || !Array.isArray(rows) || rows.length === 0) return res.status(400).json({ error: 'Tipe aset atau data import tidak valid.' });
+  const value = (row, keys) => getPropCaseInsensitive(row, keys);
+  const requiredFields = assetType === 'ga'
+    ? [['Hostname', 'hostname'], ['Tipe Fasilitas', 'tipe_fasilitas', 'Tipe'], ['Nama Asset', 'nama_asset', 'Nama']]
+    : [['Hostname', 'hostname'], ['Nama Asset', 'nama_asset', 'Nama'], ['Kategori', 'kategori']];
+  const invalidRow = rows.findIndex((row) => requiredFields.some((keys) => !value(row, keys)));
+  if (invalidRow !== -1) {
+    return res.status(400).json({
+      error: `Template Aset ${assetType.toUpperCase()} tidak sesuai pada baris ${invalidRow + 1}. Gunakan template resmi Aset ${assetType.toUpperCase()}.`,
+    });
+  }
+  try {
+    let imported = 0;
+    await withTransaction(async (client) => {
+      for (const row of rows) {
+        if (assetType === 'ga') {
+          const hostname = value(row, ['Hostname', 'hostname']);
+          const quantity = Number(value(row, ['Quantity', 'quantity'])) || 1;
+          const tipe = value(row, ['Tipe Fasilitas', 'tipe_fasilitas', 'Tipe']);
+          const nama = value(row, ['Nama Asset', 'nama_asset', 'Nama']);
+          const lokasi = normalizeLocation(value(row, ['Lokasi', 'lokasi']));
+          if (!hostname || !tipe || !nama || !lokasi) continue;
+          await client.query(`INSERT INTO aset_ga (hostname, quantity, tipe_fasilitas, nama_asset, ukuran, detail, lokasi, lokasi_detail, kondisi) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)`, [hostname, quantity, tipe, nama, value(row, ['Ukuran', 'ukuran']), value(row, ['Detail', 'detail']), lokasi, value(row, ['Lokasi Detail', 'lokasi_detail']), value(row, ['Kondisi', 'kondisi']) || 'Baik']);
+        } else {
+          const hostname = value(row, ['Hostname', 'hostname']);
+          const nama = value(row, ['Nama Asset', 'nama_asset', 'Nama']);
+          const kategori = value(row, ['Kategori', 'kategori']);
+          const lokasi = normalizeLocation(value(row, ['Lokasi', 'lokasi']));
+          if (!hostname || !nama || !kategori || !lokasi) continue;
+          await client.query(`INSERT INTO aset_ops (hostname, nama_asset, kategori, lokasi, pic, tanggal_beli, total_asset_amount, kondisi, status) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)`, [hostname, nama, kategori, lokasi, value(row, ['PIC', 'pic']), normalizeDate(value(row, ['Tanggal Beli', 'tanggal_beli'])), Number(value(row, ['Total Asset Amount', 'total_asset_amount'])) || 0, value(row, ['Kondisi', 'kondisi']) || 'Baik', value(row, ['Status', 'status']) || 'Aktif']);
+        }
+        imported++;
+      }
+    });
+    res.json({ success: true, message: `${imported} Aset ${assetType.toUpperCase()} berhasil diimpor.`, details: { imported } });
+  } catch (error) {
+    if (error.code === '23505') return res.status(409).json({ error: 'Hostname aset sudah digunakan.' });
+    console.error('[Category Asset Import Error]', error);
+    res.status(500).json({ error: 'Gagal memproses import aset.' });
   }
 }

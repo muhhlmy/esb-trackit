@@ -59,14 +59,12 @@ export async function listGaAssets(req, res) {
     const countRes = await pool.query(`
       SELECT COUNT(*)::int AS count
       FROM aset_ga
-      WHERE deleted_at IS NULL
     `)
     const totalCount = countRes.rows[0]?.count || 0
 
     const result = await pool.query(
       `SELECT id, hostname, quantity, tipe_fasilitas, nama_asset, ukuran, detail, lokasi, lokasi_detail, kondisi, created_at, updated_at
        FROM aset_ga
-       WHERE deleted_at IS NULL
        ORDER BY created_at DESC, id DESC
        LIMIT $1 OFFSET $2`,
       [limit, offset]
@@ -90,7 +88,7 @@ export async function fetchGaAsset(req, res) {
     if (isNaN(id) || id <= 0) throw createHttpError(400, "ID Aset GA tidak valid.");
 
     const result = await pool.query(
-      `SELECT * FROM aset_ga WHERE id = $1 AND deleted_at IS NULL`,
+      `SELECT * FROM aset_ga WHERE id = $1`,
       [id]
     );
 
@@ -192,7 +190,7 @@ export async function replaceGaAsset(req, res) {
 
     const updated = await withTransaction(async (client) => {
       const existingRes = await client.query(
-        `SELECT * FROM aset_ga WHERE id = $1 AND deleted_at IS NULL FOR UPDATE`,
+        `SELECT * FROM aset_ga WHERE id = $1 FOR UPDATE`,
         [id]
       );
       if (existingRes.rowCount === 0) throw createHttpError(404, "Aset GA tidak ditemukan.");
@@ -247,17 +245,14 @@ export async function deleteGaAsset(req, res) {
 
     await withTransaction(async (client) => {
       const existingRes = await client.query(
-        `SELECT * FROM aset_ga WHERE id = $1 AND deleted_at IS NULL FOR UPDATE`,
+        `SELECT * FROM aset_ga WHERE id = $1 FOR UPDATE`,
         [id]
       );
       if (existingRes.rowCount === 0) throw createHttpError(404, "Aset GA tidak ditemukan.");
 
       const target = existingRes.rows[0];
 
-      await client.query(
-        `UPDATE aset_ga SET deleted_at = CURRENT_TIMESTAMP WHERE id = $1`,
-        [id]
-      );
+      await client.query(`DELETE FROM aset_ga WHERE id = $1`, [id]);
 
       await recordAssetLog(
         client,

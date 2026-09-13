@@ -13,7 +13,7 @@ import AppBadge from '../components/ui/AppBadge.vue'
 import SearchableSelect from '../components/ui/SearchableSelect.vue'
 import CustomSelect from '../components/ui/CustomSelect.vue'
 import AppRowActions from '../components/ui/AppRowActions.vue'
-import AppImportModal from '../components/ui/AppImportModal.vue'
+import AssetCategoryImportModal from '../components/ui/AssetCategoryImportModal.vue'
 import AssetLabelModal from '../components/common/AssetLabelModal.vue'
 import AppPagination from '../components/ui/AppPagination.vue'
 import BaseSkeleton from '../components/ui/skeleton/BaseSkeleton.vue'
@@ -771,16 +771,26 @@ onMounted(async () => {
         </div>
 
         <!-- Primary Action CTA -->
-        <button
-          v-if="canWriteAssets"
-          type="button"
-          @click="openAdd"
-          class="h-9 shrink-0 whitespace-nowrap rounded-lg bg-[#0A51B0] px-3 sm:px-3.5 text-xs font-semibold text-white shadow-2xs hover:bg-[#0A4391] active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer touch-manipulation"
-          title="Tambah aset baru"
-        >
-          <span class="material-symbols-outlined text-[16px]">add</span>
-          <span>Tambah Aset</span>
-        </button>
+        <div class="flex shrink-0 items-center gap-2">
+          <button
+            v-if="canWriteAssets"
+            type="button"
+            @click="openAdd"
+            class="inline-flex h-9 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg bg-[#0A51B0] px-3 sm:px-3.5 text-xs font-semibold text-white shadow-2xs transition-all hover:bg-[#0A4391] active:scale-95"
+            title="Tambah aset baru"
+          >
+            <span class="material-symbols-outlined text-[16px]">add</span>
+            <span>Tambah Aset</span>
+          </button>
+          <div class="flex items-center gap-1 rounded-lg border border-[#D7E3F2] bg-[#F8FAFC] p-1">
+            <button v-if="canWriteAssets" type="button" @click="showImportModal = true" class="inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-[11px] font-bold text-[#0A51B0] hover:bg-white">
+              <span class="material-symbols-outlined text-[15px]">upload_file</span>Import
+            </button>
+            <button type="button" @click="openExport" class="inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-[11px] font-bold text-[#0A51B0] hover:bg-white">
+              <span class="material-symbols-outlined text-[15px]">download</span>Export
+            </button>
+          </div>
+        </div>
       </div>
 
       <!-- Row 2: Search, Filters & Actions -->
@@ -839,29 +849,6 @@ onMounted(async () => {
             </button>
           </div>
 
-          <!-- Actions Group: Ekspor & Impor -->
-          <div class="flex items-center gap-2 w-full sm:w-auto">
-            <button
-              type="button"
-              @click="openExport"
-              class="h-9 flex-1 sm:flex-initial shrink-0 whitespace-nowrap rounded-lg border border-[#E2E8F0] bg-white px-3.5 text-xs font-medium text-[#475569] hover:bg-[#F8FAFC] hover:text-[#333333] active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs touch-manipulation"
-              title="Ekspor laporan data aset"
-            >
-              <span class="material-symbols-outlined text-[16px] text-[#64748B]">download</span>
-              <span>Ekspor</span>
-            </button>
-
-            <button
-              v-if="canWriteAssets"
-              type="button"
-              @click="showImportModal = true"
-              class="h-9 flex-1 sm:flex-initial shrink-0 whitespace-nowrap rounded-lg border border-[#E2E8F0] bg-white px-3.5 text-xs font-medium text-[#475569] hover:bg-[#F8FAFC] hover:text-[#333333] active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs touch-manipulation"
-              title="Impor data dari file Excel"
-            >
-              <span class="material-symbols-outlined text-[16px] text-[#64748B]">file_upload</span>
-              <span>Impor</span>
-            </button>
-          </div>
         </div>
       </div>
     </div>
@@ -2005,8 +1992,9 @@ onMounted(async () => {
     </AppModal>
 
     <!-- Modal Import Excel -->
-    <AppImportModal
+    <AssetCategoryImportModal
       :is-open="showImportModal"
+      asset-type="it"
       @close="showImportModal = false"
       @imported="onImported"
     />

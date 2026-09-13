@@ -1,4 +1,4 @@
-import { pool } from '../config/database.js'
+import { pool, withTransaction } from '../config/database.js'
 import {
   assertAllowedFields,
   assertNoActiveMarkup,
@@ -372,6 +372,36 @@ export async function createShipment(req, res) {
   )
 
   res.status(201).json(mapShipmentRow(fetchResult.rows[0]))
+}
+
+// POST /api/shipments/import
+export async function importShipments(req, res) {
+  const rows = req.body?.rows
+  if (!Array.isArray(rows) || rows.length === 0) {
+    throw createHttpError(400, 'Data import pengiriman tidak valid.')
+  }
+
+  const createdBy = req.user?.id || null
+  let imported = 0
+  await withTransaction(async (client) => {
+    for (const row of rows) {
+      const requestDate = normalizeRequestDate(row.request_date)
+      const recipientName = normalizeRecipientName(row.recipient_name)
+      const itemDescription = normalizeItemDescription(row.item_description)
+      const destination = normalizeDestination(row.destination)
+      const trackingNumber = normalizeTrackingNumber(row.tracking_number)
+      const status = normalizeStatus(row.status)
+      const deliveryProofUrl = normalizeDeliveryProofUrl(row.delivery_proof_url)
+      await client.query(
+        `INSERT INTO asset_shipments
+          (request_date, recipient_name, item_description, destination, tracking_number, status, delivery_proof_url, created_by)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+        [requestDate, recipientName, itemDescription, destination, trackingNumber, status, deliveryProofUrl, createdBy],
+      )
+      imported += 1
+    }
+  })
+  res.status(201).json({ success: true, message: `${imported} data pengiriman berhasil diimpor.`, imported })
 }
 
 // PUT / PATCH /api/shipments/:id

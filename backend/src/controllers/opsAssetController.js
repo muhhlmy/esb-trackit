@@ -68,14 +68,12 @@ export async function listOpsAssets(req, res) {
     const countRes = await pool.query(`
       SELECT COUNT(*)::int AS count
       FROM aset_ops
-      WHERE deleted_at IS NULL
     `)
     const totalCount = countRes.rows[0]?.count || 0
 
     const result = await pool.query(
       `SELECT id, hostname, nama_asset, kategori, lokasi, pic, tanggal_beli, total_asset_amount, kondisi, status, created_at, updated_at
        FROM aset_ops
-       WHERE deleted_at IS NULL
        ORDER BY created_at DESC, id DESC
        LIMIT $1 OFFSET $2`,
       [limit, offset]
@@ -99,7 +97,7 @@ export async function fetchOpsAsset(req, res) {
     if (isNaN(id) || id <= 0) throw createHttpError(400, "ID Aset OPS tidak valid.");
 
     const result = await pool.query(
-      `SELECT * FROM aset_ops WHERE id = $1 AND deleted_at IS NULL`,
+      `SELECT * FROM aset_ops WHERE id = $1`,
       [id]
     );
 
@@ -199,7 +197,7 @@ export async function replaceOpsAsset(req, res) {
 
     const updated = await withTransaction(async (client) => {
       const existingRes = await client.query(
-        `SELECT * FROM aset_ops WHERE id = $1 AND deleted_at IS NULL FOR UPDATE`,
+        `SELECT * FROM aset_ops WHERE id = $1 FOR UPDATE`,
         [id]
       );
       if (existingRes.rowCount === 0) throw createHttpError(404, "Aset OPS tidak ditemukan.");
@@ -254,17 +252,14 @@ export async function deleteOpsAsset(req, res) {
 
     await withTransaction(async (client) => {
       const existingRes = await client.query(
-        `SELECT * FROM aset_ops WHERE id = $1 AND deleted_at IS NULL FOR UPDATE`,
+        `SELECT * FROM aset_ops WHERE id = $1 FOR UPDATE`,
         [id]
       );
       if (existingRes.rowCount === 0) throw createHttpError(404, "Aset OPS tidak ditemukan.");
 
       const target = existingRes.rows[0];
 
-      await client.query(
-        `UPDATE aset_ops SET deleted_at = CURRENT_TIMESTAMP WHERE id = $1`,
-        [id]
-      );
+      await client.query(`DELETE FROM aset_ops WHERE id = $1`, [id]);
 
       await recordAssetLog(
         client,

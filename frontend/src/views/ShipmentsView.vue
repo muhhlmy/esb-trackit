@@ -8,6 +8,8 @@ import AppBadge from '../components/ui/AppBadge.vue'
 import AppPagination from '../components/ui/AppPagination.vue'
 import CustomSelect from '../components/ui/CustomSelect.vue'
 import SkeletonTable from '../components/ui/skeleton/SkeletonTable.vue'
+import ShipmentImportModal from '../components/ui/ShipmentImportModal.vue'
+import ShipmentExportModal from '../components/ui/ShipmentExportModal.vue'
 import {
   ExternalLink,
   FilterX,
@@ -73,6 +75,8 @@ function getTodayString() {
 // ── Form State ───────────────────────────────────────────────
 const showFormModal = ref(false)
 const showDeleteModal = ref(false)
+const showImportModal = ref(false)
+const showExportModal = ref(false)
 const modalMode = ref('add') // 'add' | 'edit'
 const selectedShipment = ref(null)
 
@@ -353,12 +357,28 @@ onMounted(() => {
           <button
             type="button"
             @click="openAdd"
-            class="h-10 sm:h-9 shrink-0 whitespace-nowrap rounded-lg bg-[#0A51B0] px-4 text-xs font-semibold text-white shadow-2xs hover:bg-[#0A4391] transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+            class="inline-flex h-9 shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg bg-[#0A51B0] px-3 text-xs font-semibold text-white shadow-2xs transition-all hover:bg-[#0A4391] active:scale-95 sm:px-3.5"
             title="Tambah pengiriman baru"
           >
-            <Plus class="w-4 h-4" />
+            <span class="material-symbols-outlined text-[16px]">add</span>
             <span>Tambah Pengiriman</span>
           </button>
+          <div class="flex items-center gap-1 rounded-lg border border-[#D7E3F2] bg-[#F8FAFC] p-1">
+            <button
+              type="button"
+              @click="showImportModal = true"
+              class="inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-[11px] font-bold text-[#0A51B0] hover:bg-white"
+            >
+              <span class="material-symbols-outlined text-[15px]">upload_file</span>Import
+            </button>
+            <button
+              type="button"
+              @click="showExportModal = true"
+              class="inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-[11px] font-bold text-[#0A51B0] hover:bg-white"
+            >
+              <span class="material-symbols-outlined text-[15px]">download</span>Export
+            </button>
+          </div>
         </div>
       </div>
 
@@ -888,6 +908,9 @@ onMounted(() => {
       </template>
     </AppModal>
 
+    <ShipmentImportModal :is-open="showImportModal" @close="showImportModal = false" @imported="showImportModal = false; fetchData()" />
+    <ShipmentExportModal :is-open="showExportModal" :shipments="shipments" @close="showExportModal = false" />
+
     <!-- Delete Confirmation Modal -->
     <AppModal :is-open="showDeleteModal" title="Hapus Data Pengiriman" @close="closeModal">
       <div class="space-y-4">
@@ -950,10 +973,22 @@ onMounted(() => {
 .shipment-toolbar > div:first-child {
   margin-bottom: 24px;
 }
-.shipment-toolbar > div:first-child button {
+.shipment-toolbar > div:first-child > div:last-child > button {
   background: #0a51b0;
-  min-height: 42px;
+  min-height: 0;
   box-shadow: none;
+}
+.shipment-toolbar > div:first-child > div:last-child > div:first-child button {
+  background: transparent;
+  min-height: 0;
+  box-shadow: none;
+  color: #0a51b0;
+}
+.shipment-toolbar > div:first-child > div:last-child > div:first-child button:hover {
+  background: white;
+}
+.shipment-toolbar > div:first-child > div:last-child > div:first-child button span {
+  color: inherit;
 }
 .shipment-toolbar > div:nth-child(2) {
   padding: 16px;

@@ -12,6 +12,8 @@ import AppPagination from '../components/ui/AppPagination.vue'
 import AssetLabelModal from '../components/common/AssetLabelModal.vue'
 import BaseSkeleton from '../components/ui/skeleton/BaseSkeleton.vue'
 import SkeletonAvatar from '../components/ui/skeleton/SkeletonAvatar.vue'
+import AssetCategoryImportModal from '../components/ui/AssetCategoryImportModal.vue'
+import AssetCategoryExportModal from '../components/ui/AssetCategoryExportModal.vue'
 
 const { get, post, put, del } = useApi()
 const { isAdmin, isSuperAdmin, hasWritePermission } = useAuth()
@@ -45,6 +47,9 @@ const modalMode = ref('add') // 'add' | 'edit'
 const selectedAsset = ref(null)
 const isSubmitting = ref(false)
 const modalError = ref('')
+const showImportModal = ref(false)
+const showExportModal = ref(false)
+
 
 function openLabelModal(asset) {
   selectedLabelAsset.value = asset
@@ -292,6 +297,7 @@ async function confirmDelete() {
   modalError.value = ''
   try {
     await del(`/api/ga-assets/${selectedAsset.value.id}`)
+    isSubmitting.value = false
     closeModal()
     await fetchData()
   } catch (err) {
@@ -387,16 +393,31 @@ function formatKondisiPill(kondisi) {
         </div>
 
         <!-- Primary Action CTA -->
-        <button
-          v-if="canWriteAssets"
-          type="button"
-          @click="openAdd"
-          class="h-9 shrink-0 whitespace-nowrap rounded-lg bg-[#0A51B0] px-3 sm:px-3.5 text-xs font-semibold text-white shadow-2xs hover:bg-[#0A4391] active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer touch-manipulation"
-          title="Tambah Aset GA baru"
-        >
-          <span class="material-symbols-outlined text-[16px]">add</span>
-          <span>Tambah Aset GA</span>
-        </button>
+        <div class="flex shrink-0 items-center gap-2">
+          <button v-if="canWriteAssets"
+            type="button"
+            @click="openAdd"
+            class="inline-flex h-9 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg bg-[#0A51B0] px-3 sm:px-3.5 text-xs font-semibold text-white shadow-2xs transition-all hover:bg-[#0A4391] active:scale-95"
+            title="Tambah Aset GA baru"
+          >
+            <span class="material-symbols-outlined text-[16px]">add</span>
+            <span>Tambah Aset GA</span>
+          </button>
+          <div class="flex items-center gap-1 rounded-lg border border-[#D7E3F2] bg-[#F8FAFC] p-1">
+            <button
+              v-if="canWriteAssets"
+              type="button"
+              @click="showImportModal = true"
+              class="inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-[11px] font-bold text-[#0A51B0] hover:bg-white"
+              title="Impor data Aset GA dari Excel"
+            >
+              <span class="material-symbols-outlined text-[15px]">upload_file</span>Import
+            </button>
+            <button type="button" @click="showExportModal = true" class="inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-[11px] font-bold text-[#0A51B0] hover:bg-white" title="Export data Aset GA">
+              <span class="material-symbols-outlined text-[15px]">download</span>Export
+            </button>
+          </div>
+        </div>
       </div>
 
       <!-- Row 2: Search, Filters & Actions -->
@@ -999,6 +1020,8 @@ function formatKondisiPill(kondisi) {
       :asset="selectedLabelAsset"
       @close="showLabelModal = false"
     />
+    <AssetCategoryImportModal :is-open="showImportModal" asset-type="ga" @close="showImportModal = false" @imported="showImportModal = false; fetchData()" />
+    <AssetCategoryExportModal :is-open="showExportModal" asset-type="ga" :assets="filteredAssets" @close="showExportModal = false" />
   </div>
 </template>
 

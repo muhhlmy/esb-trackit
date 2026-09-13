@@ -102,6 +102,19 @@ const lokasiFilterOptions = computed(() => [
   ...lokasiOptions.value.map((loc) => ({ value: loc, label: loc })),
 ])
 
+const tipeFilterOptions = computed(() => {
+  const employeeAssetTypes = employeesWithAssets.value.flatMap((employee) =>
+    Array.isArray(employee.asset_types) ? employee.asset_types : [],
+  )
+  const loadedAssetTypes = myAssets.value.map((asset) => asset.tipe_perangkat).filter(Boolean)
+  const types = [...new Set([...employeeAssetTypes, ...loadedAssetTypes].filter(Boolean))].sort()
+
+  return [
+    { value: '', label: 'Semua Tipe Perangkat' },
+    ...types.map((type) => ({ value: type, label: type })),
+  ]
+})
+
 const currentPageEmployees = ref(1)
 const currentPageAssets = ref(1)
 const itemsPerPage = ref(10)
@@ -113,6 +126,7 @@ watch([employeeSearch, filterDepartemen, filterLokasi], () => {
 watch([assetSearch, filterTipe, selectedEmployee], () => {
   currentPageAssets.value = 1
 })
+
 
 const filteredEmployees = computed(() => {
   const q = employeeSearch.value.trim().toLowerCase()
@@ -454,6 +468,7 @@ function resetEmployeeFilters() {
   employeeSearch.value = ''
   filterDepartemen.value = ''
   filterLokasi.value = ''
+  filterTipe.value = ''
 }
 
 function openSpecification(asset) {
@@ -602,9 +617,9 @@ onMounted(() => {
       <!-- Toolbar: Elegant Single Search & Compact Filters -->
       <div
         v-if="isAdmin"
-        class="employee-assets-toolbar flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 rounded-xl border border-[#E2E8F0] bg-white p-3 shadow-2xs"
+        class="employee-assets-toolbar grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2.5 rounded-xl border border-[#E2E8F0] bg-white p-3 shadow-2xs"
       >
-        <div class="relative w-full sm:flex-1 sm:min-w-[200px]">
+        <div class="relative h-9 w-full sm:flex-1 sm:min-w-[200px]">
           <label for="emp-search" class="sr-only">Cari karyawan dengan aset</label>
           <span
             class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[18px] text-[#94A3B8] pointer-events-none"
@@ -615,7 +630,7 @@ onMounted(() => {
             v-model="employeeSearch"
             type="text"
             placeholder="Cari nama karyawan, NIK, atau departemen..."
-            class="h-9 w-full rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] pl-9 pr-8 text-xs text-[#333333] placeholder-[#94A3B8] focus:border-[#0A51B0] focus:bg-white focus:outline-none transition-all"
+            class="h-full w-full rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] pl-9 pr-8 text-xs text-[#333333] placeholder-[#94A3B8] focus:border-[#0A51B0] focus:bg-white focus:outline-none transition-all"
           />
           <!-- Inline Clear Button -->
           <button
@@ -1539,7 +1554,7 @@ onMounted(() => {
     <FilterModal :is-open="showFilterModal" title="Filter Aset Karyawan" @close="showFilterModal = false" @apply="showFilterModal = false" @reset="resetEmployeeFilters">
       <CustomSelect v-model="filterDepartemen" :options="departemenFilterOptions" aria-label="Filter departemen" :block="true" />
       <CustomSelect v-model="filterLokasi" :options="lokasiFilterOptions" aria-label="Filter lokasi" :block="true" />
-      <select v-model="filterTipe" class="h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-xs"><option value="">Semua Tipe Perangkat</option><option v-for="item in [...new Set(myAssets.map((asset) => asset.tipe_perangkat).filter(Boolean))]" :key="item" :value="item">{{ item }}</option></select>
+      <CustomSelect v-model="filterTipe" :options="tipeFilterOptions" aria-label="Filter tipe perangkat" :block="true" />
     </FilterModal>
 
     <!-- ── Modal Spesifikasi Perangkat ── -->
@@ -1671,7 +1686,6 @@ onMounted(() => {
   flex-wrap: wrap;
 }
 .employee-assets-toolbar input {
-  height: 42px;
   border-radius: 8px;
 }
 .employee-assets-toolbar > div:first-child {
@@ -1812,8 +1826,9 @@ onMounted(() => {
     flex-basis: auto;
   }
   .employee-assets-toolbar input {
+    height: 100%;
+    min-height: 0;
     font-size: 16px;
-    min-height: 44px;
   }
   .employee-profile,
   .asset-profile-banner {

@@ -1387,7 +1387,7 @@ function toast(message, type = 'success') {
         <button
           type="button"
           @click="openAdd"
-          class="h-9.5 shrink-0 whitespace-nowrap rounded-xl bg-[#0A51B0] px-3.5 sm:px-4 text-xs font-bold text-white shadow-2xs hover:bg-[#0A4391] active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+          class="h-9 shrink-0 whitespace-nowrap rounded-xl bg-[#0A51B0] px-3.5 sm:px-4 text-xs font-bold text-white shadow-2xs hover:bg-[#0A4391] active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
           :title="isAdmin || isSuperAdmin ? 'Buat tiket baru' : 'Request ticket baru'"
         >
           <span class="material-symbols-outlined text-[16px]">add</span>
@@ -1529,9 +1529,9 @@ function toast(message, type = 'success') {
       </div>
 
       <!-- Bottom Row: Toolbar (Search on Top Row, Filters on Bottom Row) -->
-      <div class="flex w-full items-center gap-2.5">
+      <div class="grid w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-2.5">
         <!-- Baris Atas: Search Input with Inline Clear (X) -->
-        <div class="relative min-w-0 flex-1">
+        <div class="relative h-9 min-w-0">
           <span
             class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-[18px] text-[#94A3B8] pointer-events-none"
             >search</span
@@ -1541,7 +1541,7 @@ function toast(message, type = 'success') {
             type="search"
             aria-label="Cari tiket, judul, nomor, atau pelapor"
             placeholder="Cari tiket, judul kendala, nomor tiket, atau pelapor..."
-            class="h-10 w-full rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] pl-10 pr-9 text-xs font-medium text-[#333333] placeholder-[#94A3B8] focus:border-[#0A51B0] focus:bg-white focus:ring-2 focus:ring-[#0A51B0]/10 focus:outline-none transition-all"
+            class="toolbar-search-input h-full min-h-0 w-full rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] pl-10 pr-9 text-xs font-medium text-[#333333] placeholder-[#94A3B8] focus:border-[#0A51B0] focus:bg-white focus:ring-2 focus:ring-[#0A51B0]/10 focus:outline-none transition-all"
           />
           <button
             v-if="searchQuery"
@@ -1554,7 +1554,7 @@ function toast(message, type = 'success') {
           </button>
         </div>
 
-        <button type="button" @click="showFilterModal = true" class="h-9 shrink-0 rounded-xl border border-[#E2E8F0] bg-slate-50 px-3 text-xs font-semibold text-slate-600 hover:bg-white"><span class="material-symbols-outlined mr-1 align-middle text-[16px]">filter_alt</span>Filter</button>
+        <button type="button" @click="showFilterModal = true" class="toolbar-filter-button h-9 shrink-0 rounded-lg border border-[#E2E8F0] bg-slate-50 px-3 text-xs font-semibold text-slate-600 hover:bg-white"><span class="material-symbols-outlined mr-1 align-middle text-[16px]">filter_alt</span>Filter</button>
       </div>
     </div>
 
@@ -3223,6 +3223,18 @@ function toast(message, type = 'success') {
 </template>
 
 <style scoped>
+.toolbar-search-input {
+  height: 36px;
+  min-height: 36px;
+  max-height: 36px;
+  box-sizing: border-box;
+}
+.toolbar-filter-button {
+  height: 36px;
+  min-height: 36px !important;
+  max-height: 36px;
+  box-sizing: border-box;
+}
 .ticket-card-list {
   gap: 12px;
 }

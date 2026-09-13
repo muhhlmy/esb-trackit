@@ -40,7 +40,7 @@
   background: white;
   gap: 12px;
 }
-.admin-workspace input:not([type='checkbox']):not([type='radio']):not([type='file']),
+.admin-workspace input:not([type='checkbox']):not([type='radio']):not([type='file']):not(.toolbar-search-input),
 .admin-entry-form input:not([type='checkbox']):not([type='radio']),
 .admin-entry-form select,
 .admin-entry-form textarea {
@@ -223,7 +223,7 @@
   .admin-page-header button {
     min-height: 44px;
   }
-  .admin-workspace input:not([type='checkbox']):not([type='radio']):not([type='file']),
+  .admin-workspace input:not([type='checkbox']):not([type='radio']):not([type='file']):not(.toolbar-search-input),
   .admin-entry-form input:not([type='checkbox']):not([type='radio']),
   .admin-entry-form select,
   .admin-entry-form textarea,

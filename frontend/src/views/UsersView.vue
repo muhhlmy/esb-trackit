@@ -658,9 +658,9 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
 
       <!-- Row 2: Search & Filters -->
       <div
-        class="flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-2 w-full min-w-0 pt-2 border-t border-[#F1F5F9]"
+        class="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 w-full min-w-0 pt-2 border-t border-[#F1F5F9]"
       >
-        <div class="relative w-full sm:flex-1 sm:min-w-[200px]">
+        <div class="relative h-9 min-w-0">
           <span
             aria-hidden="true"
             class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-[17px] text-[#94A3B8] pointer-events-none"
@@ -672,7 +672,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
             type="search"
             autocomplete="off"
             placeholder="Cari nama atau email pengguna..."
-            class="h-9 w-full rounded-lg border border-[#E2E8F0] bg-white pl-8 text-xs text-[#333333] placeholder-[#94A3B8] focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
+            class="toolbar-search-input h-full min-h-0 w-full rounded-lg border border-[#E2E8F0] bg-white pl-8 text-xs text-[#333333] placeholder-[#94A3B8] focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
             :class="searchQuery ? 'pr-8' : 'pr-2.5'"
           />
           <button
@@ -686,7 +686,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
           </button>
         </div>
 
-        <button type="button" @click="showFilterModal = true" class="h-9 shrink-0 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-semibold text-[#64748B] hover:bg-white"><span class="material-symbols-outlined mr-1 align-middle text-[16px]">filter_alt</span>Filter</button>
+        <button type="button" @click="showFilterModal = true" class="toolbar-filter-button h-9 shrink-0 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-semibold text-[#64748B] hover:bg-white"><span class="material-symbols-outlined mr-1 align-middle text-[16px]">filter_alt</span>Filter</button>
       </div>
     </div>
 
@@ -1510,6 +1510,18 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
 <style scoped src="../assets/admin-workspace.css"></style>
 
 <style scoped>
+.toolbar-search-input {
+  height: 36px;
+  min-height: 36px;
+  max-height: 36px;
+  box-sizing: border-box;
+}
+.toolbar-filter-button {
+  height: 36px;
+  min-height: 36px !important;
+  max-height: 36px;
+  box-sizing: border-box;
+}
 .user-entry-form {
   gap: 22px;
   padding: 0;

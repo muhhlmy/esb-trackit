@@ -288,10 +288,10 @@ function parsePerubahan(perubahan, aksi) {
 
     <!-- Filters Bar Card -->
     <div
-      class="logs-filters shadow-card flex flex-col sm:flex-row min-w-0 flex-wrap items-stretch sm:items-center gap-3 rounded-2xl border border-[#E8EDF3] bg-white p-3"
+      class="logs-filters shadow-card grid grid-cols-[minmax(0,1fr)_auto] min-w-0 items-center gap-3 rounded-2xl border border-[#E8EDF3] bg-white p-3"
     >
       <!-- Search -->
-      <div class="relative min-w-0 sm:flex-1 sm:min-w-[200px]">
+      <div class="relative h-9 min-w-0">
         <span
           aria-hidden="true"
           class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-[18px] text-[#94A3B8] pointer-events-none"
@@ -303,14 +303,14 @@ function parsePerubahan(perubahan, aksi) {
           aria-label="Cari kata kunci log"
           type="text"
           placeholder="Cari kata kunci log..."
-          class="h-11 sm:h-10 w-full rounded-xl border border-[#DCE3EC] bg-white pl-10 pr-3 text-[11px] font-semibold text-[#334155] outline-none transition-all focus:border-brand focus:ring-1 focus:ring-brand/10"
+          class="toolbar-search-input h-full min-h-0 w-full rounded-lg border border-[#DCE3EC] bg-white pl-10 pr-3 text-[11px] font-semibold text-[#334155] outline-none transition-all focus:border-brand focus:ring-1 focus:ring-brand/10"
         />
       </div>
 
       <!-- Filter + Refresh grouped (kept together) -->
-      <div class="grid grid-cols-1 min-w-0 gap-2 sm:flex sm:items-center">
+      <div class="flex min-w-0 items-center gap-2">
         <!-- Action Filter (Asset Tab only) -->
-        <div v-if="activeTab === 'assets'" class="min-w-0 sm:w-36">
+        <div v-if="activeTab === 'assets'" class="min-w-0 w-36">
           <CustomSelect
             v-model="filterAction"
             :options="[
@@ -320,13 +320,13 @@ function parsePerubahan(perubahan, aksi) {
               { value: 'HAPUS', label: 'Hapus Aset' },
             ]"
             aria-label="Filter aksi"
-            height-class="h-11 sm:h-9"
+            height-class="h-9"
             block
           />
         </div>
 
         <!-- Activity Filter (Audit Tab only) -->
-        <div v-if="activeTab === 'audit'" class="min-w-0 sm:w-44">
+        <div v-if="activeTab === 'audit'" class="min-w-0 w-44">
           <CustomSelect
             v-model="filterActivity"
             :options="[
@@ -338,7 +338,7 @@ function parsePerubahan(perubahan, aksi) {
               { value: 'LOGOUT', label: 'Logout' },
             ]"
             aria-label="Filter aktivitas"
-            height-class="h-11 sm:h-9"
+            height-class="h-9"
             block
           />
         </div>
@@ -348,7 +348,7 @@ function parsePerubahan(perubahan, aksi) {
           type="button"
           @click="fetchLogs"
           :disabled="isLoading"
-          class="flex h-11 sm:h-10 items-center justify-center gap-2 rounded-xl border border-[#DCE3EC] bg-white/50 px-4 text-[12px] font-bold text-[#334155] shadow-sm hover:bg-[#F8FAFC] disabled:opacity-50"
+          class="logs-refresh-button h-9 items-center justify-center gap-2 rounded-lg border border-[#DCE3EC] bg-white/50 px-4 text-[12px] font-bold text-[#334155] shadow-sm hover:bg-[#F8FAFC] disabled:opacity-50"
         >
           <span
             aria-hidden="true"
@@ -637,6 +637,18 @@ function parsePerubahan(perubahan, aksi) {
 </template>
 
 <style scoped>
+.toolbar-search-input,
+.logs-refresh-button,
+.logs-filters :deep(button[aria-haspopup='listbox']) {
+  height: 36px;
+  min-height: 36px !important;
+  max-height: 36px;
+  border-radius: 8px;
+  box-sizing: border-box;
+}
+.logs-refresh-button {
+  display: inline-flex;
+}
 @media (width < 40rem) {
   .logs-page input {
     font-size: 1rem;

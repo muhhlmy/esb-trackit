@@ -385,9 +385,9 @@ onMounted(() => {
 
       <!-- Row 2: Search Input & Filters Control Bar -->
       <div
-        class="grid grid-cols-1 sm:grid-cols-2 lg:flex lg:flex-wrap items-center gap-2.5 w-full min-w-0 pt-3 border-t border-[#F1F5F9]"
+        class="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2.5 w-full min-w-0 pt-3 border-t border-[#F1F5F9]"
       >
-        <div class="relative min-w-0 lg:flex-1 lg:min-w-[220px]">
+        <div class="relative h-9 min-w-0">
           <Search
             class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8] pointer-events-none"
           />
@@ -396,11 +396,11 @@ onMounted(() => {
             aria-label="Cari pengiriman"
             type="text"
             placeholder="Cari penerima, barang, tujuan, atau no resi..."
-            class="h-10 w-full rounded-xl border border-[#E2E8F0] bg-white pl-9 pr-3 text-xs text-[#333333] placeholder-[#94A3B8] focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
+            class="toolbar-search-input h-full min-h-0 w-full rounded-xl border border-[#E2E8F0] bg-white pl-9 pr-3 text-xs text-[#333333] placeholder-[#94A3B8] focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
           />
         </div>
 
-        <button type="button" @click="showFilterModal = true" class="h-10 shrink-0 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-semibold text-[#64748B] hover:bg-white"><span class="material-symbols-outlined mr-1 align-middle text-[16px]">filter_alt</span>Filter</button>
+        <button type="button" @click="showFilterModal = true" class="toolbar-filter-button h-9 shrink-0 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-semibold text-[#64748B] hover:bg-white"><span class="material-symbols-outlined mr-1 align-middle text-[16px]">filter_alt</span>Filter</button>
       </div>
     </div>
 
@@ -923,6 +923,18 @@ onMounted(() => {
 </template>
 
 <style scoped>
+.toolbar-search-input {
+  height: 36px;
+  min-height: 36px;
+  max-height: 36px;
+  box-sizing: border-box;
+}
+.toolbar-filter-button {
+  height: 36px;
+  min-height: 36px !important;
+  max-height: 36px;
+  box-sizing: border-box;
+}
 .shipments-page {
   max-width: 1600px;
   margin-inline: auto;
@@ -966,7 +978,7 @@ onMounted(() => {
   border-radius: 12px;
   gap: 12px;
 }
-.shipment-toolbar input {
+.shipment-toolbar input:not(.toolbar-search-input) {
   min-height: 42px;
   background: #fafbfd;
   border-color: #e2e8f0;

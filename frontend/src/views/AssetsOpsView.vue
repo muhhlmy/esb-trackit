@@ -430,10 +430,10 @@ function formatDate(dateStr) {
 
       <!-- Row 2: Search, Filters & Actions -->
       <div
-        class="flex flex-col sm:flex-row sm:items-center gap-2 w-full min-w-0 pt-2.5 border-t border-[#F1F5F9]"
+        class="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 w-full min-w-0 pt-2.5 border-t border-[#F1F5F9]"
       >
         <!-- Search Input -->
-        <div class="relative w-full sm:flex-1 sm:min-w-[200px]">
+        <div class="relative h-9 w-full sm:flex-1 sm:min-w-[200px]">
           <span
             class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-[17px] text-[#94A3B8] pointer-events-none"
             >search</span
@@ -442,7 +442,7 @@ function formatDate(dateStr) {
             v-model="searchQuery"
             type="text"
             placeholder="Cari hostname, nama asset, PIC, lokasi..."
-            class="h-9 w-full rounded-lg border border-[#E2E8F0] bg-white pl-8 pr-8 text-xs text-[#333333] placeholder-[#94A3B8] focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
+            class="h-full w-full rounded-lg border border-[#E2E8F0] bg-white pl-8 pr-8 text-xs text-[#333333] placeholder-[#94A3B8] focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
           />
           <!-- Inline Clear Button -->
           <button

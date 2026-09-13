@@ -48,6 +48,8 @@ const notification = ref(null)
 const searchQuery = ref('')
 const filterStatus = ref('')
 const filterTipe = ref('')
+const filterLokasi = ref('')
+const filterKondisi = ref('')
 const showFormModal = ref(false)
 const showDeleteModal = ref(false)
 const showFilterModal = ref(false)
@@ -165,6 +167,18 @@ const filterStatusOptions = computed(() => [
   { value: '', label: 'Semua Status' },
   ...ASSET_STATUSES.map((s) => ({ value: s.value, label: s.label })),
 ])
+const filterTipeOptions = computed(() => [
+  { value: '', label: 'Semua Tipe Perangkat' },
+  ...tipeOptions.map((type) => ({ value: type, label: type })),
+])
+const filterLokasiOptions = computed(() => [
+  { value: '', label: 'Semua Lokasi' },
+  ...locationOptions.value,
+])
+const filterKondisiOptions = computed(() => [
+  { value: '', label: 'Semua Kondisi' },
+  ...kondisiOptions.map((condition) => ({ value: condition, label: condition })),
+])
 
 const filteredAssets = computed(() => {
   const query = searchQuery.value.trim().toLocaleLowerCase('id-ID')
@@ -191,7 +205,9 @@ const filteredAssets = computed(() => {
     return (
       (!query || searchable.includes(query)) &&
       (!filterStatus.value || asset.status_aset === filterStatus.value) &&
-      (!filterTipe.value || asset.tipe_perangkat === filterTipe.value)
+      (!filterTipe.value || asset.tipe_perangkat === filterTipe.value) &&
+      (!filterLokasi.value || normalizeLocation(asset.lokasi_asset || asset.lokasi_aset || asset.lokasi_kerja) === filterLokasi.value) &&
+      (!filterKondisi.value || asset.kondisi_aset === filterKondisi.value)
     )
   })
 })
@@ -272,7 +288,7 @@ const hasValidationErrors = computed(() => {
   return false
 })
 
-watch([searchQuery, filterStatus, filterTipe], () => {
+watch([searchQuery, filterStatus, filterTipe, filterLokasi, filterKondisi], () => {
   currentPage.value = 1
 })
 
@@ -713,6 +729,8 @@ function resetFilters() {
   searchQuery.value = ''
   filterStatus.value = ''
   filterTipe.value = ''
+  filterLokasi.value = ''
+  filterKondisi.value = ''
   if ('q' in route.query) {
     const query = { ...route.query }
     delete query.q
@@ -789,10 +807,10 @@ onMounted(async () => {
 
       <!-- Row 2: Search, Filters & Actions -->
       <div
-        class="flex flex-col sm:flex-row sm:items-center gap-2 w-full min-w-0 pt-2.5 border-t border-[#F1F5F9]"
+        class="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 w-full min-w-0 pt-2.5 border-t border-[#F1F5F9]"
       >
         <!-- Search Input -->
-        <div class="relative w-full sm:flex-1 sm:min-w-[200px]">
+        <div class="relative h-9 w-full sm:flex-1 sm:min-w-[200px]">
           <span
             class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-[17px] text-[#94A3B8] pointer-events-none"
             >search</span
@@ -802,7 +820,7 @@ onMounted(async () => {
             type="text"
             aria-label="Cari aset, serial number, atau pemegang"
             placeholder="Cari aset, serial number, atau pemegang..."
-            class="h-9 w-full rounded-lg border border-[#E2E8F0] bg-white pl-8 pr-8 text-xs text-[#333333] placeholder-[#94A3B8] focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
+            class="h-full w-full rounded-lg border border-[#E2E8F0] bg-white pl-8 pr-8 text-xs text-[#333333] placeholder-[#94A3B8] focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
           />
           <!-- Inline Clear Button -->
           <button
@@ -1959,7 +1977,9 @@ onMounted(async () => {
     />
     <FilterModal :is-open="showFilterModal" title="Filter Aset IT" @close="showFilterModal = false" @apply="showFilterModal = false" @reset="resetFilters">
       <CustomSelect v-model="filterStatus" :options="filterStatusOptions" aria-label="Filter status" :block="true" />
-      <select v-model="filterTipe" class="h-9 w-full rounded-lg border border-slate-200 bg-white px-3 text-xs"><option value="">Semua Tipe Perangkat</option><option v-for="type in tipeOptions" :key="type" :value="type">{{ type }}</option></select>
+      <CustomSelect v-model="filterTipe" :options="filterTipeOptions" aria-label="Filter tipe perangkat" :block="true" />
+      <CustomSelect v-model="filterLokasi" :options="filterLokasiOptions" aria-label="Filter lokasi" :block="true" />
+      <CustomSelect v-model="filterKondisi" :options="filterKondisiOptions" aria-label="Filter kondisi" :block="true" />
     </FilterModal>
 
     <!-- Modal Cetak Label Aset -->

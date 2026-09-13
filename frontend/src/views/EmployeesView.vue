@@ -462,7 +462,7 @@ onMounted(() => {
           <button
             type="button"
             @click="openAdd"
-            class="h-11 sm:h-9 shrink-0 whitespace-nowrap rounded-lg bg-[#0A51B0] px-4 text-xs font-semibold text-white shadow-2xs hover:bg-[#0A4391] transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+            class="h-9 shrink-0 whitespace-nowrap rounded-lg bg-[#0A51B0] px-4 text-xs font-semibold text-white shadow-2xs hover:bg-[#0A4391] transition-all flex items-center justify-center gap-1.5 cursor-pointer"
             title="Tambah karyawan baru"
           >
             <span class="material-symbols-outlined text-[16px]">person_add</span>
@@ -473,9 +473,9 @@ onMounted(() => {
 
       <!-- Row 2: Search Input & Filters Control Bar -->
       <div
-        class="employee-filters grid grid-cols-1 sm:grid-cols-2 xl:flex xl:flex-wrap items-center gap-2.5 w-full min-w-0 pt-3 border-t border-[#F1F5F9]"
+        class="employee-filters grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2.5 w-full min-w-0 pt-3 border-t border-[#F1F5F9]"
       >
-        <div class="relative min-w-0 xl:flex-1 xl:min-w-[220px]">
+        <div class="relative h-9 min-w-0">
           <span
             class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[18px] text-[#94A3B8] pointer-events-none"
             >search</span
@@ -485,10 +485,10 @@ onMounted(() => {
             aria-label="Cari karyawan"
             type="text"
             placeholder="Cari NIK, nama, email, jabatan, atau departemen..."
-            class="h-11 sm:h-10 w-full rounded-xl border border-[#E2E8F0] bg-white pl-9.5 pr-3 text-base sm:text-xs text-[#333333] placeholder-[#94A3B8] focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
+            class="toolbar-search-input h-full min-h-0 w-full rounded-xl border border-[#E2E8F0] bg-white pl-9.5 pr-3 text-base sm:text-xs text-[#333333] placeholder-[#94A3B8] focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
           />
         </div>
-        <button type="button" @click="showFilterModal = true" class="h-10 shrink-0 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-semibold text-[#64748B] hover:bg-white"><span class="material-symbols-outlined mr-1 align-middle text-[16px]">filter_alt</span>Filter</button>
+        <button type="button" @click="showFilterModal = true" class="toolbar-filter-button h-9 shrink-0 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-semibold text-[#64748B] hover:bg-white"><span class="material-symbols-outlined mr-1 align-middle text-[16px]">filter_alt</span>Filter</button>
       </div>
     </div>
 
@@ -1086,6 +1086,18 @@ onMounted(() => {
 </template>
 
 <style scoped>
+.toolbar-search-input {
+  height: 36px;
+  min-height: 36px;
+  max-height: 36px;
+  box-sizing: border-box;
+}
+.toolbar-filter-button {
+  height: 36px;
+  min-height: 36px !important;
+  max-height: 36px;
+  box-sizing: border-box;
+}
 @media (width < 64rem) {
   .employee-stats :deep(.truncate),
   .employee-filters :deep(.truncate) {

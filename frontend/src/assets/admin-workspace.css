@@ -30,23 +30,6 @@
   border-radius: 8px;
   box-shadow: none;
 }
-.admin-page-header .toolbar-primary-button {
-  height: 36px;
-  min-height: 36px !important;
-  max-height: 36px;
-  box-sizing: border-box;
-}
-.admin-page-header .toolbar-segmented-control {
-  height: 36px;
-  max-height: 36px;
-  box-sizing: border-box;
-}
-.admin-page-header .toolbar-segment-button {
-  height: 28px;
-  min-height: 28px !important;
-  max-height: 28px;
-  box-sizing: border-box;
-}
 .admin-page-header button:is(.bg-\[\#0A51B0\], .bg-\[\#0A51B0\], .bg-brand) {
   background: #0A51B0;
 }

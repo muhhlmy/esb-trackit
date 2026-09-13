@@ -411,17 +411,17 @@ function formatDate(dateStr) {
             v-if="canWriteAssets"
             type="button"
             @click="openAdd"
-            class="inline-flex h-9 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg bg-[#0A51B0] px-3 sm:px-3.5 text-xs font-semibold text-white shadow-2xs transition-all hover:bg-[#0A4391] active:scale-95"
+            class="toolbar-primary-action inline-flex h-9 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg bg-[#0A51B0] px-3 sm:px-3.5 text-xs font-semibold text-white shadow-2xs transition-all hover:bg-[#0A4391] active:scale-95"
             title="Tambah Aset OPS baru"
           >
             <span class="material-symbols-outlined text-[16px]">add</span>
             <span>Tambah Aset OPS</span>
           </button>
-          <div class="flex items-center gap-1 rounded-lg border border-[#D7E3F2] bg-[#F8FAFC] p-1">
-            <button type="button" @click="showImportModal = true" class="inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-[11px] font-bold text-[#0A51B0] hover:bg-white" title="Impor data Aset OPS dari Excel">
+          <div class="toolbar-action-group flex items-center gap-1 rounded-lg border border-[#D7E3F2] bg-[#F8FAFC] p-1">
+            <button type="button" @click="showImportModal = true" class="toolbar-action-button inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-[11px] font-bold text-[#0A51B0] hover:bg-white" title="Impor data Aset OPS dari Excel">
               <span class="material-symbols-outlined text-[15px]">upload_file</span>Import
             </button>
-            <button type="button" @click="showExportModal = true" class="inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-[11px] font-bold text-[#0A51B0] hover:bg-white" title="Export data Aset OPS">
+            <button type="button" @click="showExportModal = true" class="toolbar-action-button inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-[11px] font-bold text-[#0A51B0] hover:bg-white" title="Export data Aset OPS">
               <span class="material-symbols-outlined text-[15px]">download</span>Export
             </button>
           </div>

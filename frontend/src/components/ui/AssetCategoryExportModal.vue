@@ -1,7 +1,7 @@
 <script setup>
 import { computed } from 'vue'
 import AppModal from './AppModal.vue'
-import { downloadAssetCategoryCsv } from '@/utils/exportAssetCategoryCsv.js'
+import { exportToExcel } from '../../utils/exportEngine.js'
 
 const props = defineProps({
   isOpen: Boolean,
@@ -10,10 +10,40 @@ const props = defineProps({
 })
 const emit = defineEmits(['close', 'exported'])
 const label = computed(() => props.assetType.toUpperCase())
+const exportColumns = computed(() =>
+  props.assetType === 'ga'
+    ? [
+        { name: 'hostname', label: 'Hostname' },
+        { name: 'quantity', label: 'Quantity' },
+        { name: 'tipe_fasilitas', label: 'Tipe Fasilitas' },
+        { name: 'nama_asset', label: 'Nama Asset' },
+        { name: 'ukuran', label: 'Ukuran' },
+        { name: 'detail', label: 'Detail' },
+        { name: 'lokasi', label: 'Lokasi' },
+        { name: 'lokasi_detail', label: 'Lokasi Detail' },
+        { name: 'kondisi', label: 'Kondisi' },
+      ]
+    : [
+        { name: 'hostname', label: 'Hostname' },
+        { name: 'nama_asset', label: 'Nama Asset' },
+        { name: 'kategori', label: 'Kategori' },
+        { name: 'lokasi', label: 'Lokasi' },
+        { name: 'pic', label: 'PIC' },
+        { name: 'tanggal_beli', label: 'Tanggal Beli' },
+        { name: 'total_asset_amount', label: 'Total Asset Amount' },
+        { name: 'kondisi', label: 'Kondisi' },
+        { name: 'status', label: 'Status' },
+      ],
+)
 
 function exportData() {
   if (!props.assets.length) return
-  downloadAssetCategoryCsv(props.assets, props.assetType)
+  exportToExcel(
+    props.assets,
+    exportColumns.value,
+    `Data Aset ${label.value}`,
+    `Aset_${props.assetType.toUpperCase()}`,
+  )
   emit('exported')
 }
 </script>
@@ -43,7 +73,7 @@ function exportData() {
       <div class="flex flex-col-reverse gap-2 border-t border-slate-200 pt-4 sm:flex-row sm:justify-end">
         <button type="button" @click="emit('close')" class="min-h-10 rounded-xl border border-slate-200 px-4 text-xs font-bold text-slate-600 hover:bg-slate-50">Batal</button>
         <button type="button" :disabled="!assets.length" @click="exportData" class="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl bg-[#0A51B0] px-5 text-xs font-bold text-white hover:bg-[#08458f] disabled:cursor-not-allowed disabled:opacity-50">
-          <span class="material-symbols-outlined text-[17px]">download</span>Unduh CSV
+          <span class="material-symbols-outlined text-[17px]">download</span>Unduh XLSX
         </button>
       </div>
     </div>

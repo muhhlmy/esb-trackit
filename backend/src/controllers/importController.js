@@ -226,6 +226,14 @@ export async function importExcelData(req, res) {
   try {
     let karyawanRows = req.body?.karyawanRows || [];
     let assetRows = req.body?.assetRows || [];
+    const mode = req.body?.mode || 'append';
+    const replaceScope = req.body?.replaceScope || 'assets';
+    if (!['append', 'replace'].includes(mode)) return res.status(400).json({ error: 'Mode import tidak valid.' });
+    if (!['assets', 'employees', 'assets_and_employees'].includes(replaceScope)) return res.status(400).json({ error: 'Scope Replace All tidak valid.' });
+    if (mode === 'replace' && req.body?.replaceConfirmation !== 'GANTI') {
+      return res.status(400).json({ error: 'Konfirmasi Replace All tidak valid. Ketik GANTI untuk melanjutkan.' });
+    }
+    if (mode === 'replace' && replaceScope === 'assets') karyawanRows = [];
 
     const totalKaryawanRows = karyawanRows.length;
     const totalAssetRows = assetRows.length;
@@ -298,6 +306,10 @@ export async function importExcelData(req, res) {
 
     // ── Phase 3: Proses Karyawan, User & Aset dalam SATU Database Transaction ──
     await withTransaction(async (client) => {
+      if (mode === 'replace') {
+        if (replaceScope !== 'employees') await client.query('DELETE FROM aset_ti');
+        if (replaceScope !== 'assets') await client.query('DELETE FROM karyawan');
+      }
       // Pre-fetch semua user email existing di DB untuk pengecekan unik yang sangat cepat & efisien
       const dbUsersRes = await client.query(`SELECT LOWER(TRIM(email)) AS email FROM users WHERE email IS NOT NULL AND deleted_at IS NULL`);
       const dbUserEmailsSet = new Set(dbUsersRes.rows.map(r => r.email));
@@ -514,7 +526,12 @@ export async function importExcelData(req, res) {
 
 export async function importCategoryAssets(req, res) {
   const { assetType, rows } = req.body || {};
+  const mode = req.body?.mode || 'append';
   if (!['ga', 'ops'].includes(assetType) || !Array.isArray(rows) || rows.length === 0) return res.status(400).json({ error: 'Tipe aset atau data import tidak valid.' });
+  if (!['append', 'replace'].includes(mode)) return res.status(400).json({ error: 'Mode import tidak valid.' });
+  if (mode === 'replace' && req.body?.replaceConfirmation !== 'GANTI') {
+    return res.status(400).json({ error: 'Konfirmasi Replace All tidak valid. Ketik GANTI untuk melanjutkan.' });
+  }
   const value = (row, keys) => getPropCaseInsensitive(row, keys);
   const requiredFields = assetType === 'ga'
     ? [['Hostname', 'hostname'], ['Tipe Fasilitas', 'tipe_fasilitas', 'Tipe'], ['Nama Asset', 'nama_asset', 'Nama']]
@@ -528,6 +545,7 @@ export async function importCategoryAssets(req, res) {
   try {
     let imported = 0;
     await withTransaction(async (client) => {
+      if (mode === 'replace') await client.query(`DELETE FROM ${assetType === 'ga' ? 'aset_ga' : 'aset_ops'}`);
       for (const row of rows) {
         if (assetType === 'ga') {
           const hostname = value(row, ['Hostname', 'hostname']);

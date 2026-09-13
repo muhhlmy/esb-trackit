@@ -99,6 +99,23 @@ html.light {
   box-sizing: border-box;
 }
 
+.toolbar-primary-action,
+.toolbar-action-group {
+  height: 36px !important;
+  min-height: 36px !important;
+  max-height: 36px !important;
+}
+
+.toolbar-action-group {
+  padding: 4px !important;
+}
+
+.toolbar-action-button {
+  height: 28px !important;
+  min-height: 28px !important;
+  max-height: 28px !important;
+}
+
 html,
 body,
 #app {

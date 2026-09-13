@@ -4,7 +4,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useApi } from '../composables/useApi.js'
 import { useAuth } from '../composables/useAuth.js'
 import { animateStagger } from '../composables/useGsap.js'
-import { downloadAssetsCsv } from '../utils/exportAssetsCsv.js'
+import { exportToExcelWorkbook } from '../utils/exportEngine.js'
 import { downloadAssetsPdf } from '../utils/exportAssetsPdf.js'
 import { ASSET_STATUSES, formatStatusPill, getAssetStatusLabel } from '../utils/assetStatus.js'
 import { normalizeLocation } from '../utils/locationNormalizer.js'
@@ -63,7 +63,7 @@ function openLabelModal(asset) {
   selectedLabelAsset.value = asset
   showLabelModal.value = true
 }
-const exportFormat = ref('csv')
+const exportFormat = ref('xlsx')
 const exportStatus = ref('')
 const exportTipe = ref('')
 const modalMode = ref('add')
@@ -338,7 +338,7 @@ async function fetchData() {
       const lokasi = normalizeLocation(rawLokasi)
       const status = a.status || a.status_aset || 'In Use'
       const kondisi = a.kondisi || a.kondisi_aset || 'Normal'
-      const note = a.note_asset || a.catatan_aset || ''
+      const note = a.note_asset && a.note_asset !== '-' ? a.note_asset : a.catatan_aset || ''
       const brand = a.brand_merek || a.merek || ''
 
       return {
@@ -532,7 +532,7 @@ async function deleteAsset() {
 function openExport() {
   exportStatus.value = filterStatus.value
   exportTipe.value = filterTipe.value
-  exportFormat.value = 'csv'
+  exportFormat.value = 'xlsx'
   showExportModal.value = true
 }
 
@@ -574,9 +574,55 @@ async function executeExport() {
       return
     }
 
-    if (exportFormat.value === 'csv') {
-      downloadAssetsCsv(filteredData)
-      toast('CSV aset berhasil dibuat.')
+    if (exportFormat.value === 'xlsx') {
+      const exportData = filteredData.map((asset) => ({
+        ...asset,
+        note_asset:
+          asset.note_asset && asset.note_asset !== '-'
+            ? asset.note_asset
+            : asset.catatan_aset || '',
+      }))
+      const exportedNik = new Set(exportData.map((asset) => asset.nik_pemegang_asset).filter(Boolean))
+      exportToExcelWorkbook([
+        {
+          name: 'Table Karyawan',
+          data: employees.value.filter((employee) => exportedNik.has(employee.nik)),
+          columns: [
+            { name: 'nik', label: 'NIK' },
+            { name: 'nama_karyawan', label: 'Nama Karyawan' },
+            { name: 'status', label: 'Status' },
+            { name: 'title', label: 'Title' },
+            { name: 'job_level', label: 'Job Level' },
+            { name: 'departemen', label: 'Departemen' },
+            { name: 'directorate', label: 'Directorate' },
+            { name: 'tanggal_mulai_bekerja', label: 'Tanggal Mulai Bekerja' },
+            { name: 'employeement_status', label: 'Employeement Status' },
+            { name: 'nik_atasan_langsung', label: 'NIK Atasan Langsung' },
+            { name: 'email_kantor', label: 'Email Kantor' },
+            { name: 'lokasi_kerja', label: 'Lokasi Kerja' },
+          ],
+        },
+        {
+          name: 'Table Asset',
+          data: exportData,
+          columns: [
+            { name: 'hostname', label: 'Hostname' },
+            { name: 'serial_number', label: 'Serial Number' },
+            { name: 'spesifikasi', label: 'Spesifikasi' },
+            { name: 'nik_pemegang_asset', label: 'NIK Pemegang' },
+            { name: 'nama_karyawan_pemegang_asset', label: 'Nama Karyawan Pemegang' },
+            { name: 'departemen_pemegang_asset', label: 'Departemen Pemegang' },
+            { name: 'lokasi_asset', label: 'Lokasi Aset' },
+            { name: 'tipe_perangkat', label: 'Tipe Perangkat' },
+            { name: 'brand_merek', label: 'Brand/Merek' },
+            { name: 'model', label: 'Model' },
+            { name: 'status', label: 'Status' },
+            { name: 'kondisi', label: 'Kondisi' },
+            { name: 'note_asset', label: 'Note Asset' },
+          ],
+        },
+      ], 'Aset_IT_Export')
+      toast('XLSX aset berhasil dibuat.')
     } else {
       downloadAssetsPdf(filteredData, {
         status: exportStatus.value,
@@ -788,17 +834,17 @@ onMounted(async () => {
             v-if="canWriteAssets"
             type="button"
             @click="openAdd"
-            class="inline-flex h-9 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg bg-[#0A51B0] px-3 sm:px-3.5 text-xs font-semibold text-white shadow-2xs transition-all hover:bg-[#0A4391] active:scale-95"
+            class="toolbar-primary-action inline-flex h-9 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg bg-[#0A51B0] px-3 sm:px-3.5 text-xs font-semibold text-white shadow-2xs transition-all hover:bg-[#0A4391] active:scale-95"
             title="Tambah aset baru"
           >
             <span class="material-symbols-outlined text-[16px]">add</span>
             <span>Tambah Aset</span>
           </button>
-          <div class="flex items-center gap-1 rounded-lg border border-[#D7E3F2] bg-[#F8FAFC] p-1">
-            <button v-if="canWriteAssets" type="button" @click="showImportModal = true" class="inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-[11px] font-bold text-[#0A51B0] hover:bg-white">
+          <div class="toolbar-action-group flex items-center gap-1 rounded-lg border border-[#D7E3F2] bg-[#F8FAFC] p-1">
+            <button v-if="canWriteAssets" type="button" @click="showImportModal = true" class="toolbar-action-button inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-[11px] font-bold text-[#0A51B0] hover:bg-white">
               <span class="material-symbols-outlined text-[15px]">upload_file</span>Import
             </button>
-            <button type="button" @click="openExport" class="inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-[11px] font-bold text-[#0A51B0] hover:bg-white">
+            <button type="button" @click="openExport" class="toolbar-action-button inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-[11px] font-bold text-[#0A51B0] hover:bg-white">
               <span class="material-symbols-outlined text-[15px]">download</span>Export
             </button>
           </div>
@@ -1688,7 +1734,7 @@ onMounted(async () => {
           <div>
             <p class="mb-1 text-[10px] font-bold uppercase text-[#9CA3AF]">Catatan Aset</p>
             <p class="whitespace-pre-wrap rounded-xl bg-[#FFFDF5] p-3 text-[13px] text-[#374151]">
-              {{ selectedAsset.catatan_aset || '—' }}
+              {{ selectedAsset.note_asset || selectedAsset.catatan_aset || '—' }}
             </p>
           </div>
         </div>
@@ -1870,20 +1916,20 @@ onMounted(async () => {
             <label
               class="flex cursor-pointer items-center justify-between rounded-xl border p-3.5 transition-colors"
               :class="
-                exportFormat === 'csv'
+                exportFormat === 'xlsx'
                   ? 'border-brand bg-brand-light'
                   : 'border-[#DCE3EC] bg-white hover:bg-[#F8FAFC]'
               "
             >
               <span class="flex items-center gap-2">
                 <span class="material-symbols-outlined text-[20px] text-[#0B9B6C]">table_view</span>
-                <span class="text-[12px] font-bold text-[#172033]">CSV (Excel)</span>
+                <span class="text-[12px] font-bold text-[#172033]">XLSX (Excel)</span>
               </span>
               <input
                 v-model="exportFormat"
                 type="radio"
                 name="exportFormat"
-                value="csv"
+                value="xlsx"
                 class="accent-brand"
               />
             </label>
@@ -1962,7 +2008,7 @@ onMounted(async () => {
             :disabled="isExporting"
             class="h-10 w-full sm:w-auto rounded-xl bg-brand px-5 text-[12px] font-bold text-white shadow-md shadow-brand/20 hover:bg-brand-dark active:scale-95 disabled:opacity-50 transition-all cursor-pointer touch-manipulation"
           >
-            {{ isExporting ? 'Mengekspor...' : 'Unduh File' }}
+            {{ isExporting ? 'Mengekspor...' : exportFormat === 'xlsx' ? 'Unduh XLSX' : 'Unduh PDF' }}
           </button>
         </div>
       </form>

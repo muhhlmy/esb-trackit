@@ -21,9 +21,28 @@ const success = ref('')
 const submitting = ref(false)
 const isDragging = ref(false)
 const isParsing = ref(false)
+const importMode = ref('append')
+const replaceScope = ref('assets')
+const replaceConfirmation = ref('')
 
 const fields = {
-  it: [{ Hostname: 'ESB-LAP-001', 'Serial Number': 'PF3X90B', Spesifikasi: 'Laptop 16GB RAM', 'NIK Pemegang': '2026001', 'Lokasi Aset': 'JKT', 'Tipe Perangkat': 'Laptop', 'Brand/Merek': 'Lenovo', Model: 'ThinkPad T14', Status: 'In Use', Kondisi: 'Normal' }],
+  it: [
+    {
+      Hostname: 'ESB-LAP-001',
+      'Serial Number': 'PF3X90B',
+      Spesifikasi: 'Laptop 16GB RAM',
+      'NIK Pemegang': '2026001',
+      'Nama Karyawan Pemegang': 'Budi Santoso',
+      'Departemen Pemegang': 'Technology',
+      'Lokasi Aset': 'JKT',
+      'Tipe Perangkat': 'Laptop',
+      'Brand/Merek': 'Lenovo',
+      Model: 'ThinkPad T14',
+      Status: 'In Use',
+      Kondisi: 'Normal',
+      'Note Asset': 'Laptop utama pengembang',
+    },
+  ],
   ga: [
     {
       Hostname: 'GA-001', Quantity: 1, 'Tipe Fasilitas': 'Meja', 'Nama Asset': 'Meja Kerja',
@@ -52,7 +71,20 @@ const requiredFields = computed(() => {
 function downloadTemplate() {
   const wb = XLSX.utils.book_new()
   if (props.assetType === 'it') {
-    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet([{ NIK: '2026001', 'Nama Karyawan': 'Budi Santoso', Status: 'Active', Title: 'Software Engineer', Departemen: 'Technology', 'Email Kantor': 'budi@esb.co.id', 'Lokasi Kerja': 'JKT' }]), 'Table Karyawan')
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet([{
+      NIK: '2026001',
+      'Nama Karyawan': 'Budi Santoso',
+      Status: 'Active',
+      Title: 'Software Engineer',
+      'Job Level': 'L3',
+      Departemen: 'Technology',
+      Directorate: 'Technology',
+      'Tanggal Mulai Bekerja': '2024-01-15',
+      'Employeement Status': 'Permanent',
+      'NIK Atasan Langsung': '',
+      'Email Kantor': 'budi.santoso@esb.co.id',
+      'Lokasi Kerja': 'JKT',
+    }]), 'Table Karyawan')
     XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(fields.it), 'Table Asset')
   } else {
     XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(fields[props.assetType]), sheetLabel.value)
@@ -167,8 +199,14 @@ async function submit() {
   error.value = ''
   try {
     const payload = props.assetType === 'it'
-      ? { karyawanRows: employeeRows.value, assetRows: assetRows.value }
-      : { assetType: props.assetType, rows: rows.value }
+      ? {
+          karyawanRows: employeeRows.value,
+          assetRows: assetRows.value,
+          mode: importMode.value,
+          replaceScope: replaceScope.value,
+          replaceConfirmation: replaceConfirmation.value,
+        }
+      : { assetType: props.assetType, rows: rows.value, mode: importMode.value, replaceConfirmation: replaceConfirmation.value }
     const result = await post(props.assetType === 'it' ? '/api/import/excel' : '/api/import/excel-assets', payload)
     success.value = result.message || 'Import aset berhasil.'
     await nextTick()
@@ -189,6 +227,9 @@ function close() {
   error.value = ''
   success.value = ''
   isDragging.value = false
+  importMode.value = 'append'
+  replaceScope.value = 'assets'
+  replaceConfirmation.value = ''
   if (fileInput.value) fileInput.value.value = ''
   emit('close')
 }
@@ -274,12 +315,25 @@ watch(() => props.isOpen, (open) => {
         <div class="overflow-x-auto"><table class="min-w-full text-left text-[11px]"><thead class="bg-white"><tr><th class="whitespace-nowrap px-3 py-2 font-bold text-slate-400">#</th><th v-for="column in previewColumns" :key="column" class="whitespace-nowrap px-3 py-2 font-bold text-slate-400">{{ column }}</th></tr></thead><tbody class="divide-y divide-slate-100"><tr v-for="(row, index) in previewRows" :key="index" class="hover:bg-slate-50"><td class="px-3 py-2 text-slate-400">{{ index + 1 }}</td><td v-for="column in previewColumns" :key="column" class="max-w-40 truncate whitespace-nowrap px-3 py-2 text-slate-700">{{ row[column] || '—' }}</td></tr></tbody></table></div>
       </div>
 
+      <fieldset class="rounded-2xl border border-slate-200 p-3">
+        <legend class="px-1 text-xs font-bold text-slate-700">Mode import</legend>
+        <label class="flex cursor-pointer items-start gap-2 text-xs text-slate-700"><input v-model="importMode" type="radio" value="append" class="mt-0.5" /><span><b>Tambah Data</b><br><span class="text-[11px] text-slate-500">Data lama tidak dihapus.</span></span></label>
+        <label class="mt-3 flex cursor-pointer items-start gap-2 text-xs text-rose-700"><input v-model="importMode" type="radio" value="replace" class="mt-0.5" /><span><b>Replace All</b><br><span class="text-[11px] text-rose-600">Hapus data lama kategori ini, lalu masukkan file.</span></span></label>
+        <div v-if="importMode === 'replace'" class="mt-3 space-y-2 rounded-xl border border-rose-200 bg-rose-50 p-3">
+          <template v-if="assetType === 'it'">
+            <label class="flex items-center gap-2 text-xs text-slate-700"><input v-model="replaceScope" type="radio" value="assets" /> Aset IT saja</label>
+            <label class="flex items-center gap-2 text-xs text-slate-700"><input v-model="replaceScope" type="radio" value="assets_and_employees" /> Aset IT dan Karyawan</label>
+          </template>
+          <label class="block text-[11px] font-semibold text-rose-800">Ketik <b>GANTI</b> untuk konfirmasi<input v-model="replaceConfirmation" class="mt-1 h-9 w-full rounded-lg border border-rose-200 bg-white px-2 text-xs" /></label>
+        </div>
+      </fieldset>
+
       <p v-if="error" class="flex items-start gap-2 rounded-xl border border-rose-200 bg-rose-50 p-3 text-xs font-semibold text-rose-700"><span class="material-symbols-outlined text-[17px]">error</span>{{ error }}</p>
       <p v-if="success" class="flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-xs font-semibold text-emerald-700"><span class="material-symbols-outlined text-[17px]">check_circle</span>{{ success }}</p>
 
       <div class="flex flex-col-reverse gap-2 border-t border-slate-200 pt-4 sm:flex-row sm:justify-end">
         <button type="button" :disabled="submitting" @click="close" class="min-h-10 rounded-xl border border-slate-200 px-4 text-xs font-bold text-slate-600 hover:bg-slate-50 disabled:opacity-50">Batal</button>
-        <button type="button" :disabled="submitting || isParsing || !rows.length" @click="submit" class="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl bg-[#0A51B0] px-5 text-xs font-bold text-white shadow-sm hover:bg-[#08458f] disabled:cursor-not-allowed disabled:opacity-50"><span v-if="submitting" class="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></span><span v-else class="material-symbols-outlined text-[17px]">file_upload</span>{{ submitting ? 'Menyimpan...' : `Import ${rows.length} Baris` }}</button>
+        <button type="button" :disabled="submitting || isParsing || !rows.length || (importMode === 'replace' && replaceConfirmation !== 'GANTI')" @click="submit" class="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl bg-[#0A51B0] px-5 text-xs font-bold text-white shadow-sm hover:bg-[#08458f] disabled:cursor-not-allowed disabled:opacity-50"><span v-if="submitting" class="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></span><span v-else class="material-symbols-outlined text-[17px]">file_upload</span>{{ submitting ? 'Menyimpan...' : `Import ${rows.length} Baris` }}</button>
       </div>
     </div>
   </AppModal>

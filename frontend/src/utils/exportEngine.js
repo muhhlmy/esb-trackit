@@ -49,6 +49,38 @@ function getNormalizedExportValue(key, value) {
   return value
 }
 
+function createWorksheet(data, columns) {
+  return XLSX.utils.aoa_to_sheet([
+    columns.map((column) => column.label),
+    ...data.map((row) =>
+      columns.map((column) =>
+        neutralizeSpreadsheetFormula(getNormalizedExportValue(column.name, row[column.name])),
+      ),
+    ),
+  ])
+}
+
+export function exportToExcelWorkbook(sheets, filenamePrefix = 'Export_Data') {
+  if (!Array.isArray(sheets) || sheets.length === 0 || sheets.some(({ data }) => !Array.isArray(data))) return false
+
+  try {
+    const workbook = XLSX.utils.book_new()
+    sheets.forEach(({ data, columns, name }) => {
+      const sheetName = (name || 'Data').replace(/[:\\/?*[\\]]/g, '').slice(0, 30) || 'Data'
+      XLSX.utils.book_append_sheet(workbook, createWorksheet(data, columns), sheetName)
+    })
+    const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' })
+    triggerDownload(
+      new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }),
+      `${filenamePrefix}_${formatDateStamp()}.xlsx`,
+    )
+    return true
+  } catch (error) {
+    console.error('Error generating Excel workbook via SheetJS:', error)
+    return false
+  }
+}
+
 /**
  * Ekspor Data ke CSV (UTF-8 BOM untuk MS Excel)
  */
@@ -102,21 +134,12 @@ export function exportToExcel(
 ) {
   if (!Array.isArray(data) || data.length === 0) return false
 
-  const colKeys = columns.length > 0 ? columns.map((c) => c.name) : Object.keys(data[0])
-  const colLabels = columns.length > 0 ? columns.map((c) => c.label) : colKeys
-
-  // Map rows into plain objects using user-facing column labels as object keys
-  const mappedData = data.map((row) => {
-    const obj = {}
-    colKeys.forEach((key, idx) => {
-      const label = colLabels[idx] || key
-      obj[label] = neutralizeSpreadsheetFormula(getNormalizedExportValue(key, row[key]))
-    })
-    return obj
-  })
+  const normalizedColumns = columns.length > 0
+    ? columns
+    : Object.keys(data[0]).map((name) => ({ name, label: name }))
 
   try {
-    const worksheet = XLSX.utils.json_to_sheet(mappedData)
+    const worksheet = createWorksheet(data, normalizedColumns)
     const workbook = XLSX.utils.book_new()
     const sheetName = (tableName || 'Data').replace(/[:\\/?*[\\]]/g, '').slice(0, 30)
     XLSX.utils.book_append_sheet(workbook, worksheet, sheetName || 'Data')

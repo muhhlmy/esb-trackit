@@ -358,24 +358,24 @@ onMounted(() => {
           <button
             type="button"
             @click="openAdd"
-            class="inline-flex h-9 shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg bg-[#0A51B0] px-3 text-xs font-semibold text-white shadow-2xs transition-all hover:bg-[#0A4391] active:scale-95 sm:px-3.5"
+            class="toolbar-primary-action inline-flex h-9 shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg bg-[#0A51B0] px-3 text-xs font-semibold text-white shadow-2xs transition-all hover:bg-[#0A4391] active:scale-95 sm:px-3.5"
             title="Tambah pengiriman baru"
           >
             <span class="material-symbols-outlined text-[16px]">add</span>
             <span>Tambah Pengiriman</span>
           </button>
-          <div class="flex items-center gap-1 rounded-lg border border-[#D7E3F2] bg-[#F8FAFC] p-1">
+          <div class="toolbar-action-group flex items-center gap-1 rounded-lg border border-[#D7E3F2] bg-[#F8FAFC] p-1">
             <button
               type="button"
               @click="showImportModal = true"
-              class="inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-[11px] font-bold text-[#0A51B0] hover:bg-white"
+              class="toolbar-action-button inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-[11px] font-bold text-[#0A51B0] hover:bg-white"
             >
               <span class="material-symbols-outlined text-[15px]">upload_file</span>Import
             </button>
             <button
               type="button"
               @click="showExportModal = true"
-              class="inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-[11px] font-bold text-[#0A51B0] hover:bg-white"
+              class="toolbar-action-button inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-[11px] font-bold text-[#0A51B0] hover:bg-white"
             >
               <span class="material-symbols-outlined text-[15px]">download</span>Export
             </button>

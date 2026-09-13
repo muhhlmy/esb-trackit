@@ -377,13 +377,19 @@ export async function createShipment(req, res) {
 // POST /api/shipments/import
 export async function importShipments(req, res) {
   const rows = req.body?.rows
+  const mode = req.body?.mode || 'append'
   if (!Array.isArray(rows) || rows.length === 0) {
     throw createHttpError(400, 'Data import pengiriman tidak valid.')
+  }
+  if (!['append', 'replace'].includes(mode)) throw createHttpError(400, 'Mode import tidak valid.')
+  if (mode === 'replace' && req.body?.replaceConfirmation !== 'GANTI') {
+    throw createHttpError(400, 'Konfirmasi Replace All tidak valid. Ketik GANTI untuk melanjutkan.')
   }
 
   const createdBy = req.user?.id || null
   let imported = 0
   await withTransaction(async (client) => {
+    if (mode === 'replace') await client.query('DELETE FROM asset_shipments')
     for (const row of rows) {
       const requestDate = normalizeRequestDate(row.request_date)
       const recipientName = normalizeRecipientName(row.recipient_name)

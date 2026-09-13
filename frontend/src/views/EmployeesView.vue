@@ -14,7 +14,7 @@ import SkeletonTable from '../components/ui/skeleton/SkeletonTable.vue'
 import CustomSelect from '../components/ui/CustomSelect.vue'
 import SearchableSelect from '../components/ui/SearchableSelect.vue'
 import FilterModal from '../components/ui/FilterModal.vue'
-import { exportToCsv } from '../utils/exportEngine.js'
+import { exportToExcel } from '../utils/exportEngine.js'
 
 const { get, post, put, del } = useApi()
 const { isAdmin, isSuperAdmin, hasWritePermission } = useAuth()
@@ -267,25 +267,26 @@ function exportEmployees() {
     return
   }
 
-  exportToCsv(
+  exportToExcel(
     filteredEmployees.value,
     [
       { name: 'nik', label: 'NIK' },
       { name: 'nama_karyawan', label: 'Nama Karyawan' },
-      { name: 'email_kantor', label: 'Email Kantor' },
       { name: 'status_karyawan', label: 'Status' },
-      { name: 'jabatan', label: 'Title / Jabatan' },
+      { name: 'jabatan', label: 'Title' },
       { name: 'tingkat_jabatan', label: 'Job Level' },
       { name: 'departemen', label: 'Departemen' },
       { name: 'direktorat', label: 'Directorate' },
       { name: 'tanggal_mulai_bekerja', label: 'Tanggal Mulai Bekerja' },
       { name: 'status_kepegawaian', label: 'Employeement Status' },
       { name: 'nik_atasan_langsung', label: 'NIK Atasan Langsung' },
+      { name: 'email_kantor', label: 'Email Kantor' },
       { name: 'lokasi_kerja', label: 'Lokasi Kerja' },
     ],
+    'Table Karyawan',
     'Karyawan',
   )
-  toast('Data karyawan berhasil diekspor.')
+  toast('Data karyawan berhasil diekspor ke XLSX.')
 }
 
 function openAdd() {
@@ -481,18 +482,18 @@ onMounted(() => {
             v-if="canWriteKaryawan"
             type="button"
             @click="openAdd"
-            class="toolbar-primary-button h-9 shrink-0 whitespace-nowrap rounded-lg bg-[#0A51B0] px-4 text-xs font-semibold text-white shadow-2xs hover:bg-[#0A4391] transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+            class="toolbar-primary-action h-9 shrink-0 whitespace-nowrap rounded-lg bg-[#0A51B0] px-3 sm:px-3.5 text-xs font-semibold text-white shadow-2xs hover:bg-[#0A4391] transition-all flex items-center justify-center gap-1.5 cursor-pointer"
             title="Tambah karyawan baru"
           >
             <span class="material-symbols-outlined text-[16px]">person_add</span>
             <span>Tambah Karyawan</span>
           </button>
-          <div class="toolbar-segmented-control flex items-center gap-1 rounded-lg border border-[#D7E3F2] bg-[#F8FAFC] p-1">
+          <div class="toolbar-action-group flex items-center gap-1 rounded-lg border border-[#D7E3F2] bg-[#F8FAFC] p-1">
             <button
               v-if="canWriteKaryawan"
               type="button"
               @click="showImportModal = true"
-              class="toolbar-segment-button inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-[11px] font-bold text-[#0A51B0] hover:bg-white"
+              class="toolbar-action-button inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-[11px] font-bold text-[#0A51B0] hover:bg-white"
               title="Import data karyawan dari Excel"
             >
               <span class="material-symbols-outlined text-[15px]">upload_file</span>Import
@@ -500,7 +501,7 @@ onMounted(() => {
             <button
               type="button"
               @click="exportEmployees"
-              class="toolbar-segment-button inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-[11px] font-bold text-[#0A51B0] hover:bg-white"
+              class="toolbar-action-button inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-[11px] font-bold text-[#0A51B0] hover:bg-white"
               title="Export data karyawan"
             >
               <span class="material-symbols-outlined text-[15px]">download</span>Export

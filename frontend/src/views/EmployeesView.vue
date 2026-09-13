@@ -13,6 +13,7 @@ import StatCard from '../components/ui/StatCard.vue'
 import SkeletonTable from '../components/ui/skeleton/SkeletonTable.vue'
 import CustomSelect from '../components/ui/CustomSelect.vue'
 import SearchableSelect from '../components/ui/SearchableSelect.vue'
+import FilterModal from '../components/ui/FilterModal.vue'
 
 const { get, post, put, del } = useApi()
 const { isAdmin, isSuperAdmin, hasWritePermission } = useAuth()
@@ -44,6 +45,7 @@ const searchQuery = ref('')
 const filterDepartemen = ref('')
 const filterLokasi = ref('')
 const filterStatus = ref('')
+const showFilterModal = ref(false)
 
 // ── Modal State ──────────────────────────────────────────────
 const showFormModal = ref(false)
@@ -473,6 +475,7 @@ onMounted(() => {
       <div
         class="employee-filters grid grid-cols-1 sm:grid-cols-2 xl:flex xl:flex-wrap items-center gap-2.5 w-full min-w-0 pt-3 border-t border-[#F1F5F9]"
       >
+        <button type="button" @click="showFilterModal = true" class="h-10 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-semibold text-[#64748B] hover:bg-white"><span class="material-symbols-outlined mr-1 align-middle text-[16px]">filter_alt</span>Filter</button>
         <div class="relative min-w-0 xl:flex-1 xl:min-w-[220px]">
           <span
             class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[18px] text-[#94A3B8] pointer-events-none"
@@ -532,6 +535,12 @@ onMounted(() => {
         />
       </div>
     </div>
+
+    <FilterModal :is-open="showFilterModal" title="Filter Karyawan" @close="showFilterModal = false" @apply="showFilterModal = false" @reset="resetFilters">
+      <select v-model="filterDepartemen" class="h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-xs"><option value="">Semua Departemen</option><option v-for="item in availableDepartemenOptions" :key="item" :value="item">{{ item }}</option></select>
+      <select v-model="filterLokasi" class="h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-xs"><option value="">Semua Lokasi</option><option v-for="item in availableLokasiOptions" :key="item" :value="item">{{ item }}</option></select>
+      <select v-model="filterStatus" class="h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-xs"><option value="">Semua Status</option><option value="Active">Active</option><option value="Outsource">Outsource</option><option value="Resigned">Resigned</option></select>
+    </FilterModal>
 
     <!-- ── Card Stats Karyawan ── -->
     <div

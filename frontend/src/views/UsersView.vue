@@ -15,6 +15,7 @@ import AppRowActions from '../components/ui/AppRowActions.vue'
 import AppPagination from '../components/ui/AppPagination.vue'
 import SearchableSelect from '../components/ui/SearchableSelect.vue'
 import CustomSelect from '../components/ui/CustomSelect.vue'
+import FilterModal from '../components/ui/FilterModal.vue'
 import SkeletonTable from '../components/ui/skeleton/SkeletonTable.vue'
 
 const route = useRoute()
@@ -41,6 +42,7 @@ const itemsPerPage = ref(10)
 // ── Filter & Search ──────────────────────────────────────────
 const searchQuery = ref('')
 const filterRole = ref('')
+const showFilterModal = ref(false)
 
 // ── Modal State ──────────────────────────────────────────────
 const showFormModal = ref(false)
@@ -685,6 +687,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
         </div>
 
         <div class="flex items-center gap-2">
+          <button type="button" @click="showFilterModal = true" class="h-9 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-semibold text-[#64748B] hover:bg-white"><span class="material-symbols-outlined mr-1 align-middle text-[16px]">filter_alt</span>Filter</button>
           <CustomSelect
             v-model="filterRole"
             :options="[
@@ -708,6 +711,10 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
         </div>
       </div>
     </div>
+
+    <FilterModal :is-open="showFilterModal" title="Filter Pengguna" @close="showFilterModal = false" @apply="showFilterModal = false" @reset="resetFilters">
+      <CustomSelect v-model="filterRole" :options="[{ value: '', label: 'Semua Role' }, { value: 'admin', label: 'ADMIN' }, { value: 'superadmin', label: 'SUPERADMIN' }, { value: 'user', label: 'USER' }]" aria-label="Filter role" :block="true" />
+    </FilterModal>
 
     <!-- ── Tabel Pengguna ─────────────────────────────────── -->
     <div class="rounded-2xl border border-[#E2E8F0]/80 bg-white shadow-2xs overflow-hidden">

@@ -10,6 +10,7 @@ import CustomSelect from '../components/ui/CustomSelect.vue'
 import SkeletonTable from '../components/ui/skeleton/SkeletonTable.vue'
 import ShipmentImportModal from '../components/ui/ShipmentImportModal.vue'
 import ShipmentExportModal from '../components/ui/ShipmentExportModal.vue'
+import FilterModal from '../components/ui/FilterModal.vue'
 import {
   ExternalLink,
   FilterX,
@@ -77,6 +78,7 @@ const showFormModal = ref(false)
 const showDeleteModal = ref(false)
 const showImportModal = ref(false)
 const showExportModal = ref(false)
+const showFilterModal = ref(false)
 const modalMode = ref('add') // 'add' | 'edit'
 const selectedShipment = ref(null)
 
@@ -399,6 +401,7 @@ onMounted(() => {
           />
         </div>
 
+        <button type="button" @click="showFilterModal = true" class="h-10 shrink-0 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-semibold text-[#64748B] hover:bg-white"><span class="material-symbols-outlined mr-1 align-middle text-[16px]">filter_alt</span>Filter</button>
         <div class="min-w-0 sm:w-[160px]">
           <CustomSelect
             v-model="filterStatus"
@@ -908,6 +911,11 @@ onMounted(() => {
       </template>
     </AppModal>
 
+    <FilterModal :is-open="showFilterModal" title="Filter Pengiriman" @close="showFilterModal = false" @apply="showFilterModal = false" @reset="resetFilters">
+      <CustomSelect v-model="filterStatus" :options="STATUS_OPTIONS" aria-label="Filter status" :block="true" height-class="h-10" />
+      <input v-model="filterDateFrom" type="date" class="h-10 w-full rounded-xl border border-slate-200 px-3 text-xs" />
+      <input v-model="filterDateTo" type="date" class="h-10 w-full rounded-xl border border-slate-200 px-3 text-xs" />
+    </FilterModal>
     <ShipmentImportModal :is-open="showImportModal" @close="showImportModal = false" @imported="showImportModal = false; fetchData()" />
     <ShipmentExportModal :is-open="showExportModal" :shipments="shipments" @close="showExportModal = false" />
 

@@ -14,6 +14,7 @@ import SearchableSelect from '../components/ui/SearchableSelect.vue'
 import CustomSelect from '../components/ui/CustomSelect.vue'
 import AppRowActions from '../components/ui/AppRowActions.vue'
 import AssetCategoryImportModal from '../components/ui/AssetCategoryImportModal.vue'
+import FilterModal from '../components/ui/FilterModal.vue'
 import AssetLabelModal from '../components/common/AssetLabelModal.vue'
 import AppPagination from '../components/ui/AppPagination.vue'
 import BaseSkeleton from '../components/ui/skeleton/BaseSkeleton.vue'
@@ -49,6 +50,7 @@ const filterStatus = ref('')
 const filterTipe = ref('')
 const showFormModal = ref(false)
 const showDeleteModal = ref(false)
+const showFilterModal = ref(false)
 const showDetailsModal = ref(false)
 const showSpecificationModal = ref(false)
 const showExportModal = ref(false)
@@ -613,32 +615,24 @@ function openStatusChange(asset) {
 }
 
 function formatKondisiText(kondisi) {
-  if (!kondisi) return 'Kondisi —'
+  if (!kondisi) return '—'
   const k = String(kondisi).trim().toLowerCase()
-  if (k === 'normal' || k === 'baik' || k === 'baru') return 'Kondisi normal'
+  if (k === 'normal' || k === 'baik' || k === 'baru') return 'Normal'
   return kondisi
 }
 
 function formatKondisiStyle(kondisi) {
   const k = (kondisi || '').toLowerCase()
+  if (k === 'normal' || k === 'baik' || k === 'baru') {
+    return 'text-[#059669] font-medium'
+  }
   if (k.includes('rusak') || k.includes('perbaikan') || k.includes('berat')) {
     return 'text-[#DC2626] font-medium'
   }
   if (k.includes('ringan') || k.includes('sedang')) {
     return 'text-[#D97706] font-medium'
   }
-  return 'text-[#64748B] font-normal'
-}
-
-function formatKondisiDot(kondisi) {
-  const k = (kondisi || '').toLowerCase()
-  if (k.includes('rusak') || k.includes('perbaikan') || k.includes('berat')) {
-    return 'bg-[#DC2626]'
-  }
-  if (k.includes('ringan') || k.includes('sedang')) {
-    return 'bg-[#D97706]'
-  }
-  return 'bg-[#94A3B8]'
+  return 'text-[#64748B] font-medium'
 }
 
 function getAssetActions(asset) {
@@ -825,6 +819,7 @@ onMounted(async () => {
 
         <!-- Filter & Actions Cluster -->
         <div class="flex flex-col sm:flex-row sm:items-center gap-2 w-full sm:w-auto">
+          <button type="button" @click="showFilterModal = true" class="h-9 shrink-0 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-semibold text-[#64748B] hover:bg-white"><span class="material-symbols-outlined mr-1 align-middle text-[16px]">filter_alt</span>Filter</button>
           <!-- Filter Group: Status & Reset -->
           <div class="flex items-center gap-2 w-full sm:w-auto">
             <div class="flex-1 sm:w-[150px] min-w-0">
@@ -1051,18 +1046,9 @@ onMounted(async () => {
             }}</strong>
           </div>
           <div class="laptop-state">
-            <span
-              class="laptop-status"
-              :class="[
-                formatStatusPill(asset.status_aset).bg,
-                formatStatusPill(asset.status_aset).text,
-              ]"
-            >
-              <span class="laptop-dot" :class="formatStatusPill(asset.status_aset).dot"></span>
-              {{ formatStatusPill(asset.status_aset).label }}
-            </span>
+            <span class="laptop-label">Status</span>
+            <span class="laptop-status">{{ formatStatusPill(asset.status_aset).label }}</span>
             <span class="laptop-condition" :class="formatKondisiStyle(asset.kondisi_aset)">
-              <span class="laptop-dot" :class="formatKondisiDot(asset.kondisi_aset)"></span>
               {{ formatKondisiText(asset.kondisi_aset) }}
             </span>
           </div>
@@ -1998,6 +1984,10 @@ onMounted(async () => {
       @close="showImportModal = false"
       @imported="onImported"
     />
+    <FilterModal :is-open="showFilterModal" title="Filter Aset IT" @close="showFilterModal = false" @apply="showFilterModal = false" @reset="resetFilters">
+      <CustomSelect v-model="filterStatus" :options="filterStatusOptions" aria-label="Filter status" :block="true" />
+      <select v-model="filterTipe" class="h-9 w-full rounded-lg border border-slate-200 bg-white px-3 text-xs"><option value="">Semua Tipe Perangkat</option><option v-for="type in tipeOptions" :key="type" :value="type">{{ type }}</option></select>
+    </FilterModal>
 
     <!-- Modal Cetak Label Aset -->
     <AssetLabelModal

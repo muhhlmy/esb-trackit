@@ -11,6 +11,7 @@ import AppRowActions from '../components/ui/AppRowActions.vue'
 import AppPagination from '../components/ui/AppPagination.vue'
 import SearchableSelect from '../components/ui/SearchableSelect.vue'
 import CustomSelect from '../components/ui/CustomSelect.vue'
+import FilterModal from '../components/ui/FilterModal.vue'
 import TicketCaspRating from '../components/tickets/TicketCaspRating.vue'
 import { animateStagger } from '../composables/useGsap.js'
 import BaseSkeleton from '../components/ui/skeleton/BaseSkeleton.vue'
@@ -196,6 +197,7 @@ const searchQuery = ref('')
 const filterStatus = ref('')
 const filterPrioritas = ref('')
 const filterKategori = ref('')
+const showFilterModal = ref(false)
 const sortOrder = ref('terbaru') // 'terbaru' | 'terlama'
 const pageError = ref('')
 const notification = ref(null)
@@ -1554,6 +1556,7 @@ function toast(message, type = 'success') {
 
         <!-- Baris Bawah: Filter Options Cluster -->
         <div class="flex flex-wrap items-center gap-2.5 w-full">
+          <button type="button" @click="showFilterModal = true" class="h-9 shrink-0 rounded-xl border border-[#E2E8F0] bg-slate-50 px-3 text-xs font-semibold text-slate-600 hover:bg-white"><span class="material-symbols-outlined mr-1 align-middle text-[16px]">filter_alt</span>Filter</button>
           <div class="flex-1 min-w-[145px]">
             <CustomSelect
               v-model="filterStatus"
@@ -2165,6 +2168,13 @@ function toast(message, type = 'success') {
         mobile-compact
       />
     </div>
+
+    <FilterModal :is-open="showFilterModal" title="Filter Tiket" @close="showFilterModal = false" @apply="showFilterModal = false" @reset="resetFilters">
+      <CustomSelect v-model="filterStatus" :options="[{ value: '', label: 'Semua Status' }, ...TICKET_STATUS_OPTIONS]" aria-label="Filter status" :block="true" />
+      <CustomSelect v-model="filterPrioritas" :options="[{ value: '', label: 'Semua Prioritas' }, ...TICKET_PRIORITY_OPTIONS]" aria-label="Filter prioritas" :block="true" />
+      <CustomSelect v-model="filterQueue" :options="[{ value: '', label: 'Semua Unit' }, ...queues.map((q) => ({ value: q.id, label: `${q.kode} — ${q.nama}` }))]" aria-label="Filter unit" :block="true" />
+      <select v-model="filterKategori" class="h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-xs"><option value="">Semua Kategori</option><option value="Incident">Incident</option><option value="Request">Request</option><option value="QNA">QNA</option></select>
+    </FilterModal>
 
     <!-- ── Create / Edit Ticket Modal (Unified Single Page Form) ─────── -->
     <AppModal

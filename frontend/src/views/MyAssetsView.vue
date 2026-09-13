@@ -8,6 +8,7 @@ import AppModal from '../components/ui/AppModal.vue'
 import AppBadge from '../components/ui/AppBadge.vue'
 import AppPagination from '../components/ui/AppPagination.vue'
 import CustomSelect from '../components/ui/CustomSelect.vue'
+import FilterModal from '../components/ui/FilterModal.vue'
 import SkeletonTable from '../components/ui/skeleton/SkeletonTable.vue'
 
 const { get } = useApi()
@@ -33,6 +34,7 @@ const isLoadingAssets = ref(false)
 const assetError = ref('')
 const assetSearch = ref('')
 const filterTipe = ref('')
+const showFilterModal = ref(false)
 
 const showSpecificationModal = ref(false)
 const activeModalAsset = ref(null)
@@ -629,6 +631,7 @@ onMounted(() => {
         </div>
 
         <div class="flex items-center gap-2 flex-wrap w-full sm:w-auto">
+          <button type="button" @click="showFilterModal = true" class="h-9 shrink-0 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-semibold text-[#64748B] hover:bg-white"><span class="material-symbols-outlined mr-1 align-middle text-[16px]">filter_alt</span>Filter</button>
           <div class="flex-1 min-w-[170px] sm:w-[175px] sm:flex-initial">
             <CustomSelect
               v-model="filterDepartemen"
@@ -1562,6 +1565,12 @@ onMounted(() => {
         </div>
       </div>
     </template>
+
+    <FilterModal :is-open="showFilterModal" title="Filter Aset Karyawan" @close="showFilterModal = false" @apply="showFilterModal = false" @reset="resetEmployeeFilters">
+      <CustomSelect v-model="filterDepartemen" :options="departemenFilterOptions" aria-label="Filter departemen" :block="true" />
+      <CustomSelect v-model="filterLokasi" :options="lokasiFilterOptions" aria-label="Filter lokasi" :block="true" />
+      <select v-model="filterTipe" class="h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-xs"><option value="">Semua Tipe Perangkat</option><option v-for="item in [...new Set(myAssets.map((asset) => asset.tipe_perangkat).filter(Boolean))]" :key="item" :value="item">{{ item }}</option></select>
+    </FilterModal>
 
     <!-- ── Modal Spesifikasi Perangkat ── -->
     <AppModal

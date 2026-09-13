@@ -13,6 +13,7 @@ import AssetLabelModal from '../components/common/AssetLabelModal.vue'
 import BaseSkeleton from '../components/ui/skeleton/BaseSkeleton.vue'
 import SkeletonAvatar from '../components/ui/skeleton/SkeletonAvatar.vue'
 import AssetCategoryImportModal from '../components/ui/AssetCategoryImportModal.vue'
+import FilterModal from '../components/ui/FilterModal.vue'
 import AssetCategoryExportModal from '../components/ui/AssetCategoryExportModal.vue'
 
 const { get, post, put, del } = useApi()
@@ -40,6 +41,7 @@ const selectedStatus = ref('')
 // Modal States
 const showFormModal = ref(false)
 const showDeleteModal = ref(false)
+const showFilterModal = ref(false)
 const showDetailsModal = ref(false)
 const showLabelModal = ref(false)
 const selectedLabelAsset = ref(null)
@@ -455,6 +457,7 @@ function formatDate(dateStr) {
           </button>
         </div>
 
+        <button type="button" @click="showFilterModal = true" class="h-9 shrink-0 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-semibold text-[#64748B] hover:bg-white"><span class="material-symbols-outlined mr-1 align-middle text-[16px]">filter_alt</span>Filter</button>
         <!-- Filter Cluster -->
         <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
           <!-- Filter Lokasi -->
@@ -707,6 +710,12 @@ function formatDate(dateStr) {
         :items-per-page="itemsPerPage"
       />
     </div>
+
+    <FilterModal :is-open="showFilterModal" title="Filter Aset OPS" @close="showFilterModal = false" @apply="showFilterModal = false" @reset="resetFilters">
+      <CustomSelect v-model="selectedLocation" :options="locationFilterOptions" aria-label="Filter lokasi" :block="true" height-class="h-9" />
+      <CustomSelect v-model="selectedKategori" :options="kategoriFilterOptions" aria-label="Filter kategori" :block="true" height-class="h-9" />
+      <CustomSelect v-model="selectedStatus" :options="statusFilterOptions" aria-label="Filter status" :block="true" height-class="h-9" />
+    </FilterModal>
 
     <!-- Modal Form (Tambah / Edit) -->
     <AppModal

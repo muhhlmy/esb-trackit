@@ -675,13 +675,8 @@ function formatKondisiPill(kondisi) {
             >
           </div>
           <div class="laptop-state">
-            <span
-              class="laptop-status"
-              :class="[formatKondisiPill(asset.kondisi).bg, formatKondisiPill(asset.kondisi).text]"
-            >
-              <span class="laptop-dot" :class="formatKondisiPill(asset.kondisi).dot"></span
-              >{{ asset.kondisi || '—' }}
-            </span>
+            <span class="laptop-label">Status</span>
+            <span class="laptop-status">{{ asset.kondisi || '—' }}</span>
             <span
               v-if="asset.detail"
               class="laptop-secondary asset-row-note"

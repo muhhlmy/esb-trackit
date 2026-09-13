@@ -610,20 +610,19 @@
   min-width: 0;
 }
 .laptop-status {
-  display: inline-block;
-  padding: 3px 8px;
-  border: 1px solid #bfdbfe;
-  border-radius: 6px;
-  background: #eff6ff;
-  color: #0a51b0;
-  font-size: 11px;
-  line-height: 1.5;
-  font-weight: 600;
+  display: block;
+  color: #334155;
+  font-size: 13px;
+  line-height: 1.45;
+  font-weight: 650;
 }
 .laptop-condition {
   display: block;
   font-size: 11px;
   line-height: 1.5;
+}
+.asset-it-inventory .laptop-condition {
+  font-size: 11.5px;
 }
 .laptop-actions {
   grid-area: actions;

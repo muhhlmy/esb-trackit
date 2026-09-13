@@ -677,17 +677,9 @@ function formatDate(dateStr) {
             >
           </div>
           <div class="laptop-state">
-            <span
-              class="laptop-status"
-              :class="[
-                formatStatusPillOps(asset.status).bg,
-                formatStatusPillOps(asset.status).text,
-              ]"
-            >
-              <span class="laptop-dot" :class="formatStatusPillOps(asset.status).dot"></span
-              >{{ asset.status || '—' }}
-            </span>
-            <span class="laptop-secondary">{{ asset.kondisi || '—' }}</span>
+            <span class="laptop-label">Status</span>
+            <span class="laptop-status">{{ asset.status || '—' }}</span>
+            <span class="laptop-condition">{{ asset.kondisi || '—' }}</span>
             <span
               class="laptop-secondary"
               :title="'Total nilai: ' + formatCurrency(asset.total_asset_amount)"

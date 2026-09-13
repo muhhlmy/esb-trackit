@@ -744,7 +744,7 @@ onMounted(async () => {
 
 <template>
   <div
-    class="asset-workspace asset-inventory space-y-4"
+    class="asset-workspace asset-inventory asset-it-inventory space-y-4"
     :data-testid="!isLoading ? 'page-ready' : undefined"
   >
     <!-- Simplified SaaS Header & Toolbar Container -->

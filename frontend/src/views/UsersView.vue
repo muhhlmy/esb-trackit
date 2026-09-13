@@ -648,7 +648,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
           v-if="canWriteUsers"
           type="button"
           @click="openAdd"
-          class="h-9 shrink-0 rounded-lg bg-[#0A51B0] px-2.5 sm:px-3.5 text-xs font-semibold text-white shadow-2xs hover:bg-[#0A4391] active:scale-[0.98] transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+          class="toolbar-primary-button h-9 shrink-0 rounded-lg bg-[#0A51B0] px-2.5 sm:px-3.5 text-xs font-semibold text-white shadow-2xs hover:bg-[#0A4391] active:scale-[0.98] transition-all flex items-center justify-center gap-1.5 cursor-pointer"
           title="Tambah admin baru atau promosikan akses"
         >
           <span aria-hidden="true" class="material-symbols-outlined text-[16px]">person_add</span>

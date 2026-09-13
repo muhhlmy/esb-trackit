@@ -605,14 +605,14 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 5px;
   min-width: 0;
 }
 .laptop-status {
   display: block;
   color: #334155;
-  font-size: 13px;
+  font-size: 12px;
   line-height: 1.45;
   font-weight: 650;
 }
@@ -637,23 +637,23 @@
   .asset-inventory .laptop-list > .laptop-row {
     grid-template-columns: minmax(0, 2.2fr) minmax(0, 1.35fr) minmax(0, 1fr) minmax(0, 1.15fr) 32px;
     grid-template-areas: 'identity holder location state actions';
-    align-items: center;
+    align-items: start;
     gap: 20px;
     padding: 18px 22px;
     border-radius: 12px;
   }
   .laptop-identity {
-    align-items: center;
+    align-items: flex-start;
   }
   .laptop-state {
     flex-direction: column;
     align-items: flex-start;
-    justify-content: center;
+    justify-content: flex-start;
     padding: 0;
     gap: 5px;
   }
   .laptop-actions {
-    align-self: center;
+    align-self: flex-start;
   }
 }
 @media (max-width: 767px) {

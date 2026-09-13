@@ -475,7 +475,6 @@ onMounted(() => {
       <div
         class="employee-filters grid grid-cols-1 sm:grid-cols-2 xl:flex xl:flex-wrap items-center gap-2.5 w-full min-w-0 pt-3 border-t border-[#F1F5F9]"
       >
-        <button type="button" @click="showFilterModal = true" class="h-10 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-semibold text-[#64748B] hover:bg-white"><span class="material-symbols-outlined mr-1 align-middle text-[16px]">filter_alt</span>Filter</button>
         <div class="relative min-w-0 xl:flex-1 xl:min-w-[220px]">
           <span
             class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[18px] text-[#94A3B8] pointer-events-none"
@@ -489,50 +488,7 @@ onMounted(() => {
             class="h-11 sm:h-10 w-full rounded-xl border border-[#E2E8F0] bg-white pl-9.5 pr-3 text-base sm:text-xs text-[#333333] placeholder-[#94A3B8] focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
           />
         </div>
-
-        <CustomSelect
-          v-model="filterDepartemen"
-          aria-label="Filter departemen"
-          :options="[
-            { value: '', label: 'Semua Departemen' },
-            ...availableDepartemenOptions.map((dep) => ({ value: dep, label: dep })),
-          ]"
-          placeholder="Semua Departemen"
-          class="min-w-0 xl:w-[175px]"
-          width-class="w-full"
-          height-class="min-h-11 sm:min-h-10"
-          @change="currentPage = 1"
-        />
-
-        <CustomSelect
-          v-model="filterLokasi"
-          aria-label="Filter lokasi"
-          :options="[
-            { value: '', label: 'Semua Lokasi' },
-            ...availableLokasiOptions.map((loc) => ({ value: loc, label: loc })),
-          ]"
-          placeholder="Semua Lokasi"
-          class="min-w-0 xl:w-[155px]"
-          width-class="w-full"
-          height-class="min-h-11 sm:min-h-10"
-          @change="currentPage = 1"
-        />
-
-        <CustomSelect
-          v-model="filterStatus"
-          aria-label="Filter status"
-          :options="[
-            { value: '', label: 'Semua Status' },
-            { value: 'Active', label: 'Active' },
-            { value: 'Outsource', label: 'Outsource' },
-            { value: 'Resigned', label: 'Resigned' },
-          ]"
-          placeholder="Semua Status"
-          class="min-w-0 xl:w-[145px]"
-          width-class="w-full"
-          height-class="min-h-11 sm:min-h-10"
-          @change="currentPage = 1"
-        />
+        <button type="button" @click="showFilterModal = true" class="h-10 shrink-0 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-semibold text-[#64748B] hover:bg-white"><span class="material-symbols-outlined mr-1 align-middle text-[16px]">filter_alt</span>Filter</button>
       </div>
     </div>
 

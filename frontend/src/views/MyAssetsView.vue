@@ -630,37 +630,7 @@ onMounted(() => {
           </button>
         </div>
 
-        <div class="flex items-center gap-2 flex-wrap w-full sm:w-auto">
-          <button type="button" @click="showFilterModal = true" class="h-9 shrink-0 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-semibold text-[#64748B] hover:bg-white"><span class="material-symbols-outlined mr-1 align-middle text-[16px]">filter_alt</span>Filter</button>
-          <div class="flex-1 min-w-[170px] sm:w-[175px] sm:flex-initial">
-            <CustomSelect
-              v-model="filterDepartemen"
-              :options="departemenFilterOptions"
-              aria-label="Filter departemen"
-              :block="true"
-              height-class="h-9"
-            />
-          </div>
-
-          <div class="flex-1 min-w-[145px] sm:w-[155px] sm:flex-initial">
-            <CustomSelect
-              v-model="filterLokasi"
-              :options="lokasiFilterOptions"
-              aria-label="Filter lokasi"
-              :block="true"
-              height-class="h-9"
-            />
-          </div>
-
-          <button
-            v-if="employeeSearch || filterDepartemen || filterLokasi"
-            type="button"
-            @click="resetEmployeeFilters"
-            class="h-9 shrink-0 whitespace-nowrap rounded-lg border border-[#FECACA] bg-[#FEF2F2] px-3 text-xs font-semibold text-[#DC2626] hover:bg-[#FEE2E2] active:scale-95 transition-all cursor-pointer shadow-2xs touch-manipulation"
-          >
-            Reset Filter
-          </button>
-        </div>
+        <button type="button" @click="showFilterModal = true" class="h-9 shrink-0 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-semibold text-[#64748B] hover:bg-white"><span class="material-symbols-outlined mr-1 align-middle text-[16px]">filter_alt</span>Filter</button>
       </div>
 
       <!-- Main Hybrid Employee Table/List -->

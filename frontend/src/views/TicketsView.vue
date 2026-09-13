@@ -1529,9 +1529,9 @@ function toast(message, type = 'success') {
       </div>
 
       <!-- Bottom Row: Toolbar (Search on Top Row, Filters on Bottom Row) -->
-      <div class="flex flex-col gap-2.5 w-full">
+      <div class="flex w-full items-center gap-2.5">
         <!-- Baris Atas: Search Input with Inline Clear (X) -->
-        <div class="relative w-full">
+        <div class="relative min-w-0 flex-1">
           <span
             class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-[18px] text-[#94A3B8] pointer-events-none"
             >search</span
@@ -1554,97 +1554,7 @@ function toast(message, type = 'success') {
           </button>
         </div>
 
-        <!-- Baris Bawah: Filter Options Cluster -->
-        <div class="flex flex-wrap items-center gap-2.5 w-full">
-          <button type="button" @click="showFilterModal = true" class="h-9 shrink-0 rounded-xl border border-[#E2E8F0] bg-slate-50 px-3 text-xs font-semibold text-slate-600 hover:bg-white"><span class="material-symbols-outlined mr-1 align-middle text-[16px]">filter_alt</span>Filter</button>
-          <div class="flex-1 min-w-[145px]">
-            <CustomSelect
-              v-model="filterStatus"
-              :options="[
-                { value: '', label: 'Semua Status' },
-                { value: 'Open', label: 'Open' },
-                { value: 'In Progress', label: 'In Progress' },
-                { value: 'Pending', label: 'Pending' },
-                { value: 'Resolved', label: 'Resolved' },
-                { value: 'Closed', label: 'Closed' },
-              ]"
-              aria-label="Filter status"
-              :block="true"
-              @change="fetchTickets"
-            />
-          </div>
-
-          <div class="flex-1 min-w-[145px]">
-            <CustomSelect
-              v-model="filterPrioritas"
-              :options="[
-                { value: '', label: 'Semua Prioritas' },
-                { value: 'Critical', label: 'Critical' },
-                { value: 'High', label: 'High' },
-                { value: 'Medium', label: 'Medium' },
-                { value: 'Low', label: 'Low' },
-              ]"
-              aria-label="Filter priority"
-              :block="true"
-              @change="fetchTickets"
-            />
-          </div>
-
-          <div class="flex-1 min-w-[145px]">
-            <CustomSelect
-              v-model="filterQueue"
-              :options="[
-                { value: '', label: 'Semua Unit' },
-                ...queues.map((q) => ({ value: q.id, label: `${q.kode} — ${q.nama}` })),
-              ]"
-              aria-label="Filter unit"
-              :block="true"
-              @change="fetchTickets"
-            />
-          </div>
-
-          <div class="flex-1 min-w-[145px]">
-            <CustomSelect
-              v-model="filterKategori"
-              :options="[
-                { value: '', label: 'Semua Kategori' },
-                { value: 'Request', label: 'Request' },
-                { value: 'Support', label: 'Support' },
-                { value: 'Incident', label: 'Incident' },
-                { value: 'QNA', label: 'QNA' },
-              ]"
-              aria-label="Filter kategori"
-              :block="true"
-              @change="fetchTickets"
-            />
-          </div>
-
-          <div class="flex-1 min-w-[145px]">
-            <CustomSelect
-              v-model="sortOrder"
-              :options="[
-                { value: 'terbaru', label: 'Terbaru' },
-                { value: 'terlama', label: 'Terlama' },
-              ]"
-              aria-label="Urutkan tiket"
-              align="right"
-              :block="true"
-              @change="fetchTickets"
-            />
-          </div>
-
-          <!-- Reset Filter Button -->
-          <button
-            v-if="hasActiveFilters"
-            type="button"
-            @click="resetFilters"
-            class="h-9 shrink-0 whitespace-nowrap rounded-xl border border-[#E2E8F0] bg-slate-50 px-3 text-xs font-semibold text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-all flex items-center justify-center gap-1.5 cursor-pointer active:scale-95"
-            title="Reset semua filter"
-          >
-            <span class="material-symbols-outlined text-[15px]">filter_alt_off</span>
-            <span>Reset</span>
-          </button>
-        </div>
+        <button type="button" @click="showFilterModal = true" class="h-9 shrink-0 rounded-xl border border-[#E2E8F0] bg-slate-50 px-3 text-xs font-semibold text-slate-600 hover:bg-white"><span class="material-symbols-outlined mr-1 align-middle text-[16px]">filter_alt</span>Filter</button>
       </div>
     </div>
 

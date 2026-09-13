@@ -13,7 +13,6 @@ import ShipmentExportModal from '../components/ui/ShipmentExportModal.vue'
 import FilterModal from '../components/ui/FilterModal.vue'
 import {
   ExternalLink,
-  FilterX,
   Package,
   Pencil,
   Plus,
@@ -402,44 +401,6 @@ onMounted(() => {
         </div>
 
         <button type="button" @click="showFilterModal = true" class="h-10 shrink-0 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-semibold text-[#64748B] hover:bg-white"><span class="material-symbols-outlined mr-1 align-middle text-[16px]">filter_alt</span>Filter</button>
-        <div class="min-w-0 sm:w-[160px]">
-          <CustomSelect
-            v-model="filterStatus"
-            :options="STATUS_OPTIONS"
-            aria-label="Filter status pengiriman"
-            placeholder="Semua Status"
-            :block="true"
-            height-class="h-10"
-          />
-        </div>
-
-        <div class="flex items-center gap-1.5 min-w-0">
-          <input
-            v-model="filterDateFrom"
-            type="date"
-            aria-label="Tanggal Dari"
-            title="Tanggal Dari"
-            class="h-10 w-full sm:w-[140px] rounded-xl border border-[#E2E8F0] bg-white px-2.5 text-xs text-[#333333] focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
-          />
-          <span class="text-xs text-[#94A3B8]">-</span>
-          <input
-            v-model="filterDateTo"
-            type="date"
-            aria-label="Tanggal Sampai"
-            title="Tanggal Sampai"
-            class="h-10 w-full sm:w-[140px] rounded-xl border border-[#E2E8F0] bg-white px-2.5 text-xs text-[#333333] focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
-          />
-        </div>
-
-        <button
-          type="button"
-          @click="resetFilters"
-          class="h-10 shrink-0 whitespace-nowrap rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-semibold text-[#64748B] hover:bg-[#F1F5F9] hover:text-[#333333] transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs"
-          title="Reset filter pencarian"
-        >
-          <FilterX class="w-3.5 h-3.5" />
-          <span>Reset</span>
-        </button>
       </div>
     </div>
 

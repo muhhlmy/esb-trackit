@@ -457,56 +457,8 @@ function formatDate(dateStr) {
           </button>
         </div>
 
-        <button type="button" @click="showFilterModal = true" class="h-9 shrink-0 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-semibold text-[#64748B] hover:bg-white"><span class="material-symbols-outlined mr-1 align-middle text-[16px]">filter_alt</span>Filter</button>
-        <!-- Filter Cluster -->
-        <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
-          <!-- Filter Lokasi -->
-          <div class="flex-1 min-w-[145px] sm:w-[155px] sm:flex-initial">
-            <CustomSelect
-              v-model="selectedLocation"
-              :options="locationFilterOptions"
-              aria-label="Filter lokasi"
-              placeholder="Semua Lokasi"
-              :block="true"
-              height-class="h-9"
-            />
-          </div>
-
-          <!-- Filter Kategori -->
-          <div class="flex-1 min-w-[155px] sm:w-[170px] sm:flex-initial">
-            <CustomSelect
-              v-model="selectedKategori"
-              :options="kategoriFilterOptions"
-              aria-label="Filter kategori"
-              placeholder="Semua Kategori"
-              :block="true"
-              height-class="h-9"
-            />
-          </div>
-
-          <!-- Filter Status -->
-          <div class="flex-1 min-w-[145px] sm:w-[155px] sm:flex-initial">
-            <CustomSelect
-              v-model="selectedStatus"
-              :options="statusFilterOptions"
-              aria-label="Filter status"
-              placeholder="Semua Status"
-              :block="true"
-              height-class="h-9"
-            />
-          </div>
-
-          <!-- Reset Filter Button -->
-          <button
-            v-if="searchQuery || selectedLocation || selectedKategori || selectedStatus"
-            type="button"
-            @click="resetFilters"
-            class="h-9 shrink-0 whitespace-nowrap rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-medium text-[#64748B] hover:text-[#333333] active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs touch-manipulation"
-            title="Reset filter"
-          >
-            <span class="material-symbols-outlined text-[16px]">restart_alt</span>
-            <span>Reset</span>
-          </button>
+        <div class="flex w-full items-center justify-end">
+          <button type="button" @click="showFilterModal = true" class="h-9 shrink-0 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-semibold text-[#64748B] hover:bg-white"><span class="material-symbols-outlined mr-1 align-middle text-[16px]">filter_alt</span>Filter</button>
         </div>
       </div>
     </div>

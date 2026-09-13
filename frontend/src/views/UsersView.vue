@@ -686,29 +686,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
           </button>
         </div>
 
-        <div class="flex items-center gap-2">
-          <button type="button" @click="showFilterModal = true" class="h-9 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-semibold text-[#64748B] hover:bg-white"><span class="material-symbols-outlined mr-1 align-middle text-[16px]">filter_alt</span>Filter</button>
-          <CustomSelect
-            v-model="filterRole"
-            :options="[
-              { value: '', label: 'Semua Role' },
-              { value: 'admin', label: 'ADMIN' },
-              { value: 'superadmin', label: 'SUPERADMIN' },
-              { value: 'user', label: 'USER' },
-            ]"
-            aria-label="Filter by role"
-            width-class="w-[135px]"
-          />
-
-          <button
-            v-if="searchQuery || filterRole"
-            type="button"
-            @click="resetFilters"
-            class="h-9 rounded-lg border border-[#FDE8E8] bg-[#FDF2F2] px-3 text-xs font-semibold text-[#E11D48] hover:bg-[#FCE7F3] active:scale-[0.98] transition-all cursor-pointer"
-          >
-            Reset
-          </button>
-        </div>
+        <button type="button" @click="showFilterModal = true" class="h-9 shrink-0 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-semibold text-[#64748B] hover:bg-white"><span class="material-symbols-outlined mr-1 align-middle text-[16px]">filter_alt</span>Filter</button>
       </div>
     </div>
 

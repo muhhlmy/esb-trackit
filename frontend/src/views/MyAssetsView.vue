@@ -441,7 +441,7 @@ async function loadMyOwnAssets() {
         hasEmployeeRecord: true,
       }
       currentLevel.value = 2
-      const assetData = await get(`/api/assets/my?nik=${encodeURIComponent(empData.nik)}`)
+      const assetData = await get('/api/assets/my')
       myAssets.value = Array.isArray(assetData) ? assetData.map(normalizeAsset) : []
     } else {
       selectedEmployee.value = {

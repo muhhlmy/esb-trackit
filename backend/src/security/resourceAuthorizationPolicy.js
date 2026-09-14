@@ -21,6 +21,21 @@ export function isAdmin(user) {
 }
 
 /**
+ * Checks if the user is authorized to query IT assets for another user/employee.
+ * - Superadmin: Authorized.
+ * - Admin with 'assets' read permission (read_only or full): Authorized.
+ * - Regular users: Denied.
+ */
+export function canReadOtherAssets(user) {
+  if (!user || typeof user !== 'object') return false
+  if (isSuperadmin(user)) return true
+  if (isAdmin(user)) {
+    return hasReadPermissionLevel(user.permissions?.assets)
+  }
+  return false
+}
+
+/**
  * Checks if the user is authorized to READ a specific IT Asset.
  * - Superadmin & Admins with 'assets' read_only/full permission: Authorized.
  * - Regular Users: Authorized ONLY IF asset.nik_pemegang_asset matches user's NIK or email/nama.

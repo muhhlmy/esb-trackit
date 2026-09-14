@@ -17,6 +17,7 @@ function makeRequest(server, path, headers = {}, bodyObj = null) {
     const payloadStr = bodyObj ? JSON.stringify(bodyObj) : headers.body || ''
     const reqHeaders = {
       Host: `127.0.0.1:${address.port}`,
+      Connection: 'close',
       ...headers,
     }
 
@@ -194,7 +195,13 @@ test('IDOR & Resource-Level Authorization Security Suite (DEFECT-05 / SEC-09)', 
     if (assetBId) await pool.query('DELETE FROM aset_ti WHERE id = $1', [assetBId]).catch(() => {})
     if (gaAssetId) await pool.query('DELETE FROM aset_ga WHERE id = $1', [gaAssetId]).catch(() => {})
     if (opsAssetId) await pool.query('DELETE FROM aset_ops WHERE id = $1', [opsAssetId]).catch(() => {})
-    if (server) await new Promise((resolve) => server.close(resolve))
+    if (server) {
+      if (typeof server.closeAllConnections === 'function') {
+        server.closeAllConnections()
+      }
+      await new Promise((resolve) => server.close(resolve))
+    }
+    await pool.end().catch(() => {})
   })
 
   await t.test('TEST 1 — User A can read own Asset A', async () => {
@@ -315,6 +322,7 @@ test('IDOR & Resource-Level Authorization Security Suite (DEFECT-05 / SEC-09)', 
       {
         hostname: `HOST-A-${Date.now()}`,
         serial_number: `SN-A-${Date.now()}`,
+        nik_pemegang_asset: userANik,
         status: 'Stock',
         kondisi: 'Normal',
         deleted_at: '2020-01-01T00:00:00Z', // Attempt mass assignment override
@@ -325,5 +333,72 @@ test('IDOR & Resource-Level Authorization Security Suite (DEFECT-05 / SEC-09)', 
     // Verify deleted_at remains NULL in database
     const dbRes = await pool.query('SELECT deleted_at FROM aset_ti WHERE id = $1', [assetAId])
     assert.equal(dbRes.rows[0].deleted_at, null)
+  })
+
+  await t.test('TEST 14 — My Assets IDOR Defense: User A CANNOT access User B assets via GET /api/assets/my?nik=UserB (returns 403)', async () => {
+    const res = await makeRequest(server, `/api/assets/my?nik=${userBNik}`, {
+      Authorization: `Bearer ${tokenA}`,
+    })
+    assert.equal(res.status, 403)
+    const json = JSON.parse(res.body)
+    assert.ok(json.error || json.message)
+  })
+
+  await t.test('TEST 15 — My Assets: User A can access own assets via GET /api/assets/my (session NIK, returns 200)', async () => {
+    const res = await makeRequest(server, '/api/assets/my', {
+      Authorization: `Bearer ${tokenA}`,
+    })
+    assert.equal(res.status, 200)
+    const json = JSON.parse(res.body)
+    assert.ok(Array.isArray(json))
+    assert.ok(json.some((a) => a.id === assetAId))
+    assert.ok(!json.some((a) => a.id === assetBId))
+  })
+
+  await t.test('TEST 16 — My Assets: User A can access own assets via GET /api/assets/my?nik=UserA (own NIK, returns 200)', async () => {
+    const res = await makeRequest(server, `/api/assets/my?nik=${userANik}`, {
+      Authorization: `Bearer ${tokenA}`,
+    })
+    assert.equal(res.status, 200)
+    const json = JSON.parse(res.body)
+    assert.ok(Array.isArray(json))
+    assert.ok(json.some((a) => a.id === assetAId))
+    assert.ok(!json.some((a) => a.id === assetBId))
+  })
+
+  await t.test('TEST 17 — My Assets Authorization: Admin with assets:read can access User B assets via GET /api/assets/my?nik=UserB (returns 200)', async () => {
+    const res = await makeRequest(server, `/api/assets/my?nik=${userBNik}`, {
+      Authorization: `Bearer ${tokenAdmin}`,
+    })
+    assert.equal(res.status, 200)
+    const json = JSON.parse(res.body)
+    assert.ok(Array.isArray(json))
+    assert.ok(json.some((a) => a.id === assetBId))
+    assert.ok(!json.some((a) => a.id === assetAId))
+  })
+
+  await t.test('TEST 18 — My Assets IDOR Defense: Admin without assets read permission CANNOT query User B NIK (returns 403)', async () => {
+    const ts = Date.now()
+    const resNoPermAdmin = await pool.query(
+      `INSERT INTO users (nama, email, password_hash, role, permissions, is_active)
+       VALUES ('Admin No Assets', $1, '$2b$10$KUuuaQWHvErN2WNcqrJOXeRC1Ym6GRyxcIzwpmRboOSkDpOPxE/Cu', 'admin', '{"assets":"none"}'::jsonb, true)
+       RETURNING id`,
+      [`admin.noassets.${ts}@company.com`],
+    )
+    const noPermAdminId = resNoPermAdmin.rows[0].id
+    const sessionNoPermAdmin = await createSession(noPermAdminId)
+    const tokenNoPermAdmin = jwt.sign(
+      { sub: String(noPermAdminId), id: noPermAdminId, sid: sessionNoPermAdmin.sessionId, role: 'admin', permissions: { assets: 'none' } },
+      env.jwt.secret,
+      { expiresIn: '1h' },
+    )
+
+    const res = await makeRequest(server, `/api/assets/my?nik=${userBNik}`, {
+      Authorization: `Bearer ${tokenNoPermAdmin}`,
+    })
+    assert.equal(res.status, 403)
+
+    await pool.query('DELETE FROM user_sessions WHERE user_id = $1', [noPermAdminId]).catch(() => {})
+    await pool.query('UPDATE users SET deleted_at = CURRENT_TIMESTAMP WHERE id = $1', [noPermAdminId]).catch(() => {})
   })
 })

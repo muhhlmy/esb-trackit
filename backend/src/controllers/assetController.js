@@ -3,7 +3,7 @@
 
 import { pool, withTransaction } from "../config/database.js";
 import { normalizeLocation } from "../utils/locationNormalizer.js";
-import { canReadITAsset, canWriteITAsset } from "../security/resourceAuthorizationPolicy.js";
+import { canReadITAsset, canWriteITAsset, canReadOtherAssets } from "../security/resourceAuthorizationPolicy.js";
 import { parsePaginationQuery, setPaginationHeaders } from "../security/requestValidation.js";
 
 function createHttpError(statusCode, message) {
@@ -295,7 +295,7 @@ const assetColumns = `
 async function findAssetById(id, databaseClient) {
   if (!databaseClient) databaseClient = pool;
 
-  const sql = "SELECT " + assetColumns + " FROM aset_ti WHERE id = $1";
+  const sql = "SELECT " + assetColumns + " FROM aset_ti WHERE id = $1 AND deleted_at IS NULL";
   const result = await databaseClient.query(sql, [id]);
 
   if (result.rowCount === 0) return null;
@@ -325,33 +325,48 @@ async function syncDeviceCycle(databaseClient, idAset, oldNik, newNik, assetInfo
 export async function listMyAssets(req, res) {
   try {
     if (!req.user?.id) return res.status(401).json({ error: "Unauthorized" });
-    
-    let sql = `SELECT ` + assetColumns + ` FROM aset_ti WHERE 1 = 1`;
-    const params = [];
 
-    const queryNik = req.query.nik;
+    // 1. Resolve NIK from authenticated session / employee binding
+    let sessionNik = (req.user.nik || req.user.employee?.nik || '').trim();
+    if (!sessionNik && req.user.email) {
+      const empRes = await pool.query(
+        `SELECT nik FROM karyawan WHERE LOWER(TRIM(email_kantor)) = LOWER(TRIM($1)) OR LOWER(TRIM(nama_karyawan)) = LOWER(TRIM($2)) LIMIT 1`,
+        [req.user.email, req.user.nama || '']
+      );
+      if (empRes.rows.length > 0 && empRes.rows[0].nik) {
+        sessionNik = empRes.rows[0].nik.trim();
+      }
+    }
+
+    const queryNik = typeof req.query.nik === 'string' ? req.query.nik.trim() : '';
+
+    // 2. Authorization check if custom NIK is requested
+    let targetNik = null;
     if (queryNik) {
-      sql += ` AND nik_pemegang_asset = $1`;
-      params.push(queryNik);
-    } else if (req.user.role !== 'admin' && req.user.role !== 'superadmin') {
-      let userNik = req.user.nik;
-      if (!userNik && req.user.email) {
-        const empRes = await pool.query(
-          `SELECT nik FROM karyawan WHERE LOWER(TRIM(email_kantor)) = LOWER(TRIM($1)) OR LOWER(TRIM(nama_karyawan)) = LOWER(TRIM($2)) LIMIT 1`,
-          [req.user.email, req.user.nama || '']
-        );
-        if (empRes.rows.length > 0 && empRes.rows[0].nik) {
-          userNik = empRes.rows[0].nik;
+      if (!canReadOtherAssets(req.user)) {
+        // User biasa atau non-authorized admin: tolak jika NIK target tidak sesuai dengan NIK session
+        if (!sessionNik || queryNik.toLowerCase() !== sessionNik.toLowerCase()) {
+          return res.status(403).json({
+            error: "Anda tidak memiliki akses untuk melihat aset pengguna lain.",
+            message: "Anda tidak memiliki akses untuk melihat aset pengguna lain.",
+          });
         }
       }
+      targetNik = queryNik;
+    } else {
+      // Tidak ada query nik: resolve dari session
+      targetNik = sessionNik;
+    }
 
-      if (userNik) {
-        sql += ` AND nik_pemegang_asset = $1`;
-        params.push(userNik);
-      } else {
-        sql += ` AND (LOWER(TRIM(nama_karyawan_pemegang_asset)) = LOWER(TRIM($1)) OR LOWER(TRIM(nik_pemegang_asset)) = LOWER(TRIM($2)))`;
-        params.push(req.user.nama || '', req.user.email || '');
-      }
+    let sql = `SELECT ` + assetColumns + ` FROM aset_ti WHERE deleted_at IS NULL`;
+    const params = [];
+
+    if (targetNik) {
+      sql += ` AND LOWER(TRIM(nik_pemegang_asset)) = LOWER(TRIM($1))`;
+      params.push(targetNik);
+    } else {
+      sql += ` AND (LOWER(TRIM(nama_karyawan_pemegang_asset)) = LOWER(TRIM($1)) OR LOWER(TRIM(nik_pemegang_asset)) = LOWER(TRIM($2)))`;
+      params.push(req.user.nama || '', req.user.email || '');
     }
     sql += ` ORDER BY created_at DESC`;
 

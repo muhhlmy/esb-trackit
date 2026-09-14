@@ -245,7 +245,7 @@ const menuGroups = computed(() => {
             },
             {
               to: '/submissions',
-              label: 'Pengajuan',
+              label: 'BAST/Asset Form',
               icon: 'assignment',
               permission: 'submissions',
             },

@@ -691,7 +691,8 @@ export async function createTicket(req, res) {
       )
     }
 
-    const nomor_tiket = `TKT-${new Date().getFullYear()}-${String(insertedTicket.id).padStart(6, '0')}`
+    const yearTwo = String(new Date().getFullYear()).slice(-2)
+    const nomor_tiket = `#TIC${yearTwo}-${String(insertedTicket.id).padStart(4, '0')}`
     const numberResult = await client.query(
       `UPDATE tickets
        SET nomor_tiket = $1

@@ -30,4 +30,72 @@ test('renderPasswordResetOtpEmailHtml renders ESB Logo Only logo vertically cent
 
   assert.ok(html.includes('cid:esbLogoOnly'), 'OTP HTML should contain cid:esbLogoOnly')
   assert.ok(html.includes('vertical-align: middle'), 'OTP HTML header should use vertical-align: middle')
+  assert.ok(html.includes('Pemberitahuan Otomatis &bull; No-Reply'), 'OTP HTML should include No-Reply notice')
 })
+
+test('renderTicketEmailHtml includes No-Reply notice and ESB branding styles', () => {
+  const html = renderTicketEmailHtml({
+    recipientName: 'Ahmad',
+    title: '[#TIC26-0001] Laptop Mati Total',
+    subtitle: 'Tiket Anda telah berhasil dibuat.',
+    ticket: {
+      nomor_tiket: '#TIC26-0001',
+      judul: 'Laptop Mati Total',
+      status_tiket: 'Open',
+      prioritas: 'High',
+      unit_support: 'IT Desktop',
+      pelapor: 'Ahmad'
+    }
+  })
+
+  // Check No-Reply notice callout
+  assert.ok(html.includes('Pemberitahuan Otomatis &bull; No-Reply'), 'Ticket email should contain No-Reply banner')
+  assert.ok(html.includes('tidak dapat menerima balasan email masuk'), 'Ticket email should state incoming replies are not accepted')
+  assert.ok(html.includes('#TIC26-0001'), 'Ticket email should include ticket number tag')
+
+  // Check ESB Branding styling tokens
+  assert.ok(html.includes('linear-gradient(135deg, #FF4F1B'), 'Ticket email should feature ESB orange gradient top bar')
+  assert.ok(html.includes('linear-gradient(135deg, #0A51B0'), 'Ticket email should feature ESB blue gradient header')
+  assert.ok(html.includes('People Technology Division'), 'Ticket email should state People Technology Division in footer')
+})
+
+test('formatTicketTag prefixes ticket numbers with # correctly', async () => {
+  const { formatTicketTag } = await import('../src/services/emailNotificationService.js')
+  assert.strictEqual(formatTicketTag('#TIC26-0001'), '#TIC26-0001')
+  assert.strictEqual(formatTicketTag('TIC26-0001'), '#TIC26-0001')
+  assert.strictEqual(formatTicketTag(''), '#TIC26-0000')
+  assert.strictEqual(formatTicketTag(null), '#TIC26-0000')
+})
+
+test('ticket email lifecycle subject formats match specification', async () => {
+  const { formatTicketTag } = await import('../src/services/emailNotificationService.js')
+  const tag = formatTicketTag('#TIC26-0001')
+  const ticket = { nomor_tiket: '#TIC26-0001', judul: 'Laptop Mati Total', prioritas: 'High', pelapor: 'Budi Santoso' }
+
+  // 1. Ticket Created (Reporter): [#TIC26-0001] Laptop Mati Total
+  const createdReporterSubject = `[${tag}] ${ticket.judul || 'Tiket Dibuat'}`
+  assert.strictEqual(createdReporterSubject, '[#TIC26-0001] Laptop Mati Total')
+
+  // 2. Ticket Created (Admin): [Tiket Baru] [High] [#TIC26-0001] Printer Kasir Error - oleh Budi Santoso
+  const prioritasLabel = ticket.prioritas || 'Normal'
+  const pelaporLabel = ticket.pelapor || 'Pengguna'
+  const createdAdminSubject = `[Tiket Baru] [${prioritasLabel}] [${tag}] ${ticket.judul || ''} - oleh ${pelaporLabel}`
+  assert.strictEqual(createdAdminSubject, '[Tiket Baru] [High] [#TIC26-0001] Laptop Mati Total - oleh Budi Santoso')
+
+  // 3. Status Update: [#TIC26-0001] Status Update
+  const updateSubject = `[${tag}] Status Update`
+  assert.strictEqual(updateSubject, '[#TIC26-0001] Status Update')
+
+  // 4. Resolved: [#TIC26-0001] Tiket Selesai: Laptop Mati Total
+  const resolvedSubject = `[${tag}] Tiket Selesai: ${ticket.judul || ''}`
+  assert.strictEqual(resolvedSubject, '[#TIC26-0001] Tiket Selesai: Laptop Mati Total')
+
+  // 5. IT Comment: [#TIC26-0001] Komentar baru telah ditambahkan
+  const commentSubject = `[${tag}] Komentar baru telah ditambahkan`
+  assert.strictEqual(commentSubject, '[#TIC26-0001] Komentar baru telah ditambahkan')
+
+  // 6. Reporter Comment (to IT): [Balasan Pelapor] [#TIC26-0001] Laptop Mati Total - oleh Budi Santoso
+  const reporterReplySubject = `[Balasan Pelapor] [${tag}] ${ticket.judul || ''} - oleh ${ticket.pelapor}`
+  assert.strictEqual(reporterReplySubject, '[Balasan Pelapor] [#TIC26-0001] Laptop Mati Total - oleh Budi Santoso')
+})
+

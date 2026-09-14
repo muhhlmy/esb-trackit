@@ -23,6 +23,7 @@ export const allowedRouteMap = [
   { key: 'shipments', name: 'shipments' },
   { key: 'logs', name: 'logs' },
   { key: 'users', name: 'users' },
+  { key: 'knowledge_base', name: 'admin-cases' },
   { key: 'export', name: 'export' },
   { key: 'database', name: 'database' },
 ]
@@ -134,7 +135,7 @@ const routes = [
     path: '/faqs',
     name: 'faqs',
     component: () => import('../views/FaqAdminView.vue'),
-    meta: { title: 'FAQ', subtitle: 'Kelola FAQ Help Center', permission: 'users' },
+    meta: { title: 'FAQ', subtitle: 'Kelola FAQ Help Center', permission: 'knowledge_base' },
   },
   {
     path: '/submissions',
@@ -191,7 +192,7 @@ const routes = [
       title: 'Admin CMS',
       subtitle: 'Kelola Artikel Knowledge Base',
       adminOnly: true,
-      permission: 'users',
+      permission: 'knowledge_base',
     },
   },
   {
@@ -202,7 +203,7 @@ const routes = [
       title: 'Kategori KB',
       subtitle: 'Kelola Topic Cards Help Center',
       adminOnly: true,
-      permission: 'users',
+      permission: 'knowledge_base',
     },
   },
   {
@@ -214,7 +215,7 @@ const routes = [
       title: 'Article Editor',
       subtitle: 'Editor Artikel Knowledge Base',
       adminOnly: true,
-      permission: 'users',
+      permission: 'knowledge_base',
     },
   },
 

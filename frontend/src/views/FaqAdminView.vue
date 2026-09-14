@@ -4,6 +4,7 @@ import { computed, onMounted, ref } from 'vue'
 import { RouterLink } from 'vue-router'
 import { useApi } from '../composables/useApi.js'
 import { useToast } from '../composables/useToast.js'
+import { useAuth } from '../composables/useAuth.js'
 import AppModal from '../components/ui/AppModal.vue'
 import CustomSelect from '../components/ui/CustomSelect.vue'
 import {
@@ -22,6 +23,8 @@ import {
 
 const { get, post, put, del } = useApi()
 const { showToast } = useToast()
+const { hasWritePermission } = useAuth()
+const canWrite = computed(() => hasWritePermission('knowledge_base'))
 
 const FAQ_CATEGORIES = [
   'Account & Access',
@@ -111,6 +114,7 @@ const stats = computed(() => {
 })
 
 function openAdd() {
+  if (!canWrite.value) return
   modalMode.value = 'add'
   modalError.value = ''
   form.value = emptyForm()
@@ -118,6 +122,7 @@ function openAdd() {
 }
 
 function openEdit(faq) {
+  if (!canWrite.value) return
   modalMode.value = 'edit'
   modalError.value = ''
   selectedFaq.value = faq
@@ -132,6 +137,7 @@ function openEdit(faq) {
 }
 
 function openDelete(faq) {
+  if (!canWrite.value) return
   selectedFaq.value = faq
   showDeleteModal.value = true
 }
@@ -153,6 +159,7 @@ function clearFilters() {
 }
 
 async function saveFaq() {
+  if (!canWrite.value) return
   modalError.value = ''
   if (!form.value.question.trim()) {
     modalError.value = 'Pertanyaan wajib diisi.'
@@ -194,6 +201,7 @@ async function saveFaq() {
 }
 
 async function confirmDelete() {
+  if (!canWrite.value) return
   isSubmitting.value = true
   try {
     await del(`/api/faqs/${selectedFaq.value.id}`)
@@ -269,6 +277,7 @@ onMounted(fetchFaqs)
       </div>
 
       <button
+        v-if="canWrite"
         @click="openAdd"
         class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-[#0A51B0] hover:bg-[#0A4391] text-white shadow-sm shadow-[#0A51B0]/25 hover:shadow-md transition-all cursor-pointer active:scale-95 touch-manipulation shrink-0"
       >
@@ -521,7 +530,7 @@ onMounted(fetchFaqs)
                 </div>
 
                 <!-- Action buttons -->
-                <div class="flex items-center gap-1.5 shrink-0">
+                <div v-if="canWrite" class="flex items-center gap-1.5 shrink-0">
                   <button
                     @click="openEdit(f)"
                     class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-bold bg-[#0A51B0] hover:bg-[#0A4391] text-white transition-all cursor-pointer shadow-xs active:scale-95 touch-manipulation"
@@ -579,7 +588,7 @@ onMounted(fetchFaqs)
                   <th class="py-4 px-4">Status</th>
                   <th class="py-4 px-4">Sort Order</th>
                   <th class="py-4 px-4">Updated</th>
-                  <th class="py-4 px-6 text-right">Actions</th>
+                  <th v-if="canWrite" class="py-4 px-6 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-[#E5EAEF] dark:divide-slate-800">
@@ -643,7 +652,7 @@ onMounted(fetchFaqs)
                   </td>
 
                   <!-- Actions -->
-                  <td class="py-4 px-6 text-right">
+                  <td v-if="canWrite" class="py-4 px-6 text-right">
                     <div class="flex items-center justify-end gap-2">
                       <button
                         @click="openEdit(f)"

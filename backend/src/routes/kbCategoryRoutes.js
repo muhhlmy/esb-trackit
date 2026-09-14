@@ -1,5 +1,8 @@
 import { Router } from 'express'
-import { authorizeRoles } from '../middleware/authMiddleware.js'
+import {
+  authorizePermission,
+  authorizeRoles,
+} from '../middleware/authMiddleware.js'
 import {
   listKbCategories,
   getKbCategory,
@@ -11,9 +14,13 @@ import {
 export const kbCategoryRouter = Router()
 
 const requireAdmin = authorizeRoles('admin', 'super admin', 'superadmin')
+const requireKbRead = authorizePermission('knowledge_base', 'read')
+const requireKbWrite = authorizePermission('knowledge_base', 'write')
 
-kbCategoryRouter.get('/', requireAdmin, listKbCategories)
-kbCategoryRouter.get('/:id', requireAdmin, getKbCategory)
-kbCategoryRouter.post('/', requireAdmin, createKbCategory)
-kbCategoryRouter.put('/:id', requireAdmin, updateKbCategory)
-kbCategoryRouter.delete('/:id', requireAdmin, deleteKbCategory)
+kbCategoryRouter.use(requireAdmin)
+
+kbCategoryRouter.get('/', requireKbRead, listKbCategories)
+kbCategoryRouter.get('/:id', requireKbRead, getKbCategory)
+kbCategoryRouter.post('/', requireKbWrite, createKbCategory)
+kbCategoryRouter.put('/:id', requireKbWrite, updateKbCategory)
+kbCategoryRouter.delete('/:id', requireKbWrite, deleteKbCategory)

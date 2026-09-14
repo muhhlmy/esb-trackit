@@ -3,6 +3,7 @@ import AppModal from '../../components/ui/AppModal.vue'
 import { ref, computed, onMounted, nextTick } from 'vue'
 import { RouterLink } from 'vue-router'
 import { useKbCategories } from '@/composables/useKbCategories'
+import { useAuth } from '@/composables/useAuth'
 import gsap from 'gsap'
 import { isReducedMotion } from '@/composables/useGsap'
 import {
@@ -29,6 +30,8 @@ import {
 } from 'lucide-vue-next'
 
 const { categories, fetchAllCategories, saveCategory, deleteCategory } = useKbCategories()
+const { hasWritePermission } = useAuth()
+const canWrite = computed(() => hasWritePermission('knowledge_base'))
 
 const searchQuery = ref('')
 const selectedStatus = ref('all') // 'all', 'PUBLISHED', 'DRAFT'
@@ -117,6 +120,7 @@ const stats = computed(() => {
 })
 
 function openCreateDrawer() {
+  if (!canWrite.value) return
   drawerMode.value = 'create'
   editingCategory.value = {
     key: '',
@@ -131,6 +135,7 @@ function openCreateDrawer() {
 }
 
 function openEditDrawer(id) {
+  if (!canWrite.value) return
   const found = categories.value.find((c) => Number(c.id) === Number(id))
   if (!found) return
   drawerMode.value = 'edit'
@@ -156,7 +161,7 @@ function handleTitleInput() {
 }
 
 async function handleSave() {
-  if (!editingCategory.value || isSaving.value) return
+  if (!canWrite.value || !editingCategory.value || isSaving.value) return
   isSaving.value = true
   const ok = await saveCategory(editingCategory.value)
   isSaving.value = false
@@ -164,10 +169,12 @@ async function handleSave() {
 }
 
 function confirmDelete(id) {
+  if (!canWrite.value) return
   deleteConfirmId.value = id
 }
 
 async function executeDelete() {
+  if (!canWrite.value) return
   if (deleteConfirmId.value) {
     await deleteCategory(deleteConfirmId.value)
     deleteConfirmId.value = null
@@ -227,6 +234,7 @@ function clearFilters() {
       </div>
 
       <button
+        v-if="canWrite"
         @click="openCreateDrawer"
         class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-[#0A51B0] hover:bg-[#0A4391] text-white shadow-sm shadow-[#0A51B0]/25 hover:shadow-md transition-all cursor-pointer active:scale-95 touch-manipulation shrink-0"
       >
@@ -405,8 +413,9 @@ function clearFilters() {
             <div class="min-w-0 flex-1">
               <div class="flex items-center gap-1.5 flex-wrap">
                 <h3
-                  @click="openEditDrawer(c.id)"
-                  class="font-bold text-[#333333] dark:text-slate-100 text-sm hover:text-[#333333] dark:hover:text-blue-400 transition-colors cursor-pointer leading-tight truncate"
+                  @click="canWrite && openEditDrawer(c.id)"
+                  class="font-bold text-[#333333] dark:text-slate-100 text-sm transition-colors leading-tight truncate"
+                  :class="canWrite ? 'hover:text-[#333333] dark:hover:text-blue-400 cursor-pointer' : ''"
                 >
                   {{ c.title }}
                 </h3>
@@ -430,7 +439,7 @@ function clearFilters() {
           </div>
 
           <!-- Quick Action Buttons -->
-          <div class="flex items-center gap-1 shrink-0">
+          <div v-if="canWrite" class="flex items-center gap-1 shrink-0">
             <button
               @click="openEditDrawer(c.id)"
               class="flex items-center justify-center h-8 px-2.5 gap-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-[#0A51B0] hover:text-white text-xs font-semibold transition-all active:scale-95 touch-manipulation cursor-pointer"
@@ -502,13 +511,13 @@ function clearFilters() {
               <th class="py-3 px-4 font-medium">Icon</th>
               <th class="py-3 px-4 font-medium">Urutan</th>
               <th class="py-3 px-4 font-medium">Status</th>
-              <th class="py-3 px-5 text-right font-medium">Aksi</th>
+              <th v-if="canWrite" class="py-3 px-5 text-right font-medium">Aksi</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-[#F1F5F9] dark:divide-slate-800/60">
             <!-- Empty State -->
             <tr v-if="filteredCategories.length === 0">
-              <td colspan="6" class="py-16 px-6 text-center">
+              <td :colspan="canWrite ? 6 : 5" class="py-16 px-6 text-center">
                 <div class="flex flex-col items-center justify-center gap-2 max-w-xs mx-auto">
                   <div
                     class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center justify-center mb-1"
@@ -605,7 +614,7 @@ function clearFilters() {
               </td>
 
               <!-- Actions -->
-              <td class="py-3.5 px-5 text-right">
+              <td v-if="canWrite" class="py-3.5 px-5 text-right">
                 <button
                   @click="toggleActionMenu(c.id, $event)"
                   class="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0A51B0]"
@@ -624,7 +633,7 @@ function clearFilters() {
     <!-- Action Menu (Teleported to body) -->
     <Teleport to="body">
       <div
-        v-if="actionMenu"
+        v-if="canWrite && actionMenu"
         :style="{ top: actionMenu.top + 'px', left: actionMenu.left + 'px' }"
         class="fixed z-50 w-40 bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 rounded-lg shadow-lg p-1 space-y-0.5"
       >
@@ -657,7 +666,7 @@ function clearFilters() {
     </Teleport>
 
     <!-- Backdrop for Action Menu -->
-    <div v-if="actionMenu" @click="closeActionMenu" class="fixed inset-0 z-40 bg-transparent"></div>
+    <div v-if="canWrite && actionMenu" @click="closeActionMenu" class="fixed inset-0 z-40 bg-transparent"></div>
 
     <AppModal
       :is-open="isDrawerOpen && Boolean(editingCategory)"

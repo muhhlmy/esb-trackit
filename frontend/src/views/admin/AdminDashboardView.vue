@@ -3,6 +3,7 @@ import AppModal from '../../components/ui/AppModal.vue'
 import { ref, computed, onMounted, nextTick } from 'vue'
 import { useRouter, RouterLink } from 'vue-router'
 import { useCases } from '@/composables/useCases'
+import { useAuth } from '@/composables/useAuth'
 import gsap from 'gsap'
 import { isReducedMotion } from '@/composables/useGsap'
 import CustomSelect from '@/components/ui/CustomSelect.vue'
@@ -23,6 +24,8 @@ import {
 
 const router = useRouter()
 const { cases, deleteCase, fetchAllCases } = useCases()
+const { hasWritePermission } = useAuth()
+const canWrite = computed(() => hasWritePermission('knowledge_base'))
 
 const searchQuery = ref('')
 const selectedCategory = ref('all')
@@ -112,18 +115,22 @@ const stats = computed(() => {
 })
 
 function editDoc(id) {
+  if (!canWrite.value) return
   router.push(`/admin/editor/${id}`)
 }
 
 function createNewDoc() {
+  if (!canWrite.value) return
   router.push('/admin/editor')
 }
 
 function confirmDelete(id) {
+  if (!canWrite.value) return
   deleteConfirmId.value = id
 }
 
 function executeDelete() {
+  if (!canWrite.value) return
   if (deleteConfirmId.value) {
     deleteCase(deleteConfirmId.value)
     deleteConfirmId.value = null
@@ -189,6 +196,7 @@ function getCategoryBadgeClass(category) {
       </div>
 
       <button
+        v-if="canWrite"
         @click="createNewDoc"
         class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-[#0A51B0] hover:bg-[#0A4391] text-white shadow-md shadow-[#0A51B0]/25 hover:shadow-lg transition-all cursor-pointer active:scale-95 shrink-0 touch-manipulation"
       >
@@ -428,7 +436,7 @@ function getCategoryBadgeClass(category) {
             </div>
 
             <!-- Direct Action Buttons on Mobile Card Header -->
-            <div class="flex items-center gap-1 shrink-0">
+            <div v-if="canWrite" class="flex items-center gap-1 shrink-0">
               <button
                 @click="editDoc(c.id)"
                 class="flex items-center justify-center h-7 px-2.5 gap-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-[#0A51B0] hover:text-white text-[11px] font-semibold transition-all active:scale-95 touch-manipulation cursor-pointer"
@@ -448,7 +456,7 @@ function getCategoryBadgeClass(category) {
           </div>
 
           <!-- Card Body: Title & Summary -->
-          <div class="cursor-pointer" @click="editDoc(c.id)">
+          <div :class="canWrite ? 'cursor-pointer' : ''" @click="canWrite && editDoc(c.id)">
             <h3
               class="text-[13px] font-bold text-[#333333] dark:text-slate-100 hover:text-[#333333] transition-colors leading-snug"
             >
@@ -514,13 +522,13 @@ function getCategoryBadgeClass(category) {
               <th class="py-3 px-4 font-medium">Severity</th>
               <th class="py-3 px-4 font-medium">Tag</th>
               <th class="py-3 px-4 font-medium">Status</th>
-              <th class="py-3 px-5 text-right font-medium">Aksi</th>
+              <th v-if="canWrite" class="py-3 px-5 text-right font-medium">Aksi</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-[#F1F5F9] dark:divide-slate-800/60">
             <!-- Empty State -->
             <tr v-if="filteredCases.length === 0">
-              <td colspan="6" class="py-16 px-6 text-center">
+              <td :colspan="canWrite ? 6 : 5" class="py-16 px-6 text-center">
                 <div class="flex flex-col items-center justify-center gap-2 max-w-xs mx-auto">
                   <div
                     class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center justify-center mb-1"
@@ -622,7 +630,7 @@ function getCategoryBadgeClass(category) {
               </td>
 
               <!-- Actions -->
-              <td class="py-3.5 px-5 text-right">
+              <td v-if="canWrite" class="py-3.5 px-5 text-right">
                 <button
                   @click="toggleActionMenu(c.id, $event)"
                   class="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0A51B0]"

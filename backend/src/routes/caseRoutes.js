@@ -1,5 +1,8 @@
 import { Router } from 'express'
-import { authorizeRoles } from '../middleware/authMiddleware.js'
+import {
+  authorizePermission,
+  authorizeRoles,
+} from '../middleware/authMiddleware.js'
 import {
   listCases,
   getCase,
@@ -11,9 +14,13 @@ import {
 export const caseRouter = Router()
 
 const requireAdmin = authorizeRoles('admin', 'super admin', 'superadmin')
+const requireKbRead = authorizePermission('knowledge_base', 'read')
+const requireKbWrite = authorizePermission('knowledge_base', 'write')
 
-caseRouter.get('/', requireAdmin, listCases)
-caseRouter.get('/:id', requireAdmin, getCase)
-caseRouter.post('/', requireAdmin, createCase)
-caseRouter.put('/:id', requireAdmin, updateCase)
-caseRouter.delete('/:id', requireAdmin, deleteCase)
+caseRouter.use(requireAdmin)
+
+caseRouter.get('/', requireKbRead, listCases)
+caseRouter.get('/:id', requireKbRead, getCase)
+caseRouter.post('/', requireKbWrite, createCase)
+caseRouter.put('/:id', requireKbWrite, updateCase)
+caseRouter.delete('/:id', requireKbWrite, deleteCase)

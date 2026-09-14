@@ -92,6 +92,12 @@ const OPERATIONAL_FEATURES = [
 
 const ADMINISTRATIVE_FEATURES = [
   {
+    key: 'knowledge_base',
+    label: 'Knowledge Base & CMS',
+    icon: 'menu_book',
+    desc: 'Pengaturan artikel, FAQ & kategori KB',
+  },
+  {
     key: 'users',
     label: 'Manajemen Pengguna',
     icon: 'manage_accounts',
@@ -142,6 +148,7 @@ const defaultPermissions = () => ({
   users: 'none',
   logs: 'none',
   karyawan: 'none',
+  knowledge_base: 'none',
 })
 
 const superadminPermissions = () => ({
@@ -154,6 +161,7 @@ const superadminPermissions = () => ({
   users: 'full',
   logs: 'full',
   karyawan: 'full',
+  knowledge_base: 'full',
 })
 
 // ── Form Data ────────────────────────────────────────────────

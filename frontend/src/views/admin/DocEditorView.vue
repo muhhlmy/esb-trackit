@@ -3,6 +3,7 @@ import { ref, computed, onMounted, onBeforeUnmount, watch, nextTick } from 'vue'
 import { useRoute, useRouter, RouterLink } from 'vue-router'
 import { useCases } from '@/composables/useCases'
 import { useToast } from '@/composables/useToast'
+import { useAuth } from '@/composables/useAuth'
 import DocEditorInspector from '@/components/admin/DocEditorInspector.vue'
 import { sanitizeRichTextHtml } from '@/utils/htmlSanitizer'
 import { useEditor, EditorContent } from '@tiptap/vue-3'
@@ -36,6 +37,8 @@ const route = useRoute()
 const router = useRouter()
 const { cases, saveCase, fetchAllCases } = useCases()
 const { showToast } = useToast()
+const { hasWritePermission } = useAuth()
+const canWrite = computed(() => hasWritePermission('knowledge_base'))
 
 const isMobileInspectorOpen = ref(false)
 const isDesktopInspectorOpen = ref(true)
@@ -233,6 +236,7 @@ watch(
 
 // TipTap Editor Instance
 const editor = useEditor({
+  editable: canWrite.value,
   content: '',
   extensions: [
     StarterKit.configure({
@@ -271,6 +275,10 @@ const editor = useEditor({
     }
     saveStatus.value = 'Belum disimpan'
   },
+})
+
+watch(canWrite, (val) => {
+  editor.value?.setEditable(val)
 })
 
 const canUndo = computed(() => {
@@ -673,6 +681,7 @@ function insertStep() {
 
 // Save & Publish
 async function handleSaveDraft() {
+  if (!canWrite.value) return
   if (editor.value) {
     doc.value.contentHtml = editor.value.getHTML()
   }
@@ -704,6 +713,7 @@ async function handleSaveDraft() {
 }
 
 async function handlePublish() {
+  if (!canWrite.value) return
   if (editor.value) {
     doc.value.contentHtml = editor.value.getHTML()
   }
@@ -808,6 +818,7 @@ function goToAdminCases() {
 
         <!-- Save Draft -->
         <button
+          v-if="canWrite"
           @click="handleSaveDraft"
           :disabled="isSaving"
           class="px-2.5 sm:px-3.5 py-1.5 rounded-lg text-xs font-semibold border border-[#E2E8F0] dark:border-slate-700 text-[#333333] dark:text-slate-200 bg-white dark:bg-slate-900 hover:bg-[#F8FAFC] dark:hover:bg-slate-800 transition-colors cursor-pointer disabled:opacity-50 active:scale-95 touch-manipulation"
@@ -817,6 +828,7 @@ function goToAdminCases() {
 
         <!-- Publish Article -->
         <button
+          v-if="canWrite"
           @click="handlePublish"
           :disabled="isSaving"
           class="px-3 sm:px-4 py-1.5 rounded-lg text-xs font-bold bg-[#0A51B0] hover:bg-[#0A4391] text-white shadow-xs transition-all cursor-pointer flex items-center gap-1 disabled:opacity-50 active:scale-95 touch-manipulation"
@@ -838,9 +850,18 @@ function goToAdminCases() {
       </div>
     </header>
 
+    <!-- Read-Only Mode Banner -->
+    <div
+      v-if="!canWrite"
+      class="bg-amber-50 dark:bg-amber-950/40 border-b border-amber-200 dark:border-amber-900/50 px-4 py-2.5 flex items-center gap-2 text-xs text-amber-800 dark:text-amber-200 shrink-0"
+    >
+      <Info class="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
+      <span><strong>Mode Baca Saja:</strong> Anda memiliki hak akses Read Only untuk Knowledge Base. Anda dapat membaca artikel tetapi tidak dapat menyimpan perubahan atau menerbitkannya.</span>
+    </div>
+
     <!-- 2. STICKY FORMATTING RIBBON (TIPTAP CONNECTED) -->
     <div
-      v-if="editor"
+      v-if="editor && canWrite"
       class="cms-editor-ribbon sticky top-14 z-40 bg-white dark:bg-slate-900 border-b border-[#E2E8F0] dark:border-slate-800 px-3 sm:px-6 py-1.5 flex items-center gap-1 sm:gap-1.5 overflow-x-auto no-scrollbar text-xs select-none touch-manipulation shadow-2xs"
     >
       <!-- Undo / Redo -->
@@ -1061,6 +1082,7 @@ function goToAdminCases() {
           <input
             ref="titleInputRef"
             v-model="doc.title"
+            :readonly="!canWrite"
             @focus="lastActiveTarget = 'title'"
             @keydown.ctrl.z.exact.stop.prevent="handleUndo"
             @keydown.meta.z.exact.stop.prevent="handleUndo"
@@ -1086,6 +1108,7 @@ function goToAdminCases() {
             <textarea
               ref="summaryInputRef"
               v-model="doc.summary"
+              :readonly="!canWrite"
               @focus="lastActiveTarget = 'summary'"
               @keydown.ctrl.z.exact.stop.prevent="handleUndo"
               @keydown.meta.z.exact.stop.prevent="handleUndo"
@@ -1102,7 +1125,7 @@ function goToAdminCases() {
 
           <!-- TIPTAP FLOATING BUBBLE MENU -->
           <div
-            v-if="isSelectionMenuOpen && editor"
+            v-if="isSelectionMenuOpen && editor && canWrite"
             :style="{ left: selectionMenuPos.x + 'px', top: selectionMenuPos.y + 'px' }"
             class="fixed z-50 -translate-x-1/2 -translate-y-full flex items-center gap-0.5 p-1 bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-700 rounded-lg shadow-lg transition-all select-none"
           >
@@ -1180,6 +1203,7 @@ function goToAdminCases() {
       >
         <DocEditorInspector
           v-model="doc"
+          :can-write="canWrite"
           @close="isDesktopInspectorOpen = false"
           @view-portal="goToAdminCases"
         />
@@ -1221,6 +1245,7 @@ function goToAdminCases() {
             <div class="flex-1 overflow-y-auto">
               <DocEditorInspector
                 v-model="doc"
+                :can-write="canWrite"
                 @close="isMobileInspectorOpen = false"
                 @view-portal="goToAdminCases"
               />

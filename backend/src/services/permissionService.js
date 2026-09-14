@@ -11,6 +11,7 @@ export const FEATURE_PERMISSION_KEYS = Object.freeze([
   'logs',
   'karyawan',
   'export',
+  'knowledge_base',
 ])
 
 export const DEFAULT_USER_PERMISSIONS = Object.freeze({
@@ -26,6 +27,7 @@ export const DEFAULT_USER_PERMISSIONS = Object.freeze({
   logs: 'none',
   karyawan: 'none',
   export: 'none',
+  knowledge_base: 'none',
 })
 
 export const SUPERADMIN_PERMISSIONS = Object.freeze(

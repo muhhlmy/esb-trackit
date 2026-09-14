@@ -11,6 +11,10 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  canWrite: {
+    type: Boolean,
+    default: true,
+  },
 })
 
 const emit = defineEmits(['update:modelValue', 'close', 'viewPortal'])
@@ -35,6 +39,7 @@ const severities = [
 ]
 
 function addTag() {
+  if (!props.canWrite) return
   const val = newTagInput.value.trim().toLowerCase()
   if (val && !props.modelValue.tags?.includes(val)) {
     const updated = [...(props.modelValue.tags || []), val]
@@ -44,6 +49,7 @@ function addTag() {
 }
 
 function removeTag(tagToRemove) {
+  if (!props.canWrite) return
   const updated = (props.modelValue.tags || []).filter((t) => t !== tagToRemove)
   emit('update:modelValue', { ...props.modelValue, tags: updated })
 }
@@ -122,8 +128,9 @@ function removeTag(tagToRemove) {
           <div class="relative">
             <select
               :value="modelValue.category"
+              :disabled="!canWrite"
               @change="$emit('update:modelValue', { ...modelValue, category: $event.target.value })"
-              class="w-full bg-[#F8FAFC] dark:bg-slate-800 border border-[#E2E8F0] dark:border-slate-700 rounded-lg py-2 pl-3 pr-8 text-xs font-medium text-[#333333] dark:text-slate-100 appearance-none focus:outline-none focus:border-[#0A51B0] cursor-pointer"
+              class="w-full bg-[#F8FAFC] dark:bg-slate-800 border border-[#E2E8F0] dark:border-slate-700 rounded-lg py-2 pl-3 pr-8 text-xs font-medium text-[#333333] dark:text-slate-100 appearance-none focus:outline-none focus:border-[#0A51B0] disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
             >
               <option v-for="c in categories" :key="c.id" :value="c.id">
                 {{ c.label }}
@@ -145,8 +152,9 @@ function removeTag(tagToRemove) {
           <div class="relative">
             <select
               :value="modelValue.severity"
+              :disabled="!canWrite"
               @change="$emit('update:modelValue', { ...modelValue, severity: $event.target.value })"
-              class="w-full bg-[#F8FAFC] dark:bg-slate-800 border border-[#E2E8F0] dark:border-slate-700 rounded-lg py-2 pl-3 pr-8 text-xs font-medium text-[#333333] dark:text-slate-100 appearance-none focus:outline-none focus:border-[#0A51B0] cursor-pointer"
+              class="w-full bg-[#F8FAFC] dark:bg-slate-800 border border-[#E2E8F0] dark:border-slate-700 rounded-lg py-2 pl-3 pr-8 text-xs font-medium text-[#333333] dark:text-slate-100 appearance-none focus:outline-none focus:border-[#0A51B0] disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
             >
               <option v-for="s in severities" :key="s.id" :value="s.id">
                 {{ s.label }}
@@ -194,6 +202,7 @@ function removeTag(tagToRemove) {
           >
             <span>#{{ tag }}</span>
             <button
+              v-if="canWrite"
               @click="removeTag(tag)"
               class="text-[#64748B] hover:text-rose-600 dark:hover:text-rose-400 cursor-pointer"
             >
@@ -209,7 +218,7 @@ function removeTag(tagToRemove) {
         </div>
 
         <!-- Add Tag Input -->
-        <div class="flex gap-2">
+        <div v-if="canWrite" class="flex gap-2">
           <input
             v-model="newTagInput"
             @keydown.enter.prevent="addTag"

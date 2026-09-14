@@ -99,3 +99,31 @@ test('ticket email lifecycle subject formats match specification', async () => {
   assert.strictEqual(reporterReplySubject, '[Balasan Pelapor] [#TIC26-0001] Laptop Mati Total - oleh Budi Santoso')
 })
 
+test('renderTicketEmailHtml renders valid CTA button URL and ticket title', () => {
+  const html = renderTicketEmailHtml({
+    recipientName: 'Muhammad Helmy',
+    title: '[#TIC26-0002] Komentar baru telah ditambahkan',
+    subtitle: 'Super Administrator menambahkan pesan baru pada tiket Anda.',
+    ticket: {
+      id: 2,
+      nomor_tiket: '#TIC26-0002',
+      judul: 'Kendala Akses VPN Kantor',
+      status_tiket: 'In Progress',
+      prioritas: 'Normal',
+      queue_nama: 'IT Support',
+      pelapor: 'Muhammad Helmy',
+    },
+    commentPesan: 'Sudah kami cek, silakan coba login ulang VPN sekarang ya.',
+    commentAuthor: 'Super Administrator',
+  })
+
+  // CTA button should link directly to ticket with comments tab, NEVER href="#"
+  assert.ok(!html.includes('href="#"'), 'CTA button should not have empty href="#"')
+  assert.ok(html.includes('/tickets?id=2&tab=comments'), 'CTA button should point to ticket comments URL')
+
+  // Title and reporter should render properly without falling back to '-' or raw ID
+  assert.ok(html.includes('Kendala Akses VPN Kantor'), 'Judul tiket should appear in the email card')
+  assert.ok(html.includes('Muhammad Helmy'), 'Pelapor name should appear in the email card')
+  assert.ok(!html.includes('Pelapor: 38'), 'Pelapor should not display raw database user ID')
+})
+

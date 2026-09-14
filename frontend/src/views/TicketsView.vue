@@ -147,6 +147,7 @@ onMounted(async () => {
 
   await fetchQueues()
   await fetchTickets()
+  await openTicketFromQuery()
 
   // Muat daftar user untuk dropdown "Pelapor" (hanya dipakai admin/superadmin)
   if (isAdmin.value || isSuperAdmin.value) {
@@ -1025,6 +1026,47 @@ function openDetail(ticket) {
   fetchTicketComments(ticket.id)
   startChatPoll(ticket.id)
 }
+
+async function openTicketFromQuery() {
+  const queryId = route.query.id || route.query.ticket_id
+  const queryNomor = route.query.nomor_tiket || route.query.nomor
+  if (!queryId && !queryNomor) return
+
+  let target = tickets.value.find(
+    (t) =>
+      (queryId && String(t.id) === String(queryId)) ||
+      (queryNomor && (t.nomor_tiket === queryNomor || t.nomor_tiket === `#${queryNomor}`)),
+  )
+
+  if (!target && queryId) {
+    try {
+      const fetched = await get(`/api/tickets/${queryId}`)
+      if (fetched && fetched.id) {
+        target = fetched
+      }
+    } catch {
+      // ignore
+    }
+  }
+
+  if (target) {
+    openDetail(target)
+    if (route.query.tab === 'comments' || route.query.action === 'comment') {
+      activeDetailTab.value = 'comments'
+      await nextTick()
+      scrollChatToBottom()
+    }
+  }
+}
+
+watch(
+  () => [route.query.id, route.query.ticket_id, route.query.nomor_tiket, route.query.tab],
+  ([newId, newTicketId, newNomor]) => {
+    if (newId || newTicketId || newNomor) {
+      openTicketFromQuery()
+    }
+  },
+)
 
 async function loadSelectedTicketAttachment(ticketId, target) {
   const requestVersion = ++ticketAttachmentRequestVersion

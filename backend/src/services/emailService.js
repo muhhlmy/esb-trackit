@@ -123,6 +123,7 @@ export function renderTicketEmailHtml({
   changes = [],
   commentPesan = null,
   commentAuthor = null,
+  ticketUrl: customTicketUrl = null,
 }) {
   const rawNomorTiket = ticket?.nomor_tiket || (ticket?.id ? `#TIC26-${String(ticket.id).padStart(4, '0')}` : '#TIC26-0000')
   const nomorTiket = rawNomorTiket.startsWith('#') ? rawNomorTiket : `#${rawNomorTiket}`
@@ -130,7 +131,22 @@ export function renderTicketEmailHtml({
   const statusTiket = ticket?.status_tiket || 'Open'
   const prioritasTiket = ticket?.prioritas || 'Normal'
   const unitSupport = ticket?.queue_nama || ticket?.queue_kode || ticket?.kategori || 'IT Support'
-  const pelaporNama = ticket?.pelapor || '-'
+  const pelaporNama =
+    (typeof ticket?.pelapor === 'string' && !/^\d+$/.test(ticket.pelapor.trim()))
+      ? ticket.pelapor
+      : (ticket?.pelapor_nama || '-')
+
+  const frontendBaseUrl = (
+    process.env.FRONTEND_URL ||
+    process.env.APP_URL ||
+    'http://localhost:5173'
+  ).replace(/\/+$/, '')
+
+  const ticketUrl = customTicketUrl || (
+    ticket?.id
+      ? `${frontendBaseUrl}/tickets?id=${ticket.id}${commentPesan ? '&tab=comments' : ''}`
+      : `${frontendBaseUrl}/tickets`
+  )
 
   // Semantic Status Tokens according to DESIGN.md
   const statusConfigMap = {
@@ -280,7 +296,7 @@ export function renderTicketEmailHtml({
           <p style="font-size: 13px; color: #64748B; margin: 0 0 14px 0;">
             ${actionText || 'Silakan buka aplikasi untuk memantau status atau merespons tiket ini.'}
           </p>
-          <a href="#" style="background: linear-gradient(135deg, #0A51B0 0%, #0A5DBD 50%, #0892F5 100%); color: #FFFFFF; text-decoration: none; padding: 12px 28px; border-radius: 8px; font-size: 13.5px; font-weight: 700; display: inline-block; box-shadow: 0 2px 8px rgba(10, 81, 176, 0.25);">
+          <a href="${ticketUrl}" style="background: linear-gradient(135deg, #0A51B0 0%, #0A5DBD 50%, #0892F5 100%); color: #FFFFFF; text-decoration: none; padding: 12px 28px; border-radius: 8px; font-size: 13.5px; font-weight: 700; display: inline-block; box-shadow: 0 2px 8px rgba(10, 81, 176, 0.25);">
             Buka Tiket di ESB TrackIT &rarr;
           </a>
         </div>

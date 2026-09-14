@@ -373,6 +373,10 @@ export async function loadTicketAccessContext(
     `SELECT
        t.id,
        t.nomor_tiket,
+       t.judul,
+       t.deskripsi,
+       t.kategori,
+       t.prioritas,
        t.status_tiket,
        t.queue_id,
        t.pelapor_user_id,

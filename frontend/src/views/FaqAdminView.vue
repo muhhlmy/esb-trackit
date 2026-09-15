@@ -249,7 +249,7 @@ onMounted(fetchFaqs)
       <div class="space-y-1 sm:space-y-1.5 w-full sm:w-auto">
         <!-- Breadcrumb -->
         <div
-          class="flex items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs font-semibold text-[#64748B] dark:text-slate-400"
+          class="flex items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs font-semibold text-[#5F7089] dark:text-slate-400"
         >
           <RouterLink to="/" class="hover:text-[#333333] transition-colors flex items-center gap-1">
             <span>Help Center</span>
@@ -270,7 +270,7 @@ onMounted(fetchFaqs)
         </h1>
 
         <p
-          class="text-xs sm:text-sm text-[#64748B] dark:text-slate-400 font-medium leading-relaxed"
+          class="text-xs sm:text-sm text-[#5F7089] dark:text-slate-400 font-medium leading-relaxed"
         >
           Kelola daftar pertanyaan dan jawaban yang tampil di Help Center publik.
         </p>
@@ -294,7 +294,7 @@ onMounted(fetchFaqs)
       >
         <div class="space-y-0.5 sm:space-y-1 min-w-0">
           <span
-            class="text-[10px] sm:text-xs font-semibold text-[#64748B] dark:text-slate-400 truncate block"
+            class="text-[10px] sm:text-xs font-semibold text-[#5F7089] dark:text-slate-400 truncate block"
             >Total Questions</span
           >
           <p
@@ -321,7 +321,7 @@ onMounted(fetchFaqs)
       >
         <div class="space-y-0.5 sm:space-y-1 min-w-0">
           <span
-            class="text-[10px] sm:text-xs font-semibold text-[#64748B] dark:text-slate-400 truncate block"
+            class="text-[10px] sm:text-xs font-semibold text-[#5F7089] dark:text-slate-400 truncate block"
             >Published</span
           >
           <p
@@ -348,7 +348,7 @@ onMounted(fetchFaqs)
       >
         <div class="space-y-0.5 sm:space-y-1 min-w-0">
           <span
-            class="text-[10px] sm:text-xs font-semibold text-[#64748B] dark:text-slate-400 truncate block"
+            class="text-[10px] sm:text-xs font-semibold text-[#5F7089] dark:text-slate-400 truncate block"
             >Drafts</span
           >
           <p
@@ -391,14 +391,14 @@ onMounted(fetchFaqs)
       <!-- Left: Search Input -->
       <div class="relative flex-1 sm:max-w-md w-full">
         <Search
-          class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8] pointer-events-none"
+          class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#687281] pointer-events-none"
         />
         <input
           v-model="searchQuery"
           type="text"
           aria-label="Cari pertanyaan atau jawaban FAQ"
           placeholder="Search questions or answer keywords..."
-          class="w-full bg-[#F8FAFC] dark:bg-slate-800/80 border border-[#E5EAEF] dark:border-slate-700 rounded-xl pl-9 sm:pl-10 pr-9 py-2 text-xs sm:text-sm font-medium text-[#333333] dark:text-white placeholder-[#94A3B8] focus:outline-none focus:border-[#0A51B0] focus:bg-white dark:focus:bg-slate-900 transition-all"
+          class="w-full bg-[#F8FAFC] dark:bg-slate-800/80 border border-[#E5EAEF] dark:border-slate-700 rounded-xl pl-9 sm:pl-10 pr-9 py-2 text-xs sm:text-sm font-medium text-[#333333] dark:text-white placeholder-[#687281] focus:outline-none focus:border-[#0A51B0] focus:bg-white dark:focus:bg-slate-900 transition-all"
         />
         <button
           v-if="searchQuery"
@@ -428,7 +428,7 @@ onMounted(fetchFaqs)
             :class="
               selectedStatus === st.key
                 ? 'bg-white dark:bg-slate-900 text-[#333333] dark:text-indigo-400 shadow-2xs'
-                : 'text-[#64748B] dark:text-slate-400 hover:text-[#333333] dark:hover:text-white'
+                : 'text-[#5F7089] dark:text-slate-400 hover:text-[#333333] dark:hover:text-white'
             "
           >
             {{ st.label }}
@@ -466,7 +466,7 @@ onMounted(fetchFaqs)
       <!-- Loading State -->
       <div
         v-if="isLoading"
-        class="py-12 px-6 text-center text-xs font-bold text-[#64748B] dark:text-slate-400 flex items-center justify-center gap-2"
+        class="py-12 px-6 text-center text-xs font-bold text-[#5F7089] dark:text-slate-400 flex items-center justify-center gap-2"
       >
         <RefreshCw class="w-4 h-4 animate-spin text-[#333333]" />
         <span>Loading FAQ entries...</span>
@@ -484,7 +484,7 @@ onMounted(fetchFaqs)
             <p class="text-sm font-extrabold text-[#333333] dark:text-white">
               No FAQ entries found
             </p>
-            <p class="text-xs text-[#64748B] dark:text-slate-400">
+            <p class="text-xs text-[#5F7089] dark:text-slate-400">
               No FAQs match your current search query or active filter settings.
             </p>
             <button
@@ -508,7 +508,7 @@ onMounted(fetchFaqs)
               <div class="flex items-center justify-between gap-2">
                 <div class="flex items-center gap-2 min-w-0 flex-wrap">
                   <span
-                    class="inline-flex items-center px-2 py-0.5 rounded-md text-[10.5px] font-extrabold border capitalize shrink-0"
+                    class="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-extrabold border capitalize shrink-0"
                     :class="getCategoryBadgeClass(f.category)"
                   >
                     {{ f.category }}
@@ -558,14 +558,14 @@ onMounted(fetchFaqs)
 
               <!-- Answer Snippet -->
               <p
-                class="text-[11.5px] text-[#64748B] dark:text-slate-400 font-normal leading-relaxed line-clamp-3 break-words bg-slate-50 dark:bg-slate-950/50 p-2.5 rounded-xl border border-slate-100 dark:border-slate-800/80"
+                class="text-[12px] text-[#5F7089] dark:text-slate-400 font-normal leading-relaxed line-clamp-3 break-words bg-slate-50 dark:bg-slate-950/50 p-2.5 rounded-xl border border-slate-100 dark:border-slate-800/80"
               >
                 {{ f.answer }}
               </p>
 
               <!-- Footer Metadata: Sort Order & Updated Date -->
               <div
-                class="flex items-center justify-between text-[11px] text-[#64748B] dark:text-slate-400 pt-1 border-t border-slate-100 dark:border-slate-800/60 font-medium"
+                class="flex items-center justify-between text-[11px] text-[#5F7089] dark:text-slate-400 pt-1 border-t border-slate-100 dark:border-slate-800/60 font-medium"
               >
                 <span class="font-mono text-slate-500 dark:text-slate-400">
                   Order:
@@ -580,7 +580,7 @@ onMounted(fetchFaqs)
           <div class="hidden xl:block overflow-x-auto">
             <table class="w-full text-left text-xs border-collapse">
               <thead
-                class="bg-[#F8FAFC] dark:bg-slate-950/80 border-b border-[#E5EAEF] dark:border-slate-800 text-[#64748B] dark:text-slate-400 font-extrabold uppercase tracking-wider text-[10.5px]"
+                class="bg-[#F8FAFC] dark:bg-slate-950/80 border-b border-[#E5EAEF] dark:border-slate-800 text-[#5F7089] dark:text-slate-400 font-extrabold uppercase tracking-wider text-[11px]"
               >
                 <tr>
                   <th class="py-4 px-6">Question &amp; Answer</th>
@@ -605,7 +605,7 @@ onMounted(fetchFaqs)
                       {{ f.question }}
                     </div>
                     <div
-                      class="text-[11px] text-[#64748B] dark:text-slate-400 line-clamp-1 mt-1 font-normal max-w-md"
+                      class="text-[11px] text-[#5F7089] dark:text-slate-400 line-clamp-1 mt-1 font-normal max-w-md"
                     >
                       {{ f.answer }}
                     </div>
@@ -614,7 +614,7 @@ onMounted(fetchFaqs)
                   <!-- Category Badge -->
                   <td class="py-4 px-4">
                     <span
-                      class="inline-flex items-center px-2.5 py-1 rounded-lg text-[10.5px] font-extrabold border capitalize"
+                      class="inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-extrabold border capitalize"
                       :class="getCategoryBadgeClass(f.category)"
                     >
                       {{ f.category }}
@@ -641,13 +641,13 @@ onMounted(fetchFaqs)
 
                   <!-- Sort Order -->
                   <td
-                    class="py-4 px-4 font-mono text-xs font-semibold text-[#64748B] dark:text-slate-400"
+                    class="py-4 px-4 font-mono text-xs font-semibold text-[#5F7089] dark:text-slate-400"
                   >
                     #{{ f.sort_order || 0 }}
                   </td>
 
                   <!-- Updated Date -->
-                  <td class="py-4 px-4 text-[#64748B] dark:text-slate-400 font-medium">
+                  <td class="py-4 px-4 text-[#5F7089] dark:text-slate-400 font-medium">
                     {{ formatDate(f.updated_at) }}
                   </td>
 
@@ -705,7 +705,7 @@ onMounted(fetchFaqs)
               required
               type="text"
               placeholder="Contoh: Bagaimana cara mereset kata sandi akun?"
-              class="w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] dark:bg-slate-800 px-3.5 py-2.5 text-base sm:text-xs font-semibold text-[#333333] dark:text-slate-100 placeholder-[#94A3B8] focus:border-[#0A51B0] focus:outline-none transition-all"
+              class="w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] dark:bg-slate-800 px-3.5 py-2.5 text-base sm:text-xs font-semibold text-[#333333] dark:text-slate-100 placeholder-[#687281] focus:border-[#0A51B0] focus:outline-none transition-all"
             />
           </div>
 
@@ -721,7 +721,7 @@ onMounted(fetchFaqs)
               required
               rows="5"
               placeholder="Tuliskan jawaban atau langkah penyelesaian yang mudah diikuti..."
-              class="w-full min-h-[140px] resize-y rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] dark:bg-slate-800 p-3.5 text-base sm:text-xs font-medium leading-[1.8] text-[#333333] dark:text-slate-100 placeholder-[#94A3B8] focus:border-[#0A51B0] focus:outline-none transition-all"
+              class="w-full min-h-[140px] resize-y rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] dark:bg-slate-800 p-3.5 text-base sm:text-xs font-medium leading-[1.8] text-[#333333] dark:text-slate-100 placeholder-[#687281] focus:border-[#0A51B0] focus:outline-none transition-all"
             ></textarea>
           </div>
         </section>
@@ -934,7 +934,7 @@ onMounted(fetchFaqs)
   margin-bottom: 8px;
 }
 .faq-section-hint {
-  color: #8291a7;
+  color: #667283;
   font-size: 11px;
   margin-bottom: 18px;
 }

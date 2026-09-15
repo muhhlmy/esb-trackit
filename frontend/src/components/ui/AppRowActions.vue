@@ -123,7 +123,7 @@ onBeforeUnmount(() => {
       @click.stop="toggleDropdown"
       aria-label="Opsi Aksi"
       title="Opsi Aksi"
-      class="flex h-7 w-7 items-center justify-center rounded-lg text-[#7C8BAC] hover:bg-[#F8FAFC] hover:text-[#333333] transition-all cursor-pointer"
+      class="flex h-7 w-7 items-center justify-center rounded-lg text-[#66728d] hover:bg-[#F8FAFC] hover:text-[#333333] transition-all cursor-pointer"
       :class="isOpen ? 'bg-[#ECF2FF] text-[#333333]' : ''"
     >
       <span aria-hidden="true" class="material-symbols-outlined text-[18px]">more_horiz</span>

@@ -59,7 +59,7 @@ function exportData() {
   >
     <div class="space-y-4">
       <div class="flex items-start gap-3 rounded-2xl border border-[#CFE0F8] bg-[#F4F8FF] p-4">
-        <span class="material-symbols-outlined text-[24px] text-[#0A51B0]">table_view</span>
+        <span aria-hidden="true" class="material-symbols-outlined text-[24px] text-[#0A51B0]">table_view</span>
         <div>
           <p class="text-sm font-bold text-slate-800">Data siap diunduh</p>
           <p class="mt-1 text-xs leading-relaxed text-slate-500">Export berisi data Aset {{ label }} yang sedang tampil setelah filter diterapkan.</p>
@@ -73,7 +73,7 @@ function exportData() {
       <div class="flex flex-col-reverse gap-2 border-t border-slate-200 pt-4 sm:flex-row sm:justify-end">
         <button type="button" @click="emit('close')" class="min-h-10 rounded-xl border border-slate-200 px-4 text-xs font-bold text-slate-600 hover:bg-slate-50">Batal</button>
         <button type="button" :disabled="!assets.length" @click="exportData" class="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl bg-[#0A51B0] px-5 text-xs font-bold text-white hover:bg-[#08458f] disabled:cursor-not-allowed disabled:opacity-50">
-          <span class="material-symbols-outlined text-[17px]">download</span>Unduh XLSX
+          <span aria-hidden="true" class="material-symbols-outlined text-[17px]">download</span>Unduh XLSX
         </button>
       </div>
     </div>

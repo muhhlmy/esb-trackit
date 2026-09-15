@@ -70,8 +70,8 @@ const filteredTemplates = computed(() => {
         <input
           v-model="templateSearch"
           type="text"
-          class="w-full bg-slate-900 border border-slate-800 rounded-xl pl-9 pr-4 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-all"
-          placeholder="Filter template pesan..."
+          class="w-full bg-slate-900 border border-slate-800 rounded-xl pl-9 pr-4 py-2 text-xs text-slate-100 placeholder-slate-400 focus:outline-none focus:border-indigo-500 transition-all"
+          aria-label="Filter template" placeholder="Filter template pesan..."
         />
       </div>
     </div>

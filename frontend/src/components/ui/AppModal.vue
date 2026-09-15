@@ -145,7 +145,7 @@ onBeforeUnmount(() => {
                 </h2>
                 <p
                   v-if="subtitle"
-                  class="text-[11px] font-normal text-[#64748B] mt-0.5 leading-none truncate"
+                  class="text-[11px] font-normal text-[#5F7089] mt-0.5 leading-none truncate"
                 >
                   {{ subtitle }}
                 </p>
@@ -205,6 +205,6 @@ onBeforeUnmount(() => {
   border-radius: 9999px;
 }
 .modal-body::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: #687281;
 }
 </style>

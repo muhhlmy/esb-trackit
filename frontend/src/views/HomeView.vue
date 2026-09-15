@@ -645,7 +645,7 @@ onMounted(async () => {
 <style scoped>
 .help-home {
   --ink: #333333;
-  --muted: #64748b;
+  --muted: #5F7089;
   --line: #e1e7ef;
   --surface: #fff;
   --canvas: #f5f7fb;
@@ -745,7 +745,7 @@ onMounted(async () => {
   padding: 7px 7px 7px 17px;
   border-radius: 12px;
   background: white;
-  color: #64748b;
+  color: #5F7089;
   box-shadow: 0 8px 24px #071b3726;
 }
 .help-search > svg {
@@ -1342,7 +1342,7 @@ onMounted(async () => {
     line-height: 1.5;
   }
   .section-kicker {
-    font-size: 9px;
+    font-size: 10px;
   }
   .topics-section {
     margin-top: 26px;

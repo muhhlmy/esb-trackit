@@ -668,13 +668,13 @@ onMounted(fetchData)
       <div
         class="flex h-9 w-9 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-xl bg-[#EDF5FF] text-[#0A5DBD] border border-[#B8D4F5]/40"
       >
-        <span class="material-symbols-outlined text-[20px] sm:text-[22px]">assignment</span>
+        <span aria-hidden="true" class="material-symbols-outlined text-[20px] sm:text-[22px]">assignment</span>
       </div>
       <div class="min-w-0">
         <h1 class="text-base sm:text-lg font-bold text-[#333333] tracking-tight truncate">
           Formulir Serah Terima Aset
         </h1>
-        <p class="text-xs font-normal text-[#64748B] mt-0.5 truncate">
+        <p class="text-xs font-normal text-[#5F7089] mt-0.5 truncate">
           Dokumentasi &amp; Berita Acara Serah Terima (BAST) perangkat IT &amp; inventaris
         </p>
       </div>
@@ -785,7 +785,7 @@ onMounted(fetchData)
       role="alert"
       class="flex items-center gap-3 rounded-2xl border border-rose-200 bg-rose-50 p-5 text-[13px] text-rose-700 shadow-2xs"
     >
-      <span class="material-symbols-outlined text-[20px] shrink-0 text-rose-600">error</span>
+      <span aria-hidden="true" class="material-symbols-outlined text-[20px] shrink-0 text-rose-600">error</span>
       <span class="flex-1 font-medium">{{ pageError }}</span>
       <button
         type="button"
@@ -805,7 +805,7 @@ onMounted(fetchData)
         aria-live="assertive"
         class="flex items-start sm:items-center gap-3 p-4 rounded-2xl border border-rose-300 bg-rose-50 text-rose-800 text-[12px] font-semibold shadow-2xs"
       >
-        <span class="material-symbols-outlined shrink-0 text-[20px] text-rose-600">error</span>
+        <span aria-hidden="true" class="material-symbols-outlined shrink-0 text-[20px] text-rose-600">error</span>
         <span class="flex-1 leading-relaxed">{{ validationError }}</span>
         <button
           type="button"
@@ -813,7 +813,7 @@ onMounted(fetchData)
           @click="validationError = ''"
           title="Tutup pesan error"
         >
-          <span class="material-symbols-outlined text-[18px]">close</span>
+          <span aria-hidden="true" class="material-symbols-outlined text-[18px]">close</span>
         </button>
       </div>
 
@@ -832,7 +832,7 @@ onMounted(fetchData)
               <h2 class="text-[14px] sm:text-[15px] font-bold text-[#333333]">
                 Profil Pihak Terkait
               </h2>
-              <p class="text-[11.5px] text-[#64748B]">
+              <p class="text-[12px] text-[#5F7089]">
                 Tentukan identitas pihak pemberi dan penerima aset
               </p>
             </div>
@@ -845,7 +845,7 @@ onMounted(fetchData)
             class="flex flex-col gap-3.5 rounded-xl sm:rounded-2xl border border-slate-200/80 bg-slate-50/50 p-4"
           >
             <div class="flex items-center gap-2">
-              <span class="material-symbols-outlined text-[18px] text-[#333333]"
+              <span aria-hidden="true" class="material-symbols-outlined text-[18px] text-[#333333]"
                 >person_outline</span
               >
               <h3 class="text-xs font-bold uppercase tracking-wider text-[#333333]">
@@ -854,7 +854,7 @@ onMounted(fetchData)
             </div>
 
             <label class="flex flex-col gap-1.5">
-              <span class="text-[10.5px] font-bold uppercase text-[#475569]">Pilih Karyawan *</span>
+              <span class="text-[11px] font-bold uppercase text-[#475569]">Pilih Karyawan *</span>
               <SearchableSelect
                 v-model="form.pemberiNik"
                 :options="employees"
@@ -869,7 +869,7 @@ onMounted(fetchData)
 
             <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <label class="flex flex-col gap-1.5">
-                <span class="text-[10px] font-bold uppercase text-[#64748B]"
+                <span class="text-[10px] font-bold uppercase text-[#5F7089]"
                   >Nama Lengkap (Auto)</span
                 >
                 <input
@@ -884,7 +884,7 @@ onMounted(fetchData)
               </label>
 
               <label class="flex flex-col gap-1.5">
-                <span class="text-[10px] font-bold uppercase text-[#64748B]"
+                <span class="text-[10px] font-bold uppercase text-[#5F7089]"
                   >Direktorat (Auto)</span
                 >
                 <input
@@ -906,7 +906,7 @@ onMounted(fetchData)
           >
             <div class="flex flex-wrap items-center justify-between gap-2">
               <div class="flex items-center gap-2">
-                <span class="material-symbols-outlined text-[18px] text-amber-600">person_add</span>
+                <span aria-hidden="true" class="material-symbols-outlined text-[18px] text-amber-600">person_add</span>
                 <h3 class="text-xs font-bold uppercase tracking-wider text-amber-600">
                   Pihak Penerima
                 </h3>
@@ -926,7 +926,7 @@ onMounted(fetchData)
             </div>
 
             <label v-if="!form.isPenerimaLainnya" class="flex flex-col gap-1.5">
-              <span class="text-[10.5px] font-bold uppercase text-[#475569]">Pilih Karyawan *</span>
+              <span class="text-[11px] font-bold uppercase text-[#475569]">Pilih Karyawan *</span>
               <SearchableSelect
                 v-model="form.penerimaNik"
                 :options="employees"
@@ -940,7 +940,7 @@ onMounted(fetchData)
             </label>
 
             <div v-else class="flex flex-col gap-1.5">
-              <span class="text-[10.5px] font-bold uppercase text-[#475569]"
+              <span class="text-[11px] font-bold uppercase text-[#475569]"
                 >Nama Lengkap / Vendor *</span
               >
               <input
@@ -948,14 +948,14 @@ onMounted(fetchData)
                 required
                 type="text"
                 aria-label="Nama Lengkap / Vendor Penerima"
-                class="h-10 w-full rounded-xl border border-[#E2E8F0] bg-white px-3 text-xs font-medium text-[#333333] placeholder-[#94A3B8] focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 focus:outline-none transition-all"
+                class="h-10 w-full rounded-xl border border-[#E2E8F0] bg-white px-3 text-xs font-medium text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 focus:outline-none transition-all"
                 placeholder="Tulis nama lengkap penerima atau vendor..."
               />
             </div>
 
             <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <label v-if="!form.isPenerimaLainnya" class="flex flex-col gap-1.5">
-                <span class="text-[10px] font-bold uppercase text-[#64748B]"
+                <span class="text-[10px] font-bold uppercase text-[#5F7089]"
                   >Nama Lengkap (Auto)</span
                 >
                 <input
@@ -973,7 +973,7 @@ onMounted(fetchData)
                 class="flex flex-col gap-1.5"
                 :class="form.isPenerimaLainnya ? 'sm:col-span-2' : ''"
               >
-                <span class="text-[10px] font-bold uppercase text-[#64748B]">
+                <span class="text-[10px] font-bold uppercase text-[#5F7089]">
                   {{ form.isPenerimaLainnya ? 'Direktorat / Perusahaan *' : 'Direktorat (Auto)' }}
                 </span>
                 <input
@@ -989,7 +989,7 @@ onMounted(fetchData)
                   :class="
                     !form.isPenerimaLainnya
                       ? 'border-slate-200 bg-slate-100/70 text-slate-600 cursor-default'
-                      : 'border-[#E2E8F0] bg-white text-[#333333] placeholder-[#94A3B8] focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10'
+                      : 'border-[#E2E8F0] bg-white text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10'
                   "
                   :readonly="!form.isPenerimaLainnya"
                   :placeholder="
@@ -1019,7 +1019,7 @@ onMounted(fetchData)
               <h2 class="text-[14px] sm:text-[15px] font-bold text-[#333333]">
                 Tujuan Serah Terima Aset
               </h2>
-              <p class="text-[11.5px] text-[#64748B]">
+              <p class="text-[12px] text-[#5F7089]">
                 Pilih salah satu keperluan serah terima perangkat
               </p>
             </div>
@@ -1085,7 +1085,7 @@ onMounted(fetchData)
                 class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-[16px]"
                 :class="form.tujuan === t.key ? 'bg-white text-[#333333] shadow-2xs' : t.color"
               >
-                <span class="material-symbols-outlined text-[16px]">{{ t.icon }}</span>
+                <span aria-hidden="true" class="material-symbols-outlined text-[16px]">{{ t.icon }}</span>
               </span>
               <span
                 class="text-xs font-bold truncate"
@@ -1114,7 +1114,7 @@ onMounted(fetchData)
             required
             type="text"
             aria-label="Keterangan Tujuan Serah Terima Lainnya"
-            class="h-10 w-full rounded-xl border border-[#E2E8F0] bg-white px-3 text-xs font-medium text-[#333333] placeholder-[#94A3B8] focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 focus:outline-none transition-all"
+            class="h-10 w-full rounded-xl border border-[#E2E8F0] bg-white px-3 text-xs font-medium text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 focus:outline-none transition-all"
             placeholder="Tuliskan tujuan serah terima aset lainnya..."
           />
         </div>
@@ -1137,7 +1137,7 @@ onMounted(fetchData)
                 <h2 class="text-[14px] sm:text-[15px] font-bold text-[#333333] truncate">
                   Aset Baru (Diserahkan)
                 </h2>
-                <p class="text-[11.5px] text-[#64748B] truncate">
+                <p class="text-[12px] text-[#5F7089] truncate">
                   Perangkat yang diserahkan ke penerima
                 </p>
               </div>
@@ -1148,7 +1148,7 @@ onMounted(fetchData)
               @click="addAssetBaruRow"
               class="h-8.5 shrink-0 whitespace-nowrap rounded-xl bg-[#0A51B0] px-3 text-xs font-bold text-white shadow-2xs hover:bg-[#0A4391] active:scale-95 transition-all flex items-center justify-center gap-1 cursor-pointer"
             >
-              <span class="material-symbols-outlined text-[15px]">add</span>
+              <span aria-hidden="true" class="material-symbols-outlined text-[15px]">add</span>
               <span>Tambah Unit</span>
             </button>
           </div>
@@ -1166,7 +1166,7 @@ onMounted(fetchData)
                 <span
                   class="inline-flex items-center gap-1.5 rounded-lg bg-[#EDF5FF] px-2.5 py-0.5 text-[11px] font-bold text-[#333333] border border-[#B8D4F5]/40"
                 >
-                  <span class="material-symbols-outlined text-[14px]">devices</span>
+                  <span aria-hidden="true" class="material-symbols-outlined text-[14px]">devices</span>
                   Unit Baru #{{ index + 1 }}
                 </span>
 
@@ -1174,10 +1174,10 @@ onMounted(fetchData)
                   v-if="asetBaruList.length > 1"
                   type="button"
                   @click="removeAssetBaruRow(index)"
-                  class="flex h-7 items-center gap-1 rounded-lg bg-rose-50 px-2 text-[10.5px] font-bold text-rose-600 hover:bg-rose-100 active:scale-95 transition-all cursor-pointer border border-rose-200/60"
+                  class="flex h-7 items-center gap-1 rounded-lg bg-rose-50 px-2 text-[11px] font-bold text-rose-600 hover:bg-rose-100 active:scale-95 transition-all cursor-pointer border border-rose-200/60"
                   title="Hapus baris unit ini"
                 >
-                  <span class="material-symbols-outlined text-[14px]">delete</span>
+                  <span aria-hidden="true" class="material-symbols-outlined text-[14px]">delete</span>
                   <span>Hapus</span>
                 </button>
               </div>
@@ -1199,41 +1199,41 @@ onMounted(fetchData)
 
               <div class="grid grid-cols-1 sm:grid-cols-4 gap-2.5 sm:gap-2">
                 <label class="flex flex-col gap-1.5 sm:col-span-3">
-                  <span class="text-[9.5px] font-bold uppercase text-[#64748B]"
+                  <span class="text-[9.5px] font-bold uppercase text-[#5F7089]"
                     >Deskripsi / Tipe (Auto)</span
                   >
                   <input
                     v-model="row.tipe"
                     type="text"
                     :aria-label="`Deskripsi Aset Baru Baris ${index + 1}`"
-                    class="h-9.5 w-full rounded-xl border border-slate-200 bg-slate-100/70 px-3 text-[11.5px] font-medium text-slate-600 outline-none cursor-default"
+                    class="h-9.5 w-full rounded-xl border border-slate-200 bg-slate-100/70 px-3 text-[12px] font-medium text-slate-600 outline-none cursor-default"
                     readonly
                     placeholder="Tipe perangkat"
                   />
                 </label>
 
                 <label class="flex flex-col gap-1.5 sm:col-span-1">
-                  <span class="text-[9.5px] font-bold uppercase text-[#64748B]">Qty</span>
+                  <span class="text-[9.5px] font-bold uppercase text-[#5F7089]">Qty</span>
                   <input
                     v-model="row.qty"
                     required
                     type="number"
                     min="1"
                     :aria-label="`Jumlah (Qty) Aset Baru Baris ${index + 1}`"
-                    class="h-9.5 w-full rounded-xl border border-[#E2E8F0] bg-white px-2.5 text-[11.5px] font-bold text-center text-[#333333] focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 focus:outline-none transition-all"
+                    class="h-9.5 w-full rounded-xl border border-[#E2E8F0] bg-white px-2.5 text-[12px] font-bold text-center text-[#333333] focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 focus:outline-none transition-all"
                   />
                 </label>
               </div>
 
               <label class="flex flex-col gap-1.5">
-                <span class="text-[9.5px] font-bold uppercase text-[#64748B]"
+                <span class="text-[9.5px] font-bold uppercase text-[#5F7089]"
                   >Spesifikasi Lengkap (Auto)</span
                 >
                 <input
                   v-model="row.spesifikasi"
                   type="text"
                   :aria-label="`Spesifikasi Aset Baru Baris ${index + 1}`"
-                  class="h-9.5 w-full rounded-xl border border-slate-200 bg-slate-100/70 px-3 text-[11.5px] font-medium text-slate-600 outline-none cursor-default"
+                  class="h-9.5 w-full rounded-xl border border-slate-200 bg-slate-100/70 px-3 text-[12px] font-medium text-slate-600 outline-none cursor-default"
                   readonly
                   placeholder="Merek / Model / Serial Number"
                 />
@@ -1257,7 +1257,7 @@ onMounted(fetchData)
                 <h2 class="text-[14px] sm:text-[15px] font-bold text-[#333333] truncate">
                   Aset Lama (Dikembalikan)
                 </h2>
-                <p class="text-[11.5px] text-[#64748B] truncate">
+                <p class="text-[12px] text-[#5F7089] truncate">
                   Perangkat lama jika ada penggantian
                 </p>
               </div>
@@ -1268,7 +1268,7 @@ onMounted(fetchData)
               @click="addAssetLamaRow"
               class="h-8.5 shrink-0 whitespace-nowrap rounded-xl bg-slate-800 px-3 text-xs font-bold text-white shadow-2xs hover:bg-slate-900 active:scale-95 transition-all flex items-center justify-center gap-1 cursor-pointer"
             >
-              <span class="material-symbols-outlined text-[15px]">add</span>
+              <span aria-hidden="true" class="material-symbols-outlined text-[15px]">add</span>
               <span>Tambah Unit</span>
             </button>
           </div>
@@ -1286,7 +1286,7 @@ onMounted(fetchData)
                 <span
                   class="inline-flex items-center gap-1.5 rounded-lg bg-amber-50 px-2.5 py-0.5 text-[11px] font-bold text-amber-700 border border-amber-200/60"
                 >
-                  <span class="material-symbols-outlined text-[14px]"
+                  <span aria-hidden="true" class="material-symbols-outlined text-[14px]"
                     >history_toggle_drop_down</span
                   >
                   Unit Lama #{{ index + 1 }}
@@ -1296,10 +1296,10 @@ onMounted(fetchData)
                   v-if="asetLamaList.length > 1"
                   type="button"
                   @click="removeAssetLamaRow(index)"
-                  class="flex h-7 items-center gap-1 rounded-lg bg-rose-50 px-2 text-[10.5px] font-bold text-rose-600 hover:bg-rose-100 active:scale-95 transition-all cursor-pointer border border-rose-200/60"
+                  class="flex h-7 items-center gap-1 rounded-lg bg-rose-50 px-2 text-[11px] font-bold text-rose-600 hover:bg-rose-100 active:scale-95 transition-all cursor-pointer border border-rose-200/60"
                   title="Hapus baris unit lama ini"
                 >
-                  <span class="material-symbols-outlined text-[14px]">delete</span>
+                  <span aria-hidden="true" class="material-symbols-outlined text-[14px]">delete</span>
                   <span>Hapus</span>
                 </button>
               </div>
@@ -1323,41 +1323,41 @@ onMounted(fetchData)
 
               <div class="grid grid-cols-1 sm:grid-cols-4 gap-2.5 sm:gap-2">
                 <label class="flex flex-col gap-1.5 sm:col-span-3">
-                  <span class="text-[9.5px] font-bold uppercase text-[#64748B]"
+                  <span class="text-[9.5px] font-bold uppercase text-[#5F7089]"
                     >Deskripsi / Tipe (Auto)</span
                   >
                   <input
                     v-model="row.tipe"
                     type="text"
                     :aria-label="`Deskripsi Aset Lama Baris ${index + 1}`"
-                    class="h-9.5 w-full rounded-xl border border-slate-200 bg-slate-100/70 px-3 text-[11.5px] font-medium text-slate-600 outline-none cursor-default"
+                    class="h-9.5 w-full rounded-xl border border-slate-200 bg-slate-100/70 px-3 text-[12px] font-medium text-slate-600 outline-none cursor-default"
                     readonly
                     placeholder="Tipe perangkat"
                   />
                 </label>
 
                 <label class="flex flex-col gap-1.5 sm:col-span-1">
-                  <span class="text-[9.5px] font-bold uppercase text-[#64748B]">Qty</span>
+                  <span class="text-[9.5px] font-bold uppercase text-[#5F7089]">Qty</span>
                   <input
                     v-model="row.qty"
                     required
                     type="number"
                     min="1"
                     :aria-label="`Jumlah (Qty) Aset Lama Baris ${index + 1}`"
-                    class="h-9.5 w-full rounded-xl border border-[#E2E8F0] bg-white px-2.5 text-[11.5px] font-bold text-center text-[#333333] focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 focus:outline-none transition-all"
+                    class="h-9.5 w-full rounded-xl border border-[#E2E8F0] bg-white px-2.5 text-[12px] font-bold text-center text-[#333333] focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 focus:outline-none transition-all"
                   />
                 </label>
               </div>
 
               <label class="flex flex-col gap-1.5">
-                <span class="text-[9.5px] font-bold uppercase text-[#64748B]"
+                <span class="text-[9.5px] font-bold uppercase text-[#5F7089]"
                   >Spesifikasi Lengkap (Auto)</span
                 >
                 <input
                   v-model="row.spesifikasi"
                   type="text"
                   :aria-label="`Spesifikasi Aset Lama Baris ${index + 1}`"
-                  class="h-9.5 w-full rounded-xl border border-slate-200 bg-slate-100/70 px-3 text-[11.5px] font-medium text-slate-600 outline-none cursor-default"
+                  class="h-9.5 w-full rounded-xl border border-slate-200 bg-slate-100/70 px-3 text-[12px] font-medium text-slate-600 outline-none cursor-default"
                   readonly
                   placeholder="Merek / Model / Serial Number"
                 />
@@ -1381,7 +1381,7 @@ onMounted(fetchData)
             <div>
               <h2 class="text-[14px] sm:text-[15px] font-bold text-[#333333]">Diketahui Oleh
               </h2>
-              <p class="text-[11.5px] text-[#64748B]">
+              <p class="text-[12px] text-[#5F7089]">
                 Pilih atau tulis identitas pihak yang mengetahui untuk dicantumkan pada lembar tanda tangan formulir
               </p>
             </div>
@@ -1402,7 +1402,7 @@ onMounted(fetchData)
           <!-- Pilih Karyawan / PBP -->
           <div v-if="!form.isMengetahuiKustom" class="flex flex-col gap-1.5">
             <div class="flex items-center justify-between">
-              <span class="text-[10.5px] font-bold uppercase text-[#475569]">Pilih Karyawan / PBP</span>
+              <span class="text-[11px] font-bold uppercase text-[#475569]">Pilih Karyawan / PBP</span>
               <span class="text-[10px] text-slate-400 font-medium">(Opsional)</span>
             </div>
             <SearchableSelect
@@ -1419,19 +1419,19 @@ onMounted(fetchData)
           </div>
 
           <div v-else class="flex flex-col gap-1.5">
-            <span class="text-[10.5px] font-bold uppercase text-[#475569]">Nama Lengkap</span>
+            <span class="text-[11px] font-bold uppercase text-[#475569]">Nama Lengkap</span>
             <input
               v-model="form.mengetahuiNama"
               type="text"
               aria-label="Nama Lengkap yang Mengetahui"
-              class="h-10 w-full rounded-xl border border-[#E2E8F0] bg-white px-3 text-xs font-medium text-[#333333] placeholder-[#94A3B8] focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 focus:outline-none transition-all"
+              class="h-10 w-full rounded-xl border border-[#E2E8F0] bg-white px-3 text-xs font-medium text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 focus:outline-none transition-all"
               placeholder="Tulis nama lengkap yang mengetahui..."
             />
           </div>
 
           <!-- Nama Terpilih (Auto) -->
           <div v-if="!form.isMengetahuiKustom" class="flex flex-col gap-1.5">
-            <span class="text-[10px] font-bold uppercase text-[#64748B]">Nama Lengkap Terpilih</span>
+            <span class="text-[10px] font-bold uppercase text-[#5F7089]">Nama Lengkap Terpilih</span>
             <input
               v-model="form.mengetahuiNama"
               type="text"
@@ -1447,14 +1447,14 @@ onMounted(fetchData)
             class="flex flex-col gap-1.5"
             :class="form.isMengetahuiKustom ? 'sm:col-span-1 lg:col-span-2' : ''"
           >
-            <span class="text-[10px] font-bold uppercase text-[#64748B]">
+            <span class="text-[10px] font-bold uppercase text-[#5F7089]">
               Jabatan / Unit Pada Dokumen
             </span>
             <input
               v-model="form.mengetahuiJabatan"
               type="text"
               aria-label="Jabatan atau Unit yang Mengetahui"
-              class="h-10 w-full rounded-xl border border-[#E2E8F0] bg-white px-3 text-xs font-medium text-[#333333] placeholder-[#94A3B8] focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 focus:outline-none transition-all"
+              class="h-10 w-full rounded-xl border border-[#E2E8F0] bg-white px-3 text-xs font-medium text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 focus:outline-none transition-all"
               placeholder="People Business Partner atau Asset Management"
             />
           </div>
@@ -1469,7 +1469,7 @@ onMounted(fetchData)
           <span
             class="text-xs font-bold text-[#333333] whitespace-nowrap flex items-center gap-1.5"
           >
-            <span class="material-symbols-outlined text-[18px] text-slate-400">calendar_today</span>
+            <span aria-hidden="true" class="material-symbols-outlined text-[18px] text-slate-400">calendar_today</span>
             Tanggal Serah Terima:
           </span>
           <input
@@ -1485,7 +1485,7 @@ onMounted(fetchData)
           type="submit"
           class="h-11 w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-[#0A51B0] px-6 text-xs font-bold text-white shadow-2xs hover:bg-[#0A4391] active:scale-95 transition-all cursor-pointer"
         >
-          <span class="material-symbols-outlined text-[18px]">picture_as_pdf</span>
+          <span aria-hidden="true" class="material-symbols-outlined text-[18px]">picture_as_pdf</span>
           <span>Cetak Formulir Serah Terima (PDF)</span>
         </button>
       </div>
@@ -1518,7 +1518,7 @@ onMounted(fetchData)
   min-width: 0;
   font-size: 12px;
   line-height: 1.5;
-  color: #64748b;
+  color: #5F7089;
   font-weight: 500;
 }
 .submission-steps li > span {

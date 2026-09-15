@@ -748,7 +748,7 @@ onBeforeUnmount(() => {
           {{ pageTitle }}
         </h1>
         <p
-          class="hidden md:block truncate text-[10px] font-medium text-[#71829B] leading-relaxed mt-1"
+          class="hidden md:block truncate text-[10px] font-medium text-[#637288] leading-relaxed mt-1"
         >
           {{ pageSubtitle }}
         </p>
@@ -782,7 +782,7 @@ onBeforeUnmount(() => {
             autocomplete="off"
             @focus="initGlobalSearchData"
             :placeholder="searchPlaceholder"
-            class="h-11 md:h-9 w-full rounded-lg md:rounded-lg border border-[#DFE5EF] bg-[#F8FAFC] pl-10 md:pl-9 pr-12 md:pr-20 text-[11px] sm:text-xs font-medium text-[#333333] placeholder-[#64748B] outline-none transition-all focus:bg-white focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/20 [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden"
+            class="h-11 md:h-9 w-full rounded-lg md:rounded-lg border border-[#DFE5EF] bg-[#F8FAFC] pl-10 md:pl-9 pr-12 md:pr-20 text-[11px] sm:text-xs font-medium text-[#333333] placeholder-[#5F7089] outline-none transition-all focus:bg-white focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/20 [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden"
           />
 
           <!-- Action Buttons / Hotkey Indicator -->
@@ -809,7 +809,7 @@ onBeforeUnmount(() => {
 
             <kbd
               v-if="!searchQuery"
-              class="hidden md:inline-flex items-center rounded-md border border-[#E2E8F0] bg-white px-1.5 py-0.5 text-[9px] font-mono font-semibold text-[#475569] shadow-2xs"
+              class="hidden md:inline-flex items-center rounded-md border border-[#E2E8F0] bg-white px-1.5 py-0.5 text-[10px] font-mono font-semibold text-[#475569] shadow-2xs"
             >
               Ctrl K
             </kbd>
@@ -833,15 +833,15 @@ onBeforeUnmount(() => {
                   @click="closeSearch"
                   aria-label="Tutup pencarian"
                   title="Tutup pencarian"
-                  class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-[#64748B] hover:bg-[#F1F5F9] active:scale-95 touch-manipulation cursor-pointer"
+                  class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-[#5F7089] hover:bg-[#F1F5F9] active:scale-95 touch-manipulation cursor-pointer"
                 >
-                  <span class="material-symbols-outlined text-[22px]">arrow_back</span>
+                  <span aria-hidden="true" class="material-symbols-outlined text-[22px]">arrow_back</span>
                 </button>
 
                 <!-- Dedicated Mobile Search Input -->
                 <div class="relative flex flex-1 items-center min-w-0">
                   <span
-                    class="material-symbols-outlined absolute left-3 text-[17px] text-[#333333] pointer-events-none"
+                    aria-hidden="true" class="material-symbols-outlined absolute left-3 text-[17px] text-[#333333] pointer-events-none"
                   >
                     search
                   </span>
@@ -856,16 +856,16 @@ onBeforeUnmount(() => {
                     autocapitalize="off"
                     spellcheck="false"
                     placeholder="Cari aset, tiket, karyawan, user..."
-                    class="h-11 w-full rounded-xl border border-[#DFE5EF] bg-[#F8FAFC] pl-9 pr-11 text-xs font-medium text-[#333333] placeholder-[#64748B] outline-none transition-all focus:bg-white focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/20 [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden"
+                    class="h-11 w-full rounded-xl border border-[#DFE5EF] bg-[#F8FAFC] pl-9 pr-11 text-xs font-medium text-[#333333] placeholder-[#5F7089] outline-none transition-all focus:bg-white focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/20 [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden"
                   />
                   <button
                     v-if="searchQuery"
                     type="button"
                     @click="clearSearch"
                     aria-label="Bersihkan kata kunci"
-                    class="absolute right-0 flex h-11 w-11 items-center justify-center rounded-full text-[#64748B] hover:bg-[#E2E8F0] active:scale-90 touch-manipulation cursor-pointer"
+                    class="absolute right-0 flex h-11 w-11 items-center justify-center rounded-full text-[#5F7089] hover:bg-[#E2E8F0] active:scale-90 touch-manipulation cursor-pointer"
                   >
-                    <span class="material-symbols-outlined text-[15px]">close</span>
+                    <span aria-hidden="true" class="material-symbols-outlined text-[15px]">close</span>
                   </button>
                 </div>
 
@@ -918,14 +918,14 @@ onBeforeUnmount(() => {
                   :class="
                     searchTabFilter === tab.key
                       ? 'bg-[#0A51B0] text-white shadow-xs'
-                      : 'text-[#64748B] hover:bg-[#ECF2FF] hover:text-[#333333]'
+                      : 'text-[#5F7089] hover:bg-[#ECF2FF] hover:text-[#333333]'
                   "
                 >
-                  <span class="material-symbols-outlined text-[14px]">{{ tab.icon }}</span>
+                  <span aria-hidden="true" class="material-symbols-outlined text-[14px]">{{ tab.icon }}</span>
                   <span>{{ tab.label }}</span>
                   <span
                     v-if="searchQuery.trim() && tab.count !== undefined"
-                    class="ml-0.5 rounded-full px-1.5 py-0.2 text-[9px] font-extrabold"
+                    class="ml-0.5 rounded-full px-1.5 py-0.2 text-[10px] font-extrabold"
                     :class="
                       searchTabFilter === tab.key
                         ? 'bg-white/25 text-white'
@@ -941,7 +941,7 @@ onBeforeUnmount(() => {
                 v-if="isFetchingSearch"
                 role="status"
                 aria-live="polite"
-                class="flex items-center justify-center gap-2 py-8 text-[12px] text-[#94A3B8]"
+                class="flex items-center justify-center gap-2 py-8 text-[12px] text-[#687281]"
               >
                 <div
                   class="w-4 h-4 border-2 border-[#E2E8F0] border-t-[#0A51B0] rounded-full animate-spin"
@@ -955,7 +955,7 @@ onBeforeUnmount(() => {
                 class="search-start p-4 sm:p-5 text-center overflow-y-auto"
               >
                 <p
-                  class="text-[10.5px] sm:text-[11px] font-bold uppercase tracking-wider text-[#94A3B8] mb-2.5"
+                  class="text-[11px] sm:text-[11px] font-bold uppercase tracking-wider text-[#687281] mb-2.5"
                 >
                   Mulai pencarian Anda
                 </p>
@@ -1000,11 +1000,11 @@ onBeforeUnmount(() => {
                 "
                 class="flex flex-col items-center justify-center py-8 text-center px-4"
               >
-                <span class="material-symbols-outlined text-[36px] text-[#CBD5E1]">search_off</span>
-                <p class="text-[12px] font-semibold text-[#64748B] mt-1">
+                <span aria-hidden="true" class="material-symbols-outlined text-[36px] text-[#CBD5E1]">search_off</span>
+                <p class="text-[12px] font-semibold text-[#5F7089] mt-1">
                   Tidak ada hasil ditemukan untuk "{{ searchQuery }}"
                 </p>
-                <p class="text-[11px] text-[#94A3B8]">
+                <p class="text-[11px] text-[#687281]">
                   Coba kata kunci lain atau pilih kategori pencarian yang sesuai.
                 </p>
               </div>
@@ -1037,7 +1037,7 @@ onBeforeUnmount(() => {
                       <div
                         class="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-[#ECF2FF] text-[#333333] group-hover:bg-[#0A51B0] group-hover:text-white transition-all"
                       >
-                        <span class="material-symbols-outlined text-[17px]">devices</span>
+                        <span aria-hidden="true" class="material-symbols-outlined text-[17px]">devices</span>
                       </div>
                       <div class="min-w-0">
                         <p
@@ -1045,7 +1045,7 @@ onBeforeUnmount(() => {
                         >
                           {{ item.label_aset || item.hostname || 'Aset' }}
                         </p>
-                        <p class="text-[10px] font-medium text-[#71829B] truncate">
+                        <p class="text-[10px] font-medium text-[#637288] truncate">
                           {{ item.nomor_seri ? 'SN: ' + item.nomor_seri : '' }}
                           <span v-if="item.tipe_perangkat"> · {{ item.tipe_perangkat }}</span>
                           <span v-if="item.merek"> · {{ item.merek }} {{ item.model }}</span>
@@ -1056,7 +1056,7 @@ onBeforeUnmount(() => {
                       </div>
                     </div>
                     <span
-                      class="material-symbols-outlined text-[16px] text-[#CBD5E1] group-hover:text-[#333333] shrink-0"
+                      aria-hidden="true" class="material-symbols-outlined text-[16px] text-[#CBD5E1] group-hover:text-[#333333] shrink-0"
                       >chevron_right</span
                     >
                   </button>
@@ -1085,7 +1085,7 @@ onBeforeUnmount(() => {
                       <div
                         class="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-[#E6FFFA] text-[#13DEB9] group-hover:bg-[#13DEB9] group-hover:text-white transition-all"
                       >
-                        <span class="material-symbols-outlined text-[17px]">badge</span>
+                        <span aria-hidden="true" class="material-symbols-outlined text-[17px]">badge</span>
                       </div>
                       <div class="min-w-0">
                         <p
@@ -1093,14 +1093,14 @@ onBeforeUnmount(() => {
                         >
                           {{ item.nama_karyawan }}
                         </p>
-                        <p class="text-[10px] font-medium text-[#71829B] truncate">
+                        <p class="text-[10px] font-medium text-[#637288] truncate">
                           NIK: {{ item.nik }}
                           <span v-if="item.departemen">· {{ item.departemen }}</span>
                         </p>
                       </div>
                     </div>
                     <span
-                      class="material-symbols-outlined text-[16px] text-[#CBD5E1] group-hover:text-[#13DEB9] shrink-0"
+                      aria-hidden="true" class="material-symbols-outlined text-[16px] text-[#CBD5E1] group-hover:text-[#13DEB9] shrink-0"
                       >chevron_right</span
                     >
                   </button>
@@ -1129,7 +1129,7 @@ onBeforeUnmount(() => {
                       <div
                         class="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-[#FDEDE8] text-[#FA896B] group-hover:bg-[#FA896B] group-hover:text-white transition-all"
                       >
-                        <span class="material-symbols-outlined text-[17px]"
+                        <span aria-hidden="true" class="material-symbols-outlined text-[17px]"
                           >confirmation_number</span
                         >
                       </div>
@@ -1139,13 +1139,13 @@ onBeforeUnmount(() => {
                         >
                           {{ item.nomor_tiket }}: {{ item.judul }}
                         </p>
-                        <p class="text-[10px] font-medium text-[#71829B] truncate">
+                        <p class="text-[10px] font-medium text-[#637288] truncate">
                           Pelapor: {{ item.pelapor || 'User' }} · Status: {{ item.status_tiket }}
                         </p>
                       </div>
                     </div>
                     <span
-                      class="material-symbols-outlined text-[16px] text-[#CBD5E1] group-hover:text-[#FA896B] shrink-0"
+                      aria-hidden="true" class="material-symbols-outlined text-[16px] text-[#CBD5E1] group-hover:text-[#FA896B] shrink-0"
                       >chevron_right</span
                     >
                   </button>
@@ -1174,7 +1174,7 @@ onBeforeUnmount(() => {
                       <div
                         class="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-[#F3E8FF] text-[#7C3AED] group-hover:bg-[#7C3AED] group-hover:text-white transition-all"
                       >
-                        <span class="material-symbols-outlined text-[17px]">manage_accounts</span>
+                        <span aria-hidden="true" class="material-symbols-outlined text-[17px]">manage_accounts</span>
                       </div>
                       <div class="min-w-0">
                         <p
@@ -1182,13 +1182,13 @@ onBeforeUnmount(() => {
                         >
                           {{ item.nama }} ({{ item.email }})
                         </p>
-                        <p class="text-[10px] font-medium text-[#71829B] uppercase tracking-wide">
+                        <p class="text-[10px] font-medium text-[#637288] uppercase tracking-wide">
                           Role: {{ item.role }}
                         </p>
                       </div>
                     </div>
                     <span
-                      class="material-symbols-outlined text-[16px] text-[#CBD5E1] group-hover:text-[#7C3AED] shrink-0"
+                      aria-hidden="true" class="material-symbols-outlined text-[16px] text-[#CBD5E1] group-hover:text-[#7C3AED] shrink-0"
                       >chevron_right</span
                     >
                   </button>
@@ -1197,14 +1197,14 @@ onBeforeUnmount(() => {
 
               <!-- Popup Footer -->
               <div
-                class="search-popup-footer px-3.5 sm:px-4 py-2.5 sm:py-2.5 border-t border-[#F1F5F9] bg-[#FAFBFC] flex items-center justify-between text-[11px] font-semibold text-[#71829B] shrink-0 pb-[max(0.625rem,env(safe-area-inset-bottom))]"
+                class="search-popup-footer px-3.5 sm:px-4 py-2.5 sm:py-2.5 border-t border-[#F1F5F9] bg-[#FAFBFC] flex items-center justify-between text-[11px] font-semibold text-[#637288] shrink-0 pb-[max(0.625rem,env(safe-area-inset-bottom))]"
               >
                 <span class="hidden md:inline">
                   Tekan
                   <kbd class="font-mono bg-white px-1 border border-[#E2E8F0] rounded">ENTER</kbd>
                   untuk cari semua
                 </span>
-                <span class="md:hidden text-[#94A3B8] text-[11px]">
+                <span class="md:hidden text-[#687281] text-[11px]">
                   {{ searchResults.totalCount }} hasil ditemukan
                 </span>
                 <button
@@ -1236,7 +1236,7 @@ onBeforeUnmount(() => {
         @click="initGlobalSearchData"
         aria-label="Cari Global"
         title="Cari Global (Aset, Tiket, Karyawan, User)"
-        class="flex md:hidden h-9 w-9 items-center justify-center rounded-xl text-[#64748B] hover:bg-[#F8FAFC] hover:text-[#333333] transition-all cursor-pointer select-none active:scale-95 touch-manipulation"
+        class="flex md:hidden h-9 w-9 items-center justify-center rounded-xl text-[#5F7089] hover:bg-[#F8FAFC] hover:text-[#333333] transition-all cursor-pointer select-none active:scale-95 touch-manipulation"
       >
         <span aria-hidden="true" class="material-symbols-outlined text-[20px]">search</span>
       </button>
@@ -1251,7 +1251,7 @@ onBeforeUnmount(() => {
           type="button"
           :title="unreadCount > 0 ? `Notifikasi (${unreadCount})` : 'Notifikasi'"
           @click="toggleNotif"
-          class="relative flex h-9 w-9 items-center justify-center rounded-xl text-[#64748B] hover:bg-[#F8FAFC] hover:text-[#333333] transition-all cursor-pointer select-none active:scale-95 touch-manipulation"
+          class="relative flex h-9 w-9 items-center justify-center rounded-xl text-[#5F7089] hover:bg-[#F8FAFC] hover:text-[#333333] transition-all cursor-pointer select-none active:scale-95 touch-manipulation"
           :class="isNotifOpen ? 'bg-[#EDF5FF] text-[#333333]' : ''"
         >
           <span aria-hidden="true" class="material-symbols-outlined text-[20px]"
@@ -1279,7 +1279,7 @@ onBeforeUnmount(() => {
               class="flex items-center justify-between px-4 py-3 border-b border-[#F1F5F9] bg-white"
             >
               <div class="flex items-center gap-2">
-                <span class="material-symbols-outlined text-[18px] text-[#333333]"
+                <span aria-hidden="true" class="material-symbols-outlined text-[18px] text-[#333333]"
                   >notifications</span
                 >
                 <h3 class="text-xs font-bold text-[#333333]">Notifikasi</h3>
@@ -1292,10 +1292,10 @@ onBeforeUnmount(() => {
               <button
                 type="button"
                 @click="isNotifOpen = false"
-                class="flex h-6 w-6 items-center justify-center rounded-lg hover:bg-[#F8FAFC] text-[#64748B] transition-colors cursor-pointer"
+                class="flex h-6 w-6 items-center justify-center rounded-lg hover:bg-[#F8FAFC] text-[#5F7089] transition-colors cursor-pointer"
                 aria-label="Tutup notifikasi"
               >
-                <span class="material-symbols-outlined text-[16px]">close</span>
+                <span aria-hidden="true" class="material-symbols-outlined text-[16px]">close</span>
               </button>
             </div>
 
@@ -1312,14 +1312,14 @@ onBeforeUnmount(() => {
                 :class="
                   notifFilter === tab.key
                     ? 'bg-[#EFF6FF] text-[#333333] font-semibold border border-[#BFDBFE]/60'
-                    : 'text-[#64748B] hover:text-[#333333] hover:bg-white font-medium'
+                    : 'text-[#5F7089] hover:text-[#333333] hover:bg-white font-medium'
                 "
               >
                 <span>{{ tab.label }}</span>
                 <span
                   v-if="tab.count > 0"
                   class="text-[10px] px-1 rounded-md"
-                  :class="notifFilter === tab.key ? 'text-[#333333] font-bold' : 'text-[#94A3B8]'"
+                  :class="notifFilter === tab.key ? 'text-[#333333] font-bold' : 'text-[#687281]'"
                   >{{ tab.count }}</span
                 >
               </button>
@@ -1342,11 +1342,11 @@ onBeforeUnmount(() => {
                 v-else-if="latestNotifications.length === 0"
                 class="flex flex-col items-center justify-center gap-1.5 py-10 px-4 text-center"
               >
-                <span class="material-symbols-outlined text-[32px] text-[#CBD5E1]"
+                <span aria-hidden="true" class="material-symbols-outlined text-[32px] text-[#CBD5E1]"
                   >notifications_off</span
                 >
                 <p class="text-xs font-semibold text-[#333333]">Tidak ada notifikasi</p>
-                <p class="text-[11px] text-[#64748B]">Belum ada aktivitas baru di kategori ini.</p>
+                <p class="text-[11px] text-[#5F7089]">Belum ada aktivitas baru di kategori ini.</p>
               </div>
 
               <!-- Compact Activity Item -->
@@ -1377,14 +1377,14 @@ onBeforeUnmount(() => {
 
                   <!-- Secondary Detail / Description -->
                   <p
-                    class="text-[11.5px] font-normal text-[#64748B] mt-0.5 line-clamp-2 leading-relaxed"
+                    class="text-[12px] font-normal text-[#5F7089] mt-0.5 line-clamp-2 leading-relaxed"
                   >
                     {{ notif.message }}
                   </p>
 
                   <!-- Metadata -->
                   <div
-                    class="flex items-center gap-1.5 text-[10.5px] font-normal text-[#94A3B8] mt-1 flex-wrap"
+                    class="flex items-center gap-1.5 text-[11px] font-normal text-[#687281] mt-1 flex-wrap"
                   >
                     <span>{{ notif.nomor_tiket }}</span>
                     <template v-if="notif.status_tiket">
@@ -1406,7 +1406,7 @@ onBeforeUnmount(() => {
 
                 <!-- Action Chevron -->
                 <span
-                  class="material-symbols-outlined text-[16px] text-[#CBD5E1] group-hover:text-[#333333] shrink-0 mt-0.5 transition-colors"
+                  aria-hidden="true" class="material-symbols-outlined text-[16px] text-[#CBD5E1] group-hover:text-[#333333] shrink-0 mt-0.5 transition-colors"
                 >
                   chevron_right
                 </span>
@@ -1421,7 +1421,7 @@ onBeforeUnmount(() => {
                 class="inline-flex items-center gap-1 text-xs font-semibold text-[#333333] hover:text-[#0A4391] hover:underline cursor-pointer transition-colors"
               >
                 <span>Lihat semua aktivitas</span>
-                <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+                <span aria-hidden="true" class="material-symbols-outlined text-[14px]">arrow_forward</span>
               </button>
             </div>
           </div>
@@ -1454,13 +1454,13 @@ onBeforeUnmount(() => {
               {{ user ? user.nama : 'Pengguna' }}
             </p>
             <p
-              class="text-[10.5px] font-normal text-[#64748B] leading-tight truncate max-w-[140px] capitalize"
+              class="text-[11px] font-normal text-[#5F7089] leading-tight truncate max-w-[140px] capitalize"
             >
               {{ user?.role || 'Guest' }} {{ user?.nik ? '· ' + user.nik : '' }}
             </p>
           </div>
           <span
-            class="material-symbols-outlined text-[16px] header-profile-chevron text-[#94A3B8] hidden lg:block"
+            aria-hidden="true" class="material-symbols-outlined text-[16px] header-profile-chevron text-[#687281] hidden lg:block"
             >expand_more</span
           >
         </button>
@@ -1478,10 +1478,10 @@ onBeforeUnmount(() => {
               <p class="text-xs font-bold text-[#333333] truncate">
                 {{ user ? user.nama : 'Pengguna' }}
               </p>
-              <p class="text-[11px] font-normal text-[#64748B] truncate capitalize mt-0.5">
+              <p class="text-[11px] font-normal text-[#5F7089] truncate capitalize mt-0.5">
                 {{ user?.role || 'Guest' }} {{ user?.nik ? '· ' + user.nik : '' }}
               </p>
-              <p v-if="user?.email" class="text-[10.5px] text-[#94A3B8] truncate mt-0.5">
+              <p v-if="user?.email" class="text-[11px] text-[#687281] truncate mt-0.5">
                 {{ user.email }}
               </p>
             </div>
@@ -1493,7 +1493,7 @@ onBeforeUnmount(() => {
                 @click="openMyAssets"
                 class="w-full flex items-center gap-2 rounded-xl px-2.5 py-1.5 text-xs font-medium text-[#334155] hover:bg-[#F8FAFC] hover:text-[#333333] transition-colors text-left cursor-pointer"
               >
-                <span class="material-symbols-outlined text-[16px] text-[#64748B]">badge</span>
+                <span aria-hidden="true" class="material-symbols-outlined text-[16px] text-[#5F7089]">badge</span>
                 <span>Aset Saya</span>
               </button>
 
@@ -1504,7 +1504,7 @@ onBeforeUnmount(() => {
               >
                 <span
                   aria-hidden="true"
-                  class="material-symbols-outlined text-[16px] text-[#64748B]"
+                  class="material-symbols-outlined text-[16px] text-[#5F7089]"
                   >key</span
                 >
                 <span>Ganti Password</span>
@@ -1521,7 +1521,7 @@ onBeforeUnmount(() => {
                 "
                 class="w-full flex items-center gap-2 rounded-xl px-2.5 py-1.5 text-xs font-medium text-rose-600 hover:bg-rose-50 transition-colors text-left cursor-pointer"
               >
-                <span class="material-symbols-outlined text-[16px]">restart_alt</span>
+                <span aria-hidden="true" class="material-symbols-outlined text-[16px]">restart_alt</span>
                 <span>Reset Database</span>
               </button>
 
@@ -1529,10 +1529,11 @@ onBeforeUnmount(() => {
 
               <button
                 type="button"
+                data-testid="logout-button"
                 @click="performLogout"
                 class="w-full flex items-center gap-2 rounded-xl px-2.5 py-1.5 text-xs font-medium text-rose-600 hover:bg-rose-50 transition-colors text-left cursor-pointer"
               >
-                <span class="material-symbols-outlined text-[16px]">logout</span>
+                <span aria-hidden="true" class="material-symbols-outlined text-[16px]">logout</span>
                 <span>Keluar</span>
               </button>
             </div>
@@ -1566,7 +1567,7 @@ onBeforeUnmount(() => {
       <div>
         <label
           for="account-currentPassword"
-          class="block text-[11px] font-bold uppercase tracking-wider text-[#71829B] mb-1"
+          class="block text-[11px] font-bold uppercase tracking-wider text-[#637288] mb-1"
           >Password Saat Ini *</label
         >
         <input
@@ -1583,7 +1584,7 @@ onBeforeUnmount(() => {
       <div>
         <label
           for="account-newPassword"
-          class="block text-[11px] font-bold uppercase tracking-wider text-[#71829B] mb-1"
+          class="block text-[11px] font-bold uppercase tracking-wider text-[#637288] mb-1"
           >Password Baru (min 8 karakter) *</label
         >
         <input
@@ -1601,7 +1602,7 @@ onBeforeUnmount(() => {
       <div>
         <label
           for="account-confirmPassword"
-          class="block text-[11px] font-bold uppercase tracking-wider text-[#71829B] mb-1"
+          class="block text-[11px] font-bold uppercase tracking-wider text-[#637288] mb-1"
           >Konfirmasi Password Baru *</label
         >
         <input
@@ -1622,7 +1623,7 @@ onBeforeUnmount(() => {
         <button
           type="button"
           @click="closePasswordModal"
-          class="rounded-xl border border-[#E5EAEF] px-4 py-2 text-[12px] font-bold text-[#71829B] hover:bg-gray-50 transition-all cursor-pointer"
+          class="rounded-xl border border-[#E5EAEF] px-4 py-2 text-[12px] font-bold text-[#637288] hover:bg-gray-50 transition-all cursor-pointer"
         >
           Batal
         </button>
@@ -1693,7 +1694,7 @@ onBeforeUnmount(() => {
 }
 .search-result-list > div > div:first-child {
   background: #f8fafc;
-  color: #71829b;
+  color: #637288;
   padding: 10px 16px;
   font-weight: 600;
   letter-spacing: 0.06em;
@@ -1713,7 +1714,7 @@ onBeforeUnmount(() => {
 }
 .search-result-list button p + p {
   font-size: 11px;
-  color: #71829b;
+  color: #637288;
   margin-top: 4px;
 }
 .search-result-list button > div {
@@ -1735,7 +1736,7 @@ onBeforeUnmount(() => {
   font-weight: 600;
 }
 .search-popup-footer button:disabled {
-  color: #94a3b8;
+  color: #687281;
   cursor: default;
   text-decoration: none;
 }

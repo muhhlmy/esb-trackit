@@ -457,7 +457,7 @@ onMounted(() => {
         class="fixed top-3 left-3 right-3 sm:top-5 sm:left-auto sm:right-5 sm:max-w-md z-50 flex items-center gap-3 rounded-2xl px-5 py-3.5 shadow-2xl text-white font-semibold text-[13px]"
         :class="notification.type === 'error' ? 'bg-rose-600' : 'bg-emerald-600'"
       >
-        <span class="material-symbols-outlined text-[20px]">
+        <span aria-hidden="true" class="material-symbols-outlined text-[20px]">
           {{ notification.type === 'error' ? 'error' : 'check_circle' }}
         </span>
         <span class="min-w-0 wrap-anywhere" role="status">{{ notification.message }}</span>
@@ -472,7 +472,7 @@ onMounted(() => {
       <div class="flex flex-col items-stretch justify-between gap-3 lg:flex-row lg:items-center">
         <div>
           <h2 class="text-xl font-bold text-[#333333] tracking-tight">Data Karyawan</h2>
-          <p class="text-[13px] text-[#64748B] mt-0.5 leading-normal">
+          <p class="text-[13px] text-[#5F7089] mt-0.5 leading-normal">
             Pengelolaan dan integrasi data karyawan perusahaan
           </p>
         </div>
@@ -485,7 +485,7 @@ onMounted(() => {
             class="toolbar-primary-action h-9 shrink-0 whitespace-nowrap rounded-lg bg-[#0A51B0] px-3 sm:px-3.5 text-xs font-semibold text-white shadow-2xs hover:bg-[#0A4391] transition-all flex items-center justify-center gap-1.5 cursor-pointer"
             title="Tambah karyawan baru"
           >
-            <span class="material-symbols-outlined text-[16px]">person_add</span>
+            <span aria-hidden="true" class="material-symbols-outlined text-[16px]">person_add</span>
             <span>Tambah Karyawan</span>
           </button>
           <div class="toolbar-action-group flex items-center gap-1 rounded-lg border border-[#D7E3F2] bg-[#F8FAFC] p-1">
@@ -496,7 +496,7 @@ onMounted(() => {
               class="toolbar-action-button inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-[11px] font-bold text-[#0A51B0] hover:bg-white"
               title="Import data karyawan dari Excel"
             >
-              <span class="material-symbols-outlined text-[15px]">upload_file</span>Import
+              <span aria-hidden="true" class="material-symbols-outlined text-[15px]">upload_file</span>Import
             </button>
             <button
               type="button"
@@ -504,7 +504,7 @@ onMounted(() => {
               class="toolbar-action-button inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-[11px] font-bold text-[#0A51B0] hover:bg-white"
               title="Export data karyawan"
             >
-              <span class="material-symbols-outlined text-[15px]">download</span>Export
+              <span aria-hidden="true" class="material-symbols-outlined text-[15px]">download</span>Export
             </button>
           </div>
         </div>
@@ -516,7 +516,7 @@ onMounted(() => {
       >
         <div class="relative h-9 min-w-0">
           <span
-            class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[18px] text-[#94A3B8] pointer-events-none"
+            aria-hidden="true" class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[18px] text-[#687281] pointer-events-none"
             >search</span
           >
           <input
@@ -524,10 +524,10 @@ onMounted(() => {
             aria-label="Cari karyawan"
             type="text"
             placeholder="Cari NIK, nama, email, jabatan, atau departemen..."
-            class="toolbar-search-input h-full min-h-0 w-full rounded-xl border border-[#E2E8F0] bg-white pl-9.5 pr-3 text-base sm:text-xs text-[#333333] placeholder-[#94A3B8] focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
+            class="toolbar-search-input h-full min-h-0 w-full rounded-xl border border-[#E2E8F0] bg-white pl-9.5 pr-3 text-base sm:text-xs text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
           />
         </div>
-        <button type="button" @click="showFilterModal = true" class="toolbar-filter-button h-9 shrink-0 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-semibold text-[#64748B] hover:bg-white"><span class="material-symbols-outlined mr-1 align-middle text-[16px]">filter_alt</span>Filter</button>
+        <button type="button" @click="showFilterModal = true" class="toolbar-filter-button h-9 shrink-0 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-semibold text-[#5F7089] hover:bg-white"><span aria-hidden="true" class="material-symbols-outlined mr-1 align-middle text-[16px]">filter_alt</span>Filter</button>
       </div>
     </div>
 
@@ -592,11 +592,11 @@ onMounted(() => {
 
       <div
         v-else-if="filteredEmployees.length === 0"
-        class="px-4 py-8 sm:p-12 text-center text-[#64748B]"
+        class="px-4 py-8 sm:p-12 text-center text-[#5F7089]"
       >
-        <span class="material-symbols-outlined text-[44px] text-[#CBD5E1]">person_off</span>
+        <span aria-hidden="true" class="material-symbols-outlined text-[44px] text-[#CBD5E1]">person_off</span>
         <p class="mt-2 font-bold text-[13.5px] text-[#333333]">Tidak Ada Data Karyawan</p>
-        <p class="text-[11.5px] text-[#64748B]">
+        <p class="text-[12px] text-[#5F7089]">
           Cobalah untuk mengosongkan filter atau menambah karyawan baru.
         </p>
       </div>
@@ -610,7 +610,7 @@ onMounted(() => {
           >
             <div class="space-y-1">
               <h3 class="text-sm font-bold leading-snug text-[#333333]">{{ emp.nama_karyawan }}</h3>
-              <p class="text-[13px] leading-relaxed text-[#64748B]">
+              <p class="text-[13px] leading-relaxed text-[#5F7089]">
                 {{ emp.email_kantor || '—' }}
               </p>
             </div>
@@ -626,23 +626,23 @@ onMounted(() => {
             />
             <dl class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-[13px] leading-relaxed">
               <div>
-                <dt class="text-xs text-[#64748B]">NIK</dt>
+                <dt class="text-xs text-[#5F7089]">NIK</dt>
                 <dd class="font-mono font-semibold text-[#333333]">{{ emp.nik }}</dd>
               </div>
               <div>
-                <dt class="text-xs text-[#64748B]">Title / Jabatan</dt>
+                <dt class="text-xs text-[#5F7089]">Title / Jabatan</dt>
                 <dd class="text-[#333333]">{{ emp.jabatan || emp.title || '—' }}</dd>
               </div>
               <div>
-                <dt class="text-xs text-[#64748B]">Departemen</dt>
+                <dt class="text-xs text-[#5F7089]">Departemen</dt>
                 <dd class="text-[#333333]">{{ emp.departemen || '—' }}</dd>
               </div>
               <div>
-                <dt class="text-xs text-[#64748B]">Direktorat</dt>
+                <dt class="text-xs text-[#5F7089]">Direktorat</dt>
                 <dd class="text-[#333333]">{{ emp.direktorat || emp.directorate || '—' }}</dd>
               </div>
               <div>
-                <dt class="text-xs text-[#64748B]">Lokasi Kerja</dt>
+                <dt class="text-xs text-[#5F7089]">Lokasi Kerja</dt>
                 <dd class="text-[#333333]">
                   {{ normalizeLocation(emp.lokasi_kerja || emp.work_location) || '—' }}
                 </dd>
@@ -688,38 +688,38 @@ onMounted(() => {
           >
             <tr>
               <th
-                class="py-3 pl-5 pr-4 text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B] text-left whitespace-nowrap"
+                class="py-3 pl-5 pr-4 text-[11px] font-semibold uppercase tracking-wider text-[#5F7089] text-left whitespace-nowrap"
               >
                 Karyawan
               </th>
               <th
-                class="py-3 px-4 text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B] text-left whitespace-nowrap"
+                class="py-3 px-4 text-[11px] font-semibold uppercase tracking-wider text-[#5F7089] text-left whitespace-nowrap"
               >
                 NIK
               </th>
               <th
-                class="py-3 px-4 text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B] text-left whitespace-nowrap"
+                class="py-3 px-4 text-[11px] font-semibold uppercase tracking-wider text-[#5F7089] text-left whitespace-nowrap"
               >
                 Title / Jabatan
               </th>
               <th
-                class="py-3 px-4 text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B] text-left whitespace-nowrap"
+                class="py-3 px-4 text-[11px] font-semibold uppercase tracking-wider text-[#5F7089] text-left whitespace-nowrap"
               >
                 Departemen / Direktorat
               </th>
               <th
-                class="py-3 px-4 text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B] text-left whitespace-nowrap"
+                class="py-3 px-4 text-[11px] font-semibold uppercase tracking-wider text-[#5F7089] text-left whitespace-nowrap"
               >
                 Status
               </th>
               <th
-                class="py-3 px-4 text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B] text-left whitespace-nowrap"
+                class="py-3 px-4 text-[11px] font-semibold uppercase tracking-wider text-[#5F7089] text-left whitespace-nowrap"
               >
                 Lokasi Kerja
               </th>
               <th
                 v-if="canWriteKaryawan"
-                class="py-3 pr-5 pl-4 text-right text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B] whitespace-nowrap"
+                class="py-3 pr-5 pl-4 text-right text-[11px] font-semibold uppercase tracking-wider text-[#5F7089] whitespace-nowrap"
               >
                 Aksi
               </th>
@@ -740,7 +740,7 @@ onMounted(() => {
                     {{ emp.nama_karyawan }}
                   </span>
                   <span
-                    class="text-[11.5px] font-normal text-[#64748B] mt-0.5 truncate block"
+                    class="text-[12px] font-normal text-[#5F7089] mt-0.5 truncate block"
                     :title="emp.email_kantor || '—'"
                   >
                     {{ emp.email_kantor || '—' }}
@@ -749,14 +749,14 @@ onMounted(() => {
               </td>
 
               <td
-                class="py-4 px-4 font-mono text-[11.5px] font-semibold text-[#333333] overflow-hidden"
+                class="py-4 px-4 font-mono text-[12px] font-semibold text-[#333333] overflow-hidden"
               >
                 <span class="truncate block" :title="emp.nik">{{ emp.nik }}</span>
               </td>
 
               <td class="py-4 px-4 overflow-hidden">
                 <span
-                  class="text-[12.5px] font-medium text-[#333333] truncate block"
+                  class="text-[13px] font-medium text-[#333333] truncate block"
                   :title="emp.jabatan || emp.title || '—'"
                   >{{ emp.jabatan || emp.title || '—' }}</span
                 >
@@ -765,13 +765,13 @@ onMounted(() => {
               <td class="py-4 px-4 overflow-hidden">
                 <div class="flex flex-col min-w-0">
                   <span
-                    class="text-[12.5px] font-medium text-[#333333] leading-snug truncate block"
+                    class="text-[13px] font-medium text-[#333333] leading-snug truncate block"
                     :title="emp.departemen || '—'"
                   >
                     {{ emp.departemen || '—' }}
                   </span>
                   <span
-                    class="text-[11.5px] font-normal text-[#64748B] mt-0.5 truncate block"
+                    class="text-[12px] font-normal text-[#5F7089] mt-0.5 truncate block"
                     :title="emp.direktorat || emp.directorate || '—'"
                   >
                     {{ emp.direktorat || emp.directorate || '—' }}
@@ -791,7 +791,7 @@ onMounted(() => {
                   :text="emp.status_karyawan || emp.status || 'Active'"
                 />
               </td>
-              <td class="py-4 px-4 text-[12.5px] font-normal text-[#333333] overflow-hidden">
+              <td class="py-4 px-4 text-[13px] font-normal text-[#333333] overflow-hidden">
                 <span
                   class="truncate block"
                   :title="normalizeLocation(emp.lokasi_kerja || emp.work_location) || '—'"
@@ -842,7 +842,7 @@ onMounted(() => {
           <div>
             <label
               for="employee-nik"
-              class="block text-xs sm:text-[11px] font-bold uppercase tracking-wider text-[#7C8BAC] mb-1"
+              class="block text-xs sm:text-[11px] font-bold uppercase tracking-wider text-[#66728d] mb-1"
               >NIK *</label
             >
             <input
@@ -858,7 +858,7 @@ onMounted(() => {
           <div>
             <label
               for="employee-nama_karyawan"
-              class="block text-xs sm:text-[11px] font-bold uppercase tracking-wider text-[#7C8BAC] mb-1"
+              class="block text-xs sm:text-[11px] font-bold uppercase tracking-wider text-[#66728d] mb-1"
               >Nama Karyawan *</label
             >
             <input
@@ -876,7 +876,7 @@ onMounted(() => {
           <div>
             <label
               for="employee-email_kantor"
-              class="block text-xs sm:text-[11px] font-bold uppercase tracking-wider text-[#7C8BAC] mb-1"
+              class="block text-xs sm:text-[11px] font-bold uppercase tracking-wider text-[#66728d] mb-1"
               >Email Kantor *</label
             >
             <input
@@ -892,7 +892,7 @@ onMounted(() => {
           <div>
             <label
               for="employee-lokasi_kerja"
-              class="block text-xs sm:text-[11px] font-bold uppercase tracking-wider text-[#7C8BAC] mb-1"
+              class="block text-xs sm:text-[11px] font-bold uppercase tracking-wider text-[#66728d] mb-1"
               >Lokasi Kerja *</label
             >
             <input
@@ -910,7 +910,7 @@ onMounted(() => {
           <div>
             <label
               for="employee-jabatan"
-              class="block text-xs sm:text-[11px] font-bold uppercase tracking-wider text-[#7C8BAC] mb-1"
+              class="block text-xs sm:text-[11px] font-bold uppercase tracking-wider text-[#66728d] mb-1"
               >Title / Jabatan *</label
             >
             <input
@@ -925,7 +925,7 @@ onMounted(() => {
 
           <div>
             <label
-              class="block text-xs sm:text-[11px] font-bold uppercase tracking-wider text-[#7C8BAC] mb-1"
+              class="block text-xs sm:text-[11px] font-bold uppercase tracking-wider text-[#66728d] mb-1"
               >Job Level *</label
             >
             <CustomSelect
@@ -943,7 +943,7 @@ onMounted(() => {
           <div>
             <label
               for="employee-departemen"
-              class="block text-xs sm:text-[11px] font-bold uppercase tracking-wider text-[#7C8BAC] mb-1"
+              class="block text-xs sm:text-[11px] font-bold uppercase tracking-wider text-[#66728d] mb-1"
               >Departemen *</label
             >
             <input
@@ -959,7 +959,7 @@ onMounted(() => {
           <div>
             <label
               for="employee-direktorat"
-              class="block text-xs sm:text-[11px] font-bold uppercase tracking-wider text-[#7C8BAC] mb-1"
+              class="block text-xs sm:text-[11px] font-bold uppercase tracking-wider text-[#66728d] mb-1"
               >Directorate *</label
             >
             <input
@@ -976,7 +976,7 @@ onMounted(() => {
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div>
             <label
-              class="block text-xs sm:text-[11px] font-bold uppercase tracking-wider text-[#7C8BAC] mb-1"
+              class="block text-xs sm:text-[11px] font-bold uppercase tracking-wider text-[#66728d] mb-1"
               >Status Karyawan *</label
             >
             <CustomSelect
@@ -991,7 +991,7 @@ onMounted(() => {
 
           <div>
             <label
-              class="block text-xs sm:text-[11px] font-bold uppercase tracking-wider text-[#7C8BAC] mb-1"
+              class="block text-xs sm:text-[11px] font-bold uppercase tracking-wider text-[#66728d] mb-1"
               >Status Kepegawaian *</label
             >
             <CustomSelect
@@ -1007,7 +1007,7 @@ onMounted(() => {
           <div>
             <label
               for="employee-tanggal_mulai_bekerja"
-              class="block text-xs sm:text-[11px] font-bold uppercase tracking-wider text-[#7C8BAC] mb-1"
+              class="block text-xs sm:text-[11px] font-bold uppercase tracking-wider text-[#66728d] mb-1"
               >Tgl Mulai Bekerja *</label
             >
             <input
@@ -1022,7 +1022,7 @@ onMounted(() => {
 
         <div>
           <label
-            class="block text-xs sm:text-[11px] font-bold uppercase tracking-wider text-[#7C8BAC] mb-1"
+            class="block text-xs sm:text-[11px] font-bold uppercase tracking-wider text-[#66728d] mb-1"
             >NIK Atasan Langsung</label
           >
           <SearchableSelect
@@ -1045,7 +1045,7 @@ onMounted(() => {
           <button
             type="button"
             @click="closeModal"
-            class="min-h-11 sm:min-h-0 rounded-xl border border-[#E5EAEF] px-4 py-2 text-[12px] font-bold text-[#7C8BAC] hover:bg-gray-50 transition-all cursor-pointer"
+            class="min-h-11 sm:min-h-0 rounded-xl border border-[#E5EAEF] px-4 py-2 text-[12px] font-bold text-[#66728d] hover:bg-gray-50 transition-all cursor-pointer"
           >
             Batal
           </button>
@@ -1080,7 +1080,7 @@ onMounted(() => {
           v-if="parseInt(selectedEmployee?.jumlah_aset || 0) > 0"
           class="rounded-xl bg-amber-50 p-3 text-[12px] font-semibold text-amber-700 flex items-start gap-2"
         >
-          <span class="material-symbols-outlined text-[18px] mt-0.5">warning</span>
+          <span aria-hidden="true" class="material-symbols-outlined text-[18px] mt-0.5">warning</span>
           <div>
             <p>
               Karyawan ini masih memiliki {{ selectedEmployee?.jumlah_aset }} unit aset ter-assign.
@@ -1099,7 +1099,7 @@ onMounted(() => {
           <button
             type="button"
             @click="closeModal"
-            class="min-h-11 sm:min-h-0 rounded-xl border border-[#E5EAEF] px-4 py-2 text-[12px] font-bold text-[#7C8BAC] hover:bg-gray-50 transition-all cursor-pointer"
+            class="min-h-11 sm:min-h-0 rounded-xl border border-[#E5EAEF] px-4 py-2 text-[12px] font-bold text-[#66728d] hover:bg-gray-50 transition-all cursor-pointer"
           >
             Batal
           </button>

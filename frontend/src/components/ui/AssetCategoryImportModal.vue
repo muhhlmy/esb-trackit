@@ -275,7 +275,7 @@ watch(() => props.isOpen, (open) => {
       <div class="flex flex-col gap-3 rounded-2xl border border-[#CFE0F8] bg-[#F4F8FF] p-4 sm:flex-row sm:items-center sm:justify-between">
         <div class="min-w-0">
           <div class="flex items-center gap-2">
-            <span class="material-symbols-outlined text-[20px] text-[#0A51B0]">table_view</span>
+            <span aria-hidden="true" class="material-symbols-outlined text-[20px] text-[#0A51B0]">table_view</span>
             <h3 class="text-sm font-bold text-slate-800">Template Aset {{ typeLabel }}</h3>
           </div>
           <p class="mt-1 text-[11px] leading-relaxed text-slate-500">
@@ -284,7 +284,7 @@ watch(() => props.isOpen, (open) => {
           </p>
         </div>
         <button type="button" @click="downloadTemplate" class="inline-flex min-h-10 shrink-0 items-center justify-center gap-2 rounded-xl bg-[#0A51B0] px-4 text-xs font-bold text-white shadow-sm transition hover:bg-[#08458f] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0A51B0]">
-          <span class="material-symbols-outlined text-[17px]">download</span>
+          <span aria-hidden="true" class="material-symbols-outlined text-[17px]">download</span>
           Unduh Template
         </button>
       </div>
@@ -295,7 +295,7 @@ watch(() => props.isOpen, (open) => {
       </div>
 
       <div class="flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2.5 text-[11px] text-amber-800">
-        <span class="material-symbols-outlined mt-0.5 text-[17px]">info</span>
+        <span aria-hidden="true" class="material-symbols-outlined mt-0.5 text-[17px]">info</span>
         <p><b>Kolom wajib:</b> {{ requiredFields }}. Jangan ubah nama header template.</p>
       </div>
 
@@ -310,16 +310,16 @@ watch(() => props.isOpen, (open) => {
         @dragleave.prevent="isDragging = false"
         @drop.prevent="handleDrop"
       >
-        <span class="material-symbols-outlined text-[34px] text-[#0A51B0]">cloud_upload</span>
+        <span aria-hidden="true" class="material-symbols-outlined text-[34px] text-[#0A51B0]">cloud_upload</span>
         <span class="mt-2 text-sm font-bold text-slate-700">Tarik file ke sini</span>
         <span class="mt-1 text-[11px] text-slate-500">atau klik untuk memilih · .xlsx, .xls, .csv</span>
       </button>
 
       <div v-else class="rounded-2xl border border-slate-200 bg-white p-3 shadow-xs">
         <div class="flex items-center gap-3">
-          <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600"><span class="material-symbols-outlined">description</span></span>
+          <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600"><span aria-hidden="true" class="material-symbols-outlined">description</span></span>
           <div class="min-w-0 flex-1"><p class="truncate text-xs font-bold text-slate-800">{{ file.name }}</p><p class="mt-0.5 text-[11px] text-slate-500">{{ (file.size / 1024).toFixed(1) }} KB · {{ isParsing ? 'Membaca file...' : `${rows.length} baris terbaca` }}</p></div>
-          <button type="button" aria-label="Hapus file" :disabled="isParsing || submitting" class="flex h-9 w-9 items-center justify-center rounded-lg text-slate-400 hover:bg-rose-50 hover:text-rose-600 disabled:opacity-40" @click="removeFile"><span class="material-symbols-outlined text-[18px]">delete</span></button>
+          <button type="button" aria-label="Hapus file" :disabled="isParsing || submitting" class="flex h-9 w-9 items-center justify-center rounded-lg text-slate-400 hover:bg-rose-50 hover:text-rose-600 disabled:opacity-40" @click="removeFile"><span aria-hidden="true" class="material-symbols-outlined text-[18px]">delete</span></button>
         </div>
       </div>
 
@@ -341,12 +341,12 @@ watch(() => props.isOpen, (open) => {
         </div>
       </fieldset>
 
-      <p v-if="error" class="flex items-start gap-2 rounded-xl border border-rose-200 bg-rose-50 p-3 text-xs font-semibold text-rose-700"><span class="material-symbols-outlined text-[17px]">error</span>{{ error }}</p>
-      <p v-if="success" class="flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-xs font-semibold text-emerald-700"><span class="material-symbols-outlined text-[17px]">check_circle</span>{{ success }}</p>
+      <p v-if="error" class="flex items-start gap-2 rounded-xl border border-rose-200 bg-rose-50 p-3 text-xs font-semibold text-rose-700"><span aria-hidden="true" class="material-symbols-outlined text-[17px]">error</span>{{ error }}</p>
+      <p v-if="success" class="flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-xs font-semibold text-emerald-700"><span aria-hidden="true" class="material-symbols-outlined text-[17px]">check_circle</span>{{ success }}</p>
 
       <div class="flex flex-col-reverse gap-2 border-t border-slate-200 pt-4 sm:flex-row sm:justify-end">
         <button type="button" :disabled="submitting" @click="close" class="min-h-10 rounded-xl border border-slate-200 px-4 text-xs font-bold text-slate-600 hover:bg-slate-50 disabled:opacity-50">Batal</button>
-        <button type="button" :disabled="submitting || isParsing || !rows.length || (importMode === 'replace' && replaceConfirmation !== 'GANTI')" @click="submit" class="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl bg-[#0A51B0] px-5 text-xs font-bold text-white shadow-sm hover:bg-[#08458f] disabled:cursor-not-allowed disabled:opacity-50"><span v-if="submitting" class="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></span><span v-else class="material-symbols-outlined text-[17px]">file_upload</span>{{ submitting ? 'Menyimpan...' : `Import ${rows.length} Baris` }}</button>
+        <button type="button" :disabled="submitting || isParsing || !rows.length || (importMode === 'replace' && replaceConfirmation !== 'GANTI')" @click="submit" class="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl bg-[#0A51B0] px-5 text-xs font-bold text-white shadow-sm hover:bg-[#08458f] disabled:cursor-not-allowed disabled:opacity-50"><span v-if="submitting" class="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></span><span aria-hidden="true" v-else class="material-symbols-outlined text-[17px]">file_upload</span>{{ submitting ? 'Menyimpan...' : `Import ${rows.length} Baris` }}</button>
       </div>
     </div>
   </AppModal>

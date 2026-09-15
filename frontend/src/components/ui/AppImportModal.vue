@@ -279,7 +279,7 @@ async function submitImport() {
         class="rounded-xl bg-emerald-50 p-4 text-[12px] font-bold text-emerald-700 border border-emerald-200 flex flex-col gap-2"
       >
         <div class="flex items-center gap-2">
-          <span class="material-symbols-outlined text-[20px]">check_circle</span>
+          <span aria-hidden="true" class="material-symbols-outlined text-[20px]">check_circle</span>
           <span>{{ successResult }}</span>
         </div>
 
@@ -369,7 +369,7 @@ async function submitImport() {
       >
         <div>
           <h4 class="text-[13px] font-bold text-[#2A3547]">Format / Template Import Excel</h4>
-          <p class="text-[11px] text-[#7C8BAC] mt-0.5">
+          <p class="text-[11px] text-[#66728d] mt-0.5">
             Gunakan template Excel resmi dengan Sheet <code>Table Karyawan</code>.
           </p>
         </div>
@@ -378,7 +378,7 @@ async function submitImport() {
           @click="downloadTemplate"
           class="flex min-h-11 sm:min-h-0 justify-center items-center gap-2 rounded-xl bg-[#0A51B0] px-4 py-2 text-[12px] font-bold text-white shadow-md hover:bg-[#0A4391] transition-all cursor-pointer shrink-0"
         >
-          <span class="material-symbols-outlined text-[16px]">download</span>
+          <span aria-hidden="true" class="material-symbols-outlined text-[16px]">download</span>
           <span>Unduh Template (.xlsx)</span>
         </button>
       </div>
@@ -406,7 +406,7 @@ async function submitImport() {
         <div
           class="flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-[#333333] shadow-sm mb-2"
         >
-          <span class="material-symbols-outlined text-[28px]">upload_file</span>
+          <span aria-hidden="true" class="material-symbols-outlined text-[28px]">upload_file</span>
         </div>
 
         <p v-if="!selectedFile" class="text-[13px] font-bold text-[#2A3547]">
@@ -417,7 +417,7 @@ async function submitImport() {
           📄 {{ selectedFile.name }} ({{ (selectedFile.size / 1024).toFixed(1) }} KB)
         </p>
 
-        <p class="text-[11px] text-[#7C8BAC] mt-1">
+        <p class="text-[11px] text-[#66728d] mt-1">
           Mendukung file berformat .xlsx, .xls, atau .csv
         </p>
       </div>
@@ -444,10 +444,10 @@ async function submitImport() {
             :class="
               activeTab === 'karyawan'
                 ? 'bg-[#0A51B0] text-white shadow-sm'
-                : 'text-[#7C8BAC] hover:bg-[#F8FAFC]'
+                : 'text-[#66728d] hover:bg-[#F8FAFC]'
             "
           >
-            <span class="material-symbols-outlined text-[16px]">badge</span>
+            <span aria-hidden="true" class="material-symbols-outlined text-[16px]">badge</span>
             <span>Table Karyawan ({{ parsedKaryawanRows.length }})</span>
           </button>
 
@@ -458,10 +458,10 @@ async function submitImport() {
             :class="
               activeTab === 'assets'
                 ? 'bg-[#0A51B0] text-white shadow-sm'
-                : 'text-[#7C8BAC] hover:bg-[#F8FAFC]'
+                : 'text-[#66728d] hover:bg-[#F8FAFC]'
             "
           >
-            <span class="material-symbols-outlined text-[16px]">devices</span>
+            <span aria-hidden="true" class="material-symbols-outlined text-[16px]">devices</span>
             <span>Table Asset ({{ parsedAssetRows.length }})</span>
           </button>
         </div>
@@ -475,14 +475,14 @@ async function submitImport() {
             <table v-if="parsedKaryawanRows.length > 0" class="w-full text-left text-[11px]">
               <thead class="bg-[#F8FAFC] sticky top-0 border-b border-[#E5EAEF]">
                 <tr>
-                  <th class="p-2 font-bold text-[#7C8BAC]">NIK</th>
-                  <th class="p-2 font-bold text-[#7C8BAC]">Nama Karyawan</th>
-                  <th class="p-2 font-bold text-[#7C8BAC]">Email</th>
-                  <th class="p-2 font-bold text-[#7C8BAC]">Jabatan</th>
-                  <th class="p-2 font-bold text-[#7C8BAC]">Job Level</th>
-                  <th class="p-2 font-bold text-[#7C8BAC]">Departemen</th>
-                  <th class="p-2 font-bold text-[#7C8BAC]">Status Kepegawaian</th>
-                  <th class="p-2 font-bold text-[#7C8BAC]">Lokasi</th>
+                  <th class="p-2 font-bold text-[#66728d]">NIK</th>
+                  <th class="p-2 font-bold text-[#66728d]">Nama Karyawan</th>
+                  <th class="p-2 font-bold text-[#66728d]">Email</th>
+                  <th class="p-2 font-bold text-[#66728d]">Jabatan</th>
+                  <th class="p-2 font-bold text-[#66728d]">Job Level</th>
+                  <th class="p-2 font-bold text-[#66728d]">Departemen</th>
+                  <th class="p-2 font-bold text-[#66728d]">Status Kepegawaian</th>
+                  <th class="p-2 font-bold text-[#66728d]">Lokasi</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-[#F1F5F9]">
@@ -497,7 +497,7 @@ async function submitImport() {
                   <td class="p-2 font-bold text-[#2A3547]">
                     {{ row['Nama Karyawan'] || row.nama_karyawan || '—' }}
                   </td>
-                  <td class="p-2 text-[#7C8BAC]">
+                  <td class="p-2 text-[#66728d]">
                     {{ row['Email Kantor'] || row.email_kantor || '—' }}
                   </td>
                   <td class="p-2 text-[#2A3547]">
@@ -522,7 +522,7 @@ async function submitImport() {
                 </tr>
               </tbody>
             </table>
-            <p v-else class="p-4 text-center text-[12px] text-[#7C8BAC]">
+            <p v-else class="p-4 text-center text-[12px] text-[#66728d]">
               Tidak ada baris data Karyawan.
             </p>
           </div>
@@ -544,12 +544,12 @@ async function submitImport() {
             <table v-if="parsedAssetRows.length > 0" class="w-full text-left text-[11px]">
               <thead class="bg-[#F8FAFC] sticky top-0 border-b border-[#E5EAEF]">
                 <tr>
-                  <th class="p-2 font-bold text-[#7C8BAC]">Hostname / Label</th>
-                  <th class="p-2 font-bold text-[#7C8BAC]">Serial Number</th>
-                  <th class="p-2 font-bold text-[#7C8BAC]">Perangkat</th>
-                  <th class="p-2 font-bold text-[#7C8BAC]">NIK Pemegang</th>
-                  <th class="p-2 font-bold text-[#7C8BAC]">Lokasi</th>
-                  <th class="p-2 font-bold text-[#7C8BAC]">Status</th>
+                  <th class="p-2 font-bold text-[#66728d]">Hostname / Label</th>
+                  <th class="p-2 font-bold text-[#66728d]">Serial Number</th>
+                  <th class="p-2 font-bold text-[#66728d]">Perangkat</th>
+                  <th class="p-2 font-bold text-[#66728d]">NIK Pemegang</th>
+                  <th class="p-2 font-bold text-[#66728d]">Lokasi</th>
+                  <th class="p-2 font-bold text-[#66728d]">Status</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-[#F1F5F9]">
@@ -593,7 +593,7 @@ async function submitImport() {
                       '—'
                     }}
                   </td>
-                  <td class="p-2 font-mono text-[#7C8BAC]">
+                  <td class="p-2 font-mono text-[#66728d]">
                     {{
                       row['NIK Pemegang Asset'] ||
                       row.NIK ||
@@ -619,7 +619,7 @@ async function submitImport() {
                 </tr>
               </tbody>
             </table>
-            <p v-else class="p-4 text-center text-[12px] text-[#7C8BAC]">
+            <p v-else class="p-4 text-center text-[12px] text-[#66728d]">
               Tidak ada baris data Aset IT.
             </p>
           </div>
@@ -640,7 +640,7 @@ async function submitImport() {
         <button
           type="button"
           @click="handleClose"
-          class="min-h-11 sm:min-h-0 rounded-xl border border-[#E5EAEF] px-4 py-2 text-[12px] font-bold text-[#7C8BAC] hover:bg-gray-50 transition-all cursor-pointer"
+          class="min-h-11 sm:min-h-0 rounded-xl border border-[#E5EAEF] px-4 py-2 text-[12px] font-bold text-[#66728d] hover:bg-gray-50 transition-all cursor-pointer"
         >
           Batal
         </button>
@@ -656,7 +656,7 @@ async function submitImport() {
             v-if="isSubmitting"
             class="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"
           ></span>
-          <span v-else class="material-symbols-outlined text-[16px]">file_upload</span>
+          <span aria-hidden="true" v-else class="material-symbols-outlined text-[16px]">file_upload</span>
           <span>{{
             isSubmitting
               ? 'Memproses Import...'

@@ -762,7 +762,7 @@ function goToAdminCases() {
         <!-- Back to Admin CMS -->
         <RouterLink
           to="/admin/cases"
-          class="p-1.5 rounded-lg text-[#64748B] hover:text-[#333333] dark:hover:text-white hover:bg-[#F1F5F9] dark:hover:bg-slate-800 transition-colors flex items-center gap-1 text-xs font-semibold shrink-0 active:scale-95 touch-manipulation"
+          class="p-1.5 rounded-lg text-[#5F7089] hover:text-[#333333] dark:hover:text-white hover:bg-[#F1F5F9] dark:hover:bg-slate-800 transition-colors flex items-center gap-1 text-xs font-semibold shrink-0 active:scale-95 touch-manipulation"
           title="Kembali ke Admin CMS"
         >
           <ArrowLeft class="w-4 h-4" />
@@ -798,7 +798,7 @@ function goToAdminCases() {
             {{ doc.status || 'DRAFT' }}
           </span>
 
-          <span class="text-[11px] text-[#64748B] dark:text-slate-400 font-medium">
+          <span class="text-[11px] text-[#5F7089] dark:text-slate-400 font-medium">
             {{ saveStatus }}
           </span>
         </div>
@@ -812,7 +812,7 @@ function goToAdminCases() {
           class="flex items-center gap-1.5 text-xs font-semibold px-2 sm:px-3 py-1.5 rounded-lg border border-[#E2E8F0] dark:border-slate-700 bg-white dark:bg-slate-900 text-[#333333] dark:text-slate-200 hover:bg-[#F8FAFC] dark:hover:bg-slate-800 transition-colors cursor-pointer active:scale-95 touch-manipulation"
           title="Preview Tampilan Employee"
         >
-          <Eye class="w-3.5 h-3.5 text-[#64748B] dark:text-slate-400" />
+          <Eye class="w-3.5 h-3.5 text-[#5F7089] dark:text-slate-400" />
           <span class="hidden sm:inline">Preview</span>
         </button>
 
@@ -841,7 +841,7 @@ function goToAdminCases() {
         <button
           type="button"
           @click="toggleInspector"
-          class="p-1.5 sm:p-2 rounded-lg text-[#64748B] dark:text-slate-400 hover:bg-[#F8FAFC] dark:hover:bg-slate-800 transition-colors cursor-pointer active:scale-95 touch-manipulation"
+          class="p-1.5 sm:p-2 rounded-lg text-[#5F7089] dark:text-slate-400 hover:bg-[#F8FAFC] dark:hover:bg-slate-800 transition-colors cursor-pointer active:scale-95 touch-manipulation"
           :class="{ 'text-[#333333] bg-blue-50 dark:bg-blue-950/40': isInspectorActive }"
           title="Pengaturan Artikel (Metadata Inspector)"
         >
@@ -872,7 +872,7 @@ function goToAdminCases() {
           @mousedown.prevent
           @click="handleUndo"
           :disabled="!canUndo"
-          class="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center text-[#64748B] dark:text-slate-400 hover:bg-[#F1F5F9] dark:hover:bg-slate-800 rounded-lg disabled:opacity-30 cursor-pointer active:scale-95 touch-manipulation"
+          class="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center text-[#5F7089] dark:text-slate-400 hover:bg-[#F1F5F9] dark:hover:bg-slate-800 rounded-lg disabled:opacity-30 cursor-pointer active:scale-95 touch-manipulation"
           title="Undo (Ctrl+Z)"
         >
           <Undo class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
@@ -881,7 +881,7 @@ function goToAdminCases() {
           @mousedown.prevent
           @click="handleRedo"
           :disabled="!canRedo"
-          class="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center text-[#64748B] dark:text-slate-400 hover:bg-[#F1F5F9] dark:hover:bg-slate-800 rounded-lg disabled:opacity-30 cursor-pointer active:scale-95 touch-manipulation"
+          class="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center text-[#5F7089] dark:text-slate-400 hover:bg-[#F1F5F9] dark:hover:bg-slate-800 rounded-lg disabled:opacity-30 cursor-pointer active:scale-95 touch-manipulation"
           title="Redo (Ctrl+Y)"
         >
           <Redo class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
@@ -914,7 +914,7 @@ function goToAdminCases() {
           :class="
             editor.isActive('bold')
               ? 'bg-[#0A51B0] text-white shadow-2xs'
-              : 'text-[#64748B] dark:text-slate-400 hover:bg-[#F1F5F9] dark:hover:bg-slate-800'
+              : 'text-[#5F7089] dark:text-slate-400 hover:bg-[#F1F5F9] dark:hover:bg-slate-800'
           "
           title="Bold (Ctrl+B)"
         >
@@ -927,7 +927,7 @@ function goToAdminCases() {
           :class="
             editor.isActive('italic')
               ? 'bg-[#0A51B0] text-white shadow-2xs'
-              : 'text-[#64748B] dark:text-slate-400 hover:bg-[#F1F5F9] dark:hover:bg-slate-800'
+              : 'text-[#5F7089] dark:text-slate-400 hover:bg-[#F1F5F9] dark:hover:bg-slate-800'
           "
           title="Italic (Ctrl+I)"
         >
@@ -940,7 +940,7 @@ function goToAdminCases() {
           :class="
             editor.isActive('underline')
               ? 'bg-[#0A51B0] text-white shadow-2xs'
-              : 'text-[#64748B] dark:text-slate-400 hover:bg-[#F1F5F9] dark:hover:bg-slate-800'
+              : 'text-[#5F7089] dark:text-slate-400 hover:bg-[#F1F5F9] dark:hover:bg-slate-800'
           "
           title="Underline (Ctrl+U)"
         >
@@ -958,7 +958,7 @@ function goToAdminCases() {
           :class="
             editor.isActive('bulletList')
               ? 'bg-blue-50 dark:bg-blue-950/40 text-[#333333] dark:text-blue-400'
-              : 'text-[#64748B] dark:text-slate-400 hover:bg-[#F1F5F9] dark:hover:bg-slate-800'
+              : 'text-[#5F7089] dark:text-slate-400 hover:bg-[#F1F5F9] dark:hover:bg-slate-800'
           "
           title="Bullet List"
         >
@@ -971,7 +971,7 @@ function goToAdminCases() {
           :class="
             editor.isActive('orderedList')
               ? 'bg-blue-50 dark:bg-blue-950/40 text-[#333333] dark:text-blue-400'
-              : 'text-[#64748B] dark:text-slate-400 hover:bg-[#F1F5F9] dark:hover:bg-slate-800'
+              : 'text-[#5F7089] dark:text-slate-400 hover:bg-[#F1F5F9] dark:hover:bg-slate-800'
           "
           title="Numbered List"
         >
@@ -984,7 +984,7 @@ function goToAdminCases() {
           :class="
             editor.isActive('blockquote')
               ? 'bg-blue-50 dark:bg-blue-950/40 text-[#333333] dark:text-blue-400'
-              : 'text-[#64748B] dark:text-slate-400 hover:bg-[#F1F5F9] dark:hover:bg-slate-800'
+              : 'text-[#5F7089] dark:text-slate-400 hover:bg-[#F1F5F9] dark:hover:bg-slate-800'
           "
           title="Blockquote"
         >
@@ -997,7 +997,7 @@ function goToAdminCases() {
           :class="
             editor.isActive('codeBlock')
               ? 'bg-[#0A51B0] text-white shadow-2xs'
-              : 'text-[#64748B] dark:text-slate-400 hover:bg-[#F1F5F9] dark:hover:bg-slate-800'
+              : 'text-[#5F7089] dark:text-slate-400 hover:bg-[#F1F5F9] dark:hover:bg-slate-800'
           "
           title="Code Block"
         >
@@ -1010,7 +1010,7 @@ function goToAdminCases() {
           :class="
             editor.isActive('link')
               ? 'bg-[#0A51B0] text-white shadow-2xs'
-              : 'text-[#64748B] dark:text-slate-400 hover:bg-[#F1F5F9] dark:hover:bg-slate-800'
+              : 'text-[#5F7089] dark:text-slate-400 hover:bg-[#F1F5F9] dark:hover:bg-slate-800'
           "
           title="Insert Link"
         >
@@ -1022,7 +1022,7 @@ function goToAdminCases() {
       <div class="flex items-center gap-1 sm:gap-1.5 shrink-0">
         <button
           @click="openImageModal"
-          class="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-1 rounded-lg bg-[#ECF2FF] dark:bg-indigo-950/60 text-[#333333] dark:text-indigo-300 font-bold cursor-pointer hover:bg-[#0A51B0] hover:text-white transition-colors text-[10.5px] sm:text-[11px] shadow-2xs active:scale-95 touch-manipulation shrink-0"
+          class="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-1 rounded-lg bg-[#ECF2FF] dark:bg-indigo-950/60 text-[#333333] dark:text-indigo-300 font-bold cursor-pointer hover:bg-[#0A51B0] hover:text-white transition-colors text-[11px] sm:text-[11px] shadow-2xs active:scale-95 touch-manipulation shrink-0"
         >
           <ImageIcon class="w-3.5 h-3.5" />
           <span>+ Gambar</span>
@@ -1030,7 +1030,7 @@ function goToAdminCases() {
 
         <button
           @click="insertInfoCallout"
-          class="flex items-center gap-1 px-2 sm:px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-[#475569] dark:text-slate-300 font-semibold cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors text-[10.5px] sm:text-[11px] active:scale-95 touch-manipulation shrink-0"
+          class="flex items-center gap-1 px-2 sm:px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-[#475569] dark:text-slate-300 font-semibold cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors text-[11px] sm:text-[11px] active:scale-95 touch-manipulation shrink-0"
         >
           <Info class="w-3.5 h-3.5" />
           <span>Info Callout</span>
@@ -1038,7 +1038,7 @@ function goToAdminCases() {
 
         <button
           @click="insertWarningCallout"
-          class="flex items-center gap-1 px-2 sm:px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-[#475569] dark:text-slate-300 font-semibold cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors text-[10.5px] sm:text-[11px] active:scale-95 touch-manipulation shrink-0"
+          class="flex items-center gap-1 px-2 sm:px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-[#475569] dark:text-slate-300 font-semibold cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors text-[11px] sm:text-[11px] active:scale-95 touch-manipulation shrink-0"
         >
           <AlertTriangle class="w-3.5 h-3.5" />
           <span>Warning Banner</span>
@@ -1046,7 +1046,7 @@ function goToAdminCases() {
 
         <button
           @click="insertStep"
-          class="flex items-center gap-1 px-2 sm:px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-[#475569] dark:text-slate-300 font-semibold cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors text-[10.5px] sm:text-[11px] active:scale-95 touch-manipulation shrink-0"
+          class="flex items-center gap-1 px-2 sm:px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-[#475569] dark:text-slate-300 font-semibold cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors text-[11px] sm:text-[11px] active:scale-95 touch-manipulation shrink-0"
         >
           <Plus class="w-3.5 h-3.5" />
           <span>Step</span>
@@ -1064,7 +1064,7 @@ function goToAdminCases() {
         >
           <!-- Document Breadcrumbs & Category Bar -->
           <div
-            class="flex flex-wrap items-center justify-between gap-2 text-xs text-[#64748B] dark:text-slate-400 pb-2.5 sm:pb-3 border-b border-[#F1F5F9] dark:border-slate-800"
+            class="flex flex-wrap items-center justify-between gap-2 text-xs text-[#5F7089] dark:text-slate-400 pb-2.5 sm:pb-3 border-b border-[#F1F5F9] dark:border-slate-800"
           >
             <div class="flex items-center gap-1.5 font-semibold text-[11px] sm:text-xs">
               <span>Knowledge Base</span>
@@ -1092,7 +1092,7 @@ function goToAdminCases() {
             @keydown.meta.shift.z.stop.prevent="handleRedo"
             aria-label="Judul artikel"
             type="text"
-            class="w-full text-xl sm:text-3xl font-extrabold text-[#333333] dark:text-white bg-transparent border-none focus:outline-none focus:ring-0 p-0 placeholder:text-[#CBD5E1] tracking-tight"
+            class="w-full text-xl sm:text-3xl font-extrabold text-[#333333] dark:text-white bg-transparent border-none focus:outline-none focus:ring-0 p-0 placeholder:text-[#5F7089] tracking-tight"
             placeholder="Judul artikel..."
           />
 
@@ -1101,7 +1101,7 @@ function goToAdminCases() {
             class="bg-[#F8FAFC] dark:bg-slate-800/50 border border-[#E2E8F0] dark:border-slate-700/60 rounded-xl p-3 sm:p-4"
           >
             <label
-              class="block text-[10.5px] sm:text-[11px] font-bold uppercase tracking-wide text-[#64748B] dark:text-slate-400 mb-1"
+              class="block text-[11px] sm:text-[11px] font-bold uppercase tracking-wide text-[#5F7089] dark:text-slate-400 mb-1"
             >
               Ringkasan
             </label>
@@ -1274,7 +1274,7 @@ function goToAdminCases() {
           </div>
           <button
             @click="isPreviewModalOpen = false"
-            class="p-1 rounded-lg text-[#64748B] hover:bg-[#F1F5F9] dark:hover:bg-slate-800 transition-colors cursor-pointer"
+            class="p-1 rounded-lg text-[#5F7089] hover:bg-[#F1F5F9] dark:hover:bg-slate-800 transition-colors cursor-pointer"
           >
             <X class="w-5 h-5" />
           </button>
@@ -1380,7 +1380,7 @@ function goToAdminCases() {
           </div>
           <button
             @click="isImageModalOpen = false"
-            class="p-1 rounded-lg text-[#64748B] hover:bg-[#F1F5F9] dark:hover:bg-slate-800 transition-colors cursor-pointer"
+            class="p-1 rounded-lg text-[#5F7089] hover:bg-[#F1F5F9] dark:hover:bg-slate-800 transition-colors cursor-pointer"
           >
             <X class="w-4 h-4" />
           </button>
@@ -1398,7 +1398,7 @@ function goToAdminCases() {
               :class="
                 imageInputTab === 'upload'
                   ? 'bg-white dark:bg-slate-900 text-[#333333] shadow-2xs'
-                  : 'text-[#64748B] dark:text-slate-400'
+                  : 'text-[#5F7089] dark:text-slate-400'
               "
             >
               Upload Local File
@@ -1409,7 +1409,7 @@ function goToAdminCases() {
               :class="
                 imageInputTab === 'url'
                   ? 'bg-white dark:bg-slate-900 text-[#333333] shadow-2xs'
-                  : 'text-[#64748B] dark:text-slate-400'
+                  : 'text-[#5F7089] dark:text-slate-400'
               "
             >
               URL Gambar Web
@@ -1452,7 +1452,7 @@ function goToAdminCases() {
                   <p class="text-xs font-extrabold text-[#333333] dark:text-white">
                     Klik atau Tarik File Gambar ke Sini
                   </p>
-                  <p class="text-[10px] text-[#64748B] dark:text-slate-400 font-medium">
+                  <p class="text-[10px] text-[#5F7089] dark:text-slate-400 font-medium">
                     PNG, JPG, WebP, GIF, SVG (Maksimal 5MB)
                   </p>
                 </div>
@@ -1463,11 +1463,11 @@ function goToAdminCases() {
           <!-- Tab 2: URL Input Area -->
           <div v-else class="space-y-2">
             <label
-              class="block text-[11px] font-extrabold uppercase text-[#64748B] dark:text-slate-400"
+              class="block text-[11px] font-extrabold uppercase text-[#5F7089] dark:text-slate-400"
               >URL Gambar (HTTPS):</label
             >
             <div class="relative flex items-center">
-              <LinkIcon class="absolute left-3 w-4 h-4 text-[#7C8BAC]" />
+              <LinkIcon class="absolute left-3 w-4 h-4 text-[#66728d]" />
               <input
                 v-model="imageUrlInput"
                 type="url"
@@ -1488,7 +1488,7 @@ function goToAdminCases() {
           <!-- Caption Input -->
           <div class="space-y-1">
             <label
-              class="block text-[11px] font-extrabold uppercase text-[#64748B] dark:text-slate-400"
+              class="block text-[11px] font-extrabold uppercase text-[#5F7089] dark:text-slate-400"
               >Keterangan Gambar / Caption (Opsional):</label
             >
             <input
@@ -1506,7 +1506,7 @@ function goToAdminCases() {
         >
           <button
             @click="isImageModalOpen = false"
-            class="px-4 py-2 rounded-xl text-xs font-extrabold text-[#64748B] hover:bg-[#F1F5F9] dark:hover:bg-slate-800 transition-colors cursor-pointer"
+            class="px-4 py-2 rounded-xl text-xs font-extrabold text-[#5F7089] hover:bg-[#F1F5F9] dark:hover:bg-slate-800 transition-colors cursor-pointer"
           >
             Batal
           </button>
@@ -1618,7 +1618,7 @@ function goToAdminCases() {
 }
 
 .ProseMirror p.is-editor-empty:first-child::before {
-  color: #94a3b8;
+  color: #687281;
   content: attr(data-placeholder);
   float: left;
   height: 0;

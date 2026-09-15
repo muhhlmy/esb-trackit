@@ -49,32 +49,32 @@ defineProps({
       >
         <tr>
           <th
-            class="py-3 pl-5 pr-4 text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B] text-left whitespace-nowrap"
+            class="py-3 pl-5 pr-4 text-[11px] font-semibold uppercase tracking-wider text-[#5F7089] text-left whitespace-nowrap"
           >
             Pengguna
           </th>
           <th
-            class="py-3 px-4 text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B] text-left whitespace-nowrap"
+            class="py-3 px-4 text-[11px] font-semibold uppercase tracking-wider text-[#5F7089] text-left whitespace-nowrap"
           >
             Role Akses
           </th>
           <th
-            class="py-3 px-4 text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B] text-left whitespace-nowrap"
+            class="py-3 px-4 text-[11px] font-semibold uppercase tracking-wider text-[#5F7089] text-left whitespace-nowrap"
           >
             Sub Role / Unit Ditangani
           </th>
           <th
-            class="py-3 px-4 text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B] text-left whitespace-nowrap"
+            class="py-3 px-4 text-[11px] font-semibold uppercase tracking-wider text-[#5F7089] text-left whitespace-nowrap"
           >
             Hak Akses Fitur
           </th>
           <th
-            class="py-3 px-4 text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B] text-left whitespace-nowrap"
+            class="py-3 px-4 text-[11px] font-semibold uppercase tracking-wider text-[#5F7089] text-left whitespace-nowrap"
           >
             Status
           </th>
           <th
-            class="py-3 pr-5 pl-4 text-right text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B] whitespace-nowrap"
+            class="py-3 pr-5 pl-4 text-right text-[11px] font-semibold uppercase tracking-wider text-[#5F7089] whitespace-nowrap"
           >
             Aksi
           </th>
@@ -140,37 +140,37 @@ defineProps({
       <thead class="border-b border-[#E2E8F0]/80 bg-[#F8FAFC]/80 select-none whitespace-nowrap">
         <tr>
           <th
-            class="py-3 pl-5 pr-4 text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B] text-left whitespace-nowrap"
+            class="py-3 pl-5 pr-4 text-[11px] font-semibold uppercase tracking-wider text-[#5F7089] text-left whitespace-nowrap"
           >
             Karyawan
           </th>
           <th
-            class="py-3 px-4 text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B] text-left whitespace-nowrap"
+            class="py-3 px-4 text-[11px] font-semibold uppercase tracking-wider text-[#5F7089] text-left whitespace-nowrap"
           >
             NIK
           </th>
           <th
-            class="py-3 px-4 text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B] text-left whitespace-nowrap"
+            class="py-3 px-4 text-[11px] font-semibold uppercase tracking-wider text-[#5F7089] text-left whitespace-nowrap"
           >
             Title / Jabatan
           </th>
           <th
-            class="py-3 px-4 text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B] text-left whitespace-nowrap"
+            class="py-3 px-4 text-[11px] font-semibold uppercase tracking-wider text-[#5F7089] text-left whitespace-nowrap"
           >
             Departemen / Direktorat
           </th>
           <th
-            class="py-3 px-4 text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B] text-left whitespace-nowrap"
+            class="py-3 px-4 text-[11px] font-semibold uppercase tracking-wider text-[#5F7089] text-left whitespace-nowrap"
           >
             Status
           </th>
           <th
-            class="py-3 px-4 text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B] text-left whitespace-nowrap"
+            class="py-3 px-4 text-[11px] font-semibold uppercase tracking-wider text-[#5F7089] text-left whitespace-nowrap"
           >
             Lokasi Kerja
           </th>
           <th
-            class="py-3 pr-5 pl-4 text-right text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B] whitespace-nowrap"
+            class="py-3 pr-5 pl-4 text-right text-[11px] font-semibold uppercase tracking-wider text-[#5F7089] whitespace-nowrap"
           >
             Aksi
           </th>
@@ -231,27 +231,27 @@ defineProps({
       <thead class="border-b border-[#E2E8F0]/80 bg-[#F8FAFC]/80 select-none">
         <tr>
           <th
-            class="py-3 pl-5 pr-4 text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B] min-w-[140px]"
+            class="py-3 pl-5 pr-4 text-[11px] font-semibold uppercase tracking-wider text-[#5F7089] min-w-[140px]"
           >
             Waktu
           </th>
           <th
-            class="py-3 px-4 text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B] min-w-[180px]"
+            class="py-3 px-4 text-[11px] font-semibold uppercase tracking-wider text-[#5F7089] min-w-[180px]"
           >
             Pelaku
           </th>
           <th
-            class="py-3 px-4 text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B] min-w-[110px]"
+            class="py-3 px-4 text-[11px] font-semibold uppercase tracking-wider text-[#5F7089] min-w-[110px]"
           >
             Aksi
           </th>
           <th
-            class="py-3 px-4 text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B] min-w-[240px]"
+            class="py-3 px-4 text-[11px] font-semibold uppercase tracking-wider text-[#5F7089] min-w-[240px]"
           >
             Detail Aktivitas
           </th>
           <th
-            class="py-3 pr-5 pl-4 text-right text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B]"
+            class="py-3 pr-5 pl-4 text-right text-[11px] font-semibold uppercase tracking-wider text-[#5F7089]"
           >
             IP / Perangkat
           </th>
@@ -293,32 +293,32 @@ defineProps({
       <thead class="border-b border-[#E2E8F0]/80 bg-[#F8FAFC]/80 select-none">
         <tr>
           <th
-            class="py-3 pl-5 pr-4 text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B] min-w-[240px]"
+            class="py-3 pl-5 pr-4 text-[11px] font-semibold uppercase tracking-wider text-[#5F7089] min-w-[240px]"
           >
             Tiket &amp; Subjek
           </th>
           <th
-            class="py-3 px-4 text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B] min-w-[150px]"
+            class="py-3 px-4 text-[11px] font-semibold uppercase tracking-wider text-[#5F7089] min-w-[150px]"
           >
             Pemohon
           </th>
           <th
-            class="py-3 px-4 text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B] min-w-[110px]"
+            class="py-3 px-4 text-[11px] font-semibold uppercase tracking-wider text-[#5F7089] min-w-[110px]"
           >
             Unit
           </th>
           <th
-            class="py-3 px-4 text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B] min-w-[110px]"
+            class="py-3 px-4 text-[11px] font-semibold uppercase tracking-wider text-[#5F7089] min-w-[110px]"
           >
             Status
           </th>
           <th
-            class="py-3 px-4 text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B] min-w-[100px]"
+            class="py-3 px-4 text-[11px] font-semibold uppercase tracking-wider text-[#5F7089] min-w-[100px]"
           >
             Prioritas
           </th>
           <th
-            class="py-3 pr-5 pl-4 text-right text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B]"
+            class="py-3 pr-5 pl-4 text-right text-[11px] font-semibold uppercase tracking-wider text-[#5F7089]"
           >
             Aksi
           </th>

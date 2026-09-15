@@ -25,10 +25,9 @@ const filledCount = computed(() => {
     <span
       v-for="star in 5"
       :key="star"
-      class="material-symbols-outlined fill-1"
+      aria-hidden="true" class="material-symbols-outlined fill-1"
       :style="{ fontSize: size }"
       :class="star <= filledCount ? 'text-[#FFAE1F]' : 'text-[#CBD5E1]'"
-      aria-hidden="true"
     >
       star
     </span>

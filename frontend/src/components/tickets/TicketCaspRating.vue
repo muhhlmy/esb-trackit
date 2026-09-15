@@ -115,8 +115,8 @@ watch(
 <template>
   <div class="rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] p-4 text-xs transition-all">
     <!-- Loading State -->
-    <div v-if="isLoading" class="flex items-center gap-2 py-2 text-[#64748B]">
-      <span class="material-symbols-outlined text-[16px] animate-spin text-[#333333]"
+    <div v-if="isLoading" class="flex items-center gap-2 py-2 text-[#5F7089]">
+      <span aria-hidden="true" class="material-symbols-outlined text-[16px] animate-spin text-[#333333]"
         >progress_activity</span
       >
       <span>Memeriksa status penilaian CASP...</span>
@@ -144,14 +144,14 @@ watch(
 
       <p
         v-if="isUserReporter && !isAdmin && !isSuperAdmin"
-        class="text-[11.5px] font-medium text-[#64748B]"
+        class="text-[12px] font-medium text-[#5F7089]"
       >
         Terima kasih atas feedback Anda.
       </p>
 
       <div
         v-if="existingRating.feedback"
-        class="mt-1 rounded-lg border border-[#E2E8F0] bg-white p-3 text-[11.5px] text-[#334155] italic"
+        class="mt-1 rounded-lg border border-[#E2E8F0] bg-white p-3 text-[12px] text-[#334155] italic"
       >
         "{{ existingRating.feedback }}"
       </div>
@@ -160,7 +160,7 @@ watch(
         v-if="
           (isAdmin || isSuperAdmin) && (existingRating.reporterName || existingRating.assigneeName)
         "
-        class="text-[10.5px] text-[#94A3B8] flex items-center gap-2 mt-0.5"
+        class="text-[11px] text-[#687281] flex items-center gap-2 mt-0.5"
       >
         <span v-if="existingRating.reporterName">Pelapor: {{ existingRating.reporterName }}</span>
         <span v-if="existingRating.assigneeName">· Petugas: {{ existingRating.assigneeName }}</span>
@@ -171,7 +171,7 @@ watch(
     <div v-else-if="isEligible" class="flex flex-col gap-3">
       <div>
         <h4 class="text-xs font-bold text-[#333333]">Penilaian Layanan</h4>
-        <p class="text-[11.5px] font-normal text-[#64748B] mt-0.5">
+        <p class="text-[12px] font-normal text-[#5F7089] mt-0.5">
           Bagaimana pengalaman Anda terhadap penanganan ticket ini?
         </p>
       </div>
@@ -190,7 +190,7 @@ watch(
             class="text-amber-400 focus:outline-none transition-transform hover:scale-110 cursor-pointer"
           >
             <span
-              class="material-symbols-outlined text-[26px] fill-1"
+              aria-hidden="true" class="material-symbols-outlined text-[26px] fill-1"
               :class="(hoverRating || selectedRating) >= star ? 'text-[#FFAE1F]' : 'text-[#CBD5E1]'"
             >
               star
@@ -208,7 +208,7 @@ watch(
           v-model="feedback"
           rows="2"
           placeholder="Tulis feedback atau masukan Anda... (opsional)"
-          class="w-full rounded-xl border border-[#E2E8F0] bg-white p-3 text-xs font-medium text-[#333333] focus:border-[#0A51B0] focus:outline-none transition-all placeholder-[#94A3B8]"
+          class="w-full rounded-xl border border-[#E2E8F0] bg-white p-3 text-xs font-medium text-[#333333] focus:border-[#0A51B0] focus:outline-none transition-all placeholder-[#687281]"
         ></textarea>
       </div>
 
@@ -223,17 +223,17 @@ watch(
           :disabled="isSubmitting || !selectedRating"
           class="inline-flex items-center gap-1.5 rounded-xl bg-[#0A51B0] px-4 py-2 text-xs font-bold text-white shadow-2xs hover:bg-[#0A4391] transition-all cursor-pointer disabled:opacity-50"
         >
-          <span v-if="isSubmitting" class="material-symbols-outlined text-[16px] animate-spin"
+          <span aria-hidden="true" v-if="isSubmitting" class="material-symbols-outlined text-[16px] animate-spin"
             >progress_activity</span
           >
-          <span v-else class="material-symbols-outlined text-[16px]">send</span>
+          <span aria-hidden="true" v-else class="material-symbols-outlined text-[16px]">send</span>
           <span>{{ isSubmitting ? 'Mengirim...' : 'Kirim Penilaian' }}</span>
         </button>
       </div>
     </div>
 
     <!-- Belum Eligible / Status Belum Selesai -->
-    <div v-else class="text-xs font-medium text-[#64748B]">
+    <div v-else class="text-xs font-medium text-[#5F7089]">
       <span v-if="!isFinished" class="italic">Penilaian tersedia setelah ticket selesai.</span>
       <span v-else-if="isAdmin || isSuperAdmin" class="italic">Belum ada penilaian dari user.</span>
       <span v-else class="italic">{{

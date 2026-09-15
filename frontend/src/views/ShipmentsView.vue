@@ -349,7 +349,7 @@ onMounted(() => {
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h1 class="text-lg sm:text-xl font-bold text-[#333333] tracking-tight">Pengiriman</h1>
-          <p class="text-[13px] text-[#64748B] mt-0.5 leading-normal">
+          <p class="text-[13px] text-[#5F7089] mt-0.5 leading-normal">
             Pantau proses pengiriman barang dan aset kantor.
           </p>
         </div>
@@ -361,7 +361,7 @@ onMounted(() => {
             class="toolbar-primary-action inline-flex h-9 shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg bg-[#0A51B0] px-3 text-xs font-semibold text-white shadow-2xs transition-all hover:bg-[#0A4391] active:scale-95 sm:px-3.5"
             title="Tambah pengiriman baru"
           >
-            <span class="material-symbols-outlined text-[16px]">add</span>
+            <span aria-hidden="true" class="material-symbols-outlined text-[16px]">add</span>
             <span>Tambah Pengiriman</span>
           </button>
           <div class="toolbar-action-group flex items-center gap-1 rounded-lg border border-[#D7E3F2] bg-[#F8FAFC] p-1">
@@ -370,14 +370,14 @@ onMounted(() => {
               @click="showImportModal = true"
               class="toolbar-action-button inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-[11px] font-bold text-[#0A51B0] hover:bg-white"
             >
-              <span class="material-symbols-outlined text-[15px]">upload_file</span>Import
+              <span aria-hidden="true" class="material-symbols-outlined text-[15px]">upload_file</span>Import
             </button>
             <button
               type="button"
               @click="showExportModal = true"
               class="toolbar-action-button inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-[11px] font-bold text-[#0A51B0] hover:bg-white"
             >
-              <span class="material-symbols-outlined text-[15px]">download</span>Export
+              <span aria-hidden="true" class="material-symbols-outlined text-[15px]">download</span>Export
             </button>
           </div>
         </div>
@@ -389,18 +389,18 @@ onMounted(() => {
       >
         <div class="relative h-9 min-w-0">
           <Search
-            class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8] pointer-events-none"
+            class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#687281] pointer-events-none"
           />
           <input
             v-model="searchQuery"
             aria-label="Cari pengiriman"
             type="text"
             placeholder="Cari penerima, barang, tujuan, atau no resi..."
-            class="toolbar-search-input h-full min-h-0 w-full rounded-xl border border-[#E2E8F0] bg-white pl-9 pr-3 text-xs text-[#333333] placeholder-[#94A3B8] focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
+            class="toolbar-search-input h-full min-h-0 w-full rounded-xl border border-[#E2E8F0] bg-white pl-9 pr-3 text-xs text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
           />
         </div>
 
-        <button type="button" @click="showFilterModal = true" class="toolbar-filter-button h-9 shrink-0 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-semibold text-[#64748B] hover:bg-white"><span class="material-symbols-outlined mr-1 align-middle text-[16px]">filter_alt</span>Filter</button>
+        <button type="button" @click="showFilterModal = true" class="toolbar-filter-button h-9 shrink-0 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-semibold text-[#5F7089] hover:bg-white"><span aria-hidden="true" class="material-symbols-outlined mr-1 align-middle text-[16px]">filter_alt</span>Filter</button>
       </div>
     </div>
 
@@ -415,7 +415,7 @@ onMounted(() => {
           <Package class="w-5 h-5" />
         </div>
         <div class="min-w-0">
-          <p class="text-[11px] font-semibold text-[#64748B] uppercase tracking-wider">
+          <p class="text-[11px] font-semibold text-[#5F7089] uppercase tracking-wider">
             Total Pengiriman
           </p>
           <p class="text-xl sm:text-2xl font-bold text-[#333333] mt-0.5">
@@ -433,7 +433,7 @@ onMounted(() => {
           <Package class="w-5 h-5" />
         </div>
         <div class="min-w-0">
-          <p class="text-[11px] font-semibold text-[#64748B] uppercase tracking-wider">
+          <p class="text-[11px] font-semibold text-[#5F7089] uppercase tracking-wider">
             Belum Dikirim
           </p>
           <p class="text-xl sm:text-2xl font-bold text-[#333333] mt-0.5">
@@ -451,7 +451,7 @@ onMounted(() => {
           <Truck class="w-5 h-5" />
         </div>
         <div class="min-w-0">
-          <p class="text-[11px] font-semibold text-[#64748B] uppercase tracking-wider">
+          <p class="text-[11px] font-semibold text-[#5F7089] uppercase tracking-wider">
             Sedang Dikirim
           </p>
           <p class="text-xl sm:text-2xl font-bold text-[#333333] mt-0.5">
@@ -469,7 +469,7 @@ onMounted(() => {
           <Truck class="w-5 h-5" />
         </div>
         <div class="min-w-0">
-          <p class="text-[11px] font-semibold text-[#64748B] uppercase tracking-wider">Diterima</p>
+          <p class="text-[11px] font-semibold text-[#5F7089] uppercase tracking-wider">Diterima</p>
           <p class="text-xl sm:text-2xl font-bold text-[#333333] mt-0.5">
             {{ summary.diterima }}
           </p>
@@ -497,14 +497,14 @@ onMounted(() => {
         </button>
       </div>
 
-      <div v-else-if="shipments.length === 0" class="px-4 py-12 text-center text-[#64748B]">
+      <div v-else-if="shipments.length === 0" class="px-4 py-12 text-center text-[#5F7089]">
         <div
-          class="mx-auto w-12 h-12 rounded-2xl bg-slate-100 flex items-center justify-center text-[#94A3B8] mb-3"
+          class="mx-auto w-12 h-12 rounded-2xl bg-slate-100 flex items-center justify-center text-[#687281] mb-3"
         >
           <Package class="w-6 h-6" />
         </div>
         <p class="font-bold text-sm text-[#333333]">Belum ada data pengiriman.</p>
-        <p class="text-xs text-[#64748B] mt-1 max-w-sm mx-auto">
+        <p class="text-xs text-[#5F7089] mt-1 max-w-sm mx-auto">
           {{
             canWriteShipments
               ? 'Tambahkan pengiriman pertama untuk mulai melakukan tracking.'
@@ -528,7 +528,7 @@ onMounted(() => {
           <table class="w-full text-left border-collapse">
             <thead>
               <tr
-                class="border-b border-[#E2E8F0] bg-[#F8FAFC] text-[11px] font-bold text-[#64748B] uppercase tracking-wider"
+                class="border-b border-[#E2E8F0] bg-[#F8FAFC] text-[11px] font-bold text-[#5F7089] uppercase tracking-wider"
               >
                 <th class="py-3 px-4">Tanggal Request</th>
                 <th class="py-3 px-4">Nama Penerima</th>
@@ -577,20 +577,20 @@ onMounted(() => {
                     :href="item.delivery_proof_url"
                     target="_blank"
                     rel="noopener noreferrer"
-                    class="inline-flex items-center gap-1 text-[11.5px] font-bold text-[#333333] hover:text-[#0A4391] hover:underline"
+                    class="inline-flex items-center gap-1 text-[12px] font-bold text-[#333333] hover:text-[#0A4391] hover:underline"
                     title="Buka link bukti pengiriman di tab baru"
                   >
                     <span>Lihat Bukti</span>
                     <ExternalLink class="w-3 h-3" />
                   </a>
-                  <span v-else class="text-[#94A3B8]">-</span>
+                  <span v-else class="text-[#687281]">-</span>
                 </td>
                 <td v-if="canWriteShipments" class="py-3 px-4 text-right whitespace-nowrap">
                   <div class="flex items-center justify-end gap-1">
                     <button
                       type="button"
                       @click="openEdit(item)"
-                      class="p-1.5 rounded-lg text-[#64748B] hover:text-[#333333] hover:bg-[#F1F5F9] transition-colors cursor-pointer"
+                      class="p-1.5 rounded-lg text-[#5F7089] hover:text-[#333333] hover:bg-[#F1F5F9] transition-colors cursor-pointer"
                       title="Edit pengiriman"
                       aria-label="Edit pengiriman"
                     >
@@ -599,7 +599,7 @@ onMounted(() => {
                     <button
                       type="button"
                       @click="openDelete(item)"
-                      class="p-1.5 rounded-lg text-[#64748B] hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
+                      class="p-1.5 rounded-lg text-[#5F7089] hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
                       title="Hapus pengiriman"
                       aria-label="Hapus pengiriman"
                     >
@@ -622,7 +622,7 @@ onMounted(() => {
             <div class="flex items-start justify-between gap-2">
               <div>
                 <p class="text-sm font-bold text-[#333333]">{{ item.recipient_name }}</p>
-                <p class="text-[11px] text-[#64748B] mt-0.5">
+                <p class="text-[11px] text-[#5F7089] mt-0.5">
                   {{ formatDate(item.request_date) }} &bull; {{ item.destination }}
                 </p>
               </div>
@@ -636,9 +636,9 @@ onMounted(() => {
               {{ item.item_description }}
             </p>
 
-            <div class="flex items-center justify-between text-xs text-[#64748B] pt-1">
+            <div class="flex items-center justify-between text-xs text-[#5F7089] pt-1">
               <div class="flex items-center gap-1.5 font-mono text-[11px]">
-                <span class="text-[#94A3B8]">Resi:</span>
+                <span class="text-[#687281]">Resi:</span>
                 <span>{{ item.tracking_number || '-' }}</span>
               </div>
 
@@ -812,7 +812,7 @@ onMounted(() => {
                 for="shipment-tracking_number"
                 class="block text-xs font-bold text-[#333333] mb-1"
               >
-                No Resi <span class="text-[#94A3B8] font-normal">(Opsional)</span>
+                No Resi <span class="text-[#687281] font-normal">(Opsional)</span>
               </label>
               <input
                 id="shipment-tracking_number"
@@ -829,7 +829,7 @@ onMounted(() => {
                 for="shipment-delivery_proof_url"
                 class="block text-xs font-bold text-[#333333] mb-1"
               >
-                Link Bukti Pengiriman <span class="text-[#94A3B8] font-normal">(Opsional)</span>
+                Link Bukti Pengiriman <span class="text-[#687281] font-normal">(Opsional)</span>
               </label>
               <input
                 id="shipment-delivery_proof_url"
@@ -1005,7 +1005,7 @@ onMounted(() => {
   letter-spacing: 0;
   font-size: 11px;
   font-weight: 500;
-  color: #8291a7;
+  color: #667283;
   padding: 16px 12px;
 }
 .shipment-table td {
@@ -1239,7 +1239,7 @@ onMounted(() => {
   margin: 7px 0 18px;
   font-size: 11px;
   line-height: 1.7;
-  color: #71829b;
+  color: #637288;
 }
 .shipment-entry-section > .grid {
   gap: 18px;

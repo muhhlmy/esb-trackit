@@ -354,13 +354,13 @@ function formatStatusPillOps(status) {
     case 'Maintenance':
       return { text: 'text-[#854D0E]', bg: 'bg-[#FEF9C3]', dot: 'bg-[#CA8A04]' }
     case 'Tidak Aktif':
-      return { text: 'text-[#475569]', bg: 'bg-[#F1F5F9]', dot: 'bg-[#64748B]' }
+      return { text: 'text-[#475569]', bg: 'bg-[#F1F5F9]', dot: 'bg-[#5F7089]' }
     case 'Rusak':
       return { text: 'text-[#C2410C]', bg: 'bg-[#FFEDD5]', dot: 'bg-[#EA580C]' }
     case 'Disposed':
       return { text: 'text-[#991B1B]', bg: 'bg-[#FEE2E2]', dot: 'bg-[#DC2626]' }
     default:
-      return { text: 'text-[#475569]', bg: 'bg-[#F1F5F9]', dot: 'bg-[#64748B]' }
+      return { text: 'text-[#475569]', bg: 'bg-[#F1F5F9]', dot: 'bg-[#5F7089]' }
   }
 }
 
@@ -399,7 +399,7 @@ function formatDate(dateStr) {
             Aset OPS
           </h2>
           <p
-            class="text-[11px] sm:text-xs text-[#64748B] mt-0.5 leading-normal line-clamp-1 sm:line-clamp-none"
+            class="text-[11px] sm:text-xs text-[#5F7089] mt-0.5 leading-normal line-clamp-1 sm:line-clamp-none"
           >
             Kelola perangkat & mesin operasional outlet / store (POS, KIOSK, Payment, Display).
           </p>
@@ -414,15 +414,15 @@ function formatDate(dateStr) {
             class="toolbar-primary-action inline-flex h-9 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg bg-[#0A51B0] px-3 sm:px-3.5 text-xs font-semibold text-white shadow-2xs transition-all hover:bg-[#0A4391] active:scale-95"
             title="Tambah Aset OPS baru"
           >
-            <span class="material-symbols-outlined text-[16px]">add</span>
+            <span aria-hidden="true" class="material-symbols-outlined text-[16px]">add</span>
             <span>Tambah Aset OPS</span>
           </button>
           <div class="toolbar-action-group flex items-center gap-1 rounded-lg border border-[#D7E3F2] bg-[#F8FAFC] p-1">
             <button type="button" @click="showImportModal = true" class="toolbar-action-button inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-[11px] font-bold text-[#0A51B0] hover:bg-white" title="Impor data Aset OPS dari Excel">
-              <span class="material-symbols-outlined text-[15px]">upload_file</span>Import
+              <span aria-hidden="true" class="material-symbols-outlined text-[15px]">upload_file</span>Import
             </button>
             <button type="button" @click="showExportModal = true" class="toolbar-action-button inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-[11px] font-bold text-[#0A51B0] hover:bg-white" title="Export data Aset OPS">
-              <span class="material-symbols-outlined text-[15px]">download</span>Export
+              <span aria-hidden="true" class="material-symbols-outlined text-[15px]">download</span>Export
             </button>
           </div>
         </div>
@@ -435,14 +435,14 @@ function formatDate(dateStr) {
         <!-- Search Input -->
         <div class="relative h-9 w-full sm:flex-1 sm:min-w-[200px]">
           <span
-            class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-[17px] text-[#94A3B8] pointer-events-none"
+            aria-hidden="true" class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-[17px] text-[#687281] pointer-events-none"
             >search</span
           >
           <input
             v-model="searchQuery"
             type="text"
-            placeholder="Cari hostname, nama asset, PIC, lokasi..."
-            class="h-full w-full rounded-lg border border-[#E2E8F0] bg-white pl-8 pr-8 text-xs text-[#333333] placeholder-[#94A3B8] focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
+            aria-label="Cari aset OPS" placeholder="Cari hostname, nama asset, PIC, lokasi..."
+            class="h-full w-full rounded-lg border border-[#E2E8F0] bg-white pl-8 pr-8 text-xs text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
           />
           <!-- Inline Clear Button -->
           <button
@@ -450,15 +450,15 @@ function formatDate(dateStr) {
             type="button"
             @click="searchQuery = ''"
             aria-label="Bersihkan pencarian"
-            class="absolute right-2 top-1/2 -translate-y-1/2 flex h-5 w-5 items-center justify-center rounded-full text-[#94A3B8] hover:bg-[#F1F5F9] hover:text-[#333333] transition-all cursor-pointer touch-manipulation"
+            class="absolute right-2 top-1/2 -translate-y-1/2 flex h-5 w-5 items-center justify-center rounded-full text-[#687281] hover:bg-[#F1F5F9] hover:text-[#333333] transition-all cursor-pointer touch-manipulation"
             title="Bersihkan"
           >
-            <span class="material-symbols-outlined text-[15px]">close</span>
+            <span aria-hidden="true" class="material-symbols-outlined text-[15px]">close</span>
           </button>
         </div>
 
         <div class="flex w-full items-center justify-end">
-          <button type="button" @click="showFilterModal = true" class="h-9 shrink-0 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-semibold text-[#64748B] hover:bg-white"><span class="material-symbols-outlined mr-1 align-middle text-[16px]">filter_alt</span>Filter</button>
+          <button type="button" @click="showFilterModal = true" class="h-9 shrink-0 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-semibold text-[#5F7089] hover:bg-white"><span aria-hidden="true" class="material-symbols-outlined mr-1 align-middle text-[16px]">filter_alt</span>Filter</button>
         </div>
       </div>
     </div>
@@ -477,9 +477,9 @@ function formatDate(dateStr) {
       <div
         v-if="pageError"
         role="alert"
-        class="flex items-center gap-2 bg-rose-50 px-5 py-4 text-[12.5px] text-rose-600 rounded-2xl border border-rose-200"
+        class="flex items-center gap-2 bg-rose-50 px-5 py-4 text-[13px] text-rose-600 rounded-2xl border border-rose-200"
       >
-        <span class="material-symbols-outlined text-[18px]">error</span>
+        <span aria-hidden="true" class="material-symbols-outlined text-[18px]">error</span>
         <span class="flex-1 font-semibold">{{ pageError }}</span>
         <button type="button" class="font-bold underline cursor-pointer" @click="fetchData">
           Coba lagi
@@ -574,12 +574,12 @@ function formatDate(dateStr) {
       >
         <div class="flex flex-col items-center justify-center gap-2 max-w-sm mx-auto">
           <span
-            class="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#F1F5F9] text-[#64748B]"
+            class="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#F1F5F9] text-[#5F7089]"
           >
-            <span class="material-symbols-outlined text-[24px]">precision_manufacturing</span>
+            <span aria-hidden="true" class="material-symbols-outlined text-[24px]">precision_manufacturing</span>
           </span>
           <h3 class="text-[14px] font-bold text-[#333333] mt-1">Belum Ada Aset OPS</h3>
-          <p class="text-[11.5px] text-[#64748B] leading-relaxed">
+          <p class="text-[12px] text-[#5F7089] leading-relaxed">
             Belum ada perangkat operasional yang terdaftar dalam inventaris atau sesuai dengan kata
             kunci pencarian.
           </p>
@@ -589,7 +589,7 @@ function formatDate(dateStr) {
             @click="openAdd"
             class="mt-2 h-9 rounded-lg bg-[#0A51B0] px-4 text-[12px] font-semibold text-white shadow-2xs hover:bg-[#0A4391] transition-all flex items-center gap-1.5 cursor-pointer"
           >
-            <span class="material-symbols-outlined text-[16px]">add</span>
+            <span aria-hidden="true" class="material-symbols-outlined text-[16px]">add</span>
             <span>Tambah Aset OPS</span>
           </button>
         </div>
@@ -609,7 +609,7 @@ function formatDate(dateStr) {
         >
           <div class="laptop-identity">
             <div class="laptop-icon" aria-hidden="true">
-              <span class="material-symbols-outlined">{{ getOpsIcon(asset.kategori) }}</span>
+              <span aria-hidden="true" class="material-symbols-outlined">{{ getOpsIcon(asset.kategori) }}</span>
             </div>
             <div class="laptop-identity-text">
               <h4 :title="asset.nama_asset">{{ asset.nama_asset || '—' }}</h4>
@@ -696,7 +696,7 @@ function formatDate(dateStr) {
               type="text"
               required
               placeholder="Contoh: OPS-PL-001"
-              class="w-full h-10 px-3 text-[12.5px] rounded-xl border border-[#E2E8F0] bg-white focus:border-[#0A51B0] focus:outline-none"
+              class="w-full h-10 px-3 text-[13px] rounded-xl border border-[#E2E8F0] bg-white focus:border-[#0A51B0] focus:outline-none"
             />
           </div>
 
@@ -711,7 +711,7 @@ function formatDate(dateStr) {
               type="text"
               required
               placeholder="Contoh: KIOSK Self Service Station"
-              class="w-full h-10 px-3 text-[12.5px] rounded-xl border border-[#E2E8F0] bg-white focus:border-[#0A51B0] focus:outline-none"
+              class="w-full h-10 px-3 text-[13px] rounded-xl border border-[#E2E8F0] bg-white focus:border-[#0A51B0] focus:outline-none"
             />
           </div>
         </div>
@@ -759,7 +759,7 @@ function formatDate(dateStr) {
               v-model="form.pic"
               type="text"
               placeholder="Contoh: Store Manager / Spv Kasir"
-              class="w-full h-10 px-3 text-[12.5px] rounded-xl border border-[#E2E8F0] bg-white focus:border-[#0A51B0] focus:outline-none"
+              class="w-full h-10 px-3 text-[13px] rounded-xl border border-[#E2E8F0] bg-white focus:border-[#0A51B0] focus:outline-none"
             />
           </div>
 
@@ -772,7 +772,7 @@ function formatDate(dateStr) {
               id="ops-tanggal-beli"
               v-model="form.tanggal_beli"
               type="date"
-              class="w-full h-10 px-3 text-[12.5px] rounded-xl border border-[#E2E8F0] bg-white focus:border-[#0A51B0] focus:outline-none"
+              class="w-full h-10 px-3 text-[13px] rounded-xl border border-[#E2E8F0] bg-white focus:border-[#0A51B0] focus:outline-none"
             />
           </div>
         </div>
@@ -791,7 +791,7 @@ function formatDate(dateStr) {
               min="0"
               step="1000"
               placeholder="0"
-              class="w-full h-10 px-3 text-[12.5px] rounded-xl border border-[#E2E8F0] bg-white focus:border-[#0A51B0] focus:outline-none"
+              class="w-full h-10 px-3 text-[13px] rounded-xl border border-[#E2E8F0] bg-white focus:border-[#0A51B0] focus:outline-none"
             />
           </div>
 
@@ -833,7 +833,7 @@ function formatDate(dateStr) {
             type="button"
             :disabled="isSubmitting"
             @click="closeModal"
-            class="h-10 px-4 rounded-xl border border-[#E2E8F0] text-[12.5px] font-semibold text-[#64748B] hover:bg-[#F8FAFC]"
+            class="h-10 px-4 rounded-xl border border-[#E2E8F0] text-[13px] font-semibold text-[#5F7089] hover:bg-[#F8FAFC]"
           >
             Batal
           </button>
@@ -841,7 +841,7 @@ function formatDate(dateStr) {
             type="submit"
             form="crud-AssetsOpsView"
             :disabled="isSubmitting"
-            class="h-10 px-5 rounded-xl bg-[#0A51B0] text-[12.5px] font-bold text-white shadow-2xs hover:bg-[#0A4391] disabled:opacity-50 flex items-center gap-2"
+            class="h-10 px-5 rounded-xl bg-[#0A51B0] text-[13px] font-bold text-white shadow-2xs hover:bg-[#0A4391] disabled:opacity-50 flex items-center gap-2"
           >
             <span v-if="isSubmitting" class="animate-spin text-[16px]">hourglass_empty</span>
             <span>{{ isSubmitting ? 'Menyimpan...' : 'Simpan Aset OPS' }}</span>
@@ -868,7 +868,7 @@ function formatDate(dateStr) {
             type="button"
             :disabled="isSubmitting"
             @click="closeModal"
-            class="h-10 px-4 rounded-xl border border-[#E2E8F0] text-[12.5px] font-semibold text-[#64748B] hover:bg-[#F8FAFC]"
+            class="h-10 px-4 rounded-xl border border-[#E2E8F0] text-[13px] font-semibold text-[#5F7089] hover:bg-[#F8FAFC]"
           >
             Batal
           </button>
@@ -876,7 +876,7 @@ function formatDate(dateStr) {
             type="button"
             :disabled="isSubmitting"
             @click="confirmDelete"
-            class="h-10 px-5 rounded-xl bg-rose-600 text-[12.5px] font-bold text-white shadow-2xs hover:bg-rose-700 disabled:opacity-50"
+            class="h-10 px-5 rounded-xl bg-rose-600 text-[13px] font-bold text-white shadow-2xs hover:bg-rose-700 disabled:opacity-50"
           >
             {{ isSubmitting ? 'Menghapus...' : 'Ya, Hapus' }}
           </button>
@@ -893,48 +893,48 @@ function formatDate(dateStr) {
           <div
             class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#EFF6FF] text-[#333333]"
           >
-            <span class="material-symbols-outlined text-[22px]">{{
+            <span aria-hidden="true" class="material-symbols-outlined text-[22px]">{{
               getOpsIcon(selectedAsset.kategori)
             }}</span>
           </div>
           <div>
             <h3 class="font-bold text-[#333333] text-[14px]">{{ selectedAsset.nama_asset }}</h3>
-            <p class="font-mono text-[11px] text-[#64748B]">{{ selectedAsset.hostname }}</p>
+            <p class="font-mono text-[11px] text-[#5F7089]">{{ selectedAsset.hostname }}</p>
           </div>
         </div>
 
         <div class="asset-detail-fields">
           <div>
-            <span class="text-[#64748B] block text-[11px] font-medium">Kategori</span>
+            <span class="text-[#5F7089] block text-[11px] font-medium">Kategori</span>
             <span class="font-semibold text-[#333333]">{{ selectedAsset.kategori }}</span>
           </div>
 
           <div>
-            <span class="text-[#64748B] block text-[11px] font-medium">Lokasi</span>
+            <span class="text-[#5F7089] block text-[11px] font-medium">Lokasi</span>
             <span class="font-semibold text-[#333333]">{{ selectedAsset.lokasi }}</span>
           </div>
 
           <div>
-            <span class="text-[#64748B] block text-[11px] font-medium">PIC / Penanggung Jawab</span>
+            <span class="text-[#5F7089] block text-[11px] font-medium">PIC / Penanggung Jawab</span>
             <span class="text-[#333333] font-medium">{{
               selectedAsset.pic || 'Belum ditetapkan'
             }}</span>
           </div>
 
           <div>
-            <span class="text-[#64748B] block text-[11px] font-medium">Tanggal Pembelian</span>
+            <span class="text-[#5F7089] block text-[11px] font-medium">Tanggal Pembelian</span>
             <span class="text-[#333333]">{{ formatDate(selectedAsset.tanggal_beli) }}</span>
           </div>
 
           <div>
-            <span class="text-[#64748B] block text-[11px] font-medium">Total Asset Amount</span>
+            <span class="text-[#5F7089] block text-[11px] font-medium">Total Asset Amount</span>
             <span class="font-bold text-[#333333] text-[13.5px]">{{
               formatCurrency(selectedAsset.total_asset_amount)
             }}</span>
           </div>
 
           <div>
-            <span class="text-[#64748B] block text-[11px] font-medium">Status Operasional</span>
+            <span class="text-[#5F7089] block text-[11px] font-medium">Status Operasional</span>
             <span
               class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold mt-0.5"
               :class="[
@@ -952,8 +952,8 @@ function formatDate(dateStr) {
         </div>
 
         <div class="pt-2 border-t border-[#E2E8F0]">
-          <span class="text-[#64748B] block text-[11px] font-medium">Kondisi Perangkat</span>
-          <p class="text-[12.5px] text-[#333333] font-semibold mt-0.5">
+          <span class="text-[#5F7089] block text-[11px] font-medium">Kondisi Perangkat</span>
+          <p class="text-[13px] text-[#333333] font-semibold mt-0.5">
             {{ selectedAsset.kondisi || 'Baik' }}
           </p>
         </div>
@@ -963,7 +963,7 @@ function formatDate(dateStr) {
           <button
             type="button"
             @click="closeModal"
-            class="h-10 px-5 rounded-xl bg-[#0A51B0] text-[12.5px] font-bold text-white shadow-2xs hover:bg-[#0A4391]"
+            class="h-10 px-5 rounded-xl bg-[#0A51B0] text-[13px] font-bold text-white shadow-2xs hover:bg-[#0A4391]"
           >
             Tutup
           </button>

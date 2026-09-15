@@ -21,7 +21,7 @@
 .asset-toolbar > div:first-child p {
   font-size: 12px;
   line-height: 1.7;
-  color: #71829b;
+  color: #637288;
 }
 .asset-toolbar > div:first-child > button {
   background: #0A51B0;
@@ -102,7 +102,7 @@
 .asset-detail-identity p {
   font-size: 11px;
   line-height: 1.7;
-  color: #71829b;
+  color: #637288;
 }
 .asset-detail-fields {
   display: grid;
@@ -118,7 +118,7 @@
 .asset-detail-fields dt,
 .asset-detail-fields > div > span:first-child {
   display: block;
-  color: #71829b;
+  color: #637288;
   font-size: 11px;
   font-weight: 500;
   text-transform: none;
@@ -429,12 +429,12 @@
   text-align: center;
 }
 .it-list-heading p {
-  color: #71829b;
+  color: #637288;
   font-size: 11px;
   margin-top: 5px;
 }
 .it-result-range {
-  color: #71829b;
+  color: #637288;
   font-size: 11px;
   font-variant-numeric: tabular-nums;
   text-align: right;
@@ -450,10 +450,10 @@
   gap: 16px;
 }
 .asset-inventory .asset-card-list > div > .grid > div > span:first-child {
-  font-size: 9px;
+  font-size: 10px;
   letter-spacing: 0.055em;
   font-weight: 500;
-  color: #8291a7;
+  color: #667283;
 }
 .asset-inventory .asset-card-list > div > .grid > div > span:nth-child(2) {
   margin-top: 5px;
@@ -467,8 +467,8 @@
     gap: 18px;
   }
   .asset-inventory .asset-card-list > div > .xl\:flex > span.uppercase {
-    font-size: 9px;
-    color: #8291a7;
+    font-size: 10px;
+    color: #667283;
     font-weight: 500;
     letter-spacing: 0.04em;
   }
@@ -556,13 +556,13 @@
 .laptop-identity p {
   margin: 3px 0;
   font-size: 12px;
-  color: #64748b;
+  color: #5F7089;
 }
 .laptop-serial {
   display: block;
   font-family: ui-monospace, monospace;
-  font-size: 10.5px;
-  color: #8291a7;
+  font-size: 11px;
+  color: #667283;
 }
 .laptop-identity :is(h4, p, .laptop-serial),
 .laptop-field > * {
@@ -584,7 +584,7 @@
 }
 .laptop-label {
   font-size: 11px;
-  color: #8291a7;
+  color: #667283;
 }
 .laptop-field strong {
   font-size: 12px;
@@ -592,12 +592,12 @@
   font-weight: 550;
 }
 .laptop-field .laptop-unassigned {
-  color: #94a3b8;
+  color: #687281;
   font-weight: 400;
 }
 .laptop-secondary {
-  font-size: 10.5px;
-  color: #8291a7;
+  font-size: 11px;
+  color: #667283;
 }
 .laptop-state {
   grid-area: state;
@@ -621,7 +621,7 @@
   line-height: 1.5;
 }
 .asset-it-inventory .laptop-condition {
-  font-size: 11.5px;
+  font-size: 12px;
 }
 .laptop-actions {
   grid-area: actions;
@@ -715,10 +715,8 @@
   border-color: #dce4ef;
   background: #fafbfd;
 }
-.asset-entry-form :is(input, textarea)::placeholder {
-  color: #94a3b8;
-  font-weight: 400;
-}
+/* Placeholder (warna, ukuran, weight) diatur global di main.css — audit v2.
+   Token lama #5F7089 duplikat di sini dihapus (Nielsen #4 Consistency). */
 .asset-entry-form :is(input, select, textarea):focus {
   background: #fff;
 }

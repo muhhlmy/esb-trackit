@@ -222,7 +222,7 @@ function parsePerubahan(perubahan, aksi) {
         <h2 class="text-lg font-bold text-[#333333] tracking-tight">
           Audit Log &amp; Riwayat Aktivitas
         </h2>
-        <p class="text-xs text-[#64748B] mt-0.5 leading-normal">
+        <p class="text-xs text-[#5F7089] mt-0.5 leading-normal">
           {{
             isSuperAdmin
               ? 'Melihat rekam jejak perubahan sistem & audit login pengguna'
@@ -263,7 +263,7 @@ function parsePerubahan(perubahan, aksi) {
         :class="
           activeTab === 'assets'
             ? 'border-brand text-brand font-black'
-            : 'border-transparent text-[#64748B] hover:text-[#172033]'
+            : 'border-transparent text-[#5F7089] hover:text-[#172033]'
         "
       >
         <span aria-hidden="true" class="material-symbols-outlined text-[18px]">history</span>
@@ -278,7 +278,7 @@ function parsePerubahan(perubahan, aksi) {
         :class="
           activeTab === 'audit'
             ? 'border-brand text-brand font-black'
-            : 'border-transparent text-[#64748B] hover:text-[#172033]'
+            : 'border-transparent text-[#5F7089] hover:text-[#172033]'
         "
       >
         <span aria-hidden="true" class="material-symbols-outlined text-[18px]">security</span>
@@ -294,7 +294,7 @@ function parsePerubahan(perubahan, aksi) {
       <div class="relative h-9 min-w-0">
         <span
           aria-hidden="true"
-          class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-[18px] text-[#94A3B8] pointer-events-none"
+          class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-[18px] text-[#687281] pointer-events-none"
         >
           search
         </span>
@@ -378,7 +378,7 @@ function parsePerubahan(perubahan, aksi) {
           <span aria-hidden="true" class="material-symbols-outlined text-[40px] text-[#D1D5DB]"
             >history_toggle_off</span
           >
-          <p class="text-[13px] font-semibold text-[#64748B]">
+          <p class="text-[13px] font-semibold text-[#5F7089]">
             Tidak ada riwayat perubahan aset ditemukan.
           </p>
         </div>
@@ -412,7 +412,7 @@ function parsePerubahan(perubahan, aksi) {
                   >{{ log.label_aset }}</span
                 >
                 <span
-                  class="text-[10px] text-[#94A3B8] font-medium ml-auto shrink-0 hidden sm:inline"
+                  class="text-[10px] text-[#687281] font-medium ml-auto shrink-0 hidden sm:inline"
                 >
                   <span
                     aria-hidden="true"
@@ -450,7 +450,7 @@ function parsePerubahan(perubahan, aksi) {
                     >
                     <span
                       aria-hidden="true"
-                      class="material-symbols-outlined rotate-90 sm:rotate-0 text-[16px] sm:text-[12px] text-[#64748B] sm:text-[#CBD5E1] shrink-0"
+                      class="material-symbols-outlined rotate-90 sm:rotate-0 text-[16px] sm:text-[12px] text-[#5F7089] sm:text-[#CBD5E1] shrink-0"
                       >arrow_forward</span
                     >
                     <span
@@ -483,7 +483,7 @@ function parsePerubahan(perubahan, aksi) {
               <!-- Fallback text -->
               <p
                 v-else
-                class="text-[13px] sm:text-[11px] font-medium text-[#64748B] leading-relaxed whitespace-pre-line"
+                class="text-[13px] sm:text-[11px] font-medium text-[#5F7089] leading-relaxed whitespace-pre-line"
               >
                 {{ log.perubahan }}
               </p>
@@ -492,11 +492,11 @@ function parsePerubahan(perubahan, aksi) {
               <div
                 class="flex flex-col items-start sm:flex-row sm:items-center gap-1.5 sm:gap-3 mt-3 sm:mt-2"
               >
-                <span class="text-xs text-[#64748B] font-medium sm:hidden">
+                <span class="text-xs text-[#5F7089] font-medium sm:hidden">
                   {{ formatDateTime(log.dibuat_pada) }}
                 </span>
                 <span
-                  class="text-xs sm:text-[10px] font-semibold sm:font-bold text-[#64748B] sm:text-[#94A3B8]"
+                  class="text-xs sm:text-[10px] font-semibold sm:font-bold text-[#5F7089] sm:text-[#687281]"
                 >
                   <span
                     aria-hidden="true"
@@ -527,7 +527,7 @@ function parsePerubahan(perubahan, aksi) {
           <span aria-hidden="true" class="material-symbols-outlined text-[40px] text-[#D1D5DB]"
             >shield_person</span
           >
-          <p class="mt-3 text-[13px] font-semibold text-[#64748B]">
+          <p class="mt-3 text-[13px] font-semibold text-[#5F7089]">
             Tidak ada audit aktivitas login ditemukan.
           </p>
         </div>
@@ -547,7 +547,7 @@ function parsePerubahan(perubahan, aksi) {
               </h3>
               <p class="text-[13px] leading-relaxed text-[#374151]">{{ log.email }}</p>
             </div>
-            <dl class="text-xs leading-relaxed text-[#64748B]">
+            <dl class="text-xs leading-relaxed text-[#5F7089]">
               <dt class="font-semibold">Waktu aktivitas</dt>
               <dd>{{ formatDateTime(log.dibuat_pada) }}</dd>
             </dl>
@@ -612,7 +612,7 @@ function parsePerubahan(perubahan, aksi) {
                       class="material-symbols-outlined text-[40px] text-[#D1D5DB]"
                       >shield_person</span
                     >
-                    <p class="text-[13px] font-semibold text-[#64748B]">
+                    <p class="text-[13px] font-semibold text-[#5F7089]">
                       Tidak ada audit aktivitas login ditemukan.
                     </p>
                   </div>

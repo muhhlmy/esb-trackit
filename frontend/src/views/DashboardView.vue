@@ -243,7 +243,7 @@ function getStatusColorClass(status) {
   if (['dalam perawatan', 'maintenance', 'in service'].includes(s)) return 'bg-[#FFAE1F]'
   if (['rusak', 'damaged'].includes(s)) return 'bg-[#FA896B]'
   if (['disposal'].includes(s)) return 'bg-[#8B5CF6]'
-  return 'bg-[#94A3B8]'
+  return 'bg-[#687281]'
 }
 
 function getStatusPercentage(status) {
@@ -575,7 +575,7 @@ onUnmounted(() => {
       role="alert"
     >
       <div class="flex items-center gap-2.5">
-        <span class="material-symbols-outlined text-[18px]">error</span>
+        <span aria-hidden="true" class="material-symbols-outlined text-[18px]">error</span>
         <span>{{ error }}</span>
       </div>
       <button
@@ -661,7 +661,7 @@ onUnmounted(() => {
         <div class="xl:col-span-8 dashboard-panel">
           <div class="flex items-center justify-between mb-3">
             <h3 class="text-sm font-bold text-[#333333]">Tren Aset Bulanan</h3>
-            <span class="text-[10px] font-medium text-[#64748B] bg-[#F1F5F9] px-2 py-0.5 rounded-md"
+            <span class="text-[10px] font-medium text-[#606f85] bg-[#F1F5F9] px-2 py-0.5 rounded-md"
               >Per Bulan</span
             >
           </div>
@@ -675,7 +675,7 @@ onUnmounted(() => {
         <div class="xl:col-span-4 dashboard-panel">
           <div class="flex items-center justify-between mb-3">
             <h3 class="text-sm font-bold text-[#333333]">Status Aset</h3>
-            <span class="text-[10px] font-medium text-[#64748B] bg-[#F1F5F9] px-2 py-0.5 rounded-md"
+            <span class="text-[10px] font-medium text-[#606f85] bg-[#F1F5F9] px-2 py-0.5 rounded-md"
               >Distribusi</span
             >
           </div>
@@ -683,7 +683,7 @@ onUnmounted(() => {
           <!-- Empty State -->
           <template v-if="!stats?.byStatus || stats.byStatus.length === 0">
             <div class="py-6 text-center">
-              <p class="text-xs text-[#94A3B8]">Belum ada data status aset.</p>
+              <p class="text-xs text-[#687281]">Belum ada data status aset.</p>
             </div>
           </template>
 
@@ -725,7 +725,7 @@ onUnmounted(() => {
                     <span class="text-xs font-bold text-[#333333] font-num">{{ item.count }}</span>
                   </div>
                   <div class="flex items-center justify-between gap-2 mt-1">
-                    <span class="text-[10px] text-[#94A3B8]"
+                    <span class="text-[10px] text-[#687281]"
                       >{{ getStatusPercentage(item.status) }}%</span
                     >
                   </div>
@@ -741,7 +741,7 @@ onUnmounted(() => {
         <div class="lg:col-span-7 dashboard-panel">
           <div class="flex items-center justify-between mb-4">
             <h3 class="text-sm font-semibold text-[#333333]">Aset Per Tipe</h3>
-            <span class="text-xs font-medium text-[#64748B] bg-[#F1F5F9] px-2.5 py-1 rounded-lg"
+            <span class="text-xs font-medium text-[#606f85] bg-[#F1F5F9] px-2.5 py-1 rounded-lg"
               >Kategori</span
             >
           </div>
@@ -755,7 +755,7 @@ onUnmounted(() => {
         <div class="lg:col-span-5 dashboard-panel">
           <div class="flex items-center justify-between mb-4">
             <h3 class="text-sm font-semibold text-[#333333]">Kondisi Aset</h3>
-            <span class="text-xs font-medium text-[#64748B] bg-[#F1F5F9] px-2.5 py-1 rounded-lg"
+            <span class="text-xs font-medium text-[#606f85] bg-[#F1F5F9] px-2.5 py-1 rounded-lg"
               >Persentase</span
             >
           </div>
@@ -776,12 +776,12 @@ onUnmounted(() => {
         <div class="flex items-center justify-between mb-5 pb-4 border-b border-[#F1F5F9]">
           <div>
             <h3 class="text-sm font-semibold text-[#333333]">Sebaran Lokasi Aset</h3>
-            <p class="text-xs text-[#64748B] mt-1">Lokasi penempatan perangkat saat ini</p>
+            <p class="text-xs text-[#606f85] mt-1">Lokasi penempatan perangkat saat ini</p>
           </div>
           <span
             class="inline-flex items-center gap-1.5 text-xs font-semibold text-[#0A51B0] bg-[#EDF5FF] px-3 py-1.5 rounded-full"
           >
-            <span class="material-symbols-outlined text-[16px]" style="opacity: 0.7"
+            <span aria-hidden="true" class="material-symbols-outlined text-[16px]" style="opacity: 0.7"
               >location_on</span
             >
             {{ locationBreakdown.length }} Lokasi
@@ -807,11 +807,11 @@ onUnmounted(() => {
                 :style="{ width: `${location.pct}%` }"
               ></div>
             </div>
-            <p class="text-right text-xs font-medium text-[#64748B]">{{ location.pct }}%</p>
+            <p class="text-right text-xs font-medium text-[#606f85]">{{ location.pct }}%</p>
           </div>
         </div>
         <div v-else class="py-8 text-center">
-          <p class="text-sm text-[#64748B]">Belum ada data lokasi aset.</p>
+          <p class="text-sm text-[#606f85]">Belum ada data lokasi aset.</p>
         </div>
       </div>
 
@@ -824,7 +824,7 @@ onUnmounted(() => {
             <h3 class="text-sm sm:text-base font-bold text-slate-900 tracking-tight truncate">
               Aset Terbaru
             </h3>
-            <p class="text-[11.5px] sm:text-xs text-slate-500 mt-0.5 truncate">
+            <p class="text-[12px] sm:text-xs text-slate-500 mt-0.5 truncate">
               5 Perangkat IT paling baru dalam sistem
             </p>
           </div>
@@ -833,7 +833,7 @@ onUnmounted(() => {
             class="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-600 bg-blue-50/70 hover:bg-blue-100/80 hover:text-blue-700 px-3 py-1.5 rounded-lg border border-blue-100/60 transition-all duration-150 shrink-0 active:scale-95 touch-manipulation"
           >
             <span>Lihat Semua</span>
-            <span class="material-symbols-outlined text-[15px]">arrow_forward</span>
+            <span aria-hidden="true" class="material-symbols-outlined text-[15px]">arrow_forward</span>
           </RouterLink>
         </div>
 
@@ -850,7 +850,7 @@ onUnmounted(() => {
                 <div
                   class="w-8 h-8 rounded-lg bg-blue-50 text-[#0A51B0] flex items-center justify-center shrink-0"
                 >
-                  <span class="material-symbols-outlined text-[18px]">
+                  <span aria-hidden="true" class="material-symbols-outlined text-[18px]">
                     {{
                       asset.tipe_perangkat?.toLowerCase().includes('laptop')
                         ? 'laptop_mac'
@@ -866,14 +866,14 @@ onUnmounted(() => {
                   <p class="text-xs sm:text-sm font-bold text-[#333333] truncate leading-tight">
                     {{ asset.label_aset }}
                   </p>
-                  <p class="text-[11px] text-[#64748B] font-mono mt-0.5">ID #{{ asset.id_aset }}</p>
+                  <p class="text-[11px] text-[#606f85] font-mono mt-0.5">ID #{{ asset.id_aset }}</p>
                 </div>
               </div>
 
               <AppBadge
                 :type="getStatusBadgeType(asset.status_aset)"
                 :text="asset.status_aset || 'Available'"
-                class="shrink-0 text-[10.5px] whitespace-nowrap"
+                class="shrink-0 text-[11px] whitespace-nowrap"
               />
             </div>
 
@@ -882,10 +882,10 @@ onUnmounted(() => {
               class="grid grid-cols-2 gap-2 text-xs bg-slate-50/70 p-2.5 rounded-lg border border-slate-100"
             >
               <div class="min-w-0">
-                <span class="block text-[10px] uppercase font-semibold text-[#94A3B8]"
+                <span class="block text-[10px] uppercase font-semibold text-[#687281]"
                   >Merek &amp; Tipe</span
                 >
-                <span class="font-medium text-[#333333] truncate block text-[11.5px]">
+                <span class="font-medium text-[#333333] truncate block text-[12px]">
                   {{ asset.merek || '—' }}
                   <span v-if="asset.tipe_perangkat" class="text-slate-400 font-normal"
                     >({{ asset.tipe_perangkat }})</span
@@ -893,30 +893,30 @@ onUnmounted(() => {
                 </span>
               </div>
               <div class="min-w-0">
-                <span class="block text-[10px] uppercase font-semibold text-[#94A3B8]">Serial</span>
-                <span class="font-mono text-[11px] text-[#64748B] truncate block font-medium">
+                <span class="block text-[10px] uppercase font-semibold text-[#687281]">Serial</span>
+                <span class="font-mono text-[11px] text-[#606f85] truncate block font-medium">
                   {{ asset.nomor_seri || '—' }}
                 </span>
               </div>
             </div>
 
             <!-- Bottom Row: Kondisi & Tanggal Ditambahkan -->
-            <div class="flex items-center justify-between text-[11px] text-[#64748B] pt-0.5">
+            <div class="flex items-center justify-between text-[11px] text-[#606f85] pt-0.5">
               <div class="flex items-center gap-1.5">
-                <span class="text-[#94A3B8]">Kondisi:</span>
+                <span class="text-[#687281]">Kondisi:</span>
                 <span class="font-semibold text-[#333333]">{{
                   asset.kondisi_aset || 'Normal'
                 }}</span>
               </div>
-              <div class="flex items-center gap-1 text-[10.5px] text-[#94A3B8]">
-                <span class="material-symbols-outlined text-[13px]">calendar_today</span>
+              <div class="flex items-center gap-1 text-[11px] text-[#687281]">
+                <span aria-hidden="true" class="material-symbols-outlined text-[13px]">calendar_today</span>
                 <span>{{ formatDate(asset.dibuat_pada) }}</span>
               </div>
             </div>
           </div>
 
           <div v-if="recentAssets.length === 0" class="py-7 text-center">
-            <p class="text-xs text-[#64748B]">Belum ada data aset.</p>
+            <p class="text-xs text-[#606f85]">Belum ada data aset.</p>
           </div>
         </div>
 
@@ -968,7 +968,7 @@ onUnmounted(() => {
                     <div
                       class="w-8 h-8 rounded-lg bg-slate-100/80 text-blue-600 flex items-center justify-center shrink-0 border border-slate-200/60 group-hover:border-blue-200 group-hover:bg-blue-50/60 transition-colors"
                     >
-                      <span class="material-symbols-outlined text-[17px]">
+                      <span aria-hidden="true" class="material-symbols-outlined text-[17px]">
                         {{
                           asset.tipe_perangkat?.toLowerCase().includes('laptop')
                             ? 'laptop_mac'
@@ -1062,7 +1062,7 @@ onUnmounted(() => {
             <h3 class="text-sm sm:text-base font-bold text-slate-900 tracking-tight truncate">
               Tiket Terbaru
             </h3>
-            <p class="text-[11.5px] sm:text-xs text-slate-500 mt-0.5 truncate">
+            <p class="text-[12px] sm:text-xs text-slate-500 mt-0.5 truncate">
               5 Laporan kendala &amp; permintaan IT terbaru
             </p>
           </div>
@@ -1071,7 +1071,7 @@ onUnmounted(() => {
             class="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-600 bg-blue-50/70 hover:bg-blue-100/80 hover:text-blue-700 px-3 py-1.5 rounded-lg border border-blue-100/60 transition-all duration-150 shrink-0 active:scale-95 touch-manipulation"
           >
             <span>Lihat Semua</span>
-            <span class="material-symbols-outlined text-[15px]">arrow_forward</span>
+            <span aria-hidden="true" class="material-symbols-outlined text-[15px]">arrow_forward</span>
           </RouterLink>
         </div>
 
@@ -1113,10 +1113,10 @@ onUnmounted(() => {
 
             <!-- Bottom Row: Pelapor, Assigned To & Tanggal -->
             <div
-              class="flex flex-wrap items-center justify-between gap-y-1.5 gap-x-2 text-[11px] text-[#64748B] pt-1 border-t border-slate-50"
+              class="flex flex-wrap items-center justify-between gap-y-1.5 gap-x-2 text-[11px] text-[#606f85] pt-1 border-t border-slate-50"
             >
               <div class="flex items-center gap-1 min-w-0">
-                <span class="material-symbols-outlined text-[14px] text-[#94A3B8] shrink-0"
+                <span aria-hidden="true" class="material-symbols-outlined text-[14px] text-[#687281] shrink-0"
                   >person</span
                 >
                 <span class="truncate">
@@ -1127,15 +1127,15 @@ onUnmounted(() => {
                 </span>
               </div>
 
-              <div class="flex items-center gap-1 text-[10.5px] text-[#94A3B8] shrink-0">
-                <span class="material-symbols-outlined text-[13px]">calendar_today</span>
+              <div class="flex items-center gap-1 text-[11px] text-[#687281] shrink-0">
+                <span aria-hidden="true" class="material-symbols-outlined text-[13px]">calendar_today</span>
                 <span>{{ formatDate(ticket.dibuat_pada) }}</span>
               </div>
             </div>
           </div>
 
           <div v-if="recentTickets.length === 0" class="py-7 text-center">
-            <p class="text-xs text-[#64748B]">Belum ada tiket permintaan.</p>
+            <p class="text-xs text-[#606f85]">Belum ada tiket permintaan.</p>
           </div>
         </div>
 
@@ -1206,7 +1206,7 @@ onUnmounted(() => {
                 <td class="py-3 px-4 align-middle">
                   <div class="flex items-center gap-1.5 min-w-0">
                     <span
-                      class="material-symbols-outlined text-[16px] shrink-0"
+                      aria-hidden="true" class="material-symbols-outlined text-[16px] shrink-0"
                       :class="ticket.assigned_to ? 'text-slate-400' : 'text-amber-500'"
                     >
                       {{ ticket.assigned_to ? 'person' : 'person_off' }}
@@ -1277,8 +1277,8 @@ onUnmounted(() => {
 }
 .dashboard-eyebrow {
   color: #7b8aa0;
-  font-size: 9px;
-  letter-spacing: 0.13em;
+  font-size: 10px;
+  letter-spacing: 0.11em;
   font-weight: 650;
   margin-bottom: 7px;
 }
@@ -1290,7 +1290,7 @@ onUnmounted(() => {
 }
 .dashboard-intro h2 + p {
   font-size: 12px;
-  color: #6d7d93;
+  color: #66768a;
   line-height: 1.7;
   margin-top: 7px;
 }
@@ -1368,13 +1368,13 @@ onUnmounted(() => {
   color: #d3e1f6;
 }
 .stat-green {
-  --stat-color: #369580;
+  --stat-color: #2d7d6c;
 }
 .stat-blue {
   --stat-color: #548acd;
 }
 .stat-red {
-  --stat-color: #ce7180;
+  --stat-color: #a55a66;
 }
 .stat-amber {
   --stat-color: #c09951;
@@ -1384,7 +1384,7 @@ onUnmounted(() => {
   align-items: center;
   gap: 10px;
   font-size: 10px;
-  color: #71829b;
+  color: #637288;
   font-variant-numeric: tabular-nums;
 }
 .stat-progress {
@@ -1591,7 +1591,7 @@ onUnmounted(() => {
   align-items: center;
   gap: 8px;
   font-size: 10px;
-  color: #64748b;
+  color: #606f85;
 }
 .dashboard-eyebrow::before {
   content: '';

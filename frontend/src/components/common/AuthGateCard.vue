@@ -54,7 +54,7 @@ function handleLoginRedirect() {
     </h3>
 
     <p
-      class="mt-1.5 text-xs sm:text-sm text-[#64748B] dark:text-slate-400 max-w-md mx-auto leading-relaxed"
+      class="mt-1.5 text-xs sm:text-sm text-[#5F7089] dark:text-slate-400 max-w-md mx-auto leading-relaxed"
     >
       {{ description }}
     </p>

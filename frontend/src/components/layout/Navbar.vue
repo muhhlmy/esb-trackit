@@ -446,7 +446,7 @@ onUnmounted(() => {
   }
   .brand-mobile-caption {
     display: block;
-    font-size: 9px;
+    font-size: 10px;
     font-weight: 500;
     letter-spacing: 0.01em;
     color: var(--nav-muted);

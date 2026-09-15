@@ -450,7 +450,7 @@ function closeSubmenuAndMobile() {
             type="button"
             aria-label="Perluas Sidebar"
             title="Perluas Sidebar"
-            class="flex h-6 w-6 items-center justify-center rounded-md text-[#71829B] hover:bg-[#ECF2FF] hover:text-[#333333] transition-all cursor-pointer shrink-0"
+            class="flex h-6 w-6 items-center justify-center rounded-md text-[#637288] hover:bg-[#ECF2FF] hover:text-[#333333] transition-all cursor-pointer shrink-0"
             @click="emit('toggle-collapse')"
           >
             <span aria-hidden="true" class="material-symbols-outlined text-[16px]"
@@ -467,7 +467,7 @@ function closeSubmenuAndMobile() {
         type="button"
         aria-label="Ciutkan Sidebar"
         title="Ciutkan Sidebar"
-        class="hidden lg:flex h-7 w-7 items-center justify-center rounded-lg text-[#71829B] hover:bg-[#ECF2FF] hover:text-[#333333] transition-all cursor-pointer shrink-0"
+        class="hidden lg:flex h-7 w-7 items-center justify-center rounded-lg text-[#637288] hover:bg-[#ECF2FF] hover:text-[#333333] transition-all cursor-pointer shrink-0"
         @click="emit('toggle-collapse')"
       >
         <span aria-hidden="true" class="material-symbols-outlined text-[18px]">menu_open</span>
@@ -478,7 +478,7 @@ function closeSubmenuAndMobile() {
         type="button"
         aria-label="Tutup navigasi mobile"
         title="Tutup Navigasi"
-        class="flex lg:hidden h-7 w-7 items-center justify-center rounded-lg text-[#71829B] hover:bg-[#ECF2FF] hover:text-[#333333] transition-all cursor-pointer shrink-0"
+        class="flex lg:hidden h-7 w-7 items-center justify-center rounded-lg text-[#637288] hover:bg-[#ECF2FF] hover:text-[#333333] transition-all cursor-pointer shrink-0"
         @click="emit('close-mobile')"
       >
         <span aria-hidden="true" class="material-symbols-outlined text-[18px]">close</span>
@@ -486,8 +486,9 @@ function closeSubmenuAndMobile() {
     </div>
 
     <!-- ── Sidebar Scrollable Menu / Navigation Rail Container ── -->
-    <div
+    <nav
       class="sidebar-menu relative flex-1 overflow-y-auto py-3 transition-all"
+      aria-label="Navigasi utama"
       :class="isEffectiveCollapsed ? 'px-0 space-y-3' : 'px-2.5 space-y-4'"
     >
       <div
@@ -498,12 +499,12 @@ function closeSubmenuAndMobile() {
         <!-- Category Title (Hanya di Expanded Mode) -->
         <p
           v-if="!isEffectiveCollapsed"
-          class="sidebar-group-title px-2 text-[10px] font-semibold uppercase tracking-wider text-[#71829B] transition-all"
+          class="sidebar-group-title px-2 text-[10px] font-semibold uppercase tracking-wider text-[#637288] transition-all"
         >
           {{ group.title }}
         </p>
 
-        <nav :class="isEffectiveCollapsed ? 'flex flex-col items-center gap-1.5' : 'space-y-0.5'">
+        <div :class="isEffectiveCollapsed ? 'flex flex-col items-center gap-1.5' : 'space-y-0.5'">
           <!-- 1. Direct Items (e.g. Dashboard) -->
           <template v-if="group.items && group.items.length">
             <div
@@ -520,7 +521,7 @@ function closeSubmenuAndMobile() {
                 :class="[
                   isEffectiveCollapsed
                     ? 'h-10 w-10 justify-center rounded-xl'
-                    : 'w-full gap-2.5 rounded-lg px-2.5 py-2 text-[12.5px]',
+                    : 'w-full gap-2.5 rounded-lg px-2.5 py-2 text-[13px]',
                   route.path === item.to
                     ? 'bg-[#EAF1FC] text-[#234B83] font-semibold'
                     : 'text-[#2A3547] hover:bg-[#ECF2FF] hover:text-[#333333] font-medium',
@@ -534,7 +535,7 @@ function closeSubmenuAndMobile() {
                     isEffectiveCollapsed ? 'text-[20px]' : 'text-[18px]',
                     route.path === item.to
                       ? 'text-[#234B83]'
-                      : 'text-[#71829B] group-hover:text-[#333333]',
+                      : 'text-[#637288] group-hover:text-[#333333]',
                   ]"
                 >
                   {{ item.icon }}
@@ -549,7 +550,7 @@ function closeSubmenuAndMobile() {
 
                 <span
                   v-if="item.badge && !isEffectiveCollapsed"
-                  class="rounded-full px-1.5 py-0.2 text-[9px] font-bold shrink-0"
+                  class="rounded-full px-1.5 py-0.2 text-[10px] font-bold shrink-0"
                   :class="
                     route.path === item.to
                       ? 'bg-white/20 text-white'
@@ -588,7 +589,7 @@ function closeSubmenuAndMobile() {
                 :class="[
                   isEffectiveCollapsed
                     ? 'h-10 w-10 justify-center rounded-xl'
-                    : 'w-full gap-2.5 rounded-lg px-2.5 py-2 text-[12.5px] font-semibold justify-between',
+                    : 'w-full gap-2.5 rounded-lg px-2.5 py-2 text-[13px] font-semibold justify-between',
                   parent.items.some((child) => route.path === child.to)
                     ? isEffectiveCollapsed
                       ? 'bg-[#ECF2FF] text-[#333333]'
@@ -608,7 +609,7 @@ function closeSubmenuAndMobile() {
                       isEffectiveCollapsed ? 'text-[20px]' : 'text-[18px]',
                       parent.items.some((child) => route.path === child.to)
                         ? 'text-[#333333]'
-                        : 'text-[#71829B] group-hover:text-[#333333]',
+                        : 'text-[#637288] group-hover:text-[#333333]',
                     ]"
                   >
                     {{ parent.icon }}
@@ -625,7 +626,7 @@ function closeSubmenuAndMobile() {
                 <span
                   v-if="!isEffectiveCollapsed"
                   aria-hidden="true"
-                  class="material-symbols-outlined text-[16px] text-[#71829B] transition-transform duration-200 shrink-0"
+                  class="material-symbols-outlined text-[16px] text-[#637288] transition-transform duration-200 shrink-0"
                   :class="{ 'rotate-180': isParentExpanded(parent.key) }"
                 >
                   keyboard_arrow_down
@@ -649,7 +650,7 @@ function closeSubmenuAndMobile() {
                   :class="
                     route.path === sub.to
                       ? 'bg-[#ECF2FF] text-[#333333] font-bold shadow-2xs border-l-2 border-[#0A51B0] rounded-r-lg'
-                      : 'text-[#64748B] hover:bg-[#F8FAFC] hover:text-[#333333] font-medium'
+                      : 'text-[#5F7089] hover:bg-[#F8FAFC] hover:text-[#333333] font-medium'
                   "
                   @click="emit('close-mobile')"
                 >
@@ -659,7 +660,7 @@ function closeSubmenuAndMobile() {
                     :class="
                       route.path === sub.to
                         ? 'text-[#333333]'
-                        : 'text-[#94A3B8] group-hover:text-[#333333]'
+                        : 'text-[#687281] group-hover:text-[#333333]'
                     "
                   >
                     {{ sub.icon }}
@@ -672,9 +673,9 @@ function closeSubmenuAndMobile() {
               </div>
             </div>
           </template>
-        </nav>
+        </div>
       </div>
-    </div>
+    </nav>
   </aside>
 
   <!-- ── Teleport Flyout Popovers & Tooltips for Collapsed Navigation Rail ── -->
@@ -688,7 +689,7 @@ function closeSubmenuAndMobile() {
       @mouseleave="handleParentMouseLeave"
     >
       <div class="px-2 py-1.5 border-b border-[#F1F5F9] mb-1">
-        <p class="text-[10.5px] font-extrabold uppercase tracking-wider text-[#71829B]">
+        <p class="text-[11px] font-extrabold uppercase tracking-wider text-[#637288]">
           {{ activeFlyoutParent.label }}
         </p>
       </div>
@@ -697,7 +698,7 @@ function closeSubmenuAndMobile() {
           v-for="sub in activeFlyoutParent.items"
           :key="sub.to"
           :to="sub.to"
-          class="group flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-[11.5px] transition-all cursor-pointer"
+          class="group flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-[12px] transition-all cursor-pointer"
           :class="
             route.path === sub.to
               ? 'bg-[#EFF6FF] text-[#333333] font-bold'
@@ -709,7 +710,7 @@ function closeSubmenuAndMobile() {
             aria-hidden="true"
             class="material-symbols-outlined text-[16px] shrink-0"
             :class="
-              route.path === sub.to ? 'text-[#333333]' : 'text-[#71829B] group-hover:text-[#333333]'
+              route.path === sub.to ? 'text-[#333333]' : 'text-[#637288] group-hover:text-[#333333]'
             "
           >
             {{ sub.icon }}
@@ -752,8 +753,8 @@ function closeSubmenuAndMobile() {
   padding-bottom: 24px;
 }
 .sidebar-group-title {
-  font-size: 9px;
-  letter-spacing: 0.11em;
+  font-size: 11px;
+  letter-spacing: 0.08em;
   margin-bottom: 9px;
 }
 .sidebar-menu nav > div > a,

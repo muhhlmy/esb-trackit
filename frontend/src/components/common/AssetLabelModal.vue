@@ -109,7 +109,7 @@ function handlePrint() {
         <div
           class="h-9 w-9 rounded-lg bg-blue-100/70 text-blue-600 flex items-center justify-center shrink-0"
         >
-          <span class="material-symbols-outlined text-lg">qr_code_2</span>
+          <span aria-hidden="true" class="material-symbols-outlined text-lg">qr_code_2</span>
         </div>
         <div class="min-w-0 flex-1">
           <div class="text-xs font-semibold text-slate-900 truncate">
@@ -165,7 +165,7 @@ function handlePrint() {
           >
             <!-- Header -->
             <div
-              class="text-center font-extrabold text-[8.5px] sm:text-[9.5px] leading-tight tracking-[0.1px] text-black"
+              class="text-center font-extrabold text-[10px] sm:text-[9.5px] leading-tight tracking-[0.1px] text-black"
             >
               <div>ASET INI MERUPAKAN PROPERTI MILIK</div>
               <div>PT ESENSI SOLUSI BUANA.</div>
@@ -200,7 +200,7 @@ function handlePrint() {
                   (Barcode Kosong)
                 </div>
                 <div
-                  class="mt-0.5 text-[10px] sm:text-[11.5px] font-extrabold tracking-wide text-black text-center truncate max-w-full"
+                  class="mt-0.5 text-[10px] sm:text-[12px] font-extrabold tracking-wide text-black text-center truncate max-w-full"
                 >
                   {{ activeHostname || 'KODE-LABEL-0' }}
                 </div>
@@ -232,7 +232,7 @@ function handlePrint() {
           @click="handlePrint"
           class="inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-4 py-2 text-xs font-semibold text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
         >
-          <span class="material-symbols-outlined text-[16px]">print</span>
+          <span aria-hidden="true" class="material-symbols-outlined text-[16px]">print</span>
           <span>{{ isPrinting ? 'Membuka Cetak...' : 'Cetak Label' }}</span>
         </button>
       </div>

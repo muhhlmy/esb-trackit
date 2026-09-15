@@ -359,7 +359,7 @@ function switchTab(tab) {
     >
       <div>
         <h1 class="text-xl font-bold tracking-tight text-[#333333]">Database</h1>
-        <p class="text-sm text-[#64748B]">Backup & restore database PostgreSQL</p>
+        <p class="text-sm text-[#5F7089]">Backup & restore database PostgreSQL</p>
       </div>
       <div class="flex flex-col sm:flex-row sm:items-center gap-2">
         <button
@@ -371,7 +371,7 @@ function switchTab(tab) {
             v-if="isBackingUp"
             class="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"
           ></span>
-          <span v-else class="material-symbols-outlined text-lg">database</span>
+          <span aria-hidden="true" v-else class="material-symbols-outlined text-lg">database</span>
           {{ isBackingUp ? 'Membuat Backup...' : 'Backup Now' }}
         </button>
       </div>
@@ -394,12 +394,12 @@ function switchTab(tab) {
         :class="
           activeTab === tab.key
             ? 'bg-white text-[#333333] shadow-sm'
-            : 'text-[#64748B] hover:text-[#334155]'
+            : 'text-[#5F7089] hover:text-[#334155]'
         "
         :aria-pressed="activeTab === tab.key"
         @click="switchTab(tab.key)"
       >
-        <span class="material-symbols-outlined text-base">{{ tab.icon }}</span>
+        <span aria-hidden="true" class="material-symbols-outlined text-base">{{ tab.icon }}</span>
         {{ tab.label }}
       </button>
     </div>
@@ -414,8 +414,8 @@ function switchTab(tab) {
       <!-- Status Cards -->
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <div class="rounded-xl border border-[#E5EAEF] bg-white p-4 shadow-sm">
-          <div class="flex items-center gap-2 text-sm text-[#64748B]">
-            <span class="material-symbols-outlined text-base">database</span>
+          <div class="flex items-center gap-2 text-sm text-[#5F7089]">
+            <span aria-hidden="true" class="material-symbols-outlined text-base">database</span>
             PostgreSQL
           </div>
           <div class="mt-2 flex items-center gap-2">
@@ -427,12 +427,12 @@ function switchTab(tab) {
               dbStatus.connected ? 'Connected' : 'Disconnected'
             }}</span>
           </div>
-          <div class="mt-1 text-xs text-[#94A3B8]">{{ dbStatus.databaseName }}</div>
+          <div class="mt-1 text-xs text-[#687281]">{{ dbStatus.databaseName }}</div>
         </div>
 
         <div class="rounded-xl border border-[#E5EAEF] bg-white p-4 shadow-sm">
-          <div class="flex items-center gap-2 text-sm text-[#64748B]">
-            <span class="material-symbols-outlined text-base">checklist</span>
+          <div class="flex items-center gap-2 text-sm text-[#5F7089]">
+            <span aria-hidden="true" class="material-symbols-outlined text-base">checklist</span>
             Schema
           </div>
           <div class="mt-2 flex items-center gap-2">
@@ -444,14 +444,14 @@ function switchTab(tab) {
               dbStatus.schemaHealthy ? 'Healthy' : 'Incomplete'
             }}</span>
           </div>
-          <div class="mt-1 text-xs text-[#94A3B8]">
+          <div class="mt-1 text-xs text-[#687281]">
             {{ dbStatus.tables.length }} tables, {{ dbStatus.views.length }} views
           </div>
         </div>
 
         <div class="rounded-xl border border-[#E5EAEF] bg-white p-4 shadow-sm">
-          <div class="flex items-center gap-2 text-sm text-[#64748B]">
-            <span class="material-symbols-outlined text-base">terminal</span>
+          <div class="flex items-center gap-2 text-sm text-[#5F7089]">
+            <span aria-hidden="true" class="material-symbols-outlined text-base">terminal</span>
             Tools
           </div>
           <div class="mt-2 space-y-1">
@@ -460,8 +460,8 @@ function switchTab(tab) {
                 class="inline-block h-1.5 w-1.5 rounded-full"
                 :class="dbStatus.pgDumpAvailable ? 'bg-emerald-500' : 'bg-red-500'"
               ></span>
-              <span class="text-[#64748B]">pg_dump</span>
-              <span class="text-[#94A3B8]">{{
+              <span class="text-[#5F7089]">pg_dump</span>
+              <span class="text-[#687281]">{{
                 dbStatus.pgDumpAvailable ? 'Ready' : 'Not Found'
               }}</span>
             </div>
@@ -470,8 +470,8 @@ function switchTab(tab) {
                 class="inline-block h-1.5 w-1.5 rounded-full"
                 :class="dbStatus.pgRestoreAvailable ? 'bg-emerald-500' : 'bg-red-500'"
               ></span>
-              <span class="text-[#64748B]">pg_restore</span>
-              <span class="text-[#94A3B8]">{{
+              <span class="text-[#5F7089]">pg_restore</span>
+              <span class="text-[#687281]">{{
                 dbStatus.pgRestoreAvailable ? 'Ready' : 'Not Found'
               }}</span>
             </div>
@@ -480,8 +480,8 @@ function switchTab(tab) {
                 class="inline-block h-1.5 w-1.5 rounded-full"
                 :class="dbStatus.psqlAvailable ? 'bg-emerald-500' : 'bg-red-500'"
               ></span>
-              <span class="text-[#64748B]">psql</span>
-              <span class="text-[#94A3B8]">{{
+              <span class="text-[#5F7089]">psql</span>
+              <span class="text-[#687281]">{{
                 dbStatus.psqlAvailable ? 'Ready' : 'Not Found'
               }}</span>
             </div>
@@ -489,8 +489,8 @@ function switchTab(tab) {
         </div>
 
         <div class="rounded-xl border border-[#E5EAEF] bg-white p-4 shadow-sm">
-          <div class="flex items-center gap-2 text-sm text-[#64748B]">
-            <span class="material-symbols-outlined text-base">folder</span>
+          <div class="flex items-center gap-2 text-sm text-[#5F7089]">
+            <span aria-hidden="true" class="material-symbols-outlined text-base">folder</span>
             Storage
           </div>
           <div class="mt-2 flex items-center gap-2">
@@ -502,7 +502,7 @@ function switchTab(tab) {
               dbStatus.backupStorageAvailable ? 'Available' : 'Unavailable'
             }}</span>
           </div>
-          <div class="mt-1 text-xs text-[#94A3B8]">{{ dbStatus.backupCount }} backup files</div>
+          <div class="mt-1 text-xs text-[#687281]">{{ dbStatus.backupCount }} backup files</div>
         </div>
       </div>
 
@@ -512,7 +512,7 @@ function switchTab(tab) {
         class="rounded-xl border border-amber-200 bg-amber-50 p-4"
       >
         <div class="flex items-start gap-2">
-          <span class="material-symbols-outlined text-amber-600">warning</span>
+          <span aria-hidden="true" class="material-symbols-outlined text-amber-600">warning</span>
           <div>
             <p class="font-semibold text-amber-800">Schema tidak lengkap</p>
             <p v-if="dbStatus.missingTables?.length" class="mt-1 text-sm text-amber-700">
@@ -531,7 +531,7 @@ function switchTab(tab) {
         class="rounded-xl border border-red-200 bg-red-50 p-4"
       >
         <div class="flex items-start gap-2">
-          <span class="material-symbols-outlined text-red-600">error</span>
+          <span aria-hidden="true" class="material-symbols-outlined text-red-600">error</span>
           <div>
             <p class="font-semibold text-red-800">PostgreSQL utility tidak tersedia</p>
             <p v-if="!dbStatus.pgDumpAvailable" class="mt-1 text-sm text-red-700">
@@ -553,7 +553,7 @@ function switchTab(tab) {
         </div>
         <p
           v-else-if="backups.length === 0"
-          class="px-4 py-10 text-center text-sm text-[#64748B] lg:hidden"
+          class="px-4 py-10 text-center text-sm text-[#5F7089] lg:hidden"
         >
           Belum ada backup
         </p>
@@ -567,19 +567,19 @@ function switchTab(tab) {
             >
             <dl class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
               <div>
-                <dt class="text-xs text-[#64748B]">Date</dt>
+                <dt class="text-xs text-[#5F7089]">Date</dt>
                 <dd>{{ formatDate(backup.created_at) }}</dd>
               </div>
               <div>
-                <dt class="text-xs text-[#64748B]">Size</dt>
+                <dt class="text-xs text-[#5F7089]">Size</dt>
                 <dd>{{ formatBytes(backup.file_size) }}</dd>
               </div>
               <div>
-                <dt class="text-xs text-[#64748B]">Created By</dt>
+                <dt class="text-xs text-[#5F7089]">Created By</dt>
                 <dd>{{ backup.created_by_name || '-' }}</dd>
               </div>
               <div class="sm:col-span-2">
-                <dt class="text-xs text-[#64748B]">Checksum</dt>
+                <dt class="text-xs text-[#5F7089]">Checksum</dt>
                 <dd class="font-mono text-xs leading-relaxed">{{ backup.checksum || '-' }}</dd>
               </div>
             </dl>
@@ -607,7 +607,7 @@ function switchTab(tab) {
         <div class="hidden lg:block overflow-x-auto">
           <table class="w-full text-left text-sm">
             <thead
-              class="border-b border-[#F1F5F9] bg-[#F8FAFC] text-xs font-semibold uppercase text-[#64748B]"
+              class="border-b border-[#F1F5F9] bg-[#F8FAFC] text-xs font-semibold uppercase text-[#5F7089]"
             >
               <tr>
                 <th class="px-4 py-3">Filename</th>
@@ -621,8 +621,8 @@ function switchTab(tab) {
             </thead>
             <tbody class="divide-y divide-[#F1F5F9]">
               <tr v-if="backups.length === 0 && !isLoadingBackups">
-                <td colspan="7" class="px-4 py-12 text-center text-[#94A3B8]">
-                  <span class="material-symbols-outlined mb-2 block text-3xl">database_off</span>
+                <td colspan="7" class="px-4 py-12 text-center text-[#687281]">
+                  <span aria-hidden="true" class="material-symbols-outlined mb-2 block text-3xl">database_off</span>
                   Belum ada backup
                 </td>
               </tr>
@@ -637,13 +637,13 @@ function switchTab(tab) {
                 >
                   {{ backup.filename }}
                 </td>
-                <td class="px-4 py-3 text-[#64748B] whitespace-nowrap">
+                <td class="px-4 py-3 text-[#5F7089] whitespace-nowrap">
                   {{ formatDate(backup.created_at) }}
                 </td>
-                <td class="px-4 py-3 text-[#64748B] whitespace-nowrap">
+                <td class="px-4 py-3 text-[#5F7089] whitespace-nowrap">
                   {{ formatBytes(backup.file_size) }}
                 </td>
-                <td class="px-4 py-3 text-[#64748B]">{{ backup.created_by_name || '-' }}</td>
+                <td class="px-4 py-3 text-[#5F7089]">{{ backup.created_by_name || '-' }}</td>
                 <td class="px-4 py-3">
                   <span
                     class="inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium"
@@ -653,7 +653,7 @@ function switchTab(tab) {
                   </span>
                 </td>
                 <td
-                  class="px-4 py-3 text-[#94A3B8] font-mono text-xs max-w-[100px] truncate"
+                  class="px-4 py-3 text-[#687281] font-mono text-xs max-w-[100px] truncate"
                   :title="backup.checksum"
                 >
                   {{ backup.checksum ? backup.checksum.slice(0, 12) + '...' : '-' }}
@@ -662,18 +662,18 @@ function switchTab(tab) {
                   <div class="flex items-center justify-end gap-1">
                     <button
                       v-if="backup.status === 'success'"
-                      class="rounded-lg p-1.5 text-[#64748B] hover:bg-[#F1F5F9] hover:text-[#333333] transition-colors"
+                      class="rounded-lg p-1.5 text-[#5F7089] hover:bg-[#F1F5F9] hover:text-[#333333] transition-colors"
                       title="Download"
                       @click="handleDownload(backup)"
                     >
-                      <span class="material-symbols-outlined text-lg">download</span>
+                      <span aria-hidden="true" class="material-symbols-outlined text-lg">download</span>
                     </button>
                     <button
-                      class="rounded-lg p-1.5 text-[#64748B] hover:bg-[#F1F5F9] hover:text-red-600 transition-colors"
+                      class="rounded-lg p-1.5 text-[#5F7089] hover:bg-[#F1F5F9] hover:text-red-600 transition-colors"
                       title="Delete"
                       @click="openDeleteConfirm(backup)"
                     >
-                      <span class="material-symbols-outlined text-lg">delete</span>
+                      <span aria-hidden="true" class="material-symbols-outlined text-lg">delete</span>
                     </button>
                   </div>
                 </td>
@@ -690,7 +690,7 @@ function switchTab(tab) {
         <!-- Warning Banner -->
         <div class="mb-6 rounded-lg border border-red-200 bg-red-50 p-4">
           <div class="flex items-start gap-3">
-            <span class="material-symbols-outlined text-red-600 text-2xl">warning</span>
+            <span aria-hidden="true" class="material-symbols-outlined text-red-600 text-2xl">warning</span>
             <div>
               <p class="font-semibold text-red-800">PERINGATAN</p>
               <p class="mt-1 text-sm text-red-700">
@@ -721,17 +721,17 @@ function switchTab(tab) {
               for="restoreFileInput"
               class="block cursor-pointer rounded-lg peer-focus-visible:outline-2 peer-focus-visible:outline-offset-4 peer-focus-visible:outline-[#0A51B0]"
             >
-              <span class="material-symbols-outlined mb-2 block text-4xl text-[#94A3B8]"
+              <span aria-hidden="true" class="material-symbols-outlined mb-2 block text-4xl text-[#687281]"
                 >upload_file</span
               >
-              <p class="text-sm text-[#64748B]">
+              <p class="text-sm text-[#5F7089]">
                 {{
                   restoreFile
                     ? restoreFile.name
                     : 'Klik untuk memilih file backup (.dump, .sql, .tar)'
                 }}
               </p>
-              <p v-if="restoreFile" class="mt-1 text-xs text-[#94A3B8]">
+              <p v-if="restoreFile" class="mt-1 text-xs text-[#687281]">
                 {{ formatBytes(restoreFile.size) }}
               </p>
             </label>
@@ -753,7 +753,7 @@ function switchTab(tab) {
               v-if="restoreStep === 'validating'"
               class="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"
             ></span>
-            <span v-else class="material-symbols-outlined text-lg">fact_check</span>
+            <span aria-hidden="true" v-else class="material-symbols-outlined text-lg">fact_check</span>
             {{ restoreStep === 'validating' ? 'Memvalidasi...' : 'Validate Backup' }}
           </button>
         </div>
@@ -763,25 +763,25 @@ function switchTab(tab) {
           <h3 class="mb-4 text-base font-semibold text-[#333333]">Informasi Backup</h3>
           <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div class="rounded-lg bg-[#F8FAFC] p-3">
-              <div class="text-xs text-[#94A3B8]">Format</div>
+              <div class="text-xs text-[#687281]">Format</div>
               <div class="text-sm font-medium text-[#333333]">
                 {{ restoreValidation?.format || '-' }}
               </div>
             </div>
             <div class="rounded-lg bg-[#F8FAFC] p-3">
-              <div class="text-xs text-[#94A3B8]">Database</div>
+              <div class="text-xs text-[#687281]">Database</div>
               <div class="text-sm font-medium text-[#333333]">
                 {{ restoreValidation?.databaseName || '-' }}
               </div>
             </div>
             <div class="rounded-lg bg-[#F8FAFC] p-3">
-              <div class="text-xs text-[#94A3B8]">Size</div>
+              <div class="text-xs text-[#687281]">Size</div>
               <div class="text-sm font-medium text-[#333333]">
                 {{ formatBytes(restoreValidation?.fileSize) }}
               </div>
             </div>
             <div class="rounded-lg bg-[#F8FAFC] p-3">
-              <div class="text-xs text-[#94A3B8]">Checksum</div>
+              <div class="text-xs text-[#687281]">Checksum</div>
               <div class="text-sm font-mono font-medium text-[#333333] truncate">
                 {{ restoreValidation?.checksum?.slice(0, 24) || '-' }}
               </div>
@@ -793,7 +793,7 @@ function switchTab(tab) {
               <div class="p-3">
                 <div class="flex items-center gap-2">
                   <span
-                    class="material-symbols-outlined text-sm"
+                    aria-hidden="true" class="material-symbols-outlined text-sm"
                     :class="restoreValidation?.contentValid ? 'text-emerald-600' : 'text-red-600'"
                   >
                     {{ restoreValidation?.contentValid ? 'check_circle' : 'cancel' }}
@@ -821,7 +821,7 @@ function switchTab(tab) {
 
           <div class="mt-4 grid grid-cols-1 sm:flex gap-2">
             <button
-              class="rounded-lg border border-[#E5EAEF] px-4 py-2 text-sm font-medium text-[#64748B] hover:bg-[#F8FAFC]"
+              class="rounded-lg border border-[#E5EAEF] px-4 py-2 text-sm font-medium text-[#5F7089] hover:bg-[#F8FAFC]"
               @click="resetRestore"
             >
               Batal
@@ -835,7 +835,7 @@ function switchTab(tab) {
                 v-if="restoreStep === 'restoring'"
                 class="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"
               ></span>
-              <span v-else class="material-symbols-outlined text-lg">restore_page</span>
+              <span aria-hidden="true" v-else class="material-symbols-outlined text-lg">restore_page</span>
               {{ restoreStep === 'restoring' ? 'Restoring...' : 'Restore Database' }}
             </button>
           </div>
@@ -843,12 +843,12 @@ function switchTab(tab) {
 
         <!-- Step 3: Done -->
         <div v-if="restoreStep === 'done'" class="text-center">
-          <span class="material-symbols-outlined mb-3 text-5xl text-emerald-500">check_circle</span>
+          <span aria-hidden="true" class="material-symbols-outlined mb-3 text-5xl text-emerald-500">check_circle</span>
           <h3 class="text-lg font-semibold text-[#333333]">Restore Berhasil</h3>
-          <p class="mt-1 text-sm text-[#64748B]">
+          <p class="mt-1 text-sm text-[#5F7089]">
             Database telah diverifikasi dan berjalan normal.
           </p>
-          <p v-if="restoreResult?.safetyBackupId" class="mt-1 text-xs text-[#94A3B8]">
+          <p v-if="restoreResult?.safetyBackupId" class="mt-1 text-xs text-[#687281]">
             Safety backup ID: {{ restoreResult.safetyBackupId }}
           </p>
           <button
@@ -867,7 +867,7 @@ function switchTab(tab) {
         <div v-if="isLoadingAudit" class="p-4 lg:hidden" role="status">Memuat audit log...</div>
         <p
           v-else-if="auditLogs.length === 0"
-          class="px-4 py-10 text-center text-sm text-[#64748B] lg:hidden"
+          class="px-4 py-10 text-center text-sm text-[#5F7089] lg:hidden"
         >
           Belum ada audit log
         </p>
@@ -883,19 +883,19 @@ function switchTab(tab) {
             >
             <dl class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
               <div>
-                <dt class="text-xs text-[#64748B]">User</dt>
+                <dt class="text-xs text-[#5F7089]">User</dt>
                 <dd>{{ log.user_name || '-' }}</dd>
               </div>
               <div>
-                <dt class="text-xs text-[#64748B]">Database</dt>
+                <dt class="text-xs text-[#5F7089]">Database</dt>
                 <dd class="font-mono text-xs leading-relaxed">{{ log.target_database }}</dd>
               </div>
               <div>
-                <dt class="text-xs text-[#64748B]">Timestamp</dt>
+                <dt class="text-xs text-[#5F7089]">Timestamp</dt>
                 <dd>{{ formatDate(log.created_at) }}</dd>
               </div>
               <div class="sm:col-span-2">
-                <dt class="text-xs text-[#64748B]">Error</dt>
+                <dt class="text-xs text-[#5F7089]">Error</dt>
                 <dd class="text-[13px] leading-relaxed whitespace-pre-line">
                   {{ log.error_summary || '-' }}
                 </dd>
@@ -906,7 +906,7 @@ function switchTab(tab) {
         <div class="hidden lg:block overflow-x-auto">
           <table class="w-full text-left text-sm">
             <thead
-              class="border-b border-[#F1F5F9] bg-[#F8FAFC] text-xs font-semibold uppercase text-[#64748B]"
+              class="border-b border-[#F1F5F9] bg-[#F8FAFC] text-xs font-semibold uppercase text-[#5F7089]"
             >
               <tr>
                 <th class="px-4 py-3">Operation</th>
@@ -919,7 +919,7 @@ function switchTab(tab) {
             </thead>
             <tbody class="divide-y divide-[#F1F5F9]">
               <tr v-if="auditLogs.length === 0 && !isLoadingAudit">
-                <td colspan="6" class="px-4 py-12 text-center text-[#94A3B8]">
+                <td colspan="6" class="px-4 py-12 text-center text-[#687281]">
                   Belum ada audit log
                 </td>
               </tr>
@@ -936,8 +936,8 @@ function switchTab(tab) {
                     {{ operationLabel(log.operation) }}
                   </span>
                 </td>
-                <td class="px-4 py-3 text-[#64748B]">{{ log.user_name || '-' }}</td>
-                <td class="px-4 py-3 text-[#64748B] font-mono text-xs">
+                <td class="px-4 py-3 text-[#5F7089]">{{ log.user_name || '-' }}</td>
+                <td class="px-4 py-3 text-[#5F7089] font-mono text-xs">
                   {{ log.target_database }}
                 </td>
                 <td class="px-4 py-3">
@@ -949,12 +949,12 @@ function switchTab(tab) {
                   </span>
                 </td>
                 <td
-                  class="px-4 py-3 text-[#94A3B8] text-xs max-w-[200px] truncate"
+                  class="px-4 py-3 text-[#687281] text-xs max-w-[200px] truncate"
                   :title="log.error_summary"
                 >
                   {{ log.error_summary || '-' }}
                 </td>
-                <td class="px-4 py-3 text-[#94A3B8] whitespace-nowrap text-xs">
+                <td class="px-4 py-3 text-[#687281] whitespace-nowrap text-xs">
                   {{ formatDate(log.created_at) }}
                 </td>
               </tr>
@@ -973,7 +973,7 @@ function switchTab(tab) {
       <div class="database-modal space-y-4 wrap-anywhere">
         <div class="rounded-lg border border-red-200 bg-red-50 p-4">
           <div class="flex items-start gap-3">
-            <span class="material-symbols-outlined text-red-600">dangerous</span>
+            <span aria-hidden="true" class="material-symbols-outlined text-red-600">dangerous</span>
             <div>
               <p class="font-semibold text-red-800">PERINGATAN: Operasi Destructive</p>
               <p class="mt-1 text-sm text-red-700">
@@ -1011,7 +1011,7 @@ function switchTab(tab) {
       <template #footer>
         <div class="admin-modal-actions grid grid-cols-1 sm:flex sm:justify-end gap-3 pt-2">
           <button
-            class="rounded-lg border border-[#E5EAEF] px-4 py-2 text-sm font-medium text-[#64748B] hover:bg-[#F8FAFC]"
+            class="rounded-lg border border-[#E5EAEF] px-4 py-2 text-sm font-medium text-[#5F7089] hover:bg-[#F8FAFC]"
             @click="showRestoreConfirm = false"
           >
             Cancel
@@ -1030,7 +1030,7 @@ function switchTab(tab) {
     <!-- ===== DELETE CONFIRMATION MODAL ===== -->
     <AppModal :is-open="showDeleteConfirm" title="Hapus Backup" @close="showDeleteConfirm = false">
       <div class="database-modal space-y-4 wrap-anywhere">
-        <p class="text-sm text-[#64748B]">
+        <p class="text-sm text-[#5F7089]">
           Anda yakin ingin menghapus backup <strong>{{ deleteTargetName }}</strong
           >? Tindakan ini tidak dapat dibatalkan.
         </p>
@@ -1038,7 +1038,7 @@ function switchTab(tab) {
       <template #footer>
         <div class="admin-modal-actions grid grid-cols-1 sm:flex sm:justify-end gap-3">
           <button
-            class="rounded-lg border border-[#E5EAEF] px-4 py-2 text-sm font-medium text-[#64748B] hover:bg-[#F8FAFC]"
+            class="rounded-lg border border-[#E5EAEF] px-4 py-2 text-sm font-medium text-[#5F7089] hover:bg-[#F8FAFC]"
             @click="showDeleteConfirm = false"
           >
             Cancel
@@ -1061,7 +1061,7 @@ function switchTab(tab) {
         class="fixed bottom-3 left-3 right-3 sm:bottom-6 sm:left-auto sm:right-6 sm:max-w-md z-50 flex items-center gap-2 rounded-xl px-4 py-3 shadow-lg text-sm font-medium"
         :class="toast.type === 'success' ? 'bg-emerald-600 text-white' : 'bg-red-600 text-white'"
       >
-        <span class="material-symbols-outlined text-lg">
+        <span aria-hidden="true" class="material-symbols-outlined text-lg">
           {{ toast.type === 'success' ? 'check_circle' : 'error' }}
         </span>
         <span class="min-w-0 wrap-anywhere" role="status">{{ toast.message }}</span>
@@ -1070,7 +1070,7 @@ function switchTab(tab) {
           class="ml-2 opacity-70 hover:opacity-100"
           @click="toast.show = false"
         >
-          <span class="material-symbols-outlined text-base">close</span>
+          <span aria-hidden="true" class="material-symbols-outlined text-base">close</span>
         </button>
       </div>
     </Transition>

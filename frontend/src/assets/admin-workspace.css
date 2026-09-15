@@ -20,7 +20,7 @@
 .admin-page-header p {
   font-size: 12px;
   line-height: 1.8;
-  color: #71829b;
+  color: #637288;
 }
 .admin-page-header > div:first-child {
   gap: 16px;
@@ -52,7 +52,7 @@
   box-shadow: none;
 }
 .admin-workspace table th {
-  color: #8291a7;
+  color: #667283;
   font-size: 11px;
   font-weight: 500;
   text-transform: none;
@@ -91,7 +91,7 @@
   text-transform: none;
   letter-spacing: 0;
   font-weight: 500;
-  color: #8291a7;
+  color: #667283;
 }
 .admin-person-cards :deep(button) {
   min-width: 40px;

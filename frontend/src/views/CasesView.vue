@@ -124,7 +124,7 @@ onMounted(() => {
             <div
               class="w-16 h-16 rounded-2xl bg-[#edeef0] dark:bg-slate-900 flex items-center justify-center mb-4"
             >
-              <SearchX class="w-8 h-8 text-[#64748b] dark:text-slate-600" />
+              <SearchX class="w-8 h-8 text-[#5F7089] dark:text-slate-600" />
             </div>
             <h3 class="text-base font-bold text-[#1a1c1d] dark:text-slate-300">
               Tidak ada hasil untuk "{{ searchQuery }}"

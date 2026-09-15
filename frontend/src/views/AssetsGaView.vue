@@ -367,7 +367,7 @@ function formatKondisiPill(kondisi) {
     case 'Rusak Berat':
       return { text: 'text-[#991B1B]', bg: 'bg-[#FEE2E2]', dot: 'bg-[#DC2626]' }
     default:
-      return { text: 'text-[#475569]', bg: 'bg-[#F1F5F9]', dot: 'bg-[#64748B]' }
+      return { text: 'text-[#475569]', bg: 'bg-[#F1F5F9]', dot: 'bg-[#5F7089]' }
   }
 }
 </script>
@@ -388,7 +388,7 @@ function formatKondisiPill(kondisi) {
             Aset GA
           </h2>
           <p
-            class="text-[11px] sm:text-xs text-[#64748B] mt-0.5 leading-normal line-clamp-1 sm:line-clamp-none"
+            class="text-[11px] sm:text-xs text-[#5F7089] mt-0.5 leading-normal line-clamp-1 sm:line-clamp-none"
           >
             Kelola inventaris fasilitas General Affair, mebel, AC, dan perlengkapan kantor.
           </p>
@@ -402,7 +402,7 @@ function formatKondisiPill(kondisi) {
             class="toolbar-primary-action inline-flex h-9 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg bg-[#0A51B0] px-3 sm:px-3.5 text-xs font-semibold text-white shadow-2xs transition-all hover:bg-[#0A4391] active:scale-95"
             title="Tambah Aset GA baru"
           >
-            <span class="material-symbols-outlined text-[16px]">add</span>
+            <span aria-hidden="true" class="material-symbols-outlined text-[16px]">add</span>
             <span>Tambah Aset GA</span>
           </button>
           <div class="toolbar-action-group flex items-center gap-1 rounded-lg border border-[#D7E3F2] bg-[#F8FAFC] p-1">
@@ -413,10 +413,10 @@ function formatKondisiPill(kondisi) {
               class="toolbar-action-button inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-[11px] font-bold text-[#0A51B0] hover:bg-white"
               title="Impor data Aset GA dari Excel"
             >
-              <span class="material-symbols-outlined text-[15px]">upload_file</span>Import
+              <span aria-hidden="true" class="material-symbols-outlined text-[15px]">upload_file</span>Import
             </button>
             <button type="button" @click="showExportModal = true" class="toolbar-action-button inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-[11px] font-bold text-[#0A51B0] hover:bg-white" title="Export data Aset GA">
-              <span class="material-symbols-outlined text-[15px]">download</span>Export
+              <span aria-hidden="true" class="material-symbols-outlined text-[15px]">download</span>Export
             </button>
           </div>
         </div>
@@ -429,14 +429,14 @@ function formatKondisiPill(kondisi) {
         <!-- Search Input -->
         <div class="relative h-9 w-full sm:flex-1 sm:min-w-[200px]">
           <span
-            class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-[17px] text-[#94A3B8] pointer-events-none"
+            aria-hidden="true" class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-[17px] text-[#687281] pointer-events-none"
             >search</span
           >
           <input
             v-model="searchQuery"
             type="text"
-            placeholder="Cari hostname, nama asset, detail, lokasi..."
-            class="h-full w-full rounded-lg border border-[#E2E8F0] bg-white pl-8 pr-8 text-xs text-[#333333] placeholder-[#94A3B8] focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
+            aria-label="Cari aset GA" placeholder="Cari hostname, nama asset, detail, lokasi..."
+            class="h-full w-full rounded-lg border border-[#E2E8F0] bg-white pl-8 pr-8 text-xs text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
           />
           <!-- Inline Clear Button -->
           <button
@@ -444,15 +444,15 @@ function formatKondisiPill(kondisi) {
             type="button"
             @click="searchQuery = ''"
             aria-label="Bersihkan pencarian"
-            class="absolute right-2 top-1/2 -translate-y-1/2 flex h-5 w-5 items-center justify-center rounded-full text-[#94A3B8] hover:bg-[#F1F5F9] hover:text-[#333333] transition-all cursor-pointer touch-manipulation"
+            class="absolute right-2 top-1/2 -translate-y-1/2 flex h-5 w-5 items-center justify-center rounded-full text-[#687281] hover:bg-[#F1F5F9] hover:text-[#333333] transition-all cursor-pointer touch-manipulation"
             title="Bersihkan"
           >
-            <span class="material-symbols-outlined text-[15px]">close</span>
+            <span aria-hidden="true" class="material-symbols-outlined text-[15px]">close</span>
           </button>
         </div>
 
         <div class="flex w-full items-center justify-end">
-          <button type="button" @click="showFilterModal = true" class="h-9 shrink-0 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-semibold text-[#64748B] hover:bg-white"><span class="material-symbols-outlined mr-1 align-middle text-[16px]">filter_alt</span>Filter</button>
+          <button type="button" @click="showFilterModal = true" class="h-9 shrink-0 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-semibold text-[#5F7089] hover:bg-white"><span aria-hidden="true" class="material-symbols-outlined mr-1 align-middle text-[16px]">filter_alt</span>Filter</button>
         </div>
       </div>
     </div>
@@ -471,9 +471,9 @@ function formatKondisiPill(kondisi) {
       <div
         v-if="pageError"
         role="alert"
-        class="flex items-center gap-2 bg-rose-50 px-5 py-4 text-[12.5px] text-rose-600 rounded-2xl border border-rose-200"
+        class="flex items-center gap-2 bg-rose-50 px-5 py-4 text-[13px] text-rose-600 rounded-2xl border border-rose-200"
       >
-        <span class="material-symbols-outlined text-[18px]">error</span>
+        <span aria-hidden="true" class="material-symbols-outlined text-[18px]">error</span>
         <span class="flex-1 font-semibold">{{ pageError }}</span>
         <button type="button" class="font-bold underline cursor-pointer" @click="fetchData">
           Coba lagi
@@ -568,12 +568,12 @@ function formatKondisiPill(kondisi) {
       >
         <div class="flex flex-col items-center justify-center gap-2 max-w-sm mx-auto">
           <span
-            class="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#F1F5F9] text-[#64748B]"
+            class="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#F1F5F9] text-[#5F7089]"
           >
-            <span class="material-symbols-outlined text-[24px]">domain_disabled</span>
+            <span aria-hidden="true" class="material-symbols-outlined text-[24px]">domain_disabled</span>
           </span>
           <h3 class="text-[14px] font-bold text-[#333333] mt-1">Belum Ada Aset GA</h3>
-          <p class="text-[11.5px] text-[#64748B] leading-relaxed">
+          <p class="text-[12px] text-[#5F7089] leading-relaxed">
             Belum ada fasilitas General Affair yang terdaftar dalam inventaris atau sesuai dengan
             kata kunci pencarian.
           </p>
@@ -583,7 +583,7 @@ function formatKondisiPill(kondisi) {
             @click="openAdd"
             class="mt-2 h-9 rounded-lg bg-[#0A51B0] px-4 text-[12px] font-semibold text-white shadow-2xs hover:bg-[#0A4391] transition-all flex items-center gap-1.5 cursor-pointer"
           >
-            <span class="material-symbols-outlined text-[16px]">add</span>
+            <span aria-hidden="true" class="material-symbols-outlined text-[16px]">add</span>
             <span>Tambah Aset GA</span>
           </button>
         </div>
@@ -603,7 +603,7 @@ function formatKondisiPill(kondisi) {
         >
           <div class="laptop-identity">
             <div class="laptop-icon" aria-hidden="true">
-              <span class="material-symbols-outlined">{{ getGaIcon(asset.tipe_fasilitas) }}</span>
+              <span aria-hidden="true" class="material-symbols-outlined">{{ getGaIcon(asset.tipe_fasilitas) }}</span>
             </div>
             <div class="laptop-identity-text">
               <h4 :title="asset.nama_asset">{{ asset.nama_asset || '—' }}</h4>
@@ -694,7 +694,7 @@ function formatKondisiPill(kondisi) {
               type="text"
               required
               placeholder="Contoh: GA-PL-001"
-              class="w-full h-10 px-3 text-[12.5px] rounded-xl border border-[#E2E8F0] bg-white focus:border-[#0A51B0] focus:outline-none"
+              class="w-full h-10 px-3 text-[13px] rounded-xl border border-[#E2E8F0] bg-white focus:border-[#0A51B0] focus:outline-none"
             />
           </div>
 
@@ -709,7 +709,7 @@ function formatKondisiPill(kondisi) {
               type="text"
               required
               placeholder="Contoh: Meja Kerja Kayu Jati"
-              class="w-full h-10 px-3 text-[12.5px] rounded-xl border border-[#E2E8F0] bg-white focus:border-[#0A51B0] focus:outline-none"
+              class="w-full h-10 px-3 text-[13px] rounded-xl border border-[#E2E8F0] bg-white focus:border-[#0A51B0] focus:outline-none"
             />
           </div>
         </div>
@@ -727,7 +727,7 @@ function formatKondisiPill(kondisi) {
               type="number"
               min="1"
               required
-              class="w-full h-10 px-3 text-[12.5px] rounded-xl border border-[#E2E8F0] bg-white focus:border-[#0A51B0] focus:outline-none"
+              class="w-full h-10 px-3 text-[13px] rounded-xl border border-[#E2E8F0] bg-white focus:border-[#0A51B0] focus:outline-none"
             />
           </div>
 
@@ -787,7 +787,7 @@ function formatKondisiPill(kondisi) {
               v-model="form.lokasi_detail"
               type="text"
               placeholder="Contoh: Lantai 2 / Ruang Rapat Utama"
-              class="w-full h-10 px-3 text-[12.5px] rounded-xl border border-[#E2E8F0] bg-white focus:border-[#0A51B0] focus:outline-none"
+              class="w-full h-10 px-3 text-[13px] rounded-xl border border-[#E2E8F0] bg-white focus:border-[#0A51B0] focus:outline-none"
             />
           </div>
         </div>
@@ -804,7 +804,7 @@ function formatKondisiPill(kondisi) {
               v-model="form.ukuran"
               type="text"
               placeholder="Contoh: 120x60x75 cm / 2 PK"
-              class="w-full h-10 px-3 text-[12.5px] rounded-xl border border-[#E2E8F0] bg-white focus:border-[#0A51B0] focus:outline-none"
+              class="w-full h-10 px-3 text-[13px] rounded-xl border border-[#E2E8F0] bg-white focus:border-[#0A51B0] focus:outline-none"
             />
           </div>
 
@@ -818,7 +818,7 @@ function formatKondisiPill(kondisi) {
               v-model="form.detail"
               type="text"
               placeholder="Contoh: Warna Hitam, Daikin Inverter"
-              class="w-full h-10 px-3 text-[12.5px] rounded-xl border border-[#E2E8F0] bg-white focus:border-[#0A51B0] focus:outline-none"
+              class="w-full h-10 px-3 text-[13px] rounded-xl border border-[#E2E8F0] bg-white focus:border-[#0A51B0] focus:outline-none"
             />
           </div>
         </div>
@@ -832,7 +832,7 @@ function formatKondisiPill(kondisi) {
             type="button"
             :disabled="isSubmitting"
             @click="closeModal"
-            class="h-10 px-4 rounded-xl border border-[#E2E8F0] text-[12.5px] font-semibold text-[#64748B] hover:bg-[#F8FAFC]"
+            class="h-10 px-4 rounded-xl border border-[#E2E8F0] text-[13px] font-semibold text-[#5F7089] hover:bg-[#F8FAFC]"
           >
             Batal
           </button>
@@ -840,7 +840,7 @@ function formatKondisiPill(kondisi) {
             type="submit"
             form="crud-AssetsGaView"
             :disabled="isSubmitting"
-            class="h-10 px-5 rounded-xl bg-[#0A51B0] text-[12.5px] font-bold text-white shadow-2xs hover:bg-[#0A4391] disabled:opacity-50 flex items-center gap-2"
+            class="h-10 px-5 rounded-xl bg-[#0A51B0] text-[13px] font-bold text-white shadow-2xs hover:bg-[#0A4391] disabled:opacity-50 flex items-center gap-2"
           >
             <span v-if="isSubmitting" class="animate-spin text-[16px]">hourglass_empty</span>
             <span>{{ isSubmitting ? 'Menyimpan...' : 'Simpan Aset GA' }}</span>
@@ -867,7 +867,7 @@ function formatKondisiPill(kondisi) {
             type="button"
             :disabled="isSubmitting"
             @click="closeModal"
-            class="h-10 px-4 rounded-xl border border-[#E2E8F0] text-[12.5px] font-semibold text-[#64748B] hover:bg-[#F8FAFC]"
+            class="h-10 px-4 rounded-xl border border-[#E2E8F0] text-[13px] font-semibold text-[#5F7089] hover:bg-[#F8FAFC]"
           >
             Batal
           </button>
@@ -875,7 +875,7 @@ function formatKondisiPill(kondisi) {
             type="button"
             :disabled="isSubmitting"
             @click="confirmDelete"
-            class="h-10 px-5 rounded-xl bg-rose-600 text-[12.5px] font-bold text-white shadow-2xs hover:bg-rose-700 disabled:opacity-50"
+            class="h-10 px-5 rounded-xl bg-rose-600 text-[13px] font-bold text-white shadow-2xs hover:bg-rose-700 disabled:opacity-50"
           >
             {{ isSubmitting ? 'Menghapus...' : 'Ya, Hapus' }}
           </button>
@@ -892,44 +892,44 @@ function formatKondisiPill(kondisi) {
           <div
             class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#EFF6FF] text-[#333333]"
           >
-            <span class="material-symbols-outlined text-[22px]">{{
+            <span aria-hidden="true" class="material-symbols-outlined text-[22px]">{{
               getGaIcon(selectedAsset.tipe_fasilitas)
             }}</span>
           </div>
           <div>
             <h3 class="font-bold text-[#333333] text-[14px]">{{ selectedAsset.nama_asset }}</h3>
-            <p class="font-mono text-[11px] text-[#64748B]">{{ selectedAsset.hostname }}</p>
+            <p class="font-mono text-[11px] text-[#5F7089]">{{ selectedAsset.hostname }}</p>
           </div>
         </div>
 
         <div class="asset-detail-fields">
           <div>
-            <span class="text-[#64748B] block text-[11px] font-medium">Quantity</span>
+            <span class="text-[#5F7089] block text-[11px] font-medium">Quantity</span>
             <span class="font-bold text-[#333333]">{{ selectedAsset.quantity }} Unit</span>
           </div>
 
           <div>
-            <span class="text-[#64748B] block text-[11px] font-medium">Tipe Fasilitas</span>
+            <span class="text-[#5F7089] block text-[11px] font-medium">Tipe Fasilitas</span>
             <span class="font-semibold text-[#333333]">{{ selectedAsset.tipe_fasilitas }}</span>
           </div>
 
           <div>
-            <span class="text-[#64748B] block text-[11px] font-medium">Lokasi</span>
+            <span class="text-[#5F7089] block text-[11px] font-medium">Lokasi</span>
             <span class="font-semibold text-[#333333]">{{ selectedAsset.lokasi }}</span>
           </div>
 
           <div>
-            <span class="text-[#64748B] block text-[11px] font-medium">Lokasi Detail</span>
+            <span class="text-[#5F7089] block text-[11px] font-medium">Lokasi Detail</span>
             <span class="text-[#333333]">{{ selectedAsset.lokasi_detail || '—' }}</span>
           </div>
 
           <div>
-            <span class="text-[#64748B] block text-[11px] font-medium">Ukuran / Dimensi</span>
+            <span class="text-[#5F7089] block text-[11px] font-medium">Ukuran / Dimensi</span>
             <span class="text-[#333333]">{{ selectedAsset.ukuran || '—' }}</span>
           </div>
 
           <div>
-            <span class="text-[#64748B] block text-[11px] font-medium">Kondisi</span>
+            <span class="text-[#5F7089] block text-[11px] font-medium">Kondisi</span>
             <span
               class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold mt-0.5"
               :class="[
@@ -947,11 +947,11 @@ function formatKondisiPill(kondisi) {
         </div>
 
         <div class="pt-2 border-t border-[#E2E8F0]">
-          <span class="text-[#64748B] block text-[11px] font-medium"
+          <span class="text-[#5F7089] block text-[11px] font-medium"
             >Detail / Catatan Spesifikasi</span
           >
           <p
-            class="text-[12.5px] text-[#333333] mt-1 p-3 bg-[#F8FAFC] rounded-xl border border-[#E2E8F0]"
+            class="text-[13px] text-[#333333] mt-1 p-3 bg-[#F8FAFC] rounded-xl border border-[#E2E8F0]"
           >
             {{ selectedAsset.detail || 'Tidak ada detail tambahan.' }}
           </p>
@@ -962,7 +962,7 @@ function formatKondisiPill(kondisi) {
           <button
             type="button"
             @click="closeModal"
-            class="h-10 px-5 rounded-xl bg-[#0A51B0] text-[12.5px] font-bold text-white shadow-2xs hover:bg-[#0A4391]"
+            class="h-10 px-5 rounded-xl bg-[#0A51B0] text-[13px] font-bold text-white shadow-2xs hover:bg-[#0A4391]"
           >
             Tutup
           </button>

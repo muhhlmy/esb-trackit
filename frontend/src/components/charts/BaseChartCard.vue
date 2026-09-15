@@ -17,7 +17,7 @@ defineProps({
     <div class="flex items-center justify-between pb-3 border-b border-[#F1F5F9] mb-4">
       <div>
         <h3 class="text-[15px] font-extrabold text-[#2A3547] leading-tight">{{ title }}</h3>
-        <p v-if="subtitle" class="text-[11px] font-medium text-[#7C8BAC] mt-0.5">{{ subtitle }}</p>
+        <p v-if="subtitle" class="text-[11px] font-medium text-[#66728d] mt-0.5">{{ subtitle }}</p>
       </div>
       <slot name="header-action" />
     </div>
@@ -33,16 +33,16 @@ defineProps({
         v-else-if="error"
         class="flex flex-col items-center gap-2 text-[#FA896B] p-4 text-center"
       >
-        <span class="material-symbols-outlined text-[32px]">error</span>
+        <span aria-hidden="true" class="material-symbols-outlined text-[32px]">error</span>
         <p class="text-[12px] font-semibold">{{ error }}</p>
       </div>
 
       <!-- Empty State -->
       <div
         v-else-if="empty"
-        class="flex flex-col items-center gap-2 text-[#94A3B8] p-4 text-center"
+        class="flex flex-col items-center gap-2 text-[#687281] p-4 text-center"
       >
-        <span class="material-symbols-outlined text-[36px]">bar_chart_off</span>
+        <span aria-hidden="true" class="material-symbols-outlined text-[36px]">bar_chart_off</span>
         <p class="text-[12px] font-semibold">Belum ada data visualisasi.</p>
       </div>
 

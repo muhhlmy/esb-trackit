@@ -148,14 +148,14 @@ onMounted(() => {
         <h3 class="text-[17px] font-extrabold text-[#2A3547] leading-tight">
           Kepuasan Pelanggan (CSAT Monitoring)
         </h3>
-        <p class="text-[12px] font-medium text-[#7C8BAC] mt-0.5">
+        <p class="text-[12px] font-medium text-[#66728d] mt-0.5">
           Analisis skor CSAT perbulan dan sebaran ulasan penyelesaian tiket
         </p>
       </div>
       <span
         class="inline-flex items-center gap-1.5 rounded-full bg-[#FEF3C7] px-3.5 py-1 text-[11px] font-bold text-[#FFAE1F]"
       >
-        <span class="material-symbols-outlined text-[15px] fill-1">star</span>
+        <span aria-hidden="true" class="material-symbols-outlined text-[15px] fill-1">star</span>
         CSAT Analytics
       </span>
     </div>
@@ -171,21 +171,21 @@ onMounted(() => {
             <h3 class="text-[15px] font-extrabold text-[#2A3547] leading-tight">
               Rata-rata Kepuasan (CSAT)
             </h3>
-            <p class="text-[11px] font-medium text-[#7C8BAC] mt-0.5">
+            <p class="text-[11px] font-medium text-[#66728d] mt-0.5">
               Penilaian pelapor terhadap penyelesaian tiket
             </p>
           </div>
           <span
             class="flex h-9 w-9 items-center justify-center rounded-xl bg-[#FEF3C7] text-[#FFAE1F]"
           >
-            <span class="material-symbols-outlined text-[20px] fill-1">star</span>
+            <span aria-hidden="true" class="material-symbols-outlined text-[20px] fill-1">star</span>
           </span>
         </div>
 
         <!-- Loading -->
         <div
           v-if="isLoading"
-          class="flex flex-1 flex-col items-center justify-center gap-2 py-8 text-[#7C8BAC]"
+          class="flex flex-1 flex-col items-center justify-center gap-2 py-8 text-[#66728d]"
         >
           <div
             class="h-8 w-8 animate-spin rounded-full border-3 border-[#E5EAEF] border-t-[#FFAE1F]"
@@ -198,7 +198,7 @@ onMounted(() => {
           v-else-if="error"
           class="flex flex-1 flex-col items-center justify-center gap-2 py-8 text-[#FA896B]"
         >
-          <span class="material-symbols-outlined text-[28px]">error</span>
+          <span aria-hidden="true" class="material-symbols-outlined text-[28px]">error</span>
           <p class="text-[12px] font-semibold">{{ error }}</p>
           <button
             type="button"
@@ -212,9 +212,9 @@ onMounted(() => {
         <!-- Empty -->
         <div
           v-else-if="isEmpty"
-          class="flex flex-1 flex-col items-center justify-center gap-2 py-8 text-[#94A3B8]"
+          class="flex flex-1 flex-col items-center justify-center gap-2 py-8 text-[#687281]"
         >
-          <span class="material-symbols-outlined text-[34px]">reviews</span>
+          <span aria-hidden="true" class="material-symbols-outlined text-[34px]">reviews</span>
           <p class="text-[12px] font-semibold text-center">
             Belum ada penilaian CSAT.<br />Penilaian muncul setelah tiket di-resolve.
           </p>
@@ -226,7 +226,7 @@ onMounted(() => {
             <p class="font-num text-[44px] font-black leading-none text-[#2A3547]">
               {{ stats.averageRating.toFixed(1) }}
             </p>
-            <p class="mb-1 text-[14px] font-bold text-[#7C8BAC]">/ 5.0</p>
+            <p class="mb-1 text-[14px] font-bold text-[#66728d]">/ 5.0</p>
           </div>
           <div class="mt-2">
             <CsatStars :value="stats.averageRating" size="26px" />
@@ -237,7 +237,7 @@ onMounted(() => {
             >
               {{ ratingLabel }}
             </span>
-            <span class="text-[11px] font-medium text-[#7C8BAC]"
+            <span class="text-[11px] font-medium text-[#66728d]"
               >{{ stats.totalRatings }} total ulasan</span
             >
           </div>
@@ -253,7 +253,7 @@ onMounted(() => {
             <h3 class="text-[15px] font-extrabold text-[#2A3547] leading-tight">
               Distribusi Penilaian
             </h3>
-            <p class="text-[11px] font-medium text-[#7C8BAC] mt-0.5">
+            <p class="text-[11px] font-medium text-[#66728d] mt-0.5">
               Sebaran jumlah ulasan per tingkat bintang
             </p>
           </div>
@@ -261,7 +261,7 @@ onMounted(() => {
 
         <div class="relative flex-1 min-h-[260px] flex items-center justify-center">
           <!-- Loading Skeleton -->
-          <div v-if="isLoading" class="flex flex-col items-center gap-2 text-[#7C8BAC]">
+          <div v-if="isLoading" class="flex flex-col items-center gap-2 text-[#66728d]">
             <div
               class="h-8 w-8 animate-spin rounded-full border-3 border-[#E5EAEF] border-t-[#0A51B0]"
             ></div>
@@ -273,16 +273,16 @@ onMounted(() => {
             v-else-if="error"
             class="flex flex-col items-center gap-2 text-[#FA896B] p-4 text-center"
           >
-            <span class="material-symbols-outlined text-[32px]">error</span>
+            <span aria-hidden="true" class="material-symbols-outlined text-[32px]">error</span>
             <p class="text-[12px] font-semibold">{{ error }}</p>
           </div>
 
           <!-- Empty State -->
           <div
             v-else-if="isEmpty"
-            class="flex flex-col items-center gap-2 text-[#94A3B8] p-4 text-center"
+            class="flex flex-col items-center gap-2 text-[#687281] p-4 text-center"
           >
-            <span class="material-symbols-outlined text-[36px]">bar_chart_off</span>
+            <span aria-hidden="true" class="material-symbols-outlined text-[36px]">bar_chart_off</span>
             <p class="text-[12px] font-semibold">Belum ada data visualisasi.</p>
           </div>
 

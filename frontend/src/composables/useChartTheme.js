@@ -22,7 +22,7 @@ export function useChartTheme() {
     '#49BEFF',
     '#8B5CF6',
     '#FA896B',
-    '#64748B',
+    '#5F7089',
   ]
 
   const commonOptions = {

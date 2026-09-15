@@ -245,15 +245,15 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside))
         ></span>
         <span v-if="selectedOption" class="truncate text-xs text-[#2A3547]">
           {{ selectedOption[labelKey] }}
-          <span v-if="secondaryLabelKey && selectedOption[secondaryLabelKey]" class="font-mono text-[10px] text-[#7C8BAC]">
+          <span v-if="secondaryLabelKey && selectedOption[secondaryLabelKey]" class="font-mono text-[10px] text-[#66728d]">
             ({{ selectedOption[secondaryLabelKey] }})
           </span>
         </span>
-        <span v-else class="truncate text-xs text-[#94A3B8] font-normal">{{ placeholder }}</span>
+        <span v-else class="truncate text-xs text-[#687281] font-normal">{{ placeholder }}</span>
       </div>
       <span
         aria-hidden="true"
-        class="material-symbols-outlined shrink-0 text-[16px] text-[#7C8BAC] transition-transform duration-200"
+        class="material-symbols-outlined shrink-0 text-[16px] text-[#66728d] transition-transform duration-200"
         :class="{ 'rotate-180 text-[#333333]': isOpen }"
         >expand_more</span
       >
@@ -277,7 +277,7 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside))
       <div class="relative mb-1 pb-1 border-b border-[#F1F5F9]">
         <span
           aria-hidden="true"
-          class="material-symbols-outlined pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[16px] text-[#7C8BAC]"
+          class="material-symbols-outlined pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[16px] text-[#66728d]"
           >search</span
         >
         <input
@@ -291,7 +291,7 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside))
           :aria-controls="listboxId"
           :aria-activedescendant="activeDescendant"
           :placeholder="searchPlaceholder"
-          class="h-8 w-full rounded-lg border border-[#E5EAEF] bg-[#F8FAFC] pl-8 pr-2.5 text-xs font-medium text-[#2A3547] placeholder-[#94A3B8] focus:bg-white focus:border-[#0A51B0] focus:outline-none focus:ring-2 focus:ring-[#0A51B0]/15 transition-all"
+          class="h-8 w-full rounded-lg border border-[#E5EAEF] bg-[#F8FAFC] pl-8 pr-2.5 text-xs font-medium text-[#2A3547] placeholder-[#687281] focus:bg-white focus:border-[#0A51B0] focus:outline-none focus:ring-2 focus:ring-[#0A51B0]/15 transition-all"
           @keydown.stop="handleSearchKeydown"
         />
       </div>
@@ -337,7 +337,7 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside))
                 </div>
                 <div
                   v-if="secondaryLabelKey && option[secondaryLabelKey]"
-                  class="mt-0.5 font-mono text-[10px] text-[#7C8BAC] truncate"
+                  class="mt-0.5 font-mono text-[10px] text-[#66728d] truncate"
                 >
                   {{ option[secondaryLabelKey] }}
                 </div>
@@ -353,7 +353,7 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside))
           <li
             v-if="filteredOptions.length === 0"
             role="status"
-            class="px-3 py-4 text-center text-xs text-[#94A3B8]"
+            class="px-3 py-4 text-center text-xs text-[#687281]"
           >
             Tidak ada hasil ditemukan.
           </li>

@@ -167,7 +167,7 @@ function getCategoryBadgeClass(category) {
       <div class="space-y-1 sm:space-y-1.5 w-full sm:w-auto">
         <!-- Breadcrumb -->
         <div
-          class="flex items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs font-semibold text-[#64748B] dark:text-slate-400"
+          class="flex items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs font-semibold text-[#5F7089] dark:text-slate-400"
         >
           <RouterLink
             to="/dashboard"
@@ -184,13 +184,13 @@ function getCategoryBadgeClass(category) {
         >
           <span>Knowledge Base</span>
           <span
-            class="text-[10.5px] sm:text-xs px-2 sm:px-2.5 py-0.5 rounded-full font-bold bg-[#ECF2FF] dark:bg-indigo-950/80 text-[#333333] dark:text-indigo-300 border border-[#0A51B0]/20"
+            class="text-[11px] sm:text-xs px-2 sm:px-2.5 py-0.5 rounded-full font-bold bg-[#ECF2FF] dark:bg-indigo-950/80 text-[#333333] dark:text-indigo-300 border border-[#0A51B0]/20"
           >
             Admin CMS
           </span>
         </h1>
 
-        <p class="text-xs sm:text-sm text-[#64748B] dark:text-slate-400 font-medium">
+        <p class="text-xs sm:text-sm text-[#5F7089] dark:text-slate-400 font-medium">
           Kelola panduan dan artikel knowledge base.
         </p>
       </div>
@@ -222,14 +222,14 @@ function getCategoryBadgeClass(category) {
               Kategori Knowledge Base
             </div>
             <div
-              class="text-[11px] sm:text-xs text-[#64748B] dark:text-slate-400 font-normal truncate"
+              class="text-[11px] sm:text-xs text-[#5F7089] dark:text-slate-400 font-normal truncate"
             >
               Kelola topic cards yang tampil di Browse Topics Help Center.
             </div>
           </div>
         </div>
         <ChevronRight
-          class="w-4 h-4 text-[#94A3B8] group-hover:text-[#333333] group-hover:translate-x-0.5 transition-all shrink-0 ml-2"
+          class="w-4 h-4 text-[#687281] group-hover:text-[#333333] group-hover:translate-x-0.5 transition-all shrink-0 ml-2"
         />
       </RouterLink>
     </div>
@@ -247,7 +247,7 @@ function getCategoryBadgeClass(category) {
             <FileText class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           </div>
           <span
-            class="text-[10px] sm:text-xs font-semibold text-[#64748B] dark:text-slate-400 truncate"
+            class="text-[10px] sm:text-xs font-semibold text-[#5F7089] dark:text-slate-400 truncate"
             >Total Panduan</span
           >
         </div>
@@ -269,7 +269,7 @@ function getCategoryBadgeClass(category) {
             <CheckCircle class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           </div>
           <span
-            class="text-[10px] sm:text-xs font-semibold text-[#64748B] dark:text-slate-400 truncate"
+            class="text-[10px] sm:text-xs font-semibold text-[#5F7089] dark:text-slate-400 truncate"
             >Published</span
           >
         </div>
@@ -291,7 +291,7 @@ function getCategoryBadgeClass(category) {
             <Sparkles class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           </div>
           <span
-            class="text-[10px] sm:text-xs font-semibold text-[#64748B] dark:text-slate-400 truncate"
+            class="text-[10px] sm:text-xs font-semibold text-[#5F7089] dark:text-slate-400 truncate"
             >Custom</span
           >
         </div>
@@ -310,13 +310,13 @@ function getCategoryBadgeClass(category) {
       <!-- Search -->
       <div class="relative flex-1 sm:max-w-sm">
         <Search
-          class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8] pointer-events-none"
+          class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#687281] pointer-events-none"
         />
         <input
           v-model="searchQuery"
           type="text"
-          placeholder="Cari judul, deskripsi, atau tag..."
-          class="w-full bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-700 rounded-xl pl-9 pr-9 py-2 sm:py-2.5 text-xs sm:text-sm font-normal text-[#333333] dark:text-white placeholder-[#94A3B8] dark:placeholder-slate-500 focus:outline-none focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 transition-all shadow-2xs"
+          aria-label="Cari kasus" placeholder="Cari judul, deskripsi, atau tag..."
+          class="w-full bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-700 rounded-xl pl-9 pr-9 py-2 sm:py-2.5 text-xs sm:text-sm font-normal text-[#333333] dark:text-white placeholder-[#687281] dark:placeholder-slate-500 focus:outline-none focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 transition-all shadow-2xs"
         />
         <button
           v-if="searchQuery"
@@ -346,7 +346,7 @@ function getCategoryBadgeClass(category) {
             :class="
               selectedStatus === st.key
                 ? 'bg-white dark:bg-slate-900 text-[#333333] dark:text-white shadow-xs'
-                : 'text-[#64748B] dark:text-slate-400 hover:text-[#333333] dark:hover:text-slate-200'
+                : 'text-[#5F7089] dark:text-slate-400 hover:text-[#333333] dark:hover:text-slate-200'
             "
           >
             {{ st.label }}
@@ -369,7 +369,7 @@ function getCategoryBadgeClass(category) {
         <button
           v-if="searchQuery || selectedCategory !== 'all' || selectedStatus !== 'all'"
           @click="clearFilters"
-          class="px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-semibold text-[#64748B] dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors cursor-pointer shrink-0 touch-manipulation"
+          class="px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-semibold text-[#5F7089] dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors cursor-pointer shrink-0 touch-manipulation"
         >
           Reset
         </button>
@@ -390,7 +390,7 @@ function getCategoryBadgeClass(category) {
             <FolderOpen class="w-5 h-5" />
           </div>
           <p class="text-sm font-semibold text-[#333333] dark:text-slate-200">Tidak ada dokumen</p>
-          <p class="text-xs text-[#64748B] dark:text-slate-400 font-normal mt-0.5">
+          <p class="text-xs text-[#5F7089] dark:text-slate-400 font-normal mt-0.5">
             Tidak ada dokumen yang cocok dengan filter atau pencarian.
           </p>
           <button
@@ -412,7 +412,7 @@ function getCategoryBadgeClass(category) {
             <div class="flex items-center gap-1.5 flex-wrap min-w-0">
               <!-- Category Badge -->
               <span
-                class="inline-flex items-center px-2 py-0.5 rounded-md text-[10.5px] font-semibold capitalize shrink-0"
+                class="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-semibold capitalize shrink-0"
                 :class="getCategoryBadgeClass(c.category)"
               >
                 {{ c.category || 'General' }}
@@ -463,7 +463,7 @@ function getCategoryBadgeClass(category) {
               {{ c.title }}
             </h3>
             <p
-              class="text-xs text-[#64748B] dark:text-slate-400 line-clamp-2 mt-1 font-normal leading-relaxed"
+              class="text-xs text-[#5F7089] dark:text-slate-400 line-clamp-2 mt-1 font-normal leading-relaxed"
             >
               {{ c.summary }}
             </p>
@@ -474,8 +474,8 @@ function getCategoryBadgeClass(category) {
             class="flex items-center justify-between gap-2 pt-1.5 border-t border-[#F1F5F9] dark:border-slate-800/60 text-[11px]"
           >
             <!-- Severity -->
-            <div class="flex items-center gap-1 text-[#64748B] dark:text-slate-400">
-              <span class="text-[10px] uppercase font-bold text-[#94A3B8]">Severity:</span>
+            <div class="flex items-center gap-1 text-[#5F7089] dark:text-slate-400">
+              <span class="text-[10px] uppercase font-bold text-[#687281]">Severity:</span>
               <span
                 class="inline-flex items-center gap-1 font-medium capitalize"
                 :class="{
@@ -501,7 +501,7 @@ function getCategoryBadgeClass(category) {
               <span
                 v-for="t in (c.tags || []).slice(0, 2)"
                 :key="t"
-                class="px-1.5 py-0.2 rounded bg-slate-50 dark:bg-slate-800/80 text-[10px] text-[#94A3B8] dark:text-slate-400 font-mono truncate max-w-[90px]"
+                class="px-1.5 py-0.2 rounded bg-slate-50 dark:bg-slate-800/80 text-[10px] text-[#687281] dark:text-slate-400 font-mono truncate max-w-[90px]"
               >
                 #{{ t }}
               </span>
@@ -514,7 +514,7 @@ function getCategoryBadgeClass(category) {
       <div class="hidden xl:block overflow-x-auto">
         <table class="w-full text-left text-sm border-collapse">
           <thead
-            class="border-b border-[#E2E8F0] dark:border-slate-800 text-[#64748B] dark:text-slate-400 font-medium text-xs"
+            class="border-b border-[#E2E8F0] dark:border-slate-800 text-[#5F7089] dark:text-slate-400 font-medium text-xs"
           >
             <tr>
               <th class="py-3 px-5 font-medium">Dokumen</th>
@@ -538,7 +538,7 @@ function getCategoryBadgeClass(category) {
                   <p class="text-sm font-semibold text-[#333333] dark:text-slate-200">
                     Tidak ada dokumen
                   </p>
-                  <p class="text-xs text-[#64748B] dark:text-slate-400 font-normal">
+                  <p class="text-xs text-[#5F7089] dark:text-slate-400 font-normal">
                     Tidak ada dokumen yang cocok dengan filter atau pencarian.
                   </p>
                   <button
@@ -565,7 +565,7 @@ function getCategoryBadgeClass(category) {
                   {{ c.title }}
                 </div>
                 <div
-                  class="text-xs text-[#64748B] dark:text-slate-400 line-clamp-1 mt-0.5 font-normal"
+                  class="text-xs text-[#5F7089] dark:text-slate-400 line-clamp-1 mt-0.5 font-normal"
                 >
                   {{ c.summary }}
                 </div>
@@ -604,7 +604,7 @@ function getCategoryBadgeClass(category) {
                   <span
                     v-for="t in (c.tags || []).slice(0, 2)"
                     :key="t"
-                    class="text-[11px] font-normal text-[#94A3B8] dark:text-slate-500"
+                    class="text-[11px] font-normal text-[#687281] dark:text-slate-500"
                   >
                     #{{ t }}
                   </span>
@@ -662,7 +662,7 @@ function getCategoryBadgeClass(category) {
           "
           class="w-full flex items-center gap-2 px-3 py-2 text-xs font-medium text-[#333333] dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-md transition-colors cursor-pointer"
         >
-          <Edit3 class="w-3.5 h-3.5 text-[#64748B] dark:text-slate-400" />
+          <Edit3 class="w-3.5 h-3.5 text-[#5F7089] dark:text-slate-400" />
           <span>Edit</span>
         </button>
 

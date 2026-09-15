@@ -72,13 +72,13 @@ function removeTag(tagToRemove) {
         </h2>
         <button
           @click="$emit('close')"
-          class="p-1 rounded-lg hover:bg-[#E2E8F0] dark:hover:bg-slate-800 text-[#64748B] dark:text-slate-400 transition-colors cursor-pointer"
+          class="p-1 rounded-lg hover:bg-[#E2E8F0] dark:hover:bg-slate-800 text-[#5F7089] dark:text-slate-400 transition-colors cursor-pointer"
           title="Tutup panel"
         >
           <X class="w-4 h-4" />
         </button>
       </div>
-      <p class="text-[11px] font-medium text-[#64748B] dark:text-slate-400">
+      <p class="text-[11px] font-medium text-[#5F7089] dark:text-slate-400">
         Metadata &amp; tag artikel
       </p>
     </div>
@@ -93,7 +93,7 @@ function removeTag(tagToRemove) {
         :class="
           activeTab === 'meta'
             ? 'border-b-2 border-[#0A51B0] text-[#333333] dark:text-blue-400'
-            : 'text-[#64748B] dark:text-slate-400 hover:text-[#333333] border-b-2 border-transparent'
+            : 'text-[#5F7089] dark:text-slate-400 hover:text-[#333333] border-b-2 border-transparent'
         "
       >
         <Info class="w-4 h-4" />
@@ -106,7 +106,7 @@ function removeTag(tagToRemove) {
         :class="
           activeTab === 'tags'
             ? 'border-b-2 border-[#0A51B0] text-[#333333] dark:text-blue-400'
-            : 'text-[#64748B] dark:text-slate-400 hover:text-[#333333] border-b-2 border-transparent'
+            : 'text-[#5F7089] dark:text-slate-400 hover:text-[#333333] border-b-2 border-transparent'
         "
       >
         <TagIcon class="w-4 h-4" />
@@ -121,7 +121,7 @@ function removeTag(tagToRemove) {
         <!-- Category -->
         <div class="space-y-1.5">
           <label
-            class="block text-[11px] font-medium uppercase tracking-wide text-[#64748B] dark:text-slate-400"
+            class="block text-[11px] font-medium uppercase tracking-wide text-[#5F7089] dark:text-slate-400"
           >
             Kategori
           </label>
@@ -137,7 +137,7 @@ function removeTag(tagToRemove) {
               </option>
             </select>
             <ChevronDown
-              class="w-4 h-4 text-[#64748B] absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none"
+              class="w-4 h-4 text-[#5F7089] absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none"
             />
           </div>
         </div>
@@ -145,7 +145,7 @@ function removeTag(tagToRemove) {
         <!-- Severity -->
         <div class="space-y-1.5">
           <label
-            class="block text-[11px] font-medium uppercase tracking-wide text-[#64748B] dark:text-slate-400"
+            class="block text-[11px] font-medium uppercase tracking-wide text-[#5F7089] dark:text-slate-400"
           >
             Severity / Priority
           </label>
@@ -161,7 +161,7 @@ function removeTag(tagToRemove) {
               </option>
             </select>
             <ChevronDown
-              class="w-4 h-4 text-[#64748B] absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none"
+              class="w-4 h-4 text-[#5F7089] absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none"
             />
           </div>
         </div>
@@ -173,7 +173,7 @@ function removeTag(tagToRemove) {
           <span class="font-semibold text-[#333333] dark:text-slate-200 block"
             >Status Artikel:</span
           >
-          <p class="text-[11px] text-[#64748B] dark:text-slate-400 leading-relaxed">
+          <p class="text-[11px] text-[#5F7089] dark:text-slate-400 leading-relaxed">
             {{
               modelValue.isCustom
                 ? 'Custom — dapat diedit & dihapus admin.'
@@ -186,7 +186,7 @@ function removeTag(tagToRemove) {
       <!-- TAB 2: TAGS -->
       <div v-if="activeTab === 'tags'" class="space-y-3">
         <label
-          class="block text-[11px] font-medium uppercase tracking-wide text-[#64748B] dark:text-slate-400"
+          class="block text-[11px] font-medium uppercase tracking-wide text-[#5F7089] dark:text-slate-400"
         >
           Tag Artikel
         </label>
@@ -204,14 +204,14 @@ function removeTag(tagToRemove) {
             <button
               v-if="canWrite"
               @click="removeTag(tag)"
-              class="text-[#64748B] hover:text-rose-600 dark:hover:text-rose-400 cursor-pointer"
+              class="text-[#5F7089] hover:text-rose-600 dark:hover:text-rose-400 cursor-pointer"
             >
               <X class="w-3.5 h-3.5" />
             </button>
           </span>
           <span
             v-if="!modelValue.tags || !modelValue.tags.length"
-            class="text-[11px] text-[#94A3B8] italic py-1"
+            class="text-[11px] text-[#687281] italic py-1"
           >
             Belum ada tag...
           </span>

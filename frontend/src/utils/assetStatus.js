@@ -44,8 +44,8 @@ export const ASSET_STATUS_MAP = {
   Disposal: {
     label: 'Disposal',
     bg: 'bg-[#F8FAFC]',
-    text: 'text-[#64748B]',
-    dot: 'bg-[#64748B]',
+    text: 'text-[#5F7089]',
+    dot: 'bg-[#5F7089]',
     border: 'border-[#CBD5E1]/60',
   },
 }
@@ -78,8 +78,8 @@ export function formatStatusPill(status) {
     return {
       label: '—',
       bg: 'bg-[#F8FAFC]',
-      text: 'text-[#64748B]',
-      dot: 'bg-[#64748B]',
+      text: 'text-[#5F7089]',
+      dot: 'bg-[#5F7089]',
       border: 'border-[#CBD5E1]/60',
     }
   }
@@ -94,8 +94,8 @@ export function formatStatusPill(status) {
   return {
     label: status,
     bg: 'bg-[#F8FAFC]',
-    text: 'text-[#64748B]',
-    dot: 'bg-[#64748B]',
+    text: 'text-[#5F7089]',
+    dot: 'bg-[#5F7089]',
     border: 'border-[#CBD5E1]/60',
   }
 }

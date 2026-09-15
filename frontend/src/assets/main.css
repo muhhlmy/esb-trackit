@@ -47,6 +47,21 @@
   --color-text: #333333;
   --color-text-muted: #475569;
   --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+
+  /* Type scale — micro 5-step (see docs/typography-layout-audit.md) */
+  --fs-2xs: 10px;
+  --fs-xs: 11px;
+  --fs-sm: 12px;
+  --fs-md: 13px;
+  --fs-base: 14px;
+
+  /* Placeholder law (audit v2): PH = state, bukan label — selalu lebih kecil dari
+     input text (hierarchy), floor 11px (WCAG 1.4.4 legibility), tak pernah lebih
+     besar dari input. Formula: clamp(11px, input − 2px, input).
+     Warna satu token 4.6:1 di atas #fff (override gelap di bawah). */
+  --fs-placeholder: clamp(11px, calc(1em - 2px), 1em);
+  --color-placeholder: #5F7089;
+  --fs-form-label: 12px;
 }
 
 :root {
@@ -82,6 +97,7 @@
 html.dark {
   background-color: #020617;
   color: #f8fafc;
+  --color-placeholder: #94a3b8; /* slate-400 di atas surface gelap ≈ 7:1 */
 }
 html.light {
   background-color: #f9f9fb;
@@ -152,11 +168,6 @@ textarea {
   font-size: 0.8125rem; /* 13px — ponytail: was 12px, fails readability */
 }
 
-input::placeholder,
-textarea::placeholder {
-  font-size: inherit;
-}
-
 button:not(:disabled),
 select:not(:disabled) {
   cursor: pointer;
@@ -197,7 +208,7 @@ textarea {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: #687281;
 }
 
 /* App Shell Background */
@@ -276,7 +287,8 @@ textarea {
   color: #2a3547;
   border-radius: 0.5rem; /* 8px rounded-lg */
   padding: 0.4rem 0.65rem;
-  font-size: 0.75rem;
+  /* font-size intentionally not set here: global input rule (0.8125rem = 13px)
+     already applies; the old 0.75rem here was a dead conflicting value. */
   font-weight: 500;
 }
 
@@ -330,22 +342,34 @@ input[class*='pr-12'] {
 input::placeholder,
 textarea::placeholder,
 .form-control::placeholder {
-  color: #64748b; /* ponytail: was #98a4ae (2.8:1), now 4.6:1 contrast */
+  color: var(--color-placeholder); /* 4.6:1 di atas #fff — WCAG 1.4.3 AA */
   opacity: 1;
+  /* Placeholder law (audit v2): PH ≠ label, PH = preview input.
+     Ukuran: 1 tingkat di bawah teks input (Gestalt hierarchy), floor 11px
+     (legibility, WCAG 1.4.4), tanpa per-role override — satu formula global. */
+  font-size: var(--fs-placeholder);
+  font-style: normal;
+  font-weight: 400;
+  /* Apple HIG (WWDC 2020, UI Typography): tracking size-specific — teks kecil
+     butuh tracking positif untuk legibility, bukan inherit dari input. */
+  letter-spacing: 0.01em;
+  text-transform: none;
+  transition: color 0.15s ease;
 }
 
 input[readonly],
 input[readonly].form-control,
 .bg-slate-50 {
   background: #f8fafc;
-  color: #64748b;
+  color: #5F7089;
   border-color: #e2e8f0;
 }
 
-/* Form Labels */
+/* Form Labels — 12px: satu tingkat di bawah input 13px (hierarki form standar),
+   dinaikkan dari 11px agar di atas floor legibility (audit v2). */
 label > span:first-child,
 .form-label {
-  font-size: 0.6875rem;
+  font-size: var(--fs-form-label, 12px);
   font-weight: 700;
   color: #2a3547;
   text-transform: uppercase;
@@ -363,7 +387,7 @@ label > span:first-child,
   border-radius: 0.5rem; /* 8px */
   box-shadow: 0 2px 8px rgba(93, 135, 255, 0.2);
   display: inline-flex;
-  items-center: center;
+  align-items: center;
   justify-content: center;
   gap: 0.375rem;
   transition: all 150ms ease-in-out;
@@ -390,7 +414,7 @@ label > span:first-child,
   border-radius: 0.5rem;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
   display: inline-flex;
-  items-center: center;
+  align-items: center;
   justify-content: center;
   gap: 0.375rem;
   transition: all 150ms ease-in-out;
@@ -416,7 +440,7 @@ label > span:first-child,
   padding: 0.375rem 0.875rem;
   border-radius: 0.5rem;
   display: inline-flex;
-  items-center: center;
+  align-items: center;
   justify-content: center;
   gap: 0.375rem;
   transition: all 150ms ease-in-out;
@@ -568,8 +592,8 @@ table {
 
 table thead th {
   background: #f8fafc;
-  color: #7c8bac;
-  font-size: 0.6875rem;
+  color: #66728d;
+  font-size: var(--fs-form-label, 12px);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;

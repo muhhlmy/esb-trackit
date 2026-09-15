@@ -53,7 +53,7 @@ function goToPage(page) {
 <template>
   <div
     :class="{ 'mobile-compact': mobileCompact, 'asset-pagination': assetStyle }"
-    class="flex flex-col sm:flex-row items-center justify-between gap-3 px-5 py-4 border-t border-[#F1F5F9] text-[11.5px] text-[#475569] select-none"
+    class="flex flex-col sm:flex-row items-center justify-between gap-3 px-5 py-4 border-t border-[#F1F5F9] text-[12px] text-[#475569] select-none"
   >
     <div class="flex items-center gap-1 font-medium">
       <span>Menampilkan</span>
@@ -133,7 +133,7 @@ function goToPage(page) {
   border-radius: 12px;
   background: white;
   gap: 16px;
-  color: #71829b;
+  color: #637288;
   font-size: 12px;
   font-variant-numeric: tabular-nums;
 }

@@ -647,7 +647,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
           <h2 class="text-base sm:text-lg font-bold text-[#333333] tracking-tight">
             Data Pengguna
           </h2>
-          <p class="text-[11px] sm:text-xs text-[#64748B] mt-0.5 leading-normal">
+          <p class="text-[11px] sm:text-xs text-[#5F7089] mt-0.5 leading-normal">
             Pengelolaan akun, role, dan hak akses pengguna sistem
           </p>
         </div>
@@ -671,7 +671,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
         <div class="relative h-9 min-w-0">
           <span
             aria-hidden="true"
-            class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-[17px] text-[#94A3B8] pointer-events-none"
+            class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-[17px] text-[#687281] pointer-events-none"
             >search</span
           >
           <input
@@ -679,22 +679,22 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
             v-model="searchQuery"
             type="search"
             autocomplete="off"
-            placeholder="Cari nama atau email pengguna..."
-            class="toolbar-search-input h-full min-h-0 w-full rounded-lg border border-[#E2E8F0] bg-white pl-8 text-xs text-[#333333] placeholder-[#94A3B8] focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
+            aria-label="Cari pengguna" placeholder="Cari nama atau email pengguna..."
+            class="toolbar-search-input h-full min-h-0 w-full rounded-lg border border-[#E2E8F0] bg-white pl-8 text-xs text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
             :class="searchQuery ? 'pr-8' : 'pr-2.5'"
           />
           <button
             v-if="searchQuery"
             type="button"
             @click="searchQuery = ''"
-            class="absolute right-2 top-1/2 -translate-y-1/2 flex h-5 w-5 items-center justify-center rounded-full bg-[#E2E8F0] text-[#64748B] hover:bg-[#CBD5E1] hover:text-[#333333] transition-colors cursor-pointer"
+            class="absolute right-2 top-1/2 -translate-y-1/2 flex h-5 w-5 items-center justify-center rounded-full bg-[#E2E8F0] text-[#5F7089] hover:bg-[#CBD5E1] hover:text-[#333333] transition-colors cursor-pointer"
             title="Hapus pencarian"
           >
-            <span class="material-symbols-outlined text-[13px]">close</span>
+            <span aria-hidden="true" class="material-symbols-outlined text-[13px]">close</span>
           </button>
         </div>
 
-        <button type="button" @click="showFilterModal = true" class="toolbar-filter-button h-9 shrink-0 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-semibold text-[#64748B] hover:bg-white"><span class="material-symbols-outlined mr-1 align-middle text-[16px]">filter_alt</span>Filter</button>
+        <button type="button" @click="showFilterModal = true" class="toolbar-filter-button h-9 shrink-0 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-semibold text-[#5F7089] hover:bg-white"><span aria-hidden="true" class="material-symbols-outlined mr-1 align-middle text-[16px]">filter_alt</span>Filter</button>
       </div>
     </div>
 
@@ -741,7 +741,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
       <div
         v-else-if="pageError"
         role="alert"
-        class="flex flex-wrap items-center gap-2 px-4 sm:px-5 py-4 text-[12.5px] text-rose-600 bg-rose-50"
+        class="flex flex-wrap items-center gap-2 px-4 sm:px-5 py-4 text-[13px] text-rose-600 bg-rose-50"
       >
         <span aria-hidden="true" class="material-symbols-outlined text-[18px] shrink-0">error</span>
         <span class="flex-1 font-semibold">{{ pageError }}</span>
@@ -774,32 +774,32 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
             >
               <tr>
                 <th
-                  class="py-3 pl-5 pr-4 text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B] text-left whitespace-nowrap"
+                  class="py-3 pl-5 pr-4 text-[11px] font-semibold uppercase tracking-wider text-[#5F7089] text-left whitespace-nowrap"
                 >
                   Pengguna
                 </th>
                 <th
-                  class="py-3 px-4 text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B] text-left whitespace-nowrap"
+                  class="py-3 px-4 text-[11px] font-semibold uppercase tracking-wider text-[#5F7089] text-left whitespace-nowrap"
                 >
                   Role Akses
                 </th>
                 <th
-                  class="py-3 px-4 text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B] text-left whitespace-nowrap"
+                  class="py-3 px-4 text-[11px] font-semibold uppercase tracking-wider text-[#5F7089] text-left whitespace-nowrap"
                 >
                   Sub Role / Unit Ditangani
                 </th>
                 <th
-                  class="py-3 px-4 text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B] text-left whitespace-nowrap"
+                  class="py-3 px-4 text-[11px] font-semibold uppercase tracking-wider text-[#5F7089] text-left whitespace-nowrap"
                 >
                   Hak Akses Fitur
                 </th>
                 <th
-                  class="py-3 px-4 text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B] text-left whitespace-nowrap"
+                  class="py-3 px-4 text-[11px] font-semibold uppercase tracking-wider text-[#5F7089] text-left whitespace-nowrap"
                 >
                   Status
                 </th>
                 <th
-                  class="py-3 pr-5 pl-4 text-right text-[10.5px] font-semibold uppercase tracking-wider text-[#64748B] whitespace-nowrap"
+                  class="py-3 pr-5 pl-4 text-right text-[11px] font-semibold uppercase tracking-wider text-[#5F7089] whitespace-nowrap"
                 >
                   Aksi
                 </th>
@@ -821,7 +821,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
                       {{ user.nama }}
                     </span>
                     <span
-                      class="text-[11.5px] font-normal text-[#64748B] mt-0.5 truncate block"
+                      class="text-[12px] font-normal text-[#5F7089] mt-0.5 truncate block"
                       :title="user.email"
                     >
                       {{ user.email }}
@@ -841,7 +841,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
                 <td class="py-4 px-4 overflow-hidden">
                   <div
                     v-if="isRoleSuperAdmin(user.role)"
-                    class="text-[11.5px] font-semibold text-[#333333] truncate block"
+                    class="text-[12px] font-semibold text-[#333333] truncate block"
                   >
                     Semua Unit (Superadmin)
                   </div>
@@ -852,11 +852,11 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
                     <span
                       v-for="q in user.queues"
                       :key="q.id"
-                      class="inline-flex items-center rounded-md bg-[#EFF6FF] px-2 py-0.5 text-[10.5px] font-semibold text-[#333333] shrink-0"
+                      class="inline-flex items-center rounded-md bg-[#EFF6FF] px-2 py-0.5 text-[11px] font-semibold text-[#333333] shrink-0"
                       >{{ q.kode }}</span
                     >
                   </div>
-                  <span v-else class="text-[11.5px] text-[#94A3B8] italic truncate block"
+                  <span v-else class="text-[12px] text-[#687281] italic truncate block"
                     >Tidak ada unit</span
                   >
                 </td>
@@ -943,7 +943,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
                     :class="{
                       'bg-purple-600': isRoleSuperAdmin(user.role),
                       'bg-[#0A51B0]': user.role === 'admin' && !isRoleSuperAdmin(user.role),
-                      'bg-[#64748B]': user.role === 'user' || !user.role,
+                      'bg-[#5F7089]': user.role === 'user' || !user.role,
                     }"
                   >
                     {{ getInitials(user.nama) }}
@@ -955,7 +955,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
                     >
                       {{ user.nama }}
                     </p>
-                    <p class="text-[11px] text-[#64748B] truncate" :title="user.email">
+                    <p class="text-[11px] text-[#5F7089] truncate" :title="user.email">
                       {{ user.email }}
                     </p>
                   </div>
@@ -969,7 +969,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
               <div class="grid grid-cols-2 gap-2">
                 <!-- Role -->
                 <div class="flex flex-col gap-0.5 rounded-lg bg-[#F8FAFC] px-2.5 py-2">
-                  <span class="text-[9px] font-semibold uppercase tracking-wider text-[#94A3B8]"
+                  <span class="text-[10px] font-semibold uppercase tracking-wider text-[#687281]"
                     >Role</span
                   >
                   <AppBadge
@@ -980,7 +980,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
 
                 <!-- Status -->
                 <div class="flex flex-col gap-0.5 rounded-lg bg-[#F8FAFC] px-2.5 py-2">
-                  <span class="text-[9px] font-semibold uppercase tracking-wider text-[#94A3B8]"
+                  <span class="text-[10px] font-semibold uppercase tracking-wider text-[#687281]"
                     >Status</span
                   >
                   <AppBadge
@@ -991,12 +991,12 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
 
                 <!-- Unit Ditangani -->
                 <div class="flex flex-col gap-1 rounded-lg bg-[#F8FAFC] px-2.5 py-2">
-                  <span class="text-[9px] font-semibold uppercase tracking-wider text-[#94A3B8]"
+                  <span class="text-[10px] font-semibold uppercase tracking-wider text-[#687281]"
                     >Unit</span
                   >
                   <div
                     v-if="isRoleSuperAdmin(user.role)"
-                    class="text-[10.5px] font-semibold text-[#333333] leading-tight"
+                    class="text-[11px] font-semibold text-[#333333] leading-tight"
                   >
                     Semua Unit
                   </div>
@@ -1011,12 +1011,12 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
                       >{{ q.kode }}</span
                     >
                   </div>
-                  <span v-else class="text-[10.5px] text-[#94A3B8] italic leading-tight">—</span>
+                  <span v-else class="text-[11px] text-[#687281] italic leading-tight">—</span>
                 </div>
 
                 <!-- Hak Akses -->
                 <div class="flex flex-col gap-0.5 rounded-lg bg-[#F8FAFC] px-2.5 py-2">
-                  <span class="text-[9px] font-semibold uppercase tracking-wider text-[#94A3B8]"
+                  <span class="text-[10px] font-semibold uppercase tracking-wider text-[#687281]"
                     >Hak Akses</span
                   >
                   <AppBadge
@@ -1096,7 +1096,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
                   <p class="text-xs font-bold text-[#333333] leading-snug truncate">
                     {{ selectedEmployee.nama_karyawan }}
                   </p>
-                  <p class="text-[11px] text-[#64748B] truncate">
+                  <p class="text-[11px] text-[#5F7089] truncate">
                     {{ selectedEmployee.email_kantor || 'Tanpa Email' }} • NIK:
                     {{ selectedEmployee.nik }}
                   </p>
@@ -1105,7 +1105,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
               <button
                 type="button"
                 @click="clearSelectedEmployee"
-                class="text-xs text-[#94A3B8] hover:text-[#E11D48] font-medium cursor-pointer"
+                class="text-xs text-[#687281] hover:text-[#E11D48] font-medium cursor-pointer"
               >
                 Batal
               </button>
@@ -1128,7 +1128,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
                 autocomplete="name"
                 :disabled="modalMode === 'edit' && !isSuperAdmin"
                 placeholder="Nama lengkap pengguna"
-                class="h-9 w-full rounded-xl border border-[#E2E8F0] bg-white px-3 text-xs text-[#333333] placeholder-[#94A3B8] focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs disabled:bg-[#F8FAFC] disabled:opacity-60 disabled:cursor-not-allowed"
+                class="h-9 w-full rounded-xl border border-[#E2E8F0] bg-white px-3 text-xs text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs disabled:bg-[#F8FAFC] disabled:opacity-60 disabled:cursor-not-allowed"
               />
             </div>
 
@@ -1143,7 +1143,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
                 autocomplete="email"
                 :disabled="modalMode === 'edit' && !isSuperAdmin"
                 placeholder="email@perusahaan.com"
-                class="h-9 w-full rounded-xl border border-[#E2E8F0] bg-white px-3 text-xs text-[#333333] placeholder-[#94A3B8] focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs disabled:bg-[#F8FAFC] disabled:opacity-60 disabled:cursor-not-allowed"
+                class="h-9 w-full rounded-xl border border-[#E2E8F0] bg-white px-3 text-xs text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs disabled:bg-[#F8FAFC] disabled:opacity-60 disabled:cursor-not-allowed"
               />
             </div>
 
@@ -1161,7 +1161,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
                 :placeholder="
                   modalMode === 'add' ? 'Default: Essensians@2026' : 'Kosongkan jika tidak diubah'
                 "
-                class="h-9 w-full rounded-xl border border-[#E2E8F0] bg-white px-3 text-xs text-[#333333] placeholder-[#94A3B8] focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
+                class="h-9 w-full rounded-xl border border-[#E2E8F0] bg-white px-3 text-xs text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
               />
             </div>
 
@@ -1196,7 +1196,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
             <span class="block text-xs font-semibold text-[#333333]"
               >Unit Tiket yang Ditangani</span
             >
-            <span class="block text-[11px] text-[#64748B]"
+            <span class="block text-[11px] text-[#5F7089]"
               >Pilih unit tiket yang dapat diakses &amp; ditangani pengguna ini:</span
             >
           </div>
@@ -1227,13 +1227,13 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
               />
               <div class="flex items-center gap-2 min-w-0">
                 <span
-                  class="material-symbols-outlined text-[20px] shrink-0"
-                  :class="isUnitSelected(unit) ? 'text-[#333333]' : 'text-[#64748B]'"
+                  aria-hidden="true" class="material-symbols-outlined text-[20px] shrink-0"
+                  :class="isUnitSelected(unit) ? 'text-[#333333]' : 'text-[#5F7089]'"
                   >{{ unit.icon }}</span
                 >
                 <div class="min-w-0">
                   <p class="text-xs font-bold leading-tight truncate">{{ unit.kode }}</p>
-                  <p class="text-[10.5px] text-[#64748B] leading-tight truncate">{{ unit.nama }}</p>
+                  <p class="text-[11px] text-[#5F7089] leading-tight truncate">{{ unit.nama }}</p>
                 </div>
               </div>
             </div>
@@ -1245,7 +1245,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
           <div class="flex items-center justify-between gap-3 flex-wrap">
             <div>
               <h3 class="text-xs font-semibold text-[#333333]">Hak Akses</h3>
-              <p class="text-[11px] text-[#64748B]">
+              <p class="text-[11px] text-[#5F7089]">
                 Tentukan level akses pengguna untuk setiap fitur
               </p>
             </div>
@@ -1270,7 +1270,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
               <button
                 type="button"
                 @click="selectAllPermissions('none')"
-                class="font-semibold text-[#64748B] hover:underline cursor-pointer"
+                class="font-semibold text-[#5F7089] hover:underline cursor-pointer"
               >
                 Reset
               </button>
@@ -1282,7 +1282,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
             v-if="form.role === 'superadmin'"
             class="rounded-xl bg-[#EFF6FF] p-3 text-xs font-semibold text-[#333333] border border-[#BFDBFE] flex items-center gap-2"
           >
-            <span class="material-symbols-outlined text-[18px]">verified_user</span>
+            <span aria-hidden="true" class="material-symbols-outlined text-[18px]">verified_user</span>
             <span>Superadmin memiliki akses penuh ke seluruh fitur sistem secara otomatis.</span>
           </div>
 
@@ -1290,7 +1290,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
           <div v-else class="flex flex-col gap-4">
             <!-- Group 1: Operasional -->
             <div class="flex flex-col gap-1.5">
-              <span class="text-[10.5px] font-semibold uppercase tracking-wider text-[#94A3B8]"
+              <span class="text-[11px] font-semibold uppercase tracking-wider text-[#687281]"
                 >Operasional</span
               >
               <div
@@ -1302,12 +1302,12 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
                   class="user-permission-row flex items-center justify-between gap-2 sm:gap-3 px-3 sm:px-3.5 py-2.5 hover:bg-[#F8FAFC] transition-colors"
                 >
                   <div class="flex items-center gap-2.5 min-w-0 flex-1">
-                    <span class="material-symbols-outlined text-[18px] text-[#64748B] shrink-0">{{
+                    <span aria-hidden="true" class="material-symbols-outlined text-[18px] text-[#5F7089] shrink-0">{{
                       f.icon
                     }}</span>
                     <div class="min-w-0">
                       <p class="text-xs font-semibold text-[#333333] truncate">{{ f.label }}</p>
-                      <p class="text-[11px] text-[#64748B] truncate">{{ f.desc }}</p>
+                      <p class="text-[11px] text-[#5F7089] truncate">{{ f.desc }}</p>
                     </div>
                   </div>
 
@@ -1320,7 +1320,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
                         ? 'bg-[#ECFDF5] text-[#059669] border-[#A7F3D0]'
                         : form.permissions[f.key] === 'read_only'
                           ? 'bg-[#EFF6FF] text-[#333333] border-[#BFDBFE]'
-                          : 'bg-[#F8FAFC] text-[#64748B] border-[#E2E8F0]'
+                          : 'bg-[#F8FAFC] text-[#5F7089] border-[#E2E8F0]'
                     "
                   >
                     <option value="none">Tanpa akses</option>
@@ -1333,7 +1333,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
 
             <!-- Group 2: Administrasi & Audit -->
             <div class="flex flex-col gap-1.5">
-              <span class="text-[10.5px] font-semibold uppercase tracking-wider text-[#94A3B8]"
+              <span class="text-[11px] font-semibold uppercase tracking-wider text-[#687281]"
                 >Administrasi &amp; Audit</span
               >
               <div
@@ -1345,12 +1345,12 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
                   class="user-permission-row flex items-center justify-between gap-2 sm:gap-3 px-3 sm:px-3.5 py-2.5 hover:bg-[#F8FAFC] transition-colors"
                 >
                   <div class="flex items-center gap-2.5 min-w-0 flex-1">
-                    <span class="material-symbols-outlined text-[18px] text-[#64748B] shrink-0">{{
+                    <span aria-hidden="true" class="material-symbols-outlined text-[18px] text-[#5F7089] shrink-0">{{
                       f.icon
                     }}</span>
                     <div class="min-w-0">
                       <p class="text-xs font-semibold text-[#333333] truncate">{{ f.label }}</p>
-                      <p class="text-[11px] text-[#64748B] truncate">{{ f.desc }}</p>
+                      <p class="text-[11px] text-[#5F7089] truncate">{{ f.desc }}</p>
                     </div>
                   </div>
 
@@ -1363,7 +1363,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
                         ? 'bg-[#ECFDF5] text-[#059669] border-[#A7F3D0]'
                         : form.permissions[f.key] === 'read_only'
                           ? 'bg-[#EFF6FF] text-[#333333] border-[#BFDBFE]'
-                          : 'bg-[#F8FAFC] text-[#64748B] border-[#E2E8F0]'
+                          : 'bg-[#F8FAFC] text-[#5F7089] border-[#E2E8F0]'
                     "
                   >
                     <option value="none">Tanpa akses</option>
@@ -1383,7 +1383,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
         >
           <div>
             <span class="block text-xs font-semibold text-[#333333]">Status Akun Aktif</span>
-            <span class="block text-[11px] text-[#64748B]"
+            <span class="block text-[11px] text-[#5F7089]"
               >Pengguna nonaktif tidak dapat login ke dalam sistem.</span
             >
           </div>
@@ -1458,7 +1458,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
           {{ modalError }}
         </div>
         <div class="w-14 h-14 rounded-full bg-red-50 flex items-center justify-center">
-          <span class="material-symbols-outlined text-[28px] text-[#EF4444]">warning</span>
+          <span aria-hidden="true" class="material-symbols-outlined text-[28px] text-[#EF4444]">warning</span>
         </div>
 
         <div>
@@ -1551,7 +1551,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
   margin-bottom: 20px;
   font-size: 12px;
   line-height: 1.7;
-  color: #71829b;
+  color: #637288;
 }
 .user-entry-section > div + div {
   margin-top: 18px;
@@ -1601,7 +1601,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
 }
 .user-entry-form input:disabled {
   background: #f1f5f9;
-  color: #71829b;
+  color: #637288;
 }
 @media (max-width: 639px) {
   .user-entry-section,

@@ -51,7 +51,7 @@ const severityClass = computed(() => {
     <div
       class="w-16 h-16 rounded-2xl bg-[#edeef0] dark:bg-slate-900 flex items-center justify-center mb-4"
     >
-      <HelpCircle class="w-8 h-8 text-[#64748b] dark:text-slate-600" />
+      <HelpCircle class="w-8 h-8 text-[#5F7089] dark:text-slate-600" />
     </div>
     <h3 class="text-base font-bold text-[#1a1c1d] dark:text-slate-300">Pilih Artikel</h3>
     <p class="text-xs text-[#575d7a] dark:text-slate-500 mt-1 max-w-sm">
@@ -70,11 +70,11 @@ const severityClass = computed(() => {
       <span class="hover:text-[#0040e5] dark:hover:text-indigo-400 cursor-pointer"
         >Help Center</span
       >
-      <ChevronRight class="w-3.5 h-3.5 text-[#64748b]" />
+      <ChevronRight class="w-3.5 h-3.5 text-[#5F7089]" />
       <span class="capitalize hover:text-[#0040e5] dark:hover:text-indigo-400 cursor-pointer">
         {{ caseItem.category }}
       </span>
-      <ChevronRight class="w-3.5 h-3.5 text-[#64748b]" />
+      <ChevronRight class="w-3.5 h-3.5 text-[#5F7089]" />
       <span class="text-[#1a1c1d] dark:text-slate-200 font-semibold truncate max-w-xs sm:max-w-md">
         {{ caseItem.title }}
       </span>
@@ -133,7 +133,7 @@ const severityClass = computed(() => {
       <!-- Meta Info Line -->
       <div class="flex items-center gap-4 text-xs text-[#575d7a] dark:text-slate-400 pt-1">
         <div class="flex items-center gap-1.5">
-          <User class="w-3.5 h-3.5 text-[#64748b]" />
+          <User class="w-3.5 h-3.5 text-[#5F7089]" />
           <span>Tim IT</span>
         </div>
       </div>

@@ -74,7 +74,7 @@ const chartOptions = {
   plugins: {
     legend: {
       labels: {
-        color: '#94a3b8',
+        color: '#687281',
         font: {
           family: 'Plus Jakarta Sans',
           size: 11,
@@ -84,11 +84,11 @@ const chartOptions = {
   },
   scales: {
     x: {
-      ticks: { color: '#94a3b8' },
+      ticks: { color: '#687281' },
       grid: { color: '#1e293b' },
     },
     y: {
-      ticks: { color: '#94a3b8', stepSize: 1 },
+      ticks: { color: '#687281', stepSize: 1 },
       grid: { color: '#1e293b' },
     },
   },
@@ -101,7 +101,7 @@ const doughnutOptions = {
     legend: {
       position: 'bottom',
       labels: {
-        color: '#94a3b8',
+        color: '#687281',
         font: {
           family: 'Plus Jakarta Sans',
           size: 11,

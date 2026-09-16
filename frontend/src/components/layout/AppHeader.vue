@@ -88,11 +88,11 @@ async function submitChangePassword() {
   passwordSuccessMessage.value = ''
 
   try {
-    const res = await post('/api/auth/change-password', { currentPassword, newPassword })
-    passwordSuccessMessage.value = res.message || 'Password berhasil diperbarui.'
-    setTimeout(() => {
-      closePasswordModal()
-    }, 1500)
+    await post('/api/auth/change-password', { currentPassword, newPassword })
+    // Backend telah mencabut seluruh sesi setelah kata sandi diubah. Bersihkan
+    // cache profil dan arahkan ke login agar kata sandi baru dipakai langsung.
+    closePasswordModal()
+    await logout()
   } catch (err) {
     passwordModalError.value = err.message || 'Gagal mengganti password.'
   } finally {

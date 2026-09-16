@@ -315,7 +315,8 @@ function getCategoryBadgeClass(category) {
         <input
           v-model="searchQuery"
           type="text"
-          aria-label="Cari kasus" placeholder="Cari judul, deskripsi, atau tag..."
+          aria-label="Cari kasus"
+          placeholder="Cari judul, deskripsi, atau tag..."
           class="w-full bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-700 rounded-xl pl-9 pr-9 py-2 sm:py-2.5 text-xs sm:text-sm font-normal text-[#333333] dark:text-white placeholder-[#687281] dark:placeholder-slate-500 focus:outline-none focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 transition-all shadow-2xs"
         />
         <button

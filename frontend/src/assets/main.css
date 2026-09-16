@@ -5,11 +5,11 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-  --color-brand-orange: #FF4F1B;
-  --color-primary: #0A51B0;
-  --color-primary-hover: #0A4391;
-  --color-primary-light: #EDF5FF;
-  --color-secondary: #0892F5;
+  --color-brand-orange: #ff4f1b;
+  --color-primary: #0a51b0;
+  --color-primary-hover: #0a4391;
+  --color-primary-light: #edf5ff;
+  --color-secondary: #0892f5;
   --color-secondary-light: #e8f7ff;
   --color-success: #059669;
   --color-success-light: #edfbf7;
@@ -19,28 +19,28 @@
   --color-danger-light: #fdede8;
 
   /* ESB Brand Logo Palette Stops */
-  --color-esb-blue-start: #0A51B0;
-  --color-esb-blue-mid1: #0A5DBD;
-  --color-esb-blue-mid2: #097CDE;
-  --color-esb-blue-end: #0892F5;
+  --color-esb-blue-start: #0a51b0;
+  --color-esb-blue-mid1: #0a5dbd;
+  --color-esb-blue-mid2: #097cde;
+  --color-esb-blue-end: #0892f5;
 
-  --color-esb-orange-start: #FF4F1B;
-  --color-esb-orange-mid1: #FE5B1C;
-  --color-esb-orange-mid2: #FC7C20;
-  --color-esb-orange-end: #FAA425;
+  --color-esb-orange-start: #ff4f1b;
+  --color-esb-orange-mid1: #fe5b1c;
+  --color-esb-orange-mid2: #fc7c20;
+  --color-esb-orange-end: #faa425;
 
-  --color-esb-primary: #FF4F1B;
-  --color-esb-primary-dark: #B83A10;
-  --color-esb-primary-light: #FFF2E7;
-  --color-brand-orange-dark: #B83A10;
-  --color-brand-orange-light: #FFF2E7;
-  --color-esb-gold: #FAA425;
+  --color-esb-primary: #ff4f1b;
+  --color-esb-primary-dark: #b83a10;
+  --color-esb-primary-light: #fff2e7;
+  --color-brand-orange-dark: #b83a10;
+  --color-brand-orange-light: #fff2e7;
+  --color-esb-gold: #faa425;
 
-  --color-brand: #0A51B0;
-  --color-brand-dark: #0A4391;
-  --color-brand-light: #EDF5FF;
-  --color-brand-secondary: #0892F5;
-  --color-brand-accent: #FF4F1B;
+  --color-brand: #0a51b0;
+  --color-brand-dark: #0a4391;
+  --color-brand-light: #edf5ff;
+  --color-brand-secondary: #0892f5;
+  --color-brand-accent: #ff4f1b;
   --color-bg: #f4f6f9;
   --color-surface: #ffffff;
   --color-border: #e2e8f0;
@@ -60,7 +60,7 @@
      besar dari input. Formula: clamp(11px, input − 2px, input).
      Warna satu token 4.6:1 di atas #fff (override gelap di bawah). */
   --fs-placeholder: clamp(11px, calc(1em - 2px), 1em);
-  --color-placeholder: #5F7089;
+  --color-placeholder: #5f7089;
   --fs-form-label: 12px;
 }
 
@@ -70,9 +70,15 @@
   text-rendering: optimizeLegibility;
 
   /* Official ESB Brand Gradients from Logo */
-  --gradient-esb-blue: linear-gradient(135deg, #0A51B0 0%, #0A5DBD 26%, #097CDE 72%, #0892F5 100%);
-  --gradient-esb-blue-hero: linear-gradient(145deg, #0A51B0 0%, #084391 40%, #062b5e 100%);
-  --gradient-esb-orange: linear-gradient(135deg, #FF4F1B 0%, #FE5B1C 21%, #FC7C20 60%, #FAA425 100%);
+  --gradient-esb-blue: linear-gradient(135deg, #0a51b0 0%, #0a5dbd 26%, #097cde 72%, #0892f5 100%);
+  --gradient-esb-blue-hero: linear-gradient(145deg, #0a51b0 0%, #084391 40%, #062b5e 100%);
+  --gradient-esb-orange: linear-gradient(
+    135deg,
+    #ff4f1b 0%,
+    #fe5b1c 21%,
+    #fc7c20 60%,
+    #faa425 100%
+  );
 
   /* Shared component geometry. Keep these values as the single source of truth
      for controls and surfaces used across the application. */
@@ -87,21 +93,21 @@
 }
 
 .bg-gradient-esb-blue {
-  background: linear-gradient(135deg, #0A51B0 0%, #0A5DBD 26%, #097CDE 72%, #0892F5 100%);
+  background: linear-gradient(135deg, #0a51b0 0%, #0a5dbd 26%, #097cde 72%, #0892f5 100%);
 }
 
 .bg-gradient-esb-orange {
-  background: linear-gradient(135deg, #FF4F1B 0%, #FE5B1C 21%, #FC7C20 60%, #FAA425 100%);
+  background: linear-gradient(135deg, #ff4f1b 0%, #fe5b1c 21%, #fc7c20 60%, #faa425 100%);
 }
 
 .text-gradient-esb-blue {
-  background: linear-gradient(135deg, #0A51B0 0%, #0892F5 100%);
+  background: linear-gradient(135deg, #0a51b0 0%, #0892f5 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 .text-gradient-esb-orange {
-  background: linear-gradient(135deg, #FF4F1B 0%, #FAA425 100%);
+  background: linear-gradient(135deg, #ff4f1b 0%, #faa425 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -116,7 +122,7 @@ html.light {
 }
 
 :focus-visible {
-  outline: 2px solid #0A51B0;
+  outline: 2px solid #0a51b0;
   outline-offset: 2px;
 }
 
@@ -196,11 +202,11 @@ textarea {
 
 ::selection {
   color: #ffffff;
-  background: #0A51B0;
+  background: #0a51b0;
 }
 
 :focus-visible {
-  outline: 2px solid #0A51B0;
+  outline: 2px solid #0a51b0;
   outline-offset: 2px;
 }
 
@@ -275,7 +281,7 @@ textarea {
 
 .ui-search-input:focus,
 .toolbar-search-input:focus {
-  border-color: #0A51B0 !important;
+  border-color: #0a51b0 !important;
   box-shadow: var(--ui-focus-ring) !important;
 }
 
@@ -312,17 +318,17 @@ textarea {
 .ui-pagination-button:focus-visible,
 .ui-menu-trigger:focus-visible {
   outline: none;
-  border-color: #0A51B0 !important;
+  border-color: #0a51b0 !important;
   box-shadow: var(--ui-focus-ring) !important;
 }
 
 .ui-select-trigger[aria-expanded='true'] {
-  border-color: #0A51B0 !important;
+  border-color: #0a51b0 !important;
   box-shadow: var(--ui-focus-ring) !important;
 }
 
 .ui-pagination-button[aria-current='page'] {
-  border-color: #0A4391 !important;
+  border-color: #0a4391 !important;
 }
 
 .ui-select-menu,
@@ -435,7 +441,7 @@ input[class*='pr-12'] {
   .form-control:focus
 ) {
   background: #ffffff;
-  border-color: #0A51B0 !important;
+  border-color: #0a51b0 !important;
   box-shadow: var(--ui-focus-ring) !important;
   outline: none;
 }
@@ -462,7 +468,7 @@ input[readonly],
 input[readonly].form-control,
 .bg-slate-50 {
   background: #f8fafc;
-  color: #5F7089;
+  color: #5f7089;
   border-color: #e2e8f0;
 }
 
@@ -480,7 +486,7 @@ label > span:first-child,
 
 /* ── Modernize Buttons Design System ── */
 .btn-primary {
-  background-color: #0A51B0;
+  background-color: #0a51b0;
   color: #ffffff;
   font-weight: 700;
   font-size: 0.75rem;
@@ -497,7 +503,7 @@ label > span:first-child,
 }
 
 .btn-primary:hover {
-  background-color: #0A4391;
+  background-color: #0a4391;
   box-shadow: 0 4px 12px rgba(69, 112, 234, 0.3);
 }
 
@@ -524,7 +530,7 @@ label > span:first-child,
 
 .btn-secondary:hover {
   background-color: #f2f6fa;
-  border-color: #0A51B0;
+  border-color: #0a51b0;
   color: #333333;
 }
 
@@ -570,7 +576,7 @@ label > span:first-child,
   transition: all 150ms ease;
 }
 .btn-icon-view:hover {
-  background-color: #0A51B0;
+  background-color: #0a51b0;
   color: #ffffff;
 }
 
@@ -654,7 +660,7 @@ div.relative > button.text-left.h-10.w-full {
 }
 
 div.relative > button.text-left:focus {
-  border-color: #0A51B0 !important;
+  border-color: #0a51b0 !important;
   box-shadow: 0 0 0 3px rgba(93, 135, 255, 0.12) !important;
 }
 

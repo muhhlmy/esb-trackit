@@ -290,11 +290,7 @@ const canUndo = computed(() => {
 })
 
 const canRedo = computed(() => {
-  return (
-    titleHistory.canRedo() ||
-    summaryHistory.canRedo() ||
-    (editor.value?.can().redo() ?? false)
-  )
+  return titleHistory.canRedo() || summaryHistory.canRedo() || (editor.value?.can().redo() ?? false)
 })
 
 function handleUndo() {
@@ -856,7 +852,10 @@ function goToAdminCases() {
       class="bg-amber-50 dark:bg-amber-950/40 border-b border-amber-200 dark:border-amber-900/50 px-4 py-2.5 flex items-center gap-2 text-xs text-amber-800 dark:text-amber-200 shrink-0"
     >
       <Info class="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
-      <span><strong>Mode Baca Saja:</strong> Anda memiliki hak akses Read Only untuk Knowledge Base. Anda dapat membaca artikel tetapi tidak dapat menyimpan perubahan atau menerbitkannya.</span>
+      <span
+        ><strong>Mode Baca Saja:</strong> Anda memiliki hak akses Read Only untuk Knowledge Base.
+        Anda dapat membaca artikel tetapi tidak dapat menyimpan perubahan atau menerbitkannya.</span
+      >
     </div>
 
     <!-- 2. STICKY FORMATTING RIBBON (TIPTAP CONNECTED) -->
@@ -1580,7 +1579,7 @@ function goToAdminCases() {
 }
 
 .ProseMirror blockquote {
-  border-left: 3px solid #0A51B0 !important;
+  border-left: 3px solid #0a51b0 !important;
   background-color: #f8fafc !important;
   padding: 0.75rem 1rem !important;
   border-radius: 0.5rem !important;
@@ -1709,7 +1708,7 @@ function goToAdminCases() {
 }
 
 .doc-preview blockquote {
-  border-left: 3px solid #0A51B0;
+  border-left: 3px solid #0a51b0;
   background-color: #f8fafc;
   padding: 0.75rem 1rem;
   border-radius: 0.5rem;
@@ -1786,7 +1785,7 @@ function goToAdminCases() {
 }
 .cms-editor-sheet {
   border-radius: 14px;
-  box-shadow: 0 3px 18px #0A51B006;
+  box-shadow: 0 3px 18px #0a51b006;
 }
 .cms-editor-sheet > input {
   font-weight: 650;
@@ -1800,7 +1799,7 @@ function goToAdminCases() {
   line-height: 1.85;
 }
 .cms-editor button:focus-visible {
-  outline: 2px solid #097CDE;
+  outline: 2px solid #097cde;
   outline-offset: 2px;
 }
 .cms-editor > div.fixed > div {

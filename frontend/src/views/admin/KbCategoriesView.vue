@@ -415,7 +415,9 @@ function clearFilters() {
                 <h3
                   @click="canWrite && openEditDrawer(c.id)"
                   class="font-bold text-[#333333] dark:text-slate-100 text-sm transition-colors leading-tight truncate"
-                  :class="canWrite ? 'hover:text-[#333333] dark:hover:text-blue-400 cursor-pointer' : ''"
+                  :class="
+                    canWrite ? 'hover:text-[#333333] dark:hover:text-blue-400 cursor-pointer' : ''
+                  "
                 >
                   {{ c.title }}
                 </h3>
@@ -666,7 +668,11 @@ function clearFilters() {
     </Teleport>
 
     <!-- Backdrop for Action Menu -->
-    <div v-if="canWrite && actionMenu" @click="closeActionMenu" class="fixed inset-0 z-40 bg-transparent"></div>
+    <div
+      v-if="canWrite && actionMenu"
+      @click="closeActionMenu"
+      class="fixed inset-0 z-40 bg-transparent"
+    ></div>
 
     <AppModal
       :is-open="isDrawerOpen && Boolean(editingCategory)"

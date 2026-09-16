@@ -771,7 +771,7 @@ function closeSubmenuAndMobile() {
   font-weight: 500;
 }
 .clean-sidebar :is(a, button):focus-visible {
-  outline: 2px solid #097CDE;
+  outline: 2px solid #097cde;
   outline-offset: 2px;
 }
 @media (max-width: 1023px) {

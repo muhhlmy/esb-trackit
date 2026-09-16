@@ -61,7 +61,12 @@ function createWorksheet(data, columns) {
 }
 
 export function exportToExcelWorkbook(sheets, filenamePrefix = 'Export_Data') {
-  if (!Array.isArray(sheets) || sheets.length === 0 || sheets.some(({ data }) => !Array.isArray(data))) return false
+  if (
+    !Array.isArray(sheets) ||
+    sheets.length === 0 ||
+    sheets.some(({ data }) => !Array.isArray(data))
+  )
+    return false
 
   try {
     const workbook = XLSX.utils.book_new()
@@ -71,7 +76,9 @@ export function exportToExcelWorkbook(sheets, filenamePrefix = 'Export_Data') {
     })
     const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' })
     triggerDownload(
-      new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }),
+      new Blob([excelBuffer], {
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      }),
       `${filenamePrefix}_${formatDateStamp()}.xlsx`,
     )
     return true
@@ -134,9 +141,8 @@ export function exportToExcel(
 ) {
   if (!Array.isArray(data) || data.length === 0) return false
 
-  const normalizedColumns = columns.length > 0
-    ? columns
-    : Object.keys(data[0]).map((name) => ({ name, label: name }))
+  const normalizedColumns =
+    columns.length > 0 ? columns : Object.keys(data[0]).map((name) => ({ name, label: name }))
 
   try {
     const worksheet = createWorksheet(data, normalizedColumns)

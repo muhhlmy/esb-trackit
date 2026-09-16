@@ -116,7 +116,9 @@ watch(
   <div class="rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] p-4 text-xs transition-all">
     <!-- Loading State -->
     <div v-if="isLoading" class="flex items-center gap-2 py-2 text-[#5F7089]">
-      <span aria-hidden="true" class="material-symbols-outlined text-[16px] animate-spin text-[#333333]"
+      <span
+        aria-hidden="true"
+        class="material-symbols-outlined text-[16px] animate-spin text-[#333333]"
         >progress_activity</span
       >
       <span>Memeriksa status penilaian CASP...</span>
@@ -190,7 +192,8 @@ watch(
             class="text-amber-400 focus:outline-none transition-transform hover:scale-110 cursor-pointer"
           >
             <span
-              aria-hidden="true" class="material-symbols-outlined text-[26px] fill-1"
+              aria-hidden="true"
+              class="material-symbols-outlined text-[26px] fill-1"
               :class="(hoverRating || selectedRating) >= star ? 'text-[#FFAE1F]' : 'text-[#CBD5E1]'"
             >
               star
@@ -223,7 +226,10 @@ watch(
           :disabled="isSubmitting || !selectedRating"
           class="inline-flex items-center gap-1.5 rounded-xl bg-[#0A51B0] px-4 py-2 text-xs font-bold text-white shadow-2xs hover:bg-[#0A4391] transition-all cursor-pointer disabled:opacity-50"
         >
-          <span aria-hidden="true" v-if="isSubmitting" class="material-symbols-outlined text-[16px] animate-spin"
+          <span
+            aria-hidden="true"
+            v-if="isSubmitting"
+            class="material-symbols-outlined text-[16px] animate-spin"
             >progress_activity</span
           >
           <span aria-hidden="true" v-else class="material-symbols-outlined text-[16px]">send</span>

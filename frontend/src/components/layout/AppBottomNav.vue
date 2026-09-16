@@ -223,7 +223,7 @@ watch(
 }
 .clean-bottom-nav :is(a, button):focus-visible,
 .clean-more-menu :is(a, button):focus-visible {
-  outline: 2px solid #097CDE;
+  outline: 2px solid #097cde;
   outline-offset: 2px;
 }
 :global(.dark) .clean-bottom-nav {

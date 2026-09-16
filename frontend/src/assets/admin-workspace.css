@@ -31,7 +31,7 @@
   box-shadow: none;
 }
 .admin-page-header button:is(.bg-\[\#0A51B0\], .bg-\[\#0A51B0\], .bg-brand) {
-  background: #0A51B0;
+  background: #0a51b0;
 }
 .admin-page-header > div:nth-child(2):has(input) {
   padding: 16px;
@@ -40,7 +40,8 @@
   background: white;
   gap: 12px;
 }
-.admin-workspace input:not([type='checkbox']):not([type='radio']):not([type='file']):not(.toolbar-search-input),
+.admin-workspace
+  input:not([type='checkbox']):not([type='radio']):not([type='file']):not(.toolbar-search-input),
 .admin-entry-form input:not([type='checkbox']):not([type='radio']),
 .admin-entry-form select,
 .admin-entry-form textarea {
@@ -116,7 +117,7 @@
 .admin-tabs button[aria-pressed='true'] {
   background: white;
   color: #333333;
-  box-shadow: 0 1px 4px #0A51B008;
+  box-shadow: 0 1px 4px #0a51b008;
 }
 .admin-log-list {
   display: flex;
@@ -187,7 +188,7 @@
   font-weight: 600;
 }
 .admin-modal-actions button[type='submit'] {
-  background: #0A51B0;
+  background: #0a51b0;
   color: white;
 }
 .admin-modal-actions button:disabled {
@@ -196,7 +197,7 @@
 }
 .admin-workspace button:focus-visible,
 .admin-modal-actions button:focus-visible {
-  outline: 2px solid #097CDE;
+  outline: 2px solid #097cde;
   outline-offset: 3px;
 }
 .database-modal {
@@ -223,7 +224,8 @@
   .admin-page-header button {
     min-height: 44px;
   }
-  .admin-workspace input:not([type='checkbox']):not([type='radio']):not([type='file']):not(.toolbar-search-input),
+  .admin-workspace
+    input:not([type='checkbox']):not([type='radio']):not([type='file']):not(.toolbar-search-input),
   .admin-entry-form input:not([type='checkbox']):not([type='radio']),
   .admin-entry-form select,
   .admin-entry-form textarea,

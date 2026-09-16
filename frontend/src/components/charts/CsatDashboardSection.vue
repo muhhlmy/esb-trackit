@@ -178,7 +178,9 @@ onMounted(() => {
           <span
             class="flex h-9 w-9 items-center justify-center rounded-xl bg-[#FEF3C7] text-[#FFAE1F]"
           >
-            <span aria-hidden="true" class="material-symbols-outlined text-[20px] fill-1">star</span>
+            <span aria-hidden="true" class="material-symbols-outlined text-[20px] fill-1"
+              >star</span
+            >
           </span>
         </div>
 
@@ -282,7 +284,9 @@ onMounted(() => {
             v-else-if="isEmpty"
             class="flex flex-col items-center gap-2 text-[#687281] p-4 text-center"
           >
-            <span aria-hidden="true" class="material-symbols-outlined text-[36px]">bar_chart_off</span>
+            <span aria-hidden="true" class="material-symbols-outlined text-[36px]"
+              >bar_chart_off</span
+            >
             <p class="text-[12px] font-semibold">Belum ada data visualisasi.</p>
           </div>
 

@@ -109,13 +109,13 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside))
           class="h-2 w-2 rounded-full shrink-0"
           :class="selectedOption.dot"
         ></span>
-        <span
-          class="truncate"
-          :title="selectedOption ? selectedOption.label : placeholder"
-        >{{ selectedOption ? selectedOption.label : placeholder }}</span>
+        <span class="truncate" :title="selectedOption ? selectedOption.label : placeholder">{{
+          selectedOption ? selectedOption.label : placeholder
+        }}</span>
       </div>
       <span
-        aria-hidden="true" class="material-symbols-outlined text-[16px] text-[#66728d] shrink-0 transition-transform duration-200"
+        aria-hidden="true"
+        class="material-symbols-outlined text-[16px] text-[#66728d] shrink-0 transition-transform duration-200"
         :class="{ 'rotate-180 text-[#333333]': isOpen }"
         >expand_more</span
       >
@@ -159,7 +159,8 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside))
           </div>
           <span
             v-if="opt.value === modelValue"
-            aria-hidden="true" class="material-symbols-outlined text-[15px] text-[#333333] shrink-0"
+            aria-hidden="true"
+            class="material-symbols-outlined text-[15px] text-[#333333] shrink-0"
             >check</span
           >
         </button>

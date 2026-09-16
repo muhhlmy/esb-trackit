@@ -54,7 +54,7 @@ async function fetchLogs() {
     const [assetsData, auditData = [], systemData = []] = await Promise.all(requests)
     assetLogs.value = Array.isArray(assetsData) ? assetsData : []
     auditLogs.value = Array.isArray(auditData) ? auditData : []
-    systemLogs.value = Array.isArray(systemData) ? systemData : (systemData?.data || [])
+    systemLogs.value = Array.isArray(systemData) ? systemData : systemData?.data || []
     systemLogTotal.value = Array.isArray(systemData)
       ? systemLogs.value.length
       : Number(systemData?.pagination?.total || 0)
@@ -119,8 +119,23 @@ const filteredAuditLogs = computed(() => {
 
 const filteredSystemLogs = computed(() => {
   const query = searchQuery.value.trim().toLowerCase()
-  return systemLogs.value.filter((log) => !query || [log.module, log.action, log.entity_type, log.entity_label, log.summary, log.actor_name, log.actor_email]
-    .some((value) => String(value || '').toLowerCase().includes(query)))
+  return systemLogs.value.filter(
+    (log) =>
+      !query ||
+      [
+        log.module,
+        log.action,
+        log.entity_type,
+        log.entity_label,
+        log.summary,
+        log.actor_name,
+        log.actor_email,
+      ].some((value) =>
+        String(value || '')
+          .toLowerCase()
+          .includes(query),
+      ),
+  )
 })
 
 watch([searchQuery, filterAction, filterActivity, activeTab], () => {
@@ -354,7 +369,11 @@ function systemAuditChanges(log) {
         :aria-pressed="activeTab === 'system'"
         @click="activeTab = 'system'"
         class="flex min-w-0 min-h-11 items-center justify-center sm:justify-start gap-2 px-2 sm:px-5 py-3.5 text-xs leading-relaxed text-left font-bold transition-all duration-150 border-b-2 -mb-[2px]"
-        :class="activeTab === 'system' ? 'border-brand text-brand font-black' : 'border-transparent text-[#5F7089] hover:text-[#172033]'"
+        :class="
+          activeTab === 'system'
+            ? 'border-brand text-brand font-black'
+            : 'border-transparent text-[#5F7089] hover:text-[#172033]'
+        "
       >
         <span aria-hidden="true" class="material-symbols-outlined text-[18px]">receipt_long</span>
         Audit Sistem
@@ -711,8 +730,12 @@ function systemAuditChanges(log) {
       <!-- ── TAB 3: System Audit ────────────────────────────── -->
       <div v-else-if="activeTab === 'system'">
         <div v-if="filteredSystemLogs.length === 0" class="px-4 py-12 text-center">
-          <span aria-hidden="true" class="material-symbols-outlined text-[40px] text-[#D1D5DB]">receipt_long</span>
-          <p class="mt-3 text-[13px] font-semibold text-[#5F7089]">Belum ada aktivitas sistem tercatat.</p>
+          <span aria-hidden="true" class="material-symbols-outlined text-[40px] text-[#D1D5DB]"
+            >receipt_long</span
+          >
+          <p class="mt-3 text-[13px] font-semibold text-[#5F7089]">
+            Belum ada aktivitas sistem tercatat.
+          </p>
         </div>
         <div v-else class="divide-y divide-[#F3F4F6]">
           <article
@@ -726,36 +749,84 @@ function systemAuditChanges(log) {
             @keydown.enter.prevent="toggleSystemLogDetail(log.id)"
             @keydown.space.prevent="toggleSystemLogDetail(log.id)"
           >
-            <span aria-hidden="true" class="material-symbols-outlined mt-0.5 text-[20px] text-brand">history</span>
+            <span aria-hidden="true" class="material-symbols-outlined mt-0.5 text-[20px] text-brand"
+              >history</span
+            >
             <div class="min-w-0 flex-1 wrap-anywhere">
               <div class="flex flex-wrap items-center gap-2">
-                <AppBadge :type="log.action === 'DELETE' ? 'danger' : log.action === 'CREATE' ? 'success' : 'warning'" :text="log.action" />
-                <span class="text-xs font-bold text-[#111827]">{{ log.module }} · {{ log.entity_label || log.entity_type }}</span>
-                <time class="ml-auto text-[10px] font-medium text-[#687281]">{{ formatDateTime(log.dibuat_pada) }}</time>
+                <AppBadge
+                  :type="
+                    log.action === 'DELETE'
+                      ? 'danger'
+                      : log.action === 'CREATE'
+                        ? 'success'
+                        : 'warning'
+                  "
+                  :text="log.action"
+                />
+                <span class="text-xs font-bold text-[#111827]"
+                  >{{ log.module }} · {{ log.entity_label || log.entity_type }}</span
+                >
+                <time class="ml-auto text-[10px] font-medium text-[#687281]">{{
+                  formatDateTime(log.dibuat_pada)
+                }}</time>
               </div>
               <p class="mt-2 text-xs leading-relaxed text-[#5F7089]">{{ log.summary }}</p>
-              <p class="mt-2 text-[10px] font-semibold text-[#687281]">Oleh: {{ log.actor_name }}<span v-if="log.actor_email"> · {{ log.actor_email }}</span></p>
-              <p class="mt-3 text-[10px] font-bold text-brand">{{ expandedSystemLogId === log.id ? 'Klik untuk menutup detail' : 'Klik aktivitas untuk melihat detail' }}</p>
+              <p class="mt-2 text-[10px] font-semibold text-[#687281]">
+                Oleh: {{ log.actor_name
+                }}<span v-if="log.actor_email"> · {{ log.actor_email }}</span>
+              </p>
+              <p class="mt-3 text-[10px] font-bold text-brand">
+                {{
+                  expandedSystemLogId === log.id
+                    ? 'Klik untuk menutup detail'
+                    : 'Klik aktivitas untuk melihat detail'
+                }}
+              </p>
               <section
                 v-if="expandedSystemLogId === log.id"
                 class="mt-3 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] p-3"
                 aria-label="Detail perubahan audit sistem"
               >
-                <p class="text-[10px] font-extrabold uppercase tracking-wider text-[#687281]">Detail Perubahan</p>
+                <p class="text-[10px] font-extrabold uppercase tracking-wider text-[#687281]">
+                  Detail Perubahan
+                </p>
                 <div v-if="systemAuditChanges(log).length" class="mt-2 divide-y divide-[#E2E8F0]">
-                  <div v-for="change in systemAuditChanges(log)" :key="change.field" class="grid gap-2 py-2.5 text-[11px] sm:grid-cols-[9rem_minmax(0,1fr)_minmax(0,1fr)]">
+                  <div
+                    v-for="change in systemAuditChanges(log)"
+                    :key="change.field"
+                    class="grid gap-2 py-2.5 text-[11px] sm:grid-cols-[9rem_minmax(0,1fr)_minmax(0,1fr)]"
+                  >
                     <span class="font-bold text-[#475569]">{{ change.field }}</span>
-                    <div v-if="change.hasBefore" class="min-w-0 rounded-md bg-[#FEF2F2] px-2 py-1.5 text-[#991B1B]">
-                      <span class="mb-1 block text-[9px] font-extrabold uppercase tracking-wide">Sebelum</span>
-                      <pre class="whitespace-pre-wrap break-words font-sans">{{ formatAuditValue(change.before) }}</pre>
+                    <div
+                      v-if="change.hasBefore"
+                      class="min-w-0 rounded-md bg-[#FEF2F2] px-2 py-1.5 text-[#991B1B]"
+                    >
+                      <span class="mb-1 block text-[9px] font-extrabold uppercase tracking-wide"
+                        >Sebelum</span
+                      >
+                      <pre class="whitespace-pre-wrap break-words font-sans">{{
+                        formatAuditValue(change.before)
+                      }}</pre>
                     </div>
-                    <div v-if="change.hasAfter" class="min-w-0 rounded-md bg-[#F0FDF4] px-2 py-1.5 text-[#166534]" :class="!change.hasBefore ? 'sm:col-start-2' : ''">
-                      <span class="mb-1 block text-[9px] font-extrabold uppercase tracking-wide">Sesudah</span>
-                      <pre class="whitespace-pre-wrap break-words font-sans">{{ formatAuditValue(change.after) }}</pre>
+                    <div
+                      v-if="change.hasAfter"
+                      class="min-w-0 rounded-md bg-[#F0FDF4] px-2 py-1.5 text-[#166534]"
+                      :class="!change.hasBefore ? 'sm:col-start-2' : ''"
+                    >
+                      <span class="mb-1 block text-[9px] font-extrabold uppercase tracking-wide"
+                        >Sesudah</span
+                      >
+                      <pre class="whitespace-pre-wrap break-words font-sans">{{
+                        formatAuditValue(change.after)
+                      }}</pre>
                     </div>
                   </div>
                 </div>
-                <p v-else class="mt-2 text-[11px] leading-relaxed text-[#687281]">Aktivitas ini tidak memiliki perubahan field yang dapat dibandingkan. Lihat ringkasan aktivitas di atas.</p>
+                <p v-else class="mt-2 text-[11px] leading-relaxed text-[#687281]">
+                  Aktivitas ini tidak memiliki perubahan field yang dapat dibandingkan. Lihat
+                  ringkasan aktivitas di atas.
+                </p>
               </section>
             </div>
           </article>

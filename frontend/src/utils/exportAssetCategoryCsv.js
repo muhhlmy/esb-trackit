@@ -7,7 +7,9 @@ export function downloadAssetCategoryCsv(assets, type) {
   if (!Array.isArray(assets) || assets.length === 0) return false
   const columns = [...new Set(assets.flatMap((asset) => Object.keys(asset)))]
   const csv = [columns, ...assets.map((asset) => columns.map((column) => csvCell(asset[column])))]
-    .map((row) => row.map((cell) => (String(cell).startsWith('"') ? cell : csvCell(cell))).join(','))
+    .map((row) =>
+      row.map((cell) => (String(cell).startsWith('"') ? cell : csvCell(cell))).join(','),
+    )
     .join('\r\n')
   const blob = new Blob([`\uFEFF${csv}`], { type: 'text/csv;charset=utf-8;' })
   const url = URL.createObjectURL(blob)

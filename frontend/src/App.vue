@@ -12,11 +12,13 @@ import Toast from './components/common/Toast.vue'
 
 import { animatePageEnter, animatePageLeave } from './composables/useGsap.js'
 import { getStoredUser } from './utils/authStorage.js'
+import { useAuth } from './composables/useAuth.js'
 import { initTicketRealtime, stopTicketRealtime } from './composables/useTicketRealtime.js'
 import { useCases } from './composables/useCases.js'
 
 const route = useRoute()
 const { fetchCases } = useCases()
+const { user, refreshUser } = useAuth()
 
 const isLoginPage = computed(() => {
   return route.name === 'login' || route.path === '/login'
@@ -69,10 +71,13 @@ function handleResize() {
   }
 }
 
-onMounted(() => {
+onMounted(async () => {
   fetchCases()
+  // Data pengguna di localStorage hanya cache UI. Selalu cocokkan kembali
+  // dengan sesi server saat aplikasi dibuka agar nama/role lama tidak tampil.
   if (getStoredUser()) {
-    initTicketRealtime()
+    await refreshUser()
+    if (user.value) initTicketRealtime()
   }
   if (typeof window !== 'undefined') {
     window.addEventListener('resize', handleResize)

@@ -622,7 +622,9 @@ function switchTab(tab) {
             <tbody class="divide-y divide-[#F1F5F9]">
               <tr v-if="backups.length === 0 && !isLoadingBackups">
                 <td colspan="7" class="px-4 py-12 text-center text-[#687281]">
-                  <span aria-hidden="true" class="material-symbols-outlined mb-2 block text-3xl">database_off</span>
+                  <span aria-hidden="true" class="material-symbols-outlined mb-2 block text-3xl"
+                    >database_off</span
+                  >
                   Belum ada backup
                 </td>
               </tr>
@@ -666,14 +668,18 @@ function switchTab(tab) {
                       title="Download"
                       @click="handleDownload(backup)"
                     >
-                      <span aria-hidden="true" class="material-symbols-outlined text-lg">download</span>
+                      <span aria-hidden="true" class="material-symbols-outlined text-lg"
+                        >download</span
+                      >
                     </button>
                     <button
                       class="rounded-lg p-1.5 text-[#5F7089] hover:bg-[#F1F5F9] hover:text-red-600 transition-colors"
                       title="Delete"
                       @click="openDeleteConfirm(backup)"
                     >
-                      <span aria-hidden="true" class="material-symbols-outlined text-lg">delete</span>
+                      <span aria-hidden="true" class="material-symbols-outlined text-lg"
+                        >delete</span
+                      >
                     </button>
                   </div>
                 </td>
@@ -690,7 +696,9 @@ function switchTab(tab) {
         <!-- Warning Banner -->
         <div class="mb-6 rounded-lg border border-red-200 bg-red-50 p-4">
           <div class="flex items-start gap-3">
-            <span aria-hidden="true" class="material-symbols-outlined text-red-600 text-2xl">warning</span>
+            <span aria-hidden="true" class="material-symbols-outlined text-red-600 text-2xl"
+              >warning</span
+            >
             <div>
               <p class="font-semibold text-red-800">PERINGATAN</p>
               <p class="mt-1 text-sm text-red-700">
@@ -721,7 +729,9 @@ function switchTab(tab) {
               for="restoreFileInput"
               class="block cursor-pointer rounded-lg peer-focus-visible:outline-2 peer-focus-visible:outline-offset-4 peer-focus-visible:outline-[#0A51B0]"
             >
-              <span aria-hidden="true" class="material-symbols-outlined mb-2 block text-4xl text-[#687281]"
+              <span
+                aria-hidden="true"
+                class="material-symbols-outlined mb-2 block text-4xl text-[#687281]"
                 >upload_file</span
               >
               <p class="text-sm text-[#5F7089]">
@@ -753,7 +763,9 @@ function switchTab(tab) {
               v-if="restoreStep === 'validating'"
               class="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"
             ></span>
-            <span aria-hidden="true" v-else class="material-symbols-outlined text-lg">fact_check</span>
+            <span aria-hidden="true" v-else class="material-symbols-outlined text-lg"
+              >fact_check</span
+            >
             {{ restoreStep === 'validating' ? 'Memvalidasi...' : 'Validate Backup' }}
           </button>
         </div>
@@ -793,7 +805,8 @@ function switchTab(tab) {
               <div class="p-3">
                 <div class="flex items-center gap-2">
                   <span
-                    aria-hidden="true" class="material-symbols-outlined text-sm"
+                    aria-hidden="true"
+                    class="material-symbols-outlined text-sm"
                     :class="restoreValidation?.contentValid ? 'text-emerald-600' : 'text-red-600'"
                   >
                     {{ restoreValidation?.contentValid ? 'check_circle' : 'cancel' }}
@@ -835,7 +848,9 @@ function switchTab(tab) {
                 v-if="restoreStep === 'restoring'"
                 class="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"
               ></span>
-              <span aria-hidden="true" v-else class="material-symbols-outlined text-lg">restore_page</span>
+              <span aria-hidden="true" v-else class="material-symbols-outlined text-lg"
+                >restore_page</span
+              >
               {{ restoreStep === 'restoring' ? 'Restoring...' : 'Restore Database' }}
             </button>
           </div>
@@ -843,7 +858,9 @@ function switchTab(tab) {
 
         <!-- Step 3: Done -->
         <div v-if="restoreStep === 'done'" class="text-center">
-          <span aria-hidden="true" class="material-symbols-outlined mb-3 text-5xl text-emerald-500">check_circle</span>
+          <span aria-hidden="true" class="material-symbols-outlined mb-3 text-5xl text-emerald-500"
+            >check_circle</span
+          >
           <h3 class="text-lg font-semibold text-[#333333]">Restore Berhasil</h3>
           <p class="mt-1 text-sm text-[#5F7089]">
             Database telah diverifikasi dan berjalan normal.

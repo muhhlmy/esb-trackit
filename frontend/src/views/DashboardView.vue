@@ -781,7 +781,10 @@ onUnmounted(() => {
           <span
             class="inline-flex items-center gap-1.5 text-xs font-semibold text-[#0A51B0] bg-[#EDF5FF] px-3 py-1.5 rounded-full"
           >
-            <span aria-hidden="true" class="material-symbols-outlined text-[16px]" style="opacity: 0.7"
+            <span
+              aria-hidden="true"
+              class="material-symbols-outlined text-[16px]"
+              style="opacity: 0.7"
               >location_on</span
             >
             {{ locationBreakdown.length }} Lokasi
@@ -833,7 +836,9 @@ onUnmounted(() => {
             class="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-600 bg-blue-50/70 hover:bg-blue-100/80 hover:text-blue-700 px-3 py-1.5 rounded-lg border border-blue-100/60 transition-all duration-150 shrink-0 active:scale-95 touch-manipulation"
           >
             <span>Lihat Semua</span>
-            <span aria-hidden="true" class="material-symbols-outlined text-[15px]">arrow_forward</span>
+            <span aria-hidden="true" class="material-symbols-outlined text-[15px]"
+              >arrow_forward</span
+            >
           </RouterLink>
         </div>
 
@@ -909,7 +914,9 @@ onUnmounted(() => {
                 }}</span>
               </div>
               <div class="flex items-center gap-1 text-[11px] text-[#687281]">
-                <span aria-hidden="true" class="material-symbols-outlined text-[13px]">calendar_today</span>
+                <span aria-hidden="true" class="material-symbols-outlined text-[13px]"
+                  >calendar_today</span
+                >
                 <span>{{ formatDate(asset.dibuat_pada) }}</span>
               </div>
             </div>
@@ -1071,7 +1078,9 @@ onUnmounted(() => {
             class="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-600 bg-blue-50/70 hover:bg-blue-100/80 hover:text-blue-700 px-3 py-1.5 rounded-lg border border-blue-100/60 transition-all duration-150 shrink-0 active:scale-95 touch-manipulation"
           >
             <span>Lihat Semua</span>
-            <span aria-hidden="true" class="material-symbols-outlined text-[15px]">arrow_forward</span>
+            <span aria-hidden="true" class="material-symbols-outlined text-[15px]"
+              >arrow_forward</span
+            >
           </RouterLink>
         </div>
 
@@ -1116,7 +1125,9 @@ onUnmounted(() => {
               class="flex flex-wrap items-center justify-between gap-y-1.5 gap-x-2 text-[11px] text-[#606f85] pt-1 border-t border-slate-50"
             >
               <div class="flex items-center gap-1 min-w-0">
-                <span aria-hidden="true" class="material-symbols-outlined text-[14px] text-[#687281] shrink-0"
+                <span
+                  aria-hidden="true"
+                  class="material-symbols-outlined text-[14px] text-[#687281] shrink-0"
                   >person</span
                 >
                 <span class="truncate">
@@ -1128,7 +1139,9 @@ onUnmounted(() => {
               </div>
 
               <div class="flex items-center gap-1 text-[11px] text-[#687281] shrink-0">
-                <span aria-hidden="true" class="material-symbols-outlined text-[13px]">calendar_today</span>
+                <span aria-hidden="true" class="material-symbols-outlined text-[13px]"
+                  >calendar_today</span
+                >
                 <span>{{ formatDate(ticket.dibuat_pada) }}</span>
               </div>
             </div>
@@ -1206,7 +1219,8 @@ onUnmounted(() => {
                 <td class="py-3 px-4 align-middle">
                   <div class="flex items-center gap-1.5 min-w-0">
                     <span
-                      aria-hidden="true" class="material-symbols-outlined text-[16px] shrink-0"
+                      aria-hidden="true"
+                      class="material-symbols-outlined text-[16px] shrink-0"
                       :class="ticket.assigned_to ? 'text-slate-400' : 'text-amber-500'"
                     >
                       {{ ticket.assigned_to ? 'person' : 'person_off' }}

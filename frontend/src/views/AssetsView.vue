@@ -206,7 +206,9 @@ const filteredAssets = computed(() => {
       (!query || searchable.includes(query)) &&
       (!filterStatus.value || asset.status_aset === filterStatus.value) &&
       (!filterTipe.value || asset.tipe_perangkat === filterTipe.value) &&
-      (!filterLokasi.value || normalizeLocation(asset.lokasi_asset || asset.lokasi_aset || asset.lokasi_kerja) === filterLokasi.value) &&
+      (!filterLokasi.value ||
+        normalizeLocation(asset.lokasi_asset || asset.lokasi_aset || asset.lokasi_kerja) ===
+          filterLokasi.value) &&
       (!filterKondisi.value || asset.kondisi_aset === filterKondisi.value)
     )
   })
@@ -582,46 +584,51 @@ async function executeExport() {
             ? asset.note_asset
             : asset.catatan_aset || '',
       }))
-      const exportedNik = new Set(exportData.map((asset) => asset.nik_pemegang_asset).filter(Boolean))
-      exportToExcelWorkbook([
-        {
-          name: 'Table Karyawan',
-          data: employees.value.filter((employee) => exportedNik.has(employee.nik)),
-          columns: [
-            { name: 'nik', label: 'NIK' },
-            { name: 'nama_karyawan', label: 'Nama Karyawan' },
-            { name: 'status', label: 'Status' },
-            { name: 'title', label: 'Title' },
-            { name: 'job_level', label: 'Job Level' },
-            { name: 'departemen', label: 'Departemen' },
-            { name: 'directorate', label: 'Directorate' },
-            { name: 'tanggal_mulai_bekerja', label: 'Tanggal Mulai Bekerja' },
-            { name: 'employeement_status', label: 'Employeement Status' },
-            { name: 'nik_atasan_langsung', label: 'NIK Atasan Langsung' },
-            { name: 'email_kantor', label: 'Email Kantor' },
-            { name: 'lokasi_kerja', label: 'Lokasi Kerja' },
-          ],
-        },
-        {
-          name: 'Table Asset',
-          data: exportData,
-          columns: [
-            { name: 'hostname', label: 'Hostname' },
-            { name: 'serial_number', label: 'Serial Number' },
-            { name: 'spesifikasi', label: 'Spesifikasi' },
-            { name: 'nik_pemegang_asset', label: 'NIK Pemegang' },
-            { name: 'nama_karyawan_pemegang_asset', label: 'Nama Karyawan Pemegang' },
-            { name: 'departemen_pemegang_asset', label: 'Departemen Pemegang' },
-            { name: 'lokasi_asset', label: 'Lokasi Aset' },
-            { name: 'tipe_perangkat', label: 'Tipe Perangkat' },
-            { name: 'brand_merek', label: 'Brand/Merek' },
-            { name: 'model', label: 'Model' },
-            { name: 'status', label: 'Status' },
-            { name: 'kondisi', label: 'Kondisi' },
-            { name: 'note_asset', label: 'Note Asset' },
-          ],
-        },
-      ], 'Aset_IT_Export')
+      const exportedNik = new Set(
+        exportData.map((asset) => asset.nik_pemegang_asset).filter(Boolean),
+      )
+      exportToExcelWorkbook(
+        [
+          {
+            name: 'Table Karyawan',
+            data: employees.value.filter((employee) => exportedNik.has(employee.nik)),
+            columns: [
+              { name: 'nik', label: 'NIK' },
+              { name: 'nama_karyawan', label: 'Nama Karyawan' },
+              { name: 'status', label: 'Status' },
+              { name: 'title', label: 'Title' },
+              { name: 'job_level', label: 'Job Level' },
+              { name: 'departemen', label: 'Departemen' },
+              { name: 'directorate', label: 'Directorate' },
+              { name: 'tanggal_mulai_bekerja', label: 'Tanggal Mulai Bekerja' },
+              { name: 'employeement_status', label: 'Employeement Status' },
+              { name: 'nik_atasan_langsung', label: 'NIK Atasan Langsung' },
+              { name: 'email_kantor', label: 'Email Kantor' },
+              { name: 'lokasi_kerja', label: 'Lokasi Kerja' },
+            ],
+          },
+          {
+            name: 'Table Asset',
+            data: exportData,
+            columns: [
+              { name: 'hostname', label: 'Hostname' },
+              { name: 'serial_number', label: 'Serial Number' },
+              { name: 'spesifikasi', label: 'Spesifikasi' },
+              { name: 'nik_pemegang_asset', label: 'NIK Pemegang' },
+              { name: 'nama_karyawan_pemegang_asset', label: 'Nama Karyawan Pemegang' },
+              { name: 'departemen_pemegang_asset', label: 'Departemen Pemegang' },
+              { name: 'lokasi_asset', label: 'Lokasi Aset' },
+              { name: 'tipe_perangkat', label: 'Tipe Perangkat' },
+              { name: 'brand_merek', label: 'Brand/Merek' },
+              { name: 'model', label: 'Model' },
+              { name: 'status', label: 'Status' },
+              { name: 'kondisi', label: 'Kondisi' },
+              { name: 'note_asset', label: 'Note Asset' },
+            ],
+          },
+        ],
+        'Aset_IT_Export',
+      )
       toast('XLSX aset berhasil dibuat.')
     } else {
       downloadAssetsPdf(filteredData, {
@@ -840,12 +847,26 @@ onMounted(async () => {
             <span aria-hidden="true" class="material-symbols-outlined text-[16px]">add</span>
             <span>Tambah Aset</span>
           </button>
-          <div class="toolbar-action-group flex items-center gap-1 rounded-lg border border-[#D7E3F2] bg-[#F8FAFC] p-1">
-            <button v-if="canWriteAssets" type="button" @click="showImportModal = true" class="toolbar-action-button inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-[11px] font-bold text-[#0A51B0] hover:bg-white">
-              <span aria-hidden="true" class="material-symbols-outlined text-[15px]">upload_file</span>Import
+          <div
+            class="toolbar-action-group flex items-center gap-1 rounded-lg border border-[#D7E3F2] bg-[#F8FAFC] p-1"
+          >
+            <button
+              v-if="canWriteAssets"
+              type="button"
+              @click="showImportModal = true"
+              class="toolbar-action-button inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-[11px] font-bold text-[#0A51B0] hover:bg-white"
+            >
+              <span aria-hidden="true" class="material-symbols-outlined text-[15px]"
+                >upload_file</span
+              >Import
             </button>
-            <button type="button" @click="openExport" class="toolbar-action-button inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-[11px] font-bold text-[#0A51B0] hover:bg-white">
-              <span aria-hidden="true" class="material-symbols-outlined text-[15px]">download</span>Export
+            <button
+              type="button"
+              @click="openExport"
+              class="toolbar-action-button inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-[11px] font-bold text-[#0A51B0] hover:bg-white"
+            >
+              <span aria-hidden="true" class="material-symbols-outlined text-[15px]">download</span
+              >Export
             </button>
           </div>
         </div>
@@ -858,7 +879,8 @@ onMounted(async () => {
         <!-- Search Input -->
         <div class="relative h-9 w-full sm:flex-1 sm:min-w-[200px]">
           <span
-            aria-hidden="true" class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-[17px] text-[#687281] pointer-events-none"
+            aria-hidden="true"
+            class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-[17px] text-[#687281] pointer-events-none"
             >search</span
           >
           <input
@@ -881,7 +903,15 @@ onMounted(async () => {
           </button>
         </div>
 
-        <button type="button" @click="showFilterModal = true" class="h-9 shrink-0 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-semibold text-[#5F7089] hover:bg-white"><span aria-hidden="true" class="material-symbols-outlined mr-1 align-middle text-[16px]">filter_alt</span>Filter</button>
+        <button
+          type="button"
+          @click="showFilterModal = true"
+          class="h-9 shrink-0 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-semibold text-[#5F7089] hover:bg-white"
+        >
+          <span aria-hidden="true" class="material-symbols-outlined mr-1 align-middle text-[16px]"
+            >filter_alt</span
+          >Filter
+        </button>
       </div>
     </div>
     <!-- ─── MODERN ENTERPRISE SAAS DATA MANAGEMENT CONTAINER ──────────────── -->
@@ -1009,7 +1039,9 @@ onMounted(async () => {
           <span
             class="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#F1F5F9] text-[#5F7089]"
           >
-            <span aria-hidden="true" class="material-symbols-outlined text-[24px]">devices_off</span>
+            <span aria-hidden="true" class="material-symbols-outlined text-[24px]"
+              >devices_off</span
+            >
           </span>
           <h3 class="text-[14px] font-bold text-[#333333] mt-1">Belum Ada Aset IT</h3>
           <p class="text-[12px] text-[#5F7089] leading-relaxed">
@@ -1161,7 +1193,11 @@ onMounted(async () => {
           role="alert"
           class="mb-3.5 flex items-center gap-2 rounded-xl bg-rose-50 border border-rose-200 px-3.5 py-2.5 text-[12px] font-semibold text-rose-700 shadow-2xs"
         >
-          <span aria-hidden="true" class="material-symbols-outlined text-[18px] text-rose-500 shrink-0">error</span>
+          <span
+            aria-hidden="true"
+            class="material-symbols-outlined text-[18px] text-rose-500 shrink-0"
+            >error</span
+          >
           <span class="flex-1">{{ modalError }}</span>
         </div>
 
@@ -1172,7 +1208,9 @@ onMounted(async () => {
               <span
                 class="flex h-6 w-6 items-center justify-center rounded-md bg-[#EDF5FF] text-[#333333]"
               >
-                <span aria-hidden="true" class="material-symbols-outlined text-[15px]">devices</span>
+                <span aria-hidden="true" class="material-symbols-outlined text-[15px]"
+                  >devices</span
+                >
               </span>
               <span class="text-[12px] font-bold text-[#333333] uppercase tracking-wider">
                 Identitas perangkat
@@ -1190,7 +1228,8 @@ onMounted(async () => {
               </label>
               <div class="relative flex items-center">
                 <span
-                  aria-hidden="true" class="material-symbols-outlined absolute left-3 text-[17px] text-[#687281] pointer-events-none"
+                  aria-hidden="true"
+                  class="material-symbols-outlined absolute left-3 text-[17px] text-[#687281] pointer-events-none"
                 >
                   computer
                 </span>
@@ -1212,7 +1251,8 @@ onMounted(async () => {
               </label>
               <div class="relative flex items-center">
                 <span
-                  aria-hidden="true" class="material-symbols-outlined absolute left-3 text-[17px] text-[#687281] pointer-events-none"
+                  aria-hidden="true"
+                  class="material-symbols-outlined absolute left-3 text-[17px] text-[#687281] pointer-events-none"
                 >
                   tag
                 </span>
@@ -1246,7 +1286,9 @@ onMounted(async () => {
             <div
               class="flex items-start gap-2.5 rounded-xl bg-[#EDF5FF]/70 border border-[#B8D4F5]/40 p-3 col-span-1 sm:col-span-2"
             >
-              <span aria-hidden="true" class="material-symbols-outlined text-[17px] text-[#333333] mt-0.5 shrink-0"
+              <span
+                aria-hidden="true"
+                class="material-symbols-outlined text-[17px] text-[#333333] mt-0.5 shrink-0"
                 >info</span
               >
               <p class="text-[12px] leading-relaxed text-[#0A4391]">
@@ -1314,7 +1356,9 @@ onMounted(async () => {
                     <span
                       class="inline-flex items-center gap-1 rounded-full bg-[#0A5DBD]/15 px-2 py-0.5 text-[11px] font-bold text-[#0A4391]"
                     >
-                      <span aria-hidden="true" class="material-symbols-outlined text-[12px]">business</span>
+                      <span aria-hidden="true" class="material-symbols-outlined text-[12px]"
+                        >business</span
+                      >
                       {{ form.departemen_pemegang_asset || 'Umum' }}
                     </span>
                   </div>
@@ -1325,7 +1369,9 @@ onMounted(async () => {
                     >
                     <span>•</span>
                     <span class="flex items-center gap-0.5 text-[#059669] font-semibold">
-                      <span aria-hidden="true" class="material-symbols-outlined text-[13px]">check_circle</span>
+                      <span aria-hidden="true" class="material-symbols-outlined text-[13px]"
+                        >check_circle</span
+                      >
                       Akan ditugaskan
                     </span>
                   </div>
@@ -1349,7 +1395,9 @@ onMounted(async () => {
               <div
                 class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white border border-[#E2E8F0] text-[#333333] shadow-2xs"
               >
-                <span aria-hidden="true" class="material-symbols-outlined text-[18px]">inventory_2</span>
+                <span aria-hidden="true" class="material-symbols-outlined text-[18px]"
+                  >inventory_2</span
+                >
               </div>
               <div class="text-[12px] leading-snug">
                 <p class="font-bold text-[#333333]">Status Unit: Stok Tersedia (Stock)</p>
@@ -1423,7 +1471,8 @@ onMounted(async () => {
               <label class="text-[12px] font-bold text-[#333333]">Model / Seri</label>
               <div class="relative flex items-center">
                 <span
-                  aria-hidden="true" class="material-symbols-outlined absolute left-3 text-[17px] text-[#687281] pointer-events-none"
+                  aria-hidden="true"
+                  class="material-symbols-outlined absolute left-3 text-[17px] text-[#687281] pointer-events-none"
                 >
                   memory
                 </span>
@@ -1518,7 +1567,9 @@ onMounted(async () => {
               @click="activeTab = activeTab === 'specifications' ? 'placement' : 'info'"
               class="h-9.5 flex-1 sm:flex-initial rounded-lg border border-[#E2E8F0] bg-white px-3.5 text-[12px] font-bold text-[#0A4391] hover:bg-[#EDF5FF] hover:border-[#B8D4F5] active:scale-95 transition-all flex items-center justify-center gap-1 cursor-pointer touch-manipulation shadow-2xs"
             >
-              <span aria-hidden="true" class="material-symbols-outlined text-[16px]">arrow_back</span>
+              <span aria-hidden="true" class="material-symbols-outlined text-[16px]"
+                >arrow_back</span
+              >
               <span>Kembali</span>
             </button>
 
@@ -1530,7 +1581,9 @@ onMounted(async () => {
               class="h-9.5 flex-1 sm:flex-initial rounded-lg bg-[#0A51B0] hover:bg-[#0A4391] active:bg-[#0F1F38] px-4.5 text-[12px] font-bold text-white shadow-sm disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer touch-manipulation"
             >
               <span>Lanjutkan</span>
-              <span aria-hidden="true" class="material-symbols-outlined text-[16px]">arrow_forward</span>
+              <span aria-hidden="true" class="material-symbols-outlined text-[16px]"
+                >arrow_forward</span
+              >
             </button>
 
             <button
@@ -1570,7 +1623,9 @@ onMounted(async () => {
           {{ modalError }}
         </div>
         <div class="flex h-14 w-14 items-center justify-center rounded-full bg-red-50">
-          <span aria-hidden="true" class="material-symbols-outlined text-[28px] text-[#EF4444]">warning</span>
+          <span aria-hidden="true" class="material-symbols-outlined text-[28px] text-[#EF4444]"
+            >warning</span
+          >
         </div>
         <div>
           <h4 class="text-[15px] font-black text-[#111827]">
@@ -1881,7 +1936,9 @@ onMounted(async () => {
                 </p>
 
                 <p class="mt-2 text-[10px] font-bold text-[#687281]">
-                  <span aria-hidden="true" class="material-symbols-outlined text-[12px] align-text-bottom mr-0.5"
+                  <span
+                    aria-hidden="true"
+                    class="material-symbols-outlined text-[12px] align-text-bottom mr-0.5"
                     >person</span
                   >
                   {{ log.oleh_pengguna }}
@@ -1922,7 +1979,11 @@ onMounted(async () => {
               "
             >
               <span class="flex items-center gap-2">
-                <span aria-hidden="true" class="material-symbols-outlined text-[20px] text-[#0B9B6C]">table_view</span>
+                <span
+                  aria-hidden="true"
+                  class="material-symbols-outlined text-[20px] text-[#0B9B6C]"
+                  >table_view</span
+                >
                 <span class="text-[12px] font-bold text-[#172033]">XLSX (Excel)</span>
               </span>
               <input
@@ -1942,7 +2003,9 @@ onMounted(async () => {
               "
             >
               <span class="flex items-center gap-2">
-                <span aria-hidden="true" class="material-symbols-outlined text-[20px] text-[#DC4C4C]"
+                <span
+                  aria-hidden="true"
+                  class="material-symbols-outlined text-[20px] text-[#DC4C4C]"
                   >picture_as_pdf</span
                 >
                 <span class="text-[12px] font-bold text-[#172033]">PDF Laporan</span>
@@ -2008,7 +2071,9 @@ onMounted(async () => {
             :disabled="isExporting"
             class="h-10 w-full sm:w-auto rounded-xl bg-brand px-5 text-[12px] font-bold text-white shadow-md shadow-brand/20 hover:bg-brand-dark active:scale-95 disabled:opacity-50 transition-all cursor-pointer touch-manipulation"
           >
-            {{ isExporting ? 'Mengekspor...' : exportFormat === 'xlsx' ? 'Unduh XLSX' : 'Unduh PDF' }}
+            {{
+              isExporting ? 'Mengekspor...' : exportFormat === 'xlsx' ? 'Unduh XLSX' : 'Unduh PDF'
+            }}
           </button>
         </div>
       </form>
@@ -2021,11 +2086,37 @@ onMounted(async () => {
       @close="showImportModal = false"
       @imported="onImported"
     />
-    <FilterModal :is-open="showFilterModal" title="Filter Aset IT" @close="showFilterModal = false" @apply="showFilterModal = false" @reset="resetFilters">
-      <CustomSelect v-model="filterStatus" :options="filterStatusOptions" aria-label="Filter status" :block="true" />
-      <CustomSelect v-model="filterTipe" :options="filterTipeOptions" aria-label="Filter tipe perangkat" :block="true" />
-      <CustomSelect v-model="filterLokasi" :options="filterLokasiOptions" aria-label="Filter lokasi" :block="true" />
-      <CustomSelect v-model="filterKondisi" :options="filterKondisiOptions" aria-label="Filter kondisi" :block="true" />
+    <FilterModal
+      :is-open="showFilterModal"
+      title="Filter Aset IT"
+      @close="showFilterModal = false"
+      @apply="showFilterModal = false"
+      @reset="resetFilters"
+    >
+      <CustomSelect
+        v-model="filterStatus"
+        :options="filterStatusOptions"
+        aria-label="Filter status"
+        :block="true"
+      />
+      <CustomSelect
+        v-model="filterTipe"
+        :options="filterTipeOptions"
+        aria-label="Filter tipe perangkat"
+        :block="true"
+      />
+      <CustomSelect
+        v-model="filterLokasi"
+        :options="filterLokasiOptions"
+        aria-label="Filter lokasi"
+        :block="true"
+      />
+      <CustomSelect
+        v-model="filterKondisi"
+        :options="filterKondisiOptions"
+        aria-label="Filter kondisi"
+        :block="true"
+      />
     </FilterModal>
 
     <!-- Modal Cetak Label Aset -->
@@ -2264,7 +2355,7 @@ onMounted(async () => {
 .it-entry-summary p {
   font-size: 11px;
   line-height: 1.7;
-  color: #5F7089;
+  color: #5f7089;
   margin-top: 3px;
 }
 .it-create-steps {

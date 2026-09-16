@@ -245,7 +245,10 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside))
         ></span>
         <span v-if="selectedOption" class="truncate text-xs text-[#2A3547]">
           {{ selectedOption[labelKey] }}
-          <span v-if="secondaryLabelKey && selectedOption[secondaryLabelKey]" class="font-mono text-[10px] text-[#66728d]">
+          <span
+            v-if="secondaryLabelKey && selectedOption[secondaryLabelKey]"
+            class="font-mono text-[10px] text-[#66728d]"
+          >
             ({{ selectedOption[secondaryLabelKey] }})
           </span>
         </span>
@@ -316,7 +319,8 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside))
             class="flex cursor-pointer items-center justify-between rounded-lg px-2.5 py-1.5 text-xs font-medium text-[#2A3547] hover:bg-[#F8FAFC] transition-colors"
             :class="{
               'bg-[#ECF2FF] font-bold text-[#333333]': option[valueKey] === modelValue,
-              'ring-1 ring-inset ring-[#0A51B0]/30': activeIndex === index && option[valueKey] !== modelValue,
+              'ring-1 ring-inset ring-[#0A51B0]/30':
+                activeIndex === index && option[valueKey] !== modelValue,
             }"
             @mouseenter="activeIndex = index"
             @mousedown.prevent

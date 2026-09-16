@@ -427,8 +427,8 @@ onMounted(() => {
           <h3 class="text-sm font-bold text-rose-900">Reset &amp; Kosongkan Database</h3>
           <p class="text-xs text-rose-700/90 leading-relaxed max-w-2xl">
             Menghapus secara permanen seluruh data aset TI, aset GA, aset OPS, tiket helpdesk,
-            karyawan, dan log aktivitas. Akun Superadmin yang dikonfigurasi
-            administrator pada backend akan diprovisi kembali secara otomatis.
+            karyawan, dan log aktivitas. Akun Superadmin yang dikonfigurasi administrator pada
+            backend akan diprovisi kembali secara otomatis.
           </p>
         </div>
         <button
@@ -458,7 +458,9 @@ onMounted(() => {
               : 'text-[#5F7089] hover:bg-[#F8FAFC] hover:text-[#333333]'
           "
         >
-          <span aria-hidden="true" class="material-symbols-outlined text-[18px] text-[#5F7089]">bolt</span>
+          <span aria-hidden="true" class="material-symbols-outlined text-[18px] text-[#5F7089]"
+            >bolt</span
+          >
           <span>Ekspor Cepat per Tabel</span>
         </button>
 
@@ -473,7 +475,9 @@ onMounted(() => {
               : 'text-[#5F7089] hover:bg-[#F8FAFC] hover:text-[#333333]'
           "
         >
-          <span aria-hidden="true" class="material-symbols-outlined text-[18px] text-[#5F7089]">tune</span>
+          <span aria-hidden="true" class="material-symbols-outlined text-[18px] text-[#5F7089]"
+            >tune</span
+          >
           <span>Ekspor Kustom</span>
           <span class="rounded-md bg-[#EFF6FF] px-1.5 py-0.2 text-[10px] font-medium text-[#333333]"
             >Advanced</span
@@ -491,7 +495,9 @@ onMounted(() => {
               : 'text-[#5F7089] hover:bg-[#F8FAFC] hover:text-[#333333]'
           "
         >
-          <span aria-hidden="true" class="material-symbols-outlined text-[18px] text-[#5F7089]">bookmark</span>
+          <span aria-hidden="true" class="material-symbols-outlined text-[18px] text-[#5F7089]"
+            >bookmark</span
+          >
           <span>Template Laporan</span>
         </button>
       </div>
@@ -527,7 +533,9 @@ onMounted(() => {
               <div
                 class="flex h-8 w-8 items-center justify-center rounded-lg bg-[#F8FAFC] border border-[#E2E8F0] text-[#475569] group-hover:text-[#333333] group-hover:border-[#BFDBFE] transition-colors"
               >
-                <span aria-hidden="true" class="material-symbols-outlined text-[18px]">{{ table.icon }}</span>
+                <span aria-hidden="true" class="material-symbols-outlined text-[18px]">{{
+                  table.icon
+                }}</span>
               </div>
               <span
                 class="rounded-full bg-[#F1F5F9] px-2 py-0.5 font-mono text-[11px] font-semibold text-[#5F7089]"
@@ -626,7 +634,8 @@ onMounted(() => {
               "
             >
               <span
-                aria-hidden="true" class="material-symbols-outlined text-[18px] mb-1"
+                aria-hidden="true"
+                class="material-symbols-outlined text-[18px] mb-1"
                 :class="selectedTableKey === tbl.tableName ? 'text-[#333333]' : 'text-[#5F7089]'"
               >
                 {{ tbl.icon }}
@@ -761,7 +770,8 @@ onMounted(() => {
               >
               <div class="relative">
                 <span
-                  aria-hidden="true" class="material-symbols-outlined absolute left-3 top-2 text-[18px] text-[#687281]"
+                  aria-hidden="true"
+                  class="material-symbols-outlined absolute left-3 top-2 text-[18px] text-[#687281]"
                   >search</span
                 >
                 <input
@@ -836,7 +846,9 @@ onMounted(() => {
                 "
               >
                 <div class="flex items-center gap-1.5">
-                  <span aria-hidden="true" class="material-symbols-outlined text-[18px]">table_chart</span>
+                  <span aria-hidden="true" class="material-symbols-outlined text-[18px]"
+                    >table_chart</span
+                  >
                   <span class="text-xs">Excel</span>
                 </div>
                 <input
@@ -871,7 +883,9 @@ onMounted(() => {
                 "
               >
                 <div class="flex items-center gap-1.5">
-                  <span aria-hidden="true" class="material-symbols-outlined text-[18px]">picture_as_pdf</span>
+                  <span aria-hidden="true" class="material-symbols-outlined text-[18px]"
+                    >picture_as_pdf</span
+                  >
                   <span class="text-xs">PDF</span>
                 </div>
                 <input type="radio" v-model="exportFormat" value="pdf" class="accent-rose-600" />
@@ -903,7 +917,9 @@ onMounted(() => {
               :disabled="isPreviewing || selectedColumns.length === 0"
               class="w-full flex items-center justify-center gap-2 rounded-xl border border-[#E2E8F0] bg-white py-2.5 text-xs font-semibold text-[#334155] hover:bg-[#F8FAFC] hover:text-[#333333] transition-all cursor-pointer disabled:opacity-50"
             >
-              <span aria-hidden="true" class="material-symbols-outlined text-[16px]">visibility</span>
+              <span aria-hidden="true" class="material-symbols-outlined text-[16px]"
+                >visibility</span
+              >
               <span>{{ isPreviewing ? 'Memuat Pratinjau...' : 'Pratinjau Data (10 Baris)' }}</span>
             </button>
 
@@ -932,7 +948,9 @@ onMounted(() => {
             <div
               class="flex h-8 w-8 items-center justify-center rounded-lg bg-[#EFF6FF] text-[#333333]"
             >
-              <span aria-hidden="true" class="material-symbols-outlined text-[18px]">devices_other</span>
+              <span aria-hidden="true" class="material-symbols-outlined text-[18px]"
+                >devices_other</span
+              >
             </div>
             <h3 class="font-bold text-[#333333] text-sm">Laporan Aset IT Aktif</h3>
             <p class="text-xs text-[#5F7089] leading-relaxed">
@@ -1104,7 +1122,9 @@ onMounted(() => {
         <div
           class="reset-impact rounded-xl bg-rose-50 p-4 border border-rose-200 flex items-start gap-3"
         >
-          <span aria-hidden="true" class="material-symbols-outlined text-rose-600 text-[22px] shrink-0 mt-0.5"
+          <span
+            aria-hidden="true"
+            class="material-symbols-outlined text-rose-600 text-[22px] shrink-0 mt-0.5"
             >error</span
           >
           <div class="text-xs text-rose-900 space-y-1">
@@ -1115,8 +1135,8 @@ onMounted(() => {
               permanen.
             </p>
             <p class="reset-after-note text-[11px] text-rose-700">
-              Setelah reset, akun Superadmin dari konfigurasi backend dan unit helpdesk default
-              akan disiapkan kembali secara otomatis. Password tidak ditampilkan di aplikasi.
+              Setelah reset, akun Superadmin dari konfigurasi backend dan unit helpdesk default akan
+              disiapkan kembali secara otomatis. Password tidak ditampilkan di aplikasi.
             </p>
           </div>
         </div>
@@ -1164,10 +1184,15 @@ onMounted(() => {
             @click="handleConfirmResetDatabase"
             class="inline-flex items-center gap-1.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white px-4 py-2 text-xs font-bold transition-all shadow-xs disabled:opacity-50 disabled:pointer-events-none cursor-pointer"
           >
-            <span aria-hidden="true" v-if="isResetting" class="material-symbols-outlined text-[16px] animate-spin"
+            <span
+              aria-hidden="true"
+              v-if="isResetting"
+              class="material-symbols-outlined text-[16px] animate-spin"
               >progress_activity</span
             >
-            <span aria-hidden="true" v-else class="material-symbols-outlined text-[16px]">restart_alt</span>
+            <span aria-hidden="true" v-else class="material-symbols-outlined text-[16px]"
+              >restart_alt</span
+            >
             <span>{{ isResetting ? 'Me-reset...' : 'Reset database' }}</span>
           </button>
         </div>

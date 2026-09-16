@@ -105,7 +105,6 @@ function downloadTemplate() {
     },
   ]
 
-
   const wb = XLSX.utils.book_new()
   const wsKaryawan = XLSX.utils.json_to_sheet(sampleKaryawan)
 
@@ -259,12 +258,7 @@ async function submitImport() {
 </script>
 
 <template>
-  <AppModal
-    :is-open="isOpen"
-    title="Import Data Karyawan (Excel)"
-    size="xl"
-    @close="handleClose"
-  >
+  <AppModal :is-open="isOpen" title="Import Data Karyawan (Excel)" size="xl" @close="handleClose">
     <div class="space-y-4">
       <!-- Alert Notifikasi -->
       <div
@@ -656,7 +650,9 @@ async function submitImport() {
             v-if="isSubmitting"
             class="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"
           ></span>
-          <span aria-hidden="true" v-else class="material-symbols-outlined text-[16px]">file_upload</span>
+          <span aria-hidden="true" v-else class="material-symbols-outlined text-[16px]"
+            >file_upload</span
+          >
           <span>{{
             isSubmitting
               ? 'Memproses Import...'

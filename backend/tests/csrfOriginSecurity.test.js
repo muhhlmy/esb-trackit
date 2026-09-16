@@ -55,6 +55,7 @@ test('CSRF & Origin Security Suite (DEFECT-03 / SEC-07)', async (t) => {
   let testUserId = null
   let testSessionId = null
   let validToken = null
+  let testAssetHostname = null
 
   t.before(async () => {
     await ensureUserSessionsTable(pool)
@@ -84,8 +85,15 @@ test('CSRF & Origin Security Suite (DEFECT-03 / SEC-07)', async (t) => {
   })
 
   t.after(async () => {
+    if (testAssetHostname) {
+      // Hapus jejak data yang memang dibuat oleh test ini agar database
+      // development tidak menampilkan aktor/riwayat uji pada UI aplikasi.
+      await pool.query('DELETE FROM log_riwayat_aset WHERE label_aset = $1', [testAssetHostname]).catch(() => {})
+      await pool.query('UPDATE aset_ti SET deleted_at = CURRENT_TIMESTAMP WHERE hostname = $1', [testAssetHostname]).catch(() => {})
+    }
     if (testUserId) {
       await pool.query('DELETE FROM user_sessions WHERE user_id = $1', [testUserId]).catch(() => {})
+      await pool.query('DELETE FROM system_audit_logs WHERE actor_user_id = $1', [testUserId]).catch(() => {})
       await pool.query('UPDATE users SET deleted_at = CURRENT_TIMESTAMP WHERE id = $1', [testUserId]).catch(() => {})
     }
     if (server) {
@@ -94,6 +102,7 @@ test('CSRF & Origin Security Suite (DEFECT-03 / SEC-07)', async (t) => {
   })
 
   await t.test('TEST 1 — POST mutation with trusted origin succeeds', async () => {
+    testAssetHostname = `HST-${Date.now().toString().slice(-8)}`
     const res = await makeRequest(
       server,
       '/api/assets',
@@ -103,7 +112,7 @@ test('CSRF & Origin Security Suite (DEFECT-03 / SEC-07)', async (t) => {
         Origin: 'http://localhost:5173',
       },
       {
-        hostname: `HST-${Date.now().toString().slice(-8)}`,
+        hostname: testAssetHostname,
         serial_number: `SN-${Date.now().toString().slice(-8)}`,
         status: 'Stock',
         kondisi: 'Normal',

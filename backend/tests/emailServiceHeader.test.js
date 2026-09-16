@@ -26,7 +26,7 @@ test('OTP email requires complete SMTP configuration', () => {
 
 test('renderTicketEmailHtml renders ESB Logo Only logo with cid:esbLogoOnly vertically centered in header', () => {
   const pngPath = getEsbLogoPngPath()
-  assert.ok(pngPath.endsWith('esb_logo_only.png') || pngPath.endsWith('ESB Logo Only.png'), 'PNG logo path should exist')
+  assert.ok(pngPath.endsWith('esb_logo_only.png') || pngPath.endsWith('esb-logo-only.png'), 'PNG logo path should exist')
 
   const html = renderTicketEmailHtml({
     recipientName: 'Budi',

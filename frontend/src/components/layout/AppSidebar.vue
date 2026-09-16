@@ -431,7 +431,7 @@ function closeSubmenuAndMobile() {
         title="Kembali ke Help Center"
         class="flex items-center justify-center shrink-0 hover:opacity-80 transition-opacity cursor-pointer"
       >
-        <img src="/ESB Logo Only.svg" alt="ESB Logo" class="h-6 w-8 object-contain shrink-0" />
+        <img src="/esb-logo-only.svg" alt="ESB Logo" class="h-6 w-8 object-contain shrink-0" />
         <span class="sidebar-wordmark">TrackIT</span>
       </RouterLink>
 
@@ -444,7 +444,7 @@ function closeSubmenuAndMobile() {
             class="flex h-7 w-7 items-center justify-center rounded-lg hover:bg-[#ECF2FF] transition-all cursor-pointer shrink-0"
           >
             <img
-              src="/ESB Logo Only.svg"
+              src="/esb-logo-only.svg"
               alt="ESB Logo"
               class="h-6 w-6 object-contain shrink-0 block"
             />

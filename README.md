@@ -30,19 +30,13 @@ esb-trackit/
 │   └── src/
 ├── frontend/                   # Vue SPA
 ├── e2e/                         # Playwright test
-├── docs/                        # Dokumentasi teknis
-├── esb-trackit.sql              # Snapshot schema legacy (referensi saja)
+├── docs/                        # Dokumentasi teknis, audit, deployment
 ├── package.json                 # Perintah E2E root
 └── README.md
 ```
 
 ## Database
 
-`esb-trackit.sql` adalah snapshot schema legacy tanpa data. File ini tidak
-menjadi sumber kebenaran dan tidak boleh dipakai untuk provisioning database baru.
-
-- Berisi tabel, sequence, constraint, foreign key, dan index.
-- Tidak berisi data, owner, privilege, password, token, API key, atau connection string.
 Untuk database baru, existing, maupun production, gunakan migrasi versioned.
 Jangan mencampur import dump dan penerapan migrasi pada database yang sama.
 

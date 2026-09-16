@@ -61,7 +61,7 @@ onUnmounted(() => {
   <header class="help-navbar">
     <nav class="navbar-inner" aria-label="Help Center">
       <RouterLink to="/" class="navbar-brand" aria-label="ESB TrackIT Help Center">
-        <img src="/ESB Logo Only.svg" alt="" class="brand-logo" />
+        <img src="/esb-logo-only.svg" alt="" class="brand-logo" />
         <span class="brand-wordmark"
           >TrackIT<span class="brand-mobile-caption">Help Center</span></span
         >

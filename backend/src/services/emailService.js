@@ -10,9 +10,9 @@ export function getEsbLogoPngPath() {
   try {
     const candidatePaths = [
       path.resolve(__dirname, '../assets/esb_logo_only.png'),
-      path.resolve(__dirname, '../../../../frontend/public/ESB Logo Only.png'),
-      path.resolve(process.cwd(), '../frontend/public/ESB Logo Only.png'),
-      path.resolve(process.cwd(), 'frontend/public/ESB Logo Only.png'),
+      path.resolve(__dirname, '../../../../frontend/public/esb-logo-only.png'),
+      path.resolve(process.cwd(), '../frontend/public/esb-logo-only.png'),
+      path.resolve(process.cwd(), 'frontend/public/esb-logo-only.png'),
       path.resolve(process.cwd(), 'src/assets/esb_logo_only.png'),
     ]
     for (const p of candidatePaths) {
@@ -87,7 +87,7 @@ export async function sendEmail({ to, subject, html, text, attachments = [] }) {
     const hasCid = mailAttachments.some((a) => a.cid === 'esbLogoOnly')
     if (!hasCid) {
       mailAttachments.push({
-        filename: 'ESB Logo Only.png',
+        filename: 'esb-logo-only.png',
         path: logoPngPath,
         cid: 'esbLogoOnly',
       })

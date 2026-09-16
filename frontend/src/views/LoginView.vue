@@ -291,7 +291,7 @@ const finishResetAndLogin = () => {
   <div class="login-page">
     <header class="login-header">
       <RouterLink to="/" class="login-brand" aria-label="ESB TrackIT — Pusat Bantuan">
-        <img src="/ESB Logo Only.svg" alt="" width="36" height="28" />
+        <img src="/esb-logo-only.svg" alt="" width="36" height="28" />
         <span>TrackIT</span>
       </RouterLink>
       <RouterLink to="/" class="back-help"

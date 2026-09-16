@@ -117,6 +117,9 @@ test('DEFECT-10 — Export API Implementation & Security Suite (EXP-02)', async 
 
   t.after(async () => {
     if (superadminId) {
+      await pool.query('DELETE FROM system_audit_logs WHERE actor_user_id = $1', [superadminId]).catch(() => {})
+    }
+    if (superadminId) {
       await pool.query('DELETE FROM users WHERE id = $1', [superadminId]).catch(() => {})
     }
     if (normalUserId) {
@@ -197,7 +200,30 @@ test('DEFECT-10 — Export API Implementation & Security Suite (EXP-02)', async 
     assert.equal(json.tableName, 'aset_ti')
   })
 
-  await t.test('TEST 8 — Formula injection characters (=, +, -, @) are neutralized in CSV export', () => {
+  await t.test('TEST 8 — Export dicatat pada System Audit tanpa memakai riwayat aset', async () => {
+    const res = await makeRequest(
+      server,
+      '/api/export/data',
+      { Authorization: `Bearer ${superadminToken}`, method: 'POST' },
+      { tableName: 'users', columns: ['id', 'nama'], limit: 1 },
+    )
+    assert.equal(res.status, 200)
+
+    const audit = await pool.query(
+      `SELECT action, entity_id, after_data
+       FROM system_audit_logs
+       WHERE actor_user_id = $1 AND module = 'export' AND entity_id = 'users'
+       ORDER BY id DESC
+       LIMIT 1`,
+      [superadminId],
+    )
+    assert.equal(audit.rowCount, 1)
+    assert.equal(audit.rows[0].action, 'EXPORT')
+    assert.equal(audit.rows[0].after_data.tableName, 'users')
+    assert.equal(audit.rows[0].after_data.format, 'custom')
+  })
+
+  await t.test('TEST 9 — Formula injection characters (=, +, -, @) are neutralized in CSV export', () => {
     assert.equal(escapeCsvField('=SUM(1+1)'), "'=SUM(1+1)")
     assert.equal(escapeCsvField('+123'), "'+123")
     assert.equal(escapeCsvField('-123'), "'-123")
@@ -205,7 +231,7 @@ test('DEFECT-10 — Export API Implementation & Security Suite (EXP-02)', async 
     assert.equal(escapeCsvField('Normal Text'), 'Normal Text')
   })
 
-  await t.test('TEST 9 — Non-superadmin user POST /api/export/reset-database is denied with 403', async () => {
+  await t.test('TEST 10 — Non-superadmin user POST /api/export/reset-database is denied with 403', async () => {
     const res = await makeRequest(
       server,
       '/api/export/reset-database',

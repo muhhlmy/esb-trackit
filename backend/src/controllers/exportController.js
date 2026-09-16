@@ -590,22 +590,15 @@ export async function exportTableData(req, res) {
       )
     )
 
-    // Audit Logging
-    try {
-      const auditActor = req.user?.nama || req.user?.email || 'Super Administrator'
-      await pool.query(
-        `INSERT INTO log_riwayat_aset (id_aset, label_aset, aksi, perubahan, oleh_pengguna, dibuat_pada)
-         VALUES (0, $1, $2, $3, $4, CURRENT_TIMESTAMP)`,
-        [
-          `Export ${schema.label}`,
-          'UBAH',
-          `Mengekspor ${projectedRows.length} baris data (tabel: ${schema.tableName})`,
-          auditActor
-        ]
-      )
-    } catch (logErr) {
-      console.error('[Export Audit Log Error]', logErr.message)
-    }
+    await logExportAudit(req, {
+      label: schema.label,
+      tableName: schema.tableName,
+      rowCount: projectedRows.length,
+      format: 'custom',
+      columns: selectedCols,
+      filters: { startDate: startDate || null, endDate: endDate || null, search: search || null, status: status || null },
+      isTruncated,
+    })
 
     res.json({
       success: true,
@@ -660,21 +653,36 @@ export function toCsvString(rows, columns) {
   return [headerRow, ...dataRows].join('\r\n')
 }
 
-async function logExportAudit(req, label, tableName, rowCount) {
+async function logExportAudit(req, {
+  label,
+  tableName,
+  rowCount,
+  format,
+  columns,
+  filters,
+  isTruncated = false,
+}) {
   try {
-    const auditActor = req.user?.nama || req.user?.email || 'Super Administrator'
-    await pool.query(
-      `INSERT INTO log_riwayat_aset (id_aset, label_aset, aksi, perubahan, oleh_pengguna, dibuat_pada)
-       VALUES (0, $1, $2, $3, $4, CURRENT_TIMESTAMP)`,
-      [
-        `Export ${label}`,
-        'UBAH',
-        `Mengekspor ${rowCount} baris data (tabel: ${tableName})`,
-        auditActor
-      ]
-    )
+    await recordSystemAudit(req, {
+      module: 'export',
+      action: 'EXPORT',
+      entityType: 'export',
+      entityId: tableName,
+      entityLabel: label,
+      summary: `Mengekspor ${rowCount} baris data ${label} dalam format ${String(format).toUpperCase()}.`,
+      after: {
+        tableName,
+        format,
+        rowCount,
+        columns: columns || null,
+        filters: filters || null,
+        isTruncated,
+      },
+    })
   } catch (logErr) {
-    console.error('[Export Audit Log Error]', logErr.message)
+    // Audit tidak boleh menggagalkan proses unduh, namun jangan pernah diamkan
+    // kegagalan pencatatan karena ekspor memuat data sensitif.
+    console.error('[System Audit] Gagal mencatat ekspor:', logErr.message)
   }
 }
 
@@ -730,7 +738,13 @@ export async function exportAssetsHandler(req, res) {
       )
     )
 
-    await logExportAudit(req, 'Aset IT', 'aset_ti', projectedRows.length)
+    await logExportAudit(req, {
+      label: 'Aset IT',
+      tableName: 'aset_ti',
+      rowCount: projectedRows.length,
+      format,
+      columns: selectedCols,
+    })
 
     const todayStr = new Date().toISOString().slice(0, 10)
 
@@ -775,7 +789,13 @@ export async function exportUsersHandler(req, res) {
       Object.fromEntries(selectedCols.map((column) => [column, row[column]]))
     )
 
-    await logExportAudit(req, 'Pengguna Sistem', 'users', projectedRows.length)
+    await logExportAudit(req, {
+      label: 'Pengguna Sistem',
+      tableName: 'users',
+      rowCount: projectedRows.length,
+      format,
+      columns: selectedCols,
+    })
 
     const todayStr = new Date().toISOString().slice(0, 10)
 
@@ -828,7 +848,13 @@ export async function exportTicketsHandler(req, res) {
       Object.fromEntries(selectedCols.map((column) => [column, row[column]]))
     )
 
-    await logExportAudit(req, 'Tiket Kendala IT', 'tickets', projectedRows.length)
+    await logExportAudit(req, {
+      label: 'Tiket Kendala IT',
+      tableName: 'tickets',
+      rowCount: projectedRows.length,
+      format,
+      columns: selectedCols,
+    })
 
     const todayStr = new Date().toISOString().slice(0, 10)
 

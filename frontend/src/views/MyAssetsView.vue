@@ -6,7 +6,7 @@ import { formatStatusPill } from '../utils/assetStatus.js'
 import { normalizeLocation } from '../utils/locationNormalizer.js'
 import AppModal from '../components/ui/AppModal.vue'
 import AppBadge from '../components/ui/AppBadge.vue'
-import AppPagination from '../components/ui/AppPagination.vue'
+import MyAssetsEmployeeList from '../components/assets/MyAssetsEmployeeList.vue'
 import CustomSelect from '../components/ui/CustomSelect.vue'
 import FilterModal from '../components/ui/FilterModal.vue'
 import SkeletonTable from '../components/ui/skeleton/SkeletonTable.vue'
@@ -559,418 +559,37 @@ onMounted(() => {
   }
 })
 </script>
-
 <template>
   <div
     class="employee-assets-page flex min-w-0 flex-col gap-5"
     :data-testid="!isLoading ? 'page-ready' : undefined"
   >
-    <!-- ═══════════════════════════════════════════════════════════════════════
-         LEVEL 1 — MAIN "ASET KARYAWAN" PAGE
-    ════════════════════════════════════════════════════════════════════════ -->
-    <template v-if="currentLevel === 1">
-      <!-- Enterprise Header & Title -->
-      <div
-        class="employee-assets-heading flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between"
-      >
-        <div>
-          <h1 class="text-lg sm:text-xl font-bold tracking-tight text-[#333333]">Aset Karyawan</h1>
-          <p class="mt-0.5 text-xs text-[#5F7089]">
-            Karyawan yang sedang memegang aset IT perusahaan
-          </p>
-        </div>
-      </div>
+    <MyAssetsEmployeeList
+      v-if="currentLevel === 1 && canBrowseOtherAssets"
+      :filtered-employees="filteredEmployees"
+      :paginated-employees="paginatedEmployees"
+      :employees-with-assets="employeesWithAssets"
+      :total-employees-holding-assets="totalEmployeesHoldingAssets"
+      :total-assigned-assets-count="totalAssignedAssetsCount"
+      :recently-assigned-count="recentlyAssignedCount"
+      :employee-search="employeeSearch"
+      :filter-departemen="filterDepartemen"
+      :filter-lokasi="filterLokasi"
+      :departemen-filter-options="departemenFilterOptions"
+      :lokasi-filter-options="lokasiFilterOptions"
+      :current-page-employees="currentPageEmployees"
+      :items-per-page="itemsPerPage"
+      :is-loading-employees="isLoadingEmployees"
+      :employee-error="employeeError"
+      @update:employee-search="employeeSearch = $event"
+      @update:filter-departemen="filterDepartemen = $event"
+      @update:filter-lokasi="filterLokasi = $event"
+      @update:current-page-employees="currentPageEmployees = $event"
+      @select-employee="goToLevel2"
+      @refresh="fetchEmployees"
+    />
 
-      <div class="employee-kpis">
-        <div
-          v-for="(item, index) in [
-            {
-              label: 'Karyawan dengan aset',
-              value: totalEmployeesHoldingAssets,
-              caption: 'Pemegang aktif',
-              icon: 'badge',
-            },
-            {
-              label: 'Aset ditugaskan',
-              value: totalAssignedAssetsCount,
-              caption: 'Unit digunakan',
-              icon: 'devices',
-            },
-            {
-              label: 'Penugasan baru',
-              value: recentlyAssignedCount,
-              caption: '30 hari terakhir',
-              icon: 'assignment_turned_in',
-            },
-          ]"
-          :key="item.label"
-          class="employee-kpi"
-          :class="{ 'employee-kpi-primary': index === 0 }"
-        >
-          <div class="employee-kpi-label">
-            {{ item.label
-            }}<span class="material-symbols-outlined" aria-hidden="true">{{ item.icon }}</span>
-          </div>
-          <strong>{{ item.value }}</strong
-          ><span class="employee-kpi-caption">{{ item.caption }}</span>
-        </div>
-      </div>
-
-      <!-- Toolbar: Elegant Single Search & Compact Filters -->
-      <div
-        v-if="canBrowseOtherAssets"
-        class="employee-assets-toolbar grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2.5 rounded-xl border border-[#E2E8F0] bg-white p-3 shadow-2xs"
-      >
-        <div class="relative h-9 w-full sm:flex-1 sm:min-w-[200px]">
-          <label for="emp-search" class="sr-only">Cari karyawan dengan aset</label>
-          <span
-            aria-hidden="true"
-            class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[18px] text-[#687281] pointer-events-none"
-            >search</span
-          >
-          <input
-            id="emp-search"
-            v-model="employeeSearch"
-            type="text"
-            placeholder="Cari nama karyawan, NIK, atau departemen..."
-            class="h-full w-full rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] pl-9 pr-8 text-xs text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:bg-white focus:outline-none transition-all"
-          />
-          <!-- Inline Clear Button -->
-          <button
-            v-if="employeeSearch"
-            type="button"
-            @click="employeeSearch = ''"
-            aria-label="Bersihkan pencarian"
-            class="absolute right-2 top-1/2 -translate-y-1/2 flex h-5 w-5 items-center justify-center rounded-full text-[#687281] hover:bg-[#F1F5F9] hover:text-[#333333] transition-all cursor-pointer touch-manipulation"
-            title="Bersihkan"
-          >
-            <span aria-hidden="true" class="material-symbols-outlined text-[15px]">close</span>
-          </button>
-        </div>
-
-        <button
-          type="button"
-          @click="showFilterModal = true"
-          class="h-9 shrink-0 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-semibold text-[#5F7089] hover:bg-white"
-        >
-          <span aria-hidden="true" class="material-symbols-outlined mr-1 align-middle text-[16px]"
-            >filter_alt</span
-          >Filter
-        </button>
-      </div>
-
-      <!-- Main Hybrid Employee Table/List -->
-      <div
-        class="employee-list rounded-xl border border-[#E2E8F0] bg-white shadow-2xs overflow-hidden"
-      >
-        <!-- Loading State -->
-        <div v-if="isLoadingEmployees" aria-busy="true">
-          <SkeletonTable preset="employees" :rows="5" />
-        </div>
-
-        <!-- Error State -->
-        <div v-else-if="employeeError" class="p-6 text-center text-rose-600 text-xs">
-          <p class="font-semibold">{{ employeeError }}</p>
-          <button
-            type="button"
-            @click="fetchEmployees"
-            class="mt-2 font-bold underline cursor-pointer"
-          >
-            Coba muat ulang
-          </button>
-        </div>
-
-        <!-- Empty State -->
-        <div v-else-if="filteredEmployees.length === 0" class="p-12 text-center text-[#5F7089]">
-          <span aria-hidden="true" class="material-symbols-outlined text-[36px] text-[#CBD5E1]"
-            >person_search</span
-          >
-          <h3 class="mt-2 font-semibold text-sm text-[#333333]">
-            Tidak Ada Karyawan Memegang Aset
-          </h3>
-          <p class="text-xs text-[#5F7089] mt-1 max-w-sm mx-auto">
-            Tidak ditemukan karyawan yang sedang memegang aset IT sesuai kriteria pencarian.
-          </p>
-        </div>
-
-        <!-- Data Presentation (Responsive: Desktop Table >= 768px, Mobile Cards < 768px) -->
-        <div v-else class="w-full max-w-full">
-          <!-- Desktop Table (>= 768px / hidden xl:block) -->
-          <div class="hidden xl:block w-full max-w-full overflow-hidden">
-            <table class="w-full max-w-full text-left border-collapse table-fixed">
-              <colgroup>
-                <col class="w-[27%]" />
-                <col class="w-[21%]" />
-                <col class="w-[14%]" />
-                <col class="w-[10%]" />
-                <col class="w-[20%]" />
-                <col class="w-[8%]" />
-              </colgroup>
-              <thead>
-                <tr
-                  class="border-b border-[#E2E8F0] bg-[#F8FAFC] text-[11px] font-semibold text-[#5F7089] uppercase tracking-wider select-none whitespace-nowrap"
-                >
-                  <th class="py-3 pl-4 pr-3 text-left whitespace-nowrap">Karyawan</th>
-                  <th class="py-3 px-3 text-left whitespace-nowrap">Departemen & Lokasi</th>
-                  <th class="py-3 px-3 text-left whitespace-nowrap">Kategori Aset</th>
-                  <th class="py-3 px-2 text-center whitespace-nowrap">Total Aset</th>
-                  <th class="py-3 px-3 text-center whitespace-nowrap">Penugasan Terakhir</th>
-                  <th class="py-3 pr-4 pl-2 text-center whitespace-nowrap">Detail</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-[#F1F5F9] text-xs">
-                <tr
-                  v-for="(employee, idx) in paginatedEmployees"
-                  :key="employee.id_karyawan || employee.nik"
-                  @click="goToLevel2(employee)"
-                  class="group hover:bg-[#F8FAFC] transition-colors duration-150 cursor-pointer select-none"
-                >
-                  <!-- Avatar & Employee Info -->
-                  <td class="py-3.5 pl-4 pr-3 overflow-hidden">
-                    <div class="flex items-center gap-2.5 min-w-0">
-                      <div
-                        class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br text-[11px] font-bold text-white shadow-2xs"
-                        :class="getAvatarGradient(idx)"
-                      >
-                        {{ getInitials(employee.nama_karyawan) }}
-                      </div>
-                      <div class="flex flex-col min-w-0">
-                        <span
-                          class="text-xs font-semibold text-[#333333] group-hover:text-[#333333] transition-colors truncate block"
-                          :title="employee.nama_karyawan"
-                        >
-                          {{ employee.nama_karyawan }}
-                        </span>
-                        <span
-                          class="font-mono text-[11px] text-[#5F7089] truncate block"
-                          :title="`NIK: ${employee.nik}`"
-                          >NIK: {{ employee.nik }}</span
-                        >
-                      </div>
-                    </div>
-                  </td>
-
-                  <!-- Departemen & Lokasi -->
-                  <td class="py-3.5 px-3 overflow-hidden">
-                    <div class="flex flex-col min-w-0">
-                      <span
-                        class="font-semibold text-[#333333] truncate block"
-                        :title="employee.departemen || '—'"
-                        >{{ employee.departemen || '—' }}</span
-                      >
-                      <span
-                        class="text-[11px] text-[#5F7089] flex items-center gap-1 truncate mt-0.5"
-                        :title="normalizeLocation(employee.lokasi_kerja) || '—'"
-                      >
-                        <span
-                          aria-hidden="true"
-                          class="material-symbols-outlined text-[13px] text-[#687281] shrink-0"
-                          >location_on</span
-                        >
-                        <span class="truncate block">{{
-                          normalizeLocation(employee.lokasi_kerja) || '—'
-                        }}</span>
-                      </span>
-                    </div>
-                  </td>
-
-                  <!-- Asset Type Chips -->
-                  <td class="py-3.5 px-3 overflow-hidden">
-                    <div class="flex items-center gap-1 min-w-0 overflow-hidden">
-                      <template v-if="employee.asset_types && employee.asset_types.length > 0">
-                        <span
-                          v-for="tipe in employee.asset_types.slice(0, 2)"
-                          :key="tipe"
-                          class="inline-flex items-center gap-1 rounded-md bg-[#F1F5F9] px-1.5 py-0.5 text-[10px] font-medium text-[#475569] border border-[#E2E8F0] shrink min-w-0 overflow-hidden"
-                        >
-                          <span
-                            aria-hidden="true"
-                            class="material-symbols-outlined text-[12px] text-[#333333] shrink-0"
-                            >{{ getDeviceIcon(tipe) }}</span
-                          >
-                          <span class="truncate">{{ tipe }}</span>
-                        </span>
-                        <span
-                          v-if="employee.asset_types.length > 2"
-                          class="text-[10px] font-semibold text-[#687281] shrink-0"
-                        >
-                          +{{ employee.asset_types.length - 2 }}
-                        </span>
-                      </template>
-                      <span v-else class="text-[11px] text-[#687281] truncate">Aset IT</span>
-                    </div>
-                  </td>
-
-                  <!-- Total Aset Badge -->
-                  <td class="py-3.5 px-2 text-center overflow-hidden">
-                    <span
-                      class="inline-flex items-center justify-center rounded-full bg-[#EFF6FF] px-2 py-0.5 text-[11px] font-bold text-[#333333] border border-[#BFDBFE]/60 whitespace-nowrap"
-                    >
-                      {{ employee.jumlah_aset || 0 }} Aset
-                    </span>
-                  </td>
-
-                  <!-- Last Assignment Date -->
-                  <td class="py-3.5 px-4 text-[#5F7089] overflow-hidden text-center">
-                    <span
-                      class="text-xs font-medium truncate block"
-                      :title="formatDate(employee.last_assignment_date)"
-                      >{{ formatDate(employee.last_assignment_date) }}</span
-                    >
-                  </td>
-
-                  <!-- Action Chevron -->
-                  <td class="py-3.5 pr-5 pl-4 text-center overflow-hidden">
-                    <span
-                      aria-hidden="true"
-                      class="material-symbols-outlined text-[18px] text-[#687281] group-hover:text-[#333333] group-hover:translate-x-0.5 transition-all inline-block"
-                      >chevron_right</span
-                    >
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <!-- Mobile Card List (< 768px / xl:hidden) -->
-          <div class="xl:hidden divide-y divide-[#F1F5F9]">
-            <div
-              v-for="(employee, idx) in paginatedEmployees"
-              :key="'mob-' + (employee.id_karyawan || employee.nik)"
-              @click="goToLevel2(employee)"
-              class="p-3.5 hover:bg-[#F8FAFC] active:bg-[#F1F5F9] transition-colors cursor-pointer select-none"
-            >
-              <!-- Card Header: Avatar, Name, NIK, Total Aset Badge & Chevron -->
-              <div class="flex items-center justify-between gap-2.5">
-                <div class="flex items-center gap-2.5 min-w-0 flex-1">
-                  <div
-                    class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br text-xs font-bold text-white shadow-2xs"
-                    :class="getAvatarGradient(idx)"
-                  >
-                    {{ getInitials(employee.nama_karyawan) }}
-                  </div>
-                  <div class="flex flex-col min-w-0 flex-1">
-                    <span class="text-[13.5px] font-bold text-[#333333] truncate block">
-                      {{ employee.nama_karyawan }}
-                    </span>
-                    <span class="font-mono text-[11px] text-[#5F7089] truncate block">
-                      NIK: {{ employee.nik }}
-                    </span>
-                  </div>
-                </div>
-
-                <div class="flex items-center gap-1.5 shrink-0">
-                  <span
-                    class="inline-flex items-center justify-center rounded-full bg-[#EFF6FF] px-2 py-0.5 text-[11px] font-bold text-[#333333] border border-[#BFDBFE]/60 whitespace-nowrap"
-                  >
-                    {{ employee.jumlah_aset || 0 }} Aset
-                  </span>
-                  <span
-                    aria-hidden="true"
-                    class="material-symbols-outlined text-[18px] text-[#687281]"
-                    >chevron_right</span
-                  >
-                </div>
-              </div>
-
-              <!-- Subtle Divider -->
-              <div class="border-t border-[#F1F5F9] my-2"></div>
-
-              <!-- 2x2 Metadata Grid -->
-              <div class="grid grid-cols-2 gap-2 text-left">
-                <!-- 1. Departemen -->
-                <div class="flex flex-col min-w-0 overflow-hidden">
-                  <span class="text-[10px] font-semibold uppercase text-[#687281] tracking-wider"
-                    >Departemen</span
-                  >
-                  <span
-                    class="text-[12px] font-semibold text-[#333333] mt-0.5 truncate block"
-                    :title="employee.departemen || '—'"
-                  >
-                    {{ employee.departemen || '—' }}
-                  </span>
-                </div>
-
-                <!-- 2. Lokasi -->
-                <div class="flex flex-col min-w-0 overflow-hidden">
-                  <span class="text-[10px] font-semibold uppercase text-[#687281] tracking-wider"
-                    >Lokasi</span
-                  >
-                  <span
-                    class="text-[12px] font-normal text-[#333333] mt-0.5 truncate flex items-center gap-1"
-                    :title="normalizeLocation(employee.lokasi_kerja) || '—'"
-                  >
-                    <span
-                      aria-hidden="true"
-                      class="material-symbols-outlined text-[12px] text-[#687281] shrink-0"
-                      >location_on</span
-                    >
-                    <span class="truncate">{{
-                      normalizeLocation(employee.lokasi_kerja) || '—'
-                    }}</span>
-                  </span>
-                </div>
-
-                <!-- 3. Kategori Aset -->
-                <div class="flex flex-col min-w-0 overflow-hidden">
-                  <span class="text-[10px] font-semibold uppercase text-[#687281] tracking-wider"
-                    >Kategori Aset</span
-                  >
-                  <div class="flex items-center gap-1 min-w-0 overflow-hidden mt-0.5">
-                    <template v-if="employee.asset_types && employee.asset_types.length > 0">
-                      <span
-                        v-for="tipe in employee.asset_types.slice(0, 2)"
-                        :key="'mob-tip-' + tipe"
-                        class="inline-flex items-center gap-1 rounded-md bg-[#F1F5F9] px-1.5 py-0.5 text-[10px] font-medium text-[#475569] border border-[#E2E8F0] shrink min-w-0 overflow-hidden"
-                      >
-                        <span
-                          aria-hidden="true"
-                          class="material-symbols-outlined text-[12px] text-[#333333] shrink-0"
-                          >{{ getDeviceIcon(tipe) }}</span
-                        >
-                        <span class="truncate">{{ tipe }}</span>
-                      </span>
-                      <span
-                        v-if="employee.asset_types.length > 2"
-                        class="text-[10px] font-semibold text-[#687281] shrink-0"
-                      >
-                        +{{ employee.asset_types.length - 2 }}
-                      </span>
-                    </template>
-                    <span v-else class="text-[11px] text-[#687281] truncate">Aset IT</span>
-                  </div>
-                </div>
-
-                <!-- 4. Penugasan Terakhir -->
-                <div class="flex flex-col min-w-0 overflow-hidden">
-                  <span class="text-[10px] font-semibold uppercase text-[#687281] tracking-wider"
-                    >Penugasan Terakhir</span
-                  >
-                  <span
-                    class="text-[12px] font-medium text-[#5F7089] mt-0.5 truncate block"
-                    :title="formatDate(employee.last_assignment_date)"
-                  >
-                    {{ formatDate(employee.last_assignment_date) }}
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <AppPagination
-          v-if="!isLoadingEmployees && !employeeError && employeesWithAssets.length > 0"
-          v-model:currentPage="currentPageEmployees"
-          :total-items="filteredEmployees.length"
-          :items-per-page="itemsPerPage"
-        />
-      </div>
-    </template>
-
-    <!-- ═══════════════════════════════════════════════════════════════════════
-         LEVEL 2 — EMPLOYEE ASSET DETAIL
-    ════════════════════════════════════════════════════════════════════════ -->
-    <template v-else-if="currentLevel === 2 && selectedEmployee">
+<template v-else-if="currentLevel === 2 && selectedEmployee">
       <!-- Interactive Breadcrumb & Back Navigation -->
       <div class="flex items-center justify-between gap-2.5 min-w-0">
         <nav
@@ -1298,10 +917,7 @@ onMounted(() => {
       </div>
     </template>
 
-    <!-- ═══════════════════════════════════════════════════════════════════════
-         LEVEL 3 — ASSET DETAIL + AUDIT HISTORY
-    ════════════════════════════════════════════════════════════════════════ -->
-    <template v-else-if="currentLevel === 3 && selectedAsset && selectedEmployee">
+<template v-else-if="currentLevel === 3 && selectedAsset && selectedEmployee">
       <!-- Breadcrumb Navigation -->
       <div class="flex items-center justify-between gap-2.5 min-w-0">
         <!-- Desktop Breadcrumb (>= sm) -->
@@ -1607,7 +1223,7 @@ onMounted(() => {
       </div>
     </template>
 
-    <FilterModal
+<FilterModal
       :is-open="showFilterModal"
       title="Filter Aset Karyawan"
       @close="showFilterModal = false"
@@ -1633,9 +1249,8 @@ onMounted(() => {
         :block="true"
       />
     </FilterModal>
-
-    <!-- ── Modal Spesifikasi Perangkat ── -->
-    <AppModal
+<!-- ── Modal Spesifikasi Perangkat ── -->
+<AppModal
       :is-open="showSpecificationModal"
       title="Spesifikasi Perangkat"
       size="md"

@@ -25,8 +25,11 @@ Superadmin credentials:
 
 ```text
 Email    : superadmin@admin.com
-Password : admin123
+Password:[REDACTED]
 ```
+
+Kredensial superadmin bersifat rahasia. Baca dari environment variable QA_SUPERADMIN_EMAIL
+dan QA_SUPERADMIN_PASSWORD pada test environment; jangan tulis nilai literal di repositori.
 
 Use these credentials only against the authorized test environment.
 

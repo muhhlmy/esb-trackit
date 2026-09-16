@@ -13,7 +13,7 @@
 The application is a **well-architected, security-conscious Vue 3 frontend** with several genuinely strong controls (HttpOnly session cookies, centralized API layer with global 401 handling, DOMPurify sanitization of all rich-text, robust SSE realtime with backoff, OTP brute-force protection, account-enumeration-resistant forgot-password, rate limiting). 
 
 All previously identified blocking and high/medium defects have been **fully remediated and verified**:
-1. **AUTH-01 (RESOLVED):** Identified root cause in `backend/tests/passwordResetOtp.test.js` where test cleanup was overwriting `superadmin@admin.com` password to `admin123`. Updated cleanup to restore `Admin123!`. Reset password hash in DB to `Admin123!`. Verified live via `POST /api/auth/login` returning HTTP 200 OK with full superadmin session.
+1. **AUTH-01 (RESOLVED):** Identified root cause in `backend/tests/passwordResetOtp.test.js` where test cleanup was overwriting `superadmin@admin.com` password to `[REDACTED]`. Updated cleanup to restore `[REDACTED]`. Reset password hash in DB to `[REDACTED]`. Verified live via `POST /api/auth/login` returning HTTP 200 OK with full superadmin session.
 2. **SEC-01 (RESOLVED):** Decoupled IP limit (60/15m) and Account limit (10/15m) in `rateLimitMiddleware.js`. Added `clearKey()` to reset account failure counters upon successful login in `authController.js`.
 3. **SEC-02 & DEP-01 (RESOLVED):** Configured `vite.config.js` to bind to `127.0.0.1` by default, disabled source maps (`sourcemap: false`), and blocked direct serving of `package(-lock)?.json` and hidden dotfiles. Hardened production Nginx configuration in `frontend/Dockerfile`.
 4. **SEC-03 (RESOLVED):** Upgraded `xlsx` to SheetJS official release `0.20.3` via CDN tarball, eliminating CVE-2023-30533 and CVE-2024-22363 (0 high vulnerabilities in `npm audit`).
@@ -68,11 +68,11 @@ Authentication, password reset/OTP, RBAC route guarding, asset/ticket/user/emplo
 
 ## 4. AUTHENTICATION RESULTS (PHASE 2)
 
-**RESOLVED (Previously BLOCKER):** Authentication with `superadmin@admin.com` / `Admin123!` has been fully remediated and verified. Root cause: `backend/tests/passwordResetOtp.test.js` teardown was previously resetting `superadmin@admin.com` password to `admin123`. The teardown has been corrected to preserve `Admin123!`, and the password hash in the PostgreSQL database was restored to `Admin123!`. Live testing against `POST /api/auth/login` returns HTTP 200 OK with full superadmin user payload and active session cookie.
+**RESOLVED (Previously BLOCKER):** Authentication with `superadmin@admin.com` / `[REDACTED]` has been fully remediated and verified. Root cause: `backend/tests/passwordResetOtp.test.js` teardown was previously resetting `superadmin@admin.com` password to `[REDACTED]`. The teardown has been corrected to preserve `[REDACTED]`, and the password hash in the PostgreSQL database was restored to `[REDACTED]`. Live testing against `POST /api/auth/login` returns HTTP 200 OK with full superadmin user payload and active session cookie.
 
 | Test | Result |
 |---|---|
-| Valid login (`superadmin@admin.com` / `Admin123!`) | ✅ 200 OK (Session generated, role: superadmin) |
+| Valid login (`superadmin@admin.com` / `[REDACTED]`) | ✅ 200 OK (Session generated, role: superadmin) |
 | Invalid email / password | ✅ 401 (correct, generic message) |
 | Empty email/password (frontend) | ✅ Blocked before submit ("Email dan kata sandi wajib diisi.") |
 | Wrong email format (frontend + backend) | ✅ Rejected by `EMAIL_FORMAT_PATTERN` / backend format check |
@@ -279,8 +279,8 @@ Two parallel subagents (Security/Code-QA, Product/UX/A11y) were dispatched. **Bo
 - **Category:** Authentication
 - **Severity:** HIGH (test-blocking) | **Priority:** P0 | **Module:** Auth
 - **Status:** **RESOLVED**
-- **Remediation Details:** Discovered that `backend/tests/passwordResetOtp.test.js` teardown was overwriting `superadmin@admin.com`'s password hash in the database to `admin123`. Fixed the test suite cleanup to restore `Admin123!`. Re-hashed and updated the database record for `superadmin@admin.com` to `Admin123!`.
-- **Verification:** Live test with `POST http://127.0.0.1:5000/api/auth/login` using `{ email: 'superadmin@admin.com', password: 'Admin123!' }` returns HTTP 200 OK with full superadmin profile and session cookie. Re-running the 217-test backend suite leaves credentials intact.
+- **Remediation Details:** Discovered that `backend/tests/passwordResetOtp.test.js` teardown was overwriting `superadmin@admin.com`'s password hash in the database to `[REDACTED]`. Fixed the test suite cleanup to restore `[REDACTED]`. Re-hashed and updated the database record for `superadmin@admin.com` to `[REDACTED]`.
+- **Verification:** Live test with `POST http://127.0.0.1:5000/api/auth/login` using `{ email: 'superadmin@admin.com', password: '[REDACTED]' }` returns HTTP 200 OK with full superadmin profile and session cookie. Re-running the 217-test backend suite leaves credentials intact.
 
 ### FEA-01 — Collapsible sidebar menus lack `aria-expanded`/`aria-controls` (MEDIUM) — [RESOLVED]
 - **Category:** Accessibility (WCAG 4.1.2)
@@ -372,7 +372,7 @@ Two parallel subagents (Security/Code-QA, Product/UX/A11y) were dispatched. **Bo
 
 | # | Bug | Sev | Status | Resolution Summary |
 |---|---|---|---|---|
-| P0 | AUTH-01 | HIGH | **RESOLVED** | Fixed test cleanup password reset; restored `Admin123!` in DB; 200 OK verified |
+| P0 | AUTH-01 | HIGH | **RESOLVED** | Fixed test cleanup password reset; restored `[REDACTED]` in DB; 200 OK verified |
 | P1 | SEC-02 / DEP-01 | HIGH | **RESOLVED** | Bound Vite to 127.0.0.1; disabled sourcemaps; blocked dot/lock files; Nginx Docker setup |
 | P1 | SEC-01 | HIGH | **RESOLVED** | Decoupled IP & Account rate limit; clearKey on success; no NAT lockout |
 | P1 | SEC-03 | HIGH | **RESOLVED** | Upgraded `xlsx` to SheetJS 0.20.3 CDN tarball; 0 audit vulnerabilities |
@@ -386,7 +386,7 @@ Two parallel subagents (Security/Code-QA, Product/UX/A11y) were dispatched. **Bo
 
 ## 19. RELEASE BLOCKING ISSUES — RESOLUTION STATUS
 
-1. **AUTH-01 (RESOLVED):** `superadmin@admin.com` with password `Admin123!` successfully authenticates with HTTP 200 and session generation.
+1. **AUTH-01 (RESOLVED):** `superadmin@admin.com` with password `[REDACTED]` successfully authenticates with HTTP 200 and session generation.
 2. **SEC-02 / DEP-01 (RESOLVED):** Production bundle builds cleanly in 1.58s with sourcemaps disabled; dev server bound to localhost only; lockfiles protected.
 3. **SEC-01 (RESOLVED):** Account-specific throttling with success-clearing prevents office-wide NAT denial of service.
 4. **SEC-03 (RESOLVED):** SheetJS `xlsx` upgraded to 0.20.3; known CVEs completely eliminated.
@@ -398,7 +398,7 @@ All release-blocking issues have been resolved.
 ## 20. DEVELOPMENT ROADMAP — STATUS
 
 **Immediate (blockers) — COMPLETED:**
-- Superadmin credentials valid and verified (`Admin123!`).
+- Superadmin credentials valid and verified (`[REDACTED]`).
 - Production build verified with zero errors (`npm run build`).
 - Source maps stripped; dev server host restricted.
 

@@ -71,11 +71,13 @@ test('Brute-Force Lockout & Account Protection Suite (DEFECT-04 / SEC-11)', asyn
     authRateLimiter.reset()
 
     // Insert test user into database
+    const { hashPassword } = await import('../src/security/passwordService.js')
+    const testUserHash = await hashPassword(testUserPassword)
     const userRes = await pool.query(
       `INSERT INTO users (nama, email, password_hash, role, permissions, is_active)
-       VALUES ('Brute Lockout Test User', $1, '$2b$10$KUuuaQWHvErN2WNcqrJOXeRC1Ym6GRyxcIzwpmRboOSkDpOPxE/Cu', 'user', '{"assets":"read"}'::jsonb, true)
+       VALUES ('Brute Lockout Test User', $1, $2, 'user', '{"assets":"read"}'::jsonb, true)
        RETURNING id`,
-      [testUserEmail],
+      [testUserEmail, testUserHash],
     )
     testUserId = userRes.rows[0].id
 
@@ -236,14 +238,14 @@ test('Brute-Force Lockout & Account Protection Suite (DEFECT-04 / SEC-11)', asyn
     await makeRequest(server, '/api/auth/login', {}, { email: testUserEmail, password: 'Bad1' })
     await makeRequest(server, '/api/auth/login', {}, { email: testUserEmail, password: 'Bad2' })
 
-    // Successful login (password admin123 matches hash $2b$10$KUuuaQWHvErN2WNcqrJOXeRC1Ym6GRyxcIzwpmRboOSkDpOPxE/Cu)
+    // Successful login uses testUserPassword (hash computed in t.before)
     const resSuccess = await makeRequest(
       server,
       '/api/auth/login',
       {},
       {
         email: testUserEmail,
-        password: 'admin123',
+        password: testUserPassword,
       },
     )
 

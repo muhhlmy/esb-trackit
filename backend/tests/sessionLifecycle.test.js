@@ -3,6 +3,7 @@ import assert from 'node:assert/strict'
 import jwt from 'jsonwebtoken'
 import crypto from 'node:crypto'
 import { pool } from '../src/config/database.js'
+import { hashPassword } from '../src/security/passwordService.js'
 import { env } from '../src/config/env.js'
 import {
   createSession,
@@ -18,7 +19,13 @@ test('Session Lifecycle & Token Rotation Security Suite (DEFECT-01)', async (t) 
 
   let testUserId = null
   const testUserEmail = `session.test.${Date.now()}@company.com`
-  const testUserPasswordHash = '$2b$10$KUuuaQWHvErN2WNcqrJOXeRC1Ym6GRyxcIzwpmRboOSkDpOPxE/Cu' // 'Admin123!'
+  const testUserPassword = 'Session-Test-Password-9!'
+  let testUserPasswordHash = null
+
+  await t.before(async () => {
+    // Hash test arbitrary; bukan kredensial environment manapun.
+    testUserPasswordHash = await hashPassword(testUserPassword)
+  })
 
   await t.test('Setup Test User', async () => {
     const result = await pool.query(

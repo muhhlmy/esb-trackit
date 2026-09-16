@@ -17,7 +17,13 @@ function req(method, path, body, token) {
 }
 
 const results = {};
-const sa = await req('POST', '/api/auth/login', { email: 'superadmin@admin.com', password: 'admin123' });
+const QA_EMAIL = process.env.QA_SUPERADMIN_EMAIL
+const QA_PASSWORD = process.env.QA_SUPERADMIN_PASSWORD
+if (!QA_EMAIL || !QA_PASSWORD) {
+  throw new Error('QA_SUPERADMIN_EMAIL dan QA_SUPERADMIN_PASSWORD wajib di-set via environment.')
+}
+
+const sa = await req('POST', '/api/auth/login', { email: QA_EMAIL, password: QA_PASSWORD });
 const token = sa.cookie;
 if (sa.status !== 200 || !token) throw new Error('QA login did not issue an authenticated session cookie.');
 

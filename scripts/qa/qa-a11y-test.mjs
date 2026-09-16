@@ -1,6 +1,6 @@
 import { chromium } from '@playwright/test'
 
-const BASE = 'http://localhost:5173'
+const BASE = process.env.E2E_BASE_URL || 'http://localhost:5173'
 const results = []
 let browser, page
 
@@ -18,6 +18,12 @@ async function login(email, password) {
   return !page.url().includes('/login')
 }
 
+const QA_EMAIL = process.env.QA_SUPERADMIN_EMAIL
+const QA_PASSWORD = process.env.QA_SUPERADMIN_PASSWORD
+if (!QA_EMAIL || !QA_PASSWORD) {
+  throw new Error('QA_SUPERADMIN_EMAIL dan QA_SUPERADMIN_PASSWORD wajib di-set via environment.')
+}
+
 async function run() {
   browser = await chromium.launch({ headless: true })
   page = await browser.newPage()
@@ -32,7 +38,7 @@ async function run() {
 
   console.log('=== ACCESSIBILITY & PERFORMANCE TESTING ===\n')
 
-  await login('superadmin@admin.com', 'admin123')
+  await login(QA_EMAIL, QA_PASSWORD)
 
   // === PAGE LOAD PERFORMANCE ===
   console.log('--- Page Load Performance ---')
@@ -110,8 +116,8 @@ async function run() {
   log('Keyboard tab reaches second input', focused2.includes('INPUT'), focused2)
 
   // Enter key submit
-  await page.fill('#email', 'superadmin@admin.com')
-  await page.fill('#password', 'admin123')
+  await page.fill('#email', QA_EMAIL)
+  await page.fill('#password', QA_PASSWORD)
   await page.keyboard.press('Enter')
   await page.waitForTimeout(2000)
   log('Enter key submits form', !page.url().includes('/login'), page.url())

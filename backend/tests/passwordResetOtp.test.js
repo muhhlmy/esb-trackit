@@ -90,10 +90,12 @@ test('OTP Password Reset Flow', async (t) => {
 
   // Complete enrollment for the isolated user only.
   await t.test('7. Enrolled password authenticates after OTP verification', async () => {
-    const defaultHash = await hashPassword('Admin123!')
+    // Password test arbitrary untuk user isolated; bukan kredensial environment manapun.
+    const testPassword = 'Enrolled-Test-Password-9!'
+    const defaultHash = await hashPassword(testPassword)
     await pool.query('UPDATE users SET password_hash = $1 WHERE email = $2', [defaultHash, testEmail])
     const checkUser = await pool.query('SELECT password_hash FROM users WHERE email = $1', [testEmail])
-    const valid = await verifyPassword('Admin123!', checkUser.rows[0].password_hash)
+    const valid = await verifyPassword(testPassword, checkUser.rows[0].password_hash)
     assert.equal(valid, true)
   })
 })

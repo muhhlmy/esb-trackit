@@ -1,6 +1,6 @@
 import { chromium } from '@playwright/test'
 
-const BASE = 'http://localhost:5173'
+const BASE = process.env.E2E_BASE_URL || 'http://localhost:5173'
 const API = process.env.E2E_API_URL || 'http://localhost:3000'
 const results = []
 let browser, page
@@ -34,6 +34,12 @@ async function testPage(name, url) {
   }
 }
 
+const QA_EMAIL = process.env.QA_SUPERADMIN_EMAIL
+const QA_PASSWORD = process.env.QA_SUPERADMIN_PASSWORD
+if (!QA_EMAIL || !QA_PASSWORD) {
+  throw new Error('QA_SUPERADMIN_EMAIL dan QA_SUPERADMIN_PASSWORD wajib di-set via environment.')
+}
+
 async function run() {
   browser = await chromium.launch({ headless: true })
   page = await browser.newPage()
@@ -48,7 +54,7 @@ async function run() {
   console.log('\n=== LOGIN TESTS ===')
   
   // Valid login
-  const loggedIn = await login('superadmin@admin.com', 'admin123')
+  const loggedIn = await login(QA_EMAIL, QA_PASSWORD)
   log('Login with valid credentials', loggedIn, page.url())
 
   // Clear storage before invalid login test
@@ -69,7 +75,7 @@ async function run() {
   log('Empty form stays on login', page.url().includes('/login'))
 
   // Login again for remaining tests
-  await login('superadmin@admin.com', 'admin123')
+  await login(QA_EMAIL, QA_PASSWORD)
 
   // === PAGE NAVIGATION TESTS ===
   console.log('\n=== PAGE NAVIGATION ===')
@@ -120,7 +126,7 @@ async function run() {
 
   // === RESPONSIVE TESTS ===
   console.log('\n=== RESPONSIVE TESTS ===')
-  await login('superadmin@admin.com', 'admin123')
+  await login(QA_EMAIL, QA_PASSWORD)
   const viewports = [
     ['Mobile 375px', 375, 667],
     ['Tablet 768px', 768, 1024],

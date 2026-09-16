@@ -23,7 +23,7 @@ test("canonical migrations load PLpgSQL safely and detect applied checksum drift
   );
   assert.ok(
     migrations.every(
-      ({ sql }) => !/DROP TABLE|INSERT INTO users|admin123/.test(sql),
+      ({ sql }) => !/DROP TABLE|INSERT INTO users/.test(sql),
     ),
   );
 });

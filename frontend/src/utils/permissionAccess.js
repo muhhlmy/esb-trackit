@@ -71,13 +71,7 @@ export function canAccessFrontendFeature(user, featureKey) {
     user?.permissions && typeof user.permissions === 'object' && !Array.isArray(user.permissions)
       ? user.permissions
       : {}
-  const permValue =
-    perms[featureKey] !== undefined
-      ? perms[featureKey]
-      : featureKey === 'assets_ga' || featureKey === 'assets_ops'
-        ? perms.assets
-        : undefined
-  return canReadPermission(permValue)
+  return canReadPermission(perms[featureKey])
 }
 
 export function findFirstAllowedRoute(user, routeMap) {

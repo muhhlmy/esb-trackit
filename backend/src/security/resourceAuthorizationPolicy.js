@@ -86,8 +86,7 @@ export function canWriteITAsset(user, _asset) {
 export function canReadGAAsset(user, _gaAsset) {
   if (!user) return false
   if (isSuperadmin(user)) return true
-  const perm = user.permissions?.assets_ga || user.permissions?.assets
-  return hasReadPermissionLevel(perm)
+  return hasReadPermissionLevel(user.permissions?.assets_ga)
 }
 
 /**
@@ -96,8 +95,7 @@ export function canReadGAAsset(user, _gaAsset) {
 export function canWriteGAAsset(user, _gaAsset) {
   if (!user) return false
   if (isSuperadmin(user)) return true
-  const perm = user.permissions?.assets_ga || user.permissions?.assets
-  return hasWritePermissionLevel(perm)
+  return hasWritePermissionLevel(user.permissions?.assets_ga)
 }
 
 /**
@@ -106,8 +104,7 @@ export function canWriteGAAsset(user, _gaAsset) {
 export function canReadOPSAsset(user, _opsAsset) {
   if (!user) return false
   if (isSuperadmin(user)) return true
-  const perm = user.permissions?.assets_ops || user.permissions?.assets
-  return hasReadPermissionLevel(perm)
+  return hasReadPermissionLevel(user.permissions?.assets_ops)
 }
 
 /**
@@ -116,6 +113,41 @@ export function canReadOPSAsset(user, _opsAsset) {
 export function canWriteOPSAsset(user, _opsAsset) {
   if (!user) return false
   if (isSuperadmin(user)) return true
-  const perm = user.permissions?.assets_ops || user.permissions?.assets
-  return hasWritePermissionLevel(perm)
+  return hasWritePermissionLevel(user.permissions?.assets_ops)
 }
+
+/**
+ * Checks if the user is authorized to READ an Employee resource.
+ * - Superadmin: Authorized.
+ * - Admins: Authorized if holding read permissions on 'karyawan', 'assets', 'submissions', or 'my_assets'.
+ * - Regular users: Authorized.
+ */
+export function canReadEmployee(user) {
+  if (!user) return false
+  if (isSuperadmin(user)) return true
+  if (isAdmin(user)) {
+    return (
+      hasReadPermissionLevel(user.permissions?.karyawan) ||
+      hasReadPermissionLevel(user.permissions?.assets) ||
+      hasReadPermissionLevel(user.permissions?.submissions) ||
+      hasReadPermissionLevel(user.permissions?.my_assets)
+    )
+  }
+  return true
+}
+
+/**
+ * Checks if the user is authorized to WRITE (Create, Update, Delete) an Employee resource.
+ * - Superadmin: Authorized.
+ * - Admin with 'karyawan' full permission: Authorized.
+ * - Regular users: Denied.
+ */
+export function canWriteEmployee(user) {
+  if (!user) return false
+  if (isSuperadmin(user)) return true
+  if (isAdmin(user)) {
+    return hasWritePermissionLevel(user.permissions?.karyawan)
+  }
+  return false
+}
+

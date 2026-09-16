@@ -65,6 +65,18 @@ const OPERATIONAL_FEATURES = [
     desc: 'Inventaris & pengolahan data aset',
   },
   {
+    key: 'assets_ga',
+    label: 'Manajemen Aset GA',
+    icon: 'domain',
+    desc: 'Inventaris fasilitas & mebel kantor',
+  },
+  {
+    key: 'assets_ops',
+    label: 'Manajemen Aset Ops',
+    icon: 'precision_manufacturing',
+    desc: 'Inventaris mesin & operasional outlet',
+  },
+  {
     key: 'my_assets',
     label: 'Aset Saya / Karyawan',
     icon: 'badge',
@@ -141,6 +153,8 @@ function getInitials(name) {
 const defaultPermissions = () => ({
   dashboard: 'none',
   assets: 'none',
+  assets_ga: 'none',
+  assets_ops: 'none',
   my_assets: 'read_only',
   tickets: 'read_only',
   submissions: 'none',
@@ -154,6 +168,8 @@ const defaultPermissions = () => ({
 const superadminPermissions = () => ({
   dashboard: 'full',
   assets: 'full',
+  assets_ga: 'full',
+  assets_ops: 'full',
   my_assets: 'full',
   tickets: 'full',
   submissions: 'full',

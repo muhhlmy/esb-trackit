@@ -18,10 +18,7 @@ import { exportToExcel } from '../utils/exportEngine.js'
 
 const { get, post, put, del } = useApi()
 const { hasWritePermission } = useAuth()
-const canWriteKaryawan = computed(
-  () =>
-    hasWritePermission('karyawan') || hasWritePermission('assets') || hasWritePermission('users'),
-)
+const canWriteKaryawan = computed(() => hasWritePermission('karyawan'))
 
 // ── State Utama ──────────────────────────────────────────────
 const employees = ref([])
@@ -1095,7 +1092,7 @@ onMounted(() => {
           <button
             type="submit"
             form="admin-employee-form"
-            :disabled="isSubmitting"
+            :disabled="isSubmitting || !canWriteKaryawan"
             class="min-h-11 sm:min-h-0 rounded-xl bg-[#0A51B0] px-4 py-2 text-[12px] font-bold text-white shadow-md hover:bg-[#0A4391] transition-all cursor-pointer disabled:opacity-60"
           >
             {{ isSubmitting ? 'Menyimpan...' : 'Simpan Data' }}
@@ -1151,7 +1148,7 @@ onMounted(() => {
           <button
             type="button"
             @click="deleteEmployee"
-            :disabled="isSubmitting"
+            :disabled="isSubmitting || !canWriteKaryawan"
             class="min-h-11 sm:min-h-0 rounded-xl bg-rose-600 px-4 py-2 text-[12px] font-bold text-white shadow-md hover:bg-rose-700 transition-all cursor-pointer disabled:opacity-60"
           >
             {{ isSubmitting ? 'Menghapus...' : 'Ya, Hapus Karyawan' }}

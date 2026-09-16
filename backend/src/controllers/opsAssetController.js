@@ -118,6 +118,10 @@ export async function fetchOpsAsset(req, res) {
 
 export async function addOpsAsset(req, res) {
   try {
+    if (!canWriteOPSAsset(req.user, null)) {
+      return res.status(403).json({ error: "Anda tidak memiliki akses untuk menambahkan Aset OPS." });
+    }
+
     const body = req.body || {};
     const hostname = cleanText(body.hostname);
     const namaAsset = cleanText(body.nama_asset || body.nama);

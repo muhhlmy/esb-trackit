@@ -9,8 +9,8 @@ import {
 export const opsAssetRouter = Router()
 
 const requireAdmin = authorizeRoles('admin', 'super admin', 'superadmin')
-const requireOpsRead = authorizeAnyPermission(['assets_ops', 'assets'], 'read')
-const requireOpsWrite = authorizeAnyPermission(['assets_ops', 'assets'], 'write')
+const requireOpsRead = authorizePermission('assets_ops', 'read')
+const requireOpsWrite = authorizePermission('assets_ops', 'write')
 
 opsAssetRouter.use(requireAdmin)
 

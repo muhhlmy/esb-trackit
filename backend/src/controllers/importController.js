@@ -2,6 +2,7 @@ import crypto from 'node:crypto';
 import { pool, withTransaction } from "../config/database.js";
 import { createEnrollmentCredential, hashPassword, DEFAULT_USER_PASSWORD } from "../security/passwordService.js";
 import { normalizeLocation } from "../utils/locationNormalizer.js";
+import { canWriteGAAsset, canWriteOPSAsset, canWriteITAsset, canWriteEmployee } from "../security/resourceAuthorizationPolicy.js";
 
 export function cleanText(value) {
   if (value === undefined || value === null) return null;
@@ -238,6 +239,21 @@ export async function importExcelData(req, res) {
     const totalKaryawanRows = karyawanRows.length;
     const totalAssetRows = assetRows.length;
 
+    if (totalKaryawanRows > 0 && !canWriteEmployee(req.user)) {
+      return res.status(403).json({ error: 'Anda tidak memiliki izin untuk mengimpor data karyawan.' });
+    }
+    if (totalAssetRows > 0 && !canWriteITAsset(req.user)) {
+      return res.status(403).json({ error: 'Anda tidak memiliki izin untuk mengimpor data aset.' });
+    }
+    if (mode === 'replace') {
+      if (replaceScope !== 'assets' && !canWriteEmployee(req.user)) {
+        return res.status(403).json({ error: 'Anda tidak memiliki izin untuk mengganti data karyawan.' });
+      }
+      if (replaceScope !== 'employees' && !canWriteITAsset(req.user)) {
+        return res.status(403).json({ error: 'Anda tidak memiliki izin untuk mengganti data aset.' });
+      }
+    }
+
     let importedKaryawanCount = 0;
     let updatedKaryawanCount = 0;
     let createdUserCount = 0;
@@ -302,7 +318,9 @@ export async function importExcelData(req, res) {
     }
 
     // Pre-compute hash password default 1x untuk performa cepat saat bulk import
-    const defaultPasswordHash = await hashPassword(DEFAULT_USER_PASSWORD);
+    const defaultPasswordHash = DEFAULT_USER_PASSWORD
+      ? await hashPassword(DEFAULT_USER_PASSWORD)
+      : createEnrollmentCredential();
 
     // ── Phase 3: Proses Karyawan, User & Aset dalam SATU Database Transaction ──
     await withTransaction(async (client) => {
@@ -528,6 +546,12 @@ export async function importCategoryAssets(req, res) {
   const { assetType, rows } = req.body || {};
   const mode = req.body?.mode || 'append';
   if (!['ga', 'ops'].includes(assetType) || !Array.isArray(rows) || rows.length === 0) return res.status(400).json({ error: 'Tipe aset atau data import tidak valid.' });
+  if (assetType === 'ga' && !canWriteGAAsset(req.user, null)) {
+    return res.status(403).json({ error: 'Anda tidak memiliki izin untuk mengimpor Aset GA.' });
+  }
+  if (assetType === 'ops' && !canWriteOPSAsset(req.user, null)) {
+    return res.status(403).json({ error: 'Anda tidak memiliki izin untuk mengimpor Aset OPS.' });
+  }
   if (!['append', 'replace'].includes(mode)) return res.status(400).json({ error: 'Mode import tidak valid.' });
   if (mode === 'replace' && req.body?.replaceConfirmation !== 'GANTI') {
     return res.status(400).json({ error: 'Konfirmasi Replace All tidak valid. Ketik GANTI untuk melanjutkan.' });

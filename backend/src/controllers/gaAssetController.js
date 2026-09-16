@@ -109,6 +109,10 @@ export async function fetchGaAsset(req, res) {
 
 export async function addGaAsset(req, res) {
   try {
+    if (!canWriteGAAsset(req.user, null)) {
+      return res.status(403).json({ error: "Anda tidak memiliki akses untuk menambahkan Aset GA." });
+    }
+
     const body = req.body || {};
     const hostname = cleanText(body.hostname);
     const quantity = parseQuantity(body.quantity);

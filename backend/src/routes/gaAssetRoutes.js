@@ -9,8 +9,8 @@ import {
 export const gaAssetRouter = Router()
 
 const requireAdmin = authorizeRoles('admin', 'super admin', 'superadmin')
-const requireGaRead = authorizeAnyPermission(['assets_ga', 'assets'], 'read')
-const requireGaWrite = authorizeAnyPermission(['assets_ga', 'assets'], 'write')
+const requireGaRead = authorizePermission('assets_ga', 'read')
+const requireGaWrite = authorizePermission('assets_ga', 'write')
 
 gaAssetRouter.use(requireAdmin)
 

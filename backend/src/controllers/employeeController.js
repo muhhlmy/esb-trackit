@@ -3,6 +3,7 @@ import { recordSystemAudit } from "../services/systemAuditService.js";
 import { createEnrollmentCredential, hashPassword, DEFAULT_USER_PASSWORD } from "../security/passwordService.js";
 import { normalizeLocation } from "../utils/locationNormalizer.js";
 import { parsePaginationQuery, setPaginationHeaders } from "../security/requestValidation.js";
+import { canWriteEmployee } from "../security/resourceAuthorizationPolicy.js";
 
 // Validasi ENUM status karyawan & Job Level sesuai spesifikasi
 const VALID_KARYAWAN_STATUSES = ["Active", "Outsource", "Resigned"];
@@ -191,6 +192,10 @@ export async function fetchEmployee(req, res) {
 
 export async function storeEmployee(req, res) {
   try {
+    if (!canWriteEmployee(req.user)) {
+      return res.status(403).json({ error: "Anda tidak memiliki izin untuk menambahkan data karyawan." });
+    }
+
     const nik = cleanText(req.body.nik);
     const nama_karyawan = cleanText(req.body.nama_karyawan);
     const email_kantor = cleanText(req.body.email_kantor) || `${nik?.toLowerCase()}@esb.co.id`;
@@ -270,7 +275,9 @@ export async function storeEmployee(req, res) {
           karyawan: "none",
         });
 
-        const defaultPasswordHash = await hashPassword(DEFAULT_USER_PASSWORD);
+        const defaultPasswordHash = DEFAULT_USER_PASSWORD
+          ? await hashPassword(DEFAULT_USER_PASSWORD)
+          : createEnrollmentCredential();
         await client.query(
           `INSERT INTO users (nama, email, password_hash, role, permissions, is_active)
            VALUES ($1, $2, $3, 'user', $4::jsonb, true)`,
@@ -358,6 +365,10 @@ async function convertEmployeeAssetsToStock(client, nik, employeeName, auditActo
 
 export async function updateEmployee(req, res) {
   try {
+    if (!canWriteEmployee(req.user)) {
+      return res.status(403).json({ error: "Anda tidak memiliki izin untuk memperbarui data karyawan." });
+    }
+
     const id = Number(req.params.id);
     if (!Number.isSafeInteger(id) || id <= 0) {
       return res.status(400).json({ error: "ID karyawan tidak valid." });
@@ -486,6 +497,10 @@ export async function updateEmployee(req, res) {
 
 export async function deleteEmployee(req, res) {
   try {
+    if (!canWriteEmployee(req.user)) {
+      return res.status(403).json({ error: "Anda tidak memiliki izin untuk menghapus data karyawan." });
+    }
+
     const id = Number(req.params.id);
     if (!Number.isSafeInteger(id) || id <= 0) {
       return res.status(400).json({ error: "ID karyawan tidak valid." });

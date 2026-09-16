@@ -18,9 +18,7 @@ import AssetCategoryExportModal from '../components/ui/AssetCategoryExportModal.
 
 const { getAllPages, post, put, del } = useApi()
 const { hasWritePermission } = useAuth()
-const canWriteAssets = computed(
-  () => hasWritePermission('assets_ops') || hasWritePermission('assets'),
-)
+const canWriteAssets = computed(() => hasWritePermission('assets_ops'))
 
 const assets = ref([])
 const currentPage = ref(1)
@@ -246,6 +244,7 @@ function closeModal() {
 }
 
 async function submitForm() {
+  if (!canWriteAssets.value) return
   modalError.value = ''
   if (!form.value.hostname) {
     modalError.value = 'Hostname wajib diisi.'
@@ -288,7 +287,7 @@ async function submitForm() {
 }
 
 async function confirmDelete() {
-  if (!selectedAsset.value) return
+  if (!canWriteAssets.value || !selectedAsset.value) return
   isSubmitting.value = true
   modalError.value = ''
   try {
@@ -421,6 +420,7 @@ function formatDate(dateStr) {
             class="toolbar-action-group flex items-center gap-1 rounded-lg border border-[#D7E3F2] bg-[#F8FAFC] p-1"
           >
             <button
+              v-if="canWriteAssets"
               type="button"
               @click="showImportModal = true"
               class="toolbar-action-button inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-[11px] font-bold text-[#0A51B0] hover:bg-white"
@@ -893,7 +893,7 @@ function formatDate(dateStr) {
           <button
             type="submit"
             form="crud-AssetsOpsView"
-            :disabled="isSubmitting"
+            :disabled="isSubmitting || !canWriteAssets"
             class="h-10 px-5 rounded-xl bg-[#0A51B0] text-[13px] font-bold text-white shadow-2xs hover:bg-[#0A4391] disabled:opacity-50 flex items-center gap-2"
           >
             <span v-if="isSubmitting" class="animate-spin text-[16px]">hourglass_empty</span>
@@ -927,7 +927,7 @@ function formatDate(dateStr) {
           </button>
           <button
             type="button"
-            :disabled="isSubmitting"
+            :disabled="isSubmitting || !canWriteAssets"
             @click="confirmDelete"
             class="h-10 px-5 rounded-xl bg-rose-600 text-[13px] font-bold text-white shadow-2xs hover:bg-rose-700 disabled:opacity-50"
           >

@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import * as employeeController from '../controllers/employeeController.js'
-import { authorizeAnyPermission } from '../middleware/authMiddleware.js'
+import { authorizeAnyPermission, authorizePermission } from '../middleware/authMiddleware.js'
 
 export const employeeRouter = Router()
 
@@ -9,10 +9,7 @@ const requireEmployeeReferenceRead = authorizeAnyPermission(
   'read',
 )
 
-const requireEmployeeWrite = authorizeAnyPermission(
-  ['karyawan', 'assets', 'users'],
-  'write',
-)
+const requireEmployeeWrite = authorizePermission('karyawan', 'write')
 
 // /with-assets dan /locations harus sebelum /:id
 employeeRouter.get(

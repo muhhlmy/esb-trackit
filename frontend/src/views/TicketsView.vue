@@ -19,7 +19,7 @@ import AuthGateCard from '../components/common/AuthGateCard.vue'
 import SkeletonList from '../components/ui/skeleton/SkeletonList.vue'
 
 const route = useRoute()
-const { get, post, put, del } = useApi()
+const { get, getAllPages, post, put, del } = useApi()
 const { user, isAuthenticated, isSuperAdmin, isAdmin, hasWritePermission } = useAuth()
 
 const TICKET_PRIORITY_OPTIONS = [
@@ -695,7 +695,7 @@ async function fetchTickets(silent = false) {
 
     const qs = params.toString()
     const [data, statsData] = await Promise.all([
-      get(`/api/tickets${qs ? '?' + qs : ''}`),
+      getAllPages(`/api/tickets${qs ? '?' + qs : ''}`, { limit: 100 }),
       get('/api/tickets/stats'),
     ])
     // Abaikan response stale (ada request lebih baru yang sudah dimulai).
@@ -1457,7 +1457,9 @@ function toast(message, type = 'success') {
                 : 'bg-slate-100 text-slate-500'
             "
           >
-            <span aria-hidden="true" class="material-symbols-outlined text-[20px]">assignment_late</span>
+            <span aria-hidden="true" class="material-symbols-outlined text-[20px]"
+              >assignment_late</span
+            >
           </div>
           <div class="min-w-0">
             <span class="text-[11px] font-medium text-[#5F7089] block truncate">{{
@@ -1478,7 +1480,9 @@ function toast(message, type = 'success') {
           <div
             class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#EDF5FF] text-[#333333] border border-[#B8D4F5]/40"
           >
-            <span aria-hidden="true" class="material-symbols-outlined text-[20px]">pending_actions</span>
+            <span aria-hidden="true" class="material-symbols-outlined text-[20px]"
+              >pending_actions</span
+            >
           </div>
           <div class="min-w-0">
             <span class="text-[11px] font-medium text-[#5F7089] block truncate"
@@ -1564,7 +1568,8 @@ function toast(message, type = 'success') {
         <!-- Baris Atas: Search Input with Inline Clear (X) -->
         <div class="relative h-9 min-w-0">
           <span
-            aria-hidden="true" class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-[18px] text-[#687281] pointer-events-none"
+            aria-hidden="true"
+            class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-[18px] text-[#687281] pointer-events-none"
             >search</span
           >
           <input
@@ -1585,7 +1590,15 @@ function toast(message, type = 'success') {
           </button>
         </div>
 
-        <button type="button" @click="showFilterModal = true" class="toolbar-filter-button h-9 shrink-0 rounded-lg border border-[#E2E8F0] bg-slate-50 px-3 text-xs font-semibold text-slate-600 hover:bg-white"><span aria-hidden="true" class="material-symbols-outlined mr-1 align-middle text-[16px]">filter_alt</span>Filter</button>
+        <button
+          type="button"
+          @click="showFilterModal = true"
+          class="toolbar-filter-button h-9 shrink-0 rounded-lg border border-[#E2E8F0] bg-slate-50 px-3 text-xs font-semibold text-slate-600 hover:bg-white"
+        >
+          <span aria-hidden="true" class="material-symbols-outlined mr-1 align-middle text-[16px]"
+            >filter_alt</span
+          >Filter
+        </button>
       </div>
     </div>
 
@@ -1752,7 +1765,11 @@ function toast(message, type = 'success') {
                   <span
                     class="inline-flex items-center gap-1 text-[11px] font-medium text-[#5F7089] bg-slate-100 px-2 py-0.5 rounded shrink-0"
                   >
-                    <span aria-hidden="true" class="material-symbols-outlined text-[12px] text-slate-400">label</span>
+                    <span
+                      aria-hidden="true"
+                      class="material-symbols-outlined text-[12px] text-slate-400"
+                      >label</span
+                    >
                     {{ ticket.kategori || 'Support' }}
                   </span>
                 </div>
@@ -1827,7 +1844,9 @@ function toast(message, type = 'success') {
                   class="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200/80"
                   title="Belum ada teknisi yang menangani"
                 >
-                  <span aria-hidden="true" class="material-symbols-outlined text-[12px] text-amber-500"
+                  <span
+                    aria-hidden="true"
+                    class="material-symbols-outlined text-[12px] text-amber-500"
                     >assignment_late</span
                   >
                   <span>Belum Ditugaskan</span>
@@ -1866,7 +1885,9 @@ function toast(message, type = 'success') {
               <!-- Time, Comments & Attachments -->
               <div class="flex items-center gap-2.5 text-[11px] text-[#667283] font-normal">
                 <span class="flex items-center gap-1" title="Waktu pembaruan">
-                  <span aria-hidden="true" class="material-symbols-outlined text-[12px]">schedule</span>
+                  <span aria-hidden="true" class="material-symbols-outlined text-[12px]"
+                    >schedule</span
+                  >
                   <span>{{
                     formatRelativeTime(ticket.diperbarui_pada || ticket.dibuat_pada)
                   }}</span>
@@ -1876,7 +1897,9 @@ function toast(message, type = 'success') {
                   class="flex items-center gap-1 text-[#0A5DBD] font-medium"
                   title="Komentar"
                 >
-                  <span aria-hidden="true" class="material-symbols-outlined text-[12px]">chat_bubble_outline</span>
+                  <span aria-hidden="true" class="material-symbols-outlined text-[12px]"
+                    >chat_bubble_outline</span
+                  >
                   <span>{{ ticket.total_komentar }}</span>
                 </span>
                 <span
@@ -1884,7 +1907,9 @@ function toast(message, type = 'success') {
                   class="flex items-center gap-0.5 text-slate-400"
                   title="Lampiran"
                 >
-                  <span aria-hidden="true" class="material-symbols-outlined text-[12px]">attach_file</span>
+                  <span aria-hidden="true" class="material-symbols-outlined text-[12px]"
+                    >attach_file</span
+                  >
                 </span>
               </div>
             </div>
@@ -1983,7 +2008,9 @@ function toast(message, type = 'success') {
                   <span
                     class="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-700"
                   >
-                    <span aria-hidden="true" class="material-symbols-outlined text-[12px] text-amber-500"
+                    <span
+                      aria-hidden="true"
+                      class="material-symbols-outlined text-[12px] text-amber-500"
                       >assignment_late</span
                     >
                     <span>Belum Ditugaskan</span>
@@ -2024,7 +2051,9 @@ function toast(message, type = 'success') {
               <!-- Secondary Meta: Time, Comments, Attachments -->
               <div class="flex items-center gap-2 text-[#667283] font-normal">
                 <span class="flex items-center gap-1">
-                  <span aria-hidden="true" class="material-symbols-outlined text-[12px]">schedule</span>
+                  <span aria-hidden="true" class="material-symbols-outlined text-[12px]"
+                    >schedule</span
+                  >
                   <span>{{
                     formatRelativeTime(ticket.diperbarui_pada || ticket.dibuat_pada)
                   }}</span>
@@ -2033,11 +2062,15 @@ function toast(message, type = 'success') {
                   v-if="ticket.total_komentar > 0"
                   class="flex items-center gap-1 text-[#0A5DBD] font-medium"
                 >
-                  <span aria-hidden="true" class="material-symbols-outlined text-[12px]">chat_bubble_outline</span>
+                  <span aria-hidden="true" class="material-symbols-outlined text-[12px]"
+                    >chat_bubble_outline</span
+                  >
                   <span>{{ ticket.total_komentar }}</span>
                 </span>
                 <span v-if="ticket.has_attachment" class="flex items-center gap-0.5 text-slate-400">
-                  <span aria-hidden="true" class="material-symbols-outlined text-[12px]">attach_file</span>
+                  <span aria-hidden="true" class="material-symbols-outlined text-[12px]"
+                    >attach_file</span
+                  >
                 </span>
               </div>
             </div>
@@ -2110,11 +2143,43 @@ function toast(message, type = 'success') {
       />
     </div>
 
-    <FilterModal :is-open="showFilterModal" title="Filter Tiket" @close="showFilterModal = false" @apply="showFilterModal = false" @reset="resetFilters">
-      <CustomSelect v-model="filterStatus" :options="[{ value: '', label: 'Semua Status' }, ...TICKET_STATUS_OPTIONS]" aria-label="Filter status" :block="true" />
-      <CustomSelect v-model="filterPrioritas" :options="[{ value: '', label: 'Semua Prioritas' }, ...TICKET_PRIORITY_OPTIONS]" aria-label="Filter prioritas" :block="true" />
-      <CustomSelect v-model="filterQueue" :options="[{ value: '', label: 'Semua Unit' }, ...queues.map((q) => ({ value: q.id, label: `${q.kode} — ${q.nama}` }))]" aria-label="Filter unit" :block="true" />
-      <select v-model="filterKategori" class="h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-xs"><option value="">Semua Kategori</option><option value="Incident">Incident</option><option value="Request">Request</option><option value="QNA">QNA</option></select>
+    <FilterModal
+      :is-open="showFilterModal"
+      title="Filter Tiket"
+      @close="showFilterModal = false"
+      @apply="showFilterModal = false"
+      @reset="resetFilters"
+    >
+      <CustomSelect
+        v-model="filterStatus"
+        :options="[{ value: '', label: 'Semua Status' }, ...TICKET_STATUS_OPTIONS]"
+        aria-label="Filter status"
+        :block="true"
+      />
+      <CustomSelect
+        v-model="filterPrioritas"
+        :options="[{ value: '', label: 'Semua Prioritas' }, ...TICKET_PRIORITY_OPTIONS]"
+        aria-label="Filter prioritas"
+        :block="true"
+      />
+      <CustomSelect
+        v-model="filterQueue"
+        :options="[
+          { value: '', label: 'Semua Unit' },
+          ...queues.map((q) => ({ value: q.id, label: `${q.kode} — ${q.nama}` })),
+        ]"
+        aria-label="Filter unit"
+        :block="true"
+      />
+      <select
+        v-model="filterKategori"
+        class="h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-xs"
+      >
+        <option value="">Semua Kategori</option>
+        <option value="Incident">Incident</option>
+        <option value="Request">Request</option>
+        <option value="QNA">QNA</option>
+      </select>
     </FilterModal>
 
     <!-- ── Create / Edit Ticket Modal (Unified Single Page Form) ─────── -->
@@ -2149,7 +2214,9 @@ function toast(message, type = 'success') {
           role="alert"
           class="rounded-lg bg-rose-50 border border-rose-200 px-3.5 py-2 text-[12px] font-semibold text-rose-600 shadow-2xs flex items-center gap-2"
         >
-          <span aria-hidden="true" class="material-symbols-outlined text-[16px] shrink-0">error</span>
+          <span aria-hidden="true" class="material-symbols-outlined text-[16px] shrink-0"
+            >error</span
+          >
           <span>{{ modalError }}</span>
         </div>
 
@@ -2233,7 +2300,11 @@ function toast(message, type = 'success') {
                       : 'bg-[#F1F5F9] text-[#66728d]'
                   "
                 >
-                  <span aria-hidden="true" class="material-symbols-outlined text-[16px] sm:text-[18px]">computer</span>
+                  <span
+                    aria-hidden="true"
+                    class="material-symbols-outlined text-[16px] sm:text-[18px]"
+                    >computer</span
+                  >
                 </div>
                 <div class="min-w-0">
                   <p class="text-[11px] sm:text-[13px] font-bold leading-tight truncate">
@@ -2264,7 +2335,11 @@ function toast(message, type = 'success') {
                       : 'bg-[#F1F5F9] text-[#66728d]'
                   "
                 >
-                  <span aria-hidden="true" class="material-symbols-outlined text-[16px] sm:text-[18px]">badge</span>
+                  <span
+                    aria-hidden="true"
+                    class="material-symbols-outlined text-[16px] sm:text-[18px]"
+                    >badge</span
+                  >
                 </div>
                 <div class="min-w-0">
                   <p class="text-[11px] sm:text-[13px] font-bold leading-tight truncate">
@@ -2295,7 +2370,9 @@ function toast(message, type = 'success') {
                       : 'bg-[#F1F5F9] text-[#66728d]'
                   "
                 >
-                  <span aria-hidden="true" class="material-symbols-outlined text-[16px] sm:text-[18px]"
+                  <span
+                    aria-hidden="true"
+                    class="material-symbols-outlined text-[16px] sm:text-[18px]"
                     >corporate_fare</span
                   >
                 </div>
@@ -2331,12 +2408,11 @@ function toast(message, type = 'success') {
                 "
               >
                 <div class="flex items-center justify-center sm:justify-between w-full">
-                  <span class="text-[12px] sm:text-[12px] font-bold truncate">{{
-                    cat.title
-                  }}</span>
+                  <span class="text-[12px] sm:text-[12px] font-bold truncate">{{ cat.title }}</span>
                   <span
                     v-if="form.kategori === cat.value"
-                    aria-hidden="true" class="hidden sm:inline material-symbols-outlined text-[15px] text-[#333333]"
+                    aria-hidden="true"
+                    class="hidden sm:inline material-symbols-outlined text-[15px] text-[#333333]"
                     >check_circle</span
                   >
                 </div>
@@ -2386,7 +2462,9 @@ function toast(message, type = 'success') {
               <label
                 class="inline-flex h-10 items-center gap-2 rounded-lg border border-[#E5EAEF] bg-white px-3.5 text-[12px] font-bold text-[#2A3547] hover:bg-[#F8FAFC] hover:border-[#0A51B0] transition-all cursor-pointer select-none shadow-2xs"
               >
-                <span aria-hidden="true" class="material-symbols-outlined text-[18px] text-[#333333]"
+                <span
+                  aria-hidden="true"
+                  class="material-symbols-outlined text-[18px] text-[#333333]"
                   >attach_file</span
                 >
                 <span>Pilih File Lampiran</span>
@@ -2446,7 +2524,9 @@ function toast(message, type = 'success') {
                   class="flex h-7 w-7 items-center justify-center rounded-lg text-[#66728d] hover:bg-rose-50 hover:text-rose-600 transition-colors shrink-0 cursor-pointer"
                   title="Hapus Lampiran"
                 >
-                  <span aria-hidden="true" class="material-symbols-outlined text-[18px]">close</span>
+                  <span aria-hidden="true" class="material-symbols-outlined text-[18px]"
+                    >close</span
+                  >
                 </button>
               </li>
             </ul>
@@ -2471,7 +2551,10 @@ function toast(message, type = 'success') {
             :disabled="isSubmitting"
             class="inline-flex h-9 items-center gap-1.5 rounded-lg bg-[#0A51B0] px-4 text-[12px] font-bold text-white hover:bg-[#4A73E0] transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            <span aria-hidden="true" v-if="isSubmitting" class="material-symbols-outlined text-[14px] animate-spin"
+            <span
+              aria-hidden="true"
+              v-if="isSubmitting"
+              class="material-symbols-outlined text-[14px] animate-spin"
               >progress_activity</span
             >
             <span>{{
@@ -2547,7 +2630,8 @@ function toast(message, type = 'success') {
             "
           >
             <span
-              aria-hidden="true" class="material-symbols-outlined text-[15px] transition-colors duration-200"
+              aria-hidden="true"
+              class="material-symbols-outlined text-[15px] transition-colors duration-200"
               :class="
                 activeDetailTab === 'detail'
                   ? 'text-[#333333]'
@@ -2569,7 +2653,8 @@ function toast(message, type = 'success') {
             "
           >
             <span
-              aria-hidden="true" class="material-symbols-outlined text-[15px] transition-colors duration-200"
+              aria-hidden="true"
+              class="material-symbols-outlined text-[15px] transition-colors duration-200"
               :class="
                 activeDetailTab === 'history'
                   ? 'text-[#333333]'
@@ -2601,7 +2686,8 @@ function toast(message, type = 'success') {
             "
           >
             <span
-              aria-hidden="true" class="material-symbols-outlined text-[15px] transition-colors duration-200"
+              aria-hidden="true"
+              class="material-symbols-outlined text-[15px] transition-colors duration-200"
               :class="
                 activeDetailTab === 'comments'
                   ? 'text-[#333333]'
@@ -2723,7 +2809,10 @@ function toast(message, type = 'success') {
               <h3
                 class="text-[11px] font-semibold uppercase tracking-wider text-[#687281] flex items-center gap-1"
               >
-                <span aria-hidden="true" class="material-symbols-outlined text-[15px]">attach_file</span> Lampiran
+                <span aria-hidden="true" class="material-symbols-outlined text-[15px]"
+                  >attach_file</span
+                >
+                Lampiran
                 <span class="text-[#CBD5E1] font-normal"
                   >({{ selectedTicket.attachments.length }})</span
                 >
@@ -2764,7 +2853,9 @@ function toast(message, type = 'success') {
                     "
                     class="flex h-8 items-center gap-1.5 rounded-lg border border-[#E2E8F0] bg-white px-3 text-[11px] font-bold text-[#333333] hover:bg-[#EFF6FF] hover:border-[#0A51B0] transition-all cursor-pointer shadow-2xs shrink-0"
                   >
-                    <span aria-hidden="true" class="material-symbols-outlined text-[16px]">download</span>
+                    <span aria-hidden="true" class="material-symbols-outlined text-[16px]"
+                      >download</span
+                    >
                     <span>Unduh</span>
                   </button>
                 </li>
@@ -2843,7 +2934,9 @@ function toast(message, type = 'success') {
                 v-if="isCommentsLoading"
                 class="flex flex-col items-center justify-center py-6 gap-2 text-[#687281]"
               >
-                <span aria-hidden="true" class="material-symbols-outlined text-[24px] animate-spin text-[#333333]"
+                <span
+                  aria-hidden="true"
+                  class="material-symbols-outlined text-[24px] animate-spin text-[#333333]"
                   >progress_activity</span
                 >
                 <span class="text-xs font-medium">Memuat percakapan...</span>
@@ -2853,7 +2946,9 @@ function toast(message, type = 'success') {
                 v-else-if="ticketComments.length === 0"
                 class="flex flex-col items-center justify-center py-6 gap-1.5 text-center text-[#687281] my-auto"
               >
-                <span aria-hidden="true" class="material-symbols-outlined text-[24px] text-[#687281]"
+                <span
+                  aria-hidden="true"
+                  class="material-symbols-outlined text-[24px] text-[#687281]"
                   >chat_bubble_outline</span
                 >
                 <p class="text-xs font-semibold text-[#334155]">
@@ -2897,7 +2992,9 @@ function toast(message, type = 'success') {
                     class="mt-2 flex items-center gap-1 rounded-lg border border-current/20 px-2 py-1 text-[10px] font-bold disabled:opacity-60 cursor-pointer"
                     @click="loadCommentAttachment(c)"
                   >
-                    <span aria-hidden="true" class="material-symbols-outlined text-[14px]">attach_file</span>
+                    <span aria-hidden="true" class="material-symbols-outlined text-[14px]"
+                      >attach_file</span
+                    >
                     {{ c.is_attachment_loading ? 'Memuat...' : 'Muat lampiran' }}
                   </button>
 
@@ -2927,7 +3024,9 @@ function toast(message, type = 'success') {
                       "
                       class="flex h-7 items-center gap-1 rounded-md border border-[#E2E8F0] bg-white px-2 text-[10px] font-bold text-[#333333] hover:bg-[#EFF6FF] hover:border-[#0A51B0] transition-all cursor-pointer shrink-0"
                     >
-                      <span aria-hidden="true" class="material-symbols-outlined text-[14px]">download</span>
+                      <span aria-hidden="true" class="material-symbols-outlined text-[14px]"
+                        >download</span
+                      >
                       <span>Unduh</span>
                     </button>
                   </div>
@@ -2940,7 +3039,9 @@ function toast(message, type = 'success') {
               v-if="['Resolved', 'Closed', 'Cancelled'].includes(selectedTicket.status_tiket)"
               class="flex shrink-0 items-center gap-2 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] p-3 text-xs font-medium text-[#5F7089]"
             >
-              <span aria-hidden="true" class="material-symbols-outlined text-[16px] text-[#687281]">lock</span>
+              <span aria-hidden="true" class="material-symbols-outlined text-[16px] text-[#687281]"
+                >lock</span
+              >
               <span
                 >Diskusi ditutup karena status tiket sudah {{ selectedTicket.status_tiket }}.</span
               >
@@ -2973,7 +3074,9 @@ function toast(message, type = 'success') {
                   title="Hapus lampiran"
                   class="text-rose-500 hover:text-rose-700 cursor-pointer"
                 >
-                  <span aria-hidden="true" class="material-symbols-outlined text-[16px]">close</span>
+                  <span aria-hidden="true" class="material-symbols-outlined text-[16px]"
+                    >close</span
+                  >
                 </button>
               </div>
 
@@ -3067,7 +3170,8 @@ function toast(message, type = 'success') {
                   <span>{{ getStatusDotInfo(selectedTicket.status_tiket).label }}</span>
                 </div>
                 <span
-                  aria-hidden="true" class="material-symbols-outlined text-[16px] text-[#66728d] transition-transform duration-200"
+                  aria-hidden="true"
+                  class="material-symbols-outlined text-[16px] text-[#66728d] transition-transform duration-200"
                   :class="{ 'rotate-180 text-[#333333]': showStatusDropdown }"
                   >expand_more</span
                 >
@@ -3103,7 +3207,8 @@ function toast(message, type = 'success') {
                     </div>
                     <span
                       v-if="selectedTicket.status_tiket === st.value"
-                      aria-hidden="true" class="material-symbols-outlined text-[15px] text-[#333333]"
+                      aria-hidden="true"
+                      class="material-symbols-outlined text-[15px] text-[#333333]"
                       >check</span
                     >
                   </button>
@@ -3122,7 +3227,9 @@ function toast(message, type = 'success') {
               :disabled="isClaiming === selectedTicket.id"
               class="h-9 w-full sm:w-auto inline-flex items-center justify-center gap-1.5 rounded-xl bg-[#0A51B0] px-3.5 text-xs font-bold text-white shadow-2xs hover:bg-[#0A4391] disabled:opacity-50 transition-all cursor-pointer whitespace-nowrap active:scale-95"
             >
-              <span aria-hidden="true" class="material-symbols-outlined text-[16px]">person_add</span>
+              <span aria-hidden="true" class="material-symbols-outlined text-[16px]"
+                >person_add</span
+              >
               <span>{{
                 isClaiming === selectedTicket.id ? 'Mengambil...' : 'Ambil Tiket Ini'
               }}</span>
@@ -3143,12 +3250,16 @@ function toast(message, type = 'success') {
                 class="inline-flex h-9 w-full sm:w-auto items-center justify-between sm:justify-center gap-1.5 rounded-xl border border-[#E5EAEF] bg-white px-3.5 text-xs font-bold text-[#2A3547] shadow-2xs hover:bg-[#F8FAFC] hover:border-[#0A51B0] transition-all cursor-pointer disabled:opacity-50 whitespace-nowrap active:scale-95"
               >
                 <div class="flex items-center gap-1.5">
-                  <span aria-hidden="true" class="material-symbols-outlined text-[16px] text-[#333333]"
+                  <span
+                    aria-hidden="true"
+                    class="material-symbols-outlined text-[16px] text-[#333333]"
                     >assignment_ind</span
                   >
                   <span>Assign ke Admin</span>
                 </div>
-                <span aria-hidden="true" class="material-symbols-outlined text-[16px] text-[#66728d]"
+                <span
+                  aria-hidden="true"
+                  class="material-symbols-outlined text-[16px] text-[#66728d]"
                   >expand_more</span
                 >
               </button>
@@ -3179,7 +3290,8 @@ function toast(message, type = 'success') {
                     <span class="truncate">{{ admin.nama }}</span>
                     <span
                       v-if="selectedTicket.assigned_to_user_id === admin.id"
-                      aria-hidden="true" class="material-symbols-outlined text-[15px] text-[#333333]"
+                      aria-hidden="true"
+                      class="material-symbols-outlined text-[15px] text-[#333333]"
                       >check</span
                     >
                   </button>

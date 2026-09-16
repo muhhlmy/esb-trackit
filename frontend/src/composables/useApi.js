@@ -109,6 +109,46 @@ export function useApi() {
     return request(endpoint, { ...options, method: 'GET' })
   }
 
+  // Ambil seluruh halaman dari endpoint REST ber-header pagination. Helper ini
+  // menjaga layar dengan filter lokal agar tidak hanya memproses halaman pertama.
+  async function getAllPages(endpoint, options = {}) {
+    const { limit = 500, maxPages = 1000, signal } = options
+    const rows = []
+    let page = 1
+    let totalPages
+
+    do {
+      const url = new URL(endpoint, 'http://local.invalid')
+      url.searchParams.set('page', String(page))
+      url.searchParams.set('limit', String(limit))
+
+      const { data, response } = await get(`${url.pathname}${url.search}`, {
+        withResponse: true,
+        signal,
+      })
+      const pageRows = Array.isArray(data) ? data : Array.isArray(data?.data) ? data.data : []
+      rows.push(...pageRows)
+
+      const headerPages = Number(response.headers.get('x-total-pages'))
+      const total = Number(response.headers.get('x-total-count') ?? data?.total)
+      totalPages =
+        Number.isSafeInteger(headerPages) && headerPages > 0
+          ? headerPages
+          : Number.isFinite(total)
+            ? Math.max(1, Math.ceil(total / limit))
+            : pageRows.length === limit
+              ? page + 1
+              : page
+      page += 1
+    } while (page <= totalPages && page <= maxPages)
+
+    if (page <= totalPages) {
+      throw new Error('Jumlah halaman data melebihi batas aman pengambilan.')
+    }
+
+    return rows
+  }
+
   // ----------------------------------------------------------
   // POST — Mengirim data baru ke API
   // Contoh: post('/api/assets', { label_aset: 'ESB-LAP-001' })
@@ -166,5 +206,5 @@ export function useApi() {
   }
 
   // Kembalikan semua fungsi agar bisa digunakan di komponen
-  return { get, post, put, del, upload }
+  return { get, getAllPages, post, put, del, upload }
 }

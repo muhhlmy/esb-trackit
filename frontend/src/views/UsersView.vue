@@ -19,7 +19,7 @@ import FilterModal from '../components/ui/FilterModal.vue'
 import SkeletonTable from '../components/ui/skeleton/SkeletonTable.vue'
 
 const route = useRoute()
-const { get, post, put, del } = useApi()
+const { get, getAllPages, post, put, del } = useApi()
 const { isSuperAdmin, hasWritePermission } = useAuth()
 const { user: currentUser } = useAuth()
 const canWriteUsers = computed(() => hasWritePermission('users'))
@@ -359,8 +359,7 @@ async function fetchUsers() {
   isLoading.value = true
   pageError.value = ''
   try {
-    const response = await get('/api/users?limit=500')
-    const data = Array.isArray(response) ? response : response?.data || []
+    const data = await getAllPages('/api/users')
     if (!Array.isArray(data)) throw new Error('Format data pengguna dari server tidak valid.')
     users.value = data
   } catch (e) {
@@ -679,7 +678,8 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
             v-model="searchQuery"
             type="search"
             autocomplete="off"
-            aria-label="Cari pengguna" placeholder="Cari nama atau email pengguna..."
+            aria-label="Cari pengguna"
+            placeholder="Cari nama atau email pengguna..."
             class="toolbar-search-input h-full min-h-0 w-full rounded-lg border border-[#E2E8F0] bg-white pl-8 text-xs text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
             :class="searchQuery ? 'pr-8' : 'pr-2.5'"
           />
@@ -694,12 +694,36 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
           </button>
         </div>
 
-        <button type="button" @click="showFilterModal = true" class="toolbar-filter-button h-9 shrink-0 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-semibold text-[#5F7089] hover:bg-white"><span aria-hidden="true" class="material-symbols-outlined mr-1 align-middle text-[16px]">filter_alt</span>Filter</button>
+        <button
+          type="button"
+          @click="showFilterModal = true"
+          class="toolbar-filter-button h-9 shrink-0 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-semibold text-[#5F7089] hover:bg-white"
+        >
+          <span aria-hidden="true" class="material-symbols-outlined mr-1 align-middle text-[16px]"
+            >filter_alt</span
+          >Filter
+        </button>
       </div>
     </div>
 
-    <FilterModal :is-open="showFilterModal" title="Filter Pengguna" @close="showFilterModal = false" @apply="showFilterModal = false" @reset="resetFilters">
-      <CustomSelect v-model="filterRole" :options="[{ value: '', label: 'Semua Role' }, { value: 'admin', label: 'ADMIN' }, { value: 'superadmin', label: 'SUPERADMIN' }, { value: 'user', label: 'USER' }]" aria-label="Filter role" :block="true" />
+    <FilterModal
+      :is-open="showFilterModal"
+      title="Filter Pengguna"
+      @close="showFilterModal = false"
+      @apply="showFilterModal = false"
+      @reset="resetFilters"
+    >
+      <CustomSelect
+        v-model="filterRole"
+        :options="[
+          { value: '', label: 'Semua Role' },
+          { value: 'admin', label: 'ADMIN' },
+          { value: 'superadmin', label: 'SUPERADMIN' },
+          { value: 'user', label: 'USER' },
+        ]"
+        aria-label="Filter role"
+        :block="true"
+      />
     </FilterModal>
 
     <!-- ── Tabel Pengguna ─────────────────────────────────── -->
@@ -1227,7 +1251,8 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
               />
               <div class="flex items-center gap-2 min-w-0">
                 <span
-                  aria-hidden="true" class="material-symbols-outlined text-[20px] shrink-0"
+                  aria-hidden="true"
+                  class="material-symbols-outlined text-[20px] shrink-0"
                   :class="isUnitSelected(unit) ? 'text-[#333333]' : 'text-[#5F7089]'"
                   >{{ unit.icon }}</span
                 >
@@ -1282,7 +1307,9 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
             v-if="form.role === 'superadmin'"
             class="rounded-xl bg-[#EFF6FF] p-3 text-xs font-semibold text-[#333333] border border-[#BFDBFE] flex items-center gap-2"
           >
-            <span aria-hidden="true" class="material-symbols-outlined text-[18px]">verified_user</span>
+            <span aria-hidden="true" class="material-symbols-outlined text-[18px]"
+              >verified_user</span
+            >
             <span>Superadmin memiliki akses penuh ke seluruh fitur sistem secara otomatis.</span>
           </div>
 
@@ -1302,9 +1329,11 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
                   class="user-permission-row flex items-center justify-between gap-2 sm:gap-3 px-3 sm:px-3.5 py-2.5 hover:bg-[#F8FAFC] transition-colors"
                 >
                   <div class="flex items-center gap-2.5 min-w-0 flex-1">
-                    <span aria-hidden="true" class="material-symbols-outlined text-[18px] text-[#5F7089] shrink-0">{{
-                      f.icon
-                    }}</span>
+                    <span
+                      aria-hidden="true"
+                      class="material-symbols-outlined text-[18px] text-[#5F7089] shrink-0"
+                      >{{ f.icon }}</span
+                    >
                     <div class="min-w-0">
                       <p class="text-xs font-semibold text-[#333333] truncate">{{ f.label }}</p>
                       <p class="text-[11px] text-[#5F7089] truncate">{{ f.desc }}</p>
@@ -1345,9 +1374,11 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
                   class="user-permission-row flex items-center justify-between gap-2 sm:gap-3 px-3 sm:px-3.5 py-2.5 hover:bg-[#F8FAFC] transition-colors"
                 >
                   <div class="flex items-center gap-2.5 min-w-0 flex-1">
-                    <span aria-hidden="true" class="material-symbols-outlined text-[18px] text-[#5F7089] shrink-0">{{
-                      f.icon
-                    }}</span>
+                    <span
+                      aria-hidden="true"
+                      class="material-symbols-outlined text-[18px] text-[#5F7089] shrink-0"
+                      >{{ f.icon }}</span
+                    >
                     <div class="min-w-0">
                       <p class="text-xs font-semibold text-[#333333] truncate">{{ f.label }}</p>
                       <p class="text-[11px] text-[#5F7089] truncate">{{ f.desc }}</p>
@@ -1458,7 +1489,9 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
           {{ modalError }}
         </div>
         <div class="w-14 h-14 rounded-full bg-red-50 flex items-center justify-center">
-          <span aria-hidden="true" class="material-symbols-outlined text-[28px] text-[#EF4444]">warning</span>
+          <span aria-hidden="true" class="material-symbols-outlined text-[28px] text-[#EF4444]"
+            >warning</span
+          >
         </div>
 
         <div>

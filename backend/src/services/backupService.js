@@ -173,7 +173,9 @@ export async function getDatabaseStatus() {
       'tickets', 'ticket_queues', 'komentar_tiket', 'ticket_casp_ratings',
       'user_ticket_queues', 'log_riwayat_tiket', 'log_riwayat_aset',
       'riwayat_pemakaian_aset', 'log_audit_login', 'user_sessions',
-      'account_security_state',
+      'account_security_state', 'system_audit_logs', 'asset_submissions',
+      'faq', 'cases', 'kb_categories', 'kb_search_logs', 'case_bookmarks',
+      'asset_shipments', 'backup_metadata',
     ]
     const requiredViews = ['daftar_aset_ti_lengkap', 'v_ticket_stats_per_queue', 'v_employee_asset_summary']
 
@@ -586,6 +588,7 @@ async function verifyDatabaseAfterRestore() {
   const requiredTables = [
     'users', 'karyawan', 'aset_ti', 'aset_ga', 'aset_ops',
     'tickets', 'ticket_queues', 'log_audit_login', 'user_sessions',
+    'system_audit_logs', 'asset_submissions', 'asset_shipments',
   ]
   const requiredViews = ['daftar_aset_ti_lengkap']
 

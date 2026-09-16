@@ -1,4 +1,5 @@
 import { pool } from '../config/database.js'
+import { recordSystemAudit } from '../services/systemAuditService.js'
 import {
   assertAllowedFields,
   assertNoActiveMarkup,
@@ -273,7 +274,9 @@ export async function createCase(req, res) {
       p.sort_order,
     ],
   )
-  res.status(201).json(mapCaseRow(result.rows[0]))
+  const article = mapCaseRow(result.rows[0])
+  await recordSystemAudit(req, { module: 'articles', action: 'CREATE', entityType: 'article', entityId: article.id, entityLabel: article.title, summary: `Artikel ditambahkan: ${article.title}`, after: article })
+  res.status(201).json(article)
 }
 
 // PUT /api/cases/:id
@@ -281,7 +284,7 @@ export async function updateCase(req, res) {
   const id = parsePositiveIntegerParam(req.params.id, 'Case ID')
   const p = validateUpdateBody(req.body)
 
-  const existing = await pool.query('SELECT id FROM cases WHERE id = $1', [id])
+  const existing = await pool.query(`SELECT ${SELECT_COLUMNS} FROM cases WHERE id = $1`, [id])
   if (existing.rowCount === 0) throw createHttpError(404, 'Case tidak ditemukan.')
 
   const result = await pool.query(
@@ -321,13 +324,17 @@ export async function updateCase(req, res) {
       p.sort_order ?? null,
     ],
   )
-  res.json(mapCaseRow(result.rows[0]))
+  const article = mapCaseRow(result.rows[0])
+  await recordSystemAudit(req, { module: 'articles', action: 'UPDATE', entityType: 'article', entityId: id, entityLabel: article.title, summary: `Artikel diperbarui: ${article.title}`, before: mapCaseRow(existing.rows[0]), after: article })
+  res.json(article)
 }
 
 // DELETE /api/cases/:id
 export async function deleteCase(req, res) {
   const id = parsePositiveIntegerParam(req.params.id, 'Case ID')
-  const result = await pool.query('DELETE FROM cases WHERE id = $1 RETURNING id', [id])
+  const result = await pool.query(`DELETE FROM cases WHERE id = $1 RETURNING ${SELECT_COLUMNS}`, [id])
   if (result.rowCount === 0) throw createHttpError(404, 'Case tidak ditemukan.')
+  const article = mapCaseRow(result.rows[0])
+  await recordSystemAudit(req, { module: 'articles', action: 'DELETE', entityType: 'article', entityId: id, entityLabel: article.title, summary: `Artikel dihapus: ${article.title}`, before: article })
   res.json({ message: 'Case berhasil dihapus.' })
 }

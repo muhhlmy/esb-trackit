@@ -12,10 +12,13 @@ import FilterModal from '../components/ui/FilterModal.vue'
 import SkeletonTable from '../components/ui/skeleton/SkeletonTable.vue'
 
 const { get } = useApi()
-const { isAdmin, isSuperAdmin, user, refreshUser } = useAuth()
+const { isAdmin, isSuperAdmin, user, refreshUser, hasPermission } = useAuth()
+const canBrowseOtherAssets = computed(
+  () => isSuperAdmin.value || (isAdmin.value && hasPermission('assets')),
+)
 
 // ── State Level Navigasi (1 = Listing Karyawan, 2 = Detail Karyawan, 3 = Detail & Audit History Aset) ──
-const currentLevel = ref(isAdmin.value ? 1 : 2)
+const currentLevel = ref(canBrowseOtherAssets.value ? 1 : 2)
 
 // ── State: Data Karyawan & Aset ───────────────────────────────────────────────
 const employees = ref([])
@@ -126,7 +129,6 @@ watch([employeeSearch, filterDepartemen, filterLokasi], () => {
 watch([assetSearch, filterTipe, selectedEmployee], () => {
   currentPageAssets.value = 1
 })
-
 
 const filteredEmployees = computed(() => {
   const q = employeeSearch.value.trim().toLowerCase()
@@ -290,7 +292,7 @@ const assetHistoryTimeline = computed(() => {
 
 // ── Navigasi Helper ────────────────────────────────────────────────────────────
 function goToLevel1() {
-  if (!isAdmin.value) return
+  if (!canBrowseOtherAssets.value) return
   currentLevel.value = 1
   selectedEmployee.value = null
   selectedAsset.value = null
@@ -359,7 +361,7 @@ async function goToLevel2(employee) {
     const assetData = await get(`/api/assets/my?nik=${encodeURIComponent(nik)}`)
     myAssets.value = Array.isArray(assetData) ? assetData.map(normalizeAsset) : []
 
-    if ((isAdmin.value || isSuperAdmin.value) && nik) {
+    if (canBrowseOtherAssets.value && nik) {
       isLoadingCycle.value = true
       try {
         const cycleData = await get(`/api/assets/cycle/${encodeURIComponent(nik)}`)
@@ -402,7 +404,7 @@ async function fetchAssetLogs(idAset) {
 
 // ── Data Fetching ─────────────────────────────────────────────────────────────
 async function fetchEmployees() {
-  if (!isAdmin.value) return
+  if (!canBrowseOtherAssets.value) return
 
   isLoadingEmployees.value = true
   employeeError.value = ''
@@ -550,7 +552,7 @@ function getAvatarGradient(index) {
 }
 
 onMounted(() => {
-  if (isAdmin.value) {
+  if (canBrowseOtherAssets.value) {
     fetchEmployees()
   } else {
     loadMyOwnAssets()
@@ -616,13 +618,14 @@ onMounted(() => {
 
       <!-- Toolbar: Elegant Single Search & Compact Filters -->
       <div
-        v-if="isAdmin"
+        v-if="canBrowseOtherAssets"
         class="employee-assets-toolbar grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2.5 rounded-xl border border-[#E2E8F0] bg-white p-3 shadow-2xs"
       >
         <div class="relative h-9 w-full sm:flex-1 sm:min-w-[200px]">
           <label for="emp-search" class="sr-only">Cari karyawan dengan aset</label>
           <span
-            aria-hidden="true" class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[18px] text-[#687281] pointer-events-none"
+            aria-hidden="true"
+            class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[18px] text-[#687281] pointer-events-none"
             >search</span
           >
           <input
@@ -645,7 +648,15 @@ onMounted(() => {
           </button>
         </div>
 
-        <button type="button" @click="showFilterModal = true" class="h-9 shrink-0 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-semibold text-[#5F7089] hover:bg-white"><span aria-hidden="true" class="material-symbols-outlined mr-1 align-middle text-[16px]">filter_alt</span>Filter</button>
+        <button
+          type="button"
+          @click="showFilterModal = true"
+          class="h-9 shrink-0 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-semibold text-[#5F7089] hover:bg-white"
+        >
+          <span aria-hidden="true" class="material-symbols-outlined mr-1 align-middle text-[16px]"
+            >filter_alt</span
+          >Filter
+        </button>
       </div>
 
       <!-- Main Hybrid Employee Table/List -->
@@ -671,7 +682,9 @@ onMounted(() => {
 
         <!-- Empty State -->
         <div v-else-if="filteredEmployees.length === 0" class="p-12 text-center text-[#5F7089]">
-          <span aria-hidden="true" class="material-symbols-outlined text-[36px] text-[#CBD5E1]">person_search</span>
+          <span aria-hidden="true" class="material-symbols-outlined text-[36px] text-[#CBD5E1]"
+            >person_search</span
+          >
           <h3 class="mt-2 font-semibold text-sm text-[#333333]">
             Tidak Ada Karyawan Memegang Aset
           </h3>
@@ -749,7 +762,9 @@ onMounted(() => {
                         class="text-[11px] text-[#5F7089] flex items-center gap-1 truncate mt-0.5"
                         :title="normalizeLocation(employee.lokasi_kerja) || '—'"
                       >
-                        <span aria-hidden="true" class="material-symbols-outlined text-[13px] text-[#687281] shrink-0"
+                        <span
+                          aria-hidden="true"
+                          class="material-symbols-outlined text-[13px] text-[#687281] shrink-0"
                           >location_on</span
                         >
                         <span class="truncate block">{{
@@ -769,7 +784,8 @@ onMounted(() => {
                           class="inline-flex items-center gap-1 rounded-md bg-[#F1F5F9] px-1.5 py-0.5 text-[10px] font-medium text-[#475569] border border-[#E2E8F0] shrink min-w-0 overflow-hidden"
                         >
                           <span
-                            aria-hidden="true" class="material-symbols-outlined text-[12px] text-[#333333] shrink-0"
+                            aria-hidden="true"
+                            class="material-symbols-outlined text-[12px] text-[#333333] shrink-0"
                             >{{ getDeviceIcon(tipe) }}</span
                           >
                           <span class="truncate">{{ tipe }}</span>
@@ -806,7 +822,8 @@ onMounted(() => {
                   <!-- Action Chevron -->
                   <td class="py-3.5 pr-5 pl-4 text-center overflow-hidden">
                     <span
-                      aria-hidden="true" class="material-symbols-outlined text-[18px] text-[#687281] group-hover:text-[#333333] group-hover:translate-x-0.5 transition-all inline-block"
+                      aria-hidden="true"
+                      class="material-symbols-outlined text-[18px] text-[#687281] group-hover:text-[#333333] group-hover:translate-x-0.5 transition-all inline-block"
                       >chevron_right</span
                     >
                   </td>
@@ -848,7 +865,9 @@ onMounted(() => {
                   >
                     {{ employee.jumlah_aset || 0 }} Aset
                   </span>
-                  <span aria-hidden="true" class="material-symbols-outlined text-[18px] text-[#687281]"
+                  <span
+                    aria-hidden="true"
+                    class="material-symbols-outlined text-[18px] text-[#687281]"
                     >chevron_right</span
                   >
                 </div>
@@ -881,7 +900,9 @@ onMounted(() => {
                     class="text-[12px] font-normal text-[#333333] mt-0.5 truncate flex items-center gap-1"
                     :title="normalizeLocation(employee.lokasi_kerja) || '—'"
                   >
-                    <span aria-hidden="true" class="material-symbols-outlined text-[12px] text-[#687281] shrink-0"
+                    <span
+                      aria-hidden="true"
+                      class="material-symbols-outlined text-[12px] text-[#687281] shrink-0"
                       >location_on</span
                     >
                     <span class="truncate">{{
@@ -903,7 +924,8 @@ onMounted(() => {
                         class="inline-flex items-center gap-1 rounded-md bg-[#F1F5F9] px-1.5 py-0.5 text-[10px] font-medium text-[#475569] border border-[#E2E8F0] shrink min-w-0 overflow-hidden"
                       >
                         <span
-                          aria-hidden="true" class="material-symbols-outlined text-[12px] text-[#333333] shrink-0"
+                          aria-hidden="true"
+                          class="material-symbols-outlined text-[12px] text-[#333333] shrink-0"
                           >{{ getDeviceIcon(tipe) }}</span
                         >
                         <span class="truncate">{{ tipe }}</span>
@@ -956,7 +978,7 @@ onMounted(() => {
           aria-label="Breadcrumb"
         >
           <button
-            v-if="isAdmin"
+            v-if="canBrowseOtherAssets"
             type="button"
             @click="goToLevel1"
             class="font-medium text-[#5F7089] hover:text-[#333333] transition-colors shrink-0"
@@ -964,7 +986,9 @@ onMounted(() => {
             Aset Karyawan
           </button>
           <span v-else class="font-medium text-[#5F7089] shrink-0">Aset Saya</span>
-          <span aria-hidden="true" class="material-symbols-outlined text-[14px] text-[#CBD5E1] shrink-0"
+          <span
+            aria-hidden="true"
+            class="material-symbols-outlined text-[14px] text-[#CBD5E1] shrink-0"
             >chevron_right</span
           >
           <span class="font-bold text-[#333333] truncate">{{
@@ -973,7 +997,7 @@ onMounted(() => {
         </nav>
 
         <button
-          v-if="isAdmin"
+          v-if="canBrowseOtherAssets"
           type="button"
           @click="goToLevel1"
           class="flex items-center gap-1 shrink-0 rounded-lg border border-[#E2E8F0] bg-white px-2.5 sm:px-3 py-1.5 text-xs font-semibold text-[#475569] hover:bg-[#F8FAFC] hover:text-[#333333] active:scale-95 transition-all cursor-pointer shadow-2xs touch-manipulation"
@@ -1028,7 +1052,9 @@ onMounted(() => {
                 v-if="selectedEmployee.lokasi_kerja"
                 class="inline-flex items-center gap-1 h-6 px-2.5 rounded-md bg-[#F8FAFC] border border-[#E2E8F0] text-[#475569] leading-none"
               >
-                <span aria-hidden="true" class="material-symbols-outlined text-[13px] text-[#687281] leading-none shrink-0"
+                <span
+                  aria-hidden="true"
+                  class="material-symbols-outlined text-[13px] text-[#687281] leading-none shrink-0"
                   >location_on</span
                 >
                 {{ selectedEmployee.lokasi_kerja }}
@@ -1050,20 +1076,26 @@ onMounted(() => {
           <div
             class="flex flex-col justify-center h-[54px] sm:h-[58px] min-w-[110px] sm:min-w-[125px] rounded-xl bg-[#F8FAFC] px-3.5 py-2 border border-[#E2E8F0] text-center sm:text-right shadow-2xs"
           >
-            <span class="block text-[10px] font-bold uppercase tracking-wider text-[#5F7089] leading-tight">Total Aset</span>
-            <span class="font-num text-sm sm:text-base font-bold text-[#333333] leading-snug mt-0.5 block"
+            <span
+              class="block text-[10px] font-bold uppercase tracking-wider text-[#5F7089] leading-tight"
+              >Total Aset</span
+            >
+            <span
+              class="font-num text-sm sm:text-base font-bold text-[#333333] leading-snug mt-0.5 block"
               >{{ myAssets.length }} Unit</span
             >
           </div>
           <div
             class="flex flex-col justify-center h-[54px] sm:h-[58px] min-w-[110px] sm:min-w-[125px] rounded-xl bg-[#F8FAFC] px-3.5 py-2 border border-[#E2E8F0] text-center sm:text-right shadow-2xs"
           >
-            <span class="block text-[10px] font-bold uppercase tracking-wider text-[#5F7089] leading-tight"
+            <span
+              class="block text-[10px] font-bold uppercase tracking-wider text-[#5F7089] leading-tight"
               >Penugasan Awal</span
             >
-            <span class="font-num text-xs sm:text-[13px] font-semibold text-[#333333] leading-snug mt-0.5 block truncate">{{
-              employeeAssignedSince
-            }}</span>
+            <span
+              class="font-num text-xs sm:text-[13px] font-semibold text-[#333333] leading-snug mt-0.5 block truncate"
+              >{{ employeeAssignedSince }}</span
+            >
           </div>
         </div>
       </div>
@@ -1072,7 +1104,9 @@ onMounted(() => {
       <div class="flex flex-col gap-3">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5">
           <div class="flex items-center gap-2">
-            <span aria-hidden="true" class="material-symbols-outlined text-[20px] text-[#333333]">inventory_2</span>
+            <span aria-hidden="true" class="material-symbols-outlined text-[20px] text-[#333333]"
+              >inventory_2</span
+            >
             <h3 class="text-sm font-bold text-[#333333]">Aset yang ditugaskan</h3>
             <span class="rounded-full bg-[#EFF6FF] px-2.5 py-0.5 text-xs font-bold text-[#333333]">
               {{ myAssets.length }}
@@ -1082,7 +1116,8 @@ onMounted(() => {
           <!-- Quick Search Assets inside Employee -->
           <div v-if="myAssets.length > 0" class="relative w-full sm:w-auto sm:min-w-[220px]">
             <span
-              aria-hidden="true" class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-[16px] text-[#687281] pointer-events-none"
+              aria-hidden="true"
+              class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-[16px] text-[#687281] pointer-events-none"
               >search</span
             >
             <input
@@ -1134,7 +1169,9 @@ onMounted(() => {
           v-else-if="selectedEmployee.hasEmployeeRecord === false"
           class="flex flex-col items-center justify-center gap-2 py-12 px-4 text-center rounded-xl border border-[#FEF3C7] bg-[#FFFBEB]"
         >
-          <span aria-hidden="true" class="material-symbols-outlined text-[32px] text-[#D97706]">account_box_off</span>
+          <span aria-hidden="true" class="material-symbols-outlined text-[32px] text-[#D97706]"
+            >account_box_off</span
+          >
           <h4 class="text-sm font-bold text-[#92400E]">
             Akun Belum Terhubung dengan Data Karyawan
           </h4>
@@ -1150,7 +1187,9 @@ onMounted(() => {
           v-else-if="myAssets.length === 0"
           class="flex flex-col items-center justify-center gap-2 py-12 px-4 text-center rounded-xl border border-[#E2E8F0] bg-white"
         >
-          <span aria-hidden="true" class="material-symbols-outlined text-[32px] text-[#CBD5E1]">devices_off</span>
+          <span aria-hidden="true" class="material-symbols-outlined text-[32px] text-[#CBD5E1]"
+            >devices_off</span
+          >
           <h4 class="text-sm font-semibold text-[#333333]">Belum Ada Aset yang ditugaskan</h4>
           <p class="max-w-xs text-xs text-[#5F7089]">
             Tidak ada aset IT yang terdaftar atas nama {{ selectedEmployee.nama_karyawan }}.
@@ -1242,7 +1281,8 @@ onMounted(() => {
             >
               <span>Lihat detail & riwayat</span>
               <span
-                aria-hidden="true" class="material-symbols-outlined text-[16px] group-hover:translate-x-1 transition-transform"
+                aria-hidden="true"
+                class="material-symbols-outlined text-[16px] group-hover:translate-x-1 transition-transform"
                 >arrow_forward</span
               >
             </div>
@@ -1270,7 +1310,7 @@ onMounted(() => {
           aria-label="Breadcrumb"
         >
           <button
-            v-if="isAdmin"
+            v-if="canBrowseOtherAssets"
             type="button"
             @click="goToLevel1"
             class="font-medium text-[#5F7089] hover:text-[#333333] transition-colors shrink-0"
@@ -1284,13 +1324,17 @@ onMounted(() => {
           >
             {{ selectedEmployee.nama_karyawan }}
           </button>
-          <span aria-hidden="true" class="material-symbols-outlined text-[14px] text-[#CBD5E1] shrink-0"
+          <span
+            aria-hidden="true"
+            class="material-symbols-outlined text-[14px] text-[#CBD5E1] shrink-0"
             >chevron_right</span
           >
           <span class="font-bold text-[#333333] truncate">{{
             selectedAsset.label_aset || selectedAsset.nomor_seri
           }}</span>
-          <span aria-hidden="true" class="material-symbols-outlined text-[14px] text-[#CBD5E1] shrink-0"
+          <span
+            aria-hidden="true"
+            class="material-symbols-outlined text-[14px] text-[#CBD5E1] shrink-0"
             >chevron_right</span
           >
           <span class="font-semibold text-[#5F7089] shrink-0">Audit History</span>
@@ -1356,7 +1400,11 @@ onMounted(() => {
               <span
                 class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#F8FAFC] border border-[#E2E8F0] text-[#475569]"
               >
-                <span aria-hidden="true" class="material-symbols-outlined text-[12px] text-[#687281]">person</span>
+                <span
+                  aria-hidden="true"
+                  class="material-symbols-outlined text-[12px] text-[#687281]"
+                  >person</span
+                >
                 {{ selectedEmployee.nama_karyawan }}
               </span>
             </div>
@@ -1380,7 +1428,9 @@ onMounted(() => {
           <!-- Information Card -->
           <div class="rounded-xl border border-[#E2E8F0] bg-white p-3.5 sm:p-4 shadow-2xs">
             <div class="flex items-center gap-2 pb-2.5 mb-3 border-b border-[#F1F5F9]">
-              <span aria-hidden="true" class="material-symbols-outlined text-[18px] text-[#333333]">info</span>
+              <span aria-hidden="true" class="material-symbols-outlined text-[18px] text-[#333333]"
+                >info</span
+              >
               <h3 class="text-xs font-bold uppercase tracking-wider text-[#333333]">
                 Informasi Perangkat
               </h3>
@@ -1454,7 +1504,11 @@ onMounted(() => {
           <div class="rounded-xl border border-[#E2E8F0] bg-white p-3.5 sm:p-4 shadow-2xs">
             <div class="flex items-center justify-between pb-2.5 mb-3 border-b border-[#F1F5F9]">
               <div class="flex items-center gap-2">
-                <span aria-hidden="true" class="material-symbols-outlined text-[18px] text-[#059669]">person_pin</span>
+                <span
+                  aria-hidden="true"
+                  class="material-symbols-outlined text-[18px] text-[#059669]"
+                  >person_pin</span
+                >
                 <h3 class="text-xs font-bold uppercase tracking-wider text-[#333333]">
                   Pemegang Aktif saat ini
                 </h3>
@@ -1493,7 +1547,9 @@ onMounted(() => {
         >
           <div class="flex items-center justify-between pb-2.5 mb-3.5 border-b border-[#F1F5F9]">
             <div class="flex items-center gap-2">
-              <span aria-hidden="true" class="material-symbols-outlined text-[18px] text-[#7C3AED]">history</span>
+              <span aria-hidden="true" class="material-symbols-outlined text-[18px] text-[#7C3AED]"
+                >history</span
+              >
               <h3 class="text-xs font-bold uppercase tracking-wider text-[#333333]">
                 Audit Timeline & Log History
               </h3>
@@ -1551,10 +1607,31 @@ onMounted(() => {
       </div>
     </template>
 
-    <FilterModal :is-open="showFilterModal" title="Filter Aset Karyawan" @close="showFilterModal = false" @apply="showFilterModal = false" @reset="resetEmployeeFilters">
-      <CustomSelect v-model="filterDepartemen" :options="departemenFilterOptions" aria-label="Filter departemen" :block="true" />
-      <CustomSelect v-model="filterLokasi" :options="lokasiFilterOptions" aria-label="Filter lokasi" :block="true" />
-      <CustomSelect v-model="filterTipe" :options="tipeFilterOptions" aria-label="Filter tipe perangkat" :block="true" />
+    <FilterModal
+      :is-open="showFilterModal"
+      title="Filter Aset Karyawan"
+      @close="showFilterModal = false"
+      @apply="showFilterModal = false"
+      @reset="resetEmployeeFilters"
+    >
+      <CustomSelect
+        v-model="filterDepartemen"
+        :options="departemenFilterOptions"
+        aria-label="Filter departemen"
+        :block="true"
+      />
+      <CustomSelect
+        v-model="filterLokasi"
+        :options="lokasiFilterOptions"
+        aria-label="Filter lokasi"
+        :block="true"
+      />
+      <CustomSelect
+        v-model="filterTipe"
+        :options="tipeFilterOptions"
+        aria-label="Filter tipe perangkat"
+        :block="true"
+      />
     </FilterModal>
 
     <!-- ── Modal Spesifikasi Perangkat ── -->
@@ -1650,7 +1727,7 @@ onMounted(() => {
   justify-content: space-between;
   gap: 10px;
   font-size: 12px;
-  color: #5F7089;
+  color: #5f7089;
   font-weight: 500;
 }
 .employee-kpi-label span {
@@ -1671,8 +1748,8 @@ onMounted(() => {
   color: #637288;
 }
 .employee-kpi-primary {
-  background: #0A51B0;
-  border-color: #0A51B0;
+  background: #0a51b0;
+  border-color: #0a51b0;
   color: white;
 }
 .employee-kpi-primary :is(.employee-kpi-label, .employee-kpi-caption, .employee-kpi-label span) {
@@ -1694,7 +1771,7 @@ onMounted(() => {
 .employee-assets-toolbar > div:last-child > button {
   background: #f8fafc;
   border-color: #e2e8f0;
-  color: #5F7089;
+  color: #5f7089;
 }
 .employee-list {
   border-radius: 13px;
@@ -1750,7 +1827,7 @@ onMounted(() => {
   gap: 7px;
 }
 .assigned-asset-card > div:last-child {
-  color: #0A5DBD;
+  color: #0a5dbd;
   padding-top: 15px;
   margin-top: 20px;
   min-height: 44px;
@@ -1786,7 +1863,7 @@ onMounted(() => {
   letter-spacing: -0.015em;
 }
 .employee-assets-page [tabindex='0']:focus-visible {
-  outline: 2px solid #097CDE;
+  outline: 2px solid #097cde;
   outline-offset: 3px;
 }
 @media (max-width: 767px) {

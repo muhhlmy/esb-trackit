@@ -1,6 +1,6 @@
 <script setup>
-import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, onMounted, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { useCases } from '@/composables/useCases'
 import { useAuth } from '@/composables/useAuth'
 import { useBookmarks } from '@/composables/useBookmarks'
@@ -9,12 +9,23 @@ import CaseReader from '@/components/cases/CaseReader.vue'
 import { PanelLeft, PanelLeftClose, Menu, X, SearchX } from 'lucide-vue-next'
 
 const router = useRouter()
-const { activeCase, fetchCases, searchQuery, hasNoSearchResult, clearSearch } = useCases()
+const route = useRoute()
+const {
+  cases,
+  activeCaseId,
+  activeCase,
+  fetchCases,
+  selectCase,
+  searchQuery,
+  hasNoSearchResult,
+  clearSearch,
+} = useCases()
 const { isAuthenticated } = useAuth()
 const { syncBookmarks } = useBookmarks()
 
 const isSidebarCollapsed = ref(false)
 const isMobileSidebarOpen = ref(false)
+const isRouteReady = ref(false)
 
 function toggleSidebar() {
   isSidebarCollapsed.value = !isSidebarCollapsed.value
@@ -34,8 +45,35 @@ function handleEditDoc(caseItem) {
   }
 }
 
-onMounted(() => {
-  fetchCases()
+function selectCaseFromRoute(id) {
+  const normalizedId = Number(id)
+  if (Number.isSafeInteger(normalizedId) && cases.value.some((item) => item.id === normalizedId)) {
+    selectCase(normalizedId)
+    return true
+  }
+  return false
+}
+
+watch(
+  () => route.params.id,
+  (id) => {
+    if (isRouteReady.value) selectCaseFromRoute(id)
+  },
+)
+
+watch(activeCaseId, (id) => {
+  if (!isRouteReady.value || !id || Number(route.params.id) === Number(id)) return
+  router.replace({ name: 'case-detail', params: { id } })
+})
+
+onMounted(async () => {
+  const requestedId = route.params.id
+  await fetchCases()
+  const matchedRequestedCase = selectCaseFromRoute(requestedId)
+  isRouteReady.value = true
+  if (!matchedRequestedCase && activeCaseId.value) {
+    router.replace({ name: 'case-detail', params: { id: activeCaseId.value } })
+  }
   syncBookmarks()
 })
 </script>

@@ -2,6 +2,7 @@ import { pool } from '../config/database.js'
 import { normalizeLocation } from '../utils/locationNormalizer.js'
 import { env } from '../config/env.js'
 import { hashPassword } from '../security/passwordService.js'
+import { recordSystemAudit } from '../services/systemAuditService.js'
 
 const MAX_EXPORT_ROWS = 1000
 const MAX_SEARCH_LENGTH = 200
@@ -884,6 +885,11 @@ export async function resetDatabaseHandler(req, res, next) {
     })
   }
 
+  const resetActor = {
+    name: req.user?.nama || req.user?.email || 'Superadmin',
+    email: req.user?.email || null,
+  }
+
   console.warn(`[SECURITY AUDIT] Database reset initiated by user ${req.user?.id || req.user?.email || 'superadmin'} from IP ${req.ip}`)
 
   const client = await pool.connect()
@@ -904,6 +910,15 @@ export async function resetDatabaseHandler(req, res, next) {
         aset_ti,
         aset_ga,
         aset_ops,
+        asset_shipments,
+        asset_submissions,
+        case_bookmarks,
+        kb_search_logs,
+        kb_categories,
+        cases,
+        faq,
+        backup_metadata,
+        system_audit_logs,
         log_audit_login,
         user_sessions,
         account_security_state,
@@ -934,6 +949,20 @@ export async function resetDatabaseHandler(req, res, next) {
         ('IT', 'IT Support', 'IT support & services')
     `)
 
+    // Ditulis setelah reset agar jejak reset tidak ikut terhapus. actor_user_id
+    // null karena akun pelaku dihapus; nama/email snapshot tetap tersimpan.
+    await recordSystemAudit(req, {
+      module: 'system',
+      action: 'DATABASE_RESET',
+      entityType: 'database',
+      entityLabel: env.database.database,
+      summary: `Database di-reset oleh ${resetActor.name}; akun superadmin baru diprovisi.`,
+      actorUserId: null,
+      actorName: resetActor.name,
+      actorEmail: resetActor.email,
+      after: { seededSuperadminEmail: seedEmail, defaultQueues: ['GA', 'HR', 'IT'] },
+    }, client)
+
     await client.query('COMMIT')
 
     res.json({
@@ -947,4 +976,3 @@ export async function resetDatabaseHandler(req, res, next) {
     client.release()
   }
 }
-

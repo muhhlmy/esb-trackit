@@ -1,4 +1,5 @@
 import { pool } from '../config/database.js'
+import { recordSystemAudit } from '../services/systemAuditService.js'
 import {
   assertAllowedFields,
   assertNoActiveMarkup,
@@ -254,7 +255,9 @@ export async function createFaq(req, res) {
       payload.emergency_text,
     ],
   )
-  res.status(201).json(mapFaqRow(result.rows[0]))
+  const faq = mapFaqRow(result.rows[0])
+  await recordSystemAudit(req, { module: 'faq', action: 'CREATE', entityType: 'faq', entityId: faq.id, entityLabel: faq.question, summary: `FAQ ditambahkan: ${faq.question}`, after: faq })
+  res.status(201).json(faq)
 }
 
 // PUT /api/faqs/:id
@@ -262,7 +265,7 @@ export async function updateFaq(req, res) {
   const id = parsePositiveIntegerParam(req.params.id, 'FAQ ID')
   const payload = validateUpdateBody(req.body)
 
-  const existing = await pool.query('SELECT id FROM faq WHERE id = $1', [id])
+  const existing = await pool.query(`SELECT ${FAQ_SELECT_COLUMNS} FROM faq WHERE id = $1`, [id])
   if (existing.rowCount === 0) throw createHttpError(404, 'FAQ tidak ditemukan.')
 
   const result = await pool.query(
@@ -298,13 +301,17 @@ export async function updateFaq(req, res) {
       payload.emergency_text ?? null,
     ],
   )
-  res.json(mapFaqRow(result.rows[0]))
+  const faq = mapFaqRow(result.rows[0])
+  await recordSystemAudit(req, { module: 'faq', action: 'UPDATE', entityType: 'faq', entityId: id, entityLabel: faq.question, summary: `FAQ diperbarui: ${faq.question}`, before: mapFaqRow(existing.rows[0]), after: faq })
+  res.json(faq)
 }
 
 // DELETE /api/faqs/:id
 export async function deleteFaq(req, res) {
   const id = parsePositiveIntegerParam(req.params.id, 'FAQ ID')
-  const result = await pool.query('DELETE FROM faq WHERE id = $1 RETURNING id', [id])
+  const result = await pool.query(`DELETE FROM faq WHERE id = $1 RETURNING ${FAQ_SELECT_COLUMNS}`, [id])
   if (result.rowCount === 0) throw createHttpError(404, 'FAQ tidak ditemukan.')
+  const faq = mapFaqRow(result.rows[0])
+  await recordSystemAudit(req, { module: 'faq', action: 'DELETE', entityType: 'faq', entityId: id, entityLabel: faq.question, summary: `FAQ dihapus: ${faq.question}`, before: faq })
   res.json({ message: 'FAQ berhasil dihapus.' })
 }

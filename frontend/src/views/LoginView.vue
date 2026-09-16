@@ -429,7 +429,9 @@ const finishResetAndLogin = () => {
                 <div
                   class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-blue-50 text-[#333333] flex items-center justify-center font-bold shrink-0"
                 >
-                  <span aria-hidden="true" class="material-symbols-outlined text-[18px] sm:text-[20px]"
+                  <span
+                    aria-hidden="true"
+                    class="material-symbols-outlined text-[18px] sm:text-[20px]"
                     >lock_reset</span
                   >
                 </div>
@@ -450,7 +452,11 @@ const finishResetAndLogin = () => {
                 class="w-8 h-8 sm:w-9 sm:h-9 rounded-lg hover:bg-slate-200/70 text-slate-400 hover:text-slate-600 flex items-center justify-center transition-colors cursor-pointer active:scale-95 touch-manipulation"
                 aria-label="Tutup"
               >
-                <span aria-hidden="true" class="material-symbols-outlined text-[18px] sm:text-[20px]">close</span>
+                <span
+                  aria-hidden="true"
+                  class="material-symbols-outlined text-[18px] sm:text-[20px]"
+                  >close</span
+                >
               </button>
             </div>
 
@@ -521,7 +527,9 @@ const finishResetAndLogin = () => {
                 class="mb-3.5 sm:mb-4 rounded-xl bg-red-50 p-3 border border-red-200 flex items-start gap-2.5"
                 role="alert"
               >
-                <span aria-hidden="true" class="material-symbols-outlined text-red-600 text-[18px] shrink-0 mt-0.5"
+                <span
+                  aria-hidden="true"
+                  class="material-symbols-outlined text-red-600 text-[18px] shrink-0 mt-0.5"
                   >error</span
                 >
                 <p class="text-xs font-semibold text-red-800 leading-snug">{{ forgotError }}</p>
@@ -533,7 +541,9 @@ const finishResetAndLogin = () => {
                 class="mb-3.5 sm:mb-4 rounded-xl bg-emerald-50 p-3 border border-emerald-200 flex items-start gap-2.5"
                 role="alert"
               >
-                <span aria-hidden="true" class="material-symbols-outlined text-emerald-600 text-[18px] shrink-0 mt-0.5"
+                <span
+                  aria-hidden="true"
+                  class="material-symbols-outlined text-emerald-600 text-[18px] shrink-0 mt-0.5"
                   >check_circle</span
                 >
                 <p class="text-xs font-semibold text-emerald-800 leading-snug">
@@ -558,7 +568,9 @@ const finishResetAndLogin = () => {
                       <span
                         class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none flex items-center"
                       >
-                        <span aria-hidden="true" class="material-symbols-outlined text-[18px]">mail</span>
+                        <span aria-hidden="true" class="material-symbols-outlined text-[18px]"
+                          >mail</span
+                        >
                       </span>
                       <input
                         id="forgot-email"
@@ -577,14 +589,18 @@ const finishResetAndLogin = () => {
                     class="w-full h-11 sm:h-12 rounded-xl bg-[#0A51B0] hover:bg-[#0A4391] text-white font-semibold text-sm transition-all shadow-xs flex items-center justify-center gap-2 disabled:opacity-60 cursor-pointer active:scale-[0.98] touch-manipulation"
                   >
                     <span v-if="forgotLoading" class="flex items-center gap-2">
-                      <span aria-hidden="true" class="material-symbols-outlined animate-spin text-[18px]"
+                      <span
+                        aria-hidden="true"
+                        class="material-symbols-outlined animate-spin text-[18px]"
                         >progress_activity</span
                       >
                       <span>Mengirim OTP...</span>
                     </span>
                     <span v-else class="flex items-center gap-2">
                       <span>Kirim Kode OTP</span>
-                      <span aria-hidden="true" class="material-symbols-outlined text-[18px]">send</span>
+                      <span aria-hidden="true" class="material-symbols-outlined text-[18px]"
+                        >send</span
+                      >
                     </span>
                   </button>
                 </form>
@@ -602,7 +618,9 @@ const finishResetAndLogin = () => {
                   <div
                     class="inline-flex items-center gap-1.5 mt-2 px-3 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-700 text-xs font-semibold"
                   >
-                    <span aria-hidden="true" class="material-symbols-outlined text-[14px]">timer</span>
+                    <span aria-hidden="true" class="material-symbols-outlined text-[14px]"
+                      >timer</span
+                    >
                     <span>Berlaku: {{ formatTimer(otpExpirySeconds) }}</span>
                   </div>
                 </div>
@@ -644,14 +662,18 @@ const finishResetAndLogin = () => {
                     class="w-full h-11 sm:h-12 rounded-xl bg-[#0A51B0] hover:bg-[#0A4391] text-white font-semibold text-sm transition-all shadow-xs flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer active:scale-[0.98] touch-manipulation"
                   >
                     <span v-if="forgotLoading" class="flex items-center gap-2">
-                      <span aria-hidden="true" class="material-symbols-outlined animate-spin text-[18px]"
+                      <span
+                        aria-hidden="true"
+                        class="material-symbols-outlined animate-spin text-[18px]"
                         >progress_activity</span
                       >
                       <span>Memverifikasi...</span>
                     </span>
                     <span v-else class="flex items-center gap-1.5">
                       <span>Verifikasi OTP</span>
-                      <span aria-hidden="true" class="material-symbols-outlined text-[18px]">arrow_forward</span>
+                      <span aria-hidden="true" class="material-symbols-outlined text-[18px]"
+                        >arrow_forward</span
+                      >
                     </span>
                   </button>
 
@@ -693,7 +715,9 @@ const finishResetAndLogin = () => {
                       <span
                         class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none flex items-center"
                       >
-                        <span aria-hidden="true" class="material-symbols-outlined text-[18px]">lock</span>
+                        <span aria-hidden="true" class="material-symbols-outlined text-[18px]"
+                          >lock</span
+                        >
                       </span>
                       <input
                         id="new-password"
@@ -713,7 +737,10 @@ const finishResetAndLogin = () => {
                             : 'Tampilkan kata sandi baru'
                         "
                       >
-                        <span aria-hidden="true" class="material-symbols-outlined text-[18px] block">
+                        <span
+                          aria-hidden="true"
+                          class="material-symbols-outlined text-[18px] block"
+                        >
                           {{ showNewPassword ? 'visibility_off' : 'visibility' }}
                         </span>
                       </button>
@@ -729,7 +756,9 @@ const finishResetAndLogin = () => {
                       <span
                         class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none flex items-center"
                       >
-                        <span aria-hidden="true" class="material-symbols-outlined text-[18px]">lock_clock</span>
+                        <span aria-hidden="true" class="material-symbols-outlined text-[18px]"
+                          >lock_clock</span
+                        >
                       </span>
                       <input
                         id="confirm-password"
@@ -745,7 +774,10 @@ const finishResetAndLogin = () => {
                         class="absolute right-1.5 top-1/2 -translate-y-1/2 w-8 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors focus:outline-none cursor-pointer touch-manipulation"
                         tabindex="-1"
                       >
-                        <span aria-hidden="true" class="material-symbols-outlined text-[18px] block">
+                        <span
+                          aria-hidden="true"
+                          class="material-symbols-outlined text-[18px] block"
+                        >
                           {{ showConfirmPassword ? 'visibility_off' : 'visibility' }}
                         </span>
                       </button>
@@ -796,14 +828,18 @@ const finishResetAndLogin = () => {
                     class="w-full h-11 sm:h-12 mt-2 rounded-xl bg-[#0A51B0] hover:bg-[#0A4391] text-white font-semibold text-sm transition-all shadow-xs flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer active:scale-[0.98] touch-manipulation"
                   >
                     <span v-if="forgotLoading" class="flex items-center gap-2">
-                      <span aria-hidden="true" class="material-symbols-outlined animate-spin text-[18px]"
+                      <span
+                        aria-hidden="true"
+                        class="material-symbols-outlined animate-spin text-[18px]"
                         >progress_activity</span
                       >
                       <span>Menyimpan Password...</span>
                     </span>
                     <span v-else class="flex items-center gap-2">
                       <span>Simpan & Perbarui Kata Sandi</span>
-                      <span aria-hidden="true" class="material-symbols-outlined text-[18px]">check</span>
+                      <span aria-hidden="true" class="material-symbols-outlined text-[18px]"
+                        >check</span
+                      >
                     </span>
                   </button>
                 </form>
@@ -814,7 +850,9 @@ const finishResetAndLogin = () => {
                 <div
                   class="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-emerald-100 text-emerald-600 mx-auto flex items-center justify-center"
                 >
-                  <span aria-hidden="true" class="material-symbols-outlined text-[32px] sm:text-[36px]"
+                  <span
+                    aria-hidden="true"
+                    class="material-symbols-outlined text-[32px] sm:text-[36px]"
                     >check_circle</span
                   >
                 </div>
@@ -835,7 +873,9 @@ const finishResetAndLogin = () => {
                   class="w-full h-11 sm:h-12 mt-3 rounded-xl bg-[#0A51B0] hover:bg-[#0A4391] text-white font-semibold text-sm transition-all shadow-xs flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98] touch-manipulation"
                 >
                   <span>Masuk ke Akun Anda</span>
-                  <span aria-hidden="true" class="material-symbols-outlined text-[18px]">login</span>
+                  <span aria-hidden="true" class="material-symbols-outlined text-[18px]"
+                    >login</span
+                  >
                 </button>
               </div>
             </div>
@@ -888,7 +928,7 @@ const finishResetAndLogin = () => {
   align-items: center;
   gap: 8px;
   min-height: 40px;
-  color: #5F7089;
+  color: #5f7089;
   font-size: 12px;
   font-weight: 550;
 }
@@ -915,7 +955,7 @@ const finishResetAndLogin = () => {
   justify-content: space-between;
   padding: 38px 44px;
   color: #fff;
-  background: linear-gradient(150deg, #0A51B0 0%, #0A5DBD 35%, #074797 70%, #052F66 100%);
+  background: linear-gradient(150deg, #0a51b0 0%, #0a5dbd 35%, #074797 70%, #052f66 100%);
   position: relative;
   overflow: hidden;
   min-width: 0;
@@ -962,7 +1002,7 @@ const finishResetAndLogin = () => {
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #FF4F1B 0%, #FAA425 100%);
+  background: linear-gradient(135deg, #ff4f1b 0%, #faa425 100%);
   box-shadow: 0 0 8px rgba(255, 79, 27, 0.6);
 }
 .story-top {
@@ -978,7 +1018,7 @@ const finishResetAndLogin = () => {
   width: 28px;
   height: 3px;
   border-radius: 2px;
-  background: linear-gradient(90deg, #FF4F1B 0%, #FAA425 100%);
+  background: linear-gradient(90deg, #ff4f1b 0%, #faa425 100%);
 }
 .story-content {
   padding: 0;
@@ -1075,7 +1115,7 @@ const finishResetAndLogin = () => {
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.12em;
-  color: #0A51B0;
+  color: #0a51b0;
   margin-bottom: 14px;
 }
 .login-form-panel h1 {
@@ -1087,7 +1127,7 @@ const finishResetAndLogin = () => {
 }
 .login-intro {
   margin-top: 12px;
-  color: #5F7089;
+  color: #5f7089;
   font-size: 13px;
   line-height: 1.8;
 }
@@ -1120,7 +1160,7 @@ const finishResetAndLogin = () => {
   flex-shrink: 0;
 }
 .input-wrap:focus-within {
-  border-color: #0892F5;
+  border-color: #0892f5;
   box-shadow: 0 0 0 3px rgba(10, 81, 176, 0.12);
 }
 .input-wrap input {
@@ -1135,7 +1175,7 @@ const finishResetAndLogin = () => {
   color: #333333;
 }
 .input-wrap input::placeholder {
-  color: var(--color-placeholder, #5F7089); /* token global, 4.6:1 — audit v2 */
+  color: var(--color-placeholder, #5f7089); /* token global, 4.6:1 — audit v2 */
 }
 .password-toggle {
   display: grid;
@@ -1149,7 +1189,7 @@ const finishResetAndLogin = () => {
   cursor: pointer;
 }
 .password-toggle:hover {
-  color: #0A51B0;
+  color: #0a51b0;
   background: #f5f7fb;
 }
 .login-options {
@@ -1172,16 +1212,16 @@ const finishResetAndLogin = () => {
 .login-options input {
   width: 16px;
   height: 16px;
-  accent-color: #0A51B0;
+  accent-color: #0a51b0;
 }
 .login-options button {
-  color: #0A51B0;
+  color: #0a51b0;
   min-height: 44px;
   font-weight: 600;
   cursor: pointer;
 }
 .login-options button:hover {
-  color: #0892F5;
+  color: #0892f5;
 }
 .login-submit {
   display: flex;
@@ -1191,7 +1231,7 @@ const finishResetAndLogin = () => {
   width: 100%;
   min-height: 49px;
   border-radius: 9px;
-  background: linear-gradient(135deg, #0A51B0 0%, #0A5DBD 50%, #0892F5 100%);
+  background: linear-gradient(135deg, #0a51b0 0%, #0a5dbd 50%, #0892f5 100%);
   color: white;
   font-size: 13px;
   font-weight: 650;
@@ -1200,7 +1240,7 @@ const finishResetAndLogin = () => {
   transition: all 0.2s ease;
 }
 .login-submit:hover {
-  background: linear-gradient(135deg, #0A4391 0%, #094f9e 50%, #0779d1 100%);
+  background: linear-gradient(135deg, #0a4391 0%, #094f9e 50%, #0779d1 100%);
   box-shadow: 0 6px 18px rgba(10, 81, 176, 0.32);
   transform: translateY(-1px);
 }
@@ -1214,17 +1254,17 @@ const finishResetAndLogin = () => {
 .form-help {
   margin: 20px auto 0;
   text-align: center;
-  color: #8795a9;
+  color: #5f6f85;
   font-size: 11px;
   line-height: 1.8;
 }
 .form-help a {
-  color: #0A51B0;
+  color: #0a51b0;
   text-decoration: underline;
   text-underline-offset: 3px;
 }
 .form-help a:hover {
-  color: #0892F5;
+  color: #0892f5;
 }
 .login-error {
   display: flex;
@@ -1246,12 +1286,12 @@ const finishResetAndLogin = () => {
 .login-footer {
   text-align: center;
   padding: clamp(8px, 1.2vh, 12px) 0;
-  color: #8996a9;
+  color: #5f6f85;
   font-size: 11px;
   flex-shrink: 0;
 }
 .login-page :is(a, button, input):focus-visible {
-  outline: 2px solid #0892F5;
+  outline: 2px solid #0892f5;
   outline-offset: 4px;
 }
 .input-wrap input:focus-visible {
@@ -1269,7 +1309,7 @@ const finishResetAndLogin = () => {
   font-size: 16px;
 }
 .login-reset button:focus-visible {
-  outline: 2px solid #0892F5;
+  outline: 2px solid #0892f5;
   outline-offset: 2px;
 }
 @media (max-width: 1023px) {

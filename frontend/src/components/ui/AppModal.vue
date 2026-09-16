@@ -114,7 +114,7 @@ onBeforeUnmount(() => {
           aria-modal="true"
           :aria-labelledby="titleId"
           tabindex="-1"
-          class="modal-panel app-modal-panel flex max-h-[calc(100dvh-1.5rem)] sm:max-h-[85vh] w-full flex-col overflow-hidden rounded-2xl border border-[#E2E8F0] bg-white shadow-2xl outline-none"
+          class="modal-panel app-modal-panel ui-modal-panel flex max-h-[calc(100dvh-1.5rem)] sm:max-h-[85vh] w-full flex-col overflow-hidden rounded-2xl border border-[#E2E8F0] bg-white shadow-2xl outline-none"
           :class="{
             'max-w-sm': size === 'sm',
             'max-w-lg': size === 'md',

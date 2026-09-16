@@ -16,14 +16,10 @@ import AssetCategoryImportModal from '../components/ui/AssetCategoryImportModal.
 import FilterModal from '../components/ui/FilterModal.vue'
 import AssetCategoryExportModal from '../components/ui/AssetCategoryExportModal.vue'
 
-const { get, post, put, del } = useApi()
-const { isAdmin, isSuperAdmin, hasWritePermission } = useAuth()
+const { getAllPages, post, put, del } = useApi()
+const { hasWritePermission } = useAuth()
 const canWriteAssets = computed(
-  () =>
-    isAdmin.value ||
-    isSuperAdmin.value ||
-    hasWritePermission('assets_ops') ||
-    hasWritePermission('assets'),
+  () => hasWritePermission('assets_ops') || hasWritePermission('assets'),
 )
 
 const assets = ref([])
@@ -51,7 +47,6 @@ const isSubmitting = ref(false)
 const modalError = ref('')
 const showImportModal = ref(false)
 const showExportModal = ref(false)
-
 
 function openLabelModal(asset) {
   selectedLabelAsset.value = asset
@@ -173,6 +168,11 @@ function resetFilters() {
   selectedStatus.value = ''
 }
 
+async function handleImported() {
+  showImportModal.value = false
+  await fetchData()
+}
+
 // Lifecycle
 onMounted(() => {
   fetchData()
@@ -182,7 +182,7 @@ async function fetchData() {
   isLoading.value = true
   pageError.value = ''
   try {
-    const data = await get('/api/ops-assets')
+    const data = await getAllPages('/api/ops-assets')
     assets.value = (Array.isArray(data) ? data : []).map((a) => ({
       ...a,
       lokasi: normalizeLocation(a.lokasi),
@@ -417,12 +417,27 @@ function formatDate(dateStr) {
             <span aria-hidden="true" class="material-symbols-outlined text-[16px]">add</span>
             <span>Tambah Aset OPS</span>
           </button>
-          <div class="toolbar-action-group flex items-center gap-1 rounded-lg border border-[#D7E3F2] bg-[#F8FAFC] p-1">
-            <button type="button" @click="showImportModal = true" class="toolbar-action-button inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-[11px] font-bold text-[#0A51B0] hover:bg-white" title="Impor data Aset OPS dari Excel">
-              <span aria-hidden="true" class="material-symbols-outlined text-[15px]">upload_file</span>Import
+          <div
+            class="toolbar-action-group flex items-center gap-1 rounded-lg border border-[#D7E3F2] bg-[#F8FAFC] p-1"
+          >
+            <button
+              type="button"
+              @click="showImportModal = true"
+              class="toolbar-action-button inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-[11px] font-bold text-[#0A51B0] hover:bg-white"
+              title="Impor data Aset OPS dari Excel"
+            >
+              <span aria-hidden="true" class="material-symbols-outlined text-[15px]"
+                >upload_file</span
+              >Import
             </button>
-            <button type="button" @click="showExportModal = true" class="toolbar-action-button inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-[11px] font-bold text-[#0A51B0] hover:bg-white" title="Export data Aset OPS">
-              <span aria-hidden="true" class="material-symbols-outlined text-[15px]">download</span>Export
+            <button
+              type="button"
+              @click="showExportModal = true"
+              class="toolbar-action-button inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-[11px] font-bold text-[#0A51B0] hover:bg-white"
+              title="Export data Aset OPS"
+            >
+              <span aria-hidden="true" class="material-symbols-outlined text-[15px]">download</span
+              >Export
             </button>
           </div>
         </div>
@@ -435,13 +450,15 @@ function formatDate(dateStr) {
         <!-- Search Input -->
         <div class="relative h-9 w-full sm:flex-1 sm:min-w-[200px]">
           <span
-            aria-hidden="true" class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-[17px] text-[#687281] pointer-events-none"
+            aria-hidden="true"
+            class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-[17px] text-[#687281] pointer-events-none"
             >search</span
           >
           <input
             v-model="searchQuery"
             type="text"
-            aria-label="Cari aset OPS" placeholder="Cari hostname, nama asset, PIC, lokasi..."
+            aria-label="Cari aset OPS"
+            placeholder="Cari hostname, nama asset, PIC, lokasi..."
             class="h-full w-full rounded-lg border border-[#E2E8F0] bg-white pl-8 pr-8 text-xs text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
           />
           <!-- Inline Clear Button -->
@@ -458,7 +475,15 @@ function formatDate(dateStr) {
         </div>
 
         <div class="flex w-full items-center justify-end">
-          <button type="button" @click="showFilterModal = true" class="h-9 shrink-0 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-semibold text-[#5F7089] hover:bg-white"><span aria-hidden="true" class="material-symbols-outlined mr-1 align-middle text-[16px]">filter_alt</span>Filter</button>
+          <button
+            type="button"
+            @click="showFilterModal = true"
+            class="h-9 shrink-0 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-semibold text-[#5F7089] hover:bg-white"
+          >
+            <span aria-hidden="true" class="material-symbols-outlined mr-1 align-middle text-[16px]"
+              >filter_alt</span
+            >Filter
+          </button>
         </div>
       </div>
     </div>
@@ -576,7 +601,9 @@ function formatDate(dateStr) {
           <span
             class="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#F1F5F9] text-[#5F7089]"
           >
-            <span aria-hidden="true" class="material-symbols-outlined text-[24px]">precision_manufacturing</span>
+            <span aria-hidden="true" class="material-symbols-outlined text-[24px]"
+              >precision_manufacturing</span
+            >
           </span>
           <h3 class="text-[14px] font-bold text-[#333333] mt-1">Belum Ada Aset OPS</h3>
           <p class="text-[12px] text-[#5F7089] leading-relaxed">
@@ -609,7 +636,9 @@ function formatDate(dateStr) {
         >
           <div class="laptop-identity">
             <div class="laptop-icon" aria-hidden="true">
-              <span aria-hidden="true" class="material-symbols-outlined">{{ getOpsIcon(asset.kategori) }}</span>
+              <span aria-hidden="true" class="material-symbols-outlined">{{
+                getOpsIcon(asset.kategori)
+              }}</span>
             </div>
             <div class="laptop-identity-text">
               <h4 :title="asset.nama_asset">{{ asset.nama_asset || '—' }}</h4>
@@ -655,10 +684,34 @@ function formatDate(dateStr) {
       />
     </div>
 
-    <FilterModal :is-open="showFilterModal" title="Filter Aset OPS" @close="showFilterModal = false" @apply="showFilterModal = false" @reset="resetFilters">
-      <CustomSelect v-model="selectedLocation" :options="locationFilterOptions" aria-label="Filter lokasi" :block="true" height-class="h-9" />
-      <CustomSelect v-model="selectedKategori" :options="kategoriFilterOptions" aria-label="Filter kategori" :block="true" height-class="h-9" />
-      <CustomSelect v-model="selectedStatus" :options="statusFilterOptions" aria-label="Filter status" :block="true" height-class="h-9" />
+    <FilterModal
+      :is-open="showFilterModal"
+      title="Filter Aset OPS"
+      @close="showFilterModal = false"
+      @apply="showFilterModal = false"
+      @reset="resetFilters"
+    >
+      <CustomSelect
+        v-model="selectedLocation"
+        :options="locationFilterOptions"
+        aria-label="Filter lokasi"
+        :block="true"
+        height-class="h-9"
+      />
+      <CustomSelect
+        v-model="selectedKategori"
+        :options="kategoriFilterOptions"
+        aria-label="Filter kategori"
+        :block="true"
+        height-class="h-9"
+      />
+      <CustomSelect
+        v-model="selectedStatus"
+        :options="statusFilterOptions"
+        aria-label="Filter status"
+        :block="true"
+        height-class="h-9"
+      />
     </FilterModal>
 
     <!-- Modal Form (Tambah / Edit) -->
@@ -977,8 +1030,18 @@ function formatDate(dateStr) {
       :asset="selectedLabelAsset"
       @close="showLabelModal = false"
     />
-    <AssetCategoryImportModal :is-open="showImportModal" asset-type="ops" @close="showImportModal = false" @imported="showImportModal = false; fetchData()" />
-    <AssetCategoryExportModal :is-open="showExportModal" asset-type="ops" :assets="filteredAssets" @close="showExportModal = false" />
+    <AssetCategoryImportModal
+      :is-open="showImportModal"
+      asset-type="ops"
+      @close="showImportModal = false"
+      @imported="handleImported"
+    />
+    <AssetCategoryExportModal
+      :is-open="showExportModal"
+      asset-type="ops"
+      :assets="filteredAssets"
+      @close="showExportModal = false"
+    />
   </div>
 </template>
 

@@ -49,29 +49,30 @@ const filteredTemplates = computed(() => {
   <div class="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-8">
     <!-- Header -->
     <div
-      class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-slate-800 pb-6"
+      class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-slate-200 pb-6"
     >
       <div>
         <div
-          class="flex items-center gap-2 text-indigo-400 font-semibold text-xs uppercase tracking-wider mb-1"
+          class="flex items-center gap-2 text-indigo-700 font-semibold text-xs uppercase tracking-wider mb-1"
         >
           <MessageSquare class="w-4 h-4" />
           <span>Communication Hub</span>
         </div>
-        <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-100">Template Komunikasi Tim</h1>
-        <p class="text-xs sm:text-sm text-slate-400 mt-1">
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900">Template Komunikasi Tim</h1>
+        <p class="text-xs sm:text-sm text-slate-600 mt-1">
           Format pesan standar profesional untuk Slack, Microsoft Teams, Discord, dan WhatsApp grup.
         </p>
       </div>
 
       <!-- Search Input -->
       <div class="relative w-full md:w-72">
-        <Search class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+        <Search class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-600" />
         <input
           v-model="templateSearch"
           type="text"
-          class="w-full bg-slate-900 border border-slate-800 rounded-xl pl-9 pr-4 py-2 text-xs text-slate-100 placeholder-slate-400 focus:outline-none focus:border-indigo-500 transition-all"
-          aria-label="Filter template" placeholder="Filter template pesan..."
+          class="w-full bg-white border border-slate-300 rounded-xl pl-9 pr-4 py-2 text-xs text-slate-900 placeholder-slate-500 focus:outline-none focus:border-indigo-600 transition-all"
+          aria-label="Filter template"
+          placeholder="Filter template pesan..."
         />
       </div>
     </div>

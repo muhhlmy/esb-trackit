@@ -123,7 +123,7 @@ onBeforeUnmount(() => {
       @click.stop="toggleDropdown"
       aria-label="Opsi Aksi"
       title="Opsi Aksi"
-      class="flex h-7 w-7 items-center justify-center rounded-lg text-[#66728d] hover:bg-[#F8FAFC] hover:text-[#333333] transition-all cursor-pointer"
+      class="ui-menu-trigger flex h-7 w-7 items-center justify-center rounded-lg text-[#66728d] hover:bg-[#F8FAFC] hover:text-[#333333] transition-all cursor-pointer"
       :class="isOpen ? 'bg-[#ECF2FF] text-[#333333]' : ''"
     >
       <span aria-hidden="true" class="material-symbols-outlined text-[18px]">more_horiz</span>
@@ -135,7 +135,7 @@ onBeforeUnmount(() => {
           v-if="isOpen"
           ref="dropdownRef"
           :style="dropdownStyle"
-          class="rounded-xl border border-[#E5EAEF] bg-white p-1.5 shadow-2xl outline-none select-none"
+          class="ui-action-menu rounded-xl border border-[#E5EAEF] bg-white p-1.5 shadow-2xl outline-none select-none"
         >
           <template v-for="(act, idx) in actions" :key="idx">
             <button

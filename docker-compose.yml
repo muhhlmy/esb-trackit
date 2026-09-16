@@ -6,23 +6,23 @@ services:
     networks:
       - app-network
     environment:
-      POSTGRES_DB: ${DB_NAME:-assets_monitoring}
+      POSTGRES_DB: ${DB_NAME:-esb_trackit}
       POSTGRES_USER: ${DB_USER:-postgres}
       POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD must be set in environment}
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d ${DB_NAME:-assets_monitoring}"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d ${DB_NAME:-esb_trackit}"]
       interval: 10s
       timeout: 5s
       retries: 5
 
-  backend:
+  migrate:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: esb-backend
-    restart: unless-stopped
+    container_name: esb-migrate
+    restart: "no"
     networks:
       - app-network
     depends_on:
@@ -35,9 +35,45 @@ services:
       DB_PORT: 5432
       DB_USER: ${DB_USER:-postgres}
       DB_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD must be set in environment}
-      DB_NAME: ${DB_NAME:-assets_monitoring}
+      DB_NAME: ${DB_NAME:-esb_trackit}
       JWT_SECRET: ${JWT_SECRET:?JWT_SECRET must be set in environment (min 32 characters)}
-      PASSWORD_BCRYPT_ROUNDS: 12
+      MIGRATION_MODE: ${MIGRATION_MODE:-fresh}
+      MIGRATION_EXPECTED_HOST: postgres
+      MIGRATION_EXPECTED_DATABASE: ${DB_NAME:-esb_trackit}
+      ALLOW_DB_MIGRATIONS: "true"
+      MIGRATION_RECOVERY_PROOF_ID: ${MIGRATION_RECOVERY_PROOF_ID:?MIGRATION_RECOVERY_PROOF_ID must be set}
+      MIGRATION_CHANGE_ID: ${MIGRATION_CHANGE_ID:?MIGRATION_CHANGE_ID must be set}
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    volumes:
+      - backups:/app/storage/backups
+    command: ["npm", "run", "db:migrate:apply"]
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: esb-backend
+    restart: unless-stopped
+    networks:
+      - app-network
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    environment:
+      PORT: 3000
+      HOST: 0.0.0.0
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: ${DB_USER:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD must be set in environment}
+      DB_NAME: ${DB_NAME:-esb_trackit}
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET must be set in environment (min 32 characters)}
+      PASSWORD_BCRYPT_ROUNDS: ${PASSWORD_BCRYPT_ROUNDS:-12}
+      ACCESS_TOKEN_TTL_SECONDS: ${ACCESS_TOKEN_TTL_SECONDS:-900}
+      SESSION_COOKIE_PATH: ${SESSION_COOKIE_PATH:-/}
       CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost}
       TRUST_PROXY_CIDRS: ${TRUST_PROXY_CIDRS:-172.28.0.0/16}
       EMAIL_ENABLED: ${EMAIL_ENABLED:-false}
@@ -47,6 +83,17 @@ services:
       SMTP_USER: ${SMTP_USER:-}
       SMTP_PASS: ${SMTP_PASS:-}
       EMAIL_FROM: ${EMAIL_FROM:-}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost}
+      DB_BACKUP_DIR: /app/storage/backups
+      DB_BACKUP_RETENTION_DAYS: ${DB_BACKUP_RETENTION_DAYS:-30}
+      DB_BACKUP_MAX_FILES: ${DB_BACKUP_MAX_FILES:-20}
+      PG_DUMP_PATH: pg_dump
+      PG_RESTORE_PATH: pg_restore
+      PSQL_PATH: psql
+      ENABLE_DB_RESET: ${ENABLE_DB_RESET:-false}
+      SEED_SUPERADMIN_NAME: ${SEED_SUPERADMIN_NAME:-}
+      SEED_SUPERADMIN_EMAIL: ${SEED_SUPERADMIN_EMAIL:-}
+      SEED_SUPERADMIN_PASSWORD: ${SEED_SUPERADMIN_PASSWORD:-}
     security_opt:
       - no-new-privileges:true
     cap_drop:

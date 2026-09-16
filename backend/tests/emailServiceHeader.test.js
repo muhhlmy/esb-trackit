@@ -1,6 +1,28 @@
 import { test } from 'node:test'
 import assert from 'node:assert'
-import { renderTicketEmailHtml, renderPasswordResetOtpEmailHtml, getEsbLogoPngPath } from '../src/services/emailService.js'
+import { renderTicketEmailHtml, renderPasswordResetOtpEmailHtml, getEsbLogoPngPath, isEmailConfigured } from '../src/services/emailService.js'
+
+test('OTP email requires complete SMTP configuration', () => {
+  const original = Object.fromEntries(
+    ['EMAIL_ENABLED', 'SMTP_HOST', 'SMTP_USER', 'SMTP_PASS'].map((key) => [key, process.env[key]]),
+  )
+  try {
+    process.env.EMAIL_ENABLED = 'true'
+    process.env.SMTP_HOST = 'smtp.example.test'
+    process.env.SMTP_USER = ''
+    process.env.SMTP_PASS = ''
+    assert.equal(isEmailConfigured(), false)
+
+    process.env.SMTP_USER = 'mailer@example.test'
+    process.env.SMTP_PASS = 'app-password'
+    assert.equal(isEmailConfigured(), true)
+  } finally {
+    for (const [key, value] of Object.entries(original)) {
+      if (value === undefined) delete process.env[key]
+      else process.env[key] = value
+    }
+  }
+})
 
 test('renderTicketEmailHtml renders ESB Logo Only logo with cid:esbLogoOnly vertically centered in header', () => {
   const pngPath = getEsbLogoPngPath()
@@ -126,4 +148,3 @@ test('renderTicketEmailHtml renders valid CTA button URL and ticket title', () =
   assert.ok(html.includes('Muhammad Helmy'), 'Pelapor name should appear in the email card')
   assert.ok(!html.includes('Pelapor: 38'), 'Pelapor should not display raw database user ID')
 })
-

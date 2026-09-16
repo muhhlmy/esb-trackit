@@ -1,20 +1,26 @@
+function readTestCredential(name) {
+  const value = process.env[name]?.trim()
+  if (!value) throw new Error(`${name} wajib diisi melalui .env.e2e untuk menjalankan E2E.`)
+  return value
+}
+
 export const TEST_USERS = {
   superadmin: {
-    email: process.env.E2E_SUPERADMIN_EMAIL || 'superadmin@admin.com',
-    password: process.env.E2E_SUPERADMIN_PASSWORD || 'admin123',
-    role: 'superadmin',
-    name: 'Super Admin',
+    email: readTestCredential('E2E_SUPERADMIN_EMAIL'),
+    password: readTestCredential('E2E_SUPERADMIN_PASSWORD'),
+    role: "superadmin",
+    name: "Super Admin",
   },
   admin: {
-    email: process.env.E2E_ADMIN_EMAIL || 'admin@admin.com',
-    password: process.env.E2E_ADMIN_PASSWORD || 'admin123',
-    role: 'admin',
-    name: 'Admin IT',
+    email: readTestCredential('E2E_ADMIN_EMAIL'),
+    password: readTestCredential('E2E_ADMIN_PASSWORD'),
+    role: "admin",
+    name: "Admin IT",
   },
   user: {
-    email: process.env.E2E_USER_EMAIL || 'user@user.com',
-    password: process.env.E2E_USER_PASSWORD || 'user12345',
-    role: 'user',
-    name: 'User Karyawan',
+    email: readTestCredential('E2E_USER_EMAIL'),
+    password: readTestCredential('E2E_USER_PASSWORD'),
+    role: "user",
+    name: "User Karyawan",
   },
-}
+};

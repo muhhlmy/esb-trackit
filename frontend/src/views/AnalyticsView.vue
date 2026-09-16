@@ -4,7 +4,7 @@ import { useCases } from '@/composables/useCases'
 import AnalyticsCharts from '@/components/charts/AnalyticsCharts.vue'
 import { BarChart3, RefreshCw } from 'lucide-vue-next'
 
-const { cases } = useCases()
+const { cases, fetchCases } = useCases()
 
 const statsData = ref({
   summary: {
@@ -47,33 +47,34 @@ async function loadStats() {
   isLoading.value = false
 }
 
-onMounted(() => {
-  loadStats()
+onMounted(async () => {
+  await fetchCases()
+  await loadStats()
 })
 </script>
 
 <template>
   <div class="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-8">
     <!-- Header -->
-    <div class="flex items-center justify-between border-b border-slate-800 pb-6">
+    <div class="flex items-center justify-between border-b border-slate-200 pb-6">
       <div>
         <div
-          class="flex items-center gap-2 text-indigo-400 font-semibold text-xs uppercase tracking-wider mb-1"
+          class="flex items-center gap-2 text-indigo-700 font-semibold text-xs uppercase tracking-wider mb-1"
         >
           <BarChart3 class="w-4 h-4" />
           <span>Analytics & Metrics</span>
         </div>
-        <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-100">
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900">
           Statistik Incident Playbook
         </h1>
-        <p class="text-xs sm:text-sm text-slate-400 mt-1">
+        <p class="text-xs sm:text-sm text-slate-600 mt-1">
           Metrik distribusi artikel, klasifikasi severity, dan efektivitas dokumentasi insiden.
         </p>
       </div>
 
       <button
         @click="loadStats"
-        class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-white transition-colors cursor-pointer"
+        class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 transition-colors cursor-pointer"
         title="Refresh Data"
       >
         <RefreshCw class="w-3.5 h-3.5" :class="{ 'animate-spin': isLoading }" />

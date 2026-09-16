@@ -31,25 +31,20 @@ esb-trackit/
 ├── frontend/                   # Vue SPA
 ├── e2e/                         # Playwright test
 ├── docs/                        # Dokumentasi teknis
-├── esb-trackit.sql              # Dump schema PostgreSQL tanpa data
+├── esb-trackit.sql              # Snapshot schema legacy (referensi saja)
 ├── package.json                 # Perintah E2E root
 └── README.md
 ```
 
 ## Database
 
-`esb-trackit.sql` adalah dump schema PostgreSQL dari database proyek saat ini.
+`esb-trackit.sql` adalah snapshot schema legacy tanpa data. File ini tidak
+menjadi sumber kebenaran dan tidak boleh dipakai untuk provisioning database baru.
 
 - Berisi tabel, sequence, constraint, foreign key, dan index.
 - Tidak berisi data, owner, privilege, password, token, API key, atau connection string.
-- Gunakan untuk membuat database kosong bila diperlukan:
-
-```bash
-createdb esb_trackit
-psql -d esb_trackit -f esb-trackit.sql
-```
-
-Untuk skema production atau database existing, gunakan migrasi versioned. Jangan mencampur import dump dan penerapan migrasi pada database yang sama tanpa runbook adopsi migrasi.
+Untuk database baru, existing, maupun production, gunakan migrasi versioned.
+Jangan mencampur import dump dan penerapan migrasi pada database yang sama.
 
 ```bash
 cd backend
@@ -184,7 +179,7 @@ npm run lint
 npm run format:check
 ```
 
-Untuk E2E, salin `.env.e2e.example` menjadi `.env.e2e`, lalu isi konfigurasi environment test secara lokal. Jangan simpan credential dalam repository.
+Untuk E2E, salin `.env.e2e.example` menjadi `.env.e2e`, arahkan hanya ke database lokal disposable berakhiran `_test`, lalu jalankan `npm run test:e2e:prepare`. Perintah E2E utama juga menjalankan persiapan migrasi dan fixture tersebut secara otomatis. Jangan simpan credential dalam repository.
 
 ## Lisensi
 

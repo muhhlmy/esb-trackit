@@ -1,8 +1,8 @@
 # IT Assets Monitoring API
 
 REST API Express.js menggunakan ES Modules dan PostgreSQL. Struktur database
-mengikuti `Schema.sql`: tabel `karyawan`, tabel `aset_ti`, dan view
-`daftar_aset_ti_lengkap`.
+mengikuti migrasi kanonik di `migrations/versioned/`: tabel `karyawan`, tabel
+`aset_ti`, dan view `daftar_aset_ti_lengkap`.
 
 ## Struktur folder
 
@@ -15,8 +15,7 @@ backend/
 |   |-- app.js           # Konfigurasi aplikasi Express
 |   `-- server.js        # Entry point untuk menjalankan server
 |-- tests/               # Automated test
-|-- Schema.sql           # Tabel dan view PostgreSQL
-|-- Seed.sql             # Data dummy
+|-- migrations/versioned/# Sumber kebenaran skema PostgreSQL
 |-- .env.example         # Contoh environment variable
 `-- package.json
 ```
@@ -65,12 +64,8 @@ Arrow function, spread object, optional chaining, nullish coalescing,
    wajib tidak lengkap.
 5. Jalankan frontend dari folder `frontend` menggunakan `npm run dev`.
 
-`Schema.sql` dan `Seed.sql` adalah bootstrap legacy yang belum terbukti aman
-untuk fresh/existing/rerun dan diketahui belum menjadi schema ticket canonical.
-Jalur setup legacy sekarang sengaja **fail closed**: `db:setup`, `migrate`, dan
-`seed` selalu berhenti dengan exit code non-zero sebelum membuka koneksi atau
-menjalankan SQL. Nama script dipertahankan agar pemanggilan lama gagal secara
-jelas, bukan diam-diam memodifikasi database.
+Jalur setup lama sengaja **fail closed**. Gunakan migration runner versioned
+untuk perubahan skema; jangan membuat jalur bootstrap SQL baru di luar runner.
 
 Guard tersebut baru boleh diganti dengan runner migration setelah tersedia
 target terisolasi yang diotorisasi, bukti backup dan restore yang terverifikasi,

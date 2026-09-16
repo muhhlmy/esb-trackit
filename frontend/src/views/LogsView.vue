@@ -18,13 +18,17 @@ const { isSuperAdmin } = useAuth()
 // ── State Utama ──────────────────────────────────────────────
 const assetLogs = ref([])
 const auditLogs = ref([])
+const systemLogs = ref([])
 const isLoading = ref(true)
 const pageError = ref('')
-const activeTab = ref('assets') // 'assets' | 'audit'
+const activeTab = ref('assets') // 'assets' | 'audit' | 'system'
 
 const currentPageAssets = ref(1)
 const currentPageAudit = ref(1)
+const currentPageSystem = ref(1)
 const itemsPerPage = ref(10)
+const expandedSystemLogId = ref(null)
+const systemLogTotal = ref(0)
 
 // ── Filter State ─────────────────────────────────────────────
 const searchQuery = ref('')
@@ -39,11 +43,21 @@ async function fetchLogs() {
     const requests = [get('/api/logs/assets')]
     if (isSuperAdmin.value) {
       requests.push(get('/api/logs/audit'))
+      const systemParams = new URLSearchParams({
+        page: String(currentPageSystem.value),
+        limit: String(itemsPerPage.value),
+      })
+      if (searchQuery.value.trim()) systemParams.set('q', searchQuery.value.trim())
+      requests.push(get(`/api/logs/system?${systemParams.toString()}`))
     }
 
-    const [assetsData, auditData = []] = await Promise.all(requests)
+    const [assetsData, auditData = [], systemData = []] = await Promise.all(requests)
     assetLogs.value = Array.isArray(assetsData) ? assetsData : []
     auditLogs.value = Array.isArray(auditData) ? auditData : []
+    systemLogs.value = Array.isArray(systemData) ? systemData : (systemData?.data || [])
+    systemLogTotal.value = Array.isArray(systemData)
+      ? systemLogs.value.length
+      : Number(systemData?.pagination?.total || 0)
   } catch (error) {
     pageError.value = error.message || 'Gagal memuat data log dari server.'
     console.error(error)
@@ -103,9 +117,22 @@ const filteredAuditLogs = computed(() => {
   })
 })
 
+const filteredSystemLogs = computed(() => {
+  const query = searchQuery.value.trim().toLowerCase()
+  return systemLogs.value.filter((log) => !query || [log.module, log.action, log.entity_type, log.entity_label, log.summary, log.actor_name, log.actor_email]
+    .some((value) => String(value || '').toLowerCase().includes(query)))
+})
+
 watch([searchQuery, filterAction, filterActivity, activeTab], () => {
+  const shouldReloadSystemLogs = activeTab.value === 'system' && currentPageSystem.value === 1
   currentPageAssets.value = 1
   currentPageAudit.value = 1
+  currentPageSystem.value = 1
+  if (shouldReloadSystemLogs) fetchLogs()
+})
+
+watch(currentPageSystem, () => {
+  if (activeTab.value === 'system') fetchLogs()
 })
 
 const paginatedAssetLogs = computed(() => {
@@ -116,6 +143,10 @@ const paginatedAssetLogs = computed(() => {
 const paginatedAuditLogs = computed(() => {
   const start = (currentPageAudit.value - 1) * itemsPerPage.value
   return filteredAuditLogs.value.slice(start, start + itemsPerPage.value)
+})
+
+const paginatedSystemLogs = computed(() => {
+  return filteredSystemLogs.value
 })
 
 // ── Helper Badge Aksi / Aktifitas ───────────────────────────
@@ -207,6 +238,39 @@ function parsePerubahan(perubahan, aksi) {
 
   return [{ field: null, value: perubahan }]
 }
+
+function toggleSystemLogDetail(logId) {
+  expandedSystemLogId.value = expandedSystemLogId.value === logId ? null : logId
+}
+
+function formatAuditField(field) {
+  return String(field || '')
+    .replace(/_/g, ' ')
+    .replace(/([a-z])([A-Z])/g, '$1 $2')
+    .replace(/\b\w/g, (letter) => letter.toUpperCase())
+}
+
+function formatAuditValue(value) {
+  if (value === undefined || value === null || value === '') return '—'
+  if (typeof value === 'boolean') return value ? 'Ya' : 'Tidak'
+  if (typeof value === 'object') return JSON.stringify(value, null, 2)
+  return String(value)
+}
+
+function systemAuditChanges(log) {
+  const before = log.before_data && typeof log.before_data === 'object' ? log.before_data : {}
+  const after = log.after_data && typeof log.after_data === 'object' ? log.after_data : {}
+  const fields = new Set([...Object.keys(before), ...Object.keys(after)])
+  return [...fields]
+    .filter((field) => JSON.stringify(before[field]) !== JSON.stringify(after[field]))
+    .map((field) => ({
+      field: formatAuditField(field),
+      before: before[field],
+      after: after[field],
+      hasBefore: Object.prototype.hasOwnProperty.call(before, field),
+      hasAfter: Object.prototype.hasOwnProperty.call(after, field),
+    }))
+}
 </script>
 
 <template>
@@ -252,7 +316,7 @@ function parsePerubahan(perubahan, aksi) {
     <!-- Tab Selection Navigation -->
     <div
       class="admin-tabs grid sm:flex border-b border-[#E2E8F0]/80"
-      :class="isSuperAdmin ? 'grid-cols-2' : 'grid-cols-1'"
+      :class="isSuperAdmin ? 'grid-cols-3' : 'grid-cols-1'"
       aria-label="Jenis log"
     >
       <button
@@ -283,6 +347,17 @@ function parsePerubahan(perubahan, aksi) {
       >
         <span aria-hidden="true" class="material-symbols-outlined text-[18px]">security</span>
         Audit Aktivitas Login
+      </button>
+      <button
+        v-if="isSuperAdmin"
+        type="button"
+        :aria-pressed="activeTab === 'system'"
+        @click="activeTab = 'system'"
+        class="flex min-w-0 min-h-11 items-center justify-center sm:justify-start gap-2 px-2 sm:px-5 py-3.5 text-xs leading-relaxed text-left font-bold transition-all duration-150 border-b-2 -mb-[2px]"
+        :class="activeTab === 'system' ? 'border-brand text-brand font-black' : 'border-transparent text-[#5F7089] hover:text-[#172033]'"
+      >
+        <span aria-hidden="true" class="material-symbols-outlined text-[18px]">receipt_long</span>
+        Audit Sistem
       </button>
     </div>
 
@@ -325,7 +400,7 @@ function parsePerubahan(perubahan, aksi) {
           />
         </div>
 
-        <!-- Activity Filter (Audit Tab only) -->
+        <!-- Activity Filter (Audit Login Tab only) -->
         <div v-if="activeTab === 'audit'" class="min-w-0 w-44">
           <CustomSelect
             v-model="filterActivity"
@@ -629,6 +704,68 @@ function parsePerubahan(perubahan, aksi) {
           v-if="filteredAuditLogs.length > 0"
           v-model:currentPage="currentPageAudit"
           :total-items="filteredAuditLogs.length"
+          :items-per-page="itemsPerPage"
+        />
+      </div>
+
+      <!-- ── TAB 3: System Audit ────────────────────────────── -->
+      <div v-else-if="activeTab === 'system'">
+        <div v-if="filteredSystemLogs.length === 0" class="px-4 py-12 text-center">
+          <span aria-hidden="true" class="material-symbols-outlined text-[40px] text-[#D1D5DB]">receipt_long</span>
+          <p class="mt-3 text-[13px] font-semibold text-[#5F7089]">Belum ada aktivitas sistem tercatat.</p>
+        </div>
+        <div v-else class="divide-y divide-[#F3F4F6]">
+          <article
+            v-for="log in paginatedSystemLogs"
+            :key="log.id"
+            role="button"
+            tabindex="0"
+            :aria-expanded="expandedSystemLogId === log.id"
+            class="flex min-w-0 cursor-pointer gap-3 p-4 transition-colors hover:bg-[#F8FAFC] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand sm:px-5"
+            @click="toggleSystemLogDetail(log.id)"
+            @keydown.enter.prevent="toggleSystemLogDetail(log.id)"
+            @keydown.space.prevent="toggleSystemLogDetail(log.id)"
+          >
+            <span aria-hidden="true" class="material-symbols-outlined mt-0.5 text-[20px] text-brand">history</span>
+            <div class="min-w-0 flex-1 wrap-anywhere">
+              <div class="flex flex-wrap items-center gap-2">
+                <AppBadge :type="log.action === 'DELETE' ? 'danger' : log.action === 'CREATE' ? 'success' : 'warning'" :text="log.action" />
+                <span class="text-xs font-bold text-[#111827]">{{ log.module }} · {{ log.entity_label || log.entity_type }}</span>
+                <time class="ml-auto text-[10px] font-medium text-[#687281]">{{ formatDateTime(log.dibuat_pada) }}</time>
+              </div>
+              <p class="mt-2 text-xs leading-relaxed text-[#5F7089]">{{ log.summary }}</p>
+              <p class="mt-2 text-[10px] font-semibold text-[#687281]">Oleh: {{ log.actor_name }}<span v-if="log.actor_email"> · {{ log.actor_email }}</span></p>
+              <p class="mt-3 text-[10px] font-bold text-brand">{{ expandedSystemLogId === log.id ? 'Klik untuk menutup detail' : 'Klik aktivitas untuk melihat detail' }}</p>
+              <section
+                v-if="expandedSystemLogId === log.id"
+                class="mt-3 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] p-3"
+                aria-label="Detail perubahan audit sistem"
+              >
+                <p class="text-[10px] font-extrabold uppercase tracking-wider text-[#687281]">Detail Perubahan</p>
+                <div v-if="systemAuditChanges(log).length" class="mt-2 divide-y divide-[#E2E8F0]">
+                  <div v-for="change in systemAuditChanges(log)" :key="change.field" class="grid gap-2 py-2.5 text-[11px] sm:grid-cols-[9rem_minmax(0,1fr)_minmax(0,1fr)]">
+                    <span class="font-bold text-[#475569]">{{ change.field }}</span>
+                    <div v-if="change.hasBefore" class="min-w-0 rounded-md bg-[#FEF2F2] px-2 py-1.5 text-[#991B1B]">
+                      <span class="mb-1 block text-[9px] font-extrabold uppercase tracking-wide">Sebelum</span>
+                      <pre class="whitespace-pre-wrap break-words font-sans">{{ formatAuditValue(change.before) }}</pre>
+                    </div>
+                    <div v-if="change.hasAfter" class="min-w-0 rounded-md bg-[#F0FDF4] px-2 py-1.5 text-[#166534]" :class="!change.hasBefore ? 'sm:col-start-2' : ''">
+                      <span class="mb-1 block text-[9px] font-extrabold uppercase tracking-wide">Sesudah</span>
+                      <pre class="whitespace-pre-wrap break-words font-sans">{{ formatAuditValue(change.after) }}</pre>
+                    </div>
+                  </div>
+                </div>
+                <p v-else class="mt-2 text-[11px] leading-relaxed text-[#687281]">Aktivitas ini tidak memiliki perubahan field yang dapat dibandingkan. Lihat ringkasan aktivitas di atas.</p>
+              </section>
+            </div>
+          </article>
+        </div>
+        <AppPagination
+          v-if="filteredSystemLogs.length > 0"
+          asset-style
+          mobile-compact
+          v-model:currentPage="currentPageSystem"
+          :total-items="systemLogTotal"
           :items-per-page="itemsPerPage"
         />
       </div>

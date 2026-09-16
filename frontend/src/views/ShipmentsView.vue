@@ -151,8 +151,10 @@ function toast(msg, type = 'success') {
 
 // ── Fetch Data ───────────────────────────────────────────────
 let searchDebounce = null
+let fetchRequestId = 0
 
 async function fetchData() {
+  const requestId = ++fetchRequestId
   isLoading.value = true
   pageError.value = ''
   try {
@@ -166,17 +168,21 @@ async function fetchData() {
     if (filterDateTo.value) params.dateTo = filterDateTo.value
 
     const res = await api.getShipments(params)
+    if (requestId !== fetchRequestId) return
     shipments.value = Array.isArray(res?.data) ? res.data : []
     totalRecords.value = Number(res?.total) || 0
     if (res?.summary) {
       summary.value = res.summary
     }
   } catch (err) {
+    if (requestId !== fetchRequestId) return
     pageError.value = err.message || 'Gagal memuat data pengiriman.'
   } finally {
-    isLoading.value = false
-    await nextTick()
-    animateStagger('tbody tr')
+    if (requestId === fetchRequestId) {
+      isLoading.value = false
+      await nextTick()
+      animateStagger('tbody tr')
+    }
   }
 }
 
@@ -200,6 +206,11 @@ function resetFilters() {
   filterDateTo.value = ''
   currentPage.value = 1
   fetchData()
+}
+
+async function handleImported() {
+  showImportModal.value = false
+  await fetchData()
 }
 
 // ── Modals & Actions ─────────────────────────────────────────
@@ -329,7 +340,10 @@ onMounted(() => {
 </script>
 
 <template>
-  <div data-testid="page-ready" class="shipments-page space-y-4 sm:space-y-6 pb-12">
+  <div
+    :data-testid="!isLoading ? 'page-ready' : undefined"
+    class="shipments-page space-y-4 sm:space-y-6 pb-12"
+  >
     <!-- Notification Toast -->
     <Transition name="fade">
       <div
@@ -364,20 +378,25 @@ onMounted(() => {
             <span aria-hidden="true" class="material-symbols-outlined text-[16px]">add</span>
             <span>Tambah Pengiriman</span>
           </button>
-          <div class="toolbar-action-group flex items-center gap-1 rounded-lg border border-[#D7E3F2] bg-[#F8FAFC] p-1">
+          <div
+            class="toolbar-action-group flex items-center gap-1 rounded-lg border border-[#D7E3F2] bg-[#F8FAFC] p-1"
+          >
             <button
               type="button"
               @click="showImportModal = true"
               class="toolbar-action-button inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-[11px] font-bold text-[#0A51B0] hover:bg-white"
             >
-              <span aria-hidden="true" class="material-symbols-outlined text-[15px]">upload_file</span>Import
+              <span aria-hidden="true" class="material-symbols-outlined text-[15px]"
+                >upload_file</span
+              >Import
             </button>
             <button
               type="button"
               @click="showExportModal = true"
               class="toolbar-action-button inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-[11px] font-bold text-[#0A51B0] hover:bg-white"
             >
-              <span aria-hidden="true" class="material-symbols-outlined text-[15px]">download</span>Export
+              <span aria-hidden="true" class="material-symbols-outlined text-[15px]">download</span
+              >Export
             </button>
           </div>
         </div>
@@ -400,7 +419,15 @@ onMounted(() => {
           />
         </div>
 
-        <button type="button" @click="showFilterModal = true" class="toolbar-filter-button h-9 shrink-0 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-semibold text-[#5F7089] hover:bg-white"><span aria-hidden="true" class="material-symbols-outlined mr-1 align-middle text-[16px]">filter_alt</span>Filter</button>
+        <button
+          type="button"
+          @click="showFilterModal = true"
+          class="toolbar-filter-button h-9 shrink-0 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-semibold text-[#5F7089] hover:bg-white"
+        >
+          <span aria-hidden="true" class="material-symbols-outlined mr-1 align-middle text-[16px]"
+            >filter_alt</span
+          >Filter
+        </button>
       </div>
     </div>
 
@@ -872,13 +899,41 @@ onMounted(() => {
       </template>
     </AppModal>
 
-    <FilterModal :is-open="showFilterModal" title="Filter Pengiriman" @close="showFilterModal = false" @apply="showFilterModal = false" @reset="resetFilters">
-      <CustomSelect v-model="filterStatus" :options="STATUS_OPTIONS" aria-label="Filter status" :block="true" height-class="h-10" />
-      <input v-model="filterDateFrom" type="date" class="h-10 w-full rounded-xl border border-slate-200 px-3 text-xs" />
-      <input v-model="filterDateTo" type="date" class="h-10 w-full rounded-xl border border-slate-200 px-3 text-xs" />
+    <FilterModal
+      :is-open="showFilterModal"
+      title="Filter Pengiriman"
+      @close="showFilterModal = false"
+      @apply="showFilterModal = false"
+      @reset="resetFilters"
+    >
+      <CustomSelect
+        v-model="filterStatus"
+        :options="STATUS_OPTIONS"
+        aria-label="Filter status"
+        :block="true"
+        height-class="h-10"
+      />
+      <input
+        v-model="filterDateFrom"
+        type="date"
+        class="h-10 w-full rounded-xl border border-slate-200 px-3 text-xs"
+      />
+      <input
+        v-model="filterDateTo"
+        type="date"
+        class="h-10 w-full rounded-xl border border-slate-200 px-3 text-xs"
+      />
     </FilterModal>
-    <ShipmentImportModal :is-open="showImportModal" @close="showImportModal = false" @imported="showImportModal = false; fetchData()" />
-    <ShipmentExportModal :is-open="showExportModal" :shipments="shipments" @close="showExportModal = false" />
+    <ShipmentImportModal
+      :is-open="showImportModal"
+      @close="showImportModal = false"
+      @imported="handleImported"
+    />
+    <ShipmentExportModal
+      :is-open="showExportModal"
+      :shipments="shipments"
+      @close="showExportModal = false"
+    />
 
     <!-- Delete Confirmation Modal -->
     <AppModal :is-open="showDeleteModal" title="Hapus Data Pengiriman" @close="closeModal">

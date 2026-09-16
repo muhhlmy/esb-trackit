@@ -7,10 +7,11 @@
   "scripts": {
     "test:backend": "npm --prefix backend test",
     "test:frontend": "npm --prefix frontend test",
-    "test:e2e": "playwright test",
-    "test:e2e:headed": "playwright test --headed",
-    "test:e2e:ui": "playwright test --ui",
-    "test:e2e:smoke": "playwright test --grep @smoke",
+    "test:e2e:prepare": "node scripts/initialize-test-database.mjs --seed-e2e",
+    "test:e2e": "npm run test:e2e:prepare && playwright test",
+    "test:e2e:headed": "npm run test:e2e:prepare && playwright test --headed",
+    "test:e2e:ui": "npm run test:e2e:prepare && playwright test --ui",
+    "test:e2e:smoke": "npm run test:e2e:prepare && playwright test --grep @smoke",
     "test:e2e:report": "playwright show-report"
   },
   "devDependencies": {

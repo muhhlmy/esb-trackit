@@ -12,6 +12,7 @@ dist/
 build/
 playwright-report/
 test-results/
+qa-reports/
 coverage/
 
 # E2E auth state & generated QA outputs

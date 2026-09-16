@@ -23,7 +23,8 @@ const props = defineProps({
 
 defineEmits(['edit', 'submitTicket'])
 
-const { isCrudUnlocked } = useAuth()
+const { hasWritePermission } = useAuth()
+const canEditKnowledgeBase = computed(() => hasWritePermission('knowledge_base'))
 const { isBookmarked, toggleBookmark } = useBookmarks()
 
 // Sanitasi HTML rich-text sebelum v-html (pertahanan terhadap XSS dari konten
@@ -113,7 +114,7 @@ const severityClass = computed(() => {
           </button>
 
           <button
-            v-if="isCrudUnlocked"
+            v-if="canEditKnowledgeBase"
             @click="$emit('edit', caseItem)"
             class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#c4c5d9] dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-[#f3f3f5] dark:hover:bg-slate-700 text-xs font-semibold text-[#1a1c1d] dark:text-slate-200 transition-all cursor-pointer shadow-2xs"
           >

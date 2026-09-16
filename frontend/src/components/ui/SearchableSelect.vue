@@ -227,7 +227,7 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside))
       aria-haspopup="listbox"
       :aria-expanded="isOpen"
       :aria-controls="listboxId"
-      class="flex w-full items-center justify-between gap-2 rounded-xl border bg-white px-3.5 text-left text-xs font-bold text-[#2A3547] shadow-2xs hover:bg-[#F8FAFC] hover:border-[#0A51B0] transition-all cursor-pointer"
+      class="ui-select-trigger flex w-full items-center justify-between gap-2 rounded-xl border bg-white px-3.5 text-left text-xs font-bold text-[#2A3547] shadow-2xs hover:bg-[#F8FAFC] hover:border-[#0A51B0] transition-all cursor-pointer"
       :class="[
         heightClass,
         isOpen ? 'border-[#0A51B0] ring-2 ring-[#0A51B0]/15' : 'border-[#E5EAEF]',
@@ -271,7 +271,7 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside))
 
     <div
       v-if="isOpen"
-      class="absolute left-0 right-0 z-50 flex flex-col rounded-xl border border-[#E5EAEF] bg-white p-1.5 shadow-lg animate-fade-in"
+      class="ui-select-menu absolute left-0 right-0 z-50 flex flex-col rounded-xl border border-[#E5EAEF] bg-white p-1.5 shadow-lg animate-fade-in"
       :class="dropDirection === 'up' ? 'bottom-full mb-1.5' : 'top-full mt-1.5'"
     >
       <div class="relative mb-1 pb-1 border-b border-[#F1F5F9]">
@@ -291,7 +291,7 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside))
           :aria-controls="listboxId"
           :aria-activedescendant="activeDescendant"
           :placeholder="searchPlaceholder"
-          class="h-8 w-full rounded-lg border border-[#E5EAEF] bg-[#F8FAFC] pl-8 pr-2.5 text-xs font-medium text-[#2A3547] placeholder-[#687281] focus:bg-white focus:border-[#0A51B0] focus:outline-none focus:ring-2 focus:ring-[#0A51B0]/15 transition-all"
+          class="ui-search-input h-8 w-full rounded-lg border border-[#E5EAEF] bg-[#F8FAFC] pl-8 pr-2.5 text-xs font-medium text-[#2A3547] placeholder-[#687281] focus:bg-white focus:border-[#0A51B0] focus:outline-none focus:ring-2 focus:ring-[#0A51B0]/15 transition-all"
           @keydown.stop="handleSearchKeydown"
         />
       </div>

@@ -25,14 +25,17 @@ import {
 } from '../services/accountSecurityService.js';
 import {
   createPasswordResetOtp,
+  invalidatePasswordResetOtps,
   verifyPasswordResetOtp,
   consumePasswordResetToken,
 } from '../services/otpService.js';
 import {
   sendEmail,
+  isEmailConfigured,
   renderPasswordResetOtpEmailHtml,
 } from '../services/emailService.js';
 import { loginRateLimiter } from '../middleware/rateLimitMiddleware.js';
+import { recordSystemAudit } from '../services/systemAuditService.js';
 
 const MAX_LOGIN_EMAIL_LENGTH = 150
 const MAX_LOGIN_PASSWORD_LENGTH = 255
@@ -122,6 +125,7 @@ export async function login(req, res) {
         'INSERT INTO log_audit_login (user_id, email, login_time, ip_address, user_agent, status_login) VALUES ($1, $2, CURRENT_TIMESTAMP, $3, $4, $5)',
         [userRow ? userRow.id : null, email, req.ip, req.headers['user-agent'], 'LOGIN_FAILED'],
       ).catch(() => {})
+      await recordSystemAudit(req, { module: 'auth', action: 'LOGIN_FAILED', entityType: 'session', entityLabel: email, summary: `Login gagal untuk ${email}`, actorUserId: userRow?.id ?? null, actorName: userRow?.nama || email, actorEmail: email }).catch(() => {})
 
       if (failedState.lockedUntil && failedState.retryAfterSeconds > 0) {
         res.setHeader('Retry-After', String(failedState.retryAfterSeconds))
@@ -196,6 +200,7 @@ export async function login(req, res) {
       'INSERT INTO log_audit_login (user_id, email, login_time, ip_address, user_agent, status_login) VALUES ($1, $2, CURRENT_TIMESTAMP, $3, $4, $5)',
       [userRow.id, userRow.email, req.ip, req.headers['user-agent'], 'LOGIN_SUCCESS'],
     )
+    await recordSystemAudit(req, { module: 'auth', action: 'LOGIN_SUCCESS', entityType: 'session', entityId: session.sessionId, entityLabel: userRow.email, summary: `Login berhasil: ${userRow.email}`, actorUserId: userRow.id, actorName: payload.nama, actorEmail: userRow.email })
 
     res.json({
       message: 'Login berhasil.',
@@ -226,6 +231,7 @@ export async function logout(req, res) {
         'INSERT INTO log_audit_login (user_id, email, login_time, ip_address, user_agent, status_login) VALUES ($1, $2, CURRENT_TIMESTAMP, $3, $4, $5)',
         [userId, req.user?.email || '', req.ip, req.headers['user-agent'], 'LOGOUT'],
       ).catch(() => {})
+      await recordSystemAudit(req, { module: 'auth', action: 'LOGOUT', entityType: 'session', entityId: sessionId, entityLabel: req.user?.email || '', summary: `Logout: ${req.user?.email || 'pengguna'}` }).catch(() => {})
     }
 
     // Hapus cookie sesi HttpOnly (session revocation di sisi browser).
@@ -369,6 +375,7 @@ export async function changePassword(req, res) {
       `INSERT INTO log_audit_login (user_id, email, login_time, ip_address, user_agent, status_login) VALUES ($1, $2, CURRENT_TIMESTAMP, $3, $4, $5)`,
       [user.id, user.email, req.ip, req.headers['user-agent'], 'PASSWORD_CHANGE'],
     );
+    await recordSystemAudit(req, { module: 'auth', action: 'PASSWORD_CHANGE', entityType: 'user', entityId: user.id, entityLabel: user.email, summary: `Kata sandi diubah: ${user.email}` });
 
     res.json({ message: 'Password berhasil diperbarui.' });
   } catch (error) {
@@ -388,6 +395,15 @@ export async function forgotPassword(req, res) {
       parsedEmail = parseRequiredEmail(email)
     } catch {
       return res.status(400).json({ message: 'Format alamat email tidak valid.' })
+    }
+
+    // Jangan memberi kesan OTP berhasil dikirim ketika SMTP belum siap.
+    // Pemeriksaan dilakukan sebelum pencarian akun agar tidak menjadi user-enumeration oracle.
+    if (!isEmailConfigured()) {
+      console.error('[forgotPassword] Pengiriman OTP tidak tersedia: konfigurasi SMTP belum lengkap.')
+      return res.status(503).json({
+        message: 'Layanan pengiriman email sedang tidak tersedia. Silakan hubungi administrator.',
+      })
     }
 
     // 1. Cari data user berdasarkan email
@@ -435,7 +451,15 @@ export async function forgotPassword(req, res) {
       text: `Halo ${user.nama}, kode verifikasi OTP Anda untuk reset kata sandi adalah: ${otpCode}. Kode ini berlaku selama ${expiresMinutes} menit.`,
     })
 
-    console.log(`[forgotPassword] OTP issued for ${hashIdentifier(user.email)} (email sent: ${isSent})`)
+    if (!isSent) {
+      await invalidatePasswordResetOtps(user.email)
+      console.error(`[forgotPassword] OTP delivery failed for ${hashIdentifier(user.email)}`)
+      return res.status(503).json({
+        message: 'Kode OTP belum dapat dikirim. Silakan coba lagi beberapa saat atau hubungi administrator.',
+      })
+    }
+
+    console.log(`[forgotPassword] OTP delivered for ${hashIdentifier(user.email)}`)
 
     res.json({ message: genericMessage })
   } catch (error) {
@@ -525,6 +549,7 @@ export async function resetPassword(req, res) {
     `,
       [userId, email, req.ip, req.headers['user-agent'] || '', 'PASSWORD_RESET_OTP'],
     ).catch(() => {})
+    await recordSystemAudit(req, { module: 'auth', action: 'PASSWORD_RESET', entityType: 'user', entityId: userId, entityLabel: email, summary: `Kata sandi direset melalui OTP: ${email}`, actorUserId: userId, actorName: email, actorEmail: email }).catch(() => {})
 
     res.json({
       message: 'Kata sandi Anda berhasil diperbarui. Silakan masuk kembali dengan kata sandi baru.',
@@ -537,4 +562,3 @@ export async function resetPassword(req, res) {
     res.status(500).json({ message: 'Terjadi kesalahan pada server saat memperbarui kata sandi.' })
   }
 }
-

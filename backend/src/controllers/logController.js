@@ -6,6 +6,12 @@ function createHttpError(statusCode, message) {
   return error
 }
 
+function parsePositiveInteger(value, fallback, maximum) {
+  const parsed = Number.parseInt(String(value ?? ''), 10)
+  if (!Number.isSafeInteger(parsed) || parsed < 1) return fallback
+  return Math.min(parsed, maximum)
+}
+
 export async function listAssetLogs(req, res) {
   const result = await pool.query(
     `SELECT id, id_aset, label_aset, aksi, perubahan, oleh_pengguna, dibuat_pada
@@ -135,5 +141,40 @@ export async function listLoginLogs(req, res) {
   } catch (error) {
     console.error('Error fetching login logs:', error)
     res.status(500).json({ error: 'Gagal mengambil log audit login.' })
+  }
+}
+
+export async function listSystemAuditLogs(req, res) {
+  try {
+    const page = parsePositiveInteger(req.query.page, 1, 1_000_000)
+    const limit = parsePositiveInteger(req.query.limit, 20, 100)
+    const search = typeof req.query.q === 'string' ? req.query.q.trim().slice(0, 200) : ''
+    const params = []
+    let whereClause = ''
+    if (search) {
+      params.push(`%${search}%`)
+      whereClause = `WHERE CONCAT_WS(' ', module, action, entity_type, entity_id, entity_label, summary, actor_name, actor_email) ILIKE $1`
+    }
+    const offset = (page - 1) * limit
+    const [countResult, result] = await Promise.all([
+      pool.query(`SELECT COUNT(*)::int AS total FROM system_audit_logs ${whereClause}`, params),
+      pool.query(
+        `SELECT id, module, action, entity_type, entity_id, entity_label, summary,
+                actor_name, actor_email, before_data, after_data, created_at AS dibuat_pada
+           FROM system_audit_logs
+           ${whereClause}
+          ORDER BY id DESC
+          LIMIT $${params.length + 1} OFFSET $${params.length + 2}`,
+        [...params, limit, offset],
+      ),
+    ])
+    const total = countResult.rows[0]?.total || 0
+    res.json({
+      data: result.rows,
+      pagination: { page, limit, total, totalPages: Math.max(1, Math.ceil(total / limit)) },
+    })
+  } catch (error) {
+    console.error('Error fetching system audit logs:', error)
+    res.status(500).json({ error: 'Gagal mengambil audit aktivitas sistem.' })
   }
 }

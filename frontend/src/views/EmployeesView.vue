@@ -17,9 +17,10 @@ import FilterModal from '../components/ui/FilterModal.vue'
 import { exportToExcel } from '../utils/exportEngine.js'
 
 const { get, post, put, del } = useApi()
-const { isAdmin, isSuperAdmin, hasWritePermission } = useAuth()
+const { hasWritePermission } = useAuth()
 const canWriteKaryawan = computed(
-  () => isAdmin.value || isSuperAdmin.value || hasWritePermission('karyawan'),
+  () =>
+    hasWritePermission('karyawan') || hasWritePermission('assets') || hasWritePermission('users'),
 )
 
 // ── State Utama ──────────────────────────────────────────────
@@ -409,9 +410,7 @@ async function deleteEmployee() {
     const res = await del(`/api/karyawan/${targetId}`)
     const count = res?.affectedAssetsCount || 0
     if (count > 0) {
-      toast(
-        `Data karyawan berhasil dihapus. ${count} unit aset otomatis dialihkan menjadi Stock.`,
-      )
+      toast(`Data karyawan berhasil dihapus. ${count} unit aset otomatis dialihkan menjadi Stock.`)
     } else {
       toast('Data karyawan berhasil dihapus dari tabel.')
     }
@@ -488,7 +487,9 @@ onMounted(() => {
             <span aria-hidden="true" class="material-symbols-outlined text-[16px]">person_add</span>
             <span>Tambah Karyawan</span>
           </button>
-          <div class="toolbar-action-group flex items-center gap-1 rounded-lg border border-[#D7E3F2] bg-[#F8FAFC] p-1">
+          <div
+            class="toolbar-action-group flex items-center gap-1 rounded-lg border border-[#D7E3F2] bg-[#F8FAFC] p-1"
+          >
             <button
               v-if="canWriteKaryawan"
               type="button"
@@ -496,7 +497,9 @@ onMounted(() => {
               class="toolbar-action-button inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-[11px] font-bold text-[#0A51B0] hover:bg-white"
               title="Import data karyawan dari Excel"
             >
-              <span aria-hidden="true" class="material-symbols-outlined text-[15px]">upload_file</span>Import
+              <span aria-hidden="true" class="material-symbols-outlined text-[15px]"
+                >upload_file</span
+              >Import
             </button>
             <button
               type="button"
@@ -504,7 +507,8 @@ onMounted(() => {
               class="toolbar-action-button inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-[11px] font-bold text-[#0A51B0] hover:bg-white"
               title="Export data karyawan"
             >
-              <span aria-hidden="true" class="material-symbols-outlined text-[15px]">download</span>Export
+              <span aria-hidden="true" class="material-symbols-outlined text-[15px]">download</span
+              >Export
             </button>
           </div>
         </div>
@@ -516,7 +520,8 @@ onMounted(() => {
       >
         <div class="relative h-9 min-w-0">
           <span
-            aria-hidden="true" class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[18px] text-[#687281] pointer-events-none"
+            aria-hidden="true"
+            class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[18px] text-[#687281] pointer-events-none"
             >search</span
           >
           <input
@@ -527,14 +532,50 @@ onMounted(() => {
             class="toolbar-search-input h-full min-h-0 w-full rounded-xl border border-[#E2E8F0] bg-white pl-9.5 pr-3 text-base sm:text-xs text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
           />
         </div>
-        <button type="button" @click="showFilterModal = true" class="toolbar-filter-button h-9 shrink-0 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-semibold text-[#5F7089] hover:bg-white"><span aria-hidden="true" class="material-symbols-outlined mr-1 align-middle text-[16px]">filter_alt</span>Filter</button>
+        <button
+          type="button"
+          @click="showFilterModal = true"
+          class="toolbar-filter-button h-9 shrink-0 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-semibold text-[#5F7089] hover:bg-white"
+        >
+          <span aria-hidden="true" class="material-symbols-outlined mr-1 align-middle text-[16px]"
+            >filter_alt</span
+          >Filter
+        </button>
       </div>
     </div>
 
-    <FilterModal :is-open="showFilterModal" title="Filter Karyawan" @close="showFilterModal = false" @apply="showFilterModal = false" @reset="resetFilters">
-      <select v-model="filterDepartemen" class="h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-xs"><option value="">Semua Departemen</option><option v-for="item in availableDepartemenOptions" :key="item" :value="item">{{ item }}</option></select>
-      <select v-model="filterLokasi" class="h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-xs"><option value="">Semua Lokasi</option><option v-for="item in availableLokasiOptions" :key="item" :value="item">{{ item }}</option></select>
-      <select v-model="filterStatus" class="h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-xs"><option value="">Semua Status</option><option value="Active">Active</option><option value="Outsource">Outsource</option><option value="Resigned">Resigned</option></select>
+    <FilterModal
+      :is-open="showFilterModal"
+      title="Filter Karyawan"
+      @close="showFilterModal = false"
+      @apply="showFilterModal = false"
+      @reset="resetFilters"
+    >
+      <select
+        v-model="filterDepartemen"
+        class="h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-xs"
+      >
+        <option value="">Semua Departemen</option>
+        <option v-for="item in availableDepartemenOptions" :key="item" :value="item">
+          {{ item }}
+        </option>
+      </select>
+      <select
+        v-model="filterLokasi"
+        class="h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-xs"
+      >
+        <option value="">Semua Lokasi</option>
+        <option v-for="item in availableLokasiOptions" :key="item" :value="item">{{ item }}</option>
+      </select>
+      <select
+        v-model="filterStatus"
+        class="h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-xs"
+      >
+        <option value="">Semua Status</option>
+        <option value="Active">Active</option>
+        <option value="Outsource">Outsource</option>
+        <option value="Resigned">Resigned</option>
+      </select>
     </FilterModal>
 
     <!-- ── Card Stats Karyawan ── -->
@@ -594,7 +635,9 @@ onMounted(() => {
         v-else-if="filteredEmployees.length === 0"
         class="px-4 py-8 sm:p-12 text-center text-[#5F7089]"
       >
-        <span aria-hidden="true" class="material-symbols-outlined text-[44px] text-[#CBD5E1]">person_off</span>
+        <span aria-hidden="true" class="material-symbols-outlined text-[44px] text-[#CBD5E1]"
+          >person_off</span
+        >
         <p class="mt-2 font-bold text-[13.5px] text-[#333333]">Tidak Ada Data Karyawan</p>
         <p class="text-[12px] text-[#5F7089]">
           Cobalah untuk mengosongkan filter atau menambah karyawan baru.
@@ -1080,7 +1123,9 @@ onMounted(() => {
           v-if="parseInt(selectedEmployee?.jumlah_aset || 0) > 0"
           class="rounded-xl bg-amber-50 p-3 text-[12px] font-semibold text-amber-700 flex items-start gap-2"
         >
-          <span aria-hidden="true" class="material-symbols-outlined text-[18px] mt-0.5">warning</span>
+          <span aria-hidden="true" class="material-symbols-outlined text-[18px] mt-0.5"
+            >warning</span
+          >
           <div>
             <p>
               Karyawan ini masih memiliki {{ selectedEmployee?.jumlah_aset }} unit aset ter-assign.

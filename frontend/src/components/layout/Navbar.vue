@@ -146,7 +146,7 @@ onUnmounted(() => {
 <style scoped>
 .help-navbar {
   --nav-ink: #172b4d;
-  --nav-muted: #687a92;
+  --nav-muted: #526277;
   --nav-line: #e5eaf1;
   --nav-surface: #fff;
   --nav-hover: #f4f7fb;
@@ -168,7 +168,7 @@ onUnmounted(() => {
   gap: 28px;
 }
 .help-navbar :is(a, button, select):focus-visible {
-  outline: 2px solid #0A51B0;
+  outline: 2px solid #0a51b0;
   outline-offset: 4px;
 }
 .navbar-brand {
@@ -286,14 +286,14 @@ onUnmounted(() => {
   min-height: 42px;
   padding: 0 17px;
   border-radius: 8px;
-  background: #0A51B0;
+  background: #0a51b0;
   color: #fff;
   font-size: 12px;
   font-weight: 600;
   white-space: nowrap;
 }
 .navbar-signin:hover {
-  background: #0A4391;
+  background: #0a4391;
 }
 .navbar-profile {
   position: relative;

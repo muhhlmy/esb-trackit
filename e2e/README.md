@@ -73,7 +73,15 @@ Copy file konfigurasi `.env.e2e.example`:
 cp .env.e2e.example .env.e2e
 ```
 
-Pastikan server PostgreSQL memiliki database `assets_monitoring` yang telah dimigrasi dengan skema canonical (`npm --prefix backend run db:migrate:apply`).
+Isi `DB_NAME` dengan nama database lokal khusus pengujian yang berakhiran `_test` (contoh `esb_trackit_test`). Database kosong tersebut harus sudah dibuat di PostgreSQL. Konfigurasi akan ditolak bila host bukan loopback atau nama database tidak berakhiran `_test`.
+
+Siapkan migrasi dan akun fixture secara idempotent:
+
+```bash
+npm run test:e2e:prepare
+```
+
+Perintah `test:e2e`, `test:e2e:smoke`, `test:e2e:headed`, dan `test:e2e:ui` otomatis menjalankan langkah persiapan ini.
 
 ---
 

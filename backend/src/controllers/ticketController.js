@@ -1,5 +1,6 @@
 import { randomUUID } from 'node:crypto'
 import { pool } from '../config/database.js'
+import { recordSystemAudit } from '../services/systemAuditService.js'
 import { assertNoActiveMarkup } from '../security/requestValidation.js'
 import { addSseClient, broadcastTicketEvent } from '../services/realtimeService.js'
 import {
@@ -572,6 +573,15 @@ export async function createTicketComment(req, res) {
     }
 
     await addTicketLog(client, id, ticket.nomor_tiket, 'KOMENTAR', 'Komentar ditambahkan.', identity.name)
+    await recordSystemAudit(req, {
+      module: 'tickets',
+      action: 'COMMENT',
+      entityType: 'ticket',
+      entityId: id,
+      entityLabel: ticket.nomor_tiket,
+      summary: `Komentar ditambahkan pada tiket ${ticket.nomor_tiket} oleh ${identity.name}.`,
+      after: { commentId: newComment.id, hasAttachment: newComment.has_attachment },
+    }, client)
     await client.query('COMMIT')
   } catch (error) {
     await client.query('ROLLBACK')
@@ -714,6 +724,7 @@ export async function createTicket(req, res) {
       `Tiket '${createdTicket.judul}' dibuat untuk unit ${queue.nama}. Prioritas: ${createdTicket.prioritas}.`,
       pelaporNama,
     )
+    await recordSystemAudit(req, { module: 'tickets', action: 'CREATE', entityType: 'ticket', entityId: createdTicket.id, entityLabel: createdTicket.nomor_tiket, summary: `Tiket dibuat: ${createdTicket.nomor_tiket} — ${createdTicket.judul}`, after: createdTicket }, client)
     return createdTicket
   })
 
@@ -936,6 +947,7 @@ export async function updateTicket(req, res) {
       : changes.join('. ') || 'Detail tiket diperbarui'
 
     await addTicketLog(client, id, oldTicket.nomor_tiket, aksi, logDetail, identity.name)
+    await recordSystemAudit(req, { module: 'tickets', action: 'UPDATE', entityType: 'ticket', entityId: id, entityLabel: oldTicket.nomor_tiket, summary: `Tiket diperbarui: ${oldTicket.nomor_tiket}. ${logDetail}`, before: oldTicket, after: transactionTicket }, client)
     return { ticket: transactionTicket, changes }
   })
 
@@ -1001,6 +1013,15 @@ export async function claimTicket(req, res) {
       `Tiket diambil oleh ${identity.name}.`,
       identity.name,
     )
+    await recordSystemAudit(req, {
+      module: 'tickets',
+      action: 'CLAIM',
+      entityType: 'ticket',
+      entityId: id,
+      entityLabel: claimedTicket.nomor_tiket,
+      summary: `Tiket ${claimedTicket.nomor_tiket} diambil oleh ${identity.name}.`,
+      after: claimedTicket,
+    }, client)
     return claimedTicket
   })
 
@@ -1127,6 +1148,7 @@ export async function reassignTicket(req, res) {
       `Tiket di-reassign ke ${target.nama} oleh ${identity.name}.`,
       identity.name,
     )
+    await recordSystemAudit(req, { module: 'tickets', action: 'REASSIGN', entityType: 'ticket', entityId: id, entityLabel: ticket.nomor_tiket, summary: `Tiket ${ticket.nomor_tiket} dialihkan ke ${target.nama} oleh ${identity.name}.`, before: ticket, after: result.rows[0] }, client)
     return result.rows[0]
   })
   await broadcastTicketEvent('TICKET_UPDATED', reassignedTicket, {
@@ -1172,6 +1194,7 @@ export async function deleteTicket(req, res) {
       deletionReason,
       identity.name,
     )
+    await recordSystemAudit(req, { module: 'tickets', action: 'DELETE', entityType: 'ticket', entityId: id, entityLabel: ticket.nomor_tiket, summary: `Tiket dihapus: ${ticket.nomor_tiket} oleh ${identity.name}.`, before: ticket }, client)
     return result.rows[0]
   })
 
@@ -1325,6 +1348,15 @@ export async function submitTicketCasp(req, res) {
       `Pelapor memberikan penilaian CASP ${numericRating}/5 (${ratingLabel}).`,
       reporterName,
     )
+    await recordSystemAudit(req, {
+      module: 'tickets',
+      action: 'RATE',
+      entityType: 'ticket',
+      entityId: id,
+      entityLabel: ticket.nomor_tiket,
+      summary: `Penilaian CASP ${numericRating}/5 dikirim untuk tiket ${ticket.nomor_tiket} oleh ${reporterName}.`,
+      after: { rating: numericRating, feedback: normalizedFeedback },
+    }, client)
 
     await client.query('COMMIT')
 

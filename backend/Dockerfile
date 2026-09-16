@@ -5,6 +5,9 @@ FROM node:22-alpine AS base
 
 WORKDIR /app
 
+# Backup/restore memakai pg_dump, pg_restore, dan psql.
+RUN apk add --no-cache postgresql-client
+
 # Install dependencies first for efficient layer caching
 COPY package*.json ./
 RUN npm ci --omit=dev

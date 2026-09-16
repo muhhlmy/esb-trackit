@@ -81,6 +81,18 @@ export async function createPasswordResetOtp(userId, email) {
   }
 }
 
+/** Invalidate pending OTPs when delivery fails, so no unusable code remains active. */
+export async function invalidatePasswordResetOtps(email) {
+  const normalizedEmail = String(email).trim().toLowerCase()
+  await pool.query(
+    `UPDATE password_reset_otps
+        SET used_at = CURRENT_TIMESTAMP
+      WHERE email = $1
+        AND used_at IS NULL`,
+    [normalizedEmail],
+  )
+}
+
 /**
  * Verify submitted OTP and return a temporary reset token.
  */

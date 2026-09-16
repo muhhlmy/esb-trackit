@@ -1,4 +1,5 @@
 import { pool, withTransaction } from "../config/database.js";
+import { recordSystemAudit } from "../services/systemAuditService.js";
 import { createEnrollmentCredential, hashPassword, DEFAULT_USER_PASSWORD } from "../security/passwordService.js";
 import { normalizeLocation } from "../utils/locationNormalizer.js";
 import { parsePaginationQuery, setPaginationHeaders } from "../security/requestValidation.js";
@@ -277,7 +278,9 @@ export async function storeEmployee(req, res) {
         );
       }
 
-      return result.rows[0];
+      const employee = result.rows[0];
+      await recordSystemAudit(req, { module: "employees", action: "CREATE", entityType: "employee", entityId: employee.id, entityLabel: `${employee.nama_karyawan} (${employee.nik})`, summary: `Karyawan ditambahkan: ${employee.nama_karyawan}`, after: employee }, client);
+      return employee;
     });
 
     res.status(201).json(createdEmployee);
@@ -458,7 +461,9 @@ export async function updateEmployee(req, res) {
         );
       }
 
-      return result.rows[0];
+      const employee = result.rows[0];
+      await recordSystemAudit(req, { module: "employees", action: "UPDATE", entityType: "employee", entityId: employee.id, entityLabel: `${employee.nama_karyawan} (${employee.nik})`, summary: `Karyawan diperbarui: ${employee.nama_karyawan}`, before: oldEmp, after: employee }, client);
+      return employee;
     });
 
     res.json(updatedEmployee);
@@ -526,7 +531,9 @@ export async function deleteEmployee(req, res) {
         [id]
       );
 
-      return { employee: deleteRes.rows[0], affectedAssetsCount: count };
+      const employee = deleteRes.rows[0];
+      await recordSystemAudit(req, { module: "employees", action: "DELETE", entityType: "employee", entityId: employee.id, entityLabel: `${employee.nama_karyawan} (${employee.nik})`, summary: `Karyawan dihapus: ${employee.nama_karyawan}`, before: employee }, client);
+      return { employee, affectedAssetsCount: count };
     });
 
     res.json({
@@ -542,4 +549,3 @@ export async function deleteEmployee(req, res) {
     res.status(500).json({ error: "Gagal menghapus data karyawan." });
   }
 }
-

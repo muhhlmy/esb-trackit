@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from 'vue'
+import { computed, watch } from 'vue'
 
 const props = defineProps({
   currentPage: { type: Number, required: true, default: 1 },
@@ -15,6 +15,18 @@ const totalPages = computed(() => {
   if (props.totalItems <= 0) return 1
   return Math.ceil(props.totalItems / props.itemsPerPage)
 })
+
+watch(
+  totalPages,
+  (pages) => {
+    const clampedPage = Math.min(Math.max(props.currentPage, 1), pages)
+    if (clampedPage !== props.currentPage) {
+      emit('update:currentPage', clampedPage)
+      emit('pageChange', clampedPage)
+    }
+  },
+  { immediate: true },
+)
 
 const startIndex = computed(() => {
   if (props.totalItems === 0) return 0
@@ -77,7 +89,7 @@ function goToPage(page) {
         :disabled="currentPage <= 1"
         aria-label="Halaman Sebelumnya"
         title="Halaman Sebelumnya"
-        class="flex h-8 w-8 items-center justify-center rounded-lg border border-[#CBD5E1] bg-white text-[#334155] shadow-2xs hover:bg-[#F8FAFC] hover:text-[#333333] transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+        class="ui-pagination-button flex h-8 w-8 items-center justify-center rounded-lg border border-[#CBD5E1] bg-white text-[#334155] shadow-2xs hover:bg-[#F8FAFC] hover:text-[#333333] transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
       >
         <span aria-hidden="true" class="material-symbols-outlined text-[18px]">chevron_left</span>
       </button>
@@ -99,7 +111,7 @@ function goToPage(page) {
           @click="goToPage(page)"
           :aria-label="`Halaman ${page}`"
           :aria-current="page === currentPage ? 'page' : undefined"
-          class="flex h-8 min-w-[32px] px-2 items-center justify-center rounded-lg text-[12px] font-bold transition-all cursor-pointer"
+          class="ui-pagination-button flex h-8 min-w-[32px] px-2 items-center justify-center rounded-lg text-[12px] font-bold transition-all cursor-pointer"
           :class="[
             mobileCompact ? 'hidden sm:flex' : '',
             page === currentPage
@@ -117,7 +129,7 @@ function goToPage(page) {
         :disabled="currentPage >= totalPages"
         aria-label="Halaman Selanjutnya"
         title="Halaman Selanjutnya"
-        class="flex h-8 w-8 items-center justify-center rounded-lg border border-[#CBD5E1] bg-white text-[#334155] shadow-2xs hover:bg-[#F8FAFC] hover:text-[#333333] transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+        class="ui-pagination-button flex h-8 w-8 items-center justify-center rounded-lg border border-[#CBD5E1] bg-white text-[#334155] shadow-2xs hover:bg-[#F8FAFC] hover:text-[#333333] transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
       >
         <span aria-hidden="true" class="material-symbols-outlined text-[18px]">chevron_right</span>
       </button>
@@ -153,13 +165,13 @@ function goToPage(page) {
   font-weight: 600;
 }
 .asset-pagination button[aria-current='page'] {
-  background: #0A51B0;
-  border-color: #0A51B0;
+  background: #0a51b0;
+  border-color: #0a51b0;
   color: white;
 }
 .asset-pagination button:focus-visible,
 .asset-pagination select:focus-visible {
-  outline: 2px solid #097CDE;
+  outline: 2px solid #097cde;
   outline-offset: 3px;
 }
 @media (width < 40rem) {

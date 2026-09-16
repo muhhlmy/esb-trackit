@@ -73,6 +73,17 @@
   --gradient-esb-blue: linear-gradient(135deg, #0A51B0 0%, #0A5DBD 26%, #097CDE 72%, #0892F5 100%);
   --gradient-esb-blue-hero: linear-gradient(145deg, #0A51B0 0%, #084391 40%, #062b5e 100%);
   --gradient-esb-orange: linear-gradient(135deg, #FF4F1B 0%, #FE5B1C 21%, #FC7C20 60%, #FAA425 100%);
+
+  /* Shared component geometry. Keep these values as the single source of truth
+     for controls and surfaces used across the application. */
+  --ui-radius-control: 0.625rem;
+  --ui-radius-card: 0.875rem;
+  --ui-border: #e2e8f0;
+  --ui-border-strong: #dfe5ef;
+  --ui-surface-muted: #f8fafc;
+  --ui-shadow-control: 0 1px 2px rgba(15, 23, 42, 0.04);
+  --ui-shadow-card: 0 2px 8px rgba(15, 23, 42, 0.04);
+  --ui-focus-ring: 0 0 0 3px rgba(10, 81, 176, 0.14);
 }
 
 .bg-gradient-esb-blue {
@@ -223,8 +234,9 @@ textarea {
 /* Modernize Clean Cards */
 .shadow-card {
   background: #ffffff;
-  border: 1px solid #e5eaef;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-card);
+  box-shadow: var(--ui-shadow-card);
 }
 
 .shadow-card-hover {
@@ -235,6 +247,95 @@ textarea {
   transform: translateY(-1px);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
   border-color: #d2e3ff;
+}
+
+/* ── Shared UI primitives ──
+   These semantic classes are used by shared Vue components and the main list
+   toolbars. They prevent each page from drifting in border, radius, focus, and
+   elevation while allowing page-specific layout to remain flexible. */
+.ui-card {
+  background: #ffffff;
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-card);
+  box-shadow: var(--ui-shadow-card);
+}
+
+.ui-search-input,
+.toolbar-search-input {
+  border-color: var(--ui-border-strong) !important;
+  border-radius: var(--ui-radius-control) !important;
+  background-color: #ffffff !important;
+  box-shadow: var(--ui-shadow-control);
+}
+
+.ui-search-input:hover,
+.toolbar-search-input:hover {
+  border-color: #cbd5e1 !important;
+}
+
+.ui-search-input:focus,
+.toolbar-search-input:focus {
+  border-color: #0A51B0 !important;
+  box-shadow: var(--ui-focus-ring) !important;
+}
+
+.toolbar-filter-button,
+.toolbar-action-button {
+  border-radius: var(--ui-radius-control) !important;
+}
+
+.toolbar-filter-button {
+  border-color: var(--ui-border) !important;
+  background: var(--ui-surface-muted) !important;
+  box-shadow: var(--ui-shadow-control);
+}
+
+.toolbar-primary-action {
+  border-radius: var(--ui-radius-control) !important;
+  box-shadow: 0 2px 6px rgba(10, 81, 176, 0.18) !important;
+}
+
+.toolbar-action-button:hover,
+.toolbar-filter-button:hover {
+  border-color: #b8d4f5 !important;
+}
+
+.ui-select-trigger,
+.ui-pagination-button,
+.ui-menu-trigger {
+  border-radius: var(--ui-radius-control) !important;
+  border-color: var(--ui-border) !important;
+  box-shadow: var(--ui-shadow-control);
+}
+
+.ui-select-trigger:focus-visible,
+.ui-pagination-button:focus-visible,
+.ui-menu-trigger:focus-visible {
+  outline: none;
+  border-color: #0A51B0 !important;
+  box-shadow: var(--ui-focus-ring) !important;
+}
+
+.ui-select-trigger[aria-expanded='true'] {
+  border-color: #0A51B0 !important;
+  box-shadow: var(--ui-focus-ring) !important;
+}
+
+.ui-pagination-button[aria-current='page'] {
+  border-color: #0A4391 !important;
+}
+
+.ui-select-menu,
+.ui-action-menu {
+  border-color: var(--ui-border) !important;
+  border-radius: var(--ui-radius-card) !important;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.12) !important;
+}
+
+.ui-modal-panel {
+  border-color: var(--ui-border) !important;
+  border-radius: var(--ui-radius-card) !important;
+  box-shadow: 0 20px 40px -12px rgba(15, 23, 42, 0.2) !important;
 }
 
 /* Header & Sidebar Modernize Themes */
@@ -283,9 +384,9 @@ textarea {
   .app-shell .form-control
 ) {
   background: #ffffff;
-  border: 1px solid #dfe5ef;
+  border: 1px solid var(--ui-border-strong);
   color: #2a3547;
-  border-radius: 0.5rem; /* 8px rounded-lg */
+  border-radius: var(--ui-radius-control);
   padding: 0.4rem 0.65rem;
   /* font-size intentionally not set here: global input rule (0.8125rem = 13px)
      already applies; the old 0.75rem here was a dead conflicting value. */
@@ -335,7 +436,7 @@ input[class*='pr-12'] {
 ) {
   background: #ffffff;
   border-color: #0A51B0 !important;
-  box-shadow: 0 0 0 3px rgba(93, 135, 255, 0.12) !important;
+  box-shadow: var(--ui-focus-ring) !important;
   outline: none;
 }
 
@@ -384,7 +485,7 @@ label > span:first-child,
   font-weight: 700;
   font-size: 0.75rem;
   padding: 0.375rem 0.875rem;
-  border-radius: 0.5rem; /* 8px */
+  border-radius: var(--ui-radius-control);
   box-shadow: 0 2px 8px rgba(93, 135, 255, 0.2);
   display: inline-flex;
   align-items: center;
@@ -411,7 +512,7 @@ label > span:first-child,
   font-weight: 700;
   font-size: 0.75rem;
   padding: 0.375rem 0.875rem;
-  border-radius: 0.5rem;
+  border-radius: var(--ui-radius-control);
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
   display: inline-flex;
   align-items: center;
@@ -438,7 +539,7 @@ label > span:first-child,
   font-weight: 700;
   font-size: 0.75rem;
   padding: 0.375rem 0.875rem;
-  border-radius: 0.5rem;
+  border-radius: var(--ui-radius-control);
   display: inline-flex;
   align-items: center;
   justify-content: center;

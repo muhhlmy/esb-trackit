@@ -32,13 +32,21 @@ export function getEsbLogoSrc() {
 
 let transporter = null
 
+export function isEmailConfigured() {
+  return (
+    process.env.EMAIL_ENABLED === 'true' &&
+    Boolean(process.env.SMTP_HOST?.trim()) &&
+    Boolean(process.env.SMTP_USER?.trim()) &&
+    Boolean(process.env.SMTP_PASS?.trim())
+  )
+}
+
 export function getTransporter() {
-  const enabled = process.env.EMAIL_ENABLED === 'true'
   const host = process.env.SMTP_HOST
   const user = process.env.SMTP_USER
   const pass = process.env.SMTP_PASS
 
-  if (!enabled || !host || !user || !pass) {
+  if (!isEmailConfigured()) {
     return null
   }
 

@@ -8,7 +8,7 @@ const requireLogsRead = authorizePermission('logs', 'read')
 
 // Root handler redirects to asset logs (DEF-009)
 logRouter.get('/', (req, res) => {
-  res.json({ message: 'Log API endpoints: /assets, /audit', endpoints: ['/api/logs/assets', '/api/logs/audit'] })
+  res.json({ message: 'Log API endpoints: /assets, /audit, /system', endpoints: ['/api/logs/assets', '/api/logs/audit', '/api/logs/system'] })
 })
 
 // History Asset hanya Admin dan Super Admin yang bisa lihat
@@ -29,4 +29,10 @@ logRouter.get(
   authorizeRoles('superadmin'),
   requireLogsRead,
   logController.listLoginLogs,
+)
+logRouter.get(
+  '/system',
+  authorizeRoles('superadmin'),
+  requireLogsRead,
+  logController.listSystemAuditLogs,
 )

@@ -74,6 +74,10 @@ const { isAuthenticated, isAdmin } = useAuth()
   border-radius: 9px;
   gap: 3px;
 }
+.clean-bottom-nav > a.router-link-active,
+.clean-bottom-nav > a.router-link-exact-active {
+  color: #17345d !important;
+}
 .clean-bottom-nav svg {
   width: 18px;
   height: 18px;

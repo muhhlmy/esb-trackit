@@ -1,13 +1,16 @@
 <script setup>
-import { nextTick, onMounted, ref, watch } from 'vue'
+import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { useApi } from '../composables/useApi.js'
+import { useAuth } from '../composables/useAuth.js'
 import SearchableSelect from '../components/ui/SearchableSelect.vue'
 import BaseSkeleton from '../components/ui/skeleton/BaseSkeleton.vue'
 import { animateStagger } from '../composables/useGsap.js'
 import { escapeHtml, printHtmlDocument } from '../utils/printDocument.js'
 import { normalizeLocation } from '../utils/locationNormalizer.js'
 
-const { get } = useApi()
+const { get, getAllPages, post, put, del } = useApi()
+const { hasWritePermission } = useAuth()
+const canWriteSubmissions = computed(() => hasWritePermission('submissions'))
 
 // ── State ────────────────────────────────────────────────────
 const employees = ref([])
@@ -15,9 +18,14 @@ const assets = ref([])
 const isLoading = ref(true)
 const pageError = ref('')
 const validationError = ref('')
+const saveMessage = ref('')
+const savedSubmissions = ref([])
+const selectedSubmissionId = ref(null)
+const isSaving = ref(false)
+const isHydratingSubmission = ref(false)
 
 // Form State
-const form = ref({
+const emptyForm = () => ({
   pemberiNik: '',
   pemberiNama: '',
   pemberiDirektorat: '',
@@ -33,6 +41,7 @@ const form = ref({
   tujuanLainnya: '',
   tanggal: new Date().toISOString().substring(0, 10), // yyyy-mm-dd
 })
+const form = ref(emptyForm())
 
 // Dynamic list of assets (Up to 3 by default, matching template)
 const asetBaruList = ref([{ id_aset: '', tipe: '', qty: 1, spesifikasi: '' }])
@@ -43,9 +52,10 @@ async function fetchData() {
   isLoading.value = true
   pageError.value = ''
   try {
-    const [employeeData, assetData] = await Promise.all([
+    const [employeeData, assetData, submissionData] = await Promise.all([
       get('/api/karyawan?all=true'),
       get('/api/assets?all=true'),
+      getAllPages('/api/submissions'),
     ])
     employees.value = Array.isArray(employeeData) ? employeeData : []
     assets.value = (Array.isArray(assetData) ? assetData : []).map((a) => {
@@ -89,6 +99,7 @@ async function fetchData() {
         catatan_aset: note,
       }
     })
+    savedSubmissions.value = submissionData
   } catch (error) {
     pageError.value = error.message || 'Gagal memuat data referensi.'
   } finally {
@@ -103,6 +114,7 @@ async function fetchData() {
 watch(
   () => form.value.pemberiNik,
   (nik) => {
+    if (isHydratingSubmission.value) return
     const emp = employees.value.find((e) => e.nik === nik)
     if (emp) {
       form.value.pemberiNama = emp.nama_karyawan || ''
@@ -118,6 +130,7 @@ watch(
 watch(
   () => form.value.penerimaNik,
   (nik) => {
+    if (isHydratingSubmission.value) return
     const emp = employees.value.find((e) => e.nik === nik)
     if (emp) {
       form.value.penerimaNama = emp.nama_karyawan || ''
@@ -133,6 +146,7 @@ watch(
 watch(
   () => form.value.isPenerimaLainnya,
   () => {
+    if (isHydratingSubmission.value) return
     form.value.penerimaNik = ''
     form.value.penerimaNama = ''
     form.value.penerimaDirektorat = ''
@@ -143,11 +157,15 @@ watch(
 watch(
   () => form.value.mengetahuiNik,
   (nik) => {
+    if (isHydratingSubmission.value) return
     const emp = employees.value.find((e) => e.nik === nik)
     if (emp) {
       form.value.mengetahuiNama = emp.nama_karyawan || ''
       form.value.mengetahuiJabatan =
-        emp.title || emp.jabatan || emp.departemen || 'People Business Partner atau Asset Management'
+        emp.title ||
+        emp.jabatan ||
+        emp.departemen ||
+        'People Business Partner atau Asset Management'
     } else if (!form.value.isMengetahuiKustom) {
       form.value.mengetahuiNama = ''
       form.value.mengetahuiJabatan = 'People Business Partner atau Asset Management'
@@ -159,6 +177,7 @@ watch(
 watch(
   () => form.value.isMengetahuiKustom,
   (isKustom) => {
+    if (isHydratingSubmission.value) return
     if (isKustom) {
       form.value.mengetahuiNik = ''
     } else {
@@ -231,7 +250,80 @@ function removeAssetLamaRow(index) {
   }
 }
 
-function generatePdf() {
+function buildSubmissionPayload() {
+  return {
+    ...form.value,
+    asetBaruList: asetBaruList.value.map((item) => ({ ...item })),
+    asetLamaList: asetLamaList.value.map((item) => ({ ...item })),
+  }
+}
+
+function resetSubmissionForm() {
+  selectedSubmissionId.value = null
+  form.value = emptyForm()
+  asetBaruList.value = [{ id_aset: '', tipe: '', qty: 1, spesifikasi: '' }]
+  asetLamaList.value = [{ id_aset: '', tipe: '', qty: 1, spesifikasi: '' }]
+  validationError.value = ''
+  saveMessage.value = ''
+}
+
+async function editSubmission(submission) {
+  const payload = submission?.payload || {}
+  isHydratingSubmission.value = true
+  selectedSubmissionId.value = submission.id
+  form.value = { ...emptyForm(), ...payload }
+  asetBaruList.value =
+    Array.isArray(payload.asetBaruList) && payload.asetBaruList.length
+      ? payload.asetBaruList.map((item) => ({ ...item }))
+      : [{ id_aset: '', tipe: '', qty: 1, spesifikasi: '' }]
+  asetLamaList.value =
+    Array.isArray(payload.asetLamaList) && payload.asetLamaList.length
+      ? payload.asetLamaList.map((item) => ({ ...item }))
+      : [{ id_aset: '', tipe: '', qty: 1, spesifikasi: '' }]
+  await nextTick()
+  isHydratingSubmission.value = false
+  validationError.value = ''
+  saveMessage.value = `Mengedit ${submission.submission_number}`
+  window.scrollTo({ top: 0, behavior: 'smooth' })
+}
+
+async function persistSubmission(status = 'draft') {
+  if (!canWriteSubmissions.value || isSaving.value) return false
+  isSaving.value = true
+  validationError.value = ''
+  saveMessage.value = ''
+  try {
+    const body = { payload: buildSubmissionPayload(), status }
+    const saved = selectedSubmissionId.value
+      ? await put(`/api/submissions/${selectedSubmissionId.value}`, body)
+      : await post('/api/submissions', body)
+    selectedSubmissionId.value = saved.id
+    saveMessage.value = `${saved.submission_number} berhasil ${status === 'draft' ? 'disimpan sebagai draft' : 'diajukan'}.`
+    savedSubmissions.value = await getAllPages('/api/submissions')
+    return true
+  } catch (error) {
+    validationError.value = error.message || 'Gagal menyimpan pengajuan.'
+    return false
+  } finally {
+    isSaving.value = false
+  }
+}
+
+async function deleteSubmission(submission) {
+  if (!canWriteSubmissions.value) return
+  const confirmed = window.confirm(`Hapus pengajuan ${submission.submission_number}?`)
+  if (!confirmed) return
+  try {
+    await del(`/api/submissions/${submission.id}`)
+    if (selectedSubmissionId.value === submission.id) resetSubmissionForm()
+    savedSubmissions.value = savedSubmissions.value.filter((item) => item.id !== submission.id)
+    saveMessage.value = 'Pengajuan berhasil dihapus.'
+  } catch (error) {
+    validationError.value = error.message || 'Gagal menghapus pengajuan.'
+  }
+}
+
+async function generatePdf() {
   validationError.value = ''
 
   if (!form.value.pemberiNama?.trim()) {
@@ -261,6 +353,8 @@ function generatePdf() {
       'Minimal pilih salah satu Aset (Aset Baru / Aset Lama) untuk serah terima.'
     return
   }
+
+  if (!(await persistSubmission('submitted'))) return
 
   // Format Date to Indonsian Date (e.g. 21 Juli 2026)
   const months = [
@@ -313,9 +407,9 @@ function generatePdf() {
     section3Html += '<h3 class="section-title">III. Daftar Data Serah Terima Aset</h3>'
 
     if (hasAsetBaru) {
-      const maxRows = 3
       let rowsBaruHtml = ''
       const validAssetsBaru = asetBaruList.value.filter((a) => a.id_aset)
+      const maxRows = Math.max(3, validAssetsBaru.length)
       for (let i = 0; i < maxRows; i++) {
         const asset = validAssetsBaru[i] || {}
         rowsBaruHtml += `
@@ -349,9 +443,9 @@ function generatePdf() {
     }
 
     if (hasAsetLama) {
-      const maxRows = 3
       let rowsLamaHtml = ''
       const validAssetsLama = asetLamaList.value.filter((a) => a.id_aset)
+      const maxRows = Math.max(3, validAssetsLama.length)
       for (let i = 0; i < maxRows; i++) {
         const asset = validAssetsLama[i] || {}
         rowsLamaHtml += `
@@ -668,7 +762,9 @@ onMounted(fetchData)
       <div
         class="flex h-9 w-9 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-xl bg-[#EDF5FF] text-[#0A5DBD] border border-[#B8D4F5]/40"
       >
-        <span aria-hidden="true" class="material-symbols-outlined text-[20px] sm:text-[22px]">assignment</span>
+        <span aria-hidden="true" class="material-symbols-outlined text-[20px] sm:text-[22px]"
+          >assignment</span
+        >
       </div>
       <div class="min-w-0">
         <h1 class="text-base sm:text-lg font-bold text-[#333333] tracking-tight truncate">
@@ -686,6 +782,87 @@ onMounted(fetchData)
       <li><span>3</span>Daftar aset</li>
       <li><span>4</span>Pengesahan & Cetak</li>
     </ol>
+
+    <div
+      v-if="saveMessage"
+      role="status"
+      aria-live="polite"
+      class="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-xs font-semibold text-emerald-800"
+    >
+      {{ saveMessage }}
+    </div>
+
+    <section
+      v-if="!isLoading"
+      class="rounded-2xl border border-[#E2E8F0] bg-white p-4 shadow-2xs"
+      aria-labelledby="submission-history-title"
+    >
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h2 id="submission-history-title" class="text-sm font-bold text-[#333333]">
+            Riwayat Pengajuan
+          </h2>
+          <p class="mt-0.5 text-xs text-[#5F7089]">Draft dan formulir yang sudah diajukan.</p>
+        </div>
+        <button
+          v-if="canWriteSubmissions"
+          type="button"
+          class="h-9 rounded-xl border border-[#CBD5E1] bg-white px-3 text-xs font-bold text-[#334155] hover:bg-[#F8FAFC]"
+          @click="resetSubmissionForm"
+        >
+          Formulir Baru
+        </button>
+      </div>
+
+      <div v-if="savedSubmissions.length" class="mt-4 grid gap-2 md:grid-cols-2 xl:grid-cols-3">
+        <article
+          v-for="submission in savedSubmissions"
+          :key="submission.id"
+          class="rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] p-3"
+        >
+          <div class="flex items-start justify-between gap-2">
+            <div class="min-w-0">
+              <p class="truncate text-xs font-bold text-[#333333]">
+                {{ submission.submission_number }}
+              </p>
+              <p class="mt-1 truncate text-[11px] text-[#5F7089]">
+                {{ submission.payload?.pemberiNama || 'Belum ada pemberi' }} →
+                {{ submission.payload?.penerimaNama || 'Belum ada penerima' }}
+              </p>
+            </div>
+            <span
+              class="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase"
+              :class="
+                submission.status === 'draft'
+                  ? 'bg-amber-100 text-amber-800'
+                  : 'bg-emerald-100 text-emerald-800'
+              "
+            >
+              {{ submission.status }}
+            </span>
+          </div>
+          <div v-if="canWriteSubmissions" class="mt-3 flex gap-2">
+            <button
+              type="button"
+              class="h-8 flex-1 rounded-lg bg-[#0A51B0] px-2 text-[11px] font-bold text-white hover:bg-[#0A4391]"
+              @click="editSubmission(submission)"
+            >
+              Edit
+            </button>
+            <button
+              type="button"
+              class="h-8 rounded-lg border border-rose-200 bg-white px-3 text-[11px] font-bold text-rose-700 hover:bg-rose-50"
+              @click="deleteSubmission(submission)"
+            >
+              Hapus
+            </button>
+          </div>
+        </article>
+      </div>
+      <p v-else class="mt-4 rounded-xl bg-[#F8FAFC] p-4 text-center text-xs text-[#5F7089]">
+        Belum ada pengajuan tersimpan.
+      </p>
+    </section>
     <!-- Loading Form Skeleton -->
     <div v-if="isLoading" role="status" aria-busy="true" class="flex flex-col gap-5 select-none">
       <!-- Section 1 Skeleton: Profil Pihak Terkait -->
@@ -785,7 +962,9 @@ onMounted(fetchData)
       role="alert"
       class="flex items-center gap-3 rounded-2xl border border-rose-200 bg-rose-50 p-5 text-[13px] text-rose-700 shadow-2xs"
     >
-      <span aria-hidden="true" class="material-symbols-outlined text-[20px] shrink-0 text-rose-600">error</span>
+      <span aria-hidden="true" class="material-symbols-outlined text-[20px] shrink-0 text-rose-600"
+        >error</span
+      >
       <span class="flex-1 font-medium">{{ pageError }}</span>
       <button
         type="button"
@@ -805,7 +984,11 @@ onMounted(fetchData)
         aria-live="assertive"
         class="flex items-start sm:items-center gap-3 p-4 rounded-2xl border border-rose-300 bg-rose-50 text-rose-800 text-[12px] font-semibold shadow-2xs"
       >
-        <span aria-hidden="true" class="material-symbols-outlined shrink-0 text-[20px] text-rose-600">error</span>
+        <span
+          aria-hidden="true"
+          class="material-symbols-outlined shrink-0 text-[20px] text-rose-600"
+          >error</span
+        >
         <span class="flex-1 leading-relaxed">{{ validationError }}</span>
         <button
           type="button"
@@ -906,7 +1089,11 @@ onMounted(fetchData)
           >
             <div class="flex flex-wrap items-center justify-between gap-2">
               <div class="flex items-center gap-2">
-                <span aria-hidden="true" class="material-symbols-outlined text-[18px] text-amber-600">person_add</span>
+                <span
+                  aria-hidden="true"
+                  class="material-symbols-outlined text-[18px] text-amber-600"
+                  >person_add</span
+                >
                 <h3 class="text-xs font-bold uppercase tracking-wider text-amber-600">
                   Pihak Penerima
                 </h3>
@@ -1085,7 +1272,9 @@ onMounted(fetchData)
                 class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-[16px]"
                 :class="form.tujuan === t.key ? 'bg-white text-[#333333] shadow-2xs' : t.color"
               >
-                <span aria-hidden="true" class="material-symbols-outlined text-[16px]">{{ t.icon }}</span>
+                <span aria-hidden="true" class="material-symbols-outlined text-[16px]">{{
+                  t.icon
+                }}</span>
               </span>
               <span
                 class="text-xs font-bold truncate"
@@ -1166,7 +1355,9 @@ onMounted(fetchData)
                 <span
                   class="inline-flex items-center gap-1.5 rounded-lg bg-[#EDF5FF] px-2.5 py-0.5 text-[11px] font-bold text-[#333333] border border-[#B8D4F5]/40"
                 >
-                  <span aria-hidden="true" class="material-symbols-outlined text-[14px]">devices</span>
+                  <span aria-hidden="true" class="material-symbols-outlined text-[14px]"
+                    >devices</span
+                  >
                   Unit Baru #{{ index + 1 }}
                 </span>
 
@@ -1177,7 +1368,9 @@ onMounted(fetchData)
                   class="flex h-7 items-center gap-1 rounded-lg bg-rose-50 px-2 text-[11px] font-bold text-rose-600 hover:bg-rose-100 active:scale-95 transition-all cursor-pointer border border-rose-200/60"
                   title="Hapus baris unit ini"
                 >
-                  <span aria-hidden="true" class="material-symbols-outlined text-[14px]">delete</span>
+                  <span aria-hidden="true" class="material-symbols-outlined text-[14px]"
+                    >delete</span
+                  >
                   <span>Hapus</span>
                 </button>
               </div>
@@ -1299,7 +1492,9 @@ onMounted(fetchData)
                   class="flex h-7 items-center gap-1 rounded-lg bg-rose-50 px-2 text-[11px] font-bold text-rose-600 hover:bg-rose-100 active:scale-95 transition-all cursor-pointer border border-rose-200/60"
                   title="Hapus baris unit lama ini"
                 >
-                  <span aria-hidden="true" class="material-symbols-outlined text-[14px]">delete</span>
+                  <span aria-hidden="true" class="material-symbols-outlined text-[14px]"
+                    >delete</span
+                  >
                   <span>Hapus</span>
                 </button>
               </div>
@@ -1379,10 +1574,10 @@ onMounted(fetchData)
               04
             </span>
             <div>
-              <h2 class="text-[14px] sm:text-[15px] font-bold text-[#333333]">Diketahui Oleh
-              </h2>
+              <h2 class="text-[14px] sm:text-[15px] font-bold text-[#333333]">Diketahui Oleh</h2>
               <p class="text-[12px] text-[#5F7089]">
-                Pilih atau tulis identitas pihak yang mengetahui untuk dicantumkan pada lembar tanda tangan formulir
+                Pilih atau tulis identitas pihak yang mengetahui untuk dicantumkan pada lembar tanda
+                tangan formulir
               </p>
             </div>
           </div>
@@ -1402,7 +1597,9 @@ onMounted(fetchData)
           <!-- Pilih Karyawan / PBP -->
           <div v-if="!form.isMengetahuiKustom" class="flex flex-col gap-1.5">
             <div class="flex items-center justify-between">
-              <span class="text-[11px] font-bold uppercase text-[#475569]">Pilih Karyawan / PBP</span>
+              <span class="text-[11px] font-bold uppercase text-[#475569]"
+                >Pilih Karyawan / PBP</span
+              >
               <span class="text-[10px] text-slate-400 font-medium">(Opsional)</span>
             </div>
             <SearchableSelect
@@ -1431,7 +1628,9 @@ onMounted(fetchData)
 
           <!-- Nama Terpilih (Auto) -->
           <div v-if="!form.isMengetahuiKustom" class="flex flex-col gap-1.5">
-            <span class="text-[10px] font-bold uppercase text-[#5F7089]">Nama Lengkap Terpilih</span>
+            <span class="text-[10px] font-bold uppercase text-[#5F7089]"
+              >Nama Lengkap Terpilih</span
+            >
             <input
               v-model="form.mengetahuiNama"
               type="text"
@@ -1469,7 +1668,9 @@ onMounted(fetchData)
           <span
             class="text-xs font-bold text-[#333333] whitespace-nowrap flex items-center gap-1.5"
           >
-            <span aria-hidden="true" class="material-symbols-outlined text-[18px] text-slate-400">calendar_today</span>
+            <span aria-hidden="true" class="material-symbols-outlined text-[18px] text-slate-400"
+              >calendar_today</span
+            >
             Tanggal Serah Terima:
           </span>
           <input
@@ -1481,13 +1682,30 @@ onMounted(fetchData)
           />
         </div>
 
-        <button
-          type="submit"
-          class="h-11 w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-[#0A51B0] px-6 text-xs font-bold text-white shadow-2xs hover:bg-[#0A4391] active:scale-95 transition-all cursor-pointer"
-        >
-          <span aria-hidden="true" class="material-symbols-outlined text-[18px]">picture_as_pdf</span>
-          <span>Cetak Formulir Serah Terima (PDF)</span>
-        </button>
+        <div v-if="canWriteSubmissions" class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
+          <button
+            type="button"
+            :disabled="isSaving"
+            class="h-11 w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl border border-[#CBD5E1] bg-white px-5 text-xs font-bold text-[#334155] hover:bg-[#F8FAFC] disabled:opacity-60"
+            @click="persistSubmission('draft')"
+          >
+            <span aria-hidden="true" class="material-symbols-outlined text-[18px]">save</span>
+            <span>{{ isSaving ? 'Menyimpan…' : 'Simpan Draft' }}</span>
+          </button>
+          <button
+            type="submit"
+            :disabled="isSaving"
+            class="h-11 w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-[#0A51B0] px-6 text-xs font-bold text-white shadow-2xs hover:bg-[#0A4391] active:scale-95 transition-all cursor-pointer disabled:opacity-60"
+          >
+            <span aria-hidden="true" class="material-symbols-outlined text-[18px]"
+              >picture_as_pdf</span
+            >
+            <span>Simpan &amp; Cetak PDF</span>
+          </button>
+        </div>
+        <p v-else class="text-xs font-semibold text-[#5F7089]">
+          Mode hanya baca — Anda tidak memiliki izin mengubah pengajuan.
+        </p>
       </div>
     </form>
   </div>
@@ -1518,7 +1736,7 @@ onMounted(fetchData)
   min-width: 0;
   font-size: 12px;
   line-height: 1.5;
-  color: #5F7089;
+  color: #5f7089;
   font-weight: 500;
 }
 .submission-steps li > span {
@@ -1528,8 +1746,8 @@ onMounted(fetchData)
   height: 28px;
   flex-shrink: 0;
   border-radius: 8px;
-  color: #0A5DBD;
-  background: #EDF5FF;
+  color: #0a5dbd;
+  background: #edf5ff;
   font-size: 11px;
   font-weight: 650;
 }

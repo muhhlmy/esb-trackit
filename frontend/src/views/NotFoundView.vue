@@ -1,7 +1,7 @@
 <template>
   <div class="flex min-h-screen items-center justify-center bg-[#F8FAFC] px-4">
     <div class="text-center">
-      <div class="mb-4 text-[96px] font-extrabold leading-none text-[#E2E8F0] select-none">404</div>
+      <div class="mb-4 text-[96px] font-extrabold leading-none text-[#64748B] select-none">404</div>
       <h1 class="mb-2 text-[20px] font-bold text-[#333333]">Halaman Tidak Ditemukan</h1>
       <p class="mb-8 max-w-sm text-[14px] text-[#5F7089]">
         Halaman yang Anda cari tidak tersedia atau telah dipindahkan. Periksa kembali URL atau

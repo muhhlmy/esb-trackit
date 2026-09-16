@@ -1,4 +1,5 @@
 import { pool, withTransaction } from '../config/database.js'
+import { recordSystemAudit } from '../services/systemAuditService.js'
 import {
   assertAllowedFields,
   assertNoActiveMarkup,
@@ -371,7 +372,9 @@ export async function createShipment(req, res) {
     [newId],
   )
 
-  res.status(201).json(mapShipmentRow(fetchResult.rows[0]))
+  const shipment = mapShipmentRow(fetchResult.rows[0])
+  await recordSystemAudit(req, { module: 'shipments', action: 'CREATE', entityType: 'shipment', entityId: shipment.id, entityLabel: shipment.tracking_number || shipment.recipient_name, summary: `Pengiriman ditambahkan untuk ${shipment.recipient_name}`, after: shipment })
+  res.status(201).json(shipment)
 }
 
 // POST /api/shipments/import
@@ -406,6 +409,7 @@ export async function importShipments(req, res) {
       )
       imported += 1
     }
+    await recordSystemAudit(req, { module: 'shipments', action: mode === 'replace' ? 'REPLACE_IMPORT' : 'IMPORT', entityType: 'shipment', entityLabel: 'Import pengiriman', summary: `${imported} data pengiriman diimpor (${mode}).`, after: { imported, mode } }, client)
   })
   res.status(201).json({ success: true, message: `${imported} data pengiriman berhasil diimpor.`, imported })
 }
@@ -416,7 +420,7 @@ export async function updateShipment(req, res) {
   assertPlainObject(req.body, 'Payload pengiriman harus berupa object JSON.')
   assertAllowedFields(req.body, SHIPMENT_UPDATE_FIELDS, 'Payload pengiriman')
 
-  const existingResult = await pool.query('SELECT id FROM asset_shipments WHERE id = $1', [id])
+  const existingResult = await pool.query('SELECT * FROM asset_shipments WHERE id = $1', [id])
   if (existingResult.rowCount === 0) {
     throw createHttpError(404, 'Data pengiriman tidak ditemukan.')
   }
@@ -487,15 +491,19 @@ export async function updateShipment(req, res) {
     [id],
   )
 
-  res.json(mapShipmentRow(updatedResult.rows[0]))
+  const shipment = mapShipmentRow(updatedResult.rows[0])
+  await recordSystemAudit(req, { module: 'shipments', action: 'UPDATE', entityType: 'shipment', entityId: id, entityLabel: shipment.tracking_number || shipment.recipient_name, summary: `Pengiriman diperbarui untuk ${shipment.recipient_name}`, before: existingResult.rows[0], after: shipment })
+  res.json(shipment)
 }
 
 // DELETE /api/shipments/:id
 export async function deleteShipment(req, res) {
   const id = parsePositiveIntegerParam(req.params.id, 'Shipment ID')
-  const result = await pool.query('DELETE FROM asset_shipments WHERE id = $1 RETURNING id', [id])
+  const result = await pool.query('DELETE FROM asset_shipments WHERE id = $1 RETURNING *', [id])
   if (result.rowCount === 0) {
     throw createHttpError(404, 'Data pengiriman tidak ditemukan.')
   }
+  const shipment = result.rows[0]
+  await recordSystemAudit(req, { module: 'shipments', action: 'DELETE', entityType: 'shipment', entityId: id, entityLabel: shipment.tracking_number || shipment.recipient_name, summary: `Pengiriman dihapus untuk ${shipment.recipient_name}`, before: shipment })
   res.json({ message: 'Data pengiriman berhasil dihapus.' })
 }

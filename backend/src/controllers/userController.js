@@ -1,4 +1,5 @@
 import { pool, withTransaction } from "../config/database.js";
+import { recordSystemAudit } from "../services/systemAuditService.js";
 import {
   USER_MANAGEMENT_ROLES,
   canCreateManagedUser,
@@ -219,6 +220,7 @@ export async function storeUser(req, res) {
     );
     createdUser.queues = qResult.rows.map((q) => ({ ...q, id: Number(q.id) }));
     createdUser.queue_ids = qResult.rows.map((q) => Number(q.id)).filter(Number.isSafeInteger);
+    await recordSystemAudit(req, { module: "users", action: "CREATE", entityType: "user", entityId: createdUser.id, entityLabel: createdUser.email, summary: `Pengguna ditambahkan: ${createdUser.email}`, after: createdUser }, client);
     return createdUser;
   });
 
@@ -381,6 +383,7 @@ export async function replaceUser(req, res) {
       role === USER_MANAGEMENT_ROLES.SUPERADMIN
         ? { ...SUPERADMIN_PERMISSIONS }
         : normalizePermissions(transactionUser.permissions, { defaults: userPermissions });
+    await recordSystemAudit(req, { module: "users", action: "UPDATE", entityType: "user", entityId: transactionUser.id, entityLabel: transactionUser.email, summary: `Pengguna diperbarui: ${transactionUser.email}`, before: oldUser, after: transactionUser }, client);
     return transactionUser;
   });
 
@@ -404,7 +407,7 @@ export async function destroyUser(req, res) {
 
   await withTransaction(async (client) => {
     const oldUserResult = await client.query(
-      `SELECT role
+      `SELECT id, nama, email, role, permissions, is_active
          FROM users
         WHERE id = $1
           AND deleted_at IS NULL
@@ -439,6 +442,7 @@ export async function destroyUser(req, res) {
         "Role pengguna berubah selama permintaan diproses. Silakan muat ulang data.",
       );
     }
+    await recordSystemAudit(req, { module: "users", action: "DELETE", entityType: "user", entityId: id, entityLabel: oldUserResult.rows[0].email, summary: `Pengguna dinonaktifkan: ${oldUserResult.rows[0].email}`, before: oldUserResult.rows[0] }, client);
   });
 
   res.json({ message: "Pengguna berhasil dinonaktifkan dan dihapus secara logis." });

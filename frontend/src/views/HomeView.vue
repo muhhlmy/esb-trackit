@@ -546,7 +546,7 @@ onMounted(async () => {
             <RouterLink
               v-for="article in featuredSopList"
               :key="article.id"
-              to="/cases"
+              :to="`/cases/${article.id}`"
               @click="handleArticleClick(article.id)"
               class="article-row gsap-sop-item"
             >
@@ -645,11 +645,11 @@ onMounted(async () => {
 <style scoped>
 .help-home {
   --ink: #333333;
-  --muted: #5F7089;
+  --muted: #5f7089;
   --line: #e1e7ef;
   --surface: #fff;
   --canvas: #f5f7fb;
-  --blue: #0A51B0;
+  --blue: #0a51b0;
   background: var(--canvas);
   color: var(--ink);
   padding: 28px 24px 0;
@@ -659,7 +659,7 @@ onMounted(async () => {
   margin: 0 auto;
 }
 .help-home :is(button, a, input):focus-visible {
-  outline: 3px solid #0892F5;
+  outline: 3px solid #0892f5;
   outline-offset: 4px;
 }
 .help-home button {
@@ -671,7 +671,7 @@ onMounted(async () => {
   gap: 48px;
   padding: 40px;
   border-radius: 24px;
-  background: linear-gradient(145deg, #0A51B0 0%, #0A5DBD 40%, #074797 75%, #052F66 100%);
+  background: linear-gradient(145deg, #0a51b0 0%, #0a5dbd 40%, #074797 75%, #052f66 100%);
   position: relative;
   overflow: hidden;
   color: white;
@@ -717,7 +717,7 @@ onMounted(async () => {
   width: 24px;
   height: 3px;
   border-radius: 2px;
-  background: linear-gradient(90deg, #FF4F1B 0%, #FAA425 100%);
+  background: linear-gradient(90deg, #ff4f1b 0%, #faa425 100%);
 }
 .help-hero h1 {
   max-width: 570px;
@@ -745,7 +745,7 @@ onMounted(async () => {
   padding: 7px 7px 7px 17px;
   border-radius: 12px;
   background: white;
-  color: #5F7089;
+  color: #5f7089;
   box-shadow: 0 8px 24px #071b3726;
 }
 .help-search > svg {
@@ -764,7 +764,7 @@ onMounted(async () => {
   display: none;
 }
 .help-search:focus-within {
-  outline: 3px solid #0892F5;
+  outline: 3px solid #0892f5;
   outline-offset: 3px;
 }
 .help-search input:focus-visible {
@@ -777,7 +777,7 @@ onMounted(async () => {
   gap: 8px;
   min-height: 44px;
   padding: 0 18px;
-  background: linear-gradient(135deg, #0A51B0 0%, #0A5DBD 50%, #0892F5 100%);
+  background: linear-gradient(135deg, #0a51b0 0%, #0a5dbd 50%, #0892f5 100%);
   color: white;
   border-radius: 8px;
   font-size: 13px;
@@ -786,7 +786,7 @@ onMounted(async () => {
   transition: all 0.2s ease;
 }
 .search-submit:hover {
-  background: linear-gradient(135deg, #0A4391 0%, #094f9e 50%, #0779d1 100%);
+  background: linear-gradient(135deg, #0a4391 0%, #094f9e 50%, #0779d1 100%);
   box-shadow: 0 6px 16px rgba(10, 81, 176, 0.35);
   transform: translateY(-1px);
 }
@@ -860,7 +860,7 @@ onMounted(async () => {
 }
 .popular-searches button:hover {
   background: rgba(255, 255, 255, 0.16);
-  border-color: #0892F5;
+  border-color: #0892f5;
 }
 .hero-help {
   border-left: 1px solid #ffffff26;
@@ -877,7 +877,7 @@ onMounted(async () => {
   border: 1px solid rgba(8, 146, 245, 0.4);
   background: rgba(8, 146, 245, 0.15);
   border-radius: 14px;
-  color: #0892F5;
+  color: #0892f5;
   margin-bottom: 18px;
 }
 .hero-help h2 {
@@ -910,7 +910,7 @@ onMounted(async () => {
 }
 .support-button:hover {
   background: rgba(255, 255, 255, 0.2);
-  border-color: #0892F5;
+  border-color: #0892f5;
 }
 .support-button svg {
   flex-shrink: 0;
@@ -985,12 +985,12 @@ onMounted(async () => {
     transform 0.18s;
 }
 .topic-card:hover {
-  border-color: #0A51B0;
+  border-color: #0a51b0;
   box-shadow: 0 6px 20px rgba(10, 81, 176, 0.08);
   transform: translateY(-1px);
 }
 .topic-featured {
-  border-top: 3px solid #0A51B0;
+  border-top: 3px solid #0a51b0;
   padding-top: 20px;
 }
 .topic-icon {
@@ -1003,7 +1003,7 @@ onMounted(async () => {
 }
 .topic-tone-0 {
   background: #edf5ff;
-  color: #0A51B0;
+  color: #0a51b0;
 }
 .topic-tone-1 {
   background: #fff2e7;
@@ -1011,7 +1011,7 @@ onMounted(async () => {
 }
 .topic-tone-2 {
   background: #e8f7ff;
-  color: #0892F5;
+  color: #0892f5;
 }
 .topic-copy {
   display: flex;
@@ -1066,7 +1066,7 @@ onMounted(async () => {
 .article-number {
   font-size: 12px;
   font-weight: 550;
-  color: #8c9bb0;
+  color: #5f7089;
   font-variant-numeric: tabular-nums;
   padding-top: 3px;
 }
@@ -1181,7 +1181,7 @@ onMounted(async () => {
 }
 .faq-answer pre {
   background: #072652;
-  border: 1px solid #0A4391;
+  border: 1px solid #0a4391;
   color: #c5f2e1;
   padding: 13px;
   border-radius: 8px;

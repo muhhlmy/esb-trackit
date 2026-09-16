@@ -7,7 +7,20 @@ const activeCaseId = ref(null)
 const selectedCategory = ref('all')
 const selectedSeverity = ref('all')
 const searchQuery = ref('')
-const recentSearches = ref(JSON.parse(localStorage.getItem('esb_recent_searches') || '[]'))
+function loadRecentSearches() {
+  if (typeof localStorage === 'undefined') return []
+  try {
+    const stored = JSON.parse(localStorage.getItem('esb_recent_searches') || '[]')
+    return Array.isArray(stored)
+      ? stored.filter((item) => typeof item === 'string').slice(0, 5)
+      : []
+  } catch {
+    localStorage.removeItem('esb_recent_searches')
+    return []
+  }
+}
+
+const recentSearches = ref(loadRecentSearches())
 const isLoading = ref(false)
 
 // Drawer state
@@ -142,10 +155,20 @@ export function useCases() {
   }
 
   function setSearch(query) {
-    searchQuery.value = query
-    if (query.trim() && !recentSearches.value.includes(query.trim())) {
-      recentSearches.value = [query.trim(), ...recentSearches.value.slice(0, 4)]
-      localStorage.setItem('esb_recent_searches', JSON.stringify(recentSearches.value))
+    const normalizedQuery = typeof query === 'string' ? query.trim() : ''
+    searchQuery.value = normalizedQuery
+    if (normalizedQuery && !recentSearches.value.includes(normalizedQuery)) {
+      recentSearches.value = [normalizedQuery, ...recentSearches.value.slice(0, 4)]
+      try {
+        localStorage.setItem('esb_recent_searches', JSON.stringify(recentSearches.value))
+      } catch {
+        // Penyimpanan lokal bersifat opsional (private mode/quota dapat menolaknya).
+      }
+    }
+    if (normalizedQuery) {
+      queueMicrotask(() => {
+        api.logKbSearch(normalizedQuery, filteredCases.value.length).catch(() => {})
+      })
     }
   }
 
@@ -155,7 +178,11 @@ export function useCases() {
 
   function clearRecentSearches() {
     recentSearches.value = []
-    localStorage.removeItem('esb_recent_searches')
+    try {
+      localStorage.removeItem('esb_recent_searches')
+    } catch {
+      // Penyimpanan lokal bersifat opsional.
+    }
   }
 
   function openCreateDrawer() {

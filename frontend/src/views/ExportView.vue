@@ -427,10 +427,8 @@ onMounted(() => {
           <h3 class="text-sm font-bold text-rose-900">Reset &amp; Kosongkan Database</h3>
           <p class="text-xs text-rose-700/90 leading-relaxed max-w-2xl">
             Menghapus secara permanen seluruh data aset TI, aset GA, aset OPS, tiket helpdesk,
-            karyawan, dan log aktivitas. Akun Superadmin default (<code
-              class="font-mono bg-white/80 px-1 py-0.5 rounded text-rose-900 border border-rose-200"
-              >superadmin@admin.com</code
-            >) akan diprovisi kembali secara otomatis.
+            karyawan, dan log aktivitas. Akun Superadmin yang dikonfigurasi
+            administrator pada backend akan diprovisi kembali secara otomatis.
           </p>
         </div>
         <button
@@ -1117,11 +1115,8 @@ onMounted(() => {
               permanen.
             </p>
             <p class="reset-after-note text-[11px] text-rose-700">
-              Setelah reset, akun Superadmin (<code class="font-mono font-semibold"
-                >superadmin@admin.com</code
-              >
-              / <code class="font-mono font-semibold">admin123</code>) dan unit helpdesk default
-              akan disiapkan kembali secara otomatis.
+              Setelah reset, akun Superadmin dari konfigurasi backend dan unit helpdesk default
+              akan disiapkan kembali secara otomatis. Password tidak ditampilkan di aplikasi.
             </p>
           </div>
         </div>

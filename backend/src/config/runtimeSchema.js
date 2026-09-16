@@ -1,348 +1,384 @@
 // Runtime schema validation untuk Simple Schema with CHECK Constraints
-export const EXPECTED_SCHEMA_VERSION = 2
+export const EXPECTED_SCHEMA_VERSION = 2;
 
-const nn = (type) => Object.freeze({ type, nullable: false })
-const optional = (type) => Object.freeze({ type, nullable: true })
+const nn = (type) => Object.freeze({ type, nullable: false });
+const optional = (type) => Object.freeze({ type, nullable: true });
 
 const REQUIRED_RUNTIME_SCHEMA = Object.freeze({
   karyawan: {
-    id: nn('int4'),
-    nik: nn('varchar'),
-    nama_karyawan: nn('varchar'),
-    status: nn('varchar'),
-    title: nn('varchar'),
-    job_level: nn('varchar'),
-    departemen: nn('varchar'),
-    directorate: nn('varchar'),
-    tanggal_mulai_bekerja: nn('date'),
-    employeement_status: nn('varchar'),
-    nik_atasan_langsung: optional('varchar'),
-    email_kantor: nn('varchar'),
-    lokasi_kerja: optional('varchar'),
-    created_at: nn('timestamp'),
-    updated_at: nn('timestamp'),
+    id: nn("int4"),
+    nik: nn("varchar"),
+    nama_karyawan: nn("varchar"),
+    status: nn("varchar"),
+    title: nn("varchar"),
+    job_level: nn("varchar"),
+    departemen: nn("varchar"),
+    directorate: nn("varchar"),
+    tanggal_mulai_bekerja: nn("date"),
+    employeement_status: nn("varchar"),
+    nik_atasan_langsung: optional("varchar"),
+    email_kantor: nn("varchar"),
+    lokasi_kerja: optional("varchar"),
+    created_at: nn("timestamp"),
+    updated_at: nn("timestamp"),
   },
   users: {
-    id: nn('int4'),
-    nama: nn('varchar'),
-    email: nn('varchar'),
-    password_hash: nn('text'),
-    role: nn('varchar'),
-    permissions: nn('jsonb'),
-    is_active: nn('bool'),
-    deleted_at: optional('timestamp'),
-    deleted_by_id: optional('int4'),
-    deletion_reason: optional('text'),
-    created_at: nn('timestamp'),
-    updated_at: nn('timestamp'),
+    id: nn("int4"),
+    nama: nn("varchar"),
+    email: nn("varchar"),
+    password_hash: nn("text"),
+    role: nn("varchar"),
+    permissions: nn("jsonb"),
+    is_active: nn("bool"),
+    deleted_at: optional("timestamp"),
+    deleted_by_id: optional("int4"),
+    deletion_reason: optional("text"),
+    created_at: nn("timestamp"),
+    updated_at: nn("timestamp"),
   },
   account_security_state: {
-    account_key: nn('varchar'),
-    failed_attempt_count: nn('int4'),
-    first_failed_at: optional('timestamptz'),
-    last_failed_at: optional('timestamptz'),
-    locked_until: optional('timestamptz'),
-    updated_at: nn('timestamptz'),
+    account_key: nn("varchar"),
+    failed_attempt_count: nn("int4"),
+    first_failed_at: optional("timestamptz"),
+    last_failed_at: optional("timestamptz"),
+    locked_until: optional("timestamptz"),
+    updated_at: nn("timestamptz"),
   },
   user_sessions: {
-    id: nn('int4'),
-    session_id: nn('uuid'),
-    user_id: nn('int4'),
-    issued_at: nn('timestamp'),
-    expires_at: nn('timestamp'),
-    revoked_at: optional('timestamp'),
-    last_seen_at: optional('timestamp'),
-    created_at: nn('timestamp'),
-    updated_at: nn('timestamp'),
+    id: nn("int4"),
+    session_id: nn("uuid"),
+    user_id: nn("int4"),
+    issued_at: nn("timestamp"),
+    expires_at: nn("timestamp"),
+    revoked_at: optional("timestamp"),
+    last_seen_at: optional("timestamp"),
+    created_at: nn("timestamp"),
+    updated_at: nn("timestamp"),
   },
   aset_ti: {
-    id: nn('int4'),
-    hostname: optional('varchar'),
-    serial_number: optional('varchar'),
-    spesifikasi: optional('text'),
-    nik_pemegang_asset: optional('varchar'),
-    nama_karyawan_pemegang_asset: optional('varchar'),
-    departemen_pemegang_asset: optional('varchar'),
-    lokasi_asset: optional('varchar'),
-    tipe_perangkat: optional('varchar'),
-    brand_merek: optional('varchar'),
-    model: optional('varchar'),
-    status: nn('varchar'), // Has DEFAULT 'In Use' -> NOT NULL
-    kondisi: nn('varchar'), // Has DEFAULT 'Normal' -> NOT NULL
-    note_asset: optional('varchar'),
-    deleted_at: optional('timestamp'),
-    created_at: nn('timestamp'),
-    updated_at: nn('timestamp'),
+    id: nn("int4"),
+    hostname: optional("varchar"),
+    serial_number: optional("varchar"),
+    spesifikasi: optional("text"),
+    nik_pemegang_asset: optional("varchar"),
+    nama_karyawan_pemegang_asset: optional("varchar"),
+    departemen_pemegang_asset: optional("varchar"),
+    lokasi_asset: optional("varchar"),
+    tipe_perangkat: optional("varchar"),
+    brand_merek: optional("varchar"),
+    model: optional("varchar"),
+    status: nn("varchar"), // Has DEFAULT 'In Use' -> NOT NULL
+    kondisi: nn("varchar"), // Has DEFAULT 'Normal' -> NOT NULL
+    note_asset: optional("varchar"),
+    deleted_at: optional("timestamp"),
+    created_at: nn("timestamp"),
+    updated_at: nn("timestamp"),
   },
   aset_ga: {
-    id: nn('int4'),
-    hostname: nn('varchar'),
-    quantity: nn('int4'),
-    tipe_fasilitas: nn('varchar'),
-    nama_asset: nn('varchar'),
-    ukuran: optional('varchar'),
-    detail: optional('text'),
-    lokasi: nn('varchar'),
-    lokasi_detail: optional('varchar'),
-    kondisi: nn('varchar'),
-    deleted_at: optional('timestamp'),
-    created_at: nn('timestamp'),
-    updated_at: nn('timestamp'),
+    id: nn("int4"),
+    hostname: nn("varchar"),
+    quantity: nn("int4"),
+    tipe_fasilitas: nn("varchar"),
+    nama_asset: nn("varchar"),
+    ukuran: optional("varchar"),
+    detail: optional("text"),
+    lokasi: nn("varchar"),
+    lokasi_detail: optional("varchar"),
+    kondisi: nn("varchar"),
+    deleted_at: optional("timestamp"),
+    created_at: nn("timestamp"),
+    updated_at: nn("timestamp"),
   },
   aset_ops: {
-    id: nn('int4'),
-    hostname: nn('varchar'),
-    nama_asset: nn('varchar'),
-    kategori: nn('varchar'),
-    lokasi: nn('varchar'),
-    pic: optional('varchar'),
-    tanggal_beli: optional('date'),
-    total_asset_amount: optional('numeric'),
-    kondisi: nn('varchar'),
-    status: nn('varchar'),
-    deleted_at: optional('timestamp'),
-    created_at: nn('timestamp'),
-    updated_at: nn('timestamp'),
+    id: nn("int4"),
+    hostname: nn("varchar"),
+    nama_asset: nn("varchar"),
+    kategori: nn("varchar"),
+    lokasi: nn("varchar"),
+    pic: optional("varchar"),
+    tanggal_beli: optional("date"),
+    total_asset_amount: optional("numeric"),
+    kondisi: nn("varchar"),
+    status: nn("varchar"),
+    deleted_at: optional("timestamp"),
+    created_at: nn("timestamp"),
+    updated_at: nn("timestamp"),
   },
   ticket_queues: {
-    id: nn('int4'),
-    kode: nn('varchar'),
-    nama: nn('varchar'),
-    deskripsi: optional('text'),
-    is_active: nn('bool'),
-    created_at: nn('timestamp'),
-    updated_at: nn('timestamp'),
+    id: nn("int4"),
+    kode: nn("varchar"),
+    nama: nn("varchar"),
+    deskripsi: optional("text"),
+    is_active: nn("bool"),
+    created_at: nn("timestamp"),
+    updated_at: nn("timestamp"),
   },
   tickets: {
-    id: nn('int4'),
-    nomor_tiket: nn('varchar'),
-    judul: nn('varchar'),
-    deskripsi: optional('text'),
-    kategori: optional('varchar'),
-    prioritas: nn('varchar'),
-    status_tiket: nn('varchar'),
-    queue_id: optional('int4'),
-    assigned_to_user_id: optional('int4'),
-    pelapor_user_id: nn('int4'),
-    attachment_count: optional('int4'),
-    resolved_at: optional('timestamp'),
-    resolved_by_user_id: optional('int4'),
-    deleted_at: optional('timestamp'),
-    deleted_by_user_id: optional('int4'),
-    deletion_reason: optional('text'),
-    created_at: nn('timestamp'),
-    updated_at: nn('timestamp'),
+    id: nn("int4"),
+    nomor_tiket: nn("varchar"),
+    judul: nn("varchar"),
+    deskripsi: optional("text"),
+    kategori: optional("varchar"),
+    prioritas: nn("varchar"),
+    status_tiket: nn("varchar"),
+    queue_id: optional("int4"),
+    assigned_to_user_id: optional("int4"),
+    pelapor_user_id: nn("int4"),
+    attachment_count: optional("int4"),
+    resolved_at: optional("timestamp"),
+    resolved_by_user_id: optional("int4"),
+    deleted_at: optional("timestamp"),
+    deleted_by_user_id: optional("int4"),
+    deletion_reason: optional("text"),
+    created_at: nn("timestamp"),
+    updated_at: nn("timestamp"),
   },
   komentar_tiket: {
-    id: nn('int4'),
-    id_tiket: nn('int4'),
-    pesan: nn('text'),
-    attachment_data: optional('text'),
-    attachment_name: optional('varchar'),
-    user_id: nn('int4'),
-    created_at: nn('timestamp'),
+    id: nn("int4"),
+    id_tiket: nn("int4"),
+    pesan: nn("text"),
+    attachment_data: optional("text"),
+    attachment_name: optional("varchar"),
+    user_id: nn("int4"),
+    created_at: nn("timestamp"),
   },
   ticket_casp_ratings: {
-    id: nn('int4'),
-    id_tiket: nn('int4'),
-    reporter_user_id: nn('int4'),
-    assignee_user_id: optional('int4'),
-    rating_score: nn('int4'),
-    feedback: optional('text'),
-    submitted_at: nn('timestamp'),
+    id: nn("int4"),
+    id_tiket: nn("int4"),
+    reporter_user_id: nn("int4"),
+    assignee_user_id: optional("int4"),
+    rating_score: nn("int4"),
+    feedback: optional("text"),
+    submitted_at: nn("timestamp"),
   },
   user_ticket_queues: {
-    id: nn('int4'),
-    user_id: nn('int4'),
-    queue_id: nn('int4'),
-    is_primary: nn('bool'),
-    created_at: nn('timestamp'),
+    id: nn("int4"),
+    user_id: nn("int4"),
+    queue_id: nn("int4"),
+    is_primary: nn("bool"),
+    created_at: nn("timestamp"),
   },
   log_riwayat_tiket: {
-    id: nn('int4'),
-    id_tiket: nn('int4'),
-    action: nn('varchar'),
-    old_value: optional('jsonb'),
-    new_value: optional('jsonb'),
-    actor_name: nn('varchar'),
-    created_at: nn('timestamp'),
+    id: nn("int4"),
+    id_tiket: nn("int4"),
+    action: nn("varchar"),
+    old_value: optional("jsonb"),
+    new_value: optional("jsonb"),
+    actor_name: nn("varchar"),
+    created_at: nn("timestamp"),
   },
   riwayat_pemakaian_aset: {
-    id: nn('int4'),
-    id_aset: nn('int4'),
-    nik_pemegang: optional('varchar'),
-    tanggal_mulai: nn('timestamp'),
-    tanggal_selesai: optional('timestamp'),
-    catatan: optional('text'),
-    created_at: nn('timestamp'),
-    updated_at: nn('timestamp'),
+    id: nn("int4"),
+    id_aset: nn("int4"),
+    nik_pemegang: optional("varchar"),
+    tanggal_mulai: nn("timestamp"),
+    tanggal_selesai: optional("timestamp"),
+    catatan: optional("text"),
+    created_at: nn("timestamp"),
+    updated_at: nn("timestamp"),
   },
   log_riwayat_aset: {
-    id: nn('int4'),
-    id_aset: nn('int4'),
-    label_aset: optional('varchar'),
-    aksi: nn('varchar'),
-    perubahan: optional('text'),
-    oleh_pengguna: nn('varchar'),
-    dibuat_pada: nn('timestamp'),
+    id: nn("int4"),
+    id_aset: nn("int4"),
+    label_aset: optional("varchar"),
+    aksi: nn("varchar"),
+    perubahan: optional("text"),
+    oleh_pengguna: nn("varchar"),
+    dibuat_pada: nn("timestamp"),
   },
   log_audit_login: {
-    id: nn('int4'),
-    user_id: optional('int4'),
-    email: optional('varchar'),
-    login_time: nn('timestamp'),
-    ip_address: optional('varchar'),
-    user_agent: optional('text'),
-    created_at: nn('timestamp'),
+    id: nn("int4"),
+    user_id: optional("int4"),
+    email: optional("varchar"),
+    login_time: nn("timestamp"),
+    ip_address: optional("varchar"),
+    user_agent: optional("text"),
+    created_at: nn("timestamp"),
+  },
+  system_audit_logs: {
+    id: nn("int8"),
+    module: nn("varchar"),
+    action: nn("varchar"),
+    entity_type: nn("varchar"),
+    entity_id: optional("varchar"),
+    entity_label: optional("varchar"),
+    summary: nn("text"),
+    actor_user_id: optional("int4"),
+    actor_name: nn("varchar"),
+    actor_email: optional("varchar"),
+    before_data: optional("jsonb"),
+    after_data: optional("jsonb"),
+    ip_address: optional("varchar"),
+    user_agent: optional("text"),
+    created_at: nn("timestamp"),
   },
   faq: {
-    id: nn('int4'),
-    question: nn('varchar'),
-    answer: nn('text'),
-    category: nn('varchar'),
-    status: nn('varchar'),
-    sort_order: nn('int4'),
-    steps: nn('jsonb'),
-    code_snippet: optional('text'),
-    action_text: optional('varchar'),
-    action_link: optional('text'),
-    is_emergency: nn('bool'),
-    emergency_title: optional('varchar'),
-    emergency_text: optional('text'),
-    created_at: nn('timestamp'),
-    updated_at: nn('timestamp'),
+    id: nn("int4"),
+    question: nn("varchar"),
+    answer: nn("text"),
+    category: nn("varchar"),
+    status: nn("varchar"),
+    sort_order: nn("int4"),
+    steps: nn("jsonb"),
+    code_snippet: optional("text"),
+    action_text: optional("varchar"),
+    action_link: optional("text"),
+    is_emergency: nn("bool"),
+    emergency_title: optional("varchar"),
+    emergency_text: optional("text"),
+    created_at: nn("timestamp"),
+    updated_at: nn("timestamp"),
   },
   kb_categories: {
-    id: nn('int4'),
-    key: nn('varchar'),
-    title: nn('varchar'),
-    description: optional('text'),
-    icon: optional('varchar'),
-    is_featured: nn('bool'),
-    sort_order: nn('int4'),
-    status: nn('varchar'),
-    created_at: nn('timestamp'),
-    updated_at: nn('timestamp'),
+    id: nn("int4"),
+    key: nn("varchar"),
+    title: nn("varchar"),
+    description: optional("text"),
+    icon: optional("varchar"),
+    is_featured: nn("bool"),
+    sort_order: nn("int4"),
+    status: nn("varchar"),
+    created_at: nn("timestamp"),
+    updated_at: nn("timestamp"),
   },
   kb_search_logs: {
-    id: nn('int8'),
-    query: nn('varchar'),
-    results_count: nn('int4'),
-    user_id: optional('int4'),
-    created_at: nn('timestamp'),
+    id: nn("int8"),
+    query: nn("varchar"),
+    results_count: nn("int4"),
+    user_id: optional("int4"),
+    created_at: nn("timestamp"),
   },
   case_bookmarks: {
-    id: nn('int4'),
-    user_id: nn('int4'),
-    case_id: nn('int4'),
-    created_at: nn('timestamp'),
+    id: nn("int4"),
+    user_id: nn("int4"),
+    case_id: nn("int4"),
+    created_at: nn("timestamp"),
   },
   cases: {
-    id: nn('int4'),
-    title: nn('varchar'),
-    category: nn('varchar'),
-    severity: nn('varchar'),
-    tags: nn('jsonb'),
-    summary: optional('text'),
-    problem_context: optional('text'),
-    content_html: optional('text'),
-    action_steps: nn('jsonb'),
-    dos: nn('jsonb'),
-    donts: nn('jsonb'),
-    snippets: nn('jsonb'),
-    status: nn('varchar'),
-    is_custom: nn('bool'),
-    sort_order: nn('int4'),
-    created_at: nn('timestamp'),
-    updated_at: nn('timestamp'),
+    id: nn("int4"),
+    title: nn("varchar"),
+    category: nn("varchar"),
+    severity: nn("varchar"),
+    tags: nn("jsonb"),
+    summary: optional("text"),
+    problem_context: optional("text"),
+    content_html: optional("text"),
+    action_steps: nn("jsonb"),
+    dos: nn("jsonb"),
+    donts: nn("jsonb"),
+    snippets: nn("jsonb"),
+    status: nn("varchar"),
+    is_custom: nn("bool"),
+    sort_order: nn("int4"),
+    created_at: nn("timestamp"),
+    updated_at: nn("timestamp"),
   },
   asset_shipments: {
-    id: nn('int4'),
-    request_date: nn('date'),
-    recipient_name: nn('varchar'),
-    item_description: nn('text'),
-    destination: nn('varchar'),
-    tracking_number: optional('varchar'),
-    status: nn('varchar'),
-    delivery_proof_url: optional('text'),
-    created_by: optional('int4'),
-    created_at: nn('timestamp'),
-    updated_at: nn('timestamp'),
+    id: nn("int4"),
+    request_date: nn("date"),
+    recipient_name: nn("varchar"),
+    item_description: nn("text"),
+    destination: nn("varchar"),
+    tracking_number: optional("varchar"),
+    status: nn("varchar"),
+    delivery_proof_url: optional("text"),
+    created_by: optional("int4"),
+    created_at: nn("timestamp"),
+    updated_at: nn("timestamp"),
   },
-})
+  asset_submissions: {
+    id: nn("int4"),
+    submission_number: nn("varchar"),
+    payload: nn("jsonb"),
+    status: nn("varchar"),
+    created_by: nn("int4"),
+    updated_by: optional("int4"),
+    created_at: nn("timestamp"),
+    updated_at: nn("timestamp"),
+  },
+});
 
 const REQUIRED_RELATION_KINDS = Object.freeze({
-  karyawan: 'r',
-  users: 'r',
-  user_sessions: 'r',
-  account_security_state: 'r',
-  aset_ti: 'r',
-  aset_ga: 'r',
-  aset_ops: 'r',
-  ticket_queues: 'r',
-  tickets: 'r',
-  komentar_tiket: 'r',
-  ticket_casp_ratings: 'r',
-  user_ticket_queues: 'r',
-  log_riwayat_tiket: 'r',
-  log_riwayat_aset: 'r',
-  riwayat_pemakaian_aset: 'r',
-  log_audit_login: 'r',
-  faq: 'r',
-  cases: 'r',
-  kb_categories: 'r',
-  kb_search_logs: 'r',
-  case_bookmarks: 'r',
-  asset_shipments: 'r',
-})
+  karyawan: "r",
+  users: "r",
+  user_sessions: "r",
+  account_security_state: "r",
+  aset_ti: "r",
+  aset_ga: "r",
+  aset_ops: "r",
+  ticket_queues: "r",
+  tickets: "r",
+  komentar_tiket: "r",
+  ticket_casp_ratings: "r",
+  user_ticket_queues: "r",
+  log_riwayat_tiket: "r",
+  log_riwayat_aset: "r",
+  riwayat_pemakaian_aset: "r",
+  log_audit_login: "r",
+  system_audit_logs: "r",
+  faq: "r",
+  cases: "r",
+  kb_categories: "r",
+  kb_search_logs: "r",
+  case_bookmarks: "r",
+  asset_shipments: "r",
+  asset_submissions: "r",
+});
 
 const REQUIRED_INDEXES = Object.freeze([
-  'idx_karyawan_departemen',
-  'idx_karyawan_email',
-  'idx_karyawan_nik_atasan',
-  'idx_users_email',
-  'idx_users_is_active',
-  'idx_user_sessions_sid',
-  'idx_user_sessions_user',
-  'idx_user_sessions_expires',
-  'idx_user_sessions_revoked',
-  'idx_account_security_locked_until',
-  'idx_aset_hostname',
-  'idx_aset_serial_number',
-  'idx_aset_status',
-  'idx_aset_kondisi',
-  'idx_aset_nik_pemegang',
-  'idx_aset_ga_hostname',
-  'idx_aset_ga_lokasi',
-  'idx_aset_ga_kondisi',
-  'idx_aset_ops_hostname',
-  'idx_aset_ops_lokasi',
-  'idx_aset_ops_status',
-  'idx_tickets_queue_status',
-  'idx_tickets_assigned_status',
-  'idx_tickets_reporter_created',
-  'idx_komentar_tiket_id',
-  'idx_log_riwayat_tiket_id',
-  'idx_rpa_active',
-  'idx_log_audit_login_time',
-  'idx_faq_status',
-  'idx_cases_status',
-  'idx_kb_categories_status',
-  'idx_kb_search_logs_query',
-  'idx_kb_search_logs_created',
-  'idx_case_bookmarks_user',
-  'idx_asset_shipments_request_date',
-  'idx_asset_shipments_status',
-  'idx_asset_shipments_tracking_number',
-  'idx_asset_shipments_created_at',
-])
+  "idx_karyawan_departemen",
+  "idx_karyawan_email",
+  "idx_karyawan_nik_atasan",
+  "idx_users_email",
+  "idx_users_is_active",
+  "idx_user_sessions_sid",
+  "idx_user_sessions_user",
+  "idx_user_sessions_expires",
+  "idx_user_sessions_revoked",
+  "idx_account_security_locked_until",
+  "idx_aset_hostname",
+  "idx_aset_serial_number",
+  "idx_aset_status",
+  "idx_aset_kondisi",
+  "idx_aset_nik_pemegang",
+  "idx_aset_ga_hostname",
+  "idx_aset_ga_lokasi",
+  "idx_aset_ga_kondisi",
+  "idx_aset_ops_hostname",
+  "idx_aset_ops_lokasi",
+  "idx_aset_ops_status",
+  "idx_tickets_queue_status",
+  "idx_tickets_assigned_status",
+  "idx_tickets_reporter_created",
+  "idx_komentar_tiket_id",
+  "idx_log_riwayat_tiket_id",
+  "idx_rpa_active",
+  "idx_log_audit_login_time",
+  "idx_system_audit_logs_created_at",
+  "idx_system_audit_logs_module_action",
+  "idx_system_audit_logs_entity",
+  "idx_faq_status",
+  "idx_cases_status",
+  "idx_kb_categories_status",
+  "idx_kb_search_logs_query",
+  "idx_kb_search_logs_created",
+  "idx_case_bookmarks_user",
+  "idx_asset_shipments_request_date",
+  "idx_asset_shipments_status",
+  "idx_asset_shipments_tracking_number",
+  "idx_asset_shipments_created_at",
+  "idx_asset_submissions_status",
+  "idx_asset_submissions_created_by",
+  "idx_asset_submissions_created_at",
+]);
 
-const REQUIRED_TRIGGERS = Object.freeze([]) // Triggers are optional
+const REQUIRED_TRIGGERS = Object.freeze([]); // Triggers are optional
 
 export function getRequiredRuntimeColumns() {
-  return Object.entries(REQUIRED_RUNTIME_SCHEMA).flatMap(([relation, columns]) =>
-    Object.keys(columns).map((column) => `${relation}.${column}`),
-  )
+  return Object.entries(REQUIRED_RUNTIME_SCHEMA).flatMap(
+    ([relation, columns]) =>
+      Object.keys(columns).map((column) => `${relation}.${column}`),
+  );
 }
 
 export async function verifyRuntimeSchema(
@@ -357,92 +393,113 @@ export async function verifyRuntimeSchema(
       is_nullable
     FROM information_schema.columns
     WHERE table_schema = 'public'
-  `)
+  `);
   const actualColumns = new Map(
     columnsResult.rows.map((row) => [
       `${row.table_name}.${row.column_name}`,
       {
         type: row.udt_name,
-        nullable: row.is_nullable === 'YES',
+        nullable: row.is_nullable === "YES",
       },
     ]),
-  )
+  );
 
-  const missing = []
-  const typeMismatch = []
-  const nullabilityMismatch = []
+  const missing = [];
+  const typeMismatch = [];
+  const nullabilityMismatch = [];
   for (const [relation, columns] of Object.entries(REQUIRED_RUNTIME_SCHEMA)) {
     for (const [column, expected] of Object.entries(columns)) {
-      const key = `${relation}.${column}`
-      const actual = actualColumns.get(key)
+      const key = `${relation}.${column}`;
+      const actual = actualColumns.get(key);
       if (!actual) {
-        missing.push(key)
-        continue
+        missing.push(key);
+        continue;
       }
       if (actual.type !== expected.type) {
-        typeMismatch.push(`${key} expected=${expected.type} actual=${actual.type}`)
+        typeMismatch.push(
+          `${key} expected=${expected.type} actual=${actual.type}`,
+        );
       }
       if (actual.nullable !== expected.nullable) {
         nullabilityMismatch.push(
-          `${key} expected=${expected.nullable ? 'nullable' : 'not-null'}`,
-        )
+          `${key} expected=${expected.nullable ? "nullable" : "not-null"}`,
+        );
       }
     }
   }
 
   if ([missing, typeMismatch, nullabilityMismatch].some((p) => p.length > 0)) {
     const problems = [
-      missing.length > 0 ? `Missing: ${missing.join(', ')}` : null,
-      typeMismatch.length > 0 ? `Type mismatch: ${typeMismatch.join(', ')}` : null,
-      nullabilityMismatch.length > 0 ? `Nullability mismatch: ${nullabilityMismatch.join(', ')}` : null,
-    ].filter(Boolean)
-    throw new Error(`Runtime schema belum siap. ${problems.join('; ')}`)
+      missing.length > 0 ? `Missing: ${missing.join(", ")}` : null,
+      typeMismatch.length > 0
+        ? `Type mismatch: ${typeMismatch.join(", ")}`
+        : null,
+      nullabilityMismatch.length > 0
+        ? `Nullability mismatch: ${nullabilityMismatch.join(", ")}`
+        : null,
+    ].filter(Boolean);
+    throw new Error(`Runtime schema belum siap. ${problems.join("; ")}`);
   }
 
-  const relationsResult = await queryable.query(`
+  const relationsResult = await queryable.query(
+    `
     SELECT c.relname AS relation_name, c.relkind AS relation_kind
     FROM pg_class c
     JOIN pg_namespace n ON n.oid = c.relnamespace
     WHERE n.nspname = 'public'
       AND c.relname = ANY($1::text[])
-  `, [Object.keys(REQUIRED_RELATION_KINDS)])
-  
+  `,
+    [Object.keys(REQUIRED_RELATION_KINDS)],
+  );
+
   const actualRelationKinds = new Map(
     relationsResult.rows.map((row) => [row.relation_name, row.relation_kind]),
-  )
+  );
   const relationMismatch = Object.entries(REQUIRED_RELATION_KINDS)
     .filter(([relation, kind]) => actualRelationKinds.get(relation) !== kind)
-    .map(([relation, kind]) => `${relation} expected-kind=${kind}`)
+    .map(([relation, kind]) => `${relation} expected-kind=${kind}`);
 
   const indexesResult = await queryable.query(`
     SELECT indexname
     FROM pg_indexes
     WHERE schemaname = 'public'
-  `)
-  const actualIndexes = new Set(indexesResult.rows.map((row) => row.indexname))
-  const missingIndexes = REQUIRED_INDEXES.filter((index) => !actualIndexes.has(index))
+  `);
+  const actualIndexes = new Set(indexesResult.rows.map((row) => row.indexname));
+  const missingIndexes = REQUIRED_INDEXES.filter(
+    (index) => !actualIndexes.has(index),
+  );
 
   const triggersResult = await queryable.query(`
     SELECT trigger_name
     FROM information_schema.triggers
     WHERE trigger_schema = 'public'
-  `)
-  const actualTriggers = new Set(triggersResult.rows.map((row) => row.trigger_name))
-  const missingTriggers = REQUIRED_TRIGGERS.filter((trigger) => !actualTriggers.has(trigger))
+  `);
+  const actualTriggers = new Set(
+    triggersResult.rows.map((row) => row.trigger_name),
+  );
+  const missingTriggers = REQUIRED_TRIGGERS.filter(
+    (trigger) => !actualTriggers.has(trigger),
+  );
 
   const problems = [
-    relationMismatch.length > 0 ? `Relation mismatch: ${relationMismatch.join(', ')}` : null,
-    missingIndexes.length > 0 ? `Missing indexes: ${missingIndexes.join(', ')}` : null,
-    missingTriggers.length > 0 ? `Missing triggers: ${missingTriggers.join(', ')}` : null,
-  ].filter(Boolean)
+    relationMismatch.length > 0
+      ? `Relation mismatch: ${relationMismatch.join(", ")}`
+      : null,
+    missingIndexes.length > 0
+      ? `Missing indexes: ${missingIndexes.join(", ")}`
+      : null,
+    missingTriggers.length > 0
+      ? `Missing triggers: ${missingTriggers.join(", ")}`
+      : null,
+  ].filter(Boolean);
 
   if (problems.length > 0) {
-    throw new Error(`Runtime schema belum siap. ${problems.join('; ')}`)
+    throw new Error(`Runtime schema belum siap. ${problems.join("; ")}`);
   }
 
   return {
-    database_name: 'esb_trackit',
-    database_user: 'postgres',
+    database_name: "esb_trackit",
+    database_user: "postgres",
     is_superuser: true,
-  }
+  };
 }

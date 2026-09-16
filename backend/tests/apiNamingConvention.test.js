@@ -119,11 +119,14 @@ test('DEFECT-14 — API Naming Standardization & Backward Compatibility Suite (A
       await pool.query('DELETE FROM karyawan WHERE id = $1', [createdEmpId]).catch(() => {})
     }
     if (superadminId) {
+      await pool.query('DELETE FROM user_sessions WHERE user_id = $1', [superadminId]).catch(() => {})
       await pool.query('DELETE FROM users WHERE id = $1', [superadminId]).catch(() => {})
     }
     if (server) {
+      server.closeAllConnections()
       await new Promise((resolve) => server.close(resolve))
     }
+    await pool.end()
   })
 
   await t.test('TEST 1 — Canonical GET /api/ga-assets returns 200 OK', async () => {

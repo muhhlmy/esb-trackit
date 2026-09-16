@@ -97,7 +97,7 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside))
       aria-haspopup="listbox"
       :aria-expanded="isOpen"
       @click="toggle"
-      class="inline-flex w-full items-center justify-between gap-1.5 rounded-xl border bg-white px-3 text-xs font-bold text-[#2A3547] shadow-2xs hover:bg-[#F8FAFC] hover:border-[#0A51B0] transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+      class="ui-select-trigger inline-flex w-full items-center justify-between gap-1.5 rounded-xl border bg-white px-3 text-xs font-bold text-[#2A3547] shadow-2xs hover:bg-[#F8FAFC] hover:border-[#0A51B0] transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
       :class="[
         heightClass,
         isOpen ? 'border-[#0A51B0] ring-2 ring-[#0A51B0]/15' : 'border-[#E5EAEF]',
@@ -136,7 +136,7 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside))
         v-if="isOpen"
         :id="listboxId"
         role="listbox"
-        class="absolute z-50 max-h-64 overflow-y-auto rounded-xl border border-[#E5EAEF] bg-white p-1.5 shadow-lg"
+        class="ui-select-menu absolute z-50 max-h-64 overflow-y-auto rounded-xl border border-[#E5EAEF] bg-white p-1.5 shadow-lg"
         :class="[
           widthClass === 'w-full' ? 'min-w-full w-max max-w-[340px]' : widthClass,
           align === 'right' ? 'right-0' : 'left-0',

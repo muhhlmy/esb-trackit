@@ -296,8 +296,30 @@ router.afterEach((to) => {
     : 'ESB TrackIT & Help Center'
 })
 
-router.onError((error) => {
+router.onError((error, to) => {
   console.error('[Vue Router] Navigation error handled gracefully:', error)
+
+  const errorMessage = error?.message || String(error)
+  const isDynamicImportError =
+    errorMessage.includes('Failed to fetch dynamically imported module') ||
+    errorMessage.includes('Importing a module script failed') ||
+    errorMessage.includes('Outdated Optimize Dep') ||
+    errorMessage.includes('error loading dynamically imported module')
+
+  if (isDynamicImportError && typeof window !== 'undefined') {
+    const storageKey = 'trackit_vite_dynamic_import_reload'
+    const lastReload = sessionStorage.getItem(storageKey)
+    const now = Date.now()
+    // Cegah loop reload tak hingga: reload otomatis maksimal 1 kali dalam 10 detik
+    if (!lastReload || now - Number(lastReload) > 10000) {
+      sessionStorage.setItem(storageKey, String(now))
+      if (to?.fullPath) {
+        window.location.href = to.fullPath
+      } else {
+        window.location.reload()
+      }
+    }
+  }
 })
 
 export default router

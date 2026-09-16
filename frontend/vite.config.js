@@ -101,6 +101,23 @@ export default defineConfig(({ mode = 'development' }) => {
       vue(),
       securityHeadersPlugin(devHeaders),
     ],
+    optimizeDeps: {
+      include: [
+        'vue',
+        'vue-router',
+        'lucide-vue-next',
+        'gsap',
+        'chart.js',
+        'vue-chartjs',
+        'dompurify',
+        'jsbarcode',
+        '@tiptap/vue-3',
+        '@tiptap/starter-kit',
+        '@tiptap/extension-placeholder',
+        '@tiptap/extension-image',
+        'xlsx',
+      ],
+    },
     resolve: {
       alias: {
         '@': fileURLToPath(new URL('./src', import.meta.url)),

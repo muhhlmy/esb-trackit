@@ -90,16 +90,9 @@ export function useCases() {
       if (!activeCaseId.value && cases.value.length) {
         activeCaseId.value = cases.value[0].id
       }
-    } catch {
-      // Fallback ke daftar public (read-only) bila sesi admin tidak cukup.
-      try {
-        cases.value = normalizeList(await api.getPublicCases())
-        if (!activeCaseId.value && cases.value.length) {
-          activeCaseId.value = cases.value[0].id
-        }
-      } catch {
-        cases.value = []
-      }
+    } catch (err) {
+      cases.value = []
+      showToast(err?.message || 'Gagal memuat data artikel Admin CMS.', 'error')
     } finally {
       isLoading.value = false
     }

@@ -111,12 +111,14 @@ function autoExpandActiveParent() {
     ].some((p) => currentPath.startsWith(p))
   )
     expandedParents.value.knowledge_base = true
-  if (['/assets', '/my-assets'].includes(currentPath)) expandedParents.value.asset_management = true
+  if (currentPath.startsWith('/assets') || currentPath === '/my-assets')
+    expandedParents.value.asset_management = true
   if (
     ['/tickets', '/submissions', '/shipments', '/pengiriman'].some((p) => currentPath.startsWith(p))
   )
     expandedParents.value.helpdesk = true
-  if (['/users', '/karyawan'].includes(currentPath)) expandedParents.value.master_data = true
+  if (['/users', '/karyawan', '/employees'].some((p) => currentPath.startsWith(p)))
+    expandedParents.value.master_data = true
   if (['/logs', '/export', '/database'].includes(currentPath)) expandedParents.value.sistem = true
 }
 
@@ -313,20 +315,22 @@ const menuGroups = computed(() => {
 
   return groups
     .map((g) => {
-      const validItems = (g.items || []).filter(
-        (item) =>
-          (!item.superadminOnly || isSuperAdmin.value) &&
-          (item.superadminOnly || hasPermission(item.permission)),
-      )
+      const isItemVisible = (item) => {
+        if (item.superadminOnly) {
+          return isSuperAdmin.value
+        }
+        if (!item.permission) {
+          return true
+        }
+        return hasPermission(item.permission)
+      }
+
+      const validItems = (g.items || []).filter(isItemVisible)
 
       const validParents = (g.parents || [])
         .map((p) => ({
           ...p,
-          items: (p.items || []).filter(
-            (item) =>
-              (!item.superadminOnly || isSuperAdmin.value) &&
-              (item.superadminOnly || hasPermission(item.permission)),
-          ),
+          items: (p.items || []).filter(isItemVisible),
         }))
         .filter((p) => p.items.length > 0)
 

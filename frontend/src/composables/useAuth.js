@@ -58,6 +58,7 @@ export function useAuth() {
 
   // Returns true if the user has AT LEAST 'read_only' access to the feature
   const hasPermission = (featureKey) => {
+    if (!featureKey) return true
     if (!user.value) return false
     return canAccessFrontendFeature(user.value, featureKey)
   }

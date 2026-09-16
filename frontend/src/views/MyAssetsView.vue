@@ -9,7 +9,6 @@ import AppBadge from '../components/ui/AppBadge.vue'
 import MyAssetsEmployeeList from '../components/assets/MyAssetsEmployeeList.vue'
 import CustomSelect from '../components/ui/CustomSelect.vue'
 import FilterModal from '../components/ui/FilterModal.vue'
-import SkeletonTable from '../components/ui/skeleton/SkeletonTable.vue'
 
 const { get } = useApi()
 const { isAdmin, isSuperAdmin, user, refreshUser, hasPermission } = useAuth()
@@ -539,18 +538,6 @@ function getInitials(name) {
     .toUpperCase()
 }
 
-function getAvatarGradient(index) {
-  const gradients = [
-    'from-[#0A51B0] to-[#0A4391]',
-    'from-[#0D9488] to-[#0F766E]',
-    'from-[#6366F1] to-[#4F46E5]',
-    'from-[#D97706] to-[#B45309]',
-    'from-[#0284C7] to-[#0369A1]',
-    'from-[#059669] to-[#047857]',
-  ]
-  return gradients[index % gradients.length]
-}
-
 onMounted(() => {
   if (canBrowseOtherAssets.value) {
     fetchEmployees()
@@ -581,6 +568,7 @@ onMounted(() => {
       :items-per-page="itemsPerPage"
       :is-loading-employees="isLoadingEmployees"
       :employee-error="employeeError"
+      :can-browse-other-assets="canBrowseOtherAssets"
       @update:employee-search="employeeSearch = $event"
       @update:filter-departemen="filterDepartemen = $event"
       @update:filter-lokasi="filterLokasi = $event"
@@ -1312,101 +1300,26 @@ onMounted(() => {
   color: #333333;
   padding-bottom: 12px;
 }
-.employee-assets-heading {
-  padding: 4px 0;
-}
-.employee-assets-heading h1 {
-  font-size: 25px;
-  letter-spacing: -0.04em;
-  font-weight: 650;
-}
-.employee-assets-heading p {
-  margin-top: 7px;
-  color: #637288;
-  line-height: 1.7;
-}
-.employee-kpis {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 16px;
-}
-.employee-kpi {
-  padding: 22px;
-  border: 1px solid #e2e8f0;
-  border-radius: 13px;
-  background: white;
-}
-.employee-kpi-label {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  font-size: 12px;
-  color: #5f7089;
-  font-weight: 500;
-}
-.employee-kpi-label span {
-  font-size: 19px;
-  color: #6486b5;
-}
-.employee-kpi strong {
-  display: block;
-  font-size: 32px;
-  line-height: 1.2;
-  font-weight: 650;
-  letter-spacing: -0.04em;
-  margin: 16px 0 8px;
-  font-variant-numeric: tabular-nums;
-}
-.employee-kpi-caption {
-  font-size: 11px;
-  color: #637288;
-}
-.employee-kpi-primary {
-  background: #0a51b0;
-  border-color: #0a51b0;
-  color: white;
-}
-.employee-kpi-primary :is(.employee-kpi-label, .employee-kpi-caption, .employee-kpi-label span) {
-  color: #c0d1eb;
-}
-.employee-assets-toolbar {
-  padding: 16px;
-  border-radius: 12px;
-  box-shadow: none;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-.employee-assets-toolbar input {
-  border-radius: 8px;
-}
-.employee-assets-toolbar > div:first-child {
-  flex-basis: 260px;
-}
-.employee-assets-toolbar > div:last-child > button {
-  background: #f8fafc;
-  border-color: #e2e8f0;
-  color: #5f7089;
-}
-.employee-list {
-  border-radius: 13px;
-  box-shadow: none;
-}
-.employee-list th {
-  font-size: 10px;
-  font-weight: 600;
-  color: #637288;
-}
-.employee-list td {
-  padding-top: 18px;
-  padding-bottom: 18px;
-}
-.employee-list tr {
-  border-color: #edf1f6;
-}
-.employee-list tbody tr:hover {
-  background: #f7f9fc;
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 .employee-profile,
 .asset-profile-banner {
   padding: 24px;
@@ -1477,71 +1390,40 @@ onMounted(() => {
   font-weight: 650;
   letter-spacing: -0.015em;
 }
-.employee-assets-page [tabindex='0']:focus-visible {
-  outline: 2px solid #097cde;
-  outline-offset: 3px;
-}
+
 @media (max-width: 767px) {
-  .employee-assets-heading h1 {
-    font-size: 22px;
-  }
-  .employee-kpis {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 10px;
-  }
-  .employee-kpi {
-    padding: 16px;
-  }
-  .employee-kpi-primary {
-    grid-column: 1/-1;
-  }
-  .employee-kpi-primary strong {
-    margin-top: 12px;
-  }
-  .employee-kpi-label {
-    font-size: 11px;
-    align-items: flex-start;
-  }
-  .employee-kpi-label span {
-    font-size: 17px;
-  }
-  .employee-kpi strong {
-    font-size: 28px;
-  }
-  .employee-kpi-caption {
-    font-size: 10px;
-  }
-  .employee-assets-toolbar {
-    padding: 14px;
-  }
-  .employee-assets-toolbar > div:first-child {
-    flex-basis: auto;
-  }
-  .employee-assets-toolbar input {
-    height: 100%;
-    min-height: 0;
-    font-size: 16px;
-  }
-  .employee-profile,
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    .employee-profile,
   .asset-profile-banner {
     padding: 18px;
   }
-  .employee-profile h2,
+    .employee-profile h2,
   .asset-profile-banner h2 {
     font-size: 18px;
   }
-  .assigned-asset-card {
+    .assigned-asset-card {
     padding: 18px;
   }
-  .asset-profile-banner > button {
+    .asset-profile-banner > button {
     min-height: 44px;
   }
-  .asset-audit-layout dl {
+    .asset-audit-layout dl {
     gap: 14px;
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .assigned-asset-card {
+    .assigned-asset-card {
     transition: none;
   }
 }

@@ -9,7 +9,7 @@ import {
   findFirstAllowedRoute,
   getTicketEligibility,
 } from '../utils/permissionAccess.js'
-import { getAuthSnapshot } from '../utils/authStorage.js'
+import { getAuthSnapshot, restoreSession } from '../utils/authStorage.js'
 
 export const allowedRouteMap = [
   { key: 'dashboard', name: 'dashboard' },
@@ -243,8 +243,24 @@ const router = createRouter({
   scrollBehavior: () => ({ top: 0 }),
 })
 
-router.beforeEach((to) => {
-  const { user, authenticated } = getAuthSnapshot()
+router.beforeEach(async (to) => {
+  let { user, authenticated } = getAuthSnapshot()
+
+  // Cache user hilang (storage dibersihkan / profile terpartisi / tab baru),
+  // tetapi cookie sesi HttpOnly mungkin masih valid. Tanya server SEKALI
+  // (restoreSession mendedup request paralel) sebelum memutuskan logout.
+  if (!authenticated) {
+    const restored = await restoreSession()
+    if (restored?.user) {
+      user = restored.user
+      authenticated = true
+    } else if (restored?.offline) {
+      // Server tidak dapat dijangkau: biarkan navigasi ke halaman publik saja.
+      // Halaman terproteksi tetap akan memunculkan 401 global bila sesi mati.
+      if (to.meta.public) return
+      return { name: 'login', query: { redirect: to.fullPath } }
+    }
+  }
 
   // Halaman publik (Help Center landing page, Cases, Templates, Login, dll) dapat diakses tanpa login
   if (to.meta.public) {
@@ -255,7 +271,8 @@ router.beforeEach((to) => {
     return
   }
 
-  // Jika halaman terproteksi dan belum login (cache user tidak ada)
+  // Jika halaman terproteksi dan sesi invalid (server 401/403),
+  // baru arahkan ke halaman login.
   if (!authenticated) {
     return { name: 'login', query: { redirect: to.fullPath } }
   }

@@ -11,7 +11,7 @@ import AppBottomNav from './components/layout/AppBottomNav.vue'
 import Toast from './components/common/Toast.vue'
 
 import { animatePageEnter, animatePageLeave } from './composables/useGsap.js'
-import { getStoredUser } from './utils/authStorage.js'
+import { getStoredUser, restoreSession } from './utils/authStorage.js'
 import { useAuth } from './composables/useAuth.js'
 import { initTicketRealtime, stopTicketRealtime } from './composables/useTicketRealtime.js'
 import { useCases } from './composables/useCases.js'
@@ -75,7 +75,7 @@ onMounted(async () => {
   fetchCases()
   // Data pengguna di localStorage hanya cache UI. Selalu cocokkan kembali
   // dengan sesi server saat aplikasi dibuka agar nama/role lama tidak tampil.
-  if (getStoredUser()) {
+  if (getStoredUser() || (await restoreSession())?.user) {
     await refreshUser()
     if (user.value) initTicketRealtime()
   }

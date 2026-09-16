@@ -156,3 +156,75 @@ export function getAuthSnapshot() {
     persistent: true,
   }
 }
+
+// ============================================================
+// Pemulihan sesi dari server (session restore)
+// ============================================================
+// Cache `user` di localStorage hanya salinan UI; sumber kebenaran tetap
+// cookie sesi HttpOnly. Saat cache hilang (storage dibersihkan, mode
+// private, profile terpartisi, tab baru), guard router tidak boleh
+// langsung menganggap user logout — cookie HttpOnly mungkin masih valid.
+//
+// `restoreSession()` memanggil /api/auth/me:
+//   - 200  → simpan kembali cache user, kembalikan { user, restored: true }
+//   - 401/403 → sesi memang invalid → kembalikan null (redirect /login)
+//   - gangguan jaringan/server → kembalikan { offline: true } agar pemanggil
+//     TIDAK logout prematur, melainkan melanjutkan ke halaman tujuan
+//     (API pertama akan memunculkan 401 global bila sesi benar-benar mati).
+//
+// Token/session tetap TIDAK pernah disentuh JavaScript (HttpOnly).
+// ============================================================
+
+let restorePromise = null
+
+export async function restoreSession() {
+  // Cegah request paralel & race antar beberapa route guard.
+  if (restorePromise) return restorePromise
+
+  restorePromise = (async () => {
+    if (typeof window === 'undefined') return null
+
+    try {
+      const response = await fetch('/api/auth/me', {
+        method: 'GET',
+        credentials: 'include',
+        headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+      })
+
+      // 401/403 = sesi invalid menurut server → memang harus login ulang.
+      if (response.status === 401 || response.status === 403) {
+        clearAuthSession()
+        return null
+      }
+
+      // Server tidak dapat dijangkau / 5xx: jangan logout prematur.
+      // Biarkan navigasi lanjut; 401 global akan dikoreksi oleh useApi.
+      if (!response.ok) {
+        return { offline: true, user: null }
+      }
+
+      const payload = await response.json().catch(() => null)
+      const user = payload && (payload.user || payload)
+      if (!isPlainObject(user) || !user.email) {
+        clearAuthSession()
+        return null
+      }
+
+      try {
+        storeAuthSession({ user })
+      } catch {
+        // Storage tidak dapat ditulis (private mode / diblokir) — tetap
+        // kembalikan user agar UI bisa dirender dari memori guard.
+      }
+
+      return { user, restored: true }
+    } catch {
+      // Network failure / abort → tidak ada kepastian sesi mati.
+      return { offline: true, user: null }
+    } finally {
+      restorePromise = null
+    }
+  })()
+
+  return restorePromise
+}

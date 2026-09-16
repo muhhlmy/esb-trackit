@@ -78,6 +78,9 @@ export function useAuth() {
   }
 
   const refreshUser = async () => {
+    // Setelah session-restore oleh router guard, cache user bisa muncul
+    // setelah ref global ini diinisialisasi — hidrasi dulu dari cache.
+    if (!user.value) user.value = getStoredUser()
     if (!user.value) return null
     try {
       const freshUser = await api.get('/api/auth/me')

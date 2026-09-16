@@ -1,8 +1,8 @@
 <script setup>
-import { computed } from 'vue'
-import AppPagination from '../../ui/AppPagination.vue'
-import SkeletonTable from '../../ui/skeleton/SkeletonTable.vue'
-import { normalizeLocation } from '../../../utils/locationNormalizer.js'
+import { computed, ref } from 'vue'
+import AppPagination from '../ui/AppPagination.vue'
+import SkeletonTable from '../ui/skeleton/SkeletonTable.vue'
+import { normalizeLocation } from '../../utils/locationNormalizer.js'
 
 const props = defineProps({
   filteredEmployees: { type: Array, default: () => [] },
@@ -20,6 +20,7 @@ const props = defineProps({
   itemsPerPage: { type: Number, default: 10 },
   isLoadingEmployees: { type: Boolean, default: false },
   employeeError: { type: String, default: '' },
+  canBrowseOtherAssets: { type: Boolean, default: false },
 })
 
 const emit = defineEmits([
@@ -31,17 +32,15 @@ const emit = defineEmits([
   'refresh',
 ])
 
+const showFilterModal = ref(false)
+function goToLevel2(employee) {
+  emit('select-employee', employee) }
+function fetchEmployees() {
+  emit('refresh') }
+
 const search = computed({
   get: () => props.employeeSearch,
   set: (v) => emit('update:employeeSearch', v),
-})
-const departemen = computed({
-  get: () => props.filterDepartemen,
-  set: (v) => emit('update:filterDepartemen', v),
-})
-const lokasi = computed({
-  get: () => props.filterLokasi,
-  set: (v) => emit('update:filterLokasi', v),
 })
 const page = computed({
   get: () => props.currentPageEmployees,
@@ -64,10 +63,10 @@ function getInitials(name) {
 }
 function getAvatarGradient(index) {
   const gradients = [
-    'linear-gradient(135deg,#003d9b,#0052cc)',
-    'linear-gradient(135deg,#0052cc,#0066ff)',
-    'linear-gradient(135deg,#0c56d0,#4f5f7b)',
-    'linear-gradient(135deg,#4f5f7b,#737685)',
+    'from-[#003d9b] to-[#0052cc]',
+    'from-[#0052cc] to-[#0066ff]',
+    'from-[#0c56d0] to-[#4f5f7b]',
+    'from-[#4f5f7b] to-[#737685]',
   ]
   return gradients[index % gradients.length]
 }
@@ -161,16 +160,16 @@ function getDeviceIcon(tipe) {
           >
           <input
             id="emp-search"
-            v-model="employeeSearch"
+            v-model="search"
             type="text"
             placeholder="Cari nama karyawan, NIK, atau departemen..."
             class="h-full w-full rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] pl-9 pr-8 text-xs text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:bg-white focus:outline-none transition-all"
           />
           <!-- Inline Clear Button -->
           <button
-            v-if="employeeSearch"
+            v-if="search"
             type="button"
-            @click="employeeSearch = ''"
+            @click="search = ''"
             aria-label="Bersihkan pencarian"
             class="absolute right-2 top-1/2 -translate-y-1/2 flex h-5 w-5 items-center justify-center rounded-full text-[#687281] hover:bg-[#F1F5F9] hover:text-[#333333] transition-all cursor-pointer touch-manipulation"
             title="Bersihkan"
@@ -490,10 +489,153 @@ function getDeviceIcon(tipe) {
 
         <AppPagination
           v-if="!isLoadingEmployees && !employeeError && employeesWithAssets.length > 0"
-          v-model:currentPage="currentPageEmployees"
+          v-model:currentPage="page"
           :total-items="filteredEmployees.length"
           :items-per-page="itemsPerPage"
         />
       </div>
   </div>
 </template>
+<style scoped>
+.employee-assets-heading {
+  padding: 4px 0;
+}
+.employee-assets-heading h1 {
+  font-size: 25px;
+  letter-spacing: -0.04em;
+  font-weight: 650;
+}
+.employee-assets-heading p {
+  margin-top: 7px;
+  color: #637288;
+  line-height: 1.7;
+}
+.employee-kpis {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+.employee-kpi {
+  padding: 22px;
+  border: 1px solid #e2e8f0;
+  border-radius: 13px;
+  background: white;
+}
+.employee-kpi-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 12px;
+  color: #5f7089;
+  font-weight: 500;
+}
+.employee-kpi-label span {
+  font-size: 19px;
+  color: #6486b5;
+}
+.employee-kpi strong {
+  display: block;
+  font-size: 32px;
+  line-height: 1.2;
+  font-weight: 650;
+  letter-spacing: -0.04em;
+  margin: 16px 0 8px;
+  font-variant-numeric: tabular-nums;
+}
+.employee-kpi-caption {
+  font-size: 11px;
+  color: #637288;
+}
+.employee-kpi-primary {
+  background: #0a51b0;
+  border-color: #0a51b0;
+  color: white;
+}
+.employee-kpi-primary :is(.employee-kpi-label, .employee-kpi-caption, .employee-kpi-label span) {
+  color: #c0d1eb;
+}
+.employee-assets-toolbar {
+  padding: 16px;
+  border-radius: 12px;
+  box-shadow: none;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.employee-assets-toolbar input {
+  border-radius: 8px;
+}
+.employee-assets-toolbar > div:first-child {
+  flex-basis: 260px;
+}
+.employee-assets-toolbar > div:last-child > button {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+  color: #5f7089;
+}
+.employee-list {
+  border-radius: 13px;
+  box-shadow: none;
+}
+.employee-list th {
+  font-size: 10px;
+  font-weight: 600;
+  color: #637288;
+}
+.employee-list td {
+  padding-top: 18px;
+  padding-bottom: 18px;
+}
+.employee-list tr {
+  border-color: #edf1f6;
+}
+.employee-list tbody tr:hover {
+  background: #f7f9fc;
+}
+.employee-assets-page [tabindex='0']:focus-visible {
+  outline: 2px solid #097cde;
+  outline-offset: 3px;
+}
+  @media (max-width: 767px) {
+  .employee-assets-heading h1 {
+  font-size: 22px;
+}
+  .employee-kpis {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+  .employee-kpi {
+  padding: 16px;
+}
+  .employee-kpi-primary {
+  grid-column: 1/-1;
+}
+  .employee-kpi-primary strong {
+  margin-top: 12px;
+}
+  .employee-kpi-label {
+  font-size: 11px;
+  align-items: flex-start;
+}
+  .employee-kpi-label span {
+  font-size: 17px;
+}
+  .employee-kpi strong {
+  font-size: 28px;
+}
+  .employee-kpi-caption {
+  font-size: 10px;
+}
+  .employee-assets-toolbar {
+  padding: 14px;
+}
+  .employee-assets-toolbar > div:first-child {
+  flex-basis: auto;
+}
+  .employee-assets-toolbar input {
+  height: 100%;
+  min-height: 0;
+  font-size: 16px;
+}
+  }
+</style>

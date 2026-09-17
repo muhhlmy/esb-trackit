@@ -1,6 +1,7 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { Info, Tag as TagIcon, X, ExternalLink, ChevronDown } from 'lucide-vue-next'
+import { useKbCategories } from '@/composables/useKbCategories'
 
 const props = defineProps({
   modelValue: {
@@ -19,10 +20,19 @@ const props = defineProps({
 
 const emit = defineEmits(['update:modelValue', 'close', 'viewPortal'])
 
+// Kategori dimuat dari sumber yang sama dengan halaman KB Categories
+// (GET /api/kb-categories), agar pilihan kategori di Meta selalu sinkron.
+const { categories: kbCategories, fetchAllCategories } = useKbCategories()
+onMounted(() => {
+  fetchAllCategories().catch(() => {
+    /* fallback ke daftar statis di bawah */
+  })
+})
+
 const activeTab = ref('meta') // 'meta' | 'tags'
 const newTagInput = ref('')
 
-const categories = [
+const DEFAULT_CATEGORIES = [
   { id: 'hardware', label: 'Hardware & Equipment' },
   { id: 'software', label: 'Software & Applications' },
   { id: 'git', label: 'Software & Git' },
@@ -31,6 +41,14 @@ const categories = [
   { id: 'backend', label: 'Backend & Database' },
   { id: 'devops', label: 'Policies & SLAs' },
 ]
+
+const categories = computed(() => {
+  const fromDb = kbCategories.value.map((c) => ({ id: c.key, label: c.title }))
+  const seen = new Set(fromDb.map((c) => c.id))
+  // Pertahankan opsi default agar case lama yang kategorinya belum terdaftar
+  // di kb_categories tetap ter-render dengan label yang benar.
+  return [...fromDb, ...DEFAULT_CATEGORIES.filter((c) => !seen.has(c.id))]
+})
 
 const severities = [
   { id: 'high', label: 'High Priority' },

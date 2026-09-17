@@ -1,0 +1,1761 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Buku Panduan & User Manual — ESB TrackIT</title>
+  <style>
+    /* ============================================================
+       PANDUAN PENGGUNAAN ESB TRACKIT - PRINT STYLESHEET
+       ============================================================ */
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap');
+
+    :root {
+      --primary: #0A51B0;
+      --primary-dark: #073B80;
+      --primary-light: #EFF6FF;
+      --secondary: #1E293B;
+      --text-main: #1E293B;
+      --text-muted: #64748B;
+      --border-color: #E2E8F0;
+      --bg-surface: #F8FAFC;
+      --success: #10B981;
+      --success-bg: #ECFDF5;
+      --warning: #F59E0B;
+      --warning-bg: #FFFBEB;
+      --danger: #EF4444;
+      --danger-bg: #FEF2F2;
+      --info: #0284C7;
+      --info-bg: #F0F9FF;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-size: 10pt;
+      line-height: 1.55;
+      color: var(--text-main);
+      background-color: #ffffff;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 700;
+      color: var(--secondary);
+      page-break-after: avoid;
+    }
+
+    /* ── Cover Page ── */
+    .cover-page {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 40px 20px 20px 20px;
+      page-break-after: always;
+      background: linear-gradient(145deg, #ffffff 0%, #F8FAFC 50%, #EFF6FF 100%);
+      border: 1px solid #E2E8F0;
+      border-radius: 12px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cover-page::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 8px;
+      background: linear-gradient(90deg, #0A51B0 0%, #3B82F6 50%, #60A5FA 100%);
+    }
+
+    .cover-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 2px solid #E2E8F0;
+      padding-bottom: 20px;
+    }
+
+    .brand-logo-badge {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-icon-box {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, #0A51B0 0%, #1D4ED8 100%);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 800;
+      font-size: 20pt;
+      box-shadow: 0 4px 12px rgba(10, 81, 176, 0.25);
+    }
+
+    .brand-name {
+      font-size: 20pt;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      color: #0A51B0;
+    }
+
+    .brand-tag {
+      font-size: 8.5pt;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #64748B;
+    }
+
+    .doc-confidential-badge {
+      padding: 6px 14px;
+      background-color: #FEF2F2;
+      border: 1px solid #FCA5A5;
+      border-radius: 20px;
+      color: #991B1B;
+      font-size: 8pt;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .cover-body {
+      margin-top: 40px;
+      margin-bottom: 40px;
+    }
+
+    .cover-badge-pill {
+      display: inline-block;
+      padding: 4px 12px;
+      background-color: var(--primary-light);
+      border: 1px solid #BFDBFE;
+      border-radius: 6px;
+      color: var(--primary);
+      font-size: 9pt;
+      font-weight: 700;
+      margin-bottom: 16px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .cover-title {
+      font-size: 28pt;
+      line-height: 1.2;
+      color: #0F172A;
+      margin-bottom: 14px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
+
+    .cover-title span {
+      color: #0A51B0;
+    }
+
+    .cover-subtitle {
+      font-size: 12pt;
+      color: #475569;
+      line-height: 1.6;
+      max-width: 90%;
+      margin-bottom: 28px;
+    }
+
+    .cover-feature-highlights {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .highlight-card {
+      background: white;
+      border: 1px solid #E2E8F0;
+      border-radius: 8px;
+      padding: 12px 14px;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .highlight-bullet {
+      width: 22px;
+      height: 22px;
+      background: var(--primary-light);
+      border-radius: 6px;
+      color: var(--primary);
+      font-size: 9pt;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .highlight-text h5 {
+      font-size: 9pt;
+      color: #0F172A;
+      margin-bottom: 2px;
+    }
+
+    .highlight-text p {
+      font-size: 8pt;
+      color: #64748B;
+      line-height: 1.35;
+    }
+
+    .cover-footer {
+      border-top: 1px solid #E2E8F0;
+      padding-top: 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+
+    .meta-col h6 {
+      font-size: 7.5pt;
+      color: #94A3B8;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 3px;
+    }
+
+    .meta-col p {
+      font-size: 9pt;
+      font-weight: 600;
+      color: #1E293B;
+    }
+
+    /* ── Table of Contents & Structure ── */
+    .page-section {
+      page-break-after: always;
+      padding-top: 10px;
+    }
+
+    .page-section:last-child {
+      page-break-after: auto;
+    }
+
+    .chapter-banner {
+      background: linear-gradient(90deg, #0A51B0 0%, #1E3A8A 100%);
+      color: white;
+      padding: 14px 18px;
+      border-radius: 8px;
+      margin-bottom: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .chapter-banner h2 {
+      color: white;
+      font-size: 16pt;
+      letter-spacing: -0.02em;
+    }
+
+    .chapter-banner .chapter-tag {
+      font-size: 8pt;
+      background: rgba(255, 255, 255, 0.2);
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    h3.sub-title {
+      font-size: 12pt;
+      color: #0A51B0;
+      border-bottom: 2px solid #E2E8F0;
+      padding-bottom: 6px;
+      margin-top: 20px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    h3.sub-title::before {
+      content: "";
+      display: inline-block;
+      width: 6px;
+      height: 16px;
+      background-color: #0A51B0;
+      border-radius: 2px;
+    }
+
+    h4.nested-title {
+      font-size: 10pt;
+      color: #1E293B;
+      margin-top: 14px;
+      margin-bottom: 6px;
+      font-weight: 700;
+    }
+
+    p {
+      margin-bottom: 10px;
+      color: #334155;
+      text-align: justify;
+    }
+
+    ul, ol {
+      margin-left: 20px;
+      margin-bottom: 12px;
+      color: #334155;
+    }
+
+    li {
+      margin-bottom: 5px;
+    }
+
+    /* ── Components: Badges & Tags ── */
+    .badge {
+      display: inline-block;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-size: 7.5pt;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      white-space: nowrap;
+    }
+
+    .badge-blue { background: #EFF6FF; color: #1E40AF; border: 1px solid #BFDBFE; }
+    .badge-green { background: #ECFDF5; color: #065F46; border: 1px solid #A7F3D0; }
+    .badge-amber { background: #FFFBEB; color: #92400E; border: 1px solid #FDE68A; }
+    .badge-red { background: #FEF2F2; color: #991B1B; border: 1px solid #FECACA; }
+    .badge-purple { background: #FAF5FF; color: #6B21A8; border: 1px solid #E9D5FF; }
+    .badge-gray { background: #F1F5F9; color: #475569; border: 1px solid #CBD5E1; }
+
+    /* ── Components: Tables ── */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 14px 0 18px 0;
+      font-size: 8.5pt;
+      break-inside: avoid;
+    }
+
+    th {
+      background-color: #F1F5F9;
+      color: #0F172A;
+      font-weight: 700;
+      text-align: left;
+      padding: 8px 10px;
+      border: 1px solid #CBD5E1;
+      font-size: 8pt;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    td {
+      padding: 7px 10px;
+      border: 1px solid #E2E8F0;
+      vertical-align: top;
+      color: #334155;
+    }
+
+    tr:nth-child(even) td {
+      background-color: #F8FAFC;
+    }
+
+    /* ── Components: Callouts ── */
+    .callout {
+      border-radius: 8px;
+      padding: 12px 14px;
+      margin: 12px 0 16px 0;
+      font-size: 8.5pt;
+      line-height: 1.5;
+      display: flex;
+      gap: 10px;
+      break-inside: avoid;
+    }
+
+    .callout-icon {
+      font-size: 11pt;
+      font-weight: bold;
+      flex-shrink: 0;
+    }
+
+    .callout-info {
+      background-color: #F0F9FF;
+      border-left: 4px solid #0284C7;
+      color: #075985;
+    }
+
+    .callout-warning {
+      background-color: #FFFBEB;
+      border-left: 4px solid #F59E0B;
+      color: #92400E;
+    }
+
+    .callout-success {
+      background-color: #ECFDF5;
+      border-left: 4px solid #10B981;
+      color: #065F46;
+    }
+
+    .callout-danger {
+      background-color: #FEF2F2;
+      border-left: 4px solid #EF4444;
+      color: #991B1B;
+    }
+
+    .callout-content strong {
+      display: block;
+      margin-bottom: 2px;
+      font-size: 9pt;
+    }
+
+    /* ── Process Steps Diagram ── */
+    .process-container {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin: 14px 0 18px 0;
+      break-inside: avoid;
+    }
+
+    .process-card {
+      background: white;
+      border: 1px solid #E2E8F0;
+      border-top: 3px solid #0A51B0;
+      border-radius: 6px;
+      padding: 10px;
+      position: relative;
+    }
+
+    .process-num {
+      font-size: 12pt;
+      font-weight: 800;
+      color: #0A51B0;
+      margin-bottom: 4px;
+    }
+
+    .process-title {
+      font-size: 8.5pt;
+      font-weight: 700;
+      color: #0F172A;
+      margin-bottom: 3px;
+    }
+
+    .process-desc {
+      font-size: 7.5pt;
+      color: #64748B;
+      line-height: 1.35;
+    }
+
+    /* ── Code / Keystroke ── */
+    kbd {
+      display: inline-block;
+      padding: 2px 5px;
+      font-family: 'Fira Code', monospace;
+      font-size: 7.5pt;
+      background: #F1F5F9;
+      border: 1px solid #CBD5E1;
+      border-radius: 4px;
+      box-shadow: 0 1px 0 rgba(0,0,0,0.1);
+      color: #0F172A;
+    }
+
+    code {
+      font-family: 'Fira Code', monospace;
+      font-size: 8pt;
+      background: #F1F5F9;
+      padding: 1px 4px;
+      border-radius: 3px;
+      color: #0A51B0;
+    }
+
+    /* ── Grid Layouts ── */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin: 12px 0;
+      break-inside: avoid;
+    }
+
+    .grid-card {
+      background: #F8FAFC;
+      border: 1px solid #E2E8F0;
+      border-radius: 8px;
+      padding: 12px;
+    }
+
+    .grid-card h5 {
+      font-size: 9.5pt;
+      color: #0A51B0;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .grid-card p {
+      font-size: 8pt;
+      color: #475569;
+      margin-bottom: 4px;
+    }
+
+    /* ── TOC Table ── */
+    .toc-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 14px;
+    }
+
+    .toc-table tr td {
+      padding: 8px 10px;
+      border-bottom: 1px dashed #CBD5E1;
+      border-top: none;
+      border-left: none;
+      border-right: none;
+      background: transparent !important;
+    }
+
+    .toc-chapter-title {
+      font-weight: 700;
+      color: #0F172A;
+      font-size: 9.5pt;
+    }
+
+    .toc-sub-title {
+      color: #64748B;
+      font-size: 8.5pt;
+      padding-left: 18px;
+    }
+
+    .toc-page {
+      text-align: right;
+      font-weight: 600;
+      color: #0A51B0;
+      font-size: 9pt;
+      width: 60px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ============================================================
+       HALAMAN COVER EKSEKUTIF
+       ============================================================ -->
+  <div class="cover-page">
+    <div class="cover-header">
+      <div class="brand-logo-badge">
+        <div class="logo-icon-box">T</div>
+        <div>
+          <div class="brand-name">ESB TrackIT</div>
+          <div class="brand-tag">Asset, Helpdesk &amp; Help Center Platform</div>
+        </div>
+      </div>
+      <div class="doc-confidential-badge">Dokumen Resmi Internal</div>
+    </div>
+
+    <div class="cover-body">
+      <div class="cover-badge-pill">Buku Panduan Penggunaan &amp; User Manual</div>
+      <h1 class="cover-title">
+        Panduan Operasional Terpadu<br>
+        <span>ESB TrackIT Enterprise</span>
+      </h1>
+      <p class="cover-subtitle">
+        Dokumentasi komprehensif panduan pengguna, fungsi fitur, alur kerja pemeliharaan aset IT/GA/OPS, penanganan tiket helpdesk, pelacakan logistik ekspedisi, administrasi master data karyawan, serta pemanfaatan portal Pusat Bantuan (Help Center).
+      </p>
+
+      <div class="cover-feature-highlights">
+        <div class="highlight-card">
+          <div class="highlight-bullet">1</div>
+          <div class="highlight-text">
+            <h5>Pusat Bantuan &amp; Playbook Insiden</h5>
+            <p>Pencarian artikel cerdas, playbook troubleshooting instan, template komunikasi tim, dan FAQ operasional.</p>
+          </div>
+        </div>
+        <div class="highlight-card">
+          <div class="highlight-bullet">2</div>
+          <div class="highlight-text">
+            <h5>Manajemen Aset IT, GA, &amp; OPS</h5>
+            <p>Pelacakan siklus hidup aset, riwayat pemakaian mutasi, cetak label QR, portal aset karyawan, serta import aman.</p>
+          </div>
+        </div>
+        <div class="highlight-card">
+          <div class="highlight-bullet">3</div>
+          <div class="highlight-text">
+            <h5>Helpdesk &amp; Realtime Ticketing</h5>
+            <p>Antrean tiket lintas departemen, SLA countdown otomatis, live updates via SSE, kolaborasi internal &amp; CASP.</p>
+          </div>
+        </div>
+        <div class="highlight-card">
+          <div class="highlight-bullet">4</div>
+          <div class="highlight-text">
+            <h5>Logistik, BAST &amp; Administrasi</h5>
+            <p>Formulir BAST fisik siap cetak, tracker ekspedisi kurir &amp; POD, RBAC granular, serta disaster recovery database.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cover-footer">
+      <div class="meta-col">
+        <h6>Penerbit &amp; Pengembang</h6>
+        <p>Divisi IT &amp; Asset Management — PT Esensi Solusi Buana (ESB)</p>
+      </div>
+      <div class="meta-col">
+        <h6>Versi Rilis Dokumen</h6>
+        <p>Versi 2.4 (September 2026)</p>
+      </div>
+      <div class="meta-col">
+        <h6>Klasifikasi Akses</h6>
+        <p>Karyawan, Teknisi IT, GA, &amp; Superadmin</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       DAFTAR ISI
+       ============================================================ -->
+  <div class="page-section">
+    <div class="chapter-banner">
+      <h2>Daftar Isi Buku Panduan</h2>
+      <div class="chapter-tag">Navigasi Dokumen</div>
+    </div>
+
+    <p style="margin-bottom: 16px;">
+      Buku panduan ini disusun secara sistematis untuk memandu pengguna dari berbagai tingkatan peran (User Karyawan, Teknisi/Admin, hingga Superadmin) dalam memanfaatkan seluruh fungsionalitas yang ada di platform <strong>ESB TrackIT</strong>.
+    </p>
+
+    <table class="toc-table">
+      <tbody>
+        <tr>
+          <td class="toc-chapter-title" colspan="2">BAB 1: PENGENALAN &amp; GAMBARAN UMUM SISTEM</td>
+          <td class="toc-page">Hal 3</td>
+        </tr>
+        <tr>
+          <td class="toc-sub-title">1.1 Latar Belakang &amp; Tujuan Platform</td>
+          <td style="color:#94A3B8; font-size: 7.5pt;">Solusi terintegrasi operasional IT &amp; F&amp;B</td>
+          <td class="toc-page">3</td>
+        </tr>
+        <tr>
+          <td class="toc-sub-title">1.2 Arsitektur Sistem &amp; Teknologi</td>
+          <td style="color:#94A3B8; font-size: 7.5pt;">Vue 3, Express 5, PostgreSQL &amp; SSE</td>
+          <td class="toc-page">3</td>
+        </tr>
+        <tr>
+          <td class="toc-sub-title">1.3 Matriks Peran Pengguna (RBAC)</td>
+          <td style="color:#94A3B8; font-size: 7.5pt;">Superadmin, Admin, Reporter/User</td>
+          <td class="toc-page">4</td>
+        </tr>
+        <tr>
+          <td class="toc-sub-title">1.4 Izin Granular &amp; Navigasi Antarmuka</td>
+          <td style="color:#94A3B8; font-size: 7.5pt;">Sidebar, Rail Mode, Mobile Bar</td>
+          <td class="toc-page">4</td>
+        </tr>
+
+        <tr>
+          <td class="toc-chapter-title" colspan="2">BAB 2: PUSAT BANTUAN &amp; KNOWLEDGE BASE (HELP CENTER)</td>
+          <td class="toc-page">Hal 5</td>
+        </tr>
+        <tr>
+          <td class="toc-sub-title">2.1 Halaman Depan &amp; Pencarian Pintar</td>
+          <td style="color:#94A3B8; font-size: 7.5pt;">Live autocomplete &amp; popular query</td>
+          <td class="toc-page">5</td>
+        </tr>
+        <tr>
+          <td class="toc-sub-title">2.2 Cases &amp; Playbook Troubleshooting Insiden</td>
+          <td style="color:#94A3B8; font-size: 7.5pt;">Panduan langkah perbaikan &amp; bookmark</td>
+          <td class="toc-page">5</td>
+        </tr>
+        <tr>
+          <td class="toc-sub-title">2.3 Templates Hub &amp; FAQ Interaktif</td>
+          <td style="color:#94A3B8; font-size: 7.5pt;">Format pesan standar 1-klik salin</td>
+          <td class="toc-page">6</td>
+        </tr>
+        <tr>
+          <td class="toc-sub-title">2.4 Help Center Analytics &amp; Admin CMS</td>
+          <td style="color:#94A3B8; font-size: 7.5pt;">Editor artikel, kategori &amp; gap analysis</td>
+          <td class="toc-page">6</td>
+        </tr>
+
+        <tr>
+          <td class="toc-chapter-title" colspan="2">BAB 3: MODUL MANAJEMEN ASET (ASSET MANAGEMENT)</td>
+          <td class="toc-page">Hal 7</td>
+        </tr>
+        <tr>
+          <td class="toc-sub-title">3.1 Manajemen Aset IT (Laptop, PC, POS, Printer)</td>
+          <td style="color:#94A3B8; font-size: 7.5pt;">Spesifikasi, status &amp; log mutasi</td>
+          <td class="toc-page">7</td>
+        </tr>
+        <tr>
+          <td class="toc-sub-title">3.2 Cetak Label QR Code &amp; Barcode Aset</td>
+          <td style="color:#94A3B8; font-size: 7.5pt;">Generator label fisik inventaris</td>
+          <td class="toc-page">7</td>
+        </tr>
+        <tr>
+          <td class="toc-sub-title">3.3 Aset GA &amp; Aset Operasional Resto (OPS)</td>
+          <td style="color:#94A3B8; font-size: 7.5pt;">Mebel, kitchen &amp; store equipment</td>
+          <td class="toc-page">8</td>
+        </tr>
+        <tr>
+          <td class="toc-sub-title">3.4 Portal Aset Karyawan (My Assets)</td>
+          <td style="color:#94A3B8; font-size: 7.5pt;">Self-service verifikasi aset pribadi</td>
+          <td class="toc-page">8</td>
+        </tr>
+        <tr>
+          <td class="toc-sub-title">3.5 Prosedur Import/Export Excel &amp; Proteksi Formula</td>
+          <td style="color:#94A3B8; font-size: 7.5pt;">Tambah Data vs Replace All (GANTI)</td>
+          <td class="toc-page">9</td>
+        </tr>
+
+        <tr>
+          <td class="toc-chapter-title" colspan="2">BAB 4: MODUL HELPDESK &amp; TIKET KENDALA</td>
+          <td class="toc-page">Hal 10</td>
+        </tr>
+        <tr>
+          <td class="toc-sub-title">4.1 Alur Pelaporan &amp; Antrean Tiket (Queues)</td>
+          <td style="color:#94A3B8; font-size: 7.5pt;">IT, Hardware, POS, Network Support</td>
+          <td class="toc-page">10</td>
+        </tr>
+        <tr>
+          <td class="toc-sub-title">4.2 Status Siklus Tiket &amp; Countdown SLA</td>
+          <td style="color:#94A3B8; font-size: 7.5pt;">Low, Medium, High, Critical SLA Timer</td>
+          <td class="toc-page">10</td>
+        </tr>
+        <tr>
+          <td class="toc-sub-title">4.3 Komunikasi Real-Time SSE &amp; Catatan Internal</td>
+          <td style="color:#94A3B8; font-size: 7.5pt;">Live chat tiket &amp; private notes</td>
+          <td class="toc-page">11</td>
+        </tr>
+        <tr>
+          <td class="toc-sub-title">4.4 Lampiran File &amp; Penilaian CASP (CSAT)</td>
+          <td style="color:#94A3B8; font-size: 7.5pt;">Validasi file &amp; rating kepuasan pelapor</td>
+          <td class="toc-page">11</td>
+        </tr>
+
+        <tr>
+          <td class="toc-chapter-title" colspan="2">BAB 5: MODUL TRANSAKSI &amp; LOGISTIK</td>
+          <td class="toc-page">Hal 12</td>
+        </tr>
+        <tr>
+          <td class="toc-sub-title">5.1 BAST (Berita Acara Serah Terima) Resmi</td>
+          <td style="color:#94A3B8; font-size: 7.5pt;">Pemberi, penerima, saksi &amp; cetak PDF</td>
+          <td class="toc-page">12</td>
+        </tr>
+        <tr>
+          <td class="toc-sub-title">5.2 Tracker Pengiriman (Shipments Logistics)</td>
+          <td style="color:#94A3B8; font-size: 7.5pt;">Resi kurir ekspedisi &amp; bukti terima POD</td>
+          <td class="toc-page">12</td>
+        </tr>
+
+        <tr>
+          <td class="toc-chapter-title" colspan="2">BAB 6: ADMINISTRASI MASTER DATA</td>
+          <td class="toc-page">Hal 13</td>
+        </tr>
+        <tr>
+          <td class="toc-sub-title">6.1 Master Karyawan &amp; Hierarki Organisasi</td>
+          <td style="color:#94A3B8; font-size: 7.5pt;">NIK, jabatan, lokasi kerja, atasan</td>
+          <td class="toc-page">13</td>
+        </tr>
+        <tr>
+          <td class="toc-sub-title">6.2 Manajemen Pengguna (Users &amp; Access Control)</td>
+          <td style="color:#94A3B8; font-size: 7.5pt;">Akun login, password, hak akses modular</td>
+          <td class="toc-page">13</td>
+        </tr>
+
+        <tr>
+          <td class="toc-chapter-title" colspan="2">BAB 7: SISTEM, PEMELIHARAAN &amp; AUDIT KEAMANAN</td>
+          <td class="toc-page">Hal 14</td>
+        </tr>
+        <tr>
+          <td class="toc-sub-title">7.1 Log Aktivitas Sistem (Audit Trail)</td>
+          <td style="color:#94A3B8; font-size: 7.5pt;">Perekaman aksi administratif &amp; filter</td>
+          <td class="toc-page">14</td>
+        </tr>
+        <tr>
+          <td class="toc-sub-title">7.2 Ekspor Data Lanjutan &amp; Pemulihan Database</td>
+          <td style="color:#94A3B8; font-size: 7.5pt;">Snapshot backup, restore wizard, reset</td>
+          <td class="toc-page">14</td>
+        </tr>
+
+        <tr>
+          <td class="toc-chapter-title" colspan="2">BAB 8: PANDUAN PRAKTIS &amp; SOP SEHARI-HARI</td>
+          <td class="toc-page">Hal 15</td>
+        </tr>
+        <tr>
+          <td class="toc-sub-title">8.1 SOP Karyawan, Teknisi IT, GA &amp; Superadmin</td>
+          <td style="color:#94A3B8; font-size: 7.5pt;">Langkah operasional harian standar</td>
+          <td class="toc-page">15</td>
+        </tr>
+        <tr>
+          <td class="toc-sub-title">8.2 Troubleshooting &amp; Tanya Jawab (FAQ)</td>
+          <td style="color:#94A3B8; font-size: 7.5pt;">Solusi cepat kendala sistem operasional</td>
+          <td class="toc-page">16</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ============================================================
+       BAB 1: PENGENALAN & GAMBARAN UMUM SISTEM
+       ============================================================ -->
+  <div class="page-section">
+    <div class="chapter-banner">
+      <h2>BAB 1: Pengenalan &amp; Gambaran Umum Sistem</h2>
+      <div class="chapter-tag">Fondasi &amp; Akses</div>
+    </div>
+
+    <h3 class="sub-title">1.1 Latar Belakang &amp; Tujuan ESB TrackIT</h3>
+    <p>
+      <strong>ESB TrackIT</strong> adalah sistem enterprise internal yang dirancang dan dikembangkan secara khusus untuk mendukung operasional <strong>PT Esensi Solusi Buana (ESB)</strong>. Platform ini menghubungkan manajemen inventaris perangkat kerja (IT, General Affairs, dan Operasional Store/Resto), penanganan tiket bantuan helpdesk dengan SLA ketat, pelacakan pengiriman logistik antarcabang, formulir Berita Acara Serah Terima (BAST), serta pusat edukasi dan panduan troubleshooting mandiri (Help Center).
+    </p>
+    <p>
+      Tujuan utama dari implementasi ESB TrackIT meliputi:
+    </p>
+    <ul>
+      <li><strong>Sentralisasi Data Aset:</strong> Menghilangkan pencatatan aset yang tercecer di berbagai spreadsheet manual dengan database PostgreSQL terpusat.</li>
+      <li><strong>Akuntabilitas &amp; Audit Mutasi:</strong> Mencatat riwayat perpindahan laptop, PC, dan perangkat toko dari satu karyawan ke karyawan lainnya secara transparan.</li>
+      <li><strong>Peningkatan Responsivitas Helpdesk:</strong> Memastikan insiden teknis di kantor pusat maupun outlet resto tertangani tepat waktu sesuai target SLA dengan notifikasi live.</li>
+      <li><strong>Pemberdayaan Karyawan (Self-Service):</strong> Menyediakan portal Help Center berisi artikel panduan (*playbook*) dan template pesan siap pakai untuk memecahkan kendala umum tanpa harus menunggu tim teknisi.</li>
+    </ul>
+
+    <h3 class="sub-title">1.2 Arsitektur Sistem &amp; Teknologi</h3>
+    <p>
+      Sistem ini dibangun dengan arsitektur modern berstandar tinggi yang mengutamakan kecepatan, reaktivitas waktu nyata, dan integritas data:
+    </p>
+    <table>
+      <thead>
+        <tr>
+          <th style="width: 25%;">Komponen</th>
+          <th style="width: 35%;">Teknologi Terpasang</th>
+          <th style="width: 40%;">Peran &amp; Keunggulan</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Frontend SPA</strong></td>
+          <td>Vue 3 (Composition API), Vite, Tailwind CSS 4</td>
+          <td>Antarmuka responsif super cepat, state management reaktif, dan transisi halaman halus (*GSAP animations*).</td>
+        </tr>
+        <tr>
+          <td><strong>Backend API</strong></td>
+          <td>Node.js ESM, Express 5, `pg` driver</td>
+          <td>RESTful API modular dengan validasi skema runtime, pooling koneksi database aman, dan performa I/O tinggi.</td>
+        </tr>
+        <tr>
+          <td><strong>Real-Time Engine</strong></td>
+          <td>Server-Sent Events (SSE)</td>
+          <td>Pengiriman event tiket baru, pembaruan status, dan komentar obrolan secara live ke browser tanpa perlu refresh.</td>
+        </tr>
+        <tr>
+          <td><strong>Database Utama</strong></td>
+          <td>PostgreSQL 15+</td>
+          <td>Database relasional tangguh dengan ledger migrasi versioned (*canonical SQL*), audit logging, dan index teroptimasi.</td>
+        </tr>
+        <tr>
+          <td><strong>Keamanan Data</strong></td>
+          <td>JWT (HttpOnly Cookie), CORS Whitelist, CSRF, Rate Limiting</td>
+          <td>Perlindungan terhadap *brute force*, kebocoran sesi, serta serangan injeksi formula spreadsheet pada file Excel.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 class="sub-title">1.3 Matriks Peran Pengguna (RBAC)</h3>
+    <p>
+      Akses pengguna ke fitur-fitur di dalam aplikasi dikendalikan oleh sistem Role-Based Access Control (RBAC) yang terbagi menjadi 3 tingkatan utama:
+    </p>
+    <div class="grid-2">
+      <div class="grid-card">
+        <h5><span class="badge badge-purple">Superadmin</span> Akses Penuh Sistem</h5>
+        <p>Peran tertinggi yang memegang wewenang penuh atas seluruh aplikasi.</p>
+        <ul style="font-size: 8pt; margin-left: 16px; margin-bottom: 0;">
+          <li>Mengelola semua aset (IT, GA, OPS) dan karyawan.</li>
+          <li>Mengatur akun pengguna, penugasan peran, dan hak akses modular.</li>
+          <li>Melakukan backup, restore skema, migrasi, dan reset database.</li>
+          <li>Melakukan ekspor administratif lintas tabel tanpa batasan.</li>
+        </ul>
+      </div>
+
+      <div class="grid-card">
+        <h5><span class="badge badge-blue">Admin</span> Pengelola Operasional</h5>
+        <p>Peran untuk tim IT Support, Helpdesk Leader, GA, dan Asset Management.</p>
+        <ul style="font-size: 8pt; margin-left: 16px; margin-bottom: 0;">
+          <li>Menginput, mengedit, mencetak label, dan mengaudit aset IT/GA/OPS.</li>
+          <li>Menangani antrean tiket, mengubah status, dan menulis catatan internal.</li>
+          <li>Membuat formulir BAST serah terima dan memperbarui resi pengiriman.</li>
+          <li>Mengelola artikel di CMS Help Center dan daftar FAQ.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="grid-card" style="margin-top: 8px;">
+      <h5><span class="badge badge-green">Reporter / User (Karyawan)</span> Akses Layanan Mandiri</h5>
+      <p style="font-size: 8pt; margin-bottom: 6px;">
+        Peran default untuk seluruh staf dan karyawan perusahaan. Memiliki akses langsung ke:
+      </p>
+      <ul style="font-size: 8pt; margin-left: 16px; margin-bottom: 0;">
+        <li><strong>Help Center Publik:</strong> Membaca seluruh artikel troubleshooting, panduan SOP, dan menyalin template pesan.</li>
+        <li><strong>Aset Saya (My Assets):</strong> Melihat daftar perangkat inventaris perusahaan yang sedang dipinjamkan ke NIK karyawan yang bersangkutan.</li>
+        <li><strong>Tiket Helpdesk:</strong> Membuat tiket pelaporan kendala baru, berinteraksi di kolom komentar tiket publik, dan memberikan nilai kepuasan (CASP) setelah penanganan selesai.</li>
+      </ul>
+    </div>
+
+    <h3 class="sub-title">1.4 Izin Granular &amp; Navigasi Antarmuka</h3>
+    <p>
+      Selain peran global, sistem menyediakan pengaturan izin granular per fitur dengan 3 tingkatan: <code>None</code> (Tidak Dapat Mengakses), <code>Read Only</code> (Hanya Melihat), dan <code>Full</code> (Melihat, Menambah, Mengubah, &amp; Menghapus Data).
+    </p>
+    <table>
+      <thead>
+        <tr>
+          <th>Modul / Fitur</th>
+          <th>Superadmin</th>
+          <th>Admin</th>
+          <th>User / Reporter</th>
+          <th>Keterangan Izin</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Help Center &amp; Cases</strong></td>
+          <td><span class="badge badge-green">Full</span></td>
+          <td><span class="badge badge-green">Full</span></td>
+          <td><span class="badge badge-blue">Read Only</span></td>
+          <td>User membaca artikel; Admin/Superadmin mengelola di CMS.</td>
+        </tr>
+        <tr>
+          <td><strong>Dashboard Monitoring</strong></td>
+          <td><span class="badge badge-green">Full</span></td>
+          <td><span class="badge badge-blue">Read Only</span></td>
+          <td><span class="badge badge-gray">None</span></td>
+          <td>Hanya untuk staf operasional dan pengambil kebijakan.</td>
+        </tr>
+        <tr>
+          <td><strong>Aset IT, GA, &amp; OPS</strong></td>
+          <td><span class="badge badge-green">Full</span></td>
+          <td><span class="badge badge-green">Full / Read</span></td>
+          <td><span class="badge badge-gray">None</span></td>
+          <td>Dibatasi pada tim pengelola inventaris.</td>
+        </tr>
+        <tr>
+          <td><strong>Aset Karyawan (My Assets)</strong></td>
+          <td><span class="badge badge-green">Full</span></td>
+          <td><span class="badge badge-green">Full</span></td>
+          <td><span class="badge badge-blue">Read Only</span></td>
+          <td>User melihat aset yang terikat pada NIK miliknya.</td>
+        </tr>
+        <tr>
+          <td><strong>Tiket Helpdesk</strong></td>
+          <td><span class="badge badge-green">Full</span></td>
+          <td><span class="badge badge-green">Full</span></td>
+          <td><span class="badge badge-green">Full (Self)</span></td>
+          <td>User mengelola tiket miliknya; Admin menangani seluruh tiket.</td>
+        </tr>
+        <tr>
+          <td><strong>BAST &amp; Pengiriman</strong></td>
+          <td><span class="badge badge-green">Full</span></td>
+          <td><span class="badge badge-green">Full / Read</span></td>
+          <td><span class="badge badge-gray">None</span></td>
+          <td>Pencatatan serah terima fisik dan ekspedisi logistik.</td>
+        </tr>
+        <tr>
+          <td><strong>Master Karyawan &amp; Users</strong></td>
+          <td><span class="badge badge-green">Full</span></td>
+          <td><span class="badge badge-blue">Read / Full</span></td>
+          <td><span class="badge badge-gray">None</span></td>
+          <td>Hanya untuk administrator dan tim HR/Asset.</td>
+        </tr>
+        <tr>
+          <td><strong>Database &amp; Ekspor Penuh</strong></td>
+          <td><span class="badge badge-green">Full</span></td>
+          <td><span class="badge badge-gray">None</span></td>
+          <td><span class="badge badge-gray">None</span></td>
+          <td>Khusus Superadmin untuk menjaga integritas data kritikal.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="callout callout-info">
+      <div class="callout-icon">ℹ</div>
+      <div class="callout-content">
+        <strong>Navigasi Dual Mode (Desktop Sidebar &amp; Collapsed Rail):</strong>
+        Pada layar desktop, pengguna dapat memperluas menu navigasi (245px) atau menciutkannya menjadi *Navigation Rail* (74px) dengan tombol panah di samping logo. Saat mode rail aktif, hover mouse di atas ikon menu akan memunculkan menu melayang (*floating flyout popover*) tanpa menghabiskan area pandang kerja Anda.
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       BAB 2: PUSAT BANTUAN & KNOWLEDGE BASE (HELP CENTER)
+       ============================================================ -->
+  <div class="page-section">
+    <div class="chapter-banner">
+      <h2>BAB 2: Pusat Bantuan &amp; Knowledge Base (Help Center)</h2>
+      <div class="chapter-tag">Layanan Mandiri &amp; Edukasi</div>
+    </div>
+
+    <h3 class="sub-title">2.1 Halaman Depan &amp; Pencarian Pintar</h3>
+    <p>
+      Halaman Pusat Bantuan (dapat diakses pada rute <code>/</code>) merupakan gerbang utama yang langsung terbuka bagi seluruh pengguna tanpa keharusan login terlebih dahulu. Halaman ini dirancang bersih, intuitif, dan bebas hambatan visual untuk memberikan jawaban instan atas permasalahan kerja sehari-hari.
+    </p>
+    <ul>
+      <li><strong>Kolom Pencarian Utama:</strong> Dilengkapi fitur pencarian pintar instan (*fuzzy search*) dengan *live suggestions*. Saat pengguna mengetik kata kunci (misal: "password" atau "printer"), sistem secara dinamis menampilkan judul artikel relevan dan ringkasan ringkasnya di bawah kolom input.</li>
+      <li><strong>Pencarian Populer (Trending Searches):</strong> Menyajikan tagar kata kunci yang paling sering ditelusuri pengguna (seperti <em>Password Reset</em>, <em>VPN Setup</em>, <em>Hardware Request</em>). Klik pada tagar untuk langsung memfilter artikel.</li>
+      <li><strong>Kartu Topik Kategori:</strong> Navigasi berdasarkan klasifikasi sistem (Hardware, Software, Jaringan &amp; WiFi, Akses &amp; Keamanan, Sistem POS Toko, dan General Affairs).</li>
+      <li><strong>SOP Unggulan (Featured SOPs):</strong> Pintasan langsung ke SOP standar penting seperti <em>SOP Setup Laptop Baru New Joiner</em> dan <em>SOP Setup Laptop Re-use</em>.</li>
+    </ul>
+
+    <h3 class="sub-title">2.2 Cases &amp; Playbook Troubleshooting Insiden</h3>
+    <p>
+      Portal Kasus (<code>/cases</code>) menyajikan pustaka artikel panduan insiden teknis bergaya dokumentasi modern (*Notion-style navigation*).
+    </p>
+    <div class="process-container">
+      <div class="process-card">
+        <div class="process-num">01</div>
+        <div class="process-title">Pilih Topik / Kasus</div>
+        <div class="process-desc">Telusuri hierarki kategori di panel kiri atau cari kasus spesifik menggunakan kotak pencarian.</div>
+      </div>
+      <div class="process-card">
+        <div class="process-num">02</div>
+        <div class="process-title">Baca Langkah Solusi</div>
+        <div class="process-desc">Pelajari langkah troubleshooting terstruktur yang dilengkapi screenshot, parameter, dan indikator sukses.</div>
+      </div>
+      <div class="process-card">
+        <div class="process-num">03</div>
+        <div class="process-title">Simpan Bookmark</div>
+        <div class="process-desc">Klik tombol bookmark untuk menyimpan artikel favorit yang sering Anda jadikan rujukan kerja.</div>
+      </div>
+      <div class="process-card">
+        <div class="process-num">04</div>
+        <div class="process-title">Beri Rating / Umpan Balik</div>
+        <div class="process-desc">Beri evaluasi apakah panduan bermanfaat (Helpful) atau butuh eskalasi langsung ke tiket helpdesk.</div>
+      </div>
+    </div>
+
+    <h3 class="sub-title">2.3 Templates Hub (Pusat Template Komunikasi)</h3>
+    <p>
+      Halaman <strong>Templates Hub</strong> (<code>/templates</code>) menyediakan format pesan standar profesional siap pakai untuk komunikasi antartim via Slack, Microsoft Teams, Discord, WhatsApp grup, maupun email.
+    </p>
+    <table>
+      <thead>
+        <tr>
+          <th>Nama Template</th>
+          <th>Kategori</th>
+          <th>Fungsi &amp; Tujuan Penggunaan</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Daily Standup Report</strong></td>
+          <td>Reporting</td>
+          <td>Laporan harian perkembangan tugas (Completed Yesterday, Planned Today, Blockers).</td>
+        </tr>
+        <tr>
+          <td><strong>Bertanya Saat Stuck (15-Min Rule)</strong></td>
+          <td>Support</td>
+          <td>Format terstruktur bertanya ke mentor/lead setelah mencoba mandiri selama 15 menit.</td>
+        </tr>
+        <tr>
+          <td><strong>Pull Request (PR) Description</strong></td>
+          <td>Code Review</td>
+          <td>Ringkasan perubahan kode, checklist pengujian, dan screenshot untuk tim engineering.</td>
+        </tr>
+        <tr>
+          <td><strong>Laporan Bug ke Backend / QA</strong></td>
+          <td>Bug Report</td>
+          <td>Format pelaporan insiden staging/produksi lengkap dengan endpoint, payload, dan respon.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="callout callout-success">
+      <div class="callout-icon">✔</div>
+      <div class="callout-content">
+        <strong>Fitur 1-Klik Salin (Copy to Clipboard):</strong>
+        Setiap kartu template memiliki tombol salin. Klik sekali, dan seluruh isi teks format akan langsung berada di papan klip perangkat Anda, siap ditempel (*paste*) ke aplikasi chat.
+      </div>
+    </div>
+
+    <h3 class="sub-title">2.4 FAQ Interaktif (Pertanyaan Umum)</h3>
+    <p>
+      Komponen akordeon FAQ interaktif di halaman utama menyajikan jawaban cepat atas pertanyaan yang paling sering diajukan karyawan terkait operasional harian, kebijakan penggantian laptop kerja, prosedur peminjaman perangkat tes, hingga perpanjangan akun email.
+    </p>
+
+    <h3 class="sub-title">2.5 Help Center Analytics &amp; Admin CMS</h3>
+    <p>
+      Bagi tim administrator dan dokumentasi, modul CMS (<code>/admin/cases</code> dan <code>/admin/editor</code>) memungkinkan pembuatan dan pengeditan artikel panduan menggunakan rich text editor:
+    </p>
+    <ul>
+      <li><strong>Manajemen Status Artikel:</strong> Opsi penyimpanan artikel sebagai <code>Draft</code> (hanya terlihat oleh tim admin) atau <code>Published</code> (dapat dibaca oleh seluruh karyawan).</li>
+      <li><strong>Atur Kategori &amp; Kartu Topik:</strong> Mengelola ikon, label, dan urutan kartu kategori di <code>/admin/kb-categories</code>.</li>
+      <li><strong>Analisis Celah Informasi (Gap Analysis):</strong> Dashboard analitik (<code>/kb-analytics</code>) merekam metrik istilah pencarian yang dimasukkan pengguna. Jika ada query pencarian yang sering dicari namun tidak menghasilkan artikel, admin dapat segera menulis panduan baru untuk menutup celah tersebut.</li>
+    </ul>
+  </div>
+
+  <!-- ============================================================
+       BAB 3: MODUL MANAJEMEN ASET (ASSET MANAGEMENT)
+       ============================================================ -->
+  <div class="page-section">
+    <div class="chapter-banner">
+      <h2>BAB 3: Modul Manajemen Aset (Asset Management)</h2>
+      <div class="chapter-tag">Inventaris &amp; Audit Fisik</div>
+    </div>
+
+    <h3 class="sub-title">3.1 Manajemen Aset IT (Hardware &amp; Devices)</h3>
+    <p>
+      Halaman <strong>Aset IT</strong> (<code>/assets</code>) adalah pusat kendali untuk seluruh perangkat komputasi perusahaan. Sistem menyimpan informasi aset secara mendalam dengan atribut-atribut utama berikut:
+    </p>
+    <table>
+      <thead>
+        <tr>
+          <th>Atribut Data</th>
+          <th>Penjelasan &amp; Format</th>
+          <th>Contoh Nilai</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Hostname</strong></td>
+          <td>Identitas unik sistem operasi perangkat di jaringan ESB.</td>
+          <td><code>HO-LPT-042</code>, <code>POS-JKT01-01</code></td>
+        </tr>
+        <tr>
+          <td><strong>Serial Number (SN)</strong></td>
+          <td>Nomor seri pabrikan perangkat keras fisik.</td>
+          <td><code>PF3X9A21</code>, <code>CNU482910X</code></td>
+        </tr>
+        <tr>
+          <td><strong>Tipe Perangkat</strong></td>
+          <td>Kategori jenis unit hardware kerja.</td>
+          <td>Laptop, Desktop, Server, Monitor, Printer, Network Device</td>
+        </tr>
+        <tr>
+          <td><strong>Brand / Merk &amp; Model</strong></td>
+          <td>Pabrikan pembuat dan tipe spesifik unit.</td>
+          <td>Lenovo ThinkPad T14, Apple MacBook Pro M2, Dell OptiPlex</td>
+        </tr>
+        <tr>
+          <td><strong>Spesifikasi Teknis</strong></td>
+          <td>Rincian prosesor, kapasitas RAM, SSD, dan sistem operasi.</td>
+          <td>Intel Core i7, 16GB DDR4, 512GB NVMe SSD, Windows 11 Pro</td>
+        </tr>
+        <tr>
+          <td><strong>Pemegang Aset (NIK &amp; Nama)</strong></td>
+          <td>Karyawan yang bertanggung jawab memegang perangkat saat ini.</td>
+          <td><code>ESB-2023-089</code> — Budi Santoso</td>
+        </tr>
+        <tr>
+          <td><strong>Lokasi Fisik</strong></td>
+          <td>Kantor cabang, lantai kantor pusat, atau outlet resto tempat unit berada.</td>
+          <td>Head Office - Lt. 4, Outlet Gandaria City, Gudang Logistik</td>
+        </tr>
+        <tr>
+          <td><strong>Status Operasional</strong></td>
+          <td>Status ketersediaan unit dalam siklus manajemen aset.</td>
+          <td><span class="badge badge-green">In Use</span>, <span class="badge badge-blue">Stock</span>, <span class="badge badge-amber">In Service</span>, <span class="badge badge-red">Damaged</span>, <span class="badge badge-gray">Disposal</span></td>
+        </tr>
+        <tr>
+          <td><strong>Kondisi Fisik</strong></td>
+          <td>Tingkat kelayakan fungsi dan fisik unit.</td>
+          <td>Baru, Normal, Rusak Ringan, Rusak Sedang, Rusak Berat</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 class="sub-title">3.2 Riwayat Pemakaian &amp; Audit Log Aset (Device Logs)</h3>
+    <p>
+      Setiap kali terjadi mutasi perangkat (misalnya laptop diserahkan dari Karyawan A ke Karyawan B, atau unit dipindahkan dari status *In Use* menjadi *In Service* di vendor perbaikan), sistem secara otomatis mencatat riwayat tersebut ke dalam tab <strong>Device Logs</strong> di dalam modal Detail Aset.
+    </p>
+    <p>
+      Hal ini menjamin transparansi riwayat audit sehingga tim Asset Management dapat melacak rekam jejak pengguna masa lalu, tanggal serah terima, dan riwayat perbaikan fisik tanpa khawatir ada data yang hilang.
+    </p>
+
+    <h3 class="sub-title">3.3 Generator &amp; Cetak Label Aset (QR Code / Barcode)</h3>
+    <p>
+      Untuk memudahkan proses audit inventaris fisik di lapangan, setiap baris data aset dilengkapi tombol <strong>Label Aset</strong>:
+    </p>
+    <ul>
+      <li>Sistem merender kartu label beresolusi tinggi berisi informasi: Logo ESB, Hostname, Serial Number, Tipe Perangkat, Tanggal Perolehan, dan QR Code terenkripsi.</li>
+      <li>QR Code tersebut dapat dipindai (*scan*) menggunakan kamera smartphone atau barcode scanner untuk langsung membuka halaman verifikasi detail aset.</li>
+      <li>Tersedia tombol <strong>Cetak Label</strong> yang telah diformat pas dengan ukuran kertas stiker label fisik standar industri.</li>
+    </ul>
+
+    <h3 class="sub-title">3.4 Aset General Affairs (GA) &amp; Aset Operasional Resto (OPS)</h3>
+    <p>
+      Selain perangkat teknologi informasi, ESB TrackIT menyediakan dua modul inventaris terpisah dengan basis database yang diisolasi:
+    </p>
+    <div class="grid-2">
+      <div class="grid-card">
+        <h5><span class="badge badge-blue">Aset GA</span> (General Affairs)</h5>
+        <p>Pengelolaan inventaris sarana dan fasilitas kantor non-IT:</p>
+        <ul style="font-size: 8pt; margin-left: 16px;">
+          <li>Perabot kantor (meja ergonomis, kursi kerja, lemari brankas arsip).</li>
+          <li>Fasilitas gedung (unit AC, genset cadangan, pemadam api ringan/APAR).</li>
+          <li>Perangkat keamanan (CCTV gedung, sistem kunci akses sidik jari).</li>
+        </ul>
+      </div>
+
+      <div class="grid-card">
+        <h5><span class="badge badge-purple">Aset OPS</span> (Operasional Resto / Store)</h5>
+        <p>Inventaris khusus perlengkapan gerai dan dapur resto:</p>
+        <ul style="font-size: 8pt; margin-left: 16px;">
+          <li>Mesin kasir POS khusus gerai, laci uang otomatis (*cash drawer*).</li>
+          <li>Kitchen Display System (KDS), thermal printer pesanan dapur.</li>
+          <li>Peralatan dapur operasional (chiller, microwave komersial, scale digital).</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3 class="sub-title">3.5 Portal Aset Saya (My Assets) untuk Karyawan</h3>
+    <p>
+      Halaman <strong>Aset Karyawan</strong> (<code>/my-assets</code>) dirancang khusus sebagai antarmuka *self-service*. Ketika seorang karyawan masuk (*login*), sistem secara otomatis mencocokkan NIK pengguna dengan database aset:
+    </p>
+    <ul>
+      <li>Karyawan dapat melihat seluruh unit yang resmi terdaftar atas namanya (misal: Laptop Lenovo ThinkPad dan Monitor Eksternal 24 inci).</li>
+      <li>Menampilkan rincian tanggal serah terima, kondisi saat diterima, nomor seri unit, dan catatan spesifik.</li>
+      <li>Jika terdapat ketidaksesuaian data fisik dengan sistem, karyawan dapat langsung menekan tombol <em>Laporkan Ketidaksesuaian</em> yang akan otomatis membuka tiket helpdesk ke tim Asset Management.</li>
+    </ul>
+
+    <h3 class="sub-title">3.6 Prosedur Import &amp; Export Excel (XLSX)</h3>
+    <p>
+      Fitur Import/Export Excel di ESB TrackIT telah diselaraskan agar format file hasil Export memiliki header dan kolom sheet yang 100% sama dengan template Import. Dengan demikian, file ekspor dapat diedit langsung lalu diimpor kembali ke sistem.
+    </p>
+    <table>
+      <thead>
+        <tr>
+          <th>Modul Target</th>
+          <th>Nama Sheet Utama</th>
+          <th>Identitas Kunci</th>
+          <th>Aturan &amp; Keterkaitan Data</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Karyawan</strong></td>
+          <td><code>Table Karyawan</code></td>
+          <td>NIK Karyawan</td>
+          <td>Template hanya memuat profil karyawan. NIK wajib unik.</td>
+        </tr>
+        <tr>
+          <td><strong>Aset IT Standar</strong></td>
+          <td><code>Table Asset</code></td>
+          <td>Hostname</td>
+          <td>Import Karyawan terlebih dahulu agar kolom <em>NIK Pemegang</em> terhubung otomatis.</td>
+        </tr>
+        <tr>
+          <td><strong>Aset IT Lengkap</strong></td>
+          <td><code>Table Karyawan</code> + <code>Table Asset</code></td>
+          <td>NIK &amp; Hostname</td>
+          <td>Pilihan import awal dua sheet sekaligus untuk instalasi data baru.</td>
+        </tr>
+        <tr>
+          <td><strong>Aset GA</strong></td>
+          <td><code>Data Aset GA</code></td>
+          <td>Nomor Inventaris</td>
+          <td>Sheet mandiri terpisah khusus fasilitas non-IT.</td>
+        </tr>
+        <tr>
+          <td><strong>Aset OPS</strong></td>
+          <td><code>Data Aset OPS</code></td>
+          <td>Nomor Seri / Hostname</td>
+          <td>Sheet mandiri khusus inventaris resto.</td>
+        </tr>
+        <tr>
+          <td><strong>Pengiriman</strong></td>
+          <td><code>Data Pengiriman</code></td>
+          <td>Nomor Resi</td>
+          <td>Header impor dan ekspor identik untuk memudahkan pelacakan logistik.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="callout callout-danger">
+      <div class="callout-icon">⚠</div>
+      <div class="callout-content">
+        <strong>Aturan Penggantian Data (Replace All vs Tambah Data):</strong><br>
+        • <strong>Tambah Data:</strong> Menambahkan data baru dari file Excel tanpa menghapus rekaman data yang sudah ada di database.<br>
+        • <strong>Replace All:</strong> Menghapus seluruh data lama pada tabel target, lalu memasukkan isi file Excel yang baru. Untuk keamanan, sistem mewajibkan admin mengetik kata sandi konfirmasi <code>GANTI</code> secara persis sebelum proses dijalankan. Validasi ini juga diverifikasi ganda oleh server (*server-side security guard*).
+      </div>
+    </div>
+
+    <div class="callout callout-info">
+      <div class="callout-icon">🛡</div>
+      <div class="callout-content">
+        <strong>Proteksi Formula Injection:</strong>
+        Untuk melindungi workstation dari serangan spreadsheet injection, setiap sel data hasil ekspor yang diawali karakter formula berbahaya seperti <code>=</code>, <code>+</code>, <code>-</code>, atau <code>@</code> akan dinetralkan secara otomatis oleh mesin sanitasi backend sebelum ditulis ke workbook Excel.
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       BAB 4: MODUL HELPDESK & TIKET KENDALA
+       ============================================================ -->
+  <div class="page-section">
+    <div class="chapter-banner">
+      <h2>BAB 4: Modul Helpdesk &amp; Tiket Kendala</h2>
+      <div class="chapter-tag">Dukungan &amp; Layanan IT</div>
+    </div>
+
+    <h3 class="sub-title">4.1 Alur Pelaporan Kendala &amp; Antrean Tiket (Queues)</h3>
+    <p>
+      Modul <strong>Tiket</strong> (<code>/tickets</code>) adalah sarana formal bagi seluruh karyawan dan operasional cabang untuk mengajukan permohonan bantuan teknis, perbaikan kerusakan, peminjaman perangkat, maupun permohonan hak akses software.
+    </p>
+    <p>
+      Saat membuat tiket baru melalui tombol <strong>+ Tiket Baru</strong>, pengguna mengisi informasi:
+    </p>
+    <ul>
+      <li><strong>Judul Tiket:</strong> Ringkasan singkat permasalahan (contoh: <em>Printer Thermal POS Kasir Outlet Sudirman Tidak Merespon</em>).</li>
+      <li><strong>Antrean Divisi (Ticket Queue):</strong> Pemilihan divisi penanggung jawab, seperti <em>IT Support</em>, <em>Hardware Maintenance</em>, <em>Network &amp; WiFi Infrastructure</em>, atau <em>POS System Support</em>.</li>
+      <li><strong>Tingkat Kepentingan (Prioritas):</strong> Pilihan estimasi dampak urgensi (Low, Medium, High, Critical).</li>
+      <li><strong>Deskripsi Detail:</strong> Penjelasan rinci kendala, langkah-langkah yang sudah dicoba, dan waktu terjadinya masalah.</li>
+      <li><strong>Lampiran Foto / File:</strong> Bukti visual screenshot pesan error atau foto fisik perangkat.</li>
+    </ul>
+
+    <h3 class="sub-title">4.2 Siklus Hidup Status Tiket &amp; Countdown SLA</h3>
+    <p>
+      Tiket yang diajukan akan bergerak melalui siklus hidup terstandarisasi untuk memastikan kepatuhan Service Level Agreement (SLA):
+    </p>
+    <div class="process-container">
+      <div class="process-card" style="border-top-color: #10B981;">
+        <div class="process-num"><span class="badge badge-green">Open</span></div>
+        <div class="process-title">Tiket Diterima</div>
+        <div class="process-desc">Tiket baru berhasil dibuat oleh pelapor. Menunggu penugasan teknisi (*assignment*). Timer SLA mulai berjalan mundur.</div>
+      </div>
+      <div class="process-card" style="border-top-color: #3B82F6;">
+        <div class="process-num"><span class="badge badge-blue">In Progress</span></div>
+        <div class="process-title">Sedang Dikerjakan</div>
+        <div class="process-desc">Teknisi IT telah mengambil tiket dan aktif melakukan investigasi, pengujian, atau perbaikan perangkat.</div>
+      </div>
+      <div class="process-card" style="border-top-color: #F59E0B;">
+        <div class="process-num"><span class="badge badge-amber">Pending</span></div>
+        <div class="process-title">Menunggu Tindak Lanjut</div>
+        <div class="process-desc">Pekerjaan tertahan sementara karena menunggu suku cadang vendor, respon konfirmasi user, atau persetujuan atasan.</div>
+      </div>
+      <div class="process-card" style="border-top-color: #14B8A6;">
+        <div class="process-num"><span class="badge badge-green">Resolved</span></div>
+        <div class="process-title">Solusi Diterapkan</div>
+        <div class="process-desc">Kendala telah diselesaikan oleh teknisi. Pelapor menerima notifikasi dan diminta memvalidasi hasil perbaikan.</div>
+      </div>
+    </div>
+
+    <p style="margin-top: 10px;">
+      Setelah status <em>Resolved</em> divalidasi dan pelapor memberikan penilaian kepuasan, tiket akan otomatis berubah menjadi <span class="badge badge-gray">Closed</span> (Selesai Sepenuhnya) dan diarsipkan dalam riwayat sistem.
+    </p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Tingkat Prioritas</th>
+          <th>Warna Indikator</th>
+          <th>Target Respons Pertama</th>
+          <th>Target Batas Waktu Resolusi (SLA)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="badge badge-red">Critical</span></td>
+          <td>Merah Berkedip</td>
+          <td>&le; 15 Menit</td>
+          <td>&le; 2 Jam (Downtime sistem kasir toko, server down)</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-amber">High</span></td>
+          <td>Kuning Amber</td>
+          <td>&le; 30 Menit</td>
+          <td>&le; 4 Jam (Karyawan tidak bisa bekerja, printer kasir mati)</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-blue">Medium</span></td>
+          <td>Biru Langit</td>
+          <td>&le; 2 Jam</td>
+          <td>&le; 8 Jam Kerja (Kendala software minor, email lambat)</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-green">Low</span></td>
+          <td>Hijau Emerald</td>
+          <td>&le; 4 Jam</td>
+          <td>&le; 24 Jam Kerja (Permintaan informasi, setup akun baru)</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 class="sub-title">4.3 Komunikasi Real-Time (SSE) &amp; Catatan Internal</h3>
+    <p>
+      Halaman tiket dilengkapi dengan mesin <strong>Server-Sent Events (SSE)</strong> terintegrasi:
+    </p>
+    <ul>
+      <li>Setiap kali ada tiket baru dibuat oleh user atau status tiket diperbarui oleh teknisi, seluruh layar admin yang sedang aktif akan langsung terupdate dalam hitungan milidetik tanpa perlu memuat ulang (*refresh*) browser. Notifikasi lonceng banner juga akan muncul di pojok kanan atas.</li>
+      <li><strong>Kolom Komentar Ganda (Publik vs Internal):</strong>
+        <ul>
+          <li><strong>Balasan Publik (Public Reply):</strong> Pesan yang dapat dibaca oleh karyawan pelapor untuk memberikan instruksi troubleshooting atau kabar perkembangan perbaikan.</li>
+          <li><strong>Catatan Internal (Internal Note - Berlatar Kuning):</strong> Pesan rahasia yang hanya dapat dilihat oleh sesama teknisi IT dan Superadmin, digunakan untuk mencatat koordinasi teknis, password sementara perbaikan, atau catatan vendor.</li>
+        </ul>
+      </li>
+    </ul>
+
+    <h3 class="sub-title">4.4 Penilaian Kepuasan Pengguna / CASP (Customer Satisfaction)</h3>
+    <p>
+      Ketika teknisi menandai tiket menjadi status <strong>Resolved</strong>, kartu evaluasi <strong>CASP Rating</strong> akan muncul di layar pelapor:
+    </p>
+    <ul>
+      <li>Pelapor memberikan skor bintang kepuasan (skala 1 sampai 5) atas keramahan dan kecepatan teknisi.</li>
+      <li>Pelapor dapat menyertakan komentar ulasan kepuasan layanan.</li>
+      <li>Data CASP ini langsung direkam ke metrik kepuasan helpdesk bulanan untuk evaluasi kinerja divisi IT.</li>
+    </ul>
+  </div>
+
+  <!-- ============================================================
+       BAB 5: MODUL TRANSAKSI & LOGISTIK
+       ============================================================ -->
+  <div class="page-section">
+    <div class="chapter-banner">
+      <h2>BAB 5: Modul Transaksi &amp; Logistik</h2>
+      <div class="chapter-tag">BAST &amp; Ekspedisi</div>
+    </div>
+
+    <h3 class="sub-title">5.1 Formulir BAST (Berita Acara Serah Terima) Aset</h3>
+    <p>
+      Halaman <strong>BAST / Submissions</strong> (<code>/submissions</code>) berfungsi untuk mengotomatisasi pembuatan dokumen formal serah terima aset perusahaan, menggantikan proses pengetikan surat manual di dokumen pengolah kata.
+    </p>
+    <p>
+      Struktur pengisian formulir BAST mencakup:
+    </p>
+    <ul>
+      <li><strong>Pihak Pertama (Pemberi):</strong> Memilih NIK karyawan penyerah aset (biasanya staf Asset Management atau IT Support). Nama lengkap dan direktorat terisi secara otomatis dari database karyawan.</li>
+      <li><strong>Pihak Kedua (Penerima):</strong> Memilih NIK karyawan penerima fasilitas kerja (misal: karyawan baru atau karyawan yang menerima unit pengganti).</li>
+      <li><strong>Pihak Ketiga (Mengetahui):</strong> Secara default diisi oleh perwakilan <em>People Business Partner (PBP)</em> atau pimpinan unit kerja untuk memvalidasi legalitas serah terima.</li>
+      <li><strong>Tujuan Penyerahan:</strong> Pilihan kategori transaksi: <em>Penyerahan Aset Baru</em>, <em>Peminjaman Sementara</em>, <em>Perbaikan / Service</em>, atau <em>Disposal / Pengembalian Unit</em>.</li>
+      <li><strong>Daftar Aset Baru (Diserahkan):</strong> Memilih unit perangkat dari master aset lengkap dengan jumlah (*qty*) dan spesifikasinya.</li>
+      <li><strong>Daftar Aset Lama (Ditarik):</strong> Memilih unit laptop lama milik karyawan yang ditarik kembali ke gudang IT.</li>
+    </ul>
+
+    <div class="callout callout-info">
+      <div class="callout-icon">🖨</div>
+      <div class="callout-content">
+        <strong>Pencetakan Dokumen BAST Resmi:</strong>
+        Setelah formulir disimpan, pengguna cukup menekan tombol <strong>Cetak Dokumen BAST</strong>. Sistem akan merender surat resmi Berita Acara lengkap dengan nomor referensi unik, rincian tabel perangkat, klausul perjanjian pemeliharaan aset perusahaan, serta tiga kolom tanda tangan basah/digital pihak terkait.
+      </div>
+    </div>
+
+    <h3 class="sub-title">5.2 Pelacak Pengiriman Aset (Shipments Logistics Tracker)</h3>
+    <p>
+      Halaman <strong>Pengiriman</strong> (<code>/shipments</code>) memantau pergerakan fisik perangkat yang dikirimkan melalui jasa ekspedisi kurir antarkantor cabang, pengiriman ke rumah karyawan remote (*work from home*), maupun pengiriman unit rusak ke pusat servis vendor rekanan.
+    </p>
+    <table>
+      <thead>
+        <tr>
+          <th>Kolom Data</th>
+          <th>Deskripsi</th>
+          <th>Fungsi Operasional</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Tanggal Request</strong></td>
+          <td>Tanggal permintaan pengiriman dibuat</td>
+          <td>Pencatatan SLA proses persiapan unit di logistik.</td>
+        </tr>
+        <tr>
+          <td><strong>Penerima &amp; Tujuan</strong></td>
+          <td>Nama orang dan alamat tujuan lengkap</td>
+          <td>Memastikan kurir mengantar ke lokasi cabang/alamat yang tepat.</td>
+        </tr>
+        <tr>
+          <td><strong>Rincian Barang</strong></td>
+          <td>Deskripsi fisik unit yang dipaketkan</td>
+          <td>Contoh: <em>1 Unit Laptop ThinkPad T14 + Charger + Mouse</em>.</td>
+        </tr>
+        <tr>
+          <td><strong>Nomor Resi (AWB)</strong></td>
+          <td>Kode pelacakan resi ekspedisi</td>
+          <td>Nomor AWB dari JNE, J&amp;T, SiCepat, atau kurir internal perusahaan.</td>
+        </tr>
+        <tr>
+          <td><strong>Status Pengiriman</strong></td>
+          <td>Status tracking real-time</td>
+          <td>
+            <span class="badge badge-gray">Belum Dikirim</span> &rarr;
+            <span class="badge badge-amber">Pending</span> &rarr;
+            <span class="badge badge-blue">Sedang Dikirim</span> &rarr;
+            <span class="badge badge-green">Diterima</span> (atau <span class="badge badge-red">Cancel</span>)
+          </td>
+        </tr>
+        <tr>
+          <td><strong>Bukti Terima (POD)</strong></td>
+          <td>Tautan foto Proof of Delivery</td>
+          <td>Foto resi bertanda tangan atau foto penerima saat paket sampai.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>
+      Modul pengiriman juga dilengkapi dengan modal <strong>Import Pengiriman</strong> dan <strong>Export Pengiriman</strong> untuk memperbarui status ratusan resi ekspedisi sekaligus dari laporan harian vendor kurir.
+    </p>
+  </div>
+
+  <!-- ============================================================
+       BAB 6: ADMINISTRASI MASTER DATA
+       ============================================================ -->
+  <div class="page-section">
+    <div class="chapter-banner">
+      <h2>BAB 6: Administrasi Master Data</h2>
+      <div class="chapter-tag">Karyawan &amp; Akun Pengguna</div>
+    </div>
+
+    <h3 class="sub-title">6.1 Master Data Karyawan (Employees)</h3>
+    <p>
+      Halaman <strong>Karyawan</strong> (<code>/karyawan</code>) bertindak sebagai sumber kebenaran tunggal (*single source of truth*) data identitas staf di ESB TrackIT. Data ini menjadi pondasi bagi modul Aset (menentukan pemegang perangkat) dan modul Tiket (menentukan pihak pelapor).
+    </p>
+    <ul>
+      <li><strong>NIK (Nomor Induk Karyawan):</strong> Kunci primer unik identitas karyawan (misal: <code>ESB-2024-105</code>).</li>
+      <li><strong>Nama Lengkap &amp; Email:</strong> Kontak resmi korespondensi notifikasi tiket.</li>
+      <li><strong>Departemen &amp; Jabatan:</strong> Pengelompokan divisi kerja (misal: Engineering, Product, Marketing, People &amp; Culture, Finance).</li>
+      <li><strong>Level Jabatan (Job Level):</strong> Pilihan terstandarisasi: <em>C-Level</em>, <em>L1</em> s/d <em>L6</em>, <em>LS1</em> s/d <em>LS3</em>, <em>Freelance</em>, dan <em>Intern</em>.</li>
+      <li><strong>Lokasi Kerja:</strong> Penempatan fisik kantor pusat, regional hub, atau remote store.</li>
+      <li><strong>Hierarki Atasan Langsung:</strong> Menghubungkan NIK atasan (Manager/Supervisor) untuk alur eskalasi persetujuan pengadaan perangkat baru.</li>
+    </ul>
+
+    <div class="callout callout-success">
+      <div class="callout-icon">🔄</div>
+      <div class="callout-content">
+        <strong>Sinkronisasi Akun Otomatis:</strong>
+        Saat administrator mengimpor data karyawan melalui file Excel, sistem secara cerdas memeriksa apakah karyawan tersebut sudah memiliki akun login di tabel <code>users</code>. Jika belum, akun login baru dengan username berbasis NIK dan kata sandi default sistem akan dibuatkan secara otomatis.
+      </div>
+    </div>
+
+    <h3 class="sub-title">6.2 Manajemen Pengguna Sistem (Users &amp; Access Control)</h3>
+    <p>
+      Halaman <strong>Pengguna</strong> (<code>/users</code>) digunakan oleh administrator untuk mengontrol hak masuk (*authentication*) dan hak eksekusi (*authorization*) ke dalam platform TrackIT:
+    </p>
+    <table>
+      <thead>
+        <tr>
+          <th>Tindakan Pengelolaan</th>
+          <th>Hak Akses Pelaksana</th>
+          <th>Fungsi &amp; Dampak Terhadap Sistem</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Tambah Pengguna Baru</strong></td>
+          <td>Superadmin, Admin</td>
+          <td>Membuat akun dengan mengaitkan NIK karyawan, email login, username, dan password awal.</td>
+        </tr>
+        <tr>
+          <td><strong>Penetapan Peran (Role)</strong></td>
+          <td>Superadmin</td>
+          <td>Menetapkan hak sebagai <code>Superadmin</code>, <code>Admin</code>, atau <code>Reporter</code>.</td>
+        </tr>
+        <tr>
+          <td><strong>Konfigurasi Izin Modular</strong></td>
+          <td>Superadmin</td>
+          <td>Menentukan apakah pengguna memiliki hak <em>Full Access</em>, <em>Read Only</em>, atau <em>No Access</em> pada tiap modul (Dashboard, Aset, Tiket, BAST, Ekspor, dll).</td>
+        </tr>
+        <tr>
+          <td><strong>Penugasan Antrean (Queues)</strong></td>
+          <td>Superadmin, Admin</td>
+          <td>Menentukan antrean tiket mana saja (IT Support, Hardware, Network, POS) yang dapat ditangani oleh teknisi yang bersangkutan.</td>
+        </tr>
+        <tr>
+          <td><strong>Reset Kata Sandi</strong></td>
+          <td>Superadmin, Admin</td>
+          <td>Mereset kata sandi akun pengguna jika staf yang bersangkutan lupa kata sandi.</td>
+        </tr>
+        <tr>
+          <td><strong>Aktivasi / Suspend Akun</strong></td>
+          <td>Superadmin</td>
+          <td>Menonaktifkan akses login staf yang telah mengundurkan diri (*resigned*) demi keamanan data.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ============================================================
+       BAB 7: SISTEM, PEMELIHARAAN & AUDIT KEAMANAN
+       ============================================================ -->
+  <div class="page-section">
+    <div class="chapter-banner">
+      <h2>BAB 7: Sistem, Pemeliharaan &amp; Audit Keamanan</h2>
+      <div class="chapter-tag">Audit Trail &amp; Keamanan Database</div>
+    </div>
+
+    <h3 class="sub-title">7.1 Log Aktivitas Sistem (Audit Trail)</h3>
+    <p>
+      Halaman <strong>Log Aktivitas</strong> (<code>/logs</code>) merekam setiap jejak digital tindakan operasional penting yang terjadi di dalam platform secara kronologis dan tidak dapat dimanipulasi (*tamper-proof*).
+    </p>
+    <p>
+      Informasi yang direkam mencakup:
+    </p>
+    <ul>
+      <li><strong>Aktor (Pengguna):</strong> Nama, username, dan alamat IP perangkat yang mengeksekusi tindakan.</li>
+      <li><strong>Tipe Tindakan:</strong> Aktivitas Login, Logout Gagal, Penambahan Data Baru (*Create*), Pengubahan Atribut (*Update*), Penghapusan Rekaman (*Delete*), Eksekusi Import/Export, serta Pemulihan Database.</li>
+      <li><strong>Modul Terkait:</strong> Bagian sistem yang mengalami perubahan (misal: <code>ASSETS</code>, <code>TICKETS</code>, <code>USERS</code>).</li>
+      <li><strong>Rincian Perubahan (Payload):</strong> Nilai data sebelum diubah (*before*) dan nilai data setelah diubah (*after*).</li>
+      <li><strong>Timestamp Presisi:</strong> Tanggal dan waktu detik terjadinya peristiwa.</li>
+    </ul>
+
+    <h3 class="sub-title">7.2 Pusat Ekspor Data Lanjutan (Advanced Export Hub)</h3>
+    <p>
+      Halaman <strong>Ekspor Data</strong> (<code>/export</code>) khusus disediakan bagi Superadmin untuk kebutuhan pembuatan laporan manajerial, audit eksternal, dan arsip data historis:
+    </p>
+    <ul>
+      <li><strong>Ekspor Cepat (Quick Export):</strong> Mengunduh seluruh isi tabel utama (Aset TI, Aset GA, Aset OPS, Karyawan, Tiket, Pengiriman) dalam 1 klik ke format Excel (XLSX).</li>
+      <li><strong>Ekspor Kustom (Custom Export):</strong> Superadmin dapat memilih tabel tertentu, mencentang kolom mana saja yang ingin disertakan, menentukan filter rentang tanggal (*Date From - Date To*), membatasi jumlah baris (50, 100, 500, 1000, atau Semua Baris), serta memilih format keluaran antara <strong>Excel (.xlsx)</strong>, <strong>CSV</strong>, <strong>JSON</strong>, atau <strong>PDF Laporan Resmi</strong>.</li>
+    </ul>
+
+    <h3 class="sub-title">7.3 Pusat Database &amp; Pemulihan Bencana (Disaster Recovery)</h3>
+    <p>
+      Halaman <strong>Database</strong> (<code>/database</code>) memberikan wewenang penuh kepada Superadmin untuk memantau integritas dan kesehatan penyimpanan PostgreSQL:
+    </p>
+    <table>
+      <thead>
+        <tr>
+          <th>Fitur Database</th>
+          <th>Fungsi Utama</th>
+          <th>Mekanisme Keamanan</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Status &amp; Health Check</strong></td>
+          <td>Memeriksa ketersediaan koneksi pool, validitas tabel, view skema, dan utilitas `pg_dump`/`pg_restore`.</td>
+          <td>Peringatan otomatis bila terdapat skema yang hilang (*missing schema*).</td>
+        </tr>
+        <tr>
+          <td><strong>Snapshot Backup</strong></td>
+          <td>Membuat salinan cadangan kompresi database lengkap (skema DDL dan baris data DML).</td>
+          <td>Backup disimpan di folder terisolasi dengan penamaan timestamp unik.</td>
+        </tr>
+        <tr>
+          <td><strong>Restore Wizard</strong></td>
+          <td>Memulihkan database dari file cadangan jika terjadi kegagalan sistem.</td>
+          <td>Validasi berkas sebelum eksekusi; membutuhkan konfirmasi teks ganda.</td>
+        </tr>
+        <tr>
+          <td><strong>Database Reset</strong></td>
+          <td>Mengosongkan seluruh data operasional untuk persiapan tahun buku baru atau staging test.</td>
+          <td>Wajib mengetik kata kunci <code>RESET</code>. Server akan menolak jika string tidak cocok.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 class="sub-title">7.4 Proteksi Keamanan Berlapis (Multi-Layer Security)</h3>
+    <p>
+      Aplikasi dilindungi oleh beberapa lapis pengamanan infrastruktur:
+    </p>
+    <ul>
+      <li><strong>Proteksi Brute Force &amp; Rate Limiter:</strong> Membatasi jumlah request per menit dari IP publik dan per akun login terautentikasi untuk mencegah serangan penolakan layanan (DoS) dan pembobolan sandi.</li>
+      <li><strong>Token JWT dengan Sesi Server-Side:</strong> Sesi pengguna disimpan dalam cookie HttpOnly yang aman dari pencurian script sisi klien (XSS) dan divalidasi keaktifannya di server.</li>
+      <li><strong>CORS &amp; Origin Whitelist:</strong> Permintaan API dari domain tidak dikenal akan langsung ditolak pada layer middleware Express.</li>
+    </ul>
+  </div>
+
+  <!-- ============================================================
+       BAB 8: PANDUAN PRAKTIS & SOP SEHARI-HARI
+       ============================================================ -->
+  <div class="page-section">
+    <div class="chapter-banner">
+      <h2>BAB 8: Panduan Praktis &amp; SOP Sehari-Hari</h2>
+      <div class="chapter-tag">Prosedur Operasional Standar</div>
+    </div>
+
+    <h3 class="sub-title">8.1 SOP untuk Pengguna Umum / Karyawan</h3>
+    <div class="grid-2">
+      <div class="grid-card">
+        <h5>Langkah Pelaporan Kendala Teknis:</h5>
+        <ol style="font-size: 8pt; margin-left: 16px;">
+          <li>Buka <code>/</code> (Help Center) dan coba cari solusi di kolom pencarian atau baca FAQ.</li>
+          <li>Jika butuh bantuan teknisi, klik tombol <strong>Ajukan Tiket</strong> atau masuk ke <code>/tickets</code>.</li>
+          <li>Isi judul masalah, pilih divisi antrean, tentukan prioritas, dan lampirkan foto kendala.</li>
+          <li>Pantau perkembangan tiket melalui balasan teknisi di kolom komentar tiket.</li>
+          <li>Setelah kendala tuntas (*Resolved*), beri nilai bintang kepuasan (CASP) dan ulasan.</li>
+        </ol>
+      </div>
+
+      <div class="grid-card">
+        <h5>Langkah Verifikasi Aset Kerja Pribadi:</h5>
+        <ol style="font-size: 8pt; margin-left: 16px;">
+          <li>Masuk ke menu <strong>Aset Karyawan</strong> (<code>/my-assets</code>).</li>
+          <li>Periksa apakah nomor seri dan tipe laptop/monitor yang Anda bawa sesuai dengan tabel.</li>
+          <li>Cek status serah terima dan tanggal penerimaan perangkat.</li>
+          <li>Jika ada unit yang belum terdaftar atau unit sudah dikembalikan, klik <em>Laporkan Ketidaksesuaian</em>.</li>
+        </ol>
+      </div>
+    </div>
+
+    <h3 class="sub-title">8.2 SOP untuk Teknisi &amp; Admin IT</h3>
+    <div class="grid-2">
+      <div class="grid-card">
+        <h5>Penanganan Antrean Tiket Masuk:</h5>
+        <ol style="font-size: 8pt; margin-left: 16px;">
+          <li>Buka menu <strong>Tiket</strong> (<code>/tickets</code>). Filter berdasarkan antrean tugas Anda.</li>
+          <li>Buka tiket berstatus <em>Open</em> yang memiliki SLA paling kritis (*Critical* &amp; *High* terlebih dahulu).</li>
+          <li>Ubah status menjadi <em>In Progress</em> dan berikan respon awal ke pelapor.</li>
+          <li>Gunakan fitur <em>Catatan Internal</em> untuk mencatat riwayat teknis dengan rekan teknisi.</li>
+          <li>Setelah perbaikan selesai, ubah status menjadi <em>Resolved</em>.</li>
+        </ol>
+      </div>
+
+      <div class="grid-card">
+        <h5>Pendaftaran &amp; Mutasi Aset IT Baru:</h5>
+        <ol style="font-size: 8pt; margin-left: 16px;">
+          <li>Buka menu <strong>Aset IT</strong> (<code>/assets</code>) &rarr; klik <strong>+ Tambah Aset</strong>.</li>
+          <li>Masukkan Hostname, Serial Number, Merk/Model, dan Spesifikasi Lengkap.</li>
+          <li>Pilih NIK Karyawan pemegang unit dan tentukan lokasi kantornya.</li>
+          <li>Klik tombol <strong>Label Aset</strong>, cetak stiker QR Code, dan tempelkan pada bodi laptop.</li>
+          <li>Jika ada perpindahan tangan, buka modal BAST di <code>/submissions</code> untuk cetak bukti serah terima.</li>
+        </ol>
+      </div>
+    </div>
+
+    <h3 class="sub-title">8.3 SOP untuk Logistik &amp; General Affairs</h3>
+    <ul>
+      <li><strong>Pembuatan BAST Serah Terima:</strong> Setiap kali ada penyerahan laptop baru atau penarikan perangkat lama karyawan yang keluar (*exit clearance*), wajib mengisi form BAST di <code>/submissions</code> dan mencetak dokumen fisik untuk ditandatangani basah.</li>
+      <li><strong>Pencatatan Pengiriman Ekspedisi:</strong> Saat mengirimkan perlengkapan resto atau laptop ke cabang, segera daftarkan paket di <code>/shipments</code>, masukkan nomor resi AWB, dan unggah foto resi ekspedisi. Saat paket telah tiba, ubah status menjadi <em>Diterima</em> dan unggah foto tanda terima (*Proof of Delivery*).</li>
+    </ul>
+
+    <h3 class="sub-title">8.4 SOP untuk Superadmin</h3>
+    <ul>
+      <li><strong>Backup Database Berkala:</strong> Lakukan pencadangan database di <code>/database</code> minimal sekali setiap minggu sebelum jam sibuk kantor, atau setiap kali sebelum melakukan migrasi data besar.</li>
+      <li><strong>Audit Log Rutin:</strong> Periksa log aktivitas di <code>/logs</code> untuk memantau percobaan login mencurigakan atau penghapusan data aset yang tidak sah.</li>
+      <li><strong>Manajemen Pengguna Baru &amp; Resign:</strong> Pastikan karyawan yang mengundurkan diri segera dinonaktifkan status akunnya di menu <code>/users</code> agar hak akses sistem langsung terputus.</li>
+    </ul>
+
+    <h3 class="sub-title">8.5 Tanya Jawab &amp; Pemecahan Masalah Umum (FAQ)</h3>
+    <div class="callout callout-info" style="margin-bottom: 8px;">
+      <div class="callout-icon">❓</div>
+      <div class="callout-content">
+        <strong>Mengapa status tiket saya berubah menjadi "Pending"?</strong><br>
+        Status <em>Pending</em> berarti teknisi sedang menunggu suku cadang pengganti dari vendor resmi, atau teknisi membutuhkan informasi tambahan dari Anda di kolom komentar tiket. Silakan cek pesan di tiket Anda.
+      </div>
+    </div>
+
+    <div class="callout callout-info" style="margin-bottom: 8px;">
+      <div class="callout-icon">❓</div>
+      <div class="callout-content">
+        <strong>Apa yang harus dilakukan jika gagal mengimpor file Excel ke database?</strong><br>
+        Pastikan nama sheet di dalam file Excel Anda sesuai persis dengan standar (misal: <code>Table Asset</code> untuk aset IT atau <code>Table Karyawan</code> untuk karyawan). Pastikan tidak ada kolom identitas kunci (NIK atau Hostname) yang kosong atau duplikat.
+      </div>
+    </div>
+
+    <div class="callout callout-info" style="margin-bottom: 8px;">
+      <div class="callout-icon">❓</div>
+      <div class="callout-content">
+        <strong>Bagaimana jika tombol Database / Ekspor tidak muncul di sidebar saya?</strong><br>
+        Menu <em>Database</em> dan <em>Ekspor</em> tingkat lanjut dirancang khusus hanya untuk peran <strong>Superadmin</strong>. Jika posisi pekerjaan Anda memerlukan akses tersebut, hubungi Superadmin IT untuk meningkatkan izin akun Anda di menu Pengguna.
+      </div>
+    </div>
+
+    <div style="margin-top: 30px; text-align: center; border-top: 1px solid #E2E8F0; padding-top: 16px; color: #94A3B8; font-size: 8pt;">
+      <p>Buku Panduan Penggunaan &amp; User Manual — ESB TrackIT Platform Enterprise</p>
+      <p>© 2026 PT Esensi Solusi Buana (ESB). Seluruh hak cipta dilindungi undang-undang.</p>
+    </div>
+  </div>
+
+</body>
+</html>

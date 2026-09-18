@@ -194,7 +194,7 @@ function clearFilters() {
   >
     <!-- Header Card -->
     <div
-      class="admin-page-header flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3.5 sm:gap-4 bg-white dark:bg-slate-900 border border-[#E5EAEF] dark:border-slate-800 p-4 sm:p-6 rounded-xl sm:rounded-2xl shadow-xs gsap-admin-el"
+      class="admin-page-header ws-toolbar-flat flex flex-col items-start sm:items-center justify-between gap-3.5 bg-white border border-[#E2E8F0]/80 p-3.5 sm:p-4.5 rounded-2xl shadow-2xs gsap-admin-el"
     >
       <div class="space-y-1 sm:space-y-1.5 w-full sm:w-auto">
         <!-- Breadcrumb -->
@@ -903,6 +903,7 @@ function clearFilters() {
 </style>
 
 <style scoped src="../../assets/admin-workspace.css"></style>
+<style scoped src="../../assets/ws-table.css"></style>
 
 <style scoped>
 .kb-management table td:first-child {

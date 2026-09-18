@@ -34,13 +34,7 @@ const isFullscreenEditor = computed(() => {
 
 const isHelpCenterView = computed(() => {
   const p = route.path
-  if (
-    p === '/' ||
-    p.startsWith('/cases') ||
-    p.startsWith('/templates') ||
-    p.startsWith('/analytics') ||
-    p === '/kb-analytics'
-  ) {
+  if (p === '/' || p.startsWith('/cases')) {
     return true
   }
   return false

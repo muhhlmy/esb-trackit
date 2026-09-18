@@ -7,6 +7,9 @@ import { useApi } from '@/composables/useApi'
 const props = defineProps({
   isOpen: Boolean,
   assetType: { type: String, required: true },
+  // Daftar karyawan existing (dari /api/karyawan?all=true) untuk validasi NIK & Nama Pemegang.
+  // Hanya dipakai modal Aset IT. Ops/GA tidak punya kolom NIK di template.
+  employees: { type: Array, default: () => [] },
 })
 const emit = defineEmits(['close', 'imported'])
 const { post } = useApi()
@@ -295,8 +298,74 @@ const fields = {
 
 const typeLabel = computed(() => props.assetType.toUpperCase())
 const sheetLabel = computed(() => `Data Aset ${typeLabel.value}`)
+
+// NIK & Nama Pemegang valid (terdaftar di Data Karyawan) → cell dikosongkan,
+// barisnya ditaruh paling atas pada Tabel Pratinjau agar mudah diperbaiki
+// sebelum import dikirim.
+function getRowValue(row, names) {
+  const key = Object.keys(row).find((k) => names.includes(k.trim().toLowerCase()))
+  return key ? String(row[key] ?? '').trim() : ''
+}
+
+function isPemegangMatched(row) {
+  if (props.assetType !== 'it') return true
+  const nik = getRowValue(row, ['nik pemegang', 'nik pemegang asset'])
+  const nama = getRowValue(row, ['nama karyawan pemegang', 'nama karyawan'])
+  if (!nik && !nama) return true // kosong = Stock, bukan mismatch
+  if (!validNikSet.value.has(nik)) return false
+  const found = props.employees.find((e) => String(e.nik ?? '').trim() === nik)
+  if (
+    nama &&
+    found &&
+    String(found.nama_karyawan ?? '')
+      .trim()
+      .toLowerCase() !== nama.toLowerCase()
+  ) {
+    return false
+  }
+  return true
+}
+
+// NIK yang dianggap valid: karyawan existing di DB, ditambah NIK dari Sheet
+// Table Karyawan saat import lengkap (mereka akan di-insert dalam transaksi
+// yang sama, jadi tidak boleh false-positive).
+const validNikSet = computed(() => {
+  const set = new Set(props.employees.map((e) => String(e.nik ?? '').trim()))
+  if (props.assetType === 'it' && includeEmployees.value) {
+    for (const row of employeeRows.value) {
+      const nik = getRowValue(row, ['nik'])
+      if (nik) set.add(nik)
+    }
+  }
+  return set
+})
+
+// Cell NIK & Nama Pemegang yang tidak terdaftar ditampilkan kosong (bukan '—')
+// sebagai penanda baris yang harus diperbaiki sebelum import.
+const PEMEGANG_HEADERS = [
+  'nik pemegang',
+  'nik pemegang asset',
+  'nama karyawan pemegang',
+  'nama karyawan',
+]
+
+const unmatchedPreviewCount = computed(() => {
+  if (props.assetType !== 'it' || !props.employees.length) return 0
+  return rows.value.filter((row) => !isPemegangMatched(row)).length
+})
+
 const previewColumns = computed(() => Object.keys(rows.value[0] || {}).slice(0, 6))
-const previewRows = computed(() => rows.value.slice(0, 5))
+const previewRows = computed(() => {
+  if (props.assetType !== 'it' || !props.employees.length) {
+    return rows.value.slice(0, 5).map((row) => ({ row, matched: true }))
+  }
+  return [
+    ...rows.value.filter((row) => !isPemegangMatched(row)),
+    ...rows.value.filter((row) => isPemegangMatched(row)),
+  ]
+    .slice(0, 5)
+    .map((row) => ({ row, matched: isPemegangMatched(row) }))
+})
 const requiredFields = computed(() => {
   if (props.assetType === 'it')
     return includeEmployees.value
@@ -668,6 +737,19 @@ watch(
             >{{ rows.length }} baris{{ rows.length > 5 ? ', tampil 5 pertama' : '' }}</span
           >
         </div>
+        <div
+          v-if="unmatchedPreviewCount > 0"
+          class="flex items-start gap-2 border-b border-amber-200 bg-amber-50 px-3 py-2 text-[11px] leading-relaxed text-amber-800"
+        >
+          <span aria-hidden="true" class="material-symbols-outlined mt-0.5 text-[15px]"
+            >warning</span
+          >
+          <p>
+            <b>{{ unmatchedPreviewCount }} baris</b> dengan NIK / Nama Karyawan Pemegang tidak
+            terdaftar di Data Karyawan ditaruh paling atas dan cell NIK/Nama dikosongkan. Perbaiki
+            isi Excel sebelum import, atau biarkan kosong untuk menyimpan sebagai Stock.
+          </p>
+        </div>
         <div class="overflow-x-auto">
           <table class="min-w-full text-left text-[11px]">
             <thead class="bg-white">
@@ -683,14 +765,22 @@ watch(
               </tr>
             </thead>
             <tbody class="divide-y divide-slate-100">
-              <tr v-for="(row, index) in previewRows" :key="index" class="hover:bg-slate-50">
+              <tr
+                v-for="(item, index) in previewRows"
+                :key="index"
+                class="hover:bg-slate-50"
+                :class="{ 'bg-amber-50/60': !item.matched }"
+              >
                 <td class="px-3 py-2 text-slate-400">{{ index + 1 }}</td>
                 <td
                   v-for="column in previewColumns"
                   :key="column"
                   class="max-w-40 truncate whitespace-nowrap px-3 py-2 text-slate-700"
                 >
-                  {{ row[column] || '—' }}
+                  <template
+                    v-if="!item.matched && PEMEGANG_HEADERS.includes(column.trim().toLowerCase())"
+                  ></template>
+                  <template v-else>{{ item.row[column] || '—' }}</template>
                 </td>
               </tr>
             </tbody>

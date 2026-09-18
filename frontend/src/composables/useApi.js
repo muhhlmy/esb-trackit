@@ -153,12 +153,14 @@ export function useApi() {
   // POST — Mengirim data baru ke API
   // Contoh: post('/api/assets', { label_aset: 'ESB-LAP-001' })
   // ----------------------------------------------------------
-  async function post(endpoint, data) {
+  async function post(endpoint, data, options = {}) {
     return request(endpoint, {
+      ...options,
       method: 'POST',
       headers: {
         // Beritahu server bahwa kita mengirim data dalam format JSON
         'Content-Type': 'application/json',
+        ...options.headers,
       },
       // JSON.stringify() mengubah object JavaScript → string JSON
       body: JSON.stringify(data),

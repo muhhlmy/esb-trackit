@@ -13,12 +13,15 @@ import StatCard from '../components/ui/StatCard.vue'
 import SkeletonTable from '../components/ui/skeleton/SkeletonTable.vue'
 import CustomSelect from '../components/ui/CustomSelect.vue'
 import SearchableSelect from '../components/ui/SearchableSelect.vue'
+import { useViewMode } from '../composables/useViewMode.js'
+import AppViewToggle from '../components/ui/AppViewToggle.vue'
 import FilterModal from '../components/ui/FilterModal.vue'
 import { exportToExcel } from '../utils/exportEngine.js'
 
 const { get, post, put, del } = useApi()
 const { hasWritePermission } = useAuth()
 const canWriteKaryawan = computed(() => hasWritePermission('karyawan'))
+const { viewMode } = useViewMode('karyawan', 'table')
 
 // ── State Utama ──────────────────────────────────────────────
 const employees = ref([])
@@ -221,6 +224,13 @@ function toast(msg, type = 'success') {
   setTimeout(() => {
     notification.value = null
   }, 3500)
+}
+
+function resetFilters() {
+  searchQuery.value = ''
+  filterDepartemen.value = ''
+  filterLokasi.value = ''
+  filterStatus.value = ''
 }
 
 // ── Methods ──────────────────────────────────────────────────
@@ -460,84 +470,90 @@ onMounted(() => {
       </div>
     </Transition>
 
-    <!-- Modern SaaS Header & Control Bar Container -->
-    <div
-      class="admin-page-header flex min-w-0 flex-col gap-4 bg-white p-3.5 sm:p-5 rounded-2xl border border-[#E2E8F0] shadow-2xs"
-    >
-      <!-- Row 1: Page Title & Primary/Secondary Action Bar -->
-      <div class="flex flex-col items-stretch justify-between gap-3 lg:flex-row lg:items-center">
-        <div>
-          <h2 class="text-xl font-bold text-[#333333] tracking-tight">Data Karyawan</h2>
-          <p class="text-[13px] text-[#5F7089] mt-0.5 leading-normal">
-            Pengelolaan dan integrasi data karyawan perusahaan
-          </p>
-        </div>
+    <!-- Modern SaaS Header & Control Bar Container (sticky mengikuti scroll) -->
+    <div class="ws-toolbar-sticky">
+      <div
+        class="admin-page-header flex min-w-0 flex-col gap-4 bg-white p-3.5 sm:p-4.5 rounded-2xl border border-[#E2E8F0]/80 shadow-2xs"
+      >
+        <!-- Row 1: Page Title & Primary/Secondary Action Bar -->
+        <div class="flex flex-col items-stretch justify-between gap-3 lg:flex-row lg:items-center">
+          <div>
+            <h2 class="text-xl font-bold text-[#333333] tracking-tight">Data Karyawan</h2>
+            <p class="text-[13px] text-[#5F7089] mt-0.5 leading-normal">
+              Pengelolaan dan integrasi data karyawan perusahaan
+            </p>
+          </div>
 
-        <div class="flex shrink-0 items-center gap-2">
-          <button
-            v-if="canWriteKaryawan"
-            type="button"
-            @click="openAdd"
-            class="toolbar-primary-action h-9 shrink-0 whitespace-nowrap rounded-lg bg-[#0A51B0] px-3 sm:px-3.5 text-xs font-semibold text-white shadow-2xs hover:bg-[#0A4391] transition-all flex items-center justify-center gap-1.5 cursor-pointer"
-            title="Tambah karyawan baru"
-          >
-            <span aria-hidden="true" class="material-symbols-outlined text-[16px]">person_add</span>
-            <span>Tambah Karyawan</span>
-          </button>
-          <div
-            class="toolbar-action-group flex items-center gap-1 rounded-lg border border-[#D7E3F2] bg-[#F8FAFC] p-1"
-          >
+          <div class="flex shrink-0 items-center gap-2">
             <button
               v-if="canWriteKaryawan"
               type="button"
-              @click="showImportModal = true"
-              class="toolbar-action-button inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-[11px] font-bold text-[#0A51B0] hover:bg-white"
-              title="Import data karyawan dari Excel"
+              @click="openAdd"
+              class="toolbar-primary-action h-9 shrink-0 whitespace-nowrap rounded-lg bg-[#0A51B0] px-3 sm:px-3.5 text-xs font-semibold text-white shadow-2xs hover:bg-[#0A4391] transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+              title="Tambah karyawan baru"
             >
-              <span aria-hidden="true" class="material-symbols-outlined text-[15px]"
-                >upload_file</span
-              >Import
+              <span aria-hidden="true" class="material-symbols-outlined text-[16px]"
+                >person_add</span
+              >
+              <span>Tambah Karyawan</span>
             </button>
-            <button
-              type="button"
-              @click="exportEmployees"
-              class="toolbar-action-button inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-[11px] font-bold text-[#0A51B0] hover:bg-white"
-              title="Export data karyawan"
+            <div
+              class="toolbar-action-group flex items-center gap-1 rounded-lg border border-[#D7E3F2] bg-[#F8FAFC] p-1"
             >
-              <span aria-hidden="true" class="material-symbols-outlined text-[15px]">download</span
-              >Export
-            </button>
+              <button
+                v-if="canWriteKaryawan"
+                type="button"
+                @click="showImportModal = true"
+                class="toolbar-action-button inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-[11px] font-bold text-[#0A51B0] hover:bg-white"
+                title="Import data karyawan dari Excel"
+              >
+                <span aria-hidden="true" class="material-symbols-outlined text-[15px]"
+                  >upload_file</span
+                >Import
+              </button>
+              <button
+                type="button"
+                @click="exportEmployees"
+                class="toolbar-action-button inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-[11px] font-bold text-[#0A51B0] hover:bg-white"
+                title="Export data karyawan"
+              >
+                <span aria-hidden="true" class="material-symbols-outlined text-[15px]"
+                  >download</span
+                >Export
+              </button>
+            </div>
           </div>
         </div>
-      </div>
 
-      <!-- Row 2: Search Input & Filters Control Bar -->
-      <div
-        class="employee-filters grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2.5 w-full min-w-0 pt-3 border-t border-[#F1F5F9]"
-      >
-        <div class="relative h-9 min-w-0">
-          <span
-            aria-hidden="true"
-            class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[18px] text-[#687281] pointer-events-none"
-            >search</span
-          >
-          <input
-            v-model="searchQuery"
-            aria-label="Cari karyawan"
-            type="text"
-            placeholder="Cari NIK, nama, email, jabatan, atau departemen..."
-            class="toolbar-search-input h-full min-h-0 w-full rounded-xl border border-[#E2E8F0] bg-white pl-9.5 pr-3 text-base sm:text-xs text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
-          />
-        </div>
-        <button
-          type="button"
-          @click="showFilterModal = true"
-          class="toolbar-filter-button h-9 shrink-0 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-semibold text-[#5F7089] hover:bg-white"
+        <!-- Row 2: Search Input & Filters Control Bar -->
+        <div
+          class="employee-filters grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2.5 w-full min-w-0 pt-3 border-t border-[#F1F5F9]"
         >
-          <span aria-hidden="true" class="material-symbols-outlined mr-1 align-middle text-[16px]"
-            >filter_alt</span
-          >Filter
-        </button>
+          <div class="relative h-9 min-w-0">
+            <span
+              aria-hidden="true"
+              class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[18px] text-[#687281] pointer-events-none"
+              >search</span
+            >
+            <input
+              v-model="searchQuery"
+              aria-label="Cari karyawan"
+              type="text"
+              placeholder="Cari NIK, nama, atau jabatan..."
+              class="toolbar-search-input h-full min-h-0 w-full rounded-xl border border-[#E2E8F0] bg-white pl-9.5 pr-3 text-base sm:text-xs text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
+            />
+          </div>
+          <button
+            type="button"
+            @click="showFilterModal = true"
+            class="toolbar-filter-button h-9 shrink-0 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-semibold text-[#5F7089] hover:bg-white"
+          >
+            <span aria-hidden="true" class="material-symbols-outlined mr-1 align-middle text-[16px]"
+              >filter_alt</span
+            >Filter
+          </button>
+          <AppViewToggle v-model="viewMode" />
+        </div>
       </div>
     </div>
 
@@ -642,7 +658,11 @@ onMounted(() => {
       </div>
 
       <div v-else class="w-full max-w-full overflow-hidden">
-        <ul class="admin-person-cards xl:hidden" aria-label="Daftar karyawan">
+        <ul
+          v-if="viewMode === 'card'"
+          class="admin-person-cards"
+          aria-label="Daftar karyawan"
+        >
           <li
             v-for="emp in paginatedEmployees"
             :key="emp.id_karyawan || emp.nik"
@@ -713,7 +733,10 @@ onMounted(() => {
             </div>
           </li>
         </ul>
-        <table class="hidden xl:table w-full max-w-full text-left border-collapse table-fixed">
+        <table
+          v-if="viewMode === 'table'"
+          class="hidden w-full max-w-full text-left border-collapse table-fixed xl:table"
+        >
           <colgroup>
             <col :class="canWriteKaryawan ? 'w-[22%]' : 'w-[24%]'" />
             <col :class="canWriteKaryawan ? 'w-[11%]' : 'w-[12%]'" />
@@ -724,7 +747,7 @@ onMounted(() => {
             <col v-if="canWriteKaryawan" class="w-[6%]" />
           </colgroup>
           <thead
-            class="sticky top-0 z-10 border-b border-[#E2E8F0]/80 bg-[#F8FAFC]/80 backdrop-blur-xs select-none whitespace-nowrap"
+            class="sticky top-0 z-10 border-b border-[#E2E8F0] bg-[#F8FAFC] select-none whitespace-nowrap"
           >
             <tr>
               <th
@@ -765,7 +788,7 @@ onMounted(() => {
               </th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-[#F1F5F9]">
+          <tbody class="relative z-0 isolate divide-y divide-[#F1F5F9]">
             <tr
               v-for="emp in paginatedEmployees"
               :key="emp.id_karyawan || emp.nik"
@@ -890,7 +913,7 @@ onMounted(() => {
               v-model="form.nik"
               type="text"
               required
-              placeholder="Contoh: 2026001"
+              placeholder="cth: 2026001"
               class="min-w-0 min-h-11 sm:min-h-0 w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-base sm:text-[13px] text-[#2A3547] focus:outline-none focus:border-[#0A51B0]"
             />
           </div>
@@ -940,7 +963,7 @@ onMounted(() => {
               v-model="form.lokasi_kerja"
               type="text"
               required
-              placeholder="Contoh: JKT, Solo, BSD"
+              placeholder="cth: JKT, SLO, GS"
               class="min-w-0 min-h-11 sm:min-h-0 w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-base sm:text-[13px] text-[#2A3547] focus:outline-none focus:border-[#0A51B0]"
             />
           </div>
@@ -958,7 +981,7 @@ onMounted(() => {
               v-model="form.jabatan"
               type="text"
               required
-              placeholder="Contoh: Software Engineer"
+              placeholder="cth: Software Engineer"
               class="min-w-0 min-h-11 sm:min-h-0 w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-base sm:text-[13px] text-[#2A3547] focus:outline-none focus:border-[#0A51B0]"
             />
           </div>
@@ -991,7 +1014,7 @@ onMounted(() => {
               v-model="form.departemen"
               type="text"
               required
-              placeholder="Contoh: Technology"
+              placeholder="cth: Technology"
               class="min-w-0 min-h-11 sm:min-h-0 w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-base sm:text-[13px] text-[#2A3547] focus:outline-none focus:border-[#0A51B0]"
             />
           </div>
@@ -1007,7 +1030,7 @@ onMounted(() => {
               v-model="form.direktorat"
               type="text"
               required
-              placeholder="Contoh: Technology"
+              placeholder="cth: Technology"
               class="min-w-0 min-h-11 sm:min-h-0 w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-base sm:text-[13px] text-[#2A3547] focus:outline-none focus:border-[#0A51B0]"
             />
           </div>
@@ -1226,3 +1249,4 @@ onMounted(() => {
 </style>
 
 <style scoped src="../assets/admin-workspace.css"></style>
+<style scoped src="../assets/ws-table.css"></style>

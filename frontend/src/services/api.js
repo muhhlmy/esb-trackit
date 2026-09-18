@@ -8,8 +8,8 @@
 //   - penanganan 401 global (auto-logout + redirect /login)
 //   - pesan error terstruktur dari backend
 //
-// Konsumen lama (useCases, useKbCategories, useBookmarks, AnalyticsView,
-// TemplatesView, HomeView) tetap memakai API permukaan yang sama
+// Konsumen lama (useCases, useKbCategories, useBookmarks, HomeView) tetap
+// memakai API permukaan yang sama
 // (api.getCases, api.createCase, ...), sehingga tidak ada perubahan
 // perilaku.
 // ============================================================

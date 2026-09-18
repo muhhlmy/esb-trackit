@@ -15,6 +15,14 @@ export function requireJsonRequest(req, res, next) {
 
   const contentType = req.headers['content-type']
   if (typeof contentType !== 'string') {
+    // A request without a Content-Type and without a body has nothing to parse
+    // (e.g. POST /claim, POST /reassign take no payload) — do not reject it.
+    const contentLength = req.headers['content-length']
+    const hasBody = contentLength !== undefined && contentLength !== '0'
+    if (!hasBody) {
+      next()
+      return
+    }
     res.status(415).json({ message: 'Request body wajib menggunakan application/json.' })
     return
   }

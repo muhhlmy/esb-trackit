@@ -36,6 +36,9 @@ export default defineConfig({
     screenshot: "only-on-failure",
     video: "retain-on-failure",
   },
+  // Login (bcrypt + DB) bisa >5s saat banyak worker paralel; assertion
+  // bawaan 5s terlalu ketat untuk suite penuh di mesin berbagi sumber daya.
+  expect: { timeout: 10000 },
   projects: [
     {
       name: "chromium",
@@ -55,6 +58,10 @@ export default defineConfig({
         HOST: new URL(API_URL).hostname,
         PORT: new URL(API_URL).port || "3000",
         CORS_ORIGINS: FRONTEND_URL,
+        // Worker paralel berbagi satu IP (127.0.0.1): limit default 20 auth/menit
+        // memicu 429 pada login fresh. Naikkan hanya di environment E2E.
+        AUTH_RATE_LIMIT_MAX: "200",
+        API_RATE_LIMIT_MAX: "2000",
       },
       url: `${API_URL}/api/assets`,
       reuseExistingServer: false,

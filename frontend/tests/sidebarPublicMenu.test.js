@@ -12,8 +12,6 @@ describe('Sidebar Public Menu Tests', () => {
     // Public items should exist in menu definitions
     assert.match(source, /to:\s*'\/',[\s\S]*?label:\s*'Help Center',[\s\S]*?permission:\s*null/)
     assert.match(source, /to:\s*'\/cases',[\s\S]*?label:\s*'Cases & Artikel',[\s\S]*?permission:\s*null/)
-    assert.match(source, /to:\s*'\/templates',[\s\S]*?label:\s*'Templates Hub',[\s\S]*?permission:\s*null/)
-    assert.match(source, /to:\s*'\/analytics',[\s\S]*?label:\s*'KB Analytics',[\s\S]*?permission:\s*null/)
   })
 
   test('AppSidebar includes public items in menu filtering (does not drop !item.permission)', async () => {

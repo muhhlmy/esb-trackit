@@ -53,24 +53,6 @@ const routes = [
     component: () => import('../views/CasesView.vue'),
     meta: { title: 'Detail Artikel', subtitle: 'Detail Artikel Panduan Insiden', public: true },
   },
-  {
-    path: '/templates',
-    name: 'templates',
-    component: () => import('../views/TemplatesView.vue'),
-    meta: { title: 'Templates Hub', subtitle: 'Template Respon & Komunikasi', public: true },
-  },
-  {
-    path: '/kb-analytics',
-    alias: '/analytics',
-    name: 'kb-analytics',
-    component: () => import('../views/AnalyticsView.vue'),
-    meta: {
-      title: 'Help Center Analytics',
-      subtitle: 'Metrik & Tren Pencarian Artikel',
-      public: true,
-    },
-  },
-
   // Auth Route
   {
     path: '/login',

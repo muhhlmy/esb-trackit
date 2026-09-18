@@ -53,8 +53,23 @@ let expiryInterval = null
 
 const otpInputRefs = ref([])
 
+/**
+ * Fokus ke kolom email setelah aplikasi benar-benar terlihat.
+ * Saat mount awal, #app masih memegang atribut v-cloak (display:none via CSS),
+ * sehingga focus() yang dipanggil terlalu dini ditolak browser dan fokus
+ * tetap di <body>. Tunggu v-cloak lepas (maks. ~20 frame) sebelum memfokuskan.
+ */
+function focusEmailWhenVisible(attempt = 0) {
+  const app = document.getElementById('app')
+  if (app?.hasAttribute('v-cloak') && attempt < 20) {
+    requestAnimationFrame(() => focusEmailWhenVisible(attempt + 1))
+    return
+  }
+  emailInput.value?.focus()
+}
+
 onMounted(() => {
-  if (window.matchMedia('(min-width: 768px) and (pointer: fine)').matches) emailInput.value?.focus()
+  if (window.matchMedia('(min-width: 768px) and (pointer: fine)').matches) focusEmailWhenVisible()
 })
 onUnmounted(() => {
   clearInterval(resendInterval)

@@ -3,6 +3,8 @@ import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { api } from '../services/api.js'
 import { useAuth } from '../composables/useAuth.js'
 import { animateStagger } from '../composables/useGsap.js'
+import { useViewMode } from '../composables/useViewMode.js'
+import AppViewToggle from '../components/ui/AppViewToggle.vue'
 import AppModal from '../components/ui/AppModal.vue'
 import AppBadge from '../components/ui/AppBadge.vue'
 import AppPagination from '../components/ui/AppPagination.vue'
@@ -24,6 +26,7 @@ import {
 
 const { isSuperAdmin, hasWritePermission } = useAuth()
 const canWriteShipments = computed(() => isSuperAdmin.value || hasWritePermission('shipments'))
+const { viewMode } = useViewMode('shipments', 'table')
 
 // ── State Utama ──────────────────────────────────────────────
 const shipments = ref([])
@@ -355,79 +358,83 @@ onMounted(() => {
       </div>
     </Transition>
 
-    <!-- Top Card: Header & Search/Filters Bar -->
-    <div
-      class="shipment-toolbar rounded-2xl border border-[#E2E8F0] bg-white p-4 sm:p-5 shadow-2xs space-y-4"
-    >
-      <!-- Row 1: Title and Actions -->
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div>
-          <h1 class="text-lg sm:text-xl font-bold text-[#333333] tracking-tight">Pengiriman</h1>
-          <p class="text-[13px] text-[#5F7089] mt-0.5 leading-normal">
-            Pantau proses pengiriman barang dan aset kantor.
-          </p>
-        </div>
+    <!-- Top Card: Header & Search/Filters Bar (sticky mengikuti scroll) -->
+    <div class="ws-toolbar-sticky">
+      <div
+        class="shipment-toolbar rounded-2xl border border-[#E2E8F0] bg-white p-4 sm:p-5 shadow-2xs space-y-4"
+      >
+        <!-- Row 1: Title and Actions -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <h1 class="text-lg sm:text-xl font-bold text-[#333333] tracking-tight">Pengiriman</h1>
+            <p class="text-[13px] text-[#5F7089] mt-0.5 leading-normal">
+              Pantau proses pengiriman barang dan aset kantor.
+            </p>
+          </div>
 
-        <div v-if="canWriteShipments" class="flex items-center gap-2">
-          <button
-            type="button"
-            @click="openAdd"
-            class="toolbar-primary-action inline-flex h-9 shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg bg-[#0A51B0] px-3 text-xs font-semibold text-white shadow-2xs transition-all hover:bg-[#0A4391] active:scale-95 sm:px-3.5"
-            title="Tambah pengiriman baru"
-          >
-            <span aria-hidden="true" class="material-symbols-outlined text-[16px]">add</span>
-            <span>Tambah Pengiriman</span>
-          </button>
-          <div
-            class="toolbar-action-group flex items-center gap-1 rounded-lg border border-[#D7E3F2] bg-[#F8FAFC] p-1"
-          >
+          <div v-if="canWriteShipments" class="flex items-center gap-2">
             <button
               type="button"
-              @click="showImportModal = true"
-              class="toolbar-action-button inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-[11px] font-bold text-[#0A51B0] hover:bg-white"
+              @click="openAdd"
+              class="toolbar-primary-action inline-flex h-9 shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg bg-[#0A51B0] px-3 text-xs font-semibold text-white shadow-2xs transition-all hover:bg-[#0A4391] active:scale-95 sm:px-3.5"
+              title="Tambah pengiriman baru"
             >
-              <span aria-hidden="true" class="material-symbols-outlined text-[15px]"
-                >upload_file</span
-              >Import
+              <span aria-hidden="true" class="material-symbols-outlined text-[16px]">add</span>
+              <span>Tambah Pengiriman</span>
             </button>
-            <button
-              type="button"
-              @click="showExportModal = true"
-              class="toolbar-action-button inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-[11px] font-bold text-[#0A51B0] hover:bg-white"
+            <div
+              class="toolbar-action-group flex items-center gap-1 rounded-lg border border-[#D7E3F2] bg-[#F8FAFC] p-1"
             >
-              <span aria-hidden="true" class="material-symbols-outlined text-[15px]">download</span
-              >Export
-            </button>
+              <button
+                type="button"
+                @click="showImportModal = true"
+                class="toolbar-action-button inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-[11px] font-bold text-[#0A51B0] hover:bg-white"
+              >
+                <span aria-hidden="true" class="material-symbols-outlined text-[15px]"
+                  >upload_file</span
+                >Import
+              </button>
+              <button
+                type="button"
+                @click="showExportModal = true"
+                class="toolbar-action-button inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-[11px] font-bold text-[#0A51B0] hover:bg-white"
+              >
+                <span aria-hidden="true" class="material-symbols-outlined text-[15px]"
+                  >download</span
+                >Export
+              </button>
+            </div>
           </div>
         </div>
-      </div>
 
-      <!-- Row 2: Search Input & Filters Control Bar -->
-      <div
-        class="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2.5 w-full min-w-0 pt-3 border-t border-[#F1F5F9]"
-      >
-        <div class="relative h-9 min-w-0">
-          <Search
-            class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#687281] pointer-events-none"
-          />
-          <input
-            v-model="searchQuery"
-            aria-label="Cari pengiriman"
-            type="text"
-            placeholder="Cari penerima, barang, tujuan, atau no resi..."
-            class="toolbar-search-input h-full min-h-0 w-full rounded-xl border border-[#E2E8F0] bg-white pl-9 pr-3 text-xs text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
-          />
-        </div>
-
-        <button
-          type="button"
-          @click="showFilterModal = true"
-          class="toolbar-filter-button h-9 shrink-0 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-semibold text-[#5F7089] hover:bg-white"
+        <!-- Row 2: Search Input & Filters Control Bar -->
+        <div
+          class="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2.5 w-full min-w-0 pt-3 border-t border-[#F1F5F9]"
         >
-          <span aria-hidden="true" class="material-symbols-outlined mr-1 align-middle text-[16px]"
-            >filter_alt</span
-          >Filter
-        </button>
+          <div class="relative h-9 min-w-0">
+            <Search
+              class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#687281] pointer-events-none"
+            />
+            <input
+              v-model="searchQuery"
+              aria-label="Cari pengiriman"
+              type="text"
+              placeholder="Cari penerima, barang, tujuan, atau no resi..."
+              class="toolbar-search-input h-full min-h-0 w-full rounded-xl border border-[#E2E8F0] bg-white pl-9 pr-3 text-xs text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
+            />
+          </div>
+
+          <button
+            type="button"
+            @click="showFilterModal = true"
+            class="toolbar-filter-button h-9 shrink-0 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-semibold text-[#5F7089] hover:bg-white"
+          >
+            <span aria-hidden="true" class="material-symbols-outlined mr-1 align-middle text-[16px]"
+              >filter_alt</span
+            >Filter
+          </button>
+          <AppViewToggle v-model="viewMode" />
+        </div>
       </div>
     </div>
 
@@ -551,7 +558,7 @@ onMounted(() => {
 
       <div v-else class="w-full max-w-full overflow-hidden">
         <!-- Desktop Table (>= lg) -->
-        <div class="shipment-table hidden xl:block overflow-x-auto">
+        <div v-if="viewMode === 'table'" class="shipment-table hidden xl:block overflow-x-auto">
           <table class="w-full text-left border-collapse">
             <thead>
               <tr
@@ -639,8 +646,12 @@ onMounted(() => {
           </table>
         </div>
 
-        <!-- Mobile Card List (< lg) -->
-        <ul class="shipment-cards xl:hidden" aria-label="Daftar pengiriman">
+        <!-- Mobile Card List (< xl, atau saat mode Kartu dipilih) -->
+        <ul
+          class="shipment-cards"
+          :class="viewMode === 'card' ? '' : 'xl:hidden'"
+          aria-label="Daftar pengiriman"
+        >
           <li
             v-for="item in shipments"
             :key="item.id"
@@ -790,7 +801,7 @@ onMounted(() => {
               type="text"
               required
               maxlength="150"
-              placeholder="Contoh: Budi Santoso"
+              placeholder="Nama penerima"
               class="h-10 w-full rounded-xl border border-[#CBD5E1] px-3 text-xs text-[#333333] focus:border-[#0A51B0] focus:outline-none"
             />
           </div>
@@ -808,7 +819,7 @@ onMounted(() => {
               rows="3"
               required
               maxlength="5000"
-              placeholder="Contoh: 1 Unit Laptop ThinkPad X1 Carbon + Charger & Mouse"
+              placeholder="Rincian barang yang dikirim"
               class="w-full rounded-xl border border-[#CBD5E1] p-3 text-xs text-[#333333] focus:border-[#0A51B0] focus:outline-none"
             ></textarea>
           </div>
@@ -823,7 +834,7 @@ onMounted(() => {
               type="text"
               required
               maxlength="255"
-              placeholder="Contoh: Kantor Cabang Surabaya / Alamat Penerima"
+              placeholder="Kantor cabang, alamat, atau lokasi tujuan"
               class="h-10 w-full rounded-xl border border-[#CBD5E1] px-3 text-xs text-[#333333] focus:border-[#0A51B0] focus:outline-none"
             />
           </div>
@@ -846,7 +857,7 @@ onMounted(() => {
                 v-model="form.tracking_number"
                 type="text"
                 maxlength="100"
-                placeholder="Contoh: JNE-01234567"
+                placeholder="Nomor resi ekspedisi"
                 class="h-10 w-full rounded-xl border border-[#CBD5E1] px-3 text-xs text-[#333333] focus:border-[#0A51B0] focus:outline-none"
               />
             </div>
@@ -1203,11 +1214,6 @@ onMounted(() => {
 @media (min-width: 768px) and (max-width: 1279px) {
   .shipment-cards {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-@media (min-width: 1280px) {
-  .shipment-cards {
-    display: none;
   }
 }
 @media (max-width: 639px) {

@@ -34,6 +34,7 @@ const props = defineProps({
   data: { type: Array, default: () => [] },
   loading: { type: Boolean, default: false },
   error: { type: String, default: '' },
+  height: { type: Number, default: 260 },
 })
 
 const { chartColors } = useChartTheme()
@@ -110,6 +111,7 @@ const chartOptions = computed(() => ({
     :loading="loading"
     :empty="isEmpty"
     :error="error"
+    :height="height"
   >
     <div class="h-full w-full">
       <Line

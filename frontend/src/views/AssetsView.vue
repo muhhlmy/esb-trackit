@@ -8,6 +8,8 @@ import { exportToExcelWorkbook } from '../utils/exportEngine.js'
 import { downloadAssetsPdf } from '../utils/exportAssetsPdf.js'
 import { ASSET_STATUSES, formatStatusPill, getAssetStatusLabel } from '../utils/assetStatus.js'
 import { normalizeLocation } from '../utils/locationNormalizer.js'
+import { useViewMode } from '../composables/useViewMode.js'
+import AppViewToggle from '../components/ui/AppViewToggle.vue'
 import AppModal from '../components/ui/AppModal.vue'
 import AppBadge from '../components/ui/AppBadge.vue'
 import SearchableSelect from '../components/ui/SearchableSelect.vue'
@@ -26,6 +28,7 @@ const { isAdmin, isSuperAdmin, hasWritePermission } = useAuth()
 const route = useRoute()
 const router = useRouter()
 const canWriteAssets = computed(() => hasWritePermission('assets'))
+const { viewMode } = useViewMode('assets-it', 'table')
 
 const assets = ref([])
 const employees = ref([])
@@ -818,123 +821,132 @@ onMounted(async () => {
     class="asset-workspace asset-inventory asset-it-inventory space-y-4"
     :data-testid="!isLoading ? 'page-ready' : undefined"
   >
+    <!-- Toolbar + heading sticky mengikuti scroll (app-main adalah scroll container) -->
     <!-- Simplified SaaS Header & Toolbar Container -->
-    <div
-      class="asset-toolbar flex flex-col gap-3 sm:gap-3.5 bg-white p-3.5 sm:p-4.5 rounded-2xl border border-[#E2E8F0]/80 shadow-2xs"
-    >
-      <!-- Row 1: Page Title & Primary CTA -->
-      <div class="flex items-center justify-between gap-2.5">
-        <div class="min-w-0">
-          <h2 class="text-base sm:text-lg font-bold text-[#333333] tracking-tight truncate">
-            Aset IT
-          </h2>
-          <p
-            class="text-[11px] sm:text-xs text-[#5F7089] mt-0.5 leading-normal line-clamp-1 sm:line-clamp-none"
-          >
-            Monitor dan kelola seluruh perangkat IT perusahaan
-          </p>
-        </div>
+    <div class="asset-toolbar-sticky">
+      <div
+        class="asset-toolbar flex flex-col gap-3 sm:gap-3.5 bg-white p-3.5 sm:p-4.5 rounded-2xl border border-[#E2E8F0]/80 shadow-2xs"
+      >
+        <!-- Row 1: Page Title & Primary CTA -->
+        <div class="flex items-center justify-between gap-2.5">
+          <div class="min-w-0">
+            <h2 class="text-base sm:text-lg font-bold text-[#333333] tracking-tight truncate">
+              Aset IT
+            </h2>
+            <p
+              class="text-[11px] sm:text-xs text-[#5F7089] mt-0.5 leading-normal line-clamp-1 sm:line-clamp-none"
+            >
+              Monitor dan kelola seluruh perangkat IT perusahaan
+            </p>
+          </div>
 
-        <!-- Primary Action CTA -->
-        <div class="flex shrink-0 items-center gap-2">
-          <button
-            v-if="canWriteAssets"
-            type="button"
-            @click="openAdd"
-            class="toolbar-primary-action inline-flex h-9 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg bg-[#0A51B0] px-3 sm:px-3.5 text-xs font-semibold text-white shadow-2xs transition-all hover:bg-[#0A4391] active:scale-95"
-            title="Tambah aset baru"
-          >
-            <span aria-hidden="true" class="material-symbols-outlined text-[16px]">add</span>
-            <span>Tambah Aset</span>
-          </button>
-          <div
-            class="toolbar-action-group flex items-center gap-1 rounded-lg border border-[#D7E3F2] bg-[#F8FAFC] p-1"
-          >
+          <!-- Primary Action CTA -->
+          <div class="flex shrink-0 items-center gap-2">
             <button
               v-if="canWriteAssets"
               type="button"
-              @click="showImportModal = true"
-              class="toolbar-action-button inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-[11px] font-bold text-[#0A51B0] hover:bg-white"
+              @click="openAdd"
+              class="toolbar-primary-action inline-flex h-9 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg bg-[#0A51B0] px-3 sm:px-3.5 text-xs font-semibold text-white shadow-2xs transition-all hover:bg-[#0A4391] active:scale-95"
+              title="Tambah aset baru"
             >
-              <span aria-hidden="true" class="material-symbols-outlined text-[15px]"
-                >upload_file</span
-              >Import
+              <span aria-hidden="true" class="material-symbols-outlined text-[16px]">add</span>
+              <span>Tambah Aset</span>
             </button>
-            <button
-              type="button"
-              @click="openExport"
-              class="toolbar-action-button inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-[11px] font-bold text-[#0A51B0] hover:bg-white"
+            <div
+              class="toolbar-action-group flex items-center gap-1 rounded-lg border border-[#D7E3F2] bg-[#F8FAFC] p-1"
             >
-              <span aria-hidden="true" class="material-symbols-outlined text-[15px]">download</span
-              >Export
-            </button>
+              <button
+                v-if="canWriteAssets"
+                type="button"
+                @click="showImportModal = true"
+                class="toolbar-action-button inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-[11px] font-bold text-[#0A51B0] hover:bg-white"
+              >
+                <span aria-hidden="true" class="material-symbols-outlined text-[15px]"
+                  >upload_file</span
+                >Import
+              </button>
+              <button
+                type="button"
+                @click="openExport"
+                class="toolbar-action-button inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-[11px] font-bold text-[#0A51B0] hover:bg-white"
+              >
+                <span aria-hidden="true" class="material-symbols-outlined text-[15px]"
+                  >download</span
+                >Export
+              </button>
+            </div>
           </div>
         </div>
-      </div>
 
-      <!-- Row 2: Search, Filters & Actions -->
-      <div
-        class="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 w-full min-w-0 pt-2.5 border-t border-[#F1F5F9]"
-      >
-        <!-- Search Input -->
-        <div class="relative h-9 w-full sm:flex-1 sm:min-w-[200px]">
-          <span
-            aria-hidden="true"
-            class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-[17px] text-[#687281] pointer-events-none"
-            >search</span
-          >
-          <input
-            v-model="searchQuery"
-            type="text"
-            aria-label="Cari aset, serial number, atau pemegang"
-            placeholder="Cari aset, serial number, atau pemegang..."
-            class="h-full w-full rounded-lg border border-[#E2E8F0] bg-white pl-8 pr-8 text-xs text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
-          />
-          <!-- Inline Clear Button -->
+        <!-- Row 2: Search, Filters & Actions -->
+        <div
+          class="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 w-full min-w-0 pt-2.5 border-t border-[#F1F5F9]"
+        >
+          <!-- Search Input -->
+          <div class="relative h-9 w-full sm:flex-1 sm:min-w-[200px]">
+            <span
+              aria-hidden="true"
+              class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-[17px] text-[#687281] pointer-events-none"
+              >search</span
+            >
+            <input
+              v-model="searchQuery"
+              type="text"
+              aria-label="Cari aset, serial number, atau pemegang"
+              placeholder="Cari aset, serial number, atau pemegang..."
+              class="h-full w-full rounded-lg border border-[#E2E8F0] bg-white pl-8 pr-8 text-xs text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
+            />
+            <!-- Inline Clear Button -->
+            <button
+              v-if="searchQuery"
+              type="button"
+              @click="searchQuery = ''"
+              aria-label="Bersihkan pencarian"
+              class="absolute right-2 top-1/2 -translate-y-1/2 flex h-5 w-5 items-center justify-center rounded-full text-[#687281] hover:bg-[#F1F5F9] hover:text-[#333333] transition-all cursor-pointer touch-manipulation"
+              title="Bersihkan"
+            >
+              <span aria-hidden="true" class="material-symbols-outlined text-[15px]">close</span>
+            </button>
+          </div>
+
           <button
-            v-if="searchQuery"
             type="button"
-            @click="searchQuery = ''"
-            aria-label="Bersihkan pencarian"
-            class="absolute right-2 top-1/2 -translate-y-1/2 flex h-5 w-5 items-center justify-center rounded-full text-[#687281] hover:bg-[#F1F5F9] hover:text-[#333333] transition-all cursor-pointer touch-manipulation"
-            title="Bersihkan"
+            @click="showFilterModal = true"
+            class="h-9 shrink-0 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-semibold text-[#5F7089] hover:bg-white"
           >
-            <span aria-hidden="true" class="material-symbols-outlined text-[15px]">close</span>
+            <span aria-hidden="true" class="material-symbols-outlined mr-1 align-middle text-[16px]"
+              >filter_alt</span
+            >Filter
           </button>
         </div>
-
-        <button
-          type="button"
-          @click="showFilterModal = true"
-          class="h-9 shrink-0 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-semibold text-[#5F7089] hover:bg-white"
-        >
-          <span aria-hidden="true" class="material-symbols-outlined mr-1 align-middle text-[16px]"
-            >filter_alt</span
-          >Filter
-        </button>
       </div>
     </div>
     <!-- ─── MODERN ENTERPRISE SAAS DATA MANAGEMENT CONTAINER ──────────────── -->
     <div>
-      <div v-if="!isLoading && !pageError" class="it-list-heading" aria-live="polite">
-        <div>
-          <h3>
-            Daftar perangkat <span>{{ filteredAssets.length }}</span>
-          </h3>
-          <p>
-            {{
-              searchQuery || filterStatus || filterTipe
-                ? 'Hasil sesuai pencarian dan filter Anda'
-                : 'Inventaris perangkat IT perusahaan'
-            }}
-          </p>
+      <div v-if="!isLoading && !pageError" class="it-list-heading-sticky">
+        <div class="it-list-heading" aria-live="polite">
+          <div>
+            <h3>
+              Daftar perangkat <span>{{ filteredAssets.length }}</span>
+            </h3>
+            <p>
+              {{
+                searchQuery || filterStatus || filterTipe
+                  ? 'Hasil sesuai pencarian dan filter Anda'
+                  : 'Inventaris perangkat IT perusahaan'
+              }}
+            </p>
+          </div>
+          <div class="flex shrink-0 items-center gap-3">
+            <AppViewToggle v-model="viewMode" />
+            <span v-if="filteredAssets.length" class="it-result-range"
+              >{{ (currentPage - 1) * itemsPerPage + 1 }}–{{
+                Math.min(currentPage * itemsPerPage, filteredAssets.length)
+              }}
+              dari {{ filteredAssets.length }} aset</span
+            >
+          </div>
         </div>
-        <span v-if="filteredAssets.length" class="it-result-range"
-          >{{ (currentPage - 1) * itemsPerPage + 1 }}–{{
-            Math.min(currentPage * itemsPerPage, filteredAssets.length)
-          }}
-          dari {{ filteredAssets.length }} aset</span
-        >
       </div>
       <!-- Loading State Skeleton -->
       <div v-if="isLoading" aria-busy="true" class="space-y-2.5">
@@ -1060,69 +1072,148 @@ onMounted(async () => {
         </div>
       </div>
 
-      <!-- Responsive inventory list -->
-      <div v-else class="asset-card-list laptop-list">
-        <div
-          v-for="asset in paginatedAssets"
-          :key="asset.id_aset"
-          class="laptop-row"
-          tabindex="0"
-          :aria-label="'Lihat detail ' + (asset.hostname || asset.label_aset || 'aset')"
-          @click="openDetails(asset)"
-          @keydown.enter.self="openDetails(asset)"
-          @keydown.space.prevent.self="openDetails(asset)"
-        >
-          <div class="laptop-identity">
-            <div class="laptop-icon" aria-hidden="true">
-              <span aria-hidden="true" class="material-symbols-outlined">{{
-                getDeviceIcon(asset.tipe_perangkat)
-              }}</span>
+      <!-- Responsive inventory list: Tabel (desktop) / Kartu -->
+      <div v-else :class="{ 'ws-table-mode': viewMode === 'table' }">
+        <!-- Mode Tabel (tampil ≥ 1280px) -->
+        <div v-if="viewMode === 'table'" class="ws-data-table-wrap hidden xl:block">
+          <table class="ws-data-table">
+            <caption class="sr-only">
+              Daftar aset IT
+            </caption>
+            <colgroup>
+              <col class="w-[24%]" />
+              <col class="w-[17%]" />
+              <col class="w-[13%]" />
+              <col class="w-[16%]" />
+              <col class="w-[12%]" />
+              <col class="w-[12%]" />
+              <col class="w-[6%]" />
+            </colgroup>
+            <thead>
+              <tr>
+                <th scope="col">Perangkat</th>
+                <th scope="col">Pengguna</th>
+                <th scope="col">Lokasi</th>
+                <th scope="col">Tipe</th>
+                <th scope="col">Status</th>
+                <th scope="col">Kondisi</th>
+                <th scope="col"><span class="sr-only">Aksi</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                v-for="asset in paginatedAssets"
+                :key="asset.id_aset"
+                tabindex="0"
+                :aria-label="'Lihat detail ' + (asset.hostname || asset.label_aset || 'aset')"
+                @click="openDetails(asset)"
+                @keydown.enter.self="openDetails(asset)"
+                @keydown.space.prevent.self="openDetails(asset)"
+              >
+                <td>
+                  <span class="ws-cell-main" :title="asset.hostname || asset.label_aset">{{
+                    asset.hostname || asset.label_aset || '—'
+                  }}</span>
+                  <span class="ws-cell-sub" :title="asset.serial_number || asset.nomor_seri"
+                    >SN: {{ asset.serial_number || asset.nomor_seri || '—' }}</span
+                  >
+                </td>
+                <td>
+                  <span class="ws-cell-main" :title="asset.nama_karyawan">{{
+                    asset.nama_karyawan || 'Belum ditetapkan'
+                  }}</span>
+                </td>
+                <td>
+                  <span class="ws-cell-main" :title="asset.lokasi_kerja || asset.lokasi_aset">{{
+                    asset.lokasi_kerja || asset.lokasi_aset || '—'
+                  }}</span>
+                </td>
+                <td>
+                  <span class="ws-cell-main">{{ asset.tipe_perangkat || '—' }}</span>
+                  <span v-if="asset.merek || asset.brand_merek" class="ws-cell-sub">{{
+                    [asset.merek || asset.brand_merek, asset.model].filter(Boolean).join(' ')
+                  }}</span>
+                </td>
+                <td>
+                  <span class="ws-cell-main">{{ formatStatusPill(asset.status_aset).label }}</span>
+                </td>
+                <td>
+                  <span class="ws-cell-main">{{ formatKondisiText(asset.kondisi_aset) }}</span>
+                </td>
+                <td @click.stop>
+                  <AppRowActions :actions="getAssetActions(asset)" />
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Mode Kartu (default < 1280px, atau saat dipilih) -->
+        <div class="asset-card-list laptop-list">
+          <div
+            v-for="asset in paginatedAssets"
+            :key="asset.id_aset"
+            class="laptop-row"
+            tabindex="0"
+            :aria-label="'Lihat detail ' + (asset.hostname || asset.label_aset || 'aset')"
+            @click="openDetails(asset)"
+            @keydown.enter.self="openDetails(asset)"
+            @keydown.space.prevent.self="openDetails(asset)"
+          >
+            <div class="laptop-identity">
+              <div class="laptop-icon" aria-hidden="true">
+                <span aria-hidden="true" class="material-symbols-outlined">{{
+                  getDeviceIcon(asset.tipe_perangkat)
+                }}</span>
+              </div>
+              <div class="laptop-identity-text">
+                <h4 :title="asset.hostname || asset.label_aset">
+                  {{ asset.hostname || asset.label_aset || '—' }}
+                </h4>
+                <p
+                  :title="[asset.merek || asset.brand_merek, asset.model].filter(Boolean).join(' ')"
+                >
+                  {{
+                    [asset.merek || asset.brand_merek, asset.model].filter(Boolean).join(' ') ||
+                    asset.tipe_perangkat ||
+                    '—'
+                  }}
+                </p>
+                <span class="laptop-serial" :title="asset.serial_number || asset.nomor_seri"
+                  >SN: {{ asset.serial_number || asset.nomor_seri || '—' }}</span
+                >
+              </div>
             </div>
-            <div class="laptop-identity-text">
-              <h4 :title="asset.hostname || asset.label_aset">
-                {{ asset.hostname || asset.label_aset || '—' }}
-              </h4>
-              <p :title="[asset.merek || asset.brand_merek, asset.model].filter(Boolean).join(' ')">
-                {{
-                  [asset.merek || asset.brand_merek, asset.model].filter(Boolean).join(' ') ||
-                  asset.tipe_perangkat ||
-                  '—'
-                }}
-              </p>
-              <span class="laptop-serial" :title="asset.serial_number || asset.nomor_seri"
-                >SN: {{ asset.serial_number || asset.nomor_seri || '—' }}</span
+            <div class="laptop-holder laptop-field">
+              <span class="laptop-label">Pengguna</span>
+              <strong
+                :class="{ 'laptop-unassigned': !asset.nama_karyawan }"
+                :title="asset.nama_karyawan || 'Belum ditetapkan'"
+                >{{ asset.nama_karyawan || 'Belum ditetapkan' }}</strong
+              >
+              <span
+                v-if="asset.nama_karyawan && asset.nik"
+                class="laptop-secondary"
+                :title="'NIK: ' + asset.nik"
+                >NIK: {{ asset.nik }}</span
               >
             </div>
-          </div>
-          <div class="laptop-holder laptop-field">
-            <span class="laptop-label">Pengguna</span>
-            <strong
-              :class="{ 'laptop-unassigned': !asset.nama_karyawan }"
-              :title="asset.nama_karyawan || 'Belum ditetapkan'"
-              >{{ asset.nama_karyawan || 'Belum ditetapkan' }}</strong
-            >
-            <span
-              v-if="asset.nama_karyawan && asset.nik"
-              class="laptop-secondary"
-              :title="'NIK: ' + asset.nik"
-              >NIK: {{ asset.nik }}</span
-            >
-          </div>
-          <div class="laptop-location laptop-field">
-            <span class="laptop-label">Lokasi</span>
-            <strong :title="asset.lokasi_kerja || asset.lokasi_aset">{{
-              asset.lokasi_kerja || asset.lokasi_aset || '—'
-            }}</strong>
-          </div>
-          <div class="laptop-state">
-            <span class="laptop-label">Status</span>
-            <span class="laptop-status">{{ formatStatusPill(asset.status_aset).label }}</span>
-            <span class="laptop-condition" :class="formatKondisiStyle(asset.kondisi_aset)">
-              {{ formatKondisiText(asset.kondisi_aset) }}
-            </span>
-          </div>
-          <div class="laptop-actions" @click.stop>
-            <AppRowActions :actions="getAssetActions(asset)" />
+            <div class="laptop-location laptop-field">
+              <span class="laptop-label">Lokasi</span>
+              <strong :title="asset.lokasi_kerja || asset.lokasi_aset">{{
+                asset.lokasi_kerja || asset.lokasi_aset || '—'
+              }}</strong>
+            </div>
+            <div class="laptop-state">
+              <span class="laptop-label">Status</span>
+              <span class="laptop-status">{{ formatStatusPill(asset.status_aset).label }}</span>
+              <span class="laptop-condition" :class="formatKondisiStyle(asset.kondisi_aset)">
+                {{ formatKondisiText(asset.kondisi_aset) }}
+              </span>
+            </div>
+            <div class="laptop-actions" @click.stop>
+              <AppRowActions :actions="getAssetActions(asset)" />
+            </div>
           </div>
         </div>
       </div>
@@ -1276,7 +1367,7 @@ onMounted(async () => {
                 v-model="form.tipe_perangkat"
                 :options="availableTipeOptions"
                 aria-label="Tipe Perangkat Aset"
-                placeholder="Pilih jenis/tipe perangkat (Laptop, Desktop, Server, dll.)"
+                placeholder="Pilih tipe perangkat"
                 :block="true"
                 height-class="h-10"
               />
@@ -2083,6 +2174,7 @@ onMounted(async () => {
     <AssetCategoryImportModal
       :is-open="showImportModal"
       asset-type="it"
+      :employees="employees"
       @close="showImportModal = false"
       @imported="onImported"
     />
@@ -2162,6 +2254,7 @@ onMounted(async () => {
 </style>
 
 <style scoped src="../assets/asset-workspace.css"></style>
+<style scoped src="../assets/ws-table.css"></style>
 
 <style scoped>
 .it-create-steps {

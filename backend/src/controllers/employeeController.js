@@ -1,6 +1,6 @@
 import { pool, withTransaction } from "../config/database.js";
 import { recordSystemAudit } from "../services/systemAuditService.js";
-import { createEnrollmentCredential, hashPassword, DEFAULT_USER_PASSWORD } from "../security/passwordService.js";
+import { hashPassword, DEFAULT_USER_PASSWORD } from "../security/passwordService.js";
 import { normalizeLocation } from "../utils/locationNormalizer.js";
 import { parsePaginationQuery, setPaginationHeaders } from "../security/requestValidation.js";
 import { canWriteEmployee } from "../security/resourceAuthorizationPolicy.js";
@@ -275,14 +275,15 @@ export async function storeEmployee(req, res) {
           karyawan: "none",
         });
 
-        const defaultPasswordHash = DEFAULT_USER_PASSWORD
-          ? await hashPassword(DEFAULT_USER_PASSWORD)
-          : createEnrollmentCredential();
-        await client.query(
-          `INSERT INTO users (nama, email, password_hash, role, permissions, is_active)
-           VALUES ($1, $2, $3, 'user', $4::jsonb, true)`,
-          [nama_karyawan, email_kantor, defaultPasswordHash, defaultPermissions],
-        );
+          // Akun karyawan baru: TIDAK aktif sampai diaktivasi admin, dengan
+          // password default yang sudah di-hash (bisa dipakai setelah aktif).
+          const NEW_USER_PASSWORD = DEFAULT_USER_PASSWORD || 'Essensians@2026'
+          const defaultPasswordHash = await hashPassword(NEW_USER_PASSWORD)
+          await client.query(
+            `INSERT INTO users (nama, email, password_hash, role, permissions, is_active)
+             VALUES ($1, $2, $3, 'user', $4::jsonb, false)`,
+            [nama_karyawan, email_kantor, defaultPasswordHash, defaultPermissions],
+          );
       }
 
       const employee = result.rows[0];

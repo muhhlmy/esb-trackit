@@ -13,6 +13,9 @@ import {
   ScrollText,
   HelpCircle,
   FilePen,
+  BookOpen,
+  FileOutput,
+  Database,
   Truck,
   X,
 } from 'lucide-vue-next'
@@ -39,8 +42,10 @@ const lainnyaItems = computed(() =>
     { to: '/users', label: 'Pengguna', icon: Users, permission: 'users' },
     { to: '/karyawan', label: 'Karyawan', icon: UserSearch, permission: 'karyawan' },
     { to: '/logs', label: 'Log Aktivitas', icon: ScrollText, permission: 'logs' },
-    { to: '/faqs', label: 'Atur FAQ', icon: HelpCircle, permission: 'users' },
-    { to: '/admin/cases', label: 'Admin CMS', icon: FilePen, permission: 'users' },
+    { to: '/faqs', label: 'Atur FAQ', icon: HelpCircle, permission: 'knowledge_base' },
+    { to: '/admin/cases', label: 'Admin CMS', icon: BookOpen, permission: 'knowledge_base' },
+    { to: '/export', label: 'Ekspor Data', icon: FileOutput, permission: 'export' },
+    { to: '/database', label: 'Database', icon: Database, permission: 'database' },
   ].filter((item) => !item.permission || hasPermission(item.permission)),
 )
 
@@ -172,6 +177,14 @@ watch(
           <span class="text-[10px] font-semibold leading-tight">{{ item.label }}</span>
         </RouterLink>
       </div>
+
+      <p
+        v-if="!lainnyaItems.length"
+        class="px-2 py-6 text-center text-xs text-slate-400"
+        role="status"
+      >
+        Belum ada menu lain yang tersedia untuk akun Anda.
+      </p>
     </div>
   </Teleport>
 </template>

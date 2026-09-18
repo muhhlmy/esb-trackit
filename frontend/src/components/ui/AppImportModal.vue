@@ -248,6 +248,16 @@ function processFile(file) {
       parsedKaryawanRows.value = karyawanData
       parsedAssetRows.value = assetData
 
+      // Diagnostik parse: tampilkan nama sheet + key yang dikenali + jumlah
+      // baris per kategori, agar import "sukses tapi kosong" bisa ditelusuri.
+      console.info('[Import Parse]', {
+        sheetNames,
+        karyawanRows: karyawanData.length,
+        assetRows: assetData.length,
+        firstKaryawanKeys: karyawanData[0] ? Object.keys(karyawanData[0]) : [],
+        firstKaryawanRow: karyawanData[0] || null,
+      })
+
       if (karyawanData.length > 0) activeTab.value = 'karyawan'
       else if (assetData.length > 0) activeTab.value = 'assets'
 
@@ -282,11 +292,30 @@ async function submitImport() {
   successResult.value = null
   importDetails.value = null
 
+  // Diagnostik submit: kategori + jumlah baris yang dikirim ke backend.
+  console.info('[Import Submit]', {
+    karyawanRows: parsedKaryawanRows.value.length,
+    assetRows: parsedAssetRows.value.length,
+  })
+
   try {
-    const res = await post('/api/import/excel', {
-      karyawanRows: parsedKaryawanRows.value,
-      assetRows: parsedAssetRows.value,
-    })
+    const { data: res, response } = await post(
+      '/api/import/excel',
+      {
+        karyawanRows: parsedKaryawanRows.value,
+        assetRows: parsedAssetRows.value,
+      },
+      { withResponse: true },
+    )
+
+    // Backend mengembalikan HTTP 422 + success:false ketika semua baris ditolak
+    // (mis. header salah / NIK & Nama kosong). Tampilkan sebagai error, jangan
+    // disangka sukses.
+    if (!response.ok || (res && res.success === false)) {
+      modalError.value = res?.error || res?.message || `Permintaan gagal (HTTP ${response.status})`
+      importDetails.value = res?.details || null
+      return
+    }
 
     successResult.value = res.message || 'Import data Excel sukses!'
     importDetails.value = res.details || null
@@ -397,6 +426,88 @@ async function submitImport() {
           Setiap karyawan baru otomatis dibuatkan akun pengguna default (role: User) dengan password
           default sistem. Pengguna disarankan mengganti password saat login pertama.
         </p>
+      </div>
+
+      <!-- Detail Import Breakdown (dipindah ke luar blok sukses agar juga
+           tampil saat semua baris ditolak backend: header salah, NIK/Nama
+           kosong, dst. Sebelumnya tersembunyi di balik successResult.) -->
+      <div
+        v-if="importDetails && !successResult"
+        class="rounded-xl bg-rose-50 p-4 text-[12px] font-bold text-rose-700 border border-rose-200 flex flex-col gap-2"
+      >
+        <div class="flex items-center gap-2">
+          <span aria-hidden="true" class="material-symbols-outlined text-[20px]">error</span>
+          <span>Detail Penolakan / Skip</span>
+        </div>
+
+        <div class="space-y-2 text-[11px] font-normal text-rose-800">
+          <div
+            v-if="importDetails.totalKaryawanRows > 0"
+            class="bg-white/60 rounded-lg p-2.5 space-y-2"
+          >
+            <p class="font-bold text-[12px] text-rose-900">Data Karyawan</p>
+            <div class="flex gap-4 flex-wrap">
+              <span
+                >Total Excel: <b>{{ importDetails.totalKaryawanRows }}</b></span
+              >
+              <span
+                >Karyawan Baru: <b>{{ importDetails.importedKaryawanCount }}</b></span
+              >
+              <span
+                >Karyawan Diupdate: <b>{{ importDetails.updatedKaryawanCount }}</b></span
+              >
+              <span v-if="importDetails.skippedKaryawan > 0" class="text-amber-700">
+                Skip/Gagal: <b>{{ importDetails.skippedKaryawan }}</b>
+              </span>
+            </div>
+            <p class="font-bold text-[12px] text-rose-900 pt-1 border-t border-rose-200/60">
+              Akun Pengguna (Users)
+            </p>
+            <div class="flex gap-4 flex-wrap">
+              <span
+                >User Baru (Dibuat): <b>{{ importDetails.createdUserCount || 0 }}</b></span
+              >
+              <span
+                >User Existing: <b>{{ importDetails.existingUserCount || 0 }}</b></span
+              >
+              <span v-if="importDetails.failedUserCount > 0" class="font-bold">
+                User Gagal: <b>{{ importDetails.failedUserCount }}</b>
+              </span>
+            </div>
+          </div>
+
+          <div
+            v-if="importDetails.totalAssetRows > 0"
+            class="bg-white/60 rounded-lg p-2.5 space-y-1"
+          >
+            <p class="font-bold text-[12px] text-rose-900">Data Asset</p>
+            <div class="flex gap-4 flex-wrap">
+              <span
+                >Total Excel: <b>{{ importDetails.totalAssetRows }}</b></span
+              >
+              <span
+                >Berhasil: <b>{{ importDetails.importedAssetCount }}</b></span
+              >
+              <span v-if="importDetails.skippedAssets > 0" class="text-amber-700">
+                Skip/Error: <b>{{ importDetails.skippedAssets }}</b>
+              </span>
+            </div>
+          </div>
+
+          <div
+            v-if="importDetails.errors && importDetails.errors.length > 0"
+            class="bg-amber-50 rounded-lg p-2.5 max-h-[180px] overflow-y-auto"
+          >
+            <p class="font-bold text-[12px] text-amber-800 mb-1">
+              Detail Error / Skip ({{ importDetails.errors.length }}):
+            </p>
+            <ul class="list-disc list-inside space-y-0.5 text-[11px] text-amber-900">
+              <li v-for="(err, idx) in importDetails.errors" :key="idx">
+                Row {{ err.row }} ({{ err.type }}): {{ err.reason }}
+              </li>
+            </ul>
+          </div>
+        </div>
       </div>
 
       <!-- Action Banner: Download Template -->

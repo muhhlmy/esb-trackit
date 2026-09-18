@@ -8,6 +8,8 @@ import { getStatusDotInfo, getPriorityInfo } from '../utils/ticketPresentation.j
 import { validateAttachmentFile } from '../utils/attachmentPolicy.js'
 import AppModal from '../components/ui/AppModal.vue'
 import AppRowActions from '../components/ui/AppRowActions.vue'
+import { useViewMode } from '../composables/useViewMode.js'
+import AppViewToggle from '../components/ui/AppViewToggle.vue'
 import AppPagination from '../components/ui/AppPagination.vue'
 import SearchableSelect from '../components/ui/SearchableSelect.vue'
 import CustomSelect from '../components/ui/CustomSelect.vue'
@@ -21,6 +23,7 @@ import SkeletonList from '../components/ui/skeleton/SkeletonList.vue'
 const route = useRoute()
 const { get, getAllPages, post, put, del } = useApi()
 const { user, isAuthenticated, isSuperAdmin, isAdmin, hasWritePermission } = useAuth()
+const { viewMode } = useViewMode('tickets', 'table')
 
 const TICKET_PRIORITY_OPTIONS = [
   { value: 'Low', label: 'Low', dot: 'bg-emerald-500' },
@@ -1513,97 +1516,99 @@ function toast(message, type = 'success') {
       </div>
     </div>
 
-    <!-- ── 2. Integrated Control Bar & Workspace Navigation ─ -->
-    <div
-      class="flex flex-col gap-3.5 bg-white p-4 sm:p-5 rounded-2xl border border-[#E2E8F0]/80 shadow-2xs"
-    >
-      <!-- Top Row: Queue Tabs Switcher -->
-      <div class="border-b border-[#F1F5F9] pb-3.5">
-        <div
-          class="flex items-center gap-2 overflow-x-auto scrollbar-none [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden py-0.5 w-full"
-        >
-          <button
-            v-for="tab in !isAdmin && !isSuperAdmin
-              ? [
-                  { key: 'all', label: 'Semua Request' },
-                  { key: 'open', label: 'Sedang Diproses' },
-                  { key: 'closed', label: 'Selesai' },
-                ]
-              : [
-                  { key: 'all', label: 'Inbox', count: stats.totalTickets },
-                  { key: 'unassigned', label: 'Belum Diambil', count: stats.unassignedTickets },
-                  { key: 'assigned', label: 'Ditangani Saya', count: stats.assignedTickets },
-                  { key: 'closed', label: 'Selesai', count: stats.closedTickets },
-                ]"
-            :key="tab.key"
-            type="button"
-            @click="switchTab(tab.key)"
-            class="flex items-center gap-2 rounded-xl px-3.5 py-2 text-xs font-bold transition-all whitespace-nowrap cursor-pointer shrink-0 active:scale-95"
-            :class="
-              activeTab === tab.key
-                ? 'bg-[#0A51B0] text-white shadow-2xs'
-                : 'text-[#5F7089] bg-slate-50 hover:bg-slate-100 hover:text-[#333333] border border-slate-200/60'
-            "
+    <!-- ── 2. Integrated Control Bar & Workspace Navigation (sticky mengikuti scroll) ─ -->
+    <div class="tck-toolbar-sticky">
+      <div
+        class="flex flex-col gap-3.5 bg-white p-4 sm:p-5 rounded-2xl border border-[#E2E8F0]/80 shadow-2xs"
+      >
+        <!-- Top Row: Queue Tabs Switcher -->
+        <div class="border-b border-[#F1F5F9] pb-3.5">
+          <div
+            class="flex items-center gap-2 overflow-x-auto scrollbar-none [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden py-0.5 w-full"
           >
-            <span>{{ tab.label }}</span>
-            <span
-              v-if="tab.count !== undefined"
-              class="inline-flex h-4.5 min-w-[18px] items-center justify-center rounded-full px-1.5 text-[10px] font-bold"
+            <button
+              v-for="tab in !isAdmin && !isSuperAdmin
+                ? [
+                    { key: 'all', label: 'Semua Request' },
+                    { key: 'open', label: 'Sedang Diproses' },
+                    { key: 'closed', label: 'Selesai' },
+                  ]
+                : [
+                    { key: 'all', label: 'Inbox', count: stats.totalTickets },
+                    { key: 'unassigned', label: 'Belum Diambil', count: stats.unassignedTickets },
+                    { key: 'assigned', label: 'Ditangani Saya', count: stats.assignedTickets },
+                    { key: 'closed', label: 'Selesai', count: stats.closedTickets },
+                  ]"
+              :key="tab.key"
+              type="button"
+              @click="switchTab(tab.key)"
+              class="flex items-center gap-2 rounded-xl px-3.5 py-2 text-xs font-bold transition-all whitespace-nowrap cursor-pointer shrink-0 active:scale-95"
               :class="
                 activeTab === tab.key
-                  ? 'bg-white/20 text-white'
-                  : tab.key === 'unassigned' && tab.count > 0
-                    ? 'bg-rose-500 text-white'
-                    : 'bg-slate-200 text-[#475569]'
+                  ? 'bg-[#0A51B0] text-white shadow-2xs'
+                  : 'text-[#5F7089] bg-slate-50 hover:bg-slate-100 hover:text-[#333333] border border-slate-200/60'
               "
             >
-              {{ tab.count }}
-            </span>
-          </button>
+              <span>{{ tab.label }}</span>
+              <span
+                v-if="tab.count !== undefined"
+                class="inline-flex h-4.5 min-w-[18px] items-center justify-center rounded-full px-1.5 text-[10px] font-bold"
+                :class="
+                  activeTab === tab.key
+                    ? 'bg-white/20 text-white'
+                    : tab.key === 'unassigned' && tab.count > 0
+                      ? 'bg-rose-500 text-white'
+                      : 'bg-slate-200 text-[#475569]'
+                "
+              >
+                {{ tab.count }}
+              </span>
+            </button>
+          </div>
         </div>
-      </div>
 
-      <!-- Bottom Row: Toolbar (Search on Top Row, Filters on Bottom Row) -->
-      <div class="grid w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-2.5">
-        <!-- Baris Atas: Search Input with Inline Clear (X) -->
-        <div class="relative h-9 min-w-0">
-          <span
-            aria-hidden="true"
-            class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-[18px] text-[#687281] pointer-events-none"
-            >search</span
-          >
-          <input
-            v-model="searchQuery"
-            type="search"
-            aria-label="Cari tiket, judul, nomor, atau pelapor"
-            placeholder="Cari tiket, judul kendala, nomor tiket, atau pelapor..."
-            class="toolbar-search-input h-full min-h-0 w-full rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] pl-10 pr-9 text-xs font-medium text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:bg-white focus:ring-2 focus:ring-[#0A51B0]/10 focus:outline-none transition-all"
-          />
+        <!-- Bottom Row: Toolbar (Search on Top Row, Filters on Bottom Row) -->
+        <div class="grid w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-2.5">
+          <!-- Baris Atas: Search Input with Inline Clear (X) -->
+          <div class="relative h-9 min-w-0">
+            <span
+              aria-hidden="true"
+              class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-[18px] text-[#687281] pointer-events-none"
+              >search</span
+            >
+            <input
+              v-model="searchQuery"
+              type="search"
+              aria-label="Cari tiket, judul, nomor, atau pelapor"
+              placeholder="Cari tiket, judul kendala, nomor tiket, atau pelapor..."
+              class="toolbar-search-input h-full min-h-0 w-full rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] pl-10 pr-9 text-xs font-medium text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:bg-white focus:ring-2 focus:ring-[#0A51B0]/10 focus:outline-none transition-all"
+            />
+            <button
+              v-if="searchQuery"
+              type="button"
+              aria-label="Hapus pencarian"
+              @click="searchQuery = ''"
+              class="absolute right-3 top-1/2 -translate-y-1/2 flex h-5 w-5 items-center justify-center rounded-full text-[#687281] hover:bg-slate-200/60 hover:text-slate-600 transition-colors cursor-pointer"
+            >
+              <span aria-hidden="true" class="material-symbols-outlined text-[14px]">close</span>
+            </button>
+          </div>
+
           <button
-            v-if="searchQuery"
             type="button"
-            aria-label="Hapus pencarian"
-            @click="searchQuery = ''"
-            class="absolute right-3 top-1/2 -translate-y-1/2 flex h-5 w-5 items-center justify-center rounded-full text-[#687281] hover:bg-slate-200/60 hover:text-slate-600 transition-colors cursor-pointer"
+            @click="showFilterModal = true"
+            class="toolbar-filter-button h-9 shrink-0 rounded-lg border border-[#E2E8F0] bg-slate-50 px-3 text-xs font-semibold text-slate-600 hover:bg-white"
           >
-            <span aria-hidden="true" class="material-symbols-outlined text-[14px]">close</span>
+            <span aria-hidden="true" class="material-symbols-outlined mr-1 align-middle text-[16px]"
+              >filter_alt</span
+            >Filter
           </button>
         </div>
-
-        <button
-          type="button"
-          @click="showFilterModal = true"
-          class="toolbar-filter-button h-9 shrink-0 rounded-lg border border-[#E2E8F0] bg-slate-50 px-3 text-xs font-semibold text-slate-600 hover:bg-white"
-        >
-          <span aria-hidden="true" class="material-symbols-outlined mr-1 align-middle text-[16px]"
-            >filter_alt</span
-          >Filter
-        </button>
       </div>
     </div>
 
-    <!-- ── 3. List Heading & Counter ──────────────────────── -->
-    <div class="flex items-center justify-between gap-3 px-1">
+    <!-- ── 3. List Heading & Counter (sticky mengikuti scroll) ── -->
+    <div class="tck-heading-sticky flex items-center justify-between gap-3 px-1">
       <div class="flex items-center gap-2">
         <h2 class="text-[14px] font-bold text-[#333333]">Daftar Tiket Kendala</h2>
         <span
@@ -1612,17 +1617,23 @@ function toast(message, type = 'success') {
           {{ filteredTickets.length }}
         </span>
       </div>
-      <span class="text-xs font-normal text-[#5F7089] tabular-nums">
-        Menampilkan
-        {{ paginatedTickets.length ? (currentPage - 1) * itemsPerPage + 1 : 0 }}–{{
-          Math.min(currentPage * itemsPerPage, filteredTickets.length)
-        }}
-        dari {{ filteredTickets.length }} tiket
-      </span>
+      <div class="flex shrink-0 items-center gap-3">
+        <AppViewToggle v-model="viewMode" />
+        <span class="hidden sm:inline text-xs font-normal text-[#5F7089] tabular-nums">
+          Menampilkan
+          {{ paginatedTickets.length ? (currentPage - 1) * itemsPerPage + 1 : 0 }}–{{
+            Math.min(currentPage * itemsPerPage, filteredTickets.length)
+          }}
+          dari {{ filteredTickets.length }} tiket
+        </span>
+      </div>
     </div>
 
     <!-- ── 4. Ticket Inbox / Issue List Surface ───────────── -->
-    <div class="flex flex-col gap-3">
+    <div
+      class="flex flex-col gap-3"
+      :class="{ 'tck-table-mode ws-table-mode ws-force-card-off': viewMode === 'table' }"
+    >
       <!-- Loading Skeleton (Matches refined 5-column card row) -->
       <div v-if="isLoading" aria-busy="true" class="flex flex-col gap-2.5">
         <div
@@ -1716,6 +1727,86 @@ function toast(message, type = 'success') {
 
       <!-- Content Surface (Clean & Modern Card-Row Components) -->
       <div v-else class="ticket-card-list flex flex-col gap-2.5">
+        <!-- Mode Tabel (tampil ≥ 1280px) -->
+        <div
+          v-if="viewMode === 'table' && filteredTickets.length > 0"
+          class="ws-data-table-wrap hidden xl:block"
+        >
+          <table class="ws-data-table">
+            <caption class="sr-only">
+              Daftar tiket kendala
+            </caption>
+            <colgroup>
+              <col class="w-[26%]" />
+              <col class="w-[15%]" />
+              <col class="w-[15%]" />
+              <col class="w-[12%]" />
+              <col class="w-[12%]" />
+              <col class="w-[13%]" />
+              <col class="w-[7%]" />
+            </colgroup>
+            <thead>
+              <tr>
+                <th scope="col">Tiket</th>
+                <th scope="col">Pelapor</th>
+                <th scope="col">Penanggung Jawab</th>
+                <th scope="col">Status</th>
+                <th scope="col">Prioritas</th>
+                <th scope="col">Diperbarui</th>
+                <th scope="col"><span class="sr-only">Aksi</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                v-for="ticket in paginatedTickets"
+                :key="ticket.id"
+                tabindex="0"
+                :aria-label="'Lihat tiket ' + ticket.judul"
+                @click="openDetail(ticket)"
+                @keydown.enter.self="openDetail(ticket)"
+                @keydown.space.prevent.self="openDetail(ticket)"
+              >
+                <td>
+                  <span class="ws-cell-main" :title="ticket.judul">{{ ticket.judul }}</span>
+                  <span class="ws-cell-sub font-mono tracking-wider">
+                    {{ ticket.nomor_tiket || `TCK-${ticket.id}` }} ·
+                    {{
+                      ticket.queue_nama ||
+                      (ticket.queue_kode ? `${ticket.queue_kode} Support` : 'IT Support')
+                    }}
+                  </span>
+                </td>
+                <td>
+                  <span class="ws-cell-main">{{
+                    ticket.pelapor_nama || ticket.pelapor || '—'
+                  }}</span>
+                </td>
+                <td>
+                  <span v-if="ticket.assigned_to_nama || ticket.assigned_to" class="ws-cell-main">{{
+                    getAssigneeName(ticket.assigned_to_nama || ticket.assigned_to)
+                  }}</span>
+                  <span v-else class="ws-cell-main" style="color: #b45309">Belum ditugaskan</span>
+                </td>
+                <td>
+                  <span class="ws-cell-main">{{
+                    getStatusDotInfo(ticket.status_tiket).label
+                  }}</span>
+                </td>
+                <td>
+                  <span class="ws-cell-main">{{ getPriorityInfo(ticket.prioritas).label }}</span>
+                </td>
+                <td>
+                  <span class="ws-cell-main">{{
+                    formatRelativeTime(ticket.diperbarui_pada || ticket.dibuat_pada)
+                  }}</span>
+                </td>
+                <td @click.stop>
+                  <AppRowActions :actions="getTicketActions(ticket)" />
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
         <!-- ── UNIFIED TICKET CARDS (5-Column SaaS Card-Row based on Design.md Section 12) ── -->
         <div
           v-for="ticket in paginatedTickets"
@@ -3366,6 +3457,39 @@ function toast(message, type = 'success') {
 </template>
 
 <style scoped>
+@import '../assets/ws-table.css';
+
+/* ── Sticky toolbar & heading (scroll container: app-main) ── */
+.tck-toolbar-sticky {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+.tck-toolbar-sticky > div {
+  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow:
+    0 1px 0 #eef2f7,
+    0 10px 28px -20px rgba(23, 43, 77, 0.28);
+}
+.tck-heading-sticky {
+  position: sticky;
+  top: 0;
+  z-index: 15;
+  background: rgba(248, 250, 252, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 10px;
+  box-shadow: 0 1px 0 #eef2f7;
+  padding: 4px 4px;
+  margin-top: -2px;
+}
+/* Mode tabel: kartu disembunyikan di desktop (≥ 1280px) */
+@media (min-width: 1280px) {
+  .tck-table-mode .ticket-card-list > .tck-list-item {
+    display: none;
+  }
+}
+
 .toolbar-search-input {
   height: 36px;
   min-height: 36px;

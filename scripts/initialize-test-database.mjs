@@ -97,6 +97,12 @@ try {
           );
         }
       }
+
+      // ── Seed data demo (idempoten) ─────────────────────────────
+      // Diperlukan agar dashboard KPI, list aset, search tiket, Help Center
+      // publik, dan CMS punya data untuk dites. Semua baris dibersihkan
+      // setiap run karena DB test di-migrate fresh (mode: "fresh").
+      await seedDemoData(client);
     }
     console.log("Disposable test database migrated and validated.");
   } finally {
@@ -104,4 +110,95 @@ try {
   }
 } finally {
   await pool.end();
+}
+
+/**
+ * Seed data demo: aset IT/GA/Ops, kategori KB, FAQ, cases.
+ * Idempoten (ON CONFLICT DO NOTHING) — aman dijalankan berulang.
+ * Tanpa ini, dashboard KPI, list aset, search tiket, dan Help Center
+ * publik tidak punya data untuk diuji.
+ */
+async function seedDemoData(client) {
+  // Karyawan (pemegang aset) — wajib sebelum aset (FK nik_pemegang_asset)
+  await client.query(`
+    INSERT INTO karyawan (nik, nama_karyawan, email_kantor, status, title, job_level, departemen, directorate, tanggal_mulai_bekerja, employeement_status, lokasi_kerja)
+    VALUES
+      ('E2ENIK001', 'E2E Karyawan Satu', 'e2e.karyawan.satu@example.test', 'Active', 'Staff IT', 'S1', 'Engineering', 'Technology Directorate', '2023-01-15', 'Permanent', 'Jakarta'),
+      ('E2ENIK002', 'E2E Karyawan Dua', 'e2e.karyawan.dua@example.test', 'Active', 'Staff GA', 'S1', 'General Affairs', 'Operations Directorate', '2023-03-01', 'Permanent', 'Bandung')
+    ON CONFLICT (nik) DO NOTHING
+  `)
+
+  const statuses = ['In Use', 'Stock', 'In Service', 'Damaged']
+  const kondisi = ['Baru', 'Normal', 'Rusak Ringan', 'Rusak Sedang']
+  const brands = ['Lenovo', 'Dell', 'HP', 'Asus']
+
+  // Aset IT (12 baris — cukup untuk dashboard KPI + list + search)
+  for (let i = 1; i <= 12; i++) {
+    await client.query(
+      `INSERT INTO aset_ti (hostname, serial_number, spesifikasi, nik_pemegang_asset, nama_karyawan_pemegang_asset, departemen_pemegang_asset, lokasi_asset, tipe_perangkat, brand_merek, model, status, kondisi, note_asset)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+       ON CONFLICT DO NOTHING`,
+      [
+        `E2E-LAPTOP-IT-${String(i).padStart(2, '0')}`,
+        `E2E-SN-IT-${String(i).padStart(4, '0')}`,
+        `CPU i5, RAM 16GB, SSD 512GB (E2E seed ${i})`,
+        i <= 8 ? 'E2ENIK001' : null,
+        i <= 8 ? 'E2E Karyawan Satu' : null,
+        i <= 8 ? 'Engineering' : null,
+        'Jakarta',
+        'Laptop',
+        brands[i % brands.length],
+        `ThinkPad E2E ${i}`,
+        statuses[i % statuses.length],
+        kondisi[i % kondisi.length],
+        'E2E seeded demo asset',
+      ],
+    )
+  }
+
+  // Aset GA + Ops (masing-masing 3 — cukup untuk list render)
+  for (let i = 1; i <= 3; i++) {
+    await client.query(
+      `INSERT INTO aset_ga (hostname, quantity, tipe_fasilitas, nama_asset, lokasi, lokasi_detail, kondisi)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)
+       ON CONFLICT DO NOTHING`,
+      [`E2E-MEJA-GA-${String(i).padStart(2, '0')}`, 1, 'Meja Kerja', `E2E Meja Kerja ${i}`, 'Jakarta', 'Lantai 2', 'Baik'],
+    )
+    await client.query(
+      `INSERT INTO aset_ops (hostname, nama_asset, kategori, lokasi, pic, kondisi, status, total_asset_amount)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+       ON CONFLICT DO NOTHING`,
+      [`E2E-RTR-OPS-${String(i).padStart(2, '0')}`, `E2E Router Ops ${i}`, 'Network', 'Jakarta', 'E2E PIC', 'Baik', 'Aktif', 1],
+    )
+  }
+
+  // KB categories (Help Center topic cards)
+  await client.query(`
+    INSERT INTO kb_categories (key, title, description, icon, is_featured, sort_order, status)
+    VALUES
+      ('it-support', 'IT Support', 'Panduan setup IT, request perangkat, dan tools jaringan', 'Laptop', true, 1, 'PUBLISHED'),
+      ('hr-support', 'Human Resources (HR)', 'Kebijakan cuti, payroll, dan administrasi SDM', 'Users', true, 2, 'PUBLISHED'),
+      ('ga-support', 'General Affairs (GA)', 'Fasilitas kantor, aset GA, dan layanan umum', 'Building2', false, 3, 'PUBLISHED')
+    ON CONFLICT (key) DO NOTHING
+  `)
+
+  // FAQ
+  await client.query(`
+    INSERT INTO faq (question, answer, category, status, sort_order)
+    VALUES
+      ('E2E: Bagaimana cara request perangkat baru?', 'Hubungi tim IT via tombol ajukan tiket di dashboard.', 'IT Support', 'PUBLISHED', 1),
+      ('E2E: Bagaimana cara mengajukan cuti?', 'Buka aplikasi HR dan isi formulir pengajuan cuti.', 'Human Resources (HR)', 'PUBLISHED', 2)
+    ON CONFLICT DO NOTHING
+  `)
+
+  // Cases (artikel knowledge base — untuk Help Center publik & CMS)
+  await client.query(`
+    INSERT INTO cases (title, category, severity, summary, content_html, status, is_custom, sort_order)
+    VALUES
+      ('E2E: Setup VPN kantor', 'IT Support', 'medium', 'Panduan koneksi VPN', '<p>Klik ikon VPN, lalu pilih profil <strong>kantor</strong>. Hubungi IT bila gagal.</p>', 'PUBLISHED', false, 1),
+      ('E2E: Reset kata sandi email', 'IT Support', 'high', 'Langkah reset password', '<p>Buka <em>portal self-service</em> dan ikuti petunjuknya.</p>', 'PUBLISHED', false, 2)
+    ON CONFLICT DO NOTHING
+  `)
+
+  console.log('[seed] demo data seeded (aset IT/GA/Ops, kb_categories, faq, cases).')
 }

@@ -54,6 +54,9 @@
   --fs-sm: 12px;
   --fs-md: 13px;
   --fs-base: 14px;
+  --fs-lg: 15px;
+  --fs-xl: 16px;
+  --fs-2xl: 18px;
 
   /* Placeholder law (audit v2): PH = state, bukan label — selalu lebih kecil dari
      input text (hierarchy), floor 11px (WCAG 1.4.4 legibility), tak pernah lebih
@@ -286,8 +289,15 @@ textarea {
 }
 
 .toolbar-filter-button,
-.toolbar-action-button {
+.toolbar-action-button,
+.search-clear-button {
   border-radius: var(--ui-radius-control) !important;
+}
+
+.search-clear-button {
+  height: 28px !important;
+  min-height: 28px !important;
+  max-height: 28px !important;
 }
 
 .toolbar-filter-button {
@@ -453,7 +463,8 @@ textarea::placeholder,
   opacity: 1;
   /* Placeholder law (audit v2): PH ≠ label, PH = preview input.
      Ukuran: 1 tingkat di bawah teks input (Gestalt hierarchy), floor 11px
-     (legibility, WCAG 1.4.4), tanpa per-role override — satu formula global. */
+     (legibility, WCAG 1.4.4), tanpa per-role override — satu formula global.
+     Warna placeholder on dark mode diutamakan kontras lebi dah dari 4.5:1. */
   font-size: var(--fs-placeholder);
   font-style: normal;
   font-weight: 400;
@@ -480,8 +491,8 @@ label > span:first-child,
   font-weight: 700;
   color: #2a3547;
   text-transform: uppercase;
-  letter-spacing: 0.03em;
-  margin-bottom: 0.25rem;
+  letter-spacing: 0.02em;
+  margin-bottom: 0.35rem;
 }
 
 /* ── Modernize Buttons Design System ── */
@@ -497,9 +508,14 @@ label > span:first-child,
   align-items: center;
   justify-content: center;
   gap: 0.375rem;
-  transition: all 150ms ease-in-out;
+  transition:
+    color 150ms ease-in-out,
+    background-color 150ms ease-in-out,
+    box-shadow 150ms ease-in-out,
+    transform 150ms ease-in-out;
   cursor: pointer;
   border: none;
+  touch-action: manipulation;
 }
 
 .btn-primary:hover {
@@ -524,8 +540,14 @@ label > span:first-child,
   align-items: center;
   justify-content: center;
   gap: 0.375rem;
-  transition: all 150ms ease-in-out;
+  transition:
+    color 150ms ease-in-out,
+    background-color 150ms ease-in-out,
+    border-color 150ms ease-in-out,
+    box-shadow 150ms ease-in-out,
+    transform 150ms ease-in-out;
   cursor: pointer;
+  touch-action: manipulation;
 }
 
 .btn-secondary:hover {
@@ -550,8 +572,14 @@ label > span:first-child,
   align-items: center;
   justify-content: center;
   gap: 0.375rem;
-  transition: all 150ms ease-in-out;
+  transition:
+    color 150ms ease-in-out,
+    background-color 150ms ease-in-out,
+    border-color 150ms ease-in-out,
+    box-shadow 150ms ease-in-out,
+    transform 150ms ease-in-out;
   cursor: pointer;
+  touch-action: manipulation;
 }
 
 .btn-danger:hover {
@@ -610,38 +638,45 @@ label > span:first-child,
 .btn-icon-delete:hover {
   background-color: #fa896b;
   color: #ffffff;
+  transition:
+    color 150ms ease-in-out,
+    background-color 150ms ease-in-out,
+    border-color 150ms ease-in-out,
+    transform 150ms ease-in-out,
+    box-shadow 150ms ease-in-out;
+  touch-action: manipulation;
 }
 
 /* Icon Badges */
 .icon-badge {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 0.75rem;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+  border-radius: 999px;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.25);
 }
 
 .icon-badge-primary {
   background-color: #ecf2ff;
-  color: #333333;
+  color: #0a51b0;
 }
 .icon-badge-secondary {
   background-color: #e8f7ff;
-  color: #49beff;
+  color: #0892f5;
 }
 .icon-badge-success {
   background-color: #edfbf7;
-  color: #13deb9;
+  color: #15803d;
 }
 .icon-badge-warning {
-  background-color: #fef5e5;
-  color: #ffae1f;
-}
-.icon-badge-danger {
-  background-color: #fdede8;
-  color: #fa896b;
+  background-color: #fef9c3;
+  color: #854d0e;
 }
 
+.icon-badge-danger {
+  background-color: #fee2e2;
+  color: #b91c1c;
+}
 /* SearchableSelect Modern Styling */
 div.relative > button.text-left.h-8.w-full {
   background: #ffffff;
@@ -688,6 +723,11 @@ div.relative > div.absolute {
 .modal-panel > div:first-child {
   background: #ffffff;
   border-bottom: 1px solid #e5eaef;
+}
+
+.modal-panel:focus-visible {
+  outline: 2px solid #097cde;
+  outline-offset: 3px;
 }
 
 /* Table Modernize Styling */
@@ -750,6 +790,12 @@ svg.w-full.h-full {
 svg circle {
   opacity: 1 !important;
   stroke-opacity: 1 !important;
+}
+
+.window-resize-helper {
+  transition:
+    width 150ms ease-in-out,
+    height 150ms ease-in-out;
 }
 
 /* ── Reduced Motion ── */

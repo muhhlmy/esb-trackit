@@ -14,6 +14,8 @@ import AppBadge from '../components/ui/AppBadge.vue'
 import AppRowActions from '../components/ui/AppRowActions.vue'
 import AppPagination from '../components/ui/AppPagination.vue'
 import SearchableSelect from '../components/ui/SearchableSelect.vue'
+import { useViewMode } from '../composables/useViewMode.js'
+import AppViewToggle from '../components/ui/AppViewToggle.vue'
 import CustomSelect from '../components/ui/CustomSelect.vue'
 import FilterModal from '../components/ui/FilterModal.vue'
 import SkeletonTable from '../components/ui/skeleton/SkeletonTable.vue'
@@ -23,6 +25,7 @@ const { get, getAllPages, post, put, del } = useApi()
 const { isSuperAdmin, hasWritePermission } = useAuth()
 const { user: currentUser } = useAuth()
 const canWriteUsers = computed(() => hasWritePermission('users'))
+const { viewMode } = useViewMode('users', 'table')
 
 // ── State Utama ──────────────────────────────────────────────
 const users = ref([])
@@ -181,10 +184,20 @@ const superadminPermissions = () => ({
 })
 
 // ── Form Data ────────────────────────────────────────────────
+// Password awal pengguna baru dibuat acak per-user di klien (bukan hardcoded
+// secret di bundle). Admin dapat menggantinya sebelum submit; akhirnya tetap
+// di-hash bcrypt di backend.
+function generateInitialPassword() {
+  const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789@#$%'
+  const bytes = new Uint32Array(14)
+  crypto.getRandomValues(bytes)
+  return Array.from(bytes, (b) => alphabet[b % alphabet.length]).join('')
+}
+
 const emptyForm = () => ({
   nama: '',
   email: '',
-  password: 'Essensians@2026',
+  password: generateInitialPassword(),
   role: 'user',
   permissions: defaultPermissions(),
   queue_ids: [],
@@ -517,7 +530,7 @@ async function saveUser() {
     return
   }
   if (modalMode.value === 'add' && !form.value.password) {
-    form.value.password = 'Essensians@2026'
+    form.value.password = generateInitialPassword()
   }
   const PASSWORD_COMPLEXITY_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[\d\W_]).{8,}$/
   if (form.value.password && !PASSWORD_COMPLEXITY_REGEX.test(form.value.password)) {
@@ -652,73 +665,76 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
       </div>
     </Transition>
 
-    <!-- Simplified SaaS Header & Toolbar Container -->
-    <div
-      class="admin-page-header flex flex-col gap-3.5 bg-white p-3.5 sm:p-4.5 rounded-2xl border border-[#E2E8F0]/80 shadow-2xs"
-    >
-      <!-- Row 1: Page Title & Primary CTA -->
-      <div class="flex items-center justify-between gap-2 sm:gap-3">
-        <div class="min-w-0">
-          <h2 class="text-base sm:text-lg font-bold text-[#333333] tracking-tight">
-            Data Pengguna
-          </h2>
-          <p class="text-[11px] sm:text-xs text-[#5F7089] mt-0.5 leading-normal">
-            Pengelolaan akun, role, dan hak akses pengguna sistem
-          </p>
-        </div>
-
-        <button
-          v-if="canWriteUsers"
-          type="button"
-          @click="openAdd"
-          class="toolbar-primary-button h-9 shrink-0 rounded-lg bg-[#0A51B0] px-2.5 sm:px-3.5 text-xs font-semibold text-white shadow-2xs hover:bg-[#0A4391] active:scale-[0.98] transition-all flex items-center justify-center gap-1.5 cursor-pointer"
-          title="Tambah admin baru atau promosikan akses"
-        >
-          <span aria-hidden="true" class="material-symbols-outlined text-[16px]">person_add</span>
-          <span class="hidden sm:inline whitespace-nowrap">Tambah Admin / Akses</span>
-        </button>
-      </div>
-
-      <!-- Row 2: Search & Filters -->
+    <!-- Simplified SaaS Header & Toolbar Container (sticky mengikuti scroll) -->
+    <div class="ws-toolbar-sticky">
       <div
-        class="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 w-full min-w-0 pt-2 border-t border-[#F1F5F9]"
+        class="admin-page-header flex flex-col gap-3.5 bg-white p-3.5 sm:p-4.5 rounded-2xl border border-[#E2E8F0]/80 shadow-2xs"
       >
-        <div class="relative h-9 min-w-0">
-          <span
-            aria-hidden="true"
-            class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-[17px] text-[#687281] pointer-events-none"
-            >search</span
-          >
-          <input
-            id="user-search"
-            v-model="searchQuery"
-            type="search"
-            autocomplete="off"
-            aria-label="Cari pengguna"
-            placeholder="Cari nama atau email pengguna..."
-            class="toolbar-search-input h-full min-h-0 w-full rounded-lg border border-[#E2E8F0] bg-white pl-8 text-xs text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
-            :class="searchQuery ? 'pr-8' : 'pr-2.5'"
-          />
+        <!-- Row 1: Page Title & Primary CTA -->
+        <div class="flex items-center justify-between gap-2 sm:gap-3">
+          <div class="min-w-0">
+            <h2 class="text-base sm:text-lg font-bold text-[#333333] tracking-tight">
+              Data Pengguna
+            </h2>
+            <p class="text-[11px] sm:text-xs text-[#5F7089] mt-0.5 leading-normal">
+              Pengelolaan akun, role, dan hak akses pengguna sistem
+            </p>
+          </div>
+
           <button
-            v-if="searchQuery"
+            v-if="canWriteUsers"
             type="button"
-            @click="searchQuery = ''"
-            class="absolute right-2 top-1/2 -translate-y-1/2 flex h-5 w-5 items-center justify-center rounded-full bg-[#E2E8F0] text-[#5F7089] hover:bg-[#CBD5E1] hover:text-[#333333] transition-colors cursor-pointer"
-            title="Hapus pencarian"
+            @click="openAdd"
+            class="toolbar-primary-button h-9 shrink-0 rounded-lg bg-[#0A51B0] px-2.5 sm:px-3.5 text-xs font-semibold text-white shadow-2xs hover:bg-[#0A4391] active:scale-[0.98] transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+            title="Tambah admin baru atau promosikan akses"
           >
-            <span aria-hidden="true" class="material-symbols-outlined text-[13px]">close</span>
+            <span aria-hidden="true" class="material-symbols-outlined text-[16px]">person_add</span>
+            <span class="hidden sm:inline whitespace-nowrap">Tambah Admin / Akses</span>
           </button>
         </div>
 
-        <button
-          type="button"
-          @click="showFilterModal = true"
-          class="toolbar-filter-button h-9 shrink-0 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-semibold text-[#5F7089] hover:bg-white"
+        <!-- Row 2: Search & Filters -->
+        <div
+          class="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 w-full min-w-0 pt-2 border-t border-[#F1F5F9]"
         >
-          <span aria-hidden="true" class="material-symbols-outlined mr-1 align-middle text-[16px]"
-            >filter_alt</span
-          >Filter
-        </button>
+          <div class="relative h-9 min-w-0">
+            <span
+              aria-hidden="true"
+              class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-[17px] text-[#687281] pointer-events-none"
+              >search</span
+            >
+            <input
+              id="user-search"
+              v-model="searchQuery"
+              type="search"
+              autocomplete="off"
+              aria-label="Cari pengguna"
+              placeholder="Cari nama atau email pengguna..."
+              class="toolbar-search-input h-full min-h-0 w-full rounded-lg border border-[#E2E8F0] bg-white pl-8 text-xs text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
+              :class="searchQuery ? 'pr-8' : 'pr-2.5'"
+            />
+            <button
+              v-if="searchQuery"
+              type="button"
+              @click="searchQuery = ''"
+              class="absolute right-2 top-1/2 -translate-y-1/2 flex h-5 w-5 items-center justify-center rounded-full bg-[#E2E8F0] text-[#5F7089] hover:bg-[#CBD5E1] hover:text-[#333333] transition-colors cursor-pointer"
+              title="Hapus pencarian"
+            >
+              <span aria-hidden="true" class="material-symbols-outlined text-[13px]">close</span>
+            </button>
+          </div>
+
+          <button
+            type="button"
+            @click="showFilterModal = true"
+            class="toolbar-filter-button h-9 shrink-0 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-semibold text-[#5F7089] hover:bg-white"
+          >
+            <span aria-hidden="true" class="material-symbols-outlined mr-1 align-middle text-[16px]"
+              >filter_alt</span
+            >Filter
+          </button>
+          <AppViewToggle v-model="viewMode" />
+        </div>
       </div>
     </div>
 
@@ -791,8 +807,9 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
       </div>
 
       <template v-else>
-        <!-- ═══ Desktop Table (>= md / 768px) ═══ -->
+        <!-- ═══ Desktop Table (≥ 1280px, mode Tabel) ═══ -->
         <div
+          v-if="viewMode === 'table'"
           class="hidden xl:block w-full max-w-full overflow-hidden"
           tabindex="0"
           aria-label="Tabel pengguna"
@@ -810,7 +827,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
               <col class="w-[8%]" />
             </colgroup>
             <thead
-              class="sticky top-0 z-10 border-b border-[#E2E8F0]/80 bg-[#F8FAFC]/80 backdrop-blur-xs select-none whitespace-nowrap"
+              class="sticky top-0 z-10 border-b border-[#E2E8F0] bg-[#F8FAFC] select-none whitespace-nowrap"
             >
               <tr>
                 <th
@@ -845,7 +862,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
                 </th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-[#F1F5F9]">
+            <tbody class="relative z-0 isolate divide-y divide-[#F1F5F9]">
               <tr
                 v-for="user in paginatedUsers"
                 :key="user.id"
@@ -949,8 +966,8 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
           </table>
         </div>
 
-        <!-- ═══ Mobile Card List (< md / < 768px) ═══ -->
-        <div class="xl:hidden">
+        <!-- ═══ Kartu (< 1280px, atau saat mode Kartu dipilih) ═══ -->
+        <div :class="viewMode === 'card' ? '' : 'xl:hidden'">
           <!-- Empty State -->
           <div v-if="filteredUsers.length === 0" class="px-4 py-10 text-center">
             <div class="flex flex-col items-center gap-2">
@@ -1190,7 +1207,11 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
             <!-- Password -->
             <div class="flex flex-col gap-1">
               <label for="user-password" class="text-xs font-semibold text-[#333333]">
-                {{ modalMode === 'add' ? 'Password (Default: Essensians@2026)' : 'Password Baru' }}
+                {{
+                  modalMode === 'add'
+                    ? 'Password Awal (terisi otomatis — ganti bila perlu)'
+                    : 'Password Baru'
+                }}
               </label>
               <input
                 id="user-password"
@@ -1199,7 +1220,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
                 type="password"
                 autocomplete="new-password"
                 :placeholder="
-                  modalMode === 'add' ? 'Default: Essensians@2026' : 'Kosongkan jika tidak diubah'
+                  modalMode === 'add' ? 'Terisi otomatis & acak' : 'Kosongkan jika tidak diubah'
                 "
                 class="h-9 w-full rounded-xl border border-[#E2E8F0] bg-white px-3 text-xs text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
               />
@@ -1565,6 +1586,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
 </template>
 
 <style scoped src="../assets/admin-workspace.css"></style>
+<style scoped src="../assets/ws-table.css"></style>
 
 <style scoped>
 .toolbar-search-input {

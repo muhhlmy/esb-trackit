@@ -2,6 +2,7 @@
 import { ref, computed, onMounted, onBeforeUnmount, watch, nextTick } from 'vue'
 import { useRoute, useRouter, RouterLink } from 'vue-router'
 import { useCases } from '@/composables/useCases'
+import { useKbCategories } from '@/composables/useKbCategories'
 import { useToast } from '@/composables/useToast'
 import { useAuth } from '@/composables/useAuth'
 import DocEditorInspector from '@/components/admin/DocEditorInspector.vue'
@@ -35,7 +36,11 @@ import {
 
 const route = useRoute()
 const router = useRouter()
+
 const { cases, saveCase, fetchAllCases } = useCases()
+// Kategori diambil dari sumber yang sama dengan halaman KB Categories dan
+// DocEditorInspector (GET /api/kb-categories), agar pilihan kategori selalu sinkron.
+const { categories: kbCategoryList, fetchAllCategories } = useKbCategories()
 const { showToast } = useToast()
 const { hasWritePermission } = useAuth()
 const canWrite = computed(() => hasWritePermission('knowledge_base'))
@@ -98,7 +103,9 @@ function createEmptyDoc() {
   return {
     id: '',
     title: '',
-    category: 'hardware',
+    // Default: kategori pertama dari DB (sort_order ASC). Jika data belum
+    // dimuat, inspector tetap menampilkan opsi statis pengganti.
+    category: kbCategoryList.value[0]?.key || 'hardware',
     severity: 'medium',
     tags: [],
     summary: '',
@@ -540,7 +547,7 @@ function handleEditorSelection() {
 
 onMounted(async () => {
   document.addEventListener('selectionchange', handleEditorSelection)
-  await fetchAllCases()
+  await Promise.all([fetchAllCases(), fetchAllCategories()])
   const caseId = route.params.id
 
   if (caseId) {
@@ -723,13 +730,11 @@ async function handlePublish() {
   try {
     const saved = await saveCase({ ...doc.value, status: 'PUBLISHED' }, { showNotification: false })
     if (saved) {
-      if (saved.id && !doc.value.id) {
-        doc.value.id = saved.id
-        router.replace(`/admin/editor/${saved.id}`)
-      }
       doc.value.status = 'PUBLISHED'
       saveStatus.value = 'Tersimpan'
       showToast('Artikel berhasil dipublikasikan!', 'success')
+      // Kembali ke daftar artikel Admin CMS setelah publish sukses.
+      router.push('/admin/cases')
     } else {
       saveStatus.value = 'Belum disimpan'
     }
@@ -1578,6 +1583,10 @@ function goToAdminCases() {
   margin-bottom: 0.25rem !important;
 }
 
+.ProseMirror em {
+  font-style: italic !important;
+}
+
 .ProseMirror blockquote {
   border-left: 3px solid #0a51b0 !important;
   background-color: #f8fafc !important;
@@ -1705,6 +1714,10 @@ function goToAdminCases() {
 
 .doc-preview li {
   margin-bottom: 0.25rem;
+}
+
+.doc-preview em {
+  font-style: italic;
 }
 
 .doc-preview blockquote {

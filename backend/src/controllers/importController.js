@@ -1,6 +1,6 @@
 import crypto from 'node:crypto';
 import { pool, withTransaction } from "../config/database.js";
-import { createEnrollmentCredential, hashPassword, DEFAULT_USER_PASSWORD } from "../security/passwordService.js";
+import { hashPassword, DEFAULT_USER_PASSWORD } from "../security/passwordService.js";
 import { normalizeLocation } from "../utils/locationNormalizer.js";
 import { canWriteGAAsset, canWriteOPSAsset, canWriteITAsset, canWriteEmployee } from "../security/resourceAuthorizationPolicy.js";
 
@@ -317,10 +317,10 @@ export async function importExcelData(req, res) {
       });
     }
 
-    // Pre-compute hash password default 1x untuk performa cepat saat bulk import
-    const defaultPasswordHash = DEFAULT_USER_PASSWORD
-      ? await hashPassword(DEFAULT_USER_PASSWORD)
-      : createEnrollmentCredential();
+    // Pre-compute hash password default 1x untuk performa cepat saat bulk import.
+    // Akun karyawan baru TIDAK aktif (is_active=false) sampai diaktivasi admin.
+    const NEW_USER_PASSWORD = DEFAULT_USER_PASSWORD || 'Essensians@2026'
+    const defaultPasswordHash = await hashPassword(NEW_USER_PASSWORD)
 
     // ── Phase 3: Proses Karyawan, User & Aset dalam SATU Database Transaction ──
     await withTransaction(async (client) => {
@@ -329,12 +329,21 @@ export async function importExcelData(req, res) {
         if (replaceScope !== 'assets') await client.query('DELETE FROM karyawan');
       }
       // Pre-fetch semua user email existing di DB untuk pengecekan unik yang sangat cepat & efisien
-      const dbUsersRes = await client.query(`SELECT LOWER(TRIM(email)) AS email FROM users WHERE email IS NOT NULL AND deleted_at IS NULL`);
+      // Termasuk user yang soft-deleted: constraint UNIQUE pada users_email_key tetap
+      // aktif terhadap email yang sudah di-soft-delete, jadi insert akan gagal dan
+      // (sebelum fix savepoint) merollback seluruh transaction karyawan.
+      const dbUsersRes = await client.query(`SELECT LOWER(TRIM(email)) AS email FROM users WHERE email IS NOT NULL`);
       const dbUserEmailsSet = new Set(dbUsersRes.rows.map(r => r.email));
       const processedImportEmailsSet = new Set();
 
       for (const emp of parsedKaryawan) {
         try {
+          // Savepoint per baris: kegagalan insert karyawan/user (NIK/email
+          // duplikat, value terlalu panjang, dsb) hanya merugikan baris itu
+          // sendiri. Tanpa ini satu error membatalkan transaction ("current
+          // transaction is aborted") dan merollback SEMUA karyawan.
+          await client.query('SAVEPOINT sp_emp_row');
+
           // 1. Upsert Karyawan
           const existingEmpRes = await client.query(`SELECT id FROM karyawan WHERE nik = $1`, [emp.nik]);
 
@@ -385,22 +394,32 @@ export async function importExcelData(req, res) {
                             karyawan: 'none',
                           });
 
+                          // Insert user ikut savepoint sp_emp_row — kegagalan
+                          // (mis. email duplikat yang lolos cek di atas) hanya
+                          // membatalkan baris ini, bukan seluruh import.
                           await client.query(
                             `INSERT INTO users (nama, email, password_hash, role, permissions, is_active)
-                             VALUES ($1, $2, $3, 'user', $4::jsonb, true)`,
+                             VALUES ($1, $2, $3, 'user', $4::jsonb, false)`,
                             [emp.nama, emp.email, defaultPasswordHash, DEFAULT_IMPORT_PERMISSIONS]
-                );
+                          );
                 createdUserCount++;
                 dbUserEmailsSet.add(normEmail);
                 processedImportEmailsSet.add(normEmail);
               } catch (userErr) {
+                await client.query('ROLLBACK TO SAVEPOINT sp_emp_row');
                 failedUserCount++;
                 errors.push({ row: emp.rowNum, type: 'user', reason: `Gagal membuat user untuk ${emp.email}: ${userErr.message}` });
               }
             }
           }
+
+          await client.query('RELEASE SAVEPOINT sp_emp_row');
         } catch (err) {
-          errors.push({ row: emp.rowNum, type: 'karyawan', reason: `${emp.nik} (${emp.nama}): ${err.message}` });
+          await client.query('ROLLBACK TO SAVEPOINT sp_emp_row');
+          const reason = /karyawan_email_kantor_key/.test(err.message)
+            ? `Email "${emp.email}" sudah dipakai karyawan lain (NIK berbeda). Hanya 1 karyawan per email.`
+            : err.message;
+          errors.push({ row: emp.rowNum, type: 'karyawan', reason: `${emp.nik} (${emp.nama}): ${reason}` });
         }
       }
 
@@ -513,6 +532,32 @@ export async function importExcelData(req, res) {
     const totalUsersAccounted = createdUserCount + existingUserCount;
     if (parsedKaryawan.length > 0 && totalUsersAccounted < parsedKaryawan.length) {
       warnings.push(`Peringatan Rekonsiliasi: ${parsedKaryawan.length} karyawan diproses, tetapi hanya ${totalUsersAccounted} user terproses (${failedUserCount} gagal/invalid email).`);
+    }
+
+    const karyawanFailed = totalKaryawanRows > 0 && (importedKaryawanCount + updatedKaryawanCount) === 0;
+    const assetFailed = totalAssetRows > 0 && (importedAssetCount + updatedAssetCount) === 0;
+
+    if (karyawanFailed || assetFailed) {
+      return res.status(422).json({
+        success: false,
+        error: 'Import gagal: tidak ada baris yang berhasil diproses. Periksa kembali format file Excel Anda (header kolom, NIK, dan Nama Karyawan wajib terisi).',
+        details: {
+          totalKaryawanRows,
+          totalAssetRows,
+          processedKaryawan: parsedKaryawan.length,
+          importedKaryawanCount,
+          updatedKaryawanCount,
+          skippedKaryawan,
+          createdUserCount,
+          existingUserCount,
+          failedUserCount,
+          importedAssetCount,
+          updatedAssetCount,
+          skippedAssets,
+          warnings,
+          errors,
+        },
+      });
     }
 
     res.json({

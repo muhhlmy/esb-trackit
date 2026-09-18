@@ -209,9 +209,11 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+/* Catatan: card view TIDAK disembunyikan per-breakpoint di sini. Tampilan card
+   vs table sepenuhnya dikendalikan viewMode (lihat v-if di EmployeesView). */
 @media (min-width: 1280px) {
   .admin-workspace ul.admin-person-cards {
-    display: none;
+    gap: 14px;
   }
 }
 @media (max-width: 639px) {

@@ -378,7 +378,7 @@ onMounted(() => {
 
     <!-- Header SaaS Section -->
     <div
-      class="admin-page-header flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white border border-[#E2E8F0] rounded-2xl p-3.5 sm:p-5 shadow-2xs"
+      class="admin-page-header flex flex-col gap-3.5 bg-white p-3.5 sm:p-4.5 rounded-2xl border border-[#E2E8F0]/80 shadow-2xs"
     >
       <div class="space-y-1">
         <div class="flex items-center gap-1.5 text-xs text-[#687281] font-medium">

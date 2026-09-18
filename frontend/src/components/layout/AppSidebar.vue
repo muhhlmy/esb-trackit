@@ -100,15 +100,9 @@ function isParentExpanded(key) {
 function autoExpandActiveParent() {
   const currentPath = route.path
   if (
-    [
-      '/cases',
-      '/templates',
-      '/analytics',
-      '/admin/cases',
-      '/admin/kb-categories',
-      '/admin/editor',
-      '/faqs',
-    ].some((p) => currentPath.startsWith(p))
+    ['/cases', '/admin/cases', '/admin/kb-categories', '/admin/editor', '/faqs'].some((p) =>
+      currentPath.startsWith(p),
+    )
   )
     expandedParents.value.knowledge_base = true
   if (currentPath.startsWith('/assets') || currentPath === '/my-assets')
@@ -164,18 +158,6 @@ const menuGroups = computed(() => {
               to: '/cases',
               label: 'Cases & Artikel',
               icon: 'menu_book',
-              permission: null,
-            },
-            {
-              to: '/templates',
-              label: 'Templates Hub',
-              icon: 'description',
-              permission: null,
-            },
-            {
-              to: '/analytics',
-              label: 'KB Analytics',
-              icon: 'analytics',
               permission: null,
             },
             {

@@ -3,6 +3,8 @@ import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { useApi } from '../composables/useApi.js'
 import { useAuth } from '../composables/useAuth.js'
 import { animateStagger } from '../composables/useGsap.js'
+import { useViewMode } from '../composables/useViewMode.js'
+import AppViewToggle from '../components/ui/AppViewToggle.vue'
 import { normalizeLocation } from '../utils/locationNormalizer.js'
 import AppModal from '../components/ui/AppModal.vue'
 import SearchableSelect from '../components/ui/SearchableSelect.vue'
@@ -19,6 +21,7 @@ import AssetCategoryExportModal from '../components/ui/AssetCategoryExportModal.
 const { getAllPages, post, put, del } = useApi()
 const { hasWritePermission } = useAuth()
 const canWriteAssets = computed(() => hasWritePermission('assets_ops'))
+const { viewMode } = useViewMode('assets-ops', 'table')
 
 const assets = ref([])
 const currentPage = ref(1)
@@ -387,115 +390,125 @@ function formatDate(dateStr) {
     class="asset-workspace asset-inventory space-y-4"
     :data-testid="!isLoading ? 'page-ready' : undefined"
   >
-    <!-- Simplified SaaS Header & Toolbar Container -->
-    <div
-      class="asset-toolbar flex flex-col gap-3 sm:gap-3.5 bg-white p-3.5 sm:p-4.5 rounded-2xl border border-[#E2E8F0]/80 shadow-2xs"
-    >
-      <!-- Row 1: Page Title & Primary CTA -->
-      <div class="flex items-center justify-between gap-2.5">
-        <div class="min-w-0">
-          <h2 class="text-base sm:text-lg font-bold text-[#333333] tracking-tight truncate">
-            Aset OPS
-          </h2>
-          <p
-            class="text-[11px] sm:text-xs text-[#5F7089] mt-0.5 leading-normal line-clamp-1 sm:line-clamp-none"
-          >
-            Kelola perangkat & mesin operasional outlet / store (POS, KIOSK, Payment, Display).
-          </p>
-        </div>
+    <!-- Simplified SaaS Header & Toolbar Container (sticky mengikuti scroll) -->
+    <div class="asset-toolbar-sticky">
+      <div
+        class="asset-toolbar flex flex-col gap-3 sm:gap-3.5 bg-white p-3.5 sm:p-4.5 rounded-2xl border border-[#E2E8F0]/80 shadow-2xs"
+      >
+        <!-- Row 1: Page Title & Primary CTA -->
+        <div class="flex items-center justify-between gap-2.5">
+          <div class="min-w-0">
+            <h2 class="text-base sm:text-lg font-bold text-[#333333] tracking-tight truncate">
+              Aset OPS
+            </h2>
+            <p
+              class="text-[11px] sm:text-xs text-[#5F7089] mt-0.5 leading-normal line-clamp-1 sm:line-clamp-none"
+            >
+              Kelola perangkat & mesin operasional outlet / store (POS, KIOSK, Payment, Display).
+            </p>
+          </div>
 
-        <!-- Primary Action CTA -->
-        <div class="flex shrink-0 items-center gap-2">
-          <button
-            v-if="canWriteAssets"
-            type="button"
-            @click="openAdd"
-            class="toolbar-primary-action inline-flex h-9 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg bg-[#0A51B0] px-3 sm:px-3.5 text-xs font-semibold text-white shadow-2xs transition-all hover:bg-[#0A4391] active:scale-95"
-            title="Tambah Aset OPS baru"
-          >
-            <span aria-hidden="true" class="material-symbols-outlined text-[16px]">add</span>
-            <span>Tambah Aset OPS</span>
-          </button>
-          <div
-            class="toolbar-action-group flex items-center gap-1 rounded-lg border border-[#D7E3F2] bg-[#F8FAFC] p-1"
-          >
+          <!-- Primary Action CTA -->
+          <div class="flex shrink-0 items-center gap-2">
             <button
               v-if="canWriteAssets"
               type="button"
-              @click="showImportModal = true"
-              class="toolbar-action-button inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-[11px] font-bold text-[#0A51B0] hover:bg-white"
-              title="Impor data Aset OPS dari Excel"
+              @click="openAdd"
+              class="toolbar-primary-action inline-flex h-9 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg bg-[#0A51B0] px-3 sm:px-3.5 text-xs font-semibold text-white shadow-2xs transition-all hover:bg-[#0A4391] active:scale-95"
+              title="Tambah Aset OPS baru"
             >
-              <span aria-hidden="true" class="material-symbols-outlined text-[15px]"
-                >upload_file</span
-              >Import
+              <span aria-hidden="true" class="material-symbols-outlined text-[16px]">add</span>
+              <span>Tambah Aset OPS</span>
             </button>
-            <button
-              type="button"
-              @click="showExportModal = true"
-              class="toolbar-action-button inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-[11px] font-bold text-[#0A51B0] hover:bg-white"
-              title="Export data Aset OPS"
+            <div
+              class="toolbar-action-group flex items-center gap-1 rounded-lg border border-[#D7E3F2] bg-[#F8FAFC] p-1"
             >
-              <span aria-hidden="true" class="material-symbols-outlined text-[15px]">download</span
-              >Export
-            </button>
+              <button
+                v-if="canWriteAssets"
+                type="button"
+                @click="showImportModal = true"
+                class="toolbar-action-button inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-[11px] font-bold text-[#0A51B0] hover:bg-white"
+                title="Impor data Aset OPS dari Excel"
+              >
+                <span aria-hidden="true" class="material-symbols-outlined text-[15px]"
+                  >upload_file</span
+                >Import
+              </button>
+              <button
+                type="button"
+                @click="showExportModal = true"
+                class="toolbar-action-button inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-[11px] font-bold text-[#0A51B0] hover:bg-white"
+                title="Export data Aset OPS"
+              >
+                <span aria-hidden="true" class="material-symbols-outlined text-[15px]"
+                  >download</span
+                >Export
+              </button>
+            </div>
           </div>
         </div>
-      </div>
 
-      <!-- Row 2: Search, Filters & Actions -->
-      <div
-        class="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 w-full min-w-0 pt-2.5 border-t border-[#F1F5F9]"
-      >
-        <!-- Search Input -->
-        <div class="relative h-9 w-full sm:flex-1 sm:min-w-[200px]">
-          <span
-            aria-hidden="true"
-            class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-[17px] text-[#687281] pointer-events-none"
-            >search</span
-          >
-          <input
-            v-model="searchQuery"
-            type="text"
-            aria-label="Cari aset OPS"
-            placeholder="Cari hostname, nama asset, PIC, lokasi..."
-            class="h-full w-full rounded-lg border border-[#E2E8F0] bg-white pl-8 pr-8 text-xs text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
-          />
-          <!-- Inline Clear Button -->
-          <button
-            v-if="searchQuery"
-            type="button"
-            @click="searchQuery = ''"
-            aria-label="Bersihkan pencarian"
-            class="absolute right-2 top-1/2 -translate-y-1/2 flex h-5 w-5 items-center justify-center rounded-full text-[#687281] hover:bg-[#F1F5F9] hover:text-[#333333] transition-all cursor-pointer touch-manipulation"
-            title="Bersihkan"
-          >
-            <span aria-hidden="true" class="material-symbols-outlined text-[15px]">close</span>
-          </button>
-        </div>
+        <!-- Row 2: Search, Filters & Actions -->
+        <div
+          class="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 w-full min-w-0 pt-2.5 border-t border-[#F1F5F9]"
+        >
+          <!-- Search Input -->
+          <div class="relative h-9 w-full sm:flex-1 sm:min-w-[200px]">
+            <span
+              aria-hidden="true"
+              class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-[17px] text-[#687281] pointer-events-none"
+              >search</span
+            >
+            <input
+              v-model="searchQuery"
+              type="text"
+              aria-label="Cari aset OPS"
+              placeholder="Cari hostname, nama asset, PIC, lokasi..."
+              class="h-full w-full rounded-lg border border-[#E2E8F0] bg-white pl-8 pr-8 text-xs text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
+            />
+            <!-- Inline Clear Button -->
+            <button
+              v-if="searchQuery"
+              type="button"
+              @click="searchQuery = ''"
+              aria-label="Bersihkan pencarian"
+              class="absolute right-2 top-1/2 -translate-y-1/2 flex h-5 w-5 items-center justify-center rounded-full text-[#687281] hover:bg-[#F1F5F9] hover:text-[#333333] transition-all cursor-pointer touch-manipulation"
+              title="Bersihkan"
+            >
+              <span aria-hidden="true" class="material-symbols-outlined text-[15px]">close</span>
+            </button>
+          </div>
 
-        <div class="flex w-full items-center justify-end">
-          <button
-            type="button"
-            @click="showFilterModal = true"
-            class="h-9 shrink-0 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-semibold text-[#5F7089] hover:bg-white"
-          >
-            <span aria-hidden="true" class="material-symbols-outlined mr-1 align-middle text-[16px]"
-              >filter_alt</span
-            >Filter
-          </button>
+          <div class="flex w-full items-center justify-end">
+            <button
+              type="button"
+              @click="showFilterModal = true"
+              class="h-9 shrink-0 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-semibold text-[#5F7089] hover:bg-white"
+            >
+              <span
+                aria-hidden="true"
+                class="material-symbols-outlined mr-1 align-middle text-[16px]"
+                >filter_alt</span
+              >Filter
+            </button>
+          </div>
         </div>
       </div>
     </div>
 
     <!-- ─── MODERN ENTERPRISE SAAS DATA MANAGEMENT CONTAINER ──────────────── -->
     <div>
-      <div v-if="!isLoading && !pageError" class="it-list-heading" aria-live="polite">
-        <div>
-          <h3>
-            Daftar aset Ops <span>{{ filteredAssets.length }}</span>
-          </h3>
-          <p>Inventaris operasional perusahaan</p>
+      <div v-if="!isLoading && !pageError" class="it-list-heading-sticky">
+        <div class="it-list-heading" aria-live="polite">
+          <div>
+            <h3>
+              Daftar aset Ops <span>{{ filteredAssets.length }}</span>
+            </h3>
+            <p>Inventaris operasional perusahaan</p>
+          </div>
+          <div class="flex shrink-0 items-center gap-3">
+            <AppViewToggle v-model="viewMode" />
+          </div>
         </div>
       </div>
       <!-- Error Alert -->
@@ -623,52 +636,132 @@ function formatDate(dateStr) {
       </div>
 
       <!-- Asset list -->
-      <div v-else class="asset-card-list laptop-list">
-        <div
-          v-for="asset in paginatedAssets"
-          :key="asset.id"
-          class="laptop-row"
-          tabindex="0"
-          :aria-label="'Lihat detail ' + (asset.nama_asset || 'aset')"
-          @click="openDetails(asset)"
-          @keydown.enter.self="openDetails(asset)"
-          @keydown.space.prevent.self="openDetails(asset)"
-        >
-          <div class="laptop-identity">
-            <div class="laptop-icon" aria-hidden="true">
-              <span aria-hidden="true" class="material-symbols-outlined">{{
-                getOpsIcon(asset.kategori)
-              }}</span>
+      <div v-else :class="{ 'ws-table-mode': viewMode === 'table' }">
+        <!-- Mode Tabel (tampil ≥ 1280px) -->
+        <div v-if="viewMode === 'table'" class="ws-data-table-wrap hidden xl:block">
+          <table class="ws-data-table">
+            <caption class="sr-only">
+              Daftar aset Ops
+            </caption>
+            <colgroup>
+              <col class="w-[22%]" />
+              <col class="w-[14%]" />
+              <col class="w-[15%]" />
+              <col class="w-[12%]" />
+              <col class="w-[11%]" />
+              <col class="w-[12%]" />
+              <col class="w-[14%]" />
+              <col class="w-[6%]" />
+            </colgroup>
+            <thead>
+              <tr>
+                <th scope="col">Nama Aset</th>
+                <th scope="col">Penanggung Jawab</th>
+                <th scope="col">Lokasi</th>
+                <th scope="col">Kategori</th>
+                <th scope="col">Status</th>
+                <th scope="col">Kondisi</th>
+                <th scope="col">Nilai</th>
+                <th scope="col"><span class="sr-only">Aksi</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                v-for="asset in paginatedAssets"
+                :key="asset.id"
+                tabindex="0"
+                :aria-label="'Lihat detail ' + (asset.nama_asset || 'aset')"
+                @click="openDetails(asset)"
+                @keydown.enter.self="openDetails(asset)"
+                @keydown.space.prevent.self="openDetails(asset)"
+              >
+                <td>
+                  <span class="ws-cell-main" :title="asset.nama_asset">{{
+                    asset.nama_asset || '—'
+                  }}</span>
+                  <span class="ws-cell-sub">{{ asset.hostname || '—' }}</span>
+                </td>
+                <td>
+                  <span class="ws-cell-main">{{ asset.pic || 'Belum ditetapkan' }}</span>
+                </td>
+                <td>
+                  <span class="ws-cell-main" :title="asset.lokasi">{{ asset.lokasi || '—' }}</span>
+                  <span v-if="asset.tanggal_beli" class="ws-cell-sub"
+                    >Beli: {{ formatDate(asset.tanggal_beli) }}</span
+                  >
+                </td>
+                <td>
+                  <span class="ws-cell-main">{{ asset.kategori || '—' }}</span>
+                </td>
+                <td>
+                  <span class="ws-cell-main">{{ asset.status || '—' }}</span>
+                </td>
+                <td>
+                  <span class="ws-cell-main">{{ asset.kondisi || '—' }}</span>
+                </td>
+                <td>
+                  <span class="ws-cell-main ws-cell-num">{{
+                    formatCurrency(asset.total_asset_amount)
+                  }}</span>
+                </td>
+                <td @click.stop>
+                  <AppRowActions :actions="getOpsActions(asset)" />
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Mode Kartu (default < 1280px, atau saat dipilih) -->
+        <div class="asset-card-list laptop-list">
+          <div
+            v-for="asset in paginatedAssets"
+            :key="asset.id"
+            class="laptop-row"
+            tabindex="0"
+            :aria-label="'Lihat detail ' + (asset.nama_asset || 'aset')"
+            @click="openDetails(asset)"
+            @keydown.enter.self="openDetails(asset)"
+            @keydown.space.prevent.self="openDetails(asset)"
+          >
+            <div class="laptop-identity">
+              <div class="laptop-icon" aria-hidden="true">
+                <span aria-hidden="true" class="material-symbols-outlined">{{
+                  getOpsIcon(asset.kategori)
+                }}</span>
+              </div>
+              <div class="laptop-identity-text">
+                <h4 :title="asset.nama_asset">{{ asset.nama_asset || '—' }}</h4>
+                <p :title="asset.kategori">{{ asset.kategori || '—' }}</p>
+                <span class="laptop-serial" :title="asset.hostname">{{
+                  asset.hostname || '—'
+                }}</span>
+              </div>
             </div>
-            <div class="laptop-identity-text">
-              <h4 :title="asset.nama_asset">{{ asset.nama_asset || '—' }}</h4>
-              <p :title="asset.kategori">{{ asset.kategori || '—' }}</p>
-              <span class="laptop-serial" :title="asset.hostname">{{ asset.hostname || '—' }}</span>
+            <div class="laptop-holder laptop-field">
+              <span class="laptop-label">Penanggung jawab</span>
+              <strong>{{ asset.pic || 'Belum ditetapkan' }}</strong>
             </div>
-          </div>
-          <div class="laptop-holder laptop-field">
-            <span class="laptop-label">Penanggung jawab</span>
-            <strong>{{ asset.pic || 'Belum ditetapkan' }}</strong>
-          </div>
-          <div class="laptop-location laptop-field">
-            <span class="laptop-label">Lokasi</span>
-            <strong :title="asset.lokasi">{{ asset.lokasi || '—' }}</strong>
-            <span v-if="asset.tanggal_beli" class="laptop-secondary"
-              >Beli: {{ formatDate(asset.tanggal_beli) }}</span
-            >
-          </div>
-          <div class="laptop-state">
-            <span class="laptop-label">Status</span>
-            <span class="laptop-status">{{ asset.status || '—' }}</span>
-            <span class="laptop-condition">{{ asset.kondisi || '—' }}</span>
-            <span
-              class="laptop-secondary"
-              :title="'Total nilai: ' + formatCurrency(asset.total_asset_amount)"
-              >{{ formatCurrency(asset.total_asset_amount) }}</span
-            >
-          </div>
-          <div class="laptop-actions" @click.stop>
-            <AppRowActions :actions="getOpsActions(asset)" />
+            <div class="laptop-location laptop-field">
+              <span class="laptop-label">Lokasi</span>
+              <strong :title="asset.lokasi">{{ asset.lokasi || '—' }}</strong>
+              <span v-if="asset.tanggal_beli" class="laptop-secondary"
+                >Beli: {{ formatDate(asset.tanggal_beli) }}</span
+              >
+            </div>
+            <div class="laptop-state">
+              <span class="laptop-label">Status</span>
+              <span class="laptop-status">{{ asset.status || '—' }}</span>
+              <span class="laptop-condition">{{ asset.kondisi || '—' }}</span>
+              <span
+                class="laptop-secondary"
+                :title="'Total nilai: ' + formatCurrency(asset.total_asset_amount)"
+                >{{ formatCurrency(asset.total_asset_amount) }}</span
+              >
+            </div>
+            <div class="laptop-actions" @click.stop>
+              <AppRowActions :actions="getOpsActions(asset)" />
+            </div>
           </div>
         </div>
       </div>
@@ -748,7 +841,7 @@ function formatDate(dateStr) {
               v-model="form.hostname"
               type="text"
               required
-              placeholder="Contoh: OPS-PL-001"
+              placeholder="cth: OPS-PL-001"
               class="w-full h-10 px-3 text-[13px] rounded-xl border border-[#E2E8F0] bg-white focus:border-[#0A51B0] focus:outline-none"
             />
           </div>
@@ -763,7 +856,7 @@ function formatDate(dateStr) {
               v-model="form.nama_asset"
               type="text"
               required
-              placeholder="Contoh: KIOSK Self Service Station"
+              placeholder="cth: KIOSK Self Service Station"
               class="w-full h-10 px-3 text-[13px] rounded-xl border border-[#E2E8F0] bg-white focus:border-[#0A51B0] focus:outline-none"
             />
           </div>
@@ -811,7 +904,7 @@ function formatDate(dateStr) {
               id="ops-pic"
               v-model="form.pic"
               type="text"
-              placeholder="Contoh: Store Manager / Spv Kasir"
+              placeholder="cth: Store Manager / Spv Kasir"
               class="w-full h-10 px-3 text-[13px] rounded-xl border border-[#E2E8F0] bg-white focus:border-[#0A51B0] focus:outline-none"
             />
           </div>
@@ -1063,3 +1156,4 @@ function formatDate(dateStr) {
 </style>
 
 <style scoped src="../assets/asset-workspace.css"></style>
+<style scoped src="../assets/ws-table.css"></style>

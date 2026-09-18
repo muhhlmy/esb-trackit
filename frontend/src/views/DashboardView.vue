@@ -349,20 +349,20 @@ onUnmounted(() => {
       <!-- Row 2: Monthly Trend (8 col) + Status Donut (4 col) Skeleton -->
       <div class="grid grid-cols-1 xl:grid-cols-12 gap-3.5">
         <div class="xl:col-span-8">
-          <SkeletonChart type="line" height="260px" />
+          <SkeletonChart type="line" height="240px" />
         </div>
         <div class="xl:col-span-4">
-          <SkeletonChart type="donut" height="260px" />
+          <SkeletonChart type="donut" height="240px" />
         </div>
       </div>
 
       <!-- Row 3: Asset Type (6 col) + Condition (6 col) Skeleton -->
       <div class="grid grid-cols-1 xl:grid-cols-12 gap-3.5">
         <div class="lg:col-span-6">
-          <SkeletonChart type="bar" height="240px" />
+          <SkeletonChart type="bar" height="260px" />
         </div>
         <div class="lg:col-span-6">
-          <SkeletonChart type="pie" height="240px" />
+          <SkeletonChart type="pie" height="260px" />
         </div>
       </div>
 
@@ -604,7 +604,8 @@ onUnmounted(() => {
       <div class="dashboard-stats">
         <div class="dash-stat-card stat-total">
           <div class="stat-label">
-            Total aset<span class="material-symbols-outlined" aria-hidden="true">inventory_2</span>
+            <span class="stat-label-text">Total Aset</span>
+            <span class="material-symbols-outlined" aria-hidden="true">inventory_2</span>
           </div>
           <p class="stat-number">{{ totalAssets }}</p>
           <span class="stat-caption">Perangkat terdaftar</span>
@@ -645,8 +646,8 @@ onUnmounted(() => {
           :class="'stat-' + item.tone"
         >
           <div class="stat-label">
-            {{ item.label
-            }}<span class="material-symbols-outlined" aria-hidden="true">{{ item.icon }}</span>
+            <span class="stat-label-text">{{ item.label }}</span>
+            <span class="material-symbols-outlined" aria-hidden="true">{{ item.icon }}</span>
           </div>
           <p class="stat-number">{{ item.count }}</p>
           <div class="stat-bottom">
@@ -659,25 +660,23 @@ onUnmounted(() => {
       <!-- ─── ROW 2: Line Chart (8 col) + Donut Chart (4 col) ── -->
       <div class="dashboard-chart-grid grid grid-cols-1 xl:grid-cols-12">
         <div class="xl:col-span-8 dashboard-panel">
-          <div class="flex items-center justify-between mb-3">
-            <h3 class="text-sm font-bold text-[#333333]">Tren Aset Bulanan</h3>
-            <span class="text-[10px] font-medium text-[#606f85] bg-[#F1F5F9] px-2 py-0.5 rounded-md"
-              >Per Bulan</span
-            >
+          <div class="flex items-center justify-between">
+            <h3>Tren Aset Bulanan</h3>
+            <span class="panel-chip">Per Bulan</span>
           </div>
           <AssetTrendLineChart
             class="w-full"
             :data="stats.monthlyTrend || []"
             :loading="isLoading"
             :error="error"
+            :height="240"
+            embedded
           />
         </div>
         <div class="xl:col-span-4 dashboard-panel">
-          <div class="flex items-center justify-between mb-3">
-            <h3 class="text-sm font-bold text-[#333333]">Status Aset</h3>
-            <span class="text-[10px] font-medium text-[#606f85] bg-[#F1F5F9] px-2 py-0.5 rounded-md"
-              >Distribusi</span
-            >
+          <div class="flex items-center justify-between">
+            <h3>Status Aset</h3>
+            <span class="panel-chip">Distribusi</span>
           </div>
 
           <!-- Empty State -->
@@ -703,8 +702,8 @@ onUnmounted(() => {
               </div>
             </div>
 
-            <!-- Status Rows -->
-            <div class="space-y-2.5">
+            <!-- Status Rows: menyebar vertikal agar sejajar dengan panel chart -->
+            <div class="flex flex-1 flex-col justify-center gap-2.5">
               <div
                 v-for="item in getSortedByStatus()"
                 :key="item.status"
@@ -716,19 +715,17 @@ onUnmounted(() => {
                   :class="getStatusColorClass(item.status)"
                 ></div>
 
-                <!-- Label & Count -->
-                <div class="flex-1 min-w-0">
-                  <div class="flex items-center justify-between gap-2">
-                    <span class="text-xs font-semibold text-[#475569] truncate">{{
-                      item.status
-                    }}</span>
-                    <span class="text-xs font-bold text-[#333333] font-num">{{ item.count }}</span>
-                  </div>
-                  <div class="flex items-center justify-between gap-2 mt-1">
-                    <span class="text-[10px] text-[#687281]"
+                <!-- Label • count • persentase (satu baris, tidak bertumpuk) -->
+                <div class="flex flex-1 min-w-0 items-center justify-between gap-2">
+                  <span class="text-xs font-semibold text-[#475569] truncate">{{
+                    item.status
+                  }}</span>
+                  <span class="flex shrink-0 items-baseline gap-1.5 font-num">
+                    <span class="text-xs font-bold text-[#333333]">{{ item.count }}</span>
+                    <span class="text-[10px] font-medium text-[#687281]"
                       >{{ getStatusPercentage(item.status) }}%</span
                     >
-                  </div>
+                  </span>
                 </div>
               </div>
             </div>
@@ -738,32 +735,32 @@ onUnmounted(() => {
 
       <!-- ─── ROW 3: Bar Chart (7 col) + Pie Chart (5 col) ── -->
       <div class="dashboard-chart-grid grid grid-cols-1 xl:grid-cols-12">
-        <div class="lg:col-span-7 dashboard-panel">
-          <div class="flex items-center justify-between mb-4">
-            <h3 class="text-sm font-semibold text-[#333333]">Aset Per Tipe</h3>
-            <span class="text-xs font-medium text-[#606f85] bg-[#F1F5F9] px-2.5 py-1 rounded-lg"
-              >Kategori</span
-            >
+        <div class="xl:col-span-7 dashboard-panel">
+          <div class="flex items-center justify-between">
+            <h3>Aset Per Tipe</h3>
+            <span class="panel-chip">Kategori</span>
           </div>
           <AssetTypeBarChart
             class="w-full"
             :data="stats.byType || []"
             :loading="isLoading"
             :error="error"
+            :height="260"
+            embedded
           />
         </div>
-        <div class="lg:col-span-5 dashboard-panel">
-          <div class="flex items-center justify-between mb-4">
-            <h3 class="text-sm font-semibold text-[#333333]">Kondisi Aset</h3>
-            <span class="text-xs font-medium text-[#606f85] bg-[#F1F5F9] px-2.5 py-1 rounded-lg"
-              >Persentase</span
-            >
+        <div class="xl:col-span-5 dashboard-panel">
+          <div class="flex items-center justify-between">
+            <h3>Kondisi Aset</h3>
+            <span class="panel-chip">Persentase</span>
           </div>
           <AssetConditionPieChart
             class="w-full"
             :data="stats.byCondition || []"
             :loading="isLoading"
             :error="error"
+            :height="260"
+            embedded
           />
         </div>
       </div>
@@ -820,9 +817,7 @@ onUnmounted(() => {
 
       <!-- ─── ROW 6: Tabel 5 Aset Terbaru ────────────────────── -->
       <div v-if="canReadAssets" class="dashboard-table">
-        <div
-          class="flex items-center justify-between px-4 py-3.5 sm:px-6 sm:py-4 border-b border-slate-100 bg-white"
-        >
+        <div class="flex items-center justify-between border-b border-slate-100 bg-white">
           <div class="min-w-0 pr-3">
             <h3 class="text-sm sm:text-base font-bold text-slate-900 tracking-tight truncate">
               Aset Terbaru
@@ -831,10 +826,7 @@ onUnmounted(() => {
               5 Perangkat IT paling baru dalam sistem
             </p>
           </div>
-          <RouterLink
-            to="/assets"
-            class="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-600 bg-blue-50/70 hover:bg-blue-100/80 hover:text-blue-700 px-3 py-1.5 rounded-lg border border-blue-100/60 transition-all duration-150 shrink-0 active:scale-95 touch-manipulation"
-          >
+          <RouterLink to="/assets" class="table-link touch-manipulation">
             <span>Lihat Semua</span>
             <span aria-hidden="true" class="material-symbols-outlined text-[15px]"
               >arrow_forward</span
@@ -1062,9 +1054,7 @@ onUnmounted(() => {
 
       <!-- ─── ROW 7: Tabel Tiket Permintaan Terbaru ────────────────── -->
       <div v-if="canReadTickets" class="dashboard-table">
-        <div
-          class="flex items-center justify-between px-4 py-3.5 sm:px-6 sm:py-4 border-b border-slate-100 bg-white"
-        >
+        <div class="flex items-center justify-between border-b border-slate-100 bg-white">
           <div class="min-w-0 pr-3">
             <h3 class="text-sm sm:text-base font-bold text-slate-900 tracking-tight truncate">
               Tiket Terbaru
@@ -1073,10 +1063,7 @@ onUnmounted(() => {
               5 Laporan kendala &amp; permintaan IT terbaru
             </p>
           </div>
-          <RouterLink
-            to="/tickets"
-            class="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-600 bg-blue-50/70 hover:bg-blue-100/80 hover:text-blue-700 px-3 py-1.5 rounded-lg border border-blue-100/60 transition-all duration-150 shrink-0 active:scale-95 touch-manipulation"
-          >
+          <RouterLink to="/tickets" class="table-link touch-manipulation">
             <span>Lihat Semua</span>
             <span aria-hidden="true" class="material-symbols-outlined text-[15px]"
               >arrow_forward</span
@@ -1352,7 +1339,7 @@ onUnmounted(() => {
   color: #63748e;
   line-height: 1.5;
 }
-.stat-label > span {
+.stat-label > .material-symbols-outlined {
   font-size: 18px;
   color: var(--stat-color);
   flex-shrink: 0;
@@ -1367,8 +1354,8 @@ onUnmounted(() => {
   margin: 18px 0 13px;
 }
 .stat-caption {
-  font-size: 10px;
-  color: #bdcce1;
+  font-size: 11px;
+  color: #64748b;
 }
 .stat-total {
   background: #0a51b0;
@@ -1378,8 +1365,8 @@ onUnmounted(() => {
   color: white;
 }
 .stat-total .stat-label,
-.stat-total .stat-label > span {
-  color: #d3e1f6;
+.stat-total .stat-label > .material-symbols-outlined {
+  color: #d9e7fb;
 }
 .stat-green {
   --stat-color: #2d7d6c;
@@ -1420,10 +1407,15 @@ onUnmounted(() => {
 }
 .dashboard-panel {
   min-width: 0;
+  display: flex;
+  flex-direction: column;
   background: white;
   padding: 22px;
   border: 1px solid #e2e8f0;
   border-radius: 13px;
+}
+.dashboard-panel > div:first-child {
+  flex-shrink: 0;
 }
 .dashboard-panel h3 {
   font-size: 14px;
@@ -1454,13 +1446,6 @@ onUnmounted(() => {
 .dashboard-table > div:first-child {
   gap: 10px;
 }
-.dashboard-table > div:first-child a {
-  min-height: 40px;
-  background: transparent;
-  border-color: transparent;
-  padding: 0 4px;
-  font-size: 11px;
-}
 .dashboard-table h3 {
   font-size: 14px;
   font-weight: 650;
@@ -1479,18 +1464,18 @@ onUnmounted(() => {
 }
 .dashboard-csat :deep(.shadow-card) {
   box-shadow: none;
-  border-radius: 13px;
+  border-radius: 14px;
   border-color: #e2e8f0;
-  padding: 22px;
 }
-.dashboard-csat :deep(h3) {
-  font-size: 14px;
+.dashboard-csat :deep(.shadow-card h3) {
+  font-size: 15px;
   font-weight: 650;
+  color: #2a3547;
 }
-.dashboard-csat :deep(h2) {
-  font-size: 18px;
-  font-weight: 650;
-  letter-spacing: -0.025em;
+.dashboard-csat > div > h3 {
+  font-size: 17px;
+  font-weight: 700;
+  color: #2a3547;
 }
 @media (max-width: 1199px) and (min-width: 768px) {
   .dashboard-stats {
@@ -1583,29 +1568,19 @@ onUnmounted(() => {
     padding: 17px;
   }
 }
-@media (prefers-reduced-motion: reduce) {
-  .dashboard-view * {
-    transition: none !important;
-  }
-}
-</style>
+/* ── Konsolidasi layer (menggantikan style block duplikat) ───────── */
 
-<style scoped>
-.dashboard-view {
-  gap: 24px;
-}
+/* Kartu intro: elevated + gradient CTA sama dengan stat-total */
 .dashboard-intro {
-  padding: 24px;
+  padding: 22px 24px;
   border: 1px solid #e2e8f0;
   border-radius: 14px;
   background: #fff;
 }
 .dashboard-eyebrow {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 8px;
-  font-size: 10px;
-  color: #606f85;
 }
 .dashboard-eyebrow::before {
   content: '';
@@ -1614,59 +1589,45 @@ onUnmounted(() => {
   border-radius: 50%;
   background: #ff4f1b;
 }
-.dashboard-intro h2 {
-  font-size: 26px;
-  font-weight: 650;
-  color: #333;
-}
-.dashboard-intro h2 + p {
-  font-size: 12px;
-  max-width: 520px;
-}
 .dashboard-add {
-  background: #0a51b0;
   min-height: 44px;
   padding-inline: 18px;
+  background: linear-gradient(125deg, #0a51b0, #097cde);
+  transition:
+    filter 0.2s ease,
+    transform 0.15s ease;
 }
-.dashboard-stats {
-  gap: 14px;
+.dashboard-add:hover {
+  filter: brightness(1.06);
 }
-.dash-stat-card {
-  padding: 22px;
-  border-radius: 14px;
+.dashboard-add:active {
+  transform: scale(0.98);
 }
-.stat-label {
-  font-size: 12px;
-  font-weight: 500;
-}
-.stat-label > span {
+
+/* Ikon stat-label: chip dengan latar lembut, konsisten di semua kartu */
+.stat-label > .material-symbols-outlined {
   display: grid;
   place-items: center;
   width: 30px;
   height: 30px;
   border-radius: 8px;
-  background: #f8fafc;
+  background: #f1f5f9;
 }
-.stat-number {
-  margin: 16px 0;
-  font-size: 34px;
+.stat-label-text {
+  min-width: 0;
 }
 .stat-total {
   background: linear-gradient(125deg, #0a51b0, #097cde);
-  border-color: #0a51b0;
 }
-.stat-total .stat-label > span {
-  background: #ffffff18;
+.stat-total .stat-label > .material-symbols-outlined {
+  background: rgba(255, 255, 255, 0.12);
 }
 .stat-total .stat-label,
+.stat-total .stat-label > .material-symbols-outlined {
+  color: #d9e7fb;
+}
 .stat-total .stat-caption {
-  color: #e5f1ff;
-}
-.stat-caption {
-  font-size: 11px;
-}
-.stat-bottom {
-  font-size: 11px;
+  color: #9dbde4;
 }
 .stat-blue {
   --stat-color: #0a51b0;
@@ -1674,43 +1635,74 @@ onUnmounted(() => {
 .stat-amber {
   --stat-color: #b45309;
 }
-.dashboard-panel {
-  padding: 24px;
-  border-radius: 14px;
-}
+
+/* Heading panel & chip: satu ukuran, satu gaya untuk semua kartu grafik */
 .dashboard-panel h3,
 .dashboard-table h3 {
   font-size: 15px;
-  font-weight: 600;
-  color: #333;
+  font-weight: 650;
+  color: #2a3547;
 }
 .dashboard-panel > div:first-child {
-  margin-bottom: 24px;
+  margin-bottom: 20px;
 }
-.location-card {
-  background: #fafbfd;
-  padding: 16px;
-  border-radius: 10px;
+.panel-chip {
+  flex-shrink: 0;
+  font-size: 11px;
+  font-weight: 600;
+  color: #52607a;
+  background: #f1f5f9;
+  padding: 3px 10px;
+  border-radius: 999px;
+  white-space: nowrap;
 }
-.dashboard-table > div:first-child {
-  padding: 20px 22px;
-}
-.dashboard-table > div:first-child :is(h3, p) {
-  white-space: normal;
-}
-.dashboard-table > div:first-child a {
-  color: #0a51b0;
-  font-size: 12px;
-  min-height: 44px;
-}
+
+/* Tabel dashboard: header sentence-case, baris lega, link aksi konsisten */
 .dashboard-table table th {
   text-transform: none;
   letter-spacing: 0;
   font-size: 11px;
-  font-weight: 500;
+  font-weight: 600;
+  color: #64748b;
 }
 .dashboard-table table td {
-  padding-block: 18px;
+  padding-block: 16px;
+}
+.dashboard-table > div:first-child {
+  padding: 18px 20px;
+}
+.dashboard-table > div:first-child :is(h3, p) {
+  white-space: normal;
+}
+.table-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 0 12px;
+  border-radius: 8px;
+  border: 1px solid #dbeafe;
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-size: 12px;
+  font-weight: 600;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+  touch-action: manipulation;
+}
+.table-link:hover {
+  background: #dbeafe;
+  color: #1e40af;
+}
+.table-link:active {
+  transform: scale(0.97);
+}
+
+/* Kartu lokasi & recent-cards */
+.location-card {
+  background: #fafbfd;
+  border-radius: 10px;
 }
 .dashboard-recent-cards > div {
   padding: 18px;
@@ -1720,10 +1712,14 @@ onUnmounted(() => {
   flex-wrap: wrap;
   gap: 10px;
 }
+
+/* Aksesibilitas: fokus terlihat untuk semua kontrol */
 .dashboard-view :is(button, a):focus-visible {
   outline: 2px solid #097cde;
   outline-offset: 3px;
 }
+
+/* Tablet 768–1279: 4 kolom stat, recent cards 2 kolom */
 @media (min-width: 768px) and (max-width: 1279px) {
   .dashboard-stats {
     grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -1738,9 +1734,6 @@ onUnmounted(() => {
   .stat-total .stat-number {
     margin: 0;
   }
-  .dash-stat-card {
-    padding: 18px;
-  }
   .dashboard-recent-cards {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1749,40 +1742,8 @@ onUnmounted(() => {
     border: 1px solid #edf1f6;
   }
 }
+
 @media (max-width: 767px) {
-  .dashboard-view {
-    gap: 18px;
-  }
-  .dashboard-intro {
-    padding: 20px;
-    gap: 18px;
-  }
-  .dashboard-intro h2 {
-    font-size: 23px;
-  }
-  .dashboard-intro h2 + p {
-    max-width: none;
-    font-size: 12px;
-  }
-  .dashboard-add {
-    width: 100%;
-    font-size: 12px;
-  }
-  .dash-stat-card {
-    padding: 16px;
-  }
-  .stat-label {
-    font-size: 11px;
-  }
-  .stat-number {
-    font-size: 30px;
-  }
-  .stat-total .stat-number {
-    margin: 0;
-  }
-  .dashboard-panel {
-    padding: 18px;
-  }
   .dashboard-table > div:first-child {
     padding: 16px;
     flex-wrap: wrap;
@@ -1793,6 +1754,12 @@ onUnmounted(() => {
   }
   .dashboard-recent-cards > div {
     padding: 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dashboard-view * {
+    transition: none !important;
   }
 }
 </style>

@@ -6,7 +6,9 @@ import { useCases } from '@/composables/useCases'
 import { useAuth } from '@/composables/useAuth'
 import gsap from 'gsap'
 import { isReducedMotion } from '@/composables/useGsap'
+import { useViewMode } from '@/composables/useViewMode.js'
 import CustomSelect from '@/components/ui/CustomSelect.vue'
+import AppViewToggle from '@/components/ui/AppViewToggle.vue'
 import {
   FileText,
   Plus,
@@ -30,6 +32,7 @@ const canWrite = computed(() => hasWritePermission('knowledge_base'))
 const searchQuery = ref('')
 const selectedCategory = ref('all')
 const selectedStatus = ref('all') // 'all', 'PUBLISHED', 'DRAFT'
+const { viewMode } = useViewMode('admin-cms', 'table')
 
 const CATEGORY_OPTIONS = [
   { value: 'all', label: 'Semua Kategori' },
@@ -160,9 +163,9 @@ function getCategoryBadgeClass(category) {
 
 <template>
   <div ref="mainScope" class="cms-page w-full max-w-7xl mx-auto space-y-4 sm:space-y-6 font-sans">
-    <!-- Header Card -->
+    <!-- Header Card (sticky mengikuti scroll) -->
     <div
-      class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3.5 sm:gap-4 bg-white dark:bg-slate-900 border border-[#E5EAEF] dark:border-slate-800 p-4 sm:p-6 rounded-2xl shadow-sm gsap-admin-el"
+      class="ws-toolbar-flat flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3.5 sm:gap-4 bg-white dark:bg-slate-900 border border-[#E5EAEF] dark:border-slate-800 p-4 sm:p-6 rounded-2xl shadow-sm gsap-admin-el"
     >
       <div class="space-y-1 sm:space-y-1.5 w-full sm:w-auto">
         <!-- Breadcrumb -->
@@ -374,6 +377,8 @@ function getCategoryBadgeClass(category) {
         >
           Reset
         </button>
+
+        <AppViewToggle v-model="viewMode" class="shrink-0" />
       </div>
     </div>
 
@@ -381,8 +386,11 @@ function getCategoryBadgeClass(category) {
     <div
       class="bg-white dark:bg-slate-900 rounded-xl border border-[#E2E8F0] dark:border-slate-800 overflow-hidden gsap-admin-el shadow-sm"
     >
-      <!-- MOBILE CARD VIEW (< md) -->
-      <div class="cms-cards xl:hidden divide-y divide-[#F1F5F9] dark:divide-slate-800/60">
+      <!-- MOBILE CARD VIEW (< xl, atau saat mode Kartu dipilih) -->
+      <div
+        class="cms-cards divide-y divide-[#F1F5F9] dark:divide-slate-800/60"
+        :class="viewMode === 'card' ? '' : 'xl:hidden'"
+      >
         <!-- Mobile Empty State -->
         <div v-if="filteredCases.length === 0" class="py-12 px-4 text-center">
           <div
@@ -511,8 +519,8 @@ function getCategoryBadgeClass(category) {
         </div>
       </div>
 
-      <!-- DESKTOP TABLE VIEW (>= md) -->
-      <div class="hidden xl:block overflow-x-auto">
+      <!-- DESKTOP TABLE VIEW (>= xl, mode Tabel) -->
+      <div v-if="viewMode === 'table'" class="hidden xl:block overflow-x-auto">
         <table class="w-full text-left text-sm border-collapse">
           <thead
             class="border-b border-[#E2E8F0] dark:border-slate-800 text-[#5F7089] dark:text-slate-400 font-medium text-xs"
@@ -703,6 +711,8 @@ function getCategoryBadgeClass(category) {
     </AppModal>
   </div>
 </template>
+
+<style scoped src="../../assets/ws-table.css"></style>
 
 <style scoped>
 .fade-enter-active,

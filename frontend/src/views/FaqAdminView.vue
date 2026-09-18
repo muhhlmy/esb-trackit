@@ -5,6 +5,7 @@ import { RouterLink } from 'vue-router'
 import { useApi } from '../composables/useApi.js'
 import { useToast } from '../composables/useToast.js'
 import { useAuth } from '../composables/useAuth.js'
+import { useKbCategories } from '../composables/useKbCategories.js'
 import AppModal from '../components/ui/AppModal.vue'
 import CustomSelect from '../components/ui/CustomSelect.vue'
 import {
@@ -35,11 +36,23 @@ const FAQ_CATEGORIES = [
   'General & Policies',
 ]
 
-const categoryOptions = FAQ_CATEGORIES.map((cat) => ({ value: cat, label: cat }))
+// Kategori FAQ mengikuti Data Karyawan/Kategori di kb_categories (sumber yang
+// sama dengan halaman /admin/kb-categories dan editor artikel). Opsi statis
+// hanya fallback jika data DB belum dimuat.
+const { categories: kbCategories, fetchAllCategories } = useKbCategories()
+
+const categoryOptions = computed(() => {
+  const fromDb = kbCategories.value.map((c) => ({ value: c.title, label: c.title }))
+  const seen = new Set(fromDb.map((c) => c.value))
+  return [
+    ...fromDb,
+    ...FAQ_CATEGORIES.filter((c) => !seen.has(c)).map((c) => ({ value: c, label: c })),
+  ]
+})
 
 const categoryFilterOptions = computed(() => [
   { value: 'all', label: 'All Categories' },
-  ...categoryOptions,
+  ...categoryOptions.value,
 ])
 
 const faqStatusFormOptions = [
@@ -237,14 +250,19 @@ function getCategoryBadgeClass(category) {
   return 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border-emerald-200/80 dark:border-emerald-800/60'
 }
 
-onMounted(fetchFaqs)
+onMounted(() => {
+  fetchFaqs()
+  fetchAllCategories().catch(() => {
+    /* fallback ke daftar statis di atas */
+  })
+})
 </script>
 
 <template>
   <div class="kb-management admin-workspace max-w-7xl mx-auto space-y-6 select-none font-sans">
     <!-- Top Navigation & Header Card -->
     <div
-      class="admin-page-header flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3.5 sm:gap-4 bg-white dark:bg-slate-900 border border-[#E5EAEF] dark:border-slate-800 p-4 sm:p-6 rounded-xl sm:rounded-2xl shadow-xs"
+      class="admin-page-header ws-toolbar-flat flex flex-col items-start sm:items-center justify-between gap-3.5 bg-white border border-[#E2E8F0]/80 p-3.5 sm:p-4.5 rounded-2xl shadow-2xs"
     >
       <div class="space-y-1 sm:space-y-1.5 w-full sm:w-auto">
         <!-- Breadcrumb -->
@@ -839,6 +857,7 @@ onMounted(fetchFaqs)
 </template>
 
 <style scoped src="../assets/admin-workspace.css"></style>
+<style scoped src="../assets/ws-table.css"></style>
 
 <style scoped>
 .kb-management table td:first-child {

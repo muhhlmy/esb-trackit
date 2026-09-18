@@ -47,7 +47,14 @@ const categories = computed(() => {
   const seen = new Set(fromDb.map((c) => c.id))
   // Pertahankan opsi default agar case lama yang kategorinya belum terdaftar
   // di kb_categories tetap ter-render dengan label yang benar.
-  return [...fromDb, ...DEFAULT_CATEGORIES.filter((c) => !seen.has(c.id))]
+  const merged = [...fromDb, ...DEFAULT_CATEGORIES.filter((c) => !seen.has(c.id))]
+  // Kategori dokumen saat ini harus selalu ada sebagai opsi; jika tidak,
+  // <select> tampil kosong padahal doc.category masih berisi nilai lama.
+  const current = props.modelValue?.category
+  if (current && !merged.some((c) => c.id === current)) {
+    merged.push({ id: current, label: current })
+  }
+  return merged
 })
 
 const severities = [

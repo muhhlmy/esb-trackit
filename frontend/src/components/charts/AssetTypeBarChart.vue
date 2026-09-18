@@ -19,6 +19,8 @@ const props = defineProps({
   data: { type: Array, default: () => [] },
   loading: { type: Boolean, default: false },
   error: { type: String, default: '' },
+  height: { type: Number, default: 260 },
+  embedded: { type: Boolean, default: false },
 })
 
 const { chartColors, palette } = useChartTheme()
@@ -76,6 +78,8 @@ const chartOptions = computed(() => ({
     :loading="loading"
     :empty="isEmpty"
     :error="error"
+    :height="height"
+    :embedded="embedded"
   >
     <div class="h-full w-full">
       <Bar

@@ -1,0 +1,26 @@
+{
+  "name": "ESB TrackIT",
+  "short_name": "TrackIT",
+  "description": "IT asset monitoring, helpdesk, and internal operations.",
+  "lang": "id",
+  "display": "standalone",
+  "orientation": "any",
+  "start_url": "/",
+  "scope": "/",
+  "theme_color": "#0a51b0",
+  "background_color": "#f4f6f9",
+  "icons": [
+    {
+      "src": "/esb-logo-only.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/esb-logo-only.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

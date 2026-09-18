@@ -190,7 +190,7 @@ onMounted(() => {
           class="flex flex-1 flex-col items-center justify-center gap-2 py-8 text-[#66728d]"
         >
           <div
-            class="h-8 w-8 animate-spin rounded-full border-3 border-[#E5EAEF] border-t-[#FFAE1F]"
+            class="h-8 w-8 animate-spin rounded-full border-[3px] border-[#E5EAEF] border-t-[#FFAE1F]"
           ></div>
           <span class="text-[12px] font-medium">Memuat data CSAT...</span>
         </div>
@@ -261,11 +261,12 @@ onMounted(() => {
           </div>
         </div>
 
-        <div class="relative flex-1 min-h-[260px] flex items-center justify-center">
+        <!-- Tinggi tetap: Chart.js (maintainAspectRatio:false) butuh parent berukuran pasti -->
+        <div class="relative flex items-center justify-center" style="height: 240px">
           <!-- Loading Skeleton -->
           <div v-if="isLoading" class="flex flex-col items-center gap-2 text-[#66728d]">
             <div
-              class="h-8 w-8 animate-spin rounded-full border-3 border-[#E5EAEF] border-t-[#0A51B0]"
+              class="h-8 w-8 animate-spin rounded-full border-[3px] border-[#E5EAEF] border-t-[#0A51B0]"
             ></div>
             <span class="text-[12px] font-medium">Memuat data grafik...</span>
           </div>
@@ -303,8 +304,11 @@ onMounted(() => {
     </div>
 
     <!-- Row 2: Line Chart CSAT Monitoring Perbulan -->
-    <div class="min-h-[300px]">
-      <CsatTrendLineChart :data="trendData" :loading="isTrendLoading" :error="trendError" />
-    </div>
+    <CsatTrendLineChart
+      :data="trendData"
+      :loading="isTrendLoading"
+      :error="trendError"
+      :height="260"
+    />
   </div>
 </template>

@@ -577,7 +577,7 @@ onMounted(() => {
       @refresh="fetchEmployees"
     />
 
-<template v-else-if="currentLevel === 2 && selectedEmployee">
+    <template v-else-if="currentLevel === 2 && selectedEmployee">
       <!-- Interactive Breadcrumb & Back Navigation -->
       <div class="flex items-center justify-between gap-2.5 min-w-0">
         <nav
@@ -905,7 +905,7 @@ onMounted(() => {
       </div>
     </template>
 
-<template v-else-if="currentLevel === 3 && selectedAsset && selectedEmployee">
+    <template v-else-if="currentLevel === 3 && selectedAsset && selectedEmployee">
       <!-- Breadcrumb Navigation -->
       <div class="flex items-center justify-between gap-2.5 min-w-0">
         <!-- Desktop Breadcrumb (>= sm) -->
@@ -1211,7 +1211,7 @@ onMounted(() => {
       </div>
     </template>
 
-<FilterModal
+    <FilterModal
       :is-open="showFilterModal"
       title="Filter Aset Karyawan"
       @close="showFilterModal = false"
@@ -1237,8 +1237,8 @@ onMounted(() => {
         :block="true"
       />
     </FilterModal>
-<!-- ── Modal Spesifikasi Perangkat ── -->
-<AppModal
+    <!-- ── Modal Spesifikasi Perangkat ── -->
+    <AppModal
       :is-open="showSpecificationModal"
       title="Spesifikasi Perangkat"
       size="md"
@@ -1300,25 +1300,6 @@ onMounted(() => {
   color: #333333;
   padding-bottom: 12px;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 .employee-profile,
 .asset-profile-banner {
@@ -1392,38 +1373,26 @@ onMounted(() => {
 }
 
 @media (max-width: 767px) {
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-    .employee-profile,
+  .employee-profile,
   .asset-profile-banner {
     padding: 18px;
   }
-    .employee-profile h2,
+  .employee-profile h2,
   .asset-profile-banner h2 {
     font-size: 18px;
   }
-    .assigned-asset-card {
+  .assigned-asset-card {
     padding: 18px;
   }
-    .asset-profile-banner > button {
+  .asset-profile-banner > button {
     min-height: 44px;
   }
-    .asset-audit-layout dl {
+  .asset-audit-layout dl {
     gap: 14px;
   }
 }
 @media (prefers-reduced-motion: reduce) {
-    .assigned-asset-card {
+  .assigned-asset-card {
     transition: none;
   }
 }

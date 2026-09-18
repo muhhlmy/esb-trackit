@@ -355,7 +355,7 @@ function switchTab(tab) {
   >
     <!-- Page Header -->
     <div
-      class="admin-page-header flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
+      class="admin-page-header flex flex-col gap-3.5 bg-white p-3.5 sm:p-4.5 rounded-2xl border border-[#E2E8F0]/80 shadow-2xs"
     >
       <div>
         <h1 class="text-xl font-bold tracking-tight text-[#333333]">Database</h1>

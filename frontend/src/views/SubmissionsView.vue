@@ -4,6 +4,8 @@ import { useApi } from '../composables/useApi.js'
 import { useAuth } from '../composables/useAuth.js'
 import SearchableSelect from '../components/ui/SearchableSelect.vue'
 import BaseSkeleton from '../components/ui/skeleton/BaseSkeleton.vue'
+import AppPagination from '../components/ui/AppPagination.vue'
+import AppViewToggle from '../components/ui/AppViewToggle.vue'
 import { animateStagger } from '../composables/useGsap.js'
 import { escapeHtml, printHtmlDocument } from '../utils/printDocument.js'
 import { normalizeLocation } from '../utils/locationNormalizer.js'
@@ -23,6 +25,59 @@ const savedSubmissions = ref([])
 const selectedSubmissionId = ref(null)
 const isSaving = ref(false)
 const isHydratingSubmission = ref(false)
+const searchQuery = ref('')
+const filterStatus = ref('')
+const currentPage = ref(1)
+const itemsPerPage = 10
+const viewMode = ref('table')
+
+const filteredSubmissions = computed(() => {
+  const query = searchQuery.value.trim().toLocaleLowerCase('id-ID')
+  return savedSubmissions.value.filter((submission) => {
+    const payload = submission.payload || {}
+    const searchable = [submission.submission_number, payload.pemberiNama, payload.penerimaNama]
+      .filter(Boolean)
+      .join(' ')
+      .toLocaleLowerCase('id-ID')
+    return (
+      (!query || searchable.includes(query)) &&
+      (!filterStatus.value || submission.status === filterStatus.value)
+    )
+  })
+})
+const paginatedSubmissions = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage
+  return filteredSubmissions.value.slice(start, start + itemsPerPage)
+})
+watch([searchQuery, filterStatus], () => {
+  currentPage.value = 1
+})
+function resetSubmissionFilters() {
+  searchQuery.value = ''
+  filterStatus.value = ''
+  currentPage.value = 1
+}
+function formatSubmissionDate(value) {
+  if (!value) return '—'
+  return new Intl.DateTimeFormat('id-ID', { dateStyle: 'medium' }).format(new Date(value))
+}
+function submissionStatusLabel(status) {
+  return (
+    { draft: 'Draft', submitted: 'Diajukan', completed: 'Selesai', cancelled: 'Dibatalkan' }[
+      status
+    ] || status
+  )
+}
+function submissionStatusClass(status) {
+  return (
+    {
+      draft: 'bg-amber-50 text-amber-700 border-amber-200',
+      submitted: 'bg-blue-50 text-blue-700 border-blue-200',
+      completed: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+      cancelled: 'bg-rose-50 text-rose-700 border-rose-200',
+    }[status] || 'bg-slate-50 text-slate-700 border-slate-200'
+  )
+}
 
 // Form State
 const emptyForm = () => ({
@@ -287,6 +342,11 @@ async function editSubmission(submission) {
   window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
+async function printSubmission(submission) {
+  await editSubmission(submission)
+  await generatePdf({ persist: false })
+}
+
 async function persistSubmission(status = 'draft') {
   if (!canWriteSubmissions.value || isSaving.value) return false
   isSaving.value = true
@@ -323,7 +383,7 @@ async function deleteSubmission(submission) {
   }
 }
 
-async function generatePdf() {
+async function generatePdf({ persist = true } = {}) {
   validationError.value = ''
 
   if (!form.value.pemberiNama?.trim()) {
@@ -354,7 +414,7 @@ async function generatePdf() {
     return
   }
 
-  if (!(await persistSubmission('submitted'))) return
+  if (persist && !(await persistSubmission('submitted'))) return
 
   // Format Date to Indonsian Date (e.g. 21 Juli 2026)
   const months = [
@@ -794,64 +854,188 @@ onMounted(fetchData)
 
     <section
       v-if="!isLoading"
-      class="rounded-2xl border border-[#E2E8F0] bg-white p-4 shadow-2xs"
+      class="submission-history asset-toolbar-sticky"
       aria-labelledby="submission-history-title"
     >
-      <div class="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h2 id="submission-history-title" class="text-sm font-bold text-[#333333]">
-            Riwayat Pengajuan
-          </h2>
-          <p class="mt-0.5 text-xs text-[#5F7089]">Draft dan formulir yang sudah diajukan.</p>
+      <div
+        class="asset-toolbar flex flex-col gap-3 rounded-2xl border border-[#E2E8F0]/80 bg-white p-3.5 shadow-2xs"
+      >
+        <div class="flex items-center justify-between gap-2.5">
+          <div>
+            <h2
+              id="submission-history-title"
+              class="text-base font-bold tracking-tight text-[#333333]"
+            >
+              Riwayat BAST / Pengajuan
+            </h2>
+            <p class="mt-0.5 text-xs text-[#5F7089]">
+              Kelola dokumen serah terima seperti daftar Aset IT.
+            </p>
+          </div>
+          <button
+            v-if="canWriteSubmissions"
+            type="button"
+            class="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-lg bg-[#0A51B0] px-3 text-xs font-semibold text-white hover:bg-[#0A4391]"
+            @click="resetSubmissionForm"
+          >
+            <span aria-hidden="true" class="material-symbols-outlined text-[16px]">add</span>BAST
+            Baru
+          </button>
         </div>
-        <button
-          v-if="canWriteSubmissions"
-          type="button"
-          class="h-9 rounded-xl border border-[#CBD5E1] bg-white px-3 text-xs font-bold text-[#334155] hover:bg-[#F8FAFC]"
-          @click="resetSubmissionForm"
+        <div
+          class="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 border-t border-[#F1F5F9] pt-2.5"
         >
-          Formulir Baru
+          <input
+            v-model="searchQuery"
+            type="search"
+            aria-label="Cari nomor BAST atau nama pihak"
+            placeholder="Cari nomor BAST atau nama pihak…"
+            class="h-9 w-full rounded-lg border border-[#E2E8F0] bg-white px-3 text-xs text-[#333333] focus:border-[#0A51B0] focus:outline-none"
+          />
+          <select
+            v-model="filterStatus"
+            aria-label="Filter status BAST"
+            class="h-9 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-semibold text-[#5F7089]"
+          >
+            <option value="">Semua status</option>
+            <option value="draft">Draft</option>
+            <option value="submitted">Diajukan</option>
+            <option value="completed">Selesai</option>
+            <option value="cancelled">Dibatalkan</option>
+          </select>
+        </div>
+      </div>
+      <div
+        class="mt-3 flex items-center justify-between rounded-xl border border-[#E2E8F0] bg-white px-4 py-3"
+      >
+        <div>
+          <h3 class="text-sm font-bold text-[#333333]">
+            Daftar dokumen <span>{{ filteredSubmissions.length }}</span>
+          </h3>
+          <p class="text-[11px] text-[#5F7089]">Riwayat pengajuan tersimpan</p>
+        </div>
+        <AppViewToggle v-model="viewMode" />
+      </div>
+      <div
+        v-if="!filteredSubmissions.length"
+        class="mt-3 rounded-2xl border border-[#E2E8F0] bg-white px-4 py-12 text-center text-xs text-[#5F7089]"
+      >
+        Belum ada BAST yang sesuai.<button
+          type="button"
+          class="ml-1 font-bold text-[#0A51B0]"
+          @click="resetSubmissionFilters"
+        >
+          Reset filter
         </button>
       </div>
-
-      <div v-if="savedSubmissions.length" class="mt-4 grid gap-2 md:grid-cols-2 xl:grid-cols-3">
+      <div
+        v-else-if="viewMode === 'table'"
+        class="mt-3 block overflow-x-auto rounded-2xl border border-[#E2E8F0] bg-white"
+      >
+        <table class="w-full min-w-[900px] text-left text-xs">
+          <caption class="sr-only">
+            Daftar riwayat BAST
+          </caption>
+          <thead
+            class="border-b border-[#E2E8F0] bg-[#F8FAFC] text-[10px] uppercase tracking-wide text-[#5F7089]"
+          >
+            <tr>
+              <th class="px-4 py-3">Nomor BAST</th>
+              <th class="px-4 py-3">Pihak Pemberi</th>
+              <th class="px-4 py-3">Pihak Penerima</th>
+              <th class="px-4 py-3">Tanggal</th>
+              <th class="px-4 py-3">Status</th>
+              <th class="px-4 py-3 text-right">Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              v-for="submission in paginatedSubmissions"
+              :key="submission.id"
+              class="border-b border-[#F1F5F9] last:border-0 hover:bg-[#F8FAFC]"
+            >
+              <td class="px-4 py-3 font-bold text-[#333333]">{{ submission.submission_number }}</td>
+              <td class="px-4 py-3 text-[#475569]">{{ submission.payload?.pemberiNama || '—' }}</td>
+              <td class="px-4 py-3 text-[#475569]">
+                {{ submission.payload?.penerimaNama || '—' }}
+              </td>
+              <td class="px-4 py-3 text-[#475569]">
+                {{ submission.payload?.tanggal || formatSubmissionDate(submission.updated_at) }}
+              </td>
+              <td class="px-4 py-3">
+                <span
+                  class="rounded-full border px-2 py-1 text-[10px] font-bold"
+                  :class="submissionStatusClass(submission.status)"
+                  >{{ submissionStatusLabel(submission.status) }}</span
+                >
+              </td>
+              <td class="px-4 py-3">
+                <div class="flex justify-end gap-2">
+                  <button
+                    type="button"
+                    class="font-bold text-[#0A51B0]"
+                    @click="printSubmission(submission)"
+                  >
+                    Cetak</button
+                  ><button
+                    v-if="canWriteSubmissions"
+                    type="button"
+                    class="font-bold text-[#334155]"
+                    @click="editSubmission(submission)"
+                  >
+                    Edit</button
+                  ><button
+                    v-if="canWriteSubmissions"
+                    type="button"
+                    class="font-bold text-rose-700"
+                    @click="deleteSubmission(submission)"
+                  >
+                    Hapus
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div v-else class="mt-3 grid gap-2 md:grid-cols-2 xl:grid-cols-3">
         <article
-          v-for="submission in savedSubmissions"
+          v-for="submission in paginatedSubmissions"
           :key="submission.id"
-          class="rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] p-3"
+          class="rounded-xl border border-[#E2E8F0] bg-white p-3 shadow-2xs"
         >
           <div class="flex items-start justify-between gap-2">
-            <div class="min-w-0">
-              <p class="truncate text-xs font-bold text-[#333333]">
-                {{ submission.submission_number }}
-              </p>
-              <p class="mt-1 truncate text-[11px] text-[#5F7089]">
-                {{ submission.payload?.pemberiNama || 'Belum ada pemberi' }} →
-                {{ submission.payload?.penerimaNama || 'Belum ada penerima' }}
+            <div>
+              <p class="text-xs font-bold text-[#333333]">{{ submission.submission_number }}</p>
+              <p class="mt-1 text-[11px] text-[#5F7089]">
+                {{ submission.payload?.pemberiNama || '—' }} →
+                {{ submission.payload?.penerimaNama || '—' }}
               </p>
             </div>
             <span
-              class="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase"
-              :class="
-                submission.status === 'draft'
-                  ? 'bg-amber-100 text-amber-800'
-                  : 'bg-emerald-100 text-emerald-800'
-              "
+              class="rounded-full border px-2 py-1 text-[10px] font-bold"
+              :class="submissionStatusClass(submission.status)"
+              >{{ submissionStatusLabel(submission.status) }}</span
             >
-              {{ submission.status }}
-            </span>
           </div>
-          <div v-if="canWriteSubmissions" class="mt-3 flex gap-2">
-            <button
+          <p class="mt-3 text-[11px] text-[#5F7089]">
+            Tanggal:
+            {{ submission.payload?.tanggal || formatSubmissionDate(submission.updated_at) }}
+          </p>
+          <div class="mt-3 flex gap-3 text-[11px] font-bold">
+            <button type="button" class="text-[#0A51B0]" @click="printSubmission(submission)">
+              Cetak</button
+            ><button
+              v-if="canWriteSubmissions"
               type="button"
-              class="h-8 flex-1 rounded-lg bg-[#0A51B0] px-2 text-[11px] font-bold text-white hover:bg-[#0A4391]"
+              class="text-[#334155]"
               @click="editSubmission(submission)"
             >
-              Edit
-            </button>
-            <button
+              Edit</button
+            ><button
+              v-if="canWriteSubmissions"
               type="button"
-              class="h-8 rounded-lg border border-rose-200 bg-white px-3 text-[11px] font-bold text-rose-700 hover:bg-rose-50"
+              class="text-rose-700"
               @click="deleteSubmission(submission)"
             >
               Hapus
@@ -859,9 +1043,14 @@ onMounted(fetchData)
           </div>
         </article>
       </div>
-      <p v-else class="mt-4 rounded-xl bg-[#F8FAFC] p-4 text-center text-xs text-[#5F7089]">
-        Belum ada pengajuan tersimpan.
-      </p>
+      <AppPagination
+        v-if="filteredSubmissions.length"
+        v-model:current-page="currentPage"
+        :total-items="filteredSubmissions.length"
+        :items-per-page="itemsPerPage"
+        :asset-style="true"
+        mobile-compact
+      />
     </section>
     <!-- Loading Form Skeleton -->
     <div v-if="isLoading" role="status" aria-busy="true" class="flex flex-col gap-5 select-none">
@@ -1716,6 +1905,23 @@ onMounted(fetchData)
   width: 100%;
   max-width: 1440px;
   margin-inline: auto;
+}
+
+/* BAST list follows Aset IT order: toolbar/list first, form below. */
+.submission-history {
+  order: -1;
+}
+.submission-history .asset-toolbar,
+.submission-history > div:nth-child(2) {
+  box-shadow: 0 1px 2px rgb(15 23 42 / 0.04);
+}
+.submission-history > div:nth-child(2) {
+  min-height: 68px;
+}
+@media (width < 80rem) {
+  .submission-history table {
+    min-width: 760px;
+  }
 }
 .submission-steps {
   display: grid;

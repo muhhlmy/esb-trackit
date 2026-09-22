@@ -262,7 +262,7 @@ onMounted(() => {
   <div class="kb-management admin-workspace max-w-7xl mx-auto space-y-6 select-none font-sans">
     <!-- Top Navigation & Header Card -->
     <div
-      class="admin-page-header ws-toolbar-flat flex flex-col items-start sm:items-center justify-between gap-3.5 bg-white border border-[#E2E8F0]/80 p-3.5 sm:p-4.5 rounded-2xl shadow-2xs"
+      class="faq-page-header flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3.5 bg-white border border-[#E2E8F0]/80 p-3.5 sm:p-4.5 rounded-2xl shadow-2xs"
     >
       <div class="space-y-1 sm:space-y-1.5 w-full sm:w-auto">
         <!-- Breadcrumb -->

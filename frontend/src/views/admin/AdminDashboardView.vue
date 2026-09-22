@@ -162,9 +162,9 @@ function getCategoryBadgeClass(category) {
 
 <template>
   <div ref="mainScope" class="cms-page w-full max-w-7xl mx-auto space-y-4 sm:space-y-6 font-sans">
-    <!-- Header Card (sticky mengikuti scroll) -->
+    <!-- Page header scrolls with the content -->
     <div
-      class="ws-toolbar-flat flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3.5 sm:gap-4 bg-white dark:bg-slate-900 border border-[#E5EAEF] dark:border-slate-800 p-4 sm:p-6 rounded-2xl shadow-sm gsap-admin-el"
+      class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3.5 sm:gap-4 bg-white dark:bg-slate-900 border border-[#E5EAEF] dark:border-slate-800 p-4 sm:p-6 rounded-2xl shadow-sm gsap-admin-el"
     >
       <div class="space-y-1 sm:space-y-1.5 w-full sm:w-auto">
         <!-- Breadcrumb -->

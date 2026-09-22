@@ -85,6 +85,19 @@ test('Asset normalization logic transforms backend response correctly', () => {
   assert.equal(normalized.merek, 'Lenovo')
 })
 
+test('SubmissionsView uses Aset IT list primitives for table and card modes', async () => {
+  const source = await readFile(submissionsSourceUrl, 'utf8')
+
+  assert.match(source, /class="it-list-heading-sticky"/)
+  assert.match(source, /class="it-list-heading"/)
+  assert.match(source, /class="ws-data-table-wrap submission-table-wrap"/)
+  assert.match(source, /class="ws-data-table"/)
+  assert.match(source, /class="submission-card-list asset-card-list laptop-list"/)
+  assert.match(source, /class="laptop-row submission-laptop-row"/)
+  assert.match(source, /<AppRowActions/)
+  assert.match(source, /getSubmissionActions\(submission\)/)
+})
+
 test('formatAssetSpecificationSummary formats asset in order: Merek / Model / Spesifikasi / S/N / Hostname', () => {
   const formatAssetSpecificationSummary = (asset) => {
     if (!asset) return ''

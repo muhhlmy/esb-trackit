@@ -43,10 +43,11 @@ export function safeCssToken(value, safeFallback = 'default') {
 export function printHtmlDocument(
   html,
   blockedMessage = 'Pop-up terblokir. Harap izinkan pop-up untuk mencetak dokumen.',
+  preparedWindow = null,
 ) {
   if (typeof window === 'undefined' || typeof window.open !== 'function') return false
 
-  const printWindow = window.open('', '_blank')
+  const printWindow = preparedWindow || window.open('', '_blank')
   if (!printWindow) {
     if (typeof alert === 'function') alert(blockedMessage)
     return false

@@ -104,10 +104,13 @@ export function useApi() {
     do {
       // Relative path amankan dari search di base dummy; dipakai murni untuk parsing query.
       const qs = new URLSearchParams({ page: String(page), limit: String(limit) })
-      const { data, response } = await get(`${endpoint}?${qs}`, {
-        withResponse: true,
-        signal,
-      })
+      const { data, response } = await get(
+        `${endpoint}${endpoint.includes('?') ? '&' : '?'}${qs}`,
+        {
+          withResponse: true,
+          signal,
+        },
+      )
       const pageRows = Array.isArray(data) ? data : Array.isArray(data?.data) ? data.data : []
       rows.push(...pageRows)
 

@@ -1,16 +1,20 @@
 <script setup>
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { useApi } from '../composables/useApi.js'
 import { useAuth } from '../composables/useAuth.js'
 import SearchableSelect from '../components/ui/SearchableSelect.vue'
 import BaseSkeleton from '../components/ui/skeleton/BaseSkeleton.vue'
 import AppPagination from '../components/ui/AppPagination.vue'
 import AppViewToggle from '../components/ui/AppViewToggle.vue'
+import AppRowActions from '../components/ui/AppRowActions.vue'
 import { animateStagger } from '../composables/useGsap.js'
 import { escapeHtml, printHtmlDocument } from '../utils/printDocument.js'
 import { normalizeLocation } from '../utils/locationNormalizer.js'
 
 const { get, getAllPages, post, put, del } = useApi()
+const route = useRoute()
+const router = useRouter()
 const { hasWritePermission } = useAuth()
 const canWriteSubmissions = computed(() => hasWritePermission('submissions'))
 
@@ -25,8 +29,9 @@ const savedSubmissions = ref([])
 const selectedSubmissionId = ref(null)
 const isSaving = ref(false)
 const isHydratingSubmission = ref(false)
+const isDetailLoading = ref(false)
+const isFormOpen = computed(() => ['submission-new', 'submission-detail'].includes(route.name))
 const searchQuery = ref('')
-const filterStatus = ref('')
 const currentPage = ref(1)
 const itemsPerPage = 10
 const viewMode = ref('table')
@@ -39,44 +44,44 @@ const filteredSubmissions = computed(() => {
       .filter(Boolean)
       .join(' ')
       .toLocaleLowerCase('id-ID')
-    return (
-      (!query || searchable.includes(query)) &&
-      (!filterStatus.value || submission.status === filterStatus.value)
-    )
+    return !query || searchable.includes(query)
   })
 })
 const paginatedSubmissions = computed(() => {
   const start = (currentPage.value - 1) * itemsPerPage
   return filteredSubmissions.value.slice(start, start + itemsPerPage)
 })
-watch([searchQuery, filterStatus], () => {
+watch(searchQuery, () => {
   currentPage.value = 1
 })
+watch(
+  () => route.fullPath,
+  () => {
+    if (!isLoading.value) loadRouteForm()
+  },
+)
 function resetSubmissionFilters() {
   searchQuery.value = ''
-  filterStatus.value = ''
   currentPage.value = 1
 }
 function formatSubmissionDate(value) {
   if (!value) return '—'
   return new Intl.DateTimeFormat('id-ID', { dateStyle: 'medium' }).format(new Date(value))
 }
-function submissionStatusLabel(status) {
-  return (
-    { draft: 'Draft', submitted: 'Diajukan', completed: 'Selesai', cancelled: 'Dibatalkan' }[
-      status
-    ] || status
-  )
-}
-function submissionStatusClass(status) {
-  return (
-    {
-      draft: 'bg-amber-50 text-amber-700 border-amber-200',
-      submitted: 'bg-blue-50 text-blue-700 border-blue-200',
-      completed: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-      cancelled: 'bg-rose-50 text-rose-700 border-rose-200',
-    }[status] || 'bg-slate-50 text-slate-700 border-slate-200'
-  )
+function getSubmissionActions(submission) {
+  const actions = [
+    { label: 'Cetak BAST', icon: 'print', onClick: () => printSubmission(submission) },
+  ]
+  if (canWriteSubmissions.value) {
+    actions.push({ label: 'Edit BAST', icon: 'edit', onClick: () => editSubmission(submission) })
+    actions.push({
+      label: 'Hapus BAST',
+      icon: 'delete',
+      danger: true,
+      onClick: () => deleteSubmission(submission),
+    })
+  }
+  return actions
 }
 
 // Form State
@@ -108,8 +113,14 @@ async function fetchData() {
   pageError.value = ''
   try {
     const [employeeData, assetData, submissionData] = await Promise.all([
-      get('/api/karyawan?all=true'),
-      get('/api/assets?all=true'),
+      get('/api/karyawan?all=true').catch((error) => {
+        if (canWriteSubmissions.value) throw error
+        return []
+      }),
+      get('/api/assets?all=true').catch((error) => {
+        if (canWriteSubmissions.value) throw error
+        return []
+      }),
       getAllPages('/api/submissions'),
     ])
     employees.value = Array.isArray(employeeData) ? employeeData : []
@@ -155,6 +166,7 @@ async function fetchData() {
       }
     })
     savedSubmissions.value = submissionData
+    await loadRouteForm()
   } catch (error) {
     pageError.value = error.message || 'Gagal memuat data referensi.'
   } finally {
@@ -258,9 +270,51 @@ function formatAssetSpecificationSummary(asset) {
   return parts.join(' / ')
 }
 
+// aset_ti links holders by NIK; imported name-only holders are not free stock.
+function eligibleSubmissionAssets(list, parties, kind) {
+  const text = (value) => String(value ?? '').trim()
+  const niks = [parties.pemberiNik, !parties.isPenerimaLainnya && parties.penerimaNik]
+    .filter(Boolean)
+    .map(text)
+    .filter(Boolean)
+  return list.filter((asset) => {
+    const nik = text(asset.nik_pemegang_asset)
+    const name = text(asset.nama_karyawan_pemegang_asset)
+    return kind === 'baru' ? !nik && (!name || name === '-') : !!nik && niks.includes(nik)
+  })
+}
+
+const assetBaruOptions = computed(() => eligibleSubmissionAssets(assets.value, form.value, 'baru'))
+const assetLamaOptions = computed(() => eligibleSubmissionAssets(assets.value, form.value, 'lama'))
+const historicAssetRows = new WeakSet()
+function rememberAssetHistory() {
+  for (const row of [...asetBaruList.value, ...asetLamaList.value]) historicAssetRows.add(row)
+}
+function assetSelectionError() {
+  for (const [rows, options, label] of [
+    [asetBaruList.value, assetBaruOptions.value, 'Baru'],
+    [asetLamaList.value, assetLamaOptions.value, 'Lama'],
+  ]) {
+    if (
+      rows.some(
+        (row) =>
+          row.id_aset &&
+          !historicAssetRows.has(row) &&
+          !options.some((asset) => asset.id_aset === row.id_aset),
+      )
+    ) {
+      return `Pilihan Unit ${label} tidak sesuai pemegang saat ini. Pilih ulang atau kosongkan aset.`
+    }
+  }
+  return ''
+}
+
 // Autofill Asset Baru row details when selected
 function onAssetBaruSelect(index, id_aset) {
-  const asset = assets.value.find((a) => a.id_aset === id_aset)
+  const asset = assetBaruOptions.value.find((a) => a.id_aset === id_aset)
+  if (id_aset && !asset) return
+  historicAssetRows.delete(asetBaruList.value[index])
+  asetBaruList.value[index].id_aset = id_aset
   if (asset) {
     asetBaruList.value[index].tipe = asset.tipe_perangkat || ''
     asetBaruList.value[index].spesifikasi = formatAssetSpecificationSummary(asset)
@@ -272,7 +326,10 @@ function onAssetBaruSelect(index, id_aset) {
 
 // Autofill Asset Lama row details when selected
 function onAssetLamaSelect(index, id_aset) {
-  const asset = assets.value.find((a) => a.id_aset === id_aset)
+  const asset = assetLamaOptions.value.find((a) => a.id_aset === id_aset)
+  if (id_aset && !asset) return
+  historicAssetRows.delete(asetLamaList.value[index])
+  asetLamaList.value[index].id_aset = id_aset
   if (asset) {
     asetLamaList.value[index].tipe = asset.tipe_perangkat || ''
     asetLamaList.value[index].spesifikasi = formatAssetSpecificationSummary(asset)
@@ -322,7 +379,31 @@ function resetSubmissionForm() {
   saveMessage.value = ''
 }
 
-async function editSubmission(submission) {
+function editSubmission(submission) {
+  return router.push({ name: 'submission-detail', params: { id: submission.id } })
+}
+
+async function loadRouteForm() {
+  pageError.value = ''
+  if (route.name === 'submission-new') {
+    if (!canWriteSubmissions.value) return router.replace('/submissions')
+    resetSubmissionForm()
+  } else if (route.name === 'submission-detail') {
+    const id = String(route.params.id)
+    isDetailLoading.value = true
+    try {
+      const submission = await get(`/api/submissions/${encodeURIComponent(id)}`)
+      if (route.name === 'submission-detail' && String(route.params.id) === id)
+        await hydrateSubmission(submission)
+    } catch (error) {
+      if (String(route.params.id) === id) pageError.value = error.message || 'BAST tidak ditemukan.'
+    } finally {
+      isDetailLoading.value = false
+    }
+  }
+}
+
+async function hydrateSubmission(submission) {
   const payload = submission?.payload || {}
   isHydratingSubmission.value = true
   selectedSubmissionId.value = submission.id
@@ -335,16 +416,16 @@ async function editSubmission(submission) {
     Array.isArray(payload.asetLamaList) && payload.asetLamaList.length
       ? payload.asetLamaList.map((item) => ({ ...item }))
       : [{ id_aset: '', tipe: '', qty: 1, spesifikasi: '' }]
+  rememberAssetHistory()
   await nextTick()
   isHydratingSubmission.value = false
   validationError.value = ''
-  saveMessage.value = `Mengedit ${submission.submission_number}`
+  saveMessage.value = submission.submission_number
   window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
 async function printSubmission(submission) {
-  await editSubmission(submission)
-  await generatePdf({ persist: false })
+  return generatePdf({ persist: false, payload: submission.payload })
 }
 
 async function persistSubmission(status = 'draft') {
@@ -353,13 +434,24 @@ async function persistSubmission(status = 'draft') {
   validationError.value = ''
   saveMessage.value = ''
   try {
+    const selectionError = assetSelectionError()
+    if (selectionError) throw new Error(selectionError)
     const body = { payload: buildSubmissionPayload(), status }
     const saved = selectedSubmissionId.value
       ? await put(`/api/submissions/${selectedSubmissionId.value}`, body)
       : await post('/api/submissions', body)
     selectedSubmissionId.value = saved.id
-    saveMessage.value = `${saved.submission_number} berhasil ${status === 'draft' ? 'disimpan sebagai draft' : 'diajukan'}.`
-    savedSubmissions.value = await getAllPages('/api/submissions')
+    rememberAssetHistory()
+    saveMessage.value = `${saved.submission_number} berhasil disimpan.`
+    savedSubmissions.value = [
+      saved,
+      ...savedSubmissions.value.filter((item) => item.id !== saved.id),
+    ]
+    try {
+      savedSubmissions.value = await getAllPages('/api/submissions')
+    } catch {
+      saveMessage.value += ' Daftar belum dapat dimuat ulang; dokumen sudah tersimpan.'
+    }
     return true
   } catch (error) {
     validationError.value = error.message || 'Gagal menyimpan pengajuan.'
@@ -367,6 +459,10 @@ async function persistSubmission(status = 'draft') {
   } finally {
     isSaving.value = false
   }
+}
+
+async function saveAndReturn() {
+  if (await persistSubmission()) await router.push('/submissions')
 }
 
 async function deleteSubmission(submission) {
@@ -383,7 +479,14 @@ async function deleteSubmission(submission) {
   }
 }
 
-async function generatePdf({ persist = true } = {}) {
+async function generatePdf({
+  persist = canWriteSubmissions.value,
+  payload = buildSubmissionPayload(),
+} = {}) {
+  if (isSaving.value) return
+  const form = { value: payload }
+  const asetBaruList = { value: payload.asetBaruList || [] }
+  const asetLamaList = { value: payload.asetLamaList || [] }
   validationError.value = ''
 
   if (!form.value.pemberiNama?.trim()) {
@@ -414,7 +517,15 @@ async function generatePdf({ persist = true } = {}) {
     return
   }
 
-  if (persist && !(await persistSubmission('submitted'))) return
+  const printWindow = window.open('', '_blank')
+  if (!printWindow) {
+    validationError.value = 'Pop-up terblokir. Harap izinkan pop-up untuk mencetak PDF.'
+    return
+  }
+  if (persist && !(await persistSubmission('submitted'))) {
+    printWindow.close()
+    return
+  }
 
   // Format Date to Indonsian Date (e.g. 21 Juli 2026)
   const months = [
@@ -804,7 +915,11 @@ async function generatePdf({ persist = true } = {}) {
     </html>
   `)({ value: safeForm })
 
-  return printHtmlDocument(html, 'Pop-up terblokir. Harap izinkan pop-up untuk mencetak PDF.')
+  return printHtmlDocument(
+    html,
+    'Pop-up terblokir. Harap izinkan pop-up untuk mencetak PDF.',
+    printWindow,
+  )
 }
 
 onMounted(fetchData)
@@ -812,11 +927,12 @@ onMounted(fetchData)
 
 <template>
   <div
-    class="submissions-page flex min-w-0 flex-col gap-5"
+    class="submissions-page asset-inventory flex min-w-0 flex-col gap-5"
     :data-testid="!isLoading ? 'page-ready' : undefined"
   >
     <!-- ── Page Header ─────────────────────────────────────────── -->
     <div
+      v-if="isFormOpen"
       class="submission-page-header flex items-center gap-3 bg-white p-3.5 sm:p-4 rounded-2xl border border-[#E2E8F0]/80 shadow-2xs"
     >
       <div
@@ -836,7 +952,7 @@ onMounted(fetchData)
       </div>
     </div>
 
-    <ol class="submission-steps" aria-label="Tahapan pengisian">
+    <ol v-if="isFormOpen" class="submission-steps" aria-label="Tahapan pengisian">
       <li><span>1</span>Pihak terkait</li>
       <li><span>2</span>Tujuan</li>
       <li><span>3</span>Daftar aset</li>
@@ -853,8 +969,8 @@ onMounted(fetchData)
     </div>
 
     <section
-      v-if="!isLoading"
-      class="submission-history asset-toolbar-sticky"
+      v-if="!isLoading && !isFormOpen"
+      class="submission-history"
       aria-labelledby="submission-history-title"
     >
       <div
@@ -876,15 +992,13 @@ onMounted(fetchData)
             v-if="canWriteSubmissions"
             type="button"
             class="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-lg bg-[#0A51B0] px-3 text-xs font-semibold text-white hover:bg-[#0A4391]"
-            @click="resetSubmissionForm"
+            @click="router.push('/submissions/new')"
           >
             <span aria-hidden="true" class="material-symbols-outlined text-[16px]">add</span>BAST
             Baru
           </button>
         </div>
-        <div
-          class="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 border-t border-[#F1F5F9] pt-2.5"
-        >
+        <div class="grid grid-cols-1 items-center gap-2 border-t border-[#F1F5F9] pt-2.5">
           <input
             v-model="searchQuery"
             type="search"
@@ -892,29 +1006,32 @@ onMounted(fetchData)
             placeholder="Cari nomor BAST atau nama pihak…"
             class="h-9 w-full rounded-lg border border-[#E2E8F0] bg-white px-3 text-xs text-[#333333] focus:border-[#0A51B0] focus:outline-none"
           />
-          <select
-            v-model="filterStatus"
-            aria-label="Filter status BAST"
-            class="h-9 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-semibold text-[#5F7089]"
-          >
-            <option value="">Semua status</option>
-            <option value="draft">Draft</option>
-            <option value="submitted">Diajukan</option>
-            <option value="completed">Selesai</option>
-            <option value="cancelled">Dibatalkan</option>
-          </select>
         </div>
       </div>
-      <div
-        class="mt-3 flex items-center justify-between rounded-xl border border-[#E2E8F0] bg-white px-4 py-3"
-      >
-        <div>
-          <h3 class="text-sm font-bold text-[#333333]">
-            Daftar dokumen <span>{{ filteredSubmissions.length }}</span>
-          </h3>
-          <p class="text-[11px] text-[#5F7089]">Riwayat pengajuan tersimpan</p>
+      <div class="it-list-heading-sticky">
+        <div class="it-list-heading" aria-live="polite">
+          <div>
+            <h3>
+              Daftar Dokumen <span>{{ filteredSubmissions.length }}</span>
+            </h3>
+            <p>
+              {{
+                searchQuery
+                  ? 'Hasil sesuai pencarian dan filter Anda'
+                  : 'Riwayat BAST dan pengajuan aset'
+              }}
+            </p>
+          </div>
+          <div class="flex shrink-0 items-center gap-3">
+            <AppViewToggle v-model="viewMode" />
+            <span v-if="filteredSubmissions.length" class="it-result-range"
+              >{{ (currentPage - 1) * itemsPerPage + 1 }}–{{
+                Math.min(currentPage * itemsPerPage, filteredSubmissions.length)
+              }}
+              dari {{ filteredSubmissions.length }} dokumen</span
+            >
+          </div>
         </div>
-        <AppViewToggle v-model="viewMode" />
       </div>
       <div
         v-if="!filteredSubmissions.length"
@@ -928,120 +1045,122 @@ onMounted(fetchData)
           Reset filter
         </button>
       </div>
-      <div
-        v-else-if="viewMode === 'table'"
-        class="mt-3 block overflow-x-auto rounded-2xl border border-[#E2E8F0] bg-white"
-      >
-        <table class="w-full min-w-[900px] text-left text-xs">
+      <div v-else-if="viewMode === 'table'" class="ws-data-table-wrap submission-table-wrap">
+        <table class="ws-data-table">
           <caption class="sr-only">
             Daftar riwayat BAST
           </caption>
-          <thead
-            class="border-b border-[#E2E8F0] bg-[#F8FAFC] text-[10px] uppercase tracking-wide text-[#5F7089]"
-          >
+          <colgroup>
+            <col class="w-[28%]" />
+            <col class="w-[24%]" />
+            <col class="w-[24%]" />
+            <col class="w-[16%]" />
+            <col class="w-[8%]" />
+          </colgroup>
+          <thead>
             <tr>
-              <th class="px-4 py-3">Nomor BAST</th>
-              <th class="px-4 py-3">Pihak Pemberi</th>
-              <th class="px-4 py-3">Pihak Penerima</th>
-              <th class="px-4 py-3">Tanggal</th>
-              <th class="px-4 py-3">Status</th>
-              <th class="px-4 py-3 text-right">Aksi</th>
+              <th scope="col">Dokumen</th>
+              <th scope="col">Pemberi</th>
+              <th scope="col">Penerima</th>
+              <th scope="col">Tanggal</th>
+              <th scope="col"><span class="sr-only">Aksi</span></th>
             </tr>
           </thead>
           <tbody>
             <tr
               v-for="submission in paginatedSubmissions"
               :key="submission.id"
-              class="border-b border-[#F1F5F9] last:border-0 hover:bg-[#F8FAFC]"
+              @click="editSubmission(submission)"
             >
-              <td class="px-4 py-3 font-bold text-[#333333]">{{ submission.submission_number }}</td>
-              <td class="px-4 py-3 text-[#475569]">{{ submission.payload?.pemberiNama || '—' }}</td>
-              <td class="px-4 py-3 text-[#475569]">
-                {{ submission.payload?.penerimaNama || '—' }}
+              <td>
+                <RouterLink
+                  class="ws-cell-main submission-detail-link"
+                  :to="`/submissions/${submission.id}`"
+                  @click.stop
+                  >{{ submission.submission_number }}</RouterLink
+                ><span class="ws-cell-sub">BAST / Pengajuan Aset</span>
               </td>
-              <td class="px-4 py-3 text-[#475569]">
-                {{ submission.payload?.tanggal || formatSubmissionDate(submission.updated_at) }}
+              <td>
+                <span class="ws-cell-main" :title="submission.payload?.pemberiNama">{{
+                  submission.payload?.pemberiNama || '—'
+                }}</span
+                ><span class="ws-cell-sub">{{ submission.payload?.pemberiDirektorat || '—' }}</span>
               </td>
-              <td class="px-4 py-3">
-                <span
-                  class="rounded-full border px-2 py-1 text-[10px] font-bold"
-                  :class="submissionStatusClass(submission.status)"
-                  >{{ submissionStatusLabel(submission.status) }}</span
-                >
+              <td>
+                <span class="ws-cell-main" :title="submission.payload?.penerimaNama">{{
+                  submission.payload?.penerimaNama || '—'
+                }}</span
+                ><span class="ws-cell-sub">{{
+                  submission.payload?.penerimaDirektorat || '—'
+                }}</span>
               </td>
-              <td class="px-4 py-3">
-                <div class="flex justify-end gap-2">
-                  <button
-                    type="button"
-                    class="font-bold text-[#0A51B0]"
-                    @click="printSubmission(submission)"
-                  >
-                    Cetak</button
-                  ><button
-                    v-if="canWriteSubmissions"
-                    type="button"
-                    class="font-bold text-[#334155]"
-                    @click="editSubmission(submission)"
-                  >
-                    Edit</button
-                  ><button
-                    v-if="canWriteSubmissions"
-                    type="button"
-                    class="font-bold text-rose-700"
-                    @click="deleteSubmission(submission)"
-                  >
-                    Hapus
-                  </button>
-                </div>
+              <td>
+                <span class="ws-cell-main">{{
+                  submission.payload?.tanggal || formatSubmissionDate(submission.updated_at)
+                }}</span>
+              </td>
+              <td @click.stop>
+                <AppRowActions
+                  :actions="getSubmissionActions(submission)"
+                  :label="`Aksi BAST ${submission.submission_number}`"
+                />
               </td>
             </tr>
           </tbody>
         </table>
       </div>
-      <div v-else class="mt-3 grid gap-2 md:grid-cols-2 xl:grid-cols-3">
-        <article
+      <div v-else class="submission-card-list asset-card-list laptop-list">
+        <div
           v-for="submission in paginatedSubmissions"
           :key="submission.id"
-          class="rounded-xl border border-[#E2E8F0] bg-white p-3 shadow-2xs"
+          class="laptop-row submission-laptop-row"
+          @click="editSubmission(submission)"
         >
-          <div class="flex items-start justify-between gap-2">
-            <div>
-              <p class="text-xs font-bold text-[#333333]">{{ submission.submission_number }}</p>
-              <p class="mt-1 text-[11px] text-[#5F7089]">
-                {{ submission.payload?.pemberiNama || '—' }} →
-                {{ submission.payload?.penerimaNama || '—' }}
-              </p>
+          <div class="laptop-identity">
+            <div class="laptop-icon submission-card-icon" aria-hidden="true">
+              <span class="material-symbols-outlined">description</span>
             </div>
-            <span
-              class="rounded-full border px-2 py-1 text-[10px] font-bold"
-              :class="submissionStatusClass(submission.status)"
-              >{{ submissionStatusLabel(submission.status) }}</span
-            >
+            <div class="laptop-identity-text">
+              <h4>
+                <RouterLink :to="`/submissions/${submission.id}`" @click.stop>{{
+                  submission.submission_number
+                }}</RouterLink>
+              </h4>
+              <p :title="submission.payload?.tujuanLainnya || 'BAST / Pengajuan Aset'">
+                BAST / Pengajuan Aset
+              </p>
+              <span class="laptop-serial">ID: {{ submission.id }}</span>
+            </div>
           </div>
-          <p class="mt-3 text-[11px] text-[#5F7089]">
-            Tanggal:
-            {{ submission.payload?.tanggal || formatSubmissionDate(submission.updated_at) }}
-          </p>
-          <div class="mt-3 flex gap-3 text-[11px] font-bold">
-            <button type="button" class="text-[#0A51B0]" @click="printSubmission(submission)">
-              Cetak</button
-            ><button
-              v-if="canWriteSubmissions"
-              type="button"
-              class="text-[#334155]"
-              @click="editSubmission(submission)"
-            >
-              Edit</button
-            ><button
-              v-if="canWriteSubmissions"
-              type="button"
-              class="text-rose-700"
-              @click="deleteSubmission(submission)"
-            >
-              Hapus
-            </button>
+          <div class="laptop-holder laptop-field">
+            <span class="laptop-label">Pemberi</span>
+            <strong :title="submission.payload?.pemberiNama">{{
+              submission.payload?.pemberiNama || '—'
+            }}</strong>
+            <span class="laptop-secondary">{{ submission.payload?.pemberiDirektorat || '—' }}</span>
           </div>
-        </article>
+          <div class="laptop-location laptop-field">
+            <span class="laptop-label">Penerima</span>
+            <strong :title="submission.payload?.penerimaNama">{{
+              submission.payload?.penerimaNama || '—'
+            }}</strong>
+            <span class="laptop-secondary">{{
+              submission.payload?.penerimaDirektorat || '—'
+            }}</span>
+          </div>
+          <div class="laptop-state">
+            <span class="laptop-label">Tanggal</span>
+            <span class="laptop-condition">{{
+              submission.payload?.tanggal || formatSubmissionDate(submission.updated_at)
+            }}</span>
+          </div>
+          <div class="laptop-actions" @click.stop>
+            <AppRowActions
+              :actions="getSubmissionActions(submission)"
+              :label="`Aksi BAST ${submission.submission_number}`"
+            />
+          </div>
+        </div>
       </div>
       <AppPagination
         v-if="filteredSubmissions.length"
@@ -1053,7 +1172,12 @@ onMounted(fetchData)
       />
     </section>
     <!-- Loading Form Skeleton -->
-    <div v-if="isLoading" role="status" aria-busy="true" class="flex flex-col gap-5 select-none">
+    <div
+      v-if="isLoading || isDetailLoading"
+      role="status"
+      aria-busy="true"
+      class="flex flex-col gap-5 select-none"
+    >
       <!-- Section 1 Skeleton: Profil Pihak Terkait -->
       <div
         class="rounded-2xl border border-[#E2E8F0]/80 bg-white p-4 sm:p-6 shadow-2xs flex flex-col gap-4"
@@ -1165,7 +1289,31 @@ onMounted(fetchData)
     </div>
 
     <!-- Main Submission Form -->
-    <form v-else class="flex flex-col gap-5" @submit.prevent="generatePdf">
+    <form
+      v-else-if="isFormOpen"
+      class="asset-crud-form asset-entry-form submission-form flex flex-col gap-5"
+      @submit.prevent="generatePdf"
+    >
+      <div
+        class="flex items-center justify-between rounded-2xl border border-[#E2E8F0] bg-white px-4 py-3 shadow-2xs"
+      >
+        <div>
+          <h2 class="text-sm font-bold text-[#333333]">
+            {{ selectedSubmissionId ? 'Detail BAST / Pengajuan' : 'BAST Baru' }}
+          </h2>
+          <p class="text-[11px] text-[#5F7089]">
+            Lengkapi data untuk menyimpan atau mencetak dokumen.
+          </p>
+        </div>
+        <button
+          type="button"
+          class="h-8 rounded-lg border border-[#CBD5E1] px-3 text-xs font-bold text-[#334155] hover:bg-[#F8FAFC]"
+          :disabled="isSaving"
+          @click="router.push('/submissions')"
+        >
+          Tutup
+        </button>
+      </div>
       <!-- Validation Error Banner -->
       <div
         v-if="validationError"
@@ -1189,666 +1337,705 @@ onMounted(fetchData)
         </button>
       </div>
 
-      <!-- Section 1: Profil Pihak Terkait -->
-      <div
-        class="submission-section bg-white rounded-2xl border border-[#E2E8F0]/80 p-4 sm:p-6 shadow-2xs flex flex-col gap-4"
+      <fieldset
+        class="submission-fields"
+        :disabled="!canWriteSubmissions || isSaving"
+        :inert="!canWriteSubmissions || isSaving"
       >
-        <div class="flex items-center justify-between gap-2 border-b border-[#F1F5F9] pb-3.5">
-          <div class="flex items-center gap-2.5">
-            <span
-              class="flex h-6 w-6 items-center justify-center rounded-lg bg-[#EDF5FF] text-[#333333] text-[11px] font-bold"
-            >
-              01
-            </span>
-            <div>
-              <h2 class="text-[14px] sm:text-[15px] font-bold text-[#333333]">
-                Profil Pihak Terkait
-              </h2>
-              <p class="text-[12px] text-[#5F7089]">
-                Tentukan identitas pihak pemberi dan penerima aset
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
-          <!-- Pihak Pemberi (Karyawan) -->
-          <div
-            class="flex flex-col gap-3.5 rounded-xl sm:rounded-2xl border border-slate-200/80 bg-slate-50/50 p-4"
-          >
-            <div class="flex items-center gap-2">
-              <span aria-hidden="true" class="material-symbols-outlined text-[18px] text-[#333333]"
-                >person_outline</span
+        <!-- Section 1: Profil Pihak Terkait -->
+        <div
+          class="submission-section bg-white rounded-2xl border border-[#E2E8F0]/80 p-4 sm:p-6 shadow-2xs flex flex-col gap-4"
+        >
+          <div class="flex items-center justify-between gap-2 border-b border-[#F1F5F9] pb-3.5">
+            <div class="flex items-center gap-2.5">
+              <span
+                class="flex h-6 w-6 items-center justify-center rounded-lg bg-[#EDF5FF] text-[#333333] text-[11px] font-bold"
               >
-              <h3 class="text-xs font-bold uppercase tracking-wider text-[#333333]">
-                Pihak Pemberi (Karyawan)
-              </h3>
-            </div>
-
-            <label class="flex flex-col gap-1.5">
-              <span class="text-[11px] font-bold uppercase text-[#475569]">Pilih Karyawan *</span>
-              <SearchableSelect
-                v-model="form.pemberiNik"
-                :options="employees"
-                value-key="nik"
-                label-key="nama_karyawan"
-                secondary-label-key="nik"
-                placeholder="Pilih karyawan pemberi"
-                search-placeholder="Cari nama atau NIK…"
-                height-class="h-10"
-              />
-            </label>
-
-            <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              <label class="flex flex-col gap-1.5">
-                <span class="text-[10px] font-bold uppercase text-[#5F7089]"
-                  >Nama Lengkap (Auto)</span
-                >
-                <input
-                  v-model="form.pemberiNama"
-                  required
-                  type="text"
-                  aria-label="Nama Lengkap Pemberi (Auto)"
-                  class="h-10 w-full rounded-xl border border-slate-200 bg-slate-100/70 px-3 text-xs font-medium text-slate-600 outline-none cursor-default"
-                  readonly
-                  placeholder="Terisi otomatis"
-                />
-              </label>
-
-              <label class="flex flex-col gap-1.5">
-                <span class="text-[10px] font-bold uppercase text-[#5F7089]"
-                  >Direktorat (Auto)</span
-                >
-                <input
-                  v-model="form.pemberiDirektorat"
-                  required
-                  type="text"
-                  aria-label="Direktorat Pemberi (Auto)"
-                  class="h-10 w-full rounded-xl border border-slate-200 bg-slate-100/70 px-3 text-xs font-medium text-slate-600 outline-none cursor-default"
-                  readonly
-                  placeholder="Terisi otomatis"
-                />
-              </label>
+                01
+              </span>
+              <div>
+                <h2 class="text-[14px] sm:text-[15px] font-bold text-[#333333]">
+                  Profil Pihak Terkait
+                </h2>
+                <p class="text-[12px] text-[#5F7089]">
+                  Tentukan identitas pihak pemberi dan penerima aset
+                </p>
+              </div>
             </div>
           </div>
 
-          <!-- Pihak Penerima -->
-          <div
-            class="flex flex-col gap-3.5 rounded-xl sm:rounded-2xl border border-slate-200/80 bg-slate-50/50 p-4"
-          >
-            <div class="flex flex-wrap items-center justify-between gap-2">
+          <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+            <!-- Pihak Pemberi (Karyawan) -->
+            <div
+              class="flex flex-col gap-3.5 rounded-xl sm:rounded-2xl border border-slate-200/80 bg-slate-50/50 p-4"
+            >
               <div class="flex items-center gap-2">
                 <span
                   aria-hidden="true"
-                  class="material-symbols-outlined text-[18px] text-amber-600"
-                  >person_add</span
+                  class="material-symbols-outlined text-[18px] text-[#333333]"
+                  >person_outline</span
                 >
-                <h3 class="text-xs font-bold uppercase tracking-wider text-amber-600">
-                  Pihak Penerima
+                <h3 class="text-xs font-bold uppercase tracking-wider text-[#333333]">
+                  Pihak Pemberi (Karyawan)
                 </h3>
               </div>
 
-              <label class="flex items-center gap-1.5 cursor-pointer select-none py-0.5">
-                <input
-                  v-model="form.isPenerimaLainnya"
-                  type="checkbox"
-                  aria-label="Penerima Non-Karyawan (Vendor/Lainnya)"
-                  class="rounded border-slate-300 accent-[#0A51B0] h-4 w-4 cursor-pointer"
+              <label class="flex flex-col gap-1.5">
+                <span class="text-[11px] font-bold uppercase text-[#475569]">Pilih Karyawan *</span>
+                <SearchableSelect
+                  v-model="form.pemberiNik"
+                  :options="employees"
+                  value-key="nik"
+                  label-key="nama_karyawan"
+                  secondary-label-key="nik"
+                  placeholder="Pilih karyawan pemberi"
+                  search-placeholder="Cari nama atau NIK…"
+                  height-class="h-10"
                 />
-                <span class="text-[11px] font-bold text-[#475569]"
-                  >Non-Karyawan (Vendor/Lainnya)</span
-                >
               </label>
+
+              <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                <label class="flex flex-col gap-1.5">
+                  <span class="text-[10px] font-bold uppercase text-[#5F7089]"
+                    >Nama Lengkap (Auto)</span
+                  >
+                  <input
+                    v-model="form.pemberiNama"
+                    required
+                    type="text"
+                    aria-label="Nama Lengkap Pemberi (Auto)"
+                    class="h-10 w-full rounded-xl border border-slate-200 bg-slate-100/70 px-3 text-xs font-medium text-slate-600 outline-none cursor-default"
+                    readonly
+                    placeholder="Terisi otomatis"
+                  />
+                </label>
+
+                <label class="flex flex-col gap-1.5">
+                  <span class="text-[10px] font-bold uppercase text-[#5F7089]"
+                    >Direktorat (Auto)</span
+                  >
+                  <input
+                    v-model="form.pemberiDirektorat"
+                    required
+                    type="text"
+                    aria-label="Direktorat Pemberi (Auto)"
+                    class="h-10 w-full rounded-xl border border-slate-200 bg-slate-100/70 px-3 text-xs font-medium text-slate-600 outline-none cursor-default"
+                    readonly
+                    placeholder="Terisi otomatis"
+                  />
+                </label>
+              </div>
             </div>
 
-            <label v-if="!form.isPenerimaLainnya" class="flex flex-col gap-1.5">
-              <span class="text-[11px] font-bold uppercase text-[#475569]">Pilih Karyawan *</span>
-              <SearchableSelect
-                v-model="form.penerimaNik"
-                :options="employees"
-                value-key="nik"
-                label-key="nama_karyawan"
-                secondary-label-key="nik"
-                placeholder="Pilih karyawan penerima"
-                search-placeholder="Cari nama atau NIK…"
-                height-class="h-10"
-              />
-            </label>
+            <!-- Pihak Penerima -->
+            <div
+              class="flex flex-col gap-3.5 rounded-xl sm:rounded-2xl border border-slate-200/80 bg-slate-50/50 p-4"
+            >
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <div class="flex items-center gap-2">
+                  <span
+                    aria-hidden="true"
+                    class="material-symbols-outlined text-[18px] text-amber-600"
+                    >person_add</span
+                  >
+                  <h3 class="text-xs font-bold uppercase tracking-wider text-amber-600">
+                    Pihak Penerima
+                  </h3>
+                </div>
 
-            <div v-else class="flex flex-col gap-1.5">
-              <span class="text-[11px] font-bold uppercase text-[#475569]"
-                >Nama Lengkap / Vendor *</span
-              >
-              <input
-                v-model="form.penerimaNama"
-                required
-                type="text"
-                aria-label="Nama Lengkap / Vendor Penerima"
-                class="h-10 w-full rounded-xl border border-[#E2E8F0] bg-white px-3 text-xs font-medium text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 focus:outline-none transition-all"
-                placeholder="Tulis nama lengkap penerima atau vendor…"
-              />
-            </div>
+                <label class="flex items-center gap-1.5 cursor-pointer select-none py-0.5">
+                  <input
+                    v-model="form.isPenerimaLainnya"
+                    type="checkbox"
+                    aria-label="Penerima Non-Karyawan (Vendor/Lainnya)"
+                    class="rounded border-slate-300 accent-[#0A51B0] h-4 w-4 cursor-pointer"
+                  />
+                  <span class="text-[11px] font-bold text-[#475569]"
+                    >Non-Karyawan (Vendor/Lainnya)</span
+                  >
+                </label>
+              </div>
 
-            <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <label v-if="!form.isPenerimaLainnya" class="flex flex-col gap-1.5">
-                <span class="text-[10px] font-bold uppercase text-[#5F7089]"
-                  >Nama Lengkap (Auto)</span
+                <span class="text-[11px] font-bold uppercase text-[#475569]">Pilih Karyawan *</span>
+                <SearchableSelect
+                  v-model="form.penerimaNik"
+                  :options="employees"
+                  value-key="nik"
+                  label-key="nama_karyawan"
+                  secondary-label-key="nik"
+                  placeholder="Pilih karyawan penerima"
+                  search-placeholder="Cari nama atau NIK…"
+                  height-class="h-10"
+                />
+              </label>
+
+              <div v-else class="flex flex-col gap-1.5">
+                <span class="text-[11px] font-bold uppercase text-[#475569]"
+                  >Nama Lengkap / Vendor *</span
                 >
                 <input
                   v-model="form.penerimaNama"
                   required
                   type="text"
-                  aria-label="Nama Lengkap Penerima (Auto)"
-                  class="h-10 w-full rounded-xl border border-slate-200 bg-slate-100/70 px-3 text-xs font-medium text-slate-600 outline-none cursor-default"
-                  readonly
-                  placeholder="Terisi otomatis"
+                  aria-label="Nama Lengkap / Vendor Penerima"
+                  class="h-10 w-full rounded-xl border border-[#E2E8F0] bg-white px-3 text-xs font-medium text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 focus:outline-none transition-all"
+                  placeholder="Tulis nama lengkap penerima atau vendor…"
                 />
-              </label>
+              </div>
 
-              <label
-                class="flex flex-col gap-1.5"
-                :class="form.isPenerimaLainnya ? 'sm:col-span-2' : ''"
-              >
-                <span class="text-[10px] font-bold uppercase text-[#5F7089]">
-                  {{ form.isPenerimaLainnya ? 'Direktorat / Perusahaan *' : 'Direktorat (Auto)' }}
-                </span>
-                <input
-                  v-model="form.penerimaDirektorat"
-                  required
-                  type="text"
-                  :aria-label="
-                    form.isPenerimaLainnya
-                      ? 'Direktorat / Perusahaan Penerima'
-                      : 'Direktorat Penerima (Auto)'
-                  "
-                  class="h-10 w-full rounded-xl border px-3 text-xs font-medium outline-none transition-all"
-                  :class="
-                    !form.isPenerimaLainnya
-                      ? 'border-slate-200 bg-slate-100/70 text-slate-600 cursor-default'
-                      : 'border-[#E2E8F0] bg-white text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10'
-                  "
-                  :readonly="!form.isPenerimaLainnya"
-                  :placeholder="
-                    form.isPenerimaLainnya
-                      ? 'Tulis nama direktorat, departemen, atau perusahaan...'
-                      : 'Terisi otomatis'
-                  "
-                />
-              </label>
-            </div>
-          </div>
-        </div>
-      </div>
+              <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                <label v-if="!form.isPenerimaLainnya" class="flex flex-col gap-1.5">
+                  <span class="text-[10px] font-bold uppercase text-[#5F7089]"
+                    >Nama Lengkap (Auto)</span
+                  >
+                  <input
+                    v-model="form.penerimaNama"
+                    required
+                    type="text"
+                    aria-label="Nama Lengkap Penerima (Auto)"
+                    class="h-10 w-full rounded-xl border border-slate-200 bg-slate-100/70 px-3 text-xs font-medium text-slate-600 outline-none cursor-default"
+                    readonly
+                    placeholder="Terisi otomatis"
+                  />
+                </label>
 
-      <!-- Section 2: Tujuan Serah Terima -->
-      <div
-        class="submission-section bg-white rounded-2xl border border-[#E2E8F0]/80 p-4 sm:p-6 shadow-2xs flex flex-col gap-4"
-      >
-        <div class="flex items-center justify-between gap-2 border-b border-[#F1F5F9] pb-3.5">
-          <div class="flex items-center gap-2.5">
-            <span
-              class="flex h-6 w-6 items-center justify-center rounded-lg bg-[#EDF5FF] text-[#333333] text-[11px] font-bold"
-            >
-              02
-            </span>
-            <div>
-              <h2 class="text-[14px] sm:text-[15px] font-bold text-[#333333]">
-                Tujuan Serah Terima Aset
-              </h2>
-              <p class="text-[12px] text-[#5F7089]">
-                Pilih salah satu keperluan serah terima perangkat
-              </p>
+                <label
+                  class="flex flex-col gap-1.5"
+                  :class="form.isPenerimaLainnya ? 'sm:col-span-2' : ''"
+                >
+                  <span class="text-[10px] font-bold uppercase text-[#5F7089]">
+                    {{ form.isPenerimaLainnya ? 'Direktorat / Perusahaan *' : 'Direktorat (Auto)' }}
+                  </span>
+                  <input
+                    v-model="form.penerimaDirektorat"
+                    required
+                    type="text"
+                    :aria-label="
+                      form.isPenerimaLainnya
+                        ? 'Direktorat / Perusahaan Penerima'
+                        : 'Direktorat Penerima (Auto)'
+                    "
+                    class="h-10 w-full rounded-xl border px-3 text-xs font-medium outline-none transition-all"
+                    :class="
+                      !form.isPenerimaLainnya
+                        ? 'border-slate-200 bg-slate-100/70 text-slate-600 cursor-default'
+                        : 'border-[#E2E8F0] bg-white text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10'
+                    "
+                    :readonly="!form.isPenerimaLainnya"
+                    :placeholder="
+                      form.isPenerimaLainnya
+                        ? 'Tulis nama direktorat, departemen, atau perusahaan...'
+                        : 'Terisi otomatis'
+                    "
+                  />
+                </label>
+              </div>
             </div>
           </div>
         </div>
 
-        <div class="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3">
-          <label
-            v-for="t in [
-              {
-                key: 'baru',
-                label: 'Serah Terima Baru',
-                icon: 'fiber_new',
-                color: 'text-[#333333] bg-[#EDF5FF]',
-              },
-              {
-                key: 'peminjaman',
-                label: 'Peminjaman',
-                icon: 'handshake',
-                color: 'text-amber-600 bg-amber-50',
-              },
-              {
-                key: 'pengembalian',
-                label: 'Pengembalian',
-                icon: 'keyboard_return',
-                color: 'text-indigo-600 bg-indigo-50',
-              },
-              {
-                key: 'perbaikan',
-                label: 'Perbaikan',
-                icon: 'build',
-                color: 'text-rose-600 bg-rose-50',
-              },
-              {
-                key: 'penggantian',
-                label: 'Penggantian',
-                icon: 'swap_horiz',
-                color: 'text-purple-600 bg-purple-50',
-              },
-              {
-                key: 'disposal',
-                label: 'Disposal Aset',
-                icon: 'delete_sweep',
-                color: 'text-slate-600 bg-slate-100',
-              },
-              {
-                key: 'lainnya',
-                label: 'Lainnya',
-                icon: 'more_horiz',
-                color: 'text-teal-600 bg-teal-50',
-              },
-            ]"
-            :key="t.key"
-            class="flex cursor-pointer items-center justify-between min-h-[48px] rounded-xl border p-3 transition-all active:scale-[0.99] select-none"
-            :class="
-              form.tujuan === t.key
-                ? 'border-[#0A51B0] bg-[#EDF5FF]/60 ring-2 ring-[#0A51B0]/15 shadow-2xs'
-                : 'border-[#E2E8F0] bg-white hover:bg-slate-50 hover:border-slate-300'
-            "
-          >
-            <div class="flex items-center gap-2.5 min-w-0 pr-2">
-              <span
-                class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-[16px]"
-                :class="form.tujuan === t.key ? 'bg-white text-[#333333] shadow-2xs' : t.color"
-              >
-                <span aria-hidden="true" class="material-symbols-outlined text-[16px]">{{
-                  t.icon
-                }}</span>
-              </span>
-              <span
-                class="text-xs font-bold truncate"
-                :class="form.tujuan === t.key ? 'text-[#333333]' : 'text-[#334155]'"
-              >
-                {{ t.label }}
-              </span>
-            </div>
-            <input
-              v-model="form.tujuan"
-              type="radio"
-              name="tujuan"
-              :value="t.key"
-              :aria-label="t.label"
-              class="accent-[#0A51B0] cursor-pointer shrink-0 h-4 w-4"
-            />
-          </label>
-        </div>
-
-        <div v-if="form.tujuan === 'lainnya'" class="mt-1 flex flex-col gap-1.5">
-          <span class="text-[10px] font-bold uppercase text-[#475569]"
-            >Keterangan Tujuan Lainnya *</span
-          >
-          <input
-            v-model="form.tujuanLainnya"
-            required
-            type="text"
-            aria-label="Keterangan Tujuan Serah Terima Lainnya"
-            class="h-10 w-full rounded-xl border border-[#E2E8F0] bg-white px-3 text-xs font-medium text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 focus:outline-none transition-all"
-            placeholder="Tuliskan tujuan serah terima aset lainnya…"
-          />
-        </div>
-      </div>
-
-      <!-- Section 3 & 4: Data Serah Terima Aset (Baru & Lama) -->
-      <div class="grid grid-cols-1 gap-5 lg:grid-cols-2">
-        <!-- Aset Baru (Diserahkan) -->
+        <!-- Section 2: Tujuan Serah Terima -->
         <div
           class="submission-section bg-white rounded-2xl border border-[#E2E8F0]/80 p-4 sm:p-6 shadow-2xs flex flex-col gap-4"
         >
           <div class="flex items-center justify-between gap-2 border-b border-[#F1F5F9] pb-3.5">
-            <div class="flex items-center gap-2.5 min-w-0">
+            <div class="flex items-center gap-2.5">
               <span
-                class="flex h-6 w-6 items-center justify-center rounded-lg bg-[#EDF5FF] text-[#333333] text-[11px] font-bold shrink-0"
+                class="flex h-6 w-6 items-center justify-center rounded-lg bg-[#EDF5FF] text-[#333333] text-[11px] font-bold"
               >
-                03
+                02
               </span>
-              <div class="min-w-0">
-                <h2 class="text-[14px] sm:text-[15px] font-bold text-[#333333] truncate">
-                  Aset Baru (Diserahkan)
+              <div>
+                <h2 class="text-[14px] sm:text-[15px] font-bold text-[#333333]">
+                  Tujuan Serah Terima Aset
                 </h2>
-                <p class="text-[12px] text-[#5F7089] truncate">
-                  Perangkat yang diserahkan ke penerima
+                <p class="text-[12px] text-[#5F7089]">
+                  Pilih salah satu keperluan serah terima perangkat
                 </p>
               </div>
             </div>
-
-            <button
-              type="button"
-              @click="addAssetBaruRow"
-              class="h-8.5 shrink-0 whitespace-nowrap rounded-xl bg-[#0A51B0] px-3 text-xs font-bold text-white shadow-2xs hover:bg-[#0A4391] active:scale-95 transition-all flex items-center justify-center gap-1 cursor-pointer"
-            >
-              <span aria-hidden="true" class="material-symbols-outlined text-[15px]">add</span>
-              <span>Tambah Unit</span>
-            </button>
           </div>
 
-          <div class="flex flex-col gap-3.5">
-            <div
-              v-for="(row, index) in asetBaruList"
-              :key="index"
-              class="submission-unit flex flex-col gap-3 rounded-xl sm:rounded-2xl border border-slate-200/80 bg-slate-50/50 p-3.5 sm:p-4 transition-all"
+          <div class="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3">
+            <label
+              v-for="t in [
+                {
+                  key: 'baru',
+                  label: 'Serah Terima Baru',
+                  icon: 'fiber_new',
+                  color: 'text-[#333333] bg-[#EDF5FF]',
+                },
+                {
+                  key: 'peminjaman',
+                  label: 'Peminjaman',
+                  icon: 'handshake',
+                  color: 'text-amber-600 bg-amber-50',
+                },
+                {
+                  key: 'pengembalian',
+                  label: 'Pengembalian',
+                  icon: 'keyboard_return',
+                  color: 'text-indigo-600 bg-indigo-50',
+                },
+                {
+                  key: 'perbaikan',
+                  label: 'Perbaikan',
+                  icon: 'build',
+                  color: 'text-rose-600 bg-rose-50',
+                },
+                {
+                  key: 'penggantian',
+                  label: 'Penggantian',
+                  icon: 'swap_horiz',
+                  color: 'text-purple-600 bg-purple-50',
+                },
+                {
+                  key: 'disposal',
+                  label: 'Disposal Aset',
+                  icon: 'delete_sweep',
+                  color: 'text-slate-600 bg-slate-100',
+                },
+                {
+                  key: 'lainnya',
+                  label: 'Lainnya',
+                  icon: 'more_horiz',
+                  color: 'text-teal-600 bg-teal-50',
+                },
+              ]"
+              :key="t.key"
+              class="flex cursor-pointer items-center justify-between min-h-[48px] rounded-xl border p-3 transition-all active:scale-[0.99] select-none"
+              :class="
+                form.tujuan === t.key
+                  ? 'border-[#0A51B0] bg-[#EDF5FF]/60 ring-2 ring-[#0A51B0]/15 shadow-2xs'
+                  : 'border-[#E2E8F0] bg-white hover:bg-slate-50 hover:border-slate-300'
+              "
             >
-              <!-- Card Unit Header -->
-              <div
-                class="flex items-center justify-between border-b border-slate-200/60 pb-2 mb-0.5"
-              >
+              <div class="flex items-center gap-2.5 min-w-0 pr-2">
                 <span
-                  class="inline-flex items-center gap-1.5 rounded-lg bg-[#EDF5FF] px-2.5 py-0.5 text-[11px] font-bold text-[#333333] border border-[#B8D4F5]/40"
+                  class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-[16px]"
+                  :class="form.tujuan === t.key ? 'bg-white text-[#333333] shadow-2xs' : t.color"
                 >
-                  <span aria-hidden="true" class="material-symbols-outlined text-[14px]"
-                    >devices</span
-                  >
-                  Unit Baru #{{ index + 1 }}
+                  <span aria-hidden="true" class="material-symbols-outlined text-[16px]">{{
+                    t.icon
+                  }}</span>
                 </span>
-
-                <button
-                  v-if="asetBaruList.length > 1"
-                  type="button"
-                  @click="removeAssetBaruRow(index)"
-                  class="flex h-7 items-center gap-1 rounded-lg bg-rose-50 px-2 text-[11px] font-bold text-rose-600 hover:bg-rose-100 active:scale-95 transition-all cursor-pointer border border-rose-200/60"
-                  title="Hapus baris unit ini"
-                >
-                  <span aria-hidden="true" class="material-symbols-outlined text-[14px]"
-                    >delete</span
-                  >
-                  <span>Hapus</span>
-                </button>
-              </div>
-
-              <label class="flex flex-col gap-1.5">
-                <span class="text-[10px] font-bold uppercase text-[#475569]">Pilih Aset IT *</span>
-                <SearchableSelect
-                  v-model="row.id_aset"
-                  :options="assets"
-                  value-key="id_aset"
-                  label-key="label_aset"
-                  secondary-label-key="nomor_seri"
-                  placeholder="Pilih Aset IT"
-                  search-placeholder="Cari label, hostname, atau nomor seri…"
-                  height-class="h-10"
-                  @update:model-value="onAssetBaruSelect(index, $event)"
-                />
-              </label>
-
-              <div class="grid grid-cols-1 sm:grid-cols-4 gap-2.5 sm:gap-2">
-                <label class="flex flex-col gap-1.5 sm:col-span-3">
-                  <span class="text-[9.5px] font-bold uppercase text-[#5F7089]"
-                    >Deskripsi / Tipe (Auto)</span
-                  >
-                  <input
-                    v-model="row.tipe"
-                    type="text"
-                    :aria-label="`Deskripsi Aset Baru Baris ${index + 1}`"
-                    class="h-9.5 w-full rounded-xl border border-slate-200 bg-slate-100/70 px-3 text-[12px] font-medium text-slate-600 outline-none cursor-default"
-                    readonly
-                    placeholder="Tipe perangkat"
-                  />
-                </label>
-
-                <label class="flex flex-col gap-1.5 sm:col-span-1">
-                  <span class="text-[9.5px] font-bold uppercase text-[#5F7089]">Qty</span>
-                  <input
-                    v-model="row.qty"
-                    required
-                    type="number"
-                    min="1"
-                    :aria-label="`Jumlah (Qty) Aset Baru Baris ${index + 1}`"
-                    class="h-9.5 w-full rounded-xl border border-[#E2E8F0] bg-white px-2.5 text-[12px] font-bold text-center text-[#333333] focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 focus:outline-none transition-all"
-                  />
-                </label>
-              </div>
-
-              <label class="flex flex-col gap-1.5">
-                <span class="text-[9.5px] font-bold uppercase text-[#5F7089]"
-                  >Spesifikasi Lengkap (Auto)</span
-                >
-                <input
-                  v-model="row.spesifikasi"
-                  type="text"
-                  :aria-label="`Spesifikasi Aset Baru Baris ${index + 1}`"
-                  class="h-9.5 w-full rounded-xl border border-slate-200 bg-slate-100/70 px-3 text-[12px] font-medium text-slate-600 outline-none cursor-default"
-                  readonly
-                  placeholder="Merek / Model / Serial Number"
-                />
-              </label>
-            </div>
-          </div>
-        </div>
-
-        <!-- Aset Lama (Dikembalikan) -->
-        <div
-          class="submission-section bg-white rounded-2xl border border-[#E2E8F0]/80 p-4 sm:p-6 shadow-2xs flex flex-col gap-4"
-        >
-          <div class="flex items-center justify-between gap-2 border-b border-[#F1F5F9] pb-3.5">
-            <div class="flex items-center gap-2.5 min-w-0">
-              <span
-                class="flex h-6 w-6 items-center justify-center rounded-lg bg-amber-50 text-amber-600 border border-amber-200/60 text-[11px] font-bold shrink-0"
-              >
-                03
-              </span>
-              <div class="min-w-0">
-                <h2 class="text-[14px] sm:text-[15px] font-bold text-[#333333] truncate">
-                  Aset Lama (Dikembalikan)
-                </h2>
-                <p class="text-[12px] text-[#5F7089] truncate">
-                  Perangkat lama jika ada penggantian
-                </p>
-              </div>
-            </div>
-
-            <button
-              type="button"
-              @click="addAssetLamaRow"
-              class="h-8.5 shrink-0 whitespace-nowrap rounded-xl bg-slate-800 px-3 text-xs font-bold text-white shadow-2xs hover:bg-slate-900 active:scale-95 transition-all flex items-center justify-center gap-1 cursor-pointer"
-            >
-              <span aria-hidden="true" class="material-symbols-outlined text-[15px]">add</span>
-              <span>Tambah Unit</span>
-            </button>
-          </div>
-
-          <div class="flex flex-col gap-3.5">
-            <div
-              v-for="(row, index) in asetLamaList"
-              :key="index"
-              class="submission-unit flex flex-col gap-3 rounded-xl sm:rounded-2xl border border-slate-200/80 bg-slate-50/50 p-3.5 sm:p-4 transition-all"
-            >
-              <!-- Card Unit Header -->
-              <div
-                class="flex items-center justify-between border-b border-slate-200/60 pb-2 mb-0.5"
-              >
                 <span
-                  class="inline-flex items-center gap-1.5 rounded-lg bg-amber-50 px-2.5 py-0.5 text-[11px] font-bold text-amber-700 border border-amber-200/60"
+                  class="text-xs font-bold truncate"
+                  :class="form.tujuan === t.key ? 'text-[#333333]' : 'text-[#334155]'"
                 >
-                  <span aria-hidden="true" class="material-symbols-outlined text-[14px]"
-                    >history_toggle_drop_down</span
-                  >
-                  Unit Lama #{{ index + 1 }}
+                  {{ t.label }}
                 </span>
-
-                <button
-                  v-if="asetLamaList.length > 1"
-                  type="button"
-                  @click="removeAssetLamaRow(index)"
-                  class="flex h-7 items-center gap-1 rounded-lg bg-rose-50 px-2 text-[11px] font-bold text-rose-600 hover:bg-rose-100 active:scale-95 transition-all cursor-pointer border border-rose-200/60"
-                  title="Hapus baris unit lama ini"
-                >
-                  <span aria-hidden="true" class="material-symbols-outlined text-[14px]"
-                    >delete</span
-                  >
-                  <span>Hapus</span>
-                </button>
               </div>
-
-              <label class="flex flex-col gap-1.5">
-                <span class="text-[10px] font-bold uppercase text-[#475569]"
-                  >Aset IT Lama (Opsional)</span
-                >
-                <SearchableSelect
-                  v-model="row.id_aset"
-                  :options="assets"
-                  value-key="id_aset"
-                  label-key="label_aset"
-                  secondary-label-key="nomor_seri"
-                  placeholder="Pilih Aset IT Lama"
-                  search-placeholder="Cari label, hostname, atau nomor seri…"
-                  height-class="h-10"
-                  @update:model-value="onAssetLamaSelect(index, $event)"
-                />
-              </label>
-
-              <div class="grid grid-cols-1 sm:grid-cols-4 gap-2.5 sm:gap-2">
-                <label class="flex flex-col gap-1.5 sm:col-span-3">
-                  <span class="text-[9.5px] font-bold uppercase text-[#5F7089]"
-                    >Deskripsi / Tipe (Auto)</span
-                  >
-                  <input
-                    v-model="row.tipe"
-                    type="text"
-                    :aria-label="`Deskripsi Aset Lama Baris ${index + 1}`"
-                    class="h-9.5 w-full rounded-xl border border-slate-200 bg-slate-100/70 px-3 text-[12px] font-medium text-slate-600 outline-none cursor-default"
-                    readonly
-                    placeholder="Tipe perangkat"
-                  />
-                </label>
-
-                <label class="flex flex-col gap-1.5 sm:col-span-1">
-                  <span class="text-[9.5px] font-bold uppercase text-[#5F7089]">Qty</span>
-                  <input
-                    v-model="row.qty"
-                    required
-                    type="number"
-                    min="1"
-                    :aria-label="`Jumlah (Qty) Aset Lama Baris ${index + 1}`"
-                    class="h-9.5 w-full rounded-xl border border-[#E2E8F0] bg-white px-2.5 text-[12px] font-bold text-center text-[#333333] focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 focus:outline-none transition-all"
-                  />
-                </label>
-              </div>
-
-              <label class="flex flex-col gap-1.5">
-                <span class="text-[9.5px] font-bold uppercase text-[#5F7089]"
-                  >Spesifikasi Lengkap (Auto)</span
-                >
-                <input
-                  v-model="row.spesifikasi"
-                  type="text"
-                  :aria-label="`Spesifikasi Aset Lama Baris ${index + 1}`"
-                  class="h-9.5 w-full rounded-xl border border-slate-200 bg-slate-100/70 px-3 text-[12px] font-medium text-slate-600 outline-none cursor-default"
-                  readonly
-                  placeholder="Merek / Model / Serial Number"
-                />
-              </label>
-            </div>
+              <input
+                v-model="form.tujuan"
+                type="radio"
+                name="tujuan"
+                :value="t.key"
+                :aria-label="t.label"
+                class="accent-[#0A51B0] cursor-pointer shrink-0 h-4 w-4"
+              />
+            </label>
           </div>
-        </div>
-      </div>
 
-      <!-- Section 4: Lembar Tanda Tangan: Diketahui Oleh -->
-      <div
-        class="submission-section bg-white rounded-2xl border border-[#E2E8F0]/80 p-4 sm:p-6 shadow-2xs flex flex-col gap-4"
-      >
-        <div class="flex items-center justify-between gap-2 border-b border-[#F1F5F9] pb-3.5">
-          <div class="flex items-center gap-2.5">
-            <span
-              class="flex h-6 w-6 items-center justify-center rounded-lg bg-[#EDF5FF] text-[#333333] text-[11px] font-bold"
+          <div v-if="form.tujuan === 'lainnya'" class="mt-1 flex flex-col gap-1.5">
+            <span class="text-[10px] font-bold uppercase text-[#475569]"
+              >Keterangan Tujuan Lainnya *</span
             >
-              04
-            </span>
-            <div>
-              <h2 class="text-[14px] sm:text-[15px] font-bold text-[#333333]">Diketahui Oleh</h2>
-              <p class="text-[12px] text-[#5F7089]">
-                Pilih atau tulis identitas pihak yang mengetahui untuk dicantumkan pada lembar tanda
-                tangan formulir
-              </p>
-            </div>
-          </div>
-
-          <label class="flex items-center gap-1.5 cursor-pointer select-none py-0.5">
             <input
-              v-model="form.isMengetahuiKustom"
-              type="checkbox"
-              aria-label="Input Manual Pihak Mengetahui"
-              class="rounded border-slate-300 accent-[#0A51B0] h-4 w-4 cursor-pointer"
-            />
-            <span class="text-[11px] font-bold text-[#475569]">Input Manual</span>
-          </label>
-        </div>
-
-        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <!-- Pilih Karyawan / PBP -->
-          <div v-if="!form.isMengetahuiKustom" class="flex flex-col gap-1.5">
-            <div class="flex items-center justify-between">
-              <span class="text-[11px] font-bold uppercase text-[#475569]"
-                >Pilih Karyawan / PBP</span
-              >
-              <span class="text-[10px] text-slate-400 font-medium">(Opsional)</span>
-            </div>
-            <SearchableSelect
-              v-model="form.mengetahuiNik"
-              :options="employees"
-              value-key="nik"
-              label-key="nama_karyawan"
-              secondary-label-key="nik"
-              placeholder="Pilih nama yang mengetahui…"
-              search-placeholder="Cari nama atau NIK…"
-              height-class="h-10"
-              :clearable="true"
-            />
-          </div>
-
-          <div v-else class="flex flex-col gap-1.5">
-            <span class="text-[11px] font-bold uppercase text-[#475569]">Nama Lengkap</span>
-            <input
-              v-model="form.mengetahuiNama"
+              v-model="form.tujuanLainnya"
+              required
               type="text"
-              aria-label="Nama Lengkap yang Mengetahui"
+              aria-label="Keterangan Tujuan Serah Terima Lainnya"
               class="h-10 w-full rounded-xl border border-[#E2E8F0] bg-white px-3 text-xs font-medium text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 focus:outline-none transition-all"
-              placeholder="Tulis nama lengkap yang mengetahui…"
+              placeholder="Tuliskan tujuan serah terima aset lainnya…"
             />
           </div>
+        </div>
 
-          <!-- Nama Terpilih (Auto) -->
-          <div v-if="!form.isMengetahuiKustom" class="flex flex-col gap-1.5">
-            <span class="text-[10px] font-bold uppercase text-[#5F7089]"
-              >Nama Lengkap Terpilih</span
-            >
-            <input
-              v-model="form.mengetahuiNama"
-              type="text"
-              aria-label="Nama Lengkap Mengetahui (Auto)"
-              class="h-10 w-full rounded-xl border border-slate-200 bg-slate-100/70 px-3 text-xs font-medium text-slate-600 outline-none cursor-default"
-              readonly
-              placeholder="Kosong (tanda tangan manual)"
-            />
-          </div>
-
-          <!-- Jabatan / Keterangan Tanda Tangan -->
+        <!-- Section 3 & 4: Data Serah Terima Aset (Baru & Lama) -->
+        <div class="grid grid-cols-1 gap-5 lg:grid-cols-2">
+          <!-- Aset Baru (Diserahkan) -->
           <div
-            class="flex flex-col gap-1.5"
-            :class="form.isMengetahuiKustom ? 'sm:col-span-1 lg:col-span-2' : ''"
+            class="submission-section bg-white rounded-2xl border border-[#E2E8F0]/80 p-4 sm:p-6 shadow-2xs flex flex-col gap-4"
           >
-            <span class="text-[10px] font-bold uppercase text-[#5F7089]">
-              Jabatan / Unit Pada Dokumen
-            </span>
-            <input
-              v-model="form.mengetahuiJabatan"
-              type="text"
-              aria-label="Jabatan atau Unit yang Mengetahui"
-              class="h-10 w-full rounded-xl border border-[#E2E8F0] bg-white px-3 text-xs font-medium text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 focus:outline-none transition-all"
-              placeholder="People Business Partner atau Asset Management"
-            />
+            <div class="flex items-center justify-between gap-2 border-b border-[#F1F5F9] pb-3.5">
+              <div class="flex items-center gap-2.5 min-w-0">
+                <span
+                  class="flex h-6 w-6 items-center justify-center rounded-lg bg-[#EDF5FF] text-[#333333] text-[11px] font-bold shrink-0"
+                >
+                  03
+                </span>
+                <div class="min-w-0">
+                  <h2 class="text-[14px] sm:text-[15px] font-bold text-[#333333] truncate">
+                    Aset Baru (Diserahkan)
+                  </h2>
+                  <p class="text-[12px] text-[#5F7089] truncate">
+                    Perangkat yang diserahkan ke penerima
+                  </p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                @click="addAssetBaruRow"
+                class="h-8.5 shrink-0 whitespace-nowrap rounded-xl bg-[#0A51B0] px-3 text-xs font-bold text-white shadow-2xs hover:bg-[#0A4391] active:scale-95 transition-all flex items-center justify-center gap-1 cursor-pointer"
+              >
+                <span aria-hidden="true" class="material-symbols-outlined text-[15px]">add</span>
+                <span>Tambah Unit</span>
+              </button>
+            </div>
+
+            <div class="flex flex-col gap-3.5">
+              <div
+                v-for="(row, index) in asetBaruList"
+                :key="index"
+                class="submission-unit flex flex-col gap-3 rounded-xl sm:rounded-2xl border border-slate-200/80 bg-slate-50/50 p-3.5 sm:p-4 transition-all"
+              >
+                <!-- Card Unit Header -->
+                <div
+                  class="flex items-center justify-between border-b border-slate-200/60 pb-2 mb-0.5"
+                >
+                  <span
+                    class="inline-flex items-center gap-1.5 rounded-lg bg-[#EDF5FF] px-2.5 py-0.5 text-[11px] font-bold text-[#333333] border border-[#B8D4F5]/40"
+                  >
+                    <span aria-hidden="true" class="material-symbols-outlined text-[14px]"
+                      >devices</span
+                    >
+                    Unit Baru #{{ index + 1 }}
+                  </span>
+
+                  <button
+                    v-if="asetBaruList.length > 1"
+                    type="button"
+                    @click="removeAssetBaruRow(index)"
+                    class="flex h-7 items-center gap-1 rounded-lg bg-rose-50 px-2 text-[11px] font-bold text-rose-600 hover:bg-rose-100 active:scale-95 transition-all cursor-pointer border border-rose-200/60"
+                    title="Hapus baris unit ini"
+                  >
+                    <span aria-hidden="true" class="material-symbols-outlined text-[14px]"
+                      >delete</span
+                    >
+                    <span>Hapus</span>
+                  </button>
+                </div>
+
+                <label class="flex flex-col gap-1.5">
+                  <span class="text-[10px] font-bold uppercase text-[#475569]"
+                    >Pilih Aset IT *</span
+                  >
+                  <SearchableSelect
+                    :model-value="row.id_aset"
+                    :options="assetBaruOptions"
+                    :clearable="true"
+                    value-key="id_aset"
+                    label-key="label_aset"
+                    secondary-label-key="nomor_seri"
+                    placeholder="Pilih Aset IT"
+                    search-placeholder="Cari label, hostname, atau nomor seri…"
+                    height-class="h-10"
+                    @update:model-value="onAssetBaruSelect(index, $event)"
+                  />
+                  <span
+                    v-if="row.id_aset && !assetBaruOptions.some((a) => a.id_aset === row.id_aset)"
+                    class="text-xs text-amber-700"
+                  >
+                    Aset #{{ row.id_aset }}: {{ row.spesifikasi || row.tipe }}.
+                    {{
+                      historicAssetRows.has(row)
+                        ? 'Snapshot tersimpan dipertahankan; pilih ulang untuk mengganti.'
+                        : 'Pilihan tidak sesuai pihak saat ini; pilih ulang atau kosongkan.'
+                    }}
+                    <button type="button" class="underline" @click="onAssetBaruSelect(index, '')">
+                      Kosongkan aset
+                    </button>
+                  </span>
+                </label>
+
+                <div class="grid grid-cols-1 sm:grid-cols-4 gap-2.5 sm:gap-2">
+                  <label class="flex flex-col gap-1.5 sm:col-span-3">
+                    <span class="text-[9.5px] font-bold uppercase text-[#5F7089]"
+                      >Deskripsi / Tipe (Auto)</span
+                    >
+                    <input
+                      v-model="row.tipe"
+                      type="text"
+                      :aria-label="`Deskripsi Aset Baru Baris ${index + 1}`"
+                      class="h-9.5 w-full rounded-xl border border-slate-200 bg-slate-100/70 px-3 text-[12px] font-medium text-slate-600 outline-none cursor-default"
+                      readonly
+                      placeholder="Tipe perangkat"
+                    />
+                  </label>
+
+                  <label class="flex flex-col gap-1.5 sm:col-span-1">
+                    <span class="text-[9.5px] font-bold uppercase text-[#5F7089]">Qty</span>
+                    <input
+                      v-model="row.qty"
+                      required
+                      type="number"
+                      min="1"
+                      :aria-label="`Jumlah (Qty) Aset Baru Baris ${index + 1}`"
+                      class="h-9.5 w-full rounded-xl border border-[#E2E8F0] bg-white px-2.5 text-[12px] font-bold text-center text-[#333333] focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 focus:outline-none transition-all"
+                    />
+                  </label>
+                </div>
+
+                <label class="flex flex-col gap-1.5">
+                  <span class="text-[9.5px] font-bold uppercase text-[#5F7089]"
+                    >Spesifikasi Lengkap (Auto)</span
+                  >
+                  <input
+                    v-model="row.spesifikasi"
+                    type="text"
+                    :aria-label="`Spesifikasi Aset Baru Baris ${index + 1}`"
+                    class="h-9.5 w-full rounded-xl border border-slate-200 bg-slate-100/70 px-3 text-[12px] font-medium text-slate-600 outline-none cursor-default"
+                    readonly
+                    placeholder="Merek / Model / Serial Number"
+                  />
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Aset Lama (Dikembalikan) -->
+          <div
+            class="submission-section bg-white rounded-2xl border border-[#E2E8F0]/80 p-4 sm:p-6 shadow-2xs flex flex-col gap-4"
+          >
+            <div class="flex items-center justify-between gap-2 border-b border-[#F1F5F9] pb-3.5">
+              <div class="flex items-center gap-2.5 min-w-0">
+                <span
+                  class="flex h-6 w-6 items-center justify-center rounded-lg bg-amber-50 text-amber-600 border border-amber-200/60 text-[11px] font-bold shrink-0"
+                >
+                  03
+                </span>
+                <div class="min-w-0">
+                  <h2 class="text-[14px] sm:text-[15px] font-bold text-[#333333] truncate">
+                    Aset Lama (Dikembalikan)
+                  </h2>
+                  <p class="text-[12px] text-[#5F7089] truncate">
+                    Perangkat lama jika ada penggantian
+                  </p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                @click="addAssetLamaRow"
+                class="h-8.5 shrink-0 whitespace-nowrap rounded-xl bg-slate-800 px-3 text-xs font-bold text-white shadow-2xs hover:bg-slate-900 active:scale-95 transition-all flex items-center justify-center gap-1 cursor-pointer"
+              >
+                <span aria-hidden="true" class="material-symbols-outlined text-[15px]">add</span>
+                <span>Tambah Unit</span>
+              </button>
+            </div>
+
+            <div class="flex flex-col gap-3.5">
+              <div
+                v-for="(row, index) in asetLamaList"
+                :key="index"
+                class="submission-unit flex flex-col gap-3 rounded-xl sm:rounded-2xl border border-slate-200/80 bg-slate-50/50 p-3.5 sm:p-4 transition-all"
+              >
+                <!-- Card Unit Header -->
+                <div
+                  class="flex items-center justify-between border-b border-slate-200/60 pb-2 mb-0.5"
+                >
+                  <span
+                    class="inline-flex items-center gap-1.5 rounded-lg bg-amber-50 px-2.5 py-0.5 text-[11px] font-bold text-amber-700 border border-amber-200/60"
+                  >
+                    <span aria-hidden="true" class="material-symbols-outlined text-[14px]"
+                      >history_toggle_drop_down</span
+                    >
+                    Unit Lama #{{ index + 1 }}
+                  </span>
+
+                  <button
+                    v-if="asetLamaList.length > 1"
+                    type="button"
+                    @click="removeAssetLamaRow(index)"
+                    class="flex h-7 items-center gap-1 rounded-lg bg-rose-50 px-2 text-[11px] font-bold text-rose-600 hover:bg-rose-100 active:scale-95 transition-all cursor-pointer border border-rose-200/60"
+                    title="Hapus baris unit lama ini"
+                  >
+                    <span aria-hidden="true" class="material-symbols-outlined text-[14px]"
+                      >delete</span
+                    >
+                    <span>Hapus</span>
+                  </button>
+                </div>
+
+                <label class="flex flex-col gap-1.5">
+                  <span class="text-[10px] font-bold uppercase text-[#475569]"
+                    >Aset IT Lama (Opsional)</span
+                  >
+                  <SearchableSelect
+                    :model-value="row.id_aset"
+                    :options="assetLamaOptions"
+                    :clearable="true"
+                    value-key="id_aset"
+                    label-key="label_aset"
+                    secondary-label-key="nomor_seri"
+                    placeholder="Pilih Aset IT Lama"
+                    search-placeholder="Cari label, hostname, atau nomor seri…"
+                    height-class="h-10"
+                    @update:model-value="onAssetLamaSelect(index, $event)"
+                  />
+                  <span
+                    v-if="row.id_aset && !assetLamaOptions.some((a) => a.id_aset === row.id_aset)"
+                    class="text-xs text-amber-700"
+                  >
+                    Aset #{{ row.id_aset }}: {{ row.spesifikasi || row.tipe }}.
+                    {{
+                      historicAssetRows.has(row)
+                        ? 'Snapshot tersimpan dipertahankan; pilih ulang untuk mengganti.'
+                        : 'Pilihan tidak sesuai pihak saat ini; pilih ulang atau kosongkan.'
+                    }}
+                    <button type="button" class="underline" @click="onAssetLamaSelect(index, '')">
+                      Kosongkan aset
+                    </button>
+                  </span>
+                </label>
+
+                <div class="grid grid-cols-1 sm:grid-cols-4 gap-2.5 sm:gap-2">
+                  <label class="flex flex-col gap-1.5 sm:col-span-3">
+                    <span class="text-[9.5px] font-bold uppercase text-[#5F7089]"
+                      >Deskripsi / Tipe (Auto)</span
+                    >
+                    <input
+                      v-model="row.tipe"
+                      type="text"
+                      :aria-label="`Deskripsi Aset Lama Baris ${index + 1}`"
+                      class="h-9.5 w-full rounded-xl border border-slate-200 bg-slate-100/70 px-3 text-[12px] font-medium text-slate-600 outline-none cursor-default"
+                      readonly
+                      placeholder="Tipe perangkat"
+                    />
+                  </label>
+
+                  <label class="flex flex-col gap-1.5 sm:col-span-1">
+                    <span class="text-[9.5px] font-bold uppercase text-[#5F7089]">Qty</span>
+                    <input
+                      v-model="row.qty"
+                      required
+                      type="number"
+                      min="1"
+                      :aria-label="`Jumlah (Qty) Aset Lama Baris ${index + 1}`"
+                      class="h-9.5 w-full rounded-xl border border-[#E2E8F0] bg-white px-2.5 text-[12px] font-bold text-center text-[#333333] focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 focus:outline-none transition-all"
+                    />
+                  </label>
+                </div>
+
+                <label class="flex flex-col gap-1.5">
+                  <span class="text-[9.5px] font-bold uppercase text-[#5F7089]"
+                    >Spesifikasi Lengkap (Auto)</span
+                  >
+                  <input
+                    v-model="row.spesifikasi"
+                    type="text"
+                    :aria-label="`Spesifikasi Aset Lama Baris ${index + 1}`"
+                    class="h-9.5 w-full rounded-xl border border-slate-200 bg-slate-100/70 px-3 text-[12px] font-medium text-slate-600 outline-none cursor-default"
+                    readonly
+                    placeholder="Merek / Model / Serial Number"
+                  />
+                </label>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
 
+        <!-- Section 4: Lembar Tanda Tangan: Diketahui Oleh -->
+        <div
+          class="submission-section bg-white rounded-2xl border border-[#E2E8F0]/80 p-4 sm:p-6 shadow-2xs flex flex-col gap-4"
+        >
+          <div class="flex items-center justify-between gap-2 border-b border-[#F1F5F9] pb-3.5">
+            <div class="flex items-center gap-2.5">
+              <span
+                class="flex h-6 w-6 items-center justify-center rounded-lg bg-[#EDF5FF] text-[#333333] text-[11px] font-bold"
+              >
+                04
+              </span>
+              <div>
+                <h2 class="text-[14px] sm:text-[15px] font-bold text-[#333333]">Diketahui Oleh</h2>
+                <p class="text-[12px] text-[#5F7089]">
+                  Pilih atau tulis identitas pihak yang mengetahui untuk dicantumkan pada lembar
+                  tanda tangan formulir
+                </p>
+              </div>
+            </div>
+
+            <label class="flex items-center gap-1.5 cursor-pointer select-none py-0.5">
+              <input
+                v-model="form.isMengetahuiKustom"
+                type="checkbox"
+                aria-label="Input Manual Pihak Mengetahui"
+                class="rounded border-slate-300 accent-[#0A51B0] h-4 w-4 cursor-pointer"
+              />
+              <span class="text-[11px] font-bold text-[#475569]">Input Manual</span>
+            </label>
+          </div>
+
+          <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <!-- Pilih Karyawan / PBP -->
+            <div v-if="!form.isMengetahuiKustom" class="flex flex-col gap-1.5">
+              <div class="flex items-center justify-between">
+                <span class="text-[11px] font-bold uppercase text-[#475569]"
+                  >Pilih Karyawan / PBP</span
+                >
+                <span class="text-[10px] text-slate-400 font-medium">(Opsional)</span>
+              </div>
+              <SearchableSelect
+                v-model="form.mengetahuiNik"
+                :options="employees"
+                value-key="nik"
+                label-key="nama_karyawan"
+                secondary-label-key="nik"
+                placeholder="Pilih nama yang mengetahui…"
+                search-placeholder="Cari nama atau NIK…"
+                height-class="h-10"
+                :clearable="true"
+              />
+            </div>
+
+            <div v-else class="flex flex-col gap-1.5">
+              <span class="text-[11px] font-bold uppercase text-[#475569]">Nama Lengkap</span>
+              <input
+                v-model="form.mengetahuiNama"
+                type="text"
+                aria-label="Nama Lengkap yang Mengetahui"
+                class="h-10 w-full rounded-xl border border-[#E2E8F0] bg-white px-3 text-xs font-medium text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 focus:outline-none transition-all"
+                placeholder="Tulis nama lengkap yang mengetahui…"
+              />
+            </div>
+
+            <!-- Nama Terpilih (Auto) -->
+            <div v-if="!form.isMengetahuiKustom" class="flex flex-col gap-1.5">
+              <span class="text-[10px] font-bold uppercase text-[#5F7089]"
+                >Nama Lengkap Terpilih</span
+              >
+              <input
+                v-model="form.mengetahuiNama"
+                type="text"
+                aria-label="Nama Lengkap Mengetahui (Auto)"
+                class="h-10 w-full rounded-xl border border-slate-200 bg-slate-100/70 px-3 text-xs font-medium text-slate-600 outline-none cursor-default"
+                readonly
+                placeholder="Kosong (tanda tangan manual)"
+              />
+            </div>
+
+            <!-- Jabatan / Keterangan Tanda Tangan -->
+            <div
+              class="flex flex-col gap-1.5"
+              :class="form.isMengetahuiKustom ? 'sm:col-span-1 lg:col-span-2' : ''"
+            >
+              <span class="text-[10px] font-bold uppercase text-[#5F7089]">
+                Jabatan / Unit Pada Dokumen
+              </span>
+              <input
+                v-model="form.mengetahuiJabatan"
+                type="text"
+                aria-label="Jabatan atau Unit yang Mengetahui"
+                class="h-10 w-full rounded-xl border border-[#E2E8F0] bg-white px-3 text-xs font-medium text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 focus:outline-none transition-all"
+                placeholder="People Business Partner atau Asset Management"
+              />
+            </div>
+          </div>
+        </div>
+      </fieldset>
       <!-- Action Footer -->
       <div
         class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 rounded-2xl border border-[#E2E8F0]/80 bg-white p-4 sm:p-5 shadow-2xs"
@@ -1867,19 +2054,30 @@ onMounted(fetchData)
             required
             type="date"
             aria-label="Tanggal Formulir Serah Terima"
+            :disabled="!canWriteSubmissions || isSaving"
             class="h-10 w-full sm:w-48 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-medium text-[#333333] focus:border-[#0A51B0] focus:bg-white focus:ring-2 focus:ring-[#0A51B0]/10 focus:outline-none transition-all cursor-pointer"
           />
         </div>
 
-        <div v-if="canWriteSubmissions" class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
+        <div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
           <button
             type="button"
             :disabled="isSaving"
             class="h-11 w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl border border-[#CBD5E1] bg-white px-5 text-xs font-bold text-[#334155] hover:bg-[#F8FAFC] disabled:opacity-60"
-            @click="persistSubmission('draft')"
+            @click="router.push('/submissions')"
+          >
+            <span aria-hidden="true" class="material-symbols-outlined text-[18px]">close</span>
+            <span>Cancel</span>
+          </button>
+          <button
+            type="button"
+            :disabled="isSaving"
+            class="h-11 w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl border border-[#0A51B0] bg-white px-5 text-xs font-bold text-[#0A51B0] hover:bg-[#EDF5FF] disabled:opacity-60"
+            v-if="canWriteSubmissions"
+            @click="saveAndReturn"
           >
             <span aria-hidden="true" class="material-symbols-outlined text-[18px]">save</span>
-            <span>{{ isSaving ? 'Menyimpan…' : 'Simpan Draft' }}</span>
+            <span>{{ isSaving ? 'Menyimpan…' : 'Simpan' }}</span>
           </button>
           <button
             type="submit"
@@ -1889,10 +2087,10 @@ onMounted(fetchData)
             <span aria-hidden="true" class="material-symbols-outlined text-[18px]"
               >picture_as_pdf</span
             >
-            <span>Simpan &amp; Cetak PDF</span>
+            <span>{{ isSaving ? 'Menyimpan…' : 'Cetak' }}</span>
           </button>
         </div>
-        <p v-else class="text-xs font-semibold text-[#5F7089]">
+        <p v-if="!canWriteSubmissions" class="text-xs font-semibold text-[#5F7089]">
           Mode hanya baca — Anda tidak memiliki izin mengubah pengajuan.
         </p>
       </div>
@@ -1900,6 +2098,8 @@ onMounted(fetchData)
   </div>
 </template>
 
+<style scoped src="../assets/asset-workspace.css"></style>
+<style scoped src="../assets/ws-table.css"></style>
 <style scoped>
 .submissions-page {
   width: 100%;
@@ -1907,9 +2107,33 @@ onMounted(fetchData)
   margin-inline: auto;
 }
 
-/* BAST list follows Aset IT order: toolbar/list first, form below. */
 .submission-history {
-  order: -1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.submission-table-wrap {
+  overflow-x: auto;
+}
+.submission-history .ws-data-table :is(th, td) {
+  padding: 14px 16px;
+}
+.submission-history tbody tr,
+.submission-laptop-row {
+  cursor: pointer;
+}
+.submission-detail-link:focus-visible {
+  outline: 2px solid #0a51b0;
+  outline-offset: 3px;
+}
+.submission-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
 }
 .submission-history .asset-toolbar,
 .submission-history > div:nth-child(2) {
@@ -1918,10 +2142,76 @@ onMounted(fetchData)
 .submission-history > div:nth-child(2) {
   min-height: 68px;
 }
+.submission-card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 12px;
+}
+.submission-card-actions {
+  display: flex;
+  gap: 4px;
+}
+.submission-card-actions button {
+  display: inline-flex;
+  width: 34px;
+  height: 34px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  color: #0a51b0;
+}
+.submission-card-actions button:hover {
+  background: #edf5ff;
+}
+.submission-card-actions button.danger {
+  color: #be123c;
+}
 @media (width < 80rem) {
   .submission-history table {
     min-width: 760px;
   }
+}
+.submission-form label:not(:has(input[type='checkbox'], input[type='radio'])) {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.submission-form .submission-section {
+  gap: 20px;
+  padding: 24px;
+  border: 1px solid #e7ecf3;
+  border-radius: 12px;
+  background: #fafbfd;
+  box-shadow: none;
+}
+.submission-form .submission-unit {
+  gap: 16px;
+  padding: 16px;
+}
+.submission-form > :last-child {
+  gap: 20px;
+  padding: 20px;
+  flex-wrap: wrap;
+}
+.submission-form input:not([type='checkbox']):not([type='radio']) {
+  padding-inline: 12px;
+}
+@media (max-width: 639px) {
+  .submission-form .submission-section,
+  .submission-form > :last-child {
+    padding: 16px;
+  }
+}
+.submission-form input[readonly] {
+  background: #f1f5f9;
+  color: #64748b;
+}
+.submission-form .submission-section h2 {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 .submission-steps {
   display: grid;

@@ -105,6 +105,15 @@ const routes = [
     subtitle: 'Kelola FAQ Help Center',
     permission: 'knowledge_base',
   }),
+  page('/submissions/new', 'submission-new', () => import('../views/SubmissionsView.vue'), {
+    title: 'Tambah BAST',
+    subtitle: 'Buat berita acara serah terima aset',
+    permission: 'submissions',
+  }),
+  page('/submissions/:id', 'submission-detail', () => import('../views/SubmissionsView.vue'), {
+    title: 'Detail BAST',
+    permission: 'submissions',
+  }),
   page('/submissions', 'submissions', () => import('../views/SubmissionsView.vue'), {
     title: 'Pengajuan',
     subtitle: 'Kelola pengajuan',

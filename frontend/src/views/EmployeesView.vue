@@ -1,5 +1,6 @@
 <script setup>
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { useApi } from '../composables/useApi.js'
 import { useAuth } from '../composables/useAuth.js'
 import { animateStagger } from '../composables/useGsap.js'
@@ -16,6 +17,7 @@ import SearchableSelect from '../components/ui/SearchableSelect.vue'
 import { useViewMode } from '../composables/useViewMode.js'
 import AppViewToggle from '../components/ui/AppViewToggle.vue'
 import FilterModal from '../components/ui/FilterModal.vue'
+import PageHeader from '../components/ui/PageHeader.vue'
 import { exportToExcel } from '../utils/exportEngine.js'
 
 const { get, post, put, del } = useApi()
@@ -446,8 +448,18 @@ function getEmployeeActions(emp) {
   ]
 }
 
+const route = useRoute()
+const router = useRouter()
+
 onMounted(() => {
   fetchData()
+
+  // Deep link from dashboard quick action: /karyawan?action=add opens the
+  // create modal. Guarded by canWriteKaryawan, same as the toolbar button.
+  if (route.query.action === 'add') {
+    openAdd()
+    router.replace({ path: route.path, query: { ...route.query, action: undefined } })
+  }
 })
 </script>
 
@@ -469,92 +481,74 @@ onMounted(() => {
         <span class="min-w-0 wrap-anywhere" role="status">{{ notification.message }}</span>
       </div>
     </Transition>
-
-    <!-- Modern SaaS Header & Control Bar Container (sticky mengikuti scroll) -->
-    <div class="ws-toolbar-sticky">
-      <div
-        class="admin-page-header flex min-w-0 flex-col gap-4 bg-white p-3.5 sm:p-4.5 rounded-2xl border border-[#E2E8F0]/80 shadow-2xs"
-      >
-        <!-- Row 1: Page Title & Primary/Secondary Action Bar -->
-        <div class="flex flex-col items-stretch justify-between gap-3 lg:flex-row lg:items-center">
-          <div>
-            <h2 class="text-xl font-bold text-[#333333] tracking-tight">Data Karyawan</h2>
-            <p class="text-[13px] text-[#5F7089] mt-0.5 leading-normal">
-              Pengelolaan dan integrasi data karyawan perusahaan
-            </p>
-          </div>
-
-          <div class="flex shrink-0 items-center gap-2">
-            <button
-              v-if="canWriteKaryawan"
-              type="button"
-              @click="openAdd"
-              class="toolbar-primary-action h-9 shrink-0 whitespace-nowrap rounded-lg bg-[#0A51B0] px-3 sm:px-3.5 text-xs font-semibold text-white shadow-2xs hover:bg-[#0A4391] transition-all flex items-center justify-center gap-1.5 cursor-pointer"
-              title="Tambah karyawan baru"
-            >
-              <span aria-hidden="true" class="material-symbols-outlined text-[16px]"
-                >person_add</span
-              >
-              <span>Tambah Karyawan</span>
-            </button>
-            <div
-              class="toolbar-action-group flex items-center gap-1 rounded-lg border border-[#D7E3F2] bg-[#F8FAFC] p-1"
-            >
-              <button
-                v-if="canWriteKaryawan"
-                type="button"
-                @click="showImportModal = true"
-                class="toolbar-action-button inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-[11px] font-bold text-[#0A51B0] hover:bg-white"
-                title="Import data karyawan dari Excel"
-              >
-                <span aria-hidden="true" class="material-symbols-outlined text-[15px]"
-                  >upload_file</span
-                >Import
-              </button>
-              <button
-                type="button"
-                @click="exportEmployees"
-                class="toolbar-action-button inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-[11px] font-bold text-[#0A51B0] hover:bg-white"
-                title="Export data karyawan"
-              >
-                <span aria-hidden="true" class="material-symbols-outlined text-[15px]"
-                  >download</span
-                >Export
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Row 2: Search Input & Filters Control Bar -->
-        <div
-          class="employee-filters grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2.5 w-full min-w-0 pt-3 border-t border-[#F1F5F9]"
+    <!-- Page Header -->
+    <PageHeader
+      title="Data Karyawan"
+      subtitle="Pengelolaan dan integrasi data karyawan perusahaan"
+      icon="person_search"
+    >
+      <div class="flex items-center gap-2">
+        <button
+          v-if="canWriteKaryawan"
+          type="button"
+          @click="openAdd"
+          class="h-9 shrink-0 whitespace-nowrap rounded-lg bg-[#0A51B0] px-3 sm:px-3.5 text-xs font-semibold text-white shadow-2xs hover:bg-[#0A4391] transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+          title="Tambah karyawan baru"
         >
-          <div class="relative h-9 min-w-0">
-            <span
-              aria-hidden="true"
-              class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[18px] text-[#687281] pointer-events-none"
-              >search</span
-            >
-            <input
-              v-model="searchQuery"
-              aria-label="Cari karyawan"
-              type="text"
-              placeholder="Cari NIK, nama, atau jabatan..."
-              class="toolbar-search-input h-full min-h-0 w-full rounded-xl border border-[#E2E8F0] bg-white pl-9.5 pr-3 text-base sm:text-xs text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
-            />
-          </div>
+          <span aria-hidden="true" class="material-symbols-outlined text-[16px]">person_add</span>
+          <span>Tambah Karyawan</span>
+        </button>
+        <div class="flex items-center gap-1 rounded-lg border border-[#D7E3F2] bg-[#F8FAFC] p-1">
+          <button
+            v-if="canWriteKaryawan"
+            type="button"
+            @click="showImportModal = true"
+            class="inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-[11px] font-bold text-[#0A51B0] hover:bg-white"
+            title="Import data karyawan dari Excel"
+          >
+            <span aria-hidden="true" class="material-symbols-outlined text-[15px]">upload_file</span
+            >Import
+          </button>
           <button
             type="button"
-            @click="showFilterModal = true"
-            class="toolbar-filter-button h-9 shrink-0 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-semibold text-[#5F7089] hover:bg-white"
+            @click="exportEmployees"
+            class="inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-[11px] font-bold text-[#0A51B0] hover:bg-white"
+            title="Export data karyawan"
           >
-            <span aria-hidden="true" class="material-symbols-outlined mr-1 align-middle text-[16px]"
-              >filter_alt</span
-            >Filter
+            <span aria-hidden="true" class="material-symbols-outlined text-[15px]">download</span
+            >Export
           </button>
-          <AppViewToggle v-model="viewMode" />
         </div>
       </div>
+    </PageHeader>
+
+    <!-- Search & Filter Bar -->
+    <div class="flex items-center gap-2.5 w-full min-w-0">
+      <div class="relative h-9 min-w-0 flex-1">
+        <span
+          aria-hidden="true"
+          class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[18px] text-[#687281] pointer-events-none"
+          >search</span
+        >
+        <input
+          v-model="searchQuery"
+          aria-label="Cari karyawan"
+          type="text"
+          placeholder="Cari NIK, nama, atau jabatan…"
+          class="h-full min-h-0 w-full rounded-xl border border-[#E2E8F0] bg-white pl-9.5 pr-3 text-xs text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
+        />
+      </div>
+
+      <button
+        type="button"
+        @click="showFilterModal = true"
+        class="h-9 shrink-0 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-semibold text-[#5F7089] hover:bg-white"
+      >
+        <span aria-hidden="true" class="material-symbols-outlined mr-1 align-middle text-[16px]"
+          >filter_alt</span
+        >Filter
+      </button>
+      <AppViewToggle v-model="viewMode" />
     </div>
 
     <FilterModal
@@ -658,11 +652,7 @@ onMounted(() => {
       </div>
 
       <div v-else class="w-full max-w-full overflow-hidden">
-        <ul
-          v-if="viewMode === 'card'"
-          class="admin-person-cards"
-          aria-label="Daftar karyawan"
-        >
+        <ul v-if="viewMode === 'card'" class="admin-person-cards" aria-label="Daftar karyawan">
           <li
             v-for="emp in paginatedEmployees"
             :key="emp.id_karyawan || emp.nik"
@@ -746,41 +736,46 @@ onMounted(() => {
             <col :class="canWriteKaryawan ? 'w-[11%]' : 'w-[11%]'" />
             <col v-if="canWriteKaryawan" class="w-[6%]" />
           </colgroup>
-          <thead
-            class="sticky top-0 z-10 border-b border-[#E2E8F0] bg-[#F8FAFC] select-none whitespace-nowrap"
-          >
+          <thead class="border-b border-[#E2E8F0] bg-[#F8FAFC] select-none whitespace-nowrap">
             <tr>
               <th
+                scope="col"
                 class="py-3 pl-5 pr-4 text-[11px] font-semibold uppercase tracking-wider text-[#5F7089] text-left whitespace-nowrap"
               >
                 Karyawan
               </th>
               <th
+                scope="col"
                 class="py-3 px-4 text-[11px] font-semibold uppercase tracking-wider text-[#5F7089] text-left whitespace-nowrap"
               >
                 NIK
               </th>
               <th
+                scope="col"
                 class="py-3 px-4 text-[11px] font-semibold uppercase tracking-wider text-[#5F7089] text-left whitespace-nowrap"
               >
                 Title / Jabatan
               </th>
               <th
+                scope="col"
                 class="py-3 px-4 text-[11px] font-semibold uppercase tracking-wider text-[#5F7089] text-left whitespace-nowrap"
               >
                 Departemen / Direktorat
               </th>
               <th
+                scope="col"
                 class="py-3 px-4 text-[11px] font-semibold uppercase tracking-wider text-[#5F7089] text-left whitespace-nowrap"
               >
                 Status
               </th>
               <th
+                scope="col"
                 class="py-3 px-4 text-[11px] font-semibold uppercase tracking-wider text-[#5F7089] text-left whitespace-nowrap"
               >
                 Lokasi Kerja
               </th>
               <th
+                scope="col"
                 v-if="canWriteKaryawan"
                 class="py-3 pr-5 pl-4 text-right text-[11px] font-semibold uppercase tracking-wider text-[#5F7089] whitespace-nowrap"
               >
@@ -866,7 +861,10 @@ onMounted(() => {
                 class="py-4 pr-5 pl-4 text-right overflow-hidden"
                 @click.stop
               >
-                <AppRowActions :actions="getEmployeeActions(emp)" />
+                <AppRowActions
+                  :actions="getEmployeeActions(emp)"
+                  :label="`Aksi karyawan ${emp.nama_karyawan || ''}`"
+                />
               </td>
             </tr>
           </tbody>
@@ -1093,8 +1091,8 @@ onMounted(() => {
             :options="atasanOptions"
             value-key="nik"
             label-key="displayLabel"
-            placeholder="-- Tanpa Atasan / Tidak Ada --"
-            search-placeholder="Cari NIK, nama, atau posisi atasan..."
+            placeholder="Tanpa atasan"
+            search-placeholder="Cari NIK, nama, atau posisi atasan…"
             aria-label="NIK Atasan Langsung"
             height-class="h-10"
             :clearable="true"
@@ -1250,3 +1248,28 @@ onMounted(() => {
 
 <style scoped src="../assets/admin-workspace.css"></style>
 <style scoped src="../assets/ws-table.css"></style>
+
+<style scoped>
+/* Header tidak sticky di modul Master Data — scroll bersama konten.
+   HARUS setelah import ws-table.css agar menang. */
+.ws-toolbar-sticky {
+  position: static;
+  z-index: auto;
+  top: auto;
+}
+/* Pertahankan padding tebal dari class inline (p-3.5 sm:p-4.5);
+   admin-workspace.css menimpanya dengan padding 4px 0 8px karena
+   specificity lebih tinggi, sehingga header terlihat menempel. */
+.admin-workspace .admin-page-header {
+  padding: 0.875rem;
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  border-radius: 1rem;
+  background: #ffffff;
+  box-shadow: 0 1px 2px rgba(23, 43, 77, 0.04);
+}
+@media (min-width: 640px) {
+  .admin-workspace .admin-page-header {
+    padding: 1.125rem;
+  }
+}
+</style>

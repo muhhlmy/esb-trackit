@@ -3,7 +3,6 @@ import express from "express";
 import { env } from "./config/env.js";
 import { requireJsonRequest } from "./middleware/jsonRequestMiddleware.js";
 import { setSecurityHeaders } from "./middleware/securityHeaders.js";
-import { requireSafeOrigin } from "./middleware/originValidationMiddleware.js";
 import {
   requestIdMiddleware,
   apiNotFoundHandler,
@@ -72,7 +71,6 @@ app.use(
     optionsSuccessStatus: 204,
   }),
 );
-app.use(requireSafeOrigin);
 app.use(requireJsonRequest);
 app.use(express.json({ limit: "10mb" }));
 app.use(router);

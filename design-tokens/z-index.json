@@ -1,0 +1,19 @@
+{
+  "$metadata": {
+    "version": "1.0.0",
+    "description": "ESB TrackIT z-index scale — minimal and intentional."
+  },
+  "z-index": {
+    "base": { "value": 0, "type": "zIndex" },
+    "dropdown": { "value": 1000, "type": "zIndex" },
+    "sticky": { "value": 1020, "type": "zIndex" },
+    "popover": { "value": 1050, "type": "zIndex" },
+    "modal-overlay": { "value": 1040, "type": "zIndex" },
+    "modal": { "value": 1050, "type": "zIndex" },
+    "toast": { "value": 1060, "type": "zIndex" },
+    "tooltip": { "value": 1070, "type": "zIndex" },
+    "drawer": { "value": 1080, "type": "zIndex" },
+    "header": { "value": 1100, "type": "zIndex" },
+    "max": { "value": 9999, "type": "zIndex" }
+  }
+}

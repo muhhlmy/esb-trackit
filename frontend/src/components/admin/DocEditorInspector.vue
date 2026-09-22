@@ -248,7 +248,7 @@ function removeTag(tagToRemove) {
             v-model="newTagInput"
             @keydown.enter.prevent="addTag"
             type="text"
-            placeholder="Tambah tag baru..."
+            placeholder="Tambah tag baru…"
             class="flex-1 bg-white dark:bg-slate-800 border border-[#E2E8F0] dark:border-slate-700 rounded-lg px-3 py-1.5 text-xs font-medium text-[#333333] dark:text-slate-100 focus:outline-none focus:border-[#0A51B0]"
           />
           <button

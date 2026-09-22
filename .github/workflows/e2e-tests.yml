@@ -84,6 +84,19 @@ jobs:
           JWT_SECRET: supersecretjwtkeyfortestingpurpose1234567890
         run: npx playwright test --grep @smoke
 
+      - name: Run Accessibility Audit (axe-core)
+        if: github.event_name == 'pull_request'
+        env:
+          E2E_BASE_URL: http://localhost:5173
+          E2E_API_URL: http://localhost:3000
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_USER: postgres
+          DB_PASSWORD: postgrespassword
+          DB_NAME: assets_monitoring_test
+          JWT_SECRET: supersecretjwtkeyfortestingpurpose1234567890
+        run: npx playwright test e2e/tests/accessibility/
+
       - name: Run Full E2E Regression Suite (Main Push)
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         env:

@@ -20,16 +20,16 @@ defineProps({
 <template>
   <div
     class="flex flex-col transition-all"
-    :class="embedded ? 'w-full' : 'shadow-card rounded-2xl border border-[#E5EAEF] bg-white p-5'"
+    :class="embedded ? 'w-full' : 'shadow-card rounded-xl border border-[#E2E8F0] bg-white p-4'"
   >
     <!-- Header kartu (hanya mode standalone) -->
     <div
       v-if="!embedded"
-      class="flex items-center justify-between pb-3 border-b border-[#F1F5F9] mb-4"
+      class="mb-3.5 flex items-center justify-between border-b border-[#F1F5F9] pb-3"
     >
-      <div>
-        <h3 class="text-[15px] font-extrabold text-[#2A3547] leading-tight">{{ title }}</h3>
-        <p v-if="subtitle" class="text-[11px] font-medium text-[#66728d] mt-0.5">{{ subtitle }}</p>
+      <div class="min-w-0">
+        <h3 class="text-sm font-bold text-[#1E293B] leading-tight">{{ title }}</h3>
+        <p v-if="subtitle" class="mt-0.5 text-[11px] font-medium text-[#5B6B84]">{{ subtitle }}</p>
       </div>
       <slot name="header-action" />
     </div>
@@ -37,14 +37,14 @@ defineProps({
     <!-- Tinggi wrapper = tinggi chart. Slot chart mengisi penuh di dalamnya. -->
     <div class="relative flex items-center justify-center" :style="{ height: height + 'px' }">
       <!-- Loading Skeleton -->
-      <div v-if="loading" class="w-full h-full" aria-busy="true">
+      <div v-if="loading" class="h-full w-full" aria-busy="true">
         <SkeletonChart type="bar" :height="height + 'px'" />
       </div>
 
       <!-- Error State -->
       <div
         v-else-if="error"
-        class="flex flex-col items-center gap-2 text-[#FA896B] p-4 text-center"
+        class="flex flex-col items-center gap-2 p-4 text-center text-[#DC2626]"
       >
         <span aria-hidden="true" class="material-symbols-outlined text-[32px]">error</span>
         <p class="text-[12px] font-semibold">{{ error }}</p>
@@ -53,10 +53,10 @@ defineProps({
       <!-- Empty State -->
       <div
         v-else-if="empty"
-        class="flex flex-col items-center justify-center h-full w-full gap-2 text-[#687281] p-4 text-center"
+        class="flex h-full w-full flex-col items-center justify-center gap-2 p-4 text-center text-[#5B6B84]"
       >
         <span aria-hidden="true" class="material-symbols-outlined text-[36px]">bar_chart_off</span>
-        <p class="text-[12px] font-semibold">Belum ada data visualisasi.</p>
+        <p class="text-[12px] font-semibold">Belum ada data untuk ditampilkan.</p>
       </div>
 
       <!-- Chart Canvas Slot -->

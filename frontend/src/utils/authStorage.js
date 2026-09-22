@@ -1,17 +1,3 @@
-// ============================================================
-// authStorage.js - Penyimpanan state autentikasi di sisi client
-// ============================================================
-// Keamanan: token JWT TIDAK lagi disimpan di localStorage/sessionStorage.
-// Token kini hidup sebagai cookie HttpOnly (diterbitkan backend saat login),
-// sehingga tidak dapat dibaca oleh JavaScript browser (ketahanan terhadap XSS).
-//
-// Yang masih disimpan di localStorage hanyalah objek `user` yang sudah
-// di-sanitasi (tanpa password, hash, token, atau metadata internal) —
-// murni cache UI untuk guard router & render instan. Kredensial sebenarnya
-// (cookie sesi) tetap menjadi sumber kebenaran, dan setiap 401 dari API
-// akan menghapus cache ini dan mengarahkan kembali ke /login.
-// ============================================================
-
 const AUTH_USER_KEY = 'user'
 
 function getStorage() {
@@ -156,24 +142,6 @@ export function getAuthSnapshot() {
     persistent: true,
   }
 }
-
-// ============================================================
-// Pemulihan sesi dari server (session restore)
-// ============================================================
-// Cache `user` di localStorage hanya salinan UI; sumber kebenaran tetap
-// cookie sesi HttpOnly. Saat cache hilang (storage dibersihkan, mode
-// private, profile terpartisi, tab baru), guard router tidak boleh
-// langsung menganggap user logout — cookie HttpOnly mungkin masih valid.
-//
-// `restoreSession()` memanggil /api/auth/me:
-//   - 200  → simpan kembali cache user, kembalikan { user, restored: true }
-//   - 401/403 → sesi memang invalid → kembalikan null (redirect /login)
-//   - gangguan jaringan/server → kembalikan { offline: true } agar pemanggil
-//     TIDAK logout prematur, melainkan melanjutkan ke halaman tujuan
-//     (API pertama akan memunculkan 401 global bila sesi benar-benar mati).
-//
-// Token/session tetap TIDAK pernah disentuh JavaScript (HttpOnly).
-// ============================================================
 
 let restorePromise = null
 

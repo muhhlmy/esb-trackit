@@ -5,11 +5,13 @@ import test from 'node:test'
 const routerSourceUrl = new URL('../src/router/index.js', import.meta.url)
 const headerSourceUrl = new URL('../src/components/layout/AppHeader.vue', import.meta.url)
 
+// Route didefinisikan via helper page(path, name, loader, meta), jadi assertion
+// mencocokkan argumen pertama helper, bukan literal `path:` objek.
 test('Router config defines meta.title and meta.subtitle for all named routes', async () => {
   const routerSource = await readFile(routerSourceUrl, 'utf8')
-  
+
   const expectedRoutes = [
-    { path: '/', title: 'Dashboard', subtitle: 'Overview & analytics' },
+    { path: '/dashboard', title: 'Dashboard', subtitle: 'Overview & analytics' },
     { path: '/assets', title: 'Aset IT', subtitle: 'Inventaris & status perangkat' },
     { path: '/assets-ga', title: 'Aset GA', subtitle: 'Kelola aset GA' },
     { path: '/assets-ops', title: 'Aset Ops', subtitle: 'Kelola aset operasional' },
@@ -23,17 +25,23 @@ test('Router config defines meta.title and meta.subtitle for all named routes', 
   ]
 
   for (const item of expectedRoutes) {
-    assert.ok(routerSource.includes(`path: '${item.path}'`), `Route ${item.path} missing`)
-    assert.ok(routerSource.includes(`title: '${item.title}'`), `Title '${item.title}' missing for route ${item.path}`)
-    assert.ok(routerSource.includes(`subtitle: '${item.subtitle}'`), `Subtitle '${item.subtitle}' missing for route ${item.path}`)
+    assert.ok(routerSource.includes(`page('${item.path}'`), `Route ${item.path} missing`)
+    assert.ok(
+      routerSource.includes(`title: '${item.title}'`),
+      `Title '${item.title}' missing for route ${item.path}`,
+    )
+    assert.ok(
+      routerSource.includes(`subtitle: '${item.subtitle}'`),
+      `Subtitle '${item.subtitle}' missing for route ${item.path}`,
+    )
   }
 })
 
 test('AppHeader reads pageTitle and pageSubtitle dynamically from route.meta', async () => {
   const headerSource = await readFile(headerSourceUrl, 'utf8')
 
-  assert.match(headerSource, /const pageTitle = computed\(\(\) => route\.meta\?\.title \|\|/);
-  assert.match(headerSource, /const pageSubtitle = computed\(\(\) => route\.meta\?\.subtitle \|\|/);
-  assert.match(headerSource, /\{\{\s*pageTitle\s*\}\}/);
-  assert.match(headerSource, /\{\{\s*pageSubtitle\s*\}\}/);
+  assert.match(headerSource, /const pageTitle = computed\(\(\) => route\.meta\?\.title \|\|/)
+  assert.match(headerSource, /const pageSubtitle = computed\(\(\) => route\.meta\?\.subtitle \|\|/)
+  assert.match(headerSource, /\{\{\s*pageTitle\s*\}\}/)
+  assert.match(headerSource, /\{\{\s*pageSubtitle\s*\}\}/)
 })

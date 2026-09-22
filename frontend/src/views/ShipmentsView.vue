@@ -13,6 +13,7 @@ import SkeletonTable from '../components/ui/skeleton/SkeletonTable.vue'
 import ShipmentImportModal from '../components/ui/ShipmentImportModal.vue'
 import ShipmentExportModal from '../components/ui/ShipmentExportModal.vue'
 import FilterModal from '../components/ui/FilterModal.vue'
+import PageHeader from '../components/ui/PageHeader.vue'
 import {
   ExternalLink,
   Package,
@@ -358,84 +359,68 @@ onMounted(() => {
       </div>
     </Transition>
 
-    <!-- Top Card: Header & Search/Filters Bar (sticky mengikuti scroll) -->
-    <div class="ws-toolbar-sticky">
-      <div
-        class="shipment-toolbar rounded-2xl border border-[#E2E8F0] bg-white p-4 sm:p-5 shadow-2xs space-y-4"
-      >
-        <!-- Row 1: Title and Actions -->
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div>
-            <h1 class="text-lg sm:text-xl font-bold text-[#333333] tracking-tight">Pengiriman</h1>
-            <p class="text-[13px] text-[#5F7089] mt-0.5 leading-normal">
-              Pantau proses pengiriman barang dan aset kantor.
-            </p>
-          </div>
-
-          <div v-if="canWriteShipments" class="flex items-center gap-2">
-            <button
-              type="button"
-              @click="openAdd"
-              class="toolbar-primary-action inline-flex h-9 shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg bg-[#0A51B0] px-3 text-xs font-semibold text-white shadow-2xs transition-all hover:bg-[#0A4391] active:scale-95 sm:px-3.5"
-              title="Tambah pengiriman baru"
-            >
-              <span aria-hidden="true" class="material-symbols-outlined text-[16px]">add</span>
-              <span>Tambah Pengiriman</span>
-            </button>
-            <div
-              class="toolbar-action-group flex items-center gap-1 rounded-lg border border-[#D7E3F2] bg-[#F8FAFC] p-1"
-            >
-              <button
-                type="button"
-                @click="showImportModal = true"
-                class="toolbar-action-button inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-[11px] font-bold text-[#0A51B0] hover:bg-white"
-              >
-                <span aria-hidden="true" class="material-symbols-outlined text-[15px]"
-                  >upload_file</span
-                >Import
-              </button>
-              <button
-                type="button"
-                @click="showExportModal = true"
-                class="toolbar-action-button inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-[11px] font-bold text-[#0A51B0] hover:bg-white"
-              >
-                <span aria-hidden="true" class="material-symbols-outlined text-[15px]"
-                  >download</span
-                >Export
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Row 2: Search Input & Filters Control Bar -->
-        <div
-          class="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2.5 w-full min-w-0 pt-3 border-t border-[#F1F5F9]"
+    <!-- Page Header -->
+    <PageHeader
+      title="Pengiriman"
+      subtitle="Pantau proses pengiriman barang dan aset kantor."
+      icon="local_shipping"
+    >
+      <div v-if="canWriteShipments" class="flex items-center gap-2">
+        <button
+          type="button"
+          @click="openAdd"
+          class="inline-flex h-9 shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg bg-[#0A51B0] px-3 text-xs font-semibold text-white shadow-2xs transition-all hover:bg-[#0A4391] active:scale-95 sm:px-3.5"
+          title="Tambah pengiriman baru"
         >
-          <div class="relative h-9 min-w-0">
-            <Search
-              class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#687281] pointer-events-none"
-            />
-            <input
-              v-model="searchQuery"
-              aria-label="Cari pengiriman"
-              type="text"
-              placeholder="Cari penerima, barang, tujuan, atau no resi..."
-              class="toolbar-search-input h-full min-h-0 w-full rounded-xl border border-[#E2E8F0] bg-white pl-9 pr-3 text-xs text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
-            />
-          </div>
-
+          <span aria-hidden="true" class="material-symbols-outlined text-[16px]">add</span>
+          <span>Tambah Pengiriman</span>
+        </button>
+        <div class="flex items-center gap-1 rounded-lg border border-[#D7E3F2] bg-[#F8FAFC] p-1">
           <button
             type="button"
-            @click="showFilterModal = true"
-            class="toolbar-filter-button h-9 shrink-0 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-semibold text-[#5F7089] hover:bg-white"
+            @click="showImportModal = true"
+            class="inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-[11px] font-bold text-[#0A51B0] hover:bg-white"
           >
-            <span aria-hidden="true" class="material-symbols-outlined mr-1 align-middle text-[16px]"
-              >filter_alt</span
-            >Filter
+            <span aria-hidden="true" class="material-symbols-outlined text-[15px]">upload_file</span
+            >Import
           </button>
-          <AppViewToggle v-model="viewMode" />
+          <button
+            type="button"
+            @click="showExportModal = true"
+            class="inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-[11px] font-bold text-[#0A51B0] hover:bg-white"
+          >
+            <span aria-hidden="true" class="material-symbols-outlined text-[15px]">download</span
+            >Export
+          </button>
         </div>
       </div>
+    </PageHeader>
+
+    <!-- Search & Filter Bar -->
+    <div class="flex items-center gap-2.5 w-full min-w-0">
+      <div class="relative h-9 min-w-0 flex-1">
+        <Search
+          class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#687281] pointer-events-none"
+        />
+        <input
+          v-model="searchQuery"
+          aria-label="Cari pengiriman"
+          type="text"
+          placeholder="Cari penerima, barang, tujuan, atau no resi…"
+          class="h-full min-h-0 w-full rounded-xl border border-[#E2E8F0] bg-white pl-9 pr-3 text-xs text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
+        />
+      </div>
+
+      <button
+        type="button"
+        @click="showFilterModal = true"
+        class="h-9 shrink-0 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-semibold text-[#5F7089] hover:bg-white"
+      >
+        <span aria-hidden="true" class="material-symbols-outlined mr-1 align-middle text-[16px]"
+          >filter_alt</span
+        >Filter
+      </button>
+      <AppViewToggle v-model="viewMode" />
     </div>
 
     <!-- Summary Cards -->
@@ -564,14 +549,14 @@ onMounted(() => {
               <tr
                 class="border-b border-[#E2E8F0] bg-[#F8FAFC] text-[11px] font-bold text-[#5F7089] uppercase tracking-wider"
               >
-                <th class="py-3 px-4">Tanggal Request</th>
-                <th class="py-3 px-4">Nama Penerima</th>
-                <th class="py-3 px-4">Deskripsi Barang</th>
-                <th class="py-3 px-4">Tujuan Pengiriman</th>
-                <th class="py-3 px-4">No Resi</th>
-                <th class="py-3 px-4">Status</th>
-                <th class="py-3 px-4 text-center">Bukti</th>
-                <th v-if="canWriteShipments" class="py-3 px-4 text-right">Aksi</th>
+                <th scope="col" class="py-3 px-4">Tanggal Request</th>
+                <th scope="col" class="py-3 px-4">Nama Penerima</th>
+                <th scope="col" class="py-3 px-4">Deskripsi Barang</th>
+                <th scope="col" class="py-3 px-4">Tujuan Pengiriman</th>
+                <th scope="col" class="py-3 px-4">No Resi</th>
+                <th scope="col" class="py-3 px-4">Status</th>
+                <th scope="col" class="py-3 px-4 text-center">Bukti</th>
+                <th scope="col" v-if="canWriteShipments" class="py-3 px-4 text-right">Aksi</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-[#E2E8F0] text-xs text-[#333333]">
@@ -989,78 +974,14 @@ onMounted(() => {
 </template>
 
 <style scoped>
-.toolbar-search-input {
-  height: 36px;
-  min-height: 36px;
-  max-height: 36px;
-  box-sizing: border-box;
-}
-.toolbar-filter-button {
-  height: 36px;
-  min-height: 36px !important;
-  max-height: 36px;
-  box-sizing: border-box;
-}
 .shipments-page {
   max-width: 1600px;
   margin-inline: auto;
   color: #333333;
 }
-.shipment-toolbar {
-  background: transparent;
-  border: 0;
-  padding: 0;
-  box-shadow: none;
-}
-.shipment-toolbar h1 {
-  font-size: 26px;
-  font-weight: 650;
-  letter-spacing: -0.04em;
-}
-.shipment-toolbar > div:first-child {
-  margin-bottom: 24px;
-}
-.shipment-toolbar > div:first-child > div:last-child > button {
-  background: #0a51b0;
-  min-height: 0;
-  box-shadow: none;
-}
-.shipment-toolbar > div:first-child > div:last-child > div:first-child button {
-  background: transparent;
-  min-height: 0;
-  box-shadow: none;
-  color: #0a51b0;
-}
-.shipment-toolbar > div:first-child > div:last-child > div:first-child button:hover {
-  background: white;
-}
-.shipment-toolbar > div:first-child > div:last-child > div:first-child button span {
-  color: inherit;
-}
-.shipment-toolbar > div:nth-child(2) {
-  padding: 16px;
-  border: 1px solid #e2e8f0;
-  background: white;
-  border-radius: 12px;
-  gap: 12px;
-}
-.shipment-toolbar input:not(.toolbar-search-input) {
-  min-height: 42px;
-  background: #fafbfd;
-  border-color: #e2e8f0;
-}
-.shipment-list-surface {
-  border: 0;
-  background: transparent;
-  overflow: visible;
-  box-shadow: none;
-}
-.shipment-list-surface > div:last-child {
-  overflow: visible;
-}
 .shipment-table {
-  border-radius: 12px;
-  border: 1px solid #e2e8f0;
+  border-radius: var(--ui-radius-card, 0.875rem);
+  border: 1px solid var(--ui-border, #e2e8f0);
   background: white;
 }
 .shipment-table table {
@@ -1069,14 +990,14 @@ onMounted(() => {
 .shipment-table th {
   text-transform: none;
   letter-spacing: 0;
-  font-size: 11px;
-  font-weight: 500;
+  font-size: var(--fs-xs, 11px);
+  font-weight: 600;
   color: #667283;
   padding: 16px 12px;
 }
 .shipment-table td {
   padding: 20px 12px;
-  font-size: 12px;
+  font-size: var(--fs-sm, 12px);
   overflow-wrap: anywhere;
 }
 .shipment-table th:nth-child(3) {
@@ -1099,11 +1020,12 @@ onMounted(() => {
   color: #333333;
   font-weight: 600;
 }
-.shipment-table button {
-  min-width: 32px;
-  min-height: 36px;
-  display: grid;
-  place-items: center;
+.shipment-table th:nth-child(6) {
+  width: 132px;
+}
+.shipment-table td:nth-child(6) {
+  white-space: nowrap;
+  overflow-wrap: normal;
 }
 .shipment-cards {
   display: grid;
@@ -1112,8 +1034,8 @@ onMounted(() => {
 }
 .shipment-cards > li {
   background: white;
-  border: 1px solid #e2e8f0;
-  border-radius: 13px;
+  border: 1px solid var(--ui-border, #e2e8f0);
+  border-radius: var(--ui-radius-card, 0.875rem);
   padding: 20px;
   min-width: 0;
 }
@@ -1125,7 +1047,7 @@ onMounted(() => {
   overflow-wrap: anywhere;
 }
 .shipment-cards > li > div:first-child p:first-child {
-  font-size: 14px;
+  font-size: var(--fs-base, 14px);
   font-weight: 650;
   color: #333333;
 }
@@ -1150,28 +1072,34 @@ onMounted(() => {
 }
 .shipment-cards button,
 .shipment-cards a {
-  min-height: 44px;
+  min-height: var(--bottom-nav-item-min-height, 44px);
 }
 .shipment-cards button {
   padding-inline: 14px;
   cursor: pointer;
 }
 .shipment-form {
-  padding: 2px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 0;
+}
+.shipment-form > * {
+  margin: 0;
 }
 .shipment-form > div:not([role='alert']) {
   min-width: 0;
 }
 .shipment-form label {
-  font-size: 12px;
+  font-size: var(--fs-form-label, 12px);
   font-weight: 500;
   color: #52647e;
   margin-bottom: 7px;
 }
 .shipment-form :is(input, textarea) {
-  min-height: 44px;
-  font-size: 13px;
-  border-radius: 8px;
+  min-height: var(--control-height-lg, 44px);
+  font-size: var(--fs-md, 13px);
+  border-radius: var(--ui-radius-control, 0.625rem);
   border-color: #dce4ef;
   background: #fafbfd;
 }
@@ -1181,8 +1109,8 @@ onMounted(() => {
   line-height: 1.7;
 }
 .shipment-form :deep(button[aria-haspopup='listbox']) {
-  min-height: 44px;
-  border-radius: 8px;
+  min-height: var(--control-height-lg, 44px);
+  border-radius: var(--ui-radius-control, 0.625rem);
 }
 .shipment-form :is(input, textarea):focus {
   background: white;
@@ -1190,14 +1118,18 @@ onMounted(() => {
   box-shadow: 0 0 0 3px #097cde10;
 }
 .shipment-form-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
   padding: 0;
   border: 0;
-  gap: 10px;
 }
 .shipment-form-actions button {
-  min-height: 44px;
+  min-height: var(--control-height-lg, 44px);
   padding-inline: 20px;
-  border-radius: 8px;
+  border-radius: var(--ui-radius-control, 0.625rem);
+  font-weight: 600;
 }
 .shipment-form-actions button[type='submit'] {
   background: #0a51b0;
@@ -1206,39 +1138,58 @@ onMounted(() => {
   opacity: 0.5;
   cursor: not-allowed;
 }
-.shipments-page button:focus-visible,
-.shipment-form-actions button:focus-visible {
-  outline: 2px solid #097cde;
-  outline-offset: 3px;
+.shipment-entry-section {
+  padding: 20px;
+  border: 1px solid var(--ui-border, #e2e8f0);
+  border-radius: var(--ui-radius-card, 0.875rem);
 }
-@media (min-width: 768px) and (max-width: 1279px) {
-  .shipment-cards {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
+.shipment-entry-section h3 {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: var(--fs-md, 13px);
+  font-weight: 650;
+  color: #333;
 }
-@media (max-width: 639px) {
-  .shipment-toolbar h1 {
-    font-size: 23px;
-  }
-  .shipment-toolbar > div:first-child button {
-    width: 100%;
-    min-height: 44px;
-  }
-  .shipment-toolbar > div:nth-child(2) {
-    padding: 14px;
-  }
-  .shipment-cards > li {
-    padding: 16px;
-  }
-  .shipment-form :is(input, textarea),
-  .shipment-form :deep(button[aria-haspopup='listbox']) {
-    font-size: 16px;
-  }
-  .shipment-form-actions button {
-    flex: 1;
-  }
+.shipment-entry-section h3 > span {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+  background: #edf5ff;
+  color: #0a51b0;
+  font-size: var(--fs-2xs, 10px);
 }
-
+.shipment-entry-hint {
+  margin: 7px 0 18px;
+  font-size: var(--fs-xs, 11px);
+  line-height: 1.7;
+  color: #637288;
+}
+.shipment-entry-section > .grid {
+  gap: 18px;
+}
+.shipment-recipient-section > div + div {
+  margin-top: 18px;
+}
+.shipment-entry-section label {
+  font-size: var(--fs-form-label, 12px);
+  font-weight: 500;
+}
+.shipment-entry-section :is(input, textarea) {
+  font-size: var(--fs-md, 13px);
+  min-height: var(--control-height-lg, 44px);
+  background: #fafbfd;
+}
+.shipment-entry-section textarea {
+  min-height: 120px;
+  line-height: 1.8;
+}
+.shipment-entry-section :deep(button[aria-haspopup='listbox']) {
+  min-height: var(--control-height-lg, 44px);
+  background: #fafbfd;
+}
 .shipment-pagination {
   margin-top: 14px;
   padding: 0;
@@ -1254,96 +1205,32 @@ onMounted(() => {
 .shipment-status :deep(span) {
   flex-shrink: 0;
 }
-.shipment-table th:nth-child(6) {
-  width: 132px;
+.shipments-page button:focus-visible,
+.shipment-form-actions button:focus-visible {
+  outline: 2px solid #097cde;
+  outline-offset: 3px;
 }
-.shipment-table td:nth-child(6) {
-  white-space: nowrap;
-  overflow-wrap: normal;
-}
-</style>
-
-<style scoped>
-.shipment-form {
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-  padding: 0;
-}
-.shipment-form > * {
-  margin: 0;
-}
-.shipment-entry-section {
-  padding: 20px;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
-}
-.shipment-entry-section h3 {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  font-size: 13px;
-  font-weight: 650;
-  color: #333;
-}
-.shipment-entry-section h3 > span {
-  display: grid;
-  place-items: center;
-  width: 26px;
-  height: 26px;
-  border-radius: 7px;
-  background: #edf5ff;
-  color: #0a51b0;
-  font-size: 10px;
-}
-.shipment-entry-hint {
-  margin: 7px 0 18px;
-  font-size: 11px;
-  line-height: 1.7;
-  color: #637288;
-}
-.shipment-entry-section > .grid {
-  gap: 18px;
-}
-.shipment-recipient-section > div + div {
-  margin-top: 18px;
-}
-.shipment-entry-section label {
-  font-size: 12px;
-  font-weight: 500;
-}
-.shipment-entry-section :is(input, textarea) {
-  font-size: 13px;
-  min-height: 44px;
-  background: #fafbfd;
-}
-.shipment-entry-section textarea {
-  min-height: 120px;
-  line-height: 1.8;
-}
-.shipment-entry-section :deep(button[aria-haspopup='listbox']) {
-  min-height: 44px;
-  background: #fafbfd;
-}
-.shipment-form-actions {
-  gap: 10px;
-}
-.shipment-form-actions button {
-  font-weight: 600;
-  min-height: 44px;
+@media (min-width: 768px) and (max-width: 1279px) {
+  .shipment-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 @media (max-width: 639px) {
-  .shipment-entry-section {
+  .shipment-cards > li {
     padding: 16px;
   }
-  .shipment-entry-section :is(input, textarea),
-  .shipment-entry-section :deep(button[aria-haspopup='listbox']) {
+  .shipment-form :is(input, textarea),
+  .shipment-form :deep(button[aria-haspopup='listbox']) {
     font-size: 16px;
+  }
+  .shipment-entry-section {
+    padding: 16px;
   }
   .shipment-entry-hint {
     margin-bottom: 16px;
   }
   .shipment-form-actions button {
+    flex: 1;
     padding-inline: 12px;
   }
 }

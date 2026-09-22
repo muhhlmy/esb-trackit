@@ -9,6 +9,7 @@ import AppBadge from '../components/ui/AppBadge.vue'
 import MyAssetsEmployeeList from '../components/assets/MyAssetsEmployeeList.vue'
 import CustomSelect from '../components/ui/CustomSelect.vue'
 import FilterModal from '../components/ui/FilterModal.vue'
+import StatCard from '../components/ui/StatCard.vue'
 
 const { get } = useApi()
 const { isAdmin, isSuperAdmin, user, refreshUser, hasPermission } = useAuth()
@@ -707,6 +708,39 @@ onMounted(() => {
         </div>
       </div>
 
+      <!-- KPI Cards: MyAssets Summary -->
+      <div class="myassets-kpi-grid grid grid-cols-1 sm:grid-cols-3 gap-3.5 sm:gap-4">
+        <StatCard
+          title="Total Aset Saya"
+          :value="myAssets.length"
+          icon="devices"
+          color="primary"
+          subtitle="Semua perangkat terdaftar"
+        />
+        <StatCard
+          title="Status"
+          :value="
+            myAssets.filter((a) =>
+              ['digunakan', 'in use'].includes((a.status_aset || '').toLowerCase()),
+            ).length
+          "
+          icon="check_circle"
+          color="success"
+          subtitle="Aset sedang digunakan"
+        />
+        <StatCard
+          title="Stok Tersedia"
+          :value="
+            filteredAssets.filter((a) =>
+              ['tersedia', 'stok', 'stock'].includes((a.status_aset || '').toLowerCase()),
+            ).length
+          "
+          icon="inventory"
+          color="info"
+          subtitle="Aset dalam stok"
+        />
+      </div>
+
       <!-- Section: Assigned Assets -->
       <div class="flex flex-col gap-3">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5">
@@ -730,7 +764,7 @@ onMounted(() => {
             <input
               v-model="assetSearch"
               type="text"
-              placeholder="Cari label / serial..."
+              placeholder="Cari label / serial…"
               class="h-8.5 w-full rounded-lg border border-[#E2E8F0] bg-white pl-8 pr-8 text-xs text-[#333333] focus:border-[#0A51B0] focus:outline-none shadow-2xs"
             />
             <button

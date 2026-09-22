@@ -4,8 +4,7 @@ import { ref, computed, onMounted, nextTick } from 'vue'
 import { RouterLink } from 'vue-router'
 import { useKbCategories } from '@/composables/useKbCategories'
 import { useAuth } from '@/composables/useAuth'
-import gsap from 'gsap'
-import { isReducedMotion } from '@/composables/useGsap'
+import { animateIn, isReducedMotion } from '@/composables/useGsap'
 import {
   LayoutGrid,
   Plus,
@@ -81,7 +80,7 @@ onMounted(async () => {
   await nextTick()
   if (!mainScope.value) return
 
-  gsap.context(() => {
+  animateIn(mainScope, (gsap) => {
     gsap.fromTo(
       '.gsap-admin-el',
       { opacity: 0, y: 10, scale: 0.99 },
@@ -95,7 +94,7 @@ onMounted(async () => {
         clearProps: 'all',
       },
     )
-  }, mainScope.value)
+  })
 })
 
 const filteredCategories = computed(() => {
@@ -324,7 +323,7 @@ function clearFilters() {
         <input
           v-model="searchQuery"
           type="text"
-          placeholder="Cari kategori..."
+          placeholder="Cari kategori…"
           class="w-full bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-700 rounded-xl pl-9 pr-9 py-2 text-xs sm:text-sm font-normal text-[#333333] dark:text-white placeholder-[#687281] dark:placeholder-slate-500 focus:outline-none focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 transition-all"
         />
         <button
@@ -730,7 +729,7 @@ function clearFilters() {
               aria-label="Deskripsi kategori"
               v-model="editingCategory.description"
               rows="3"
-              placeholder="Deskripsi singkat yang tampil pada kartu topik..."
+              placeholder="Deskripsi singkat yang tampil pada kartu topik…"
               class="w-full bg-white dark:bg-slate-950 border border-[#E2E8F0] dark:border-slate-700 rounded-lg px-3 py-2 text-xs sm:text-sm text-[#333333] dark:text-white placeholder-[#687281] focus:outline-none focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 transition-all resize-none"
             ></textarea>
           </div>

@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && chmod -R o+rX dist",
     "test": "node --test",
     "preview": "vite preview",
     "lint": "npm run lint:check",

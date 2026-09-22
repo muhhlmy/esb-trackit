@@ -54,19 +54,51 @@ test('DEFECT-07 & DEFECT-08 — Accessibility (WCAG 2 AA & Image Alt) Audit Suit
   await t.test('TEST 2 — AppBadge.vue uses WCAG 2 AA contrast compliant colors', () => {
     const path = resolve(process.cwd(), 'src/components/ui/AppBadge.vue')
     const content = readFileSync(path, 'utf8')
-    assert.equal(content.includes('text-[#13DEB9]'), false, 'AppBadge must not use low-contrast #13DEB9 text')
-    assert.equal(content.includes('text-[#FFAE1F]'), false, 'AppBadge must not use low-contrast #FFAE1F text')
-    assert.equal(content.includes('text-[#FA896B]'), false, 'AppBadge must not use low-contrast #FA896B text')
-    assert.equal(content.includes('text-[#7C8BAC]'), false, 'AppBadge must not use low-contrast #7C8BAC text')
+    assert.equal(
+      content.includes('text-[#13DEB9]'),
+      false,
+      'AppBadge must not use low-contrast #13DEB9 text',
+    )
+    assert.equal(
+      content.includes('text-[#FFAE1F]'),
+      false,
+      'AppBadge must not use low-contrast #FFAE1F text',
+    )
+    assert.equal(
+      content.includes('text-[#FA896B]'),
+      false,
+      'AppBadge must not use low-contrast #FA896B text',
+    )
+    assert.equal(
+      content.includes('text-[#7C8BAC]'),
+      false,
+      'AppBadge must not use low-contrast #7C8BAC text',
+    )
   })
 
   await t.test('TEST 3 — StatCard.vue uses WCAG 2 AA contrast compliant colors', () => {
     const path = resolve(process.cwd(), 'src/components/ui/StatCard.vue')
     const content = readFileSync(path, 'utf8')
-    assert.equal(content.includes('text-[#13DEB9]'), false, 'StatCard must not use low-contrast #13DEB9 text')
-    assert.equal(content.includes('text-[#FFAE1F]'), false, 'StatCard must not use low-contrast #FFAE1F text')
-    assert.equal(content.includes('text-[#FA896B]'), false, 'StatCard must not use low-contrast #FA896B text')
-    assert.equal(content.includes('text-[#7C8BAC]'), false, 'StatCard must not use low-contrast #7C8BAC text')
+    assert.equal(
+      content.includes('text-[#13DEB9]'),
+      false,
+      'StatCard must not use low-contrast #13DEB9 text',
+    )
+    assert.equal(
+      content.includes('text-[#FFAE1F]'),
+      false,
+      'StatCard must not use low-contrast #FFAE1F text',
+    )
+    assert.equal(
+      content.includes('text-[#FA896B]'),
+      false,
+      'StatCard must not use low-contrast #FA896B text',
+    )
+    assert.equal(
+      content.includes('text-[#7C8BAC]'),
+      false,
+      'StatCard must not use low-contrast #7C8BAC text',
+    )
   })
 
   await t.test('TEST 4 — LoginView.vue images have descriptive alt text', () => {
@@ -75,33 +107,45 @@ test('DEFECT-07 & DEFECT-08 — Accessibility (WCAG 2 AA & Image Alt) Audit Suit
     const imgMatches = content.match(/<img[^>]+>/g) || []
     for (const imgTag of imgMatches) {
       assert.ok(imgTag.includes('alt="'), `Image tag ${imgTag} must contain an alt attribute`)
-      assert.equal(imgTag.includes('alt="image"'), false, `Image tag ${imgTag} must not use generic alt="image"`)
-      assert.equal(imgTag.includes('alt="picture"'), false, `Image tag ${imgTag} must not use generic alt="picture"`)
+      assert.equal(
+        imgTag.includes('alt="image"'),
+        false,
+        `Image tag ${imgTag} must not use generic alt="image"`,
+      )
+      assert.equal(
+        imgTag.includes('alt="picture"'),
+        false,
+        `Image tag ${imgTag} must not use generic alt="picture"`,
+      )
     }
   })
 
-  await t.test('TEST 5 — Material Symbols icons inside interactive components have aria-hidden="true"', () => {
-    const componentPaths = [
-      'src/components/ui/AppBadge.vue',
-      'src/components/ui/StatCard.vue',
-      'src/components/ui/AppRowActions.vue',
-      'src/components/ui/AppPagination.vue',
-      'src/components/ui/SearchableSelect.vue',
-      'src/components/ui/AppModal.vue',
-    ]
+  await t.test(
+    'TEST 5 — Material Symbols icons inside interactive components have aria-hidden="true"',
+    () => {
+      const componentPaths = [
+        'src/components/ui/AppBadge.vue',
+        'src/components/ui/StatCard.vue',
+        'src/components/ui/AppRowActions.vue',
+        'src/components/ui/AppPagination.vue',
+        'src/components/ui/SearchableSelect.vue',
+        'src/components/ui/AppModal.vue',
+      ]
 
-    for (const compFile of componentPaths) {
-      const path = resolve(process.cwd(), compFile)
-      const content = readFileSync(path, 'utf8')
-      const spanMatches = content.match(/<span[^>]*class="[^"]*material-symbols-outlined[^"]*"[^>]*>/g) || []
-      for (const spanTag of spanMatches) {
-        assert.ok(
-          spanTag.includes('aria-hidden="true"'),
-          `Material symbol span in ${compFile} (${spanTag}) must have aria-hidden="true"`,
-        )
+      for (const compFile of componentPaths) {
+        const path = resolve(process.cwd(), compFile)
+        const content = readFileSync(path, 'utf8')
+        const spanMatches =
+          content.match(/<span[^>]*class="[^"]*material-symbols-outlined[^"]*"[^>]*>/g) || []
+        for (const spanTag of spanMatches) {
+          assert.ok(
+            spanTag.includes('aria-hidden="true"'),
+            `Material symbol span in ${compFile} (${spanTag}) must have aria-hidden="true"`,
+          )
+        }
       }
-    }
-  })
+    },
+  )
 
   await t.test('TEST 6 — Icon-only buttons have explicit aria-label or title', () => {
     const filesToAudit = [
@@ -134,8 +178,14 @@ test('DEFECT-07 & DEFECT-08 — Accessibility (WCAG 2 AA & Image Alt) Audit Suit
     const content = readFileSync(path, 'utf8')
     assert.ok(content.includes('<label for="email"'), 'LoginView must have <label for="email">')
     assert.ok(content.includes('id="email"'), 'LoginView must have id="email" on email input')
-    assert.ok(content.includes('<label for="password"'), 'LoginView must have <label for="password">')
-    assert.ok(content.includes('id="password"'), 'LoginView must have id="password" on password input')
+    assert.ok(
+      content.includes('<label for="password"'),
+      'LoginView must have <label for="password">',
+    )
+    assert.ok(
+      content.includes('id="password"'),
+      'LoginView must have id="password" on password input',
+    )
   })
 
   await t.test('TEST 8 — AppModal.vue has accessibility dialog attributes', () => {

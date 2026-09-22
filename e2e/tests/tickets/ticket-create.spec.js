@@ -15,7 +15,8 @@ test.describe('Ticket Management - Create Ticket Suite', () => {
     await expect(openModalBtn).toBeVisible({ timeout: 10000 })
     await openModalBtn.click()
 
-    // 2. Fill Judul Kendala
+    // 2. Pilih Unit Support Target (wajib) lalu isi Judul Kendala
+    await page.getByRole('button', { name: /IT Support/ }).first().click()
     await page.getByPlaceholder(/laptop tidak dapat/i).fill(testTicket.judul)
 
     // Fill Deskripsi
@@ -24,30 +25,22 @@ test.describe('Ticket Management - Create Ticket Suite', () => {
       await descInput.fill(testTicket.deskripsi)
     }
 
-    // Select Unit Tujuan queue if available
-    const queueSelect = page.locator('form select').filter({ hasText: /pilih unit/i }).or(
-      page.locator('form select').nth(1)
-    )
-    if (await queueSelect.isVisible()) {
-      // Wait for options to load
-      await expect(queueSelect.locator('option').nth(1)).toBeAttached({ timeout: 5000 })
-      const optionsCount = await queueSelect.locator('option').count()
-      if (optionsCount > 1) {
-        await queueSelect.selectOption({ index: 1 })
-      }
-    }
-
-    // 3. Submit form using explicit modal form submit button
-    const submitBtn = page.locator('form button[type="submit"]').last()
+    // 3. Submit via footer button yang terhubung ke form modal (form attribute)
+    const submitBtn = page.locator('button[form="ticket-create-form"][type="submit"]')
+    await expect(submitBtn).toBeVisible({ timeout: 5000 })
     await submitBtn.click()
 
+    // Tunggu modal benar-benar tertutup — submit sukses menutup modal dan
+    // me-reset state pencarian. Mengisi search sebelum itu berisiko racun.
+    await expect(page.locator('[role="dialog"]')).toBeHidden({ timeout: 10000 })
+
     // 4. Filter or Search for created ticket if needed and verify visibility
-    const searchInput = page.getByPlaceholder(/cari ticket/i)
+    const searchInput = page.getByPlaceholder(/cari tiket/i)
     if (await searchInput.isVisible()) {
       await searchInput.fill(testTicket.judul)
       await searchInput.press('Enter')
     }
 
-    await expect(page.getByText(testTicket.judul)).toBeVisible({ timeout: 10000 })
+    await expect(page.getByText(testTicket.judul).first()).toBeVisible({ timeout: 15000 })
   })
 })

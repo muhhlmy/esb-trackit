@@ -168,7 +168,7 @@ function getDeviceIcon(tipe) {
           id="emp-search"
           v-model="search"
           type="text"
-          placeholder="Cari nama karyawan, NIK, atau departemen..."
+          placeholder="Cari nama karyawan, NIK, atau departemen…"
           class="h-full w-full rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] pl-9 pr-8 text-xs text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:bg-white focus:outline-none transition-all"
         />
         <!-- Inline Clear Button -->
@@ -504,6 +504,14 @@ function getDeviceIcon(tipe) {
 </template>
 <style scoped src="../../assets/ws-table.css"></style>
 <style scoped>
+/* Header tidak sticky di modul Inventaris (Aset Karyawan) — scroll
+   bersama konten. HARUS setelah import ws-table.css agar menang. */
+.ws-toolbar-sticky {
+  position: static;
+  z-index: auto;
+  top: auto;
+}
+
 .employee-assets-heading {
   padding: 4px 0;
 }

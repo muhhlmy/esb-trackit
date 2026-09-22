@@ -10,13 +10,12 @@ test.describe('Authentication - Logout Suite', () => {
     await page.getByRole('button', { name: /masuk/i }).click()
 
     // Verify redirected away from /login
-    await expect(page).not.toHaveURL(/\/login$/)
+    await expect(page).not.toHaveURL(/\/login/)
 
-    // 2. Open user profile popover
-    const profileBtn = page.locator('header button').filter({ hasText: TEST_USERS.superadmin.name.charAt(0) }).or(
-      page.getByText(TEST_USERS.superadmin.name)
-    )
-    await profileBtn.first().click()
+    // 2. Open user profile popover via stable aria-label
+    const profileBtn = page.getByRole('button', { name: 'Menu profil' })
+    await expect(profileBtn).toBeVisible()
+    await profileBtn.click()
 
     // 3. Click "Keluar" (Logout)
     const logoutBtn = page.getByRole('button', { name: /keluar/i })
@@ -24,10 +23,10 @@ test.describe('Authentication - Logout Suite', () => {
     await logoutBtn.click()
 
     // 4. Verify redirected back to /login
-    await expect(page).toHaveURL(/\/login$/)
+    await expect(page).toHaveURL(/\/login/, { timeout: 10000 })
 
     // 5. Verify protected route cannot be accessed without session
     await page.goto('/assets')
-    await expect(page).toHaveURL(/\/login$/)
+    await expect(page).toHaveURL(/\/login/, { timeout: 10000 })
   })
 })

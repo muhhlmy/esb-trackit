@@ -50,7 +50,7 @@ test.describe('Role-Based Access Control (RBAC) Suite', () => {
     const page = superAdminPage
 
     // First confirm superadmin is authenticated
-    await page.goto('/', { waitUntil: 'domcontentloaded' })
+    await page.goto('/dashboard', { waitUntil: 'domcontentloaded' })
     await expect(page).not.toHaveURL(/\/login/)
     await expect(page.getByText('Total Aset', { exact: true }).first()).toBeVisible({ timeout: 10000 })
 
@@ -66,7 +66,7 @@ test.describe('Role-Based Access Control (RBAC) Suite', () => {
     const page = adminPage
 
     // First confirm admin is authenticated via Dashboard
-    await page.goto('/', { waitUntil: 'domcontentloaded' })
+    await page.goto('/dashboard', { waitUntil: 'domcontentloaded' })
     await expect(page).not.toHaveURL(/\/login/)
     await expect(page.getByText('Total Aset', { exact: true }).first()).toBeVisible({ timeout: 10000 })
 

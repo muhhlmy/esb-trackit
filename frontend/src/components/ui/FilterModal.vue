@@ -11,6 +11,8 @@ const props = defineProps({
 })
 const emit = defineEmits(['close', 'apply', 'reset'])
 const draft = ref({ ...props.modelValue })
+const fieldIds = new Map()
+let fieldCounter = 0
 watch(
   () => props.modelValue,
   (value) => {
@@ -18,6 +20,11 @@ watch(
   },
   { deep: true },
 )
+
+function fieldId(key) {
+  if (!fieldIds.has(key)) fieldIds.set(key, `filter-field-${++fieldCounter}`)
+  return fieldIds.get(key)
+}
 
 function apply() {
   emit('apply', { ...draft.value })
@@ -36,9 +43,12 @@ function apply() {
     <div class="space-y-4">
       <div class="space-y-3">
         <div v-for="field in fields" :key="field.key" class="space-y-1.5">
-          <label class="text-xs font-bold text-slate-600">{{ field.label }}</label>
+          <label :for="fieldId(field.key)" class="text-xs font-bold text-slate-600">{{
+            field.label
+          }}</label>
           <input
             v-if="field.type === 'search' || field.type === 'date'"
+            :id="fieldId(field.key)"
             v-model="draft[field.key]"
             :type="field.type === 'search' ? 'text' : 'date'"
             :placeholder="field.placeholder"
@@ -46,6 +56,7 @@ function apply() {
           />
           <select
             v-else
+            :id="fieldId(field.key)"
             v-model="draft[field.key]"
             class="h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-xs focus:border-[#0A51B0] focus:outline-none"
           >

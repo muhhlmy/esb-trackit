@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="id">
+<html lang="id" data-typography="compact">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" href="/esb-logo-only.svg" />
@@ -47,12 +47,15 @@
     <div id="app" v-cloak>
       <div style="position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; background-color: #F4F6F9; font-family: 'Plus Jakarta Sans', sans-serif;">
         <div style="display: flex; align-items: center; gap: 12px; padding: 16px 24px; background: #ffffff; border-radius: 16px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05); border: 1px solid #E2E8F0;">
-          <div style="width: 28px; height: 28px; border: 3px solid #FC841B; border-top-color: transparent; border-radius: 50%; animation: appSpin 0.8s linear infinite;"></div>
+          <div class="app-flash-spinner" style="width: 28px; height: 28px; border: 3px solid #FC841B; border-top-color: transparent; border-radius: 50%; animation: appSpin 0.8s linear infinite;"></div>
           <span style="font-size: 14px; font-weight: 700; color: #2A3547;">Memuat IT Assets Monitoring...</span>
         </div>
       </div>
       <style>
         @keyframes appSpin { to { transform: rotate(360deg); } }
+        @media (prefers-reduced-motion: reduce) {
+          .app-flash-spinner { animation: none !important; }
+        }
       </style>
     </div>
     <script type="module" src="/src/main.js"></script>

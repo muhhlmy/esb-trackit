@@ -1,0 +1,58 @@
+{
+  "$metadata": {
+    "version": "1.0.0",
+    "description": "ESB TrackIT chart color tokens — WCAG 2.1 AA compliant palette for asset status, trends, and categories."
+  },
+  "chart": {
+    "status": {
+      "good": { "value": "#0E9F6E", "type": "color", "description": "Asset in good condition — hijau" },
+      "normal": { "value": "#0A51B0", "type": "color", "description": "Asset in normal condition — biru" },
+      "warning": { "value": "#D97706", "type": "color", "description": "Light damage — amber/orange 600" },
+      "caution": { "value": "#EA580C", "type": "color", "description": "Moderate damage — orange 700" },
+      "critical": { "value": "#DC2626", "type": "color", "description": "Severe damage — red 600" },
+      "info": { "value": "#0284C7", "type": "color", "description": "Informational — blue 600" },
+      "success": { "value": "#059669", "type": "color", "description": "Success — emerald 600" },
+      "neutral": { "value": "#7C3AED", "type": "color", "description": "Neutral/disposal — violet 600" }
+    },
+    "palette": {
+      "blue": { "value": "#0A51B0", "type": "color" },
+      "blue-light": { "value": "#60A5FA", "type": "color" },
+      "indigo": { "value": "#6366F1", "type": "color" },
+      "purple": { "value": "#8B5CF6", "type": "color" },
+      "violet": { "value": "#A78BFA", "type": "color" },
+      "pink": { "value": "#EC4899", "type": "color" },
+      "rose": { "value": "#FB7185", "type": "color" },
+      "teal": { "value": "#0D9488", "type": "color" },
+      "cyan": { "value": "#06B6D4", "type": "color" },
+      "fuchsia": { "value": "#D946EF", "type": "color" }
+    },
+    "trend": {
+      "up": { "value": "#059669", "type": "color", "description": "Upward trend — green" },
+      "down": { "value": "#DC2626", "type": "color", "description": "Downward trend — red" },
+      "neutral": { "value": "#D97706", "type": "color", "description": "Neutral/flat trend — amber" },
+      "primary": { "value": "#0A51B0", "type": "color", "description": "Primary trend line — blue" },
+      "secondary": { "value": "#64748B", "type": "color", "description": "Secondary line — gray" }
+    },
+    "csat": {
+      "excellent": { "value": "#059669", "type": "color", "description": "CSAT 80-100% — green" },
+      "good": { "value": "#D97706", "type": "color", "description": "CSAT 60-79% — amber" },
+      "needs-improvement": { "value": "#EA580C", "type": "color", "description": "CSAT 40-59% — orange" },
+      "poor": { "value": "#DC2626", "type": "color", "description": "CSAT 0-39% — red" }
+    },
+    "border": {
+      "value": "rgb(226 232 240 / 0.5)",
+      "type": "color",
+      "description": "Chart border — Tailwind slate-200/50"
+    },
+    "grid": {
+      "value": "rgb(226 232 240 / 0.5)",
+      "type": "color",
+      "description": "Grid line — Tailwind slate-200/50"
+    },
+    "font-stack": {
+      "value": "'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
+      "type": "fontFamilies",
+      "description": "Chart font stack — matches application body font"
+    }
+  }
+}

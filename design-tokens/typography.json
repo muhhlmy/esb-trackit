@@ -1,0 +1,62 @@
+{
+  "$metadata": {
+    "version": "1.0.0",
+    "description": "ESB TrackIT typography tokens — based on the audited 5-step micro scale (docs/typography-layout-audit.md)."
+  },
+  "font": {
+    "family": {
+      "sans": {
+        "value": "'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif",
+        "type": "fontFamilies",
+        "description": "Primary body font — Plus Jakarta Sans, Jakarta-based humanist sans"
+      },
+      "display": {
+        "value": "'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif",
+        "type": "fontFamilies"
+      },
+      "mono": {
+        "value": "ui-monospace, 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'Liberation Mono', 'Courier New', monospace",
+        "type": "fontFamilies",
+        "description": "Monospace for IDs, code, numeric data"
+      }
+    }
+  },
+  "font-size": {
+    "2xs": { "value": "10px", "type": "fontSizes", "description": "Micro — kbd shortcuts, compact badge" },
+    "xs": { "value": "11px", "type": "fontSizes", "description": "Caption / section eyebrow / metadata" },
+    "sm": { "value": "12px", "type": "fontSizes", "description": "Form labels, table meta, helper text" },
+    "md": { "value": "13px", "type": "fontSizes", "description": "Input text, button labels, body-small" },
+    "base": { "value": "14px", "type": "fontSizes", "description": "Body default" },
+    "lg": { "value": "15px", "type": "fontSizes", "description": "Small heading / card titles" },
+    "xl": { "value": "16px", "type": "fontSizes", "description": "Body emphasized" },
+    "2xl": { "value": "18px", "type": "fontSizes", "description": "Section heading / card title" }
+  },
+  "font-weight": {
+    "normal": { "value": "400", "type": "fontWeights" },
+    "medium": { "value": "500", "type": "fontWeights" },
+    "semibold": { "value": "600", "type": "fontWeights" },
+    "bold": { "value": "700", "type": "fontWeights" }
+  },
+  "line-height": {
+    "tight": { "value": "1.2", "type": "lineHeights" },
+    "normal": { "value": "1.45", "type": "lineHeights", "description": "For 12-14px text" },
+    "relaxed": { "value": "1.6", "type": "lineHeights" },
+    "loose": { "value": "1.75", "type": "lineHeights" }
+  },
+  "letter-spacing": {
+    "tighter": { "value": "-0.02em", "type": "letterSpacing" },
+    "tight": { "value": "-0.01em", "type": "letterSpacing" },
+    "normal": { "value": "0", "type": "letterSpacing" },
+    "wide": { "value": "0.01em", "type": "letterSpacing", "description": "For 11px uppercase labels" },
+    "wider": { "value": "0.04em", "type": "letterSpacing", "description": "For sidebar section titles" }
+  },
+  "placeholder": {
+    "font-size": {
+      "value": "clamp(11px, calc(1em - 2px), 1em)",
+      "type": "fontSizes",
+      "description": "Placeholder is always smaller than input text — floor 11px for WCAG 1.4.4 legibility"
+    },
+    "font-style": { "value": "normal", "type": "fontStyles" },
+    "font-weight": { "value": "400", "type": "fontWeights" }
+  }
+}

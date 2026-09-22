@@ -4,6 +4,7 @@ import { useApi } from '@/composables/useApi'
 import { clearAuthSession } from '@/utils/authStorage.js'
 import AppModal from '@/components/ui/AppModal.vue'
 import SkeletonCard from '@/components/ui/skeleton/SkeletonCard.vue'
+import { useToast } from '@/composables/useToast.js'
 
 const api = useApi()
 
@@ -56,15 +57,9 @@ const auditLogs = ref([])
 const auditPagination = ref({ page: 1, pageSize: 50, total: 0, totalPages: 0 })
 const isLoadingAudit = ref(false)
 
-// Toast
-const toast = ref({ show: false, message: '', type: 'success' })
-
-function showToast(message, type = 'success') {
-  toast.value = { show: true, message, type }
-  setTimeout(() => {
-    toast.value.show = false
-  }, 4000)
-}
+// Notifications use the shared toast system (one implementation app-wide,
+// rendered by <Toast /> in the app shell).
+const { showToast } = useToast()
 
 // ========== Formatters ==========
 function formatBytes(bytes) {
@@ -610,13 +605,13 @@ function switchTab(tab) {
               class="border-b border-[#F1F5F9] bg-[#F8FAFC] text-xs font-semibold uppercase text-[#5F7089]"
             >
               <tr>
-                <th class="px-4 py-3">Filename</th>
-                <th class="px-4 py-3">Date</th>
-                <th class="px-4 py-3">Size</th>
-                <th class="px-4 py-3">Created By</th>
-                <th class="px-4 py-3">Status</th>
-                <th class="px-4 py-3">Checksum</th>
-                <th class="px-4 py-3 text-right">Actions</th>
+                <th scope="col" class="px-4 py-3">Filename</th>
+                <th scope="col" class="px-4 py-3">Date</th>
+                <th scope="col" class="px-4 py-3">Size</th>
+                <th scope="col" class="px-4 py-3">Created By</th>
+                <th scope="col" class="px-4 py-3">Status</th>
+                <th scope="col" class="px-4 py-3">Checksum</th>
+                <th scope="col" class="px-4 py-3 text-right">Actions</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-[#F1F5F9]">
@@ -926,12 +921,12 @@ function switchTab(tab) {
               class="border-b border-[#F1F5F9] bg-[#F8FAFC] text-xs font-semibold uppercase text-[#5F7089]"
             >
               <tr>
-                <th class="px-4 py-3">Operation</th>
-                <th class="px-4 py-3">User</th>
-                <th class="px-4 py-3">Database</th>
-                <th class="px-4 py-3">Status</th>
-                <th class="px-4 py-3">Error</th>
-                <th class="px-4 py-3">Timestamp</th>
+                <th scope="col" class="px-4 py-3">Operation</th>
+                <th scope="col" class="px-4 py-3">User</th>
+                <th scope="col" class="px-4 py-3">Database</th>
+                <th scope="col" class="px-4 py-3">Status</th>
+                <th scope="col" class="px-4 py-3">Error</th>
+                <th scope="col" class="px-4 py-3">Timestamp</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-[#F1F5F9]">
@@ -1071,26 +1066,6 @@ function switchTab(tab) {
       </template>
     </AppModal>
 
-    <!-- Toast -->
-    <Transition name="toast">
-      <div
-        v-if="toast.show"
-        class="fixed bottom-3 left-3 right-3 sm:bottom-6 sm:left-auto sm:right-6 sm:max-w-md z-50 flex items-center gap-2 rounded-xl px-4 py-3 shadow-lg text-sm font-medium"
-        :class="toast.type === 'success' ? 'bg-emerald-600 text-white' : 'bg-red-600 text-white'"
-      >
-        <span aria-hidden="true" class="material-symbols-outlined text-lg">
-          {{ toast.type === 'success' ? 'check_circle' : 'error' }}
-        </span>
-        <span class="min-w-0 wrap-anywhere" role="status">{{ toast.message }}</span>
-        <button
-          aria-label="Tutup notifikasi"
-          class="ml-2 opacity-70 hover:opacity-100"
-          @click="toast.show = false"
-        >
-          <span aria-hidden="true" class="material-symbols-outlined text-base">close</span>
-        </button>
-      </div>
-    </Transition>
   </div>
 </template>
 
@@ -1133,3 +1108,21 @@ function switchTab(tab) {
 </style>
 
 <style scoped src="../assets/admin-workspace.css"></style>
+
+<style scoped>
+/* Pertahankan padding tebal dari class inline (p-3.5 sm:p-4.5);
+   admin-workspace.css menimpanya dengan padding 4px 0 8px karena
+   specificity lebih tinggi, sehingga header terlihat menempel. */
+.admin-workspace .admin-page-header {
+  padding: 0.875rem;
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  border-radius: 1rem;
+  background: #ffffff;
+  box-shadow: 0 1px 2px rgba(23, 43, 77, 0.04);
+}
+@media (min-width: 640px) {
+  .admin-workspace .admin-page-header {
+    padding: 1.125rem;
+  }
+}
+</style>

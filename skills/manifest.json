@@ -1,0 +1,99 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "esb-trackit-skills",
+  "description": "Agent skills manifest for ESB TrackIT UI/UX workflow — records installed skills and their intended usage.",
+  "version": "1.0.0",
+  "skills": [
+    {
+      "name": "hallmark",
+      "repository": "https://github.com/nutlope/hallmark",
+      "version": "1.1.0",
+      "commit": "unknown (vendored)",
+      "license": "MIT",
+      "purpose": "Anti-AI-slop design skill — prevents generic AI-generated UI, enforces structural variety",
+      "installMethod": "vendored at .agents/skills/hallmark/",
+      "projectScope": "UI/UX design audits and redesigns",
+      "installed": true,
+      "used": true,
+      "notes": "Loaded for Phase 21 visual design quality audit"
+    },
+    {
+      "name": "no-ai-slop",
+      "repository": "https://github.com/petergyang/no-ai-slop",
+      "version": "unknown (vendored)",
+      "commit": "unknown (vendored)",
+      "license": "MIT",
+      "purpose": "Detects and removes AI-slop writing patterns (generic phrases, faux-insight, importance puffery)",
+      "installMethod": "vendored at .agents/skills/no-ai-slop/",
+      "projectScope": "Copy quality / microcopy audit",
+      "installed": true,
+      "used": true,
+      "notes": "Loaded for Phase 17 copy review and Phase 18 anti-AI-slop writing audit"
+    },
+    {
+      "name": "anti-ai-slop-writing",
+      "repository": "https://github.com/jalaalrd/anti-ai-slop-writing",
+      "version": "unknown (vendored)",
+      "commit": "unknown (vendored)",
+      "license": "MIT",
+      "purpose": "Anti-AI slop writing guidelines",
+      "installMethod": "vendored at .agents/skills/anti-ai-slop-writing/",
+      "projectScope": "Writing quality",
+      "installed": true,
+      "used": false,
+      "notes": "Available for copy review"
+    },
+    {
+      "name": "kill-ai-slop",
+      "repository": "https://github.com/yetone/kill-ai-slop",
+      "version": "unknown (vendored)",
+      "commit": "unknown (vendored)",
+      "license": "MIT",
+      "purpose": "Find and remove AI-generated slop from text content",
+      "installMethod": "vendored at .agents/skills/kill-ai-slop/",
+      "projectScope": "Content cleanup",
+      "installed": true,
+      "used": false,
+      "notes": "Available for content cleanup"
+    },
+    {
+      "name": "accessibility-review",
+      "repository": "https://github.com/nousr/accessibility-review",
+      "version": "latest",
+      "commit": "latest",
+      "license": "unknown",
+      "purpose": "WCAG 2.1 AA accessibility audit on designs or pages",
+      "installMethod": "Hermes built-in skill",
+      "projectScope": "Accessibility auditing",
+      "installed": true,
+      "used": true,
+      "notes": "Used for Phase 22 accessibility audit — expanded axe-core E2E test spec covering Dashboard, Menu Lainya, Quick Actions, and focus-visible"
+    },
+    {
+      "name": "surgical-patch",
+      "repository": "https://github.com/nousr/surgical-patch",
+      "version": "latest",
+      "commit": "latest",
+      "license": "unknown",
+      "purpose": "Fix bugs and small behavior changes at the narrowest possible scope",
+      "installMethod": "Hermes built-in skill",
+      "projectScope": "Bug fixes",
+      "installed": true,
+      "used": true,
+      "notes": "Used for lint test and typography fixes"
+    },
+    {
+      "name": "verification-before-completion",
+      "repository": "https://github.com/nousr/verification-before-completion",
+      "version": "latest",
+      "commit": "latest",
+      "license": "unknown",
+      "purpose": "Verify work meets acceptance criteria before claiming complete",
+      "installMethod": "Hermes built-in skill",
+      "projectScope": "Quality gates",
+      "installed": true,
+      "used": true,
+      "notes": "Used for Phase 38 final QA"
+    }
+  ]
+}

@@ -415,7 +415,7 @@ onMounted(() => {
           v-model="searchQuery"
           type="text"
           aria-label="Cari pertanyaan atau jawaban FAQ"
-          placeholder="Search questions or answer keywords..."
+          placeholder="Search questions or answer keywords…"
           class="w-full bg-[#F8FAFC] dark:bg-slate-800/80 border border-[#E5EAEF] dark:border-slate-700 rounded-xl pl-9 sm:pl-10 pr-9 py-2 text-xs sm:text-sm font-medium text-[#333333] dark:text-white placeholder-[#687281] focus:outline-none focus:border-[#0A51B0] focus:bg-white dark:focus:bg-slate-900 transition-all"
         />
         <button
@@ -601,12 +601,12 @@ onMounted(() => {
                 class="bg-[#F8FAFC] dark:bg-slate-950/80 border-b border-[#E5EAEF] dark:border-slate-800 text-[#5F7089] dark:text-slate-400 font-extrabold uppercase tracking-wider text-[11px]"
               >
                 <tr>
-                  <th class="py-4 px-6">Question &amp; Answer</th>
-                  <th class="py-4 px-4">Category</th>
-                  <th class="py-4 px-4">Status</th>
-                  <th class="py-4 px-4">Sort Order</th>
-                  <th class="py-4 px-4">Updated</th>
-                  <th v-if="canWrite" class="py-4 px-6 text-right">Actions</th>
+                  <th scope="col" class="py-4 px-6">Question &amp; Answer</th>
+                  <th scope="col" class="py-4 px-4">Category</th>
+                  <th scope="col" class="py-4 px-4">Status</th>
+                  <th scope="col" class="py-4 px-4">Sort Order</th>
+                  <th scope="col" class="py-4 px-4">Updated</th>
+                  <th scope="col" v-if="canWrite" class="py-4 px-6 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-[#E5EAEF] dark:divide-slate-800">
@@ -738,7 +738,7 @@ onMounted(() => {
               v-model="form.answer"
               required
               rows="5"
-              placeholder="Tuliskan jawaban atau langkah penyelesaian yang mudah diikuti..."
+              placeholder="Tuliskan jawaban atau langkah penyelesaian yang mudah diikuti…"
               class="w-full min-h-[140px] resize-y rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] dark:bg-slate-800 p-3.5 text-base sm:text-xs font-medium leading-[1.8] text-[#333333] dark:text-slate-100 placeholder-[#687281] focus:border-[#0A51B0] focus:outline-none transition-all"
             ></textarea>
           </div>

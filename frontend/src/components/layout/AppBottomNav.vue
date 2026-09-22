@@ -1,7 +1,13 @@
 <script setup>
-import { computed, ref, watch } from 'vue'
+import { computed, ref, watch, onBeforeUnmount } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
 import { useAuth } from '@/composables/useAuth'
+import {
+  primaryBottomNav,
+  flattenMenu,
+  isNavItemVisible,
+  resolveHomeRoute,
+} from '@/config/navigationConfig.js'
 import {
   Ticket,
   Laptop,
@@ -18,40 +24,76 @@ import {
   Database,
   Truck,
   X,
+  Circle,
+  Building2,
+  Cog,
+  BadgeCheck,
+  FileText,
 } from 'lucide-vue-next'
 
+// Icons keyed by navigationConfig.js `lucide` names — one map, no star import.
+const lucide = {
+  Ticket,
+  Laptop,
+  Home,
+  MoreHorizontal,
+  LayoutDashboard,
+  Users,
+  UserSearch,
+  ScrollText,
+  HelpCircle,
+  FilePen,
+  BookOpen,
+  FileOutput,
+  Database,
+  Truck,
+  X,
+  Circle,
+  Building2,
+  Cog,
+  BadgeCheck,
+  FileText,
+}
+
 const route = useRoute()
-const { hasPermission, isAdmin } = useAuth()
+const { hasPermission, isSuperAdmin } = useAuth()
 const isLainnyaOpen = ref(false)
-const dashboardTo = computed(() => (isAdmin.value ? '/dashboard' : '/my-assets'))
 
-const items = computed(() =>
-  [
-    { to: dashboardTo.value, label: 'Dashboard', icon: LayoutDashboard, permission: 'dashboard' },
-    { to: '/tickets', label: 'Tiket', icon: Ticket, permission: 'tickets' },
-    { to: '/assets', label: 'Aset', icon: Laptop, permission: 'assets' },
-  ].filter((item) => !item.permission || hasPermission(item.permission)),
-)
+// RBAC gate shared with AppSidebar — one rule, one place.
+const gate = computed(() => ({ hasPermission, isSuperAdmin: isSuperAdmin.value }))
 
+// Home slot resolves to a real destination for every role (dashboard for
+// admins, Aset Saya for reporters, Help Center as final fallback).
+const homeRoute = computed(() => resolveHomeRoute(gate.value))
+
+const items = computed(() => {
+  // If Home resolves to /my-assets it would duplicate the standalone my-assets
+  // slot — drop the copy so the nav never shows the same route twice.
+  const homeDeduped =
+    homeRoute.value.to === '/my-assets'
+      ? primaryBottomNav.filter((item) => item.key !== 'my-assets')
+      : primaryBottomNav
+
+  return homeDeduped
+    .map((item) => (item.home ? { ...item, ...homeRoute.value } : item))
+    .filter((item) => isNavItemVisible(item, gate.value))
+})
+
+// Everything NOT in the primary bottom nav — full sidebar menu, same RBAC,
+// grouping preserved for Menu Lainnya.
+const primarySet = computed(() => new Set([...items.value.map((i) => i.to), homeRoute.value.to]))
 const lainnyaItems = computed(() =>
-  [
-    { to: '/submissions', label: 'Pengajuan', icon: FilePen, permission: 'submissions' },
-    { to: '/shipments', label: 'Pengiriman', icon: Truck, permission: 'shipments' },
-    { to: '/', label: 'Help Center', icon: Home, permission: null },
-    { to: '/my-assets', label: 'Aset Saya', icon: Laptop, permission: 'my_assets' },
-    { to: '/users', label: 'Pengguna', icon: Users, permission: 'users' },
-    { to: '/karyawan', label: 'Karyawan', icon: UserSearch, permission: 'karyawan' },
-    { to: '/logs', label: 'Log Aktivitas', icon: ScrollText, permission: 'logs' },
-    { to: '/faqs', label: 'Atur FAQ', icon: HelpCircle, permission: 'knowledge_base' },
-    { to: '/admin/cases', label: 'Admin CMS', icon: BookOpen, permission: 'knowledge_base' },
-    { to: '/export', label: 'Ekspor Data', icon: FileOutput, permission: 'export' },
-    { to: '/database', label: 'Database', icon: Database, permission: 'database' },
-  ].filter((item) => !item.permission || hasPermission(item.permission)),
+  flattenMenu()
+    .filter((item) => !primarySet.value.has(item.to))
+    .filter((item) => isNavItemVisible(item, gate.value)),
 )
 
 function isItemActive(itemTo) {
   const target = typeof itemTo === 'string' ? itemTo : itemTo?.value
   if (!target) return false
+  // Home slot: match the resolved destination OR the landing route it stands in
+  // for (a reporter's Home = /my-assets must highlight on /my-assets).
+  if (target === homeRoute.value.to) return route.path === target
   if (target === '/dashboard') {
     return route.path === '/dashboard'
   }
@@ -91,6 +133,30 @@ watch(
     isLainnyaOpen.value = false
   },
 )
+
+// Escape closes the drawer (it previously had no keyboard handler at all), and
+// body scroll is locked while it is open so the page behind cannot scroll.
+// Both are cleaned up on close and on unmount so no stale listener or scroll
+// lock survives navigation.
+function handleKeydown(event) {
+  if (event.key === 'Escape') isLainnyaOpen.value = false
+}
+
+watch(isLainnyaOpen, (open) => {
+  if (typeof window === 'undefined' || typeof document === 'undefined') return
+  if (open) {
+    window.addEventListener('keydown', handleKeydown)
+    document.body.style.overflow = 'hidden'
+  } else {
+    window.removeEventListener('keydown', handleKeydown)
+    document.body.style.overflow = ''
+  }
+})
+
+onBeforeUnmount(() => {
+  if (typeof window !== 'undefined') window.removeEventListener('keydown', handleKeydown)
+  if (typeof document !== 'undefined') document.body.style.overflow = ''
+})
 </script>
 
 <template>
@@ -104,6 +170,7 @@ watch(
       :key="item.to"
       :to="item.to"
       :aria-label="item.label"
+      :aria-current="isItemActive(item.to) ? 'page' : undefined"
       class="flex flex-col items-center justify-center gap-0.5 px-2 py-1 rounded-xl transition-colors min-w-[52px] min-h-[44px] touch-manipulation active:scale-95"
       :class="
         isItemActive(item.to)
@@ -111,7 +178,7 @@ watch(
           : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
       "
     >
-      <component :is="item.icon" class="w-4 h-4" />
+      <component :is="lucide[item.lucide] || Circle" class="w-4 h-4" />
       <span class="text-[10px]">{{ item.label }}</span>
     </RouterLink>
 
@@ -166,6 +233,7 @@ watch(
           v-for="item in lainnyaItems"
           :key="item.to"
           :to="item.to"
+          :aria-current="isLainnyaItemActive(item.to) ? 'page' : undefined"
           class="flex flex-col items-center justify-center gap-1.5 px-2 py-3 rounded-xl transition-colors text-center active:scale-95"
           :class="
             isLainnyaItemActive(item.to)
@@ -173,7 +241,7 @@ watch(
               : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-[#333333]'
           "
         >
-          <component :is="item.icon" class="w-5 h-5" />
+          <component :is="lucide[item.lucide] || Circle" class="w-5 h-5" />
           <span class="text-[10px] font-semibold leading-tight">{{ item.label }}</span>
         </RouterLink>
       </div>

@@ -12,6 +12,7 @@ import AppBadge from '../components/ui/AppBadge.vue'
 import AppPagination from '../components/ui/AppPagination.vue'
 import CustomSelect from '../components/ui/CustomSelect.vue'
 import AppViewToggle from '../components/ui/AppViewToggle.vue'
+import PageHeader from '../components/ui/PageHeader.vue'
 import SkeletonTable from '../components/ui/skeleton/SkeletonTable.vue'
 
 const { get } = useApi()
@@ -296,170 +297,161 @@ function systemAuditChanges(log) {
     class="admin-workspace logs-page flex min-w-0 flex-col gap-4"
     :data-testid="!isLoading ? 'page-ready' : undefined"
   >
-    <!-- Simplified SaaS Header Container (sticky mengikuti scroll) -->
-    <div class="ws-toolbar-sticky">
-      <div
-        class="admin-page-header flex flex-col gap-3.5 bg-white p-3.5 sm:p-4.5 rounded-2xl border border-[#E2E8F0]/80 shadow-2xs"
+    <!-- Page Header -->
+    <PageHeader
+      title="Audit Log & Riwayat Aktivitas"
+      :subtitle="
+        isSuperAdmin
+          ? 'Melihat rekam jejak perubahan sistem & audit login pengguna'
+          : 'Melihat rekam jejak perubahan aset'
+      "
+      icon="receipt_long"
+    />
+
+    <!-- Error state -->
+    <div
+      v-if="pageError"
+      role="alert"
+      class="shadow-card flex flex-wrap items-center gap-2 rounded-[20px] border border-red-200 bg-red-50/60 px-5 py-4 text-[13px] text-red-700 backdrop-blur-xl"
+    >
+      <span aria-hidden="true" class="material-symbols-outlined text-[18px]">error</span>
+      <span class="min-w-0 flex-1 wrap-anywhere">{{ pageError }}</span>
+      <button
+        @click="fetchLogs"
+        type="button"
+        class="min-h-11 px-2 ml-auto text-xs font-extrabold uppercase tracking-wider text-red-800 hover:underline"
       >
-        <div>
-          <h2 class="text-lg font-bold text-[#333333] tracking-tight">
-            Audit Log &amp; Riwayat Aktivitas
-          </h2>
-          <p class="text-xs text-[#5F7089] mt-0.5 leading-normal">
-            {{
-              isSuperAdmin
-                ? 'Melihat rekam jejak perubahan sistem & audit login pengguna'
-                : 'Melihat rekam jejak perubahan aset'
-            }}
-          </p>
-        </div>
+        Coba Lagi
+      </button>
+    </div>
+
+    <!-- Tab Selection Navigation -->
+    <div
+      class="admin-tabs grid sm:flex border-b border-[#E2E8F0]/80"
+      :class="isSuperAdmin ? 'grid-cols-3' : 'grid-cols-1'"
+      aria-label="Jenis log"
+    >
+      <button
+        type="button"
+        :aria-pressed="activeTab === 'assets'"
+        @click="activeTab = 'assets'"
+        class="flex min-w-0 min-h-11 items-center justify-center sm:justify-start gap-2 px-2 sm:px-5 py-3.5 text-xs leading-relaxed text-left font-bold transition-all duration-150 border-b-2 -mb-[2px]"
+        :class="
+          activeTab === 'assets'
+            ? 'border-brand text-brand font-black'
+            : 'border-transparent text-[#5F7089] hover:text-[#172033]'
+        "
+      >
+        <span aria-hidden="true" class="material-symbols-outlined text-[18px]">history</span>
+        Riwayat Perubahan Aset
+      </button>
+      <button
+        v-if="isSuperAdmin"
+        type="button"
+        :aria-pressed="activeTab === 'audit'"
+        @click="activeTab = 'audit'"
+        class="flex min-w-0 min-h-11 items-center justify-center sm:justify-start gap-2 px-2 sm:px-5 py-3.5 text-xs leading-relaxed text-left font-bold transition-all duration-150 border-b-2 -mb-[2px]"
+        :class="
+          activeTab === 'audit'
+            ? 'border-brand text-brand font-black'
+            : 'border-transparent text-[#5F7089] hover:text-[#172033]'
+        "
+      >
+        <span aria-hidden="true" class="material-symbols-outlined text-[18px]">security</span>
+        Audit Aktivitas Login
+      </button>
+      <button
+        v-if="isSuperAdmin"
+        type="button"
+        :aria-pressed="activeTab === 'system'"
+        @click="activeTab = 'system'"
+        class="flex min-w-0 min-h-11 items-center justify-center sm:justify-start gap-2 px-2 sm:px-5 py-3.5 text-xs leading-relaxed text-left font-bold transition-all duration-150 border-b-2 -mb-[2px]"
+        :class="
+          activeTab === 'system'
+            ? 'border-brand text-brand font-black'
+            : 'border-transparent text-[#5F7089] hover:text-[#172033]'
+        "
+      >
+        <span aria-hidden="true" class="material-symbols-outlined text-[18px]">receipt_long</span>
+        Audit Sistem
+      </button>
+    </div>
+
+    <!-- Filters Bar Card -->
+    <div
+      class="logs-filters shadow-card grid grid-cols-[minmax(0,1fr)_auto] min-w-0 items-center gap-3 rounded-2xl border border-[#E8EDF3] bg-white p-3"
+    >
+      <!-- Search -->
+      <div class="relative h-9 min-w-0">
+        <span
+          aria-hidden="true"
+          class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-[18px] text-[#687281] pointer-events-none"
+        >
+          search
+        </span>
+        <input
+          v-model="searchQuery"
+          aria-label="Cari kata kunci log"
+          type="text"
+          placeholder="Cari kata kunci log…"
+          class="toolbar-search-input h-full min-h-0 w-full rounded-lg border border-[#DCE3EC] bg-white pl-10 pr-3 text-[11px] font-semibold text-[#334155] outline-none transition-all focus:border-brand focus:ring-1 focus:ring-brand/10"
+        />
       </div>
 
-      <!-- Error state -->
-      <div
-        v-if="pageError"
-        role="alert"
-        class="shadow-card flex flex-wrap items-center gap-2 rounded-[20px] border border-red-200 bg-red-50/60 px-5 py-4 text-[13px] text-red-700 backdrop-blur-xl"
-      >
-        <span aria-hidden="true" class="material-symbols-outlined text-[18px]">error</span>
-        <span class="min-w-0 flex-1 wrap-anywhere">{{ pageError }}</span>
-        <button
-          @click="fetchLogs"
-          type="button"
-          class="min-h-11 px-2 ml-auto text-xs font-extrabold uppercase tracking-wider text-red-800 hover:underline"
-        >
-          Coba Lagi
-        </button>
-      </div>
-
-      <!-- Tab Selection Navigation -->
-      <div
-        class="admin-tabs grid sm:flex border-b border-[#E2E8F0]/80"
-        :class="isSuperAdmin ? 'grid-cols-3' : 'grid-cols-1'"
-        aria-label="Jenis log"
-      >
-        <button
-          type="button"
-          :aria-pressed="activeTab === 'assets'"
-          @click="activeTab = 'assets'"
-          class="flex min-w-0 min-h-11 items-center justify-center sm:justify-start gap-2 px-2 sm:px-5 py-3.5 text-xs leading-relaxed text-left font-bold transition-all duration-150 border-b-2 -mb-[2px]"
-          :class="
-            activeTab === 'assets'
-              ? 'border-brand text-brand font-black'
-              : 'border-transparent text-[#5F7089] hover:text-[#172033]'
-          "
-        >
-          <span aria-hidden="true" class="material-symbols-outlined text-[18px]">history</span>
-          Riwayat Perubahan Aset
-        </button>
-        <button
-          v-if="isSuperAdmin"
-          type="button"
-          :aria-pressed="activeTab === 'audit'"
-          @click="activeTab = 'audit'"
-          class="flex min-w-0 min-h-11 items-center justify-center sm:justify-start gap-2 px-2 sm:px-5 py-3.5 text-xs leading-relaxed text-left font-bold transition-all duration-150 border-b-2 -mb-[2px]"
-          :class="
-            activeTab === 'audit'
-              ? 'border-brand text-brand font-black'
-              : 'border-transparent text-[#5F7089] hover:text-[#172033]'
-          "
-        >
-          <span aria-hidden="true" class="material-symbols-outlined text-[18px]">security</span>
-          Audit Aktivitas Login
-        </button>
-        <button
-          v-if="isSuperAdmin"
-          type="button"
-          :aria-pressed="activeTab === 'system'"
-          @click="activeTab = 'system'"
-          class="flex min-w-0 min-h-11 items-center justify-center sm:justify-start gap-2 px-2 sm:px-5 py-3.5 text-xs leading-relaxed text-left font-bold transition-all duration-150 border-b-2 -mb-[2px]"
-          :class="
-            activeTab === 'system'
-              ? 'border-brand text-brand font-black'
-              : 'border-transparent text-[#5F7089] hover:text-[#172033]'
-          "
-        >
-          <span aria-hidden="true" class="material-symbols-outlined text-[18px]">receipt_long</span>
-          Audit Sistem
-        </button>
-      </div>
-
-      <!-- Filters Bar Card -->
-      <div
-        class="logs-filters shadow-card grid grid-cols-[minmax(0,1fr)_auto] min-w-0 items-center gap-3 rounded-2xl border border-[#E8EDF3] bg-white p-3"
-      >
-        <!-- Search -->
-        <div class="relative h-9 min-w-0">
-          <span
-            aria-hidden="true"
-            class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-[18px] text-[#687281] pointer-events-none"
-          >
-            search
-          </span>
-          <input
-            v-model="searchQuery"
-            aria-label="Cari kata kunci log"
-            type="text"
-            placeholder="Cari kata kunci log..."
-            class="toolbar-search-input h-full min-h-0 w-full rounded-lg border border-[#DCE3EC] bg-white pl-10 pr-3 text-[11px] font-semibold text-[#334155] outline-none transition-all focus:border-brand focus:ring-1 focus:ring-brand/10"
+      <!-- Filter + Refresh grouped (kept together) -->
+      <div class="flex min-w-0 items-center gap-2">
+        <!-- Action Filter (Asset Tab only) -->
+        <div v-if="activeTab === 'assets'" class="min-w-0 w-36">
+          <CustomSelect
+            v-model="filterAction"
+            :options="[
+              { value: '', label: 'Semua Aksi' },
+              { value: 'TAMBAH', label: 'Tambah Aset' },
+              { value: 'UBAH', label: 'Ubah Aset' },
+              { value: 'HAPUS', label: 'Hapus Aset' },
+            ]"
+            aria-label="Filter aksi"
+            height-class="h-9"
+            block
           />
         </div>
 
-        <!-- Filter + Refresh grouped (kept together) -->
-        <div class="flex min-w-0 items-center gap-2">
-          <!-- Action Filter (Asset Tab only) -->
-          <div v-if="activeTab === 'assets'" class="min-w-0 w-36">
-            <CustomSelect
-              v-model="filterAction"
-              :options="[
-                { value: '', label: 'Semua Aksi' },
-                { value: 'TAMBAH', label: 'Tambah Aset' },
-                { value: 'UBAH', label: 'Ubah Aset' },
-                { value: 'HAPUS', label: 'Hapus Aset' },
-              ]"
-              aria-label="Filter aksi"
-              height-class="h-9"
-              block
-            />
-          </div>
-
-          <!-- Activity Filter (Audit Login Tab only) -->
-          <div v-if="activeTab === 'audit'" class="min-w-0 w-44">
-            <CustomSelect
-              v-model="filterActivity"
-              :options="[
-                { value: '', label: 'Semua Aktifitas' },
-                { value: 'LOGIN', label: 'Berhasil Login' },
-                { value: 'GAGAL_LOGIN', label: 'Gagal Login' },
-                { value: 'RESET_PASSWORD', label: 'Reset Sandi (OTP)' },
-                { value: 'UBAH_PASSWORD', label: 'Ubah Kata Sandi' },
-                { value: 'LOGOUT', label: 'Logout' },
-              ]"
-              aria-label="Filter aktivitas"
-              height-class="h-9"
-              block
-            />
-          </div>
-
-          <!-- Refresh button -->
-          <button
-            type="button"
-            @click="fetchLogs"
-            :disabled="isLoading"
-            class="logs-refresh-button h-9 items-center justify-center gap-2 rounded-lg border border-[#DCE3EC] bg-white/50 px-4 text-[12px] font-bold text-[#334155] shadow-sm hover:bg-[#F8FAFC] disabled:opacity-50"
-          >
-            <span
-              aria-hidden="true"
-              class="material-symbols-outlined text-[18px]"
-              :class="{ 'animate-spin': isLoading }"
-              >refresh</span
-            >
-            Segarkan
-          </button>
-
-          <!-- Mode Tampilan (Tab Riwayat Aset saja) -->
-          <AppViewToggle v-if="activeTab === 'assets'" v-model="assetLogViewMode" />
+        <!-- Activity Filter (Audit Login Tab only) -->
+        <div v-if="activeTab === 'audit'" class="min-w-0 w-44">
+          <CustomSelect
+            v-model="filterActivity"
+            :options="[
+              { value: '', label: 'Semua Aktifitas' },
+              { value: 'LOGIN', label: 'Berhasil Login' },
+              { value: 'GAGAL_LOGIN', label: 'Gagal Login' },
+              { value: 'RESET_PASSWORD', label: 'Reset Sandi (OTP)' },
+              { value: 'UBAH_PASSWORD', label: 'Ubah Kata Sandi' },
+              { value: 'LOGOUT', label: 'Logout' },
+            ]"
+            aria-label="Filter aktivitas"
+            height-class="h-9"
+            block
+          />
         </div>
+
+        <!-- Refresh button -->
+        <button
+          type="button"
+          @click="fetchLogs"
+          :disabled="isLoading"
+          class="logs-refresh-button h-9 items-center justify-center gap-2 rounded-lg border border-[#DCE3EC] bg-white/50 px-4 text-[12px] font-bold text-[#334155] shadow-sm hover:bg-[#F8FAFC] disabled:opacity-50"
+        >
+          <span
+            aria-hidden="true"
+            class="material-symbols-outlined text-[18px]"
+            :class="{ 'animate-spin': isLoading }"
+            >refresh</span
+          >
+          Segarkan
+        </button>
+
+        <!-- Mode Tampilan (Tab Riwayat Aset saja) -->
+        <AppViewToggle v-if="activeTab === 'assets'" v-model="assetLogViewMode" />
       </div>
     </div>
 
@@ -499,22 +491,31 @@ function systemAuditChanges(log) {
             <thead>
               <tr class="text-left border-b border-[#F3F4F6]">
                 <th
+                  scope="col"
                   class="px-5 py-3 text-[10px] font-bold text-[#9CA3AF] uppercase tracking-wider w-48"
                 >
                   Waktu
                 </th>
                 <th
+                  scope="col"
                   class="px-5 py-3 text-[10px] font-bold text-[#9CA3AF] uppercase tracking-wider w-24"
                 >
                   Aksi
                 </th>
-                <th class="px-5 py-3 text-[10px] font-bold text-[#9CA3AF] uppercase tracking-wider">
+                <th
+                  scope="col"
+                  class="px-5 py-3 text-[10px] font-bold text-[#9CA3AF] uppercase tracking-wider"
+                >
                   Aset
                 </th>
-                <th class="px-5 py-3 text-[10px] font-bold text-[#9CA3AF] uppercase tracking-wider">
+                <th
+                  scope="col"
+                  class="px-5 py-3 text-[10px] font-bold text-[#9CA3AF] uppercase tracking-wider"
+                >
                   Perubahan
                 </th>
                 <th
+                  scope="col"
                   class="px-5 py-3 text-[10px] font-bold text-[#9CA3AF] uppercase tracking-wider w-40"
                 >
                   Oleh
@@ -751,17 +752,25 @@ function systemAuditChanges(log) {
             <thead>
               <tr class="text-left border-b border-[#F3F4F6]">
                 <th
+                  scope="col"
                   class="px-5 py-3 text-[10px] font-bold text-[#9CA3AF] uppercase tracking-wider w-48"
                 >
                   Waktu Login
                 </th>
-                <th class="px-5 py-3 text-[10px] font-bold text-[#9CA3AF] uppercase tracking-wider">
+                <th
+                  scope="col"
+                  class="px-5 py-3 text-[10px] font-bold text-[#9CA3AF] uppercase tracking-wider"
+                >
                   Nama Pengguna
                 </th>
-                <th class="px-5 py-3 text-[10px] font-bold text-[#9CA3AF] uppercase tracking-wider">
+                <th
+                  scope="col"
+                  class="px-5 py-3 text-[10px] font-bold text-[#9CA3AF] uppercase tracking-wider"
+                >
                   Email
                 </th>
                 <th
+                  scope="col"
                   class="px-5 py-3 text-[10px] font-bold text-[#9CA3AF] uppercase tracking-wider w-36"
                 >
                   Status

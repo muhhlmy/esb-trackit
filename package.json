@@ -13,7 +13,9 @@
     "test:e2e:ui": "npm run test:e2e:prepare && playwright test --ui",
     "test:e2e:smoke": "npm run test:e2e:prepare && playwright test --grep @smoke",
     "test:e2e:report": "playwright show-report",
-    "docs:manual:pdf": "node scripts/generate-user-manual-pdf.mjs"
+    "docs:manual:pdf": "node scripts/generate-user-manual-pdf.mjs",
+    "build:tokens": "node scripts/build-tokens.js",
+    "deploy:frontend": "bash scripts/deploy-frontend.sh"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.13.0",

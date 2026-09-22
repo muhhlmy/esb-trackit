@@ -16,14 +16,29 @@ describe('AssetsGaView Frontend Logic & Permission Tests', () => {
     const source = await readFile(assetsGaViewUrl, 'utf8')
 
     // Must evaluate hasWritePermission('assets_ga') strictly
-    assert.match(source, /canWriteAssets\s*=\s*computed\(\s*\(\)\s*=>\s*hasWritePermission\('assets_ga'\)\s*\)/)
-    assert.doesNotMatch(source, /hasWritePermission\('assets_ga'\)\s*\|\|\s*hasWritePermission\('assets'\)/)
+    assert.match(
+      source,
+      /canWriteAssets\s*=\s*computed\(\s*\(\)\s*=>\s*hasWritePermission\('assets_ga'\)\s*\)/,
+    )
+    assert.doesNotMatch(
+      source,
+      /hasWritePermission\('assets_ga'\)\s*\|\|\s*hasWritePermission\('assets'\)/,
+    )
 
     // Mutation handlers must guard with canWriteAssets
     assert.match(source, /function openAdd\(\)\s*\{[\s\S]*?if \(!canWriteAssets\.value\) return/)
-    assert.match(source, /function openEdit\(asset\)\s*\{[\s\S]*?if \(!canWriteAssets\.value\) return/)
-    assert.match(source, /function openDelete\(asset\)\s*\{[\s\S]*?if \(!canWriteAssets\.value\) return/)
-    assert.match(source, /async function submitForm\(\)\s*\{[\s\S]*?if \(!canWriteAssets\.value\) return/)
+    assert.match(
+      source,
+      /function openEdit\(asset\)\s*\{[\s\S]*?if \(!canWriteAssets\.value\) return/,
+    )
+    assert.match(
+      source,
+      /function openDelete\(asset\)\s*\{[\s\S]*?if \(!canWriteAssets\.value\) return/,
+    )
+    assert.match(
+      source,
+      /async function submitForm\(\)\s*\{[\s\S]*?if \(!canWriteAssets\.value\) return/,
+    )
     assert.match(source, /async function confirmDelete\(\)\s*\{[\s\S]*?if \(!canWriteAssets\.value/)
 
     // Template elements must bind canWriteAssets
@@ -41,4 +56,3 @@ describe('AssetsGaView Frontend Logic & Permission Tests', () => {
     assert.match(source, /assets_ga:\s*'full'/)
   })
 })
-

@@ -6,15 +6,15 @@ import { LogIn, ShieldAlert } from 'lucide-vue-next'
 const props = defineProps({
   title: {
     type: String,
-    default: 'Sign in required',
+    default: 'Masuk diperlukan',
   },
   description: {
     type: String,
-    default: 'Please sign in to access your tickets and create a support request.',
+    default: 'Silakan masuk untuk mengakses halaman ini.',
   },
   buttonText: {
     type: String,
-    default: 'Sign In to Continue',
+    default: 'Masuk',
   },
   redirectPath: {
     type: String,

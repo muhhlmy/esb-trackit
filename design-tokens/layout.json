@@ -1,0 +1,29 @@
+{
+  "$metadata": {
+    "version": "1.0.0",
+    "description": "ESB TrackIT layout dimension tokens — header, sidebar, control heights, chart dimensions."
+  },
+  "dimension": {
+    "header-height": { "value": "64px", "type": "number", "description": "App header height — desktop" },
+    "header-height-mobile": { "value": "56px", "type": "number", "description": "App header height — mobile" },
+    "sidebar-width-collapsed": { "value": "74px", "type": "number", "description": "Sidebar navigation rail width" },
+    "sidebar-width-expanded-desktop": { "value": "245px", "type": "number", "description": "Sidebar expanded width — desktop" },
+    "sidebar-width-mobile": { "value": "250px", "type": "number", "description": "Sidebar width — mobile overlay" },
+    "bottom-nav-height": { "value": "56px", "type": "number", "description": "Mobile bottom navigation height" },
+    "control-height-sm": { "value": "32px", "type": "number", "description": "Small control height — compact buttons, badges" },
+    "control-height-md": { "value": "36px", "type": "number", "description": "Medium control height — standard buttons, inputs" },
+    "control-height-lg": { "value": "44px", "type": "number", "description": "Large control height — primary buttons, form fields (mobile minimum touch target)" },
+    "chart-height-sm": { "value": "160px", "type": "number", "description": "Small chart — stat cards" },
+    "chart-height-md": { "value": "240px", "type": "number", "description": "Medium chart — dashboard sections" },
+    "chart-height-lg": { "value": "320px", "type": "number", "description": "Large chart — full dashboard widgets" },
+    "table-row-height": { "value": "44px", "type": "number", "description": "Table row height — desktop default" },
+    "bottom-nav-item-min-width": { "value": "52px", "type": "number", "description": "Mobile bottom nav item minimum tap width" },
+    "bottom-nav-item-min-height": { "value": "44px", "type": "number", "description": "Mobile bottom nav item minimum tap height (WCAG 2.5.8)" }
+  },
+  "safe-area": {
+    "inset-bottom": { "value": "env(safe-area-inset-bottom, 0px)", "type": "number", "description": "iOS/Android safe area — bottom (home indicator / gesture nav)" },
+    "inset-top": { "value": "env(safe-area-inset-top, 0px)", "type": "number", "description": "iOS safe area — top (notch / status bar)" },
+    "inset-left": { "value": "env(safe-area-inset-left, 0px)", "type": "number", "description": "Landscape safe area — left" },
+    "inset-right": { "value": "env(safe-area-inset-right, 0px)", "type": "number", "description": "Landscape safe area — right" }
+  }
+}

@@ -19,7 +19,8 @@ test.describe('Ticket CASP Rating Flow', () => {
     expect(resolved.ok()).toBeTruthy()
 
     await userPage.goto('/tickets', { waitUntil: 'domcontentloaded' })
-    await userPage.getByText(title, { exact: true }).click()
+    // Judul dapat muncul di dua tempat (heading list + heading detail): pilih yang pertama
+    await userPage.getByText(title, { exact: true }).first().click()
     await userPage.getByRole('button', { name: 'Bintang 4: Puas', exact: true }).click()
     await userPage.getByRole('button', { name: 'Kirim Penilaian', exact: true }).click()
     await expect(userPage.getByText('4 / 5', { exact: true })).toBeVisible()

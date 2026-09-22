@@ -8,17 +8,23 @@ const dashboardUrl = new URL('../src/views/DashboardView.vue', import.meta.url)
 
 test('AssetTrendLineChart maps labels and count/added flexibly', async () => {
   const source = await readFile(lineChartUrl, 'utf8')
-  assert.match(source, /labels:\s*props\.data\.map\(\(d\)\s*=>\s*d\.label\s*\|\|\s*d\.month\s*\|\|\s*d\.period/)
-  assert.match(source, /data:\s*props\.data\.map\(\(d\)\s*=>\s*\(d\.added\s*!==\s*undefined\s*\?\s*d\.added\s*:\s*d\.count/)
+  assert.match(
+    source,
+    /labels:\s*props\.data\.map\(\(d\)\s*=>\s*d\.label\s*\|\|\s*d\.month\s*\|\|\s*d\.period/,
+  )
+  assert.match(
+    source,
+    /data:\s*props\.data\.map\(\(d\)\s*=>\s*\(d\.added\s*!==\s*undefined\s*\?\s*d\.added\s*:\s*d\.count/,
+  )
 })
 
 test('AssetConditionPieChart defines distinct colors for all 5 asset conditions', async () => {
   const source = await readFile(pieChartUrl, 'utf8')
-  assert.match(source, /baru:\s*'#13DEB9'/)
+  assert.match(source, /baru:\s*'#0E9F6E'/)
   assert.match(source, /normal:\s*'#0A51B0'/)
-  assert.match(source, /'rusak ringan':\s*'#FFAE1F'/)
-  assert.match(source, /'rusak sedang':\s*'#E855A2'/)
-  assert.match(source, /'rusak berat':\s*'#FA896B'/)
+  assert.match(source, /'rusak ringan':\s*'#D97706'/)
+  assert.match(source, /'rusak sedang':\s*'#EA580C'/)
+  assert.match(source, /'rusak berat':\s*'#DC2626'/)
 })
 
 test('DashboardView status helpers include Dalam Perawatan and proper colors', async () => {

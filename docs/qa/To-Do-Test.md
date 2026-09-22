@@ -272,8 +272,8 @@ Two parallel subagents (Security/Code-QA, Product/UX/A11y) were dispatched. **Bo
 - **Remediation Details:** Documented and verified defense-in-depth CSRF controls:
   - Session cookies use `SameSite=Lax` and `HttpOnly`.
   - Centralized `useApi` attaches `X-Requested-With: XMLHttpRequest` on all requests (which triggers CORS preflight and cannot be forged cross-origin).
-  - Backend enforces `requireSafeOrigin` middleware checking `Origin` and `Referer` against allowed origin lists.
-- **Verification:** CORS and Origin isolation unit tests pass.
+  - [REMOVED 2026-09-21] `requireSafeOrigin` middleware dihapus atas permintaan owner; sisa proteksi: `SameSite=Lax` cookie + `X-Requested-With` preflight + CORS allowlist.
+- **Verification:** CORS unit tests pass.
 
 ### AUTH-01 — Provided superadmin credentials rejected (BLOCKER) — [RESOLVED]
 - **Category:** Authentication

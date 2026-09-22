@@ -4,42 +4,7 @@
   margin-inline: auto;
   color: #333333;
 }
-.admin-workspace .admin-page-header {
-  padding: 4px 0 8px;
-  border: 0;
-  background: transparent;
-  box-shadow: none;
-  gap: 20px;
-}
-.admin-page-header :is(h1, h2) {
-  font-size: 25px;
-  font-weight: 650;
-  letter-spacing: -0.04em;
-  line-height: 1.4;
-}
-.admin-page-header p {
-  font-size: 12px;
-  line-height: 1.8;
-  color: #637288;
-}
-.admin-page-header > div:first-child {
-  gap: 16px;
-}
-.admin-page-header button {
-  min-height: 42px;
-  border-radius: 8px;
-  box-shadow: none;
-}
-.admin-page-header button:is(.bg-\[\#0A51B0\], .bg-\[\#0A51B0\], .bg-brand) {
-  background: #0a51b0;
-}
-.admin-page-header > div:nth-child(2):has(input) {
-  padding: 16px;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  background: white;
-  gap: 12px;
-}
+/* admin-page-header styles removed — now handled by PageHeader.vue component */
 .admin-workspace
   input:not([type='checkbox']):not([type='radio']):not([type='file']):not(.toolbar-search-input),
 .admin-entry-form input:not([type='checkbox']):not([type='radio']),
@@ -217,15 +182,7 @@
   }
 }
 @media (max-width: 639px) {
-  .admin-page-header :is(h1, h2) {
-    font-size: 23px;
-  }
-  .admin-page-header > div:first-child {
-    flex-wrap: wrap;
-  }
-  .admin-page-header button {
-    min-height: 44px;
-  }
+  /* admin-page-header responsive styles removed — handled by PageHeader.vue */
   .admin-workspace
     input:not([type='checkbox']):not([type='radio']):not([type='file']):not(.toolbar-search-input),
   .admin-entry-form input:not([type='checkbox']):not([type='radio']),

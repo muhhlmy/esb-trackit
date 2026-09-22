@@ -16,10 +16,7 @@ import {
 const routerSourceUrl = new URL('../src/router/index.js', import.meta.url)
 const ticketsSourceUrl = new URL('../src/views/TicketsView.vue', import.meta.url)
 const usersSourceUrl = new URL('../src/views/UsersView.vue', import.meta.url)
-const appHeaderSourceUrl = new URL(
-  '../src/components/layout/AppHeader.vue',
-  import.meta.url,
-)
+const appHeaderSourceUrl = new URL('../src/components/layout/AppHeader.vue', import.meta.url)
 
 function sourceSection(source, startMarker, endMarker) {
   const start = source.indexOf(startMarker)
@@ -113,20 +110,18 @@ test('read-only users permission hides and blocks user mutation controls', async
   const source = await readFile(usersSourceUrl, 'utf8')
   const openAddSection = sourceSection(source, 'function openAdd()', 'function openEdit')
   const openEditSection = sourceSection(source, 'function openEdit(u)', 'function openDelete')
-  const saveSection = sourceSection(source, 'async function saveUser()', 'async function deleteUser')
+  const saveSection = sourceSection(
+    source,
+    'async function saveUser()',
+    'async function deleteUser',
+  )
 
   assert.match(source, /const \{ isSuperAdmin, hasWritePermission \} = useAuth\(\)/)
-  assert.match(
-    source,
-    /const canWriteUsers = computed\(\(\) => hasWritePermission\('users'\)\)/,
-  )
+  assert.match(source, /const canWriteUsers = computed\(\(\) => hasWritePermission\('users'\)\)/)
   assert.match(openAddSection, /if \(!canWriteUsers\.value\) return/)
   assert.match(openEditSection, /if \(!canWriteUsers\.value\) return/)
   assert.match(saveSection, /if \(!canWriteUsers\.value\)/)
-  assert.match(
-    source,
-    /v-if="canWriteUsers"[\s\S]{0,180}?@click="openAdd"/,
-  )
+  assert.match(source, /v-if="canWriteUsers"[\s\S]{0,180}?@click="openAdd"/)
   assert.match(
     source,
     /if\s*\(\s*canWriteUsers\.value\s*&&\s*\(\s*isSuperAdmin\.value\s*\|\|\s*!isRoleSuperAdmin\(u\.role\)\s*\)\s*\)[\s\S]*?openEdit\(u\)/,
@@ -166,10 +161,7 @@ test('router uses explicit permission evaluation instead of string truthiness', 
   assert.equal(findFirstAllowedRoute(exportOnlyAdmin, routeMap), null)
   assert.equal(canAccessFrontendFeature(exportOnlyAdmin, 'export'), false)
   assert.equal(canAccessFrontendFeature(unknownTicketRole, 'tickets'), false)
-  assert.equal(
-    canAccessFrontendFeature({ role: 'super admin', permissions: {} }, 'export'),
-    true,
-  )
+  assert.equal(canAccessFrontendFeature({ role: 'super admin', permissions: {} }, 'export'), true)
 })
 
 test('ticket create and update payloads contain only server-supported fields', async () => {
@@ -215,10 +207,7 @@ test('queue admin fan-out is denied before requests for non-superadmins', async 
 
   assert.notEqual(denyGateIndex, -1)
   assert.notEqual(fanOutIndex, -1)
-  assert.ok(
-    denyGateIndex < fanOutIndex,
-    'superadmin deny gate must run before queue-admin fan-out',
-  )
+  assert.ok(denyGateIndex < fanOutIndex, 'superadmin deny gate must run before queue-admin fan-out')
   assert.match(queueAdminSection, /queueAdmins\.value\s*=\s*\{\}\s*[\r\n]+\s*return/)
 })
 
@@ -234,9 +223,7 @@ test('ticket delete control is visible to superadmin only', async () => {
 test('app header gates ticket fetch and SSE behind ticket permission', async () => {
   const source = await readFile(appHeaderSourceUrl, 'utf8')
   const mountSection = sourceSection(source, 'onMounted(() => {', 'onBeforeUnmount')
-  const permissionGateIndex = mountSection.indexOf(
-    "if (!hasPermission('tickets')) return",
-  )
+  const permissionGateIndex = mountSection.indexOf("if (!hasPermission('tickets')) return")
   const fetchIndex = mountSection.indexOf('fetchTickets()')
   const connectIndex = mountSection.indexOf('connectSSE()')
 
@@ -297,10 +284,7 @@ test('ticket attachments are loaded individually and never through list or comme
 
   assert.match(source, /v-if="ticket\.has_attachment"[\s\S]*?attach_file/)
   assert.doesNotMatch(commentListSection, /comments\/\$\{[^}]+\}\/attachment/)
-  assert.match(
-    commentAttachmentSection,
-    /comments\/\$\{comment\.id\}\/attachment/,
-  )
+  assert.match(commentAttachmentSection, /comments\/\$\{comment\.id\}\/attachment/)
   assert.match(source, /@click="loadCommentAttachment\(c\)"/)
   assert.doesNotMatch(pollingSection, /loadCommentAttachment/)
   assert.match(editSection, /loadSelectedTicketAttachment\(ticket\.id, 'edit'\)/)

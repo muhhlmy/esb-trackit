@@ -1,6 +1,3 @@
-// ============================================================
-// router/index.js - Konfigurasi Routing (Navigasi Halaman Unified)
-// ============================================================
 import { createRouter, createWebHistory } from 'vue-router'
 
 import {
@@ -29,194 +26,150 @@ export const allowedRouteMap = [
 ]
 
 // Lista semua route aplikasi (Help Center + TrackIT Monitoring)
+const page = (path, name, loader, meta, alias) => {
+  const route = { path, name, component: loader, meta }
+  if (alias) route.alias = alias
+  return route
+}
+
 const routes = [
   // Public Help Center Routes (Ditampilkan pertama kali saat aplikasi dibuka)
-  {
-    path: '/',
-    name: 'home',
-    component: () => import('../views/HomeView.vue'),
-    meta: { title: 'Help Center', subtitle: 'Pusat Bantuan & Artikel Insiden', public: true },
-  },
-  {
-    path: '/cases',
-    name: 'cases',
-    component: () => import('../views/CasesView.vue'),
-    meta: {
-      title: 'Cases & Artikel',
-      subtitle: 'Kumpulan Artikel & Playbook Insiden',
-      public: true,
-    },
-  },
-  {
-    path: '/cases/:id',
-    name: 'case-detail',
-    component: () => import('../views/CasesView.vue'),
-    meta: { title: 'Detail Artikel', subtitle: 'Detail Artikel Panduan Insiden', public: true },
-  },
+  page('/', 'home', () => import('../views/HomeView.vue'), {
+    title: 'Help Center',
+    subtitle: 'Pusat Bantuan & Artikel Insiden',
+    public: true,
+  }),
+  page('/cases', 'cases', () => import('../views/CasesView.vue'), {
+    title: 'Cases & Artikel',
+    subtitle: 'Kumpulan Artikel & Playbook Insiden',
+    public: true,
+  }),
+  page('/cases/:id', 'case-detail', () => import('../views/CasesView.vue'), {
+    title: 'Detail Artikel',
+    subtitle: 'Detail Artikel Panduan Insiden',
+    public: true,
+  }),
   // Auth Route
-  {
-    path: '/login',
-    name: 'login',
-    component: () => import('../views/LoginView.vue'),
-    meta: { title: 'Masuk', subtitle: 'Masuk ke akun Anda', public: true },
-  },
+  page('/login', 'login', () => import('../views/LoginView.vue'), {
+    title: 'Masuk',
+    subtitle: 'Masuk ke akun Anda',
+    public: true,
+  }),
 
   // Management Routes (TrackIT Monitoring)
-  {
-    path: '/dashboard',
-    name: 'dashboard',
-    component: () => import('../views/DashboardView.vue'),
-    meta: { title: 'Dashboard', subtitle: 'Overview & analytics', permission: 'dashboard' },
-  },
-  {
-    path: '/assets',
-    name: 'assets',
-    component: () => import('../views/AssetsView.vue'),
-    meta: { title: 'Aset IT', subtitle: 'Inventaris & status perangkat', permission: 'assets' },
-  },
-  {
-    path: '/assets-ga',
+  page('/dashboard', 'dashboard', () => import('../views/DashboardView.vue'), {
+    title: 'Dashboard',
+    subtitle: 'Overview & analytics',
+    permission: 'dashboard',
+  }),
+  page('/assets', 'assets', () => import('../views/AssetsView.vue'), {
+    title: 'Aset IT',
+    subtitle: 'Inventaris & status perangkat',
+    permission: 'assets',
+  }),
+  page('/assets-ga', 'assets-ga', () => import('../views/AssetsGaView.vue'), {
+    title: 'Aset GA',
+    subtitle: 'Kelola aset GA',
+    permission: 'assets_ga',
     alias: '/assets/ga',
-    name: 'assets-ga',
-    component: () => import('../views/AssetsGaView.vue'),
-    meta: { title: 'Aset GA', subtitle: 'Kelola aset GA', permission: 'assets_ga' },
-  },
-  {
-    path: '/assets-ops',
+  }),
+  page('/assets-ops', 'assets-ops', () => import('../views/AssetsOpsView.vue'), {
+    title: 'Aset Ops',
+    subtitle: 'Kelola aset operasional',
+    permission: 'assets_ops',
     alias: '/assets/ops',
-    name: 'assets-ops',
-    component: () => import('../views/AssetsOpsView.vue'),
-    meta: { title: 'Aset Ops', subtitle: 'Kelola aset operasional', permission: 'assets_ops' },
-  },
-  {
-    path: '/my-assets',
+  }),
+  page('/my-assets', 'my-assets', () => import('../views/MyAssetsView.vue'), {
+    title: 'Aset Karyawan',
+    subtitle: 'Kelola aset karyawan',
+    permission: 'my_assets',
     alias: '/assets/karyawan',
-    name: 'my-assets',
-    component: () => import('../views/MyAssetsView.vue'),
-    meta: { title: 'Aset Karyawan', subtitle: 'Kelola aset karyawan', permission: 'my_assets' },
-  },
-  {
-    path: '/karyawan',
-    name: 'karyawan',
-    component: () => import('../views/EmployeesView.vue'),
-    meta: { title: 'Karyawan', subtitle: 'Kelola data karyawan', permission: 'karyawan' },
-  },
-  {
-    path: '/tickets',
-    name: 'tickets',
-    component: () => import('../views/TicketsView.vue'),
-    meta: { title: 'Tiket', subtitle: 'Kelola tiket helpdesk', permission: 'tickets' },
-  },
-  {
-    path: '/users',
-    name: 'users',
-    component: () => import('../views/UsersView.vue'),
-    meta: { title: 'Pengguna', subtitle: 'Kelola data pengguna', permission: 'users' },
-  },
-  {
-    path: '/faqs',
-    name: 'faqs',
-    component: () => import('../views/FaqAdminView.vue'),
-    meta: { title: 'FAQ', subtitle: 'Kelola FAQ Help Center', permission: 'knowledge_base' },
-  },
-  {
-    path: '/submissions',
+  }),
+  page('/karyawan', 'karyawan', () => import('../views/EmployeesView.vue'), {
+    title: 'Karyawan',
+    subtitle: 'Kelola data karyawan',
+    permission: 'karyawan',
+  }),
+  page('/tickets', 'tickets', () => import('../views/TicketsView.vue'), {
+    title: 'Tiket',
+    subtitle: 'Kelola tiket helpdesk',
+    permission: 'tickets',
+  }),
+  page('/users', 'users', () => import('../views/UsersView.vue'), {
+    title: 'Pengguna',
+    subtitle: 'Kelola data pengguna',
+    permission: 'users',
+  }),
+  page('/faqs', 'faqs', () => import('../views/FaqAdminView.vue'), {
+    title: 'FAQ',
+    subtitle: 'Kelola FAQ Help Center',
+    permission: 'knowledge_base',
+  }),
+  page('/submissions', 'submissions', () => import('../views/SubmissionsView.vue'), {
+    title: 'Pengajuan',
+    subtitle: 'Kelola pengajuan',
+    permission: 'submissions',
     alias: '/pengajuan',
-    name: 'submissions',
-    component: () => import('../views/SubmissionsView.vue'),
-    meta: { title: 'Pengajuan', subtitle: 'Kelola pengajuan', permission: 'submissions' },
-  },
-  {
-    path: '/shipments',
+  }),
+  page('/shipments', 'shipments', () => import('../views/ShipmentsView.vue'), {
+    title: 'Pengiriman',
+    subtitle: 'Tracker pengiriman barang & aset',
+    permission: 'shipments',
     alias: '/pengiriman',
-    name: 'shipments',
-    component: () => import('../views/ShipmentsView.vue'),
-    meta: {
-      title: 'Pengiriman',
-      subtitle: 'Tracker pengiriman barang & aset',
-      permission: 'shipments',
-    },
-  },
-  {
-    path: '/logs',
-    name: 'logs',
-    component: () => import('../views/LogsView.vue'),
-    meta: { title: 'Log Aktivitas', subtitle: 'Riwayat aktivitas sistem', permission: 'logs' },
-  },
-  {
-    path: '/export',
-    name: 'export',
-    component: () => import('../views/ExportView.vue'),
-    meta: {
-      title: 'Ekspor Data',
-      subtitle: 'Ekspor dan kelola data',
-      permission: 'export',
-      superadminOnly: true,
-    },
-  },
-  {
-    path: '/database',
-    name: 'database',
-    component: () => import('../views/DatabaseView.vue'),
-    meta: {
-      title: 'Database',
-      subtitle: 'Backup & restore database',
-      superadminOnly: true,
-    },
-  },
+  }),
+  page('/logs', 'logs', () => import('../views/LogsView.vue'), {
+    title: 'Log Aktivitas',
+    subtitle: 'Riwayat aktivitas sistem',
+    permission: 'logs',
+  }),
+  page('/export', 'export', () => import('../views/ExportView.vue'), {
+    title: 'Ekspor Data',
+    subtitle: 'Ekspor dan kelola data',
+    permission: 'export',
+    superadminOnly: true,
+  }),
+  page('/database', 'database', () => import('../views/DatabaseView.vue'), {
+    title: 'Database',
+    subtitle: 'Backup & restore database',
+    superadminOnly: true,
+  }),
 
   // Help Center Admin CMS Routes
-  {
-    path: '/admin/cases',
-    name: 'admin-cases',
-    component: () => import('../views/admin/AdminDashboardView.vue'),
-    meta: {
-      title: 'Admin CMS',
-      subtitle: 'Kelola Artikel Knowledge Base',
-      adminOnly: true,
-      permission: 'knowledge_base',
-    },
-  },
-  {
-    path: '/admin/kb-categories',
-    name: 'admin-kb-categories',
-    component: () => import('../views/admin/KbCategoriesView.vue'),
-    meta: {
+  page('/admin/cases', 'admin-cases', () => import('../views/admin/AdminDashboardView.vue'), {
+    title: 'Admin CMS',
+    subtitle: 'Kelola Artikel Knowledge Base',
+    adminOnly: true,
+    permission: 'knowledge_base',
+  }),
+  page(
+    '/admin/kb-categories',
+    'admin-kb-categories',
+    () => import('../views/admin/KbCategoriesView.vue'),
+    {
       title: 'Kategori KB',
       subtitle: 'Kelola Topic Cards Help Center',
       adminOnly: true,
       permission: 'knowledge_base',
     },
-  },
-  {
-    path: '/admin/editor/:id?',
+  ),
+  page('/admin/editor/:id?', 'article-editor', () => import('../views/admin/DocEditorView.vue'), {
+    title: 'Article Editor',
+    subtitle: 'Editor Artikel Knowledge Base',
+    adminOnly: true,
+    permission: 'knowledge_base',
     alias: '/admin/article-editor/:id?',
-    name: 'article-editor',
-    component: () => import('../views/admin/DocEditorView.vue'),
-    meta: {
-      title: 'Article Editor',
-      subtitle: 'Editor Artikel Knowledge Base',
-      adminOnly: true,
-      permission: 'knowledge_base',
-    },
-  },
+  }),
 
-  {
-    path: '/forbidden',
-    name: 'forbidden',
-    component: () => import('../views/AccessDeniedView.vue'),
-    meta: {
-      title: 'Akses Ditolak',
-      subtitle: 'Anda tidak memiliki izin untuk halaman ini',
-      public: true,
-    },
-  },
-  {
-    path: '/:pathMatch(.*)*',
-    name: 'NotFound',
-    component: () => import('../views/NotFoundView.vue'),
-    meta: { title: 'Halaman Tidak Ditemukan', subtitle: '404', public: true },
-  },
+  page('/forbidden', 'forbidden', () => import('../views/AccessDeniedView.vue'), {
+    title: 'Akses Ditolak',
+    subtitle: 'Anda tidak memiliki izin untuk halaman ini',
+    public: true,
+  }),
+  page('/:pathMatch(.*)*', 'NotFound', () => import('../views/NotFoundView.vue'), {
+    title: 'Halaman Tidak Ditemukan',
+    subtitle: '404',
+    public: true,
+  }),
 ]
 
 const router = createRouter({

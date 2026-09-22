@@ -858,7 +858,7 @@ onBeforeUnmount(() => {
                   autocomplete="off"
                   autocapitalize="off"
                   spellcheck="false"
-                  placeholder="Cari aset, tiket, karyawan, user..."
+                  placeholder="Cari aset, tiket, karyawan, user…"
                   class="h-11 w-full rounded-xl border border-[#DFE5EF] bg-[#F8FAFC] pl-9 pr-11 text-xs font-medium text-[#333333] placeholder-[#5F7089] outline-none transition-all focus:bg-white focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/20 [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden"
                 />
                 <button
@@ -1244,7 +1244,7 @@ onBeforeUnmount(() => {
       ></div>
     </div>
 
-    <!-- 3. RIGHT: Actions (Mobile Search, Notification Bell & Profile Menu) -->
+    <!-- 3. RIGHT: Actions (Desktop Scale Control, Mobile Search, Notifications, Profile) -->
     <div class="flex shrink-0 items-center gap-1 sm:gap-1.5 md:gap-2.5 z-40">
       <!-- Mobile Search Trigger Button (md:hidden) -->
       <button

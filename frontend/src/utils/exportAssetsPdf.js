@@ -178,6 +178,7 @@ export function downloadAssetsPdf(assets, filters = {}, date = new Date()) {
         .badge-maintenance { background: #FFF8E6; color: #A15C05; border: 1px solid #F8E3AF; }
         .badge-rusak { background: #FFF0F0; color: #C33737; border: 1px solid #F7CCCC; }
         .badge-disposal { background: #F1F5F9; color: #526175; border: 1px solid #DCE3EC; }
+        .badge-default { background: #F8FAFC; color: #475569; border: 1px solid #E2E8F0; }
       </style>
     </head>
     <body>

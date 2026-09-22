@@ -6,10 +6,7 @@ const assetCategoryImportModalUrl = new URL(
   '../src/components/ui/AssetCategoryImportModal.vue',
   import.meta.url,
 )
-const appImportModalUrl = new URL(
-  '../src/components/ui/AppImportModal.vue',
-  import.meta.url,
-)
+const appImportModalUrl = new URL('../src/components/ui/AppImportModal.vue', import.meta.url)
 
 describe('Import Templates Dummy Data Suite', () => {
   test('AssetCategoryImportModal provides exactly 5 dummy rows for Aset IT, Aset GA, and Aset Ops', async () => {
@@ -30,7 +27,10 @@ describe('Import Templates Dummy Data Suite', () => {
     // Check Ops dummy rows: OPS-001, OPS-002, OPS-003, OPS-004, OPS-005
     const opsHostnames = ['OPS-001', 'OPS-002', 'OPS-003', 'OPS-004', 'OPS-005']
     for (const h of opsHostnames) {
-      assert.ok(content.includes(h), `AssetCategoryImportModal must contain Ops dummy hostname ${h}`)
+      assert.ok(
+        content.includes(h),
+        `AssetCategoryImportModal must contain Ops dummy hostname ${h}`,
+      )
     }
   })
 

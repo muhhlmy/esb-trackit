@@ -7,12 +7,17 @@ const props = defineProps({
     required: true,
     // Array of: { label: String, icon?: String, danger?: Boolean, disabled?: Boolean, hidden?: Boolean, onClick: Function }
   },
+  label: {
+    type: String,
+    default: 'Opsi Aksi',
+  },
 })
 
 const isOpen = ref(false)
 const buttonRef = ref(null)
 const dropdownRef = ref(null)
 const dropdownStyle = ref({})
+const activeMenuIndex = ref(-1)
 
 function updateDropdownPosition() {
   if (!buttonRef.value) return
@@ -57,6 +62,11 @@ async function toggleDropdown() {
     isOpen.value = true
     await nextTick()
     updateDropdownPosition()
+    // Fokus masuk ke item menu pertama agar keyboard langsung beroperasi di
+    // dalam menu (pola ARIA menu). Escape/Tab akan mengembalikan fokus.
+    const items = dropdownRef.value?.querySelectorAll('button:not([disabled])') || []
+    activeMenuIndex.value = items.length ? 0 : -1
+    items[0]?.focus()
   } else {
     closeDropdown()
   }
@@ -64,6 +74,36 @@ async function toggleDropdown() {
 
 function closeDropdown() {
   isOpen.value = false
+  activeMenuIndex.value = -1
+}
+
+function handleMenuKeydown(event) {
+  const items = Array.from(dropdownRef.value?.querySelectorAll('button:not([disabled])') || [])
+  if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+    event.preventDefault()
+    if (items.length === 0) return
+    const dir = event.key === 'ArrowDown' ? 1 : -1
+    let idx = items.indexOf(document.activeElement)
+    if (idx === -1) idx = 0
+    else idx = (idx + dir + items.length) % items.length
+    activeMenuIndex.value = idx
+    items[idx].focus()
+    return
+  }
+  if (event.key === 'Escape') {
+    event.preventDefault()
+    event.stopPropagation()
+    closeDropdown()
+    buttonRef.value?.focus()
+    return
+  }
+  if (event.key === 'Tab') {
+    // Tab keluar dari menu: tutup dan kembalikan fokus ke tombol pemicu agar
+    // urutan tab tidak melompat ke elemen yang tersembunyi di teleport layer.
+    event.preventDefault()
+    closeDropdown()
+    buttonRef.value?.focus()
+  }
 }
 
 function handleAction(actionItem) {
@@ -73,6 +113,9 @@ function handleAction(actionItem) {
   setTimeout(() => {
     isJustClosed = false
   }, 200)
+  // Kembalikan fokus ke tombol pemicu sebelum aksi dijalankan agar fokus tidak
+  // hilang saat menu di-teleport di-unmount (target aksi bisa membuka modal).
+  buttonRef.value?.focus()
   if (typeof actionItem.onClick === 'function') {
     actionItem.onClick()
   }
@@ -95,8 +138,10 @@ function handleScrollOrResize() {
 }
 
 function handleKeydown(event) {
-  if (event.key === 'Escape') {
+  if (event.key === 'Escape' && isOpen.value) {
+    event.stopPropagation()
     closeDropdown()
+    buttonRef.value?.focus()
   }
 }
 
@@ -121,8 +166,10 @@ onBeforeUnmount(() => {
       ref="buttonRef"
       type="button"
       @click.stop="toggleDropdown"
-      aria-label="Opsi Aksi"
-      title="Opsi Aksi"
+      :aria-label="label"
+      :title="label"
+      :aria-haspopup="'menu'"
+      :aria-expanded="isOpen ? 'true' : 'false'"
       class="ui-menu-trigger flex h-7 w-7 items-center justify-center rounded-lg text-[#66728d] hover:bg-[#F8FAFC] hover:text-[#333333] transition-all cursor-pointer"
       :class="isOpen ? 'bg-[#ECF2FF] text-[#333333]' : ''"
     >
@@ -135,13 +182,18 @@ onBeforeUnmount(() => {
           v-if="isOpen"
           ref="dropdownRef"
           :style="dropdownStyle"
+          role="menu"
+          :aria-label="label"
           class="ui-action-menu rounded-xl border border-[#E5EAEF] bg-white p-1.5 shadow-2xl outline-none select-none"
+          @keydown="handleMenuKeydown"
         >
           <template v-for="(act, idx) in actions" :key="idx">
             <button
               v-if="!act.hidden"
               type="button"
+              role="menuitem"
               :disabled="act.disabled"
+              :tabindex="idx === activeMenuIndex ? 0 : -1"
               @click.stop="handleAction(act)"
               class="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-[12px] font-bold transition-all cursor-pointer text-left whitespace-nowrap"
               :class="[

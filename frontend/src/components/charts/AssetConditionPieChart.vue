@@ -15,18 +15,20 @@ const props = defineProps({
   embedded: { type: Boolean, default: false },
 })
 
-const { chartColors, commonOptions } = useChartTheme()
+const { chartColors, fontStack } = useChartTheme()
 
 const isEmpty = computed(() => !props.data || props.data.length === 0)
 
+// Peta warna kondisi: hijau = sehat, biru = normal, amber/oranye = bermasalah.
+// Semua warna punya kontras cukup di atas putih.
 const conditionColorMap = {
-  baru: '#13DEB9',
+  baru: '#0E9F6E',
   normal: '#0A51B0',
   baik: '#0A51B0',
-  'rusak ringan': '#FFAE1F',
-  'rusak sedang': '#E855A2',
-  'rusak berat': '#FA896B',
-  rusak: '#FA896B',
+  'rusak ringan': '#D97706',
+  'rusak sedang': '#EA580C',
+  'rusak berat': '#DC2626',
+  rusak: '#DC2626',
 }
 
 const chartData = computed(() => {
@@ -42,20 +44,51 @@ const chartData = computed(() => {
       {
         data: props.data.map((d) => Number(d.count) || 0),
         backgroundColor: bgColors,
-        borderWidth: 2,
+        hoverBackgroundColor: bgColors,
+        borderWidth: 3,
         borderColor: '#FFFFFF',
+        hoverOffset: 10,
+        hoverBorderWidth: 3,
       },
     ],
   }
 })
 
 const chartOptions = computed(() => ({
-  ...commonOptions,
+  responsive: true,
+  maintainAspectRatio: false,
   plugins: {
-    ...commonOptions.plugins,
+    legend: {
+      display: true,
+      position: 'bottom',
+      labels: {
+        color: chartColors.darkText,
+        font: { family: fontStack, size: 11, weight: '600' },
+        padding: 14,
+        usePointStyle: true,
+        pointStyle: 'circle',
+        boxWidth: 8,
+        boxHeight: 8,
+      },
+    },
     tooltip: {
+      backgroundColor: '#0F172A',
+      titleColor: '#FFFFFF',
+      bodyColor: '#E2E8F0',
+      borderColor: 'rgba(9, 124, 222, 0.45)',
+      borderWidth: 1,
+      padding: 12,
+      cornerRadius: 10,
+      boxPadding: 6,
+      usePointStyle: true,
+      titleFont: { family: fontStack, size: 12, weight: '700' },
+      bodyFont: { family: fontStack, size: 13, weight: '600' },
       callbacks: {
-        label: (ctx) => ` ${ctx.label}: ${ctx.parsed} Unit`,
+        label: (ctx) => {
+          const total = ctx.dataset.data.reduce((a, b) => a + b, 0)
+          const pct = total > 0 ? Math.round((ctx.parsed / total) * 100) : 0
+          return ` ${ctx.label}: ${ctx.parsed} unit (${pct}%)`
+        },
       },
     },
   },

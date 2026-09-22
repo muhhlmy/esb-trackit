@@ -210,7 +210,7 @@ watch(
         <textarea
           v-model="feedback"
           rows="2"
-          placeholder="Tulis feedback atau masukan Anda... (opsional)"
+          placeholder="Tulis feedback atau masukan Anda… (opsional)"
           class="w-full rounded-xl border border-[#E2E8F0] bg-white p-3 text-xs font-medium text-[#333333] focus:border-[#0A51B0] focus:outline-none transition-all placeholder-[#687281]"
         ></textarea>
       </div>

@@ -84,6 +84,9 @@ jobs:
         run: npm ci
         working-directory: frontend
 
+      - name: Build Design Tokens
+        run: node ../../scripts/build-tokens.js
+
       - name: Run Linter
         run: npm run lint
         working-directory: frontend

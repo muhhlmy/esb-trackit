@@ -22,14 +22,22 @@ export function escapeHtml(value, fallback = '') {
   return toDisplayText(value, fallback).replace(/[&<>"']/g, (character) => HTML_ENTITIES[character])
 }
 
-export function safeCssToken(value, fallback = 'default') {
+/**
+ * Ubah nilai bebas menjadi token CSS aman (slug). Fallback `'default'`
+ * dipakai bila input kosong/non-string — pemanggil wajib menyiapkan style
+ * untuk class `.default` karena token ini tidak menggambarkan input asli.
+ */
+export function safeCssToken(value, safeFallback = 'default') {
   const token = toDisplayText(value)
     .trim()
     .toLocaleLowerCase('id-ID')
     .replace(/[^a-z0-9_-]+/g, '-')
     .replace(/^-+|-+$/g, '')
 
-  return token || fallback
+  // safeFallback hanya untuk input kosong/non-string — class CSS bernama
+  // .badge-<safeFallback> wajib ada di stylesheet cetak; ini bukan tebakan
+  // nilai asli status, melainkan label netral untuk data tak terbaca.
+  return token || safeFallback
 }
 
 export function printHtmlDocument(

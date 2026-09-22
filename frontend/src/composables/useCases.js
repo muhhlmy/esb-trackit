@@ -4,9 +4,7 @@ import { useToast } from './useToast.js'
 
 const cases = ref([])
 const activeCaseId = ref(null)
-const selectedCategory = ref('all')
-const selectedSeverity = ref('all')
-const searchQuery = ref('')
+
 function loadRecentSearches() {
   if (typeof localStorage === 'undefined') return []
   try {
@@ -22,11 +20,6 @@ function loadRecentSearches() {
 
 const recentSearches = ref(loadRecentSearches())
 const isLoading = ref(false)
-
-// Drawer state
-const isDrawerOpen = ref(false)
-const drawerMode = ref('create') // 'create' | 'edit'
-const editingCase = ref(null)
 
 function normalizeCase(c) {
   return c ? { ...c, id: Number(c.id) } : null
@@ -63,120 +56,42 @@ function toCasePayload(data) {
   return out
 }
 
-export function useCases() {
-  const { showToast } = useToast()
+function createCaseFiltering(cases) {
+  const selectedCategory = ref('all')
+  const selectedSeverity = ref('all')
+  const searchQuery = ref('')
 
-  // Public Help Center: hanya case berstatus PUBLISHED
-  async function fetchCases() {
-    isLoading.value = true
-    try {
-      cases.value = normalizeList(await api.getPublicCases())
-      if (!activeCaseId.value && cases.value.length) {
-        activeCaseId.value = cases.value[0].id
-      }
-    } catch {
-      // Fail-safe: tampilkan empty state; detail teknis tidak dibocorkan ke UI.
-      cases.value = []
-    } finally {
-      isLoading.value = false
-    }
+  function caseMatches(c) {
+    if (selectedCategory.value !== 'all' && c.category !== selectedCategory.value) return false
+    if (selectedSeverity.value !== 'all' && c.severity !== selectedSeverity.value) return false
+    if (!searchQuery.value.trim()) return true
+
+    const q = searchQuery.value.toLowerCase().trim()
+    const haystack = [c.title, c.summary, c.contentHtml]
+      .map((v) => (v || '').toLowerCase())
+      .join('\n')
+    if (haystack.includes(q)) return true
+
+    return Array.isArray(c.tags) && c.tags.some((t) => (t || '').toLowerCase().includes(q))
   }
 
-  // Admin CMS: semua case (termasuk DRAFT)
-  async function fetchAllCases() {
-    isLoading.value = true
-    try {
-      cases.value = normalizeList(await api.getCases())
-      if (!activeCaseId.value && cases.value.length) {
-        activeCaseId.value = cases.value[0].id
-      }
-    } catch (err) {
-      cases.value = []
-      showToast(err?.message || 'Gagal memuat data artikel Admin CMS.', 'error')
-    } finally {
-      isLoading.value = false
-    }
+  const filteredCases = computed(() => cases.value.filter(caseMatches))
+
+  return {
+    selectedCategory,
+    selectedSeverity,
+    searchQuery,
+    filteredCases,
+    hasNoSearchResult: computed(
+      () => !!searchQuery.value.trim() && filteredCases.value.length === 0,
+    ),
   }
+}
 
-  const filteredCases = computed(() => {
-    return cases.value.filter((c) => {
-      const matchCategory =
-        selectedCategory.value === 'all' || c.category === selectedCategory.value
-      const matchSeverity =
-        selectedSeverity.value === 'all' || c.severity === selectedSeverity.value
-
-      if (!matchCategory || !matchSeverity) return false
-
-      if (!searchQuery.value.trim()) return true
-
-      const q = searchQuery.value.toLowerCase().trim()
-      const matchTitle = (c.title || '').toLowerCase().includes(q)
-      const matchSummary = (c.summary || '').toLowerCase().includes(q)
-      const matchContent = (c.contentHtml || '').toLowerCase().includes(q)
-      const matchTags =
-        Array.isArray(c.tags) && c.tags.some((t) => (t || '').toLowerCase().includes(q))
-
-      return matchTitle || matchSummary || matchContent || matchTags
-    })
-  })
-
-  // True bila user sedang mencari dan tidak ada case yang cocok
-  const hasNoSearchResult = computed(() => {
-    return !!searchQuery.value.trim() && filteredCases.value.length === 0
-  })
-
-  const activeCase = computed(() => {
-    if (hasNoSearchResult.value) return null
-    return (
-      cases.value.find((c) => c.id === activeCaseId.value) ||
-      filteredCases.value[0] ||
-      cases.value[0] ||
-      null
-    )
-  })
-
-  function selectCase(id) {
-    activeCaseId.value = Number(id)
-  }
-
-  function setCategory(cat) {
-    selectedCategory.value = cat
-  }
-
-  function setSeverity(sev) {
-    selectedSeverity.value = sev
-  }
-
-  function setSearch(query) {
-    const normalizedQuery = typeof query === 'string' ? query.trim() : ''
-    searchQuery.value = normalizedQuery
-    if (normalizedQuery && !recentSearches.value.includes(normalizedQuery)) {
-      recentSearches.value = [normalizedQuery, ...recentSearches.value.slice(0, 4)]
-      try {
-        localStorage.setItem('esb_recent_searches', JSON.stringify(recentSearches.value))
-      } catch {
-        // Penyimpanan lokal bersifat opsional (private mode/quota dapat menolaknya).
-      }
-    }
-    if (normalizedQuery) {
-      queueMicrotask(() => {
-        api.logKbSearch(normalizedQuery, filteredCases.value.length).catch(() => {})
-      })
-    }
-  }
-
-  function clearSearch() {
-    searchQuery.value = ''
-  }
-
-  function clearRecentSearches() {
-    recentSearches.value = []
-    try {
-      localStorage.removeItem('esb_recent_searches')
-    } catch {
-      // Penyimpanan lokal bersifat opsional.
-    }
-  }
+function createCaseDrawer() {
+  const isDrawerOpen = ref(false)
+  const drawerMode = ref('create') // 'create' | 'edit'
+  const editingCase = ref(null)
 
   function openCreateDrawer() {
     drawerMode.value = 'create'
@@ -206,27 +121,90 @@ export function useCases() {
     editingCase.value = null
   }
 
+  return { isDrawerOpen, drawerMode, editingCase, openCreateDrawer, openEditDrawer, closeDrawer }
+}
+
+function createSearchActions(searchQuery, filteredCases, recentSearches) {
+  function setSearch(query) {
+    const normalizedQuery = typeof query === 'string' ? query.trim() : ''
+    searchQuery.value = normalizedQuery
+    if (normalizedQuery && !recentSearches.value.includes(normalizedQuery)) {
+      recentSearches.value = [normalizedQuery, ...recentSearches.value.slice(0, 4)]
+      try {
+        localStorage.setItem('esb_recent_searches', JSON.stringify(recentSearches.value))
+      } catch {
+        /* localStorage opsional; private mode dapat menolak penyimpanan. */
+      }
+    }
+    if (normalizedQuery) {
+      queueMicrotask(() => {
+        api.logKbSearch(normalizedQuery, filteredCases.value.length).catch(() => {})
+      })
+    }
+  }
+
+  function clearSearch() {
+    searchQuery.value = ''
+  }
+
+  function clearRecentSearches() {
+    recentSearches.value = []
+    try {
+      localStorage.removeItem('esb_recent_searches')
+    } catch {
+      /* localStorage opsional. */
+    }
+  }
+
+  return { setSearch, clearSearch, clearRecentSearches }
+}
+
+async function persistCase(payload, existingId) {
+  if (existingId) {
+    const saved = normalizeCase(await api.updateCase(existingId, payload))
+    const idx = cases.value.findIndex((c) => c.id === saved.id)
+    if (idx !== -1) cases.value[idx] = saved
+    else cases.value.unshift(saved)
+    return { saved, message: 'Perubahan Case berhasil disimpan!' }
+  }
+
+  const saved = normalizeCase(await api.createCase(payload))
+  cases.value.unshift(saved)
+  activeCaseId.value = saved.id
+  return { saved, message: 'Case baru berhasil disimpan!' }
+}
+
+function createCaseLoaders(showToast) {
+  async function loadCases(fetcher, { silent = false, errorMessage = '' } = {}) {
+    isLoading.value = true
+    try {
+      cases.value = normalizeList(await fetcher())
+      if (!activeCaseId.value && cases.value.length) {
+        activeCaseId.value = cases.value[0].id
+      }
+    } catch (err) {
+      cases.value = []
+      if (!silent) showToast(err?.message || errorMessage, 'error')
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  return {
+    fetchCases: () => loadCases(api.getPublicCases.bind(api), { silent: true }),
+    fetchAllCases: () =>
+      loadCases(api.getCases.bind(api), {
+        errorMessage: 'Gagal memuat data artikel Admin CMS.',
+      }),
+  }
+}
+
+function createCaseMutations(showToast, closeDrawer) {
   async function saveCase(formData, { showNotification = true } = {}) {
     const existingId = formData?.id ? Number(formData.id) : null
-    const payload = toCasePayload(formData)
     try {
-      let saved
-      if (existingId) {
-        saved = normalizeCase(await api.updateCase(existingId, payload))
-        const idx = cases.value.findIndex((c) => c.id === saved.id)
-        if (idx !== -1) cases.value[idx] = saved
-        else cases.value.unshift(saved)
-        if (showNotification) {
-          showToast('Perubahan Case berhasil disimpan!', 'success')
-        }
-      } else {
-        saved = normalizeCase(await api.createCase(payload))
-        cases.value.unshift(saved)
-        activeCaseId.value = saved.id
-        if (showNotification) {
-          showToast('Case baru berhasil disimpan!', 'success')
-        }
-      }
+      const { saved, message } = await persistCase(toCasePayload(formData), existingId)
+      if (showNotification) showToast(message, 'success')
       closeDrawer()
       return saved
     } catch (err) {
@@ -249,6 +227,45 @@ export function useCases() {
       showToast(err.message || 'Gagal menghapus case.', 'error')
       return false
     }
+  }
+
+  return { saveCase, deleteCase }
+}
+
+export function useCases() {
+  const { showToast } = useToast()
+  const { selectedCategory, selectedSeverity, searchQuery, filteredCases, hasNoSearchResult } =
+    createCaseFiltering(cases)
+  const { isDrawerOpen, drawerMode, editingCase, openCreateDrawer, openEditDrawer, closeDrawer } =
+    createCaseDrawer()
+  const { setSearch, clearSearch, clearRecentSearches } = createSearchActions(
+    searchQuery,
+    filteredCases,
+    recentSearches,
+  )
+  const { fetchCases, fetchAllCases } = createCaseLoaders(showToast)
+  const { saveCase, deleteCase } = createCaseMutations(showToast, closeDrawer)
+
+  const activeCase = computed(() => {
+    if (hasNoSearchResult.value) return null
+    return (
+      cases.value.find((c) => c.id === activeCaseId.value) ||
+      filteredCases.value[0] ||
+      cases.value[0] ||
+      null
+    )
+  })
+
+  function selectCase(id) {
+    activeCaseId.value = Number(id)
+  }
+
+  function setCategory(cat) {
+    selectedCategory.value = cat
+  }
+
+  function setSeverity(sev) {
+    selectedSeverity.value = sev
   }
 
   return {

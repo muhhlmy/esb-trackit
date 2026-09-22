@@ -2,17 +2,16 @@ import assert from 'node:assert/strict'
 import { readFile } from 'node:fs/promises'
 import test, { describe } from 'node:test'
 
-const modalUrl = new URL(
-  '../src/components/ui/AssetCategoryImportModal.vue',
-  import.meta.url,
-)
+const modalUrl = new URL('../src/components/ui/AssetCategoryImportModal.vue', import.meta.url)
 
 // Ekstrak fungsi murni dari SFC untuk diuji langsung tanpa mounting Vue.
 async function extractFunctions() {
   const src = await readFile(modalUrl, 'utf8')
   const script = src.split('<script setup>')[1].split('</script>')[0]
   const getRowValueSrc = script.match(/function getRowValue[\s\S]*?\n}\n/)?.[0]
-  const isPemegangMatchedSrc = script.match(/function isPemegegangMatched[\s\S]*?\n}\n|function isPemegangMatched[\s\S]*?\n}\n/)?.[0]
+  const isPemegangMatchedSrc = script.match(
+    /function isPemegegangMatched[\s\S]*?\n}\n|function isPemegangMatched[\s\S]*?\n}\n/,
+  )?.[0]
   assert.ok(getRowValueSrc, 'getRowValue ditemukan')
   assert.ok(isPemegangMatchedSrc, 'isPemegangMatched ditemukan')
   return { getRowValueSrc, isPemegangMatchedSrc, src }
@@ -39,7 +38,10 @@ describe('Aset IT import: NIK/Nama Pemegang mismatch handling', () => {
     const { src } = await extractFunctions()
     const tbody = src.split('<tbody class="divide-y divide-slate-100">')[1]?.split('</tbody>')[0]
     assert.ok(tbody, 'tbody pratinjau ditemukan')
-    assert.ok(!tbody.includes('{{ row[column]'), 'tbody harus pakai item.row[column], bukan row[column]')
+    assert.ok(
+      !tbody.includes('{{ row[column]'),
+      'tbody harus pakai item.row[column], bukan row[column]',
+    )
     assert.ok(tbody.includes('item.matched'), 'tbody membaca flag matched')
     assert.ok(
       tbody.includes('PEMEGANG_HEADERS.includes(column.trim().toLowerCase())'),

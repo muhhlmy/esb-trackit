@@ -13,6 +13,7 @@ import AppViewToggle from '../components/ui/AppViewToggle.vue'
 import AppPagination from '../components/ui/AppPagination.vue'
 import SearchableSelect from '../components/ui/SearchableSelect.vue'
 import CustomSelect from '../components/ui/CustomSelect.vue'
+import PageHeader from '../components/ui/PageHeader.vue'
 import FilterModal from '../components/ui/FilterModal.vue'
 import TicketCaspRating from '../components/tickets/TicketCaspRating.vue'
 import { animateStagger } from '../composables/useGsap.js'
@@ -151,6 +152,7 @@ onMounted(async () => {
   await fetchQueues()
   await fetchTickets()
   await openTicketFromQuery()
+  openAddFromQuery()
 
   // Muat daftar user untuk dropdown "Pelapor" (hanya dipakai admin/superadmin)
   if (isAdmin.value || isSuperAdmin.value) {
@@ -974,6 +976,14 @@ function openAdd() {
   showFormModal.value = true
 }
 
+// Deep link from dashboard quick action: /tickets?action=new opens the create
+// modal directly (employees can self-serve create regardless of admin role).
+function openAddFromQuery() {
+  if (route.query.action !== 'new' && route.query.action !== 'create') return
+  openAdd()
+  router.replace({ path: route.path, query: { ...route.query, action: undefined } })
+}
+
 function openEdit(ticket) {
   modalMode.value = 'edit'
   selectedTicket.value = { ...ticket, attachments: null }
@@ -1366,9 +1376,9 @@ function toast(message, type = 'success') {
 <template>
   <div v-if="!isAuthenticated" class="max-w-2xl mx-auto py-12 px-4">
     <AuthGateCard
-      title="Sign in required"
-      description="Please sign in to access your support tickets and create a support request."
-      button-text="Sign In to Access Tickets"
+      title="Masuk diperlukan"
+      description="Silakan masuk untuk melihat tiket bantuan dan mengajukan permintaan support."
+      button-text="Masuk untuk Mengakses Tiket"
     />
   </div>
   <div
@@ -1380,11 +1390,23 @@ function toast(message, type = 'success') {
     <Transition name="slide-right">
       <div
         v-if="notification"
+        :role="notification.type === 'error' ? 'alert' : 'status'"
+        :aria-live="notification.type === 'error' ? 'assertive' : 'polite'"
         class="fixed left-4 right-4 top-4 z-[60] flex items-center gap-3 rounded-2xl px-4 py-3 text-white shadow-xl sm:left-auto sm:right-5 sm:max-w-md"
-        :class="notification.type === 'error' ? 'bg-[#FA896B]' : 'bg-[#13DEB9]'"
+        :class="
+          notification.type === 'error'
+            ? 'bg-[#DC2626]'
+            : notification.type === 'info'
+              ? 'bg-[#0A51B0]'
+              : 'bg-[#059669]'
+        "
       >
         <span aria-hidden="true" class="material-symbols-outlined text-[20px]">{{
-          notification.type === 'error' ? 'error' : 'check_circle'
+          notification.type === 'error'
+            ? 'error'
+            : notification.type === 'info'
+              ? 'info'
+              : 'check_circle'
         }}</span>
         <span class="text-[13px] font-bold">{{ notification.message }}</span>
       </div>
@@ -1393,31 +1415,15 @@ function toast(message, type = 'success') {
     <!-- ── 1. Page Header & Quick KPI Stat Cards ───────── -->
     <div class="flex flex-col gap-3.5">
       <!-- Title Bar -->
-      <div
-        class="flex flex-row items-center justify-between gap-3 bg-white p-4 sm:p-5 rounded-2xl border border-[#E2E8F0]/80 shadow-2xs"
+      <PageHeader
+        :title="isAdmin || isSuperAdmin ? 'Ticket Inbox' : 'Tiket'"
+        :subtitle="
+          isAdmin || isSuperAdmin
+            ? 'Kelola pengajuan dan penanganan kendala IT'
+            : 'Pengajuan dan layanan IT'
+        "
+        icon="confirmation_number"
       >
-        <div class="min-w-0 flex items-center gap-3">
-          <div
-            class="flex h-10 w-10 sm:h-11 sm:w-11 shrink-0 items-center justify-center rounded-xl bg-[#EDF5FF] text-[#0A5DBD] border border-[#B8D4F5]/40"
-          >
-            <span aria-hidden="true" class="material-symbols-outlined text-[22px] sm:text-[24px]"
-              >confirmation_number</span
-            >
-          </div>
-          <div class="min-w-0">
-            <h1 class="text-lg sm:text-xl font-bold text-[#333333] tracking-tight truncate">
-              {{ isAdmin || isSuperAdmin ? 'Ticket Inbox' : 'Tiket' }}
-            </h1>
-            <p class="text-xs font-normal text-[#5F7089] mt-0.5 truncate">
-              {{
-                isAdmin || isSuperAdmin
-                  ? 'Kelola pengajuan dan penanganan kendala IT'
-                  : 'Pengajuan dan layanan IT'
-              }}
-            </p>
-          </div>
-        </div>
-
         <button
           type="button"
           @click="openAdd"
@@ -1427,7 +1433,7 @@ function toast(message, type = 'success') {
           <span aria-hidden="true" class="material-symbols-outlined text-[16px]">add</span>
           <span>{{ isAdmin || isSuperAdmin ? 'Buat Tiket' : 'Request Ticket' }}</span>
         </button>
-      </div>
+      </PageHeader>
 
       <!-- Quick KPI Stat Cards (4 Cards) -->
       <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3.5">
@@ -1580,7 +1586,7 @@ function toast(message, type = 'success') {
               v-model="searchQuery"
               type="search"
               aria-label="Cari tiket, judul, nomor, atau pelapor"
-              placeholder="Cari tiket, judul kendala, nomor tiket, atau pelapor..."
+              placeholder="Cari tiket, judul kendala, nomor tiket, atau pelapor…"
               class="toolbar-search-input h-full min-h-0 w-full rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] pl-10 pr-9 text-xs font-medium text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:bg-white focus:ring-2 focus:ring-[#0A51B0]/10 focus:outline-none transition-all"
             />
             <button
@@ -1801,7 +1807,10 @@ function toast(message, type = 'success') {
                   }}</span>
                 </td>
                 <td @click.stop>
-                  <AppRowActions :actions="getTicketActions(ticket)" />
+                  <AppRowActions
+                    :actions="getTicketActions(ticket)"
+                    :label="`Aksi tiket ${ticket.nomor_tiket || ticket.id || ''}`"
+                  />
                 </td>
               </tr>
             </tbody>
@@ -2007,7 +2016,10 @@ function toast(message, type = 'success') {
 
             <!-- 5. Tombol Opsi / Aksi (36px) -->
             <div class="flex justify-end items-center" @click.stop>
-              <AppRowActions :actions="getTicketActions(ticket)" />
+              <AppRowActions
+                :actions="getTicketActions(ticket)"
+                :label="`Aksi tiket ${ticket.nomor_tiket || ticket.id || ''}`"
+              />
             </div>
           </div>
 
@@ -2040,7 +2052,10 @@ function toast(message, type = 'success') {
 
               <!-- Tombol Aksi di Kanan Atas -->
               <div @click.stop class="shrink-0">
-                <AppRowActions :actions="getTicketActions(ticket)" />
+                <AppRowActions
+                  :actions="getTicketActions(ticket)"
+                  :label="`Aksi tiket ${ticket.nomor_tiket || ticket.id || ''}`"
+                />
               </div>
             </div>
 
@@ -2264,6 +2279,7 @@ function toast(message, type = 'success') {
       />
       <select
         v-model="filterKategori"
+        aria-label="Filter kategori"
         class="h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-xs"
       >
         <option value="">Semua Kategori</option>
@@ -2326,7 +2342,7 @@ function toast(message, type = 'success') {
               value-key="id"
               label-key="nama"
               placeholder="Diri sendiri (Kosongkan)"
-              search-placeholder="Cari nama user..."
+              search-placeholder="Cari nama user…"
               clearable
               aria-label="Pilih pelapor tiket"
               class="w-full"
@@ -2360,7 +2376,7 @@ function toast(message, type = 'success') {
               v-model="form.deskripsi"
               rows="3"
               aria-label="Deskripsi Kendala Tiket"
-              placeholder="Jelaskan kendala secara singkat dan detail agar tim dapat membantu..."
+              placeholder="Jelaskan kendala secara singkat dan detail agar tim dapat membantu…"
               class="min-h-[80px] max-h-[140px] w-full rounded-lg border border-[#E5EAEF] bg-white p-2.5 text-[12px] font-medium text-[#2A3547] placeholder-[#687281] focus:border-[#0A51B0] focus:outline-none transition-all resize-y shadow-2xs"
             ></textarea>
           </label>
@@ -3206,7 +3222,7 @@ function toast(message, type = 'success') {
                   v-model="newCommentText"
                   type="text"
                   aria-label="Tulis komentar tiket"
-                  placeholder="Tulis komentar atau catatan perbaikan..."
+                  placeholder="Tulis komentar atau catatan perbaikan…"
                   class="h-10 flex-1 min-w-0 rounded-xl border border-slate-200 bg-slate-50/70 px-3.5 text-xs font-medium text-slate-900 placeholder-[#5F7089] outline-none transition-all focus:bg-white focus:border-[#0A51B0] focus:ring-1 focus:ring-[#0A51B0]/20"
                 />
 
@@ -3459,12 +3475,7 @@ function toast(message, type = 'success') {
 <style scoped>
 @import '../assets/ws-table.css';
 
-/* ── Sticky toolbar & heading (scroll container: app-main) ── */
-.tck-toolbar-sticky {
-  position: sticky;
-  top: 0;
-  z-index: 20;
-}
+/* ── Toolbar & heading (scroll bersama konten) ── */
 .tck-toolbar-sticky > div {
   backdrop-filter: blur(10px);
   background: rgba(255, 255, 255, 0.94);
@@ -3473,9 +3484,6 @@ function toast(message, type = 'success') {
     0 10px 28px -20px rgba(23, 43, 77, 0.28);
 }
 .tck-heading-sticky {
-  position: sticky;
-  top: 0;
-  z-index: 15;
   background: rgba(248, 250, 252, 0.95);
   backdrop-filter: blur(10px);
   border-radius: 10px;
@@ -3490,18 +3498,7 @@ function toast(message, type = 'success') {
   }
 }
 
-.toolbar-search-input {
-  height: 36px;
-  min-height: 36px;
-  max-height: 36px;
-  box-sizing: border-box;
-}
-.toolbar-filter-button {
-  height: 36px;
-  min-height: 36px !important;
-  max-height: 36px;
-  box-sizing: border-box;
-}
+/* toolbar-search-input and toolbar-filter-button sizing now handled by main.css design tokens */
 .ticket-card-list {
   gap: 12px;
 }

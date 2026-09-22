@@ -1,0 +1,15 @@
+{
+  "$metadata": {
+    "version": "1.0.0",
+    "description": "ESB TrackIT border radius tokens."
+  },
+  "border-radius": {
+    "sm": { "value": "6px", "type": "borderRadius", "description": "Small — tooltips, chips" },
+    "md": { "value": "8px", "type": "borderRadius", "description": "Medium — form controls, small elements" },
+    "lg": { "value": "10px", "type": "borderRadius", "description": "Large — cards, panels" },
+    "xl": { "value": "12px", "type": "borderRadius", "description": "XL — cards, modals" },
+    "2xl": { "value": "14px", "type": "borderRadius", "description": "Card radius" },
+    "3xl": { "value": "16px", "type": "borderRadius", "description": "Card/panel radius — primary surface" },
+    "full": { "value": "9999px", "type": "borderRadius", "description": "Pill shape — badges, circular buttons" }
+  }
+}

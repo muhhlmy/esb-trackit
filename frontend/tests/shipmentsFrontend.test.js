@@ -3,16 +3,14 @@ import { readFile } from 'node:fs/promises'
 import test from 'node:test'
 
 const routerFileUrl = new URL('../src/router/index.js', import.meta.url)
-const sidebarFileUrl = new URL('../src/components/layout/AppSidebar.vue', import.meta.url)
-const bottomNavFileUrl = new URL('../src/components/layout/AppBottomNav.vue', import.meta.url)
+const navConfigUrl = new URL('../src/config/navigationConfig.js', import.meta.url)
 const usersViewFileUrl = new URL('../src/views/UsersView.vue', import.meta.url)
 const shipmentsViewFileUrl = new URL('../src/views/ShipmentsView.vue', import.meta.url)
 const apiServiceFileUrl = new URL('../src/services/api.js', import.meta.url)
 
 test('Modul Tracker Pengiriman — Frontend Architecture & UI Test Suite', async (t) => {
   const routerSrc = await readFile(routerFileUrl, 'utf8')
-  const sidebarSrc = await readFile(sidebarFileUrl, 'utf8')
-  const bottomNavSrc = await readFile(bottomNavFileUrl, 'utf8')
+  const navConfigSrc = await readFile(navConfigUrl, 'utf8')
   const usersViewSrc = await readFile(usersViewFileUrl, 'utf8')
   const shipmentsViewSrc = await readFile(shipmentsViewFileUrl, 'utf8')
   const apiSrc = await readFile(apiServiceFileUrl, 'utf8')
@@ -20,10 +18,7 @@ test('Modul Tracker Pengiriman — Frontend Architecture & UI Test Suite', async
   await t.test(
     '1. Router configuration includes /shipments, alias /pengiriman, and allowedRouteMap',
     () => {
-      assert.ok(
-        routerSrc.includes("path: '/shipments'"),
-        "Route '/shipments' harus terdaftar di router",
-      )
+      assert.ok(routerSrc.includes("'/shipments'"), "Route '/shipments' harus terdaftar di router")
       assert.ok(
         routerSrc.includes("alias: '/pengiriman'"),
         "Alias '/pengiriman' harus terdaftar di router",
@@ -45,38 +40,34 @@ test('Modul Tracker Pengiriman — Frontend Architecture & UI Test Suite', async
   )
 
   await t.test(
-    '2. Navigation components include Pengiriman submenu under TRANSAKSI and BottomNav',
-    () => {
-      // AppSidebar
+    '2. Navigation source of truth includes Pengiriman submenu under TRANSAKSI and BottomNav',
+    async () => {
+      // navigationConfig.js (source of truth for sidebar + bottom nav)
       assert.ok(
-        sidebarSrc.includes("to: '/shipments'"),
-        "AppSidebar harus memiliki link ke '/shipments'",
+        navConfigSrc.includes("to: '/shipments'"),
+        'navigationConfig harus memiliki link ke /shipments',
       )
       assert.ok(
-        sidebarSrc.includes("label: 'Pengiriman'"),
-        "AppSidebar harus memiliki label 'Pengiriman'",
+        navConfigSrc.includes("label: 'Pengiriman'"),
+        'navigationConfig harus memiliki label Pengiriman',
       )
       assert.ok(
-        sidebarSrc.includes("permission: 'shipments'"),
-        "AppSidebar harus membatasi item Pengiriman dengan permission 'shipments'",
+        navConfigSrc.includes("permission: 'shipments'"),
+        'navigationConfig harus membatasi item Pengiriman dengan permission shipments',
+      )
+      assert.ok(
+        navConfigSrc.includes("lucide: 'Truck'"),
+        'navigationConfig harus menyertakan ikon lucide untuk bottom nav',
+      )
+
+      // AppSidebar autoExpand still maps the shipments route
+      const sidebarSrc = await readFile(
+        new URL('../src/components/layout/AppSidebar.vue', import.meta.url),
+        'utf8',
       )
       assert.ok(
         sidebarSrc.includes("'/shipments'"),
         'AppSidebar autoExpandActiveParent harus menyertakan /shipments',
-      )
-
-      // AppBottomNav
-      assert.ok(
-        bottomNavSrc.includes("to: '/shipments'"),
-        "AppBottomNav harus memiliki link ke '/shipments'",
-      )
-      assert.ok(
-        bottomNavSrc.includes("label: 'Pengiriman'"),
-        "AppBottomNav harus memiliki label 'Pengiriman'",
-      )
-      assert.ok(
-        bottomNavSrc.includes("permission: 'shipments'"),
-        "AppBottomNav harus membatasi item Pengiriman dengan permission 'shipments'",
       )
     },
   )

@@ -1,10 +1,7 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 
-import {
-  MAX_ATTACHMENT_BYTES,
-  validateAttachmentFile,
-} from '../src/utils/attachmentPolicy.js'
+import { MAX_ATTACHMENT_BYTES, validateAttachmentFile } from '../src/utils/attachmentPolicy.js'
 
 test('frontend attachment policy memakai MIME allowlist yang sempit', () => {
   for (const type of ['image/png', 'image/jpeg', 'image/gif', 'image/webp']) {
@@ -22,10 +19,7 @@ test('frontend attachment policy memakai MIME allowlist yang sempit', () => {
 })
 
 test('frontend attachment policy membatasi ticket dan comment pada 5 MiB', () => {
-  assert.equal(
-    validateAttachmentFile({ type: 'image/png', size: MAX_ATTACHMENT_BYTES }),
-    null,
-  )
+  assert.equal(validateAttachmentFile({ type: 'image/png', size: MAX_ATTACHMENT_BYTES }), null)
   assert.match(
     validateAttachmentFile({
       type: 'image/png',

@@ -429,10 +429,10 @@ async function generatePdf() {
         <table class="border-table">
           <thead>
             <tr>
-              <th style="width: 5%; text-align: center;">No</th>
-              <th style="width: 25%;">Deskripsi/Jenis Aset</th>
-              <th style="width: 8%; text-align: center;">Qty</th>
-              <th style="width: 62%;">Spesifikasi Merk/Tipe/Model & Nomor Serial (S/N)/Hostname</th>
+              <th scope="col" style="width: 5%; text-align: center;">No</th>
+              <th scope="col" style="width: 25%;">Deskripsi/Jenis Aset</th>
+              <th scope="col" style="width: 8%; text-align: center;">Qty</th>
+              <th scope="col" style="width: 62%;">Spesifikasi Merk/Tipe/Model & Nomor Serial (S/N)/Hostname</th>
             </tr>
           </thead>
           <tbody>
@@ -465,10 +465,10 @@ async function generatePdf() {
         <table class="border-table">
           <thead>
             <tr>
-              <th style="width: 5%; text-align: center;">No</th>
-              <th style="width: 25%;">Deskripsi/Jenis Aset</th>
-              <th style="width: 8%; text-align: center;">Qty</th>
-              <th style="width: 62%;">Spesifikasi Merk/Tipe/Model & Nomor Serial (S/N)/Hostname</th>
+              <th scope="col" style="width: 5%; text-align: center;">No</th>
+              <th scope="col" style="width: 25%;">Deskripsi/Jenis Aset</th>
+              <th scope="col" style="width: 8%; text-align: center;">Qty</th>
+              <th scope="col" style="width: 62%;">Spesifikasi Merk/Tipe/Model & Nomor Serial (S/N)/Hostname</th>
             </tr>
           </thead>
           <tbody>
@@ -651,9 +651,9 @@ async function generatePdf() {
       <table class="border-table">
         <thead>
           <tr>
-            <th style="width: 25%;">Detail</th>
-            <th style="width: 37.5%;">Pihak Pemberi</th>
-            <th style="width: 37.5%;">Pihak Penerima</th>
+            <th scope="col" style="width: 25%;">Detail</th>
+            <th scope="col" style="width: 37.5%;">Pihak Pemberi</th>
+            <th scope="col" style="width: 37.5%;">Pihak Penerima</th>
           </tr>
         </thead>
         <tbody>
@@ -1045,7 +1045,7 @@ onMounted(fetchData)
                 label-key="nama_karyawan"
                 secondary-label-key="nik"
                 placeholder="Pilih karyawan pemberi"
-                search-placeholder="Cari nama atau NIK..."
+                search-placeholder="Cari nama atau NIK…"
                 height-class="h-10"
               />
             </label>
@@ -1121,7 +1121,7 @@ onMounted(fetchData)
                 label-key="nama_karyawan"
                 secondary-label-key="nik"
                 placeholder="Pilih karyawan penerima"
-                search-placeholder="Cari nama atau NIK..."
+                search-placeholder="Cari nama atau NIK…"
                 height-class="h-10"
               />
             </label>
@@ -1136,7 +1136,7 @@ onMounted(fetchData)
                 type="text"
                 aria-label="Nama Lengkap / Vendor Penerima"
                 class="h-10 w-full rounded-xl border border-[#E2E8F0] bg-white px-3 text-xs font-medium text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 focus:outline-none transition-all"
-                placeholder="Tulis nama lengkap penerima atau vendor..."
+                placeholder="Tulis nama lengkap penerima atau vendor…"
               />
             </div>
 
@@ -1304,7 +1304,7 @@ onMounted(fetchData)
             type="text"
             aria-label="Keterangan Tujuan Serah Terima Lainnya"
             class="h-10 w-full rounded-xl border border-[#E2E8F0] bg-white px-3 text-xs font-medium text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 focus:outline-none transition-all"
-            placeholder="Tuliskan tujuan serah terima aset lainnya..."
+            placeholder="Tuliskan tujuan serah terima aset lainnya…"
           />
         </div>
       </div>
@@ -1384,7 +1384,7 @@ onMounted(fetchData)
                   label-key="label_aset"
                   secondary-label-key="nomor_seri"
                   placeholder="Pilih Aset IT"
-                  search-placeholder="Cari label, hostname, atau nomor seri..."
+                  search-placeholder="Cari label, hostname, atau nomor seri…"
                   height-class="h-10"
                   @update:model-value="onAssetBaruSelect(index, $event)"
                 />
@@ -1510,7 +1510,7 @@ onMounted(fetchData)
                   label-key="label_aset"
                   secondary-label-key="nomor_seri"
                   placeholder="Pilih Aset IT Lama"
-                  search-placeholder="Cari label, hostname, atau nomor seri..."
+                  search-placeholder="Cari label, hostname, atau nomor seri…"
                   height-class="h-10"
                   @update:model-value="onAssetLamaSelect(index, $event)"
                 />
@@ -1608,8 +1608,8 @@ onMounted(fetchData)
               value-key="nik"
               label-key="nama_karyawan"
               secondary-label-key="nik"
-              placeholder="Pilih nama yang mengetahui..."
-              search-placeholder="Cari nama atau NIK..."
+              placeholder="Pilih nama yang mengetahui…"
+              search-placeholder="Cari nama atau NIK…"
               height-class="h-10"
               :clearable="true"
             />
@@ -1622,7 +1622,7 @@ onMounted(fetchData)
               type="text"
               aria-label="Nama Lengkap yang Mengetahui"
               class="h-10 w-full rounded-xl border border-[#E2E8F0] bg-white px-3 text-xs font-medium text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 focus:outline-none transition-all"
-              placeholder="Tulis nama lengkap yang mengetahui..."
+              placeholder="Tulis nama lengkap yang mengetahui…"
             />
           </div>
 

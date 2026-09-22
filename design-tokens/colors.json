@@ -1,0 +1,75 @@
+{
+  "$metadata": {
+    "version": "1.0.0",
+    "description": "ESB TrackIT design token system — single source of truth for all visual tokens.",
+    "format": "DTCG (Design Tokens Community Group) style"
+  },
+  "color": {
+    "brand": {
+      "orange": { "value": "#ff4f1b", "type": "color", "description": "ESB primary brand accent" },
+      "orange-dark": { "value": "#b83a10", "type": "color" },
+      "orange-light": { "value": "#fff2e7", "type": "color" },
+      "blue": { "value": "#0a51b0", "type": "color", "description": "ESB primary brand blue — used for links, primary actions, nav" },
+      "blue-dark": { "value": "#0a4391", "type": "color" },
+      "blue-light": { "value": "#edf5ff", "type": "color" },
+      "blue-mid1": { "value": "#0a5dbd", "type": "color" },
+      "blue-mid2": { "value": "#097cde", "type": "color" },
+      "blue-end": { "value": "#0892f5", "type": "color" },
+      "gold": { "value": "#faa425", "type": "color" }
+    },
+    "primary": {
+      "DEFAULT": { "value": "#0a51b0", "type": "color", "description": "Primary action color — buttons, links, active states" },
+      "hover": { "value": "#0a4391", "type": "color" },
+      "light": { "value": "#edf5ff", "type": "color" }
+    },
+    "secondary": {
+      "DEFAULT": { "value": "#0892f5", "type": "color" },
+      "light": { "value": "#e8f7ff", "type": "color" }
+    },
+    "success": { "value": "#059669", "type": "color", "description": "Success — used for positive status, completed" },
+    "warning": { "value": "#b45309", "type": "color", "description": "Warning — used for caution, in-progress" },
+    "danger": { "value": "#dc2626", "type": "color", "description": "Error/danger — used for destructive, critical" },
+    "info": { "value": "#0284c7", "type": "color", "description": "Info accent" },
+    "purple": { "value": "#7c3aed", "type": "color", "description": "Purple — used for disposal status, neutral accents" },
+    "gray": {
+      "50": { "value": "#f8fafc", "type": "color" },
+      "100": { "value": "#f1f5f9", "type": "color" },
+      "200": { "value": "#e2e8f0", "type": "color" },
+      "300": { "value": "#cbd5e1", "type": "color" },
+      "400": { "value": "#94a3b8", "type": "color" },
+      "500": { "value": "#64748b", "type": "color" },
+      "600": { "value": "#475569", "type": "color" },
+      "700": { "value": "#334155", "type": "color" },
+      "800": { "value": "#1e293b", "type": "color" },
+      "900": { "value": "#0f172a", "type": "color" }
+    },
+    "text": {
+      "primary": { "value": "#1e293b", "type": "color", "description": "Primary text — high contrast on light background" },
+      "secondary": { "value": "#475569", "type": "color", "description": "Secondary/muted text — labels, captions" },
+      "tertiary": { "value": "#64748b", "type": "color", "description": "Tertiary text — placeholders, subtle labels" },
+      "inverse": { "value": "#ffffff", "type": "color", "description": "Text on dark/brand backgrounds" },
+      "danger": { "value": "#b91c1c", "type": "color" },
+      "success": { "value": "#15803d", "type": "color" }
+    },
+    "background": {
+      "DEFAULT": { "value": "#f4f6f9", "type": "color", "description": "Page background — light gray" },
+      "surface": { "value": "#ffffff", "type": "color", "description": "Card/surface background — white" },
+      "surface-muted": { "value": "#f8fafc", "type": "color", "description": "Subtle surface — hover states, subtle cards" },
+      "overlay": { "value": "#f8fafc", "type": "color" }
+    },
+    "border": {
+      "DEFAULT": { "value": "#e2e8f0", "type": "color", "description": "Standard border — card outlines, dividers" },
+      "strong": { "value": "#dfe5ef", "type": "color", "description": "Stronger border — input focus, active dividers" },
+      "muted": { "value": "#f1f5f9", "type": "color", "description": "Subtle border — table row dividers" }
+    },
+    "placeholder": {
+      "DEFAULT": { "value": "#5f7089", "type": "color", "description": "Placeholder text — 4.6:1 on white (WCAG AA)" },
+      "dark": { "value": "#94a3b8", "type": "color", "description": "Placeholder in dark mode — ~7:1 on dark surface" }
+    },
+    "gradient": {
+      "esb-blue": { "value": "linear-gradient(135deg, #0a51b0 0%, #0a5dbd 26%, #097cde 72%, #0892f5 100%)", "type": "color" },
+      "esb-blue-hero": { "value": "linear-gradient(145deg, #0a51b0 0%, #084391 40%, #062b5e 100%)", "type": "color" },
+      "esb-orange": { "value": "linear-gradient(135deg, #ff4f1b 0%, #fe5b1c 21%, #fc7c20 60%, #faa425 100%)", "type": "color" }
+    }
+  }
+}

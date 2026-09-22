@@ -9,16 +9,11 @@ import {
 } from '../utils/permissionAccess.js'
 import { clearAuthSession, getStoredUser, storeAuthSession } from '../utils/authStorage.js'
 
-// State global menggunakan ref (bisa juga pakai Pinia).
-// Kredensial sesi (JWT) berada di cookie HttpOnly — tidak pernah muncul di
-// state client. Di sini hanya cache user ter-sanitasi untuk UI & guard.
+// State global menggunakan ref. Kredensial sesi (JWT) berada di cookie HttpOnly;
+// di sini hanya cache user ter-sanitasi untuk UI & guard.
 const user = ref(getStoredUser())
 
-export function useAuth() {
-  const api = useApi()
-  const router = useRouter()
-
-  const isAuthenticated = computed(() => Boolean(user.value))
+function createTicketRoleState(user) {
   const ticketEligibility = computed(() => getTicketEligibility(user.value))
   const isSuperAdmin = computed(() => ticketEligibility.value.role === TICKET_ROLES.SUPERADMIN)
   const isAdmin = computed(
@@ -26,8 +21,23 @@ export function useAuth() {
       ticketEligibility.value.role === TICKET_ROLES.ADMIN ||
       ticketEligibility.value.role === TICKET_ROLES.SUPERADMIN,
   )
-  const isCrudUnlocked = computed(() => isAdmin.value)
-  const isUser = computed(() => ticketEligibility.value.role === TICKET_ROLES.REPORTER)
+
+  return {
+    isAuthenticated: computed(() => Boolean(user.value)),
+    ticketEligibility,
+    isSuperAdmin,
+    isAdmin,
+    isCrudUnlocked: computed(() => isAdmin.value),
+    isUser: computed(() => ticketEligibility.value.role === TICKET_ROLES.REPORTER),
+  }
+}
+
+export function useAuth() {
+  const api = useApi()
+  const router = useRouter()
+
+  const { isAuthenticated, ticketEligibility, isSuperAdmin, isAdmin, isCrudUnlocked, isUser } =
+    createTicketRoleState(user)
 
   const login = async (email, password, rememberMe = false) => {
     const response = await api.post('/api/auth/login', { email, password, rememberMe })

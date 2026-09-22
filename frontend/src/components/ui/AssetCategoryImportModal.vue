@@ -827,6 +827,7 @@ watch(
 
       <p
         v-if="error"
+        role="alert"
         class="flex items-start gap-2 rounded-xl border border-rose-200 bg-rose-50 p-3 text-xs font-semibold text-rose-700"
       >
         <span aria-hidden="true" class="material-symbols-outlined text-[17px]">error</span

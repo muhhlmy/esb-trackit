@@ -1,19 +1,3 @@
-// ============================================================
-// services/api.js - Lapisan API terpadu (satu-satunya jalur HTTP)
-// ============================================================
-// Gabungan dari pola lama (services/api.js manual-fetch) dan pola modern
-// (useApi composable). SELURUH komunikasi HTTP frontend sekarang memakai
-// implementasi `useApi`:
-//   - cookie sesi HttpOnly dikirim otomatis (credentials: same-origin)
-//   - penanganan 401 global (auto-logout + redirect /login)
-//   - pesan error terstruktur dari backend
-//
-// Konsumen lama (useCases, useKbCategories, useBookmarks, HomeView) tetap
-// memakai API permukaan yang sama
-// (api.getCases, api.createCase, ...), sehingga tidak ada perubahan
-// perilaku.
-// ============================================================
-
 import { useApi } from '../composables/useApi.js'
 
 const { get, post, put, del } = useApi()

@@ -5,6 +5,8 @@ import { useAuth } from '@/composables/useAuth'
 import { exportToCsv, exportToJson, exportToExcel, exportToPdf } from '@/utils/exportEngine'
 import SkeletonCard from '@/components/ui/skeleton/SkeletonCard.vue'
 import AppModal from '@/components/ui/AppModal.vue'
+import PageHeader from '@/components/ui/PageHeader.vue'
+import { useToast } from '@/composables/useToast.js'
 import CustomSelect from '@/components/ui/CustomSelect.vue'
 
 const api = useApi()
@@ -86,15 +88,9 @@ const previewData = ref([])
 const previewColumns = ref([])
 const showPreviewModal = ref(false)
 
-// Toast Alert State
-const toast = ref({ show: false, message: '', type: 'success' })
-
-function showToast(message, type = 'success') {
-  toast.value = { show: true, message, type }
-  setTimeout(() => {
-    toast.value.show = false
-  }, 4000)
-}
+// Notifications use the shared toast system (one implementation app-wide,
+// rendered by <Toast /> in the app shell).
+const { showToast } = useToast()
 
 // Formatters (for future use in exports)
 // function formatDate(dateStr) {
@@ -346,56 +342,14 @@ onMounted(() => {
     class="admin-workspace export-page min-w-0 space-y-4 sm:space-y-6 text-[#333333] wrap-anywhere"
     :data-testid="!isLoading ? 'page-ready' : undefined"
   >
-    <!-- Notification Toast -->
-    <Transition name="fade">
-      <div
-        v-if="toast.show"
-        class="fixed top-3 left-3 right-3 sm:top-5 sm:left-auto sm:right-5 sm:max-w-md z-50 flex items-center gap-2.5 rounded-xl px-4 py-3 shadow-lg text-white font-semibold text-xs border"
-        :class="[
-          toast.type === 'error'
-            ? 'bg-rose-600 border-rose-500'
-            : toast.type === 'warning'
-              ? 'bg-amber-600 border-amber-500'
-              : toast.type === 'info'
-                ? 'bg-blue-600 border-blue-500'
-                : 'bg-emerald-600 border-emerald-500',
-        ]"
-      >
-        <span aria-hidden="true" class="material-symbols-outlined text-[18px]">
-          {{
-            toast.type === 'error'
-              ? 'error'
-              : toast.type === 'warning'
-                ? 'warning'
-                : toast.type === 'info'
-                  ? 'info'
-                  : 'check_circle'
-          }}
-        </span>
-        <span class="min-w-0 wrap-anywhere" role="status">{{ toast.message }}</span>
-      </div>
-    </Transition>
-
-    <!-- Header SaaS Section -->
-    <div
-      class="admin-page-header flex flex-col gap-3.5 bg-white p-3.5 sm:p-4.5 rounded-2xl border border-[#E2E8F0]/80 shadow-2xs"
+    <!-- Page Header -->
+    <PageHeader
+      title="Pusat Ekspor Data"
+      subtitle="Ekspor dan kelola data sistem dengan cepat ke format CSV, Excel, JSON, atau PDF."
+      icon="output"
     >
-      <div class="space-y-1">
-        <div class="flex items-center gap-1.5 text-xs text-[#687281] font-medium">
-          <span>Database</span>
-          <span>/</span>
-          <span class="text-[#5F7089]">Ekspor Data</span>
-        </div>
-        <h1 class="text-xl font-bold text-[#333333] tracking-tight">Pusat Ekspor Data</h1>
-        <p class="text-xs text-[#5F7089]">
-          Ekspor dan kelola data sistem dengan cepat ke format CSV, Excel, JSON, atau PDF.
-        </p>
-      </div>
-
       <!-- Compact Metrics -->
-      <div
-        class="flex items-center gap-6 pt-2 sm:pt-0 sm:border-l border-[#F1F5F9] sm:pl-6 shrink-0"
-      >
+      <div class="flex items-center gap-6 shrink-0">
         <div class="flex flex-col">
           <span class="text-[11px] font-medium text-[#687281] uppercase tracking-wider">Tabel</span>
           <span class="text-xl font-bold text-[#333333] font-mono">{{ tables.length }}</span>
@@ -409,7 +363,7 @@ onMounted(() => {
           </span>
         </div>
       </div>
-    </div>
+    </PageHeader>
 
     <!-- Danger Zone: Reset Database Card (Superadmin only) -->
     <div
@@ -780,7 +734,7 @@ onMounted(() => {
                   aria-label="Pencarian Kata Kunci Data"
                   v-model="searchQuery"
                   maxlength="200"
-                  placeholder="Cari kata kunci data..."
+                  placeholder="Cari kata kunci data…"
                   class="min-w-0 max-w-full w-full rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] pl-9 pr-3 py-2 text-xs font-medium text-[#333333] focus:border-[#0A51B0] focus:bg-white focus:outline-none"
                 />
               </div>
@@ -797,7 +751,7 @@ onMounted(() => {
                 id="export-status-filter"
                 v-model="statusFilter"
                 maxlength="100"
-                placeholder="misal: Digunakan, Rusak, Resolved..."
+                placeholder="misal: Digunakan, Rusak, Resolved…"
                 class="min-w-0 max-w-full w-full rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-2 text-xs font-medium text-[#333333] focus:border-[#0A51B0] focus:bg-white focus:outline-none"
               />
             </div>
@@ -1070,7 +1024,12 @@ onMounted(() => {
               <tr
                 class="bg-[#F8FAFC] text-[#5F7089] uppercase font-bold text-[10px] tracking-wider border-b border-[#E2E8F0]"
               >
-                <th v-for="col in previewColumns" :key="col.name" class="p-3 whitespace-nowrap">
+                <th
+                  scope="col"
+                  v-for="col in previewColumns"
+                  :key="col.name"
+                  class="p-3 whitespace-nowrap"
+                >
                   {{ col.label }}
                 </th>
               </tr>

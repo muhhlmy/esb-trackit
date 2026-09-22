@@ -3,7 +3,7 @@ import { readFile } from 'node:fs/promises'
 import test from 'node:test'
 
 const routerUrl = new URL('../src/router/index.js', import.meta.url)
-const sidebarUrl = new URL('../src/components/layout/AppSidebar.vue', import.meta.url)
+const navConfigUrl = new URL('../src/config/navigationConfig.js', import.meta.url)
 const usersViewUrl = new URL('../src/views/UsersView.vue', import.meta.url)
 const faqViewUrl = new URL('../src/views/FaqAdminView.vue', import.meta.url)
 const adminDashboardUrl = new URL('../src/views/admin/AdminDashboardView.vue', import.meta.url)
@@ -17,15 +17,15 @@ test('Router specifies knowledge_base permission for all CMS and KB admin routes
   // Check allowedRouteMap
   assert.match(source, /\{\s*key:\s*'knowledge_base',\s*name:\s*'admin-cases'\s*\}/)
 
-  // Verify route permissions
-  assert.match(source, /path:\s*'\/faqs'[\s\S]*?permission:\s*'knowledge_base'/)
-  assert.match(source, /path:\s*'\/admin\/cases'[\s\S]*?permission:\s*'knowledge_base'/)
-  assert.match(source, /path:\s*'\/admin\/kb-categories'[\s\S]*?permission:\s*'knowledge_base'/)
-  assert.match(source, /path:\s*'\/admin\/editor\/:id\?'[\s\S]*?permission:\s*'knowledge_base'/)
+  // Verify route permissions (argumen pertama helper page())
+  assert.match(source, /page\('\/faqs'[\s\S]*?permission:\s*'knowledge_base'/)
+  assert.match(source, /page\('\/admin\/cases'[\s\S]*?permission:\s*'knowledge_base'/)
+  assert.match(source, /page\([\s\S]*?'\/admin\/kb-categories'[\s\S]*?permission:\s*'knowledge_base'/)
+  assert.match(source, /page\('\/admin\/editor\/:id\?'[\s\S]*?permission:\s*'knowledge_base'/)
 })
 
-test('AppSidebar specifies knowledge_base permission for CMS menu items', async () => {
-  const source = await readFile(sidebarUrl, 'utf8')
+test('navigation source of truth specifies knowledge_base permission for CMS menu items', async () => {
+  const source = await readFile(navConfigUrl, 'utf8')
 
   assert.match(source, /to:\s*'\/admin\/cases'[\s\S]*?permission:\s*'knowledge_base'/)
   assert.match(source, /to:\s*'\/faqs'[\s\S]*?permission:\s*'knowledge_base'/)
@@ -48,7 +48,10 @@ test('UsersView defines knowledge_base feature and permission defaults', async (
 test('FaqAdminView enforces canWrite permission on mutations and hides mutation UI', async () => {
   const source = await readFile(faqViewUrl, 'utf8')
 
-  assert.match(source, /const canWrite = computed\(\(\) => hasWritePermission\('knowledge_base'\)\)/)
+  assert.match(
+    source,
+    /const canWrite = computed\(\(\) => hasWritePermission\('knowledge_base'\)\)/,
+  )
   assert.match(source, /if \(!canWrite\.value\) return/)
   assert.match(source, /v-if="canWrite"/)
 })
@@ -56,7 +59,10 @@ test('FaqAdminView enforces canWrite permission on mutations and hides mutation 
 test('AdminDashboardView enforces canWrite permission on mutations and hides mutation UI', async () => {
   const source = await readFile(adminDashboardUrl, 'utf8')
 
-  assert.match(source, /const canWrite = computed\(\(\) => hasWritePermission\('knowledge_base'\)\)/)
+  assert.match(
+    source,
+    /const canWrite = computed\(\(\) => hasWritePermission\('knowledge_base'\)\)/,
+  )
   assert.match(source, /if \(!canWrite\.value\) return/)
   assert.match(source, /v-if="canWrite"/)
 })
@@ -64,7 +70,10 @@ test('AdminDashboardView enforces canWrite permission on mutations and hides mut
 test('KbCategoriesView enforces canWrite permission on mutations and hides mutation UI', async () => {
   const source = await readFile(kbCategoriesUrl, 'utf8')
 
-  assert.match(source, /const canWrite = computed\(\(\) => hasWritePermission\('knowledge_base'\)\)/)
+  assert.match(
+    source,
+    /const canWrite = computed\(\(\) => hasWritePermission\('knowledge_base'\)\)/,
+  )
   assert.match(source, /if \(!canWrite\.value\) return/)
   assert.match(source, /v-if="canWrite"/)
 })
@@ -72,7 +81,10 @@ test('KbCategoriesView enforces canWrite permission on mutations and hides mutat
 test('DocEditorView enforces canWrite and read-only mode for knowledge_base', async () => {
   const source = await readFile(docEditorUrl, 'utf8')
 
-  assert.match(source, /const canWrite = computed\(\(\) => hasWritePermission\('knowledge_base'\)\)/)
+  assert.match(
+    source,
+    /const canWrite = computed\(\(\) => hasWritePermission\('knowledge_base'\)\)/,
+  )
   assert.match(source, /editable:\s*canWrite\.value/)
   assert.match(source, /editor\.value\?\.setEditable\(val\)/)
   assert.match(source, /Mode Baca Saja/)

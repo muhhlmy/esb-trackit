@@ -32,10 +32,22 @@ describe('EmployeesView Frontend Logic & Permission Tests', () => {
 
     // Mutation handlers must guard with canWriteKaryawan
     assert.match(source, /function openAdd\(\)\s*\{[\s\S]*?if \(!canWriteKaryawan\.value\) return/)
-    assert.match(source, /function openEdit\(emp\)\s*\{[\s\S]*?if \(!canWriteKaryawan\.value\) return/)
-    assert.match(source, /function openDelete\(emp\)\s*\{[\s\S]*?if \(!canWriteKaryawan\.value\) return/)
-    assert.match(source, /async function saveEmployee\(\)\s*\{[\s\S]*?if \(!canWriteKaryawan\.value\)/)
-    assert.match(source, /async function deleteEmployee\(\)\s*\{[\s\S]*?if \(!canWriteKaryawan\.value/)
+    assert.match(
+      source,
+      /function openEdit\(emp\)\s*\{[\s\S]*?if \(!canWriteKaryawan\.value\) return/,
+    )
+    assert.match(
+      source,
+      /function openDelete\(emp\)\s*\{[\s\S]*?if \(!canWriteKaryawan\.value\) return/,
+    )
+    assert.match(
+      source,
+      /async function saveEmployee\(\)\s*\{[\s\S]*?if \(!canWriteKaryawan\.value\)/,
+    )
+    assert.match(
+      source,
+      /async function deleteEmployee\(\)\s*\{[\s\S]*?if \(!canWriteKaryawan\.value/,
+    )
 
     // Template elements must bind canWriteKaryawan
     assert.match(source, /v-if="canWriteKaryawan"[\s\S]*?Tambah Karyawan/)
@@ -43,10 +55,7 @@ describe('EmployeesView Frontend Logic & Permission Tests', () => {
     assert.match(source, /v-if="canWriteKaryawan"[\s\S]*?Aksi/)
 
     // Modal submit and delete buttons must be disabled when !canWriteKaryawan
-    assert.match(
-      source,
-      /:disabled="isSubmitting \|\| !canWriteKaryawan"[\s\S]*?Simpan Data/,
-    )
+    assert.match(source, /:disabled="isSubmitting \|\| !canWriteKaryawan"[\s\S]*?Simpan Data/)
     assert.match(
       source,
       /:disabled="isSubmitting \|\| !canWriteKaryawan"[\s\S]*?Ya, Hapus Karyawan/,

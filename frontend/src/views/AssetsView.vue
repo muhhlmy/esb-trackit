@@ -813,6 +813,14 @@ watch(
 
 onMounted(async () => {
   await fetchData()
+
+  // Deep link from dashboard quick action: /assets?action=add opens the create
+  // modal directly. Guarded by canWriteAssets, same as the toolbar button.
+  if (route.query.action === 'add') {
+    openAdd()
+    // Drop the param so a refresh doesn't reopen the modal.
+    router.replace({ path: route.path, query: { ...route.query, action: undefined } })
+  }
 })
 </script>
 
@@ -893,7 +901,7 @@ onMounted(async () => {
               v-model="searchQuery"
               type="text"
               aria-label="Cari aset, serial number, atau pemegang"
-              placeholder="Cari aset, serial number, atau pemegang..."
+              placeholder="Cari aset, serial number, atau pemegang…"
               class="h-full w-full rounded-lg border border-[#E2E8F0] bg-white pl-8 pr-8 text-xs text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
             />
             <!-- Inline Clear Button -->
@@ -1141,7 +1149,10 @@ onMounted(async () => {
                   <span class="ws-cell-main">{{ formatKondisiText(asset.kondisi_aset) }}</span>
                 </td>
                 <td @click.stop>
-                  <AppRowActions :actions="getAssetActions(asset)" />
+                  <AppRowActions
+                    :actions="getAssetActions(asset)"
+                    :label="`Aksi aset ${asset.label_aset || asset.id_aset || ''}`"
+                  />
                 </td>
               </tr>
             </tbody>
@@ -1212,7 +1223,10 @@ onMounted(async () => {
               </span>
             </div>
             <div class="laptop-actions" @click.stop>
-              <AppRowActions :actions="getAssetActions(asset)" />
+              <AppRowActions
+                :actions="getAssetActions(asset)"
+                :label="`Aksi aset ${asset.label_aset || asset.id_aset || ''}`"
+              />
             </div>
           </div>
         </div>
@@ -1422,7 +1436,7 @@ onMounted(async () => {
                 label-key="nama_karyawan"
                 secondary-label-key="nik"
                 placeholder="Pilih karyawan pemegang (Biarkan kosong jika disimpan sebagai Stok IT)"
-                search-placeholder="Cari berdasarkan nama atau NIK karyawan..."
+                search-placeholder="Cari berdasarkan nama atau NIK karyawan…"
                 clearable
                 class="w-full"
               />
@@ -1512,7 +1526,7 @@ onMounted(async () => {
                 value-key="value"
                 label-key="label"
                 placeholder="Pilih atau ketik lokasi (cth: Solo, Pluit, Gudang IT)"
-                search-placeholder="Cari atau ketik lokasi baru..."
+                search-placeholder="Cari atau ketik lokasi baru…"
                 allow-custom
                 custom-label-prefix="+ Gunakan lokasi baru"
                 drop-direction="up"
@@ -1549,7 +1563,7 @@ onMounted(async () => {
                 value-key="value"
                 label-key="label"
                 placeholder="Pilih atau ketik merek"
-                search-placeholder="Cari merek (Lenovo, Dell, HP, Apple)..."
+                search-placeholder="Cari merek (Lenovo, Dell, HP, Apple)…"
                 allow-custom
                 custom-label-prefix="+ Gunakan merek baru"
                 clearable
@@ -1966,16 +1980,19 @@ onMounted(async () => {
                     <thead>
                       <tr class="border-b border-[#E5E7EB]">
                         <th
+                          scope="col"
                           class="py-1 pr-2 text-left font-bold text-[#9CA3AF] uppercase tracking-wider w-24 sm:w-28"
                         >
                           Field
                         </th>
                         <th
+                          scope="col"
                           class="py-1 px-2 text-left font-bold text-[#9CA3AF] uppercase tracking-wider"
                         >
                           Sebelum
                         </th>
                         <th
+                          scope="col"
                           class="py-1 pl-2 text-left font-bold text-[#9CA3AF] uppercase tracking-wider"
                         >
                           Sesudah
@@ -2124,7 +2141,7 @@ onMounted(async () => {
                 ...availableStatusOptions.map((s) => ({ value: s, label: s })),
               ]"
               aria-label="Filter Status"
-              placeholder="Semua Status"
+              placeholder="Semua status"
               :block="true"
               height-class="h-10"
             />
@@ -2140,7 +2157,7 @@ onMounted(async () => {
                 ...availableTipeOptions.map((t) => ({ value: t, label: t })),
               ]"
               aria-label="Filter Tipe Perangkat"
-              placeholder="Semua Tipe"
+              placeholder="Semua tipe"
               :block="true"
               height-class="h-10"
             />
@@ -2255,6 +2272,33 @@ onMounted(async () => {
 
 <style scoped src="../assets/asset-workspace.css"></style>
 <style scoped src="../assets/ws-table.css"></style>
+
+<style scoped>
+/* Header & list heading tidak sticky di modul Inventaris — scroll
+   bersama konten. HARUS setelah import ws-table.css agar menang. */
+.asset-toolbar-sticky,
+.it-list-heading-sticky {
+  position: static;
+  z-index: auto;
+  top: auto;
+}
+/* Pertahankan padding tebal dari class inline (p-3.5 sm:p-4.5);
+   asset-inventory asset-workspace.css menimpanya dengan padding
+   4px 0 8px / transparent / border 0 karena specificity (0,2,0)
+   lebih tinggi dari utility Tailwind (0,1,0) — header menempel. */
+.asset-inventory .asset-toolbar {
+  padding: 0.875rem;
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  border-radius: 1rem;
+  background: #ffffff;
+  box-shadow: 0 1px 2px rgba(23, 43, 77, 0.04);
+}
+@media (min-width: 640px) {
+  .asset-inventory .asset-toolbar {
+    padding: 1.125rem;
+  }
+}
+</style>
 
 <style scoped>
 .it-create-steps {

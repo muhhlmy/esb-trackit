@@ -202,7 +202,7 @@ def generate_report():
         'Security Testing: SQLi, XSS, CSRF, path traversal, HTTP method abuse, rate limiting, CORS, JWT analysis',
         'Accessibility: 20 tests (18 passed) - alt attributes, form labels, keyboard nav, heading hierarchy',
         'Performance: Page load times, responsive layout at 5 viewport sizes',
-        'Source Code Review: authController, authMiddleware, passwordService, requestValidation, rateLimiter, sessionService, securityHeaders, corsPolicy, originValidation, env.js',
+        'Source Code Review: authController, authMiddleware, passwordService, requestValidation, rateLimiter, sessionService, securityHeaders, corsPolicy, env.js',
     ]
     for layer in layers:
         pdf.set_font('Helvetica', '', 9)
@@ -509,8 +509,7 @@ def generate_report():
         'backend/src/security/requestValidation.js - Input validation (email, password, pagination)',
         'backend/src/middleware/rateLimitMiddleware.js - Rate limiting (API, login, auth, export)',
         'backend/src/middleware/securityHeaders.js - CSP, X-Frame-Options, etc.',
-        'backend/src/middleware/originValidationMiddleware.js - CSRF protection',
-        'backend/src/security/corsPolicy.js - Strict CORS allowlist',
+                'backend/src/security/corsPolicy.js - Strict CORS allowlist',
         'backend/src/services/sessionService.js - Server-side session CRUD',
         'backend/src/services/accountSecurityService.js - Account lockout with progressive delays',
         'backend/src/config/env.js - Environment variable handling (no secret defaults)',

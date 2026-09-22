@@ -6,8 +6,7 @@ import { useKbCategories } from '@/composables/useKbCategories'
 import { useAuth } from '@/composables/useAuth'
 import { useLanguage } from '@/composables/useLanguage'
 import { api } from '@/services/api'
-import gsap from 'gsap'
-import { isReducedMotion } from '@/composables/useGsap'
+import { animateIn, isReducedMotion } from '@/composables/useGsap'
 import {
   Search,
   Laptop,
@@ -24,7 +23,6 @@ import {
   Ticket,
   HelpCircle,
   Clock,
-  TrendingUp,
 } from 'lucide-vue-next'
 
 const router = useRouter()
@@ -46,19 +44,10 @@ const localSearch = ref('')
 const isInputFocused = ref(false)
 const openFaqId = ref(null)
 const dbFaqs = ref([])
-const popularSearches = ref([])
 
 function handleSearchFocusOut(event) {
   if (!event.currentTarget.contains(event.relatedTarget)) isInputFocused.value = false
 }
-
-const defaultPopularSearches = ['Password Reset', 'VPN Setup', 'Hardware Request']
-const displayPopularSearches = computed(() => {
-  if (Array.isArray(popularSearches.value) && popularSearches.value.length > 0) {
-    return popularSearches.value
-  }
-  return defaultPopularSearches
-})
 
 const liveSuggestions = computed(() => {
   if (!localSearch.value.trim()) return []
@@ -71,44 +60,10 @@ const liveSuggestions = computed(() => {
     .slice(0, 5)
 })
 
-const DEFAULT_FEATURED_SOPS = [
-  {
-    num: '01',
-    id: 36,
-    title: 'SOP Setup Laptop Baru untuk New Joiner / Pergantian Perangkat',
-    summary:
-      'Panduan Operasional Standar (SOP) penyiapan unit laptop Windows baru bagi karyawan baru (new joiner) atau fasilitas penggantian unit kerja.',
-    category: 'hardware',
-  },
-  {
-    num: '02',
-    id: 37,
-    title: 'SOP Setup Laptop Re-use / Bekas untuk New Joiner / Pergantian Perangkat',
-    summary:
-      'Panduan Operasional Standar (SOP) penyiapan laptop pengembalian (re-use) untuk dialokasikan kembali kepada karyawan baru atau pergantian unit.',
-    category: 'hardware',
-  },
-  {
-    num: '03',
-    id: 38,
-    title: 'SOP Setup HP Baru untuk New Joiner / Replacement',
-    summary:
-      'Panduan Operasional Standar (SOP) konfigurasi smartphone / perangkat mobile baru bagi kebutuhan operasional karyawan.',
-    category: 'hardware',
-  },
-  {
-    num: '04',
-    id: 39,
-    title: 'SOP Setup HP Stock untuk New Joiner / Replacement',
-    summary:
-      'Panduan Operasional Standar (SOP) penyiapan unit smartphone stock / inventaris kantor untuk pergantian atau kebutuhan darurat.',
-    category: 'hardware',
-  },
-]
-
-// Featured Article list dari DB (4 pertama, published, diurutkan sesuai sort_order)
+// Featured articles come only from real published cases. No hardcoded fallback:
+// an empty knowledge base shows the section's empty state instead of fabricated
+// articles with invented ids.
 const featuredSopList = computed(() => {
-  if (!cases.value.length) return DEFAULT_FEATURED_SOPS
   return cases.value.slice(0, 4).map((c, idx) => ({
     num: String(idx + 1).padStart(2, '0'),
     id: c.id,
@@ -161,34 +116,6 @@ function handleSupportTicketAction() {
   }
 }
 
-// 3 Cards for Browse Topics — dari tabel kb_categories (fallback ke default statis)
-const DEFAULT_TOPIC_CARDS = [
-  {
-    key: 'it-support',
-    title: 'IT Support',
-    description:
-      'Learn the basics of setting up your IT profile, laptop requests, software, and connecting network tools.',
-    icon: 'Laptop',
-    is_featured: false,
-  },
-  {
-    key: 'hr-people',
-    title: 'Human Resources (HR)',
-    description:
-      'Customize your experience with account settings, Google Workspace, onboarding, 2SV, and permissions.',
-    icon: 'ShieldCheck',
-    is_featured: true,
-  },
-  {
-    key: 'general-affairs',
-    title: 'General Affairs (GA)',
-    description:
-      'Office facility management, physical asset requests, building maintenance, and operational tools.',
-    icon: 'Building2',
-    is_featured: false,
-  },
-]
-
 // Map nama icon (string dari DB) ke komponen Lucide
 const ICON_COMPONENTS = {
   Laptop,
@@ -202,7 +129,7 @@ const ICON_COMPONENTS = {
 }
 
 const topicCards = computed(() => {
-  const source = publishedCategories.value.length ? publishedCategories.value : DEFAULT_TOPIC_CARDS
+  const source = publishedCategories.value
   return source.map((c) => {
     let title = c.title
     let description = c.description || ''
@@ -237,90 +164,9 @@ const topicCards = computed(() => {
   })
 })
 
-const DEFAULT_FAQS = [
-  {
-    num: '01',
-    id: 'faq-3',
-    question: 'Bagaimana cara melakukan reset password akun Google Workspace?',
-    summary:
-      'Anda dapat mereset kata sandi akun Google Workspace karyawan melalui Google Admin Console sesuai panduan resmi:\n' +
-      '1. Buka Google Admin Console di browser (admin.google.com).\n' +
-      '2. Cari nama atau email karyawan pada menu Directory > Users.\n' +
-      '3. Klik tombol "Reset Password" dan pilih opsi buat kata sandi secara manual.\n' +
-      '4. Gunakan format kata sandi sementara sesuai standar keamanan IT perusahaan.\n' +
-      '5. Pastikan mencentang "Ask user to change their password when they sign in" sebelum menyimpan.',
-    steps: [
-      'Buka Google Admin Console di browser (admin.google.com).',
-      'Cari nama atau email karyawan pada menu Directory > Users.',
-      'Klik tombol "Reset Password" dan pilih opsi buat kata sandi secara manual.',
-      'Gunakan format kata sandi sementara sesuai panduan resmi IT perusahaan (hubungi IT Administrator jika membutuhkan bantuan).',
-      'Pastikan mencentang "Ask user to change their password when they sign in" sebelum menyimpan.',
-    ],
-    actionText: 'Buka Portal Admin',
-    actionLink: 'https://admin.google.com/',
-  },
-  {
-    num: '02',
-    id: 'faq-4',
-    question: 'Bagaimana cara meminta kode cadangan 2-Step Verification (2SV)?',
-    summary:
-      'Untuk mendukung verifikasi tim setelah konfirmasi resmi dari pihak People & Culture (PBX):\n' +
-      '1. Buka Google Admin Console dan cari profil pengguna yang bersangkutan.\n' +
-      '2. Masuk ke menu Security > 2-Step Verification > Get Backup Verification Codes.\n' +
-      '3. Salin minimal 2 (dua) kode verifikasi cadangan.\n' +
-      '4. Kirimkan kode tersebut secara aman via Direct Message kepada pihak PBX berwenang.',
-    steps: [
-      'Buka Google Admin Console dan cari profil pengguna yang bersangkutan.',
-      'Masuk ke menu Security > 2-Step Verification > Get Backup Verification Codes.',
-      'Salin minimal 2 (dua) kode verifikasi cadangan.',
-      'Kirimkan kode tersebut secara aman via Direct Message kepada pihak PBX berwenang.',
-    ],
-  },
-  {
-    num: '03',
-    id: 'faq-5',
-    question: 'Bagaimana cara bypass Microsoft OOBE pada laptop baru?',
-    summary:
-      'Untuk membuat akun lokal tanpa login akun Microsoft online saat layar koneksi jaringan:\n' +
-      '1. Tekan kombinasi tombol Shift + F10 (atau Fn + Shift + F10) di keyboard untuk membuka Command Prompt (CMD).\n' +
-      '2. Ketikkan perintah oobe\\bypassnro lalu tekan Enter.\n' +
-      '3. Laptop akan restart otomatis dan menampilkan opsi setup Local Account offline.',
-    steps: [
-      'Tekan kombinasi tombol Shift + F10 (atau Fn + Shift + F10) di keyboard untuk membuka Command Prompt (CMD).',
-      'Ketikkan perintah oobe\\bypassnro lalu tekan Enter.',
-      'Laptop akan restart otomatis dan menampilkan opsi setup Local Account offline.',
-    ],
-    code: 'oobe\\bypassnro',
-  },
-  {
-    num: '04',
-    id: 'faq-8',
-    question: 'Bagaimana cara mengajukan lisensi software tambahan untuk kebutuhan kerja?',
-    summary:
-      'Pengajuan lisensi software berbayar (seperti Figma, JetBrains, Adobe Creative Cloud, atau tool produktivitas lainnya) memerlukan persetujuan atasan:\n' +
-      '1. Dapatkan persetujuan tertulis dari Head of Department (HOD) terkait alokasi budget.\n' +
-      '2. Buat tiket pengajuan pada kategori Software & Application dengan melampirkan bukti persetujuan HOD.\n' +
-      '3. Tim IT Procurement akan memproses lisensi dan memberikan akun aktivasi kepada Anda.',
-    steps: [
-      'Dapatkan persetujuan tertulis dari Head of Department (HOD) terkait alokasi budget.',
-      'Buat tiket pengajuan pada kategori Software & Application dengan melampirkan bukti persetujuan HOD.',
-      'Tim IT Procurement akan memproses lisensi dan memberikan akun aktivasi kepada Anda.',
-    ],
-  },
-  {
-    num: '05',
-    id: 'faq-9',
-    question: 'Apa yang harus dilakukan jika laptop perusahaan hilang atau dicuri?',
-    isEmergency: true,
-    emergencyTitle: 'Tindakan Darurat Diperlukan',
-    emergencyText:
-      'Jika perangkat kerja hilang atau dicuri, segera laporkan ke Tim IT Support & Security Operations Center (SOC) agar tim dapat melakukan remote lock dan penghapusan data perusahaan secara instan.',
-  },
-]
-
-// FAQ dari tabel faq (rich content) — fallback ke default statis bila DB kosong
+// FAQs come only from the faq table. There is no hardcoded fallback: if the
+// table is empty the section is hidden rather than showing fabricated answers.
 const faqs = computed(() => {
-  if (!dbFaqs.value.length) return DEFAULT_FAQS
   return dbFaqs.value.map((f, idx) => ({
     num: String(idx + 1).padStart(2, '0'),
     id: `faq-${f.id}`,
@@ -334,6 +180,12 @@ const faqs = computed(() => {
     emergencyTitle: f.emergency_title || null,
     emergencyText: f.emergency_text || null,
   }))
+})
+
+// FAQ dengan urutan baca: emergency → pertanyaan lain (prioritas konten kritis)
+const orderedFaqs = computed(() => {
+  const list = faqs.value
+  return [...list].sort((a, b) => Number(b.isEmergency) - Number(a.isEmergency))
 })
 
 const mainScope = ref(null)
@@ -353,12 +205,6 @@ async function fetchHelpCenterContent() {
     /* fallback ke default statis */
   }
 
-  try {
-    const popular = await api.getPopularKbSearches()
-    popularSearches.value = Array.isArray(popular) ? popular.map((p) => p.query) : []
-  } catch {
-    /* popular searches opsional */
-  }
 }
 
 onMounted(async () => {
@@ -369,7 +215,7 @@ onMounted(async () => {
 
   if (!mainScope.value) return
 
-  gsap.context(() => {
+  animateIn(mainScope, (gsap) => {
     gsap.fromTo(
       '.gsap-hero-el',
       { opacity: 0, y: 16 },
@@ -411,7 +257,7 @@ onMounted(async () => {
       { opacity: 0, y: 18 },
       { opacity: 1, y: 0, duration: 0.45, ease: 'power2.out', delay: 0.35, clearProps: 'all' },
     )
-  }, mainScope.value)
+  })
 })
 </script>
 
@@ -465,19 +311,6 @@ onMounted(async () => {
               </button>
             </div>
           </div>
-          <div class="popular-searches">
-            <span><TrendingUp :size="14" aria-hidden="true" />{{ t('popular_searches') }}</span>
-            <div>
-              <button
-                v-for="term in displayPopularSearches"
-                :key="term"
-                type="button"
-                @click="handlePopularClick(term)"
-              >
-                {{ term }}
-              </button>
-            </div>
-          </div>
         </div>
         <aside class="hero-help gsap-assistance">
           <div class="support-icon">
@@ -503,7 +336,7 @@ onMounted(async () => {
         </aside>
       </section>
 
-      <section aria-labelledby="topics-title" class="topics-section">
+      <section v-if="topicCards.length" aria-labelledby="topics-title" class="topics-section">
         <div class="section-heading">
           <div>
             <span class="section-kicker">{{ t('help_center') }}</span>
@@ -576,7 +409,7 @@ onMounted(async () => {
           /></RouterLink>
         </section>
 
-        <section class="faq-section" aria-labelledby="faq-title">
+        <section v-if="orderedFaqs.length" class="faq-section" aria-labelledby="faq-title">
           <div class="section-heading">
             <div>
               <span class="section-kicker">{{ t('faq_tag') }}</span>
@@ -585,7 +418,7 @@ onMounted(async () => {
           </div>
           <div class="faq-list">
             <div
-              v-for="faq in faqs"
+              v-for="faq in orderedFaqs"
               :key="faq.id"
               class="faq-item"
               :class="{ 'faq-open': openFaqId === faq.id }"
@@ -644,15 +477,18 @@ onMounted(async () => {
 
 <style scoped>
 .help-home {
-  --ink: #333333;
+  --ink: #1b2537;
   --muted: #5f7089;
-  --line: #e1e7ef;
+  --line: #e6ebf3;
   --surface: #fff;
   --canvas: #f5f7fb;
   --blue: #0a51b0;
   background: var(--canvas);
   color: var(--ink);
   padding: 28px 24px 0;
+  font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 .help-container {
   max-width: 1200px;
@@ -669,9 +505,9 @@ onMounted(async () => {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 290px;
   gap: 48px;
-  padding: 40px;
+  padding: 44px 40px 40px;
   border-radius: 24px;
-  background: linear-gradient(145deg, #0a51b0 0%, #0a5dbd 40%, #074797 75%, #052f66 100%);
+  background: linear-gradient(150deg, #0c58c4 0%, #0a4a9e 45%, #062f66 100%);
   position: relative;
   overflow: hidden;
   color: white;
@@ -704,34 +540,29 @@ onMounted(async () => {
   z-index: 1;
 }
 .eyebrow {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 10px;
   color: #cfe2f8;
   font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
-}
-.eyebrow-line {
-  width: 24px;
-  height: 3px;
-  border-radius: 2px;
-  background: linear-gradient(90deg, #ff4f1b 0%, #faa425 100%);
 }
 .help-hero h1 {
   max-width: 570px;
-  font-size: clamp(30px, 3.5vw, 46px);
-  line-height: 1.15;
-  font-weight: 750;
-  letter-spacing: -0.045em;
-  margin: 16px 0 12px;
+  font-size: clamp(32px, 3.5vw, 48px);
+  line-height: 1.08;
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  margin: 18px 0 14px;
 }
 .hero-description {
   max-width: 470px;
-  font-size: 14px;
-  line-height: 1.75;
-  color: #e1ecfa;
+  font-size: 15px;
+  line-height: 1.7;
+  letter-spacing: -0.005em;
+  color: #dce8f9;
 }
 .search-area {
   position: relative;
@@ -742,23 +573,28 @@ onMounted(async () => {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 7px 7px 7px 17px;
-  border-radius: 12px;
+  padding: 7px 7px 7px 18px;
+  border-radius: 14px;
   background: white;
   color: #5f7089;
-  box-shadow: 0 8px 24px #071b3726;
+  box-shadow: 0 12px 30px #071b3733;
 }
 .help-search > svg {
   flex-shrink: 0;
+  color: #5f7089;
 }
 .help-search input {
   min-width: 0;
   flex: 1;
-  height: 42px;
-  color: #333333;
-  font-size: 14px;
+  height: 44px;
+  color: var(--ink);
+  font-size: 15px;
+  letter-spacing: -0.005em;
   outline: none;
   background: transparent;
+}
+.help-search input::placeholder {
+  color: #9aa9bd;
 }
 .help-search input::-webkit-search-cancel-button {
   display: none;
@@ -776,17 +612,18 @@ onMounted(async () => {
   justify-content: center;
   gap: 8px;
   min-height: 44px;
-  padding: 0 18px;
-  background: linear-gradient(135deg, #0a51b0 0%, #0a5dbd 50%, #0892f5 100%);
+  padding: 0 20px;
+  background: #0a51b0;
   color: white;
-  border-radius: 8px;
+  border-radius: 9px;
   font-size: 13px;
   font-weight: 650;
+  letter-spacing: -0.005em;
   box-shadow: 0 4px 12px rgba(10, 81, 176, 0.25);
   transition: all 0.2s ease;
 }
 .search-submit:hover {
-  background: linear-gradient(135deg, #0a4391 0%, #094f9e 50%, #0779d1 100%);
+  background: #09428f;
   box-shadow: 0 6px 16px rgba(10, 81, 176, 0.35);
   transform: translateY(-1px);
 }
@@ -832,12 +669,13 @@ onMounted(async () => {
   flex-shrink: 0;
 }
 .popular-searches {
-  margin-top: 16px;
+  margin-top: 18px;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 8px 12px;
+  gap: 8px 14px;
   font-size: 11px;
+  letter-spacing: 0.04em;
   color: #cfe2f8;
 }
 .popular-searches > span {
@@ -848,23 +686,25 @@ onMounted(async () => {
 .popular-searches > div {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 7px;
 }
 .popular-searches button {
-  padding: 6px 10px;
+  padding: 6px 11px;
   border: 1px solid #ffffff26;
-  border-radius: 6px;
-  color: #dfebff;
+  border-radius: 999px;
+  color: #e3eefd;
+  font-weight: 600;
   text-align: left;
   overflow-wrap: anywhere;
+  transition: all 0.18s ease;
 }
 .popular-searches button:hover {
-  background: rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.14);
   border-color: #0892f5;
 }
 .hero-help {
   border-left: 1px solid #ffffff26;
-  padding-left: 32px;
+  padding-left: 34px;
   align-self: center;
   position: relative;
   z-index: 1;
@@ -872,23 +712,23 @@ onMounted(async () => {
 .support-icon {
   display: grid;
   place-items: center;
-  width: 48px;
-  height: 48px;
+  width: 46px;
+  height: 46px;
   border: 1px solid rgba(8, 146, 245, 0.4);
   background: rgba(8, 146, 245, 0.15);
   border-radius: 14px;
-  color: #0892f5;
-  margin-bottom: 18px;
+  color: #4da3ff;
+  margin-bottom: 20px;
 }
 .hero-help h2 {
-  font-size: 19px;
+  font-size: 18px;
   line-height: 1.4;
   font-weight: 650;
   letter-spacing: -0.02em;
 }
 .hero-help p {
-  font-size: 12px;
-  line-height: 1.8;
+  font-size: 13px;
+  line-height: 1.7;
   color: #cfe2f8;
   margin: 10px 0 18px;
 }
@@ -902,15 +742,15 @@ onMounted(async () => {
   padding: 10px 14px;
   border: 1px solid rgba(255, 255, 255, 0.25);
   background: rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
-  font-size: 12px;
+  border-radius: 9px;
+  font-size: 13px;
   font-weight: 650;
   text-align: left;
   transition: all 0.2s ease;
 }
 .support-button:hover {
-  background: rgba(255, 255, 255, 0.2);
-  border-color: #0892f5;
+  background: rgba(255, 255, 255, 0.18);
+  border-color: #4da3ff;
 }
 .support-button svg {
   flex-shrink: 0;
@@ -920,8 +760,9 @@ onMounted(async () => {
   gap: 7px;
   align-items: center;
   font-size: 11px;
+  letter-spacing: 0.04em;
   color: #cfe2f8;
-  margin-top: 13px;
+  margin-top: 14px;
 }
 .topics-section {
   margin-top: 32px;
@@ -936,17 +777,17 @@ onMounted(async () => {
 .section-kicker {
   display: block;
   font-size: 10px;
-  font-weight: 650;
-  letter-spacing: 0.1em;
+  font-weight: 700;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--muted);
-  margin-bottom: 6px;
+  margin-bottom: 7px;
 }
 .section-heading h2 {
   font-size: 21px;
   font-weight: 700;
   letter-spacing: -0.035em;
-  line-height: 1.35;
+  line-height: 1.3;
 }
 .text-link {
   display: inline-flex;
@@ -978,16 +819,16 @@ onMounted(async () => {
   border: 1px solid var(--line);
   background: var(--surface);
   padding: 22px;
-  border-radius: 14px;
+  border-radius: 16px;
   transition:
     border-color 0.18s,
     box-shadow 0.18s,
     transform 0.18s;
 }
 .topic-card:hover {
-  border-color: #0a51b0;
-  box-shadow: 0 6px 20px rgba(10, 81, 176, 0.08);
-  transform: translateY(-1px);
+  border-color: #c4d3ec;
+  box-shadow: 0 8px 24px rgba(10, 81, 176, 0.08);
+  transform: translateY(-2px);
 }
 .topic-featured {
   border-top: 3px solid #0a51b0;
@@ -998,7 +839,7 @@ onMounted(async () => {
   place-items: center;
   width: 44px;
   height: 44px;
-  border-radius: 12px;
+  border-radius: 13px;
   flex-shrink: 0;
 }
 .topic-tone-0 {
@@ -1023,19 +864,25 @@ onMounted(async () => {
 .topic-title {
   font-size: 15px;
   font-weight: 700;
+  letter-spacing: -0.01em;
   line-height: 1.45;
 }
 .topic-description {
-  font-size: 12px;
-  line-height: 1.8;
+  font-size: 13px;
+  line-height: 1.65;
   color: var(--muted);
 }
 .topic-arrow {
   position: absolute;
   right: 14px;
   top: 16px;
-  color: #8fa2ba;
+  color: #5f7089;
   width: 14px;
+  transition: transform 0.18s ease;
+}
+.topic-card:hover .topic-arrow {
+  color: var(--blue);
+  transform: translateX(2px);
 }
 .knowledge-grid {
   display: grid;
@@ -1047,25 +894,26 @@ onMounted(async () => {
 .article-list {
   background: var(--surface);
   border: 1px solid var(--line);
-  border-radius: 14px;
+  border-radius: 16px;
   overflow: hidden;
 }
 .article-row {
   display: flex;
   align-items: flex-start;
   gap: 16px;
-  padding: 21px;
+  padding: 22px;
   border-bottom: 1px solid var(--line);
+  transition: background 0.18s ease;
 }
 .article-row:last-child {
   border-bottom: 0;
 }
 .article-row:hover {
-  background: var(--canvas);
+  background: #fafcff;
 }
 .article-number {
   font-size: 12px;
-  font-weight: 550;
+  font-weight: 600;
   color: #5f7089;
   font-variant-numeric: tabular-nums;
   padding-top: 3px;
@@ -1077,20 +925,21 @@ onMounted(async () => {
 .article-category {
   font-size: 10px;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.1em;
   color: var(--blue);
-  font-weight: 600;
+  font-weight: 700;
 }
 .article-copy h3 {
   font-size: 14px;
-  line-height: 1.6;
+  line-height: 1.55;
   font-weight: 650;
-  margin-top: 4px;
+  letter-spacing: -0.005em;
+  margin-top: 5px;
   overflow-wrap: anywhere;
 }
 .article-copy p {
   font-size: 12px;
-  line-height: 1.7;
+  line-height: 1.65;
   color: var(--muted);
   margin-top: 5px;
   display: -webkit-box;
@@ -1100,8 +949,13 @@ onMounted(async () => {
 }
 .article-arrow {
   margin-top: 18px;
-  color: #8fa2ba;
+  color: #5f7089;
   flex-shrink: 0;
+  transition: transform 0.18s ease;
+}
+.article-row:hover .article-arrow {
+  color: var(--blue);
+  transform: translateX(2px);
 }
 .article-empty {
   display: grid;
@@ -1118,14 +972,20 @@ onMounted(async () => {
   justify-content: center;
   gap: 8px;
   min-height: 48px;
+  margin-top: 14px;
+  padding: 0 20px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
   color: var(--blue);
-  font-size: 12px;
+  background: var(--surface);
+  font-size: 13px;
   font-weight: 650;
-  margin-top: 8px;
-  border-radius: 8px;
+  transition: all 0.18s ease;
 }
 .all-articles:hover {
-  background: var(--surface);
+  border-color: #c4d3ec;
+  background: #fafcff;
+  box-shadow: 0 4px 14px rgba(10, 81, 176, 0.07);
 }
 .faq-list {
   border-top: 1px solid var(--line);
@@ -1144,9 +1004,10 @@ onMounted(async () => {
   width: 100%;
   padding: 22px 0;
   text-align: left;
-  font-size: 13px;
-  line-height: 1.7;
+  font-size: 14px;
+  line-height: 1.6;
   font-weight: 600;
+  letter-spacing: -0.005em;
 }
 .faq-item h3 svg {
   flex-shrink: 0;
@@ -1163,7 +1024,7 @@ onMounted(async () => {
   padding: 0 6px 22px 0;
   color: var(--muted);
   font-size: 13px;
-  line-height: 1.8;
+  line-height: 1.75;
   overflow-wrap: anywhere;
 }
 .faq-answer p {
@@ -1191,8 +1052,9 @@ onMounted(async () => {
 .faq-emergency {
   background: #fff1f2;
   color: #9f1239;
-  border-radius: 10px;
-  padding: 14px;
+  border: 1px solid #fecdd3;
+  border-radius: 12px;
+  padding: 14px 16px;
 }
 .faq-emergency strong {
   display: flex;
@@ -1210,7 +1072,7 @@ onMounted(async () => {
   margin-top: 36px;
   border-top: 1px solid var(--line);
   color: var(--muted);
-  font-size: 11px;
+  font-size: 12px;
 }
 .help-footer span span {
   margin: 0 9px;
@@ -1275,11 +1137,11 @@ onMounted(async () => {
     min-width: 200px;
   }
   .help-hero h1 {
-    font-size: 34px;
+    font-size: clamp(28px, 8vw, 34px);
     max-width: 450px;
   }
   .hero-description {
-    font-size: 13px;
+    font-size: 13.5px;
   }
   .help-search {
     gap: 7px;

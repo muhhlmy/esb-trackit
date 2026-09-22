@@ -6,6 +6,7 @@ import { animateStagger } from '../composables/useGsap.js'
 import { useViewMode } from '../composables/useViewMode.js'
 import AppViewToggle from '../components/ui/AppViewToggle.vue'
 import { normalizeLocation } from '../utils/locationNormalizer.js'
+import { formatCurrency } from '../utils/currencyFormatter.js'
 import AppModal from '../components/ui/AppModal.vue'
 import SearchableSelect from '../components/ui/SearchableSelect.vue'
 import CustomSelect from '../components/ui/CustomSelect.vue'
@@ -366,17 +367,6 @@ function formatStatusPillOps(status) {
   }
 }
 
-function formatCurrency(amount) {
-  if (amount === undefined || amount === null || amount === '') return 'Rp 0'
-  const num = Number(amount)
-  if (isNaN(num)) return 'Rp 0'
-  return new Intl.NumberFormat('id-ID', {
-    style: 'currency',
-    currency: 'IDR',
-    maximumFractionDigits: 0,
-  }).format(num)
-}
-
 function formatDate(dateStr) {
   if (!dateStr) return '-'
   const date = new Date(dateStr)
@@ -463,7 +453,7 @@ function formatDate(dateStr) {
               v-model="searchQuery"
               type="text"
               aria-label="Cari aset OPS"
-              placeholder="Cari hostname, nama asset, PIC, lokasi..."
+              placeholder="Cari hostname, nama asset, PIC, lokasi…"
               class="h-full w-full rounded-lg border border-[#E2E8F0] bg-white pl-8 pr-8 text-xs text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
             />
             <!-- Inline Clear Button -->
@@ -705,7 +695,10 @@ function formatDate(dateStr) {
                   }}</span>
                 </td>
                 <td @click.stop>
-                  <AppRowActions :actions="getOpsActions(asset)" />
+                  <AppRowActions
+                    :actions="getOpsActions(asset)"
+                    :label="`Aksi aset Ops ${asset.hostname || ''}`"
+                  />
                 </td>
               </tr>
             </tbody>
@@ -760,7 +753,10 @@ function formatDate(dateStr) {
               >
             </div>
             <div class="laptop-actions" @click.stop>
-              <AppRowActions :actions="getOpsActions(asset)" />
+              <AppRowActions
+                :actions="getOpsActions(asset)"
+                :label="`Aksi aset Ops ${asset.hostname || ''}`"
+              />
             </div>
           </div>
         </div>
@@ -888,7 +884,7 @@ function formatDate(dateStr) {
               :options="locationOptions"
               value-key="value"
               label-key="label"
-              placeholder="Pilih Lokasi"
+              placeholder="Pilih lokasi"
             />
           </div>
         </div>
@@ -1157,3 +1153,26 @@ function formatDate(dateStr) {
 
 <style scoped src="../assets/asset-workspace.css"></style>
 <style scoped src="../assets/ws-table.css"></style>
+
+<style scoped>
+/* Header & list heading tidak sticky di modul Inventaris — scroll
+   bersama konten. HARUS setelah import ws-table.css agar menang. */
+.asset-toolbar-sticky,
+.it-list-heading-sticky {
+  position: static;
+  z-index: auto;
+  top: auto;
+}
+.asset-inventory .asset-toolbar {
+  padding: 0.875rem;
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  border-radius: 1rem;
+  background: #ffffff;
+  box-shadow: 0 1px 2px rgba(23, 43, 77, 0.04);
+}
+@media (min-width: 640px) {
+  .asset-inventory .asset-toolbar {
+    padding: 1.125rem;
+  }
+}
+</style>

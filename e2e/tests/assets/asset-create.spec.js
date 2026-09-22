@@ -16,10 +16,13 @@ test.describe('Asset Management - Create Asset Suite', () => {
     await openModalBtn.click()
 
     // 2. Step 1 (Info): Hostname, Serial Number & Type
-    await page.getByPlaceholder(/laptop-hr-01/i).fill(testAsset.hostname)
-    await page.getByPlaceholder(/nomor seri/i).fill(testAsset.serial_number)
+    await page.getByPlaceholder(/laptop-it-04/i).fill(testAsset.hostname)
+    await page.getByPlaceholder(/pf3abcde/i).fill(testAsset.serial_number)
 
-    await page.getByRole('combobox', { name: 'Tipe Perangkat Aset' }).selectOption('Laptop')
+    // Tipe Perangkat CustomSelect = button + listbox (bukan <select native>)
+    const tipeSelect = page.getByRole('button', { name: 'Tipe Perangkat Aset' })
+    await tipeSelect.click()
+    await page.getByRole('option', { name: 'Laptop' }).first().click()
 
     // Step 1 -> Step 2
     const nextBtn1 = page.getByRole('button', { name: /lanjutkan/i })
@@ -27,8 +30,9 @@ test.describe('Asset Management - Create Asset Suite', () => {
     await nextBtn1.click()
 
     // Step 2 (Placement): Select Lokasi Aset option from SearchableSelect
-    await page.getByRole('button', { name: 'Pilih atau ketik lokasi penempatan aset', exact: true }).click()
-    await page.getByPlaceholder('Cari atau ketik lokasi baru...').fill('QA Test Location')
+    // (aria-label turun dari placeholder — jangan pakai exact match)
+    await page.getByRole('button', { name: /pilih atau ketik lokasi/i }).click()
+    await page.getByPlaceholder(/cari atau ketik lokasi/i).fill('QA Test Location')
     await page.getByRole('option').filter({ hasText: 'QA Test Location' }).click()
 
     // Step 2 -> Step 3

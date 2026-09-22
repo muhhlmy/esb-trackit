@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@import '../styles/tokens.css';
 
 /* Enable class-based dark mode (Tailwind v4 — darkMode:"class" in config is a v3 no-op).
    Without this, dark: utilities key off prefers-color-scheme instead of the .dark class. */
@@ -72,6 +73,19 @@
   font-synthesis: none;
   text-rendering: optimizeLegibility;
 
+  /* Typography scaling support - desktop mode */
+  /* Default: compact (0.7) for ~30% density reduction */
+  --fs-scale-factor: 0.7;
+
+  /* Compact typography (30% smaller) - apply to html[data-typography="compact"] */
+  --fs-2xs: 9px;
+  --fs-xs: 10px;
+  --fs-sm: 11px;
+  --fs-base: 13px;
+  --fs-lg: 14px;
+  --fs-xl: 15px;
+  --fs-2xl: 17px;
+
   /* Official ESB Brand Gradients from Logo */
   --gradient-esb-blue: linear-gradient(135deg, #0a51b0 0%, #0a5dbd 26%, #097cde 72%, #0892f5 100%);
   --gradient-esb-blue-hero: linear-gradient(145deg, #0a51b0 0%, #084391 40%, #062b5e 100%);
@@ -135,21 +149,22 @@ html.light {
   box-sizing: border-box;
 }
 
+/* Toolbar action sizing — uses design tokens instead of hardcoded !important */
 .toolbar-primary-action,
 .toolbar-action-group {
-  height: 36px !important;
-  min-height: 36px !important;
-  max-height: 36px !important;
+  height: var(--control-height-md, 36px);
+  min-height: var(--control-height-md, 36px);
+  max-height: var(--control-height-md, 36px);
 }
 
 .toolbar-action-group {
-  padding: 4px !important;
+  padding: 4px;
 }
 
 .toolbar-action-button {
-  height: 28px !important;
-  min-height: 28px !important;
-  max-height: 28px !important;
+  height: 28px;
+  min-height: 28px;
+  max-height: 28px;
 }
 
 html,
@@ -768,6 +783,19 @@ table tbody td {
   font-variant-numeric: tabular-nums;
 }
 
+/* Placeholder law (audit v2): PH = state, bukan label — lebih kecil dari input,
+   floor 11px, satu warna token. Berlaku global; kelas Tailwind placeholder-*
+   yang lebih spesifik tetap bisa meng-override warna bila memang disengaja. */
+::placeholder {
+  color: var(--color-placeholder);
+  font-size: var(--fs-placeholder);
+  opacity: 1;
+}
+
+html.dark ::placeholder {
+  color: var(--color-placeholder);
+}
+
 @keyframes growUp {
   from {
     transform: scaleY(0);
@@ -818,4 +846,101 @@ svg circle {
     'wght' 400,
     'GRAD' 0,
     'opsz' 24 !important;
+}
+
+/* Typography Scaling: Desktop Density Mode - 7 levels (100% → 40%) */
+/* Default is compact (0.7) for ~30% density reduction per UI/UX spec. */
+html[data-typography='normal'] {
+  --fs-scale-factor: 0.85;
+}
+html:not([data-typography]),
+html[data-typography='compact'] {
+  --fs-scale-factor: 0.7;
+}
+html[data-typography='compact-80'] {
+  --fs-scale-factor: 0.8;
+}
+html[data-typography='compact-70'] {
+  --fs-scale-factor: 0.7;
+}
+html[data-typography='compact-60'] {
+  --fs-scale-factor: 0.6;
+}
+html[data-typography='compact-50'] {
+  --fs-scale-factor: 0.5;
+}
+html[data-typography='compact-40'] {
+  --fs-scale-factor: 0.4;
+}
+
+html[data-typography]:not([data-typography='normal']) .dashboard-view {
+  font-size: calc(1em * var(--fs-scale-factor));
+}
+
+/* Desktop density: 90% scale — smaller padding, tighter gaps */
+html[data-typography='compact'] .ui-card,
+html[data-typography='compact'] .shadow-card,
+html[data-typography='compact'] .stat-card,
+html[data-typography='compact'] .dash-stat-card,
+html[data-typography='compact'] .dashboard-panel,
+html[data-typography='compact'] .admin-page-header,
+html[data-typography='compact'] .shipment-toolbar,
+html[data-typography='compact'] .employee-profile,
+html[data-typography='compact'] .asset-profile-banner {
+  padding: calc(0.6rem * var(--fs-scale-factor)) calc(0.75rem * var(--fs-scale-factor));
+}
+
+html[data-typography='compact'] .dashboard-stats {
+  gap: calc(14px * var(--fs-scale-factor));
+}
+
+html[data-typography='compact'] .dashboard-chart-grid {
+  gap: calc(14px * var(--fs-scale-factor));
+}
+
+html[data-typography='compact'] .grid-cols-1\.sm\:grid-cols-3,
+html[data-typography='compact'] .grid-cols-2\.lg\:grid-cols-4 {
+  gap: calc(0.75rem * var(--fs-scale-factor));
+}
+
+html[data-typography='compact'] .toolbar-primary-action,
+html[data-typography='compact'] .toolbar-action-button,
+html[data-typography='compact'] .toolbar-filter-button {
+  height: calc(36px * var(--fs-scale-factor)) !important;
+  min-height: calc(36px * var(--fs-scale-factor)) !important;
+  max-height: calc(36px * var(--fs-scale-factor)) !important;
+}
+
+html[data-typography='compact'] .toolbar-search-input {
+  height: calc(36px * var(--fs-scale-factor)) !important;
+  min-height: calc(36px * var(--fs-scale-factor)) !important;
+  max-height: calc(36px * var(--fs-scale-factor)) !important;
+}
+html[data-typography]:not([data-typography='normal']) .dashboard-panel h3,
+html[data-typography]:not([data-typography='normal']) .dashboard-table h3 {
+  font-size: calc(var(--fs-lg) * var(--fs-scale-factor));
+}
+
+html[data-typography]:not([data-typography='normal']) .dashboard-intro h2 {
+  font-size: calc(20px * var(--fs-scale-factor));
+}
+
+html[data-typography]:not([data-typography='normal']) .stat-number {
+  font-size: calc(19px * var(--fs-scale-factor));
+}
+
+/* Tooltip and small text — WCAG 1.4.4 floor (never below 11px).
+   Replaced the old .text-[10px]/.text-[11px]/.text-[12px] selector list:
+   arbitrary-value class names inside a selector are re-parsed by Tailwind v4
+   and emit "No qualified name in attribute selector" build errors, AND the old
+   rule multiplied 12px by 0.7 → 8.4px, below the legibility floor. */
+html[data-typography]:not([data-typography='normal']) .tooltip,
+html[data-typography]:not([data-typography='normal']) .text-xs {
+  font-size: max(11px, calc(0.75rem * var(--fs-scale-factor)));
+}
+
+/* Ensure buttons remain accessible */
+html[data-typography]:not([data-typography='normal']) .btn-primary,
+html[data-typography]:not([data-typography='normal']) .btn-secondary {
+  font-size: calc(0.75rem * var(--fs-scale-factor));
 }

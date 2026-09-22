@@ -452,7 +452,7 @@ function formatKondisiPill(kondisi) {
               v-model="searchQuery"
               type="text"
               aria-label="Cari aset GA"
-              placeholder="Cari hostname, nama asset, detail, lokasi..."
+              placeholder="Cari hostname, nama asset, detail, lokasi…"
               class="h-full w-full rounded-lg border border-[#E2E8F0] bg-white pl-8 pr-8 text-xs text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
             />
             <!-- Inline Clear Button -->
@@ -690,7 +690,10 @@ function formatKondisiPill(kondisi) {
                   <span class="ws-cell-main">{{ asset.kondisi || '—' }}</span>
                 </td>
                 <td @click.stop>
-                  <AppRowActions :actions="getGaActions(asset)" />
+                  <AppRowActions
+                    :actions="getGaActions(asset)"
+                    :label="`Aksi aset GA ${asset.hostname || ''}`"
+                  />
                 </td>
               </tr>
             </tbody>
@@ -749,7 +752,10 @@ function formatKondisiPill(kondisi) {
               >
             </div>
             <div class="laptop-actions" @click.stop>
-              <AppRowActions :actions="getGaActions(asset)" />
+              <AppRowActions
+                :actions="getGaActions(asset)"
+                :label="`Aksi aset GA ${asset.hostname || ''}`"
+              />
             </div>
           </div>
         </div>
@@ -910,7 +916,7 @@ function formatKondisiPill(kondisi) {
               :options="locationOptions"
               value-key="value"
               label-key="label"
-              placeholder="Pilih Lokasi"
+              placeholder="Pilih lokasi"
             />
           </div>
 
@@ -1147,3 +1153,26 @@ function formatKondisiPill(kondisi) {
 
 <style scoped src="../assets/asset-workspace.css"></style>
 <style scoped src="../assets/ws-table.css"></style>
+
+<style scoped>
+/* Header & list heading tidak sticky di modul Inventaris — scroll
+   bersama konten. HARUS setelah import ws-table.css agar menang. */
+.asset-toolbar-sticky,
+.it-list-heading-sticky {
+  position: static;
+  z-index: auto;
+  top: auto;
+}
+.asset-inventory .asset-toolbar {
+  padding: 0.875rem;
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  border-radius: 1rem;
+  background: #ffffff;
+  box-shadow: 0 1px 2px rgba(23, 43, 77, 0.04);
+}
+@media (min-width: 640px) {
+  .asset-inventory .asset-toolbar {
+    padding: 1.125rem;
+  }
+}
+</style>

@@ -2,6 +2,7 @@
 import { onBeforeUnmount, onMounted, ref, watch, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useAuth } from '@/composables/useAuth'
+import { menuGroups as configuredGroups, isNavItemVisible } from '@/config/navigationConfig.js'
 
 const props = defineProps({
   isMobileOpen: { type: Boolean, default: false },
@@ -127,192 +128,16 @@ watch(
 )
 
 const menuGroups = computed(() => {
-  const groups = [
-    {
-      title: 'HOME',
-      items: [
-        {
-          to: '/',
-          label: 'Help Center',
-          icon: 'help_center',
-          permission: null,
-          badge: 'Artikel',
-        },
-        {
-          to: '/dashboard',
-          label: 'Dashboard',
-          icon: 'grid_view',
-          permission: 'dashboard',
-        },
-      ],
-    },
-    {
-      title: 'KNOWLEDGE BASE',
-      parents: [
-        {
-          key: 'knowledge_base',
-          label: 'Help Center & Artikel',
-          icon: 'auto_stories',
-          items: [
-            {
-              to: '/cases',
-              label: 'Cases & Artikel',
-              icon: 'menu_book',
-              permission: null,
-            },
-            {
-              to: '/admin/cases',
-              label: 'Admin CMS',
-              icon: 'edit_document',
-              permission: 'knowledge_base',
-            },
-            {
-              to: '/faqs',
-              label: 'Atur FAQ',
-              icon: 'quiz',
-              permission: 'knowledge_base',
-            },
-          ],
-        },
-      ],
-    },
-    {
-      title: 'INVENTARIS',
-      parents: [
-        {
-          key: 'asset_management',
-          label: 'Asset Management',
-          icon: 'inventory_2',
-          items: [
-            {
-              to: '/assets',
-              label: 'Aset IT',
-              icon: 'devices',
-              permission: 'assets',
-            },
-            {
-              to: '/assets-ga',
-              label: 'Aset GA',
-              icon: 'domain',
-              permission: 'assets_ga',
-            },
-            {
-              to: '/assets-ops',
-              label: 'Aset Ops',
-              icon: 'precision_manufacturing',
-              permission: 'assets_ops',
-            },
-            {
-              to: '/my-assets',
-              label: 'Aset Karyawan',
-              icon: 'badge',
-              permission: 'my_assets',
-            },
-          ],
-        },
-      ],
-    },
-    {
-      title: 'TRANSAKSI',
-      parents: [
-        {
-          key: 'helpdesk',
-          label: 'Helpdesk',
-          icon: 'support_agent',
-          items: [
-            {
-              to: '/tickets',
-              label: 'Tiket',
-              icon: 'confirmation_number',
-              permission: 'tickets',
-              badge: 'New',
-            },
-            {
-              to: '/submissions',
-              label: 'BAST/Asset Form',
-              icon: 'assignment',
-              permission: 'submissions',
-            },
-            {
-              to: '/shipments',
-              label: 'Pengiriman',
-              icon: 'local_shipping',
-              permission: 'shipments',
-            },
-          ],
-        },
-      ],
-    },
-    {
-      title: 'ADMINISTRASI',
-      parents: [
-        {
-          key: 'master_data',
-          label: 'Master Data',
-          icon: 'folder_shared',
-          items: [
-            {
-              to: '/users',
-              label: 'Pengguna',
-              icon: 'group',
-              permission: 'users',
-            },
-            {
-              to: '/karyawan',
-              label: 'Karyawan',
-              icon: 'person_search',
-              permission: 'karyawan',
-            },
-          ],
-        },
-        {
-          key: 'sistem',
-          label: 'Sistem',
-          icon: 'settings_suggest',
-          items: [
-            {
-              to: '/logs',
-              label: 'Log Aktivitas',
-              icon: 'receipt_long',
-              permission: 'logs',
-            },
-            {
-              to: '/export',
-              label: 'Ekspor Data',
-              icon: 'output',
-              permission: 'export',
-              superadminOnly: true,
-            },
-            {
-              to: '/database',
-              label: 'Database',
-              icon: 'database',
-              superadminOnly: true,
-            },
-          ],
-        },
-      ],
-    },
-  ]
+  const gate = { hasPermission, isSuperAdmin: isSuperAdmin.value }
 
-  return groups
+  return configuredGroups
     .map((g) => {
-      const isItemVisible = (item) => {
-        if (item.superadminOnly) {
-          return isSuperAdmin.value
-        }
-        if (!item.permission) {
-          return true
-        }
-        return hasPermission(item.permission)
-      }
-
-      const validItems = (g.items || []).filter(isItemVisible)
+      const validItems = (g.items || []).filter((item) => isNavItemVisible(item, gate))
 
       const validParents = (g.parents || [])
         .map((p) => ({
           ...p,
-          items: (p.items || []).filter(isItemVisible),
+          items: (p.items || []).filter((item) => isNavItemVisible(item, gate)),
         }))
         .filter((p) => p.items.length > 0)
 
@@ -503,6 +328,7 @@ function closeSubmenuAndMobile() {
             >
               <RouterLink
                 :to="item.to"
+                :aria-current="route.path === item.to ? 'page' : undefined"
                 class="group flex items-center transition-all duration-150 relative cursor-pointer"
                 :class="[
                   isEffectiveCollapsed
@@ -632,6 +458,7 @@ function closeSubmenuAndMobile() {
                   v-for="sub in parent.items"
                   :key="sub.to"
                   :to="sub.to"
+                  :aria-current="route.path === sub.to ? 'page' : undefined"
                   class="group flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-[12px] transition-all duration-150 relative"
                   :class="
                     route.path === sub.to
@@ -684,6 +511,7 @@ function closeSubmenuAndMobile() {
           v-for="sub in activeFlyoutParent.items"
           :key="sub.to"
           :to="sub.to"
+          :aria-current="route.path === sub.to ? 'page' : undefined"
           class="group flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-[12px] transition-all cursor-pointer"
           :class="
             route.path === sub.to

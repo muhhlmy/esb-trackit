@@ -34,8 +34,15 @@ const isFullscreenEditor = computed(() => {
 
 const isHelpCenterView = computed(() => {
   const p = route.path
-  if (p === '/' || p.startsWith('/cases')) {
+  // Landing Help Center publik tetap standalone (tanpa sidebar TrackIT).
+  if (p === '/') {
     return true
+  }
+  // Cases & Artikel: user terotentikasi melihatnya di dalam app-shell TrackIT
+  // agar sidebar menu tidak hilang & tetap saat scroll; tamu anonim tetap
+  // dapat layout Help Center.
+  if (p.startsWith('/cases')) {
+    return !user.value
   }
   return false
 })
@@ -166,6 +173,11 @@ onUnmounted(() => {
     </div>
 
     <AppBottomNav />
+
+    <!-- Shared notifications for the primary app shell. Previously absent here,
+         so useToast() calls in FaqAdminView/DocEditorView/useCases never rendered
+         and DatabaseView/ExportView had to ship their own private toast. -->
+    <Toast />
   </template>
 </template>
 

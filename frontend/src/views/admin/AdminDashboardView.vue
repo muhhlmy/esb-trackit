@@ -4,8 +4,7 @@ import { ref, computed, onMounted, nextTick } from 'vue'
 import { useRouter, RouterLink } from 'vue-router'
 import { useCases } from '@/composables/useCases'
 import { useAuth } from '@/composables/useAuth'
-import gsap from 'gsap'
-import { isReducedMotion } from '@/composables/useGsap'
+import { animateIn, isReducedMotion } from '@/composables/useGsap'
 import { useViewMode } from '@/composables/useViewMode.js'
 import CustomSelect from '@/components/ui/CustomSelect.vue'
 import AppViewToggle from '@/components/ui/AppViewToggle.vue'
@@ -69,7 +68,7 @@ onMounted(async () => {
   await nextTick()
   if (!mainScope.value) return
 
-  gsap.context(() => {
+  animateIn(mainScope, (gsap) => {
     gsap.fromTo(
       '.gsap-admin-el',
       { opacity: 0, y: 10, scale: 0.99 },
@@ -83,7 +82,7 @@ onMounted(async () => {
         clearProps: 'all',
       },
     )
-  }, mainScope.value)
+  })
 })
 
 const filteredCases = computed(() => {
@@ -319,7 +318,7 @@ function getCategoryBadgeClass(category) {
           v-model="searchQuery"
           type="text"
           aria-label="Cari kasus"
-          placeholder="Cari judul, deskripsi, atau tag..."
+          placeholder="Cari judul, deskripsi, atau tag…"
           class="w-full bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-700 rounded-xl pl-9 pr-9 py-2 sm:py-2.5 text-xs sm:text-sm font-normal text-[#333333] dark:text-white placeholder-[#687281] dark:placeholder-slate-500 focus:outline-none focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 transition-all shadow-2xs"
         />
         <button
@@ -363,7 +362,7 @@ function getCategoryBadgeClass(category) {
             v-model="selectedCategory"
             :options="CATEGORY_OPTIONS"
             aria-label="Kategori"
-            placeholder="Semua Kategori"
+            placeholder="Semua kategori"
             :block="true"
             height-class="h-9"
           />

@@ -22,7 +22,7 @@ const dictionaries = {
     // Home Hero
     hero_tag: 'Pusat Bantuan',
     hero_title: 'Apa yang bisa kami bantu?',
-    hero_subtitle: 'Cari artikel, panduan troubleshooting, dan basis pengetahuan IT kami.',
+    hero_subtitle: 'Temukan panduan, langkah troubleshooting, dan artikel IT — tanpa antrean.',
     search_placeholder: 'Cari basis pengetahuan...',
     search_btn: 'Cari',
     popular_searches: 'Pencarian populer',
@@ -34,27 +34,23 @@ const dictionaries = {
 
     // Topic Cards (fallback & translations)
     topic_it_title: 'IT Support',
-    topic_it_desc:
-      'Pelajari dasar penyiapan profil IT, permintaan laptop, software, dan koneksi jaringan.',
+    topic_it_desc: 'Setup perangkat, permintaan laptop, instalasi software, dan akses jaringan.',
     topic_hr_title: 'Human Resources (HR)',
-    topic_hr_desc:
-      'Kelola preferensi akun, Google Workspace, onboarding karyawan, 2SV, dan hak akses.',
+    topic_hr_desc: 'Akun Google Workspace, onboarding, 2SV, dan pengaturan hak akses.',
     topic_ga_title: 'General Affairs (GA)',
-    topic_ga_desc:
-      'Layanan operasional kantor, pengadaan aset fasilitas GA, inventaris gedung, dan kebutuhan kerja.',
+    topic_ga_desc: 'Pengadaan aset kantor, inventaris, dan layanan operasional gedung.',
 
     // Featured Articles
     featured_articles: 'Artikel Unggulan',
     view_all_sops: 'Lihat Semua Artikel',
 
     // FAQ
-    faq_tag: 'PERTANYAAN SEPUTAR HELPDESK',
-    faq_title: 'Pertanyaan Umum & Troubleshooting',
+    faq_tag: 'FAQ',
+    faq_title: 'Pertanyaan yang sering diajukan',
 
     // Assistance section
     need_assistance_title: 'Butuh Bantuan Personal?',
-    need_assistance_desc:
-      'Jika Anda belum menemukan informasi yang dibutuhkan, tim IT Support kami siap membantu Anda secara langsung.',
+    need_assistance_desc: 'Belum nemu jawabannya? Tim IT Support siap bantu langsung.',
     submit_ticket: 'Kirim Tiket',
     sign_in_to_submit: 'Masuk untuk Kirim Tiket',
     go_to_dashboard: 'Buka Dashboard',
@@ -81,7 +77,7 @@ const dictionaries = {
     // Home Hero
     hero_tag: 'Help Center',
     hero_title: 'What can we help you find?',
-    hero_subtitle: 'Search our articles, troubleshooting guides, and IT knowledge base.',
+    hero_subtitle: 'Find guides, troubleshooting steps, and IT articles — no waiting in line.',
     search_placeholder: 'Search the knowledge base...',
     search_btn: 'Search',
     popular_searches: 'Popular searches',
@@ -93,27 +89,23 @@ const dictionaries = {
 
     // Topic Cards (fallback & translations)
     topic_it_title: 'IT Support',
-    topic_it_desc:
-      'Learn the basics of setting up your IT profile, laptop requests, software, and connecting network tools.',
+    topic_it_desc: 'Device setup, laptop requests, software installs, and network access.',
     topic_hr_title: 'Human Resources (HR)',
-    topic_hr_desc:
-      'Customize your experience with account settings, Google Workspace, onboarding, 2SV, and permissions.',
+    topic_hr_desc: 'Google Workspace accounts, onboarding, 2SV, and access permissions.',
     topic_ga_title: 'General Affairs (GA)',
-    topic_ga_desc:
-      'Office facility management, physical asset requests, building maintenance, and operational tools.',
+    topic_ga_desc: 'Office asset procurement, inventory, and building operations.',
 
     // Featured Articles
     featured_articles: 'Featured Articles',
     view_all_sops: 'View all Articles',
 
     // FAQ
-    faq_tag: 'FREQUENTLY ASKED QUESTIONS',
-    faq_title: 'Frequently Asked Questions & Troubleshooting',
+    faq_tag: 'FAQ',
+    faq_title: 'Frequently asked questions',
 
     // Assistance section
     need_assistance_title: 'Need Personal Assistance?',
-    need_assistance_desc:
-      "If you couldn't find the information you need, our IT support team is ready to assist you. Submit a ticket to contact support right away.",
+    need_assistance_desc: "Can't find the answer? Our IT Support team is ready to help directly.",
     submit_ticket: 'Submit a Ticket',
     sign_in_to_submit: 'Sign In to Submit a Ticket',
     go_to_dashboard: 'Go to Dashboard',

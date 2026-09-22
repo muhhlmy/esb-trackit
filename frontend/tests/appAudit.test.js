@@ -51,7 +51,8 @@ test('authenticated views are lazy-loaded instead of joining the initial bundle'
     'ExportView',
     'AccessDeniedView',
   ]) {
-    assert.match(source, new RegExp(`component: \\(\\) => import\\('\\.\\./views/${view}\\.vue'\\)`))
+    // Helper page(path, name, loader, meta) menjadikan loader argumen ketiga.
+    assert.match(source, new RegExp(`import\\('\\.\\./views/${view}\\.vue'\\)`))
     assert.doesNotMatch(source, new RegExp(`import ${view} from`))
   }
 })

@@ -153,10 +153,69 @@ const openForgotModal = () => {
   resetToken.value = ''
   clearInterval(resendInterval)
   clearInterval(expiryInterval)
+  bodyOverflowBackup = document.body.style.overflow
+  document.body.style.overflow = 'hidden'
+  nextTick(() => {
+    forgotEmailInput.value?.focus()
+  })
 }
+
+// ── Focus management, Escape & scroll lock untuk modal reset kata sandi ──
+const forgotModalPanelRef = ref(null)
+const forgotEmailInput = ref(null)
+
+function getForgotModalFocusableElements() {
+  const panel = forgotModalPanelRef.value
+  if (!panel) return []
+  return Array.from(
+    panel.querySelectorAll(
+      'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+    ),
+  ).filter((el) => el.offsetParent !== null || el === document.activeElement)
+}
+
+function handleForgotModalKeydown(event) {
+  if (!showForgotModal.value) return
+  if (event.key === 'Escape') {
+    event.preventDefault()
+    closeForgotModal()
+    return
+  }
+  if (event.key !== 'Tab') return
+  const elements = getForgotModalFocusableElements()
+  if (elements.length === 0) {
+    event.preventDefault()
+    return
+  }
+  const first = elements[0]
+  const last = elements.at(-1)
+  if (event.shiftKey && document.activeElement === first) {
+    event.preventDefault()
+    last.focus()
+  } else if (!event.shiftKey && document.activeElement === last) {
+    event.preventDefault()
+    first.focus()
+  }
+}
+
+onMounted(() => {
+  document.addEventListener('keydown', handleForgotModalKeydown)
+})
+onUnmounted(() => {
+  document.removeEventListener('keydown', handleForgotModalKeydown)
+  document.body.style.overflow = bodyOverflowBackup
+})
+
+let bodyOverflowBackup = ''
 
 const closeForgotModal = () => {
   showForgotModal.value = false
+  document.body.style.overflow = ''
+  nextTick(() => {
+    // Kembalikan fokus ke tombol pemicu agar navigasi keyboard berlanjut dari
+    // titik sebelum modal dibuka (WCAG 2.2 modal dialog practice).
+    document.querySelector('.login-options button')?.focus()
+  })
   clearInterval(resendInterval)
   clearInterval(expiryInterval)
 }
@@ -430,6 +489,7 @@ const finishResetAndLogin = () => {
           class="login-reset fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/50 backdrop-blur-sm select-none"
         >
           <div
+            ref="forgotModalPanelRef"
             role="dialog"
             aria-modal="true"
             aria-labelledby="forgot-modal-title"
@@ -589,9 +649,11 @@ const finishResetAndLogin = () => {
                       </span>
                       <input
                         id="forgot-email"
+                        ref="forgotEmailInput"
                         v-model="forgotEmail"
                         type="email"
                         required
+                        autocomplete="email"
                         placeholder="nama@esb.co.id"
                         class="h-11 sm:h-12 w-full rounded-xl border border-slate-300 bg-slate-50/50 pl-10 pr-4 text-sm text-slate-900 transition-all placeholder:text-slate-400 focus:border-[#0A51B0] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#0A51B0]/10"
                       />

@@ -1,0 +1,22 @@
+{
+  "$metadata": {
+    "version": "1.0.0",
+    "description": "ESB TrackIT responsive breakpoint tokens."
+  },
+  "breakpoint": {
+    "sm": { "value": "640px", "type": "number", "description": "Small — large phones in landscape" },
+    "md": { "value": "768px", "type": "number", "description": "Medium — tablet portrait" },
+    "lg": { "value": "1024px", "type": "number", "description": "Large — tablet landscape / small laptop (sidebar breakpoint)" },
+    "xl": { "value": "1280px", "type": "number", "description": "XL — laptop / small desktop" },
+    "2xl": { "value": "1536px", "type": "number", "description": "2XL — large desktop / 4K" },
+    "3xl": { "value": "1920px", "type": "number", "description": "3XL — ultra-wide desktop" }
+  },
+  "container": {
+    "sm": { "value": "600px", "type": "number" },
+    "md": { "value": "720px", "type": "number" },
+    "lg": { "value": "1024px", "type": "number" },
+    "xl": { "value": "1280px", "type": "number" },
+    "2xl": { "value": "1536px", "type": "number" },
+    "3xl": { "value": "1920px", "type": "number" }
+  }
+}

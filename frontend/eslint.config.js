@@ -29,7 +29,16 @@ export default defineConfig([
   js.configs.recommended,
   ...pluginVue.configs['flat/essential'],
 
-  ...pluginOxlint.buildFromOxlintConfigFile('.oxlintrc.json'),
+  // Vue <script setup> uses defineProps to create variables — disable no-undef
+  // for .vue files; eslint-plugin-vue's vue/no-undef-properties covers it.
+  {
+    files: ['**/*.vue'],
+    rules: {
+      'no-undef': 'off',
+    },
+  },
+
+  pluginOxlint.buildFromOxlintConfigFile('.oxlintrc.json'),
 
   skipFormatting,
 ])

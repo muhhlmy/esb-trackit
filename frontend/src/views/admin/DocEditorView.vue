@@ -1097,7 +1097,7 @@ function goToAdminCases() {
             aria-label="Judul artikel"
             type="text"
             class="w-full text-xl sm:text-3xl font-extrabold text-[#333333] dark:text-white bg-transparent border-none focus:outline-none focus:ring-0 p-0 placeholder:text-[#5F7089] tracking-tight"
-            placeholder="Judul artikel..."
+            placeholder="Judul artikel…"
           />
 
           <!-- Summary Box -->
@@ -1123,7 +1123,7 @@ function goToAdminCases() {
               aria-label="Ringkasan artikel"
               rows="2"
               class="w-full bg-transparent text-xs sm:text-sm text-[#334155] dark:text-slate-300 focus:outline-none resize-none leading-relaxed font-normal"
-              placeholder="Ringkasan singkat artikel ini..."
+              placeholder="Ringkasan singkat artikel ini…"
             ></textarea>
           </div>
 
@@ -1498,7 +1498,7 @@ function goToAdminCases() {
             <input
               v-model="imageCaptionInput"
               type="text"
-              placeholder="Contoh: Tangkapan layar menu SSO Portal..."
+              placeholder="Contoh: Tangkapan layar menu SSO Portal…"
               class="w-full h-9 px-3 bg-[#F8FAFC] dark:bg-slate-800 border border-[#E2E8F0] dark:border-slate-700 rounded-xl text-xs font-medium focus:border-[#0A51B0] focus:outline-none"
             />
           </div>

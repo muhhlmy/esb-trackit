@@ -5,18 +5,16 @@ test.describe('Authentication - Session & Guard Suite', () => {
     page,
   }) => {
     await page.goto('/assets')
-    await expect(page).toHaveURL(/\/login$/)
+    // Guard router mempertahankan tujuan awal pada query redirect agar
+    // pengguna dapat dilanjutkan ke halaman tersebut setelah login.
+    await expect(page).toHaveURL(/\/login\?redirect=\/assets$/, { timeout: 10000 })
   })
 
-  test('Should redirect to /login when token in storage is invalid or removed', async ({ page }) => {
-    await page.goto('/login')
-    await page.evaluate(() => {
-      localStorage.setItem('token', 'invalid_jwt_token_12345')
-      localStorage.setItem('user', JSON.stringify({ email: 'fake@test.com', role: 'user' }))
-    })
-
-    await page.goto('/')
-    // App router or API interceptor should reject invalid token and return to /login
-    await expect(page.getByRole('button', { name: /masuk/i }).or(page.getByText(/login/i))).toBeVisible()
+  test('Should redirect to /login when session cookie is invalid or removed', async ({ page }) => {
+    // Auth aplikasi memakai cookie sesi HttpOnly (bukan token localStorage);
+    // menghapus cookie = sesi invalid, guard harus mengarahkan ke /login.
+    await page.context().clearCookies()
+    await page.goto('/assets')
+    await expect(page).toHaveURL(/\/login/, { timeout: 10000 })
   })
 })

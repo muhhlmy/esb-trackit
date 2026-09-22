@@ -1,0 +1,22 @@
+{
+  "$metadata": {
+    "version": "1.0.0",
+    "description": "ESB TrackIT motion tokens — subtle, functional. 3-tier easing system."
+  },
+  "duration": {
+    "fastest": { "value": "50ms", "type": "duration", "description": "Instant feedback — hover state micro-adjustments" },
+    "fast": { "value": "150ms", "type": "duration", "description": "Standard interactions — button hover, state transitions" },
+    "normal": { "value": "250ms", "type": "duration", "description": "Layout transitions — modal open/close, drawer slide" },
+    "slow": { "value": "400ms", "type": "duration", "description": "Page transitions, sidebar collapse" }
+  },
+  "easing": {
+    "standard": { "value": "cubic-bezier(0.4, 0, 0.2, 1)", "type": "cubicBezier", "description": "Standard ease-out — default for all interactions" },
+    "emphasized": { "value": "cubic-bezier(0.2, 0, 0, 1)", "type": "cubicBezier", "description": "Emphasized deceleration — page transitions" },
+    "accelerated": { "value": "cubic-bezier(0, 0, 0.2, 1)", "type": "cubicBezier", "description": "Accelerate-decelerate — entrance animations" },
+    "legacy": { "value": "ease", "type": "cubicBezier", "description": "Legacy ease (avoid; present for backward compat)" }
+  },
+  "transition-property": {
+    "DEFAULT": { "value": "background-color, border-color, color, opacity, transform", "type": "transitionProperty", "description": "Standard set — animate only these properties for 60fps" },
+    "colors": { "value": "background-color, border-color, color, opacity", "type": "transitionProperty" }
+  }
+}

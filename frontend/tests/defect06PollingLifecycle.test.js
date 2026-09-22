@@ -18,7 +18,8 @@ test('DEFECT-06 — SPA Polling & Request Lifecycle Audit Suite', async (t) => {
     const ticketsViewPath = resolve(process.cwd(), 'src/views/TicketsView.vue')
     const content = readFileSync(ticketsViewPath, 'utf8')
     assert.equal(
-      content.includes('setInterval(fetch') || content.includes('setInterval(() => { if (showDetail'),
+      content.includes('setInterval(fetch') ||
+        content.includes('setInterval(() => { if (showDetail'),
       false,
       'TicketsView.vue must not contain continuous network polling inside setInterval',
     )
@@ -33,20 +34,23 @@ test('DEFECT-06 — SPA Polling & Request Lifecycle Audit Suite', async (t) => {
     )
   })
 
-  await t.test('TEST 4 — request cancellation via AbortController is supported in client layer', () => {
-    const apiPath = resolve(process.cwd(), 'src/composables/useApi.js')
-    const ssePath = resolve(process.cwd(), 'src/composables/useTicketEvents.js')
-    const apiContent = readFileSync(apiPath, 'utf8')
-    const sseContent = readFileSync(ssePath, 'utf8')
-    assert.ok(
-      apiContent.includes('signal') || apiContent.includes('AbortError'),
-      'useApi must support AbortController signals and handle abort state',
-    )
-    assert.ok(
-      sseContent.includes('AbortController'),
-      'useTicketEvents must manage AbortController lifecycle',
-    )
-  })
+  await t.test(
+    'TEST 4 — request cancellation via AbortController is supported in client layer',
+    () => {
+      const apiPath = resolve(process.cwd(), 'src/composables/useApi.js')
+      const ssePath = resolve(process.cwd(), 'src/composables/useTicketEvents.js')
+      const apiContent = readFileSync(apiPath, 'utf8')
+      const sseContent = readFileSync(ssePath, 'utf8')
+      assert.ok(
+        apiContent.includes('signal') || apiContent.includes('AbortError'),
+        'useApi must support AbortController signals and handle abort state',
+      )
+      assert.ok(
+        sseContent.includes('AbortController'),
+        'useTicketEvents must manage AbortController lifecycle',
+      )
+    },
+  )
 
   await t.test('TEST 5 — useTicketEvents.js handles visibility change state', () => {
     const ssePath = resolve(process.cwd(), 'src/composables/useTicketEvents.js')
@@ -57,28 +61,31 @@ test('DEFECT-06 — SPA Polling & Request Lifecycle Audit Suite', async (t) => {
     )
   })
 
-  await t.test('TEST 6 — All primary views implement data-testid="page-ready" readiness signal', () => {
-    const viewFiles = [
-      'src/views/AssetsView.vue',
-      'src/views/AssetsGaView.vue',
-      'src/views/AssetsOpsView.vue',
-      'src/views/EmployeesView.vue',
-      'src/views/UsersView.vue',
-      'src/views/TicketsView.vue',
-      'src/views/DashboardView.vue',
-      'src/views/ExportView.vue',
-      'src/views/LogsView.vue',
-      'src/views/MyAssetsView.vue',
-      'src/views/SubmissionsView.vue',
-    ]
+  await t.test(
+    'TEST 6 — All primary views implement data-testid="page-ready" readiness signal',
+    () => {
+      const viewFiles = [
+        'src/views/AssetsView.vue',
+        'src/views/AssetsGaView.vue',
+        'src/views/AssetsOpsView.vue',
+        'src/views/EmployeesView.vue',
+        'src/views/UsersView.vue',
+        'src/views/TicketsView.vue',
+        'src/views/DashboardView.vue',
+        'src/views/ExportView.vue',
+        'src/views/LogsView.vue',
+        'src/views/MyAssetsView.vue',
+        'src/views/SubmissionsView.vue',
+      ]
 
-    for (const viewFile of viewFiles) {
-      const filePath = resolve(process.cwd(), viewFile)
-      const content = readFileSync(filePath, 'utf8')
-      assert.ok(
-        content.includes('data-testid="page-ready"') || content.includes('data-testid='),
-        `${viewFile} must include data-testid="page-ready" readiness signal`,
-      )
-    }
-  })
+      for (const viewFile of viewFiles) {
+        const filePath = resolve(process.cwd(), viewFile)
+        const content = readFileSync(filePath, 'utf8')
+        assert.ok(
+          content.includes('data-testid="page-ready"') || content.includes('data-testid='),
+          `${viewFile} must include data-testid="page-ready" readiness signal`,
+        )
+      }
+    },
+  )
 })

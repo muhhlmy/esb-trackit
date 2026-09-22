@@ -6,7 +6,7 @@ const submissionsSourceUrl = new URL('../src/views/SubmissionsView.vue', import.
 
 test('SubmissionsView maps backend asset properties to frontend properties', async () => {
   const source = await readFile(submissionsSourceUrl, 'utf8')
-  
+
   // Verify that fetchData normalizes assetData
   assert.match(source, /id_aset:\s*a\.id_aset\s*\|\|\s*a\.id/)
   assert.match(source, /label_aset:\s*hostname/)

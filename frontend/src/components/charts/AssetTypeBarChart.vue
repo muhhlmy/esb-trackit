@@ -23,7 +23,7 @@ const props = defineProps({
   embedded: { type: Boolean, default: false },
 })
 
-const { chartColors, palette } = useChartTheme()
+const { chartColors, fontStack } = useChartTheme()
 
 const isEmpty = computed(() => !props.data || props.data.length === 0)
 
@@ -33,9 +33,16 @@ const chartData = computed(() => ({
     {
       label: 'Jumlah Unit',
       data: props.data.map((d) => Number(d.count) || 0),
-      backgroundColor: palette,
-      borderRadius: 8,
+      // Satu aksen brand; bar paling tinggi disorot lebih pekat.
+      backgroundColor: (context) => {
+        const value = context.parsed?.y ?? 0
+        const max = Math.max(...props.data.map((d) => Number(d.count) || 0), 1)
+        return value === max ? chartColors.primary : 'rgba(10, 81, 176, 0.55)'
+      },
+      hoverBackgroundColor: chartColors.secondary,
+      borderRadius: 7,
       borderSkipped: false,
+      maxBarThickness: 44,
     },
   ],
 }))
@@ -43,29 +50,48 @@ const chartData = computed(() => ({
 const chartOptions = computed(() => ({
   responsive: true,
   maintainAspectRatio: false,
+  interaction: { mode: 'index', intersect: false },
+  animations: { colors: true },
   plugins: {
     legend: { display: false },
     tooltip: {
-      backgroundColor: '#1E293B',
-      padding: 10,
-      cornerRadius: 8,
+      backgroundColor: '#0F172A',
+      titleColor: '#FFFFFF',
+      bodyColor: '#E2E8F0',
+      borderColor: 'rgba(9, 124, 222, 0.45)',
+      borderWidth: 1,
+      padding: 12,
+      cornerRadius: 10,
+      displayColors: false,
+      titleFont: { family: fontStack, size: 12, weight: '700' },
+      bodyFont: { family: fontStack, size: 13, weight: '600' },
       callbacks: {
-        label: (ctx) => ` ${ctx.parsed.y} Unit`,
+        label: (ctx) => ` ${ctx.parsed.y} unit`,
       },
     },
   },
   scales: {
     x: {
       grid: { display: false },
+      border: { display: false },
       ticks: {
         color: chartColors.mutedText,
-        font: { family: "'Plus Jakarta Sans', sans-serif", size: 11, weight: '600' },
+        font: { family: fontStack, size: 10, weight: '600' },
+        maxRotation: 45,
+        minRotation: 0,
+        autoSkip: true,
       },
     },
     y: {
       beginAtZero: true,
+      border: { display: false },
       grid: { color: chartColors.gridLine },
-      ticks: { color: chartColors.mutedText, precision: 0 },
+      ticks: {
+        color: chartColors.mutedText,
+        font: { family: fontStack, size: 10 },
+        precision: 0,
+        maxTicksLimit: 6,
+      },
     },
   },
 }))
@@ -74,7 +100,7 @@ const chartOptions = computed(() => ({
 <template>
   <BaseChartCard
     title="Sebaran Aset Berdasarkan Tipe"
-    subtitle="Distribusi perangkat berdasarkan jenis (Laptop, Server, Printer, dll)"
+    subtitle="Distribusi perangkat berdasarkan jenis (laptop, server, printer, dll.)"
     :loading="loading"
     :empty="isEmpty"
     :error="error"

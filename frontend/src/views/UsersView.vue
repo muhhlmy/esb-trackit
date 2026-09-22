@@ -10,6 +10,7 @@ import { useAuth } from '../composables/useAuth.js'
 import { animateStagger } from '../composables/useGsap.js'
 import { isSuperAdminRole as isRoleSuperAdmin } from '../utils/permissionAccess.js'
 import AppModal from '../components/ui/AppModal.vue'
+import StatCard from '../components/ui/StatCard.vue'
 import AppBadge from '../components/ui/AppBadge.vue'
 import AppRowActions from '../components/ui/AppRowActions.vue'
 import AppPagination from '../components/ui/AppPagination.vue'
@@ -296,6 +297,18 @@ watch(
 const paginatedUsers = computed(() => {
   const start = (currentPage.value - 1) * itemsPerPage.value
   return filteredUsers.value.slice(start, start + itemsPerPage.value)
+})
+
+// ── StatCards (derived from the already-loaded user list, no extra request) ──
+const userStats = computed(() => {
+  const list = filteredUsers.value
+  const count = (role) => list.filter((u) => (u.role || 'user').toLowerCase() === role).length
+  return {
+    total: list.length,
+    superadmin: count('superadmin'),
+    admin: count('admin'),
+    reporter: list.length - count('superadmin') - count('admin'),
+  }
 })
 
 // ── CRUD Functions ───────────────────────────────────────────
@@ -665,77 +678,63 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
       </div>
     </Transition>
 
-    <!-- Simplified SaaS Header & Toolbar Container (sticky mengikuti scroll) -->
-    <div class="ws-toolbar-sticky">
-      <div
-        class="admin-page-header flex flex-col gap-3.5 bg-white p-3.5 sm:p-4.5 rounded-2xl border border-[#E2E8F0]/80 shadow-2xs"
+    <!-- Page Header -->
+    <PageHeader
+      title="Data Pengguna"
+      subtitle="Pengelolaan akun, role, dan hak akses pengguna sistem"
+      icon="group"
+    >
+      <button
+        v-if="canWriteUsers"
+        type="button"
+        @click="openAdd"
+        class="h-9 shrink-0 rounded-lg bg-[#0A51B0] px-2.5 sm:px-3.5 text-xs font-semibold text-white shadow-2xs hover:bg-[#0A4391] active:scale-[0.98] transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+        title="Tambah admin baru atau promosikan akses"
       >
-        <!-- Row 1: Page Title & Primary CTA -->
-        <div class="flex items-center justify-between gap-2 sm:gap-3">
-          <div class="min-w-0">
-            <h2 class="text-base sm:text-lg font-bold text-[#333333] tracking-tight">
-              Data Pengguna
-            </h2>
-            <p class="text-[11px] sm:text-xs text-[#5F7089] mt-0.5 leading-normal">
-              Pengelolaan akun, role, dan hak akses pengguna sistem
-            </p>
-          </div>
+        <span aria-hidden="true" class="material-symbols-outlined text-[16px]">person_add</span>
+        <span class="hidden sm:inline whitespace-nowrap">Tambah Admin / Akses</span>
+      </button>
+    </PageHeader>
 
-          <button
-            v-if="canWriteUsers"
-            type="button"
-            @click="openAdd"
-            class="toolbar-primary-button h-9 shrink-0 rounded-lg bg-[#0A51B0] px-2.5 sm:px-3.5 text-xs font-semibold text-white shadow-2xs hover:bg-[#0A4391] active:scale-[0.98] transition-all flex items-center justify-center gap-1.5 cursor-pointer"
-            title="Tambah admin baru atau promosikan akses"
-          >
-            <span aria-hidden="true" class="material-symbols-outlined text-[16px]">person_add</span>
-            <span class="hidden sm:inline whitespace-nowrap">Tambah Admin / Akses</span>
-          </button>
-        </div>
-
-        <!-- Row 2: Search & Filters -->
-        <div
-          class="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 w-full min-w-0 pt-2 border-t border-[#F1F5F9]"
+    <!-- Search & Filters -->
+    <div class="flex items-center gap-2.5 w-full min-w-0">
+      <div class="relative h-9 min-w-0">
+        <span
+          aria-hidden="true"
+          class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-[17px] text-[#687281] pointer-events-none"
+          >search</span
         >
-          <div class="relative h-9 min-w-0">
-            <span
-              aria-hidden="true"
-              class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-[17px] text-[#687281] pointer-events-none"
-              >search</span
-            >
-            <input
-              id="user-search"
-              v-model="searchQuery"
-              type="search"
-              autocomplete="off"
-              aria-label="Cari pengguna"
-              placeholder="Cari nama atau email pengguna..."
-              class="toolbar-search-input h-full min-h-0 w-full rounded-lg border border-[#E2E8F0] bg-white pl-8 text-xs text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
-              :class="searchQuery ? 'pr-8' : 'pr-2.5'"
-            />
-            <button
-              v-if="searchQuery"
-              type="button"
-              @click="searchQuery = ''"
-              class="absolute right-2 top-1/2 -translate-y-1/2 flex h-5 w-5 items-center justify-center rounded-full bg-[#E2E8F0] text-[#5F7089] hover:bg-[#CBD5E1] hover:text-[#333333] transition-colors cursor-pointer"
-              title="Hapus pencarian"
-            >
-              <span aria-hidden="true" class="material-symbols-outlined text-[13px]">close</span>
-            </button>
-          </div>
-
-          <button
-            type="button"
-            @click="showFilterModal = true"
-            class="toolbar-filter-button h-9 shrink-0 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-semibold text-[#5F7089] hover:bg-white"
-          >
-            <span aria-hidden="true" class="material-symbols-outlined mr-1 align-middle text-[16px]"
-              >filter_alt</span
-            >Filter
-          </button>
-          <AppViewToggle v-model="viewMode" />
-        </div>
+        <input
+          id="user-search"
+          v-model="searchQuery"
+          type="search"
+          autocomplete="off"
+          aria-label="Cari pengguna"
+          placeholder="Cari nama atau email pengguna…"
+          class="toolbar-search-input h-full min-h-0 w-full rounded-lg border border-[#E2E8F0] bg-white pl-8 text-xs text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
+          :class="searchQuery ? 'pr-8' : 'pr-2.5'"
+        />
+        <button
+          v-if="searchQuery"
+          type="button"
+          @click="searchQuery = ''"
+          class="absolute right-2 top-1/2 -translate-y-1/2 flex h-5 w-5 items-center justify-center rounded-full bg-[#E2E8F0] text-[#5F7089] hover:bg-[#CBD5E1] hover:text-[#333333] transition-colors cursor-pointer"
+          title="Hapus pencarian"
+        >
+          <span aria-hidden="true" class="material-symbols-outlined text-[13px]">close</span>
+        </button>
       </div>
+
+      <button
+        type="button"
+        @click="showFilterModal = true"
+        class="h-9 shrink-0 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-semibold text-[#5F7089] hover:bg-white"
+      >
+        <span aria-hidden="true" class="material-symbols-outlined mr-1 align-middle text-[16px]"
+          >filter_alt</span
+        >Filter
+      </button>
+      <AppViewToggle v-model="viewMode" />
     </div>
 
     <FilterModal
@@ -757,6 +756,24 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
         :block="true"
       />
     </FilterModal>
+
+    <!-- ── Card Stats Pengguna ── -->
+    <div v-if="!isLoading && users.length" class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3">
+      <StatCard
+        title="Total Pengguna"
+        :value="userStats.total"
+        icon="manage_accounts"
+        color="primary"
+      />
+      <StatCard
+        title="Superadmin"
+        :value="userStats.superadmin"
+        icon="shield_person"
+        color="purple"
+      />
+      <StatCard title="Admin" :value="userStats.admin" icon="admin_panel_settings" color="cyan" />
+      <StatCard title="Reporter" :value="userStats.reporter" icon="support_agent" color="success" />
+    </div>
 
     <!-- ── Tabel Pengguna ─────────────────────────────────── -->
     <div class="rounded-2xl border border-[#E2E8F0]/80 bg-white shadow-2xs overflow-hidden">
@@ -826,36 +843,40 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
               <col class="w-[12%]" />
               <col class="w-[8%]" />
             </colgroup>
-            <thead
-              class="sticky top-0 z-10 border-b border-[#E2E8F0] bg-[#F8FAFC] select-none whitespace-nowrap"
-            >
+            <thead class="border-b border-[#E2E8F0] bg-[#F8FAFC] select-none whitespace-nowrap">
               <tr>
                 <th
+                  scope="col"
                   class="py-3 pl-5 pr-4 text-[11px] font-semibold uppercase tracking-wider text-[#5F7089] text-left whitespace-nowrap"
                 >
                   Pengguna
                 </th>
                 <th
+                  scope="col"
                   class="py-3 px-4 text-[11px] font-semibold uppercase tracking-wider text-[#5F7089] text-left whitespace-nowrap"
                 >
                   Role Akses
                 </th>
                 <th
+                  scope="col"
                   class="py-3 px-4 text-[11px] font-semibold uppercase tracking-wider text-[#5F7089] text-left whitespace-nowrap"
                 >
                   Sub Role / Unit Ditangani
                 </th>
                 <th
+                  scope="col"
                   class="py-3 px-4 text-[11px] font-semibold uppercase tracking-wider text-[#5F7089] text-left whitespace-nowrap"
                 >
                   Hak Akses Fitur
                 </th>
                 <th
+                  scope="col"
                   class="py-3 px-4 text-[11px] font-semibold uppercase tracking-wider text-[#5F7089] text-left whitespace-nowrap"
                 >
                   Status
                 </th>
                 <th
+                  scope="col"
                   class="py-3 pr-5 pl-4 text-right text-[11px] font-semibold uppercase tracking-wider text-[#5F7089] whitespace-nowrap"
                 >
                   Aksi
@@ -936,13 +957,16 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
 
                 <!-- Aksi -->
                 <td class="py-4 pr-5 pl-4 text-right overflow-hidden" @click.stop>
-                  <AppRowActions :actions="getUserActions(user)" />
+                  <AppRowActions
+                    :actions="getUserActions(user)"
+                    :label="`Aksi pengguna ${user.nama || ''}`"
+                  />
                 </td>
               </tr>
 
               <!-- Empty state -->
               <tr v-if="filteredUsers.length === 0">
-                <td colspan="7" class="px-5 py-12 text-center">
+                <td colspan="6" class="px-5 py-12 text-center">
                   <div class="flex flex-col items-center gap-2">
                     <span
                       aria-hidden="true"
@@ -1018,7 +1042,10 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
                   </div>
                 </div>
                 <div @click.stop>
-                  <AppRowActions :actions="getUserActions(user)" />
+                  <AppRowActions
+                    :actions="getUserActions(user)"
+                    :label="`Aksi pengguna ${user.nama || ''}`"
+                  />
                 </div>
               </div>
 
@@ -1131,8 +1158,8 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
               value-key="id_karyawan"
               label-key="nama_karyawan"
               secondary-label-key="detail"
-              placeholder="Pilih karyawan yang akan diberikan akses..."
-              search-placeholder="Cari nama, NIK, jabatan, atau departemen..."
+              placeholder="Pilih karyawan yang akan diberikan akses…"
+              search-placeholder="Cari nama, NIK, jabatan, atau departemen…"
               aria-label="Pilih karyawan"
               clearable
               @update:modelValue="handleEmployeeSelect"
@@ -1589,18 +1616,6 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
 <style scoped src="../assets/ws-table.css"></style>
 
 <style scoped>
-.toolbar-search-input {
-  height: 36px;
-  min-height: 36px;
-  max-height: 36px;
-  box-sizing: border-box;
-}
-.toolbar-filter-button {
-  height: 36px;
-  min-height: 36px !important;
-  max-height: 36px;
-  box-sizing: border-box;
-}
 .user-entry-form {
   gap: 22px;
   padding: 0;

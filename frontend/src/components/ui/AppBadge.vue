@@ -12,7 +12,7 @@ const classes = {
   danger: 'bg-[#FEE2E2] text-[#B91C1C] border-[#FCA5A5] font-bold',
   info: 'bg-[#DBEAFE] text-[#1E40AF] border-[#93C5FD] font-bold',
   cyan: 'bg-[#E0F2FE] text-[#0369A1] border-[#7DD3FC] font-bold',
-  purple: 'bg-[#DBEAFE] text-[#1E40AF] border-[#93C5FD] font-bold',
+  purple: 'bg-[#EDE9FE] text-[#6D28D9] border-[#C4B5FD] font-bold',
   default: 'bg-[#F1F5F9] text-[#334155] border-[#CBD5E1] font-bold',
 }
 
@@ -22,7 +22,7 @@ const dotColors = {
   danger: 'bg-[#B91C1C]',
   info: 'bg-[#1E40AF]',
   cyan: 'bg-[#0369A1]',
-  purple: 'bg-[#1E40AF]',
+  purple: 'bg-[#6D28D9]',
   default: 'bg-[#475569]',
 }
 </script>

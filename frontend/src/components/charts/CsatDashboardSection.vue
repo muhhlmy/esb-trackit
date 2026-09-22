@@ -141,19 +141,19 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="flex flex-col gap-5">
+  <div class="flex flex-col gap-4">
     <!-- Header CSAT Section -->
-    <div class="flex items-center justify-between">
-      <div>
-        <h3 class="text-[17px] font-extrabold text-[#2A3547] leading-tight">
-          Kepuasan Pelanggan (CSAT Monitoring)
+    <div class="flex items-center justify-between gap-3">
+      <div class="min-w-0">
+        <h3 class="text-base font-bold tracking-tight text-[#1E293B] leading-tight">
+          Kepuasan Penanganan Tiket
         </h3>
-        <p class="text-[12px] font-medium text-[#66728d] mt-0.5">
-          Analisis skor CSAT perbulan dan sebaran ulasan penyelesaian tiket
+        <p class="mt-0.5 text-xs font-medium text-[#5B6B84]">
+          Skor CSAT bulanan dan sebaran ulasan penyelesaian tiket
         </p>
       </div>
       <span
-        class="inline-flex items-center gap-1.5 rounded-full bg-[#FEF3C7] px-3.5 py-1 text-[11px] font-bold text-[#FFAE1F]"
+        class="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-[#FEF3C7] px-3 py-1 text-[11px] font-bold text-[#92400E]"
       >
         <span aria-hidden="true" class="material-symbols-outlined text-[15px] fill-1">star</span>
         CSAT Analytics
@@ -164,19 +164,19 @@ onMounted(() => {
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
       <!-- Kartu Rata-rata CSAT -->
       <div
-        class="shadow-card rounded-2xl border border-[#E5EAEF] bg-white p-6 lg:col-span-5 flex flex-col justify-between"
+        class="rounded-xl border border-[#E2E8F0] bg-white p-5 flex flex-col justify-between lg:col-span-5"
       >
-        <div class="flex items-center justify-between pb-3 border-b border-[#F1F5F9]">
-          <div>
-            <h3 class="text-[15px] font-extrabold text-[#2A3547] leading-tight">
+        <div class="flex items-center justify-between gap-3 pb-3 border-b border-[#F1F5F9]">
+          <div class="min-w-0">
+            <h3 class="text-sm font-bold text-[#1E293B] leading-tight">
               Rata-rata Kepuasan (CSAT)
             </h3>
-            <p class="text-[11px] font-medium text-[#66728d] mt-0.5">
-              Penilaian pelapor terhadap penyelesaian tiket
+            <p class="mt-0.5 text-[11px] font-medium text-[#5B6B84]">
+              Penilaian pelapor atas tiket yang selesai
             </p>
           </div>
           <span
-            class="flex h-9 w-9 items-center justify-center rounded-xl bg-[#FEF3C7] text-[#FFAE1F]"
+            class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#FEF3C7] text-[#B45309]"
           >
             <span aria-hidden="true" class="material-symbols-outlined text-[20px] fill-1"
               >star</span
@@ -192,7 +192,7 @@ onMounted(() => {
           <div
             class="h-8 w-8 animate-spin rounded-full border-[3px] border-[#E5EAEF] border-t-[#FFAE1F]"
           ></div>
-          <span class="text-[12px] font-medium">Memuat data CSAT...</span>
+          <span class="text-[12px] font-medium">Memuat data CSAT…</span>
         </div>
 
         <!-- Error -->
@@ -225,21 +225,23 @@ onMounted(() => {
         <!-- Content -->
         <div v-else class="flex flex-1 flex-col justify-center">
           <div class="flex items-end gap-2 mt-4">
-            <p class="font-num text-[44px] font-black leading-none text-[#2A3547]">
+            <p
+              class="font-num text-[36px] font-extrabold leading-none tracking-tight text-[#1E293B]"
+            >
               {{ stats.averageRating.toFixed(1) }}
             </p>
-            <p class="mb-1 text-[14px] font-bold text-[#66728d]">/ 5.0</p>
+            <p class="mb-1 text-sm font-bold text-[#5B6B84]">/ 5.0</p>
           </div>
           <div class="mt-2">
             <CsatStars :value="stats.averageRating" size="26px" />
           </div>
           <div class="mt-3 flex items-center gap-2">
             <span
-              class="inline-flex items-center rounded-full bg-[#ECFDF5] px-2.5 py-1 text-[11px] font-bold text-[#13DEB9]"
+              class="inline-flex items-center rounded-full bg-[#ECFDF5] px-2.5 py-1 text-[11px] font-bold text-[#047857]"
             >
               {{ ratingLabel }}
             </span>
-            <span class="text-[11px] font-medium text-[#66728d]"
+            <span class="text-[11px] font-medium text-[#5B6B84]"
               >{{ stats.totalRatings }} total ulasan</span
             >
           </div>
@@ -247,16 +249,12 @@ onMounted(() => {
       </div>
 
       <!-- Bar Chart Distribusi Rating -->
-      <div
-        class="shadow-card flex flex-col rounded-2xl border border-[#E5EAEF] bg-white p-5 lg:col-span-7"
-      >
+      <div class="flex flex-col rounded-xl border border-[#E2E8F0] bg-white p-5 lg:col-span-7">
         <div class="flex items-center justify-between pb-3 border-b border-[#F1F5F9] mb-4">
-          <div>
-            <h3 class="text-[15px] font-extrabold text-[#2A3547] leading-tight">
-              Distribusi Penilaian
-            </h3>
-            <p class="text-[11px] font-medium text-[#66728d] mt-0.5">
-              Sebaran jumlah ulasan per tingkat bintang
+          <div class="min-w-0">
+            <h3 class="text-sm font-bold text-[#1E293B] leading-tight">Distribusi Penilaian</h3>
+            <p class="mt-0.5 text-[11px] font-medium text-[#5B6B84]">
+              Sebaran ulasan per tingkat bintang
             </p>
           </div>
         </div>

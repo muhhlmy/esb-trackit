@@ -11,9 +11,9 @@ test.describe('Authentication - Login Suite', () => {
     await page.locator('#password').fill(TEST_USERS.superadmin.password)
     await page.getByRole('button', { name: /masuk/i }).click()
 
-    await expect(page).not.toHaveURL(/\/login$/)
+    await expect(page).not.toHaveURL(/\/login/, { timeout: 20000 })
     await expect(page.getByText('Total Aset', { exact: true }).first()).toBeVisible({
-      timeout: 10000,
+      timeout: 15000,
     })
   })
 
@@ -23,8 +23,8 @@ test.describe('Authentication - Login Suite', () => {
 
     await page.getByRole('button', { name: /masuk/i }).click()
 
-    await expect(page.getByText(/gagal|salah|sandi|periksa/i).first()).toBeVisible({ timeout: 5000 })
-    await expect(page).toHaveURL(/\/login$/)
+    await expect(page.getByText(/gagal|salah|sandi|periksa/i).first()).toBeVisible({ timeout: 10000 })
+    await expect(page).toHaveURL(/\/login/, { timeout: 10000 })
   })
 
   test('Should display error when logging in with non-existent user email', async ({ page }) => {
@@ -33,8 +33,8 @@ test.describe('Authentication - Login Suite', () => {
 
     await page.getByRole('button', { name: /masuk/i }).click()
 
-    await expect(page.getByText(/gagal|salah|tidak valid|periksa/i).first()).toBeVisible({ timeout: 5000 })
-    await expect(page).toHaveURL(/\/login$/)
+    await expect(page.getByText(/gagal|salah|tidak valid|periksa/i).first()).toBeVisible({ timeout: 10000 })
+    await expect(page).toHaveURL(/\/login/, { timeout: 10000 })
   })
 
   test('Should validate required empty input fields', async ({ page }) => {

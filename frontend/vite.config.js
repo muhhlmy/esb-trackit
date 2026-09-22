@@ -91,7 +91,7 @@ export default defineConfig(({ mode = 'development' }) => {
     ...FRONTEND_SECURITY_HEADERS,
     'Content-Security-Policy': FRONTEND_SECURITY_HEADERS['Content-Security-Policy'].replace(
       "connect-src 'self';",
-      "connect-src 'self' https://*.trycloudflare.com wss://*.trycloudflare.com " + hmrOrigins.join(' ') + ';',
+      "connect-src 'self' " + hmrOrigins.join(' ') + ';',
     ),
   }
 

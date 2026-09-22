@@ -334,6 +334,7 @@ async function submitImport() {
       <!-- Alert Notifikasi -->
       <div
         v-if="modalError"
+        role="alert"
         class="rounded-xl bg-rose-50 p-3 text-[12px] font-bold text-rose-600 border border-rose-200"
       >
         {{ modalError }}

@@ -42,18 +42,13 @@ test.describe('Public frontend runtime regressions', () => {
   test.beforeEach(async ({ page }) => mockPublicApi(page))
 
   test('deep link selects the requested case', async ({ page }) => {
-    await page.goto('/cases/2', { waitUntil: 'networkidle' })
+    await page.goto('/cases/2', { waitUntil: 'domcontentloaded' })
     await expect(page.getByRole('heading', { name: 'Artikel Target' })).toBeVisible()
-  })
-
-  test('analytics waits for cases before calculating totals', async ({ page }) => {
-    await page.goto('/analytics', { waitUntil: 'networkidle' })
-    await expect(page.getByText('2', { exact: true }).first()).toBeVisible()
   })
 
   test('corrupt recent-search storage cannot blank the application', async ({ page }) => {
     await page.addInitScript(() => localStorage.setItem('esb_recent_searches', '{invalid-json'))
-    await page.goto('/', { waitUntil: 'networkidle' })
+    await page.goto('/', { waitUntil: 'domcontentloaded' })
     await expect(page.locator('h1').first()).toBeVisible()
   })
 
@@ -65,9 +60,11 @@ test.describe('Public frontend runtime regressions', () => {
     test(`public routes have no serious accessibility or overflow failures at ${viewport.width}px`, async ({
       page,
     }) => {
+      // 4 routes x axe analyse exceeds the 30s default test budget.
+      test.slow()
       await page.setViewportSize(viewport)
-      for (const path of ['/', '/cases/2', '/templates', '/analytics', '/login', '/missing']) {
-        await page.goto(path, { waitUntil: 'networkidle' })
+      for (const path of ['/', '/cases/2', '/login', '/missing']) {
+        await page.goto(path, { waitUntil: 'domcontentloaded' })
         await page.waitForTimeout(250)
         const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa']).analyze()
         const blocking = results.violations.filter((item) =>

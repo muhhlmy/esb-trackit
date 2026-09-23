@@ -127,6 +127,22 @@ try {
         return {gap:getComputedStyle(el).gap,overflow:document.documentElement.scrollWidth>innerWidth,links:[...el.querySelectorAll(".table-link")].map(measure),quick:[...el.querySelectorAll(".quick-action-card")].map(measure),retry:[...el.querySelectorAll(".dashboard-retry,.csat-retry")].map(measure),panels:[...el.querySelectorAll(".dashboard-panel")].map(measure)};
       });
       assert.equal(layout.overflow,false, `Dashboard overflow ${width}/${mode}/${scenario}`);
+      if (mode !== 'none') {
+        const quick = await page.locator('.quick-actions').evaluate(el => ({
+          cards: [...el.children].map(card => ({top:card.getBoundingClientRect().top, direction:getComputedStyle(card).flexDirection})),
+          descriptions: [...el.querySelectorAll('.quick-action-description,.quick-action-arrow')].map(el => getComputedStyle(el).display),
+          labels: [...el.querySelectorAll('.quick-action-label')].every(el => el.getBoundingClientRect().height > 0),
+        }));
+        assert.ok(quick.labels);
+        if (width < 640) {
+          assert.equal(new Set(quick.cards.map(card => card.top)).size, 1, 'Mobile quick actions share one row');
+          assert.ok(quick.cards.every(card => card.direction === 'column'));
+          assert.ok(quick.descriptions.every(display => display === 'none'));
+        } else {
+          assert.ok(quick.cards.every(card => card.direction === 'row'));
+          assert.ok(quick.descriptions.every(display => display !== 'none'));
+        }
+      }
       assert.ok(parseFloat(layout.gap)>=24);
       for(const group of [layout.links,layout.quick]) {
         for(const key of ["height","padding","radius","font","minWidth"]) assert.ok(new Set(group.map(x=>x[key])).size<=1,`Unequal ${key}`);
@@ -178,10 +194,7 @@ try {
         assert.equal(geometry.headerButtons, 0);
         for (const card of geometry.cards)
           assert.ok(card.height >= 44 && card.width >= 44);
-        if (width < 640)
-          for (let i = 1; i < geometry.cards.length; i++)
-            assert.ok(geometry.cards[i].y >= geometry.cards[i - 1].bottom);
-        if (width >= 1440)
+        if (width < 640 || width >= 1440)
           assert.equal(new Set(geometry.cards.map((c) => c.y)).size, 1);
         await section
           .getByRole("button", { name: labels[0], exact: true })

@@ -21,6 +21,7 @@ const { connect: connectSSE, disconnect: disconnectSSE, on: onSSE, off: offSSE }
 // Search & UI State
 const searchQuery = ref('')
 const searchInputRef = ref(null)
+const searchButtonRef = ref(null)
 const mobileSearchInputRef = ref(null)
 const searchContainerRef = ref(null)
 const isSearchOpen = ref(false)
@@ -346,6 +347,8 @@ async function initGlobalSearchData() {
   nextTick(() => {
     if (windowWidth.value < 768 && mobileSearchInputRef.value) {
       mobileSearchInputRef.value.focus()
+    } else {
+      searchInputRef.value?.focus()
     }
   })
 
@@ -468,7 +471,9 @@ const searchResults = computed(() => {
 })
 
 function closeSearch() {
+  const hadSearchFocus = searchContainerRef.value?.contains(document.activeElement)
   isSearchOpen.value = false
+  if (hadSearchFocus) nextTick(() => searchButtonRef.value?.focus())
 }
 
 // Click-outside: tutup panel search jika klik terjadi di luar area search
@@ -535,10 +540,7 @@ function selectResultUser(userItem) {
 function handleGlobalKeydown(e) {
   if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
     e.preventDefault()
-    if (searchInputRef.value) {
-      searchInputRef.value.focus()
-      initGlobalSearchData()
-    }
+    initGlobalSearchData()
   } else if (e.key === 'Escape') {
     closeSearch()
     isNotifOpen.value = false
@@ -744,9 +746,24 @@ onBeforeUnmount(() => {
     <!-- 2. CENTER: Main Global Search Bar (Desktop Only) -->
     <div
       ref="searchContainerRef"
-      class="contents md:flex md:flex-1 md:max-w-md lg:max-w-lg md:mx-4 relative justify-center z-40 min-w-0"
+      class="contents md:flex md:mx-4 relative justify-center z-40 min-w-0"
+      :class="isSearchOpen ? 'md:flex-1 md:max-w-md lg:max-w-lg' : 'md:ml-auto'"
     >
+      <button
+        v-show="!isSearchOpen"
+        ref="searchButtonRef"
+        type="button"
+        aria-label="Buka pencarian"
+        :aria-expanded="isSearchOpen"
+        aria-controls="global-main-search"
+        title="Cari (Ctrl K)"
+        class="hidden md:flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-[#475569] hover:bg-[#F1F5F9] focus-visible:outline-2 focus-visible:outline-[#0A51B0] cursor-pointer"
+        @click="initGlobalSearchData"
+      >
+        <span aria-hidden="true" class="material-symbols-outlined text-[22px]">search</span>
+      </button>
       <form
+        v-show="isSearchOpen"
         role="search"
         @submit.prevent="submitSearch"
         class="hidden md:flex relative items-center w-full"
@@ -766,7 +783,6 @@ onBeforeUnmount(() => {
           v-model="searchQuery"
           type="search"
           autocomplete="off"
-          @focus="initGlobalSearchData"
           :placeholder="searchPlaceholder"
           class="h-11 md:h-9 w-full rounded-lg md:rounded-lg border border-[#DFE5EF] bg-[#F8FAFC] pl-10 md:pl-9 pr-12 md:pr-20 text-[11px] sm:text-xs font-medium text-[#333333] placeholder-[#5F7089] outline-none transition-all focus:bg-white focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/20 [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden"
         />

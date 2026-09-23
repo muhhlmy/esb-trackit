@@ -10,8 +10,11 @@ import { ASSET_STATUSES, formatStatusPill, getAssetStatusLabel } from '../utils/
 import { normalizeLocation } from '../utils/locationNormalizer.js'
 import { useViewMode } from '../composables/useViewMode.js'
 import AppViewToggle from '../components/ui/AppViewToggle.vue'
+import StatCard from '../components/ui/StatCard.vue'
 import AppModal from '../components/ui/AppModal.vue'
 import AppBadge from '../components/ui/AppBadge.vue'
+import EmptyState from '../components/ui/EmptyState.vue'
+import ErrorState from '../components/ui/ErrorState.vue'
 import SearchableSelect from '../components/ui/SearchableSelect.vue'
 import CustomSelect from '../components/ui/CustomSelect.vue'
 import AppRowActions from '../components/ui/AppRowActions.vue'
@@ -31,6 +34,28 @@ const canWriteAssets = computed(() => hasWritePermission('assets'))
 const { viewMode } = useViewMode('assets-it', 'table')
 
 const assets = ref([])
+// Count complete category records, independent of table filters and pagination.
+const assetStats = computed(() => [
+  { title: 'Total Aset IT', value: assets.value.length, icon: 'inventory_2', color: 'primary' },
+  {
+    title: 'Digunakan',
+    value: assets.value.filter((asset) => asset.status_aset === 'In Use').length,
+    icon: 'devices',
+    color: 'success',
+  },
+  {
+    title: 'Stok',
+    value: assets.value.filter((asset) => asset.status_aset === 'Stock').length,
+    icon: 'inventory_2',
+    color: 'cyan',
+  },
+  {
+    title: 'Rusak',
+    value: assets.value.filter((asset) => asset.status_aset === 'Damaged').length,
+    icon: 'build',
+    color: 'danger',
+  },
+])
 const employees = ref([])
 const locations = ref([])
 const showImportModal = ref(false)
@@ -929,6 +954,22 @@ onMounted(async () => {
         </div>
       </div>
     </div>
+    <section
+      aria-label="Ringkasan aset"
+      :aria-busy="isLoading"
+      class="grid grid-cols-1 min-[360px]:grid-cols-2 xl:grid-cols-4 gap-3"
+    >
+      <StatCard
+        v-for="stat in assetStats"
+        :key="stat.title"
+        :title="stat.title"
+        :value="isLoading || pageError ? '—' : stat.value"
+        :icon="stat.icon"
+        :color="stat.color"
+        :subtitle="isLoading ? 'Memuat…' : pageError ? 'Tidak tersedia' : 'Seluruh data kategori'"
+      />
+    </section>
+
     <!-- ─── MODERN ENTERPRISE SAAS DATA MANAGEMENT CONTAINER ──────────────── -->
     <div>
       <div v-if="!isLoading && !pageError" class="it-list-heading-sticky">
@@ -1038,46 +1079,20 @@ onMounted(async () => {
       </div>
 
       <!-- Error State -->
-      <div
-        v-else-if="pageError"
-        role="alert"
-        class="flex items-center gap-2 bg-rose-50 px-5 py-4 text-[13px] text-rose-600 rounded-2xl border border-rose-200"
-      >
-        <span aria-hidden="true" class="material-symbols-outlined text-[18px]">error</span>
-        <span class="flex-1 font-semibold">{{ pageError }}</span>
-        <button type="button" class="font-bold underline cursor-pointer" @click="fetchData">
-          Coba lagi
-        </button>
-      </div>
+      <ErrorState v-else-if="pageError" :message="pageError" @retry="fetchData" />
 
       <!-- Empty State -->
       <div
         v-else-if="filteredAssets.length === 0"
-        class="py-12 px-4 text-center bg-white rounded-2xl border border-[#E2E8F0]/80"
+        class="py-8 px-4 bg-white rounded-2xl border border-[#E2E8F0]/80"
       >
-        <div class="flex flex-col items-center justify-center gap-2 max-w-sm mx-auto">
-          <span
-            class="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#F1F5F9] text-[#5F7089]"
-          >
-            <span aria-hidden="true" class="material-symbols-outlined text-[24px]"
-              >devices_off</span
-            >
-          </span>
-          <h3 class="text-[14px] font-bold text-[#333333] mt-1">Belum Ada Aset IT</h3>
-          <p class="text-[12px] text-[#5F7089] leading-relaxed">
-            Belum ada aset IT yang terdaftar dalam inventaris atau sesuai dengan kata kunci
-            pencarian.
-          </p>
-          <button
-            v-if="canWriteAssets"
-            type="button"
-            @click="openAdd"
-            class="mt-2 h-9 rounded-lg bg-[#0A51B0] px-4 text-[12px] font-semibold text-white shadow-2xs hover:bg-[#0A4391] transition-all flex items-center gap-1.5 cursor-pointer"
-          >
-            <span aria-hidden="true" class="material-symbols-outlined text-[16px]">add</span>
-            <span>Tambah Aset</span>
-          </button>
-        </div>
+        <EmptyState
+          icon="devices_off"
+          title="Belum Ada Aset IT"
+          description="Belum ada aset IT yang terdaftar dalam inventaris atau sesuai dengan kata kunci pencarian."
+          :action-label="canWriteAssets ? 'Tambah Aset' : ''"
+          @action="openAdd"
+        />
       </div>
 
       <!-- Responsive inventory list: Tabel (desktop) / Kartu -->

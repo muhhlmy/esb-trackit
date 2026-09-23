@@ -93,26 +93,45 @@ test.describe('SECURITY — Input, Headers, Upload, Errors @security', () => {
     }
   })
 
+  // Upload multipart memakai fetch + FormData bawaan Node (bukan multipart
+  // Playwright) karena API multipart Playwright belum kompatibel dengan Node 24
+  // (TypeError: stream.on is not a function).
+  async function restoreValidate(cookie, filename, mimeType, content) {
+    const form = new FormData()
+    form.append(
+      'backupFile',
+      new Blob([content], { type: mimeType }),
+      filename,
+    )
+    return fetch(`${API}/api/admin/database/restore/validate`, {
+      method: 'POST',
+      headers: { cookie: `trackit_session=${cookie}` },
+      body: form,
+    })
+  }
+
   test('SEC-U01 Upload file non-backup ditolak @security', async ({ request }) => {
     const cookie = await loginCookie(request, 'superadmin')
-    const buffer = Buffer.from('not a real backup - e2e harmless test file')
-    const res = await request.post(`${API}/api/admin/database/restore/validate`, {
-      headers: { cookie: `trackit_session=${cookie}` },
-      multipart: { backupFile: { name: 'evil.exe', mimeType: 'application/x-msdownload', data: buffer } },
-    })
-    expect(res.status(), '.exe harus ditolak').toBeGreaterThanOrEqual(400)
-    expect(res.status()).toBeLessThan(500)
+    const res = await restoreValidate(
+      cookie,
+      'evil.exe',
+      'application/x-msdownload',
+      'not a real backup - e2e harmless test file',
+    )
+    expect(res.status, '.exe harus ditolak').toBeGreaterThanOrEqual(400)
+    expect(res.status).toBeLessThan(500)
   })
 
   test('SEC-U02 File ekstensi benar tapi header rusak → validasi aman @security', async ({ request }) => {
     const cookie = await loginCookie(request, 'superadmin')
-    const buffer = Buffer.from('E2E harmless dummy .tar content - not executable')
-    const res = await request.post(`${API}/api/admin/database/restore/validate`, {
-      headers: { cookie: `trackit_session=${cookie}` },
-      multipart: { backupFile: { name: 'e2e-dummy.tar', mimeType: 'application/x-tar', data: buffer } },
-    })
+    const res = await restoreValidate(
+      cookie,
+      'e2e-dummy.tar',
+      'application/x-tar',
+      'E2E harmless dummy .tar content - not executable',
+    )
     // 4xx/200(=valid tapi akan ditolak restore) — yang penting tidak 500 crash
-    expect(res.status(), 'restore validate tidak boleh 500').toBeLessThan(500)
+    expect(res.status, 'restore validate tidak boleh 500').toBeLessThan(500)
   })
 
   test('SEC-E01 Error handling tidak bocor stack/DB/env @security', async ({ request }) => {

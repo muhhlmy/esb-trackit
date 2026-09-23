@@ -93,7 +93,7 @@ test.describe('Accessibility Suite — axe-core', () => {
     await page.goto('/dashboard', { waitUntil: 'domcontentloaded' })
     await expect(page.locator('#main-content')).toBeVisible()
 
-    const quickActionButtons = page.locator('.quick-action-btn')
+    const quickActionButtons = page.locator('.quick-action-card')
     await expect(quickActionButtons.first()).toBeVisible()
     const count = await quickActionButtons.count()
     expect(count).toBeGreaterThan(0)

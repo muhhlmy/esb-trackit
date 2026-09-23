@@ -27,6 +27,7 @@ function exportData() {
 
 <template>
   <AppModal
+    panel-class="shipment-dialog"
     :is-open="isOpen"
     title="Export Pengiriman"
     :subtitle="`Unduh ${shipments.length} data yang sedang tampil`"

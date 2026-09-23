@@ -54,7 +54,11 @@ test.describe('SECURITY — Authorization & IDOR @security', () => {
   }) => {
     for (const route of ['/users', '/export', '/database', '/admin/cases']) {
       await page.goto(route, { waitUntil: 'domcontentloaded' })
-      expect(page.url(), `${route} harus redirect/forbidden`).not.toEqual(expect.stringMatching(new RegExp(`${route}$`)))
+      // Redirect guard async — toHaveURL retry sampai URL keluar dari route.
+      await expect(page).toHaveURL(
+        (url) => !url.pathname.endsWith(route),
+        { timeout: 15000 },
+      )
     }
   })
 

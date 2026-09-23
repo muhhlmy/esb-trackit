@@ -159,13 +159,39 @@ const quickActions = computed(() => allQuickActions.filter((action) => action.av
   color: var(--color-text-secondary);
 }
 @media (max-width: 639px) {
+  .quick-access-heading p,
+  .quick-action-description,
+  .quick-action-arrow {
+    display: none;
+  }
   .quick-actions {
-    grid-template-columns: minmax(0, 1fr);
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 8px;
   }
   .quick-action-card {
-    min-height: 76px;
-    padding: 12px 14px;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 8px;
+    min-height: 96px;
+    padding: 8px 2px;
+    text-align: center;
+    border: 0;
+    background: transparent;
+  }
+  .quick-action-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    font-size: 24px;
+  }
+  .quick-action-copy {
+    flex: none;
+    width: 100%;
+  }
+  .quick-action-label {
+    font-size: 11px;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
   }
 }
 @media (prefers-reduced-motion: reduce) {

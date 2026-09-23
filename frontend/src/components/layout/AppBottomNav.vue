@@ -160,104 +160,122 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <nav
-    role="navigation"
-    aria-label="Navigasi Mobile Bawah"
-    class="clean-bottom-nav lg:hidden fixed bottom-0 left-0 right-0 z-30 border-t border-slate-200/90 dark:border-slate-800 bg-white/95 dark:bg-slate-950/95 backdrop-blur-lg px-2 py-1 pb-[max(0.375rem,env(safe-area-inset-bottom))] flex items-center justify-around select-none shadow-none min-h-[56px]"
-  >
-    <RouterLink
-      v-for="item in items"
-      :key="item.to"
-      :to="item.to"
-      :aria-label="item.label"
-      :aria-current="isItemActive(item.to) ? 'page' : undefined"
-      class="flex flex-col items-center justify-center gap-0.5 px-2 py-1 rounded-xl transition-colors min-w-[52px] min-h-[44px] touch-manipulation active:scale-95"
-      :class="
-        isItemActive(item.to)
-          ? 'text-[#234B83] bg-[#EAF1FC] font-semibold'
-          : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-      "
-    >
-      <component :is="lucide[item.lucide] || Circle" class="w-4 h-4" />
-      <span class="text-[10px]">{{ item.label }}</span>
-    </RouterLink>
-
-    <button
-      type="button"
-      aria-label="Menu lainnya"
-      :aria-expanded="isLainnyaOpen"
-      @click="isLainnyaOpen = !isLainnyaOpen"
-      class="flex flex-col items-center justify-center gap-0.5 px-2 py-1 rounded-xl transition-colors cursor-pointer min-w-[52px] min-h-[44px] touch-manipulation active:scale-95"
-      :class="
-        isLainnyaOpen || isLainnyaActive
-          ? 'text-[#333333] font-bold'
-          : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-      "
-    >
-      <MoreHorizontal class="w-4 h-4" />
-      <span class="text-[10px]">Lainnya</span>
-    </button>
-  </nav>
-
-  <!-- Popup Lainnya -->
   <Teleport to="body">
     <div
       v-if="isLainnyaOpen"
-      class="lg:hidden fixed inset-0 z-40 bg-slate-900/40 backdrop-blur-xs"
+      class="lg:hidden fixed inset-0 z-30 bg-slate-900/40 backdrop-blur-xs"
       @click="isLainnyaOpen = false"
     ></div>
-
-    <div
-      v-if="isLainnyaOpen"
-      role="navigation"
-      aria-label="Menu lainnya"
-      class="clean-more-menu lg:hidden fixed left-2 right-2 bottom-[calc(64px+env(safe-area-inset-bottom))] z-50 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl shadow-slate-900/15 p-2 animate-in fade-in slide-in-from-bottom-2 duration-150"
-    >
-      <div class="flex items-center justify-between px-2 pt-1 pb-2">
-        <span
-          class="text-[11px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500"
-          >Menu Lainnya</span
-        >
-        <button
-          type="button"
-          aria-label="Tutup menu"
-          @click="isLainnyaOpen = false"
-          class="p-1.5 rounded-lg text-slate-400 dark:text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-700 dark:hover:text-slate-200 transition-colors cursor-pointer"
-        >
-          <X class="w-4 h-4" />
-        </button>
-      </div>
-
-      <div class="grid grid-cols-3 gap-2">
+    <div class="mobile-navigation lg:hidden fixed bottom-0 left-0 right-0 z-40">
+      <nav
+        role="navigation"
+        aria-label="Navigasi Mobile Bawah"
+        class="clean-bottom-nav relative z-10 border-t border-slate-200/90 dark:border-slate-800 bg-white/95 dark:bg-slate-950/95 backdrop-blur-lg px-2 py-1 pb-[max(0.375rem,env(safe-area-inset-bottom))] flex items-center justify-around select-none shadow-none min-h-[56px]"
+      >
         <RouterLink
-          v-for="item in lainnyaItems"
+          v-for="item in items"
           :key="item.to"
           :to="item.to"
-          :aria-current="isLainnyaItemActive(item.to) ? 'page' : undefined"
-          class="flex flex-col items-center justify-center gap-1.5 px-2 py-3 rounded-xl transition-colors text-center active:scale-95"
+          :aria-label="item.label"
+          :aria-current="isItemActive(item.to) ? 'page' : undefined"
+          class="flex flex-col items-center justify-center gap-0.5 px-2 py-1 rounded-xl transition-colors min-w-[52px] min-h-[44px] touch-manipulation active:scale-95"
           :class="
-            isLainnyaItemActive(item.to)
-              ? 'text-[#333333] bg-[#0A51B0]/10 dark:bg-[#0A51B0]/20 font-bold'
-              : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-[#333333]'
+            isItemActive(item.to)
+              ? 'text-[#234B83] bg-[#EAF1FC] font-semibold'
+              : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
           "
         >
-          <component :is="lucide[item.lucide] || Circle" class="w-5 h-5" />
-          <span class="text-[10px] font-semibold leading-tight">{{ item.label }}</span>
+          <component :is="lucide[item.lucide] || Circle" class="w-4 h-4" />
+          <span class="text-[10px]">{{ item.label }}</span>
         </RouterLink>
-      </div>
 
-      <p
-        v-if="!lainnyaItems.length"
-        class="px-2 py-6 text-center text-xs text-slate-400"
-        role="status"
-      >
-        Belum ada menu lain yang tersedia untuk akun Anda.
-      </p>
+        <button
+          type="button"
+          aria-label="Menu lainnya"
+          aria-controls="mobile-more-menu"
+          :aria-expanded="isLainnyaOpen"
+          @click="isLainnyaOpen = !isLainnyaOpen"
+          class="flex flex-col items-center justify-center gap-0.5 px-2 py-1 rounded-xl transition-colors cursor-pointer min-w-[52px] min-h-[44px] touch-manipulation active:scale-95"
+          :class="
+            isLainnyaOpen || isLainnyaActive
+              ? 'text-[#333333] font-bold'
+              : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+          "
+        >
+          <MoreHorizontal class="w-4 h-4" />
+          <span class="text-[10px]">Lainnya</span>
+        </button>
+      </nav>
+
+      <Transition name="more-menu">
+        <div
+          v-if="isLainnyaOpen"
+          id="mobile-more-menu"
+          role="navigation"
+          aria-label="Menu lainnya"
+          class="clean-more-menu absolute left-0 right-0 bottom-full rounded-t-2xl bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 p-2"
+        >
+          <div class="flex items-center justify-between px-2 pt-1 pb-2">
+            <span
+              class="text-[11px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500"
+              >Menu Lainnya</span
+            >
+            <button
+              type="button"
+              aria-label="Tutup menu"
+              @click="isLainnyaOpen = false"
+              class="p-1.5 rounded-lg text-slate-400 dark:text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-700 dark:hover:text-slate-200 transition-colors cursor-pointer"
+            >
+              <X class="w-4 h-4" />
+            </button>
+          </div>
+
+          <div class="grid grid-cols-3 gap-2">
+            <RouterLink
+              v-for="item in lainnyaItems"
+              :key="item.to"
+              :to="item.to"
+              :aria-current="isLainnyaItemActive(item.to) ? 'page' : undefined"
+              class="flex flex-col items-center justify-center gap-1.5 px-2 py-3 rounded-xl transition-colors text-center active:scale-95"
+              :class="
+                isLainnyaItemActive(item.to)
+                  ? 'text-[#333333] bg-[#0A51B0]/10 dark:bg-[#0A51B0]/20 font-bold'
+                  : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-[#333333]'
+              "
+            >
+              <component :is="lucide[item.lucide] || Circle" class="w-5 h-5" />
+              <span class="text-[10px] font-semibold leading-tight">{{ item.label }}</span>
+            </RouterLink>
+          </div>
+
+          <p
+            v-if="!lainnyaItems.length"
+            class="px-2 py-6 text-center text-xs text-slate-400"
+            role="status"
+          >
+            Belum ada menu lain yang tersedia untuk akun Anda.
+          </p>
+        </div>
+      </Transition>
     </div>
   </Teleport>
 </template>
 
 <style scoped>
+.more-menu-enter-active,
+.more-menu-leave-active {
+  transition: transform 240ms ease;
+}
+.more-menu-enter-from,
+.more-menu-leave-to {
+  transform: translateY(100%);
+}
+@media (prefers-reduced-motion: reduce) {
+  .more-menu-enter-active,
+  .more-menu-leave-active {
+    transition: none;
+  }
+}
 .clean-bottom-nav {
   background: #fff;
   border-color: #e3e9f1;

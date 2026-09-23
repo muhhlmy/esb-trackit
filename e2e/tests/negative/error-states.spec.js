@@ -36,10 +36,9 @@ test.describe('Error States & Recovery', () => {
     // Try to access admin-only route
     await page.goto('/users', { waitUntil: 'domcontentloaded' })
 
-    // Should redirect to forbidden or first allowed route
-    const url = page.url()
-    const isForbidden = url.includes('/forbidden') || !url.includes('/users')
-    expect(isForbidden).toBeTruthy()
+    // Guard redirect berjalan async (restoreSession → redirect ke route pertama
+    // yang diizinkan / forbidden). toHaveURL retry sampai URL keluar dari /users.
+    await expect(page).toHaveURL(/\/(dashboard|forbidden|login)(\?|$)/, { timeout: 15000 })
   })
 
   test('ERROR-04: Login with empty fields shows validation', async ({ page }) => {

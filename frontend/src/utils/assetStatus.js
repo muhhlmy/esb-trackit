@@ -2,7 +2,10 @@
  * Centralized Asset Status Configuration & Helper Utilities
  * Internal DB Values: 'In Use', 'Stock', 'Damaged', 'In Service', 'Disposal'
  * Indonesian Display Labels: 'Digunakan', 'Stok', 'Rusak', 'Dalam Perawatan', 'Disposal'
+ *
+ * Warna pill selaras dengan tone semantik sentral (config/design-system.js).
  */
+import { STATE_TONES } from '../config/design-system.js'
 
 export const ASSET_STATUSES = [
   { value: 'In Use', label: 'Digunakan' },
@@ -15,38 +18,38 @@ export const ASSET_STATUSES = [
 export const ASSET_STATUS_MAP = {
   'In Use': {
     label: 'Digunakan',
-    bg: 'bg-[#EFF6FF]',
-    text: 'text-[#333333]',
+    bg: 'bg-[#EDF5FF]',
+    text: 'text-[#1E40AF]',
     dot: 'bg-[#0A51B0]',
-    border: 'border-[#BFDBFE]/60',
+    border: 'border-[#BFDBFE]',
   },
   Stock: {
     label: 'Stok',
     bg: 'bg-[#ECFDF5]',
-    text: 'text-[#059669]',
+    text: 'text-[#047857]',
     dot: 'bg-[#059669]',
-    border: 'border-[#A7F3D0]/60',
+    border: 'border-[#A7F3D0]',
   },
   'In Service': {
     label: 'Dalam Perawatan',
     bg: 'bg-[#FFFBEB]',
-    text: 'text-[#D97706]',
+    text: 'text-[#B45309]',
     dot: 'bg-[#D97706]',
-    border: 'border-[#FDE68A]/60',
+    border: 'border-[#FDE68A]',
   },
   Damaged: {
     label: 'Rusak',
     bg: 'bg-[#FEF2F2]',
-    text: 'text-[#DC2626]',
+    text: 'text-[#B91C1C]',
     dot: 'bg-[#DC2626]',
-    border: 'border-[#FECACA]/60',
+    border: 'border-[#FECACA]',
   },
   Disposal: {
     label: 'Disposal',
-    bg: 'bg-[#F8FAFC]',
-    text: 'text-[#5F7089]',
-    dot: 'bg-[#5F7089]',
-    border: 'border-[#CBD5E1]/60',
+    bg: 'bg-[#F1F5F9]',
+    text: 'text-[#475569]',
+    dot: 'bg-[#64748B]',
+    border: 'border-[#CBD5E1]',
   },
 }
 
@@ -77,10 +80,10 @@ export function formatStatusPill(status) {
   if (!status) {
     return {
       label: '—',
-      bg: 'bg-[#F8FAFC]',
-      text: 'text-[#5F7089]',
-      dot: 'bg-[#5F7089]',
-      border: 'border-[#CBD5E1]/60',
+      bg: 'bg-[#F1F5F9]',
+      text: 'text-[#475569]',
+      dot: 'bg-[#64748B]',
+      border: 'border-[#CBD5E1]',
     }
   }
   const s = String(status).trim().toLowerCase()
@@ -93,9 +96,9 @@ export function formatStatusPill(status) {
   if (foundKey) return ASSET_STATUS_MAP[foundKey]
   return {
     label: status,
-    bg: 'bg-[#F8FAFC]',
-    text: 'text-[#5F7089]',
-    dot: 'bg-[#5F7089]',
-    border: 'border-[#CBD5E1]/60',
+    bg: 'bg-[#F1F5F9]',
+    text: 'text-[#475569]',
+    dot: 'bg-[#64748B]',
+    border: 'border-[#CBD5E1]',
   }
 }

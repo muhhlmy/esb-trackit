@@ -31,7 +31,11 @@ const upload = multer({
     if (ext === '.dump' || ext === '.sql' || ext === '.tar') {
       cb(null, true)
     } else {
-      cb(new Error('Format file tidak didukung. Gunakan .dump, .sql, atau .tar.'))
+      // Error dengan statusCode supaya global error handler merespons 400
+      // (bukan 500) untuk file yang ditolak oleh filter.
+      const err = new Error('Format file tidak didukung. Gunakan .dump, .sql, atau .tar.')
+      err.statusCode = 400
+      cb(err)
     }
   },
 })

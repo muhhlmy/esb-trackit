@@ -149,6 +149,7 @@ watch(
 
 <template>
   <AppModal
+    panel-class="shipment-dialog"
     :is-open="isOpen"
     title="Import Pengiriman"
     subtitle="Tambah banyak data pengiriman lewat template Excel"
@@ -242,6 +243,7 @@ watch(
             type="button"
             :disabled="isParsing || submitting"
             class="flex h-9 w-9 items-center justify-center rounded-lg text-slate-400 hover:bg-rose-50 hover:text-rose-600 disabled:opacity-40"
+            aria-label="Hapus file"
             @click="removeFile"
           >
             <span aria-hidden="true" class="material-symbols-outlined text-[18px]">delete</span>

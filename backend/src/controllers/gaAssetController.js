@@ -2,6 +2,7 @@ import { pool, withTransaction } from "../config/database.js";
 import { normalizeLocation } from "../utils/locationNormalizer.js";
 import { canReadGAAsset, canWriteGAAsset } from "../security/resourceAuthorizationPolicy.js";
 import { parsePaginationQuery, setPaginationHeaders } from "../security/requestValidation.js";
+import { sanitizePlainText } from "../security/htmlSanitizer.js";
 
 function createHttpError(statusCode, message) {
   const error = new Error(message);
@@ -33,7 +34,7 @@ async function recordAssetLog(databaseClient, idAset, labelAset, aksi, perubahan
 
 function cleanText(value) {
   if (value === undefined || value === null) return null;
-  const text = String(value).trim();
+  const text = sanitizePlainText(String(value).trim());
   return text.length === 0 ? null : text;
 }
 

@@ -944,3 +944,33 @@ html[data-typography]:not([data-typography='normal']) .btn-primary,
 html[data-typography]:not([data-typography='normal']) .btn-secondary {
   font-size: calc(0.75rem * var(--fs-scale-factor));
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   State layer (semantic) — Phase 6 design system additions
+   Source of truth: design-tokens/states.json → tokens.css
+   These component-level aliases keep page markup semantic.
+   ═══════════════════════════════════════════════════════════════ */
+:root {
+  --state-success: #059669;
+  --state-success-bg: #ecfdf5;
+  --state-success-border: #a7f3d0;
+  --state-warning: #b45309;
+  --state-warning-bg: #fffbeb;
+  --state-warning-border: #fde68a;
+  --state-danger: #dc2626;
+  --state-danger-bg: #fef2f2;
+  --state-danger-border: #fecaca;
+  --state-info: #0a51b0;
+  --state-info-bg: #edf5ff;
+  --state-info-border: #bfdbfe;
+  --state-neutral: #475569;
+  --state-neutral-bg: #f1f5f9;
+  --state-neutral-border: #cbd5e1;
+}
+
+/* Focus ring standar untuk interaktif non-komponen (fallback konsisten) */
+:where(a, button, [role='button'], input, select, textarea):focus-visible {
+  outline: 2px solid #0a51b0;
+  outline-offset: 2px;
+  border-radius: 6px;
+}

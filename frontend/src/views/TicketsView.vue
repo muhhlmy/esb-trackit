@@ -5,6 +5,7 @@ import { useApi } from '../composables/useApi.js'
 import { useAuth } from '@/composables/useAuth'
 import { onTicketEvent } from '../composables/useTicketRealtime.js'
 import { getStatusDotInfo, getPriorityInfo } from '../utils/ticketPresentation.js'
+import { STATE_TONES } from '../config/design-system.js'
 import { validateAttachmentFile } from '../utils/attachmentPolicy.js'
 import AppModal from '../components/ui/AppModal.vue'
 import AppRowActions from '../components/ui/AppRowActions.vue'
@@ -20,6 +21,9 @@ import { animateStagger } from '../composables/useGsap.js'
 import BaseSkeleton from '../components/ui/skeleton/BaseSkeleton.vue'
 import AuthGateCard from '../components/common/AuthGateCard.vue'
 import SkeletonList from '../components/ui/skeleton/SkeletonList.vue'
+import ErrorState from '../components/ui/ErrorState.vue'
+import EmptyState from '../components/ui/EmptyState.vue'
+import StatusBadge from '../components/ui/StatusBadge.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -314,23 +318,23 @@ function getQueueTheme(ticket) {
   const name = (ticket?.queue_nama || '').toUpperCase()
   if (code.includes('HR') || name.includes('HR') || name.includes('HUMAN')) {
     return {
-      badgeClass: 'bg-purple-50 text-purple-600 border border-purple-200/80',
-      pillClass: 'bg-purple-50/80 text-purple-700 border-purple-200/80',
+      badgeClass: STATE_TONES.purple.chip,
+      pillClass: STATE_TONES.purple.chip,
       icon: 'badge',
       label: ticket?.queue_nama || 'HR Support',
     }
   }
   if (code.includes('GA') || name.includes('GA') || name.includes('GENERAL')) {
     return {
-      badgeClass: 'bg-amber-50 text-amber-700 border border-amber-200/80',
-      pillClass: 'bg-amber-50/80 text-amber-700 border-amber-200/80',
+      badgeClass: STATE_TONES.warning.chip,
+      pillClass: STATE_TONES.warning.chip,
       icon: 'corporate_fare',
       label: ticket?.queue_nama || 'GA Support',
     }
   }
   return {
-    badgeClass: 'bg-blue-50 text-blue-600 border border-blue-200/80',
-    pillClass: 'bg-blue-50/80 text-blue-700 border-blue-200/80',
+    badgeClass: STATE_TONES.info.chip,
+    pillClass: STATE_TONES.info.chip,
     icon: 'computer',
     label:
       ticket?.queue_nama || (ticket?.queue_kode ? `${ticket.queue_kode} Support` : 'IT Support'),
@@ -965,11 +969,20 @@ async function assignTicket(ticket, targetUserId) {
   }
 }
 
+// Draft tiket yang belum selesai dipertahankan selama modal ditutup,
+// sehingga user tidak kehilangan isian saat kembali membuka form.
+let ticketDraftSnapshot = null
+
 function openAdd() {
   modalMode.value = 'add'
   selectedTicket.value = null
-  form.value = emptyForm()
-  setSupportUnit('IT')
+  if (ticketDraftSnapshot && ticketDraftSnapshot.mode === 'add') {
+    form.value = { ...emptyForm(), ...ticketDraftSnapshot.form }
+    selectedSupportUnit.value = ticketDraftSnapshot.supportUnit || 'IT'
+  } else {
+    form.value = emptyForm()
+    setSupportUnit('IT')
+  }
   activeFormTab.value = 'kendala'
   attachmentChanged.value = false
   ticketAttachmentError.value = ''
@@ -1136,6 +1149,15 @@ function selectStatus(ticket, status) {
 }
 
 function closeModal() {
+  if (modalMode.value === 'add' && form.value.judul?.trim()) {
+    ticketDraftSnapshot = {
+      mode: 'add',
+      form: { ...form.value },
+      supportUnit: selectedSupportUnit.value,
+    }
+  } else {
+    ticketDraftSnapshot = null
+  }
   showStatusDropdown.value = false
   showReassignDropdown.value = false
   ticketAttachmentRequestVersion += 1
@@ -1261,6 +1283,8 @@ async function saveTicket() {
         throw err
       }
     }
+    // Submisi sukses: draft tidak perlu dipertahankan lagi.
+    ticketDraftSnapshot = null
     closeModal()
   } catch (err) {
     modalError.value = err.message || 'Gagal menyimpan tiket.'
@@ -1726,12 +1750,7 @@ function toast(message, type = 'success') {
       </div>
 
       <!-- Error State -->
-      <div
-        v-else-if="pageError"
-        class="rounded-2xl bg-rose-50 p-5 text-[13px] font-semibold text-rose-600 border border-rose-200 shadow-2xs"
-      >
-        {{ pageError }}
-      </div>
+      <ErrorState v-else-if="pageError" :message="pageError" @retry="fetchTickets()" />
 
       <!-- Content Surface (Clean & Modern Card-Row Components) -->
       <div v-else class="ticket-card-list flex flex-col gap-2.5">
@@ -1961,16 +1980,10 @@ function toast(message, type = 'success') {
             <div class="flex flex-col min-w-0 gap-1.5">
               <div class="flex items-center gap-1.5 flex-wrap">
                 <!-- Status Pill -->
-                <span
-                  class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold border transition-all"
-                  :class="getStatusDotInfo(ticket.status_tiket).badgeClass"
-                >
-                  <span
-                    class="h-1.5 w-1.5 rounded-full shrink-0"
-                    :class="getStatusDotInfo(ticket.status_tiket).dotClass"
-                  ></span>
-                  <span>{{ getStatusDotInfo(ticket.status_tiket).label }}</span>
-                </span>
+                <StatusBadge
+                  :status="ticket.status_tiket"
+                  :text="getStatusDotInfo(ticket.status_tiket).label"
+                />
 
                 <!-- Priority Badge -->
                 <span
@@ -2136,16 +2149,10 @@ function toast(message, type = 'success') {
             >
               <div class="flex items-center gap-1.5 flex-wrap">
                 <!-- Status -->
-                <span
-                  class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold border transition-all"
-                  :class="getStatusDotInfo(ticket.status_tiket).badgeClass"
-                >
-                  <span
-                    class="h-1.5 w-1.5 rounded-full shrink-0"
-                    :class="getStatusDotInfo(ticket.status_tiket).dotClass"
-                  ></span>
-                  <span>{{ getStatusDotInfo(ticket.status_tiket).label }}</span>
-                </span>
+                <StatusBadge
+                  :status="ticket.status_tiket"
+                  :text="getStatusDotInfo(ticket.status_tiket).label"
+                />
 
                 <!-- Priority -->
                 <span
@@ -2193,53 +2200,39 @@ function toast(message, type = 'success') {
           v-if="filteredTickets.length === 0"
           class="py-16 px-4 text-center bg-white rounded-2xl border border-slate-200/80 shadow-2xs"
         >
-          <div class="mx-auto flex max-w-sm flex-col items-center justify-center text-center">
-            <div
-              class="flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100 text-slate-400 mb-3.5"
-            >
-              <span aria-hidden="true" class="material-symbols-outlined text-[28px]">inbox</span>
-            </div>
-
-            <!-- Empty state title -->
-            <h3 class="text-base font-bold text-[#333333]">
-              {{
-                searchQuery || filterStatus || filterPrioritas || filterQueue || filterKategori
-                  ? 'Tidak ada tiket yang cocok'
-                  : !isAdmin && !isSuperAdmin
-                    ? 'Belum ada request tiket'
-                    : activeTab === 'all'
-                      ? 'Inbox tiket kosong'
-                      : 'Tidak ada tiket pada kategori ini'
-              }}
-            </h3>
-
-            <!-- Empty state description -->
-            <p class="mt-1 text-xs text-[#5F7089] max-w-xs leading-relaxed">
-              {{
-                searchQuery || filterStatus || filterPrioritas || filterQueue || filterKategori
-                  ? 'Coba ubah kata kunci pencarian atau sesuaikan filter Anda.'
-                  : !isAdmin && !isSuperAdmin
-                    ? 'Pengajuan kendala atau bantuan IT Anda akan muncul di sini.'
-                    : activeTab === 'all'
-                      ? 'Tidak ada tiket yang menunggu penanganan saat ini.'
-                      : 'Belum ada tiket pada tab yang dipilih.'
-              }}
-            </p>
-
-            <button
-              v-if="
-                !searchQuery && !filterStatus && !filterPrioritas && !filterQueue && !filterKategori
-              "
-              type="button"
-              @click="openAdd"
-              class="mt-4 inline-flex items-center gap-1.5 rounded-xl bg-[#0A51B0] px-4 py-2 text-xs font-bold text-white shadow-2xs hover:bg-[#0A4391] transition-all cursor-pointer active:scale-95"
-            >
-              <span aria-hidden="true" class="material-symbols-outlined text-[16px]">add</span>
-              <span>{{
-                !isAdmin && !isSuperAdmin ? 'Request Tiket Pertama' : 'Buat Tiket Baru'
-              }}</span>
-            </button>
-          </div>
+          <EmptyState
+            icon="inbox"
+            :title="
+              searchQuery || filterStatus || filterPrioritas || filterQueue || filterKategori
+                ? 'Tidak ada tiket yang cocok'
+                : !isAdmin && !isSuperAdmin
+                  ? 'Belum ada request tiket'
+                  : activeTab === 'all'
+                    ? 'Inbox tiket kosong'
+                    : 'Tidak ada tiket pada kategori ini'
+            "
+            :description="
+              searchQuery || filterStatus || filterPrioritas || filterQueue || filterKategori
+                ? 'Coba ubah kata kunci pencarian atau sesuaikan filter Anda.'
+                : !isAdmin && !isSuperAdmin
+                  ? 'Pengajuan kendala atau bantuan IT Anda akan muncul di sini.'
+                  : activeTab === 'all'
+                    ? 'Tidak ada tiket yang menunggu penanganan saat ini.'
+                    : 'Belum ada tiket pada tab yang dipilih.'
+            "
+            :action-label="
+              !searchQuery && !filterStatus && !filterPrioritas && !filterQueue && !filterKategori
+                ? (!isAdmin && !isSuperAdmin ? 'Request Tiket Pertama' : 'Buat Tiket Baru')
+                : ''
+            "
+            :secondary-label="
+              searchQuery || filterStatus || filterPrioritas || filterQueue || filterKategori
+                ? 'Reset Filter'
+                : ''
+            "
+            @action="openAdd"
+            @secondary-action="resetFilters"
+          />
         </div>
       </div>
 

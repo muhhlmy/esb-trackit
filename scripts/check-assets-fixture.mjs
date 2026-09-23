@@ -22,6 +22,21 @@ for(const width of (process.env.WIDTHS || '360,390,768,1024,1440,1920').split(',
  if(mode==='none'){await expect(page.locator('.inventory-polish')).toHaveCount(0);await context.close();count++;continue;}
  const view=page.locator('.inventory-polish');await view.waitFor();await page.locator('[data-testid="page-ready"]').waitFor();
  await expect(view.locator('.inventory-primary-action')).toHaveCount(mode==='full'?1:0);
+ const stats=view.getByRole('region',{name:'Ringkasan aset'});
+ const expectedStats=scenario==='error'?['—','—','—','—']:scenario==='empty'?['0','0','0','0']:module==='ops'?['3','0','0','0']:['3','3','0','0'];
+ await expect(stats.locator('.font-num')).toHaveText(expectedStats);
+ await expect(stats).toHaveAttribute('aria-busy','false');
+ if(scenario==='error') await expect(stats.getByText('Tidak tersedia',{exact:true})).toHaveCount(4);
+ if(scenario==='populated') {
+   const search=view.locator('input[type="text"]').first();
+   await search.fill('NOT-IN-FIXTURE');
+   await expect(stats.locator('.font-num')).toHaveText(expectedStats);
+   await search.fill('');
+ }
+ const statBoxes=await stats.locator(':scope > div').evaluateAll(nodes=>nodes.map(el=>{const r=el.getBoundingClientRect();return {top:r.top,left:r.left,right:r.right,width:r.width,height:r.height};}));
+ assert.equal(new Set(statBoxes.map(box=>Math.round(box.top))).size,width>=1280?1:2);
+ for(const box of statBoxes) assert.ok(box.width>0&&box.height>0&&box.left>=0&&box.right<=width);
+
  for(const layout of ['table','card']){
  await page.evaluate(({module,layout})=>localStorage.setItem('trackit_view_mode_assets-'+module,layout),{module,layout});await page.reload();await page.locator('.inventory-polish[data-testid="page-ready"]').waitFor();
  const geometry=await view.evaluate(el=>({overflow:document.documentElement.scrollWidth>innerWidth,buttons:[...el.querySelectorAll('.inventory-actions button')].map(b=>{const r=b.getBoundingClientRect();return {height:r.height,width:r.width};})}));

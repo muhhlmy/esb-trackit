@@ -23,3 +23,13 @@ export function sanitizeRichTextHtml(html) {
     ALLOW_DATA_ATTR: false,
   })
 }
+
+/**
+ * Sanitasi payload teks polos (hostname, nama, catatan, dsb.): hapus semua
+ * markup HTML/script dari input user sebelum disimpan. Dipakai validator
+ * controller aset/tiket — pertahanan dalam di samping escaping di frontend.
+ */
+export function sanitizePlainText(value) {
+  if (typeof value !== 'string' || value === '') return value
+  return DOMPurify.sanitize(value, { ALLOWED_TAGS: [], ALLOWED_ATTR: [], KEEP_CONTENT: true })
+}

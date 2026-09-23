@@ -6,6 +6,7 @@ import { formatStatusPill } from '../utils/assetStatus.js'
 import { normalizeLocation } from '../utils/locationNormalizer.js'
 import AppModal from '../components/ui/AppModal.vue'
 import AppBadge from '../components/ui/AppBadge.vue'
+import StatusBadge from '../components/ui/StatusBadge.vue'
 import MyAssetsEmployeeList from '../components/assets/MyAssetsEmployeeList.vue'
 import CustomSelect from '../components/ui/CustomSelect.vue'
 import FilterModal from '../components/ui/FilterModal.vue'
@@ -862,20 +863,10 @@ onMounted(() => {
                     getDeviceIcon(asset.tipe_perangkat)
                   }}</span>
                 </div>
-                <span
-                  class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold border transition-all select-none"
-                  :class="[
-                    formatStatusPill(asset.status_aset).bg,
-                    formatStatusPill(asset.status_aset).text,
-                    formatStatusPill(asset.status_aset).border,
-                  ]"
-                >
-                  <span
-                    class="h-1.5 w-1.5 rounded-full shrink-0"
-                    :class="formatStatusPill(asset.status_aset).dot"
-                  ></span>
-                  {{ formatStatusPill(asset.status_aset).label }}
-                </span>
+                <StatusBadge
+                  :status="asset.status_aset"
+                  :text="formatStatusPill(asset.status_aset).label"
+                />
               </div>
 
               <!-- Asset Label & Serial Number -->

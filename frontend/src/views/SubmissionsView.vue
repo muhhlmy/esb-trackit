@@ -11,6 +11,8 @@ import AppRowActions from '../components/ui/AppRowActions.vue'
 import { animateStagger } from '../composables/useGsap.js'
 import { escapeHtml, printHtmlDocument } from '../utils/printDocument.js'
 import { normalizeLocation } from '../utils/locationNormalizer.js'
+import ErrorState from '../components/ui/ErrorState.vue'
+import ConfirmDialog from '../components/ui/ConfirmDialog.vue'
 
 const { get, getAllPages, post, put, del } = useApi()
 const route = useRoute()
@@ -78,7 +80,7 @@ function getSubmissionActions(submission) {
       label: 'Hapus BAST',
       icon: 'delete',
       danger: true,
-      onClick: () => deleteSubmission(submission),
+      onClick: () => requestDeleteSubmission(submission),
     })
   }
   return actions
@@ -465,17 +467,29 @@ async function saveAndReturn() {
   if (await persistSubmission()) await router.push('/submissions')
 }
 
-async function deleteSubmission(submission) {
-  if (!canWriteSubmissions.value) return
-  const confirmed = window.confirm(`Hapus pengajuan ${submission.submission_number}?`)
-  if (!confirmed) return
+// Konfirmasi hapus memakai ConfirmDialog (window.confirm diganti karena
+// blocking, tidak accessible di mobile, dan tidak sesuai design system).
+const pendingDelete = ref(null)
+const isDeleting = ref(false)
+
+function requestDeleteSubmission(submission) {
+  pendingDelete.value = submission
+}
+
+async function deleteSubmission() {
+  const submission = pendingDelete.value
+  if (!submission || !canWriteSubmissions.value) return
+  isDeleting.value = true
   try {
     await del(`/api/submissions/${submission.id}`)
     if (selectedSubmissionId.value === submission.id) resetSubmissionForm()
     savedSubmissions.value = savedSubmissions.value.filter((item) => item.id !== submission.id)
     saveMessage.value = 'Pengajuan berhasil dihapus.'
+    pendingDelete.value = null
   } catch (error) {
     validationError.value = error.message || 'Gagal menghapus pengajuan.'
+  } finally {
+    isDeleting.value = false
   }
 }
 
@@ -1270,23 +1284,7 @@ onMounted(fetchData)
     </div>
 
     <!-- Error State -->
-    <div
-      v-else-if="pageError"
-      role="alert"
-      class="flex items-center gap-3 rounded-2xl border border-rose-200 bg-rose-50 p-5 text-[13px] text-rose-700 shadow-2xs"
-    >
-      <span aria-hidden="true" class="material-symbols-outlined text-[20px] shrink-0 text-rose-600"
-        >error</span
-      >
-      <span class="flex-1 font-medium">{{ pageError }}</span>
-      <button
-        type="button"
-        class="h-8.5 rounded-xl bg-rose-600 px-3.5 text-xs font-bold text-white hover:bg-rose-700 transition-all cursor-pointer"
-        @click="fetchData"
-      >
-        Coba Lagi
-      </button>
-    </div>
+    <ErrorState v-else-if="pageError" :message="pageError" retry-label="Coba Lagi" @retry="fetchData" />
 
     <!-- Main Submission Form -->
     <form
@@ -2096,6 +2094,17 @@ onMounted(fetchData)
       </div>
     </form>
   </div>
+    <ConfirmDialog
+      :open="Boolean(pendingDelete)"
+      title="Hapus Pengajuan?"
+      :message="`Pengajuan ${pendingDelete?.submission_number || ''} akan dihapus permanen. Tindakan ini tidak dapat dibatalkan.`"
+      confirm-label="Hapus"
+      destructive
+      :loading="isDeleting"
+      @update:open="(value) => { if (!value) pendingDelete = null }"
+      @confirm="deleteSubmission"
+      @cancel="pendingDelete = null"
+    />
 </template>
 
 <style scoped src="../assets/asset-workspace.css"></style>

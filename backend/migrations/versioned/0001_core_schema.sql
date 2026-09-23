@@ -1,5 +1,5 @@
 -- =====================================================================
--- SKEMA DATABASE (PostgreSQL): TRACKIT / IT ASSET MANAGEMENT
+-- SKEMA DATABASE (PostgreSQL): ESB TRACKIT / IT MONITORING ASSETS
 -- Canonical Master Schema with CHECK Constraints & Data Validation
 -- =====================================================================
 

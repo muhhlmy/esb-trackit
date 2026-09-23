@@ -1,29 +1,36 @@
 <script setup>
-// AppBadge.vue — Pill badge Modernize style
+// AppBadge.vue — Pill badge Modernize style.
+// Tone didelegasikan ke sistem semantik sentral (config/design-system.js)
+// agar semua badge di aplikasi memakai palet yang sama.
+import { STATE_TONES } from '../../config/design-system.js'
+
 defineProps({
-  // 'success' | 'warning' | 'danger' | 'info' | 'purple' | 'cyan' | 'default'
-  type: { type: String, default: 'default' },
+  // 'success' | 'warning' | 'danger' | 'info' | 'neutral' | 'cyan' | 'purple'
+  type: { type: String, default: 'neutral' },
   text: { type: String, required: true },
 })
 
+// Alias 'default' dipertahankan agar konsumen lama tetap bekerja.
 const classes = {
-  success: 'bg-[#DCFCE7] text-[#15803D] border-[#86EFAC] font-bold',
-  warning: 'bg-[#FEF9C3] text-[#854D0E] border-[#FDE047] font-bold',
-  danger: 'bg-[#FEE2E2] text-[#B91C1C] border-[#FCA5A5] font-bold',
-  info: 'bg-[#DBEAFE] text-[#1E40AF] border-[#93C5FD] font-bold',
-  cyan: 'bg-[#E0F2FE] text-[#0369A1] border-[#7DD3FC] font-bold',
-  purple: 'bg-[#EDE9FE] text-[#6D28D9] border-[#C4B5FD] font-bold',
-  default: 'bg-[#F1F5F9] text-[#334155] border-[#CBD5E1] font-bold',
+  success: STATE_TONES.success.chip + ' font-bold',
+  warning: STATE_TONES.warning.chip + ' font-bold',
+  danger: STATE_TONES.danger.chip + ' font-bold',
+  info: STATE_TONES.info.chip + ' font-bold',
+  neutral: STATE_TONES.neutral.chip + ' font-bold',
+  cyan: STATE_TONES.cyan.chip + ' font-bold',
+  purple: STATE_TONES.purple.chip + ' font-bold',
+  default: STATE_TONES.neutral.chip + ' font-bold',
 }
 
 const dotColors = {
-  success: 'bg-[#15803D]',
-  warning: 'bg-[#854D0E]',
-  danger: 'bg-[#B91C1C]',
-  info: 'bg-[#1E40AF]',
-  cyan: 'bg-[#0369A1]',
-  purple: 'bg-[#6D28D9]',
-  default: 'bg-[#475569]',
+  success: STATE_TONES.success.dot,
+  warning: STATE_TONES.warning.dot,
+  danger: STATE_TONES.danger.dot,
+  info: STATE_TONES.info.dot,
+  neutral: STATE_TONES.neutral.dot,
+  cyan: STATE_TONES.cyan.dot,
+  purple: STATE_TONES.purple.dot,
+  default: STATE_TONES.neutral.dot,
 }
 </script>
 

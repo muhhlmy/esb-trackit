@@ -1,10 +1,13 @@
-import { randomUUID } from 'node:crypto'
 import { expect, test } from '../../fixtures/auth.fixture.js'
+import { randomUUID } from 'node:crypto'
 
 const API_BASE_URL = process.env.E2E_API_URL || 'http://localhost:3000'
 
 test.describe('Ticket CASP Rating Flow', () => {
-  test('CASP-01: Reporter can rate resolved ticket with 1-5 stars @smoke', async ({ userPage, adminPage }) => {
+  test('CASP-01: Reporter can rate resolved ticket with 1-5 stars @smoke', async ({
+    userPage,
+    adminPage,
+  }) => {
     const title = 'E2E CASP ' + randomUUID()
     const created = await userPage.request.post(API_BASE_URL + '/api/tickets', {
       data: { judul: title, deskripsi: 'Test rating flow', queue_id: 1, prioritas: 'Medium' },
@@ -35,7 +38,10 @@ test.describe('Ticket CASP Rating Flow', () => {
     })
     expect(created.ok()).toBeTruthy()
     await userPage.goto('/tickets', { waitUntil: 'domcontentloaded' })
-    await userPage.getByText(title, { exact: true }).click()
+
+    // Judul tiket tampil di beberapa tempat (sel tabel + kartu + detail modal
+    // sibling render). Klik representasi pertama via role-aware locator.
+    await userPage.getByRole('table').getByText(title, { exact: true }).click()
     await expect(userPage.getByRole('button', { name: /^Bintang/ })).toHaveCount(0)
   })
 })

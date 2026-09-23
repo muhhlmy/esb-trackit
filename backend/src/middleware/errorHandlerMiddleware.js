@@ -54,6 +54,11 @@ export function globalErrorHandler(err, req, res, next) {
     statusCode = 413
     errorCode = ERROR_CODES.PAYLOAD_TOO_LARGE
     message = 'Payload melebihi batas yang diizinkan.'
+  } else if (err?.name === 'MulterError') {
+    // Error upload multer: ukuran → 413, sisanya (field/format) → 400.
+    statusCode = err.code === 'LIMIT_FILE_SIZE' ? 413 : 400
+    errorCode = statusCode === 413 ? ERROR_CODES.PAYLOAD_TOO_LARGE : ERROR_CODES.BAD_REQUEST
+    message = statusCode === 413 ? 'Ukuran file melebihi batas.' : 'Upload tidak valid.'
   } else if (err?.code === '23505') {
     statusCode = 409
     errorCode = ERROR_CODES.CONFLICT

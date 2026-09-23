@@ -1,0 +1,31 @@
+{
+  "$metadata": {
+    "version": "1.0.0",
+    "description": "TrackIT semantic state tokens — single source of truth for status colors (badges, dots, alerts)."
+  },
+  "color": {
+    "state": {
+      "success": { "value": "#059669", "type": "color", "description": "Success/resolved/active" },
+      "success-bg": { "value": "#ECFDF5", "type": "color" },
+      "success-border": { "value": "#A7F3D0", "type": "color" },
+      "warning": { "value": "#B45309", "type": "color", "description": "Warning/pending/in-progress" },
+      "warning-bg": { "value": "#FFFBEB", "type": "color" },
+      "warning-border": { "value": "#FDE68A", "type": "color" },
+      "danger": { "value": "#DC2626", "type": "color", "description": "Danger/critical/failed" },
+      "danger-bg": { "value": "#FEF2F2", "type": "color" },
+      "danger-border": { "value": "#FECACA", "type": "color" },
+      "info": { "value": "#0A51B0", "type": "color", "description": "Info/primary-linked state" },
+      "info-bg": { "value": "#EDF5FF", "type": "color" },
+      "info-border": { "value": "#BFDBFE", "type": "color" },
+      "neutral": { "value": "#475569", "type": "color", "description": "Neutral/closed/disabled" },
+      "neutral-bg": { "value": "#F1F5F9", "type": "color" },
+      "neutral-border": { "value": "#CBD5E1", "type": "color" },
+      "cyan": { "value": "#0369A1", "type": "color", "description": "Supplementary info state" },
+      "cyan-bg": { "value": "#E0F2FE", "type": "color" },
+      "cyan-border": { "value": "#7DD3FC", "type": "color" },
+      "purple": { "value": "#6D28D9", "type": "color", "description": "Special category state" },
+      "purple-bg": { "value": "#EDE9FE", "type": "color" },
+      "purple-border": { "value": "#C4B5FD", "type": "color" }
+    }
+  }
+}

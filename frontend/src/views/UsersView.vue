@@ -18,6 +18,8 @@ import SearchableSelect from '../components/ui/SearchableSelect.vue'
 import { useViewMode } from '../composables/useViewMode.js'
 import AppViewToggle from '../components/ui/AppViewToggle.vue'
 import CustomSelect from '../components/ui/CustomSelect.vue'
+import ErrorState from '../components/ui/ErrorState.vue'
+import EmptyState from '../components/ui/EmptyState.vue'
 import FilterModal from '../components/ui/FilterModal.vue'
 import SkeletonTable from '../components/ui/skeleton/SkeletonTable.vue'
 
@@ -811,17 +813,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
       </div>
 
       <!-- Error -->
-      <div
-        v-else-if="pageError"
-        role="alert"
-        class="flex flex-wrap items-center gap-2 px-4 sm:px-5 py-4 text-[13px] text-rose-600 bg-rose-50"
-      >
-        <span aria-hidden="true" class="material-symbols-outlined text-[18px] shrink-0">error</span>
-        <span class="flex-1 font-semibold">{{ pageError }}</span>
-        <button type="button" class="font-bold underline cursor-pointer" @click="fetchUsers">
-          Coba lagi
-        </button>
-      </div>
+      <ErrorState v-else-if="pageError" :message="pageError" @retry="fetchUsers" />
 
       <template v-else>
         <!-- ═══ Desktop Table (≥ 1280px, mode Tabel) ═══ -->
@@ -966,24 +958,14 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
 
               <!-- Empty state -->
               <tr v-if="filteredUsers.length === 0">
-                <td colspan="6" class="px-5 py-12 text-center">
-                  <div class="flex flex-col items-center gap-2">
-                    <span
-                      aria-hidden="true"
-                      class="material-symbols-outlined text-[40px] text-[#D1D5DB]"
-                      >group</span
-                    >
-                    <p class="text-[13px] text-[#9CA3AF]">
-                      Tidak ada pengguna yang sesuai pencarian.
-                    </p>
-                    <button
-                      v-if="searchQuery || filterRole"
-                      @click="resetFilters"
-                      class="text-[12px] text-brand font-bold hover:text-brand-dark cursor-pointer"
-                    >
-                      Reset Filter
-                    </button>
-                  </div>
+                <td colspan="6">
+                  <EmptyState
+                    icon="group"
+                    :title="searchQuery || filterRole ? 'Tidak ada pengguna yang cocok' : 'Belum ada pengguna'"
+                    :description="searchQuery || filterRole ? 'Coba ubah kata kunci atau reset filter Anda.' : 'Akun pengguna akan muncul di sini setelah dibuat.'"
+                    :secondary-label="searchQuery || filterRole ? 'Reset Filter' : ''"
+                    @secondary-action="resetFilters"
+                  />
                 </td>
               </tr>
             </tbody>
@@ -993,21 +975,14 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
         <!-- ═══ Kartu (< 1280px, atau saat mode Kartu dipilih) ═══ -->
         <div :class="viewMode === 'card' ? '' : 'xl:hidden'">
           <!-- Empty State -->
-          <div v-if="filteredUsers.length === 0" class="px-4 py-10 text-center">
-            <div class="flex flex-col items-center gap-2">
-              <span aria-hidden="true" class="material-symbols-outlined text-[36px] text-[#D1D5DB]"
-                >group</span
-              >
-              <p class="text-[13px] text-[#9CA3AF]">Tidak ada pengguna yang sesuai pencarian.</p>
-              <button
-                v-if="searchQuery || filterRole"
-                @click="resetFilters"
-                class="text-[12px] text-brand font-bold hover:text-brand-dark cursor-pointer"
-              >
-                Reset Filter
-              </button>
-            </div>
-          </div>
+          <EmptyState
+            v-if="filteredUsers.length === 0"
+            icon="group"
+            :title="searchQuery || filterRole ? 'Tidak ada pengguna yang cocok' : 'Belum ada pengguna'"
+            :description="searchQuery || filterRole ? 'Coba ubah kata kunci atau reset filter Anda.' : 'Akun pengguna akan muncul di sini setelah dibuat.'"
+            :secondary-label="searchQuery || filterRole ? 'Reset Filter' : ''"
+            @secondary-action="resetFilters"
+          />
 
           <!-- User Cards -->
           <div v-else class="admin-person-cards flex flex-col gap-3 p-3.5">

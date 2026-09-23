@@ -6,6 +6,7 @@ import { animateStagger } from '../composables/useGsap.js'
 import { normalizeLocation } from '../utils/locationNormalizer.js'
 import { useViewMode } from '../composables/useViewMode.js'
 import AppViewToggle from '../components/ui/AppViewToggle.vue'
+import StatCard from '../components/ui/StatCard.vue'
 import AppModal from '../components/ui/AppModal.vue'
 import SearchableSelect from '../components/ui/SearchableSelect.vue'
 import CustomSelect from '../components/ui/CustomSelect.vue'
@@ -24,6 +25,28 @@ const canWriteAssets = computed(() => hasWritePermission('assets_ga'))
 const { viewMode } = useViewMode('assets-ga', 'table')
 
 const assets = ref([])
+// Count complete category records, independent of table filters and pagination.
+const assetStats = computed(() => [
+  { title: 'Total Aset GA', value: assets.value.length, icon: 'inventory_2', color: 'primary' },
+  {
+    title: 'Baik',
+    value: assets.value.filter((asset) => asset.kondisi === 'Baik').length,
+    icon: 'check_circle',
+    color: 'success',
+  },
+  {
+    title: 'Rusak Ringan',
+    value: assets.value.filter((asset) => asset.kondisi === 'Rusak Ringan').length,
+    icon: 'build',
+    color: 'warning',
+  },
+  {
+    title: 'Rusak Berat',
+    value: assets.value.filter((asset) => asset.kondisi === 'Rusak Berat').length,
+    icon: 'warning',
+    color: 'danger',
+  },
+])
 const currentPage = ref(1)
 const itemsPerPage = ref(10)
 const isLoading = ref(true)
@@ -484,6 +507,22 @@ function formatKondisiPill(kondisi) {
         </div>
       </div>
     </div>
+
+    <section
+      aria-label="Ringkasan aset"
+      :aria-busy="isLoading"
+      class="grid grid-cols-1 min-[360px]:grid-cols-2 xl:grid-cols-4 gap-3"
+    >
+      <StatCard
+        v-for="stat in assetStats"
+        :key="stat.title"
+        :title="stat.title"
+        :value="isLoading || pageError ? '—' : stat.value"
+        :icon="stat.icon"
+        :color="stat.color"
+        :subtitle="isLoading ? 'Memuat…' : pageError ? 'Tidak tersedia' : 'Seluruh data kategori'"
+      />
+    </section>
 
     <!-- ─── MODERN ENTERPRISE SAAS DATA MANAGEMENT CONTAINER ──────────────── -->
     <div>

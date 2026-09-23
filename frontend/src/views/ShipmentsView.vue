@@ -14,12 +14,12 @@ import ShipmentImportModal from '../components/ui/ShipmentImportModal.vue'
 import ShipmentExportModal from '../components/ui/ShipmentExportModal.vue'
 import FilterModal from '../components/ui/FilterModal.vue'
 import PageHeader from '../components/ui/PageHeader.vue'
+import EmptyState from '../components/ui/EmptyState.vue'
+import ErrorState from '../components/ui/ErrorState.vue'
 import {
   ExternalLink,
   Package,
   Pencil,
-  Plus,
-  RefreshCw,
   Search,
   Trash2,
   Truck,
@@ -361,11 +361,12 @@ onMounted(() => {
 
     <!-- Page Header -->
     <PageHeader
+      class="shipment-header"
       title="Pengiriman"
       subtitle="Pantau proses pengiriman barang dan aset kantor."
       icon="local_shipping"
     >
-      <div v-if="canWriteShipments" class="flex items-center gap-2">
+      <div v-if="canWriteShipments" class="shipment-header-actions">
         <button
           type="button"
           @click="openAdd"
@@ -375,7 +376,7 @@ onMounted(() => {
           <span aria-hidden="true" class="material-symbols-outlined text-[16px]">add</span>
           <span>Tambah Pengiriman</span>
         </button>
-        <div class="flex items-center gap-1 rounded-lg border border-[#D7E3F2] bg-[#F8FAFC] p-1">
+        <div class="shipment-transfer-actions flex items-center gap-2">
           <button
             type="button"
             @click="showImportModal = true"
@@ -397,8 +398,8 @@ onMounted(() => {
     </PageHeader>
 
     <!-- Search & Filter Bar -->
-    <div class="flex items-center gap-2.5 w-full min-w-0">
-      <div class="relative h-9 min-w-0 flex-1">
+    <div class="shipment-toolbar">
+      <div class="shipment-search relative min-w-0">
         <Search
           class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#687281] pointer-events-none"
         />
@@ -424,7 +425,7 @@ onMounted(() => {
     </div>
 
     <!-- Summary Cards -->
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+    <div class="shipment-summary">
       <div
         class="rounded-2xl border border-[#E2E8F0] bg-white p-4 shadow-2xs flex items-center gap-3.5"
       >
@@ -504,41 +505,20 @@ onMounted(() => {
         <SkeletonTable preset="assets" :rows="6" />
       </div>
 
-      <div v-else-if="pageError" class="p-8 text-center text-rose-600">
-        <p class="font-bold text-sm">{{ pageError }}</p>
-        <button
-          type="button"
-          @click="fetchData"
-          class="mt-2 text-xs font-bold underline cursor-pointer inline-flex items-center gap-1.5"
-        >
-          <RefreshCw class="w-3.5 h-3.5" />
-          <span>Coba Lagi</span>
-        </button>
-      </div>
+      <ErrorState v-else-if="pageError" :message="pageError" @retry="fetchData" />
 
-      <div v-else-if="shipments.length === 0" class="px-4 py-12 text-center text-[#5F7089]">
-        <div
-          class="mx-auto w-12 h-12 rounded-2xl bg-slate-100 flex items-center justify-center text-[#687281] mb-3"
-        >
-          <Package class="w-6 h-6" />
-        </div>
-        <p class="font-bold text-sm text-[#333333]">Belum ada data pengiriman.</p>
-        <p class="text-xs text-[#5F7089] mt-1 max-w-sm mx-auto">
-          {{
+      <div v-else-if="shipments.length === 0" class="px-4 py-8">
+        <EmptyState
+          icon="local_shipping"
+          title="Belum Ada Data Pengiriman"
+          :description="
             canWriteShipments
               ? 'Tambahkan pengiriman pertama untuk mulai melakukan tracking.'
               : 'Tidak ada data pengiriman yang cocok dengan filter yang dipilih.'
-          }}
-        </p>
-        <button
-          v-if="canWriteShipments"
-          type="button"
-          @click="openAdd"
-          class="mt-4 inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-[#0A51B0] text-white text-xs font-semibold hover:bg-[#0A4391] transition-all cursor-pointer shadow-2xs"
-        >
-          <Plus class="w-4 h-4" />
-          <span>Tambah Pengiriman</span>
-        </button>
+          "
+          :action-label="canWriteShipments ? 'Tambah Pengiriman' : ''"
+          @action="openAdd"
+        />
       </div>
 
       <div v-else class="w-full max-w-full overflow-hidden">
@@ -634,6 +614,7 @@ onMounted(() => {
         <!-- Mobile Card List (< xl, atau saat mode Kartu dipilih) -->
         <ul
           class="shipment-cards"
+          :data-layout="viewMode"
           :class="viewMode === 'card' ? '' : 'xl:hidden'"
           aria-label="Daftar pengiriman"
         >
@@ -717,6 +698,7 @@ onMounted(() => {
 
     <!-- Form Modal (Create / Edit) -->
     <AppModal
+      panel-class="shipment-dialog"
       :is-open="showFormModal"
       :title="modalMode === 'add' ? 'Tambah Pengiriman' : 'Edit Pengiriman'"
       size="lg"
@@ -896,6 +878,7 @@ onMounted(() => {
     </AppModal>
 
     <FilterModal
+      panel-class="shipment-dialog"
       :is-open="showFilterModal"
       title="Filter Pengiriman"
       @close="showFilterModal = false"
@@ -910,11 +893,13 @@ onMounted(() => {
         height-class="h-10"
       />
       <input
+        aria-label="Tanggal awal"
         v-model="filterDateFrom"
         type="date"
         class="h-10 w-full rounded-xl border border-slate-200 px-3 text-xs"
       />
       <input
+        aria-label="Tanggal akhir"
         v-model="filterDateTo"
         type="date"
         class="h-10 w-full rounded-xl border border-slate-200 px-3 text-xs"
@@ -932,7 +917,12 @@ onMounted(() => {
     />
 
     <!-- Delete Confirmation Modal -->
-    <AppModal :is-open="showDeleteModal" title="Hapus Data Pengiriman" @close="closeModal">
+    <AppModal
+      panel-class="shipment-dialog"
+      :is-open="showDeleteModal"
+      title="Hapus Data Pengiriman"
+      @close="closeModal"
+    >
       <div class="space-y-4">
         <div
           v-if="modalError"
@@ -1232,6 +1222,154 @@ onMounted(() => {
   .shipment-form-actions button {
     flex: 1;
     padding-inline: 12px;
+  }
+}
+
+/* Page-owned spacing and controls; shared surfaces stay unchanged. */
+.shipments-page {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+}
+.shipments-page > * {
+  margin-block: 0;
+}
+.shipment-header {
+  padding-block: 8px;
+}
+.shipment-header-actions,
+.shipment-transfer-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.shipments-page .shipment-header-actions button {
+  height: 44px;
+  min-width: 96px;
+  padding: 0 16px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  justify-content: center;
+}
+.shipment-toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.shipment-search {
+  flex: 1;
+  min-width: 200px;
+  height: 44px;
+}
+.shipment-toolbar > button,
+.shipment-toolbar :deep(button) {
+  min-height: 44px;
+  min-width: 44px;
+}
+.shipment-summary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+.shipment-summary > div {
+  min-width: 0;
+  padding: 20px;
+}
+.shipment-summary p {
+  overflow-wrap: anywhere;
+}
+.shipment-list-surface {
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+.shipment-list-surface button {
+  min-height: 44px;
+  min-width: 44px;
+}
+.shipment-table th:last-child {
+  width: 112px;
+}
+.shipment-table td:last-child button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.shipment-cards > li > div:first-child > :last-child {
+  flex-shrink: 0;
+}
+.shipment-cards > li > div:nth-of-type(2) > div {
+  flex-wrap: wrap;
+}
+.shipment-cards[data-layout='card'] {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+:global(.shipment-dialog .modal-header),
+:global(.shipment-dialog .modal-body),
+:global(.shipment-dialog .modal-footer) {
+  padding: 24px;
+}
+:global(.shipment-dialog button) {
+  min-height: 44px;
+  min-width: 44px;
+}
+:global(.shipment-dialog .modal-footer button) {
+  padding-inline: 20px;
+  border-radius: 10px;
+  font-size: 12px;
+}
+:global(.shipment-dialog input:not([type='radio']):not([type='checkbox']):not([type='file'])),
+:global(.shipment-dialog select) {
+  min-height: 44px;
+}
+:global(.shipment-dialog .modal-body) {
+  overflow-wrap: anywhere;
+}
+@media (min-width: 1280px) {
+  .shipment-cards[data-layout='table'] {
+    display: none;
+  }
+}
+@media (max-width: 1279px) {
+  .shipment-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .shipment-cards[data-layout='card'] {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 767px) {
+  .shipment-cards[data-layout='card'] {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .shipment-summary > div {
+    padding: 16px;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+@media (max-width: 639px) {
+  .shipment-header-actions {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+  .shipment-header-actions > button,
+  .shipment-transfer-actions {
+    flex: 1 1 100%;
+  }
+  .shipment-transfer-actions button {
+    flex: 1;
+  }
+  .shipment-search {
+    flex-basis: 100%;
+  }
+  :global(.shipment-dialog .modal-header),
+  :global(.shipment-dialog .modal-body),
+  :global(.shipment-dialog .modal-footer) {
+    padding: 20px;
   }
 }
 </style>

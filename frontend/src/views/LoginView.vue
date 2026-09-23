@@ -1048,17 +1048,6 @@ const finishResetAndLogin = () => {
   background: radial-gradient(circle, rgba(8, 146, 245, 0.3) 0%, transparent 70%);
   pointer-events: none;
 }
-.login-story::after {
-  content: '';
-  position: absolute;
-  bottom: -40px;
-  left: -40px;
-  width: 200px;
-  height: 200px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(255, 79, 27, 0.12) 0%, transparent 70%);
-  pointer-events: none;
-}
 .story-tag {
   display: inline-flex;
   align-items: center;

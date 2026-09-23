@@ -5,6 +5,7 @@ import { useAuth } from '../composables/useAuth.js'
 import { animateStagger } from '../composables/useGsap.js'
 import { useViewMode } from '../composables/useViewMode.js'
 import AppViewToggle from '../components/ui/AppViewToggle.vue'
+import StatCard from '../components/ui/StatCard.vue'
 import { normalizeLocation } from '../utils/locationNormalizer.js'
 import { formatCurrency } from '../utils/currencyFormatter.js'
 import AppModal from '../components/ui/AppModal.vue'
@@ -25,6 +26,28 @@ const canWriteAssets = computed(() => hasWritePermission('assets_ops'))
 const { viewMode } = useViewMode('assets-ops', 'table')
 
 const assets = ref([])
+// Count complete category records, independent of table filters and pagination.
+const assetStats = computed(() => [
+  { title: 'Total Aset Ops', value: assets.value.length, icon: 'inventory_2', color: 'primary' },
+  {
+    title: 'Aktif',
+    value: assets.value.filter((asset) => asset.status === 'Aktif').length,
+    icon: 'check_circle',
+    color: 'success',
+  },
+  {
+    title: 'Maintenance',
+    value: assets.value.filter((asset) => asset.status === 'Maintenance').length,
+    icon: 'build',
+    color: 'warning',
+  },
+  {
+    title: 'Rusak',
+    value: assets.value.filter((asset) => asset.status === 'Rusak').length,
+    icon: 'warning',
+    color: 'danger',
+  },
+])
 const currentPage = ref(1)
 const itemsPerPage = ref(10)
 const isLoading = ref(true)
@@ -485,6 +508,22 @@ function formatDate(dateStr) {
         </div>
       </div>
     </div>
+
+    <section
+      aria-label="Ringkasan aset"
+      :aria-busy="isLoading"
+      class="grid grid-cols-1 min-[360px]:grid-cols-2 xl:grid-cols-4 gap-3"
+    >
+      <StatCard
+        v-for="stat in assetStats"
+        :key="stat.title"
+        :title="stat.title"
+        :value="isLoading || pageError ? '—' : stat.value"
+        :icon="stat.icon"
+        :color="stat.color"
+        :subtitle="isLoading ? 'Memuat…' : pageError ? 'Tidak tersedia' : 'Seluruh data kategori'"
+      />
+    </section>
 
     <!-- ─── MODERN ENTERPRISE SAAS DATA MANAGEMENT CONTAINER ──────────────── -->
     <div>

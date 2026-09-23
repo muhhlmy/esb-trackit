@@ -9,6 +9,8 @@ import AppModal from '../components/ui/AppModal.vue'
 import AppBadge from '../components/ui/AppBadge.vue'
 import AppRowActions from '../components/ui/AppRowActions.vue'
 import AppImportModal from '../components/ui/AppImportModal.vue'
+import EmptyState from '../components/ui/EmptyState.vue'
+import ErrorState from '../components/ui/ErrorState.vue'
 import AppPagination from '../components/ui/AppPagination.vue'
 import StatCard from '../components/ui/StatCard.vue'
 import SkeletonTable from '../components/ui/skeleton/SkeletonTable.vue'
@@ -627,28 +629,14 @@ onMounted(() => {
         <SkeletonTable preset="employees" :rows="6" />
       </div>
 
-      <div v-else-if="pageError" class="p-6 text-center text-rose-600">
-        <p class="font-bold text-[14px]">{{ pageError }}</p>
-        <button
-          type="button"
-          @click="fetchData"
-          class="mt-2 text-[12px] font-bold underline cursor-pointer"
-        >
-          Coba Lagi
-        </button>
-      </div>
+      <ErrorState v-else-if="pageError" :message="pageError" @retry="fetchData" />
 
-      <div
-        v-else-if="filteredEmployees.length === 0"
-        class="px-4 py-8 sm:p-12 text-center text-[#5F7089]"
-      >
-        <span aria-hidden="true" class="material-symbols-outlined text-[44px] text-[#CBD5E1]"
-          >person_off</span
-        >
-        <p class="mt-2 font-bold text-[13.5px] text-[#333333]">Tidak Ada Data Karyawan</p>
-        <p class="text-[12px] text-[#5F7089]">
-          Cobalah untuk mengosongkan filter atau menambah karyawan baru.
-        </p>
+      <div v-else-if="filteredEmployees.length === 0" class="px-4 py-8 sm:p-12">
+        <EmptyState
+          icon="person_off"
+          title="Tidak Ada Data Karyawan"
+          description="Cobalah untuk mengosongkan filter atau menambah karyawan baru."
+        />
       </div>
 
       <div v-else class="w-full max-w-full overflow-hidden">

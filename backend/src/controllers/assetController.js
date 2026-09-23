@@ -5,6 +5,7 @@ import { pool, withTransaction } from "../config/database.js";
 import { normalizeLocation } from "../utils/locationNormalizer.js";
 import { canReadITAsset, canWriteITAsset, canReadOtherAssets } from "../security/resourceAuthorizationPolicy.js";
 import { parsePaginationQuery, setPaginationHeaders } from "../security/requestValidation.js";
+import { sanitizePlainText } from "../security/htmlSanitizer.js";
 
 function createHttpError(statusCode, message) {
   const error = new Error(message);
@@ -199,7 +200,7 @@ function validateAssetPayload(body) {
 
   function cleanText(value) {
     if (value === undefined || value === null) return null;
-    const text = String(value).trim();
+    const text = sanitizePlainText(String(value).trim());
     return text === "" ? null : text;
   }
 

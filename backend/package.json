@@ -7,7 +7,7 @@
     "isomorphic-dompurify": "^4.1.0",
     "jsonwebtoken": "^9.0.3",
     "multer": "^2.2.0",
-    "nodemailer": "^9.0.3",
+    "nodemailer": "^10.0.10",
     "pg": "^8.22.0"
   },
   "name": "backend",

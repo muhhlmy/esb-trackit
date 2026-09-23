@@ -4,7 +4,7 @@
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
-    "isomorphic-dompurify": "^4.1.0",
+    "isomorphic-dompurify": "^4.3.0",
     "jsonwebtoken": "^9.0.3",
     "multer": "^2.2.0",
     "nodemailer": "^9.0.3",

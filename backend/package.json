@@ -6,7 +6,7 @@
     "express": "^5.2.1",
     "isomorphic-dompurify": "^4.1.0",
     "jsonwebtoken": "^9.0.3",
-    "multer": "^2.2.0",
+    "multer": "^2.4.0",
     "nodemailer": "^9.0.3",
     "pg": "^8.22.0"
   },

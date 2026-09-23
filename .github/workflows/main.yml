@@ -1,0 +1,246 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches:
+      - main
+      - master
+      - dev
+
+  pull_request:
+    branches:
+      - main
+      - master
+      - dev
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend-ci:
+    name: Backend CI
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+
+        env:
+          POSTGRES_DB: assets_monitoring_test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: ci-dummy-postgres-password
+
+        ports:
+          - 5432:5432
+
+        options: >-
+          --health-cmd "pg_isready -U postgres -d assets_monitoring_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DB_HOST: localhost
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: ci-dummy-postgres-password
+      DB_NAME: assets_monitoring_test
+
+      JWT_SECRET: ci-only-dummy-secret-minimum-32-chars-xyz123
+
+      NODE_ENV: test
+      EMAIL_ENABLED: false
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install Dependencies
+        run: npm ci
+        working-directory: backend
+
+      - name: Verify PostgreSQL Connection
+        run: |
+          node <<'NODE'
+          const net = require("net");
+
+          const socket = net.createConnection({
+            host: process.env.DB_HOST,
+            port: Number(process.env.DB_PORT)
+          });
+
+          socket.setTimeout(5000);
+
+          socket.on("connect", () => {
+            console.log("PostgreSQL is reachable.");
+            socket.end();
+          });
+
+          socket.on("timeout", () => {
+            console.error("PostgreSQL connection timed out.");
+            socket.destroy();
+            process.exit(1);
+          });
+
+          socket.on("error", (error) => {
+            console.error("PostgreSQL connection failed:");
+            console.error(error.message);
+            process.exit(1);
+          });
+          NODE
+
+      - name: Run Syntax and Preflight Check
+        run: npm run check
+        working-directory: backend
+
+      - name: Initialize and Validate Test Database
+        run: node scripts/initialize-test-database.mjs
+        working-directory: backend
+
+      - name: Run Backend Tests
+        run: npm test
+        working-directory: backend
+
+      - name: Upload Backend Test Results
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: backend-test-results
+          path: |
+            backend/test-results/
+            backend/coverage/
+          if-no-files-found: ignore
+          retention-days: 14
+
+  frontend-ci:
+    name: Frontend CI
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install Dependencies
+        run: npm ci
+        working-directory: frontend
+
+      - name: Build Design Tokens
+        run: node ../scripts/build-tokens.js
+        working-directory: frontend
+
+      - name: Run Linter
+        run: npm run lint
+        working-directory: frontend
+
+      - name: Check Formatting
+        run: npm run format:check
+        working-directory: frontend
+
+      - name: Run Unit Tests
+        run: npm test
+        working-directory: frontend
+
+      - name: Build Application
+        run: npm run build
+        working-directory: frontend
+
+      - name: Upload Frontend Build
+        if: success()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: frontend-dist
+          path: frontend/dist/
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Upload Frontend Test Results
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: frontend-test-results
+          path: |
+            frontend/test-results/
+            frontend/coverage/
+          if-no-files-found: ignore
+          retention-days: 14
+
+  dependency-ci:
+    name: Dependency Security (${{ matrix.name }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    strategy:
+      fail-fast: false
+
+      matrix:
+        include:
+          - name: root
+            directory: .
+
+          - name: backend
+            directory: backend
+
+          - name: frontend
+            directory: frontend
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: "22"
+
+      - name: Validate Package Manifest
+        run: |
+          test -f package.json
+          test -f package-lock.json
+        working-directory: ${{ matrix.directory }}
+
+      - name: Install Locked Dependencies
+        run: npm ci
+        working-directory: ${{ matrix.directory }}
+
+      - name: Audit Dependencies
+        run: npm audit --audit-level=high
+        working-directory: ${{ matrix.directory }}
+
+      - name: Generate Dependency SBOM
+        run: npm sbom --sbom-format cyclonedx > sbom.json
+        working-directory: ${{ matrix.directory }}
+
+      - name: Validate Generated SBOM
+        run: |
+          test -s sbom.json
+          echo "SBOM generated successfully."
+
+        working-directory: ${{ matrix.directory }}
+
+      - name: Upload SBOM
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: sbom-${{ matrix.name }}
+          path: ${{ matrix.directory }}/sbom.json
+          if-no-files-found: error
+          retention-days: 30

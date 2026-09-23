@@ -3,7 +3,7 @@
 TrackIT adalah aplikasi web untuk pengelolaan aset IT, aset GA dan OPS, data karyawan, pengajuan, pengiriman, tiket helpdesk, serta Help Center berbasis Knowledge Base. Satu basis kode (monorepo) yang menaungi SPA Vue 3, REST API Express 5, dan basis data PostgreSQL 16.
 
 
-## Daftar Isi
+TrackIT is a web-based asset and IT service management platform designed to help organizations manage IT assets, requests, approvals, inventory, and operational workflows from a centralized interface.
 
 - [Ringkasan](#ringkasan)
 - [Fitur](#fitur)
@@ -28,24 +28,22 @@ TrackIT adalah aplikasi web untuk pengelolaan aset IT, aset GA dan OPS, data kar
 - [Dokumentasi Terkait](#dokumentasi-terkait)
 - [Lisensi](#lisensi)
 
-## Ringkasan
+## Overview
 
 TrackIT melayani tiga kelompok pengguna dengan kebutuhan berbeda:
 
-1. **Karyawan umum** melihat aset yang sedang mereka pegang, membuat tiket bantuan, dan membaca artikel Help Center tanpa perlu login.
-2. **Tim IT, GA, dan OPS** mengelola inventaris per kategori, memproses pengajuan, dan menangani pengiriman barang.
-3. **Admin dan superadmin** mengatur akun dan izin, memantau log aktivitas, menjalankan export data, serta melakukan backup dan restore database langsung dari antarmuka.
+1. **Employees** — view assigned assets, open helpdesk tickets, and read published Help Center articles.
+2. **Operations teams (IT, GA, OPS)** — maintain per-domain asset inventories, process submissions and shipments, and work ticket queues.
+3. **Administrators** — manage accounts and feature permissions, review audit logs, run XLSX exports, and perform database backup/restore from the admin UI.
 
 Seluruh halaman manajemen berada di balik autentikasi. Hanya Help Center (artikel, FAQ, kategori) yang terbit publik, dan hanya konten berstatus `PUBLISHED` yang tampil.
 
-## Fitur
+Design constraints that shape the codebase:
 
-### Aset
-- **Aset IT** mencatat hostname, serial number, spesifikasi, pemegang (relasi ke NIK karyawan), lokasi, tipe perangkat, merek, model, status (`In Use`, `Stock`, `Damaged`, `In Service`, `Disposal`), dan kondisi (`Baru` hingga `Rusak Berat`). Setiap perubahan pemegang terekam di `riwayat_pemakaian_aset`, setiap perubahan data terekam di `log_riwayat_aset`.
-- **Aset GA** dan **Aset OPS** memiliki inventaris, skema tabel, dan aturan izin tersendiri sehingga tidak bercampur dengan aset IT.
-- **Pengajuan aset** (`asset_submissions`) berjalan sebagai workflow berstatus `draft → submitted → completed`, dengan opsi pembatalan dan nomor pengajuan unik per dokumen.
-- **Label barcode** dapat dibuat per aset dari halaman Aset IT untuk kebutuhan physical tagging.
-- **Aset Karyawan** (halaman My Assets) menampilkan aset milik karyawan yang sedang login.
+- Backend layers are explicit: `routes → controllers → services → pg`, with parameterized SQL throughout.
+- The server does not run DDL at startup; schema changes go through versioned migrations only.
+- The backend is the source of truth for roles and permissions. Frontend permission checks only gate navigation.
+- Realtime ticket updates use Server-Sent Events from an in-process event bus (single-instance deployment model).
 
 ### Helpdesk
 - Tiket memiliki nomor unik, kategori, prioritas (`Low` hingga `Critical`), dan antrean per tim (IT, HR, GA). Antrean dapat dikelola adminnya masing-masing.
@@ -65,38 +63,78 @@ Seluruh halaman manajemen berada di balik autentikasi. Hanya Help Center (artike
 - **Backup dan restore** dijalankan dari UI admin: `pg_dump` dengan checksum SHA-256, backup otomatis sebelum restore, retensi berdasarkan umur dan jumlah file, serta audit trail setiap operasi.
 - **Export data** administratif ke XLSX untuk aset, pengguna, tiket, dan tabel lainnya, khusus superadmin.
 
-## Arsitektur
+### Request and Helpdesk Workflows
+
+- Tickets with unique numbers, categories, priority levels, and per-team queues
+- Claim, reassign, resolve, and cancel flows; comments with attachments
+- Ticket history and status changes captured for audit
+- CSAT rating (1–5) after completion
+- Realtime updates over SSE (`GET /api/tickets/events`), filtered per user access
+- Shipments module: recipients, destinations, AWB/tracking numbers, status progression, cancel
+- Submissions module for asset requests with approval-style lifecycle
+
+### Knowledge Base and Help Center
+
+- Published incident articles (SOP-style), FAQs, and category/topic cards served publicly
+- Severity tags, free-text search, and popular-search logging
+- Rich-text CMS editor (TipTap) for authenticated editors with `knowledge_base` permission
+- Per-user article bookmarks for signed-in users
+
+### User Management and Access Control
+
+- Session-based authentication with HttpOnly cookies (JWT paired with server-side sessions)
+- Roles: `user`, `admin`, `superadmin`
+- Per-feature permission keys (`none` / `read_only` / `full`) checked on every API request
+- Password change, forgot-password OTP flow, and enrollment credentials that require OTP completion
+- Employee master data and user provisioning from admin screens
+
+### Reporting and Administration
+
+- Dashboard charts: asset trends, condition distribution, device-type mix, CSAT trends (Chart.js)
+- Activity and login audit trails (`system_audit_logs`, `log_audit_login`)
+- Admin-initiated PostgreSQL backup and restore with SHA-256 checksums, retention limits, and backup audit log
+- Superadmin-only XLSX exports for assets, users, tickets, and related tables
+- Health endpoint (`GET /health`) including database connectivity
+
+## Feature Matrix
+
+| Area | Capability | Status |
+| --- | --- | --- |
+| Authentication | Session cookie + server-side session, OTP password reset | Available |
+| Authorization | Global roles + 13 feature permission keys (RBAC) | Available |
+| Assets | IT / GA / OPS inventories, assignment, history, labels | Available |
+| Requests | Submissions workflow | Available |
+| Helpdesk | Tickets, queues, comments, CSAT, SSE realtime | Available |
+| Logistics | Shipments with tracking status | Available |
+| Knowledge base | Public Help Center + authenticated CMS | Available |
+| Import / Export | XLSX import and export with formula-injection guards | Available |
+| Audit | System audit logs and login audit | Available |
+| Backup | Admin UI backup / restore with checksums and retention | Available |
+| Testing | Node unit tests (backend, frontend) | Available |
+| Testing | Playwright E2E (Chromium, Firefox) | Available |
+| Testing | axe-core accessibility suite | Available |
+| CI | GitHub Actions (backend, frontend, dependencies, E2E) | Available |
+| SAST | CodeQL (JavaScript/TypeScript) | Available |
+| Containers | Docker Compose stack (PostgreSQL, migrate, backend, frontend) | Available |
+
+## Architecture
+
+Local development:
 
 ```text
-┌──────────────────────────────────────────────────────────┐
-│                       Browser (SPA)                      │
-│   Vue 3 + Vue Router + Tailwind CSS 4                    │
-│   State via composables, semua HTTP lewat useApi         │
-│   Sesi: cookie HttpOnly · Realtime: SSE                  │
-└─────────────────────────┬────────────────────────────────┘
-                          │ HTTP/HTTPS
-            ┌─────────────▼──────────────┐
-            │  Nginx (container frontend)│
-            │  statis SPA + proxy /api   │
-            └─────────────┬──────────────┘
-                          │
-            ┌─────────────▼──────────────┐
-            │  Express 5 API (Node 22)   │
-            │  routes → controllers →    │
-            │  services → pg             │
-            │  · JWT + sesi server-side  │
-            │  · RBAC + rate limiting    │
-            │  · SSE broadcaster         │
-            └─────────────┬──────────────┘
-                          │
-            ┌─────────────▼──────────────┐
-            │      PostgreSQL 16         │
-            │  24 tabel, 3 view, trigger │
-            │  audit dan anti-hard-delete│
-            └────────────────────────────┘
+Browser
+   │
+   ▼
+Frontend (Vite dev server, :5173)
+   │  proxies /api
+   ▼
+Backend API (Express, :3000)
+   │
+   ▼
+PostgreSQL (:5432)
 ```
 
-Beberapa keputusan desain yang perlu diketahui sebelum menyentuh kode:
+Docker Compose:
 
 - Backend berlapis: `routes → controllers → services → pg`. Controller memvalidasi input, service yang memegang SQL, dan seluruh query memakai placeholder parameterized (`$1`).
 - Server tidak pernah menjalankan DDL saat startup. Ia hanya memverifikasi bahwa runtime schema sesuai; perubahan skema hanya lewat migrasi versioned.
@@ -104,9 +142,16 @@ Beberapa keputusan desain yang perlu diketahui sebelum menyentuh kode:
 - Realtime memakai EventEmitter in-process yang dirancang untuk deployment single-instance. Roadmap multi-instance telah didokumentasikan di `realtimeService.js` (opsi PostgreSQL `LISTEN/NOTIFY` atau Redis Pub/Sub).
 - Frontend tidak memakai state library. State dikelola lewat composables, dan setiap panggilan HTTP melewati `useApi` yang menangani cookie sesi serta redirect 401 secara global.
 
-## Teknologi
+Operational notes (VERIFIED from source and Compose):
 
-| Area | Teknologi |
+- Same-origin deployment is the canonical production model: the reverse proxy serves the SPA and forwards `/api` to the backend.
+- Access tokens are short-lived; the browser holds an HttpOnly session cookie. Tokens are not stored in `localStorage`.
+- Application containers drop Linux capabilities and run with `no-new-privileges`.
+- Realtime is an in-process EventEmitter intended for single-instance deployments.
+
+## Technology Stack
+
+| Layer | Technology |
 | --- | --- |
 | Frontend | Vue 3.5, Vue Router, Vite, Tailwind CSS 4, TipTap (editor), Chart.js, GSAP, JsBarcode, Lucide, SheetJS (`xlsx`), DOMPurify |
 | Backend | Node.js (ESM), Express 5, `pg`, `jsonwebtoken`, `bcryptjs`, `multer`, `nodemailer`, `isomorphic-dompurify` |
@@ -115,16 +160,16 @@ Beberapa keputusan desain yang perlu diketahui sebelum menyentuh kode:
 | Infrastruktur | Docker Compose, Nginx, GitHub Actions, GitHub Packages (GHCR) |
 | Tooling | oxlint, ESLint, Prettier, nodemon, pipeline design tokens |
 
-Node.js wajib versi `^22.18.0` atau `>=24.12.0` sesuai kolom `engines` pada `package.json`.
+Node.js engines (from `backend/package.json` and `frontend/package.json`): `^22.18.0 || >=24.12.0`.
 
-## Struktur Direktori
+## Project Structure
 
 ```text
 trackit/
 ├── backend/                        REST API Express (ESM)
 │   ├── migrations/
-│   │   ├── versioned/              Migrasi kanonik 0001–0008 (satu-satunya yang dieksekusi)
-│   │   └── 0xx_*.sql               Arsip legacy, tidak dijalankan
+│   │   ├── versioned/       Canonical migrations (only executed path)
+│   │   └── 0xx_*.sql        Legacy reference files (do not run)
 │   ├── src/
 │   │   ├── config/                 env, koneksi DB, runner migrasi, verifikasi schema
 │   │   ├── controllers/            Validasi input dan orkestrasi HTTP
@@ -157,15 +202,111 @@ trackit/
 └── package.json                    Skrip root: E2E, dokumen, tokens, deploy
 ```
 
-## Menjalankan Secara Lokal
+## Requirements
 
-Prasyarat: Node.js `^22.18.0 || >=24.12.0` dan PostgreSQL 16 yang berjalan di lokal.
+- Node.js `^22.18.0` or `>=24.12.0`
+- npm
+- PostgreSQL 16 (local instance, or Docker Compose)
+- Docker and Docker Compose (optional, for the full stack)
+- Playwright browsers (for E2E): installed via `npx playwright install`
+
+## Installation
+
+```bash
+git clone https://github.com/muhhlmy/esb-trackit.git
+cd esb-trackit
+
+# Root (Playwright and root scripts)
+npm ci
+
+# Backend
+npm --prefix backend ci
+
+# Frontend
+npm --prefix frontend ci
+```
+
+Copy environment templates before configuring:
+
+```bash
+cp .env.example .env                 # Docker Compose / root
+cp backend/.env.example backend/.env  # local backend
+cp frontend/.env.example frontend/.env
+cp .env.e2e.example .env.e2e          # E2E only
+```
+
+Fill required values in your **local** `.env` files. Never commit `.env`, `.env.e2e`, database dumps, or backup files.
+
+## Configuration
+
+| File | Purpose |
+| --- | --- |
+| `backend/.env.example` | API port, PostgreSQL, JWT secret, CORS, rate limits, SMTP, migration guards, backup paths |
+| `frontend/.env.example` | Vite host/proxy settings (`VITE_API_BASE_URL` stays empty for same-origin cookies) |
+| `.env.example` | Docker Compose inputs (DB password, JWT secret, migration guards, optional SMTP/seed) |
+| `.env.e2e.example` | Playwright base URLs and disposable test accounts |
+
+Rules enforced by the application (VERIFIED):
+
+- `JWT_SECRET` is required at startup (minimum 32 characters) and has no source-code default.
+- `DB_PASSWORD` is required at startup.
+- `CORS_ORIGINS` must be an exact comma-separated allowlist; `*` fails startup.
+- `TRUST_PROXY_CIDRS` accepts only explicit IP/CIDR values (empty if you are not behind a proxy).
+- Frontend `VITE_*` values are public to the browser — never put backend secrets there.
+
+Do not commit `.env` files, credentials, private keys, production configuration, or database dumps.
+
+## Database Setup
+
+TrackIT uses **PostgreSQL 16**. Schema changes are applied only from `backend/migrations/versioned/` via the migration runner (advisory lock, SHA-256 checksums, `app_schema_migrations` ledger).
+
+Legacy `backend/migrations/0xx_*.sql` files are documentation archives — do not execute them.
+
+### Migration commands (backend working directory)
+
+```bash
+npm run db:migrate:plan    # inspect pending migrations (no changes)
+npm run db:migrate:apply   # apply migrations (guarded)
+npm run db:check           # verify runtime schema expectations
+```
+
+`db:migrate:apply` refuses to run unless the guard environment is set, including at least:
+
+| Variable | Role |
+| --- | --- |
+| `ALLOW_DB_MIGRATIONS` | Must be `true` (explicit intent) |
+| `MIGRATION_MODE` | `fresh` or `existing` |
+| `MIGRATION_EXPECTED_HOST` | Must match the target host exactly |
+| `MIGRATION_EXPECTED_DATABASE` | Must match the target database exactly |
+| `MIGRATION_RECOVERY_PROOF_ID` | Proof ID from a verified backup/restore |
+| `MIGRATION_CHANGE_ID` | Change-request identifier (required in production) |
+| `REQUIRE_NON_SUPERUSER` | Optional: require non-superuser DB owner |
+
+For adopting an existing database onto the migration ledger, follow `docs/database-migration-adoption.md`.
+
+Docker Compose runs a dedicated `migrate` one-shot service before the backend starts.
+
+### E2E / test database
+
+Playwright only accepts:
+
+- `DB_HOST` in `localhost`, `127.0.0.1`, or `::1`
+- `DB_NAME` matching `*_test`
+
+Preparation is handled by `npm run test:e2e:prepare` (`scripts/initialize-test-database.mjs --seed-e2e`).
+
+## Running Locally
+
+### Database
+
+Start PostgreSQL 16 on `localhost:5432` (local install or `docker compose up postgres`).
 
 ### Backend
 
 ```bash
-cd backend
-npm install
+npm --prefix backend run db:migrate:plan
+npm --prefix backend run db:migrate:apply
+npm --prefix backend run dev
 ```
 
 Buat file `backend/.env` dengan isi minimal berikut. File ini tidak pernah masuk git.
@@ -202,48 +343,77 @@ API berjalan di `http://localhost:3000`. Cek `GET /health`; respons `{"status":"
 ### Frontend
 
 ```bash
-cd frontend
-npm install
-npm run dev
+npm --prefix frontend run dev
 ```
 
-SPA berjalan di `http://localhost:5173`. Vite meneruskan semua permintaan `/api` ke backend pada `http://127.0.0.1:3000`; ubah target lewat variabel `VITE_API_PROXY_TARGET`.
+- App: `http://localhost:5173`
+- Vite proxies `/api` to `http://127.0.0.1:3000` (override with `VITE_API_PROXY_TARGET`)
 
-Build produksi:
+### First account (non-production)
+
+When database reset/seeding is enabled (`ENABLE_DB_RESET=true`), the backend can create an initial superadmin from `SEED_SUPERADMIN_NAME`, `SEED_SUPERADMIN_EMAIL`, and `SEED_SUPERADMIN_PASSWORD`. Use unique credentials per environment and never reuse production passwords in development.
+
+## Testing
+
+All commands below are defined in the repository `package.json` files.
 
 ```bash
 npm run build     # vite build
 npm run preview   # sajikan hasil build dengan security headers
 ```
 
-### Akun pertama
+E2E coverage (31 spec files under `e2e/tests/`): smoke, auth, tickets, assets, submissions, dashboard, RBAC, security (auth/authz/input), accessibility (axe-core), negative/error states, public regressions, view mode, and extended QA.
 
-Untuk environment non-produksi, superadmin awal dapat dibuat melalui variabel `SEED_SUPERADMIN_NAME`, `SEED_SUPERADMIN_EMAIL`, dan `SEED_SUPERADMIN_PASSWORD` pada proses inisialisasi database. Gunakan kredensial yang berbeda untuk setiap environment.
+Unit suites include security-focused tests such as session lifecycle, brute-force lockout, rate limiting, CORS, security headers, IDOR authorization, XSS sanitizing, and export formula-injection guards.
 
-## Deployment dengan Docker
+See `e2e/README.md` for suite architecture and safety rules.
 
-`docker-compose.yml` menjalankan empat layanan:
+> This README does not claim a green test run for every environment. Verify with the commands above in CI or locally.
 
-| Layanan | Peran |
+## Production Build
+
+```bash
+# Frontend
+npm --prefix frontend run build     # vite build → frontend/dist
+npm --prefix frontend run preview   # optional local preview
+
+# Backend syntax preflight (used in CI)
+npm --prefix backend run check
+
+# Lint and format (frontend, used in CI)
+npm --prefix frontend run lint
+npm --prefix frontend run format:check
+```
+
+Optional root helpers:
+
+```bash
+npm run build:tokens        # build design tokens from design-tokens/
+npm run docs:manual:pdf     # regenerate the user manual PDF
+```
+
+## Docker
+
+Verified Compose services:
+
+| Service | Role |
 | --- | --- |
-| `postgres` | PostgreSQL 16-alpine dengan healthcheck `pg_isready` |
-| `migrate` | One-shot: menerapkan migrasi lalu keluar; backend menunggu layanan ini selesai |
-| `backend` | Node 22-alpine, user non-root, dilengkapi `postgresql-client` untuk backup/restore |
-| `frontend` | Nginx: menyajikan SPA, mem-proxy `/api` ke `backend:3000`, mendukung SSE (`proxy_buffering off`) |
-
-Langkah deployment:
+| `postgres` | PostgreSQL 16 Alpine with `pg_isready` healthcheck |
+| `migrate` | One-shot job: applies versioned migrations, then exits |
+| `backend` | Node 22 Alpine, non-root user, `postgresql-client` for backup/restore |
+| `frontend` | Nginx: serves the SPA, proxies `/api` to the backend, SSE-friendly buffering |
 
 ```bash
 cp .env.example .env
-# Edit .env. Wajib diisi: DB_PASSWORD, JWT_SECRET,
+# Set at minimum: DB_PASSWORD, JWT_SECRET,
 # MIGRATION_RECOVERY_PROOF_ID, MIGRATION_CHANGE_ID
 
-docker compose up -d --build
+docker compose up --build
 ```
 
-Aplikasi dapat diakses di `http://localhost`.
+Application UI: `http://localhost` (Compose publishes the frontend on port 80).
 
-Detail hardening yang sudah diterapkan pada compose: `no-new-privileges:true` dan `cap_drop: ALL` pada container aplikasi, volume terpisah untuk data database (`pgdata`) dan file backup (`backups`), serta subnet internal `172.28.0.0/16`. Bila Anda menaruh reverse proxy eksternal (Nginx host, AWS ALB, Cloudflare), sesuaikan `TRUST_PROXY_CIDRS` dengan CIDR proxy yang sebenarnya. Nilai wildcard seperti `*` atau `0.0.0.0/0` tidak diperbolehkan dan akan ditolak.
+Notes:
 
 ## Image Docker dari GHCR
 
@@ -278,39 +448,55 @@ Catatan:
 
 ## Database dan Migrasi
 
-Empat aturan yang berlaku mutlak:
+## Security
 
-1. Semua perubahan skema hanya melalui file di `backend/migrations/versioned/`. DDL manual dilarang.
-2. File `0xx_*.sql` di folder `migrations/` adalah arsip legacy. Jangan dijalankan.
-3. Jangan mencampur import dump dengan penerapan migrasi pada database yang sama. Pilih satu jalur.
-4. Untuk database lama yang belum memakai ledger migrasi, ikuti runbook di `docs/database-migration-adoption.md` sebelum menjalankan migrasi apa pun.
+High-level security model as implemented (no exploit-oriented detail):
 
-Perintah migrasi memerlukan guard environment. Tanpa guard tersebut, `db:migrate:apply` menolak berjalan:
-
-| Variabel | Keterangan |
+| Area | Implementation |
 | --- | --- |
-| `ALLOW_DB_MIGRATIONS` | Harus `true`. Pernyataan niat eksplisit. |
-| `MIGRATION_MODE` | `fresh` untuk database baru/kosong, `existing` untuk database yang sudah mengadopsi ledger. |
-| `MIGRATION_EXPECTED_HOST` | Host database target; harus cocok persis. |
-| `MIGRATION_EXPECTED_DATABASE` | Nama database target; harus cocok persis. |
-| `MIGRATION_RECOVERY_PROOF_ID` | Bukti bahwa backup/restore sudah diverifikasi sebelum migrasi (minimal 8 karakter). |
-| `MIGRATION_CHANGE_ID` | ID tiket change request; wajib di lingkungan production. |
-| `REQUIRE_NON_SUPERUSER` | Opsional; memaksa role pemilik database berstatus non-superuser. |
+| Authentication | HttpOnly session cookie; JWT validated against server-side sessions (revocable, sliding) |
+| Authorization | Roles `user` / `admin` / `superadmin` plus 13 feature permission keys, enforced in API middleware |
+| Password storage | bcrypt with configurable rounds (default 12, bounded 10–14); non-bcrypt hashes fail closed |
+| Account protection | Login failure lockout state; OTP-based password reset with hashing, expiry, and attempt limits |
+| Session hygiene | Short access-token TTL with server session as source of truth; logout revokes server-side |
+| Rate limiting | Global API limiter, per-user authenticated limiter, dedicated auth endpoint limiter |
+| SQL | Parameterized queries; dynamic export identifiers restricted through an allowlist helper |
+| Input / output | JSON-only body policy for API mutations; DOMPurify sanitizing on client and server paths |
+| Headers | CSP, `X-Frame-Options: DENY`, `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy`, COOP/CORP; HSTS when deployed behind TLS |
+| CORS | Exact origin allowlist; wildcards rejected at startup |
+| XLSX | Formula-injection neutralization on export; template-aligned import validation |
+| Audit | Cross-module system audit (before/after JSONB, actor, IP, user-agent) plus login audit |
+| Secrets | Required via environment with no insecure source defaults; `.env*` gitignored (examples only tracked) |
+| Supply chain | Dependabot, `npm audit --audit-level=high` in CI, CycloneDX SBOM artifacts, CodeQL |
+| Containers | Non-root backend, capability drop, `no-new-privileges` |
+
+### Security disclosure
+
+To report a vulnerability, open a private GitHub security advisory on this repository, or contact the maintainer through GitHub.
+
+**Do not commit secrets, credentials, private keys, production configuration, or sensitive infrastructure information.**
+
+- Keep real values only in local `.env` files (gitignored) or a secret manager
+- Use GitHub repository secrets for CI/CD values that cannot be dummy data
+- Rotate any credential that may have been exposed
+- Never publish private keys or database dumps
 
 ## Environment Variables
 
-### Backend inti
+Representative placeholders (always prefer the `.env.example` files as the source of truth):
 
-| Variabel | Default | Keterangan |
-| --- | --- | --- |
-| `PORT` | `3000` | Port HTTP API |
-| `DB_HOST` `DB_PORT` `DB_NAME` `DB_USER` `DB_PASSWORD` | lihat `.env.example` | Koneksi PostgreSQL |
-| `JWT_SECRET` | wajib | Minimal 32 karakter |
-| `PASSWORD_BCRYPT_ROUNDS` | `12` | Dibatasi 10–14 |
-| `ACCESS_TOKEN_TTL_SECONDS` | `900` | Umur access token, dibatasi 300–3600 detik (sliding session) |
-| `SESSION_COOKIE_PATH` | `/` | Path cookie sesi HttpOnly |
+```env
+# backend/.env
+NODE_ENV=development
+HOST=127.0.0.1
+PORT=3000
+FRONTEND_URL=http://localhost:5173
 
-### Keamanan dan jaringan
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=<database-name>
+DB_USER=<database-user>
+DB_PASSWORD=<set-in-environment>
 
 | Variabel | Default | Keterangan |
 | --- | --- | --- |
@@ -320,14 +506,16 @@ Perintah migrasi memerlukan guard environment. Tanpa guard tersebut, `db:migrate
 | `SMTP_HOST` `SMTP_PORT` `SMTP_SECURE` `SMTP_USER` `SMTP_PASS` `EMAIL_FROM` | kosong | Konfigurasi SMTP |
 | `FRONTEND_URL` | `http://localhost` | Origin frontend untuk tautan dalam email |
 
-### Backup database
+CORS_ORIGINS=http://localhost:5173
+TRUST_PROXY_CIDRS=
 
-| Variabel | Default | Keterangan |
-| --- | --- | --- |
-| `DB_BACKUP_DIR` | `storage/backups` | Lokasi penyimpanan dump |
-| `DB_BACKUP_RETENTION_DAYS` | `30` | Hapus backup lebih tua dari N hari |
-| `DB_BACKUP_MAX_FILES` | `20` | Batas jumlah file backup |
-| `PG_DUMP_PATH` `PG_RESTORE_PATH` `PSQL_PATH` | `pg_dump` dst. | Lokasi binary PostgreSQL client |
+EMAIL_ENABLED=false
+SMTP_HOST=
+SMTP_PORT=587
+SMTP_SECURE=false
+SMTP_USER=
+SMTP_PASS=
+EMAIL_FROM=<sender@example.com>
 
 ### Root dan Docker Compose
 
@@ -541,7 +729,47 @@ npm run format              # prettier write
 
 ## Dokumentasi Terkait
 
-| Dokumen | Isi |
+## API Overview
+
+Base path: `/api`. JSON in/out. Mutating requests must send `Content-Type: application/json`. Authentication uses the session cookie established at login.
+
+| Area | Prefix | Access |
+| --- | --- | --- |
+| Authentication | `/api/auth/*` | Public login/reset (rate-limited); session for the rest |
+| Health | `/health` | Public |
+| IT assets | `/api/assets` | Feature permission `assets` |
+| GA assets | `/api/ga-assets` (+ aliases) | Permission `assets_ga` |
+| OPS assets | `/api/ops-assets` (+ aliases) | Permission `assets_ops` |
+| Tickets and queues | `/api/tickets`, `/api/ticket-queues` | Permission `tickets` (SSE: `GET /api/tickets/events`) |
+| Submissions | `/api/submissions` | Permission `submissions` |
+| Shipments | `/api/shipments` (+ alias) | Permission `shipments` |
+| Help Center content | `/api/cases/public`, `/api/faqs/public`, `/api/kb-categories/public` | Public, published only |
+| CMS content | `/api/cases`, `/api/faqs`, `/api/kb-categories` | Permission `knowledge_base` |
+| Bookmarks | `/api/case-bookmarks` | Authenticated session |
+| Employees | `/api/employees` (+ legacy alias) | Admin+ |
+| Users | `/api/users` | Admin+ |
+| Activity logs | `/api/logs` | Admin+ |
+| Excel import | `/api/import/*` | Admin+ |
+| Export | `/api/export/*` | Superadmin |
+| Backup / restore | `/api/admin/database/*` | Superadmin |
+
+Legacy path aliases remain for compatibility; authorization is always re-checked on the server. There is no OpenAPI document in this repository.
+
+## Development Workflow
+
+1. Clone the repository and install dependencies (`npm ci` per package).
+2. Copy `.env.example` templates; set local secrets only in gitignored files.
+3. Start PostgreSQL 16.
+4. Run `npm run db:migrate:plan`, then `npm run db:migrate:apply` with guards set.
+5. Start backend (`npm --prefix backend run dev`) and frontend (`npm --prefix frontend run dev`).
+6. Run unit tests (`npm run test:backend`, `npm run test:frontend`).
+7. Run E2E when needed (`cp .env.e2e.example .env.e2e`, then `npm run test:e2e`).
+8. Run lint/format checks (`npm --prefix frontend run lint`, `npm --prefix frontend run format:check`).
+9. Open a pull request against `main` and wait for required checks.
+
+## CI and Quality Checks
+
+| Workflow | Purpose |
 | --- | --- |
 | `e2e/README.md` | Panduan menjalankan suite E2E Playwright dan aturan keamanannya |
 | `docs/CONVENTIONS.md` | Konvensi kode, layout, aturan SQL, dan aturan state frontend |
@@ -550,6 +778,6 @@ npm run format              # prettier write
 | `docs/user-manual-source.html` | Sumber manual pengguna (dibangun menjadi PDF) |
 | `docs/audits/`, `docs/qa/`, `docs/deploy/` | Arsip audit UI/UX, artefak QA, dan contoh konfigurasi deployment |
 
-## Lisensi
+Repository automation also includes a pull request template and CODEOWNERS for review routing.
 
 Dirilis di bawah lisensi ISC (lihat kolom `license` pada `package.json`). Tambahkan file `LICENSE` bila Anda memerlukan lisensi lain untuk distribusi Anda.

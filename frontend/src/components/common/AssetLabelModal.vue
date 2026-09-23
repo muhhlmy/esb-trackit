@@ -96,6 +96,7 @@ function handlePrint() {
 
 <template>
   <AppModal
+    panel-class="inventory-dialog"
     :is-open="isOpen"
     title="Cetak Label Aset"
     subtitle="Cetak stiker barcode aset (2.17 x 0.98 inch / 55 x 25 mm - Rectangle)"

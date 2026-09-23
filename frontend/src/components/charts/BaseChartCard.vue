@@ -19,7 +19,7 @@ defineProps({
 
 <template>
   <div
-    class="flex flex-col transition-all"
+    class="chart-card flex flex-col transition-all"
     :class="embedded ? 'w-full' : 'shadow-card rounded-xl border border-[#E2E8F0] bg-white p-4'"
   >
     <!-- Header kartu (hanya mode standalone) -->
@@ -66,3 +66,25 @@ defineProps({
     </div>
   </div>
 </template>
+
+<style scoped>
+.chart-card {
+  min-width: 0;
+}
+.chart-card > div:first-child:has(h3) {
+  margin-bottom: 24px;
+  padding-bottom: 18px;
+  gap: 16px;
+}
+.chart-card h3 {
+  font-size: 16px;
+  font-weight: 650;
+  line-height: 1.5;
+  letter-spacing: -0.02em;
+}
+.chart-card h3 + p {
+  margin-top: 6px;
+  font-size: 12px;
+  line-height: 1.6;
+}
+</style>

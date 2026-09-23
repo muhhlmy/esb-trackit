@@ -1,6 +1,6 @@
 <script setup>
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useApi } from '../composables/useApi.js'
 import { useAuth } from '@/composables/useAuth'
 import { onTicketEvent } from '../composables/useTicketRealtime.js'
@@ -22,6 +22,7 @@ import AuthGateCard from '../components/common/AuthGateCard.vue'
 import SkeletonList from '../components/ui/skeleton/SkeletonList.vue'
 
 const route = useRoute()
+const router = useRouter()
 const { get, getAllPages, post, put, del } = useApi()
 const { user, isAuthenticated, isSuperAdmin, isAdmin, hasWritePermission } = useAuth()
 const { viewMode } = useViewMode('tickets', 'table')
@@ -1383,7 +1384,7 @@ function toast(message, type = 'success') {
   </div>
   <div
     v-else
-    class="flex min-w-0 flex-col gap-5"
+    class="tickets-workspace flex min-w-0 flex-col gap-5"
     :data-testid="!isLoading ? 'page-ready' : undefined"
   >
     <!-- Toast Notification -->
@@ -1416,6 +1417,7 @@ function toast(message, type = 'success') {
     <div class="flex flex-col gap-3.5">
       <!-- Title Bar -->
       <PageHeader
+        class="tickets-header"
         :title="isAdmin || isSuperAdmin ? 'Ticket Inbox' : 'Tiket'"
         :subtitle="
           isAdmin || isSuperAdmin
@@ -1436,7 +1438,7 @@ function toast(message, type = 'success') {
       </PageHeader>
 
       <!-- Quick KPI Stat Cards (4 Cards) -->
-      <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3.5">
+      <div class="tickets-kpis grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3.5">
         <!-- 1. Total Tiket -->
         <div
           class="flex items-center gap-3 p-3.5 sm:p-4 rounded-2xl bg-white border border-[#E2E8F0]/80 shadow-2xs hover:border-[#CBD5E1] transition-all"
@@ -1530,7 +1532,7 @@ function toast(message, type = 'success') {
         <!-- Top Row: Queue Tabs Switcher -->
         <div class="border-b border-[#F1F5F9] pb-3.5">
           <div
-            class="flex items-center gap-2 overflow-x-auto scrollbar-none [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden py-0.5 w-full"
+            class="tickets-queue-tabs flex items-center gap-2 overflow-x-auto scrollbar-none [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden py-0.5 w-full"
           >
             <button
               v-for="tab in !isAdmin && !isSuperAdmin
@@ -1576,7 +1578,7 @@ function toast(message, type = 'success') {
         <!-- Bottom Row: Toolbar (Search on Top Row, Filters on Bottom Row) -->
         <div class="grid w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-2.5">
           <!-- Baris Atas: Search Input with Inline Clear (X) -->
-          <div class="relative h-9 min-w-0">
+          <div class="tickets-search relative h-9 min-w-0">
             <span
               aria-hidden="true"
               class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-[18px] text-[#687281] pointer-events-none"
@@ -1587,7 +1589,7 @@ function toast(message, type = 'success') {
               type="search"
               aria-label="Cari tiket, judul, nomor, atau pelapor"
               placeholder="Cari tiket, judul kendala, nomor tiket, atau pelapor…"
-              class="toolbar-search-input h-full min-h-0 w-full rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] pl-10 pr-9 text-xs font-medium text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:bg-white focus:ring-2 focus:ring-[#0A51B0]/10 focus:outline-none transition-all"
+              class="tickets-search-input h-full min-h-0 w-full rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] pl-10 pr-9 text-xs font-medium text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:bg-white focus:ring-2 focus:ring-[#0A51B0]/10 focus:outline-none transition-all"
             />
             <button
               v-if="searchQuery"
@@ -1603,7 +1605,7 @@ function toast(message, type = 'success') {
           <button
             type="button"
             @click="showFilterModal = true"
-            class="toolbar-filter-button h-9 shrink-0 rounded-lg border border-[#E2E8F0] bg-slate-50 px-3 text-xs font-semibold text-slate-600 hover:bg-white"
+            class="tickets-filter-button h-9 shrink-0 rounded-lg border border-[#E2E8F0] bg-slate-50 px-3 text-xs font-semibold text-slate-600 hover:bg-white"
           >
             <span aria-hidden="true" class="material-symbols-outlined mr-1 align-middle text-[16px]"
               >filter_alt</span
@@ -1769,8 +1771,8 @@ function toast(message, type = 'success') {
                 tabindex="0"
                 :aria-label="'Lihat tiket ' + ticket.judul"
                 @click="openDetail(ticket)"
-                @keydown.enter.self="openDetail(ticket)"
-                @keydown.space.prevent.self="openDetail(ticket)"
+                @keydown.enter.self.prevent="openDetail(ticket)"
+                @keydown.space.self.prevent="openDetail(ticket)"
               >
                 <td>
                   <span class="ws-cell-main" :title="ticket.judul">{{ ticket.judul }}</span>
@@ -1808,6 +1810,7 @@ function toast(message, type = 'success') {
                 </td>
                 <td @click.stop>
                   <AppRowActions
+                    menu-class="tickets-action-menu"
                     :actions="getTicketActions(ticket)"
                     :label="`Aksi tiket ${ticket.nomor_tiket || ticket.id || ''}`"
                   />
@@ -1823,8 +1826,8 @@ function toast(message, type = 'success') {
           @click="openDetail(ticket)"
           tabindex="0"
           :aria-label="'Lihat tiket ' + ticket.judul"
-          @keydown.enter.self="openDetail(ticket)"
-          @keydown.space.prevent.self="openDetail(ticket)"
+          @keydown.enter.self.prevent="openDetail(ticket)"
+          @keydown.space.self.prevent="openDetail(ticket)"
           class="tck-list-item group relative bg-white rounded-xl border border-[#E2E8F0] hover:border-[#B8D4F5] hover:shadow-[0_3px_12px_rgba(23,43,77,0.06)] p-4 lg:px-5 lg:py-4 transition-all duration-150 cursor-pointer select-none active:scale-[0.997]"
         >
           <!-- ── DESKTOP VIEW (>= 1024px / lg) ── -->
@@ -2017,6 +2020,7 @@ function toast(message, type = 'success') {
             <!-- 5. Tombol Opsi / Aksi (36px) -->
             <div class="flex justify-end items-center" @click.stop>
               <AppRowActions
+                menu-class="tickets-action-menu"
                 :actions="getTicketActions(ticket)"
                 :label="`Aksi tiket ${ticket.nomor_tiket || ticket.id || ''}`"
               />
@@ -2025,7 +2029,7 @@ function toast(message, type = 'success') {
 
           <!-- ── MOBILE / TABLET VIEW (< 1024px / lg:hidden) ── -->
           <!-- Sesuai Design.md Section 12B: Grid multi-baris rapi -->
-          <div class="flex lg:hidden flex-col gap-3 min-w-0">
+          <div class="ticket-mobile flex xl:hidden flex-col gap-3 min-w-0">
             <!-- Baris 1: Avatar + Nomor Monospace + Queue Pill + Tombol Aksi di Kanan Atas -->
             <div class="flex items-center justify-between gap-2 min-w-0">
               <div class="flex items-center gap-2 min-w-0">
@@ -2053,6 +2057,7 @@ function toast(message, type = 'success') {
               <!-- Tombol Aksi di Kanan Atas -->
               <div @click.stop class="shrink-0">
                 <AppRowActions
+                  menu-class="tickets-action-menu"
                   :actions="getTicketActions(ticket)"
                   :label="`Aksi tiket ${ticket.nomor_tiket || ticket.id || ''}`"
                 />
@@ -2250,6 +2255,7 @@ function toast(message, type = 'success') {
     </div>
 
     <FilterModal
+      panel-class="tickets-dialog tickets-filter-dialog"
       :is-open="showFilterModal"
       title="Filter Tiket"
       @close="showFilterModal = false"
@@ -2292,6 +2298,7 @@ function toast(message, type = 'success') {
     <!-- ── Create / Edit Ticket Modal (Unified Single Page Form) ─────── -->
     <AppModal
       :is-open="showFormModal"
+      panel-class="tickets-dialog tickets-form-dialog"
       :title="
         modalMode === 'add'
           ? isAdmin || isSuperAdmin
@@ -2681,6 +2688,7 @@ function toast(message, type = 'success') {
     <!-- ── Detail Ticket Modal (Modern SaaS Ticket Workspace) ─ -->
     <AppModal
       :is-open="showDetailModal"
+      panel-class="tickets-dialog tickets-detail-dialog"
       :title="selectedTicket?.nomor_tiket || 'Detail Tiket'"
       :subtitle="
         selectedTicket?.queue_nama ||
@@ -2693,7 +2701,7 @@ function toast(message, type = 'success') {
       <div v-if="selectedTicket" class="flex min-w-0 flex-col text-[#333333] wrap-anywhere">
         <!-- HEADER AREA (Compact SaaS Title Block) -->
         <div
-          class="flex items-center justify-between gap-4 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] p-4 mb-4"
+          class="tickets-detail-summary flex items-center justify-between gap-4 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] p-4 mb-4"
         >
           <div class="flex flex-col gap-2.5 min-w-0 flex-1">
             <div class="flex items-center gap-2 flex-wrap">
@@ -2725,7 +2733,7 @@ function toast(message, type = 'success') {
         </div>
 
         <!-- NAVIGATION TABS (Clean Segmented Bar with Hover Effects) -->
-        <div class="grid grid-cols-3 gap-1 rounded-xl bg-[#F1F5F9] p-1 mb-5">
+        <div class="tickets-detail-tabs grid grid-cols-3 gap-1 rounded-xl bg-[#F1F5F9] p-1 mb-5">
           <button
             type="button"
             @click="activeDetailTab = 'detail'"
@@ -3242,7 +3250,7 @@ function toast(message, type = 'success') {
         <!-- Ticket management actions -->
         <div
           v-if="isAdmin || isSuperAdmin"
-          class="flex flex-col gap-3 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] p-3.5 mt-5"
+          class="tickets-management flex flex-col gap-3 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] p-3.5 mt-5"
         >
           <p class="text-[11px] font-semibold uppercase tracking-wider text-[#5F7089]">
             Kelola tiket
@@ -3428,7 +3436,13 @@ function toast(message, type = 'success') {
     </AppModal>
 
     <!-- ── Delete Confirmation Modal ────────────────────── -->
-    <AppModal :is-open="showDeleteModal" title="Hapus Tiket" size="sm" @close="closeModal">
+    <AppModal
+      :is-open="showDeleteModal"
+      panel-class="tickets-dialog tickets-delete-dialog"
+      title="Hapus Tiket"
+      size="sm"
+      @close="closeModal"
+    >
       <div class="flex flex-col items-center gap-4 text-center">
         <div
           v-if="modalError"
@@ -3498,7 +3512,140 @@ function toast(message, type = 'success') {
   }
 }
 
-/* toolbar-search-input and toolbar-filter-button sizing now handled by main.css design tokens */
+/* Ticket controls opt out of compact shared toolbar sizing. */
+.tickets-workspace {
+  gap: 24px;
+}
+.tickets-header {
+  padding: 24px;
+  box-shadow: none;
+}
+.tickets-header :deep(.page-header-title) {
+  font-size: clamp(22px, 2vw, 28px);
+  line-height: 1.25;
+}
+.tickets-header :deep(.page-header-subtitle) {
+  margin-top: 6px;
+  white-space: normal;
+  line-height: 1.6;
+}
+.tickets-kpis > div {
+  min-width: 0;
+  padding: 20px;
+  align-items: flex-start;
+  box-shadow: none;
+}
+.tickets-kpis > div > div:last-child > span:first-child {
+  white-space: normal;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.tickets-kpis > div > div:last-child > span:last-child {
+  display: block;
+  margin-top: 6px;
+  font-size: 28px;
+  line-height: 1.15;
+  letter-spacing: -0.035em;
+  overflow-wrap: anywhere;
+}
+.tickets-workspace :deep(button) {
+  min-width: 44px;
+  min-height: 44px;
+}
+.tickets-header button,
+.tickets-filter-button,
+.tickets-queue-tabs > button {
+  height: 44px;
+  padding-inline: 16px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  justify-content: center;
+}
+.tickets-search {
+  height: 44px;
+}
+.tickets-search-input {
+  font-size: 13px;
+  padding-right: 48px;
+}
+.tickets-search > button {
+  right: 0;
+}
+.tck-toolbar-sticky,
+.tck-toolbar-sticky > div,
+.tickets-queue-tabs {
+  min-width: 0;
+  max-width: 100%;
+}
+.tck-toolbar-sticky > div {
+  backdrop-filter: none;
+  background: white;
+  box-shadow: none;
+  gap: 16px;
+}
+.tck-heading-sticky {
+  flex-wrap: wrap;
+  padding: 0;
+  background: transparent;
+  backdrop-filter: none;
+  box-shadow: none;
+  margin-top: 0;
+}
+.tck-heading-sticky h2 {
+  font-size: 16px;
+}
+.tickets-workspace .ws-data-table thead th {
+  padding: 16px 12px;
+  font-size: 11px;
+  white-space: normal;
+}
+.tickets-workspace .ws-data-table tbody td {
+  padding: 16px 12px;
+}
+.tickets-workspace .ws-cell-main {
+  font-size: 13px;
+  line-height: 1.6;
+}
+.tickets-workspace .ws-cell-sub {
+  margin-top: 4px;
+}
+.tickets-workspace .ws-data-table td:first-child .ws-cell-main {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.ticket-mobile h4,
+.ticket-mobile p,
+.ticket-tags > span {
+  overflow-wrap: anywhere;
+  max-width: 100%;
+}
+.tickets-workspace :deep(.asset-pagination) {
+  margin-top: 8px;
+}
+@media (max-width: 639px) {
+  .tickets-workspace {
+    gap: 20px;
+  }
+  .tickets-header {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 20px;
+    gap: 18px;
+  }
+  .tickets-header :deep(.page-header-actions),
+  .tickets-header button {
+    width: 100%;
+  }
+  .tickets-kpis > div {
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px;
+  }
+  .tickets-search-input {
+    font-size: 16px;
+  }
+}
 .ticket-card-list {
   gap: 12px;
 }
@@ -3642,7 +3789,7 @@ function toast(message, type = 'success') {
 }
 @media (min-width: 1280px) {
   .ticket-desktop {
-    grid-template-columns: minmax(0, 2.8fr) minmax(0, 1.1fr) minmax(0, 1.2fr) minmax(0, 1.2fr) 32px;
+    grid-template-columns: minmax(0, 2.8fr) minmax(0, 1.1fr) minmax(0, 1.2fr) minmax(0, 1.2fr) 44px;
     gap: 24px;
   }
   .ticket-card-list .tck-list-item {
@@ -3713,11 +3860,13 @@ function toast(message, type = 'success') {
   font-weight: 550;
 }
 .ticket-entry-form li button {
-  min-width: 40px;
+  min-width: 44px;
   min-height: 44px;
 }
 .ticket-entry-footer {
   display: flex;
+  width: 100%;
+  flex-wrap: wrap;
   justify-content: flex-end;
   gap: 10px;
 }
@@ -3755,6 +3904,121 @@ function toast(message, type = 'success') {
   .ticket-entry-footer button {
     flex: 1;
     justify-content: center;
+  }
+}
+</style>
+
+<style>
+/* Teleported panels opt in explicitly; no shared modal styles change. */
+.tickets-dialog {
+  overflow-wrap: anywhere;
+}
+.tickets-dialog > div:first-child {
+  padding: 20px 24px;
+}
+.tickets-dialog > div:first-child h2 {
+  font-size: 18px;
+  line-height: 1.4;
+  white-space: normal;
+}
+.tickets-dialog > div:first-child p {
+  white-space: normal;
+  line-height: 1.6;
+  margin-top: 4px;
+  font-size: 12px;
+}
+.tickets-dialog .modal-body {
+  padding: 24px;
+  min-width: 0;
+  overscroll-behavior: contain;
+}
+.tickets-dialog .modal-footer {
+  padding: 16px 24px;
+}
+.tickets-dialog button,
+.tickets-dialog select,
+.tickets-dialog input:not([type='file']),
+.tickets-dialog [role='option'] {
+  min-height: 44px;
+}
+.tickets-dialog button {
+  min-width: 44px;
+}
+.tickets-dialog button:focus-visible,
+.tickets-dialog select:focus-visible {
+  outline: 2px solid #097cde;
+  outline-offset: 2px;
+}
+.tickets-dialog label:has(> input[type='file']) {
+  min-height: 44px;
+  min-width: 44px;
+}
+.tickets-dialog .ui-select-menu {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+.tickets-dialog .ticket-entry-fields > label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.tickets-dialog .ticket-entry-footer button,
+.tickets-dialog .modal-footer button,
+.tickets-delete-dialog button,
+.tickets-filter-dialog button {
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+}
+.tickets-filter-dialog .modal-body > div > div:last-child > button {
+  padding-inline: 20px;
+}
+.tickets-action-menu [role='menuitem'] {
+  min-height: 44px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ui-action-menu.tickets-action-menu {
+    transition: none;
+    transform: none;
+  }
+}
+.tickets-detail-summary {
+  padding: 20px;
+  margin-bottom: 20px;
+}
+.tickets-detail-summary h2 {
+  font-size: 20px;
+  line-height: 1.5;
+}
+.tickets-detail-tabs {
+  margin-bottom: 24px;
+}
+.tickets-management {
+  padding: 20px;
+}
+.tickets-delete-dialog .modal-body > div {
+  gap: 20px;
+}
+@media (max-width: 639px) {
+  .tickets-dialog > div:first-child,
+  .tickets-dialog .modal-body {
+    padding: 16px;
+  }
+  .tickets-dialog .modal-footer {
+    padding: 14px 16px;
+  }
+  .tickets-dialog input:not([type='file']),
+  .tickets-dialog textarea,
+  .tickets-dialog select {
+    font-size: 16px;
+  }
+  .tickets-detail-summary,
+  .tickets-management {
+    padding: 16px;
+  }
+  .tickets-detail-tabs > button {
+    padding-inline: 4px;
   }
 }
 </style>

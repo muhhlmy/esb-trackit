@@ -196,7 +196,8 @@ export function animatePageLeave(el, done) {
 
   if (isReducedMotion()) {
     setFinalState(el, { opacity: 0 })
-    safeDone()
+    // Finish after Vue marks out-in as leaving; synchronous done can strand the next view.
+    queueMicrotask(safeDone)
     return
   }
 

@@ -47,3 +47,13 @@ backend/storage/backups/
 
 # Others
 Design.md
+
+# Local-only machine artifacts (never source control)
+.backups/
+NetSendo/
+certificate/
+*.crt
+*.key
+*.enc.zip
+*.bak-*
+frontend/public/.well-known/

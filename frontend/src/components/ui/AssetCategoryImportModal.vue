@@ -590,6 +590,7 @@ watch(
 
 <template>
   <AppModal
+    panel-class="inventory-dialog"
     :is-open="isOpen"
     :title="`Import Aset ${typeLabel}`"
     :subtitle="`Tambah banyak data aset ${typeLabel} lewat template Excel`"

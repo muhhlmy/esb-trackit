@@ -4,6 +4,7 @@ import AppModal from './AppModal.vue'
 
 const props = defineProps({
   isOpen: Boolean,
+  panelClass: { type: String, default: '' },
   title: { type: String, default: 'Filter Data' },
   subtitle: { type: String, default: 'Sesuaikan filter untuk mempersempit hasil.' },
   fields: { type: Array, default: () => [] },
@@ -33,6 +34,7 @@ function apply() {
 
 <template>
   <AppModal
+    :panel-class="panelClass"
     :is-open="isOpen"
     :title="title"
     :subtitle="subtitle"

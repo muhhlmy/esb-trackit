@@ -826,7 +826,7 @@ onMounted(async () => {
 
 <template>
   <div
-    class="asset-workspace asset-inventory asset-it-inventory space-y-4"
+    class="asset-workspace asset-inventory inventory-polish asset-it-inventory space-y-4"
     :data-testid="!isLoading ? 'page-ready' : undefined"
   >
     <!-- Toolbar + heading sticky mengikuti scroll (app-main adalah scroll container) -->
@@ -849,25 +849,25 @@ onMounted(async () => {
           </div>
 
           <!-- Primary Action CTA -->
-          <div class="flex shrink-0 items-center gap-2">
+          <div class="inventory-actions flex shrink-0 items-center gap-2">
             <button
               v-if="canWriteAssets"
               type="button"
               @click="openAdd"
-              class="toolbar-primary-action inline-flex h-9 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg bg-[#0A51B0] px-3 sm:px-3.5 text-xs font-semibold text-white shadow-2xs transition-all hover:bg-[#0A4391] active:scale-95"
+              class="inventory-primary-action inline-flex h-9 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg bg-[#0A51B0] px-3 sm:px-3.5 text-xs font-semibold text-white shadow-2xs transition-all hover:bg-[#0A4391] active:scale-95"
               title="Tambah aset baru"
             >
               <span aria-hidden="true" class="material-symbols-outlined text-[16px]">add</span>
               <span>Tambah Aset</span>
             </button>
             <div
-              class="toolbar-action-group flex items-center gap-1 rounded-lg border border-[#D7E3F2] bg-[#F8FAFC] p-1"
+              class="inventory-action-group flex items-center gap-1 rounded-lg border border-[#D7E3F2] bg-[#F8FAFC] p-1"
             >
               <button
                 v-if="canWriteAssets"
                 type="button"
                 @click="showImportModal = true"
-                class="toolbar-action-button inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-[11px] font-bold text-[#0A51B0] hover:bg-white"
+                class="inventory-action-button inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-[11px] font-bold text-[#0A51B0] hover:bg-white"
               >
                 <span aria-hidden="true" class="material-symbols-outlined text-[15px]"
                   >upload_file</span
@@ -876,7 +876,7 @@ onMounted(async () => {
               <button
                 type="button"
                 @click="openExport"
-                class="toolbar-action-button inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-[11px] font-bold text-[#0A51B0] hover:bg-white"
+                class="inventory-action-button inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-[11px] font-bold text-[#0A51B0] hover:bg-white"
               >
                 <span aria-hidden="true" class="material-symbols-outlined text-[15px]"
                   >download</span
@@ -1245,6 +1245,7 @@ onMounted(async () => {
 
     <!-- ── Modal Form Tambah / Edit Aset IT (Modern Brand Navy SaaS UI) ── -->
     <AppModal
+      panel-class="inventory-dialog"
       :is-open="showFormModal"
       :title="modalMode === 'add' ? 'Tambah Aset IT' : 'Edit Aset IT'"
       :subtitle="
@@ -1718,7 +1719,13 @@ onMounted(async () => {
       </template>
     </AppModal>
 
-    <AppModal :is-open="showDeleteModal" title="Hapus Aset IT" size="sm" @close="closeModal">
+    <AppModal
+      panel-class="inventory-dialog"
+      :is-open="showDeleteModal"
+      title="Hapus Aset IT"
+      size="sm"
+      @close="closeModal"
+    >
       <div class="asset-delete-content flex flex-col items-center gap-4 text-center">
         <div
           v-if="modalError"
@@ -1761,6 +1768,7 @@ onMounted(async () => {
     </AppModal>
 
     <AppModal
+      panel-class="inventory-dialog"
       :is-open="showSpecificationModal"
       title="Detail Spesifikasi"
       size="md"
@@ -1809,7 +1817,13 @@ onMounted(async () => {
       </template>
     </AppModal>
 
-    <AppModal :is-open="showDetailsModal" title="Detail Aset" size="lg" @close="closeModal">
+    <AppModal
+      panel-class="inventory-dialog"
+      :is-open="showDetailsModal"
+      title="Detail Aset"
+      size="lg"
+      @close="closeModal"
+    >
       <div v-if="selectedAsset" class="asset-detail flex flex-col gap-0">
         <!-- Header Aset -->
         <div class="asset-detail-identity flex items-center gap-3 pb-4">
@@ -2071,7 +2085,13 @@ onMounted(async () => {
       </template>
     </AppModal>
 
-    <AppModal :is-open="showExportModal" title="Ekspor Aset IT" size="md" @close="closeModal">
+    <AppModal
+      panel-class="inventory-dialog"
+      :is-open="showExportModal"
+      title="Ekspor Aset IT"
+      size="md"
+      @close="closeModal"
+    >
       <form class="flex flex-col gap-4" @submit.prevent="executeExport">
         <fieldset class="flex flex-col gap-2">
           <legend class="text-[11px] font-bold uppercase tracking-wider text-[#374151] mb-2">
@@ -2196,6 +2216,7 @@ onMounted(async () => {
       @imported="onImported"
     />
     <FilterModal
+      panel-class="inventory-dialog"
       :is-open="showFilterModal"
       title="Filter Aset IT"
       @close="showFilterModal = false"
@@ -2272,6 +2293,7 @@ onMounted(async () => {
 
 <style scoped src="../assets/asset-workspace.css"></style>
 <style scoped src="../assets/ws-table.css"></style>
+<style src="../assets/inventory-polish.css"></style>
 
 <style scoped>
 /* Header & list heading tidak sticky di modul Inventaris — scroll

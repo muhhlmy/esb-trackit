@@ -376,7 +376,7 @@ function formatKondisiPill(kondisi) {
 
 <template>
   <div
-    class="asset-workspace asset-inventory space-y-4"
+    class="asset-workspace asset-inventory inventory-polish space-y-4"
     :data-testid="!isLoading ? 'page-ready' : undefined"
   >
     <!-- Simplified SaaS Header & Toolbar Container (sticky mengikuti scroll) -->
@@ -398,25 +398,25 @@ function formatKondisiPill(kondisi) {
           </div>
 
           <!-- Primary Action CTA -->
-          <div class="flex shrink-0 items-center gap-2">
+          <div class="inventory-actions flex shrink-0 items-center gap-2">
             <button
               v-if="canWriteAssets"
               type="button"
               @click="openAdd"
-              class="toolbar-primary-action inline-flex h-9 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg bg-[#0A51B0] px-3 sm:px-3.5 text-xs font-semibold text-white shadow-2xs transition-all hover:bg-[#0A4391] active:scale-95"
+              class="inventory-primary-action inline-flex h-9 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg bg-[#0A51B0] px-3 sm:px-3.5 text-xs font-semibold text-white shadow-2xs transition-all hover:bg-[#0A4391] active:scale-95"
               title="Tambah Aset GA baru"
             >
               <span aria-hidden="true" class="material-symbols-outlined text-[16px]">add</span>
               <span>Tambah Aset GA</span>
             </button>
             <div
-              class="toolbar-action-group flex items-center gap-1 rounded-lg border border-[#D7E3F2] bg-[#F8FAFC] p-1"
+              class="inventory-action-group flex items-center gap-1 rounded-lg border border-[#D7E3F2] bg-[#F8FAFC] p-1"
             >
               <button
                 v-if="canWriteAssets"
                 type="button"
                 @click="showImportModal = true"
-                class="toolbar-action-button inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-[11px] font-bold text-[#0A51B0] hover:bg-white"
+                class="inventory-action-button inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-[11px] font-bold text-[#0A51B0] hover:bg-white"
                 title="Impor data Aset GA dari Excel"
               >
                 <span aria-hidden="true" class="material-symbols-outlined text-[15px]"
@@ -426,7 +426,7 @@ function formatKondisiPill(kondisi) {
               <button
                 type="button"
                 @click="showExportModal = true"
-                class="toolbar-action-button inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-[11px] font-bold text-[#0A51B0] hover:bg-white"
+                class="inventory-action-button inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-[11px] font-bold text-[#0A51B0] hover:bg-white"
                 title="Export data Aset GA"
               >
                 <span aria-hidden="true" class="material-symbols-outlined text-[15px]"
@@ -773,6 +773,7 @@ function formatKondisiPill(kondisi) {
     </div>
 
     <FilterModal
+      panel-class="inventory-dialog"
       :is-open="showFilterModal"
       title="Filter Aset GA"
       @close="showFilterModal = false"
@@ -804,6 +805,7 @@ function formatKondisiPill(kondisi) {
 
     <!-- Modal Form (Tambah / Edit) -->
     <AppModal
+      panel-class="inventory-dialog"
       :is-open="showFormModal"
       :title="modalMode === 'add' ? 'Tambah Aset GA Baru' : 'Edit Aset GA'"
       subtitle="Lengkapi data aset. Kolom bertanda * wajib diisi."
@@ -993,7 +995,13 @@ function formatKondisiPill(kondisi) {
     </AppModal>
 
     <!-- Modal Confirm Delete -->
-    <AppModal :is-open="showDeleteModal" title="Hapus Aset GA" size="sm" @close="closeModal">
+    <AppModal
+      panel-class="inventory-dialog"
+      :is-open="showDeleteModal"
+      title="Hapus Aset GA"
+      size="sm"
+      @close="closeModal"
+    >
       <div class="asset-delete-content space-y-4">
         <p class="text-[13px] text-[#475569]">
           Apakah Anda yakin ingin menghapus Aset GA
@@ -1027,7 +1035,13 @@ function formatKondisiPill(kondisi) {
     </AppModal>
 
     <!-- Modal Details View -->
-    <AppModal :is-open="showDetailsModal" title="Detail Aset GA" size="lg" @close="closeModal">
+    <AppModal
+      panel-class="inventory-dialog"
+      :is-open="showDetailsModal"
+      title="Detail Aset GA"
+      size="lg"
+      @close="closeModal"
+    >
       <div v-if="selectedAsset" class="asset-detail space-y-4">
         <div
           class="asset-detail-identity flex items-center gap-3 p-3 bg-[#F8FAFC] rounded-xl border border-[#E2E8F0]"
@@ -1153,6 +1167,7 @@ function formatKondisiPill(kondisi) {
 
 <style scoped src="../assets/asset-workspace.css"></style>
 <style scoped src="../assets/ws-table.css"></style>
+<style src="../assets/inventory-polish.css"></style>
 
 <style scoped>
 /* Header & list heading tidak sticky di modul Inventaris — scroll

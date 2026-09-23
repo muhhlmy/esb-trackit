@@ -11,6 +11,7 @@ const props = defineProps({
     type: String,
     default: 'Opsi Aksi',
   },
+  menuClass: { type: String, default: '' },
 })
 
 const isOpen = ref(false)
@@ -23,7 +24,8 @@ function updateDropdownPosition() {
   if (!buttonRef.value) return
   const rect = buttonRef.value.getBoundingClientRect()
   const visibleActions = props.actions.filter((a) => !a.hidden)
-  const estimatedHeight = visibleActions.length * 38 + 16
+  const estimatedHeight =
+    (props.menuClass && dropdownRef.value?.offsetHeight) || visibleActions.length * 38 + 16
   const spaceBelow = window.innerHeight - rect.bottom
 
   const rightDistance = window.innerWidth - rect.right
@@ -182,6 +184,7 @@ onBeforeUnmount(() => {
           v-if="isOpen"
           ref="dropdownRef"
           :style="dropdownStyle"
+          :class="menuClass"
           role="menu"
           :aria-label="label"
           class="ui-action-menu rounded-xl border border-[#E5EAEF] bg-white p-1.5 shadow-2xl outline-none select-none"

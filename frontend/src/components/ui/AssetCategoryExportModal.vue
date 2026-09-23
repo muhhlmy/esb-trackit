@@ -50,6 +50,7 @@ function exportData() {
 
 <template>
   <AppModal
+    panel-class="inventory-dialog"
     :is-open="isOpen"
     :title="`Export Aset ${label}`"
     :subtitle="`Unduh ${assets.length} data yang sedang tampil`"

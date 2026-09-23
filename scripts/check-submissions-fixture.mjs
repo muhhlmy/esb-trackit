@@ -106,7 +106,7 @@ try {
    assert.match(await page.locator('.submission-form').innerText(),/pilih ulang atau kosongkan/i)
    await units.nth(1).getByRole('button',{name:'Kosongkan aset'}).click()
    console.log(JSON.stringify({assetFilters:true,noPartiesEmpty:true,nikUnion:true,customRecipientStaleBlocked:true,historicAssetAssignedElsewherePreserved:true}))
-   for (const width of [1440, 390]) {
+   for (const width of [360, 390, 768, 1024, 1440, 1920]) {
     await page.setViewportSize({width,height:1000})
     const spacing = await page.locator('.submission-form').evaluate(form => {
      const css = e => {const s=getComputedStyle(e);return {gap:s.gap,padding:s.padding,height:s.height,display:s.display}}
@@ -115,12 +115,16 @@ try {
     assert.equal(spacing.label.display,'flex')
     assert.equal(spacing.label.gap,'8px')
     assert.equal(spacing.section.gap,'20px')
-    assert.equal(spacing.section.padding,width===1440?'24px':'16px')
+    assert.equal(spacing.section.padding,width>=640?'24px':'16px')
     assert.equal(spacing.unit.gap,'16px')
     assert.equal(spacing.unit.padding,'16px')
     assert.equal(spacing.footer.gap,'20px')
-    assert.equal(spacing.footer.padding,width===1440?'20px':'16px')
+    assert.equal(spacing.footer.padding,width>=640?'20px':'16px')
     assert.equal(spacing.overflow,false)
+    const buttons=await page.locator('.submission-actions > button').evaluateAll(elements=>elements.map(e=>{const r=e.getBoundingClientRect(),s=getComputedStyle(e);return {height:r.height,width:r.width,y:r.y,padding:s.padding,radius:s.borderRadius,font:s.fontSize}}))
+    for(const button of buttons) assert.ok(button.height>=44 && button.width>=44)
+    for(const key of ['height','padding','radius','font']) assert.equal(new Set(buttons.map(b=>b[key])).size,1,`Unequal footer ${key} at ${width}`)
+    if(width>=640) assert.equal(new Set(buttons.map(b=>b.y)).size,1,`Footer alignment at ${width}`)
     const labelGaps=await page.locator('.submission-form label:not(:has(input[type=checkbox],input[type=radio]))').evaluateAll(labels=>labels.filter(e=>e.children.length>1).map(e=>e.children[1].getBoundingClientRect().top-e.children[0].getBoundingClientRect().bottom))
     assert.ok(labelGaps.length>0)
     assert.ok(labelGaps.every(gap=>gap>=7.9),JSON.stringify(labelGaps))

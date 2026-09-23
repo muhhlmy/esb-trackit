@@ -5,6 +5,7 @@ import { animateModalEnter, animateModalLeave } from '../../composables/useGsap.
 
 const props = defineProps({
   isOpen: { type: Boolean, default: false },
+  panelClass: { type: String, default: '' },
   title: { type: String, default: 'Modal' },
   subtitle: { type: String, default: '' },
   icon: { type: String, default: 'confirmation_number' },
@@ -115,14 +116,17 @@ onBeforeUnmount(() => {
           :aria-labelledby="titleId"
           tabindex="-1"
           class="modal-panel app-modal-panel ui-modal-panel flex max-h-[calc(100dvh-1.5rem)] sm:max-h-[85vh] w-full flex-col overflow-hidden rounded-2xl border border-[#E2E8F0] bg-white shadow-2xl outline-none"
-          :class="{
-            'max-w-sm': size === 'sm',
-            'max-w-lg': size === 'md',
-            'max-w-2xl': size === 'lg',
-            'max-w-4xl': size === 'xl',
-            'max-w-6xl': size === '2xl',
-            'max-w-full': size === 'full',
-          }"
+          :class="[
+            panelClass,
+            {
+              'max-w-sm': size === 'sm',
+              'max-w-lg': size === 'md',
+              'max-w-2xl': size === 'lg',
+              'max-w-4xl': size === 'xl',
+              'max-w-6xl': size === '2xl',
+              'max-w-full': size === 'full',
+            },
+          ]"
         >
           <!-- Header Modal (Fixed Non-Scrollable Header) -->
           <div

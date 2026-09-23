@@ -1,0 +1,214 @@
+/* Opt-in inventory surfaces; shared BAST and global density stay untouched. */
+.asset-workspace.inventory-polish {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+.inventory-polish.asset-inventory .asset-toolbar {
+  padding: 24px;
+  border-radius: 18px;
+  gap: 20px;
+}
+.inventory-polish .asset-toolbar > div:first-child {
+  flex-wrap: wrap;
+  gap: 20px;
+  align-items: center;
+}
+.inventory-polish .asset-toolbar h2 {
+  font-size: 26px;
+  line-height: 1.25;
+  letter-spacing: -0.035em;
+}
+.inventory-polish .asset-toolbar > div:first-child p {
+  display: block;
+  font-size: 13px;
+  line-height: 1.65;
+  margin-top: 6px;
+}
+.inventory-polish .inventory-actions {
+  flex-wrap: wrap;
+  gap: 10px;
+  min-width: 0;
+}
+.inventory-polish .inventory-action-group {
+  padding: 0;
+  gap: 8px;
+  border: 0;
+  background: transparent;
+}
+.inventory-polish .inventory-actions button {
+  height: 44px;
+  min-height: 44px;
+  min-width: 96px;
+  padding: 0 16px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  justify-content: center;
+  gap: 8px;
+}
+.inventory-polish .inventory-action-button {
+  border: 1px solid #d7e3f2;
+  background: #f8fafc;
+}
+.inventory-polish .inventory-actions button > span[aria-hidden] {
+  font-size: 18px;
+}
+.inventory-polish .asset-toolbar > div:nth-child(2) {
+  padding: 16px;
+  margin-top: 0;
+  background: #f8fafc;
+  gap: 12px;
+}
+.inventory-polish .asset-toolbar > div:nth-child(2) > div:first-child {
+  height: 44px;
+  min-width: 0;
+}
+.inventory-polish .asset-toolbar input {
+  height: 44px;
+  padding-right: 48px;
+  background: #fff;
+  font-size: 14px;
+}
+.inventory-polish .asset-toolbar button {
+  min-height: 44px;
+}
+.inventory-polish .asset-toolbar button[aria-label='Bersihkan pencarian'] {
+  width: 44px;
+  height: 44px;
+  right: 0;
+}
+.inventory-polish .it-list-heading {
+  padding: 4px 0;
+  margin-bottom: 20px;
+  gap: 16px;
+  flex-wrap: wrap;
+  box-shadow: none;
+}
+.inventory-polish .it-list-heading h3 {
+  font-size: 16px;
+}
+.inventory-polish .it-list-heading p,
+.inventory-polish .it-result-range {
+  font-size: 12px;
+  line-height: 1.6;
+}
+.inventory-polish .it-list-heading button,
+.inventory-polish .asset-card-list button,
+.inventory-polish .ws-data-table button,
+.inventory-polish [role='alert'] button {
+  min-height: 44px;
+  min-width: 44px;
+}
+.inventory-polish.asset-inventory .asset-card-list {
+  gap: 16px;
+}
+.inventory-polish.asset-inventory .asset-card-list > div {
+  border-radius: 16px;
+}
+.inventory-polish .ws-data-table thead th {
+  padding: 16px 14px;
+}
+.inventory-polish .ws-data-table tbody td {
+  padding: 16px 14px;
+  font-size: 13px;
+}
+.inventory-polish .asset-card-list > div:hover {
+  box-shadow: 0 4px 16px #172b4d0d;
+}
+.inventory-polish button:focus-visible,
+.inventory-dialog button:focus-visible {
+  outline: 2px solid #097cde;
+  outline-offset: 3px;
+}
+.inventory-dialog.app-modal-panel {
+  border-radius: 20px;
+}
+.inventory-dialog.app-modal-panel > div:first-child {
+  padding: 20px 24px;
+  gap: 16px;
+}
+.inventory-dialog.app-modal-panel > div:first-child h2 {
+  font-size: 18px;
+  line-height: 1.4;
+  white-space: normal;
+  letter-spacing: -0.02em;
+}
+.inventory-dialog.app-modal-panel > div:first-child p {
+  white-space: normal;
+  font-size: 12px;
+  line-height: 1.6;
+  margin-top: 4px;
+}
+.inventory-dialog.app-modal-panel .modal-body {
+  padding: 24px;
+}
+.inventory-dialog.app-modal-panel .modal-footer {
+  padding: 16px 24px;
+}
+.inventory-dialog.app-modal-panel.ui-modal-panel button {
+  min-height: 44px !important;
+  min-width: 44px;
+}
+.inventory-dialog.app-modal-panel :is(input:not([type='checkbox']):not([type='radio']), select) {
+  min-height: 44px;
+}
+.inventory-dialog.app-modal-panel :is(input, select, textarea) {
+  font-size: 14px;
+}
+.inventory-dialog .asset-detail-fields {
+  gap: 0 24px;
+}
+.inventory-dialog .asset-detail-fields > div {
+  padding: 18px 0;
+}
+.inventory-dialog .asset-crud-actions button {
+  font-size: 13px;
+  border-radius: 10px;
+}
+@media (max-width: 1279px) {
+  .inventory-polish.asset-inventory .asset-card-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 767px) {
+  .inventory-polish.asset-inventory .asset-toolbar {
+    padding: 18px;
+  }
+  .inventory-polish .asset-toolbar h2 {
+    font-size: 24px;
+  }
+  .inventory-polish .inventory-actions {
+    width: 100%;
+  }
+  .inventory-polish .inventory-primary-action {
+    flex: 1 0 100%;
+  }
+  .inventory-polish .inventory-action-group {
+    width: 100%;
+  }
+  .inventory-polish .inventory-action-button {
+    flex: 1;
+  }
+  .inventory-polish .asset-toolbar > div:nth-child(2) {
+    padding: 12px;
+  }
+  .inventory-polish .asset-toolbar input {
+    font-size: 16px;
+  }
+  .inventory-polish.asset-inventory .asset-card-list {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .inventory-dialog.app-modal-panel > div:first-child,
+  .inventory-dialog.app-modal-panel .modal-body,
+  .inventory-dialog.app-modal-panel .modal-footer {
+    padding: 16px;
+  }
+  .inventory-dialog.app-modal-panel :is(input, select, textarea) {
+    font-size: 16px;
+  }
+  .inventory-dialog .asset-detail-fields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

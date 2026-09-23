@@ -141,9 +141,9 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="flex flex-col gap-4">
+  <div class="csat-section flex flex-col gap-4">
     <!-- Header CSAT Section -->
-    <div class="flex items-center justify-between gap-3">
+    <div class="csat-heading flex items-center justify-between gap-3">
       <div class="min-w-0">
         <h3 class="text-base font-bold tracking-tight text-[#1E293B] leading-tight">
           Kepuasan Penanganan Tiket
@@ -161,10 +161,10 @@ onMounted(() => {
     </div>
 
     <!-- Row 1: Kartu Rata-rata CSAT + Bar Chart Distribusi -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+    <div class="csat-grid grid grid-cols-1 lg:grid-cols-12 gap-5">
       <!-- Kartu Rata-rata CSAT -->
       <div
-        class="rounded-xl border border-[#E2E8F0] bg-white p-5 flex flex-col justify-between lg:col-span-5"
+        class="csat-panel rounded-xl border border-[#E2E8F0] bg-white p-5 flex flex-col justify-between lg:col-span-5"
       >
         <div class="flex items-center justify-between gap-3 pb-3 border-b border-[#F1F5F9]">
           <div class="min-w-0">
@@ -204,7 +204,7 @@ onMounted(() => {
           <p class="text-[12px] font-semibold">{{ error }}</p>
           <button
             type="button"
-            class="mt-1 rounded-lg bg-[#FDEDE8] px-3 py-1.5 text-[11px] font-bold text-[#FA896B] hover:bg-[#FA896B] hover:text-white transition-all"
+            class="csat-retry mt-1 rounded-lg bg-[#FDEDE8] px-3 py-1.5 text-[11px] font-bold text-[#FA896B] hover:bg-[#FA896B] hover:text-white transition-all"
             @click="fetchStats"
           >
             Coba lagi
@@ -249,7 +249,9 @@ onMounted(() => {
       </div>
 
       <!-- Bar Chart Distribusi Rating -->
-      <div class="flex flex-col rounded-xl border border-[#E2E8F0] bg-white p-5 lg:col-span-7">
+      <div
+        class="csat-panel flex flex-col rounded-xl border border-[#E2E8F0] bg-white p-5 lg:col-span-7"
+      >
         <div class="flex items-center justify-between pb-3 border-b border-[#F1F5F9] mb-4">
           <div class="min-w-0">
             <h3 class="text-sm font-bold text-[#1E293B] leading-tight">Distribusi Penilaian</h3>
@@ -303,6 +305,7 @@ onMounted(() => {
 
     <!-- Row 2: Line Chart CSAT Monitoring Perbulan -->
     <CsatTrendLineChart
+      class="csat-trend"
       :data="trendData"
       :loading="isTrendLoading"
       :error="trendError"
@@ -310,3 +313,72 @@ onMounted(() => {
     />
   </div>
 </template>
+
+<style scoped>
+.csat-section {
+  gap: 24px;
+  min-width: 0;
+}
+.csat-heading {
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.csat-heading h3 {
+  font-size: 18px;
+  line-height: 1.5;
+  font-weight: 650;
+}
+.csat-heading p {
+  margin-top: 6px;
+  line-height: 1.6;
+}
+.csat-grid {
+  gap: 24px;
+}
+.csat-panel,
+.csat-trend {
+  min-width: 0;
+  padding: 24px;
+  border-radius: 16px;
+  box-shadow: none;
+}
+.csat-panel h3 {
+  font-size: 16px;
+  font-weight: 650;
+  line-height: 1.5;
+}
+.csat-panel > div:first-child {
+  padding-bottom: 18px;
+}
+.csat-panel > div:first-child p {
+  margin-top: 6px;
+  font-size: 12px;
+  line-height: 1.6;
+}
+.csat-retry {
+  min-width: 132px;
+  min-height: 44px;
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+.csat-retry:focus-visible {
+  outline: 2px solid #0a51b0;
+  outline-offset: 3px;
+}
+@media (max-width: 767px) {
+  .csat-section {
+    gap: 20px;
+  }
+  .csat-grid {
+    gap: 20px;
+  }
+  .csat-panel,
+  .csat-trend {
+    padding: 18px;
+    border-radius: 12px;
+  }
+}
+</style>

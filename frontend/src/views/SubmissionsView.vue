@@ -1055,7 +1055,7 @@ onMounted(fetchData)
             <col class="w-[24%]" />
             <col class="w-[24%]" />
             <col class="w-[16%]" />
-            <col class="w-[8%]" />
+            <col class="w-[80px]" />
           </colgroup>
           <thead>
             <tr>
@@ -1295,7 +1295,7 @@ onMounted(fetchData)
       @submit.prevent="generatePdf"
     >
       <div
-        class="flex items-center justify-between rounded-2xl border border-[#E2E8F0] bg-white px-4 py-3 shadow-2xs"
+        class="submission-form-heading flex items-center justify-between rounded-2xl border border-[#E2E8F0] bg-white px-4 py-3 shadow-2xs"
       >
         <div>
           <h2 class="text-sm font-bold text-[#333333]">
@@ -1654,7 +1654,7 @@ onMounted(fetchData)
         </div>
 
         <!-- Section 3 & 4: Data Serah Terima Aset (Baru & Lama) -->
-        <div class="grid grid-cols-1 gap-5 lg:grid-cols-2">
+        <div class="submission-assets-grid grid grid-cols-1 gap-5 xl:grid-cols-2">
           <!-- Aset Baru (Diserahkan) -->
           <div
             class="submission-section bg-white rounded-2xl border border-[#E2E8F0]/80 p-4 sm:p-6 shadow-2xs flex flex-col gap-4"
@@ -1737,7 +1737,7 @@ onMounted(fetchData)
                   />
                   <span
                     v-if="row.id_aset && !assetBaruOptions.some((a) => a.id_aset === row.id_aset)"
-                    class="text-xs text-amber-700"
+                    class="submission-asset-snapshot text-xs text-amber-700"
                   >
                     Aset #{{ row.id_aset }}: {{ row.spesifikasi || row.tipe }}.
                     {{
@@ -1878,7 +1878,7 @@ onMounted(fetchData)
                   />
                   <span
                     v-if="row.id_aset && !assetLamaOptions.some((a) => a.id_aset === row.id_aset)"
-                    class="text-xs text-amber-700"
+                    class="submission-asset-snapshot text-xs text-amber-700"
                   >
                     Aset #{{ row.id_aset }}: {{ row.spesifikasi || row.tipe }}.
                     {{
@@ -2059,7 +2059,7 @@ onMounted(fetchData)
           />
         </div>
 
-        <div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
+        <div class="submission-actions flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
           <button
             type="button"
             :disabled="isSaving"
@@ -2105,6 +2105,7 @@ onMounted(fetchData)
   width: 100%;
   max-width: 1440px;
   margin-inline: auto;
+  gap: 24px;
 }
 
 .submission-history {
@@ -2126,47 +2127,43 @@ onMounted(fetchData)
   outline: 2px solid #0a51b0;
   outline-offset: 3px;
 }
-.submission-fields {
+.submission-form .submission-fields {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 24px;
   min-width: 0;
   margin: 0;
   padding: 0;
   border: 0;
 }
-.submission-history .asset-toolbar,
-.submission-history > div:nth-child(2) {
-  box-shadow: 0 1px 2px rgb(15 23 42 / 0.04);
+.submission-history .asset-toolbar {
+  padding: 0;
+  gap: 24px;
+  box-shadow: none;
 }
-.submission-history > div:nth-child(2) {
-  min-height: 68px;
+.submission-history .it-list-heading {
+  margin: 0;
+  padding: 16px;
+  flex-wrap: wrap;
+}
+.submission-history .ws-cell-sub {
+  margin-top: 5px;
+}
+.submission-history .ws-cell-main {
+  font-size: 13px;
+  line-height: 1.6;
+}
+.submission-history .asset-toolbar input {
+  height: 44px;
+  font-size: 14px;
 }
 .submission-card-list {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  margin-top: 12px;
+  margin-top: 0;
 }
-.submission-card-actions {
-  display: flex;
-  gap: 4px;
-}
-.submission-card-actions button {
-  display: inline-flex;
-  width: 34px;
-  height: 34px;
-  align-items: center;
-  justify-content: center;
-  border-radius: 8px;
-  color: #0a51b0;
-}
-.submission-card-actions button:hover {
-  background: #edf5ff;
-}
-.submission-card-actions button.danger {
-  color: #be123c;
-}
+
 @media (width < 80rem) {
   .submission-history table {
     min-width: 760px;
@@ -2176,6 +2173,20 @@ onMounted(fetchData)
   display: flex;
   flex-direction: column;
   gap: 8px;
+  min-width: 0;
+  margin-bottom: 0;
+}
+.submission-form label:has(input[type='radio'], input[type='checkbox']) {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0;
+}
+.submission-form label:has(input[type='radio']) {
+  min-height: 56px;
+}
+.submission-assets-grid {
+  align-items: start;
+  gap: 24px;
 }
 .submission-form .submission-section {
   gap: 20px;
@@ -2208,10 +2219,11 @@ onMounted(fetchData)
   color: #64748b;
 }
 .submission-form .submission-section h2 {
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  font-size: 16px;
+  line-height: 1.5;
+  font-weight: 650;
+  letter-spacing: -0.015em;
+  text-transform: none;
 }
 .submission-steps {
   display: grid;
@@ -2252,7 +2264,166 @@ onMounted(fetchData)
   white-space: normal;
   overflow: visible;
 }
+.submission-page-header {
+  padding: 24px;
+  align-items: flex-start;
+}
+.submission-page-header h1 {
+  font-size: clamp(20px, 2vw, 26px);
+  line-height: 1.3;
+}
+.submission-page-header p {
+  margin-top: 8px;
+  line-height: 1.7;
+}
+.submission-form {
+  padding: 0;
+  gap: 24px;
+}
+.submission-form-heading {
+  gap: 16px;
+  padding: 20px 24px;
+}
+.submission-form-heading p {
+  margin-top: 6px;
+  font-size: 12px;
+  line-height: 1.6;
+}
+.submission-section > div:first-child {
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: flex-start;
+  padding-bottom: 16px;
+}
+.submission-section > div:first-child > div {
+  flex: 1 1 220px;
+  min-width: 0;
+  align-items: flex-start;
+}
+.submission-section > div:first-child :is(h2, p) {
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+}
+.submission-section > div:first-child p {
+  margin-top: 4px;
+  line-height: 1.6;
+}
+.submission-form .submission-section h3 {
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 13px;
+}
+.submission-section label > span:first-child,
+.submission-section div:has(> input) > span:first-child {
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: none;
+  line-height: 1.5;
+}
+.submission-form input:not([type='checkbox']):not([type='radio']),
+.submission-form :deep(button[aria-haspopup='listbox']) {
+  min-width: 0;
+  min-height: 44px;
+  border-radius: 8px;
+}
+.submission-section label:has(input[type='checkbox']) {
+  min-height: 44px;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.submission-history .asset-toolbar > div:first-child > button,
+.submission-form-heading > button,
+.submission-section > div:first-child > button,
+.submission-unit > div:first-child > button,
+.submission-actions > button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  gap: 8px;
+  min-width: 112px;
+  height: 44px;
+  padding: 0 16px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.submission-actions {
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.submission-actions > button {
+  flex: 1 0 auto;
+}
+.submission-form [role='alert'] > button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  flex-shrink: 0;
+}
+.submission-unit label > span > button {
+  min-height: 44px;
+  padding-inline: 8px;
+}
+.submission-asset-snapshot {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.submission-history :deep(button[aria-pressed]) {
+  min-height: 44px;
+  min-width: 44px;
+}
+.submission-actions > button .material-symbols-outlined,
+.submission-section > div:first-child > button .material-symbols-outlined {
+  font-size: 18px;
+}
+.submissions-page button:focus-visible {
+  outline: 2px solid #0a51b0;
+  outline-offset: 3px;
+}
+.submission-history :deep(button[aria-haspopup='menu']) {
+  min-width: 44px;
+  min-height: 44px;
+}
+.submissions-page .submission-card-list > .submission-laptop-row {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 44px;
+}
+@media (min-width: 1280px) {
+  .submissions-page .submission-card-list > .submission-laptop-row {
+    grid-template-columns: minmax(0, 1.4fr) repeat(2, minmax(0, 1fr)) minmax(0, 0.8fr) 44px;
+    grid-template-areas: 'identity holder location state actions';
+  }
+}
 @media (max-width: 639px) {
+  .submissions-page,
+  .submission-form,
+  .submission-form .submission-fields {
+    gap: 20px;
+  }
+  .submission-page-header,
+  .submission-form-heading {
+    padding: 16px;
+  }
+  .submission-form-heading {
+    flex-wrap: wrap;
+  }
+  .submission-form-heading > button {
+    width: 100%;
+  }
+  .submission-section > div:first-child > button,
+  .submission-actions {
+    width: 100%;
+  }
+  .submission-form :deep(button[aria-haspopup='listbox']),
+  .submission-history .asset-toolbar input {
+    font-size: 16px;
+  }
+  .submission-history .it-result-range {
+    display: none;
+  }
   .submission-steps {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 14px 10px;

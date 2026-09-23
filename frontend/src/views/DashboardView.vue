@@ -352,6 +352,12 @@ onUnmounted(() => {
 
 <template>
   <div class="dashboard-view" :data-testid="!isLoading ? 'page-ready' : undefined">
+    <PageHeader
+      title="Ringkasan aset & tiket"
+      subtitle="Kondisi aset, status penggunaan, dan aktivitas tiket IT terbaru."
+      icon="grid_view"
+    />
+    <QuickActions />
     <!-- ═══════════════════════════════════════════
          LOADING
          ═══════════════════════════════════════════ -->
@@ -598,7 +604,7 @@ onUnmounted(() => {
          ═══════════════════════════════════════════ -->
     <div
       v-else-if="error"
-      class="bg-[#FEF3F2] border border-[#FECACA]/40 text-[#DC2626] rounded-xl px-4 py-3 text-sm font-medium flex items-center justify-between gap-3"
+      class="dashboard-error bg-[#FEF3F2] border border-[#FECACA]/40 text-[#DC2626] rounded-xl px-4 py-3 text-sm font-medium flex items-center justify-between gap-3"
       role="alert"
     >
       <div class="flex items-center gap-2.5">
@@ -607,7 +613,7 @@ onUnmounted(() => {
       </div>
       <button
         type="button"
-        class="rounded-lg bg-white px-3.5 py-1.5 text-xs font-semibold text-[#DC2626] border border-[#FECACA]/40 hover:bg-[#DC2626] hover:text-white transition-all duration-200"
+        class="dashboard-retry rounded-lg bg-white px-3.5 py-1.5 text-xs font-semibold text-[#DC2626] border border-[#FECACA]/40 hover:bg-[#DC2626] hover:text-white transition-all duration-200"
         @click="fetchStats"
       >
         Coba lagi
@@ -618,13 +624,6 @@ onUnmounted(() => {
          DASHBOARD CONTENT
          ═══════════════════════════════════════════ -->
     <template v-else-if="stats">
-      <PageHeader
-        title="Ringkasan aset & tiket"
-        subtitle="Kondisi aset, status penggunaan, dan aktivitas tiket IT terbaru."
-        icon="grid_view"
-      >
-        <QuickActions />
-      </PageHeader>
       <div class="dashboard-stats">
         <div class="dash-stat-card stat-total">
           <div class="stat-label">
@@ -692,7 +691,7 @@ onUnmounted(() => {
             :data="stats.monthlyTrend || []"
             :loading="isLoading"
             :error="error"
-            :height="200"
+            :height="260"
             embedded
           />
         </div>
@@ -725,11 +724,11 @@ onUnmounted(() => {
             </div>
 
             <!-- Status Rows: menyebar vertikal agar sejajar dengan panel chart -->
-            <div class="flex flex-1 flex-col justify-center gap-2.5">
+            <div class="dashboard-status-rows flex flex-1 flex-col justify-center gap-2.5">
               <div
                 v-for="item in getSortedByStatus()"
                 :key="item.status"
-                class="flex items-center gap-2.5"
+                class="dashboard-status-row flex items-center gap-2.5"
               >
                 <!-- Status Indicator -->
                 <div
@@ -766,7 +765,7 @@ onUnmounted(() => {
             :data="stats.byType || []"
             :loading="isLoading"
             :error="error"
-            :height="220"
+            :height="260"
             embedded
           />
         </div>
@@ -779,7 +778,7 @@ onUnmounted(() => {
             :data="stats.byCondition || []"
             :loading="isLoading"
             :error="error"
-            :height="220"
+            :height="260"
             embedded
           />
         </div>
@@ -1095,7 +1094,7 @@ onUnmounted(() => {
         </div>
 
         <!-- Mobile Card List View (Clean, Readable & Zero Horizontal Scroll on < md) -->
-        <div class="block xl:hidden divide-y divide-[#F1F5F9]">
+        <div class="dashboard-recent-cards block xl:hidden divide-y divide-[#F1F5F9]">
           <div
             v-for="ticket in recentTickets"
             :key="'mob-ticket-' + ticket.id"
@@ -1291,91 +1290,82 @@ onUnmounted(() => {
 .dashboard-view {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 28px;
   width: 100%;
+  min-width: 0;
   max-width: 1500px;
   margin: 0 auto;
-  padding: 4px 0 16px;
+  padding: 8px 0 24px;
   color: #1e293b;
-}
-.dashboard-intro {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px;
-  padding: 5px 0 2px;
-}
-.dashboard-intro h2 {
-  font-size: 20px;
-  font-weight: 700;
-  letter-spacing: -0.03em;
-  line-height: 1.3;
-}
-.dashboard-intro h2 + p {
-  font-size: 12px;
-  color: #5b6b84;
-  line-height: 1.6;
-  margin-top: 6px;
 }
 .dashboard-stats {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 14px;
+  gap: 20px;
 }
 .dash-stat-card {
   --stat-color: #4d7fc2;
+  display: flex;
+  flex-direction: column;
   min-width: 0;
-  padding: 15px 16px;
+  padding: 22px;
   border: 1px solid #e2e8f0;
-  border-radius: 12px;
+  border-radius: 16px;
   background: white;
-  transition:
-    border-color 0.15s ease,
-    box-shadow 0.15s ease,
-    transform 0.1s ease;
-}
-.dash-stat-card:hover {
-  border-color: var(--stat-color);
-  box-shadow: 0 3px 12px rgba(10, 81, 176, 0.08);
 }
 .stat-label {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 7px;
-  font-size: 11px;
-  font-weight: 550;
-  color: #5b6b84;
+  gap: 10px;
+  min-height: 36px;
+  font-size: 12px;
+  font-weight: 600;
   line-height: 1.5;
+  color: #5b6b84;
+}
+.stat-label-text {
+  min-width: 0;
 }
 .stat-label > .material-symbols-outlined {
-  font-size: 18px;
-  color: var(--stat-color);
+  display: grid;
+  place-items: center;
   flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  background: #f1f5f9;
+  color: var(--stat-color);
+  font-size: 18px;
 }
 .stat-number {
-  font-size: 19px;
-  line-height: 1.2;
+  margin: 18px 0 16px;
+  overflow-wrap: anywhere;
+  font-size: 32px;
   font-weight: 700;
-  letter-spacing: -0.02em;
+  line-height: 1.1;
+  letter-spacing: -0.035em;
   font-variant-numeric: tabular-nums;
-  color: #1e293b;
-  margin: 10px 0 8px;
 }
 .stat-caption {
-  font-size: 11px;
+  font-size: 12px;
   color: #5b6b84;
+  margin-top: auto;
 }
 .stat-total {
-  background: #0a51b0;
+  background: linear-gradient(125deg, #0a51b0, #097cde);
   border-color: #0a51b0;
 }
 .stat-total .stat-number {
   color: white;
 }
 .stat-total .stat-label,
-.stat-total .stat-label > .material-symbols-outlined {
+.stat-total .stat-label > .material-symbols-outlined,
+.stat-total .stat-caption {
   color: #d9e7fb;
+}
+.stat-total .stat-label > .material-symbols-outlined {
+  background: rgba(255, 255, 255, 0.12);
 }
 .stat-green {
   --stat-color: #047857;
@@ -1392,19 +1382,17 @@ onUnmounted(() => {
 .stat-bottom {
   display: flex;
   align-items: center;
-  gap: 10px;
-  font-size: 10px;
+  gap: 12px;
+  margin-top: auto;
+  font-size: 12px;
   color: #5b6b84;
   font-variant-numeric: tabular-nums;
 }
-.stat-progress > span {
-  transition: width 0.4s cubic-bezier(0.22, 1, 0.36, 1);
-}
 .stat-progress {
   display: block;
+  flex: 1;
   height: 4px;
   background: #edf1f6;
-  flex: 1;
   overflow: hidden;
   border-radius: 4px;
 }
@@ -1415,256 +1403,109 @@ onUnmounted(() => {
   border-radius: inherit;
 }
 .dashboard-chart-grid {
-  gap: 14px;
+  gap: 24px;
 }
 .dashboard-panel {
-  min-width: 0;
   display: flex;
   flex-direction: column;
-  background: white;
-  padding: 16px 18px;
+  min-width: 0;
+  padding: 24px;
   border: 1px solid #e2e8f0;
-  border-radius: 12px;
+  border-radius: 16px;
+  background: white;
 }
 .dashboard-panel > div:first-child {
   flex-shrink: 0;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 24px;
 }
-.dashboard-panel h3 {
-  font-size: 14px;
+.dashboard-panel h3,
+.dashboard-table h3 {
+  font-size: 16px;
   font-weight: 650;
+  line-height: 1.5;
   letter-spacing: -0.02em;
   color: #1e293b;
-}
-.dashboard-panel > div:first-child {
-  gap: 12px;
-  flex-wrap: wrap;
-  margin-bottom: 14px;
 }
 .dashboard-panel :deep(canvas) {
   max-width: 100%;
 }
+.dashboard-status-rows {
+  gap: 16px;
+}
+.dashboard-status-row {
+  min-height: 28px;
+}
 .location-card {
+  min-width: 0;
+  padding: 20px;
   border: 1px solid #e7ecf3;
-  border-radius: 9px;
-  background: #f8fafc;
-  padding: 16px;
+  border-radius: 12px;
+  background: #fafbfd;
 }
 .dashboard-table {
   min-width: 0;
   background: white;
   border: 1px solid #e2e8f0;
-  border-radius: 12px;
+  border-radius: 16px;
   overflow: hidden;
 }
 .dashboard-table > div:first-child {
-  gap: 10px;
+  padding: 22px 24px;
+  gap: 16px;
 }
-.dashboard-table h3 {
-  font-size: 14px;
-  font-weight: 650;
+.dashboard-table > div:first-child :is(h3, p) {
+  white-space: normal;
+}
+.dashboard-table > div:first-child p {
+  margin-top: 6px;
+  line-height: 1.6;
+}
+.dashboard-table table {
+  table-layout: fixed;
 }
 .dashboard-table table thead {
   background: #f8fafc;
 }
 .dashboard-table table th {
-  font-weight: 600;
-  font-size: 10px;
-  color: #7b8aa0;
-}
-.dashboard-table table td {
-  padding-top: 11px;
-  padding-bottom: 11px;
-}
-.dashboard-csat :deep(.shadow-card) {
-  box-shadow: none;
-  border-radius: 12px;
-  border-color: #e2e8f0;
-}
-.dashboard-csat :deep(.shadow-card h3) {
-  font-size: 14px;
-  font-weight: 650;
-  color: #1e293b;
-}
-.dashboard-csat > div > h3 {
-  font-size: 16px;
-  font-weight: 700;
-  color: #1e293b;
-}
-.dashboard-actions {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-@media (max-width: 1199px) {
-  .dashboard-stats {
-    gap: 10px;
-  }
-
-  .dash-stat-card {
-    padding: 14px 12px;
-  }
-
-  .stat-label {
-    font-size: 11px;
-  }
-
-  .stat-number {
-    font-size: 18px;
-  }
-}
-@media (max-width: 767px) {
-  .dashboard-view {
-    gap: 18px;
-  }
-  .dashboard-intro {
-    flex-wrap: wrap;
-    gap: 12px;
-  }
-  .dashboard-intro h2 {
-    font-size: 19px;
-  }
-  .dashboard-intro h2 + p {
-    font-size: 11px;
-    max-width: 310px;
-  }
-  .dashboard-stats {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 10px;
-  }
-  .stat-total,
-  .dashboard-stat-skeleton > :first-child {
-    grid-column: 1 / -1;
-  }
-  .stat-total {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    align-items: center;
-    gap: 5px 20px;
-  }
-  .stat-total .stat-label {
-    justify-content: flex-start;
-    gap: 10px;
-  }
-  .stat-total .stat-number {
-    grid-column: 2;
-    grid-row: 1 / 3;
-    margin: 0;
-    font-size: 34px;
-  }
-  .dash-stat-card {
-    padding: 14px;
-  }
-  .stat-number {
-    font-size: 24px;
-    margin: 13px 0 12px;
-  }
-  .dashboard-panel {
-    padding: 14px;
-  }
-  .dashboard-chart-grid {
-    gap: 14px;
-  }
-  .dashboard-panel > div:first-child {
-    margin-bottom: 16px;
-  }
-  .location-card {
-    padding: 14px;
-  }
-  .dashboard-table > div:first-child {
-    padding: 16px;
-  }
-  .dashboard-table > div:first-child a {
-    min-height: 44px;
-  }
-  .dashboard-table > div:first-child p {
-    white-space: normal;
-    line-height: 1.6;
-  }
-  .dashboard-csat :deep(.shadow-card) {
-    padding: 14px;
-  }
-}
-/* ── Konsolidasi layer (menggantikan style block duplikat) ───────── */
-
-/* Kartu intro: elevated + gradient CTA sama dengan stat-total */
-.dashboard-intro {
-  padding: 16px 20px;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  background: #fff;
-}
-
-/* Ikon stat-label: chip dengan latar lembut, konsisten di semua kartu */
-.stat-label > .material-symbols-outlined {
-  display: grid;
-  place-items: center;
-  width: 30px;
-  height: 30px;
-  border-radius: 8px;
-  background: #f1f5f9;
-}
-.stat-label-text {
-  min-width: 0;
-}
-.stat-total {
-  background: linear-gradient(125deg, #0a51b0, #097cde);
-}
-.stat-total .stat-label > .material-symbols-outlined {
-  background: rgba(255, 255, 255, 0.12);
-}
-.stat-total .stat-label,
-.stat-total .stat-label > .material-symbols-outlined {
-  color: #d9e7fb;
-}
-.stat-total .stat-caption {
-  color: #9dbde4;
-}
-
-/* Heading panel: satu ukuran, satu gaya untuk semua kartu grafik */
-.dashboard-panel h3,
-.dashboard-table h3 {
-  font-size: 14px;
-  font-weight: 650;
-  color: #1e293b;
-}
-.dashboard-panel > div:first-child {
-  margin-bottom: 14px;
-}
-
-/* Tabel dashboard: header sentence-case, baris lega, link aksi konsisten */
-.dashboard-table table th {
   text-transform: none;
   letter-spacing: 0;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
   color: #5b6b84;
+  padding-block: 14px;
 }
 .dashboard-table table td {
-  padding-block: 11px;
+  padding-block: 16px;
+  overflow-wrap: anywhere;
 }
-.dashboard-table > div:first-child {
-  padding: 14px 18px;
-}
-.dashboard-table > div:first-child :is(h3, p) {
-  white-space: normal;
-}
-.table-link {
+.table-link,
+.dashboard-retry {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  min-height: 36px;
-  padding: 0 12px;
-  border-radius: 8px;
+  justify-content: center;
+  flex-shrink: 0;
+  gap: 8px;
+  min-width: 132px;
+  min-height: 44px;
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.5;
+  touch-action: manipulation;
+}
+.table-link {
   border: 1px solid #dbeafe;
   background: #eff6ff;
   color: #1d4ed8;
-  font-size: 12px;
-  font-weight: 600;
   transition:
     background-color 0.15s ease,
     color 0.15s ease;
-  touch-action: manipulation;
+}
+.table-link .material-symbols-outlined {
+  font-size: 18px;
 }
 .table-link:hover {
   background: #0a51b0;
@@ -1674,50 +1515,41 @@ onUnmounted(() => {
 .table-link:active {
   background: #0a4391;
   border-color: #0a4391;
-  transform: scale(0.97);
 }
-
-/* Kartu lokasi & recent-cards */
-.location-card {
-  background: #fafbfd;
-  border-radius: 10px;
-  transition:
-    border-color 0.15s ease,
-    background-color 0.15s ease;
+.dashboard-error {
+  padding: 20px;
+  flex-wrap: wrap;
 }
-.location-card:hover {
-  border-color: #0a51b0;
-  background: #f4f8fe;
+.dashboard-error > div {
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 .dashboard-recent-cards > div {
-  transition: background-color 0.15s ease;
-}
-.dashboard-recent-cards > div:hover {
-  background: #f4f8fe;
-}
-.dashboard-recent-cards > div {
-  padding: 18px;
-  gap: 12px;
+  min-width: 0;
+  padding: 22px 24px;
+  gap: 14px;
 }
 .dashboard-recent-cards > div > div:first-child {
   flex-wrap: wrap;
   gap: 10px;
 }
-
-/* Aksesibilitas: fokus terlihat untuk semua kontrol */
+.dashboard-recent-cards p {
+  overflow-wrap: anywhere;
+}
 .dashboard-view :is(button, a):focus-visible {
   outline: 2px solid #097cde;
   outline-offset: 3px;
 }
-
-/* Tablet 768–1279: 4 kolom stat, recent cards 2 kolom */
 @media (min-width: 768px) and (max-width: 1279px) {
   .dashboard-stats {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
+  .dash-stat-card {
+    padding: 18px;
+  }
   .stat-total {
     grid-column: 1 / -1;
-    display: flex;
+    flex-direction: row;
     align-items: center;
     justify-content: space-between;
     gap: 20px;
@@ -1725,29 +1557,145 @@ onUnmounted(() => {
   .stat-total .stat-number {
     margin: 0;
   }
+  .stat-total .stat-caption {
+    margin: 0;
+  }
   .dashboard-recent-cards {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
   .dashboard-recent-cards > div {
-    border: 1px solid #edf1f6;
+    border-bottom: 1px solid #edf1f6;
   }
 }
-
 @media (max-width: 767px) {
-  .dashboard-table > div:first-child {
+  .dashboard-view {
+    gap: 24px;
+    padding-top: 0;
+  }
+  .dashboard-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+  .dash-stat-card {
     padding: 16px;
+    border-radius: 12px;
+  }
+  .stat-total,
+  .dashboard-stat-skeleton > :first-child {
+    grid-column: 1 / -1;
+  }
+  .stat-total {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 6px 16px;
+  }
+  .stat-total .stat-label {
+    justify-content: flex-start;
+  }
+  .stat-total .stat-number {
+    grid-column: 2;
+    grid-row: 1 / 3;
+    margin: 0;
+    font-size: 36px;
+  }
+  .stat-label {
+    font-size: 11px;
+    gap: 6px;
+  }
+  .stat-label > .material-symbols-outlined {
+    width: 28px;
+    height: 28px;
+  }
+  .stat-number {
+    font-size: 28px;
+    margin: 16px 0;
+  }
+  .dashboard-panel {
+    padding: 18px;
+    border-radius: 12px;
+  }
+  .dashboard-chart-grid {
+    gap: 20px;
+  }
+  .dashboard-panel > div:first-child {
+    margin-bottom: 20px;
+  }
+  .location-card {
+    padding: 16px;
+  }
+  .dashboard-table {
+    border-radius: 12px;
+  }
+  .dashboard-table > div:first-child {
+    padding: 18px;
     flex-wrap: wrap;
-    gap: 8px;
   }
   .dashboard-table > div:first-child > div {
     padding-right: 0;
+    flex-basis: 100%;
+  }
+  .table-link {
+    width: 100%;
   }
   .dashboard-recent-cards > div {
-    padding: 16px;
+    padding: 18px;
+  }
+  .dashboard-retry {
+    width: 100%;
   }
 }
-
+.dashboard-view .dashboard-stats > * {
+  min-width: 0;
+  padding: 24px;
+  border-radius: 16px;
+}
+.dashboard-stat-skeleton > * {
+  min-height: 174px;
+}
+.dashboard-view .dashboard-stats {
+  gap: 20px;
+}
+.dashboard-view .dashboard-stats .stat-number {
+  font-size: 32px;
+}
+.stat-bottom {
+  font-weight: 600;
+}
+@media (min-width: 640px) and (max-width: 1279px) {
+  .dashboard-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+  }
+  .dashboard-stats > :first-child {
+    grid-column: 1 / -1;
+  }
+}
+@media (max-width: 1279px) {
+  .stat-total {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+  }
+  .stat-total .stat-label {
+    justify-content: space-between;
+  }
+  .stat-total .stat-number {
+    margin: 18px 0 16px;
+    font-size: 32px;
+  }
+  .stat-total .stat-caption {
+    margin-top: auto;
+  }
+}
+@media (max-width: 639px) {
+  .dashboard-stats {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
+  }
+}
 @media (prefers-reduced-motion: reduce) {
   .dashboard-view * {
     transition: none !important;

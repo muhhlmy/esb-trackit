@@ -1,6 +1,6 @@
 <script setup>
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
-import { useRoute, RouterView } from 'vue-router'
+import { useRoute, useRouter, RouterView } from 'vue-router'
 import AppSidebar from './components/layout/AppSidebar.vue'
 import AppHeader from './components/layout/AppHeader.vue'
 
@@ -17,6 +17,25 @@ import { initTicketRealtime, stopTicketRealtime } from './composables/useTicketR
 import { useCases } from './composables/useCases.js'
 
 const route = useRoute()
+const router = useRouter()
+
+function pageKey(currentRoute) {
+  // Create-action cleanup must not destroy destination modal state.
+  // Keep all other route keys (including BAST detail routes) unchanged.
+  const createActions = { '/assets': ['add'], '/karyawan': ['add'], '/tickets': ['new', 'create'] }
+  const actions = createActions[currentRoute.path]
+  if (
+    actions &&
+    (currentRoute.query.action === undefined || actions.includes(currentRoute.query.action))
+  ) {
+    return router.resolve({
+      path: currentRoute.path,
+      query: { ...currentRoute.query, action: undefined },
+      hash: currentRoute.hash,
+    }).fullPath
+  }
+  return currentRoute.fullPath
+}
 const { fetchCases } = useCases()
 const { user, refreshUser } = useAuth()
 
@@ -162,7 +181,7 @@ onUnmounted(() => {
                 @leave="animatePageLeave"
                 mode="out-in"
               >
-                <div :key="currentRoute.fullPath" class="page-transition-wrapper w-full">
+                <div :key="pageKey(currentRoute)" class="page-transition-wrapper w-full">
                   <component :is="Component" />
                 </div>
               </Transition>

@@ -1,4 +1,4 @@
-# UI/UX Consistency Report — ESB TrackIT & Help Center
+# UI/UX Consistency Report — TrackIT & Help Center
 
 **Generated:** September 21, 2026
 **Branch:** main
@@ -8,7 +8,7 @@
 
 ## Executive Summary
 
-The ESB TrackIT application demonstrates **strong architectural consistency** across its core systems. The navigation config, mobile bottom nav, RBAC, and component system are well-designed with a single source of truth. The audit focused on standardizing page headers, fixing CSS conflicts, and calibrating typography density.
+The TrackIT application demonstrates **strong architectural consistency** across its core systems. The navigation config, mobile bottom nav, RBAC, and component system are well-designed with a single source of truth. The audit focused on standardizing page headers, fixing CSS conflicts, and calibrating typography density.
 
 **Overall Status: PASS**
 

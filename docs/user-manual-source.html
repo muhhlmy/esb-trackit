@@ -2,10 +2,10 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <title>Buku Panduan & User Manual — ESB TrackIT</title>
+  <title>Buku Panduan & User Manual — TrackIT</title>
   <style>
     /* ============================================================
-       PANDUAN PENGGUNAAN ESB TRACKIT - PRINT STYLESHEET
+       PANDUAN PENGGUNAAN TRACKIT - PRINT STYLESHEET
        ============================================================ */
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap');
 
@@ -555,7 +555,7 @@
       <div class="brand-logo-badge">
         <div class="logo-icon-box">T</div>
         <div>
-          <div class="brand-name">ESB TrackIT</div>
+          <div class="brand-name">TrackIT</div>
           <div class="brand-tag">Asset, Helpdesk &amp; Help Center Platform</div>
         </div>
       </div>
@@ -566,7 +566,7 @@
       <div class="cover-badge-pill">Buku Panduan Penggunaan &amp; User Manual</div>
       <h1 class="cover-title">
         Panduan Operasional Terpadu<br>
-        <span>ESB TrackIT Enterprise</span>
+        <span>TrackIT Enterprise</span>
       </h1>
       <p class="cover-subtitle">
         Dokumentasi komprehensif panduan pengguna, fungsi fitur, alur kerja pemeliharaan aset IT/GA/OPS, penanganan tiket helpdesk, pelacakan logistik ekspedisi, administrasi master data karyawan, serta pemanfaatan portal Pusat Bantuan (Help Center).
@@ -607,7 +607,7 @@
     <div class="cover-footer">
       <div class="meta-col">
         <h6>Penerbit &amp; Pengembang</h6>
-        <p>Divisi IT &amp; Asset Management — PT Esensi Solusi Buana (ESB)</p>
+        <p>Divisi IT &amp; Asset Management — TrackIT Project</p>
       </div>
       <div class="meta-col">
         <h6>Versi Rilis Dokumen</h6>
@@ -630,7 +630,7 @@
     </div>
 
     <p style="margin-bottom: 16px;">
-      Buku panduan ini disusun secara sistematis untuk memandu pengguna dari berbagai tingkatan peran (User Karyawan, Teknisi/Admin, hingga Superadmin) dalam memanfaatkan seluruh fungsionalitas yang ada di platform <strong>ESB TrackIT</strong>.
+      Buku panduan ini disusun secara sistematis untuk memandu pengguna dari berbagai tingkatan peran (User Karyawan, Teknisi/Admin, hingga Superadmin) dalam memanfaatkan seluruh fungsionalitas yang ada di platform <strong>TrackIT</strong>.
     </p>
 
     <table class="toc-table">
@@ -812,12 +812,12 @@
       <div class="chapter-tag">Fondasi &amp; Akses</div>
     </div>
 
-    <h3 class="sub-title">1.1 Latar Belakang &amp; Tujuan ESB TrackIT</h3>
+    <h3 class="sub-title">1.1 Latar Belakang &amp; Tujuan TrackIT</h3>
     <p>
-      <strong>ESB TrackIT</strong> adalah sistem enterprise internal yang dirancang dan dikembangkan secara khusus untuk mendukung operasional <strong>PT Esensi Solusi Buana (ESB)</strong>. Platform ini menghubungkan manajemen inventaris perangkat kerja (IT, General Affairs, dan Operasional Store/Resto), penanganan tiket bantuan helpdesk dengan SLA ketat, pelacakan pengiriman logistik antarcabang, formulir Berita Acara Serah Terima (BAST), serta pusat edukasi dan panduan troubleshooting mandiri (Help Center).
+      <strong>TrackIT</strong> adalah sistem enterprise internal yang dirancang dan dikembangkan secara khusus untuk mendukung operasional <strong>TrackIT Project</strong>. Platform ini menghubungkan manajemen inventaris perangkat kerja (IT, General Affairs, dan Operasional Store/Resto), penanganan tiket bantuan helpdesk dengan SLA ketat, pelacakan pengiriman logistik antarcabang, formulir Berita Acara Serah Terima (BAST), serta pusat edukasi dan panduan troubleshooting mandiri (Help Center).
     </p>
     <p>
-      Tujuan utama dari implementasi ESB TrackIT meliputi:
+      Tujuan utama dari implementasi TrackIT meliputi:
     </p>
     <ul>
       <li><strong>Sentralisasi Data Aset:</strong> Menghilangkan pencatatan aset yang tercecer di berbagai spreadsheet manual dengan database PostgreSQL terpusat.</li>
@@ -1121,7 +1121,7 @@
       <tbody>
         <tr>
           <td><strong>Hostname</strong></td>
-          <td>Identitas unik sistem operasi perangkat di jaringan ESB.</td>
+          <td>Identitas unik sistem operasi perangkat di jaringan kantor.</td>
           <td><code>HO-LPT-042</code>, <code>POS-JKT01-01</code></td>
         </tr>
         <tr>
@@ -1147,7 +1147,7 @@
         <tr>
           <td><strong>Pemegang Aset (NIK &amp; Nama)</strong></td>
           <td>Karyawan yang bertanggung jawab memegang perangkat saat ini.</td>
-          <td><code>ESB-2023-089</code> — Budi Santoso</td>
+          <td><code>TK-2023-089</code> — Budi Santoso</td>
         </tr>
         <tr>
           <td><strong>Lokasi Fisik</strong></td>
@@ -1180,14 +1180,14 @@
       Untuk memudahkan proses audit inventaris fisik di lapangan, setiap baris data aset dilengkapi tombol <strong>Label Aset</strong>:
     </p>
     <ul>
-      <li>Sistem merender kartu label beresolusi tinggi berisi informasi: Logo ESB, Hostname, Serial Number, Tipe Perangkat, Tanggal Perolehan, dan QR Code terenkripsi.</li>
+      <li>Sistem merender kartu label beresolusi tinggi berisi informasi: Logo aplikasi, Hostname, Serial Number, Tipe Perangkat, Tanggal Perolehan, dan QR Code terenkripsi.</li>
       <li>QR Code tersebut dapat dipindai (*scan*) menggunakan kamera smartphone atau barcode scanner untuk langsung membuka halaman verifikasi detail aset.</li>
       <li>Tersedia tombol <strong>Cetak Label</strong> yang telah diformat pas dengan ukuran kertas stiker label fisik standar industri.</li>
     </ul>
 
     <h3 class="sub-title">3.4 Aset General Affairs (GA) &amp; Aset Operasional Resto (OPS)</h3>
     <p>
-      Selain perangkat teknologi informasi, ESB TrackIT menyediakan dua modul inventaris terpisah dengan basis database yang diisolasi:
+      Selain perangkat teknologi informasi, TrackIT menyediakan dua modul inventaris terpisah dengan basis database yang diisolasi:
     </p>
     <div class="grid-2">
       <div class="grid-card">
@@ -1223,7 +1223,7 @@
 
     <h3 class="sub-title">3.6 Prosedur Import &amp; Export Excel (XLSX)</h3>
     <p>
-      Fitur Import/Export Excel di ESB TrackIT telah diselaraskan agar format file hasil Export memiliki header dan kolom sheet yang 100% sama dengan template Import. Dengan demikian, file ekspor dapat diedit langsung lalu diimpor kembali ke sistem.
+      Fitur Import/Export Excel di TrackIT telah diselaraskan agar format file hasil Export memiliki header dan kolom sheet yang 100% sama dengan template Import. Dengan demikian, file ekspor dapat diedit langsung lalu diimpor kembali ke sistem.
     </p>
     <table>
       <thead>
@@ -1509,10 +1509,10 @@
 
     <h3 class="sub-title">6.1 Master Data Karyawan (Employees)</h3>
     <p>
-      Halaman <strong>Karyawan</strong> (<code>/karyawan</code>) bertindak sebagai sumber kebenaran tunggal (*single source of truth*) data identitas staf di ESB TrackIT. Data ini menjadi pondasi bagi modul Aset (menentukan pemegang perangkat) dan modul Tiket (menentukan pihak pelapor).
+      Halaman <strong>Karyawan</strong> (<code>/karyawan</code>) bertindak sebagai sumber kebenaran tunggal (*single source of truth*) data identitas staf di TrackIT. Data ini menjadi pondasi bagi modul Aset (menentukan pemegang perangkat) dan modul Tiket (menentukan pihak pelapor).
     </p>
     <ul>
-      <li><strong>NIK (Nomor Induk Karyawan):</strong> Kunci primer unik identitas karyawan (misal: <code>ESB-2024-105</code>).</li>
+      <li><strong>NIK (Nomor Induk Karyawan):</strong> Kunci primer unik identitas karyawan (misal: <code>TK-2024-105</code>).</li>
       <li><strong>Nama Lengkap &amp; Email:</strong> Kontak resmi korespondensi notifikasi tiket.</li>
       <li><strong>Departemen &amp; Jabatan:</strong> Pengelompokan divisi kerja (misal: Engineering, Product, Marketing, People &amp; Culture, Finance).</li>
       <li><strong>Level Jabatan (Job Level):</strong> Pilihan terstandarisasi: <em>C-Level</em>, <em>L1</em> s/d <em>L6</em>, <em>LS1</em> s/d <em>LS3</em>, <em>Freelance</em>, dan <em>Intern</em>.</li>
@@ -1752,8 +1752,8 @@
     </div>
 
     <div style="margin-top: 30px; text-align: center; border-top: 1px solid #E2E8F0; padding-top: 16px; color: #94A3B8; font-size: 8pt;">
-      <p>Buku Panduan Penggunaan &amp; User Manual — ESB TrackIT Platform Enterprise</p>
-      <p>© 2026 PT Esensi Solusi Buana (ESB). Seluruh hak cipta dilindungi undang-undang.</p>
+      <p>Buku Panduan Penggunaan &amp; User Manual — TrackIT Platform Enterprise</p>
+      <p>© 2026 TrackIT Project. Seluruh hak cipta dilindungi undang-undang.</p>
     </div>
   </div>
 

@@ -198,7 +198,7 @@ export async function storeEmployee(req, res) {
 
     const nik = cleanText(req.body.nik);
     const nama_karyawan = cleanText(req.body.nama_karyawan);
-    const email_kantor = cleanText(req.body.email_kantor) || `${nik?.toLowerCase()}@esb.co.id`;
+    const email_kantor = cleanText(req.body.email_kantor) || `${nik?.toLowerCase()}@example.com`;
     const lokasi_kerja = cleanText(req.body.lokasi_kerja);
     
     let status = cleanText(req.body.status || req.body.status_karyawan) || "Active";

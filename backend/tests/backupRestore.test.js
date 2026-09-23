@@ -16,27 +16,27 @@ import { generateBackupFilename } from '../src/services/backupService.js'
 
 describe('Backup Filename Generation', () => {
   it('should generate manual backup filename with correct prefix', () => {
-    const filename = generateBackupFilename('esb_trackit', 'manual')
-    assert.ok(filename.startsWith('esb_trackit_backup_'))
+    const filename = generateBackupFilename('trackit', 'manual')
+    assert.ok(filename.startsWith('trackit_backup_'))
     assert.ok(filename.endsWith('.dump'))
   })
 
   it('should generate pre_restore backup filename', () => {
-    const filename = generateBackupFilename('esb_trackit', 'pre_restore')
-    assert.ok(filename.startsWith('esb_trackit_pre_restore_'))
+    const filename = generateBackupFilename('trackit', 'pre_restore')
+    assert.ok(filename.startsWith('trackit_pre_restore_'))
     assert.ok(filename.endsWith('.dump'))
   })
 
   it('should contain timestamp in filename', () => {
-    const filename = generateBackupFilename('esb_trackit', 'manual')
-    // Format: esb_trackit_backup_YYYY-MM-DD_HH-MM-SS.dump
-    const pattern = /^esb_trackit_backup_\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}\.dump$/
+    const filename = generateBackupFilename('trackit', 'manual')
+    // Format: trackit_backup_YYYY-MM-DD_HH-MM-SS.dump
+    const pattern = /^trackit_backup_\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}\.dump$/
     assert.ok(pattern.test(filename))
   })
 
   it('should generate unique filenames across calls', () => {
-    const f1 = generateBackupFilename('esb_trackit', 'manual')
-    const f2 = generateBackupFilename('esb_trackit', 'manual')
+    const f1 = generateBackupFilename('trackit', 'manual')
+    const f2 = generateBackupFilename('trackit', 'manual')
     // If called in rapid succession, they could be the same
     // But the timestamps should differ unless called within the same second
     assert.ok(typeof f1 === 'string' && typeof f2 === 'string')
@@ -153,7 +153,7 @@ describe('Database Status Endpoint (explicit live test target)', () => {
     })
     assert.equal(login.status, 200)
     const cookie = login.headers.getSetCookie().map(value => value.split(';')[0]).join('; ')
-    assert.ok(cookie.includes('esb_session='))
+    assert.ok(cookie.includes('trackit_session='))
     const response = await fetch(process.env.TEST_API_URL + '/api/admin/database/status', { headers: { Cookie: cookie } })
     assert.equal(response.status, 403)
   })

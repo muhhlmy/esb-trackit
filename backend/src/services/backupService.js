@@ -31,7 +31,7 @@ async function ensureBackupDir() {
 /**
  * Generate nama file backup dengan timestamp.
  */
-export function generateBackupFilename(prefix = 'esb_trackit', type = 'manual') {
+export function generateBackupFilename(prefix = 'trackit', type = 'manual') {
   const now = new Date()
   const ts = now.toISOString().replace(/[:.]/g, '-').replace('T', '_').slice(0, 19)
   const typeLabel = type === 'pre_restore' ? 'pre_restore' : 'backup'
@@ -219,7 +219,7 @@ export async function createBackup(userId, userName, backupType = 'manual') {
   const dbUser = env.database.user
   const dbPassword = env.database.password
 
-  const filename = generateBackupFilename('esb_trackit', backupType)
+  const filename = generateBackupFilename('trackit', backupType)
   const dir = await ensureBackupDir()
   const filepath = path.join(dir, filename)
 

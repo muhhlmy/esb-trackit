@@ -279,7 +279,7 @@ export async function importExcelData(req, res) {
       }
 
       const emailRaw = getPropCaseInsensitive(row, ['Email Kantor', 'Email', 'email_kantor', 'email']);
-      const email = emailRaw || (nik ? `${nik.toLowerCase()}@esb.co.id` : null);
+      const email = emailRaw || (nik ? `${nik.toLowerCase()}@example.com` : null);
       const lokasiRaw = getPropCaseInsensitive(row, ['Lokasi Kerja', 'Lokasi', 'lokasi_kerja', 'lokasi']);
       const lokasi = dashIfNull(normalizeLocation(lokasiRaw));
       const title = getPropCaseInsensitive(row, ['Title', 'Jabatan', 'title']) || 'User';

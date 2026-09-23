@@ -13,7 +13,7 @@ test('app shell does not write client-authored audit events', async () => {
     ['API composable', /\buseApi\b/],
     ['client actor field', /\bnama_pengguna\s*:/],
     ['hard-coded actor name', /Admin IT/],
-    ['hard-coded actor email', /admin@esb\.co\.id/],
+    ['hard-coded actor email', /admin@example\.com/],
     ['hard-coded actor IP address', /127\.0\.0\.1/],
   ]
 

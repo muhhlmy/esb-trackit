@@ -1,7 +1,7 @@
 {
   "$metadata": {
     "version": "1.0.0",
-    "description": "ESB TrackIT chart color tokens — WCAG 2.1 AA compliant palette for asset status, trends, and categories."
+    "description": "TrackIT chart color tokens — WCAG 2.1 AA compliant palette for asset status, trends, and categories."
   },
   "chart": {
     "status": {

@@ -1,4 +1,4 @@
-# UI/UX Baseline Audit Report — ESB TrackIT Frontend
+# UI/UX Baseline Audit Report — TrackIT Frontend
 
 **Date:** 2026-09-21
 **Environment:** Linux Mint 22.3 (ptx), Node via nvm, npm workspace monorepo
@@ -10,7 +10,7 @@
 
 ### Repository Structure
 ```
-esb-trackit/                      (root npm workspace)
+trackit/                      (root npm workspace)
 ├── package.json                  (workspace root, scripts)
 ├── package-lock.json             (npm lockfile v3)
 ├── skills-lock.json              (agent skills lockfile, v1)
@@ -365,7 +365,7 @@ Cannot be assessed via browser (browser login is blocked in this environment —
 
 **Visual observations:**
 - Dashboard uses `shadow-2xs` on stat cards — reasonable, not excessive
-- Color palette uses blue (#0A51B0) as primary, orange (#FF4F1B) as accent — ESB brand
+- Color palette uses blue (#0A51B0) as primary, orange (#FF4F1B) as accent — brand
 - Rounded corners: `rounded-xl` (12px) on cards, `rounded-full` on badges — moderate, not over-rounded
 - No glassmorphism, no excessive gradients, no badge spam — clean enterprise look
 - Indonesian language throughout — appropriate localization
@@ -464,7 +464,7 @@ Current CI (`.github/workflows/ci.yml`):
 
 ## 5. Re-verification — 2026-09-21 (post-fix, live)
 
-Backup: `.backups/2026-09-21_15-09-21/` (branch `main`, commit `bbb9c5f`).
+Backup: `.backups/pre-fix-backup/` (branch `main`, commit `bbb9c5f`).
 
 ### Fixed defects
 
@@ -484,7 +484,7 @@ Backup: `.backups/2026-09-21_15-09-21/` (branch `main`, commit `bbb9c5f`).
 | Token names unusable | generator emitted `--dimension-header-height` / `--safe-area-inset-bottom` from grouping artefacts | `stripCategoryPrefix()` + `TOKEN_ALIASES`; `--desktop-scale`, `--header-height`, `--safe-area-inset-bottom` now emit correctly |
 | Dead code | `DashboardPanel.vue`, `TypographyToggle.vue`, `useDesignSystem.js`, `useTypographyScale.js`, `dashboardDesignTokens.js`, `exportAssetsCsv.js`, `exportAssetCategoryCsv.js` — zero consumers | deleted (562+ lines). `currencyFormatter.js` was NOT dead: restored and its duplicated inline copy in `AssetsOpsView.vue` replaced by the shared util |
 
-### Live verification (Playwright, authenticated as superadmin, https://trackit.esb.co.id)
+### Live verification (Playwright, authenticated as superadmin, https://trackit.example.com)
 
 | Check | Result |
 |---|---|

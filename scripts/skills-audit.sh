@@ -13,7 +13,7 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 SKILLS_DIR="$ROOT/.agents/skills"
 LOCK_FILE="$ROOT/skills-lock.json"
 
-echo "=== ESB TrackIT Skills Audit ==="
+echo "=== TrackIT Skills Audit ==="
 echo ""
 
 if [ ! -f "$LOCK_FILE" ]; then

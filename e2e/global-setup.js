@@ -50,7 +50,7 @@ export default async function globalSetup(config) {
       // Validate auth state is not empty
       const raw = fs.readFileSync(storageStatePath, 'utf-8')
       const state = JSON.parse(raw)
-      const hasSessionCookie = state.cookies?.some((cookie) => cookie.name === 'esb_session' && cookie.httpOnly)
+      const hasSessionCookie = state.cookies?.some((cookie) => cookie.name === 'trackit_session' && cookie.httpOnly)
 
       if (!hasSessionCookie) {
         throw new Error(

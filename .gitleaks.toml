@@ -1,0 +1,23 @@
+# Gitleaks configuration for TrackIT.
+#
+# The commits below were audited manually (see reports/credential-audit.md):
+#   - 36fcc98498b1c2e257d3b40b1993c92e6a2b73dc : Supabase anon key of a removed
+#     legacy prototype. Anon keys are designed to be public and are guarded by
+#     RLS; rotation is still recommended for hygiene.
+#   - 27e1b46205a5ef8bcc9a64a51ede3563685f274a : expired E2E session JWTs in
+#     e2e/auth/*.json storage states.
+#   - 4e34f640547d29d9dbfebea8e878b37311f8a92b : expired E2E/QA session JWTs in
+#     qa_tokens.json / qa-api-results.json.
+#
+# New findings after these commits will fail the Secret Scanning workflow.
+
+[extend]
+useDefault = true
+
+[allowlist]
+  description = "Manually audited historical commits (see reports/credential-audit.md)"
+  commits = [
+    "36fcc98498b1c2e257d3b40b1993c92e6a2b73dc",
+    "27e1b46205a5ef8bcc9a64a51ede3563685f274a",
+    "4e34f640547d29d9dbfebea8e878b37311f8a92b",
+  ]

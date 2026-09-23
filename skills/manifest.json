@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "name": "esb-trackit-skills",
-  "description": "Agent skills manifest for ESB TrackIT UI/UX workflow — records installed skills and their intended usage.",
+  "name": "trackit-skills",
+  "description": "Agent skills manifest for TrackIT UI/UX workflow — records installed skills and their intended usage.",
   "version": "1.0.0",
   "skills": [
     {

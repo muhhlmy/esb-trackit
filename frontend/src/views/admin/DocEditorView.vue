@@ -628,7 +628,7 @@ function confirmLinkDialog() {
   try {
     parsed = new URL(url, window.location.origin)
   } catch {
-    linkDialogError.value = 'URL tidak valid. Contoh: https://portal.esb.co.id'
+    linkDialogError.value = 'URL tidak valid. Contoh: https://portal.example.com'
     return
   }
 
@@ -1332,7 +1332,7 @@ function goToAdminCases() {
           v-model="linkDialogUrl"
           type="url"
           inputmode="url"
-          placeholder="https://portal.esb.co.id"
+          placeholder="https://portal.example.com"
           class="w-full rounded-lg border border-[#E2E8F0] dark:border-slate-700 bg-white dark:bg-slate-950 px-3 py-2 text-sm text-[#333333] dark:text-slate-100 focus:outline-none focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/20"
         />
         <p

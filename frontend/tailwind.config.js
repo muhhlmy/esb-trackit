@@ -8,17 +8,17 @@ export default {
   theme: {
     extend: {
       colors: {
-        // ESB Brand Colors
-        "esb-primary": "#0A51B0",
-        "esb-primary-dark": "#0A4391",
-        "esb-primary-light": "#5AB1FF",
-        "esb-secondary": "#49BEFF",
-        "esb-success": "#13DEB9",
-        "esb-warning": "#FFAE1F",
-        "esb-danger": "#FA896B",
-        "esb-purple": "#8B5CF6",
-        "esb-gray": "#64748B",
-        "esb-slate": "#64748B",
+        // Brand Colors
+        "brand-primary": "#0A51B0",
+        "brand-primary-dark": "#0A4391",
+        "brand-primary-light": "#5AB1FF",
+        "brand-secondary": "#49BEFF",
+        "brand-success": "#13DEB9",
+        "brand-warning": "#FFAE1F",
+        "brand-danger": "#FA896B",
+        "brand-purple": "#8B5CF6",
+        "brand-gray": "#64748B",
+        "brand-slate": "#64748B",
         
         // Status Colors
         "status-digunakan": "#13DEB9",

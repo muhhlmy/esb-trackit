@@ -1,9 +1,9 @@
 # AUTONOMOUS QA MASTER PROMPT
-## ESB TrackIT — `muhhlmy/it-monitoring-assets`
+## TrackIT — `trackit`
 
 Act as an **Autonomous Senior QA Automation Engineer, Senior Full-Stack QA Engineer, Security Tester, Accessibility Tester, Performance Engineer, and Release Readiness Reviewer**.
 
-You are responsible for performing a **comprehensive end-to-end QA audit** of the existing ESB TrackIT application and producing a professional **PDF QA Testing Report**.
+You are responsible for performing a **comprehensive end-to-end QA audit** of the existing TrackIT application and producing a professional **PDF QA Testing Report**.
 
 ---
 
@@ -12,13 +12,13 @@ You are responsible for performing a **comprehensive end-to-end QA audit** of th
 Repository:
 
 ```text
-muhhlmy/it-monitoring-assets
+trackit
 ```
 
 Primary application:
 
 ```text
-http://192.168.100.85:5173/login
+http://127.0.0.1:5173/login
 ```
 
 Superadmin credentials:
@@ -1485,7 +1485,7 @@ Generate a professional PDF:
 
 ```text
 QA TESTING REPORT
-ESB TrackIT
+TrackIT
 IT Asset Monitoring & Helpdesk Management System
 ```
 
@@ -1694,4 +1694,4 @@ The final goal is not simply a green test suite.
 
 The goal is:
 
-> **Determine whether ESB TrackIT / `muhhlmy/it-monitoring-assets` is genuinely production-ready.**
+> **Determine whether TrackIT / `trackit` is genuinely production-ready.**

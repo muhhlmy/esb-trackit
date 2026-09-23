@@ -6,14 +6,14 @@ import { fileURLToPath } from 'url'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
-export function getEsbLogoPngPath() {
+export function getLogoPngPath() {
   try {
     const candidatePaths = [
-      path.resolve(__dirname, '../assets/esb_logo_only.png'),
-      path.resolve(__dirname, '../../../../frontend/public/esb-logo-only.png'),
-      path.resolve(process.cwd(), '../frontend/public/esb-logo-only.png'),
-      path.resolve(process.cwd(), 'frontend/public/esb-logo-only.png'),
-      path.resolve(process.cwd(), 'src/assets/esb_logo_only.png'),
+      path.resolve(__dirname, '../assets/logo.png'),
+      path.resolve(__dirname, '../../../../frontend/public/logo.png'),
+      path.resolve(process.cwd(), '../frontend/public/logo.png'),
+      path.resolve(process.cwd(), 'frontend/public/logo.png'),
+      path.resolve(process.cwd(), 'src/assets/logo.png'),
     ]
     for (const p of candidatePaths) {
       if (fs.existsSync(p)) {
@@ -23,11 +23,11 @@ export function getEsbLogoPngPath() {
   } catch (err) {
     // fallback
   }
-  return path.resolve(__dirname, '../assets/esb_logo_only.png').replace(/\\/g, '/')
+  return path.resolve(__dirname, '../assets/logo.png').replace(/\\/g, '/')
 }
 
-export function getEsbLogoSrc() {
-  return 'cid:esbLogoOnly'
+export function getLogoSrc() {
+  return 'cid:trackitLogo'
 }
 
 let transporter = null
@@ -77,27 +77,25 @@ export async function sendEmail({ to, subject, html, text, attachments = [] }) {
     return false
   }
 
-  const from = process.env.EMAIL_FROM || '"People Technology" <people.technology@esb.co.id>'
+  const from = process.env.EMAIL_FROM || '"TrackIT" <no-reply@trackit.local>'
 
-  const logoPngPath = getEsbLogoPngPath()
+  const logoPngPath = getLogoPngPath()
   const mailAttachments = [...attachments]
 
   let processedHtml = html
   if (logoPngPath && fs.existsSync(logoPngPath)) {
-    const hasCid = mailAttachments.some((a) => a.cid === 'esbLogoOnly')
+    const hasCid = mailAttachments.some((a) => a.cid === 'trackitLogo')
     if (!hasCid) {
       mailAttachments.push({
-        filename: 'esb-logo-only.png',
+        filename: 'logo.png',
         path: logoPngPath,
-        cid: 'esbLogoOnly',
+        cid: 'trackitLogo',
       })
     }
 
     if (processedHtml) {
-      processedHtml = processedHtml.replace(/src="[^"]*ESB%20Logo%20Only\.(svg|png)[^"]*"/gi, 'src="cid:esbLogoOnly"')
-      processedHtml = processedHtml.replace(/src="[^"]*esb_logo_only\.(svg|png)[^"]*"/gi, 'src="cid:esbLogoOnly"')
-      processedHtml = processedHtml.replace(/src="[^"]*frontend\/public\/[^"]*"/gi, 'src="cid:esbLogoOnly"')
-      processedHtml = processedHtml.replace(/src="\.\.\/\.\.\/frontend\/public\/[^"]*"/gi, 'src="cid:esbLogoOnly"')
+      processedHtml = processedHtml.replace(/src="[^"]*frontend\/public\/[^"]*"/gi, 'src="cid:trackitLogo"')
+      processedHtml = processedHtml.replace(/src="\.\.\/\.\.\/frontend\/public\/[^"]*"/gi, 'src="cid:trackitLogo"')
     }
   }
 
@@ -120,7 +118,7 @@ function maskEmail(email) {
 
 /**
  * Helper to render HTML email for ticket events
- * Designed according to corporate DESIGN.md (ESB brand gradients, semantic status tokens, and No-Reply notice).
+ * Designed according to shared design tokens (brand gradients, semantic status tokens, No-Reply notice).
  */
 export function renderTicketEmailHtml({
   recipientName,
@@ -222,22 +220,22 @@ export function renderTicketEmailHtml({
 <body style="font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #F4F6F9; margin: 0; padding: 24px 12px; color: #334155;">
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width: 600px; margin: 0 auto; background-color: #FFFFFF; border-radius: 16px; overflow: hidden; border: 1px solid #E2E8F0; box-shadow: 0 8px 24px rgba(10, 81, 176, 0.08);">
     
-    <!-- Top Accent Bar: ESB Official Orange Gradient -->
+    <!-- Top Accent Bar: Brand Orange Gradient -->
     <tr>
       <td style="background: linear-gradient(135deg, #FF4F1B 0%, #FE5B1C 21%, #FC7C20 60%, #FAA425 100%); height: 4px; font-size: 0; line-height: 0;">&nbsp;</td>
     </tr>
 
-    <!-- Header: ESB Official Blue Gradient -->
+    <!-- Header: Brand Blue Gradient -->
     <tr>
       <td style="background: linear-gradient(135deg, #0A51B0 0%, #0A5DBD 26%, #097CDE 72%, #0892F5 100%); padding: 26px 36px; color: #FFFFFF;">
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse: collapse;">
           <tr>
             <td style="vertical-align: middle; text-align: left; width: 44px; padding-right: 14px;">
-              <img src="cid:esbLogoOnly" alt="ESB Logo" style="width: 36px; height: 36px; display: block; object-fit: contain;">
+              <img src="cid:trackitLogo" alt="TrackIT Logo" style="width: 36px; height: 36px; display: block; object-fit: contain;">
             </td>
             <td style="vertical-align: middle; text-align: left;">
-              <h1 style="margin: 0; font-size: 20px; font-weight: 800; letter-spacing: 0.3px; color: #FFFFFF;">ESB TrackIT</h1>
-              <div style="margin-top: 3px; font-size: 11px; font-weight: 600; letter-spacing: 0.8px; color: rgba(255, 255, 255, 0.85); text-transform: uppercase;">People Technology &bull; IT Service Management</div>
+              <h1 style="margin: 0; font-size: 20px; font-weight: 800; letter-spacing: 0.3px; color: #FFFFFF;">TrackIT</h1>
+              <div style="margin-top: 3px; font-size: 11px; font-weight: 600; letter-spacing: 0.8px; color: rgba(255, 255, 255, 0.85); text-transform: uppercase;">IT Asset &amp; Helpdesk Management</div>
             </td>
           </tr>
         </table>
@@ -247,7 +245,7 @@ export function renderTicketEmailHtml({
     <!-- Main Content Area -->
     <tr>
       <td style="padding: 32px 36px;">
-        <p style="font-size: 15px; margin: 0 0 8px 0; color: #1E293B;">Halo <strong>${recipientName || 'Rekan ESB'}</strong>,</p>
+        <p style="font-size: 15px; margin: 0 0 8px 0; color: #1E293B;">Halo <strong>${recipientName || 'Rekan'}</strong>,</p>
         <p style="font-size: 14px; color: #475569; line-height: 1.6; margin: 0 0 22px 0;">
           ${subtitle}
         </p>
@@ -305,7 +303,7 @@ export function renderTicketEmailHtml({
             ${actionText || 'Silakan buka aplikasi untuk memantau status atau merespons tiket ini.'}
           </p>
           <a href="${ticketUrl}" style="background: linear-gradient(135deg, #0A51B0 0%, #0A5DBD 50%, #0892F5 100%); color: #FFFFFF; text-decoration: none; padding: 12px 28px; border-radius: 8px; font-size: 13.5px; font-weight: 700; display: inline-block; box-shadow: 0 2px 8px rgba(10, 81, 176, 0.25);">
-            Buka Tiket di ESB TrackIT &rarr;
+            Buka Tiket di TrackIT &rarr;
           </a>
         </div>
 
@@ -317,7 +315,7 @@ export function renderTicketEmailHtml({
             </td>
             <td style="vertical-align: top; font-size: 12px; color: #B83A10; line-height: 1.55;">
               <strong style="color: #9A3412;">Pemberitahuan Otomatis &bull; No-Reply:</strong><br>
-              Email ini dikirimkan secara otomatis oleh sistem notifikasi <strong>ESB TrackIT</strong> dan alamat ini tidak dapat menerima balasan email masuk. Mohon untuk <strong>tidak membalas langsung</strong> email ini. Untuk memberikan respon atau melihat perkembangan tiket, silakan login ke portal ESB TrackIT.
+              Email ini dikirimkan secara otomatis oleh sistem notifikasi <strong>TrackIT</strong> dan alamat ini tidak dapat menerima balasan email masuk. Mohon untuk <strong>tidak membalas langsung</strong> email ini. Untuk memberikan respon atau melihat perkembangan tiket, silakan login ke portal TrackIT.
             </td>
           </tr>
         </table>
@@ -328,10 +326,10 @@ export function renderTicketEmailHtml({
     <tr>
       <td style="background-color: #F8FAFC; padding: 22px 36px; text-align: center; border-top: 1px solid #EDF1F6; font-size: 11.5px; color: #8291A7; line-height: 1.6;">
         <div style="font-weight: 700; color: #475569; margin-bottom: 4px;">
-          ESB TrackIT &bull; Enterprise IT &amp; Asset Management
+          TrackIT &bull; IT &amp; Asset Management
         </div>
         <div>
-          &copy; 2026 PT Esensi Solusi Buana (ESB) &bull; People Technology Division
+          &copy; 2026 TrackIT
         </div>
         <div style="margin-top: 8px; font-size: 10.5px; color: #94A3B8;">
           Pesan ini ditujukan khusus untuk pengguna terkait. Harap jaga kerahasiaan data tiket perusahaan Anda.
@@ -365,7 +363,7 @@ export function renderPasswordResetOtpEmailHtml({
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
-  <title>Verifikasi Kata Sandi – ESB TrackIT</title>
+  <title>Verifikasi Kata Sandi – TrackIT</title>
 </head>
 <body style="margin:0;padding:0;background-color:#f4f6f9;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f6f9;padding:40px 16px;">
@@ -373,7 +371,7 @@ export function renderPasswordResetOtpEmailHtml({
       <td align="center">
         <table role="presentation" width="100%" style="max-width:480px;background:#ffffff;border-radius:16px;overflow:hidden;border:1px solid #e8edf3;" cellpadding="0" cellspacing="0">
 
-          <!-- Top accent bar: ESB Official Orange Gradient -->
+          <!-- Top accent bar: Brand Orange Gradient -->
           <tr>
             <td style="background: linear-gradient(135deg, #FF4F1B 0%, #FE5B1C 21%, #FC7C20 60%, #FAA425 100%); height: 4px; font-size: 0; line-height: 0;">&nbsp;</td>
           </tr>
@@ -384,10 +382,10 @@ export function renderPasswordResetOtpEmailHtml({
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse: collapse; margin-bottom: 16px;">
                 <tr>
                   <td style="vertical-align: middle; text-align: left; width: 36px; padding-right: 10px;">
-                    <img src="cid:esbLogoOnly" alt="ESB Logo" style="width: 28px; height: 28px; display: block; object-fit: contain;">
+                    <img src="cid:trackitLogo" alt="TrackIT Logo" style="width: 28px; height: 28px; display: block; object-fit: contain;">
                   </td>
                   <td style="vertical-align: middle; text-align: left;">
-                    <div style="font-size:13px;font-weight:700;letter-spacing:1px;color:#0A51B0;text-transform:uppercase;">ESB TrackIT</div>
+                    <div style="font-size:13px;font-weight:700;letter-spacing:1px;color:#0A51B0;text-transform:uppercase;">TrackIT</div>
                   </td>
                 </tr>
               </table>
@@ -428,8 +426,8 @@ export function renderPasswordResetOtpEmailHtml({
           <!-- Footer -->
           <tr>
             <td style="padding:18px 40px;background:#f8fafc;border-top:1px solid #f1f5f9;text-align:center;">
-              <div style="font-size:11.5px;font-weight:600;color:#475569;">&copy; 2026 PT Esensi Solusi Buana (ESB) &bull; People Technology</div>
-              <div style="font-size:10.5px;color:#94A3B8;margin-top:3px;">ESB TrackIT &bull; Enterprise IT &amp; Asset Management</div>
+              <div style="font-size:11.5px;font-weight:600;color:#475569;">&copy; 2026 TrackIT</div>
+              <div style="font-size:10.5px;color:#94A3B8;margin-top:3px;">TrackIT &bull; IT &amp; Asset Management</div>
             </td>
           </tr>
 

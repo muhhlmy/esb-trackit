@@ -10,14 +10,14 @@ const XSS_PROOF = '<script>window.__E2E_XSS_TEST__=true</script>'
 async function loginCookie(request, role = 'admin') {
   const u = TEST_USERS[role]
   const res = await request.post(`${API}/api/auth/login`, { data: { email: u.email, password: u.password } })
-  return (res.headers()['set-cookie'] || '').match(/esb_session=([^;]+)/)?.[1]
+  return (res.headers()['set-cookie'] || '').match(/trackit_session=([^;]+)/)?.[1]
 }
 
 test.describe('SECURITY — Input, Headers, Upload, Errors @security', () => {
   test('SEC-I01 XSS proof string di-reject/sanitize pada input aset @security', async ({ request }) => {
     const cookie = await loginCookie(request)
     const res = await request.post(`${API}/api/assets`, {
-      headers: { cookie: `esb_session=${cookie}` },
+      headers: { cookie: `trackit_session=${cookie}` },
       data: { hostname: XSS_PROOF, serial_number: 'SN-XSS-1', tipe_perangkat: 'Laptop' },
     })
     // Payload tidak boleh diterima apa adanya (status 4xx) atau disanitize
@@ -49,7 +49,7 @@ test.describe('SECURITY — Input, Headers, Upload, Errors @security', () => {
     ]
     for (const p of probes) {
       const res = await request.get(`${API}${encodeURI(p)}`, {
-        headers: { cookie: `esb_session=${cookie}` },
+        headers: { cookie: `trackit_session=${cookie}` },
       })
       // Harus 400/404, tidak boleh 500 (500 = kemungkinan SQL error bocor)
       expect(res.status(), `GET ${p} tidak boleh 500`).toBeLessThan(500)
@@ -61,7 +61,7 @@ test.describe('SECURITY — Input, Headers, Upload, Errors @security', () => {
   test('SEC-I04 NIK/field dengan tipe salah ditolak @security', async ({ request }) => {
     const cookie = await loginCookie(request)
     const res = await request.post(`${API}/api/employees`, {
-      headers: { cookie: `esb_session=${cookie}` },
+      headers: { cookie: `trackit_session=${cookie}` },
       data: { nik: 999999, nama_karyawan: null, email_kantor: 'bukan-email' },
     })
     expect(res.status(), 'tipe salah harus ditolak 4xx').toBeGreaterThanOrEqual(400)
@@ -97,7 +97,7 @@ test.describe('SECURITY — Input, Headers, Upload, Errors @security', () => {
     const cookie = await loginCookie(request, 'superadmin')
     const buffer = Buffer.from('not a real backup - e2e harmless test file')
     const res = await request.post(`${API}/api/admin/database/restore/validate`, {
-      headers: { cookie: `esb_session=${cookie}` },
+      headers: { cookie: `trackit_session=${cookie}` },
       multipart: { backupFile: { name: 'evil.exe', mimeType: 'application/x-msdownload', data: buffer } },
     })
     expect(res.status(), '.exe harus ditolak').toBeGreaterThanOrEqual(400)
@@ -108,7 +108,7 @@ test.describe('SECURITY — Input, Headers, Upload, Errors @security', () => {
     const cookie = await loginCookie(request, 'superadmin')
     const buffer = Buffer.from('E2E harmless dummy .tar content - not executable')
     const res = await request.post(`${API}/api/admin/database/restore/validate`, {
-      headers: { cookie: `esb_session=${cookie}` },
+      headers: { cookie: `trackit_session=${cookie}` },
       multipart: { backupFile: { name: 'e2e-dummy.tar', mimeType: 'application/x-tar', data: buffer } },
     })
     // 4xx/200(=valid tapi akan ditolak restore) — yang penting tidak 500 crash

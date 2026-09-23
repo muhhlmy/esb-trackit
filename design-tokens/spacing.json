@@ -1,7 +1,7 @@
 {
   "$metadata": {
     "version": "1.0.0",
-    "description": "ESB TrackIT spacing tokens — 4-point grid system."
+    "description": "TrackIT spacing tokens — 4-point grid system."
   },
   "spacing": {
     "0": { "value": "0px", "type": "spacing" },

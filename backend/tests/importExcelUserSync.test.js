@@ -10,11 +10,11 @@ describe('Import Excel User Sync Unit & Reconcile Tests', () => {
     assert.equal(extractNik('2026001 (Siti)'), '2026001');
   });
 
-  test('Email Fallback: Karyawan tanpa email otomatis menggunakan NIK@esb.co.id', () => {
+  test('Email Fallback: Karyawan tanpa email otomatis menggunakan NIK@example.com', () => {
     const nik = '2026001';
     const emailRaw = null;
-    const emailResolved = emailRaw || (nik ? `${nik.toLowerCase()}@esb.co.id` : null);
-    assert.equal(emailResolved, '2026001@esb.co.id');
+    const emailResolved = emailRaw || (nik ? `${nik.toLowerCase()}@example.com` : null);
+    assert.equal(emailResolved, '2026001@example.com');
   });
 
   test('Single Hash Optimization: Hash password default cukup dipanggil 1x untuk 327 rows', () => {
@@ -33,7 +33,7 @@ describe('Import Excel User Sync Unit & Reconcile Tests', () => {
     for (let i = 1; i <= 327; i++) {
       createdUsers.push({
         nama: `Karyawan ${i}`,
-        email: `emp${i}@esb.co.id`,
+        email: `emp${i}@example.com`,
         password_hash: defaultPasswordHash,
       });
     }
@@ -53,8 +53,8 @@ describe('Import Excel User Sync Unit & Reconcile Tests', () => {
   });
 
   test('Email Normalization: LOWER(TRIM(email)) mencegah duplicate user akibat case difference', () => {
-    const dbUserSet = new Set(['budi.santoso@esb.co.id']);
-    const inputEmail = '  Budi.Santoso@esb.co.id  ';
+    const dbUserSet = new Set(['budi.santoso@example.com']);
+    const inputEmail = '  Budi.Santoso@example.com  ';
     const normalized = inputEmail.trim().toLowerCase();
 
     assert.equal(dbUserSet.has(normalized), true);

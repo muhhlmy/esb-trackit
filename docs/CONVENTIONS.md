@@ -1,4 +1,4 @@
-# ESB TrackIT — Project Conventions
+# TrackIT — Project Conventions
 
 Monorepo: Vue 3 SPA + Express API + PostgreSQL. Commands below run from repo root.
 

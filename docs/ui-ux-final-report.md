@@ -1,4 +1,4 @@
-# UI/UX Final Report — ESB TrackIT
+# UI/UX Final Report — TrackIT
 
 **Tanggal:** 21 September 2026
 **Branch:** main
@@ -125,9 +125,9 @@ CSS custom property `--fs-scale-factor` consumed by `calc()` expressions:
 
 **File:** `frontend/src/composables/useDesktopScale.js` (124 lines)
 - 7-level scale: 1.0 (Default) → 0.7 (Compact Legacy)
-- Persists preference in `localStorage` under `esb_desktop_scale`
+- Persists preference in `localStorage` under `trackit_desktop_scale`
 - Sets `--desktop-scale` CSS variable on `document.documentElement`
-- Dispatches `CustomEvent('esb:desktop-scale-change')` for composables to react
+- Dispatches `CustomEvent('trackit:desktop-scale-change')` for composables to react
 - Backward-compat: also sets `data-typography="compact"` attribute and `--fs-scale-factor`
 
 **File:** `frontend/src/composables/useTypographyScale.js` (41 lines)
@@ -279,7 +279,7 @@ All items respect RBAC — `isNavItemVisible()` filters by permission and supera
 - **Target:** ~90% visual density (implemented as `0.9` level in 7-step scale)
 - **Method:** CSS custom properties + `calc()` — NOT `transform: scale()` or browser zoom
 - **Control:** `DesktopScaleControl.vue` dropdown in AppHeader (desktop) and DashboardView (tablet+)
-- **Persistence:** `localStorage['esb_desktop_scale']`
+- **Persistence:** `localStorage['trackit_desktop_scale']`
 - **No global transform** — scales `--spacing`, root `font-size`, and component geometry tokens
 
 ---

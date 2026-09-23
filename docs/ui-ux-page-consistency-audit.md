@@ -1,4 +1,4 @@
-# Page-by-Page UI/UX Consistency Audit — ESB TrackIT
+# Page-by-Page UI/UX Consistency Audit — TrackIT
 
 **Date:** 2026-09-22
 **Scope:** `frontend/src/views/**` (19 routes) + shared UI primitives

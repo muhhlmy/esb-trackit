@@ -6,7 +6,7 @@ Dokumen ini mendefinisikan runbook operasional standar untuk mengadopsi sistem m
 
 ## 1. Latar Belakang & Filosofi Keamanan
 
-Sistem migrasi ESB TrackIT secara ketat menolak database yang sudah memiliki tabel aplikasi jika tabel ledger `app_schema_migrations` belum terbentuk:
+Sistem migrasi TrackIT secara ketat menolak database yang sudah memiliki tabel aplikasi jika tabel ledger `app_schema_migrations` belum terbentuk:
 ```text
 Database existing tanpa ledger ditolak. Relations: ... Buat migration adoption yang direview; baseline otomatis tidak diizinkan.
 ```

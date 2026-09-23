@@ -1,7 +1,7 @@
 {
   "$metadata": {
     "version": "1.0.0",
-    "description": "ESB TrackIT border radius tokens."
+    "description": "TrackIT border radius tokens."
   },
   "border-radius": {
     "sm": { "value": "6px", "type": "borderRadius", "description": "Small — tooltips, chips" },

@@ -1,5 +1,5 @@
-# ESB TrackIT — Security Audit & Hardening Report
-Host: ptx (Linux Mint 22.3), LAN 192.168.8.224
+# TrackIT — Security Audit & Hardening Report
+Host: app-server-01 (Linux Mint 22.3), LAN 192.0.2.10
 Tanggal: 2026-09-19
 Auditor: automated (hermes-agent)
 
@@ -15,7 +15,7 @@ Semua telah dimitigasi ke level ISO 27002 A.5/A.8/A.12 yang memungkinkan.
 - SSH PermitRootLogin without-password, PasswordAuthentication yes,
   MaxAuthTries 6, X11Forwarding yes
 - Tidak ada fail2ban / IPS
-- Hanya 1 user (esb-admin) + postgres; tanpa user service terpisah
+- Hanya 1 user (deploy-user) + postgres; tanpa user service terpisah
 
 ### Remediasi (SELESAI):
 - /etc/ssh/sshd_config:
@@ -28,7 +28,7 @@ Semua telah dimitigasi ke level ISO 27002 A.5/A.8/A.12 yang memungkinkan.
     TODO: generate keypair, pasang authorized_keys, lalu set no
 - fail2ban terpasang + jail sshd aktif:
   maxretry=4, findtime=10m, bantime=1h (incremental, max 1w),
-  ignoreip LAN 192.168.8.0/24
+  ignoreip LAN 192.0.2.0/24
 - Backup sshd_config: /etc/ssh/sshd_config.bak.20260919
 
 ## 2. Network Security / Firewall (ISO A.8.2)
@@ -38,13 +38,13 @@ Semua telah dimitigasi ke level ISO 27002 A.5/A.8/A.12 yang memungkinkan.
 - 35212/tcp+udp (Outline VPN shadowbox) — ALLOW publik internet
 - 53/tcp+udp (dnsmasq) — ALLOW publik internet
 - 7070/tcp (AnyDesk) — tidak ada rule spesifik, keluar via default deny
-- 192.168.0.0/16 + 172.16.0.0/12 ALLOW full — rentang luas
+- 198.51.100.0/24 + 172.16.0.0/12 ALLOW full — rentang luas
 - Backend Express :3000 bind 0.0.0.0 (bypass nginx + auth headers)
 - Vite :5173 bind 0.0.0.0 (bypass nginx, serve source map)
 
 ### Remediasi (SELESAI):
 - UFW deny 64895/tcp, 35212/tcp, 35212/udp (publik)
-- UFW deny 7070/tcp; allow hanya 192.168.8.0/24 (tcp+udp)
+- UFW deny 7070/tcp; allow hanya 192.0.2.0/24 (tcp+udp)
 - UFW deny 53/tcp+udp publik; allow hanya LAN
 - UFW limit 22/tcp (rate-limit anti brute-force)
 - UFW logging high
@@ -70,13 +70,13 @@ Semua telah dimitigasi ke level ISO 27002 A.5/A.8/A.12 yang memungkinkan.
 
 ### Remediasi (SELESAI):
 - Self-signed cert RSA-2048, 365 hari:
-  /etc/letsencrypt/live/trackit.esb.co.id/{fullchain,privkey}.pem
+  /etc/letsencrypt/live/trackit.example.com/{fullchain,privkey}.pem
   (privkey 600)
-- nginx block HTTPS baru: /etc/nginx/sites-available/esb-trackit-ssl
+- nginx block HTTPS baru: /etc/nginx/sites-available/trackit-ssl
   TLSv1.2+1.3, ciphers HIGH:!aNULL:!MD5, session cache
 - HTTP -> 301 HTTPS redirect
 - HSTS: max-age=63072000; includeSubDomains
-- CATATAN: Let's Encrypt tidak memungkinkan — trackit.esb.co.id
+- CATATAN: Let's Encrypt tidak memungkinkan — trackit.example.com
   NXDOMAIN di DNS publik (8.8.8.8); port 80 tidak reachable dari
   internet (NAT router). Server ini LAN-only.
   Browser akan flag "self-signed" — wajar, tekan Lanjutkan/Lanjutan.
@@ -90,9 +90,9 @@ Semua telah dimitigasi ke level ISO 27002 A.5/A.8/A.12 yang memungkinkan.
 - X-Frame-Options: backend kirim DENY; nginx duplikat dihapus
 - server_tokens off (nginx version hidden)
 - /server-status + dotfiles -> 404
-- backend CORS allowlist: https://trackit.esb.co.id ditambahkan
+- backend CORS allowlist: https://trackit.example.com ditambahkan
 - backend/.env mode 600, tidak ada .env di git history
-- JWT via HttpOnly cookie esb_session (bukan localStorage)
+- JWT via HttpOnly cookie trackit_session (bukan localStorage)
 
 ### Sisa aplikasi (REKOMENDASI):
 - App CSP sudah ketat di nginx; pertahankan
@@ -118,7 +118,7 @@ Semua telah dimitigasi ke level ISO 27002 A.5/A.8/A.12 yang memungkinkan.
 - UFW logging high (/var/log/ufw.log)
 - fail2ban log: /var/log/fail2ban.log
 - nginx access/error log standar Ubuntu
-- Backend log: journalctl -u esb-backend
+- Backend log: journalctl -u trackit-backend
 
 ## 7. Yang MASIH PERLU TINDAKAN (prioritas turun)
 
@@ -126,30 +126,30 @@ Semua telah dimitigasi ke level ISO 27002 A.5/A.8/A.12 yang memungkinkan.
    Saat ini password auth hidup karena belum ada key sama sekali
    (~/.ssh/authorized_keys kosong, /root/.ssh juga kosong).
    Tanpa ini, SSH rentan brute-force walau fail2ban+limit memitigasi.
-2. [TINGGI] DNS publik trackit.esb.co.id masih NXDOMAIN. Jika server
-   harus diakses dari luar LAN: buat A record publik -> 124.158.150.146,
+2. [TINGGI] DNS publik trackit.example.com masih NXDOMAIN. Jika server
+   harus diakses dari luar LAN: buat A record publik -> 203.0.113.10,
    lalu certbot --nginx untuk SSL valid (ganti self-signed).
    Saat ini router/NAT sudah blok port 80 dari internet, jadi risiko
    rendah; tapi ini juga berarti "domain publik" tidak bisa dipakai
    dari luar.
-3. [SEDANG] Rule UFW `Anywhere ALLOW 192.168.0.0/16` dan
-   `172.16.0.0/12` terlalu luas. Sempitkan ke 192.168.8.0/24 jika
+3. [SEDANG] Rule UFW `Anywhere ALLOW 198.51.100.0/24` dan
+   `172.16.0.0/12` terlalu luas. Sempitkan ke 192.0.2.0/24 jika
    hanya subnet kantor yang dipakai.
 4. [SEDANG] AnyDesk (7070) kini LAN-only, tetapi remote desktop tool
    di server produksi adalah risiko. Pertimbangkan disable total:
    systemctl disable --now anydesk.
 5. [SEDANG] Docker containers (outline shadowbox, watchtower) jalan
    sebagai root. Pertimbangkan hapus jika VPN tidak dipakai.
-6. [RENDAH] /etc/hosts berisi mapping statik trackit.esb.co.id.
+6. [RENDAH] /etc/hosts berisi mapping statik trackit.example.com.
    Untuk device lain, deploy via DNS LAN (dnsmasq sudah jalan di :53
    — cukup tambahkan domain di dnsmasq config agar seluruh LAN
    resolve tanpa edit hosts tiap device).
 
 ## Bukti Fungsional (post-hardening)
-- https://trackit.esb.co.id/ -> 200 (TLS self-signed)
-- http://trackit.esb.co.id/ -> 301 -> https
-- https://trackit.esb.co.id/health -> {"status":"healthy"}
-- https://trackit.esb.co.id/api/auth/login (POST kredensial salah)
+- https://trackit.example.com/ -> 200 (TLS self-signed)
+- http://trackit.example.com/ -> 301 -> https
+- https://trackit.example.com/health -> {"status":"healthy"}
+- https://trackit.example.com/api/auth/login (POST kredensial salah)
   -> 401 (validasi bekerja)
 - SSH tetap aktif (port 22), tidak ada lockout
 - fail2ban-client status sshd -> jail running, 0 banned

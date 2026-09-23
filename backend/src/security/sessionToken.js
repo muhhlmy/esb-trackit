@@ -4,7 +4,7 @@ import { verifySession } from '../services/sessionService.js';
 
 // Nama cookie sesi HttpOnly. Nilai token tidak pernah dibaca/ditampilkan oleh
 // JavaScript browser — hanya server yang menerbit dan membacanya.
-export const SESSION_COOKIE_NAME = 'esb_session';
+export const SESSION_COOKIE_NAME = 'trackit_session';
 
 const JWT_FORMAT_PATTERN = /^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/;
 const MAX_TOKEN_LENGTH = 4096;

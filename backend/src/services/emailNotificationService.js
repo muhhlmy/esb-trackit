@@ -246,10 +246,10 @@ export async function handleTicketEventNotification(
         const html = renderTicketEmailHtml({
           recipientName: admin.nama,
           title: `[Tiket Baru] [${prioritasLabel}] [${tag}] ${fullTicket.judul || ''}`,
-          subtitle: `Sebuah tiket baru telah dibuat oleh <strong>${pelaporLabel}</strong>. Harap cek Tiket terbaru pada ESB-Trackit.`,
+          subtitle: `Sebuah tiket baru telah dibuat oleh <strong>${pelaporLabel}</strong>. Harap cek Tiket terbaru pada TrackIT.`,
           ticket: fullTicket,
           actionText:
-            'Silakan login ke sistem ESB-Trackit untuk menindaklanjuti tiket ini.',
+            'Silakan login ke sistem TrackIT untuk menindaklanjuti tiket ini.',
         })
         await sendEmail({
           to: admin.email,

@@ -242,7 +242,7 @@ A local stack was already running and was used as-is:
 | Postgres | `127.0.0.1:5432` | accepting connections |
 
 E2E ran on its own isolated ports (`:3100` API / `:5273` frontend) against the
-**disposable** `esb_trackit_test` DB (`test:e2e:prepare` → migrate `fresh` + seed) — the
+**disposable** `trackit_test` DB (`test:e2e:prepare` → migrate `fresh` + seed) — the
 running instance was not touched.
 
 ### Results (chromium)

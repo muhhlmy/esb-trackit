@@ -446,7 +446,7 @@ export async function forgotPassword(req, res) {
 
     const isSent = await sendEmail({
       to: user.email,
-      subject: `[ESB TrackIT] Verifikasi Reset Kata Sandi`,
+      subject: `[TrackIT] Verifikasi Reset Kata Sandi`,
       html: htmlEmail,
       text: `Halo ${user.nama}, kode verifikasi OTP Anda untuk reset kata sandi adalah: ${otpCode}. Kode ini berlaku selama ${expiresMinutes} menit.`,
     })

@@ -1,6 +1,6 @@
 // ============================================================
 // scripts/generate-user-manual-pdf.mjs
-// Generator PDF Buku Panduan Resmi ESB TrackIT via Playwright
+// Generator PDF Buku Panduan Resmi TrackIT via Playwright
 // ============================================================
 import fs from 'fs'
 import path from 'path'
@@ -13,7 +13,7 @@ const rootDir = path.resolve(__dirname, '..')
 
 async function generatePdf() {
   const htmlPath = path.join(rootDir, 'docs', 'user-manual-source.html')
-  const pdfPath = path.join(rootDir, 'docs', 'PANDUAN_PENGGUNAAN_ESB_TRACKIT.pdf')
+  const pdfPath = path.join(rootDir, 'docs', 'PANDUAN_PENGGUNAAN_TRACKIT.pdf')
 
   if (!fs.existsSync(htmlPath)) {
     throw new Error(`File sumber HTML tidak ditemukan pada: ${htmlPath}`)
@@ -45,7 +45,7 @@ async function generatePdf() {
     displayHeaderFooter: true,
     headerTemplate: `
       <div style="font-size: 7.5pt; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #94a3b8; width: 100%; padding: 0 12mm; display: flex; justify-content: space-between; border-bottom: 1px solid #e2e8f0; padding-bottom: 3px; box-sizing: border-box;">
-        <span style="font-weight: 600; color: #0a51b0;">ESB TrackIT — Buku Panduan & User Manual</span>
+        <span style="font-weight: 600; color: #0a51b0;">TrackIT — Buku Panduan & User Manual</span>
         <span>PT Esensi Solusi Buana</span>
       </div>
     `,

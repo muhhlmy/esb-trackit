@@ -806,7 +806,7 @@ async function generatePdf({
     </head>
     <body>
       <div class="header">
-        <img src="/esb-logo.svg" alt="ESB Logo" />
+        <img src="/logo-full.svg" alt="TrackIT logo" />
         <div class="header-title">
           <h1>Formulir Serah Terima</h1>
           <h2>Aset Perusahaan</h2>

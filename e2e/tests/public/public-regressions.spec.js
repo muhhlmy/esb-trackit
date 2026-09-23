@@ -47,7 +47,7 @@ test.describe('Public frontend runtime regressions', () => {
   })
 
   test('corrupt recent-search storage cannot blank the application', async ({ page }) => {
-    await page.addInitScript(() => localStorage.setItem('esb_recent_searches', '{invalid-json'))
+    await page.addInitScript(() => localStorage.setItem('trackit_recent_searches', '{invalid-json'))
     await page.goto('/', { waitUntil: 'domcontentloaded' })
     await expect(page.locator('h1').first()).toBeVisible()
   })

@@ -259,7 +259,7 @@ export function exportToPdf(
         </div>
         <div class="stat-item">
           <div class="stat-label">Sumber Sistem</div>
-          <div class="stat-value">ESB AssetWise Platform</div>
+          <div class="stat-value">TrackIT Platform</div>
         </div>
       </div>
 

@@ -1,7 +1,7 @@
 {
   "$metadata": {
     "version": "1.0.0",
-    "description": "ESB TrackIT layout dimension tokens — header, sidebar, control heights, chart dimensions."
+    "description": "TrackIT layout dimension tokens — header, sidebar, control heights, chart dimensions."
   },
   "dimension": {
     "header-height": { "value": "64px", "type": "number", "description": "App header height — desktop" },

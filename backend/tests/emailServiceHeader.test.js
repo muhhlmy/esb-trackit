@@ -1,6 +1,6 @@
 import { test } from 'node:test'
 import assert from 'node:assert'
-import { renderTicketEmailHtml, renderPasswordResetOtpEmailHtml, getEsbLogoPngPath, isEmailConfigured } from '../src/services/emailService.js'
+import { renderTicketEmailHtml, renderPasswordResetOtpEmailHtml, getLogoPngPath, isEmailConfigured } from '../src/services/emailService.js'
 
 test('OTP email requires complete SMTP configuration', () => {
   const original = Object.fromEntries(
@@ -24,9 +24,9 @@ test('OTP email requires complete SMTP configuration', () => {
   }
 })
 
-test('renderTicketEmailHtml renders ESB Logo Only logo with cid:esbLogoOnly vertically centered in header', () => {
-  const pngPath = getEsbLogoPngPath()
-  assert.ok(pngPath.endsWith('esb_logo_only.png') || pngPath.endsWith('esb-logo-only.png'), 'PNG logo path should exist')
+test('renderTicketEmailHtml renders logo with cid:trackitLogo vertically centered in header', () => {
+  const pngPath = getLogoPngPath()
+  assert.ok(pngPath.endsWith('logo.png'), 'PNG logo path should exist')
 
   const html = renderTicketEmailHtml({
     recipientName: 'Budi',
@@ -35,27 +35,27 @@ test('renderTicketEmailHtml renders ESB Logo Only logo with cid:esbLogoOnly vert
     ticket: { nomor_tiket: 'TKT-001', judul: 'Problem Printer', status_tiket: 'Open', prioritas: 'High' }
   })
 
-  // Check logo src uses cid:esbLogoOnly
-  assert.ok(html.includes('cid:esbLogoOnly'), 'HTML should use cid:esbLogoOnly for inline email attachment')
+  // Check logo src uses cid:trackitLogo
+  assert.ok(html.includes('cid:trackitLogo'), 'HTML should use cid:trackitLogo for inline email attachment')
   // Check vertical-align: middle for center vertical positioning
   assert.ok(html.includes('vertical-align: middle'), 'HTML header should use vertical-align: middle')
   // Check left alignment
   assert.ok(html.includes('text-align: left'), 'HTML header should align logo to the left')
 })
 
-test('renderPasswordResetOtpEmailHtml renders ESB Logo Only logo vertically centered in header', () => {
+test('renderPasswordResetOtpEmailHtml renders logo vertically centered in header', () => {
   const html = renderPasswordResetOtpEmailHtml({
     recipientName: 'Siti',
     otpCode: '123456',
     expiresMinutes: 5
   })
 
-  assert.ok(html.includes('cid:esbLogoOnly'), 'OTP HTML should contain cid:esbLogoOnly')
+  assert.ok(html.includes('cid:trackitLogo'), 'OTP HTML should contain cid:trackitLogo')
   assert.ok(html.includes('vertical-align: middle'), 'OTP HTML header should use vertical-align: middle')
   assert.ok(html.includes('Pemberitahuan Otomatis &bull; No-Reply'), 'OTP HTML should include No-Reply notice')
 })
 
-test('renderTicketEmailHtml includes No-Reply notice and ESB branding styles', () => {
+test('renderTicketEmailHtml includes No-Reply notice and brand styling', () => {
   const html = renderTicketEmailHtml({
     recipientName: 'Ahmad',
     title: '[#TIC26-0001] Laptop Mati Total',
@@ -75,10 +75,10 @@ test('renderTicketEmailHtml includes No-Reply notice and ESB branding styles', (
   assert.ok(html.includes('tidak dapat menerima balasan email masuk'), 'Ticket email should state incoming replies are not accepted')
   assert.ok(html.includes('#TIC26-0001'), 'Ticket email should include ticket number tag')
 
-  // Check ESB Branding styling tokens
-  assert.ok(html.includes('linear-gradient(135deg, #FF4F1B'), 'Ticket email should feature ESB orange gradient top bar')
-  assert.ok(html.includes('linear-gradient(135deg, #0A51B0'), 'Ticket email should feature ESB blue gradient header')
-  assert.ok(html.includes('People Technology Division'), 'Ticket email should state People Technology Division in footer')
+  // Check brand styling tokens
+  assert.ok(html.includes('linear-gradient(135deg, #FF4F1B'), 'Ticket email should feature brand orange gradient top bar')
+  assert.ok(html.includes('linear-gradient(135deg, #0A51B0'), 'Ticket email should feature brand blue gradient header')
+  assert.ok(html.includes('IT Asset &amp; Helpdesk Management'), 'Ticket email should state product line in header')
 })
 
 test('formatTicketTag prefixes ticket numbers with # correctly', async () => {

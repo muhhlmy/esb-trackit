@@ -8,12 +8,12 @@ const activeCaseId = ref(null)
 function loadRecentSearches() {
   if (typeof localStorage === 'undefined') return []
   try {
-    const stored = JSON.parse(localStorage.getItem('esb_recent_searches') || '[]')
+    const stored = JSON.parse(localStorage.getItem('trackit_recent_searches') || '[]')
     return Array.isArray(stored)
       ? stored.filter((item) => typeof item === 'string').slice(0, 5)
       : []
   } catch {
-    localStorage.removeItem('esb_recent_searches')
+    localStorage.removeItem('trackit_recent_searches')
     return []
   }
 }
@@ -131,7 +131,7 @@ function createSearchActions(searchQuery, filteredCases, recentSearches) {
     if (normalizedQuery && !recentSearches.value.includes(normalizedQuery)) {
       recentSearches.value = [normalizedQuery, ...recentSearches.value.slice(0, 4)]
       try {
-        localStorage.setItem('esb_recent_searches', JSON.stringify(recentSearches.value))
+        localStorage.setItem('trackit_recent_searches', JSON.stringify(recentSearches.value))
       } catch {
         /* localStorage opsional; private mode dapat menolak penyimpanan. */
       }
@@ -150,7 +150,7 @@ function createSearchActions(searchQuery, filteredCases, recentSearches) {
   function clearRecentSearches() {
     recentSearches.value = []
     try {
-      localStorage.removeItem('esb_recent_searches')
+      localStorage.removeItem('trackit_recent_searches')
     } catch {
       /* localStorage opsional. */
     }

@@ -1,6 +1,6 @@
 # E2E Test Automation Suite
 
-Panduan menjalankan suite End-to-End Playwright untuk ESB TrackIT. Suite ini menguji journey pengguna secara nyata melintasi seluruh layer aplikasi, dari browser hingga database. Untuk gambaran umum project, kembali ke [README utama](../README.md).
+Panduan menjalankan suite End-to-End Playwright untuk TrackIT. Suite ini menguji journey pengguna secara nyata melintasi seluruh layer aplikasi, dari browser hingga database. Untuk gambaran umum project, kembali ke [README utama](../README.md).
 
 ## Arsitektur Pengujian
 
@@ -56,7 +56,7 @@ Rincian grup test di `tests/`:
 ## Prasyarat
 
 - Node.js `^22.18.0` atau `>=24.12.0`, sesuai kolom `engines` pada `package.json`.
-- PostgreSQL 16 berjalan di lokal, dengan satu database kosong khusus pengujian yang namanya berakhiran `_test` (contoh `esb_trackit_test`).
+- PostgreSQL 16 berjalan di lokal, dengan satu database kosong khusus pengujian yang namanya berakhiran `_test` (contoh `trackit_test`).
 
 Salin konfigurasi lalu isikan kredensial akun test:
 
@@ -69,7 +69,7 @@ Variabel yang dibutuhkan `fixtures/users.js`:
 ```env
 DB_HOST=localhost
 DB_PORT=5432
-DB_NAME=esb_trackit_test
+DB_NAME=trackit_test
 DB_USER=<user-postgres-lokal>
 DB_PASSWORD=<password-postgres-lokal>
 
@@ -107,7 +107,7 @@ npx playwright install chromium
 | `npm run test:e2e:ui` | Playwright UI mode |
 | `npm run test:e2e:report` | Buka laporan HTML hasil run terakhir |
 
-Sebelum test pertama, `global-setup.js` melakukan login via UI untuk ketiga role (`superadmin`, `admin`, `user`), menyimpan sesi sebagai storageState JSON di `e2e/auth/`, dan memverifikasi cookie `esb_session` HttpOnly benar-benar ada. Bila login salah satu role gagal, seluruh run dihentikan agar test tidak berjalan dengan state auth kosong.
+Sebelum test pertama, `global-setup.js` melakukan login via UI untuk ketiga role (`superadmin`, `admin`, `user`), menyimpan sesi sebagai storageState JSON di `e2e/auth/`, dan memverifikasi cookie `trackit_session` HttpOnly benar-benar ada. Bila login salah satu role gagal, seluruh run dihentikan agar test tidak berjalan dengan state auth kosong.
 
 ## Strategi Data Test dan Aturan Keamanan
 

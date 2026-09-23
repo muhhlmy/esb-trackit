@@ -1,7 +1,7 @@
 {
   "$metadata": {
     "version": "1.0.0",
-    "description": "ESB TrackIT motion tokens — subtle, functional. 3-tier easing system."
+    "description": "TrackIT motion tokens — subtle, functional. 3-tier easing system."
   },
   "duration": {
     "fastest": { "value": "50ms", "type": "duration", "description": "Instant feedback — hover state micro-adjustments" },

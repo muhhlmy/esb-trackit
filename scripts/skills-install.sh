@@ -2,7 +2,7 @@
 #
 # skills-install.sh
 #
-# Idempotent installation of agent skills for ESB TrackIT.
+# Idempotent installation of agent skills for TrackIT.
 # Verifies repository integrity, version, and license before installing.
 #
 # Usage:  bash scripts/skills-install.sh
@@ -13,7 +13,7 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 SKILLS_DIR="$ROOT/.agents/skills"
 MANIFEST="$ROOT/skills-lock.json"
 
-echo "=== ESB TrackIT Skills Installer ==="
+echo "=== TrackIT Skills Installer ==="
 echo ""
 
 mkdir -p "$SKILLS_DIR"

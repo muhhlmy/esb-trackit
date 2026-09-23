@@ -1,4 +1,4 @@
-# Skills Audit — ESB TrackIT
+# Skills Audit — TrackIT
 
 **Tanggal:** 21 September 2026
 **Audited by:** Hermes Agent (nvidia/nemotron-3-super-120b-a12b:free)

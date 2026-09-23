@@ -8,10 +8,9 @@ import SkeletonList from '../ui/skeleton/SkeletonList.vue'
 import AppModal from '../ui/AppModal.vue'
 
 defineProps({
-  isMobileOpen: { type: Boolean, default: false },
   isCollapsed: { type: Boolean, default: false },
 })
-defineEmits(['toggle-mobile', 'toggle-collapse'])
+defineEmits(['toggle-collapse'])
 
 const route = useRoute()
 const router = useRouter()
@@ -728,19 +727,6 @@ onBeforeUnmount(() => {
   >
     <!-- 1. LEFT: Navigation Drawer Toggle & Page Titles -->
     <div class="flex items-center gap-2 md:gap-2.5 md:shrink-0 min-w-0">
-      <!-- Toggle Mobile Drawer (lg:hidden) -->
-      <button
-        type="button"
-        :aria-expanded="isMobileOpen ? 'true' : 'false'"
-        aria-controls="app-navigation"
-        aria-label="Buka Navigasi Mobile"
-        title="Buka Navigasi Mobile"
-        class="flex lg:hidden h-9 w-9 md:h-8 md:w-8 shrink-0 items-center justify-center rounded-lg text-[#2A3547] hover:bg-[#EDF5FF] hover:text-[#333333] transition-all cursor-pointer active:scale-95 touch-manipulation"
-        @click="$emit('toggle-mobile')"
-      >
-        <span aria-hidden="true" class="material-symbols-outlined text-[20px]">menu</span>
-      </button>
-
       <div class="min-w-0">
         <h1
           class="text-sm wrap-anywhere md:truncate md:text-[15px] font-semibold tracking-tight text-[#333333] leading-tight"
@@ -1882,10 +1868,6 @@ onBeforeUnmount(() => {
 @media (min-width: 768px) {
   .app-header #global-main-search {
     height: 40px;
-  }
-  .app-header button[aria-label='Buka Navigasi Mobile'] {
-    width: 40px;
-    height: 44px;
   }
 }
 

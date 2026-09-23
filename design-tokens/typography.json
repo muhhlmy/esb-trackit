@@ -1,7 +1,7 @@
 {
   "$metadata": {
     "version": "1.0.0",
-    "description": "ESB TrackIT typography tokens — based on the audited 5-step micro scale (docs/typography-layout-audit.md)."
+    "description": "TrackIT typography tokens — based on the audited 5-step micro scale (docs/typography-layout-audit.md)."
   },
   "font": {
     "family": {

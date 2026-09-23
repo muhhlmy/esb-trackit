@@ -1,10 +1,7 @@
-# ESB TrackIT
+# TrackIT
 
-Aplikasi web internal untuk pengelolaan aset IT, aset GA dan OPS, data karyawan, pengajuan, pengiriman, tiket helpdesk, serta Help Center berbasis Knowledge Base. Satu basis kode (monorepo) yang menaungi SPA Vue 3, REST API Express 5, dan basis data PostgreSQL 16.
+TrackIT adalah aplikasi web untuk pengelolaan aset IT, aset GA dan OPS, data karyawan, pengajuan, pengiriman, tiket helpdesk, serta Help Center berbasis Knowledge Base. Satu basis kode (monorepo) yang menaungi SPA Vue 3, REST API Express 5, dan basis data PostgreSQL 16.
 
-[![CI](https://github.com/muhhlmy/esb-trackit/actions/workflows/ci.yml/badge.svg)](https://github.com/muhhlmy/esb-trackit/actions/workflows/ci.yml)
-[![E2E Tests](https://github.com/muhhlmy/esb-trackit/actions/workflows/e2e-tests.yml/badge.svg)](https://github.com/muhhlmy/esb-trackit/actions/workflows/e2e-tests.yml)
-[![CodeQL](https://github.com/muhhlmy/esb-trackit/actions/workflows/codeql.yml/badge.svg)](https://github.com/muhhlmy/esb-trackit/actions/workflows/codeql.yml)
 
 ## Daftar Isi
 
@@ -15,6 +12,7 @@ Aplikasi web internal untuk pengelolaan aset IT, aset GA dan OPS, data karyawan,
 - [Struktur Direktori](#struktur-direktori)
 - [Menjalankan Secara Lokal](#menjalankan-secara-lokal)
 - [Deployment dengan Docker](#deployment-dengan-docker)
+- [Image Docker dari GHCR](#image-docker-dari-ghcr)
 - [Database dan Migrasi](#database-dan-migrasi)
 - [Environment Variables](#environment-variables)
 - [Skema Database](#skema-database)
@@ -23,19 +21,22 @@ Aplikasi web internal untuk pengelolaan aset IT, aset GA dan OPS, data karyawan,
 - [Keamanan](#keamanan)
 - [Pengujian](#pengujian)
 - [CI/CD](#cicd)
+- [Panduan Deployment Production](#panduan-deployment-production)
+- [Troubleshooting](#troubleshooting)
 - [Perintah Lainnya](#perintah-lainnya)
+- [Kontribusi](#kontribusi)
 - [Dokumentasi Terkait](#dokumentasi-terkait)
 - [Lisensi](#lisensi)
 
 ## Ringkasan
 
-ESB TrackIT melayani tiga kelompok pengguna dengan kebutuhan berbeda:
+TrackIT melayani tiga kelompok pengguna dengan kebutuhan berbeda:
 
 1. **Karyawan umum** melihat aset yang sedang mereka pegang, membuat tiket bantuan, dan membaca artikel Help Center tanpa perlu login.
 2. **Tim IT, GA, dan OPS** mengelola inventaris per kategori, memproses pengajuan, dan menangani pengiriman barang.
 3. **Admin dan superadmin** mengatur akun dan izin, memantau log aktivitas, menjalankan export data, serta melakukan backup dan restore database langsung dari antarmuka.
 
-Aplikasi ini digunakan secara internal, sehingga seluruh halaman manajemen berada di balik autentikasi. Hanya Help Center (artikel, FAQ, kategori) yang terbit publik, dan hanya konten berstatus `PUBLISHED` yang tampil.
+Seluruh halaman manajemen berada di balik autentikasi. Hanya Help Center (artikel, FAQ, kategori) yang terbit publik, dan hanya konten berstatus `PUBLISHED` yang tampil.
 
 ## Fitur
 
@@ -50,19 +51,18 @@ Aplikasi ini digunakan secara internal, sehingga seluruh halaman manajemen berad
 - Tiket memiliki nomor unik, kategori, prioritas (`Low` hingga `Critical`), dan antrean per tim (IT, HR, GA). Antrean dapat dikelola adminnya masing-masing.
 - Komentar mendukung lampiran; percakapan dan perubahan status terekam sebagai riwayat audit per tiket.
 - Penanganan tiket mencakup claim, reassign, penyelesaian, dan pembatalan, dengan rating kepuasan CSAT 1–5 dari pelapor setelah tiket selesai.
-- Pembaruan tiket masuk secara realtime melalui Server-Sent Events; koneksi SSE difilter per pengguna sesuai hak aksesnya sehingga detail tiket tidak bocor ke pihak yang tidak berkepentingan.
+- Pembaruan tiket masuk secara realtime melalui Server-Sent Events; koneksi SSE difilter per pengguna sesuai hak aksesnya.
 
 ### Help Center
 - Artikel insiden (SOP) dan FAQ yang sudah dipublikasikan dapat dibaca publik tanpa login, lengkap dengan kategori, tingkat keparahan (`low/medium/high`), tag, dan pencarian.
-- Pencarian pengunjung dicatat untuk menghasilkan daftar pencarian populer.
-- CMS admin menyediakan editor rich text (TipTap) dengan struktur baku per artikel: konteks masalah, langkah penanganan, Do's and Don'ts, dan snippet perintah.
+- CMS admin menyediakan editor rich text (TipTap) dengan struktur baku per artikel.
 - Pengguna terautentikasi dapat menyimpan bookmark artikel.
 
 ### Operasional dan Administrasi
-- **Pengiriman** mencatat permintaan kirim barang atau aset, penerima, tujuan, nomor resi (AWB), status pelacakan (`belum_dikirim` hingga `diterima`), dan pembatalan.
+- **Pengiriman** mencatat permintaan kirim barang atau aset, penerima, tujuan, nomor resi (AWB), status pelacakan, dan pembatalan.
 - **Dashboard** merangkum tren aset, distribusi kondisi, komposisi tipe perangkat, dan tren CSAT dalam grafik (Chart.js).
-- **Log aktivitas** dan **log audit login** terpusat pada `system_audit_logs`, termasuk nilai sebelum dan sesudah perubahan (`before/after` dalam JSONB), pelaku, IP, dan user-agent.
-- **Backup dan restore** dijalankan dari UI admin: `pg_dump` dengan checksum SHA-256, backup otomatis sebelum restore, retensi berdasarkan umur file dan jumlah file, hingga audit trail setiap operasi.
+- **Log aktivitas** dan **log audit login** terpusat pada `system_audit_logs`, termasuk nilai sebelum dan sesudah perubahan (before/after JSONB), pelaku, IP, dan user-agent.
+- **Backup dan restore** dijalankan dari UI admin: `pg_dump` dengan checksum SHA-256, backup otomatis sebelum restore, retensi berdasarkan umur dan jumlah file, serta audit trail setiap operasi.
 - **Export data** administratif ke XLSX untuk aset, pengguna, tiket, dan tabel lainnya, khusus superadmin.
 
 ## Arsitektur
@@ -100,7 +100,7 @@ Beberapa keputusan desain yang perlu diketahui sebelum menyentuh kode:
 
 - Backend berlapis: `routes → controllers → services → pg`. Controller memvalidasi input, service yang memegang SQL, dan seluruh query memakai placeholder parameterized (`$1`).
 - Server tidak pernah menjalankan DDL saat startup. Ia hanya memverifikasi bahwa runtime schema sesuai; perubahan skema hanya lewat migrasi versioned.
-- Backend adalah sumber kebenaran untuk role dan izin. Pemeriksaan izin di frontend (`permissionAccess.js`) hanya mengatur navigasi, bukan keamanan.
+- Backend adalah sumber kebenaran untuk role dan izin. Pemeriksaan izin di frontend hanya mengatur navigasi, bukan keamanan.
 - Realtime memakai EventEmitter in-process yang dirancang untuk deployment single-instance. Roadmap multi-instance telah didokumentasikan di `realtimeService.js` (opsi PostgreSQL `LISTEN/NOTIFY` atau Redis Pub/Sub).
 - Frontend tidak memakai state library. State dikelola lewat composables, dan setiap panggilan HTTP melewati `useApi` yang menangani cookie sesi serta redirect 401 secara global.
 
@@ -112,7 +112,7 @@ Beberapa keputusan desain yang perlu diketahui sebelum menyentuh kode:
 | Backend | Node.js (ESM), Express 5, `pg`, `jsonwebtoken`, `bcryptjs`, `multer`, `nodemailer`, `isomorphic-dompurify` |
 | Database | PostgreSQL 16 dengan migrasi versioned, view, dan trigger |
 | Pengujian | Node test runner (unit), Playwright dengan axe-core (E2E), CodeQL (SAST) |
-| Infrastruktur | Docker Compose, Nginx, GitHub Actions |
+| Infrastruktur | Docker Compose, Nginx, GitHub Actions, GitHub Packages (GHCR) |
 | Tooling | oxlint, ESLint, Prettier, nodemon, pipeline design tokens |
 
 Node.js wajib versi `^22.18.0` atau `>=24.12.0` sesuai kolom `engines` pada `package.json`.
@@ -120,7 +120,7 @@ Node.js wajib versi `^22.18.0` atau `>=24.12.0` sesuai kolom `engines` pada `pac
 ## Struktur Direktori
 
 ```text
-esb-trackit/
+trackit/
 ├── backend/                        REST API Express (ESM)
 │   ├── migrations/
 │   │   ├── versioned/              Migrasi kanonik 0001–0008 (satu-satunya yang dieksekusi)
@@ -131,10 +131,11 @@ esb-trackit/
 │   │   ├── services/               Logika bisnis dan SQL (auth, backup, SSE, izin, dll.)
 │   │   ├── middleware/             Auth, rate limit, security headers, error handler
 │   │   ├── routes/                 Definisi endpoint dan alias legacy
-│   │   ├── security/               Kebijakan CORS
+│   │   ├── security/               Kebijakan CORS, session token
 │   │   ├── errors/ · utils/ · assets/
 │   │   ├── app.js                  CORS, security headers, rate limit, router
 │   │   └── server.js               Bootstrap dan graceful shutdown
+│   ├── Dockerfile                  Image API (context: ./backend)
 │   └── tests/                      Unit test backend (node --test)
 ├── frontend/                       SPA Vue 3
 │   ├── src/
@@ -143,15 +144,14 @@ esb-trackit/
 │   │   ├── composables/            State management
 │   │   ├── services/ · utils/ · config/ · styles/
 │   │   └── router/index.js         Routing dan gating izin halaman
-│   ├── tests/                      Unit test frontend (node --test)
-│   ├── Dockerfile
+│   ├── Dockerfile                  Image Nginx SPA (context: ./frontend)
 │   ├── nginx.conf                  SPA + reverse proxy /api + header keamanan
 │   └── vite.config.js              Proxy API dan security headers untuk dev/preview
 ├── e2e/                            Playwright: tests/, pages/, fixtures/
 ├── scripts/                        Inisialisasi DB, QA automation, tokens, deploy
-├── docs/                           Konvensi, audit keamanan, laporan QA, runbook, manual
+├── docs/                           Konvensi, keamanan, laporan QA, runbook, manual
 ├── design-tokens/                  Sumber design tokens (npm run build:tokens)
-├── .github/workflows/              ci.yml, e2e-tests.yml, codeql.yml
+├── .github/workflows/              ci.yml, e2e-tests.yml, codeql.yml, docker-publish.yml
 ├── docker-compose.yml              postgres, migrate, backend, frontend
 ├── playwright.config.js            Validasi database test loopback *_test
 └── package.json                    Skrip root: E2E, dokumen, tokens, deploy
@@ -174,7 +174,7 @@ Buat file `backend/.env` dengan isi minimal berikut. File ini tidak pernah masuk
 PORT=3000
 DB_HOST=localhost
 DB_PORT=5432
-DB_NAME=esb_trackit
+DB_NAME=trackit
 DB_USER=postgres
 DB_PASSWORD=<password-postgres-anda>
 JWT_SECRET=<string-acak-minimal-32-karakter>
@@ -213,7 +213,7 @@ Build produksi:
 
 ```bash
 npm run build     # vite build
-npm run preview   # sajikan hasil build
+npm run preview   # sajikan hasil build dengan security headers
 ```
 
 ### Akun pertama
@@ -244,6 +244,37 @@ docker compose up -d --build
 Aplikasi dapat diakses di `http://localhost`.
 
 Detail hardening yang sudah diterapkan pada compose: `no-new-privileges:true` dan `cap_drop: ALL` pada container aplikasi, volume terpisah untuk data database (`pgdata`) dan file backup (`backups`), serta subnet internal `172.28.0.0/16`. Bila Anda menaruh reverse proxy eksternal (Nginx host, AWS ALB, Cloudflare), sesuaikan `TRUST_PROXY_CIDRS` dengan CIDR proxy yang sebenarnya. Nilai wildcard seperti `*` atau `0.0.0.0/0` tidak diperbolehkan dan akan ditolak.
+
+## Image Docker dari GHCR
+
+Setiap push ke `main` dan setiap tag `v*.*.*` mempublikasikan dua image ke GitHub Packages (GHCR) melalui workflow `docker-publish.yml`, lalu image ditandatangani dengan cosign:
+
+```text
+ghcr.io/<owner>/<repo>-backend:latest
+ghcr.io/<owner>/<repo>-frontend:latest
+```
+
+Menarik image untuk deployment tanpa build lokal:
+
+```bash
+docker pull ghcr.io/<owner>/<repo>-backend:latest
+docker pull ghcr.io/<owner>/<repo>-frontend:latest
+```
+
+Verifikasi signature cosign:
+
+```bash
+cosign verify \
+  --certificate-identity-regexp '^https://github.com/<owner>/<repo>/\.github/workflows/' \
+  --certificate-oidc-issuer https://token.actions.githubusercontent.com \
+  ghcr.io/<owner>/<repo>-backend:latest
+```
+
+Catatan:
+
+- Pull request hanya membuild image tanpa push, sehingga CI tetap memvalidasi Dockerfile.
+- Image `frontend` di-build dari context `./frontend`, image `backend` dari context `./backend`.
+- Package pertama kali mungkin perlu di-set **public** (atau dikonfigurasi aksesnya) di tab *Packages* pada repository settings.
 
 ## Database dan Migrasi
 
@@ -284,7 +315,7 @@ Perintah migrasi memerlukan guard environment. Tanpa guard tersebut, `db:migrate
 | Variabel | Default | Keterangan |
 | --- | --- | --- |
 | `CORS_ORIGINS` | origin dev lokal | Daftar origin exact dipisah koma; nilai `*` menyebabkan startup gagal |
-| `TRUST_PROXY_CIDRS` | kosong | IP/CIDR proxy tepercaya, exact, dipisah koma |
+| `TRUST_PROXY_CIDRS` | kosong (compose: `172.28.0.0/16`) | IP/CIDR proxy tepercaya, exact, dipisah koma |
 | `EMAIL_ENABLED` | `false` | Mengaktifkan pengiriman email (aktivasi akun, reset password) |
 | `SMTP_HOST` `SMTP_PORT` `SMTP_SECURE` `SMTP_USER` `SMTP_PASS` `EMAIL_FROM` | kosong | Konfigurasi SMTP |
 | `FRONTEND_URL` | `http://localhost` | Origin frontend untuk tautan dalam email |
@@ -302,7 +333,7 @@ Perintah migrasi memerlukan guard environment. Tanpa guard tersebut, `db:migrate
 
 `.env.example` di root memuat variabel tambahan untuk compose: kredensial database, guard migrasi (`MIGRATION_*`), seed superadmin, kredensial QA (`QA_SUPERADMIN_EMAIL`, `QA_SUPERADMIN_PASSWORD` untuk skrip QA di `scripts/qa/`), dan konfigurasi SMTP. Kredensial QA hanya untuk environment test.
 
-File `.env`, `.env.e2e`, folder `backend/storage/backups/`, dan berkas `*.dump` semuanya gitignored.
+File `.env`, `.env.e2e`, folder `backend/storage/backups/`, dan berkas `*.dump` semuanya gitignored. Jangan pernah menyimpan kredensial production di repository.
 
 ## Skema Database
 
@@ -320,10 +351,10 @@ Skema kanonik berisi 24 tabel dan 3 view, dengan constraint yang ditegakkan lang
 
 Poin desain yang perlu diketahui:
 
-- Status enum ditegakkan lewat `CHECK` constraint, bukan hanya di aplikasi. Contoh: status aset hanya boleh salah satu dari lima nilai yang terdaftar; rating CSAT harus antara 1 dan 5.
+- Status enum ditegakkan lewat `CHECK` constraint, bukan hanya di aplikasi.
 - Trigger `auto_update_timestamp()` memelihara kolom `updated_at` pada tabel utama.
 - Trigger `prevent_hard_delete()` melindungi `users`, `aset_ti`, dan `tickets`. DELETE langsung akan gagal; penghapusan harus lewat soft delete (`deleted_at`).
-- Foreign key memakai strategi hapus yang disengaja: `SET NULL` untuk referensi opsional, `RESTRICT` untuk data yang tidak boleh hilang (`users` pada tiket), `CASCADE` untuk data turunan.
+- Foreign key memakai strategi hapus yang disengaja: `SET NULL` untuk referensi opsional, `RESTRICT` untuk data yang tidak boleh hilang, `CASCADE` untuk data turunan.
 - Index parsial dipasang untuk query panas, misalnya index pada `status` yang hanya mencakup baris `deleted_at IS NULL`.
 
 ## API Reference
@@ -351,7 +382,7 @@ Basis URL `/api`, format JSON. Permintaan tanpa `Content-Type: application/json`
 | `/api/ops-assets` | Izin `assets_ops` | Aset OPS. Alias: `/api/assets-ops`, `/api/assets_ops` |
 | `/api/employees` | Admin | Master data karyawan. Alias legacy: `/api/karyawan` |
 | `/api/users` | Admin | Akun, role, dan izin per fitur |
-| `/api/tickets` | Izin `tickets` | CRUD tiket, komentar, lampiran, claim/reassign, riwayat, CASP, statistik. `GET /events` = SSE |
+| `/api/tickets` | Izin `tickets` | CRUD tiket, komentar, lampiran, claim/reassign, riwayat, CSAT, statistik. `GET /events` = SSE |
 | `/api/ticket-queues` | JWT | Antrean tiket; pengelolaan admin antrean oleh superadmin |
 | `/api/shipments` | Izin `shipments` | Pengiriman dan import. Alias: `/api/pengiriman` |
 | `/api/submissions` | Izin `submissions` | Pengajuan aset |
@@ -389,7 +420,7 @@ Izin di atas memakai 13 kunci fitur (`dashboard`, `assets`, `assets_ga`, `assets
 
 Dua jaminan pada jalur XLSX:
 
-1. File export bebas formula injection. Nilai berawalan `=`, `+`, `-`, atau `@` dinetralkan sebelum ditulis ke workbook, sehingga membuka hasil export di Excel tidak mengeksekusi formula apa pun.
+1. File export bebas formula injection. Nilai berawalan `=`, `+`, `-`, atau `@` dinetralkan sebelum ditulis ke workbook.
 2. Header dan nama sheet pada export identik dengan template import, sehingga file hasil export bisa diedit lalu langsung diimpor kembali.
 
 | Halaman | Sheet | Identitas baris | Catatan |
@@ -401,29 +432,25 @@ Dua jaminan pada jalur XLSX:
 | Aset OPS | `Data Aset OPS` | hostname | |
 | Pengiriman | `Data Pengiriman` | resi | Header template sama dengan export |
 
-Modal import menyediakan dua mode. **Tambah Data** menyisipkan tanpa menyentuh data lama. **Replace All** menghapus data kategori target terlebih dahulu; konfirmasi dengan mengetik `GANTI`, dan validasi konfirmasi yang sama dijalankan ulang di server. Untuk Aset IT, Replace All menawarkan cakupan "Aset IT saja" atau "Aset IT dan Karyawan". Menghapus karyawan tidak pernah ikut menghapus akun `users`.
+Modal import menyediakan dua mode. **Tambah Data** menyisipkan tanpa menyentuh data lama. **Replace All** menghapus data kategori target terlebih dahulu; konfirmasi dengan mengetik `GANTI`, dan validasi konfirmasi yang sama dijalankan ulang di server.
 
 ## Keamanan
 
-Lapisan demi lapisan, sesuai implementasi di kode:
-
-**Sesi.** JWT dipasangkan dengan tabel `user_sessions` sehingga token dapat dicabut, diperpanji (sliding), dan tidak pernah disimpan di localStorage. Cookie memakai flag HttpOnly.
+**Sesi.** JWT 15 menit dipasangkan dengan tabel `user_sessions` sehingga token dapat dicabut, diperpanji (sliding), dan tidak pernah disimpan di localStorage. Cookie `trackit_session` memakai flag HttpOnly dan SameSite=Lax; Secure diaktifkan di production.
 
 **Otorisasi.** Tiga role global (`user`, `admin`, `superadmin`) ditambah izin granular 13 kunci fitur per pengguna. Setiap endpoint memeriksa ulang izin; frontend tidak pernah menjadi penentu.
 
-**Rate limiting.** Tiga tingkat: global untuk semua `/api`, per-pengguna untuk klien terautentikasi, dan khusus endpoint auth. Bucket dibatasi jumlahnya untuk mencegah kebocoran memori, dan trafik SSE dikecualikan agar koneksi realtime tidak terputus oleh limiter.
+**Rate limiting.** Tiga tingkat: global untuk semua `/api`, per-pengguna untuk klien terautentikasi, dan khusus endpoint auth. Trafik SSE dikecualikan agar koneksi realtime tidak terputus oleh limiter.
 
 **Perlindungan akun.** Percobaan login gagal dilacak per akun di `account_security_state` hingga terkunci sementara. Reset password memakai OTP yang disimpan sebagai hash dengan batas percobaan dan kedaluwarsa.
 
-**Header dan transport.** CSP ketat, HSTS saat HTTPS, `X-Frame-Options: DENY`, `Permissions-Policy` yang menutup kamera/mikrofon/geolokasi, COOP dan CORP, serta header `Vary: Origin` untuk mencegah cache poisoning lintas origin. CORS memakai allowlist exact; konfigurasi wildcard membuat aplikasi gagal menyala.
+**Header dan transport.** CSP ketat, HSTS saat HTTPS, `X-Frame-Options: DENY`, `Permissions-Policy` yang menutup kamera/mikrofon/geolokasi, COOP dan CORP, serta header `Vary: Origin`. CORS memakai allowlist exact; konfigurasi wildcard membuat aplikasi gagal menyala.
 
 **Validasi input.** Seluruh SQL parameterized; identifier dinamis (hanya di export) melewati `quoteAllowedIdentifier()`. Body non-JSON ditolak. Konten HTML disanitasi dengan DOMPurify di kedua sisi. File XLSX hasil export dinetralkan dari formula.
 
 **Audit.** Tabel `system_audit_logs` mencatat modul, aksi, entitas, diff before/after, pelaku, IP, dan user-agent untuk aktivitas lintas modul. Login, backup/restore, tiket, dan aset memiliki jalur audit masing-masing.
 
-**Infrastruktur.** Container aplikasi berjalan non-root tanpa kapabilitas tambahan, proxy tepercaya didefinisikan eksplisit lewat CIDR, dan CodeQL berjalan di CI.
-
-Laporan audit keamanan lengkap tersedia di `docs/security-audit-2026-09-19.md` beserta arsip di `docs/audits/`.
+**Infrastruktur.** Container aplikasi berjalan non-root tanpa kapabilitas tambahan (`no-new-privileges`, `cap_drop: ALL`), proxy tepercaya didefinisikan eksplisit lewat CIDR, CodeQL berjalan di CI, dan image Docker dipublikasikan bertanda tangan cosign.
 
 ## Pengujian
 
@@ -438,19 +465,49 @@ npm run test:e2e:ui         # Playwright UI mode
 npm run test:e2e:report     # buka laporan HTML
 ```
 
-Cakupan E2E terdiri atas 31 berkas spec di `e2e/tests/` yang mengelompokkan skenario alami: smoke, auth (login, logout, autentikasi), tiket (lifecycle, draft, undo, claim/unclaim, rating CASP, pencarian, izin), aset (CRUD, assignment, GA, OPS), submissions, dashboard, RBAC, keamanan (auth, authz, input), aksesibilitas (axe-core), error states, regresi halaman publik, view mode, dan QA extended.
+Cakupan E2E terdiri atas 31 berkas spec di `e2e/tests/` yang mengelompokkan skenario alami: smoke, auth, tiket, aset (IT/GA/OPS), submissions, dashboard, RBAC, keamanan, aksesibilitas (axe-core), error states, regresi halaman publik, view mode, dan QA extended.
 
 Aturan yang ditegakkan Playwright: suite E2E hanya boleh dijalankan terhadap database lokal dengan host loopback dan nama berakhiran `_test`. Konfigurasi yang melanggar akan menggagalkan seluruh run sebelum test dimulai. Salin `.env.e2e.example` menjadi `.env.e2e` untuk menyiapkannya; jangan pernah mengarahkan E2E ke database lain.
 
 ## CI/CD
 
-Tiga workflow GitHub Actions:
+Empat workflow GitHub Actions:
 
 | Workflow | Pemicu | Isi |
 | --- | --- | --- |
 | `ci.yml` | push/PR ke `main`, `master`, `dev` | Backend: preflight sintaks dan unit test dengan service container PostgreSQL 16. Frontend: lint, unit test, build. |
 | `e2e-tests.yml` | push/PR | Suite Playwright penuh dengan database test sekali pakai |
 | `codeql.yml` | push/PR | Analisis keamanan statis |
+| `docker-publish.yml` | push `main`, tag `v*.*.*`, jadwal harian | Build dan push image `backend` + `frontend` ke GHCR, signing cosign (PR: build saja) |
+
+Rekomendasi governance repository: lindungi branch `main` dengan required PR, minimal satu approval, required status checks (CI, E2E, CodeQL), nonaktifkan force push, dan pin action ke commit SHA.
+
+## Panduan Deployment Production
+
+Checklist minimum sebelum go-live:
+
+1. **HTTPS**: terminate TLS di reverse proxy, redirect HTTP → HTTPS, aktifkan HSTS. Gunakan certificate yang valid (mis. Let's Encrypt).
+2. **Secrets**: set `JWT_SECRET` acak ≥32 karakter, `DB_PASSWORD` kuat, dan simpan keduanya di secret manager atau file `.env` mode `600` di luar repository. Rotasi berkala.
+3. **Trusted proxy**: set `TRUST_PROXY_CIDRS` ke CIDR reverse proxy yang sebenarnya. Jangan pernah `*` atau `0.0.0.0/0`.
+4. **CORS**: set `CORS_ORIGINS` ke origin production secara exact.
+5. **Database**: backup terjadwal + uji restore berkala; database tidak pernah exposed ke host publik.
+6. **Migrasi**: setiap perubahan skema lewat `db:migrate:apply` dengan guard env lengkap (`MIGRATION_RECOVERY_PROOF_ID`, `MIGRATION_CHANGE_ID`) setelah backup terverifikasi.
+7. **Monitoring**: pantau `/health`, log aplikasi, dan disk usage untuk volume backup.
+8. **Rollback**: simpan image GHCR per tag versi; rollback = jalankan tag sebelumnya + restore backup terverifikasi.
+9. **Email**: bila `EMAIL_ENABLED=true`, gunakan kredensial SMTP dari secret, bukan dari repository.
+10. **Update**: patch container image dan dependency secara berkala (`npm audit`, rebuild image).
+
+## Troubleshooting
+
+| Gejala | Penyebab umum | Tindakan |
+| --- | --- | --- |
+| Backend gagal start: `JWT_SECRET` invalid | Secret kosong/pendek | Isi ≥32 karakter acak di `backend/.env` |
+| `db:migrate:apply` menolak jalan | Guard env belum lengkap | Set `ALLOW_DB_MIGRATIONS=true`, `MIGRATION_MODE`, `MIGRATION_EXPECTED_HOST/DATABASE`, proof/change ID |
+| `Runtime schema belum siap` saat startup | Skema DB tidak cocok dengan versi migrasi | Jalankan `npm run db:migrate:apply`, lalu `npm run db:check` |
+| Login 401 padahal kredensial benar | Cookie tidak terkirim (Secure di HTTP, path salah) | Akses via HTTPS di production; cek `SESSION_COOKIE_PATH` |
+| Rate limit kena saat development | Global limiter aktif untuk semua `/api` | Restarts reset bucket; turunkan trafik atau sesuaikan env limiter |
+| E2E menolak jalan | Database target tidak loopback / tidak berakhiran `_test` | Perbaiki `.env.e2e`; pelanggaran memang sengaja digagalkan |
+| SSE tidak update | Proxy mem-buffer response | Pastikan `proxy_buffering off` untuk rute `/api` (sudah di `frontend/nginx.conf`) |
 
 ## Perintah Lainnya
 
@@ -474,6 +531,14 @@ npm run lint:fix            # perbaikan otomatis
 npm run format              # prettier write
 ```
 
+## Kontribusi
+
+1. Fork atau buat branch dari `main`.
+2. Pastikan `npm run lint`, `npm run test:backend`, `npm run test:frontend`, dan `npm run build` lulus sebelum membuka PR.
+3. Untuk perubahan skema, tambahkan file migrasi versioned baru — jangan mengubah file migrasi yang sudah ada.
+4. Jangan pernah commit file `.env`, kredensial, dump database, atau kunci privat. Scanner secret berjalan di history.
+5. PR di-review sebelum merge; branch `main` sebaiknya dilindungi dengan required checks.
+
 ## Dokumentasi Terkait
 
 | Dokumen | Isi |
@@ -481,11 +546,10 @@ npm run format              # prettier write
 | `e2e/README.md` | Panduan menjalankan suite E2E Playwright dan aturan keamanannya |
 | `docs/CONVENTIONS.md` | Konvensi kode, layout, aturan SQL, dan aturan state frontend |
 | `docs/database-migration-adoption.md` | Runbook adopsi ledger migrasi untuk database lama |
-| `docs/security-audit-2026-09-19.md` | Laporan audit keamanan |
 | `docs/PRODUCTION_QA_REPORT.md` | Laporan QA pra-rilis |
 | `docs/user-manual-source.html` | Sumber manual pengguna (dibangun menjadi PDF) |
-| `docs/audits/`, `docs/qa/`, `docs/deploy/` | Arsip audit UI/UX, artefak QA, dan catatan deployment |
+| `docs/audits/`, `docs/qa/`, `docs/deploy/` | Arsip audit UI/UX, artefak QA, dan contoh konfigurasi deployment |
 
 ## Lisensi
 
-Hak cipta © 2026 ESB TrackIT. Perangkat lunak internal; penggunaan dan distribusi di luar organisasi memerlukan izin tertulis.
+Dirilis di bawah lisensi ISC (lihat kolom `license` pada `package.json`). Tambahkan file `LICENSE` bila Anda memerlukan lisensi lain untuk distribusi Anda.

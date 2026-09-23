@@ -41,7 +41,7 @@ const sampleEmployeesForIT = [
     'Tanggal Mulai Bekerja': '2024-01-15',
     'Employeement Status': 'Permanent',
     'NIK Atasan Langsung': '',
-    'Email Kantor': 'budi.santoso@esb.co.id',
+    'Email Kantor': 'budi.santoso@example.com',
     'Lokasi Kerja': 'JKT',
   },
   {
@@ -55,7 +55,7 @@ const sampleEmployeesForIT = [
     'Tanggal Mulai Bekerja': '2024-03-01',
     'Employeement Status': 'Contract',
     'NIK Atasan Langsung': '2026001',
-    'Email Kantor': 'siti.rahma@esb.co.id',
+    'Email Kantor': 'siti.rahma@example.com',
     'Lokasi Kerja': 'BDG',
   },
   {
@@ -69,7 +69,7 @@ const sampleEmployeesForIT = [
     'Tanggal Mulai Bekerja': '2023-08-10',
     'Employeement Status': 'Permanent',
     'NIK Atasan Langsung': '',
-    'Email Kantor': 'ahmad.fauzi@esb.co.id',
+    'Email Kantor': 'ahmad.fauzi@example.com',
     'Lokasi Kerja': 'PL',
   },
   {
@@ -83,7 +83,7 @@ const sampleEmployeesForIT = [
     'Tanggal Mulai Bekerja': '2024-05-20',
     'Employeement Status': 'Permanent',
     'NIK Atasan Langsung': '',
-    'Email Kantor': 'dewi.lestari@esb.co.id',
+    'Email Kantor': 'dewi.lestari@example.com',
     'Lokasi Kerja': 'GS',
   },
   {
@@ -97,7 +97,7 @@ const sampleEmployeesForIT = [
     'Tanggal Mulai Bekerja': '2023-11-01',
     'Employeement Status': 'Permanent',
     'NIK Atasan Langsung': '2026001',
-    'Email Kantor': 'rian.hidayat@esb.co.id',
+    'Email Kantor': 'rian.hidayat@example.com',
     'Lokasi Kerja': 'JKT',
   },
 ]
@@ -105,7 +105,7 @@ const sampleEmployeesForIT = [
 const fields = {
   it: [
     {
-      Hostname: 'ESB-LAP-001',
+      Hostname: 'IT-LAP-001',
       'Serial Number': 'PF3X90B',
       Spesifikasi: 'Laptop Core i5 16GB RAM / 512GB SSD',
       'NIK Pemegang': '2026001',
@@ -120,7 +120,7 @@ const fields = {
       'Note Asset': 'Laptop utama pengembang',
     },
     {
-      Hostname: 'ESB-LAP-002',
+      Hostname: 'IT-LAP-002',
       'Serial Number': 'PF3X91C',
       Spesifikasi: 'Laptop Core i7 16GB RAM / 512GB SSD',
       'NIK Pemegang': '2026002',
@@ -135,7 +135,7 @@ const fields = {
       'Note Asset': 'Laptop account analyst',
     },
     {
-      Hostname: 'ESB-PC-001',
+      Hostname: 'IT-PC-001',
       'Serial Number': '8CC2340XYZ',
       Spesifikasi: 'PC Desktop Core i7 32GB RAM / 1TB SSD',
       'NIK Pemegang': '2026003',
@@ -150,7 +150,7 @@ const fields = {
       'Note Asset': 'PC finance kasir pusat',
     },
     {
-      Hostname: 'ESB-LAP-003',
+      Hostname: 'IT-LAP-003',
       'Serial Number': 'PF4A10D',
       Spesifikasi: 'Laptop Ryzen 5 8GB RAM / 256GB SSD',
       'NIK Pemegang': '2026004',
@@ -165,7 +165,7 @@ const fields = {
       'Note Asset': 'Laptop pool marketing',
     },
     {
-      Hostname: 'ESB-MAC-001',
+      Hostname: 'IT-MAC-001',
       'Serial Number': 'C02G40ABMD6R',
       Spesifikasi: 'MacBook Pro M2 16GB RAM / 512GB SSD',
       'NIK Pemegang': '2026005',

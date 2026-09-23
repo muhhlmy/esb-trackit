@@ -12,8 +12,8 @@ describe('Import Templates Dummy Data Suite', () => {
   test('AssetCategoryImportModal provides exactly 5 dummy rows for Aset IT, Aset GA, and Aset Ops', async () => {
     const content = await readFile(assetCategoryImportModalUrl, 'utf8')
 
-    // Check IT dummy rows: ESB-LAP-001, ESB-LAP-002, ESB-PC-001, ESB-LAP-003, ESB-MAC-001
-    const itHostnames = ['ESB-LAP-001', 'ESB-LAP-002', 'ESB-PC-001', 'ESB-LAP-003', 'ESB-MAC-001']
+    // Check IT dummy rows: IT-LAP-001, IT-LAP-002, IT-PC-001, IT-LAP-003, IT-MAC-001
+    const itHostnames = ['IT-LAP-001', 'IT-LAP-002', 'IT-PC-001', 'IT-LAP-003', 'IT-MAC-001']
     for (const h of itHostnames) {
       assert.ok(content.includes(h), `AssetCategoryImportModal must contain IT dummy hostname ${h}`)
     }

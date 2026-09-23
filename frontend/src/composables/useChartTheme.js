@@ -1,5 +1,5 @@
 export function useChartTheme() {
-  // Palet brand ESB — satu sumber warna untuk semua chart.
+  // Palet brand — satu sumber warna untuk semua chart.
   // Gelap → terang agar urutan dataset terasa berjenjang.
   const chartColors = {
     primary: '#0A51B0',
@@ -12,7 +12,7 @@ export function useChartTheme() {
     warningLight: 'rgba(217, 119, 6, 0.14)',
     danger: '#DC2626',
     dangerLight: 'rgba(220, 38, 38, 0.12)',
-    esbPrimary: '#FF4F1B',
+    brandPrimary: '#FF4F1B',
     purple: '#7C3AED',
     gray: '#94A3B8',
     darkText: '#1E293B',

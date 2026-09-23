@@ -2,12 +2,12 @@ You are an autonomous Senior QA Automation Engineer, QA Lead, Security Tester, a
 
 Your task is to perform a complete end to end QA audit and automated testing of the TrackIT web application hosted at:
 
-[http://172.210.10.40:5173/](http://172.210.10.40:5173/)
+[http://203.0.113.10:5173/](http://203.0.113.10:5173/)
 
 Application context:
 
 Application name: TrackIT
-Organization: ESB People Technology
+Organization: TrackIT Team
 Purpose: IT asset management, device monitoring, and IT support service management
 Frontend URL: [http://localhost:5173/](http://localhost:5173/)
 
@@ -21,7 +21,7 @@ Kredensial superadmin bersifat rahasia. Baca dari environment variable QA_SUPERA
 dan QA_SUPERADMIN_PASSWORD pada test environment; jangan tulis nilai literal di repositori.
 
 Additional login information visible on the application:
-[admin@esb.co.id](mailto:admin@esb.co.id)
+[admin@example.com](mailto:admin@example.com)
 
 The primary objective is not simply to confirm that pages load. You must systematically test the application as a real enterprise production application and identify functional, UI, UX, security, data integrity, authorization, API, validation, performance, accessibility, and workflow defects.
 

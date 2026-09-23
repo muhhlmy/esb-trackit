@@ -1,6 +1,6 @@
-# Audit Menyeluruh ESB TrackIT — Re-Audit Commit Terbaru
+# Audit Menyeluruh TrackIT — Re-Audit Commit Terbaru
 
-**Repository:** `muhhlmy/esb-trackit`  
+**Repository:** `trackit`  
 **Branch:** `main`  
 **HEAD yang diaudit:** `8c1e41e23c74da9971561f8c1743eda60ba06905`  
 **Tanggal audit ulang:** 9 September 2026  
@@ -285,7 +285,7 @@ Dump lama juga sudah dihapus dari current Git tree.
 
 ## Legacy SQL Seed
 
-`backend/esb_trackit_db.sql` sekarang sengaja menjadi disabled legacy entrypoint.
+`backend/trackit_db.sql` sekarang sengaja menjadi disabled legacy entrypoint.
 
 File tersebut tidak lagi melakukan:
 

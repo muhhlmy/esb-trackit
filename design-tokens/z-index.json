@@ -1,7 +1,7 @@
 {
   "$metadata": {
     "version": "1.0.0",
-    "description": "ESB TrackIT z-index scale — minimal and intentional."
+    "description": "TrackIT z-index scale — minimal and intentional."
   },
   "z-index": {
     "base": { "value": 0, "type": "zIndex" },

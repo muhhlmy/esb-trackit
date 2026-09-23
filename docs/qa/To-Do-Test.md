@@ -1,7 +1,7 @@
-# QA & Security Assessment Report — ESB TrackIT & Help Center (IT Assets Monitoring)
+# QA & Security Assessment Report — TrackIT & Help Center (IT Assets Monitoring)
 
-**Target:** http://172.111.10.52:5173/
-**App:** Vue 3 + Vite SPA ("ESB TrackIT & Help Center"), frontend served in **DEV mode** (raw source exposed) with a Vite proxy to a backend API at `127.0.0.1:5000`.
+**Target:** http://203.0.113.20:5173/
+**App:** Vue 3 + Vite SPA ("TrackIT & Help Center"), frontend served in **DEV mode** (raw source exposed) with a Vite proxy to a backend API at `127.0.0.1:5000`.
 **Date:** 2026-09-04
 **Testing type:** Full end-to-end functional, security, frontend, backend/API, performance, accessibility, UX and architecture review (static white-box + live API black/gray-box testing).
 **Covered by self:** Phases 1–17, 19–22. Multi-agent cross-review (Phase 18) was **partially** executed (2 subagents dispatched; both terminated early due to upstream model rate-limit 429 — their transcripts were mined for verified findings; remaining gaps filled by direct analysis).
@@ -17,7 +17,7 @@ All previously identified blocking and high/medium defects have been **fully rem
 2. **SEC-01 (RESOLVED):** Decoupled IP limit (60/15m) and Account limit (10/15m) in `rateLimitMiddleware.js`. Added `clearKey()` to reset account failure counters upon successful login in `authController.js`.
 3. **SEC-02 & DEP-01 (RESOLVED):** Configured `vite.config.js` to bind to `127.0.0.1` by default, disabled source maps (`sourcemap: false`), and blocked direct serving of `package(-lock)?.json` and hidden dotfiles. Hardened production Nginx configuration in `frontend/Dockerfile`.
 4. **SEC-03 (RESOLVED):** Upgraded `xlsx` to SheetJS official release `0.20.3` via CDN tarball, eliminating CVE-2023-30533 and CVE-2024-22363 (0 high vulnerabilities in `npm audit`).
-5. **SEC-05 (RESOLVED):** Guarded `localStorage.getItem('esb_bookmarks')` in `useBookmarks.js` with try/catch fallback to `[]`.
+5. **SEC-05 (RESOLVED):** Guarded `localStorage.getItem('trackit_bookmarks')` in `useBookmarks.js` with try/catch fallback to `[]`.
 6. **SEC-06 & ARCH-02 (RESOLVED):** Replaced raw `fetch()` in `DatabaseView.vue` with centralized `api.upload()` and added client-side extension allowlist (`.dump`, `.sql`, `.tar`) and 150 MB size limits.
 7. **SEC-04 & SEC-07 (VERIFIED):** Backend security headers (CSP, XFO, CT, COOP, CORP, Referrer-Policy, Permissions-Policy) verified via 15 unit tests. CSRF protection verified with HttpOnly+SameSite cookies, `X-Requested-With` header, and origin validation.
 8. **FEA-01 to FEA-05, UX-01, UX-02 (RESOLVED):** Added ARIA expanded/controls on sidebar, semantic landmarks on MobileNav, accessible labels on form controls, dialog roles on modal overlays, OTP autocomplete attributes, database route mapping, and unified sidebar terminology.
@@ -143,8 +143,8 @@ Verified by source (interactive runtime blocked). Strong, consistent design syst
 ## 9. DATA INTEGRITY RESULTS (PHASE 9 / 16)
 
 - **No secrets in frontend source:** 0 hardcoded secrets/JWT/DB creds/URLs found across all files.
-- **`localStorage` usage:** `esb_bookmarks` (array of numeric case IDs only) and `app_notifications` — no PII or tokens. `authStorage` explicitly stores only sanitized user fields.
-- **Module-load crash risk:** `useBookmarks.js` calls `JSON.parse(localStorage.getItem('esb_bookmarks'))` at **module import time, with no try/catch** → a single corrupt value or disabled storage throws at import and can break the whole app bundle (MEDIUM/LOW — see SEC-05).
+- **`localStorage` usage:** `trackit_bookmarks` (array of numeric case IDs only) and `app_notifications` — no PII or tokens. `authStorage` explicitly stores only sanitized user fields.
+- **Module-load crash risk:** `useBookmarks.js` calls `JSON.parse(localStorage.getItem('trackit_bookmarks'))` at **module import time, with no try/catch** → a single corrupt value or disabled storage throws at import and can break the whole app bundle (MEDIUM/LOW — see SEC-05).
 - **Backend DB layer:** not reachable (no session); schema/constraints/transactions unverified.
 
 ---
@@ -252,7 +252,7 @@ Two parallel subagents (Security/Code-QA, Product/UX/A11y) were dispatched. **Bo
 - **Category:** Reliability / Code quality
 - **Severity:** LOW (MEDIUM if storage tampered) | **Priority:** P3 | **Module:** `composables/useBookmarks.js`
 - **Status:** **RESOLVED**
-- **Remediation Details:** Encapsulated `localStorage.getItem('esb_bookmarks')` inside a defensive `safeLoadBookmarks()` function with `try/catch`. Gracefully catches corrupt JSON or storage access errors and defaults safely to `[]`.
+- **Remediation Details:** Encapsulated `localStorage.getItem('trackit_bookmarks')` inside a defensive `safeLoadBookmarks()` function with `try/catch`. Gracefully catches corrupt JSON or storage access errors and defaults safely to `[]`.
 - **Verification:** Corrupted localStorage data no longer throws unhandled exceptions during module evaluation.
 
 ### SEC-06 — DB restore upload bypasses `useApi` and has no validation (MEDIUM) — [RESOLVED]
@@ -431,14 +431,14 @@ Rationale:
 
 ## 22. FINAL RECOMMENDATION
 
-The ESB TrackIT & Help Center application has successfully undergone full-stack remediation. All critical and high-priority defects identified during the assessment—including the test-blocking authentication issue, dependency vulnerabilities, rate limiting architecture, file upload security, and accessibility gaps—have been resolved and rigorously verified.
+The TrackIT & Help Center application has successfully undergone full-stack remediation. All critical and high-priority defects identified during the assessment—including the test-blocking authentication issue, dependency vulnerabilities, rate limiting architecture, file upload security, and accessibility gaps—have been resolved and rigorously verified.
 
 The application is now in a **production-ready state** and suitable for deployment behind a TLS reverse proxy or container environment.
 
 ---
 
 ### Appendix — Evidence Index
-- Live API tests: unauthenticated 64-endpoint matrix, login/OTP/forgot-password probes, rate-limit window (8×/120s), CORS, path-traversal, malformed-input, security-header comparison. (Executed via Python `urllib` against http://172.111.10.52:5173.)
+- Live API tests: unauthenticated 64-endpoint matrix, login/OTP/forgot-password probes, rate-limit window (8×/120s), CORS, path-traversal, malformed-input, security-header comparison. (Executed via Python `urllib` against http://203.0.113.20:5173.)
 - Static source: 24 view SFCs + layouts/composables/utils fetched from Vite dev server and reviewed line-by-line (grep/sink scans: 0 `v-html` unsanitized, 0 `eval`/`innerHTML`, 0 hardcoded secrets, 0 `document.cookie`).
 - Subagent transcripts (partial, rate-limited): `deleg_9caa266e/task-0.log`, `task-1.log` — findings cross-checked and reconciled.
 - Test-coverage limitation: **No browser automation available** (remote-debugging permission not granted; `computer_use` blocked by cua-driver self-protection). All UI behavior assessed via source + live API, not rendered DOM. Authenticated runtime unverified due to AUTH-01.

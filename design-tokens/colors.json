@@ -1,15 +1,15 @@
 {
   "$metadata": {
     "version": "1.0.0",
-    "description": "ESB TrackIT design token system — single source of truth for all visual tokens.",
+    "description": "TrackIT design token system — single source of truth for all visual tokens.",
     "format": "DTCG (Design Tokens Community Group) style"
   },
   "color": {
     "brand": {
-      "orange": { "value": "#ff4f1b", "type": "color", "description": "ESB primary brand accent" },
+      "orange": { "value": "#ff4f1b", "type": "color", "description": "Primary brand accent" },
       "orange-dark": { "value": "#b83a10", "type": "color" },
       "orange-light": { "value": "#fff2e7", "type": "color" },
-      "blue": { "value": "#0a51b0", "type": "color", "description": "ESB primary brand blue — used for links, primary actions, nav" },
+      "blue": { "value": "#0a51b0", "type": "color", "description": "Primary brand blue — used for links, primary actions, nav" },
       "blue-dark": { "value": "#0a4391", "type": "color" },
       "blue-light": { "value": "#edf5ff", "type": "color" },
       "blue-mid1": { "value": "#0a5dbd", "type": "color" },
@@ -67,9 +67,9 @@
       "dark": { "value": "#94a3b8", "type": "color", "description": "Placeholder in dark mode — ~7:1 on dark surface" }
     },
     "gradient": {
-      "esb-blue": { "value": "linear-gradient(135deg, #0a51b0 0%, #0a5dbd 26%, #097cde 72%, #0892f5 100%)", "type": "color" },
-      "esb-blue-hero": { "value": "linear-gradient(145deg, #0a51b0 0%, #084391 40%, #062b5e 100%)", "type": "color" },
-      "esb-orange": { "value": "linear-gradient(135deg, #ff4f1b 0%, #fe5b1c 21%, #fc7c20 60%, #faa425 100%)", "type": "color" }
+      "brand-blue": { "value": "linear-gradient(135deg, #0a51b0 0%, #0a5dbd 26%, #097cde 72%, #0892f5 100%)", "type": "color" },
+      "brand-blue-hero": { "value": "linear-gradient(145deg, #0a51b0 0%, #084391 40%, #062b5e 100%)", "type": "color" },
+      "brand-orange": { "value": "linear-gradient(135deg, #ff4f1b 0%, #fe5b1c 21%, #fc7c20 60%, #faa425 100%)", "type": "color" }
     }
   }
 }

@@ -1,17 +1,14 @@
 <script setup>
-import { onBeforeUnmount, onMounted, ref, watch, computed } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useAuth } from '@/composables/useAuth'
 import { menuGroups as configuredGroups, isNavItemVisible } from '@/config/navigationConfig.js'
 
 const props = defineProps({
-  isMobileOpen: { type: Boolean, default: false },
   isCollapsed: { type: Boolean, default: false },
 })
-const emit = defineEmits(['close-mobile', 'toggle-collapse'])
+const emit = defineEmits(['toggle-collapse'])
 const route = useRoute()
-const sidebarRef = ref(null)
-const closeButtonRef = ref(null)
 
 const { isSuperAdmin, hasPermission } = useAuth()
 // State Expanded Parent Menu
@@ -32,7 +29,7 @@ const tooltipPos = ref({ top: 0, left: 0 })
 
 let closeFlyoutTimer = null
 
-const isEffectiveCollapsed = computed(() => props.isCollapsed && !props.isMobileOpen)
+const isEffectiveCollapsed = computed(() => props.isCollapsed)
 
 function handleParentClick(parent, event) {
   if (isEffectiveCollapsed.value) {
@@ -150,77 +147,20 @@ const menuGroups = computed(() => {
     .filter((g) => (g.items && g.items.length > 0) || (g.parents && g.parents.length > 0))
 })
 
-function getFocusableElements() {
-  if (!sidebarRef.value) return []
-  return Array.from(
-    sidebarRef.value.querySelectorAll(
-      'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])',
-    ),
-  )
-}
-
-function handleKeydown(event) {
-  if (!props.isMobileOpen) return
-  if (event.key === 'Escape') {
-    event.preventDefault()
-    emit('close-mobile')
-    return
-  }
-  if (event.key !== 'Tab') return
-
-  const elements = getFocusableElements()
-  const firstElement = elements[0]
-  const lastElement = elements.at(-1)
-  if (event.shiftKey && document.activeElement === firstElement) {
-    event.preventDefault()
-    lastElement?.focus()
-  } else if (!event.shiftKey && document.activeElement === lastElement) {
-    event.preventDefault()
-    firstElement?.focus()
-  }
-}
-
-onMounted(() => {
-  document.addEventListener('keydown', handleKeydown)
-})
-
-onBeforeUnmount(() => {
-  document.removeEventListener('keydown', handleKeydown)
-})
-
-function closeSubmenuAndMobile() {
+function closeFlyoutSubmenu() {
   activeFlyoutParent.value = null
-  emit('close-mobile')
 }
 </script>
 
 <template>
-  <!-- Mobile Backdrop Overlay -->
-  <Transition name="sidebar-backdrop">
-    <button
-      v-if="isMobileOpen"
-      type="button"
-      aria-label="Tutup navigasi mobile"
-      tabindex="-1"
-      class="fixed inset-0 z-30 bg-slate-900/40 backdrop-blur-xs lg:hidden"
-      @click="emit('close-mobile')"
-    ></button>
-  </Transition>
-
-  <!-- Sidebar Component (Expanded: 245px, Collapsed Rail: 74px) -->
+  <!-- Sidebar Component (Desktop only: Expanded 245px, Collapsed Rail: 74px).
+       Di bawah breakpoint lg (< 1024px) sidebar tidak dirender sama sekali —
+       navigasi mobile sepenuhnya ditangani AppBottomNav + Menu Lainnya. -->
   <aside
     id="app-navigation"
-    ref="sidebarRef"
-    :role="isMobileOpen ? 'dialog' : undefined"
-    :aria-modal="isMobileOpen ? 'true' : undefined"
     aria-label="Navigasi aplikasi"
-    class="clean-sidebar fixed inset-y-0 left-0 z-40 flex h-dvh shrink-0 flex-col border-r border-[#E5EAEF] bg-white text-[#2A3547] shadow-xl transition-all duration-300 ease-in-out lg:static lg:z-10 lg:shadow-none select-none"
-    :class="[
-      isMobileOpen
-        ? 'w-[250px] translate-x-0 visible opacity-100'
-        : '-translate-x-full lg:translate-x-0',
-      isEffectiveCollapsed ? 'lg:w-[74px]' : 'lg:w-[245px]',
-    ]"
+    class="clean-sidebar hidden h-dvh shrink-0 flex-col border-r border-[#E5EAEF] bg-white text-[#2A3547] transition-all duration-300 ease-in-out lg:flex select-none"
+    :class="[isEffectiveCollapsed ? 'w-[74px]' : 'w-[245px]']"
   >
     <!-- ── Brand Logo Top Header Area ── -->
     <div
@@ -238,7 +178,7 @@ function closeSubmenuAndMobile() {
         title="Kembali ke Help Center"
         class="flex items-center justify-center shrink-0 hover:opacity-80 transition-opacity cursor-pointer"
       >
-        <img src="/esb-logo-only.svg" alt="ESB Logo" class="h-6 w-8 object-contain shrink-0" />
+        <img src="/logo.svg" alt="TrackIT logo" class="h-6 w-8 object-contain shrink-0" />
         <span class="sidebar-wordmark">TrackIT</span>
       </RouterLink>
 
@@ -250,11 +190,7 @@ function closeSubmenuAndMobile() {
             title="Kembali ke Help Center"
             class="flex h-7 w-7 items-center justify-center rounded-lg hover:bg-[#ECF2FF] transition-all cursor-pointer shrink-0"
           >
-            <img
-              src="/esb-logo-only.svg"
-              alt="ESB Logo"
-              class="h-6 w-6 object-contain shrink-0 block"
-            />
+            <img src="/logo.svg" alt="TrackIT logo" class="h-6 w-6 object-contain shrink-0 block" />
           </RouterLink>
 
           <button
@@ -274,25 +210,13 @@ function closeSubmenuAndMobile() {
       <!-- Toggle Button Desktop (Saat Expanded) -->
       <button
         v-if="!isEffectiveCollapsed"
-        ref="closeButtonRef"
         type="button"
         aria-label="Ciutkan Sidebar"
         title="Ciutkan Sidebar"
-        class="hidden lg:flex h-7 w-7 items-center justify-center rounded-lg text-[#637288] hover:bg-[#ECF2FF] hover:text-[#333333] transition-all cursor-pointer shrink-0"
+        class="flex h-7 w-7 items-center justify-center rounded-lg text-[#637288] hover:bg-[#ECF2FF] hover:text-[#333333] transition-all cursor-pointer shrink-0"
         @click="emit('toggle-collapse')"
       >
         <span aria-hidden="true" class="material-symbols-outlined text-[18px]">menu_open</span>
-      </button>
-
-      <!-- Close Button Mobile -->
-      <button
-        type="button"
-        aria-label="Tutup navigasi mobile"
-        title="Tutup Navigasi"
-        class="flex lg:hidden h-7 w-7 items-center justify-center rounded-lg text-[#637288] hover:bg-[#ECF2FF] hover:text-[#333333] transition-all cursor-pointer shrink-0"
-        @click="emit('close-mobile')"
-      >
-        <span aria-hidden="true" class="material-symbols-outlined text-[18px]">close</span>
       </button>
     </div>
 
@@ -338,7 +262,6 @@ function closeSubmenuAndMobile() {
                     ? 'bg-[#EAF1FC] text-[#234B83] font-semibold'
                     : 'text-[#2A3547] hover:bg-[#ECF2FF] hover:text-[#333333] font-medium',
                 ]"
-                @click="emit('close-mobile')"
               >
                 <span
                   aria-hidden="true"
@@ -465,7 +388,6 @@ function closeSubmenuAndMobile() {
                       ? 'bg-[#ECF2FF] text-[#333333] font-bold shadow-2xs border-l-2 border-[#0A51B0] rounded-r-lg'
                       : 'text-[#5F7089] hover:bg-[#F8FAFC] hover:text-[#333333] font-medium'
                   "
-                  @click="emit('close-mobile')"
                 >
                   <span
                     aria-hidden="true"
@@ -518,7 +440,7 @@ function closeSubmenuAndMobile() {
               ? 'bg-[#EFF6FF] text-[#333333] font-bold'
               : 'text-[#2A3547] hover:bg-[#F8FAFC] hover:text-[#333333] font-medium'
           "
-          @click="closeSubmenuAndMobile"
+          @click="closeFlyoutSubmenu"
         >
           <span
             aria-hidden="true"
@@ -587,27 +509,5 @@ function closeSubmenuAndMobile() {
 .clean-sidebar :is(a, button):focus-visible {
   outline: 2px solid #097cde;
   outline-offset: 2px;
-}
-@media (max-width: 1023px) {
-  .sidebar-brand button {
-    min-width: 44px;
-    min-height: 44px;
-  }
-  .sidebar-menu nav a,
-  .sidebar-menu nav button {
-    min-height: 44px;
-  }
-  .clean-sidebar {
-    max-width: calc(100vw - 40px);
-  }
-}
-
-.sidebar-backdrop-enter-active,
-.sidebar-backdrop-leave-active {
-  transition: opacity 0.2s ease;
-}
-.sidebar-backdrop-enter-from,
-.sidebar-backdrop-leave-to {
-  opacity: 0;
 }
 </style>

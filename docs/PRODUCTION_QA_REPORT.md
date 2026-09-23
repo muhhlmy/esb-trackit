@@ -2,7 +2,7 @@
 
 **Date:** 2026-09-22 · **Branch:** `main` · **Last commit:** `bbb9c5f` (working tree uncommitted)
 **Recovery point:** `.backups/2026-09-22_pre-english/`
-**Method:** local stack (API :3000, frontend :5173, Postgres :5432) + isolated E2E on :3100/:5273 against the disposable `esb_trackit_test` DB.
+**Method:** local stack (API :3000, frontend :5173, Postgres :5432) + isolated E2E on :3100/:5273 against the disposable `trackit_test` DB.
 
 Every claim below maps to a command that was actually run.
 

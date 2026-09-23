@@ -468,7 +468,7 @@ onMounted(async () => {
         </section>
       </div>
       <footer class="help-footer">
-        <span>ESB TrackIT <span aria-hidden="true">/</span> {{ t('help_center') }}</span
+        <span>TrackIT <span aria-hidden="true">/</span> {{ t('help_center') }}</span
         ><span>{{ t('it_helpdesk') }}</span>
       </footer>
     </main>

@@ -1,6 +1,6 @@
 import { ref } from 'vue'
 
-const savedLang = (typeof localStorage !== 'undefined' && localStorage.getItem('esb_lang')) || 'id'
+const savedLang = (typeof localStorage !== 'undefined' && localStorage.getItem('trackit_lang')) || 'id'
 const currentLang = ref(savedLang === 'en' ? 'en' : 'id')
 
 const dictionaries = {
@@ -121,7 +121,7 @@ export function useLanguage() {
     if (lang !== 'id' && lang !== 'en') return
     currentLang.value = lang
     if (typeof localStorage !== 'undefined') {
-      localStorage.setItem('esb_lang', lang)
+      localStorage.setItem('trackit_lang', lang)
     }
   }
 

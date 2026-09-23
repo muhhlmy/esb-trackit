@@ -1,7 +1,7 @@
 {
   "$metadata": {
     "version": "1.0.0",
-    "description": "ESB TrackIT responsive breakpoint tokens."
+    "description": "TrackIT responsive breakpoint tokens."
   },
   "breakpoint": {
     "sm": { "value": "640px", "type": "number", "description": "Small — large phones in landscape" },

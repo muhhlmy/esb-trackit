@@ -6,7 +6,7 @@ import { useToast } from './useToast.js'
 function loadStoredBookmarks() {
   try {
     if (typeof window === 'undefined' || !window.localStorage) return []
-    const raw = localStorage.getItem('esb_bookmarks')
+    const raw = localStorage.getItem('trackit_bookmarks')
     if (!raw) return []
     const parsed = JSON.parse(raw)
     return Array.isArray(parsed) ? parsed.map(Number).filter(Number.isFinite) : []
@@ -26,7 +26,7 @@ const pendingToggles = new Set()
 function persistLocal() {
   try {
     if (typeof window !== 'undefined' && window.localStorage) {
-      localStorage.setItem('esb_bookmarks', JSON.stringify(bookmarks.value))
+      localStorage.setItem('trackit_bookmarks', JSON.stringify(bookmarks.value))
     }
   } catch (err) {
     console.warn('Gagal menyimpan bookmark ke localStorage:', err)

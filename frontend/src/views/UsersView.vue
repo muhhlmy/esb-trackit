@@ -445,7 +445,7 @@ function handleEmployeeSelect(val) {
     const emp = employees.value.find((e) => Number(e.id_karyawan) === Number(empId))
     if (emp) {
       form.value.nama = emp.nama_karyawan || ''
-      form.value.email = emp.email_kantor || `${(emp.nik || '').toLowerCase()}@esb.co.id`
+      form.value.email = emp.email_kantor || `${(emp.nik || '').toLowerCase()}@example.com`
     }
   } else {
     selectedEmployeeId.value = ''

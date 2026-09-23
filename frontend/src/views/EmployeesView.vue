@@ -945,7 +945,7 @@ onMounted(() => {
               v-model="form.email_kantor"
               type="email"
               required
-              placeholder="nama@esb.co.id"
+              placeholder="nama@example.com"
               class="min-w-0 min-h-11 sm:min-h-0 w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-base sm:text-[13px] text-[#2A3547] focus:outline-none focus:border-[#0A51B0]"
             />
           </div>

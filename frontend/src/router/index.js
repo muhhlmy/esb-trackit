@@ -253,8 +253,8 @@ router.beforeEach(async (to) => {
 
 router.afterEach((to) => {
   document.title = to.meta.title
-    ? `${to.meta.title} | ESB TrackIT & Help Center`
-    : 'ESB TrackIT & Help Center'
+    ? `${to.meta.title} | TrackIT & Help Center`
+    : 'TrackIT & Help Center'
 })
 
 router.onError((error, to) => {

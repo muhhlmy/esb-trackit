@@ -498,7 +498,7 @@ export async function verifyRuntimeSchema(
   }
 
   return {
-    database_name: "esb_trackit",
+    database_name: process.env.DB_NAME || "trackit",
     database_user: "postgres",
     is_superuser: true,
   };

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Deploy ESB TrackIT frontend: build (umask 022) + sync ke web root nginx.
+# Deploy TrackIT frontend: build (umask 022) + sync ke web root nginx.
 # www-data butuh o+rx lintas path; umask 022 menjamin 0755/0644.
 # Usage: npm run deploy:frontend
 set -euo pipefail

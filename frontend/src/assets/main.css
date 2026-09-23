@@ -19,23 +19,23 @@
   --color-danger: #dc2626;
   --color-danger-light: #fdede8;
 
-  /* ESB Brand Logo Palette Stops */
-  --color-esb-blue-start: #0a51b0;
-  --color-esb-blue-mid1: #0a5dbd;
-  --color-esb-blue-mid2: #097cde;
-  --color-esb-blue-end: #0892f5;
+  /* Brand Logo Palette Stops */
+  --color-brand-blue-start: #0a51b0;
+  --color-brand-blue-mid1: #0a5dbd;
+  --color-brand-blue-mid2: #097cde;
+  --color-brand-blue-end: #0892f5;
 
-  --color-esb-orange-start: #ff4f1b;
-  --color-esb-orange-mid1: #fe5b1c;
-  --color-esb-orange-mid2: #fc7c20;
-  --color-esb-orange-end: #faa425;
+  --color-brand-orange-start: #ff4f1b;
+  --color-brand-orange-mid1: #fe5b1c;
+  --color-brand-orange-mid2: #fc7c20;
+  --color-brand-orange-end: #faa425;
 
-  --color-esb-primary: #ff4f1b;
-  --color-esb-primary-dark: #b83a10;
-  --color-esb-primary-light: #fff2e7;
+  --color-brand-primary: #ff4f1b;
+  --color-brand-primary-dark: #b83a10;
+  --color-brand-primary-light: #fff2e7;
   --color-brand-orange-dark: #b83a10;
   --color-brand-orange-light: #fff2e7;
-  --color-esb-gold: #faa425;
+  --color-brand-gold: #faa425;
 
   --color-brand: #0a51b0;
   --color-brand-dark: #0a4391;
@@ -86,10 +86,10 @@
   --fs-xl: 15px;
   --fs-2xl: 17px;
 
-  /* Official ESB Brand Gradients from Logo */
-  --gradient-esb-blue: linear-gradient(135deg, #0a51b0 0%, #0a5dbd 26%, #097cde 72%, #0892f5 100%);
-  --gradient-esb-blue-hero: linear-gradient(145deg, #0a51b0 0%, #084391 40%, #062b5e 100%);
-  --gradient-esb-orange: linear-gradient(
+  /* Brand Gradients */
+  --gradient-brand-blue: linear-gradient(135deg, #0a51b0 0%, #0a5dbd 26%, #097cde 72%, #0892f5 100%);
+  --gradient-brand-blue-hero: linear-gradient(145deg, #0a51b0 0%, #084391 40%, #062b5e 100%);
+  --gradient-brand-orange: linear-gradient(
     135deg,
     #ff4f1b 0%,
     #fe5b1c 21%,
@@ -109,21 +109,21 @@
   --ui-focus-ring: 0 0 0 3px rgba(10, 81, 176, 0.14);
 }
 
-.bg-gradient-esb-blue {
+.bg-gradient-brand-blue {
   background: linear-gradient(135deg, #0a51b0 0%, #0a5dbd 26%, #097cde 72%, #0892f5 100%);
 }
 
-.bg-gradient-esb-orange {
+.bg-gradient-brand-orange {
   background: linear-gradient(135deg, #ff4f1b 0%, #fe5b1c 21%, #fc7c20 60%, #faa425 100%);
 }
 
-.text-gradient-esb-blue {
+.text-gradient-brand-blue {
   background: linear-gradient(135deg, #0a51b0 0%, #0892f5 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
-.text-gradient-esb-orange {
+.text-gradient-brand-orange {
   background: linear-gradient(135deg, #ff4f1b 0%, #faa425 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;

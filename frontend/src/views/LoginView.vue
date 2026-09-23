@@ -364,8 +364,8 @@ const finishResetAndLogin = () => {
 <template>
   <div class="login-page">
     <header class="login-header">
-      <RouterLink to="/" class="login-brand" aria-label="ESB TrackIT — Pusat Bantuan">
-        <img src="/esb-logo-only.svg" alt="" width="36" height="28" />
+      <RouterLink to="/" class="login-brand" aria-label="TrackIT — Pusat Bantuan">
+        <img src="/logo.svg" alt="" width="36" height="28" />
         <span>TrackIT</span>
       </RouterLink>
       <RouterLink to="/" class="back-help"
@@ -401,7 +401,7 @@ const finishResetAndLogin = () => {
             </div>
           </div>
         </div>
-        <div class="story-footer">ESB TrackIT <span>Helpdesk & Asset Management</span></div>
+        <div class="story-footer">TrackIT <span>Helpdesk & Asset Management</span></div>
       </aside>
       <section class="login-form-panel" aria-labelledby="login-title">
         <div class="login-form-inner">
@@ -424,7 +424,7 @@ const finishResetAndLogin = () => {
                   autocomplete="username"
                   autocapitalize="none"
                   spellcheck="false"
-                  placeholder="nama@esb.co.id"
+                  placeholder="nama@example.com"
                   required
                   :disabled="isLoading"
                   :aria-describedby="errorMessage ? 'login-error' : undefined"
@@ -480,7 +480,7 @@ const finishResetAndLogin = () => {
       </section>
     </main>
     <footer class="login-footer">
-      &copy; {{ new Date().getFullYear() }} ESB People Technology
+      &copy; {{ new Date().getFullYear() }} TrackIT Project
     </footer>
     <Teleport to="body">
       <Transition name="modal-fade">
@@ -654,7 +654,7 @@ const finishResetAndLogin = () => {
                         type="email"
                         required
                         autocomplete="email"
-                        placeholder="nama@esb.co.id"
+                        placeholder="nama@example.com"
                         class="h-11 sm:h-12 w-full rounded-xl border border-slate-300 bg-slate-50/50 pl-10 pr-4 text-sm text-slate-900 transition-all placeholder:text-slate-400 focus:border-[#0A51B0] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#0A51B0]/10"
                       />
                     </div>

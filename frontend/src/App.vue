@@ -66,8 +66,8 @@ const isHelpCenterView = computed(() => {
   return false
 })
 
-// Dual state navigasi (mobile drawer vs desktop collapse)
-const isMobileNavigationOpen = ref(false)
+// Navigasi mobile sepenuhnya ditangani AppBottomNav + Menu Lainnya, jadi yang
+// tersisa di sini hanya state collapse sidebar desktop.
 const isDesktopSidebarCollapsed = ref(
   typeof window !== 'undefined' ? localStorage.getItem('app_sidebar_collapsed') === 'true' : false,
 )
@@ -78,19 +78,6 @@ watch(isDesktopSidebarCollapsed, (val) => {
   }
 })
 
-watch(
-  () => route.fullPath,
-  () => {
-    isMobileNavigationOpen.value = false
-  },
-)
-
-function handleResize() {
-  if (typeof window !== 'undefined' && window.innerWidth >= 1024) {
-    isMobileNavigationOpen.value = false
-  }
-}
-
 onMounted(async () => {
   fetchCases()
   // Data pengguna di localStorage hanya cache UI. Selalu cocokkan kembali
@@ -99,16 +86,10 @@ onMounted(async () => {
     await refreshUser()
     if (user.value) initTicketRealtime()
   }
-  if (typeof window !== 'undefined') {
-    window.addEventListener('resize', handleResize)
-  }
 })
 
 onUnmounted(() => {
   stopTicketRealtime()
-  if (typeof window !== 'undefined') {
-    window.removeEventListener('resize', handleResize)
-  }
 })
 </script>
 
@@ -154,17 +135,13 @@ onUnmounted(() => {
 
     <div class="app-shell relative flex h-dvh min-h-0 overflow-hidden bg-[#F8FAFC]">
       <AppSidebar
-        :is-mobile-open="isMobileNavigationOpen"
         :is-collapsed="isDesktopSidebarCollapsed"
-        @close-mobile="isMobileNavigationOpen = false"
         @toggle-collapse="isDesktopSidebarCollapsed = !isDesktopSidebarCollapsed"
       />
 
       <div class="relative flex min-w-0 flex-1 flex-col overflow-hidden">
         <AppHeader
-          :is-mobile-open="isMobileNavigationOpen"
           :is-collapsed="isDesktopSidebarCollapsed"
-          @toggle-mobile="isMobileNavigationOpen = !isMobileNavigationOpen"
           @toggle-collapse="isDesktopSidebarCollapsed = !isDesktopSidebarCollapsed"
         />
 

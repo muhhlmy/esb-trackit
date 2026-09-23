@@ -1,6 +1,6 @@
 # Database Migrations Guide
 
-Direktori ini berisi skema dan migrasi database untuk ESB TrackIT.
+Direktori ini berisi skema dan migrasi database untuk TrackIT.
 
 ## Struktur Direktori
 

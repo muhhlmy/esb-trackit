@@ -22,7 +22,7 @@ const requireSuperadmin = authorizeRoles('superadmin')
 
 // Setup multer untuk upload file restore
 const upload = multer({
-  dest: path.join(os.tmpdir(), 'esb-trackit-restore'),
+  dest: path.join(os.tmpdir(), 'trackit-restore'),
   limits: {
     fileSize: 500 * 1024 * 1024, // 500MB
   },

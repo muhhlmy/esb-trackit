@@ -2,7 +2,7 @@
 import { computed, ref, watch } from 'vue'
 import AppModal from '../ui/AppModal.vue'
 import {
-  ESB_LOGO_MONO_SVG,
+  LOGO_MONO_SVG,
   generateBarcodeSvg,
   printAssetLabel,
 } from '../../utils/assetLabelPrinter.js'
@@ -135,7 +135,7 @@ function handlePrint() {
             id="asset-label-hostname-input"
             v-model="customHostname"
             type="text"
-            placeholder="Masukkan hostname aset (cth: ESB-UPS-052026-01)"
+            placeholder="Masukkan hostname aset (cth: IT-UPS-052026-01)"
             class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-mono font-semibold text-slate-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none transition-colors"
           />
         </div>
@@ -172,13 +172,13 @@ function handlePrint() {
               <div>PT ESENSI SOLUSI BUANA.</div>
             </div>
 
-            <!-- Middle: ESB Logo + Barcode -->
+            <!-- Middle: Logo + Barcode -->
             <div class="flex items-center justify-between gap-2.5 my-0.5 px-0.5">
               <!-- Left: Logo & Tagline -->
               <div class="w-[30%] shrink-0 flex flex-col items-center justify-center text-center">
                 <div
                   class="w-full max-w-[80px] flex items-center justify-center"
-                  v-html="ESB_LOGO_MONO_SVG"
+                  v-html="LOGO_MONO_SVG"
                 ></div>
                 <div
                   class="text-[5.5px] sm:text-[6.5px] font-bold text-black tracking-tight mt-0.5 whitespace-nowrap"
@@ -242,7 +242,7 @@ function handlePrint() {
 </template>
 
 <style scoped>
-:deep(.esb-logo-svg) {
+:deep(.logo-svg) {
   width: 100%;
   height: auto;
   max-height: 24px;

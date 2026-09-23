@@ -12,7 +12,7 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 SKILLS_DIR="$ROOT/.agents/skills"
 
-echo "=== ESB TrackIT Skills Updater ==="
+echo "=== TrackIT Skills Updater ==="
 echo ""
 
 if [ ! -d "$SKILLS_DIR" ]; then

@@ -142,7 +142,7 @@ test('Employee RBAC CRUD Permissions Suite', async (t) => {
       {
         nik: `LEAK-${Date.now()}`,
         nama_karyawan: 'Illegal Employee',
-        email_kantor: `illegal.${Date.now()}@esb.co.id`,
+        email_kantor: `illegal.${Date.now()}@example.com`,
         departemen: 'IT',
         directorate: 'Tech',
         tanggal_mulai_bekerja: '2025-01-01',
@@ -166,7 +166,7 @@ test('Employee RBAC CRUD Permissions Suite', async (t) => {
       {
         nik: testEmpNik,
         nama_karyawan: 'Testing Employee Full',
-        email_kantor: `${testEmpNik.toLowerCase()}@esb.co.id`,
+        email_kantor: `${testEmpNik.toLowerCase()}@example.com`,
         lokasi_kerja: 'JKT',
         status: 'Active',
         title: 'Staff',
@@ -194,7 +194,7 @@ test('Employee RBAC CRUD Permissions Suite', async (t) => {
       {
         nik: testEmpNik,
         nama_karyawan: 'Hacked Name',
-        email_kantor: `${testEmpNik.toLowerCase()}@esb.co.id`,
+        email_kantor: `${testEmpNik.toLowerCase()}@example.com`,
         departemen: 'Engineering',
         directorate: 'Technology',
         tanggal_mulai_bekerja: '2025-01-01',
@@ -214,7 +214,7 @@ test('Employee RBAC CRUD Permissions Suite', async (t) => {
       {
         nik: testEmpNik,
         nama_karyawan: 'Updated Valid Employee',
-        email_kantor: `${testEmpNik.toLowerCase()}@esb.co.id`,
+        email_kantor: `${testEmpNik.toLowerCase()}@example.com`,
         lokasi_kerja: 'JKT',
         status: 'Active',
         title: 'Senior Staff',
@@ -249,7 +249,7 @@ test('Employee RBAC CRUD Permissions Suite', async (t) => {
           {
             NIK: `IMPORT-LEAK-${Date.now()}`,
             Nama: 'Leaked Employee',
-            'Email Kantor': 'leaked@esb.co.id',
+            'Email Kantor': 'leaked@example.com',
           },
         ],
         assetRows: [],
@@ -269,7 +269,7 @@ test('Employee RBAC CRUD Permissions Suite', async (t) => {
       {
         nik: testEmpNik,
         nama_karyawan: 'Superadmin Updated Employee',
-        email_kantor: `${testEmpNik.toLowerCase()}@esb.co.id`,
+        email_kantor: `${testEmpNik.toLowerCase()}@example.com`,
         lokasi_kerja: 'JKT',
         status: 'Active',
         title: 'Lead Staff',

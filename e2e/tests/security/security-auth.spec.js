@@ -14,7 +14,7 @@ test.describe('SECURITY — Authentication @security', () => {
     })
     expect(res.status()).toBe(200)
     const setCookie = res.headers()['set-cookie'] || ''
-    expect(setCookie, 'esb_session harus ter-set').toContain('esb_session=')
+    expect(setCookie, 'trackit_session harus ter-set').toContain('trackit_session=')
     // HttpOnly: JS tidak bisa baca cookie → XSS tidak bisa curi sesi
     expect(setCookie, 'cookie harus HttpOnly').toMatch(/HttpOnly/i)
     // SameSite: mitigasi CSRF
@@ -55,31 +55,31 @@ test.describe('SECURITY — Authentication @security', () => {
     const login = await request.post(`${API}/api/auth/login`, {
       data: { email: TEST_USERS.user.email, password: TEST_USERS.user.password },
     })
-    const cookie = (login.headers()['set-cookie'] || '').match(/esb_session=([^;]+)/)?.[1]
+    const cookie = (login.headers()['set-cookie'] || '').match(/trackit_session=([^;]+)/)?.[1]
     expect(cookie).toBeTruthy()
 
     // /me valid sebelum logout
     const meBefore = await request.get(`${API}/api/auth/me`, {
-      headers: { cookie: `esb_session=${cookie}` },
+      headers: { cookie: `trackit_session=${cookie}` },
     })
     expect(meBefore.status()).toBe(200)
 
     // Logout
     const out = await request.post(`${API}/api/auth/logout`, {
-      headers: { cookie: `esb_session=${cookie}` },
+      headers: { cookie: `trackit_session=${cookie}` },
     })
     expect(out.status(), 'logout harus sukses').toBeLessThan(500)
 
     // /me setelah logout: cookie lama tidak boleh valid
     const meAfter = await request.get(`${API}/api/auth/me`, {
-      headers: { cookie: `esb_session=${cookie}` },
+      headers: { cookie: `trackit_session=${cookie}` },
     })
     expect(meAfter.status(), 'sesi harus invalidated setelah logout').toBe(401)
   })
 
   test('SEC-A05 Token fiktif ditolak @security', async ({ request }) => {
     const res = await request.get(`${API}/api/users`, {
-      headers: { cookie: 'esb_session=aaa.bbb.ccc' },
+      headers: { cookie: 'trackit_session=aaa.bbb.ccc' },
     })
     expect(res.status()).toBe(401)
   })

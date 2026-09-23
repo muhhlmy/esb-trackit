@@ -1,18 +1,18 @@
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: esb-postgres
+    container_name: trackit-postgres
     restart: unless-stopped
     networks:
       - app-network
     environment:
-      POSTGRES_DB: ${DB_NAME:-esb_trackit}
+      POSTGRES_DB: ${DB_NAME:-trackit}
       POSTGRES_USER: ${DB_USER:-postgres}
       POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD must be set in environment}
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d ${DB_NAME:-esb_trackit}"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d ${DB_NAME:-trackit}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -21,7 +21,7 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: esb-migrate
+    container_name: trackit-migrate
     restart: "no"
     networks:
       - app-network
@@ -35,11 +35,11 @@ services:
       DB_PORT: 5432
       DB_USER: ${DB_USER:-postgres}
       DB_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD must be set in environment}
-      DB_NAME: ${DB_NAME:-esb_trackit}
+      DB_NAME: ${DB_NAME:-trackit}
       JWT_SECRET: ${JWT_SECRET:?JWT_SECRET must be set in environment (min 32 characters)}
       MIGRATION_MODE: ${MIGRATION_MODE:-fresh}
       MIGRATION_EXPECTED_HOST: postgres
-      MIGRATION_EXPECTED_DATABASE: ${DB_NAME:-esb_trackit}
+      MIGRATION_EXPECTED_DATABASE: ${DB_NAME:-trackit}
       ALLOW_DB_MIGRATIONS: "true"
       MIGRATION_RECOVERY_PROOF_ID: ${MIGRATION_RECOVERY_PROOF_ID:?MIGRATION_RECOVERY_PROOF_ID must be set}
       MIGRATION_CHANGE_ID: ${MIGRATION_CHANGE_ID:?MIGRATION_CHANGE_ID must be set}
@@ -55,7 +55,7 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: esb-backend
+    container_name: trackit-backend
     restart: unless-stopped
     networks:
       - app-network
@@ -69,7 +69,7 @@ services:
       DB_PORT: 5432
       DB_USER: ${DB_USER:-postgres}
       DB_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD must be set in environment}
-      DB_NAME: ${DB_NAME:-esb_trackit}
+      DB_NAME: ${DB_NAME:-trackit}
       JWT_SECRET: ${JWT_SECRET:?JWT_SECRET must be set in environment (min 32 characters)}
       PASSWORD_BCRYPT_ROUNDS: ${PASSWORD_BCRYPT_ROUNDS:-12}
       ACCESS_TOKEN_TTL_SECONDS: ${ACCESS_TOKEN_TTL_SECONDS:-900}
@@ -105,7 +105,7 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    container_name: esb-frontend
+    container_name: trackit-frontend
     restart: unless-stopped
     networks:
       - app-network

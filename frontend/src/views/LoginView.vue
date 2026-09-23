@@ -13,6 +13,8 @@ import {
   Eye,
   EyeOff,
   LoaderCircle,
+  Home,
+  LogIn,
 } from 'lucide-vue-next'
 import { useAuth } from '@/composables/useAuth'
 import { useApi } from '@/composables/useApi'
@@ -77,6 +79,11 @@ onUnmounted(() => {
 })
 
 const EMAIL_FORMAT_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+// Scroll ke form login (tombol Sign In pada mobile bottom nav).
+const scrollToLogin = () => {
+  document.querySelector('.login-form-panel')?.scrollIntoView({ behavior: 'smooth' })
+}
 
 const handleLogin = async () => {
   if (!email.value || !password.value) {
@@ -368,9 +375,6 @@ const finishResetAndLogin = () => {
         <img src="/logo.svg" alt="" width="36" height="28" />
         <span>TrackIT</span>
       </RouterLink>
-      <RouterLink to="/" class="back-help"
-        ><ArrowLeft :size="16" aria-hidden="true" /><span>Pusat Bantuan</span></RouterLink
-      >
     </header>
     <main class="login-main">
       <aside class="login-story" aria-labelledby="story-title">
@@ -482,6 +486,27 @@ const finishResetAndLogin = () => {
     <footer class="login-footer">
       &copy; {{ new Date().getFullYear() }} TrackIT Project
     </footer>
+    <nav
+      role="navigation"
+      aria-label="Navigasi Mobile Bawah"
+      class="clean-bottom-nav md:hidden fixed bottom-0 left-0 right-0 z-40 border-t border-slate-200/90 dark:border-slate-800 bg-white/95 dark:bg-slate-950/95 backdrop-blur-lg px-2 py-1 pb-[max(0.375rem,env(safe-area-inset-bottom))] flex items-center justify-around select-none shadow-none min-h-[56px]"
+    >
+      <a
+        href="/"
+        aria-label="Halaman Beranda"
+        class="flex flex-col items-center justify-center gap-0.5 px-3 py-1 rounded-xl text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors min-w-[56px] min-h-[44px] touch-manipulation active:scale-95"
+      ><Home class="w-4 h-4" />
+        <span class="text-[10px]">Home</span>
+      </a>
+      <button
+        type="button"
+        aria-label="Masuk ke Akun"
+        @click="scrollToLogin"
+        class="flex flex-col items-center justify-center gap-0.5 px-3 py-1 rounded-xl text-[#333333] font-bold hover:text-[#0A4391] transition-colors cursor-pointer min-w-[56px] min-h-[44px] touch-manipulation active:scale-95"
+      ><LogIn class="w-4 h-4" />
+        <span class="text-[10px]">Sign In</span>
+      </button>
+    </nav>
     <Teleport to="body">
       <Transition name="modal-fade">
         <div
@@ -1506,6 +1531,7 @@ const finishResetAndLogin = () => {
   .login-page {
     padding: 0 20px;
     background: #fff;
+    padding-bottom: calc(56px + env(safe-area-inset-bottom, 8px));
   }
   .login-header {
     min-height: 76px;

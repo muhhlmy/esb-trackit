@@ -3,6 +3,7 @@ import multer from 'multer'
 import path from 'node:path'
 import os from 'node:os'
 import { authorizeRoles } from '../middleware/authMiddleware.js'
+import { databaseAdminRateLimiter } from '../middleware/rateLimitMiddleware.js'
 import {
   getDatabaseStatusHandler,
   createBackupHandler,
@@ -19,6 +20,9 @@ export const backupRouter = Router()
 // Semua endpoint backup/restore hanya untuk superadmin.
 // authenticateToken sudah diterapkan oleh parent router.
 const requireSuperadmin = authorizeRoles('superadmin')
+
+// Rate limit ketat untuk semua endpoint admin database (backup/restore/audit).
+backupRouter.use(databaseAdminRateLimiter)
 
 // Setup multer untuk upload file restore
 const upload = multer({

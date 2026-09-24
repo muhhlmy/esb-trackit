@@ -32,7 +32,7 @@
     "vue": "^3.5.38",
     "vue-chartjs": "^5.3.4",
     "vue-router": "^5.1.0",
-    "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz"
+    "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz#sha512=a0b0eade3c3b01c2ea2961f60210a9553665f267fa5f661178ff8d7a1d12254cd5fc1759623b61f78b46e6da22301d4f3eb62dc4e09f6a850292fb6e1fedc024"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

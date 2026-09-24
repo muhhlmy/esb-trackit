@@ -20,9 +20,9 @@ jobs:
       DB_HOST: localhost
       DB_PORT: 5432
       DB_USER: postgres
-      DB_PASSWORD: postgrespassword
+      DB_PASSWORD: ${{ secrets.E2E_DB_PASSWORD }}
       DB_NAME: assets_monitoring_test
-      JWT_SECRET: supersecretjwtkeyfortestingpurpose1234567890
+      JWT_SECRET: ${{ secrets.E2E_JWT_SECRET }}
 
     services:
       postgres:
@@ -30,7 +30,7 @@ jobs:
         env:
           POSTGRES_DB: assets_monitoring_test
           POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgrespassword
+          POSTGRES_PASSWORD: ${{ secrets.E2E_DB_PASSWORD }}
         ports:
           - 5432:5432
         options: >-
@@ -66,9 +66,9 @@ jobs:
           DB_HOST: localhost
           DB_PORT: 5432
           DB_USER: postgres
-          DB_PASSWORD: postgrespassword
+          DB_PASSWORD: ${{ secrets.E2E_DB_PASSWORD }}
           DB_NAME: assets_monitoring_test
-          JWT_SECRET: supersecretjwtkeyfortestingpurpose1234567890
+          JWT_SECRET: ${{ secrets.E2E_JWT_SECRET }}
         run: node scripts/initialize-test-database.mjs --seed-e2e
 
       - name: Run E2E Smoke Suite (Pull Request)
@@ -79,9 +79,9 @@ jobs:
           DB_HOST: localhost
           DB_PORT: 5432
           DB_USER: postgres
-          DB_PASSWORD: postgrespassword
+          DB_PASSWORD: ${{ secrets.E2E_DB_PASSWORD }}
           DB_NAME: assets_monitoring_test
-          JWT_SECRET: supersecretjwtkeyfortestingpurpose1234567890
+          JWT_SECRET: ${{ secrets.E2E_JWT_SECRET }}
         run: npx playwright test --grep @smoke
 
       - name: Run Accessibility Audit (axe-core)
@@ -92,9 +92,9 @@ jobs:
           DB_HOST: localhost
           DB_PORT: 5432
           DB_USER: postgres
-          DB_PASSWORD: postgrespassword
+          DB_PASSWORD: ${{ secrets.E2E_DB_PASSWORD }}
           DB_NAME: assets_monitoring_test
-          JWT_SECRET: supersecretjwtkeyfortestingpurpose1234567890
+          JWT_SECRET: ${{ secrets.E2E_JWT_SECRET }}
         run: npx playwright test e2e/tests/accessibility/
 
       - name: Run Full E2E Regression Suite (Main Push)
@@ -105,9 +105,9 @@ jobs:
           DB_HOST: localhost
           DB_PORT: 5432
           DB_USER: postgres
-          DB_PASSWORD: postgrespassword
+          DB_PASSWORD: ${{ secrets.E2E_DB_PASSWORD }}
           DB_NAME: assets_monitoring_test
-          JWT_SECRET: supersecretjwtkeyfortestingpurpose1234567890
+          JWT_SECRET: ${{ secrets.E2E_JWT_SECRET }}
         run: npx playwright test
 
       - name: Upload Playwright Test Report

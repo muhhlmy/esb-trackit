@@ -72,7 +72,15 @@ app.use(
   }),
 );
 app.use(requireJsonRequest);
-app.use(express.json({ limit: "10mb" }));
+// ponytail: import Excel mengirim array baris hasil parse client (bukan file).
+// Isolasi limit besar hanya di /api/import (admin-only); endpoint lain 1mb.
+// Naikkan bila file Excel kantor >5mb perlu didukung — pertimbangkan multipart upload file mentah.
+const importJsonParser = express.json({ limit: "5mb" });
+const defaultJsonParser = express.json({ limit: "1mb" });
+app.use((req, res, next) => {
+  if (req.path.startsWith("/api/import")) return importJsonParser(req, res, next);
+  return defaultJsonParser(req, res, next);
+});
 app.use(router);
 
 // Unknown route & global error handlers (must be registered last)

@@ -178,6 +178,16 @@ export const exportRateLimiter = createBoundedRateLimiter({
   message: 'Terlalu banyak permintaan ekspor data. Silakan coba lagi nanti.',
 })
 
+// Operasi backup/restore DB adalah tindakan destraktif berat (pg_dump/pg_restore
+// seluruh database). Batasi jauh lebih ketat dari export biasa.
+export const databaseAdminRateLimiter = createBoundedRateLimiter({
+  windowMs: 15 * 60_000,
+  max: 10,
+  keyGenerator: (req) =>
+    req.user?.id ? `dbadmin:user:${req.user.id}` : `dbadmin:ip:${getClientIp(req)}`,
+  message: 'Terlalu banyak permintaan operasi database. Silakan coba lagi nanti.',
+})
+
 export const writeRateLimiter = createBoundedRateLimiter({
   windowMs: 60_000,
   max: 60,

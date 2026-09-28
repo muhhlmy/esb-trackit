@@ -3,9 +3,9 @@
  * Internal DB Values: 'In Use', 'Stock', 'Damaged', 'In Service', 'Disposal'
  * Indonesian Display Labels: 'Digunakan', 'Stok', 'Rusak', 'Dalam Perawatan', 'Disposal'
  *
- * Warna pill selaras dengan tone semantik sentral (config/design-system.js).
+ * Warna pill selaras dengan tone semantik sentral (config/design-system.js),
+ * tetapi ditulis sebagai hex literal di ASSET_STATUS_MAP di bawah.
  */
-import { STATE_TONES } from '../config/design-system.js'
 
 export const ASSET_STATUSES = [
   { value: 'In Use', label: 'Digunakan' },

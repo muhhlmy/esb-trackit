@@ -577,6 +577,7 @@ onMounted(() => {
       @update:current-page-employees="currentPageEmployees = $event"
       @select-employee="goToLevel2"
       @refresh="fetchEmployees"
+      @open-filter="showFilterModal = true"
     />
 
     <template v-else-if="currentLevel === 2 && selectedEmployee">

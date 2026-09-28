@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 import AppPagination from '../ui/AppPagination.vue'
 import SkeletonTable from '../ui/skeleton/SkeletonTable.vue'
 import { normalizeLocation } from '../../utils/locationNormalizer.js'
@@ -34,11 +34,14 @@ const emit = defineEmits([
   'update:currentPageEmployees',
   'select-employee',
   'refresh',
+  'open-filter',
 ])
 
-const showFilterModal = ref(false)
 function goToLevel2(employee) {
   emit('select-employee', employee)
+}
+function openFilter() {
+  emit('open-filter')
 }
 function fetchEmployees() {
   emit('refresh')
@@ -186,7 +189,7 @@ function getDeviceIcon(tipe) {
 
       <button
         type="button"
-        @click="showFilterModal = true"
+        @click="openFilter"
         class="h-9 shrink-0 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-semibold text-[#5F7089] hover:bg-white"
       >
         <span aria-hidden="true" class="material-symbols-outlined mr-1 align-middle text-[16px]"

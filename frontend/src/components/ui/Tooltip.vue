@@ -1,3 +1,6 @@
+<!-- eslint-disable vue/multi-word-component-names --
+     Primitif UI satu kata, sengaja: dipakai sebagai <Tooltip> seperti
+     ConfirmDialog/EmptyState lain di folder ini. -->
 <script setup>
 /**
  * Tooltip.vue — CSS-only tooltip (zero JS, zero deps).

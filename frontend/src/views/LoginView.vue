@@ -2,7 +2,6 @@
 import { ref, onMounted, onUnmounted, nextTick } from 'vue'
 import { RouterLink, useRouter } from 'vue-router'
 import {
-  ArrowLeft,
   ArrowRight,
   Laptop,
   Ticket,

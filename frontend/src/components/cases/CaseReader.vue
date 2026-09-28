@@ -47,7 +47,7 @@ const severityClass = computed(() => {
   <!-- Empty State -->
   <div
     v-if="!caseItem"
-    class="h-full flex flex-col items-center justify-center p-8 text-center text-[#575d7a] dark:text-slate-500"
+    class="case-reader-empty h-full flex flex-col items-center justify-center p-8 text-center text-[#575d7a] dark:text-slate-500"
   >
     <div
       class="w-16 h-16 rounded-2xl bg-[#edeef0] dark:bg-slate-900 flex items-center justify-center mb-4"
@@ -64,10 +64,13 @@ const severityClass = computed(() => {
   <!-- Notion Document Canvas -->
   <article
     v-else
-    class="h-full overflow-y-auto px-6 py-8 md:px-12 md:py-10 max-w-4xl mx-auto space-y-8 transition-colors"
+    class="case-reader px-6 py-8 md:px-12 md:py-10 max-w-4xl mx-auto space-y-8 transition-colors"
   >
     <!-- Notion Breadcrumb Navigation -->
-    <nav class="flex items-center gap-1.5 text-xs text-[#575d7a] dark:text-slate-400 font-medium">
+    <nav
+      aria-label="Lokasi artikel"
+      class="case-breadcrumb flex items-center gap-1.5 text-xs text-[#575d7a] dark:text-slate-400 font-medium"
+    >
       <span class="hover:text-[#0040e5] dark:hover:text-indigo-400 cursor-pointer"
         >Help Center</span
       >
@@ -82,10 +85,12 @@ const severityClass = computed(() => {
     </nav>
 
     <!-- Document Header Banner -->
-    <div class="border-b border-[#e2e2e4] dark:border-slate-800 pb-6 space-y-4">
-      <div class="flex items-center justify-between gap-3">
+    <div
+      class="case-document-header border-b border-[#e2e2e4] dark:border-slate-800 pb-6 space-y-4"
+    >
+      <div class="case-document-controls flex items-center justify-between gap-3">
         <!-- Severity & Tag Badges -->
-        <div class="flex items-center gap-2">
+        <div class="case-badges flex items-center gap-2">
           <span
             class="px-2.5 py-0.5 rounded-full text-xs font-semibold uppercase tracking-wider border flex items-center gap-1.5"
             :class="severityClass"
@@ -101,7 +106,7 @@ const severityClass = computed(() => {
         </div>
 
         <!-- Action Controls (Bookmark & Edit) -->
-        <div class="flex items-center gap-2">
+        <div class="case-actions flex items-center gap-2">
           <button
             @click="toggleBookmark(caseItem.id)"
             class="p-2 rounded-lg border border-[#c4c5d9] dark:border-slate-800 bg-white dark:bg-slate-900 hover:bg-[#f3f3f5] dark:hover:bg-slate-800 text-[#575d7a] dark:text-slate-400 hover:text-[#0040e5] transition-colors cursor-pointer"
@@ -109,6 +114,7 @@ const severityClass = computed(() => {
               'text-[#0040e5] dark:text-indigo-400 border-[#0040e5]/40': isBookmarked(caseItem.id),
             }"
             title="Bookmark this doc"
+            :aria-pressed="isBookmarked(caseItem.id)"
           >
             <Bookmark class="w-4 h-4" :fill="isBookmarked(caseItem.id) ? 'currentColor' : 'none'" />
           </button>
@@ -116,7 +122,7 @@ const severityClass = computed(() => {
           <button
             v-if="canEditKnowledgeBase"
             @click="$emit('edit', caseItem)"
-            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#c4c5d9] dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-[#f3f3f5] dark:hover:bg-slate-700 text-xs font-semibold text-[#1a1c1d] dark:text-slate-200 transition-all cursor-pointer shadow-2xs"
+            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#c4c5d9] dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-[#f3f3f5] dark:hover:bg-slate-700 font-semibold text-[#1a1c1d] dark:text-slate-200 transition-all cursor-pointer shadow-2xs"
           >
             <Edit3 class="w-3.5 h-3.5 text-[#0040e5] dark:text-indigo-400" />
             <span>Edit Document</span>
@@ -142,7 +148,7 @@ const severityClass = computed(() => {
       <!-- Notion Summary Callout Box -->
       <div
         v-if="caseItem.summary"
-        class="p-4 rounded-xl bg-white dark:bg-slate-900 border border-[#c4c5d9] dark:border-slate-800 shadow-2xs flex items-start gap-3"
+        class="case-summary p-4 rounded-xl bg-white dark:bg-slate-900 border border-[#c4c5d9] dark:border-slate-800 shadow-2xs flex items-start gap-3"
       >
         <div
           class="p-2 rounded-lg bg-[#f2f1ff] dark:bg-indigo-500/10 text-[#0040e5] dark:text-indigo-400 shrink-0"
@@ -161,7 +167,7 @@ const severityClass = computed(() => {
     <!-- TipTap Rich HTML Content Section (Model Dokumen Bebas) -->
     <section
       v-if="safeContentHtml"
-      class="doc-body prose prose-slate dark:prose-invert max-w-none text-xs sm:text-sm leading-relaxed"
+      class="doc-body prose prose-slate dark:prose-invert max-w-none leading-relaxed"
       v-html="safeContentHtml"
     ></section>
     <div
@@ -173,7 +179,7 @@ const severityClass = computed(() => {
 
     <!-- Bottom Escalation Banner (CTA) -->
     <div
-      class="p-6 rounded-2xl bg-gradient-to-r from-[#f2f1ff] to-white dark:from-slate-900 dark:to-slate-950 border border-[#c4c5d9] dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4"
+      class="case-escalation p-6 rounded-2xl bg-gradient-to-r from-[#f2f1ff] to-white dark:from-slate-900 dark:to-slate-950 border border-[#c4c5d9] dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4"
     >
       <div class="space-y-1 text-center sm:text-left">
         <h3 class="text-base font-bold text-[#1a1c1d] dark:text-slate-100">
@@ -197,9 +203,9 @@ const severityClass = computed(() => {
   </article>
 </template>
 
-<style>
+<style scoped>
 /* Rich Document Content Typography & Elements (Model Dokumen Bebas) */
-.doc-body h1 {
+.doc-body :deep(h1) {
   font-size: 1.875rem;
   line-height: 2.25rem;
   font-weight: 800;
@@ -208,7 +214,7 @@ const severityClass = computed(() => {
   color: #1a1c1d;
 }
 
-.doc-body h2 {
+.doc-body :deep(h2) {
   font-size: 1.5rem;
   line-height: 2rem;
   font-weight: 700;
@@ -217,7 +223,7 @@ const severityClass = computed(() => {
   color: #1a1c1d;
 }
 
-.doc-body h3 {
+.doc-body :deep(h3) {
   font-size: 1.2rem;
   line-height: 1.75rem;
   font-weight: 700;
@@ -226,32 +232,32 @@ const severityClass = computed(() => {
   color: #1a1c1d;
 }
 
-.doc-body p {
+.doc-body :deep(p) {
   margin-top: 0.5rem;
   margin-bottom: 0.75rem;
   line-height: 1.75;
 }
 
-.doc-body ul {
+.doc-body :deep(ul) {
   list-style-type: disc;
   padding-left: 1.5rem;
   margin-top: 0.5rem;
   margin-bottom: 0.75rem;
 }
 
-.doc-body ol {
+.doc-body :deep(ol) {
   list-style-type: decimal;
   padding-left: 1.5rem;
   margin-top: 0.5rem;
   margin-bottom: 0.75rem;
 }
 
-.doc-body li {
+.doc-body :deep(li) {
   margin-bottom: 0.375rem;
   line-height: 1.6;
 }
 
-.doc-body blockquote {
+.doc-body :deep(blockquote) {
   border-left: 3px solid #0040e5;
   background-color: #f8fafc;
   padding: 0.75rem 1rem;
@@ -262,7 +268,7 @@ const severityClass = computed(() => {
   color: #475569;
 }
 
-.doc-body pre {
+.doc-body :deep(pre) {
   background-color: #0f172a;
   color: #38bdf8;
   padding: 1rem 1.25rem;
@@ -275,7 +281,7 @@ const severityClass = computed(() => {
   line-height: 1.65;
 }
 
-.doc-body code {
+.doc-body :deep(code) {
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   background-color: #f1f5f9;
   color: #1a1c1d;
@@ -284,69 +290,222 @@ const severityClass = computed(() => {
   font-size: 0.85em;
 }
 
-.doc-body pre code {
+.doc-body :deep(pre code) {
   background-color: transparent;
   color: inherit;
   padding: 0;
 }
 
-.doc-body a {
+.doc-body :deep(a) {
   color: #0040e5;
   text-decoration: underline;
   text-underline-offset: 2px;
 }
 
-.doc-body img {
+.doc-body :deep(img) {
   max-width: 100%;
   border-radius: 0.75rem;
   margin-top: 1rem;
   margin-bottom: 1rem;
 }
 
-.doc-body table {
+.doc-body :deep(table) {
   width: 100%;
   border-collapse: collapse;
   margin-top: 1rem;
   margin-bottom: 1rem;
 }
 
-.doc-body th,
-.doc-body td {
+.doc-body :deep(th),
+.doc-body :deep(td) {
   border: 1px solid #e2e2e4;
   padding: 0.5rem 0.75rem;
 }
 
-.doc-body th {
+.doc-body :deep(th) {
   background-color: #f8fafc;
   font-weight: 600;
 }
 
-.dark .doc-body h1,
-.dark .doc-body h2,
-.dark .doc-body h3 {
+.doc-body :deep(h1:where(.dark *)),
+.doc-body :deep(h2:where(.dark *)),
+.doc-body :deep(h3:where(.dark *)) {
   color: #f8fafc;
 }
 
-.dark .doc-body blockquote {
+.doc-body :deep(blockquote:where(.dark *)) {
   background-color: rgba(30, 41, 59, 0.6);
   color: #cbd5e1;
 }
 
-.dark .doc-body code {
+.doc-body :deep(code:where(.dark *)) {
   background-color: #1e293b;
   color: #f8fafc;
 }
 
-.dark .doc-body a {
+.doc-body :deep(a:where(.dark *)) {
   color: #818cf8;
 }
 
-.dark .doc-body th,
-.dark .doc-body td {
+.doc-body :deep(th:where(.dark *)),
+.doc-body :deep(td:where(.dark *)) {
   border-color: #334155;
 }
 
-.dark .doc-body th {
+.doc-body :deep(th:where(.dark *)) {
   background-color: #1e293b;
+}
+.case-reader {
+  width: 100%;
+  min-width: 0;
+  padding: 24px 20px 32px;
+  overflow-wrap: anywhere;
+}
+.case-reader-empty {
+  min-height: 400px;
+}
+.case-reader-empty p {
+  font-size: 14px;
+  line-height: 1.75;
+  margin-top: 12px;
+}
+.case-breadcrumb {
+  flex-wrap: wrap;
+  gap: 8px;
+  line-height: 1.7;
+}
+.case-breadcrumb > span {
+  min-width: 0;
+  max-width: 100%;
+  cursor: default;
+}
+.case-breadcrumb > svg {
+  flex-shrink: 0;
+}
+.case-document-header {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding-bottom: 28px;
+}
+.case-document-header > * {
+  margin-block: 0;
+}
+.case-document-controls {
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 16px;
+}
+.case-badges {
+  min-width: 0;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.case-badges > span {
+  max-width: 100%;
+  font-size: 11px;
+  line-height: 1.6;
+  padding: 5px 10px;
+  letter-spacing: 0.025em;
+}
+.case-badges svg {
+  flex-shrink: 0;
+}
+.case-actions {
+  flex-shrink: 0;
+  gap: 8px;
+}
+.case-reader button {
+  min-height: 44px;
+  min-width: 44px;
+  padding: 12px;
+  border-radius: 10px;
+  font-size: 13px;
+  line-height: 18px;
+  gap: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.case-reader button svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+.case-reader button:focus-visible {
+  outline: 2px solid #0040e5;
+  outline-offset: 3px;
+}
+.case-reader h1 {
+  font-size: clamp(26px, 2.5vw, 36px);
+  line-height: 1.3;
+  letter-spacing: -0.035em;
+}
+.case-summary {
+  padding: 20px;
+  gap: 12px;
+  box-shadow: none;
+}
+.case-summary > div:last-child {
+  min-width: 0;
+  font-size: 14px;
+  line-height: 1.8;
+}
+.doc-body {
+  min-width: 0;
+  font-size: 15px;
+  line-height: 1.8;
+}
+.doc-body :deep(p) {
+  max-width: 68ch;
+  margin-block: 12px 20px;
+}
+.doc-body :deep(img) {
+  height: auto;
+}
+.doc-body :deep(table) {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+}
+.doc-body :deep(pre) {
+  max-width: 100%;
+}
+.case-escalation {
+  padding: 24px;
+  gap: 20px;
+  flex-direction: column;
+  align-items: stretch;
+}
+.case-escalation > div:first-child {
+  text-align: left;
+}
+.case-escalation p {
+  font-size: 13px;
+  line-height: 1.75;
+  margin-top: 8px;
+}
+.case-escalation button {
+  width: 100%;
+}
+@media (min-width: 1024px) {
+  .case-reader {
+    padding: 32px 40px 40px;
+  }
+}
+@media (min-width: 1280px) {
+  .case-escalation {
+    flex-direction: row;
+    align-items: center;
+  }
+  .case-escalation > div:last-child {
+    flex-shrink: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .case-reader,
+  .case-reader * {
+    transition: none;
+  }
 }
 </style>

@@ -80,18 +80,22 @@ onMounted(async () => {
 
 <template>
   <div
-    class="w-full flex-1 flex flex-col items-center bg-[#F8FAFC] dark:bg-slate-950 text-[#333333] dark:text-slate-100 py-6 px-4 sm:px-6 lg:px-8 transition-colors duration-200"
+    class="cases-page w-full flex-1 flex flex-col items-center bg-[#F8FAFC] dark:bg-slate-950 text-[#333333] dark:text-slate-100 py-6 px-4 sm:px-6 lg:px-8 transition-colors duration-200"
   >
     <div
-      class="max-w-[1200px] mx-auto w-full h-[calc(100vh-7rem)] overflow-hidden flex relative rounded-2xl border border-[#E5EAEF] dark:border-slate-800 bg-white dark:bg-slate-950 shadow-xs"
+      class="cases-workspace max-w-[1200px] mx-auto w-full h-[calc(100vh-7rem)] overflow-hidden flex relative rounded-2xl border border-[#E5EAEF] dark:border-slate-800 bg-white dark:bg-slate-950 shadow-xs"
     >
       <!-- Desktop Left Collapsible Notion Tree Sidebar -->
-      <div class="hidden md:flex h-full transition-all duration-300">
+      <div class="cases-desktop-tree hidden md:flex h-full transition-all duration-300">
         <NotionTreeSidebar :is-collapsed="isSidebarCollapsed" @toggle-collapse="toggleSidebar" />
       </div>
 
       <!-- Mobile Sidebar Drawer (Overlay) -->
-      <div v-if="isMobileSidebarOpen" class="md:hidden fixed inset-0 z-50 flex">
+      <div
+        v-if="isMobileSidebarOpen"
+        class="cases-mobile-tree md:hidden fixed inset-0 z-50 flex"
+        @keydown.esc="isMobileSidebarOpen = false"
+      >
         <!-- Backdrop -->
         <div
           @click="isMobileSidebarOpen = false"
@@ -100,7 +104,7 @@ onMounted(async () => {
 
         <!-- Drawer Content -->
         <div
-          class="relative w-80 max-w-[85vw] bg-white dark:bg-slate-950 h-full shadow-2xl z-10 flex flex-col"
+          class="cases-drawer relative w-80 max-w-[85vw] bg-white dark:bg-slate-950 h-full shadow-2xl z-10 flex flex-col"
         >
           <div
             class="p-3 border-b border-[#e2e2e4] dark:border-slate-800 flex items-center justify-between"
@@ -108,12 +112,16 @@ onMounted(async () => {
             <span class="text-xs font-bold text-[#1a1c1d] dark:text-slate-100">Daftar Dokumen</span>
             <button
               @click="isMobileSidebarOpen = false"
+              aria-label="Tutup daftar artikel"
               class="p-1.5 rounded-lg text-[#575d7a] hover:bg-[#f3f3f5] dark:hover:bg-slate-800"
             >
               <X class="w-4 h-4" />
             </button>
           </div>
-          <div class="flex-1 overflow-hidden" @click="isMobileSidebarOpen = false">
+          <div
+            class="flex-1 overflow-hidden"
+            @click="$event.target.closest('[data-case-link]') && (isMobileSidebarOpen = false)"
+          >
             <NotionTreeSidebar :is-collapsed="false" />
           </div>
         </div>
@@ -121,16 +129,17 @@ onMounted(async () => {
 
       <!-- Main Canvas Area -->
       <main
-        class="flex-1 flex flex-col overflow-hidden bg-white dark:bg-slate-950 transition-colors border-l border-[#E5EAEF] dark:border-slate-800"
+        class="cases-canvas flex-1 flex flex-col overflow-hidden bg-white dark:bg-slate-950 transition-colors border-l border-[#E5EAEF] dark:border-slate-800"
       >
         <!-- Canvas Top Control Bar (Sidebar Toggle) -->
         <div
-          class="px-4 sm:px-8 py-2.5 border-b border-[#e2e2e4] dark:border-slate-800/80 bg-white/70 dark:bg-slate-950/60 backdrop-blur-xs flex items-center justify-between gap-3 text-xs"
+          class="cases-toolbar px-4 sm:px-8 py-2.5 border-b border-[#e2e2e4] dark:border-slate-800/80 bg-white/70 dark:bg-slate-950/60 backdrop-blur-xs flex items-center justify-between gap-3 text-xs"
         >
           <div class="flex items-center gap-2">
             <!-- Desktop Toggle Sidebar -->
             <button
               @click="toggleSidebar"
+              :aria-expanded="!isSidebarCollapsed"
               class="hidden md:flex items-center gap-1.5 py-1 px-2 rounded-lg text-[#575d7a] hover:text-[#0040e5] dark:text-slate-400 hover:bg-[#f3f3f5] dark:hover:bg-slate-800 transition-colors cursor-pointer"
               :title="isSidebarCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar'"
             >
@@ -153,11 +162,11 @@ onMounted(async () => {
         </div>
 
         <!-- Main Dynamic Document Reader -->
-        <div class="flex-1 overflow-y-auto">
+        <div class="cases-scroll flex-1 overflow-y-auto">
           <!-- No search result state -->
           <div
             v-if="hasNoSearchResult"
-            class="h-full flex flex-col items-center justify-center p-8 text-center text-[#575d7a] dark:text-slate-500"
+            class="cases-no-results h-full flex flex-col items-center justify-center p-8 text-center text-[#575d7a] dark:text-slate-500"
           >
             <div
               class="w-16 h-16 rounded-2xl bg-[#edeef0] dark:bg-slate-900 flex items-center justify-center mb-4"
@@ -171,7 +180,7 @@ onMounted(async () => {
               Artikel / panduan yang Anda cari belum tersedia. Ajukan tiket agar tim IT dapat
               membantu.
             </p>
-            <div class="flex items-center gap-2 mt-5">
+            <div class="cases-empty-actions flex items-center gap-2 mt-5">
               <button
                 @click="clearSearch"
                 class="px-4 py-2 rounded-lg text-xs font-semibold border border-[#c4c5d9] dark:border-slate-700 bg-white dark:bg-slate-800 text-[#1a1c1d] dark:text-slate-200 hover:bg-[#f3f3f5] transition-all cursor-pointer"
@@ -198,3 +207,95 @@ onMounted(async () => {
     </div>
   </div>
 </template>
+
+<style scoped>
+.cases-page {
+  min-width: 0;
+  font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+  padding-block: 24px 32px;
+  gap: 24px;
+}
+.cases-workspace {
+  width: 100%;
+  max-width: 1440px;
+}
+.cases-workspace {
+  height: auto;
+  min-height: 36rem;
+  align-items: stretch;
+}
+.cases-canvas,
+.cases-scroll {
+  min-width: 0;
+}
+.cases-canvas {
+  border-left: 0;
+}
+.cases-toolbar {
+  padding: 12px 16px;
+  min-height: 68px;
+}
+.cases-page button {
+  min-height: 44px;
+  min-width: 44px;
+}
+.cases-toolbar button {
+  padding: 10px 12px;
+  gap: 8px;
+  font-size: 13px;
+  border-radius: 10px;
+}
+.cases-toolbar button span {
+  font-size: 13px;
+}
+.cases-drawer {
+  max-width: calc(100vw - 24px);
+  width: 340px;
+}
+.cases-drawer > div:first-child {
+  padding: 16px;
+}
+.cases-drawer > div:first-child span {
+  font-size: 14px;
+}
+.cases-no-results {
+  min-height: 400px;
+  overflow-wrap: anywhere;
+}
+.cases-no-results p {
+  font-size: 14px;
+  line-height: 1.75;
+  margin-top: 12px;
+}
+.cases-empty-actions {
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+.cases-empty-actions button {
+  font-size: 13px;
+  padding: 12px 16px;
+}
+.cases-page button:focus-visible {
+  outline: 2px solid #0040e5;
+  outline-offset: 3px;
+}
+@media (min-width: 768px) {
+  .cases-workspace {
+    height: calc(100dvh - 16rem);
+    min-height: 580px;
+  }
+  .cases-desktop-tree {
+    flex-shrink: 0;
+  }
+  .cases-toolbar {
+    padding-inline: 24px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cases-page,
+  .cases-page * {
+    transition: none;
+  }
+}
+</style>

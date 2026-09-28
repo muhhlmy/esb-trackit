@@ -5,6 +5,12 @@
    Without this, dark: utilities key off prefers-color-scheme instead of the .dark class. */
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* Smooth scroll on programmatic navigation (mobile bottom-nav to top) —
+   neutral on desktop; neutralized by prefers-reduced-motion below. */
+html {
+  scroll-behavior: smooth;
+}
+
 @theme {
   --color-brand-orange: #ff4f1b;
   --color-primary: #0a51b0;

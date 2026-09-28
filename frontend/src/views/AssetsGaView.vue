@@ -309,6 +309,7 @@ async function submitForm() {
     } else {
       await put(`/api/ga-assets/${selectedAsset.value.id}`, payload)
     }
+    isSubmitting.value = false
     closeModal()
     await fetchData()
   } catch (err) {
@@ -1026,7 +1027,11 @@ function formatKondisiPill(kondisi) {
             :disabled="isSubmitting || !canWriteAssets"
             class="h-10 px-5 rounded-xl bg-[#0A51B0] text-[13px] font-bold text-white shadow-2xs hover:bg-[#0A4391] disabled:opacity-50 flex items-center gap-2"
           >
-            <span v-if="isSubmitting" class="animate-spin text-[16px]">hourglass_empty</span>
+            <span
+              v-if="isSubmitting"
+              aria-hidden="true"
+              class="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"
+            ></span>
             <span>{{ isSubmitting ? 'Menyimpan...' : 'Simpan Aset GA' }}</span>
           </button>
         </div>

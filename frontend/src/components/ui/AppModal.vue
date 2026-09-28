@@ -1,7 +1,6 @@
 <script setup>
 // AppModal.vue — Modal pop-up yang dipakai di seluruh aplikasi
 import { nextTick, onBeforeUnmount, onMounted, ref, useId, watch } from 'vue'
-import { animateModalEnter, animateModalLeave } from '../../composables/useGsap.js'
 
 const props = defineProps({
   isOpen: { type: Boolean, default: false },
@@ -102,7 +101,7 @@ onBeforeUnmount(() => {
 <template>
   <!-- Teleport ke body agar tidak tertutup overflow parent -->
   <Teleport to="body">
-    <Transition :css="false" @enter="animateModalEnter" @leave="animateModalLeave">
+    <Transition name="modal">
       <div
         v-if="isOpen"
         class="modal-backdrop fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-slate-900/40 backdrop-blur-xs"
@@ -184,17 +183,31 @@ onBeforeUnmount(() => {
 <style scoped>
 .modal-enter-active,
 .modal-leave-active {
-  transition: all 0.22s ease;
+  transition: opacity 0.18s ease;
+}
+.modal-enter-active .modal-panel,
+.modal-leave-active .modal-panel {
+  transition:
+    transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 0.18s ease;
 }
 .modal-enter-from,
 .modal-leave-to {
   opacity: 0;
 }
 .modal-enter-from .modal-panel {
-  transform: translateY(12px) scale(0.98);
+  transform: translateY(10px) scale(0.98);
 }
 .modal-leave-to .modal-panel {
-  transform: translateY(8px) scale(0.98);
+  transform: translateY(6px) scale(0.98);
+}
+@media (prefers-reduced-motion: reduce) {
+  .modal-enter-active,
+  .modal-leave-active,
+  .modal-enter-active .modal-panel,
+  .modal-leave-active .modal-panel {
+    transition: none;
+  }
 }
 
 /* Custom Sleek Scrollbar for Modal Body */

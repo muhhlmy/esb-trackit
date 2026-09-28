@@ -143,6 +143,13 @@ export default defineConfig(({ mode = 'development' }) => {
       headers: FRONTEND_SECURITY_HEADERS,
     },
     build: {
+      // Bundel ditaruh di 'static/', BUKAN 'assets/'.
+      // Alasan: route SPA '/assets' (AssetsView) bertabrakan dengan direktori
+      // build di web root. nginx `try_files $uri $uri/ /index.html` menemukan
+      // direktori 'assets/' pada langkah $uri/, jadi fallback /index.html tidak
+      // pernah jalan -> 301 ke /assets/ lalu 403 (tidak ada index, autoindex off).
+      // Refresh di /assets gagal sementara navigasi klien berhasil.
+      assetsDir: 'static',
       sourcemap: false,
     },
   }

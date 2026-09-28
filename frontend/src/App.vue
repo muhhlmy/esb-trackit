@@ -96,7 +96,9 @@ onUnmounted(() => {
 <template>
   <!-- 1. Halaman Login Standalone -->
   <template v-if="isLoginPage">
-    <RouterView />
+    <Transition name="fade" mode="out-in" appear>
+      <RouterView />
+    </Transition>
   </template>
 
   <!-- 2. Halaman Editor Fullscreen (Distraction-Free Editor) -->

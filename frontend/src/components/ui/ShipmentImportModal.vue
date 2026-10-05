@@ -157,8 +157,10 @@ watch(
     size="lg"
     @close="close"
   >
-    <div class="space-y-4">
-      <div class="grid grid-cols-3 gap-2 rounded-xl border border-slate-200 bg-slate-50 p-2">
+    <div class="shipment-import-flow space-y-4">
+      <div
+        class="shipment-import-steps grid grid-cols-3 gap-2 rounded-xl border border-slate-200 bg-slate-50 p-2"
+      >
         <div class="rounded-lg bg-white px-3 py-2 shadow-xs">
           <p class="text-[10px] font-bold uppercase tracking-wide text-slate-400">Langkah 1</p>
           <p class="mt-0.5 text-xs font-bold text-slate-700">Unduh template</p>
@@ -350,3 +352,41 @@ watch(
     </div>
   </AppModal>
 </template>
+
+<style scoped>
+.shipment-import-steps > div {
+  min-width: 0;
+  border: 1px solid transparent;
+}
+.shipment-import-steps > div:first-child {
+  border-color: #cfe0f8;
+}
+.shipment-import-flow fieldset {
+  background: white;
+}
+.shipment-import-flow fieldset label {
+  min-height: 44px;
+  align-items: center;
+  cursor: pointer;
+}
+.shipment-import-flow button {
+  min-height: 44px;
+}
+.shipment-import-flow button:focus-visible,
+.shipment-import-flow input:focus-visible {
+  outline: 2px solid #0a51b0;
+  outline-offset: 2px;
+}
+.shipment-import-flow table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+@media (max-width: 639px) {
+  .shipment-import-steps {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .shipment-import-steps > div {
+    padding: 8px 12px;
+  }
+}
+</style>

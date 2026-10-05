@@ -1226,6 +1226,115 @@ onMounted(() => {
 }
 
 /* Page-owned spacing and controls; shared surfaces stay unchanged. */
+.shipment-header {
+  padding: 20px 24px;
+  border-color: #dce5f1;
+  box-shadow: 0 4px 18px #0a51b00a;
+  flex-wrap: wrap;
+}
+.shipment-header :deep(.page-header-title) {
+  font-size: clamp(1.25rem, 2vw, 1.5rem);
+}
+.shipment-header :deep(.page-header-subtitle) {
+  white-space: normal;
+  line-height: 1.5;
+}
+.shipments-page .shipment-transfer-actions {
+  padding: 3px;
+  border: 1px solid #dce5f1;
+  border-radius: 12px;
+  background: #f4f8ff;
+}
+.shipments-page .shipment-transfer-actions button {
+  min-width: 88px;
+  color: #0a51b0;
+}
+.shipments-page :is(button, input):focus-visible {
+  outline: 2px solid #0a51b0;
+  outline-offset: 2px;
+}
+.shipment-toolbar {
+  padding: 16px;
+  border: 1px solid #dce5f1;
+  border-radius: 16px;
+  background: white;
+  box-shadow: 0 2px 10px #0a51b008;
+}
+.shipment-toolbar > button {
+  padding-inline: 16px;
+  color: #0a51b0;
+}
+.shipment-search input {
+  font-size: 13px;
+  border-color: #dce5f1;
+}
+.shipment-summary > div {
+  border-color: #dce5f1;
+  box-shadow: 0 3px 12px #0a51b009;
+}
+.shipment-summary > div > div:first-child {
+  color: #0a51b0;
+}
+.shipment-table {
+  border-color: #dce5f1;
+}
+.shipment-table th {
+  border-bottom: 1px solid #dce5f1;
+  color: #52647e;
+}
+.shipment-table tbody tr:hover {
+  background: #f4f8ff;
+}
+.shipment-table a {
+  min-height: 44px;
+  color: #0a51b0;
+}
+.shipment-cards > li {
+  border-color: #dce5f1;
+  box-shadow: 0 3px 12px #0a51b009;
+}
+.shipment-cards > li > p {
+  background: #f4f8ff;
+  border: 1px solid #e4edf8;
+}
+.shipment-cards a {
+  color: #0a51b0;
+}
+:global(.shipment-dialog > div:first-child) {
+  padding: 20px 24px;
+  border-color: #dce5f1;
+}
+:global(.shipment-dialog .modal-body) {
+  background: #fafcff;
+}
+:global(.shipment-dialog .shipment-entry-section) {
+  background: white;
+  border-color: #dce5f1;
+  box-shadow: 0 2px 10px #0a51b008;
+}
+:global(.shipment-dialog :is(input, textarea, button):focus-visible) {
+  outline: 2px solid #0a51b0;
+  outline-offset: 2px;
+}
+:global(.shipment-dialog fieldset label) {
+  min-height: 44px;
+  align-items: center;
+}
+@media (max-width: 639px) {
+  .shipment-header {
+    padding: 18px;
+  }
+  .shipment-toolbar {
+    padding: 12px;
+  }
+  :global(.shipment-dialog > div:first-child) {
+    padding: 16px;
+  }
+  :global(.shipment-dialog .shipment-entry-section) {
+    padding: 16px;
+  }
+}
+
 .shipments-page {
   display: flex;
   flex-direction: column;
@@ -1236,7 +1345,12 @@ onMounted(() => {
   margin-block: 0;
 }
 .shipment-header {
-  padding-block: 8px;
+  padding: 20px 24px;
+}
+@media (max-width: 639px) {
+  .shipment-header {
+    padding: 18px;
+  }
 }
 .shipment-header-actions,
 .shipment-transfer-actions {

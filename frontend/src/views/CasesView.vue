@@ -94,6 +94,9 @@ onMounted(async () => {
       <div
         v-if="isMobileSidebarOpen"
         class="cases-mobile-tree md:hidden fixed inset-0 z-50 flex"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Daftar artikel"
         @keydown.esc="isMobileSidebarOpen = false"
       >
         <!-- Backdrop -->
@@ -153,6 +156,8 @@ onMounted(async () => {
             <!-- Mobile Open Sidebar -->
             <button
               @click="isMobileSidebarOpen = true"
+              :aria-expanded="isMobileSidebarOpen"
+              aria-label="Buka daftar artikel"
               class="md:hidden flex items-center gap-1.5 py-1 px-2 rounded-lg bg-[#f3f3f5] dark:bg-slate-800 text-[#1a1c1d] dark:text-slate-200 font-medium"
             >
               <Menu class="w-4 h-4 text-[#0040e5]" />
@@ -212,17 +217,15 @@ onMounted(async () => {
 .cases-page {
   min-width: 0;
   font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
-  padding-block: 24px 32px;
-  gap: 24px;
+  padding-block: 16px 24px;
 }
 .cases-workspace {
   width: 100%;
   max-width: 1440px;
-}
-.cases-workspace {
   height: auto;
-  min-height: 36rem;
+  min-height: min(36rem, 70dvh);
   align-items: stretch;
+  box-shadow: 0 12px 36px rgb(30 41 59 / 0.06);
 }
 .cases-canvas,
 .cases-scroll {
@@ -232,8 +235,12 @@ onMounted(async () => {
   border-left: 0;
 }
 .cases-toolbar {
-  padding: 12px 16px;
-  min-height: 68px;
+  padding: 10px 16px;
+  min-height: 64px;
+  flex-shrink: 0;
+}
+.cases-scroll {
+  overscroll-behavior: contain;
 }
 .cases-page button {
   min-height: 44px;
@@ -249,8 +256,12 @@ onMounted(async () => {
   font-size: 13px;
 }
 .cases-drawer {
-  max-width: calc(100vw - 24px);
+  max-width: calc(100vw - 32px);
   width: 340px;
+}
+.cases-drawer > div:first-child button {
+  display: grid;
+  place-items: center;
 }
 .cases-drawer > div:first-child {
   padding: 16px;
@@ -259,8 +270,12 @@ onMounted(async () => {
   font-size: 14px;
 }
 .cases-no-results {
-  min-height: 400px;
+  min-height: min(400px, 60dvh);
   overflow-wrap: anywhere;
+}
+.cases-no-results h3 {
+  max-width: 40ch;
+  line-height: 1.5;
 }
 .cases-no-results p {
   font-size: 14px;
@@ -280,10 +295,22 @@ onMounted(async () => {
   outline: 2px solid #0040e5;
   outline-offset: 3px;
 }
+@media (max-width: 767px) {
+  .cases-workspace,
+  .cases-canvas,
+  .cases-scroll {
+    overflow: visible;
+  }
+  .cases-empty-actions button {
+    flex: 1 1 160px;
+  }
+}
 @media (min-width: 768px) {
+  .cases-page {
+    padding-block: 24px 32px;
+  }
   .cases-workspace {
-    height: calc(100dvh - 16rem);
-    min-height: 580px;
+    height: max(580px, calc(100dvh - 16rem));
   }
   .cases-desktop-tree {
     flex-shrink: 0;

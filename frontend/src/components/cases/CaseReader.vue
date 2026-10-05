@@ -56,8 +56,7 @@ const severityClass = computed(() => {
     </div>
     <h3 class="text-base font-bold text-[#1a1c1d] dark:text-slate-300">Pilih Artikel</h3>
     <p class="text-xs text-[#575d7a] dark:text-slate-500 mt-1 max-w-sm">
-      Pilih salah satu panduan di panel navigasi pohon sebelah kiri untuk membaca playbook
-      dokumentasi lengkap.
+      Pilih panduan dari daftar artikel untuk membaca dokumentasi lengkap.
     </p>
   </div>
 
@@ -71,11 +70,9 @@ const severityClass = computed(() => {
       aria-label="Lokasi artikel"
       class="case-breadcrumb flex items-center gap-1.5 text-xs text-[#575d7a] dark:text-slate-400 font-medium"
     >
-      <span class="hover:text-[#0040e5] dark:hover:text-indigo-400 cursor-pointer"
-        >Help Center</span
-      >
+      <span>Help Center</span>
       <ChevronRight class="w-3.5 h-3.5 text-[#5F7089]" />
-      <span class="capitalize hover:text-[#0040e5] dark:hover:text-indigo-400 cursor-pointer">
+      <span class="capitalize">
         {{ caseItem.category }}
       </span>
       <ChevronRight class="w-3.5 h-3.5 text-[#5F7089]" />
@@ -113,7 +110,8 @@ const severityClass = computed(() => {
             :class="{
               'text-[#0040e5] dark:text-indigo-400 border-[#0040e5]/40': isBookmarked(caseItem.id),
             }"
-            title="Bookmark this doc"
+            :title="isBookmarked(caseItem.id) ? 'Hapus bookmark' : 'Simpan bookmark'"
+            :aria-label="isBookmarked(caseItem.id) ? 'Hapus bookmark' : 'Simpan bookmark'"
             :aria-pressed="isBookmarked(caseItem.id)"
           >
             <Bookmark class="w-4 h-4" :fill="isBookmarked(caseItem.id) ? 'currentColor' : 'none'" />
@@ -358,8 +356,11 @@ const severityClass = computed(() => {
 .case-reader {
   width: 100%;
   min-width: 0;
-  padding: 24px 20px 32px;
+  padding: 24px 20px 40px;
   overflow-wrap: anywhere;
+}
+.case-reader > * {
+  min-width: 0;
 }
 .case-reader-empty {
   min-height: 400px;
@@ -373,6 +374,7 @@ const severityClass = computed(() => {
   flex-wrap: wrap;
   gap: 8px;
   line-height: 1.7;
+  overflow-wrap: anywhere;
 }
 .case-breadcrumb > span {
   min-width: 0;
@@ -455,6 +457,13 @@ const severityClass = computed(() => {
   min-width: 0;
   font-size: 15px;
   line-height: 1.8;
+  overflow-wrap: anywhere;
+}
+.doc-body :deep(em) {
+  font-style: italic;
+}
+.doc-body :deep(a) {
+  overflow-wrap: anywhere;
 }
 .doc-body :deep(p) {
   max-width: 68ch;

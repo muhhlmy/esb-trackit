@@ -112,7 +112,7 @@ function handleSelectCase(id) {
           type="text"
           class="w-full bg-white dark:bg-slate-900 border border-[#c4c5d9] dark:border-slate-800 rounded-lg pl-8 pr-7 py-1.5 text-xs text-[#1a1c1d] dark:text-slate-100 placeholder-[#5F7089] dark:placeholder-slate-500 focus:outline-none focus:border-[#0040e5] transition-all shadow-2xs"
           placeholder="Cari judul atau ringkasan…"
-          aria-label="Cari artikel"
+          aria-label="Cari artikel dalam daftar"
         />
         <kbd
           class="absolute right-2 top-1/2 -translate-y-1/2 px-1 text-[10px] font-mono text-[#575d7a] dark:text-slate-500 bg-[#f3f3f5] dark:bg-slate-800 rounded border border-[#e2e2e4] dark:border-slate-700"
@@ -206,6 +206,19 @@ function handleSelectCase(id) {
 <style scoped>
 .case-tree {
   min-width: 0;
+  font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+}
+.case-tree-list {
+  overscroll-behavior: contain;
+}
+.case-tree-category,
+.case-tree-article {
+  min-width: 0;
+}
+.case-tree-category:focus-visible,
+.case-tree-article:focus-visible {
+  position: relative;
+  z-index: 1;
 }
 .case-tree:not([inert]) {
   width: 100%;

@@ -35,7 +35,7 @@ function exportData() {
     size="sm"
     @close="emit('close')"
   >
-    <div class="space-y-4">
+    <div class="shipment-export-flow space-y-4">
       <div class="flex items-start gap-3 rounded-2xl border border-[#CFE0F8] bg-[#F4F8FF] p-4">
         <span aria-hidden="true" class="material-symbols-outlined text-[24px] text-[#0A51B0]"
           >table_view</span
@@ -79,3 +79,17 @@ function exportData() {
     </div>
   </AppModal>
 </template>
+
+<style scoped>
+.shipment-export-flow > div {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.shipment-export-flow button {
+  min-height: 44px;
+}
+.shipment-export-flow button:focus-visible {
+  outline: 2px solid #0a51b0;
+  outline-offset: 2px;
+}
+</style>

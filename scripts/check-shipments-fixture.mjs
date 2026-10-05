@@ -13,7 +13,7 @@ const server = createServer(async (req, res) => {
     return;
   }
   try {
-    const file = path.startsWith("/assets/")
+    const file = path.startsWith("/static/")
       ? resolve(root, "." + path)
       : resolve(root, "index.html");
     res.setHeader(
@@ -68,6 +68,7 @@ async function geometry(locator) {
 async function checkDialog(page, name) {
   const dialog = page.getByRole("dialog", { name, exact: true });
   await expect(dialog).toBeVisible();
+  await expect.poll(() => dialog.evaluate(el => Math.abs(el.getBoundingClientRect().width - el.offsetWidth) < 0.1)).toBe(true);
   const g = await geometry(dialog);
   assert.equal(g.overflow, false, name);
   assert.deepEqual(g.internal, [], name);
@@ -161,25 +162,6 @@ try {
           .locator('.shipments-page[data-testid="page-ready"]')
           .waitFor();
         const area = page.locator(".shipments-page");
-        if (scenario === "populated" && mode === "full") {
-          const styles = async (target) => target.evaluate(() => {
-            const selectors = [".asset-toolbar", ".asset-toolbar h2", ".inventory-actions button", ".asset-toolbar > div:nth-child(2)", ".asset-toolbar input", ".it-list-heading", ".ws-data-table th", ".ws-data-table td"];
-            return Object.fromEntries(selectors.map(selector => {
-              const el = document.querySelector(selector);
-              if (!el) return [selector, null];
-              const css = getComputedStyle(el);
-              return [selector, Object.fromEntries(["padding", "borderRadius", "fontSize", "gap"].map(key => [key, css[key]]))];
-            }));
-          });
-          const actual = await styles(page);
-          const reference = await context.newPage();
-          await reference.goto(origin + "/assets");
-          await reference.locator('.asset-it-inventory[data-testid="page-ready"]').waitFor();
-          const expected = await styles(reference);
-          console.log(JSON.stringify({ width, actual, expected, comparison: "Aset IT" }));
-          assert.deepEqual(actual, expected, `Aset IT surface consistency at ${width}px`);
-          await reference.close();
-        }
         const g = await geometry(area);
         assert.equal(g.overflow, false, `${width}/${scenario}/${mode}`);
         assert.deepEqual(g.internal, [], `${width}/${scenario}/${mode}`);

@@ -644,11 +644,11 @@ onMounted(() => {
           <li
             v-for="emp in paginatedEmployees"
             :key="emp.id_karyawan || emp.nik"
-            class="min-w-0 p-4 space-y-3 wrap-anywhere"
+            class="min-w-0 p-2.5 sm:p-3 space-y-2 wrap-anywhere rounded-xl border border-[#E2E8F0] bg-white shadow-2xs"
           >
-            <div class="space-y-1">
-              <h3 class="text-sm font-bold leading-snug text-[#333333]">{{ emp.nama_karyawan }}</h3>
-              <p class="text-[13px] leading-relaxed text-[#5F7089]">
+            <div class="space-y-0.5">
+              <h3 class="text-[13px] font-bold leading-snug text-[#333333]">{{ emp.nama_karyawan }}</h3>
+              <p class="text-[11.5px] leading-relaxed text-[#5F7089]">
                 {{ emp.email_kantor || '—' }}
               </p>
             </div>
@@ -662,25 +662,25 @@ onMounted(() => {
               "
               :text="emp.status_karyawan || emp.status || 'Active'"
             />
-            <dl class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-[13px] leading-relaxed">
+            <dl class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11.5px] leading-relaxed">
               <div>
-                <dt class="text-xs text-[#5F7089]">NIK</dt>
+                <dt class="text-[10px] text-[#5F7089]">NIK</dt>
                 <dd class="font-mono font-semibold text-[#333333]">{{ emp.nik }}</dd>
               </div>
               <div>
-                <dt class="text-xs text-[#5F7089]">Title / Jabatan</dt>
+                <dt class="text-[10px] text-[#5F7089]">Title / Jabatan</dt>
                 <dd class="text-[#333333]">{{ emp.jabatan || emp.title || '—' }}</dd>
               </div>
               <div>
-                <dt class="text-xs text-[#5F7089]">Departemen</dt>
+                <dt class="text-[10px] text-[#5F7089]">Departemen</dt>
                 <dd class="text-[#333333]">{{ emp.departemen || '—' }}</dd>
               </div>
               <div>
-                <dt class="text-xs text-[#5F7089]">Direktorat</dt>
+                <dt class="text-[10px] text-[#5F7089]">Direktorat</dt>
                 <dd class="text-[#333333]">{{ emp.direktorat || emp.directorate || '—' }}</dd>
               </div>
               <div>
-                <dt class="text-xs text-[#5F7089]">Lokasi Kerja</dt>
+                <dt class="text-[10px] text-[#5F7089]">Lokasi Kerja</dt>
                 <dd class="text-[#333333]">
                   {{ normalizeLocation(emp.lokasi_kerja || emp.work_location) || '—' }}
                 </dd>
@@ -688,24 +688,24 @@ onMounted(() => {
             </dl>
             <div
               v-if="canWriteKaryawan"
-              class="grid grid-cols-2 gap-2 border-t border-[#F1F5F9] pt-3"
+              class="grid grid-cols-2 gap-2 border-t border-[#F1F5F9] pt-2"
             >
               <button
                 type="button"
                 :aria-label="'Edit ' + emp.nama_karyawan"
-                class="flex min-h-11 items-center justify-center gap-2 rounded-lg border border-[#E2E8F0] text-[13px] font-semibold text-[#334155] hover:bg-[#F8FAFC] cursor-pointer"
+                class="flex min-h-8 items-center justify-center gap-1.5 rounded-lg border border-[#E2E8F0] text-xs font-semibold text-[#334155] hover:bg-[#F8FAFC] cursor-pointer"
                 @click="openEdit(emp)"
               >
-                <span aria-hidden="true" class="material-symbols-outlined text-[18px]">edit</span
+                <span aria-hidden="true" class="material-symbols-outlined text-[16px]">edit</span
                 >Edit
               </button>
               <button
                 type="button"
                 :aria-label="'Hapus ' + emp.nama_karyawan"
-                class="flex min-h-11 items-center justify-center gap-2 rounded-lg border border-[#E2E8F0] text-[13px] font-semibold text-rose-700 hover:bg-rose-50 cursor-pointer"
+                class="flex min-h-8 items-center justify-center gap-1.5 rounded-lg border border-[#E2E8F0] text-xs font-semibold text-rose-700 hover:bg-rose-50 cursor-pointer"
                 @click="openDelete(emp)"
               >
-                <span aria-hidden="true" class="material-symbols-outlined text-[18px]">delete</span
+                <span aria-hidden="true" class="material-symbols-outlined text-[16px]">delete</span
                 >Hapus
               </button>
             </div>

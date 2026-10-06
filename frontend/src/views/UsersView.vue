@@ -985,17 +985,17 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
           />
 
           <!-- User Cards -->
-          <div v-else class="admin-person-cards flex flex-col gap-3 p-3.5">
+          <div v-else class="admin-person-cards flex flex-col gap-2 p-1 sm:p-2">
             <div
               v-for="user in paginatedUsers"
               :key="'m-' + user.id"
-              class="rounded-xl border border-[#E2E8F0] bg-white p-3.5 flex flex-col gap-2.5 shadow-2xs active:bg-[#F8FAFC] transition-colors"
+              class="rounded-xl border border-[#E2E8F0] bg-white p-2.5 sm:p-3 flex flex-col gap-2 shadow-2xs active:bg-[#F8FAFC] transition-colors"
             >
               <!-- Card Header: Avatar + Name + Email + Actions -->
               <div class="flex items-start justify-between gap-2">
-                <div class="flex items-center gap-2.5 min-w-0 flex-1">
+                <div class="flex items-center gap-2 min-w-0 flex-1">
                   <div
-                    class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-[11px] font-bold text-white select-none"
+                    class="flex h-7.5 w-7.5 shrink-0 items-center justify-center rounded-lg text-[10.5px] font-bold text-white select-none"
                     :class="{
                       'bg-purple-600': isRoleSuperAdmin(user.role),
                       'bg-[#0A51B0]': user.role === 'admin' && !isRoleSuperAdmin(user.role),
@@ -1006,12 +1006,12 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
                   </div>
                   <div class="min-w-0 flex-1">
                     <p
-                      class="text-[13px] font-bold text-[#333333] leading-snug truncate"
+                      class="text-[12px] font-bold text-[#333333] leading-snug truncate"
                       :title="user.nama"
                     >
                       {{ user.nama }}
                     </p>
-                    <p class="text-[11px] text-[#5F7089] truncate" :title="user.email">
+                    <p class="text-[10.5px] text-[#5F7089] truncate" :title="user.email">
                       {{ user.email }}
                     </p>
                   </div>
@@ -1025,10 +1025,10 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
               </div>
 
               <!-- Card Body: 2x2 Metadata Grid -->
-              <div class="grid grid-cols-2 gap-2">
+              <div class="grid grid-cols-2 gap-1.5">
                 <!-- Role -->
-                <div class="flex flex-col gap-0.5 rounded-lg bg-[#F8FAFC] px-2.5 py-2">
-                  <span class="text-[10px] font-semibold uppercase tracking-wider text-[#687281]"
+                <div class="flex flex-col gap-0.5 rounded-lg bg-[#F8FAFC] px-2 py-1.5">
+                  <span class="text-[9.5px] font-semibold uppercase tracking-wider text-[#687281]"
                     >Role</span
                   >
                   <AppBadge
@@ -1038,8 +1038,8 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
                 </div>
 
                 <!-- Status -->
-                <div class="flex flex-col gap-0.5 rounded-lg bg-[#F8FAFC] px-2.5 py-2">
-                  <span class="text-[10px] font-semibold uppercase tracking-wider text-[#687281]"
+                <div class="flex flex-col gap-0.5 rounded-lg bg-[#F8FAFC] px-2 py-1.5">
+                  <span class="text-[9.5px] font-semibold uppercase tracking-wider text-[#687281]"
                     >Status</span
                   >
                   <AppBadge

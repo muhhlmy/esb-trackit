@@ -725,18 +725,18 @@ onBeforeUnmount(() => {
 
 <template>
   <header
-    class="app-header relative z-30 flex h-14 md:h-[64px] items-center justify-between px-3 md:px-5 shrink-0 border-b border-[#E5EAEF] bg-white/95 backdrop-blur-md"
+    class="app-header relative z-30 flex h-11 md:h-12 items-center justify-between px-2.5 md:px-4 shrink-0 border-b border-[#E5EAEF] bg-white/95 backdrop-blur-md"
   >
     <!-- 1. LEFT: Navigation Drawer Toggle & Page Titles -->
     <div class="flex items-center gap-2 md:gap-2.5 md:shrink-0 min-w-0">
       <div class="min-w-0">
         <h1
-          class="text-sm wrap-anywhere md:truncate md:text-[15px] font-semibold tracking-tight text-[#333333] leading-tight"
+          class="text-xs wrap-anywhere md:truncate md:text-sm font-semibold tracking-tight text-[#333333] leading-tight"
         >
           {{ pageTitle }}
         </h1>
         <p
-          class="hidden md:block truncate text-[10px] font-medium text-[#637288] leading-relaxed mt-1"
+          class="hidden md:block truncate text-[9.5px] font-medium text-[#637288] leading-relaxed mt-0.5"
         >
           {{ pageSubtitle }}
         </p>
@@ -746,7 +746,7 @@ onBeforeUnmount(() => {
     <!-- 2. CENTER: Main Global Search Bar (Desktop Only) -->
     <div
       ref="searchContainerRef"
-      class="contents md:flex md:mx-4 relative justify-center z-40 min-w-0"
+      class="contents md:flex md:mx-3 relative justify-center z-40 min-w-0"
       :class="isSearchOpen ? 'md:flex-1 md:max-w-md lg:max-w-lg' : 'md:ml-auto'"
     >
       <button
@@ -757,10 +757,10 @@ onBeforeUnmount(() => {
         :aria-expanded="isSearchOpen"
         aria-controls="global-main-search"
         title="Cari (Ctrl K)"
-        class="hidden md:flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-[#475569] hover:bg-[#F1F5F9] focus-visible:outline-2 focus-visible:outline-[#0A51B0] cursor-pointer"
+        class="hidden md:flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-[#475569] hover:bg-[#F1F5F9] focus-visible:outline-2 focus-visible:outline-[#0A51B0] cursor-pointer"
         @click="initGlobalSearchData"
       >
-        <span aria-hidden="true" class="material-symbols-outlined text-[22px]">search</span>
+        <span aria-hidden="true" class="material-symbols-outlined text-[18px]">search</span>
       </button>
       <form
         v-show="isSearchOpen"
@@ -772,7 +772,7 @@ onBeforeUnmount(() => {
 
         <span
           aria-hidden="true"
-          class="material-symbols-outlined absolute left-2.5 sm:left-3 text-[16px] sm:text-[17px] text-[#475569] pointer-events-none transition-colors"
+          class="material-symbols-outlined absolute left-2.5 text-[15px] text-[#475569] pointer-events-none transition-colors"
         >
           search
         </span>
@@ -784,7 +784,7 @@ onBeforeUnmount(() => {
           type="search"
           autocomplete="off"
           :placeholder="searchPlaceholder"
-          class="h-11 md:h-9 w-full rounded-lg md:rounded-lg border border-[#DFE5EF] bg-[#F8FAFC] pl-10 md:pl-9 pr-12 md:pr-20 text-[11px] sm:text-xs font-medium text-[#333333] placeholder-[#5F7089] outline-none transition-all focus:bg-white focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/20 [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden"
+          class="h-8 w-full rounded-md border border-[#DFE5EF] bg-[#F8FAFC] pl-8 pr-16 text-[11px] font-medium text-[#333333] placeholder-[#5F7089] outline-none transition-all focus:bg-white focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/20 [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden"
         />
 
         <!-- Action Buttons / Hotkey Indicator -->
@@ -1254,9 +1254,9 @@ onBeforeUnmount(() => {
         @click="initGlobalSearchData"
         aria-label="Cari Global"
         title="Cari Global (Aset, Tiket, Karyawan, User)"
-        class="flex md:hidden h-9 w-9 items-center justify-center rounded-xl text-[#5F7089] hover:bg-[#F8FAFC] hover:text-[#333333] transition-all cursor-pointer select-none active:scale-95 touch-manipulation"
+        class="flex md:hidden h-8 w-8 items-center justify-center rounded-lg text-[#5F7089] hover:bg-[#F8FAFC] hover:text-[#333333] transition-all cursor-pointer select-none active:scale-95 touch-manipulation"
       >
-        <span aria-hidden="true" class="material-symbols-outlined text-[20px]">search</span>
+        <span aria-hidden="true" class="material-symbols-outlined text-[18px]">search</span>
       </button>
 
       <!-- Notification Bell -->
@@ -1269,16 +1269,16 @@ onBeforeUnmount(() => {
           type="button"
           :title="unreadCount > 0 ? `Notifikasi (${unreadCount})` : 'Notifikasi'"
           @click="toggleNotif"
-          class="relative flex h-9 w-9 items-center justify-center rounded-xl text-[#5F7089] hover:bg-[#F8FAFC] hover:text-[#333333] transition-all cursor-pointer select-none active:scale-95 touch-manipulation"
+          class="relative flex h-8 w-8 items-center justify-center rounded-lg text-[#5F7089] hover:bg-[#F8FAFC] hover:text-[#333333] transition-all cursor-pointer select-none active:scale-95 touch-manipulation"
           :class="isNotifOpen ? 'bg-[#EDF5FF] text-[#333333]' : ''"
         >
-          <span aria-hidden="true" class="material-symbols-outlined text-[20px]"
+          <span aria-hidden="true" class="material-symbols-outlined text-[18px]"
             >notifications</span
           >
           <Transition name="badge-pop">
             <span
               v-if="unreadCount > 0"
-              class="absolute -top-0.5 -right-0.5 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-[#0A51B0] px-1 text-[9.5px] font-bold text-white shadow-2xs"
+              class="absolute -top-0.5 -right-0.5 flex h-3.5 min-w-[14px] items-center justify-center rounded-full bg-[#0A51B0] px-1 text-[8.5px] font-bold text-white shadow-2xs"
               >{{ unreadCount > 9 ? '9+' : unreadCount }}</span
             >
           </Transition>
@@ -1470,12 +1470,12 @@ onBeforeUnmount(() => {
           :class="isProfileOpen ? 'bg-[#F8FAFC]' : ''"
         >
           <div
-            class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#0A51B0] text-xs font-bold text-white shadow-2xs"
+            class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#0A51B0] text-[11px] font-bold text-white shadow-2xs"
           >
             {{ (user && user.nama ? user.nama.charAt(0) : 'U').toUpperCase() }}
           </div>
           <div class="hidden text-left lg:block">
-            <p class="text-xs font-bold text-[#333333] leading-tight truncate max-w-[140px]">
+            <p class="text-[11.5px] font-bold text-[#333333] leading-tight truncate max-w-[130px]">
               {{ user ? user.nama : 'Pengguna' }}
             </p>
             <p

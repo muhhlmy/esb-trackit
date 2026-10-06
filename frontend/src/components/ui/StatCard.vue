@@ -15,14 +15,14 @@ defineProps({
 
 <template>
   <div
-    class="bg-white border border-[#E2E8F0] rounded-xl p-3.5 sm:p-4 shadow-2xs hover:border-[#CBD5E1] transition-all flex flex-col justify-between"
+    class="bg-white border border-[#E2E8F0] rounded-xl p-2 sm:p-2.5 shadow-2xs hover:border-[#CBD5E1] transition-all flex flex-col justify-between min-h-[58px] sm:min-h-[64px]"
   >
-    <div class="flex items-center justify-between gap-2">
-      <span class="text-[11px] font-semibold text-[#5F7089] uppercase tracking-wider truncate">{{
+    <div class="flex items-center justify-between gap-1.5">
+      <span class="text-[9.5px] sm:text-[10px] font-semibold text-[#5F7089] uppercase tracking-wider truncate">{{
         title
       }}</span>
       <div
-        class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg"
+        class="flex h-5 w-5 sm:h-5.5 sm:w-5.5 shrink-0 items-center justify-center rounded-md"
         :class="{
           'bg-[#EFF6FF] text-[#333333]': color === 'primary',
           'bg-[#ECFDF5] text-[#059669]': color === 'success',
@@ -32,16 +32,16 @@ defineProps({
           'bg-[#F8FAFC] text-[#475569]': color === 'purple',
         }"
       >
-        <span aria-hidden="true" class="material-symbols-outlined text-[17px]">{{ icon }}</span>
+        <span aria-hidden="true" class="material-symbols-outlined text-[13px] sm:text-[14px]">{{ icon }}</span>
       </div>
     </div>
 
-    <div class="mt-2.5">
+    <div class="mt-1 sm:mt-1.5">
       <span
-        class="font-num block text-[24px] sm:text-[26px] font-bold leading-none tracking-tight text-[#333333]"
+        class="font-num block text-[17px] sm:text-[20px] font-bold leading-none tracking-tight text-[#333333]"
         >{{ value }}</span
       >
-      <span v-if="subtitle" class="mt-1 block truncate text-[10px] font-medium text-[#687281]">{{
+      <span v-if="subtitle" class="mt-0.5 block truncate text-[9px] sm:text-[9.5px] font-medium text-[#687281]">{{
         subtitle
       }}</span>
     </div>

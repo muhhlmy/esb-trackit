@@ -1570,16 +1570,16 @@ onUnmounted(() => {
 }
 @media (max-width: 767px) {
   .dashboard-view {
-    gap: 24px;
+    gap: 12px;
     padding-top: 0;
   }
   .dashboard-stats {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 12px;
+    gap: 8px;
   }
   .dash-stat-card {
-    padding: 16px;
-    border-radius: 12px;
+    padding: 10px 12px;
+    border-radius: 10px;
   }
   .stat-total,
   .dashboard-stat-skeleton > :first-child {
@@ -1589,7 +1589,7 @@ onUnmounted(() => {
     display: grid;
     grid-template-columns: 1fr auto;
     align-items: center;
-    gap: 6px 16px;
+    gap: 4px 12px;
   }
   .stat-total .stat-label {
     justify-content: flex-start;
@@ -1598,38 +1598,38 @@ onUnmounted(() => {
     grid-column: 2;
     grid-row: 1 / 3;
     margin: 0;
-    font-size: 36px;
+    font-size: 22px;
   }
   .stat-label {
-    font-size: 11px;
-    gap: 6px;
+    font-size: 10px;
+    gap: 5px;
   }
   .stat-label > .material-symbols-outlined {
-    width: 28px;
-    height: 28px;
+    width: 22px;
+    height: 22px;
   }
   .stat-number {
-    font-size: 28px;
-    margin: 16px 0;
+    font-size: 19px;
+    margin: 6px 0;
   }
   .dashboard-panel {
-    padding: 18px;
-    border-radius: 12px;
+    padding: 12px 14px;
+    border-radius: 10px;
   }
   .dashboard-chart-grid {
-    gap: 20px;
+    gap: 12px;
   }
   .dashboard-panel > div:first-child {
-    margin-bottom: 20px;
+    margin-bottom: 12px;
   }
   .location-card {
-    padding: 16px;
+    padding: 12px;
   }
   .dashboard-table {
-    border-radius: 12px;
+    border-radius: 10px;
   }
   .dashboard-table > div:first-child {
-    padding: 18px;
+    padding: 12px 14px;
     flex-wrap: wrap;
   }
   .dashboard-table > div:first-child > div {
@@ -1640,7 +1640,7 @@ onUnmounted(() => {
     width: 100%;
   }
   .dashboard-recent-cards > div {
-    padding: 18px;
+    padding: 12px 14px;
   }
   .dashboard-retry {
     width: 100%;
@@ -1648,17 +1648,17 @@ onUnmounted(() => {
 }
 .dashboard-view .dashboard-stats > * {
   min-width: 0;
-  padding: 24px;
-  border-radius: 16px;
+  padding: 12px 14px;
+  border-radius: 10px;
 }
 .dashboard-stat-skeleton > * {
-  min-height: 174px;
+  min-height: 64px;
 }
 .dashboard-view .dashboard-stats {
-  gap: 20px;
+  gap: 10px;
 }
 .dashboard-view .dashboard-stats .stat-number {
-  font-size: 32px;
+  font-size: 20px;
 }
 .stat-bottom {
   font-weight: 600;
@@ -1666,7 +1666,7 @@ onUnmounted(() => {
 @media (min-width: 640px) and (max-width: 1279px) {
   .dashboard-stats {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 20px;
+    gap: 10px;
   }
   .dashboard-stats > :first-child {
     grid-column: 1 / -1;
@@ -1683,8 +1683,8 @@ onUnmounted(() => {
     justify-content: space-between;
   }
   .stat-total .stat-number {
-    margin: 18px 0 16px;
-    font-size: 32px;
+    margin: 8px 0 6px;
+    font-size: 22px;
   }
   .stat-total .stat-caption {
     margin-top: auto;
@@ -1692,8 +1692,8 @@ onUnmounted(() => {
 }
 @media (max-width: 639px) {
   .dashboard-stats {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 20px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
   }
 }
 @media (prefers-reduced-motion: reduce) {

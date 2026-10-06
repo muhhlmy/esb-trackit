@@ -104,17 +104,17 @@ onBeforeUnmount(() => {
     <Transition name="modal">
       <div
         v-if="isOpen"
-        class="modal-backdrop fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-slate-900/40 backdrop-blur-xs"
+        class="modal-backdrop fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-900/40 backdrop-blur-xs"
         @mousedown.self="close"
       >
-        <!-- Panel Modal Container (Fixed Outer Box with Overflow Hidden) -->
+        <!-- Panel Modal Container (Mobile Bottom Sheet / Desktop Centered Card) -->
         <div
           ref="panelRef"
           role="dialog"
           aria-modal="true"
           :aria-labelledby="titleId"
           tabindex="-1"
-          class="modal-panel app-modal-panel ui-modal-panel flex max-h-[calc(100dvh-1.5rem)] sm:max-h-[85vh] w-full flex-col overflow-hidden rounded-2xl border border-[#E2E8F0] bg-white shadow-2xl outline-none"
+          class="modal-panel app-modal-panel ui-modal-panel flex max-h-[90dvh] sm:max-h-[85vh] w-full flex-col overflow-hidden rounded-t-2xl sm:rounded-xl border-t sm:border border-[#E2E8F0] bg-white shadow-2xl outline-none"
           :class="[
             panelClass,
             {
@@ -127,28 +127,31 @@ onBeforeUnmount(() => {
             },
           ]"
         >
+          <!-- Mobile Drag Handle -->
+          <div class="mx-auto mt-2 h-1 w-9 rounded-full bg-slate-300 sm:hidden"></div>
+
           <!-- Header Modal (Fixed Non-Scrollable Header) -->
           <div
-            class="flex shrink-0 items-center justify-between gap-3 border-b border-[#F1F5F9] bg-white px-3.5 sm:px-5 py-3.5"
+            class="flex shrink-0 items-center justify-between gap-2.5 border-b border-[#F1F5F9] bg-white px-3.5 sm:px-4 py-2.5 sm:py-3"
           >
-            <div class="flex items-center gap-2.5 min-w-0">
+            <div class="flex items-center gap-2 min-w-0">
               <span
-                class="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-[#EDF5FF] text-[#333333] border border-[#B8D4F5]/30"
+                class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#EDF5FF] text-[#333333] border border-[#B8D4F5]/30"
               >
-                <span aria-hidden="true" class="material-symbols-outlined text-[18px]">{{
+                <span aria-hidden="true" class="material-symbols-outlined text-[16px]">{{
                   icon || 'devices'
                 }}</span>
               </span>
               <div class="min-w-0">
                 <h2
                   :id="titleId"
-                  class="text-sm font-bold text-[#333333] leading-tight wrap-anywhere sm:truncate"
+                  class="text-[13px] sm:text-sm font-bold text-[#333333] leading-tight wrap-anywhere sm:truncate"
                 >
                   {{ title }}
                 </h2>
                 <p
                   v-if="subtitle"
-                  class="text-[11px] font-normal text-[#5F7089] mt-0.5 leading-none truncate"
+                  class="text-[10px] sm:text-[11px] font-normal text-[#5F7089] mt-0.5 leading-none truncate"
                 >
                   {{ subtitle }}
                 </p>
@@ -158,19 +161,19 @@ onBeforeUnmount(() => {
               type="button"
               aria-label="Tutup dialog"
               @click="close"
-              class="flex h-11 w-11 sm:h-7 sm:w-7 shrink-0 items-center justify-center rounded-lg text-[#475569] transition-colors hover:bg-[#F8FAFC] hover:text-[#333333] cursor-pointer"
+              class="flex h-7.5 w-7.5 sm:h-7 sm:w-7 shrink-0 items-center justify-center rounded-lg text-[#475569] transition-colors hover:bg-[#F8FAFC] hover:text-[#333333] cursor-pointer"
             >
-              <span aria-hidden="true" class="material-symbols-outlined text-[18px]">close</span>
+              <span aria-hidden="true" class="material-symbols-outlined text-[17px]">close</span>
             </button>
           </div>
 
           <!-- Body Konten Modal (Sole Scrollable Area) -->
-          <div class="modal-body flex-1 min-h-0 overflow-y-auto p-3.5 sm:p-4">
+          <div class="modal-body flex-1 min-h-0 overflow-y-auto p-3 sm:p-3.5">
             <slot />
           </div>
           <div
             v-if="$slots.footer"
-            class="modal-footer shrink-0 border-t border-[#F1F5F9] bg-white px-3.5 py-3 sm:px-4"
+            class="modal-footer shrink-0 border-t border-[#F1F5F9] bg-white px-3.5 py-2.5 sm:px-4"
           >
             <slot name="footer" />
           </div>
@@ -188,7 +191,7 @@ onBeforeUnmount(() => {
 .modal-enter-active .modal-panel,
 .modal-leave-active .modal-panel {
   transition:
-    transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.22s cubic-bezier(0.16, 1, 0.3, 1),
     opacity 0.18s ease;
 }
 .modal-enter-from,
@@ -200,6 +203,12 @@ onBeforeUnmount(() => {
 }
 .modal-leave-to .modal-panel {
   transform: translateY(6px) scale(0.98);
+}
+@media (max-width: 639px) {
+  .modal-enter-from .modal-panel,
+  .modal-leave-to .modal-panel {
+    transform: translateY(100%) scale(1);
+  }
 }
 @media (prefers-reduced-motion: reduce) {
   .modal-enter-active,

@@ -2126,7 +2126,7 @@ onMounted(fetchData)
   overflow-x: auto;
 }
 .submission-history .ws-data-table :is(th, td) {
-  padding: 14px 16px;
+  padding: 7px 10px;
 }
 .submission-history tbody tr,
 .submission-laptop-row {
@@ -2394,15 +2394,15 @@ onMounted(fetchData)
   outline-offset: 3px;
 }
 .submission-history :deep(button[aria-haspopup='menu']) {
-  min-width: 44px;
-  min-height: 44px;
+  min-width: 30px;
+  min-height: 30px;
 }
 .submissions-page .submission-card-list > .submission-laptop-row {
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 44px;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 28px;
 }
 @media (min-width: 1280px) {
   .submissions-page .submission-card-list > .submission-laptop-row {
-    grid-template-columns: minmax(0, 1.4fr) repeat(2, minmax(0, 1fr)) minmax(0, 0.8fr) 44px;
+    grid-template-columns: minmax(0, 1.4fr) repeat(2, minmax(0, 1fr)) minmax(0, 0.8fr) 28px;
     grid-template-areas: 'identity holder location state actions';
   }
 }

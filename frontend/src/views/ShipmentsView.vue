@@ -427,70 +427,70 @@ onMounted(() => {
     <!-- Summary Cards -->
     <div class="shipment-summary">
       <div
-        class="rounded-2xl border border-[#E2E8F0] bg-white p-4 shadow-2xs flex items-center gap-3.5"
+        class="rounded-xl border border-[#E2E8F0] bg-white p-2.5 sm:p-3 shadow-2xs flex items-center gap-2.5"
       >
         <div
-          class="h-11 w-11 rounded-xl bg-blue-50 text-[#333333] flex items-center justify-center shrink-0"
+          class="h-8 w-8 rounded-lg bg-blue-50 text-[#333333] flex items-center justify-center shrink-0"
         >
-          <Package class="w-5 h-5" />
+          <Package class="w-4 h-4" />
         </div>
         <div class="min-w-0">
-          <p class="text-[11px] font-semibold text-[#5F7089] uppercase tracking-wider">
+          <p class="text-[10px] font-semibold text-[#5F7089] uppercase tracking-wider">
             Total Pengiriman
           </p>
-          <p class="text-xl sm:text-2xl font-bold text-[#333333] mt-0.5">
+          <p class="text-base sm:text-lg font-bold text-[#333333] mt-0.5 leading-none">
             {{ summary.total }}
           </p>
         </div>
       </div>
 
       <div
-        class="rounded-2xl border border-[#E2E8F0] bg-white p-4 shadow-2xs flex items-center gap-3.5"
+        class="rounded-xl border border-[#E2E8F0] bg-white p-2.5 sm:p-3 shadow-2xs flex items-center gap-2.5"
       >
         <div
-          class="h-11 w-11 rounded-xl bg-slate-100 text-[#475569] flex items-center justify-center shrink-0"
+          class="h-8 w-8 rounded-lg bg-slate-100 text-[#475569] flex items-center justify-center shrink-0"
         >
-          <Package class="w-5 h-5" />
+          <Package class="w-4 h-4" />
         </div>
         <div class="min-w-0">
-          <p class="text-[11px] font-semibold text-[#5F7089] uppercase tracking-wider">
+          <p class="text-[10px] font-semibold text-[#5F7089] uppercase tracking-wider">
             Belum Dikirim
           </p>
-          <p class="text-xl sm:text-2xl font-bold text-[#333333] mt-0.5">
+          <p class="text-base sm:text-lg font-bold text-[#333333] mt-0.5 leading-none">
             {{ summary.belum_dikirim }}
           </p>
         </div>
       </div>
 
       <div
-        class="rounded-2xl border border-[#E2E8F0] bg-white p-4 shadow-2xs flex items-center gap-3.5"
+        class="rounded-xl border border-[#E2E8F0] bg-white p-2.5 sm:p-3 shadow-2xs flex items-center gap-2.5"
       >
         <div
-          class="h-11 w-11 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center shrink-0"
+          class="h-8 w-8 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center shrink-0"
         >
-          <Truck class="w-5 h-5" />
+          <Truck class="w-4 h-4" />
         </div>
         <div class="min-w-0">
-          <p class="text-[11px] font-semibold text-[#5F7089] uppercase tracking-wider">
+          <p class="text-[10px] font-semibold text-[#5F7089] uppercase tracking-wider">
             Sedang Dikirim
           </p>
-          <p class="text-xl sm:text-2xl font-bold text-[#333333] mt-0.5">
+          <p class="text-base sm:text-lg font-bold text-[#333333] mt-0.5 leading-none">
             {{ summary.sedang_dikirim }}
           </p>
         </div>
       </div>
 
       <div
-        class="rounded-2xl border border-[#E2E8F0] bg-white p-4 shadow-2xs flex items-center gap-3.5"
+        class="rounded-xl border border-[#E2E8F0] bg-white p-2.5 sm:p-3 shadow-2xs flex items-center gap-2.5"
       >
         <div
-          class="h-11 w-11 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0"
+          class="h-8 w-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0"
         >
-          <Truck class="w-5 h-5" />
+          <Truck class="w-4 h-4" />
         </div>
         <div class="min-w-0">
-          <p class="text-[11px] font-semibold text-[#5F7089] uppercase tracking-wider">Diterima</p>
-          <p class="text-xl sm:text-2xl font-bold text-[#333333] mt-0.5">
+          <p class="text-[10px] font-semibold text-[#5F7089] uppercase tracking-wider">Diterima</p>
+          <p class="text-base sm:text-lg font-bold text-[#333333] mt-0.5 leading-none">
             {{ summary.diterima }}
           </p>
         </div>
@@ -1386,11 +1386,11 @@ onMounted(() => {
 .shipment-summary {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 16px;
+  gap: 10px;
 }
 .shipment-summary > div {
   min-width: 0;
-  padding: 20px;
+  padding: 10px 12px;
 }
 .shipment-summary p {
   overflow-wrap: anywhere;
@@ -1459,10 +1459,14 @@ onMounted(() => {
   .shipment-cards[data-layout='card'] {
     grid-template-columns: minmax(0, 1fr);
   }
+  .shipment-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
   .shipment-summary > div {
-    padding: 16px;
-    flex-direction: column;
-    align-items: flex-start;
+    padding: 9px 11px;
+    flex-direction: row;
+    align-items: center;
   }
 }
 @media (max-width: 639px) {

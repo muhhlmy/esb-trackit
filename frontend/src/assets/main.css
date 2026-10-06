@@ -103,16 +103,15 @@ html {
     #faa425 100%
   );
 
-  /* Shared component geometry. Keep these values as the single source of truth
-     for controls and surfaces used across the application. */
-  --ui-radius-control: 0.625rem;
-  --ui-radius-card: 0.875rem;
+  /* Shared component geometry. 30% compact SaaS precision scale. */
+  --ui-radius-control: 0.45rem;
+  --ui-radius-card: 0.65rem;
   --ui-border: #e2e8f0;
   --ui-border-strong: #dfe5ef;
   --ui-surface-muted: #f8fafc;
   --ui-shadow-control: 0 1px 2px rgba(15, 23, 42, 0.04);
-  --ui-shadow-card: 0 2px 8px rgba(15, 23, 42, 0.04);
-  --ui-focus-ring: 0 0 0 3px rgba(10, 81, 176, 0.14);
+  --ui-shadow-card: 0 1.5px 6px rgba(15, 23, 42, 0.03);
+  --ui-focus-ring: 0 0 0 2.5px rgba(10, 81, 176, 0.14);
 }
 
 .bg-gradient-brand-blue {
@@ -879,48 +878,37 @@ html[data-typography='compact-40'] {
   --fs-scale-factor: 0.4;
 }
 
-html[data-typography]:not([data-typography='normal']) .dashboard-view {
+html:not([data-typography='normal']) .dashboard-view {
   font-size: calc(1em * var(--fs-scale-factor));
 }
 
-/* Desktop density: 90% scale — smaller padding, tighter gaps */
-html[data-typography='compact'] .ui-card,
-html[data-typography='compact'] .shadow-card,
-html[data-typography='compact'] .stat-card,
-html[data-typography='compact'] .dash-stat-card,
-html[data-typography='compact'] .dashboard-panel,
-html[data-typography='compact'] .admin-page-header,
-html[data-typography='compact'] .shipment-toolbar,
-html[data-typography='compact'] .employee-profile,
-html[data-typography='compact'] .asset-profile-banner {
-  padding: calc(0.6rem * var(--fs-scale-factor)) calc(0.75rem * var(--fs-scale-factor));
+/* Compact SaaS density: ~30% tighter padding and gaps */
+:where(html:not([data-typography='normal'])) :is(.ui-card, .shadow-card, .stat-card, .dash-stat-card, .dashboard-panel, .admin-page-header, .shipment-toolbar, .employee-profile, .asset-profile-banner) {
+  padding: calc(0.65rem * var(--fs-scale-factor)) calc(0.85rem * var(--fs-scale-factor));
 }
 
-html[data-typography='compact'] .dashboard-stats {
+:where(html:not([data-typography='normal'])) .dashboard-stats {
   gap: calc(14px * var(--fs-scale-factor));
 }
 
-html[data-typography='compact'] .dashboard-chart-grid {
+:where(html:not([data-typography='normal'])) .dashboard-chart-grid {
   gap: calc(14px * var(--fs-scale-factor));
 }
 
-html[data-typography='compact'] .grid-cols-1\.sm\:grid-cols-3,
-html[data-typography='compact'] .grid-cols-2\.lg\:grid-cols-4 {
+:where(html:not([data-typography='normal'])) :is(.grid-cols-1\.sm\:grid-cols-3, .grid-cols-2\.lg\:grid-cols-4) {
   gap: calc(0.75rem * var(--fs-scale-factor));
 }
 
-html[data-typography='compact'] .toolbar-primary-action,
-html[data-typography='compact'] .toolbar-action-button,
-html[data-typography='compact'] .toolbar-filter-button {
-  height: calc(36px * var(--fs-scale-factor)) !important;
-  min-height: calc(36px * var(--fs-scale-factor)) !important;
-  max-height: calc(36px * var(--fs-scale-factor)) !important;
+:where(html:not([data-typography='normal'])) :is(.toolbar-primary-action, .toolbar-action-button, .toolbar-filter-button) {
+  height: calc(34px * var(--fs-scale-factor)) !important;
+  min-height: calc(34px * var(--fs-scale-factor)) !important;
+  max-height: calc(34px * var(--fs-scale-factor)) !important;
 }
 
-html[data-typography='compact'] .toolbar-search-input {
-  height: calc(36px * var(--fs-scale-factor)) !important;
-  min-height: calc(36px * var(--fs-scale-factor)) !important;
-  max-height: calc(36px * var(--fs-scale-factor)) !important;
+:where(html:not([data-typography='normal'])) .toolbar-search-input {
+  height: calc(34px * var(--fs-scale-factor)) !important;
+  min-height: calc(34px * var(--fs-scale-factor)) !important;
+  max-height: calc(34px * var(--fs-scale-factor)) !important;
 }
 html[data-typography]:not([data-typography='normal']) .dashboard-panel h3,
 html[data-typography]:not([data-typography='normal']) .dashboard-table h3 {

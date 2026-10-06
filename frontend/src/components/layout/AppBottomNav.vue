@@ -170,7 +170,7 @@ onBeforeUnmount(() => {
       <nav
         role="navigation"
         aria-label="Navigasi Mobile Bawah"
-        class="clean-bottom-nav relative z-10 border-t border-slate-200/90 dark:border-slate-800 bg-white/95 dark:bg-slate-950/95 backdrop-blur-lg px-2 py-1 pb-[max(0.375rem,env(safe-area-inset-bottom))] flex items-center justify-around select-none shadow-none min-h-[56px]"
+        class="clean-bottom-nav relative z-10 border-t border-slate-200/90 dark:border-slate-800 bg-white/95 dark:bg-slate-950/95 backdrop-blur-lg px-2 py-0.5 pb-[max(0.25rem,env(safe-area-inset-bottom))] flex items-center justify-around select-none shadow-none min-h-[48px]"
       >
         <RouterLink
           v-for="item in items"
@@ -178,15 +178,15 @@ onBeforeUnmount(() => {
           :to="item.to"
           :aria-label="item.label"
           :aria-current="isItemActive(item.to) ? 'page' : undefined"
-          class="flex flex-col items-center justify-center gap-0.5 px-2 py-1 rounded-xl transition-colors min-w-[52px] min-h-[44px] touch-manipulation active:scale-95"
+          class="flex flex-col items-center justify-center gap-0.5 px-1.5 py-0.5 rounded-xl transition-colors min-w-[48px] min-h-[38px] touch-manipulation active:scale-95"
           :class="
             isItemActive(item.to)
               ? 'text-[#234B83] bg-[#EAF1FC] font-semibold'
               : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
           "
         >
-          <component :is="lucide[item.lucide] || Circle" class="w-4 h-4" />
-          <span class="text-[10px]">{{ item.label }}</span>
+          <component :is="lucide[item.lucide] || Circle" class="w-3.5 h-3.5" />
+          <span class="text-[9.5px]">{{ item.label }}</span>
         </RouterLink>
 
         <button
@@ -195,15 +195,15 @@ onBeforeUnmount(() => {
           aria-controls="mobile-more-menu"
           :aria-expanded="isLainnyaOpen"
           @click="isLainnyaOpen = !isLainnyaOpen"
-          class="flex flex-col items-center justify-center gap-0.5 px-2 py-1 rounded-xl transition-colors cursor-pointer min-w-[52px] min-h-[44px] touch-manipulation active:scale-95"
+          class="flex flex-col items-center justify-center gap-0.5 px-1.5 py-0.5 rounded-xl transition-colors cursor-pointer min-w-[48px] min-h-[38px] touch-manipulation active:scale-95"
           :class="
             isLainnyaOpen || isLainnyaActive
               ? 'text-[#333333] font-bold'
               : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
           "
         >
-          <MoreHorizontal class="w-4 h-4" />
-          <span class="text-[10px]">Lainnya</span>
+          <MoreHorizontal class="w-3.5 h-3.5" />
+          <span class="text-[9.5px]">Lainnya</span>
         </button>
       </nav>
 
@@ -215,9 +215,14 @@ onBeforeUnmount(() => {
           aria-label="Menu lainnya"
           class="clean-more-menu absolute left-0 right-0 bottom-full rounded-t-2xl bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 p-2"
         >
-          <div class="flex items-center justify-between px-2 pt-1 pb-2">
+          <!-- Native Drag Handle Notch -->
+          <div class="flex justify-center pt-1 pb-1">
+            <div class="w-9 h-1 rounded-full bg-slate-300 dark:bg-slate-700"></div>
+          </div>
+
+          <div class="flex items-center justify-between px-2 pt-0.5 pb-1.5">
             <span
-              class="text-[11px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500"
+              class="text-[10px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500"
               >Menu Lainnya</span
             >
             <button

@@ -267,13 +267,16 @@ onBeforeUnmount(() => {
 </template>
 
 <style scoped>
-.more-menu-enter-active,
+.more-menu-enter-active {
+  transition: transform 300ms cubic-bezier(0.32, 0.72, 0, 1), opacity 300ms ease;
+}
 .more-menu-leave-active {
-  transition: transform 240ms ease;
+  transition: transform 240ms cubic-bezier(0.32, 0.72, 0, 1), opacity 240ms ease;
 }
 .more-menu-enter-from,
 .more-menu-leave-to {
   transform: translateY(100%);
+  opacity: 0.9;
 }
 @media (prefers-reduced-motion: reduce) {
   .more-menu-enter-active,

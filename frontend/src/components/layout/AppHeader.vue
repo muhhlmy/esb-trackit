@@ -1,4 +1,4 @@
-﻿<script setup>
+<script setup>
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuth } from '@/composables/useAuth'
@@ -725,18 +725,27 @@ onBeforeUnmount(() => {
 
 <template>
   <header
-    class="app-header relative z-30 flex h-11 md:h-12 items-center justify-between px-2.5 md:px-4 shrink-0 border-b border-[#E5EAEF] bg-white/95 backdrop-blur-md"
+    class="app-header relative z-30 flex h-11 md:h-12 items-center justify-between px-2.5 md:px-4 shrink-0 border-b border-[#E5EAEF] dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md"
   >
-    <!-- 1. LEFT: Navigation Drawer Toggle & Page Titles -->
+    <!-- 1. LEFT: Navigation Drawer Toggle, Brand Logo & Page Titles -->
     <div class="flex items-center gap-2 md:gap-2.5 md:shrink-0 min-w-0">
+      <!-- Mobile / Adaptive Brand Logo Mark (Anchored on mobile so user sees logo on every menu transition) -->
+      <RouterLink
+        to="/"
+        title="Kembali ke Beranda TrackIT"
+        class="flex lg:hidden items-center justify-center shrink-0 h-7 w-7 rounded-lg bg-slate-50 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 hover:bg-[#ECF2FF] dark:hover:bg-slate-700 transition-all active:scale-95 touch-manipulation cursor-pointer"
+      >
+        <img src="/logo.svg" alt="TrackIT logo" class="h-4.5 w-4.5 object-contain shrink-0 block" />
+      </RouterLink>
+
       <div class="min-w-0">
         <h1
-          class="text-xs wrap-anywhere md:truncate md:text-sm font-semibold tracking-tight text-[#333333] leading-tight"
+          class="text-xs wrap-anywhere md:truncate md:text-sm font-semibold tracking-tight text-[#333333] dark:text-white leading-tight"
         >
           {{ pageTitle }}
         </h1>
         <p
-          class="hidden md:block truncate text-[9.5px] font-medium text-[#637288] leading-relaxed mt-0.5"
+          class="hidden md:block truncate text-[9.5px] font-medium text-[#637288] dark:text-slate-400 leading-relaxed mt-0.5"
         >
           {{ pageSubtitle }}
         </p>

@@ -10,6 +10,24 @@
    neutral on desktop; neutralized by prefers-reduced-motion below. */
 html {
   scroll-behavior: smooth;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Apple Design & Mobile Native Touch Feel (Emil Kowalski guidelines) */
+button,
+a,
+[role='button'],
+input,
+select {
+  touch-action: manipulation;
+}
+
+/* Apple-style instant pointer-down press feedback (WWDC Fluid Interfaces) */
+button:active:not(:disabled),
+a:active:not(:disabled),
+[role='button']:active:not([aria-disabled='true']) {
+  transform: scale(0.98);
+  transition: transform 100ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @theme {

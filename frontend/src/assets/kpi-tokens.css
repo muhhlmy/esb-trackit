@@ -11,22 +11,22 @@
   --kpi-padding-lg: 14px;           /* desktop */
 
   /* Title font */
-  --kpi-title-font-size: 10.5px;
-  --kpi-title-font-size-sm: 11px;
-  --kpi-title-font-size-lg: 11.5px;
+  --kpi-title-font-size: 12px;
+  --kpi-title-font-size-sm: 12.5px;
+  --kpi-title-font-size-lg: 13px;
   --kpi-title-font-weight: 500;
 
   /* Value font */
-  --kpi-value-font-size: 17px;
-  --kpi-value-font-size-sm: 20px;
-  --kpi-value-font-size-lg: 22px;
+  --kpi-value-font-size: 15px;
+  --kpi-value-font-size-sm: 16px;
+  --kpi-value-font-size-lg: 17px;
   --kpi-value-font-weight: 700;
   --kpi-value-font-numeric: tabular-nums;
 
-  /* Caption / subtitle font */
-  --kpi-caption-font-size: 10px;
-  --kpi-caption-font-size-sm: 10.5px;
-  --kpi-caption-font-size-lg: 11px;
+  /* Caption / subtitle font (adjusted to clean 12-14px as requested) */
+  --kpi-caption-font-size: 12px;
+  --kpi-caption-font-size-sm: 12.5px;
+  --kpi-caption-font-size-lg: 13px;
   --kpi-caption-font-weight: 400;
 
   /* Icon size (the symbol itself) */

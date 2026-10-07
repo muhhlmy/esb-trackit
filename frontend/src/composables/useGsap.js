@@ -163,18 +163,18 @@ export function animatePageEnter(el, done) {
       gsap.killTweensOf(el)
       gsap.fromTo(
         el,
-        { opacity: 0, y: 10 },
+        { opacity: 0, y: 6 },
         {
           opacity: 1,
           y: 0,
-          duration: 0.25,
-          ease: 'power2.out',
+          duration: 0.22,
+          ease: 'power3.out',
           clearProps: 'transform,opacity',
           onComplete: safeDone,
           onInterrupt: safeDone,
         },
       )
-      setTimeout(safeDone, 350)
+      setTimeout(safeDone, 300)
     } catch (err) {
       devWarn('[PageEnter] GSAP fallback triggered:', err?.message)
       setFinalState(el, { opacity: 1, y: 0 })
@@ -211,13 +211,13 @@ export function animatePageLeave(el, done) {
       gsap.killTweensOf(el)
       gsap.to(el, {
         opacity: 0,
-        y: -6,
-        duration: 0.18,
+        y: -4,
+        duration: 0.14,
         ease: 'power2.in',
         onComplete: safeDone,
         onInterrupt: safeDone,
       })
-      setTimeout(safeDone, 280)
+      setTimeout(safeDone, 200)
     } catch (err) {
       devWarn('[PageLeave] GSAP fallback triggered:', err?.message)
       setFinalState(el, { opacity: 0 })

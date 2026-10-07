@@ -1,4 +1,4 @@
-﻿<script setup>
+<script setup>
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useApi } from '../composables/useApi.js'
@@ -947,20 +947,20 @@ onMounted(fetchData)
     <!-- ── Page Header ─────────────────────────────────────────── -->
     <div
       v-if="isFormOpen"
-      class="submission-page-header flex items-center gap-3 bg-white p-3.5 sm:p-4 rounded-2xl border border-[#E2E8F0]/80 shadow-2xs"
+      class="submission-page-header flex items-center gap-3 bg-white dark:bg-slate-900 p-3.5 sm:p-4 rounded-2xl border border-[#E2E8F0]/80 dark:border-slate-800 shadow-2xs"
     >
       <div
-        class="flex h-9 w-9 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-xl bg-[#EDF5FF] text-[#0A5DBD] border border-[#B8D4F5]/40"
+        class="flex h-9 w-9 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-xl bg-[#EDF5FF] dark:bg-sky-950/50 text-[#0A5DBD] dark:text-sky-400 border border-[#B8D4F5]/40 dark:border-sky-800/50"
       >
         <span aria-hidden="true" class="material-symbols-outlined text-[20px] sm:text-[22px]"
           >assignment</span
         >
       </div>
       <div class="min-w-0">
-        <h1 class="text-base sm:text-lg font-bold text-[#333333] tracking-tight truncate">
+        <h1 class="text-base sm:text-lg font-bold text-[#333333] dark:text-white tracking-tight truncate">
           Formulir Serah Terima Aset
         </h1>
-        <p class="text-xs font-normal text-[#5F7089] mt-0.5 truncate">
+        <p class="text-xs font-normal text-[#5F7089] dark:text-slate-400 mt-0.5 truncate">
           Dokumentasi &amp; Berita Acara Serah Terima (BAST) perangkat IT &amp; inventaris
         </p>
       </div>
@@ -977,7 +977,7 @@ onMounted(fetchData)
       v-if="saveMessage"
       role="status"
       aria-live="polite"
-      class="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-xs font-semibold text-emerald-800"
+      class="rounded-xl border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/40 px-4 py-3 text-xs font-semibold text-emerald-800 dark:text-emerald-300"
     >
       {{ saveMessage }}
     </div>
@@ -988,37 +988,37 @@ onMounted(fetchData)
       aria-labelledby="submission-history-title"
     >
       <div
-        class="asset-toolbar flex flex-col gap-3 rounded-2xl border border-[#E2E8F0]/80 bg-white p-3.5 shadow-2xs"
+        class="asset-toolbar flex flex-col gap-3 rounded-2xl border border-[#E2E8F0]/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-3.5 shadow-2xs"
       >
         <div class="flex items-center justify-between gap-2.5">
           <div>
             <h2
               id="submission-history-title"
-              class="text-base font-bold tracking-tight text-[#333333]"
+              class="text-base font-bold tracking-tight text-[#333333] dark:text-white"
             >
               Riwayat BAST / Pengajuan
             </h2>
-            <p class="mt-0.5 text-xs text-[#5F7089]">
+            <p class="mt-0.5 text-xs text-[#5F7089] dark:text-slate-400">
               Kelola dokumen serah terima seperti daftar Aset IT.
             </p>
           </div>
           <button
             v-if="canWriteSubmissions"
             type="button"
-            class="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-lg bg-[#0A51B0] px-3 text-xs font-semibold text-white hover:bg-[#0A4391]"
+            class="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-lg bg-[#0A51B0] px-3 text-xs font-semibold text-white hover:bg-[#0A4391] transition-colors"
             @click="router.push('/submissions/new')"
           >
             <span aria-hidden="true" class="material-symbols-outlined text-[16px]">add</span>BAST
             Baru
           </button>
         </div>
-        <div class="grid grid-cols-1 items-center gap-2 border-t border-[#F1F5F9] pt-2.5">
+        <div class="grid grid-cols-1 items-center gap-2 border-t border-[#F1F5F9] dark:border-slate-800 pt-2.5">
           <input
             v-model="searchQuery"
             type="search"
             aria-label="Cari nomor BAST atau nama pihak"
             placeholder="Cari nomor BAST atau nama pihak…"
-            class="h-9 w-full rounded-lg border border-[#E2E8F0] bg-white px-3 text-xs text-[#333333] focus:border-[#0A51B0] focus:outline-none"
+            class="h-9 w-full rounded-lg border border-[#E2E8F0] dark:border-slate-700 bg-white dark:bg-slate-800 px-3 text-xs text-[#333333] dark:text-slate-100 placeholder:text-slate-400 focus:border-[#0A51B0] focus:outline-none"
           />
         </div>
       </div>
@@ -1049,11 +1049,11 @@ onMounted(fetchData)
       </div>
       <div
         v-if="!filteredSubmissions.length"
-        class="mt-3 rounded-2xl border border-[#E2E8F0] bg-white px-4 py-12 text-center text-xs text-[#5F7089]"
+        class="mt-3 rounded-2xl border border-[#E2E8F0] dark:border-slate-800 bg-white dark:bg-slate-900 px-4 py-12 text-center text-xs text-[#5F7089] dark:text-slate-400"
       >
         Belum ada BAST yang sesuai.<button
           type="button"
-          class="ml-1 font-bold text-[#0A51B0]"
+          class="ml-1 font-bold text-[#0A51B0] dark:text-sky-400"
           @click="resetSubmissionFilters"
         >
           Reset filter

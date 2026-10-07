@@ -1,4 +1,4 @@
-﻿<script setup>
+<script setup>
 import AppModal from '../../components/ui/AppModal.vue'
 import { ref, computed, onMounted, nextTick } from 'vue'
 import { RouterLink } from 'vue-router'
@@ -193,7 +193,7 @@ function clearFilters() {
   >
     <!-- Header Card -->
     <div
-      class="admin-page-header ws-toolbar-flat flex flex-col items-start sm:items-center justify-between gap-3.5 bg-white border border-[#E2E8F0]/80 p-3.5 sm:p-4.5 rounded-2xl shadow-2xs gsap-admin-el"
+      class="admin-page-header ws-toolbar-flat flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3.5 bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 p-3 sm:p-4 rounded-xl shadow-2xs gsap-admin-el"
     >
       <div class="space-y-1 sm:space-y-1.5 w-full sm:w-auto">
         <!-- Breadcrumb -->
@@ -202,31 +202,31 @@ function clearFilters() {
         >
           <RouterLink
             to="/dashboard"
-            class="hover:text-[#333333] transition-colors flex items-center gap-1"
+            class="hover:text-[#333333] dark:hover:text-white transition-colors flex items-center gap-1"
           >
             <span>Dashboard</span>
           </RouterLink>
           <ChevronRight class="w-3 h-3 text-slate-400" />
-          <RouterLink to="/admin/cases" class="hover:text-[#333333] transition-colors">
+          <RouterLink to="/admin/cases" class="hover:text-[#333333] dark:hover:text-white transition-colors">
             <span>Admin CMS</span>
           </RouterLink>
           <ChevronRight class="w-3 h-3 text-slate-400" />
-          <span class="text-[#333333] font-bold">Kategori</span>
+          <span class="text-[#333333] dark:text-white font-bold">Kategori</span>
         </div>
 
         <h1
-          class="text-xl sm:text-3xl font-extrabold text-[#333333] dark:text-white tracking-tight flex items-center gap-2 flex-wrap"
+          class="text-base sm:text-lg font-bold text-[#333333] dark:text-white tracking-tight flex items-center gap-2 flex-wrap"
         >
           <span>Kategori Knowledge Base</span>
           <span
-            class="text-[10px] sm:text-xs px-2 sm:px-2.5 py-0.5 rounded-full font-bold bg-[#ECF2FF] dark:bg-indigo-950/80 text-[#333333] dark:text-indigo-300 border border-[#0A51B0]/20"
+            class="text-[10px] sm:text-[11px] px-2 py-0.5 rounded-full font-bold bg-[#ECF2FF] dark:bg-indigo-950/80 text-[#0A51B0] dark:text-indigo-300 border border-[#0A51B0]/20"
           >
             Admin CMS
           </span>
         </h1>
 
         <p
-          class="text-xs sm:text-sm text-[#5F7089] dark:text-slate-400 font-medium leading-relaxed"
+          class="text-[11px] sm:text-xs text-[#5F7089] dark:text-slate-400 font-medium leading-relaxed"
         >
           Kelola topic cards yang tampil di halaman Browse Topics Help Center.
         </p>
@@ -235,79 +235,103 @@ function clearFilters() {
       <button
         v-if="canWrite"
         @click="openCreateDrawer"
-        class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-[#0A51B0] hover:bg-[#0A4391] text-white shadow-sm shadow-[#0A51B0]/25 hover:shadow-md transition-all cursor-pointer touch-manipulation shrink-0"
+        class="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 h-8.5 sm:h-9 px-3.5 sm:px-4 rounded-lg text-xs font-semibold bg-[#0A51B0] hover:bg-[#0A4391] text-white shadow-2xs transition-all cursor-pointer shrink-0"
       >
-        <Plus class="w-4 h-4" />
+        <Plus class="w-3.5 h-3.5" />
         <span>Kategori Baru</span>
       </button>
     </div>
 
     <!-- Stats Row (3 Columns Balanced) -->
-    <div class="grid grid-cols-3 gap-2 sm:gap-4 gsap-admin-el">
+    <div class="grid grid-cols-3 gap-2 sm:gap-2.5 lg:gap-3 gsap-admin-el">
       <!-- Total -->
       <div
-        class="p-3 sm:p-5 rounded-xl bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 transition-colors hover:border-slate-300 dark:hover:border-slate-700"
+        class="kpi-focusable flex flex-col justify-between p-[var(--kpi-padding)] sm:p-[var(--kpi-padding-sm)] lg:p-[var(--kpi-padding-lg)] rounded-xl bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 shadow-2xs hover:border-[#CBD5E1] dark:hover:border-slate-700 transition-colors min-h-[var(--kpi-height)] sm:min-h-[var(--kpi-height-sm)] lg:min-h-[var(--kpi-height-lg)]"
+        tabindex="0"
       >
-        <div class="flex items-center gap-1.5 sm:gap-2 mb-1.5 sm:mb-3">
-          <div
-            class="w-6 h-6 sm:w-8 sm:h-8 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center shrink-0"
-          >
-            <LayoutGrid class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-          </div>
+        <div class="flex items-center justify-between gap-[var(--kpi-gap)]">
           <span
-            class="text-[10px] sm:text-xs font-medium text-[#5F7089] dark:text-slate-400 truncate"
-            >Total</span
+            class="text-[var(--kpi-title-font-size)] sm:text-[var(--kpi-title-font-size-sm)] lg:text-[var(--kpi-title-font-size-lg)] font-medium text-[#5F7089] dark:text-slate-400 truncate"
+            >Total kategori</span
           >
+          <div
+            class="flex h-5.5 w-5.5 sm:h-6 sm:w-6 lg:h-6.5 lg:w-6.5 shrink-0 items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300"
+          >
+            <LayoutGrid class="w-[var(--kpi-icon-size)] h-[var(--kpi-icon-size)] sm:w-[var(--kpi-icon-size-sm)] sm:h-[var(--kpi-icon-size-sm)] lg:w-[var(--kpi-icon-size-lg)] lg:h-[var(--kpi-icon-size-lg)]" />
+          </div>
         </div>
-        <p
-          class="text-lg sm:text-2xl font-extrabold text-[#333333] dark:text-white tracking-tight tabular-nums"
-        >
-          {{ stats.total }}
-        </p>
+        <div class="mt-1">
+          <p
+            class="font-num text-[var(--kpi-value-font-size)] sm:text-[var(--kpi-value-font-size-sm)] lg:text-[var(--kpi-value-font-size-lg)] font-bold text-[#333333] dark:text-white tabular-nums leading-none tracking-tight"
+          >
+            {{ stats.total }}
+          </p>
+          <span
+            class="mt-1 block truncate text-[var(--kpi-caption-font-size)] sm:text-[var(--kpi-caption-font-size-sm)] lg:text-[var(--kpi-caption-font-size-lg)] font-normal text-[#64748B] dark:text-slate-400"
+          >
+            Seluruh kategori KB
+          </span>
+        </div>
       </div>
 
       <!-- Published -->
       <div
-        class="p-3 sm:p-5 rounded-xl bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 transition-colors hover:border-slate-300 dark:hover:border-slate-700"
+        class="kpi-focusable flex flex-col justify-between p-[var(--kpi-padding)] sm:p-[var(--kpi-padding-sm)] lg:p-[var(--kpi-padding-lg)] rounded-xl bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 shadow-2xs hover:border-[#CBD5E1] dark:hover:border-slate-700 transition-colors min-h-[var(--kpi-height)] sm:min-h-[var(--kpi-height-sm)] lg:min-h-[var(--kpi-height-lg)]"
+        tabindex="0"
       >
-        <div class="flex items-center gap-1.5 sm:gap-2 mb-1.5 sm:mb-3">
-          <div
-            class="w-6 h-6 sm:w-8 sm:h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0"
-          >
-            <CheckCircle class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-          </div>
+        <div class="flex items-center justify-between gap-[var(--kpi-gap)]">
           <span
-            class="text-[10px] sm:text-xs font-medium text-[#5F7089] dark:text-slate-400 truncate"
-            >Published</span
+            class="text-[var(--kpi-title-font-size)] sm:text-[var(--kpi-title-font-size-sm)] lg:text-[var(--kpi-title-font-size-lg)] font-medium text-[#5F7089] dark:text-slate-400 truncate"
+            >Terbit</span
           >
+          <div
+            class="flex h-5.5 w-5.5 sm:h-6 sm:w-6 lg:h-6.5 lg:w-6.5 shrink-0 items-center justify-center rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400"
+          >
+            <CheckCircle class="w-[var(--kpi-icon-size)] h-[var(--kpi-icon-size)] sm:w-[var(--kpi-icon-size-sm)] sm:h-[var(--kpi-icon-size-sm)] lg:w-[var(--kpi-icon-size-lg)] lg:h-[var(--kpi-icon-size-lg)]" />
+          </div>
         </div>
-        <p
-          class="text-lg sm:text-2xl font-extrabold text-[#333333] dark:text-white tracking-tight tabular-nums"
-        >
-          {{ stats.published }}
-        </p>
+        <div class="mt-1">
+          <p
+            class="font-num text-[var(--kpi-value-font-size)] sm:text-[var(--kpi-value-font-size-sm)] lg:text-[var(--kpi-value-font-size-lg)] font-bold text-[#333333] dark:text-white tabular-nums leading-none tracking-tight"
+          >
+            {{ stats.published }}
+          </p>
+          <span
+            class="mt-1 block truncate text-[var(--kpi-caption-font-size)] sm:text-[var(--kpi-caption-font-size-sm)] lg:text-[var(--kpi-caption-font-size-lg)] font-normal text-[#64748B] dark:text-slate-400"
+          >
+            Kategori aktif
+          </span>
+        </div>
       </div>
 
       <!-- Featured -->
       <div
-        class="p-3 sm:p-5 rounded-xl bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 transition-colors hover:border-slate-300 dark:hover:border-slate-700"
+        class="kpi-focusable flex flex-col justify-between p-[var(--kpi-padding)] sm:p-[var(--kpi-padding-sm)] lg:p-[var(--kpi-padding-lg)] rounded-xl bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 shadow-2xs hover:border-[#CBD5E1] dark:hover:border-slate-700 transition-colors min-h-[var(--kpi-height)] sm:min-h-[var(--kpi-height-sm)] lg:min-h-[var(--kpi-height-lg)]"
+        tabindex="0"
       >
-        <div class="flex items-center gap-1.5 sm:gap-2 mb-1.5 sm:mb-3">
-          <div
-            class="w-6 h-6 sm:w-8 sm:h-8 rounded-lg bg-violet-50 dark:bg-violet-950/60 text-violet-600 dark:text-violet-400 flex items-center justify-center shrink-0"
-          >
-            <Star class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-          </div>
+        <div class="flex items-center justify-between gap-[var(--kpi-gap)]">
           <span
-            class="text-[10px] sm:text-xs font-medium text-[#5F7089] dark:text-slate-400 truncate"
-            >Featured</span
+            class="text-[var(--kpi-title-font-size)] sm:text-[var(--kpi-title-font-size-sm)] lg:text-[var(--kpi-title-font-size-lg)] font-medium text-[#5F7089] dark:text-slate-400 truncate"
+            >Unggulan</span
           >
+          <div
+            class="flex h-5.5 w-5.5 sm:h-6 sm:w-6 lg:h-6.5 lg:w-6.5 shrink-0 items-center justify-center rounded-lg bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400"
+          >
+            <Star class="w-[var(--kpi-icon-size)] h-[var(--kpi-icon-size)] sm:w-[var(--kpi-icon-size-sm)] sm:h-[var(--kpi-icon-size-sm)] lg:w-[var(--kpi-icon-size-lg)] lg:h-[var(--kpi-icon-size-lg)]" />
+          </div>
         </div>
-        <p
-          class="text-lg sm:text-2xl font-extrabold text-[#333333] dark:text-white tracking-tight tabular-nums"
-        >
-          {{ stats.featured }}
-        </p>
+        <div class="mt-1">
+          <p
+            class="font-num text-[var(--kpi-value-font-size)] sm:text-[var(--kpi-value-font-size-sm)] lg:text-[var(--kpi-value-font-size-lg)] font-bold text-[#333333] dark:text-white tabular-nums leading-none tracking-tight"
+          >
+            {{ stats.featured }}
+          </p>
+          <span
+            class="mt-1 block truncate text-[var(--kpi-caption-font-size)] sm:text-[var(--kpi-caption-font-size-sm)] lg:text-[var(--kpi-caption-font-size-lg)] font-normal text-[#64748B] dark:text-slate-400"
+          >
+            Tampil di beranda
+          </span>
+        </div>
       </div>
     </div>
 

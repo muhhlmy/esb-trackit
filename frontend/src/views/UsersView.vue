@@ -713,7 +713,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
           autocomplete="off"
           aria-label="Cari pengguna"
           placeholder="Cari nama atau email pengguna…"
-          class="toolbar-search-input h-full min-h-0 w-full rounded-lg border border-[#E2E8F0] bg-white pl-8 text-xs text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
+          class="toolbar-search-input h-full min-h-0 w-full rounded-lg border border-[#E2E8F0] dark:border-slate-700 bg-white dark:bg-slate-800 pl-8 text-xs text-[#333333] dark:text-slate-100 placeholder-[#687281] dark:placeholder-slate-400 focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
           :class="searchQuery ? 'pr-8' : 'pr-2.5'"
         />
         <button
@@ -730,7 +730,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
       <button
         type="button"
         @click="showFilterModal = true"
-        class="h-9 shrink-0 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-semibold text-[#5F7089] hover:bg-white"
+        class="h-9 shrink-0 rounded-lg border border-[#E2E8F0] dark:border-slate-700 bg-[#F8FAFC] dark:bg-slate-800 px-3 text-xs font-semibold text-[#5F7089] dark:text-slate-300 hover:bg-white dark:hover:bg-slate-700"
       >
         <span aria-hidden="true" class="material-symbols-outlined mr-1 align-middle text-[16px]"
           >filter_alt</span
@@ -762,23 +762,37 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
     <!-- ── Card Stats Pengguna ── -->
     <div v-if="!isLoading && users.length" class="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-2.5 lg:gap-3">
       <StatCard
-        title="Total Pengguna"
+        title="Total pengguna"
         :value="userStats.total"
         icon="manage_accounts"
         color="primary"
+        subtitle="Seluruh pengguna terdaftar"
       />
       <StatCard
         title="Superadmin"
         :value="userStats.superadmin"
         icon="shield_person"
         color="neutral"
+        subtitle="Hak akses tertinggi"
       />
-      <StatCard title="Admin" :value="userStats.admin" icon="admin_panel_settings" color="primary" />
-      <StatCard title="Reporter" :value="userStats.reporter" icon="support_agent" color="neutral" />
+      <StatCard
+        title="Admin"
+        :value="userStats.admin"
+        icon="admin_panel_settings"
+        color="primary"
+        subtitle="Pengelola sistem"
+      />
+      <StatCard
+        title="Pengguna"
+        :value="userStats.reporter"
+        icon="support_agent"
+        color="neutral"
+        subtitle="Akses operasional standar"
+      />
     </div>
 
     <!-- ── Tabel Pengguna ─────────────────────────────────── -->
-    <div class="rounded-2xl border border-[#E2E8F0]/80 bg-white shadow-2xs overflow-hidden">
+    <div class="rounded-2xl border border-[#E2E8F0]/80 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-2xs overflow-hidden">
       <!-- Loading -->
       <div v-if="isLoading" role="status" aria-busy="true">
         <!-- Desktop Skeleton -->
@@ -835,63 +849,63 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
               <col class="w-[12%]" />
               <col class="w-[8%]" />
             </colgroup>
-            <thead class="border-b border-[#E2E8F0] bg-[#F8FAFC] select-none whitespace-nowrap">
+            <thead class="border-b border-[#E2E8F0] dark:border-slate-800 bg-[#F8FAFC] dark:bg-slate-800/50 select-none whitespace-nowrap">
               <tr>
                 <th
                   scope="col"
-                  class="py-3 pl-5 pr-4 text-[11px] font-semibold uppercase tracking-wider text-[#5F7089] text-left whitespace-nowrap"
+                  class="py-3 pl-5 pr-4 text-[11px] font-semibold uppercase tracking-wider text-[#5F7089] dark:text-slate-400 text-left whitespace-nowrap"
                 >
                   Pengguna
                 </th>
                 <th
                   scope="col"
-                  class="py-3 px-4 text-[11px] font-semibold uppercase tracking-wider text-[#5F7089] text-left whitespace-nowrap"
+                  class="py-3 px-4 text-[11px] font-semibold uppercase tracking-wider text-[#5F7089] dark:text-slate-400 text-left whitespace-nowrap"
                 >
                   Role Akses
                 </th>
                 <th
                   scope="col"
-                  class="py-3 px-4 text-[11px] font-semibold uppercase tracking-wider text-[#5F7089] text-left whitespace-nowrap"
+                  class="py-3 px-4 text-[11px] font-semibold uppercase tracking-wider text-[#5F7089] dark:text-slate-400 text-left whitespace-nowrap"
                 >
                   Sub Role / Unit Ditangani
                 </th>
                 <th
                   scope="col"
-                  class="py-3 px-4 text-[11px] font-semibold uppercase tracking-wider text-[#5F7089] text-left whitespace-nowrap"
+                  class="py-3 px-4 text-[11px] font-semibold uppercase tracking-wider text-[#5F7089] dark:text-slate-400 text-left whitespace-nowrap"
                 >
                   Hak Akses Fitur
                 </th>
                 <th
                   scope="col"
-                  class="py-3 px-4 text-[11px] font-semibold uppercase tracking-wider text-[#5F7089] text-left whitespace-nowrap"
+                  class="py-3 px-4 text-[11px] font-semibold uppercase tracking-wider text-[#5F7089] dark:text-slate-400 text-left whitespace-nowrap"
                 >
                   Status
                 </th>
                 <th
                   scope="col"
-                  class="py-3 pr-5 pl-4 text-right text-[11px] font-semibold uppercase tracking-wider text-[#5F7089] whitespace-nowrap"
+                  class="py-3 pr-5 pl-4 text-right text-[11px] font-semibold uppercase tracking-wider text-[#5F7089] dark:text-slate-400 whitespace-nowrap"
                 >
                   Aksi
                 </th>
               </tr>
             </thead>
-            <tbody class="relative z-0 isolate divide-y divide-[#F1F5F9]">
+            <tbody class="relative z-0 isolate divide-y divide-[#F1F5F9] dark:divide-slate-800">
               <tr
                 v-for="user in paginatedUsers"
                 :key="user.id"
-                class="group hover:bg-[#F8FAFC] transition-colors duration-150"
+                class="group hover:bg-[#F8FAFC] dark:hover:bg-slate-800/40 transition-colors duration-150"
               >
                 <!-- Kolom Pengguna (nama + email) -->
                 <td class="py-4 pl-5 pr-4 overflow-hidden">
                   <div class="flex flex-col min-w-0">
                     <span
-                      class="text-[13.5px] font-bold text-[#333333] leading-snug truncate group-hover:text-[#333333] transition-colors block"
+                      class="text-[13.5px] font-bold text-[#333333] dark:text-white leading-snug truncate group-hover:text-[#333333] dark:group-hover:text-white transition-colors block"
                       :title="user.nama"
                     >
                       {{ user.nama }}
                     </span>
                     <span
-                      class="text-[12px] font-normal text-[#5F7089] mt-0.5 truncate block"
+                      class="text-[12px] font-normal text-[#5F7089] dark:text-slate-400 mt-0.5 truncate block"
                       :title="user.email"
                     >
                       {{ user.email }}

@@ -529,7 +529,7 @@ onMounted(() => {
       <div class="relative h-9 min-w-0 flex-1">
         <span
           aria-hidden="true"
-          class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[18px] text-[#687281] pointer-events-none"
+          class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[18px] text-[#687281] dark:text-slate-400 pointer-events-none"
           >search</span
         >
         <input
@@ -537,14 +537,14 @@ onMounted(() => {
           aria-label="Cari karyawan"
           type="text"
           placeholder="Cari NIK, nama, atau jabatan…"
-          class="h-full min-h-0 w-full rounded-xl border border-[#E2E8F0] bg-white pl-9.5 pr-3 text-xs text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
+          class="h-full min-h-0 w-full rounded-xl border border-[#E2E8F0] dark:border-slate-700 bg-white dark:bg-slate-800 pl-9.5 pr-3 text-xs text-[#333333] dark:text-slate-100 placeholder-[#687281] dark:placeholder-slate-400 focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
         />
       </div>
 
       <button
         type="button"
         @click="showFilterModal = true"
-        class="h-9 shrink-0 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-semibold text-[#5F7089] hover:bg-white"
+        class="h-9 shrink-0 rounded-lg border border-[#E2E8F0] dark:border-slate-700 bg-[#F8FAFC] dark:bg-slate-800 px-3 text-xs font-semibold text-[#5F7089] dark:text-slate-300 hover:bg-white dark:hover:bg-slate-700"
       >
         <span aria-hidden="true" class="material-symbols-outlined mr-1 align-middle text-[16px]"
           >filter_alt</span
@@ -562,7 +562,7 @@ onMounted(() => {
     >
       <select
         v-model="filterDepartemen"
-        class="h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-xs"
+        class="h-10 w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 px-3 text-xs"
       >
         <option value="">Semua Departemen</option>
         <option v-for="item in availableDepartemenOptions" :key="item" :value="item">
@@ -571,14 +571,14 @@ onMounted(() => {
       </select>
       <select
         v-model="filterLokasi"
-        class="h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-xs"
+        class="h-10 w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 px-3 text-xs"
       >
         <option value="">Semua Lokasi</option>
         <option v-for="item in availableLokasiOptions" :key="item" :value="item">{{ item }}</option>
       </select>
       <select
         v-model="filterStatus"
-        class="h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-xs"
+        class="h-10 w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 px-3 text-xs"
       >
         <option value="">Semua Status</option>
         <option value="Active">Active</option>
@@ -592,16 +592,22 @@ onMounted(() => {
       v-if="!isLoading && stats"
       class="employee-stats grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-2.5 lg:gap-3"
     >
-      <StatCard title="Total Karyawan" :value="stats.totalKaryawan" icon="groups" color="primary" />
       <StatCard
-        title="Karyawan Aktif"
+        title="Total karyawan"
+        :value="stats.totalKaryawan"
+        icon="groups"
+        color="primary"
+        subtitle="Seluruh staf terdaftar"
+      />
+      <StatCard
+        title="Karyawan aktif"
         :value="stats.active"
         icon="check_circle"
         color="success"
         :subtitle="
           stats.totalKaryawan
             ? Math.round((stats.active / stats.totalKaryawan) * 100) + '% dari total'
-            : ''
+            : 'Aktif bekerja'
         "
       />
       <StatCard
@@ -612,7 +618,7 @@ onMounted(() => {
         :subtitle="
           stats.totalKaryawan
             ? Math.round((stats.resigned / stats.totalKaryawan) * 100) + '% turnover'
-            : ''
+            : 'Telah berhenti'
         "
       />
       <StatCard
@@ -620,11 +626,12 @@ onMounted(() => {
         :value="stats.totalDepartemen"
         icon="corporate_fare"
         color="neutral"
+        subtitle="Unit kerja organisasi"
       />
     </div>
 
     <!-- Table Section -->
-    <div class="rounded-2xl border border-[#E2E8F0]/80 bg-white shadow-2xs overflow-hidden">
+    <div class="rounded-2xl border border-[#E2E8F0]/80 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-2xs overflow-hidden">
       <div v-if="isLoading" aria-busy="true">
         <SkeletonTable preset="employees" :rows="6" />
       </div>

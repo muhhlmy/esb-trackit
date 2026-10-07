@@ -178,11 +178,11 @@ function getCategoryBadgeClass(category) {
             <span>Dashboard</span>
           </RouterLink>
           <ChevronRight class="w-3 h-3 sm:w-3.5 sm:h-3.5 text-slate-400" />
-          <span class="text-[#333333] font-bold">Admin CMS</span>
+          <span class="text-[#333333] dark:text-slate-200 font-bold">Admin CMS</span>
         </div>
 
         <h1
-          class="text-lg sm:text-2xl font-extrabold text-[#333333] dark:text-white tracking-tight flex items-center gap-2"
+          class="text-base sm:text-lg font-bold text-[#333333] dark:text-white tracking-tight flex items-center gap-2"
         >
           <span>Knowledge Base</span>
           <span

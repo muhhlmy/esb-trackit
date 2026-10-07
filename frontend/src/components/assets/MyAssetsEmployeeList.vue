@@ -109,21 +109,21 @@ function getDeviceIcon(tipe) {
 </script>
 
 <template>
-  <div class="flex flex-col gap-5">
+  <div class="flex flex-col gap-4 sm:gap-5">
     <!-- Enterprise Header & Title -->
     <div
       class="employee-assets-heading flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between"
     >
       <div>
-        <h1 class="text-lg sm:text-xl font-bold tracking-tight text-[#333333]">Aset Karyawan</h1>
-        <p class="mt-0.5 text-xs text-[#5F7089]">
+        <h1 class="text-base sm:text-lg font-bold tracking-tight text-[#333333] dark:text-white">Aset Karyawan</h1>
+        <p class="mt-0.5 text-[11px] sm:text-xs text-[#5F7089] dark:text-slate-400">
           Karyawan yang sedang memegang aset IT perusahaan
         </p>
       </div>
     </div>
-    <div class="employee-kpis">
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-2.5 lg:gap-3">
       <div
-        v-for="(item, index) in [
+        v-for="item in [
           {
             label: 'Karyawan dengan aset',
             value: totalEmployeesHoldingAssets,
@@ -144,27 +144,50 @@ function getDeviceIcon(tipe) {
           },
         ]"
         :key="item.label"
-        class="employee-kpi"
-        :class="{ 'employee-kpi-primary': index === 0 }"
+        class="kpi-focusable flex flex-col justify-between p-[var(--kpi-padding)] sm:p-[var(--kpi-padding-sm)] lg:p-[var(--kpi-padding-lg)] rounded-xl bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 shadow-2xs hover:border-[#CBD5E1] dark:hover:border-slate-700 transition-colors min-h-[var(--kpi-height)] sm:min-h-[var(--kpi-height-sm)] lg:min-h-[var(--kpi-height-lg)]"
+        tabindex="0"
       >
-        <div class="employee-kpi-label">
-          {{ item.label
-          }}<span class="material-symbols-outlined" aria-hidden="true">{{ item.icon }}</span>
+        <div class="flex items-center justify-between gap-[var(--kpi-gap)]">
+          <span
+            class="text-[var(--kpi-title-font-size)] sm:text-[var(--kpi-title-font-size-sm)] lg:text-[var(--kpi-title-font-size-lg)] font-medium text-[#5F7089] dark:text-slate-400 truncate"
+          >
+            {{ item.label }}
+          </span>
+          <div
+            class="flex h-5.5 w-5.5 sm:h-6 sm:w-6 lg:h-6.5 lg:w-6.5 shrink-0 items-center justify-center rounded-lg bg-[#EFF6FF] dark:bg-blue-950/60 text-[#0A51B0] dark:text-blue-400"
+          >
+            <span
+              aria-hidden="true"
+              class="material-symbols-outlined text-[var(--kpi-icon-size)] sm:text-[var(--kpi-icon-size-sm)] lg:text-[var(--kpi-icon-size-lg)]"
+            >
+              {{ item.icon }}
+            </span>
+          </div>
         </div>
-        <strong>{{ item.value }}</strong
-        ><span class="employee-kpi-caption">{{ item.caption }}</span>
+        <div class="mt-1">
+          <span
+            class="font-num block text-[var(--kpi-value-font-size)] sm:text-[var(--kpi-value-font-size-sm)] lg:text-[var(--kpi-value-font-size-lg)] font-bold text-[#333333] dark:text-white tabular-nums leading-none tracking-tight"
+          >
+            {{ item.value }}
+          </span>
+          <span
+            class="mt-1 block truncate text-[var(--kpi-caption-font-size)] sm:text-[var(--kpi-caption-font-size-sm)] lg:text-[var(--kpi-caption-font-size-lg)] font-normal text-[#64748B] dark:text-slate-400"
+          >
+            {{ item.caption }}
+          </span>
+        </div>
       </div>
     </div>
     <!-- Toolbar: Elegant Single Search & Compact Filters (sticky mengikuti scroll) -->
     <div
       v-if="canBrowseOtherAssets"
-      class="employee-assets-toolbar ws-toolbar-sticky grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2.5 rounded-xl border border-[#E2E8F0] bg-white p-3 shadow-2xs"
+      class="employee-assets-toolbar ws-toolbar-sticky grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2.5 rounded-xl border border-[#E2E8F0] dark:border-slate-800 bg-white dark:bg-slate-900 p-2.5 sm:p-3 shadow-2xs"
     >
-      <div class="relative h-9 w-full sm:flex-1 sm:min-w-[200px]">
+      <div class="relative h-8.5 sm:h-9 w-full sm:flex-1 sm:min-w-[200px]">
         <label for="emp-search" class="sr-only">Cari karyawan dengan aset</label>
         <span
           aria-hidden="true"
-          class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[18px] text-[#687281] pointer-events-none"
+          class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[18px] text-[#687281] dark:text-slate-400 pointer-events-none"
           >search</span
         >
         <input
@@ -172,7 +195,7 @@ function getDeviceIcon(tipe) {
           v-model="search"
           type="text"
           placeholder="Cari nama karyawan, NIK, atau departemen…"
-          class="h-full w-full rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] pl-9 pr-8 text-xs text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:bg-white focus:outline-none transition-all"
+          class="h-full w-full rounded-lg border border-[#E2E8F0] dark:border-slate-800 bg-[#F8FAFC] dark:bg-slate-800 pl-9 pr-8 text-xs text-[#333333] dark:text-white placeholder-[#687281] dark:placeholder-slate-400 focus:border-[#0A51B0] focus:bg-white dark:focus:bg-slate-800 focus:outline-none transition-all"
         />
         <!-- Inline Clear Button -->
         <button
@@ -180,7 +203,7 @@ function getDeviceIcon(tipe) {
           type="button"
           @click="search = ''"
           aria-label="Bersihkan pencarian"
-          class="absolute right-2 top-1/2 -translate-y-1/2 flex h-5 w-5 items-center justify-center rounded-full text-[#687281] hover:bg-[#F1F5F9] hover:text-[#333333] transition-all cursor-pointer touch-manipulation"
+          class="absolute right-2 top-1/2 -translate-y-1/2 flex h-5 w-5 items-center justify-center rounded-full text-[#687281] dark:text-slate-400 hover:bg-[#F1F5F9] dark:hover:bg-slate-700 hover:text-[#333333] dark:hover:text-white transition-all cursor-pointer touch-manipulation"
           title="Bersihkan"
         >
           <span aria-hidden="true" class="material-symbols-outlined text-[15px]">close</span>
@@ -190,7 +213,7 @@ function getDeviceIcon(tipe) {
       <button
         type="button"
         @click="openFilter"
-        class="h-9 shrink-0 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-semibold text-[#5F7089] hover:bg-white"
+        class="h-8.5 sm:h-9 shrink-0 rounded-lg border border-[#E2E8F0] dark:border-slate-700 bg-[#F8FAFC] dark:bg-slate-800 px-3 text-xs font-semibold text-[#5F7089] dark:text-slate-300 hover:bg-white dark:hover:bg-slate-700"
       >
         <span aria-hidden="true" class="material-symbols-outlined mr-1 align-middle text-[16px]"
           >filter_alt</span
@@ -201,7 +224,7 @@ function getDeviceIcon(tipe) {
     </div>
     <!-- Main Hybrid Employee Table/List -->
     <div
-      class="employee-list rounded-xl border border-[#E2E8F0] bg-white shadow-2xs overflow-hidden"
+      class="employee-list rounded-xl border border-[#E2E8F0] dark:border-slate-800 bg-white dark:bg-slate-900 shadow-2xs overflow-hidden"
     >
       <!-- Loading State -->
       <div v-if="isLoadingEmployees" aria-busy="true">
@@ -528,57 +551,8 @@ function getDeviceIcon(tipe) {
   color: #637288;
   line-height: 1.7;
 }
-.employee-kpis {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 16px;
-}
-.employee-kpi {
-  padding: 22px;
-  border: 1px solid #e2e8f0;
-  border-radius: 13px;
-  background: white;
-}
-.employee-kpi-label {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  font-size: 12px;
-  color: #5f7089;
-  font-weight: 500;
-}
-.employee-kpi-label span {
-  font-size: 19px;
-  color: #6486b5;
-}
-.employee-kpi strong {
-  display: block;
-  font-size: 32px;
-  line-height: 1.2;
-  font-weight: 650;
-  letter-spacing: -0.04em;
-  margin: 16px 0 8px;
-  font-variant-numeric: tabular-nums;
-}
-.employee-kpi-caption {
-  font-size: 11px;
-  color: #637288;
-}
-.employee-kpi-primary {
-  background: #0a51b0;
-  border-color: #0a51b0;
-  color: white;
-}
-.employee-kpi-primary :is(.employee-kpi-label, .employee-kpi-caption, .employee-kpi-label span) {
-  color: #c0d1eb;
-}
 .employee-assets-toolbar {
-  padding: 16px;
-  border-radius: 12px;
   box-shadow: none;
-  gap: 12px;
-  flex-wrap: wrap;
 }
 .employee-assets-toolbar input {
   border-radius: 8px;
@@ -615,37 +589,8 @@ function getDeviceIcon(tipe) {
   outline-offset: 3px;
 }
 @media (max-width: 767px) {
-  .employee-assets-heading h1 {
-    font-size: 22px;
-  }
-  .employee-kpis {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 10px;
-  }
-  .employee-kpi {
-    padding: 16px;
-  }
-  .employee-kpi-primary {
-    grid-column: 1/-1;
-  }
-  .employee-kpi-primary strong {
-    margin-top: 12px;
-  }
-  .employee-kpi-label {
-    font-size: 11px;
-    align-items: flex-start;
-  }
-  .employee-kpi-label span {
-    font-size: 17px;
-  }
-  .employee-kpi strong {
-    font-size: 28px;
-  }
-  .employee-kpi-caption {
-    font-size: 10px;
-  }
   .employee-assets-toolbar {
-    padding: 14px;
+    padding: 10px;
   }
   .employee-assets-toolbar > div:first-child {
     flex-basis: auto;
@@ -653,7 +598,7 @@ function getDeviceIcon(tipe) {
   .employee-assets-toolbar input {
     height: 100%;
     min-height: 0;
-    font-size: 16px;
+    font-size: 13px;
   }
 }
 </style>

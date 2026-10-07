@@ -327,7 +327,7 @@ function systemAuditChanges(log) {
 
     <!-- Tab Selection Navigation -->
     <div
-      class="admin-tabs grid sm:flex border-b border-[#E2E8F0]/80"
+      class="admin-tabs grid sm:flex border-b border-[#E2E8F0]/80 dark:border-slate-800"
       :class="isSuperAdmin ? 'grid-cols-3' : 'grid-cols-1'"
       aria-label="Jenis log"
     >
@@ -338,8 +338,8 @@ function systemAuditChanges(log) {
         class="flex min-w-0 min-h-11 items-center justify-center sm:justify-start gap-2 px-2 sm:px-5 py-3.5 text-xs leading-relaxed text-left font-bold transition-all duration-150 border-b-2 -mb-[2px]"
         :class="
           activeTab === 'assets'
-            ? 'border-brand text-brand font-black'
-            : 'border-transparent text-[#5F7089] hover:text-[#172033]'
+            ? 'border-brand text-brand dark:text-sky-400 font-black'
+            : 'border-transparent text-[#5F7089] dark:text-slate-400 hover:text-[#172033] dark:hover:text-slate-200'
         "
       >
         <span aria-hidden="true" class="material-symbols-outlined text-[18px]">history</span>
@@ -353,8 +353,8 @@ function systemAuditChanges(log) {
         class="flex min-w-0 min-h-11 items-center justify-center sm:justify-start gap-2 px-2 sm:px-5 py-3.5 text-xs leading-relaxed text-left font-bold transition-all duration-150 border-b-2 -mb-[2px]"
         :class="
           activeTab === 'audit'
-            ? 'border-brand text-brand font-black'
-            : 'border-transparent text-[#5F7089] hover:text-[#172033]'
+            ? 'border-brand text-brand dark:text-sky-400 font-black'
+            : 'border-transparent text-[#5F7089] dark:text-slate-400 hover:text-[#172033] dark:hover:text-slate-200'
         "
       >
         <span aria-hidden="true" class="material-symbols-outlined text-[18px]">security</span>
@@ -368,8 +368,8 @@ function systemAuditChanges(log) {
         class="flex min-w-0 min-h-11 items-center justify-center sm:justify-start gap-2 px-2 sm:px-5 py-3.5 text-xs leading-relaxed text-left font-bold transition-all duration-150 border-b-2 -mb-[2px]"
         :class="
           activeTab === 'system'
-            ? 'border-brand text-brand font-black'
-            : 'border-transparent text-[#5F7089] hover:text-[#172033]'
+            ? 'border-brand text-brand dark:text-sky-400 font-black'
+            : 'border-transparent text-[#5F7089] dark:text-slate-400 hover:text-[#172033] dark:hover:text-slate-200'
         "
       >
         <span aria-hidden="true" class="material-symbols-outlined text-[18px]">receipt_long</span>
@@ -379,13 +379,13 @@ function systemAuditChanges(log) {
 
     <!-- Filters Bar Card -->
     <div
-      class="logs-filters shadow-card grid grid-cols-[minmax(0,1fr)_auto] min-w-0 items-center gap-3 rounded-2xl border border-[#E8EDF3] bg-white p-3"
+      class="logs-filters shadow-card grid grid-cols-[minmax(0,1fr)_auto] min-w-0 items-center gap-3 rounded-2xl border border-[#E8EDF3] dark:border-slate-800 bg-white dark:bg-slate-900 p-3"
     >
       <!-- Search -->
       <div class="relative h-9 min-w-0">
         <span
           aria-hidden="true"
-          class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-[18px] text-[#687281] pointer-events-none"
+          class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-[18px] text-[#687281] dark:text-slate-400 pointer-events-none"
         >
           search
         </span>
@@ -394,7 +394,7 @@ function systemAuditChanges(log) {
           aria-label="Cari kata kunci log"
           type="text"
           placeholder="Cari kata kunci log…"
-          class="toolbar-search-input h-full min-h-0 w-full rounded-lg border border-[#DCE3EC] bg-white pl-10 pr-3 text-[11px] font-semibold text-[#334155] outline-none transition-all focus:border-brand focus:ring-1 focus:ring-brand/10"
+          class="toolbar-search-input h-full min-h-0 w-full rounded-lg border border-[#DCE3EC] dark:border-slate-700 bg-white dark:bg-slate-800 pl-10 pr-3 text-[11px] font-semibold text-[#334155] dark:text-slate-100 placeholder:text-slate-400 outline-none transition-all focus:border-brand focus:ring-1 focus:ring-brand/10"
         />
       </div>
 
@@ -439,7 +439,7 @@ function systemAuditChanges(log) {
           type="button"
           @click="fetchLogs"
           :disabled="isLoading"
-          class="logs-refresh-button h-9 items-center justify-center gap-2 rounded-lg border border-[#DCE3EC] bg-white/50 px-4 text-[12px] font-bold text-[#334155] shadow-sm hover:bg-[#F8FAFC] disabled:opacity-50"
+          class="logs-refresh-button h-9 items-center justify-center gap-2 rounded-lg border border-[#DCE3EC] dark:border-slate-700 bg-white/50 dark:bg-slate-800 px-4 text-[12px] font-bold text-[#334155] dark:text-slate-200 shadow-sm hover:bg-[#F8FAFC] dark:hover:bg-slate-700 disabled:opacity-50"
         >
           <span
             aria-hidden="true"
@@ -456,7 +456,7 @@ function systemAuditChanges(log) {
     </div>
 
     <!-- Content Container -->
-    <div class="shadow-card overflow-hidden rounded-[20px] border border-[#E8EDF3] bg-white">
+    <div class="shadow-card overflow-hidden rounded-[20px] border border-[#E8EDF3] dark:border-slate-800 bg-white dark:bg-slate-900">
       <!-- Loading State -->
       <div v-if="isLoading" aria-busy="true">
         <SkeletonTable preset="logs" :rows="6" />
@@ -489,58 +489,58 @@ function systemAuditChanges(log) {
               Tabel riwayat perubahan aset
             </caption>
             <thead>
-              <tr class="text-left border-b border-[#F3F4F6]">
+              <tr class="text-left border-b border-[#F3F4F6] dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40">
                 <th
                   scope="col"
-                  class="px-5 py-3 text-[10px] font-bold text-[#9CA3AF] uppercase tracking-wider w-48"
+                  class="px-5 py-3 text-[10px] font-bold text-[#9CA3AF] dark:text-slate-400 uppercase tracking-wider w-48"
                 >
                   Waktu
                 </th>
                 <th
                   scope="col"
-                  class="px-5 py-3 text-[10px] font-bold text-[#9CA3AF] uppercase tracking-wider w-24"
+                  class="px-5 py-3 text-[10px] font-bold text-[#9CA3AF] dark:text-slate-400 uppercase tracking-wider w-24"
                 >
                   Aksi
                 </th>
                 <th
                   scope="col"
-                  class="px-5 py-3 text-[10px] font-bold text-[#9CA3AF] uppercase tracking-wider"
+                  class="px-5 py-3 text-[10px] font-bold text-[#9CA3AF] dark:text-slate-400 uppercase tracking-wider"
                 >
                   Aset
                 </th>
                 <th
                   scope="col"
-                  class="px-5 py-3 text-[10px] font-bold text-[#9CA3AF] uppercase tracking-wider"
+                  class="px-5 py-3 text-[10px] font-bold text-[#9CA3AF] dark:text-slate-400 uppercase tracking-wider"
                 >
                   Perubahan
                 </th>
                 <th
                   scope="col"
-                  class="px-5 py-3 text-[10px] font-bold text-[#9CA3AF] uppercase tracking-wider w-40"
+                  class="px-5 py-3 text-[10px] font-bold text-[#9CA3AF] dark:text-slate-400 uppercase tracking-wider w-40"
                 >
                   Oleh
                 </th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-[#F9FAFB]">
+            <tbody class="divide-y divide-[#F9FAFB] dark:divide-slate-800">
               <tr
                 v-for="log in paginatedAssetLogs"
                 :key="log.id"
-                class="hover:bg-[#F9FAFB]/50 transition-colors align-top"
+                class="hover:bg-[#F9FAFB]/50 dark:hover:bg-slate-800/50 transition-colors align-top"
               >
-                <td class="px-5 py-3.5 text-[11px] font-semibold text-[#374151] font-mono">
+                <td class="px-5 py-3.5 text-[11px] font-semibold text-[#374151] dark:text-slate-300 font-mono">
                   {{ formatDateTime(log.dibuat_pada) }}
                 </td>
                 <td class="px-5 py-3.5">
                   <AppBadge :type="getActionBadgeType(log.aksi)" :text="log.aksi" />
                 </td>
-                <td class="px-5 py-3.5 text-[12px] font-bold text-[#111827] font-mono">
+                <td class="px-5 py-3.5 text-[12px] font-bold text-[#111827] dark:text-white font-mono">
                   {{ log.label_aset }}
                 </td>
-                <td class="px-5 py-3.5 text-[11px] font-medium text-[#5F7089] wrap-anywhere">
+                <td class="px-5 py-3.5 text-[11px] font-medium text-[#5F7089] dark:text-slate-400 wrap-anywhere">
                   {{ log.perubahan || '—' }}
                 </td>
-                <td class="px-5 py-3.5 text-[12px] font-semibold text-[#374151]">
+                <td class="px-5 py-3.5 text-[12px] font-semibold text-[#374151] dark:text-slate-200">
                   {{ log.oleh_pengguna }}
                 </td>
               </tr>
@@ -575,7 +575,7 @@ function systemAuditChanges(log) {
           <div
             v-for="log in paginatedAssetLogs"
             :key="log.id"
-            class="group flex min-w-0 gap-4 px-3.5 sm:px-5 py-4 hover:bg-[#FAFBFD] transition-colors"
+            class="group flex min-w-0 gap-4 px-3.5 sm:px-5 py-4 hover:bg-[#FAFBFD] dark:hover:bg-slate-800/40 transition-colors border-b border-slate-100 dark:border-slate-800/60 last:border-b-0"
           >
             <!-- Left: Icon + Timeline connector -->
             <div class="hidden sm:flex flex-col items-center pt-0.5">
@@ -595,11 +595,11 @@ function systemAuditChanges(log) {
               <div class="flex flex-wrap items-center gap-2 mb-3 sm:mb-2">
                 <AppBadge :type="getActionBadgeType(log.aksi)" :text="log.aksi" />
                 <span
-                  class="w-full sm:w-auto min-w-0 text-sm sm:text-[13px] font-extrabold text-[#111827] font-mono tracking-tight"
+                  class="w-full sm:w-auto min-w-0 text-sm sm:text-[13px] font-extrabold text-[#111827] dark:text-white font-mono tracking-tight"
                   >{{ log.label_aset }}</span
                 >
                 <span
-                  class="text-[10px] text-[#687281] font-medium ml-auto shrink-0 hidden sm:inline"
+                  class="text-[10px] text-[#687281] dark:text-slate-400 font-medium ml-auto shrink-0 hidden sm:inline"
                 >
                   <span
                     aria-hidden="true"
@@ -750,46 +750,46 @@ function systemAuditChanges(log) {
               Tabel log audit login aktivitas pengguna
             </caption>
             <thead>
-              <tr class="text-left border-b border-[#F3F4F6]">
+              <tr class="text-left border-b border-[#F3F4F6] dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40">
                 <th
                   scope="col"
-                  class="px-5 py-3 text-[10px] font-bold text-[#9CA3AF] uppercase tracking-wider w-48"
+                  class="px-5 py-3 text-[10px] font-bold text-[#9CA3AF] dark:text-slate-400 uppercase tracking-wider w-48"
                 >
                   Waktu Login
                 </th>
                 <th
                   scope="col"
-                  class="px-5 py-3 text-[10px] font-bold text-[#9CA3AF] uppercase tracking-wider"
+                  class="px-5 py-3 text-[10px] font-bold text-[#9CA3AF] dark:text-slate-400 uppercase tracking-wider"
                 >
                   Nama Pengguna
                 </th>
                 <th
                   scope="col"
-                  class="px-5 py-3 text-[10px] font-bold text-[#9CA3AF] uppercase tracking-wider"
+                  class="px-5 py-3 text-[10px] font-bold text-[#9CA3AF] dark:text-slate-400 uppercase tracking-wider"
                 >
                   Email
                 </th>
                 <th
                   scope="col"
-                  class="px-5 py-3 text-[10px] font-bold text-[#9CA3AF] uppercase tracking-wider w-36"
+                  class="px-5 py-3 text-[10px] font-bold text-[#9CA3AF] dark:text-slate-400 uppercase tracking-wider w-36"
                 >
                   Status
                 </th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-[#F9FAFB]">
+            <tbody class="divide-y divide-[#F9FAFB] dark:divide-slate-800">
               <tr
                 v-for="log in paginatedAuditLogs"
                 :key="log.id"
-                class="hover:bg-[#F9FAFB]/50 transition-colors"
+                class="hover:bg-[#F9FAFB]/50 dark:hover:bg-slate-800/50 transition-colors"
               >
-                <td class="px-5 py-3.5 text-[11px] font-semibold text-[#374151] font-mono">
+                <td class="px-5 py-3.5 text-[11px] font-semibold text-[#374151] dark:text-slate-300 font-mono">
                   {{ formatDateTime(log.dibuat_pada) }}
                 </td>
-                <td class="px-5 py-3.5 text-[12px] font-bold text-[#111827]">
+                <td class="px-5 py-3.5 text-[12px] font-bold text-[#111827] dark:text-white">
                   {{ log.nama_pengguna }}
                 </td>
-                <td class="px-5 py-3.5 text-[11px] text-[#374151] font-mono">
+                <td class="px-5 py-3.5 text-[11px] text-[#374151] dark:text-slate-300 font-mono">
                   {{ log.email }}
                 </td>
                 <td class="px-5 py-3.5">

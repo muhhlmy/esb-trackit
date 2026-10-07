@@ -1,4 +1,4 @@
-﻿<script setup>
+<script setup>
 import { ref, computed, onMounted, watch } from 'vue'
 import { useApi } from '@/composables/useApi'
 import { useAuth } from '@/composables/useAuth'
@@ -351,14 +351,14 @@ onMounted(() => {
       <!-- Compact Metrics -->
       <div class="flex items-center gap-6 shrink-0">
         <div class="flex flex-col">
-          <span class="text-[11px] font-medium text-[#687281] uppercase tracking-wider">Tabel</span>
-          <span class="text-xl font-bold text-[#333333] font-mono">{{ tables.length }}</span>
+          <span class="text-[11px] font-medium text-[#687281] dark:text-slate-400 uppercase tracking-wider">Tabel</span>
+          <span class="text-xl font-bold text-[#333333] dark:text-white font-mono">{{ tables.length }}</span>
         </div>
         <div class="flex flex-col">
-          <span class="text-[11px] font-medium text-[#687281] uppercase tracking-wider"
-            >Total Record</span
+          <span class="text-[11px] font-medium text-[#687281] dark:text-slate-400 uppercase tracking-wider"
+            >Total rekaman</span
           >
-          <span class="text-xl font-bold text-[#333333] font-mono">
+          <span class="text-xl font-bold text-[#333333] dark:text-white font-mono">
             {{ isLoading ? '...' : totalDbRecords.toLocaleString('id-ID') }}
           </span>
         </div>
@@ -368,18 +368,18 @@ onMounted(() => {
     <!-- Tindakan Kritis: Reset Database (Superadmin only) -->
     <div
       v-if="isSuperAdmin"
-      class="bg-rose-50/70 border border-rose-200/80 rounded-2xl p-4 sm:p-5 shadow-2xs transition-all"
+      class="bg-rose-50/70 dark:bg-rose-950/20 border border-rose-200/80 dark:border-rose-900/40 rounded-2xl p-4 sm:p-5 shadow-2xs transition-all"
     >
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div class="space-y-1">
           <div
-            class="flex items-center gap-1.5 text-xs text-rose-700 font-bold tracking-wide uppercase"
+            class="flex items-center gap-1.5 text-xs text-rose-700 dark:text-rose-400 font-bold tracking-wide uppercase"
           >
             <span aria-hidden="true" class="material-symbols-outlined text-[16px]">warning</span>
             <span>Tindakan Kritis: Reset Database</span>
           </div>
-          <h3 class="text-sm font-bold text-rose-900">Reset &amp; Kosongkan Database</h3>
-          <p class="text-xs text-rose-700/90 leading-relaxed max-w-2xl">
+          <h3 class="text-sm font-bold text-rose-900 dark:text-rose-200">Reset &amp; Kosongkan Database</h3>
+          <p class="text-xs text-rose-700/90 dark:text-rose-300/80 leading-relaxed max-w-2xl">
             Menghapus secara permanen seluruh data aset TI, aset GA, aset OPS, tiket helpdesk,
             karyawan, dan log aktivitas. Akun Superadmin yang dikonfigurasi administrator pada
             backend akan diprovisi kembali secara otomatis.
@@ -398,21 +398,21 @@ onMounted(() => {
 
     <!-- Navigation Tabs -->
     <div
-      class="flex flex-col items-stretch sm:flex-row sm:items-center justify-between gap-2 border-b border-[#E2E8F0] pb-px"
+      class="flex flex-col items-stretch sm:flex-row sm:items-center justify-between gap-2 border-b border-[#E2E8F0] dark:border-slate-800 pb-px"
     >
       <div class="grid grid-cols-1 min-w-0 sm:flex sm:flex-wrap sm:items-center gap-1">
         <button
           type="button"
           :aria-pressed="activeTab === 'quick'"
-          @click="activeTab = 'quick'"
+          @click="activeTab === 'quick'"
           class="flex items-center gap-2 px-3.5 py-2 text-xs font-semibold rounded-lg transition-all cursor-pointer whitespace-normal sm:whitespace-nowrap select-none"
           :class="
             activeTab === 'quick'
-              ? 'bg-[#F1F5F9] text-[#333333]'
-              : 'text-[#5F7089] hover:bg-[#F8FAFC] hover:text-[#333333]'
+              ? 'bg-[#F1F5F9] dark:bg-slate-800 text-[#333333] dark:text-white'
+              : 'text-[#5F7089] dark:text-slate-400 hover:bg-[#F8FAFC] dark:hover:bg-slate-800/50 hover:text-[#333333] dark:hover:text-white'
           "
         >
-          <span aria-hidden="true" class="material-symbols-outlined text-[18px] text-[#5F7089]"
+          <span aria-hidden="true" class="material-symbols-outlined text-[18px] text-[#5F7089] dark:text-slate-400"
             >bolt</span
           >
           <span>Ekspor Cepat per Tabel</span>
@@ -421,15 +421,15 @@ onMounted(() => {
         <button
           type="button"
           :aria-pressed="activeTab === 'custom'"
-          @click="activeTab = 'custom'"
+          @click="activeTab === 'custom'"
           class="flex items-center gap-2 px-3.5 py-2 text-xs font-semibold rounded-lg transition-all cursor-pointer whitespace-normal sm:whitespace-nowrap select-none"
           :class="
             activeTab === 'custom'
-              ? 'bg-[#F1F5F9] text-[#333333]'
-              : 'text-[#5F7089] hover:bg-[#F8FAFC] hover:text-[#333333]'
+              ? 'bg-[#F1F5F9] dark:bg-slate-800 text-[#333333] dark:text-white'
+              : 'text-[#5F7089] dark:text-slate-400 hover:bg-[#F8FAFC] dark:hover:bg-slate-800/50 hover:text-[#333333] dark:hover:text-white'
           "
         >
-          <span aria-hidden="true" class="material-symbols-outlined text-[18px] text-[#5F7089]"
+          <span aria-hidden="true" class="material-symbols-outlined text-[18px] text-[#5F7089] dark:text-slate-400"
             >tune</span
           >
           <span>Ekspor Kustom</span>
@@ -438,15 +438,15 @@ onMounted(() => {
         <button
           type="button"
           :aria-pressed="activeTab === 'presets'"
-          @click="activeTab = 'presets'"
+          @click="activeTab === 'presets'"
           class="flex items-center gap-2 px-3.5 py-2 text-xs font-semibold rounded-lg transition-all cursor-pointer whitespace-normal sm:whitespace-nowrap select-none"
           :class="
             activeTab === 'presets'
-              ? 'bg-[#F1F5F9] text-[#333333]'
-              : 'text-[#5F7089] hover:bg-[#F8FAFC] hover:text-[#333333]'
+              ? 'bg-[#F1F5F9] dark:bg-slate-800 text-[#333333] dark:text-white'
+              : 'text-[#5F7089] dark:text-slate-400 hover:bg-[#F8FAFC] dark:hover:bg-slate-800/50 hover:text-[#333333] dark:hover:text-white'
           "
         >
-          <span aria-hidden="true" class="material-symbols-outlined text-[18px] text-[#5F7089]"
+          <span aria-hidden="true" class="material-symbols-outlined text-[18px] text-[#5F7089] dark:text-slate-400"
             >bookmark</span
           >
           <span>Template Laporan</span>
@@ -456,7 +456,7 @@ onMounted(() => {
       <button
         type="button"
         @click="fetchTablesMetadata"
-        class="flex items-center justify-center shrink-0 gap-1.5 text-xs font-medium text-[#5F7089] hover:text-[#333333] transition-colors cursor-pointer"
+        class="flex items-center justify-center shrink-0 gap-1.5 text-xs font-medium text-[#5F7089] dark:text-slate-400 hover:text-[#333333] dark:hover:text-white transition-colors cursor-pointer"
       >
         <span aria-hidden="true" class="material-symbols-outlined text-[16px]">refresh</span>
         <span>Refresh Stats</span>
@@ -477,46 +477,46 @@ onMounted(() => {
         <div
           v-for="table in tables"
           :key="table.tableName"
-          class="group min-w-0 flex flex-col justify-between rounded-2xl border border-[#E2E8F0] bg-white p-4 transition-all duration-150 hover:border-[#CBD5E1] hover:shadow-2xs"
+          class="group min-w-0 flex flex-col justify-between rounded-2xl border border-[#E2E8F0] dark:border-slate-800 bg-white dark:bg-slate-900 p-4 transition-all duration-150 hover:border-[#CBD5E1] dark:hover:border-slate-700 hover:shadow-2xs"
         >
           <div class="space-y-3">
             <div class="flex items-center justify-between gap-2">
               <div
-                class="flex h-8 w-8 items-center justify-center rounded-lg bg-[#F8FAFC] border border-[#E2E8F0] text-[#475569] group-hover:text-[#333333] group-hover:border-[#BFDBFE] transition-colors"
+                class="flex h-8 w-8 items-center justify-center rounded-lg bg-[#F8FAFC] dark:bg-slate-800 border border-[#E2E8F0] dark:border-slate-700 text-[#475569] dark:text-slate-300 group-hover:text-[#333333] dark:group-hover:text-white group-hover:border-[#BFDBFE] transition-colors"
               >
                 <span aria-hidden="true" class="material-symbols-outlined text-[18px]">{{
                   table.icon
                 }}</span>
               </div>
               <span
-                class="rounded-full bg-[#F1F5F9] px-2 py-0.5 font-mono text-[11px] font-semibold text-[#5F7089]"
+                class="rounded-full bg-[#F1F5F9] dark:bg-slate-800 px-2 py-0.5 font-mono text-[11px] font-semibold text-[#5F7089] dark:text-slate-400"
               >
-                {{ table.rowCount.toLocaleString('id-ID') }} records
+                {{ table.rowCount.toLocaleString('id-ID') }} rekaman
               </span>
             </div>
 
             <div>
               <h3
-                class="font-bold text-[#333333] text-sm group-hover:text-[#333333] transition-colors"
+                class="font-bold text-[#333333] dark:text-white text-sm group-hover:text-[#333333] dark:group-hover:text-white transition-colors"
               >
                 {{ table.label }}
               </h3>
-              <p class="mt-1 text-xs text-[#5F7089] sm:line-clamp-2 leading-relaxed">
+              <p class="mt-1 text-xs text-[#5F7089] dark:text-slate-400 sm:line-clamp-2 leading-relaxed">
                 {{ table.description }}
               </p>
             </div>
           </div>
 
-          <div class="mt-4 pt-3 border-t border-[#F1F5F9] space-y-2">
-            <span class="text-[10px] font-semibold uppercase tracking-wider text-[#687281]"
-              >Supported Formats</span
+          <div class="mt-4 pt-3 border-t border-[#F1F5F9] dark:border-slate-800 space-y-2">
+            <span class="text-[10px] font-semibold uppercase tracking-wider text-[#687281] dark:text-slate-400"
+              >Format Didukung</span
             >
             <div class="grid grid-cols-4 gap-1.5">
               <button
                 type="button"
                 @click="handleQuickExport(table.tableName, 'csv')"
                 title="Unduh berkas CSV"
-                class="flex items-center justify-center rounded-lg bg-[#F0FDF4] border border-[#DCFCE7] py-1.5 text-[11px] font-bold text-[#166534] hover:bg-[#166534] hover:text-white hover:border-[#166534] transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+                class="flex items-center justify-center rounded-lg bg-[#F0FDF4] dark:bg-emerald-950/40 border border-[#DCFCE7] dark:border-emerald-800/60 py-1.5 text-[11px] font-bold text-[#166534] dark:text-emerald-400 hover:bg-[#166534] hover:text-white hover:border-[#166534] transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
               >
                 CSV
               </button>

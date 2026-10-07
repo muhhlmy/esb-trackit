@@ -406,16 +406,16 @@ function formatKondisiPill(kondisi) {
     <!-- Simplified SaaS Header & Toolbar Container (sticky mengikuti scroll) -->
     <div class="asset-toolbar-sticky">
       <div
-        class="asset-toolbar flex flex-col gap-3 sm:gap-3.5 bg-white p-3.5 sm:p-4.5 rounded-2xl border border-[#E2E8F0]/80 shadow-2xs"
+        class="asset-toolbar flex flex-col gap-3 sm:gap-3.5 bg-white dark:bg-slate-900 p-3 sm:p-3.5 rounded-xl border border-[#E2E8F0] dark:border-slate-800 shadow-2xs"
       >
         <!-- Row 1: Page Title & Primary CTA -->
         <div class="flex items-center justify-between gap-2.5">
           <div class="min-w-0">
-            <h2 class="text-base sm:text-lg font-bold text-[#333333] tracking-tight truncate">
+            <h2 class="text-base sm:text-lg font-bold text-[#333333] dark:text-white tracking-tight truncate">
               Aset GA
             </h2>
             <p
-              class="text-[11px] sm:text-xs text-[#5F7089] mt-0.5 leading-normal line-clamp-1 sm:line-clamp-none"
+              class="text-[11px] sm:text-xs text-[#5F7089] dark:text-slate-400 mt-0.5 leading-normal line-clamp-1 sm:line-clamp-none"
             >
               Kelola inventaris fasilitas General Affair, mebel, AC, dan perlengkapan kantor.
             </p>
@@ -427,20 +427,20 @@ function formatKondisiPill(kondisi) {
               v-if="canWriteAssets"
               type="button"
               @click="openAdd"
-              class="inventory-primary-action inline-flex h-9 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg bg-[#0A51B0] px-3 sm:px-3.5 text-xs font-semibold text-white shadow-2xs transition-all hover:bg-[#0A4391]"
+              class="inventory-primary-action inline-flex h-8.5 sm:h-9 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg bg-[#0A51B0] px-3 sm:px-3.5 text-xs font-semibold text-white shadow-2xs transition-all hover:bg-[#0A4391]"
               title="Tambah Aset GA baru"
             >
               <span aria-hidden="true" class="material-symbols-outlined text-[16px]">add</span>
               <span>Tambah Aset GA</span>
             </button>
             <div
-              class="inventory-action-group flex items-center gap-1 rounded-lg border border-[#D7E3F2] bg-[#F8FAFC] p-1"
+              class="inventory-action-group flex items-center gap-1 rounded-lg border border-[#D7E3F2] dark:border-slate-700 bg-[#F8FAFC] dark:bg-slate-800 p-1"
             >
               <button
                 v-if="canWriteAssets"
                 type="button"
                 @click="showImportModal = true"
-                class="inventory-action-button inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-[11px] font-bold text-[#0A51B0] hover:bg-white"
+                class="inventory-action-button inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-[11px] font-bold text-[#0A51B0] dark:text-blue-400 hover:bg-white dark:hover:bg-slate-700"
                 title="Impor data Aset GA dari Excel"
               >
                 <span aria-hidden="true" class="material-symbols-outlined text-[15px]"
@@ -450,7 +450,7 @@ function formatKondisiPill(kondisi) {
               <button
                 type="button"
                 @click="showExportModal = true"
-                class="inventory-action-button inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-[11px] font-bold text-[#0A51B0] hover:bg-white"
+                class="inventory-action-button inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-[11px] font-bold text-[#0A51B0] dark:text-blue-400 hover:bg-white dark:hover:bg-slate-700"
                 title="Export data Aset GA"
               >
                 <span aria-hidden="true" class="material-symbols-outlined text-[15px]"
@@ -463,13 +463,13 @@ function formatKondisiPill(kondisi) {
 
         <!-- Row 2: Search, Filters & Actions -->
         <div
-          class="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 w-full min-w-0 pt-2.5 border-t border-[#F1F5F9]"
+          class="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 w-full min-w-0 pt-2.5 border-t border-[#F1F5F9] dark:border-slate-800"
         >
           <!-- Search Input -->
-          <div class="relative h-9 w-full sm:flex-1 sm:min-w-[200px]">
+          <div class="relative h-8.5 sm:h-9 w-full sm:flex-1 sm:min-w-[200px]">
             <span
               aria-hidden="true"
-              class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-[17px] text-[#687281] pointer-events-none"
+              class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-[17px] text-[#687281] dark:text-slate-400 pointer-events-none"
               >search</span
             >
             <input
@@ -477,7 +477,7 @@ function formatKondisiPill(kondisi) {
               type="text"
               aria-label="Cari aset GA"
               placeholder="Cari hostname, nama asset, detail, lokasi…"
-              class="h-full w-full rounded-lg border border-[#E2E8F0] bg-white pl-8 pr-8 text-xs text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
+              class="h-full w-full rounded-lg border border-[#E2E8F0] dark:border-slate-800 bg-white dark:bg-slate-800 pl-8 pr-8 text-xs text-[#333333] dark:text-white placeholder-[#687281] dark:placeholder-slate-400 focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
             />
             <!-- Inline Clear Button -->
             <button

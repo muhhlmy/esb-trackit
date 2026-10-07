@@ -32,13 +32,13 @@ defineProps({
       </div>
       <div class="min-w-0">
         <h1
-          class="page-header-title text-sm sm:text-base font-bold text-[#333333] tracking-tight truncate"
+          class="page-header-title text-sm sm:text-base font-bold text-[#333333] dark:text-slate-100 tracking-tight truncate"
         >
           {{ title }}
         </h1>
         <p
           v-if="subtitle"
-          class="page-header-subtitle text-[11px] font-normal text-[#5F7089] mt-0.5 truncate"
+          class="page-header-subtitle text-[11px] font-normal text-[#5F7089] dark:text-slate-400 mt-0.5 truncate"
         >
           {{ subtitle }}
         </p>
@@ -57,6 +57,13 @@ defineProps({
   border: 1px solid #e2e8f0;
   border-radius: var(--ui-radius-card, 0.65rem);
   box-shadow: var(--ui-shadow-card, 0 1.5px 6px rgba(15, 23, 42, 0.03));
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+:global(.dark) .page-header {
+  background: #0f172a;
+  border-color: #1e293b;
+  box-shadow: 0 1.5px 6px rgba(0, 0, 0, 0.2);
 }
 
 @media (min-width: 640px) {
@@ -67,5 +74,10 @@ defineProps({
 
 .page-header-icon {
   background: #edf5ff;
+}
+
+:global(.dark) .page-header-icon {
+  background: #1e293b;
+  border-color: #334155;
 }
 </style>

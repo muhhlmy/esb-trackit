@@ -598,10 +598,10 @@ onMounted(() => {
           <span v-else class="font-medium text-[#5F7089] shrink-0">Aset Saya</span>
           <span
             aria-hidden="true"
-            class="material-symbols-outlined text-[14px] text-[#CBD5E1] shrink-0"
+            class="material-symbols-outlined text-[14px] text-[#CBD5E1] dark:text-slate-600 shrink-0"
             >chevron_right</span
           >
-          <span class="font-bold text-[#333333] truncate">{{
+          <span class="font-bold text-[#333333] dark:text-white truncate">{{
             selectedEmployee.nama_karyawan
           }}</span>
         </nav>
@@ -610,7 +610,7 @@ onMounted(() => {
           v-if="canBrowseOtherAssets"
           type="button"
           @click="goToLevel1"
-          class="flex items-center gap-1 shrink-0 rounded-lg border border-[#E2E8F0] bg-white px-2.5 sm:px-3 py-1.5 text-xs font-semibold text-[#475569] hover:bg-[#F8FAFC] hover:text-[#333333] transition-all cursor-pointer shadow-2xs touch-manipulation"
+          class="flex items-center gap-1 shrink-0 rounded-lg border border-[#E2E8F0] dark:border-slate-700 bg-white dark:bg-slate-800 px-2.5 sm:px-3 py-1.5 text-xs font-semibold text-[#475569] dark:text-slate-300 hover:bg-[#F8FAFC] dark:hover:bg-slate-700 hover:text-[#333333] dark:hover:text-white transition-all cursor-pointer shadow-2xs touch-manipulation"
           title="Kembali ke Daftar Karyawan"
         >
           <span aria-hidden="true" class="material-symbols-outlined text-[16px]">arrow_back</span>
@@ -620,7 +620,7 @@ onMounted(() => {
 
       <!-- Employee Hero Profile Identity Header -->
       <div
-        class="employee-profile rounded-xl border border-[#E2E8F0] bg-white p-3.5 sm:p-5 shadow-2xs flex flex-col gap-3.5 sm:flex-row sm:items-center sm:justify-between"
+        class="employee-profile rounded-xl border border-[#E2E8F0] dark:border-slate-800 bg-white dark:bg-slate-900 p-3.5 sm:p-5 shadow-2xs flex flex-col gap-3.5 sm:flex-row sm:items-center sm:justify-between"
       >
         <div class="flex items-start sm:items-center gap-3 sm:gap-4 min-w-0">
           <div
@@ -630,7 +630,7 @@ onMounted(() => {
           </div>
           <div class="min-w-0 flex-1">
             <div class="flex items-center gap-2 flex-wrap">
-              <h2 class="text-base sm:text-lg font-bold text-[#333333] tracking-tight truncate">
+              <h2 class="text-base sm:text-lg font-bold text-[#333333] dark:text-white tracking-tight truncate">
                 {{ selectedEmployee.nama_karyawan }}
               </h2>
               <AppBadge
@@ -643,35 +643,35 @@ onMounted(() => {
                 :text="selectedEmployee.status_karyawan || selectedEmployee.status"
               />
             </div>
-            <p class="text-xs font-medium text-[#475569] mt-0.5 truncate">
+            <p class="text-xs font-medium text-[#475569] dark:text-slate-400 mt-0.5 truncate">
               {{ selectedEmployee.jabatan || selectedEmployee.title || 'Staff' }}
             </p>
-            <div class="mt-2 flex flex-wrap items-center gap-1.5 text-[11px] text-[#5F7089]">
+            <div class="mt-2 flex flex-wrap items-center gap-1.5 text-[11px] text-[#5F7089] dark:text-slate-400">
               <span
-                class="inline-flex items-center h-6 px-2.5 rounded-md bg-[#F8FAFC] border border-[#E2E8F0] font-mono font-medium text-[#333333] leading-none"
+                class="inline-flex items-center h-6 px-2.5 rounded-md bg-[#F8FAFC] dark:bg-slate-800 border border-[#E2E8F0] dark:border-slate-700 font-mono font-medium text-[#333333] dark:text-white leading-none"
               >
                 NIK: {{ selectedEmployee.nik }}
               </span>
               <span
                 v-if="selectedEmployee.departemen"
-                class="inline-flex items-center h-6 px-2.5 rounded-md bg-[#F8FAFC] border border-[#E2E8F0] text-[#475569] leading-none"
+                class="inline-flex items-center h-6 px-2.5 rounded-md bg-[#F8FAFC] dark:bg-slate-800 border border-[#E2E8F0] dark:border-slate-700 text-[#475569] dark:text-slate-300 leading-none"
               >
                 {{ selectedEmployee.departemen }}
               </span>
               <span
                 v-if="selectedEmployee.lokasi_kerja"
-                class="inline-flex items-center gap-1 h-6 px-2.5 rounded-md bg-[#F8FAFC] border border-[#E2E8F0] text-[#475569] leading-none"
+                class="inline-flex items-center gap-1 h-6 px-2.5 rounded-md bg-[#F8FAFC] dark:bg-slate-800 border border-[#E2E8F0] dark:border-slate-700 text-[#475569] dark:text-slate-300 leading-none"
               >
                 <span
                   aria-hidden="true"
-                  class="material-symbols-outlined text-[13px] text-[#687281] leading-none shrink-0"
+                  class="material-symbols-outlined text-[13px] text-[#687281] dark:text-slate-400 leading-none shrink-0"
                   >location_on</span
                 >
                 {{ selectedEmployee.lokasi_kerja }}
               </span>
               <span
                 v-if="selectedEmployee.email_kantor"
-                class="inline-flex items-center h-6 px-2.5 rounded-md bg-[#F8FAFC] border border-[#E2E8F0] text-[#475569] leading-none truncate max-w-[200px]"
+                class="inline-flex items-center h-6 px-2.5 rounded-md bg-[#F8FAFC] dark:bg-slate-800 border border-[#E2E8F0] dark:border-slate-700 text-[#475569] dark:text-slate-300 leading-none truncate max-w-[200px]"
               >
                 {{ selectedEmployee.email_kantor }}
               </span>
@@ -681,29 +681,29 @@ onMounted(() => {
 
         <!-- Employee Summary Stat Badges -->
         <div
-          class="grid grid-cols-2 sm:flex sm:items-stretch gap-2.5 shrink-0 border-t border-[#F1F5F9] pt-3 sm:border-t-0 sm:pt-0"
+          class="grid grid-cols-2 sm:flex sm:items-stretch gap-2.5 shrink-0 border-t border-[#F1F5F9] dark:border-slate-800 pt-3 sm:border-t-0 sm:pt-0"
         >
           <div
-            class="flex flex-col justify-center h-[54px] sm:h-[58px] min-w-[110px] sm:min-w-[125px] rounded-xl bg-[#F8FAFC] px-3.5 py-2 border border-[#E2E8F0] text-center sm:text-right shadow-2xs"
+            class="flex flex-col justify-center h-[54px] sm:h-[58px] min-w-[110px] sm:min-w-[125px] rounded-xl bg-[#F8FAFC] dark:bg-slate-800 px-3.5 py-2 border border-[#E2E8F0] dark:border-slate-700 text-center sm:text-right shadow-2xs"
           >
             <span
-              class="block text-[10px] font-bold uppercase tracking-wider text-[#5F7089] leading-tight"
-              >Total Aset</span
+              class="block text-[10px] font-bold uppercase tracking-wider text-[#5F7089] dark:text-slate-400 leading-tight"
+              >Total aset</span
             >
             <span
-              class="font-num text-sm sm:text-base font-bold text-[#333333] leading-snug mt-0.5 block"
+              class="font-num text-sm sm:text-base font-bold text-[#333333] dark:text-white leading-snug mt-0.5 block"
               >{{ myAssets.length }} Unit</span
             >
           </div>
           <div
-            class="flex flex-col justify-center h-[54px] sm:h-[58px] min-w-[110px] sm:min-w-[125px] rounded-xl bg-[#F8FAFC] px-3.5 py-2 border border-[#E2E8F0] text-center sm:text-right shadow-2xs"
+            class="flex flex-col justify-center h-[54px] sm:h-[58px] min-w-[110px] sm:min-w-[125px] rounded-xl bg-[#F8FAFC] dark:bg-slate-800 px-3.5 py-2 border border-[#E2E8F0] dark:border-slate-700 text-center sm:text-right shadow-2xs"
           >
             <span
-              class="block text-[10px] font-bold uppercase tracking-wider text-[#5F7089] leading-tight"
-              >Penugasan Awal</span
+              class="block text-[10px] font-bold uppercase tracking-wider text-[#5F7089] dark:text-slate-400 leading-tight"
+              >Penugasan awal</span
             >
             <span
-              class="font-num text-xs sm:text-[13px] font-semibold text-[#333333] leading-snug mt-0.5 block truncate"
+              class="font-num text-xs sm:text-[13px] font-semibold text-[#333333] dark:text-white leading-snug mt-0.5 block truncate"
               >{{ employeeAssignedSince }}</span
             >
           </div>
@@ -713,7 +713,7 @@ onMounted(() => {
       <!-- KPI Cards: MyAssets Summary -->
       <div class="myassets-kpi-grid grid grid-cols-3 gap-2 sm:gap-2.5 lg:gap-3">
         <StatCard
-          title="Total Aset Saya"
+          title="Total aset saya"
           :value="myAssets.length"
           icon="devices"
           color="primary"
@@ -731,7 +731,7 @@ onMounted(() => {
           subtitle="Aset sedang digunakan"
         />
         <StatCard
-          title="Stok Tersedia"
+          title="Stok tersedia"
           :value="
             filteredAssets.filter((a) =>
               ['tersedia', 'stok', 'stock'].includes((a.status_aset || '').toLowerCase()),

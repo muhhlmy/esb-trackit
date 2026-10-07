@@ -3,6 +3,7 @@ import { ref, onMounted } from 'vue'
 import { useApi } from '@/composables/useApi'
 import { clearAuthSession } from '@/utils/authStorage.js'
 import AppModal from '@/components/ui/AppModal.vue'
+import PageHeader from '@/components/ui/PageHeader.vue'
 import SkeletonCard from '@/components/ui/skeleton/SkeletonCard.vue'
 import { useToast } from '@/composables/useToast.js'
 
@@ -349,105 +350,101 @@ function switchTab(tab) {
     :data-testid="!isLoading ? 'page-ready' : undefined"
   >
     <!-- Page Header -->
-    <div
-      class="admin-page-header flex flex-col gap-3.5 bg-white p-3.5 sm:p-4.5 rounded-2xl border border-[#E2E8F0]/80 shadow-2xs"
+    <PageHeader
+      title="Database"
+      subtitle="Backup & restore database PostgreSQL"
+      icon="database"
     >
-      <div>
-        <h1 class="text-xl font-bold tracking-tight text-[#333333]">Database</h1>
-        <p class="text-sm text-[#5F7089]">Backup & restore database PostgreSQL</p>
-      </div>
-      <div class="flex flex-col sm:flex-row sm:items-center gap-2">
-        <button
-          :disabled="isBackingUp || !dbStatus.pgDumpAvailable"
-          class="inline-flex items-center gap-2 rounded-lg bg-[#0A51B0] px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all hover:bg-[#0A4391] disabled:cursor-not-allowed disabled:opacity-50"
-          @click="handleBackupNow"
-        >
-          <span
-            v-if="isBackingUp"
-            class="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"
-          ></span>
-          <span aria-hidden="true" v-else class="material-symbols-outlined text-lg">database</span>
-          {{ isBackingUp ? 'Membuat Backup...' : 'Backup Now' }}
-        </button>
-      </div>
-    </div>
+      <button
+        :disabled="isBackingUp || !dbStatus.pgDumpAvailable"
+        class="inline-flex h-8.5 sm:h-9 items-center gap-1.5 rounded-lg bg-[#0A51B0] px-3.5 text-xs font-semibold text-white shadow-2xs hover:bg-[#0A4391] disabled:cursor-not-allowed disabled:opacity-50 transition-all cursor-pointer"
+        @click="handleBackupNow"
+      >
+        <span
+          v-if="isBackingUp"
+          class="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-white border-t-transparent"
+        ></span>
+        <span aria-hidden="true" v-else class="material-symbols-outlined text-[16px]">database</span>
+        <span>{{ isBackingUp ? 'Membuat Cadangan...' : 'Cadangkan Sekarang' }}</span>
+      </button>
+    </PageHeader>
 
     <!-- Tab Navigation -->
     <div
-      class="admin-tabs grid grid-cols-2 sm:flex gap-1 rounded-xl bg-[#F1F5F9] p-1 w-full sm:w-fit"
+      class="admin-tabs grid grid-cols-2 sm:flex gap-1 rounded-xl bg-[#F1F5F9] dark:bg-slate-800 p-1 w-full sm:w-fit"
       aria-label="Navigasi database"
     >
       <button
         v-for="tab in [
-          { key: 'overview', label: 'Overview', icon: 'monitor_heart' },
-          { key: 'history', label: 'Backup History', icon: 'history' },
-          { key: 'restore', label: 'Restore', icon: 'restore_page' },
+          { key: 'overview', label: 'Ringkasan', icon: 'monitor_heart' },
+          { key: 'history', label: 'Riwayat Cadangan', icon: 'history' },
+          { key: 'restore', label: 'Pemulihan', icon: 'restore_page' },
           { key: 'audit', label: 'Audit Log', icon: 'receipt_long' },
         ]"
         :key="tab.key"
-        class="flex min-w-0 items-center justify-center gap-1.5 rounded-lg px-2 sm:px-3.5 py-1.5 text-sm font-medium transition-all"
+        class="flex min-w-0 items-center justify-center gap-1.5 rounded-lg px-2 sm:px-3.5 py-1.5 text-xs font-medium transition-all"
         :class="
           activeTab === tab.key
-            ? 'bg-white text-[#333333] shadow-sm'
-            : 'text-[#5F7089] hover:text-[#334155]'
+            ? 'bg-white dark:bg-slate-900 text-[#333333] dark:text-white shadow-sm font-semibold'
+            : 'text-[#5F7089] dark:text-slate-400 hover:text-[#333333] dark:hover:text-white'
         "
         :aria-pressed="activeTab === tab.key"
         @click="switchTab(tab.key)"
       >
-        <span aria-hidden="true" class="material-symbols-outlined text-base">{{ tab.icon }}</span>
+        <span aria-hidden="true" class="material-symbols-outlined text-[16px]">{{ tab.icon }}</span>
         {{ tab.label }}
       </button>
     </div>
 
     <!-- Loading Skeleton -->
-    <div v-if="isLoading" class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+    <div v-if="isLoading" class="grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-4">
       <SkeletonCard v-for="i in 4" :key="i" />
     </div>
 
     <!-- ===== OVERVIEW TAB ===== -->
     <template v-if="!isLoading && activeTab === 'overview'">
       <!-- Status Cards -->
-      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div class="rounded-xl border border-[#E5EAEF] bg-white p-4 shadow-sm">
-          <div class="flex items-center gap-2 text-sm text-[#5F7089]">
-            <span aria-hidden="true" class="material-symbols-outlined text-base">database</span>
+      <div class="grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-4">
+        <div class="rounded-xl border border-[#E2E8F0] dark:border-slate-800 bg-white dark:bg-slate-900 p-3.5 shadow-2xs">
+          <div class="flex items-center gap-2 text-xs font-medium text-[#5F7089] dark:text-slate-400">
+            <span aria-hidden="true" class="material-symbols-outlined text-[16px]">database</span>
             PostgreSQL
           </div>
           <div class="mt-2 flex items-center gap-2">
             <span
-              class="inline-block h-2.5 w-2.5 rounded-full"
+              class="inline-block h-2 w-2 rounded-full"
               :class="dbStatus.connected ? 'bg-emerald-500' : 'bg-red-500'"
             ></span>
-            <span class="text-lg font-semibold text-[#333333]">{{
-              dbStatus.connected ? 'Connected' : 'Disconnected'
+            <span class="text-sm font-bold text-[#333333] dark:text-white">{{
+              dbStatus.connected ? 'Tersambung' : 'Terputus'
             }}</span>
           </div>
-          <div class="mt-1 text-xs text-[#687281]">{{ dbStatus.databaseName }}</div>
+          <div class="mt-1 text-[11px] text-[#64748B] dark:text-slate-400">{{ dbStatus.databaseName }}</div>
         </div>
 
-        <div class="rounded-xl border border-[#E5EAEF] bg-white p-4 shadow-sm">
-          <div class="flex items-center gap-2 text-sm text-[#5F7089]">
-            <span aria-hidden="true" class="material-symbols-outlined text-base">checklist</span>
-            Schema
+        <div class="rounded-xl border border-[#E2E8F0] dark:border-slate-800 bg-white dark:bg-slate-900 p-3.5 shadow-2xs">
+          <div class="flex items-center gap-2 text-xs font-medium text-[#5F7089] dark:text-slate-400">
+            <span aria-hidden="true" class="material-symbols-outlined text-[16px]">checklist</span>
+            Skema
           </div>
           <div class="mt-2 flex items-center gap-2">
             <span
-              class="inline-block h-2.5 w-2.5 rounded-full"
+              class="inline-block h-2 w-2 rounded-full"
               :class="dbStatus.schemaHealthy ? 'bg-emerald-500' : 'bg-amber-500'"
             ></span>
-            <span class="text-lg font-semibold text-[#333333]">{{
-              dbStatus.schemaHealthy ? 'Healthy' : 'Incomplete'
+            <span class="text-sm font-bold text-[#333333] dark:text-white">{{
+              dbStatus.schemaHealthy ? 'Normal' : 'Belum lengkap'
             }}</span>
           </div>
-          <div class="mt-1 text-xs text-[#687281]">
-            {{ dbStatus.tables.length }} tables, {{ dbStatus.views.length }} views
+          <div class="mt-1 text-[11px] text-[#64748B] dark:text-slate-400">
+            {{ dbStatus.tables.length }} tabel, {{ dbStatus.views.length }} view
           </div>
         </div>
 
-        <div class="rounded-xl border border-[#E5EAEF] bg-white p-4 shadow-sm">
-          <div class="flex items-center gap-2 text-sm text-[#5F7089]">
-            <span aria-hidden="true" class="material-symbols-outlined text-base">terminal</span>
-            Tools
+        <div class="rounded-xl border border-[#E2E8F0] dark:border-slate-800 bg-white dark:bg-slate-900 p-3.5 shadow-2xs">
+          <div class="flex items-center gap-2 text-xs font-medium text-[#5F7089] dark:text-slate-400">
+            <span aria-hidden="true" class="material-symbols-outlined text-[16px]">terminal</span>
+            Perangkat utilitas
           </div>
           <div class="mt-2 space-y-1">
             <div class="flex items-center gap-2 text-xs">
@@ -455,9 +452,9 @@ function switchTab(tab) {
                 class="inline-block h-1.5 w-1.5 rounded-full"
                 :class="dbStatus.pgDumpAvailable ? 'bg-emerald-500' : 'bg-red-500'"
               ></span>
-              <span class="text-[#5F7089]">pg_dump</span>
-              <span class="text-[#687281]">{{
-                dbStatus.pgDumpAvailable ? 'Ready' : 'Not Found'
+              <span class="text-[#5F7089] dark:text-slate-400">pg_dump</span>
+              <span class="text-[#64748B] dark:text-slate-300 font-medium">{{
+                dbStatus.pgDumpAvailable ? 'Siap' : 'Tidak ditemukan'
               }}</span>
             </div>
             <div class="flex items-center gap-2 text-xs">
@@ -465,9 +462,9 @@ function switchTab(tab) {
                 class="inline-block h-1.5 w-1.5 rounded-full"
                 :class="dbStatus.pgRestoreAvailable ? 'bg-emerald-500' : 'bg-red-500'"
               ></span>
-              <span class="text-[#5F7089]">pg_restore</span>
-              <span class="text-[#687281]">{{
-                dbStatus.pgRestoreAvailable ? 'Ready' : 'Not Found'
+              <span class="text-[#5F7089] dark:text-slate-400">pg_restore</span>
+              <span class="text-[#64748B] dark:text-slate-300 font-medium">{{
+                dbStatus.pgRestoreAvailable ? 'Siap' : 'Tidak ditemukan'
               }}</span>
             </div>
             <div class="flex items-center gap-2 text-xs">
@@ -475,29 +472,29 @@ function switchTab(tab) {
                 class="inline-block h-1.5 w-1.5 rounded-full"
                 :class="dbStatus.psqlAvailable ? 'bg-emerald-500' : 'bg-red-500'"
               ></span>
-              <span class="text-[#5F7089]">psql</span>
-              <span class="text-[#687281]">{{
-                dbStatus.psqlAvailable ? 'Ready' : 'Not Found'
+              <span class="text-[#5F7089] dark:text-slate-400">psql</span>
+              <span class="text-[#64748B] dark:text-slate-300 font-medium">{{
+                dbStatus.psqlAvailable ? 'Siap' : 'Tidak ditemukan'
               }}</span>
             </div>
           </div>
         </div>
 
-        <div class="rounded-xl border border-[#E5EAEF] bg-white p-4 shadow-sm">
-          <div class="flex items-center gap-2 text-sm text-[#5F7089]">
-            <span aria-hidden="true" class="material-symbols-outlined text-base">folder</span>
-            Storage
+        <div class="rounded-xl border border-[#E2E8F0] dark:border-slate-800 bg-white dark:bg-slate-900 p-3.5 shadow-2xs">
+          <div class="flex items-center gap-2 text-xs font-medium text-[#5F7089] dark:text-slate-400">
+            <span aria-hidden="true" class="material-symbols-outlined text-[16px]">folder</span>
+            Penyimpanan
           </div>
           <div class="mt-2 flex items-center gap-2">
             <span
-              class="inline-block h-2.5 w-2.5 rounded-full"
+              class="inline-block h-2 w-2 rounded-full"
               :class="dbStatus.backupStorageAvailable ? 'bg-emerald-500' : 'bg-red-500'"
             ></span>
-            <span class="text-lg font-semibold text-[#333333]">{{
-              dbStatus.backupStorageAvailable ? 'Available' : 'Unavailable'
+            <span class="text-sm font-bold text-[#333333] dark:text-white">{{
+              dbStatus.backupStorageAvailable ? 'Tersedia' : 'Tidak tersedia'
             }}</span>
           </div>
-          <div class="mt-1 text-xs text-[#687281]">{{ dbStatus.backupCount }} backup files</div>
+          <div class="mt-1 text-[11px] text-[#64748B] dark:text-slate-400">{{ dbStatus.backupCount }} berkas cadangan</div>
         </div>
       </div>
 

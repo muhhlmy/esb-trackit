@@ -352,13 +352,13 @@ onMounted(() => {
       <div class="flex items-center gap-6 shrink-0">
         <div class="flex flex-col">
           <span class="text-[11px] font-medium text-[#687281] dark:text-slate-400 uppercase tracking-wider">Tabel</span>
-          <span class="text-xl font-bold text-[#333333] dark:text-white font-mono">{{ tables.length }}</span>
+          <span class="text-base font-bold text-[#333333] dark:text-white font-mono">{{ tables.length }}</span>
         </div>
         <div class="flex flex-col">
           <span class="text-[11px] font-medium text-[#687281] dark:text-slate-400 uppercase tracking-wider"
             >Total rekaman</span
           >
-          <span class="text-xl font-bold text-[#333333] dark:text-white font-mono">
+          <span class="text-base font-bold text-[#333333] dark:text-white font-mono">
             {{ isLoading ? '...' : totalDbRecords.toLocaleString('id-ID') }}
           </span>
         </div>

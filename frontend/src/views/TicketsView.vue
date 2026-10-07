@@ -1465,28 +1465,28 @@ function toast(message, type = 'success') {
       <div class="tickets-kpis grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-2.5 lg:gap-3">
         <!-- 1. Total tiket -->
         <div
-          class="kpi-focusable flex flex-col justify-between p-[var(--kpi-padding)] sm:p-[var(--kpi-padding-sm)] lg:p-[var(--kpi-padding-lg)] rounded-xl bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 shadow-2xs hover:border-[#CBD5E1] dark:hover:border-slate-700 transition-colors min-h-[var(--kpi-height)] sm:min-h-[var(--kpi-height-sm)] lg:min-h-[var(--kpi-height-lg)]"
+          class="kpi-focusable flex flex-col justify-between p-[var(--kpi-padding)] sm:p-[var(--kpi-padding-sm)] lg:p-[var(--kpi-padding-lg)] rounded-[var(--kpi-radius)] bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 shadow-2xs hover:border-[#CBD5E1] dark:hover:border-slate-700 transition-colors min-h-[var(--kpi-height)] sm:min-h-[var(--kpi-height-sm)] lg:min-h-[var(--kpi-height-lg)]"
           tabindex="0"
         >
           <div class="flex items-center justify-between gap-[var(--kpi-gap)]">
             <span class="text-[var(--kpi-title-font-size)] sm:text-[var(--kpi-title-font-size-sm)] lg:text-[var(--kpi-title-font-size-lg)] font-medium text-[#5F7089] dark:text-slate-400 truncate">Total tiket</span>
             <div
-              class="flex h-5.5 w-5.5 sm:h-6 sm:w-6 lg:h-6.5 lg:w-6.5 shrink-0 items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300"
+              class="flex h-[var(--kpi-icon-container-size)] w-[var(--kpi-icon-container-size)] sm:h-[var(--kpi-icon-container-size-sm)] sm:w-[var(--kpi-icon-container-size-sm)] lg:h-[var(--kpi-icon-container-size-lg)] lg:w-[var(--kpi-icon-container-size-lg)] shrink-0 items-center justify-center rounded-md bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300"
             >
               <span aria-hidden="true" class="material-symbols-outlined text-[var(--kpi-icon-size)] sm:text-[var(--kpi-icon-size-sm)] lg:text-[var(--kpi-icon-size-lg)]">inbox</span>
             </div>
           </div>
-          <div class="mt-1">
+          <div class="mt-0.5">
             <span class="font-num block text-[var(--kpi-value-font-size)] sm:text-[var(--kpi-value-font-size-sm)] lg:text-[var(--kpi-value-font-size-lg)] font-bold text-[#333333] dark:text-white tabular-nums leading-none tracking-tight">{{
               stats.totalTickets ?? 0
             }}</span>
-            <span class="mt-1 block truncate text-[var(--kpi-caption-font-size)] sm:text-[var(--kpi-caption-font-size-sm)] lg:text-[var(--kpi-caption-font-size-lg)] font-normal text-[#64748B] dark:text-slate-400">Total tiket masuk</span>
+            <span class="mt-0.5 block truncate text-[var(--kpi-caption-font-size)] sm:text-[var(--kpi-caption-font-size-sm)] lg:text-[var(--kpi-caption-font-size-lg)] font-normal text-[#64748B] dark:text-slate-400">Total tiket masuk</span>
           </div>
         </div>
 
         <!-- 2. Belum diambil / Menunggu respon -->
         <div
-          class="kpi-focusable flex flex-col justify-between p-[var(--kpi-padding)] sm:p-[var(--kpi-padding-sm)] lg:p-[var(--kpi-padding-lg)] rounded-xl bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 shadow-2xs hover:border-[#CBD5E1] dark:hover:border-slate-700 transition-colors min-h-[var(--kpi-height)] sm:min-h-[var(--kpi-height-sm)] lg:min-h-[var(--kpi-height-lg)]"
+          class="kpi-focusable flex flex-col justify-between p-[var(--kpi-padding)] sm:p-[var(--kpi-padding-sm)] lg:p-[var(--kpi-padding-lg)] rounded-[var(--kpi-radius)] bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 shadow-2xs hover:border-[#CBD5E1] dark:hover:border-slate-700 transition-colors min-h-[var(--kpi-height)] sm:min-h-[var(--kpi-height-sm)] lg:min-h-[var(--kpi-height-lg)]"
           tabindex="0"
         >
           <div class="flex items-center justify-between gap-[var(--kpi-gap)]">
@@ -1494,7 +1494,7 @@ function toast(message, type = 'success') {
               isAdmin || isSuperAdmin ? 'Belum diambil' : 'Menunggu respon'
             }}</span>
             <div
-              class="flex h-5.5 w-5.5 sm:h-6 sm:w-6 lg:h-6.5 lg:w-6.5 shrink-0 items-center justify-center rounded-lg"
+              class="flex h-[var(--kpi-icon-container-size)] w-[var(--kpi-icon-container-size)] sm:h-[var(--kpi-icon-container-size-sm)] sm:w-[var(--kpi-icon-container-size-sm)] lg:h-[var(--kpi-icon-container-size-lg)] lg:w-[var(--kpi-icon-container-size-lg)] shrink-0 items-center justify-center rounded-md"
               :class="
                 (stats.unassignedTickets || 0) > 0
                   ? 'bg-amber-50 dark:bg-amber-950/60 text-[#B45309] dark:text-amber-400'
@@ -1504,54 +1504,54 @@ function toast(message, type = 'success') {
               <span aria-hidden="true" class="material-symbols-outlined text-[var(--kpi-icon-size)] sm:text-[var(--kpi-icon-size-sm)] lg:text-[var(--kpi-icon-size-lg)]">assignment_late</span>
             </div>
           </div>
-          <div class="mt-1">
+          <div class="mt-0.5">
             <span
               class="font-num block text-[var(--kpi-value-font-size)] sm:text-[var(--kpi-value-font-size-sm)] lg:text-[var(--kpi-value-font-size-lg)] font-bold tabular-nums leading-none tracking-tight"
               :class="(stats.unassignedTickets || 0) > 0 ? 'text-[#B45309] dark:text-amber-400' : 'text-[#333333] dark:text-white'"
             >{{ stats.unassignedTickets ?? 0 }}</span>
-            <span class="mt-1 block truncate text-[var(--kpi-caption-font-size)] sm:text-[var(--kpi-caption-font-size-sm)] lg:text-[var(--kpi-caption-font-size-lg)] font-normal text-[#64748B] dark:text-slate-400">Menunggu penanganan</span>
+            <span class="mt-0.5 block truncate text-[var(--kpi-caption-font-size)] sm:text-[var(--kpi-caption-font-size-sm)] lg:text-[var(--kpi-caption-font-size-lg)] font-normal text-[#64748B] dark:text-slate-400">Menunggu penanganan</span>
           </div>
         </div>
 
         <!-- 3. Sedang diproses -->
         <div
-          class="kpi-focusable flex flex-col justify-between p-[var(--kpi-padding)] sm:p-[var(--kpi-padding-sm)] lg:p-[var(--kpi-padding-lg)] rounded-xl bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 shadow-2xs hover:border-[#CBD5E1] dark:hover:border-slate-700 transition-colors min-h-[var(--kpi-height)] sm:min-h-[var(--kpi-height-sm)] lg:min-h-[var(--kpi-height-lg)]"
+          class="kpi-focusable flex flex-col justify-between p-[var(--kpi-padding)] sm:p-[var(--kpi-padding-sm)] lg:p-[var(--kpi-padding-lg)] rounded-[var(--kpi-radius)] bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 shadow-2xs hover:border-[#CBD5E1] dark:hover:border-slate-700 transition-colors min-h-[var(--kpi-height)] sm:min-h-[var(--kpi-height-sm)] lg:min-h-[var(--kpi-height-lg)]"
           tabindex="0"
         >
           <div class="flex items-center justify-between gap-[var(--kpi-gap)]">
             <span class="text-[var(--kpi-title-font-size)] sm:text-[var(--kpi-title-font-size-sm)] lg:text-[var(--kpi-title-font-size-lg)] font-medium text-[#5F7089] dark:text-slate-400 truncate">Sedang diproses</span>
             <div
-              class="flex h-5.5 w-5.5 sm:h-6 sm:w-6 lg:h-6.5 lg:w-6.5 shrink-0 items-center justify-center rounded-lg bg-[#EFF6FF] dark:bg-blue-950/60 text-[#0A51B0] dark:text-blue-400"
+              class="flex h-[var(--kpi-icon-container-size)] w-[var(--kpi-icon-container-size)] sm:h-[var(--kpi-icon-container-size-sm)] sm:w-[var(--kpi-icon-container-size-sm)] lg:h-[var(--kpi-icon-container-size-lg)] lg:w-[var(--kpi-icon-container-size-lg)] shrink-0 items-center justify-center rounded-md bg-[#EFF6FF] dark:bg-blue-950/60 text-[#0A51B0] dark:text-blue-400"
             >
               <span aria-hidden="true" class="material-symbols-outlined text-[var(--kpi-icon-size)] sm:text-[var(--kpi-icon-size-sm)] lg:text-[var(--kpi-icon-size-lg)]">pending_actions</span>
             </div>
           </div>
-          <div class="mt-1">
+          <div class="mt-0.5">
             <span class="font-num block text-[var(--kpi-value-font-size)] sm:text-[var(--kpi-value-font-size-sm)] lg:text-[var(--kpi-value-font-size-lg)] font-bold text-[#333333] dark:text-white tabular-nums leading-none tracking-tight">{{
               (stats.openTickets || 0) + (stats.pendingTickets || 0)
             }}</span>
-            <span class="mt-1 block truncate text-[var(--kpi-caption-font-size)] sm:text-[var(--kpi-caption-font-size-sm)] lg:text-[var(--kpi-caption-font-size-lg)] font-normal text-[#64748B] dark:text-slate-400">Dalam pengerjaan tim</span>
+            <span class="mt-0.5 block truncate text-[var(--kpi-caption-font-size)] sm:text-[var(--kpi-caption-font-size-sm)] lg:text-[var(--kpi-caption-font-size-lg)] font-normal text-[#64748B] dark:text-slate-400">Dalam pengerjaan tim</span>
           </div>
         </div>
 
         <!-- 4. Tiket selesai -->
         <div
-          class="kpi-focusable flex flex-col justify-between p-[var(--kpi-padding)] sm:p-[var(--kpi-padding-sm)] lg:p-[var(--kpi-padding-lg)] rounded-xl bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 shadow-2xs hover:border-[#CBD5E1] dark:hover:border-slate-700 transition-colors min-h-[var(--kpi-height)] sm:min-h-[var(--kpi-height-sm)] lg:min-h-[var(--kpi-height-lg)]"
+          class="kpi-focusable flex flex-col justify-between p-[var(--kpi-padding)] sm:p-[var(--kpi-padding-sm)] lg:p-[var(--kpi-padding-lg)] rounded-[var(--kpi-radius)] bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 shadow-2xs hover:border-[#CBD5E1] dark:hover:border-slate-700 transition-colors min-h-[var(--kpi-height)] sm:min-h-[var(--kpi-height-sm)] lg:min-h-[var(--kpi-height-lg)]"
           tabindex="0"
         >
           <div class="flex items-center justify-between gap-[var(--kpi-gap)]">
             <span class="text-[var(--kpi-title-font-size)] sm:text-[var(--kpi-title-font-size-sm)] lg:text-[var(--kpi-title-font-size-lg)] font-medium text-[#5F7089] dark:text-slate-400 truncate">Tiket selesai</span>
             <div
-              class="flex h-5.5 w-5.5 sm:h-6 sm:w-6 lg:h-6.5 lg:w-6.5 shrink-0 items-center justify-center rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400"
+              class="flex h-[var(--kpi-icon-container-size)] w-[var(--kpi-icon-container-size)] sm:h-[var(--kpi-icon-container-size-sm)] sm:w-[var(--kpi-icon-container-size-sm)] lg:h-[var(--kpi-icon-container-size-lg)] lg:w-[var(--kpi-icon-container-size-lg)] shrink-0 items-center justify-center rounded-md bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400"
             >
               <span aria-hidden="true" class="material-symbols-outlined text-[var(--kpi-icon-size)] sm:text-[var(--kpi-icon-size-sm)] lg:text-[var(--kpi-icon-size-lg)]">task_alt</span>
             </div>
           </div>
-          <div class="mt-1">
+          <div class="mt-0.5">
             <span class="font-num block text-[var(--kpi-value-font-size)] sm:text-[var(--kpi-value-font-size-sm)] lg:text-[var(--kpi-value-font-size-lg)] font-bold text-emerald-600 dark:text-emerald-400 tabular-nums leading-none tracking-tight">{{
               stats.closedTickets ?? 0
             }}</span>
-            <span class="mt-1 block truncate text-[var(--kpi-caption-font-size)] sm:text-[var(--kpi-caption-font-size-sm)] lg:text-[var(--kpi-caption-font-size-lg)] font-normal text-[#64748B] dark:text-slate-400">Tiket terselesaikan</span>
+            <span class="mt-0.5 block truncate text-[var(--kpi-caption-font-size)] sm:text-[var(--kpi-caption-font-size-sm)] lg:text-[var(--kpi-caption-font-size-lg)] font-normal text-[#64748B] dark:text-slate-400">Tiket terselesaikan</span>
           </div>
         </div>
       </div>

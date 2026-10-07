@@ -72,7 +72,7 @@ a:active:not(:disabled),
   --color-border: #e2e8f0;
   --color-text: #333333;
   --color-text-muted: #475569;
-  --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 
   /* Type scale — micro 5-step (see docs/typography-layout-audit.md) */
   --fs-2xs: 10px;
@@ -94,9 +94,10 @@ a:active:not(:disabled),
 }
 
 :root {
-  font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
+  font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
 
   /* Typography scaling support - desktop mode */
   /* Default: compact (0.7) for ~30% density reduction */
@@ -202,29 +203,40 @@ body,
 body {
   margin: 0;
   min-width: 320px;
-  font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   background: #f4f6f9;
   color: #2a3547;
-  line-height: 1.5;
+  line-height: 1.45;
+  letter-spacing: -0.005em;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Headings optical tracking & tight leading */
+h1, h2, h3, h4, h5, h6 {
+  font-family: inherit;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
 }
 
 button,
 input,
 select,
 textarea {
-  font: inherit;
+  font-family: inherit;
+  font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
 }
 
 button {
-  font-size: 0.8125rem; /* 13px — ponytail: was 12px, fails readability */
+  font-size: 0.8125rem; /* 13px */
+  letter-spacing: -0.005em;
 }
 
 input:not([type='checkbox']):not([type='radio']),
 select,
 textarea {
-  font-size: 0.8125rem; /* 13px — ponytail: was 12px, fails readability */
+  font-size: 0.8125rem; /* 13px */
+  letter-spacing: -0.005em;
 }
 
 button:not(:disabled),
@@ -939,7 +951,7 @@ html[data-typography]:not([data-typography='normal']) .dashboard-intro h2 {
 }
 
 html[data-typography]:not([data-typography='normal']) .stat-number {
-  font-size: calc(19px * var(--fs-scale-factor));
+  font-size: var(--kpi-value-font-size-lg);
 }
 
 /* Tooltip and small text — WCAG 1.4.4 floor (never below 11px).

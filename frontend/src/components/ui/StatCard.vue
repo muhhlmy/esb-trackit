@@ -15,7 +15,7 @@ defineProps({
 
 <template>
   <div
-    class="kpi-focusable bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 rounded-xl p-2.5 sm:p-3 lg:p-3.5 shadow-2xs hover:border-[#CBD5E1] dark:hover:border-slate-700 transition-colors flex flex-col justify-between min-h-[var(--kpi-height)] sm:min-h-[var(--kpi-height-sm)] lg:min-h-[var(--kpi-height-lg)]"
+    class="kpi-focusable bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 rounded-[var(--kpi-radius)] p-[var(--kpi-padding)] sm:p-[var(--kpi-padding-sm)] lg:p-[var(--kpi-padding-lg)] shadow-2xs hover:border-[#CBD5E1] dark:hover:border-slate-700 transition-colors flex flex-col justify-between min-h-[var(--kpi-height)] sm:min-h-[var(--kpi-height-sm)] lg:min-h-[var(--kpi-height-lg)]"
     tabindex="0"
   >
     <div class="flex items-center justify-between gap-[var(--kpi-gap)]">
@@ -23,7 +23,7 @@ defineProps({
         title
       }}</span>
       <div
-        class="flex h-5.5 w-5.5 sm:h-6 sm:w-6 lg:h-6.5 lg:w-6.5 shrink-0 items-center justify-center rounded-lg"
+        class="flex h-[var(--kpi-icon-container-size)] w-[var(--kpi-icon-container-size)] sm:h-[var(--kpi-icon-container-size-sm)] sm:w-[var(--kpi-icon-container-size-sm)] lg:h-[var(--kpi-icon-container-size-lg)] lg:w-[var(--kpi-icon-container-size-lg)] shrink-0 items-center justify-center rounded-md"
         :class="{
           'bg-[#EFF6FF] text-[#0A51B0] dark:bg-blue-950/60 dark:text-blue-400': color === 'primary' || color === 'cyan' || color === 'info',
           'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300': color === 'neutral' || color === 'purple',
@@ -36,12 +36,12 @@ defineProps({
       </div>
     </div>
 
-    <div class="mt-1">
+    <div class="mt-0.5">
       <span
         class="font-num block text-[var(--kpi-value-font-size)] sm:text-[var(--kpi-value-font-size-sm)] lg:text-[var(--kpi-value-font-size-lg)] font-bold leading-none tracking-tight text-[#333333] dark:text-white tabular-nums"
         >{{ value }}</span
       >
-      <span v-if="subtitle" class="mt-1 block truncate text-[var(--kpi-caption-font-size)] sm:text-[var(--kpi-caption-font-size-sm)] lg:text-[var(--kpi-caption-font-size-lg)] font-normal text-[#64748B] dark:text-slate-400">{{
+      <span v-if="subtitle" class="mt-0.5 block truncate text-[var(--kpi-caption-font-size)] sm:text-[var(--kpi-caption-font-size-sm)] lg:text-[var(--kpi-caption-font-size-lg)] font-normal text-[#64748B] dark:text-slate-400">{{
         subtitle
       }}</span>
     </div>

@@ -729,11 +729,11 @@ onBeforeUnmount(() => {
   >
     <!-- 1. LEFT: Navigation Drawer Toggle, Brand Logo & Page Titles -->
     <div class="flex items-center gap-2 md:gap-2.5 md:shrink-0 min-w-0">
-      <!-- Mobile / Adaptive Brand Logo Mark (Anchored on mobile so user sees logo on every menu transition) -->
+      <!-- Brand Logo Mark (Anchored in header beside page title across all screen sizes) -->
       <RouterLink
         to="/"
         title="Kembali ke Beranda TrackIT"
-        class="flex lg:hidden items-center justify-center shrink-0 h-7 w-7 rounded-lg bg-slate-50 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 hover:bg-[#ECF2FF] dark:hover:bg-slate-700 transition-all active:scale-95 touch-manipulation cursor-pointer"
+        class="flex items-center justify-center shrink-0 h-7 w-7 rounded-lg bg-slate-50 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 hover:bg-[#ECF2FF] dark:hover:bg-slate-700 transition-all active:scale-95 touch-manipulation cursor-pointer"
       >
         <img src="/logo.svg" alt="TrackIT logo" class="h-4.5 w-4.5 object-contain shrink-0 block" />
       </RouterLink>

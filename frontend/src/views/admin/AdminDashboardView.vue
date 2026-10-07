@@ -164,7 +164,7 @@ function getCategoryBadgeClass(category) {
   <div ref="mainScope" class="cms-page w-full max-w-7xl mx-auto space-y-4 sm:space-y-6 font-sans">
     <!-- Page header scrolls with the content -->
     <div
-      class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3.5 sm:gap-4 bg-white dark:bg-slate-900 border border-[#E5EAEF] dark:border-slate-800 p-4 sm:p-6 rounded-2xl shadow-sm gsap-admin-el"
+      class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 bg-white dark:bg-slate-900 border border-[#E5EAEF] dark:border-slate-800 p-3.5 sm:p-4 rounded-xl shadow-2xs gsap-admin-el"
     >
       <div class="space-y-1 sm:space-y-1.5 w-full sm:w-auto">
         <!-- Breadcrumb -->
@@ -182,7 +182,7 @@ function getCategoryBadgeClass(category) {
         </div>
 
         <h1
-          class="text-base sm:text-lg font-bold text-[#333333] dark:text-white tracking-tight flex items-center gap-2"
+          class="text-sm sm:text-base font-bold text-[#333333] dark:text-white tracking-tight flex items-center gap-2"
         >
           <span>Knowledge Base</span>
           <span
@@ -240,7 +240,7 @@ function getCategoryBadgeClass(category) {
     <div class="grid grid-cols-3 gap-2 sm:gap-2.5 lg:gap-3 gsap-admin-el">
       <!-- Total -->
       <div
-        class="kpi-focusable flex flex-col justify-between p-[var(--kpi-padding)] sm:p-[var(--kpi-padding-sm)] lg:p-[var(--kpi-padding-lg)] rounded-xl bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 shadow-2xs hover:border-[#CBD5E1] dark:hover:border-slate-700 transition-colors min-h-[var(--kpi-height)] sm:min-h-[var(--kpi-height-sm)] lg:min-h-[var(--kpi-height-lg)]"
+        class="kpi-focusable flex flex-col justify-between p-[var(--kpi-padding)] sm:p-[var(--kpi-padding-sm)] lg:p-[var(--kpi-padding-lg)] rounded-[var(--kpi-radius)] bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 shadow-2xs hover:border-[#CBD5E1] dark:hover:border-slate-700 transition-colors min-h-[var(--kpi-height)] sm:min-h-[var(--kpi-height-sm)] lg:min-h-[var(--kpi-height-lg)]"
         tabindex="0"
       >
         <div class="flex items-center justify-between gap-[var(--kpi-gap)]">
@@ -248,24 +248,24 @@ function getCategoryBadgeClass(category) {
             >Total artikel</span
           >
           <div
-            class="flex h-5.5 w-5.5 sm:h-6 sm:w-6 lg:h-6.5 lg:w-6.5 shrink-0 items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300"
+            class="flex h-[var(--kpi-icon-container-size)] w-[var(--kpi-icon-container-size)] sm:h-[var(--kpi-icon-container-size-sm)] sm:w-[var(--kpi-icon-container-size-sm)] lg:h-[var(--kpi-icon-container-size-lg)] lg:w-[var(--kpi-icon-container-size-lg)] shrink-0 items-center justify-center rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300"
           >
             <FileText class="w-[var(--kpi-icon-size)] h-[var(--kpi-icon-size)] sm:w-[var(--kpi-icon-size-sm)] sm:h-[var(--kpi-icon-size-sm)] lg:w-[var(--kpi-icon-size-lg)] lg:h-[var(--kpi-icon-size-lg)]" />
           </div>
         </div>
-        <div class="mt-1">
+        <div class="mt-0.5">
           <p
             class="font-num text-[var(--kpi-value-font-size)] sm:text-[var(--kpi-value-font-size-sm)] lg:text-[var(--kpi-value-font-size-lg)] font-bold text-[#333333] dark:text-white tabular-nums leading-none tracking-tight"
           >
             {{ stats.total }}
           </p>
-          <span class="mt-1 block truncate text-[var(--kpi-caption-font-size)] sm:text-[var(--kpi-caption-font-size-sm)] lg:text-[var(--kpi-caption-font-size-lg)] font-normal text-[#64748B] dark:text-slate-400">Seluruh data artikel</span>
+          <span class="mt-0.5 block truncate text-[var(--kpi-caption-font-size)] sm:text-[var(--kpi-caption-font-size-sm)] lg:text-[var(--kpi-caption-font-size-lg)] font-normal text-[#64748B] dark:text-slate-400">Seluruh data artikel</span>
         </div>
       </div>
 
       <!-- Published -->
       <div
-        class="kpi-focusable flex flex-col justify-between p-[var(--kpi-padding)] sm:p-[var(--kpi-padding-sm)] lg:p-[var(--kpi-padding-lg)] rounded-xl bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 shadow-2xs hover:border-[#CBD5E1] dark:hover:border-slate-700 transition-colors min-h-[var(--kpi-height)] sm:min-h-[var(--kpi-height-sm)] lg:min-h-[var(--kpi-height-lg)]"
+        class="kpi-focusable flex flex-col justify-between p-[var(--kpi-padding)] sm:p-[var(--kpi-padding-sm)] lg:p-[var(--kpi-padding-lg)] rounded-[var(--kpi-radius)] bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 shadow-2xs hover:border-[#CBD5E1] dark:hover:border-slate-700 transition-colors min-h-[var(--kpi-height)] sm:min-h-[var(--kpi-height-sm)] lg:min-h-[var(--kpi-height-lg)]"
         tabindex="0"
       >
         <div class="flex items-center justify-between gap-[var(--kpi-gap)]">
@@ -273,24 +273,24 @@ function getCategoryBadgeClass(category) {
             >Terbit</span
           >
           <div
-            class="flex h-5.5 w-5.5 sm:h-6 sm:w-6 lg:h-6.5 lg:w-6.5 shrink-0 items-center justify-center rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400"
+            class="flex h-[var(--kpi-icon-container-size)] w-[var(--kpi-icon-container-size)] sm:h-[var(--kpi-icon-container-size-sm)] sm:w-[var(--kpi-icon-container-size-sm)] lg:h-[var(--kpi-icon-container-size-lg)] lg:w-[var(--kpi-icon-container-size-lg)] shrink-0 items-center justify-center rounded-md bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400"
           >
             <CheckCircle class="w-[var(--kpi-icon-size)] h-[var(--kpi-icon-size)] sm:w-[var(--kpi-icon-size-sm)] sm:h-[var(--kpi-icon-size-sm)] lg:w-[var(--kpi-icon-size-lg)] lg:h-[var(--kpi-icon-size-lg)]" />
           </div>
         </div>
-        <div class="mt-1">
+        <div class="mt-0.5">
           <p
             class="font-num text-[var(--kpi-value-font-size)] sm:text-[var(--kpi-value-font-size-sm)] lg:text-[var(--kpi-value-font-size-lg)] font-bold text-[#333333] dark:text-white tabular-nums leading-none tracking-tight"
           >
             {{ stats.published }}
           </p>
-          <span class="mt-1 block truncate text-[var(--kpi-caption-font-size)] sm:text-[var(--kpi-caption-font-size-sm)] lg:text-[var(--kpi-caption-font-size-lg)] font-normal text-[#64748B] dark:text-slate-400">Telah dipublikasi</span>
+          <span class="mt-0.5 block truncate text-[var(--kpi-caption-font-size)] sm:text-[var(--kpi-caption-font-size-sm)] lg:text-[var(--kpi-caption-font-size-lg)] font-normal text-[#64748B] dark:text-slate-400">Telah dipublikasi</span>
         </div>
       </div>
 
       <!-- Custom -->
       <div
-        class="kpi-focusable flex flex-col justify-between p-[var(--kpi-padding)] sm:p-[var(--kpi-padding-sm)] lg:p-[var(--kpi-padding-lg)] rounded-xl bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 shadow-2xs hover:border-[#CBD5E1] dark:hover:border-slate-700 transition-colors min-h-[var(--kpi-height)] sm:min-h-[var(--kpi-height-sm)] lg:min-h-[var(--kpi-height-lg)]"
+        class="kpi-focusable flex flex-col justify-between p-[var(--kpi-padding)] sm:p-[var(--kpi-padding-sm)] lg:p-[var(--kpi-padding-lg)] rounded-[var(--kpi-radius)] bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 shadow-2xs hover:border-[#CBD5E1] dark:hover:border-slate-700 transition-colors min-h-[var(--kpi-height)] sm:min-h-[var(--kpi-height-sm)] lg:min-h-[var(--kpi-height-lg)]"
         tabindex="0"
       >
         <div class="flex items-center justify-between gap-[var(--kpi-gap)]">
@@ -298,18 +298,18 @@ function getCategoryBadgeClass(category) {
             >Khusus</span
           >
           <div
-            class="flex h-5.5 w-5.5 sm:h-6 sm:w-6 lg:h-6.5 lg:w-6.5 shrink-0 items-center justify-center rounded-lg bg-[#EFF6FF] dark:bg-blue-950/60 text-[#0A51B0] dark:text-blue-400"
+            class="flex h-[var(--kpi-icon-container-size)] w-[var(--kpi-icon-container-size)] sm:h-[var(--kpi-icon-container-size-sm)] sm:w-[var(--kpi-icon-container-size-sm)] lg:h-[var(--kpi-icon-container-size-lg)] lg:w-[var(--kpi-icon-container-size-lg)] shrink-0 items-center justify-center rounded-md bg-[#EFF6FF] dark:bg-blue-950/60 text-[#0A51B0] dark:text-blue-400"
           >
             <PenTool class="w-[var(--kpi-icon-size)] h-[var(--kpi-icon-size)] sm:w-[var(--kpi-icon-size-sm)] sm:h-[var(--kpi-icon-size-sm)] lg:w-[var(--kpi-icon-size-lg)] lg:h-[var(--kpi-icon-size-lg)]" />
           </div>
         </div>
-        <div class="mt-1">
+        <div class="mt-0.5">
           <p
             class="font-num text-[var(--kpi-value-font-size)] sm:text-[var(--kpi-value-font-size-sm)] lg:text-[var(--kpi-value-font-size-lg)] font-bold text-[#333333] dark:text-white tabular-nums leading-none tracking-tight"
           >
             {{ stats.custom }}
           </p>
-          <span class="mt-1 block truncate text-[var(--kpi-caption-font-size)] sm:text-[var(--kpi-caption-font-size-sm)] lg:text-[var(--kpi-caption-font-size-lg)] font-normal text-[#64748B] dark:text-slate-400">Artikel kustom</span>
+          <span class="mt-0.5 block truncate text-[var(--kpi-caption-font-size)] sm:text-[var(--kpi-caption-font-size-sm)] lg:text-[var(--kpi-caption-font-size-lg)] font-normal text-[#64748B] dark:text-slate-400">Artikel kustom</span>
         </div>
       </div>
     </div>

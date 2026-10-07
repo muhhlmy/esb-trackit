@@ -1385,64 +1385,64 @@ onUnmounted(() => {
   border-radius: inherit;
 }
 .dashboard-chart-grid {
-  gap: 24px;
+  gap: 14px;
 }
 .dashboard-panel {
   display: flex;
   flex-direction: column;
   min-width: 0;
-  padding: 24px;
+  padding: 14px 16px;
   border: 1px solid #e2e8f0;
-  border-radius: 16px;
+  border-radius: 12px;
   background: white;
 }
 .dashboard-panel > div:first-child {
   flex-shrink: 0;
   flex-wrap: wrap;
-  gap: 12px;
-  margin-bottom: 24px;
+  gap: 10px;
+  margin-bottom: 12px;
 }
 .dashboard-panel h3,
 .dashboard-table h3 {
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 650;
-  line-height: 1.5;
-  letter-spacing: -0.02em;
+  line-height: 1.4;
+  letter-spacing: -0.015em;
   color: #1e293b;
 }
 .dashboard-panel :deep(canvas) {
   max-width: 100%;
 }
 .dashboard-status-rows {
-  gap: 16px;
+  gap: 10px;
 }
 .dashboard-status-row {
-  min-height: 28px;
+  min-height: 26px;
 }
 .location-card {
   min-width: 0;
-  padding: 20px;
+  padding: 12px 14px;
   border: 1px solid #e7ecf3;
-  border-radius: 12px;
+  border-radius: 10px;
   background: #fafbfd;
 }
 .dashboard-table {
   min-width: 0;
   background: white;
   border: 1px solid #e2e8f0;
-  border-radius: 16px;
+  border-radius: 12px;
   overflow: hidden;
 }
 .dashboard-table > div:first-child {
-  padding: 22px 24px;
-  gap: 16px;
+  padding: 12px 14px;
+  gap: 10px;
 }
 .dashboard-table > div:first-child :is(h3, p) {
   white-space: normal;
 }
 .dashboard-table > div:first-child p {
-  margin-top: 6px;
-  line-height: 1.6;
+  margin-top: 4px;
+  line-height: 1.4;
 }
 .dashboard-table table {
   table-layout: fixed;
@@ -1453,13 +1453,13 @@ onUnmounted(() => {
 .dashboard-table table th {
   text-transform: none;
   letter-spacing: 0;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
   color: #5b6b84;
-  padding-block: 14px;
+  padding-block: 8px;
 }
 .dashboard-table table td {
-  padding-block: 16px;
+  padding-block: 8px;
   overflow-wrap: anywhere;
 }
 .table-link,
@@ -1468,14 +1468,14 @@ onUnmounted(() => {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  gap: 8px;
-  min-width: 132px;
-  min-height: 44px;
-  padding: 10px 16px;
-  border-radius: 10px;
-  font-size: 13px;
+  gap: 6px;
+  min-width: 110px;
+  min-height: 32px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 12px;
   font-weight: 600;
-  line-height: 1.5;
+  line-height: 1.4;
   touch-action: manipulation;
 }
 .table-link {
@@ -1621,16 +1621,16 @@ onUnmounted(() => {
 }
 @media (min-width: 640px) {
   .stat-label {
-    font-size: 11.5px;
+    font-size: var(--kpi-title-font-size-sm);
   }
   .stat-number {
-    font-size: 17px;
+    font-size: var(--kpi-value-font-size-sm);
   }
   .stat-caption {
-    font-size: 11px;
+    font-size: var(--kpi-caption-font-size-sm);
   }
   .stat-label > .material-symbols-outlined {
-    font-size: 14px;
+    font-size: var(--kpi-icon-size-sm);
   }
 }
 .dark .dash-stat-card {

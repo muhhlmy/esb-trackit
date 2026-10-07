@@ -1445,7 +1445,7 @@ function toast(message, type = 'success') {
         :title="isAdmin || isSuperAdmin ? 'Ticket Inbox' : 'Tiket'"
         :subtitle="
           isAdmin || isSuperAdmin
-            ? 'Kelola pengajuan dan penanganan kendala IT'
+            ? 'Mengelola pengajuan dan penanganan kendala IT'
             : 'Pengajuan dan layanan IT'
         "
         icon="confirmation_number"

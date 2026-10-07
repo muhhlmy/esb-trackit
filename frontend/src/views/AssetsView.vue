@@ -966,7 +966,7 @@ onMounted(async () => {
         :value="isLoading || pageError ? '—' : stat.value"
         :icon="stat.icon"
         :color="stat.color"
-        :subtitle="isLoading ? 'Memuat…' : pageError ? 'Tidak tersedia' : 'Seluruh data kategori'"
+        :subtitle="isLoading ? 'Memuat…' : pageError ? 'Tidak tersedia' : 'Seluruh data kategori aset'"
       />
     </section>
 

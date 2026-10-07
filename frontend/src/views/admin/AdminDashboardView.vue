@@ -240,7 +240,7 @@ function getCategoryBadgeClass(category) {
     <div class="grid grid-cols-3 gap-1.5 sm:gap-2.5 gsap-admin-el">
       <!-- Total -->
       <div
-        class="flex items-center gap-2 p-2 sm:p-2.5 rounded-lg bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 transition-colors min-h-[52px] sm:min-h-[56px]"
+        class="flex items-center gap-2 p-2 sm:p-2.5 rounded-lg bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 transition-colors min-h-[56px] sm:min-h-[56px]"
       >
         <div
           class="w-6 h-6 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center shrink-0"
@@ -261,7 +261,7 @@ function getCategoryBadgeClass(category) {
 
       <!-- Published -->
       <div
-        class="flex items-center gap-2 p-2 sm:p-2.5 rounded-lg bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 transition-colors min-h-[52px] sm:min-h-[56px]"
+        class="flex items-center gap-2 p-2 sm:p-2.5 rounded-lg bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 transition-colors min-h-[56px] sm:min-h-[56px]"
       >
         <div
           class="w-6 h-6 rounded-md bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0"
@@ -282,7 +282,7 @@ function getCategoryBadgeClass(category) {
 
       <!-- Custom -->
       <div
-        class="flex items-center gap-2 p-2 sm:p-2.5 rounded-lg bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 transition-colors min-h-[52px] sm:min-h-[56px]"
+        class="flex items-center gap-2 p-2 sm:p-2.5 rounded-lg bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 transition-colors min-h-[56px] sm:min-h-[56px]"
       >
         <div
           class="w-6 h-6 rounded-md bg-[#EDF5FF] dark:bg-blue-950/60 text-[#0A51B0] dark:text-blue-400 flex items-center justify-center shrink-0"

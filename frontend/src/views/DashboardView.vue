@@ -349,18 +349,17 @@ onUnmounted(() => {
   unsubTicketUpdated?.()
 })
 </script>
-
 <template>
   <div class="dashboard-view" :data-testid="!isLoading ? 'page-ready' : undefined">
     <PageHeader
-      title="Ringkasan aset & tiket"
+      title="Ringkasan Aset dan Tiket"
       subtitle="Kondisi aset, status penggunaan, dan aktivitas tiket IT terbaru."
       icon="grid_view"
     />
     <QuickActions />
-    <!-- ═══════════════════════════════════════════
+    <!-- ════════════════════════════════════════════
          LOADING
-         ═══════════════════════════════════════════ -->
+         ═════════════════════════════════════════════ -->
     <div v-if="isLoading" class="space-y-4" role="status" aria-live="polite" aria-busy="true">
       <!-- Row 1: 5 Stat Cards Skeleton -->
       <div class="dashboard-stats dashboard-stat-skeleton">
@@ -466,35 +465,35 @@ onUnmounted(() => {
                 </tr>
               </thead>
               <tbody class="divide-y divide-slate-100/80">
-                <tr v-for="r in 3" :key="'recent-asset-skel-' + r">
-                  <td class="py-3 px-4">
-                    <div class="flex items-center gap-3">
-                      <BaseSkeleton width="32px" height="32px" radius="md" />
-                      <div class="space-y-1">
-                        <BaseSkeleton width="130px" height="13px" radius="sm" />
-                        <BaseSkeleton width="50px" height="10px" radius="sm" />
+                  <tr v-for="r in 3" :key="'recent-asset-skel-' + r">
+                    <td class="py-3 px-4">
+                      <div class="flex items-center gap-3">
+                        <BaseSkeleton width="32px" height="32px" radius="md" />
+                        <div class="space-y-1">
+                          <BaseSkeleton width="130px" height="13px" radius="sm" />
+                          <BaseSkeleton width="50px" height="10px" radius="sm" />
+                        </div>
                       </div>
-                    </div>
-                  </td>
-                  <td class="py-3 px-4">
-                    <div class="space-y-1">
-                      <BaseSkeleton width="90px" height="13px" radius="sm" />
-                      <BaseSkeleton width="60px" height="10px" radius="sm" />
-                    </div>
-                  </td>
-                  <td class="py-3 px-4"><BaseSkeleton width="90px" height="12px" radius="sm" /></td>
-                  <td class="py-3 px-4"><BaseSkeleton width="60px" height="14px" radius="sm" /></td>
-                  <td class="py-3 px-4">
-                    <BaseSkeleton width="65px" height="20px" radius="full" />
-                  </td>
-                  <td class="py-3 px-4 text-right">
-                    <BaseSkeleton width="75px" height="12px" radius="sm" class="ml-auto" />
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+                    </td>
+                    <td class="py-3 px-4">
+                      <div class="space-y-1">
+                        <BaseSkeleton width="90px" height="13px" radius="sm" />
+                        <BaseSkeleton width="60px" height="10px" radius="sm" />
+                      </div>
+                    </td>
+                    <td class="py-3 px-4"><BaseSkeleton width="90px" height="12px" radius="sm" /></td>
+                    <td class="py-3 px-4"><BaseSkeleton width="60px" height="14px" radius="sm" /></td>
+                    <td class="py-3 px-4">
+                      <BaseSkeleton weight="65px" height="20px" radius="full" />
+                    </td>
+                    <td class="py-3 px-4 text-right">
+                      <BaseSkeleton width="75px" height="12px" radius="sm" class="ml-auto" />
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
-        </div>
 
         <!-- Tiket Terbaru Skeleton Table / Card List -->
         <div
@@ -571,37 +570,37 @@ onUnmounted(() => {
                 </tr>
               </thead>
               <tbody class="divide-y divide-slate-100/80">
-                <tr v-for="r in 3" :key="'recent-ticket-skel-' + r">
-                  <td class="py-3 px-4"><BaseSkeleton width="90px" height="18px" radius="md" /></td>
-                  <td class="py-3 px-4">
-                    <div class="space-y-1">
-                      <BaseSkeleton width="180px" height="13px" radius="sm" />
-                      <BaseSkeleton width="70px" height="10px" radius="sm" />
-                    </div>
-                  </td>
-                  <td class="py-3 px-4">
-                    <BaseSkeleton width="100px" height="13px" radius="sm" />
-                  </td>
-                  <td class="py-3 px-4">
-                    <BaseSkeleton width="55px" height="20px" radius="full" />
-                  </td>
-                  <td class="py-3 px-4">
-                    <BaseSkeleton width="65px" height="20px" radius="full" />
-                  </td>
-                  <td class="py-3 px-4 text-right">
-                    <BaseSkeleton width="75px" height="12px" radius="sm" class="ml-auto" />
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+                  <tr v-for="r in 3" :key="'recent-ticket-skel-' + r">
+                    <td class="py-3 px-4"><BaseSkeleton width="90px" height="18px" radius="md" /></td>
+                    <td class="py-3 px-4">
+                      <div class="space-y-1">
+                        <BaseSkeleton width="180px" height="13px" radius="sm" />
+                        <BaseSkeleton width="70px" height="10px" radius="sm" />
+                      </div>
+                    </td>
+                    <td class="py-3 px-4">
+                      <BaseSkeleton width="100px" height="13px" radius="sm" />
+                    </td>
+                    <td class="py-3 px-4">
+                      <BaseSkeleton width="55px" height="20px" radius="full" />
+                    </td>
+                    <td class="py-3 px-4">
+                      <BaseSkeleton width="65px" height="20px" radius="full" />
+                    </td>
+                    <td class="py-3 px-4 text-right">
+                      <BaseSkeleton width="75px" height="12px" radius="sm" class="ml-auto" />
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- ═══════════════════════════════════════════
+    <!-- ════════════════════════════════════════════
          ERROR
-         ═══════════════════════════════════════════ -->
+         ═════════════════════════════════════════════ -->
     <div
       v-else-if="error"
       class="dashboard-error bg-[#FEF3F2] border border-[#FECACA]/40 text-[#DC2626] rounded-xl px-4 py-3 text-sm font-medium flex items-center justify-between gap-3"
@@ -620,12 +619,12 @@ onUnmounted(() => {
       </button>
     </div>
 
-    <!-- ═══════════════════════════════════════════
+    <!-- ════════════════════════════════════════════
          DASHBOARD CONTENT
-         ═══════════════════════════════════════════ -->
+         ═════════════════════════════════════════════ -->
     <template v-else-if="stats">
       <div class="dashboard-stats">
-        <div class="dash-stat-card stat-total">
+        <div class="dash-stat-card stat-total shadow-2xs">
           <div class="stat-label">
             <span class="stat-label-text">Total Aset</span>
             <span class="material-symbols-outlined" aria-hidden="true">inventory_2</span>
@@ -665,7 +664,7 @@ onUnmounted(() => {
             },
           ]"
           :key="item.label"
-          class="dash-stat-card"
+          class="dash-stat-card shadow-2xs"
           :class="'stat-' + item.tone"
         >
           <div class="stat-label">
@@ -843,7 +842,7 @@ onUnmounted(() => {
             </p>
           </div>
           <RouterLink to="/assets" class="table-link touch-manipulation">
-            <span>Lihat Semua</span>
+            <span>Lihat semua</span>
             <span aria-hidden="true" class="material-symbols-outlined text-[15px]"
               >arrow_forward</span
             >
@@ -979,27 +978,28 @@ onUnmounted(() => {
               </tr>
             </thead>
             <tbody class="divide-y divide-slate-100/80">
-              <tr
-                v-for="asset in recentAssets"
-                :key="asset.id_aset"
-                class="hover:bg-slate-100/80 transition-colors duration-150 group"
-              >
-                <td class="py-3 px-4 align-middle">
-                  <div class="flex items-center gap-3 min-w-0">
-                    <div
-                      class="w-8 h-8 rounded-lg bg-slate-100/80 text-blue-600 flex items-center justify-center shrink-0 border border-slate-200/60 group-hover:border-blue-200 group-hover:bg-blue-50/60 transition-colors"
-                    >
-                      <span aria-hidden="true" class="material-symbols-outlined text-[17px]">
-                        {{
-                          asset.tipe_perangkat?.toLowerCase().includes('laptop')
-                            ? 'laptop_mac'
-                            : asset.tipe_perangkat?.toLowerCase().includes('server')
-                              ? 'dns'
-                              : asset.tipe_perangkat?.toLowerCase().includes('printer')
-                                ? 'print'
-                                : 'computer'
-                        }}
-                      </span>
+                <tr
+                  v-for="asset in recentAssets"
+                  :key="asset.id_aset"
+                  class="hover:bg-slate-100/80 transition-colors duration-150 group"
+                >
+                  <td class="py-3 px-4 align-middle">
+                    <div class="flex items-center gap-3 min-w-0">
+                      <div
+                        class="w-8 h-8 rounded-lg bg-slate-100/80 text-blue-600 flex items-center justify-center shrink-0 border border-slate-200/60 group-hover:border-blue-200 group-hover:bg-blue-50/60 transition-colors"
+                      >
+                        <span aria-hidden="true" class="material-symbols-outlined text-[17px]">
+                          {{
+                            asset.tipe_perangkat?.toLowerCase().includes('laptop')
+                              ? 'laptop_mac'
+                              : asset.tipe_perangkat?.toLowerCase().includes('server')
+                                ? 'dns'
+                                : asset.tipe_perangkat?.toLowerCase().includes('printer')
+                                  ? 'print'
+                                  : 'computer'
+                          }}
+                        </span>
+                      </div>
                     </div>
                     <div class="min-w-0 pr-2">
                       <p
@@ -1012,115 +1012,114 @@ onUnmounted(() => {
                         ID #{{ asset.id_aset }}
                       </p>
                     </div>
-                  </div>
-                </td>
-                <td class="py-3 px-4 align-middle">
-                  <div class="min-w-0">
-                    <p
-                      class="text-xs font-medium text-slate-800 truncate"
-                      :title="asset.merek || '—'"
-                    >
-                      {{ asset.merek || '—' }}
-                    </p>
-                    <p
-                      v-if="asset.tipe_perangkat"
-                      class="text-[11px] text-slate-400 truncate mt-0.5"
-                    >
-                      {{ asset.tipe_perangkat }}
-                    </p>
-                  </div>
-                </td>
-                <td class="py-3 px-4 align-middle">
-                  <span
-                    class="font-mono text-xs text-slate-600 font-medium truncate block"
-                    :title="asset.nomor_seri || '—'"
-                  >
-                    {{ asset.nomor_seri || '—' }}
-                  </span>
-                </td>
-                <td class="py-3 px-4 align-middle whitespace-nowrap">
-                  <span class="inline-flex items-center gap-1.5 text-xs font-medium text-slate-700">
+                  </td>
+                  <td class="py-3 px-4 align-middle">
+                    <div class="min-w-0">
+                      <p
+                        class="text-xs font-medium text-slate-800 truncate"
+                        :title="asset.merek || '—'"
+                      >
+                        {{ asset.merek || '—' }}
+                      </p>
+                      <p
+                        v-if="asset.tipe_perangkat"
+                        class="text-[11px] text-slate-400 truncate mt-0.5"
+                      >
+                        {{ asset.tipe_perangkat }}
+                      </p>
+                    </div>
+                  </td>
+                  <td class="py-3 px-4 align-middle">
                     <span
-                      class="w-1.5 h-1.5 rounded-full shrink-0"
-                      :class="
-                        asset.kondisi_aset?.toLowerCase() === 'baik'
-                          ? 'bg-emerald-500'
-                          : 'bg-amber-500'
-                      "
-                    />
+                      class="font-mono text-xs text-slate-600 font-medium truncate block"
+                      :title="asset.nomor_seri || '—'"
+                    >
+                      {{ asset.nomor_seri || '—' }}
+                    </span>
+                  </td>
+                  <td class="py-3 px-4 align-middle whitespace-nowrap">
+                    <span class="inline-flex items-center gap-1.5 text-xs font-medium text-slate-700">
+                      <span
+                        class="w-1.5 h-1.5 rounded-full shrink-0"
+                        :class="
+                          asset.kondisi_aset?.toLowerCase() === 'baik'
+                            ? 'bg-emerald-500'
+                            : 'bg-amber-500'
+                        "
+                      />
+                    </span>
                     {{ asset.kondisi_aset || '—' }}
-                  </span>
-                </td>
-                <td class="py-3 px-4 align-middle whitespace-nowrap">
-                  <AppBadge
-                    :type="getStatusBadgeType(asset.status_aset)"
-                    :text="getAssetStatusLabel(asset.status_aset)"
-                    class="whitespace-nowrap"
-                  />
-                </td>
-                <td class="py-3 px-4 align-middle text-right whitespace-nowrap">
-                  <span class="text-xs font-medium text-slate-400">
-                    {{ formatDate(asset.dibuat_pada) }}
-                  </span>
-                </td>
-              </tr>
-              <tr v-if="recentAssets.length === 0">
-                <td colspan="6" class="py-8 text-center">
-                  <p class="text-xs text-slate-400">Belum ada aset terdaftar.</p>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- ─── ROW 7: Tabel Tiket Permintaan Terbaru ────────────────── -->
-      <div v-if="canReadTickets" class="dashboard-table">
-        <div class="flex items-center justify-between border-b border-slate-100 bg-white">
-          <div class="min-w-0 pr-3">
-            <h3 class="text-sm sm:text-base font-bold text-slate-900 tracking-tight truncate">
-              Tiket Terbaru
-            </h3>
-            <p class="text-[12px] sm:text-xs text-slate-500 mt-0.5 truncate">
-              Lima laporan kendala &amp; permintaan IT terbaru
-            </p>
+                  </td>
+                  <td class="py-3 px-4 align-middle whitespace-nowrap">
+                    <AppBadge
+                      :type="getStatusBadgeType(asset.status_aset)"
+                      :text="getAssetStatusLabel(asset.status_aset)"
+                      class="whitespace-nowrap"
+                    />
+                  </td>
+                  <td class="py-3 px-4 align-middle text-right whitespace-nowrap">
+                    <span class="text-xs font-medium text-slate-400">
+                      {{ formatDate(asset.dibuat_pada) }}
+                    </span>
+                  </td>
+                </tr>
+                <tr v-if="recentAssets.length === 0">
+                  <td colspan="6" class="py-8 text-center">
+                    <p class="text-xs text-slate-400">Belum ada aset terdaftar.</p>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
-          <RouterLink to="/tickets" class="table-link touch-manipulation">
-            <span>Lihat Semua</span>
-            <span aria-hidden="true" class="material-symbols-outlined text-[15px]"
-              >arrow_forward</span
-            >
-          </RouterLink>
         </div>
 
-        <!-- Mobile Card List View (Clean, Readable & Zero Horizontal Scroll on < md) -->
-        <div class="dashboard-recent-cards block xl:hidden divide-y divide-[#F1F5F9]">
-          <div
-            v-for="ticket in recentTickets"
-            :key="'mob-ticket-' + ticket.id"
-            class="p-3.5 sm:p-4 hover:bg-[#F8FAFC] transition-colors flex flex-col gap-2"
-          >
-            <!-- Top Row: No. Tiket + Badges (Prioritas & Status) -->
-            <div class="flex items-center justify-between gap-2">
-              <span
-                class="font-mono text-xs font-bold text-[#0A51B0] bg-blue-50/70 border border-blue-100 px-2 py-0.5 rounded-md shrink-0 whitespace-nowrap"
-              >
-                {{ ticket.nomor_tiket || `TCK-#${ticket.id}` }}
-              </span>
-
-              <div class="flex items-center gap-1.5 shrink-0">
-                <AppBadge
-                  :type="getPriorityBadgeType(ticket.prioritas)"
-                  :text="ticket.prioritas"
-                  class="text-[10px] whitespace-nowrap shrink-0"
-                />
-                <AppBadge
-                  :type="getTicketStatusBadgeType(ticket.status_tiket)"
-                  :text="ticket.status_tiket"
-                  class="text-[10px] whitespace-nowrap shrink-0"
-                />
-              </div>
+        <!-- ─── ROW 7: Tabel Tiket Permintaan Terbaru ────────────────── -->
+        <div v-if="canReadTickets" class="dashboard-table">
+          <div class="flex items-center justify-between border-b border-slate-100 bg-white">
+            <div class="min-w-0 pr-3">
+              <h3 class="text-sm sm:text-base font-bold text-slate-900 tracking-tight truncate">
+                Tiket Terbaru
+              </h3>
+              <p class="text-[12px] sm:text-xs text-slate-500 mt-0.5 truncate">
+                Lima laporan kendala &amp; permintaan IT terbaru
+              </p>
             </div>
+            <RouterLink to="/tickets" class="table-link touch-manipulation">
+              <span>Lihat semua</span>
+              <span aria-hidden="true" class="material-symbols-outlined text-[15px]"
+                >arrow_forward</span
+              >
+            </RouterLink>
+          </div>
+
+          <!-- Mobile Card List View (Clean, Readable & Zero Horizontal Scroll on < md) -->
+          <div class="dashboard-recent-cards block xl:hidden divide-y divide-[#F1F5F9]">
+            <div
+              v-for="ticket in recentTickets"
+              :key="'mob-ticket-' + ticket.id"
+              class="p-3.5 sm:p-4 hover:bg-[#F8FAFC] transition-colors flex flex-col gap-2"
+            >
+              <!-- Top Row: No. Tiket + Badges (Prioritas & Status) -->
+              <div class="flex items-center justify-between gap-2">
+                <span
+                  class="font-mono text-xs font-bold text-[#0A51B0] bg-blue-50/70 border border-blue-100 px-2 py-0.5 rounded-md shrink-0 whitespace-nowrap"
+                >
+                  {{ ticket.nomor_tiket || `TCK-#${ticket.id}` }}
+                </span>
+
+                <div class="flex items-center gap-1.5 shrink-0">
+                  <AppBadge
+                    :type="getPriorityBadgeType(ticket.prioritas)"
+                    :text="ticket.prioritas"
+                    class="text-[10px] whitespace-nowrap shrink-0"
+                  />
+                  <AppBadge
+                    :type="getTicketStatusBadgeType(ticket.status_tiket)"
+                    :text="ticket.status_tiket"
+                    class="text-[10px] whitespace-nowrap shrink-0"
+                  />
+                </div>
+              </div>
 
             <!-- Mid: Judul Tiket -->
             <div>
@@ -1192,7 +1191,7 @@ onUnmounted(() => {
                 </th>
                 <th
                   scope="col"
-                  class="w-[10%] min-w-[95px] text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider py-2.5 px-4 whitespace-nowrap"
+                  class="w-[10%] min-w-[90px] text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider py-2.5 px-4 whitespace-nowrap"
                 >
                   Status
                 </th>
@@ -1205,87 +1204,40 @@ onUnmounted(() => {
               </tr>
             </thead>
             <tbody class="divide-y divide-slate-100/80">
-              <tr
-                v-for="ticket in recentTickets"
-                :key="ticket.id"
-                class="hover:bg-slate-100/80 transition-colors duration-150 group"
-              >
-                <td class="py-3 px-4 align-middle whitespace-nowrap">
-                  <span
-                    class="font-mono text-xs font-semibold text-blue-600 bg-blue-50/70 border border-blue-100 px-2 py-0.5 rounded-md inline-block whitespace-nowrap"
-                  >
-                    {{ ticket.nomor_tiket || `TCK-#${ticket.id}` }}
-                  </span>
-                </td>
-                <td class="py-3 px-4 align-middle">
-                  <div class="min-w-0 pr-2">
-                    <p
-                      class="text-xs sm:text-[13px] font-semibold text-slate-900 leading-snug line-clamp-2 group-hover:text-blue-600 transition-colors"
-                      :title="ticket.judul"
-                    >
-                      {{ ticket.judul }}
-                    </p>
-                    <p class="text-[11px] text-slate-400 mt-0.5 truncate flex items-center gap-1">
-                      <span>Pelapor:</span>
-                      <span class="font-medium text-slate-600">{{ ticket.pelapor || 'User' }}</span>
-                    </p>
-                  </div>
-                </td>
-                <td class="py-3 px-4 align-middle">
-                  <div class="flex items-center gap-1.5 min-w-0">
+                <tr
+                  v-for="ticket in recentTickets"
+                  :key="ticket.id"
+                  class="hover:bg-slate-100/80 transition-colors duration-150 group"
+                >
+                  <td class="py-3 px-4 align-middle whitespace-nowrap">
                     <span
-                      aria-hidden="true"
-                      class="material-symbols-outlined text-[16px] shrink-0"
-                      :class="ticket.assigned_to ? 'text-slate-400' : 'text-amber-500'"
+                      class="font-mono text-xs font-semibold text-blue-600 bg-blue-50/70 border border-blue-100 px-2 py-0.5 rounded-md inline-block whitespace-nowrap"
                     >
-                      {{ ticket.assigned_to ? 'person' : 'person_off' }}
+                      {{ ticket.nomor_tiket || `TCK-#${ticket.id}` }}
                     </span>
-                    <span
-                      class="text-xs truncate"
-                      :class="
-                        ticket.assigned_to
-                          ? 'font-medium text-slate-700'
-                          : 'font-semibold text-amber-700'
-                      "
-                      :title="ticket.assigned_to || 'Belum ditugaskan'"
-                    >
-                      {{ ticket.assigned_to || 'Belum ditugaskan' }}
-                    </span>
-                  </div>
-                </td>
-                <td class="py-3 px-4 align-middle whitespace-nowrap">
-                  <AppBadge
-                    :type="getPriorityBadgeType(ticket.prioritas)"
-                    :text="ticket.prioritas"
-                    class="whitespace-nowrap"
-                  />
-                </td>
-                <td class="py-3 px-4 align-middle whitespace-nowrap">
-                  <AppBadge
-                    :type="getTicketStatusBadgeType(ticket.status_tiket)"
-                    :text="ticket.status_tiket"
-                    class="whitespace-nowrap"
-                  />
-                </td>
-                <td class="py-3 px-4 align-middle text-right whitespace-nowrap">
-                  <span class="text-xs font-medium text-slate-400">
-                    {{ formatDate(ticket.dibuat_pada) }}
-                  </span>
-                </td>
-              </tr>
-              <tr v-if="recentTickets.length === 0">
-                <td colspan="6" class="py-8 text-center">
-                  <p class="text-xs text-slate-400">Belum ada tiket masuk.</p>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+                  </td>
+                  <td class="py-3 px-4 align-middle">
+                    <div class="min-w-0 pr-2">
+                      <p
+                        class="text-xs sm:text-[13px] font-semibold text-slope-900 leading-snug line-clamp-2 group-hover:text-blue-600 transition-colors"
+                        :title="ticket.judul"
+                      >
+                        {{ ticket.judul }}
+                      </p>
+                      <p class="text-[11px] text-slope-400 mt-0.5 truncate flex items-center gap-1">
+                        <span>Pelapor:</span>
+                        <span class="font-medium text-slope-600">{{ ticket.pelapor || 'User' }}</span>
+                      </p>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>
-    </template>
-  </div>
-</template>
-
+      </template>
+    </div>
+  </template>
 <style scoped>
 .dashboard-view {
   display: flex;
@@ -1310,7 +1262,7 @@ onUnmounted(() => {
   justify-content: space-between;
   min-width: 0;
   min-height: 56px;
-  padding: 8px 10px;
+  padding: 10px;
   border: 1px solid #e2e8f0;
   border-radius: 8px;
   background: white;
@@ -1350,7 +1302,7 @@ onUnmounted(() => {
 .stat-number {
   margin: 3px 0 1px;
   overflow-wrap: anywhere;
-  font-size: 17px;
+  font-size: 16px;
   font-weight: 700;
   line-height: 1.1;
   letter-spacing: -0.02em;
@@ -1358,7 +1310,7 @@ onUnmounted(() => {
   color: #333333;
 }
 .stat-caption {
-  font-size: 10.5px;
+  font-size: 11px;
   color: #64748b;
   margin-top: auto;
   white-space: nowrap;
@@ -1411,7 +1363,7 @@ onUnmounted(() => {
   align-items: center;
   gap: 8px;
   margin-top: auto;
-  font-size: 10.5px;
+  font-size: 11px;
   font-weight: 500;
   color: #64748b;
   font-variant-numeric: tabular-nums;
@@ -1499,7 +1451,7 @@ onUnmounted(() => {
 .dashboard-table table th {
   text-transform: none;
   letter-spacing: 0;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
   color: #5b6b84;
   padding-block: 14px;
@@ -1519,7 +1471,7 @@ onUnmounted(() => {
   min-height: 44px;
   padding: 10px 16px;
   border-radius: 10px;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
   line-height: 1.5;
   touch-action: manipulation;
@@ -1588,29 +1540,29 @@ onUnmounted(() => {
     gap: 8px;
   }
   .dash-stat-card {
-    padding: 7px 9px;
-    min-height: 52px;
+    padding: 8px;
+    min-height: 56px;
     border-radius: 8px;
   }
   .stat-label {
-    font-size: 10.5px;
+    font-size: 11px;
     gap: 4px;
-    min-height: 20px;
+    min-height: 22px;
   }
   .stat-label > .material-symbols-outlined {
-    width: 20px;
-    height: 20px;
-    font-size: 12px;
+    width: 22px;
+    height: 22px;
+    font-size: 13px;
   }
   .stat-number {
     font-size: 16px;
     margin: 2px 0 1px;
   }
   .stat-caption {
-    font-size: 10px;
+    font-size: 10.5px;
   }
   .stat-bottom {
-    font-size: 10px;
+    font-size: 10.5px;
     gap: 6px;
   }
   .dashboard-panel {
@@ -1647,9 +1599,32 @@ onUnmounted(() => {
     width: 100%;
   }
 }
-@media (prefers-reduced-motion: reduce) {
-  .dashboard-view * {
-    transition: none !important;
+@media (min-width: 640px) {
+  .stat-label {
+    font-size: 11.5px;
   }
+  .stat-number {
+    font-size: 17px;
+  }
+  .stat-caption {
+    font-size: 11px;
+  }
+  .stat-label > .material-symbols-outlined {
+    font-size: 14px;
+  }
+}
+.dark .dash-stat-card {
+  background: #1e293b;
+  border-color: #334155;
+}
+.dark .dash-stat-card .stat-label,
+.dark .dash-stat-card .stat-caption {
+  color: #e2e8f0;
+}
+.dark .dash-stat-card .stat-number {
+  color: #f8fafc;
+}
+.dark .dash-stat-card .stat-label > .material-symbols-outlined {
+  background: #334155;
 }
 </style>

@@ -745,7 +745,7 @@ onBeforeUnmount(() => {
           {{ pageTitle }}
         </h1>
         <p
-          class="hidden md:block truncate text-[9.5px] font-medium text-[#637288] dark:text-slate-400 leading-relaxed mt-0.5"
+          class="hidden md:block truncate text-[11px] font-medium text-[#637288] dark:text-slate-400 leading-relaxed mt-0.5"
         >
           {{ pageSubtitle }}
         </p>

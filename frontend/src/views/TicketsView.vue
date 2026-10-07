@@ -1480,7 +1480,7 @@ function toast(message, type = 'success') {
             <span class="font-num block text-[var(--kpi-value-font-size)] sm:text-[var(--kpi-value-font-size-sm)] lg:text-[var(--kpi-value-font-size-lg)] font-bold text-[#333333] dark:text-white tabular-nums leading-none tracking-tight">{{
               stats.totalTickets ?? 0
             }}</span>
-            <span class="mt-1 block truncate text-[var(--kpi-caption-font-size)] sm:text-[var(--kpi-caption-font-size-sm)] lg:text-[var(--kpi-caption-font-size-lg)] font-normal text-[#64748B] dark:text-slate-400">Seluruh data tiket</span>
+            <span class="mt-1 block truncate text-[var(--kpi-caption-font-size)] sm:text-[var(--kpi-caption-font-size-sm)] lg:text-[var(--kpi-caption-font-size-lg)] font-normal text-[#64748B] dark:text-slate-400">Total tiket masuk</span>
           </div>
         </div>
 
@@ -1509,7 +1509,7 @@ function toast(message, type = 'success') {
               class="font-num block text-[var(--kpi-value-font-size)] sm:text-[var(--kpi-value-font-size-sm)] lg:text-[var(--kpi-value-font-size-lg)] font-bold tabular-nums leading-none tracking-tight"
               :class="(stats.unassignedTickets || 0) > 0 ? 'text-[#B45309] dark:text-amber-400' : 'text-[#333333] dark:text-white'"
             >{{ stats.unassignedTickets ?? 0 }}</span>
-            <span class="mt-1 block truncate text-[var(--kpi-caption-font-size)] sm:text-[var(--kpi-caption-font-size-sm)] lg:text-[var(--kpi-caption-font-size-lg)] font-normal text-[#64748B] dark:text-slate-400">Seluruh data tiket</span>
+            <span class="mt-1 block truncate text-[var(--kpi-caption-font-size)] sm:text-[var(--kpi-caption-font-size-sm)] lg:text-[var(--kpi-caption-font-size-lg)] font-normal text-[#64748B] dark:text-slate-400">Menunggu penanganan</span>
           </div>
         </div>
 
@@ -1530,7 +1530,7 @@ function toast(message, type = 'success') {
             <span class="font-num block text-[var(--kpi-value-font-size)] sm:text-[var(--kpi-value-font-size-sm)] lg:text-[var(--kpi-value-font-size-lg)] font-bold text-[#333333] dark:text-white tabular-nums leading-none tracking-tight">{{
               (stats.openTickets || 0) + (stats.pendingTickets || 0)
             }}</span>
-            <span class="mt-1 block truncate text-[var(--kpi-caption-font-size)] sm:text-[var(--kpi-caption-font-size-sm)] lg:text-[var(--kpi-caption-font-size-lg)] font-normal text-[#64748B] dark:text-slate-400">Seluruh data tiket</span>
+            <span class="mt-1 block truncate text-[var(--kpi-caption-font-size)] sm:text-[var(--kpi-caption-font-size-sm)] lg:text-[var(--kpi-caption-font-size-lg)] font-normal text-[#64748B] dark:text-slate-400">Dalam pengerjaan tim</span>
           </div>
         </div>
 
@@ -1551,7 +1551,7 @@ function toast(message, type = 'success') {
             <span class="font-num block text-[var(--kpi-value-font-size)] sm:text-[var(--kpi-value-font-size-sm)] lg:text-[var(--kpi-value-font-size-lg)] font-bold text-emerald-600 dark:text-emerald-400 tabular-nums leading-none tracking-tight">{{
               stats.closedTickets ?? 0
             }}</span>
-            <span class="mt-1 block truncate text-[var(--kpi-caption-font-size)] sm:text-[var(--kpi-caption-font-size-sm)] lg:text-[var(--kpi-caption-font-size-lg)] font-normal text-[#64748B] dark:text-slate-400">Seluruh data tiket</span>
+            <span class="mt-1 block truncate text-[var(--kpi-caption-font-size)] sm:text-[var(--kpi-caption-font-size-sm)] lg:text-[var(--kpi-caption-font-size-lg)] font-normal text-[#64748B] dark:text-slate-400">Tiket terselesaikan</span>
           </div>
         </div>
       </div>

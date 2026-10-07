@@ -1290,12 +1290,12 @@ onUnmounted(() => {
 .dashboard-view {
   display: flex;
   flex-direction: column;
-  gap: 28px;
+  gap: 16px;
   width: 100%;
   min-width: 0;
-  max-width: 1500px;
+  max-width: 100%;
   margin: 0 auto;
-  padding: 8px 0 24px;
+  padding: 4px 0 20px;
   color: #1e293b;
 }
 .dashboard-stats {

@@ -178,7 +178,7 @@ onBeforeUnmount(() => {
           :to="item.to"
           :aria-label="item.label"
           :aria-current="isItemActive(item.to) ? 'page' : undefined"
-          class="flex flex-col items-center justify-center gap-0.5 px-1.5 py-0.5 rounded-xl transition-colors min-w-[48px] min-h-[38px] touch-manipulation active:scale-95"
+          class="flex flex-col items-center justify-center gap-0.5 px-1.5 py-0.5 rounded-xl transition-colors min-w-[48px] min-h-[38px] touch-manipulation"
           :class="
             isItemActive(item.to)
               ? 'text-[#234B83] bg-[#EAF1FC] font-semibold'
@@ -186,7 +186,7 @@ onBeforeUnmount(() => {
           "
         >
           <component :is="lucide[item.lucide] || Circle" class="w-3.5 h-3.5" />
-          <span class="text-[9.5px]">{{ item.label }}</span>
+          <span class="text-[10px] sm:text-[11px] leading-tight font-medium">{{ item.label }}</span>
         </RouterLink>
 
         <button
@@ -195,7 +195,7 @@ onBeforeUnmount(() => {
           aria-controls="mobile-more-menu"
           :aria-expanded="isLainnyaOpen"
           @click="isLainnyaOpen = !isLainnyaOpen"
-          class="flex flex-col items-center justify-center gap-0.5 px-1.5 py-0.5 rounded-xl transition-colors cursor-pointer min-w-[48px] min-h-[38px] touch-manipulation active:scale-95"
+          class="flex flex-col items-center justify-center gap-0.5 px-1.5 py-0.5 rounded-xl transition-colors cursor-pointer min-w-[48px] min-h-[38px] touch-manipulation"
           :class="
             isLainnyaOpen || isLainnyaActive
               ? 'text-[#333333] font-bold'
@@ -203,7 +203,7 @@ onBeforeUnmount(() => {
           "
         >
           <MoreHorizontal class="w-3.5 h-3.5" />
-          <span class="text-[9.5px]">Lainnya</span>
+          <span class="text-[10px] sm:text-[11px] leading-tight font-medium">Lainnya</span>
         </button>
       </nav>
 
@@ -241,7 +241,7 @@ onBeforeUnmount(() => {
               :key="item.to"
               :to="item.to"
               :aria-current="isLainnyaItemActive(item.to) ? 'page' : undefined"
-              class="flex flex-col items-center justify-center gap-1.5 px-2 py-3 rounded-xl transition-colors text-center active:scale-95"
+              class="flex flex-col items-center justify-center gap-1.5 px-2 py-3 rounded-xl transition-colors text-center"
               :class="
                 isLainnyaItemActive(item.to)
                   ? 'text-[#333333] bg-[#0A51B0]/10 dark:bg-[#0A51B0]/20 font-bold'
@@ -249,7 +249,7 @@ onBeforeUnmount(() => {
               "
             >
               <component :is="lucide[item.lucide] || Circle" class="w-5 h-5" />
-              <span class="text-[10px] font-semibold leading-tight">{{ item.label }}</span>
+              <span class="text-[10.5px] font-semibold leading-tight">{{ item.label }}</span>
             </RouterLink>
           </div>
 

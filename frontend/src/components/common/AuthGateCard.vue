@@ -1,4 +1,4 @@
-<script setup>
+﻿<script setup>
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { LogIn, ShieldAlert } from 'lucide-vue-next'
@@ -62,7 +62,7 @@ function handleLoginRedirect() {
     <div class="mt-6 flex justify-center">
       <button
         @click="handleLoginRedirect"
-        class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#0A51B0] hover:bg-[#0A4391] text-white text-xs sm:text-sm font-bold shadow-md shadow-[#0A51B0]/25 hover:shadow-lg transition-all cursor-pointer active:scale-95"
+        class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#0A51B0] hover:bg-[#0A4391] text-white text-xs sm:text-sm font-bold shadow-md shadow-[#0A51B0]/25 hover:shadow-lg transition-all cursor-pointer"
       >
         <LogIn class="w-4 h-4" />
         <span>{{ buttonText }}</span>

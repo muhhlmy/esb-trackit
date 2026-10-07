@@ -1,4 +1,4 @@
-<script setup>
+﻿<script setup>
 import AppModal from '../../components/ui/AppModal.vue'
 import { ref, computed, onMounted, nextTick } from 'vue'
 import { useRouter, RouterLink } from 'vue-router'
@@ -200,7 +200,7 @@ function getCategoryBadgeClass(category) {
       <button
         v-if="canWrite"
         @click="createNewDoc"
-        class="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 h-8 sm:h-8.5 px-3.5 sm:px-4 rounded-lg text-xs font-semibold bg-[#0A51B0] hover:bg-[#0A4391] text-white shadow-2xs transition-all cursor-pointer active:scale-95 shrink-0"
+        class="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 h-8 sm:h-8.5 px-3.5 sm:px-4 rounded-lg text-xs font-semibold bg-[#0A51B0] hover:bg-[#0A4391] text-white shadow-2xs transition-all cursor-pointer shrink-0"
       >
         <Plus class="w-3.5 h-3.5" />
         <span>Dokumen Baru</span>
@@ -237,67 +237,76 @@ function getCategoryBadgeClass(category) {
     </div>
 
     <!-- Stats Row (Balanced 3 columns on mobile and desktop) -->
-    <div class="grid grid-cols-3 gap-1.5 sm:gap-2.5 gsap-admin-el">
+    <div class="grid grid-cols-3 gap-2 sm:gap-2.5 lg:gap-3 gsap-admin-el">
       <!-- Total -->
       <div
-        class="flex items-center gap-2 p-2 sm:p-2.5 rounded-lg bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 transition-colors min-h-[56px] sm:min-h-[56px]"
+        class="flex flex-col justify-between p-2.5 sm:p-3 lg:p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 transition-colors min-h-[76px] sm:min-h-[84px] lg:min-h-[92px] shadow-2xs hover:border-[#CBD5E1] dark:hover:border-slate-700"
       >
-        <div
-          class="w-6 h-6 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center shrink-0"
-        >
-          <FileText class="w-3.5 h-3.5" />
-        </div>
-        <div class="min-w-0">
-          <span class="text-[11px] sm:text-[11.5px] font-medium text-[#5F7089] dark:text-slate-400 block truncate"
+        <div class="flex items-center justify-between gap-1.5">
+          <span class="text-[10.5px] sm:text-[11px] lg:text-[11.5px] font-medium text-[#5F7089] dark:text-slate-400 truncate"
             >Total Artikel</span
           >
+          <div
+            class="w-5.5 h-5.5 sm:w-6 sm:h-6 lg:w-6.5 lg:w-6.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center shrink-0"
+          >
+            <FileText class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+          </div>
+        </div>
+        <div class="mt-1">
           <p
-            class="text-base sm:text-[17px] font-bold text-[#333333] dark:text-white tabular-nums leading-none mt-0.5"
+            class="font-num text-[17px] sm:text-[20px] lg:text-[22px] font-bold text-[#333333] dark:text-white tabular-nums leading-none tracking-tight"
           >
             {{ stats.total }}
           </p>
+          <span class="mt-1 block truncate text-[10px] sm:text-[10.5px] lg:text-[11px] font-normal text-[#64748B] dark:text-slate-400">Total artikel</span>
         </div>
       </div>
 
       <!-- Published -->
       <div
-        class="flex items-center gap-2 p-2 sm:p-2.5 rounded-lg bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 transition-colors min-h-[56px] sm:min-h-[56px]"
+        class="flex flex-col justify-between p-2.5 sm:p-3 lg:p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 transition-colors min-h-[76px] sm:min-h-[84px] lg:min-h-[92px] shadow-2xs hover:border-[#CBD5E1] dark:hover:border-slate-700"
       >
-        <div
-          class="w-6 h-6 rounded-md bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0"
-        >
-          <CheckCircle class="w-3.5 h-3.5" />
-        </div>
-        <div class="min-w-0">
-          <span class="text-[11px] sm:text-[11.5px] font-medium text-[#5F7089] dark:text-slate-400 block truncate"
+        <div class="flex items-center justify-between gap-1.5">
+          <span class="text-[10.5px] sm:text-[11px] lg:text-[11.5px] font-medium text-[#5F7089] dark:text-slate-400 truncate"
             >Terbit</span
           >
+          <div
+            class="w-5.5 h-5.5 sm:w-6 sm:h-6 lg:w-6.5 lg:w-6.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0"
+          >
+            <CheckCircle class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+          </div>
+        </div>
+        <div class="mt-1">
           <p
-            class="text-base sm:text-[17px] font-bold text-[#333333] dark:text-white tabular-nums leading-none mt-0.5"
+            class="font-num text-[17px] sm:text-[20px] lg:text-[22px] font-bold text-[#333333] dark:text-white tabular-nums leading-none tracking-tight"
           >
             {{ stats.published }}
           </p>
+          <span class="mt-1 block truncate text-[10px] sm:text-[10.5px] lg:text-[11px] font-normal text-[#64748B] dark:text-slate-400">Telah dipublikasi</span>
         </div>
       </div>
 
       <!-- Custom -->
       <div
-        class="flex items-center gap-2 p-2 sm:p-2.5 rounded-lg bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 transition-colors min-h-[56px] sm:min-h-[56px]"
+        class="flex flex-col justify-between p-2.5 sm:p-3 lg:p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 transition-colors min-h-[76px] sm:min-h-[84px] lg:min-h-[92px] shadow-2xs hover:border-[#CBD5E1] dark:hover:border-slate-700"
       >
-        <div
-          class="w-6 h-6 rounded-md bg-[#EDF5FF] dark:bg-blue-950/60 text-[#0A51B0] dark:text-blue-400 flex items-center justify-center shrink-0"
-        >
-          <PenTool class="w-3.5 h-3.5" />
-        </div>
-        <div class="min-w-0">
-          <span class="text-[11px] sm:text-[11.5px] font-medium text-[#5F7089] dark:text-slate-400 block truncate"
+        <div class="flex items-center justify-between gap-1.5">
+          <span class="text-[10.5px] sm:text-[11px] lg:text-[11.5px] font-medium text-[#5F7089] dark:text-slate-400 truncate"
             >Khusus</span
           >
+          <div
+            class="w-5.5 h-5.5 sm:w-6 sm:h-6 lg:w-6.5 lg:w-6.5 rounded-lg bg-[#EFF6FF] dark:bg-blue-950/60 text-[#0A51B0] dark:text-blue-400 flex items-center justify-center shrink-0"
+          >
+            <PenTool class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+          </div>
+        </div>
+        <div class="mt-1">
           <p
-            class="text-base sm:text-[17px] font-bold text-[#333333] dark:text-white tabular-nums leading-none mt-0.5"
+            class="font-num text-[17px] sm:text-[20px] lg:text-[22px] font-bold text-[#333333] dark:text-white tabular-nums leading-none tracking-tight"
           >
             {{ stats.custom }}
           </p>
+          <span class="mt-1 block truncate text-[10px] sm:text-[10.5px] lg:text-[11px] font-normal text-[#64748B] dark:text-slate-400">Artikel kustom</span>
         </div>
       </div>
     </div>
@@ -342,7 +351,7 @@ function getCategoryBadgeClass(category) {
             ]"
             :key="st.key"
             @click="selectedStatus = st.key"
-            class="px-2.5 sm:px-3 py-1.5 rounded-md font-semibold text-[11px] sm:text-xs transition-all cursor-pointer focus:outline-none active:scale-95 touch-manipulation"
+            class="px-2.5 sm:px-3 py-1.5 rounded-md font-semibold text-[11px] sm:text-xs transition-all cursor-pointer focus:outline-none touch-manipulation"
             :class="
               selectedStatus === st.key
                 ? 'bg-white dark:bg-slate-900 text-[#333333] dark:text-white shadow-xs'
@@ -444,7 +453,7 @@ function getCategoryBadgeClass(category) {
             <div v-if="canWrite" class="flex items-center gap-1 shrink-0">
               <button
                 @click="editDoc(c.id)"
-                class="flex items-center justify-center h-7 px-2.5 gap-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-[#0A51B0] hover:text-white text-[11px] font-semibold transition-all active:scale-95 touch-manipulation cursor-pointer"
+                class="flex items-center justify-center h-7 px-2.5 gap-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-[#0A51B0] hover:text-white text-[11px] font-semibold transition-all touch-manipulation cursor-pointer"
                 title="Edit Dokumen"
               >
                 <Edit3 class="w-3 h-3" />
@@ -452,7 +461,7 @@ function getCategoryBadgeClass(category) {
               </button>
               <button
                 @click="confirmDelete(c.id)"
-                class="flex items-center justify-center h-7 w-7 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors active:scale-95 touch-manipulation cursor-pointer"
+                class="flex items-center justify-center h-7 w-7 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors touch-manipulation cursor-pointer"
                 title="Hapus Dokumen"
               >
                 <Trash2 class="w-3.5 h-3.5" />

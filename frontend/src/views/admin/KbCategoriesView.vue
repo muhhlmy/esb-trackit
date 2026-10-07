@@ -1,4 +1,4 @@
-<script setup>
+﻿<script setup>
 import AppModal from '../../components/ui/AppModal.vue'
 import { ref, computed, onMounted, nextTick } from 'vue'
 import { RouterLink } from 'vue-router'
@@ -235,7 +235,7 @@ function clearFilters() {
       <button
         v-if="canWrite"
         @click="openCreateDrawer"
-        class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-[#0A51B0] hover:bg-[#0A4391] text-white shadow-sm shadow-[#0A51B0]/25 hover:shadow-md transition-all cursor-pointer active:scale-95 touch-manipulation shrink-0"
+        class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-[#0A51B0] hover:bg-[#0A4391] text-white shadow-sm shadow-[#0A51B0]/25 hover:shadow-md transition-all cursor-pointer touch-manipulation shrink-0"
       >
         <Plus class="w-4 h-4" />
         <span>Kategori Baru</span>
@@ -350,7 +350,7 @@ function clearFilters() {
             ]"
             :key="st.key"
             @click="selectedStatus = st.key"
-            class="flex-1 sm:flex-none px-3 py-1.5 rounded-lg font-medium transition-all cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0A51B0] text-center active:scale-95 touch-manipulation"
+            class="flex-1 sm:flex-none px-3 py-1.5 rounded-lg font-medium transition-all cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0A51B0] text-center touch-manipulation"
             :class="
               selectedStatus === st.key
                 ? 'bg-white dark:bg-slate-900 text-[#333333] dark:text-white shadow-2xs font-bold'
@@ -365,7 +365,7 @@ function clearFilters() {
         <button
           v-if="searchQuery || selectedStatus !== 'all'"
           @click="clearFilters"
-          class="px-3 py-1.5 rounded-xl text-xs font-semibold text-[#5F7089] dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors cursor-pointer active:scale-95 touch-manipulation shrink-0"
+          class="px-3 py-1.5 rounded-xl text-xs font-semibold text-[#5F7089] dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors cursor-pointer touch-manipulation shrink-0"
         >
           Reset
         </button>
@@ -389,7 +389,7 @@ function clearFilters() {
         </p>
         <button
           @click="clearFilters"
-          class="mt-3 px-4 py-2 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-[#333333] dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors cursor-pointer active:scale-95 touch-manipulation"
+          class="mt-3 px-4 py-2 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-[#333333] dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors cursor-pointer touch-manipulation"
         >
           Reset Filter
         </button>
@@ -443,7 +443,7 @@ function clearFilters() {
           <div v-if="canWrite" class="flex items-center gap-1 shrink-0">
             <button
               @click="openEditDrawer(c.id)"
-              class="flex items-center justify-center h-8 px-2.5 gap-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-[#0A51B0] hover:text-white text-xs font-semibold transition-all active:scale-95 touch-manipulation cursor-pointer"
+              class="flex items-center justify-center h-8 px-2.5 gap-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-[#0A51B0] hover:text-white text-xs font-semibold transition-all touch-manipulation cursor-pointer"
               title="Edit Kategori"
             >
               <Edit3 class="w-3.5 h-3.5" />
@@ -451,7 +451,7 @@ function clearFilters() {
             </button>
             <button
               @click="confirmDelete(c.id)"
-              class="flex items-center justify-center h-8 w-8 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors active:scale-95 touch-manipulation cursor-pointer"
+              class="flex items-center justify-center h-8 w-8 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors touch-manipulation cursor-pointer"
               title="Hapus Kategori"
             >
               <Trash2 class="w-3.5 h-3.5" />
@@ -746,7 +746,7 @@ function clearFilters() {
                 @click="editingCategory.icon = opt.name"
                 :aria-pressed="editingCategory.icon === opt.name"
                 :aria-label="'Pilih ikon ' + opt.name"
-                class="flex flex-col items-center gap-1.5 p-2 sm:p-2.5 rounded-lg border transition-all cursor-pointer active:scale-95 touch-manipulation"
+                class="flex flex-col items-center gap-1.5 p-2 sm:p-2.5 rounded-lg border transition-all cursor-pointer touch-manipulation"
                 :class="
                   editingCategory.icon === opt.name
                     ? 'border-[#0A51B0] bg-[#ECF2FF] dark:bg-indigo-950/50 text-[#333333] dark:text-indigo-300 font-bold'
@@ -865,13 +865,13 @@ function clearFilters() {
           <div class="flex items-center justify-end gap-2 pt-1">
             <button
               @click="deleteConfirmId = null"
-              class="px-4 py-2 rounded-xl text-xs font-semibold text-[#333333] dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer active:scale-95 touch-manipulation"
+              class="px-4 py-2 rounded-xl text-xs font-semibold text-[#333333] dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer touch-manipulation"
             >
               Batal
             </button>
             <button
               @click="executeDelete"
-              class="px-4 py-2 rounded-xl text-xs font-bold bg-rose-600 hover:bg-rose-700 text-white shadow-xs transition-colors cursor-pointer active:scale-95 touch-manipulation"
+              class="px-4 py-2 rounded-xl text-xs font-bold bg-rose-600 hover:bg-rose-700 text-white shadow-xs transition-colors cursor-pointer touch-manipulation"
             >
               Hapus
             </button>

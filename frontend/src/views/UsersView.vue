@@ -760,7 +760,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
     </FilterModal>
 
     <!-- ── Card Stats Pengguna ── -->
-    <div v-if="!isLoading && users.length" class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3">
+    <div v-if="!isLoading && users.length" class="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-2.5 lg:gap-3">
       <StatCard
         title="Total Pengguna"
         :value="userStats.total"
@@ -771,10 +771,10 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
         title="Superadmin"
         :value="userStats.superadmin"
         icon="shield_person"
-        color="purple"
+        color="neutral"
       />
-      <StatCard title="Admin" :value="userStats.admin" icon="admin_panel_settings" color="cyan" />
-      <StatCard title="Reporter" :value="userStats.reporter" icon="support_agent" color="success" />
+      <StatCard title="Admin" :value="userStats.admin" icon="admin_panel_settings" color="primary" />
+      <StatCard title="Reporter" :value="userStats.reporter" icon="support_agent" color="neutral" />
     </div>
 
     <!-- ── Tabel Pengguna ─────────────────────────────────── -->

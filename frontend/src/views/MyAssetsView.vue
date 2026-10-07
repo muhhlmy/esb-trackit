@@ -610,7 +610,7 @@ onMounted(() => {
           v-if="canBrowseOtherAssets"
           type="button"
           @click="goToLevel1"
-          class="flex items-center gap-1 shrink-0 rounded-lg border border-[#E2E8F0] bg-white px-2.5 sm:px-3 py-1.5 text-xs font-semibold text-[#475569] hover:bg-[#F8FAFC] hover:text-[#333333] active:scale-95 transition-all cursor-pointer shadow-2xs touch-manipulation"
+          class="flex items-center gap-1 shrink-0 rounded-lg border border-[#E2E8F0] bg-white px-2.5 sm:px-3 py-1.5 text-xs font-semibold text-[#475569] hover:bg-[#F8FAFC] hover:text-[#333333] transition-all cursor-pointer shadow-2xs touch-manipulation"
           title="Kembali ke Daftar Karyawan"
         >
           <span aria-hidden="true" class="material-symbols-outlined text-[16px]">arrow_back</span>
@@ -711,7 +711,7 @@ onMounted(() => {
       </div>
 
       <!-- KPI Cards: MyAssets Summary -->
-      <div class="myassets-kpi-grid grid grid-cols-1 sm:grid-cols-3 gap-3.5 sm:gap-4">
+      <div class="myassets-kpi-grid grid grid-cols-3 gap-2 sm:gap-2.5 lg:gap-3">
         <StatCard
           title="Total Aset Saya"
           :value="myAssets.length"
@@ -738,7 +738,7 @@ onMounted(() => {
             ).length
           "
           icon="inventory"
-          color="info"
+          color="neutral"
           subtitle="Aset dalam stok"
         />
       </div>
@@ -983,7 +983,7 @@ onMounted(() => {
         <button
           type="button"
           @click="currentLevel = 2"
-          class="hidden sm:flex items-center gap-1.5 rounded-lg border border-[#E2E8F0] bg-white px-3 py-1.5 text-xs font-semibold text-[#475569] hover:bg-[#F8FAFC] hover:text-[#333333] active:scale-95 transition-all cursor-pointer shadow-2xs touch-manipulation shrink-0"
+          class="hidden sm:flex items-center gap-1.5 rounded-lg border border-[#E2E8F0] bg-white px-3 py-1.5 text-xs font-semibold text-[#475569] hover:bg-[#F8FAFC] hover:text-[#333333] transition-all cursor-pointer shadow-2xs touch-manipulation shrink-0"
         >
           <span aria-hidden="true" class="material-symbols-outlined text-[16px]">arrow_back</span>
           <span>Kembali ke Detail Karyawan</span>
@@ -1044,7 +1044,7 @@ onMounted(() => {
         <button
           type="button"
           @click="openSpecification(selectedAsset)"
-          class="w-full sm:w-auto h-9 inline-flex items-center justify-center gap-1.5 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-3.5 text-xs font-semibold text-[#333333] hover:bg-[#EFF6FF] active:scale-95 cursor-pointer transition-colors shadow-2xs touch-manipulation shrink-0"
+          class="w-full sm:w-auto h-9 inline-flex items-center justify-center gap-1.5 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-3.5 text-xs font-semibold text-[#333333] hover:bg-[#EFF6FF] cursor-pointer transition-colors shadow-2xs touch-manipulation shrink-0"
         >
           <span aria-hidden="true" class="material-symbols-outlined text-[16px]">description</span>
           <span>Lihat Spesifikasi</span>

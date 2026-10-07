@@ -1,4 +1,4 @@
-<script setup>
+﻿<script setup>
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuth } from '@/composables/useAuth'
@@ -835,7 +835,7 @@ onBeforeUnmount(() => {
                 @click="closeSearch"
                 aria-label="Tutup pencarian"
                 title="Tutup pencarian"
-                class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-[#5F7089] hover:bg-[#F1F5F9] active:scale-95 touch-manipulation cursor-pointer"
+                class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-[#5F7089] hover:bg-[#F1F5F9] touch-manipulation cursor-pointer"
               >
                 <span aria-hidden="true" class="material-symbols-outlined text-[22px]"
                   >arrow_back</span
@@ -881,7 +881,7 @@ onBeforeUnmount(() => {
                 type="button"
                 @click="submitSearch"
                 :disabled="!searchQuery.trim()"
-                class="flex min-h-11 shrink-0 items-center px-2 py-1 text-xs font-bold text-[#333333] disabled:opacity-30 active:scale-95 touch-manipulation cursor-pointer"
+                class="flex min-h-11 shrink-0 items-center px-2 py-1 text-xs font-bold text-[#333333] disabled:opacity-30 touch-manipulation cursor-pointer"
               >
                 Cari
               </button>
@@ -921,7 +921,7 @@ onBeforeUnmount(() => {
                 type="button"
                 @click="searchTabFilter = tab.key"
                 :aria-pressed="searchTabFilter === tab.key"
-                class="search-filter-tab flex min-h-11 md:min-h-0 items-center gap-1 shrink-0 rounded-lg px-2 sm:px-2.5 py-1 text-[11px] font-bold transition-all cursor-pointer touch-manipulation active:scale-95"
+                class="search-filter-tab flex min-h-11 md:min-h-0 items-center gap-1 shrink-0 rounded-lg px-2 sm:px-2.5 py-1 text-[11px] font-bold transition-all cursor-pointer touch-manipulation"
                 :class="
                   searchTabFilter === tab.key
                     ? 'bg-[#0A51B0] text-white shadow-xs'
@@ -972,21 +972,21 @@ onBeforeUnmount(() => {
                 <button
                   type="button"
                   @click="quickSearchPreset('Laptop', 'ASSETS')"
-                  class="rounded-full border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-1.5 text-[11px] font-semibold text-[#475569] hover:border-[#0A51B0] hover:text-[#333333] transition-all cursor-pointer active:scale-95 touch-manipulation shadow-2xs"
+                  class="rounded-full border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-1.5 text-[11px] font-semibold text-[#475569] hover:border-[#0A51B0] hover:text-[#333333] transition-all cursor-pointer touch-manipulation shadow-2xs"
                 >
                   Laptop
                 </button>
                 <button
                   type="button"
                   @click="quickSearchPreset('Tiket', 'TICKETS')"
-                  class="rounded-full border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-1.5 text-[11px] font-semibold text-[#475569] hover:border-[#0A51B0] hover:text-[#333333] transition-all cursor-pointer active:scale-95 touch-manipulation shadow-2xs"
+                  class="rounded-full border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-1.5 text-[11px] font-semibold text-[#475569] hover:border-[#0A51B0] hover:text-[#333333] transition-all cursor-pointer touch-manipulation shadow-2xs"
                 >
                   Tiket
                 </button>
                 <button
                   type="button"
                   @click="quickSearchPreset('Active', 'KARYAWAN')"
-                  class="rounded-full border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-1.5 text-[11px] font-semibold text-[#475569] hover:border-[#0A51B0] hover:text-[#333333] transition-all cursor-pointer active:scale-95 touch-manipulation shadow-2xs"
+                  class="rounded-full border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-1.5 text-[11px] font-semibold text-[#475569] hover:border-[#0A51B0] hover:text-[#333333] transition-all cursor-pointer touch-manipulation shadow-2xs"
                 >
                   Karyawan aktif
                 </button>
@@ -1254,7 +1254,7 @@ onBeforeUnmount(() => {
         @click="initGlobalSearchData"
         aria-label="Cari Global"
         title="Cari Global (Aset, Tiket, Karyawan, User)"
-        class="flex md:hidden h-8 w-8 items-center justify-center rounded-lg text-[#5F7089] hover:bg-[#F8FAFC] hover:text-[#333333] transition-all cursor-pointer select-none active:scale-95 touch-manipulation"
+        class="flex md:hidden h-8 w-8 items-center justify-center rounded-lg text-[#5F7089] hover:bg-[#F8FAFC] hover:text-[#333333] transition-all cursor-pointer select-none touch-manipulation"
       >
         <span aria-hidden="true" class="material-symbols-outlined text-[18px]">search</span>
       </button>
@@ -1269,7 +1269,7 @@ onBeforeUnmount(() => {
           type="button"
           :title="unreadCount > 0 ? `Notifikasi (${unreadCount})` : 'Notifikasi'"
           @click="toggleNotif"
-          class="relative flex h-8 w-8 items-center justify-center rounded-lg text-[#5F7089] hover:bg-[#F8FAFC] hover:text-[#333333] transition-all cursor-pointer select-none active:scale-95 touch-manipulation"
+          class="relative flex h-8 w-8 items-center justify-center rounded-lg text-[#5F7089] hover:bg-[#F8FAFC] hover:text-[#333333] transition-all cursor-pointer select-none touch-manipulation"
           :class="isNotifOpen ? 'bg-[#EDF5FF] text-[#333333]' : ''"
         >
           <span aria-hidden="true" class="material-symbols-outlined text-[18px]"

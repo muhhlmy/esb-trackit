@@ -370,7 +370,7 @@ onMounted(() => {
         <button
           type="button"
           @click="openAdd"
-          class="inline-flex h-9 shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg bg-[#0A51B0] px-3 text-xs font-semibold text-white shadow-2xs transition-all hover:bg-[#0A4391] active:scale-95 sm:px-3.5"
+          class="inline-flex h-9 shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg bg-[#0A51B0] px-3 text-xs font-semibold text-white shadow-2xs transition-all hover:bg-[#0A4391] sm:px-3.5"
           title="Tambah pengiriman baru"
         >
           <span aria-hidden="true" class="material-symbols-outlined text-[16px]">add</span>
@@ -427,72 +427,84 @@ onMounted(() => {
     <!-- Summary Cards -->
     <div class="shipment-summary">
       <div
-        class="rounded-lg border border-[#E2E8F0] bg-white p-2 sm:p-2.5 shadow-2xs flex items-center gap-2 hover:border-[#CBD5E1] transition-colors min-h-[56px] sm:min-h-[58px]"
+        class="rounded-xl border border-[#E2E8F0] bg-white p-2.5 sm:p-3 lg:p-3.5 shadow-2xs flex flex-col justify-between hover:border-[#CBD5E1] transition-colors min-h-[76px] sm:min-h-[84px] lg:min-h-[92px]"
       >
-        <div
-          class="h-6 w-6 rounded-md bg-[#EDF5FF] text-[#0A51B0] flex items-center justify-center shrink-0"
-        >
-          <Package class="w-3.5 h-3.5" />
-        </div>
-        <div class="min-w-0">
-          <p class="text-[11px] sm:text-[11.5px] font-medium text-[#5F7089] truncate">
+        <div class="flex items-center justify-between gap-1.5">
+          <p class="text-[10.5px] sm:text-[11px] lg:text-[11.5px] font-medium text-[#5F7089] truncate">
             Total Pengiriman
           </p>
-          <p class="text-base sm:text-[17px] font-bold text-[#333333] mt-0.5 leading-none tabular-nums">
+          <div
+            class="h-5.5 w-5.5 sm:h-6 sm:w-6 lg:h-6.5 lg:w-6.5 rounded-lg bg-[#EFF6FF] text-[#0A51B0] flex items-center justify-center shrink-0"
+          >
+            <Package class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+          </div>
+        </div>
+        <div class="mt-1">
+          <p class="font-num text-[17px] sm:text-[20px] lg:text-[22px] font-bold text-[#333333] leading-none tabular-nums tracking-tight">
             {{ summary.total }}
           </p>
+          <p class="mt-1 text-[10px] sm:text-[10.5px] lg:text-[11px] text-[#64748B] truncate">Semua data resi</p>
         </div>
       </div>
 
       <div
-        class="rounded-lg border border-[#E2E8F0] bg-white p-2 sm:p-2.5 shadow-2xs flex items-center gap-2 hover:border-[#CBD5E1] transition-colors min-h-[56px] sm:min-h-[58px]"
+        class="rounded-xl border border-[#E2E8F0] bg-white p-2.5 sm:p-3 lg:p-3.5 shadow-2xs flex flex-col justify-between hover:border-[#CBD5E1] transition-colors min-h-[76px] sm:min-h-[84px] lg:min-h-[92px]"
       >
-        <div
-          class="h-6 w-6 rounded-md bg-slate-100 text-[#475569] flex items-center justify-center shrink-0"
-        >
-          <Package class="w-3.5 h-3.5" />
-        </div>
-        <div class="min-w-0">
-          <p class="text-[11px] sm:text-[11.5px] font-medium text-[#5F7089] truncate">
+        <div class="flex items-center justify-between gap-1.5">
+          <p class="text-[10.5px] sm:text-[11px] lg:text-[11.5px] font-medium text-[#5F7089] truncate">
             Belum Dikirim
           </p>
-          <p class="text-base sm:text-[17px] font-bold text-[#333333] mt-0.5 leading-none tabular-nums">
+          <div
+            class="h-5.5 w-5.5 sm:h-6 sm:w-6 lg:h-6.5 lg:w-6.5 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center shrink-0"
+          >
+            <Package class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+          </div>
+        </div>
+        <div class="mt-1">
+          <p class="font-num text-[17px] sm:text-[20px] lg:text-[22px] font-bold text-[#333333] leading-none tabular-nums tracking-tight">
             {{ summary.belum_dikirim }}
           </p>
+          <p class="mt-1 text-[10px] sm:text-[10.5px] lg:text-[11px] text-[#64748B] truncate">Siap diproses</p>
         </div>
       </div>
 
       <div
-        class="rounded-lg border border-[#E2E8F0] bg-white p-2 sm:p-2.5 shadow-2xs flex items-center gap-2 hover:border-[#CBD5E1] transition-colors min-h-[56px] sm:min-h-[58px]"
+        class="rounded-xl border border-[#E2E8F0] bg-white p-2.5 sm:p-3 lg:p-3.5 shadow-2xs flex flex-col justify-between hover:border-[#CBD5E1] transition-colors min-h-[76px] sm:min-h-[84px] lg:min-h-[92px]"
       >
-        <div
-          class="h-6 w-6 rounded-md bg-sky-50 text-sky-600 flex items-center justify-center shrink-0"
-        >
-          <Truck class="w-3.5 h-3.5" />
-        </div>
-        <div class="min-w-0">
-          <p class="text-[11px] sm:text-[11.5px] font-medium text-[#5F7089] truncate">
+        <div class="flex items-center justify-between gap-1.5">
+          <p class="text-[10.5px] sm:text-[11px] lg:text-[11.5px] font-medium text-[#5F7089] truncate">
             Sedang Dikirim
           </p>
-          <p class="text-base sm:text-[17px] font-bold text-[#333333] mt-0.5 leading-none tabular-nums">
+          <div
+            class="h-5.5 w-5.5 sm:h-6 sm:w-6 lg:h-6.5 lg:w-6.5 rounded-lg bg-[#EFF6FF] text-[#0A51B0] flex items-center justify-center shrink-0"
+          >
+            <Truck class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+          </div>
+        </div>
+        <div class="mt-1">
+          <p class="font-num text-[17px] sm:text-[20px] lg:text-[22px] font-bold text-[#333333] leading-none tabular-nums tracking-tight">
             {{ summary.sedang_dikirim }}
           </p>
+          <p class="mt-1 text-[10px] sm:text-[10.5px] lg:text-[11px] text-[#64748B] truncate">Dalam perjalanan</p>
         </div>
       </div>
 
       <div
-        class="rounded-lg border border-[#E2E8F0] bg-white p-2 sm:p-2.5 shadow-2xs flex items-center gap-2 hover:border-[#CBD5E1] transition-colors min-h-[56px] sm:min-h-[58px]"
+        class="rounded-xl border border-[#E2E8F0] bg-white p-2.5 sm:p-3 lg:p-3.5 shadow-2xs flex flex-col justify-between hover:border-[#CBD5E1] transition-colors min-h-[76px] sm:min-h-[84px] lg:min-h-[92px]"
       >
-        <div
-          class="h-6 w-6 rounded-md bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0"
-        >
-          <Truck class="w-3.5 h-3.5" />
+        <div class="flex items-center justify-between gap-1.5">
+          <p class="text-[10.5px] sm:text-[11px] lg:text-[11.5px] font-medium text-[#5F7089] truncate">Diterima</p>
+          <div
+            class="h-5.5 w-5.5 sm:h-6 sm:w-6 lg:h-6.5 lg:w-6.5 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0"
+          >
+            <Truck class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+          </div>
         </div>
-        <div class="min-w-0">
-          <p class="text-[11px] sm:text-[11.5px] font-medium text-[#5F7089] truncate">Diterima</p>
-          <p class="text-base sm:text-[17px] font-bold text-[#333333] mt-0.5 leading-none tabular-nums">
+        <div class="mt-1">
+          <p class="font-num text-[17px] sm:text-[20px] lg:text-[22px] font-bold text-emerald-600 leading-none tabular-nums tracking-tight">
             {{ summary.diterima }}
           </p>
+          <p class="mt-1 text-[10px] sm:text-[10.5px] lg:text-[11px] text-[#64748B] truncate">Terkirim ke tujuan</p>
         </div>
       </div>
     </div>
@@ -1462,11 +1474,6 @@ onMounted(() => {
   .shipment-summary {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 8px;
-  }
-  .shipment-summary > div {
-    padding: 9px 11px;
-    flex-direction: row;
-    align-items: center;
   }
 }
 @media (max-width: 639px) {

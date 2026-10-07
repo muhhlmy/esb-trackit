@@ -590,7 +590,7 @@ onMounted(() => {
     <!-- ── Card Stats Karyawan ── -->
     <div
       v-if="!isLoading && stats"
-      class="employee-stats grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3"
+      class="employee-stats grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-2.5 lg:gap-3"
     >
       <StatCard title="Total Karyawan" :value="stats.totalKaryawan" icon="groups" color="primary" />
       <StatCard
@@ -619,7 +619,7 @@ onMounted(() => {
         title="Departemen"
         :value="stats.totalDepartemen"
         icon="corporate_fare"
-        color="purple"
+        color="neutral"
       />
     </div>
 

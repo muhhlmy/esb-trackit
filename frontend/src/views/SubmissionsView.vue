@@ -1,4 +1,4 @@
-<script setup>
+﻿<script setup>
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useApi } from '../composables/useApi.js'
@@ -1677,7 +1677,7 @@ onMounted(fetchData)
               <button
                 type="button"
                 @click="addAssetBaruRow"
-                class="h-8.5 shrink-0 whitespace-nowrap rounded-xl bg-[#0A51B0] px-3 text-xs font-bold text-white shadow-2xs hover:bg-[#0A4391] active:scale-95 transition-all flex items-center justify-center gap-1 cursor-pointer"
+                class="h-8.5 shrink-0 whitespace-nowrap rounded-xl bg-[#0A51B0] px-3 text-xs font-bold text-white shadow-2xs hover:bg-[#0A4391] transition-all flex items-center justify-center gap-1 cursor-pointer"
               >
                 <span aria-hidden="true" class="material-symbols-outlined text-[15px]">add</span>
                 <span>Tambah Unit</span>
@@ -1707,7 +1707,7 @@ onMounted(fetchData)
                     v-if="asetBaruList.length > 1"
                     type="button"
                     @click="removeAssetBaruRow(index)"
-                    class="flex h-7 items-center gap-1 rounded-lg bg-rose-50 px-2 text-[11px] font-bold text-rose-600 hover:bg-rose-100 active:scale-95 transition-all cursor-pointer border border-rose-200/60"
+                    class="flex h-7 items-center gap-1 rounded-lg bg-rose-50 px-2 text-[11px] font-bold text-rose-600 hover:bg-rose-100 transition-all cursor-pointer border border-rose-200/60"
                     title="Hapus baris unit ini"
                   >
                     <span aria-hidden="true" class="material-symbols-outlined text-[14px]"
@@ -1818,7 +1818,7 @@ onMounted(fetchData)
               <button
                 type="button"
                 @click="addAssetLamaRow"
-                class="h-8.5 shrink-0 whitespace-nowrap rounded-xl bg-slate-800 px-3 text-xs font-bold text-white shadow-2xs hover:bg-slate-900 active:scale-95 transition-all flex items-center justify-center gap-1 cursor-pointer"
+                class="h-8.5 shrink-0 whitespace-nowrap rounded-xl bg-slate-800 px-3 text-xs font-bold text-white shadow-2xs hover:bg-slate-900 transition-all flex items-center justify-center gap-1 cursor-pointer"
               >
                 <span aria-hidden="true" class="material-symbols-outlined text-[15px]">add</span>
                 <span>Tambah Unit</span>
@@ -1848,7 +1848,7 @@ onMounted(fetchData)
                     v-if="asetLamaList.length > 1"
                     type="button"
                     @click="removeAssetLamaRow(index)"
-                    class="flex h-7 items-center gap-1 rounded-lg bg-rose-50 px-2 text-[11px] font-bold text-rose-600 hover:bg-rose-100 active:scale-95 transition-all cursor-pointer border border-rose-200/60"
+                    class="flex h-7 items-center gap-1 rounded-lg bg-rose-50 px-2 text-[11px] font-bold text-rose-600 hover:bg-rose-100 transition-all cursor-pointer border border-rose-200/60"
                     title="Hapus baris unit lama ini"
                   >
                     <span aria-hidden="true" class="material-symbols-outlined text-[14px]"
@@ -2080,7 +2080,7 @@ onMounted(fetchData)
           <button
             type="submit"
             :disabled="isSaving"
-            class="h-11 w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-[#0A51B0] px-6 text-xs font-bold text-white shadow-2xs hover:bg-[#0A4391] active:scale-95 transition-all cursor-pointer disabled:opacity-60"
+            class="h-11 w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-[#0A51B0] px-6 text-xs font-bold text-white shadow-2xs hover:bg-[#0A4391] transition-all cursor-pointer disabled:opacity-60"
           >
             <span aria-hidden="true" class="material-symbols-outlined text-[18px]"
               >picture_as_pdf</span

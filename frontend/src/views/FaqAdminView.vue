@@ -1,4 +1,4 @@
-<script setup>
+﻿<script setup>
 // FaqAdminView.vue — CMS FAQ Help Center (list, add, edit, delete)
 import { computed, onMounted, ref } from 'vue'
 import { RouterLink } from 'vue-router'
@@ -297,7 +297,7 @@ onMounted(() => {
       <button
         v-if="canWrite"
         @click="openAdd"
-        class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-[#0A51B0] hover:bg-[#0A4391] text-white shadow-sm shadow-[#0A51B0]/25 hover:shadow-md transition-all cursor-pointer active:scale-95 touch-manipulation shrink-0"
+        class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-[#0A51B0] hover:bg-[#0A4391] text-white shadow-sm shadow-[#0A51B0]/25 hover:shadow-md transition-all cursor-pointer touch-manipulation shrink-0"
       >
         <Plus class="w-4 h-4" />
         <span>Add New FAQ</span>
@@ -442,7 +442,7 @@ onMounted(() => {
             ]"
             :key="st.key"
             @click="selectedStatus = st.key"
-            class="flex-1 sm:flex-none px-2.5 sm:px-3 py-1.5 rounded-lg font-bold transition-all cursor-pointer text-center active:scale-95 touch-manipulation"
+            class="flex-1 sm:flex-none px-2.5 sm:px-3 py-1.5 rounded-lg font-bold transition-all cursor-pointer text-center touch-manipulation"
             :class="
               selectedStatus === st.key
                 ? 'bg-white dark:bg-slate-900 text-[#333333] dark:text-indigo-400 shadow-2xs'
@@ -469,7 +469,7 @@ onMounted(() => {
         <button
           v-if="searchQuery || selectedCategory !== 'all' || selectedStatus !== 'all'"
           @click="clearFilters"
-          class="px-2.5 py-1.5 rounded-xl text-xs font-bold text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors cursor-pointer active:scale-95 touch-manipulation shrink-0"
+          class="px-2.5 py-1.5 rounded-xl text-xs font-bold text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors cursor-pointer touch-manipulation shrink-0"
           title="Reset Filters"
         >
           Clear Filters
@@ -507,7 +507,7 @@ onMounted(() => {
             </p>
             <button
               @click="clearFilters"
-              class="mt-3 px-4 py-2 rounded-xl text-xs font-bold bg-[#ECF2FF] dark:bg-indigo-950 text-[#333333] hover:bg-[#0A51B0] hover:text-white transition-all cursor-pointer active:scale-95 touch-manipulation"
+              class="mt-3 px-4 py-2 rounded-xl text-xs font-bold bg-[#ECF2FF] dark:bg-indigo-950 text-[#333333] hover:bg-[#0A51B0] hover:text-white transition-all cursor-pointer touch-manipulation"
             >
               Reset All Filters
             </button>
@@ -551,7 +551,7 @@ onMounted(() => {
                 <div v-if="canWrite" class="flex items-center gap-1.5 shrink-0">
                   <button
                     @click="openEdit(f)"
-                    class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-bold bg-[#0A51B0] hover:bg-[#0A4391] text-white transition-all cursor-pointer shadow-xs active:scale-95 touch-manipulation"
+                    class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-bold bg-[#0A51B0] hover:bg-[#0A4391] text-white transition-all cursor-pointer shadow-xs touch-manipulation"
                     title="Edit FAQ"
                   >
                     <Edit3 class="w-3 h-3" />
@@ -559,7 +559,7 @@ onMounted(() => {
                   </button>
                   <button
                     @click="openDelete(f)"
-                    class="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors cursor-pointer active:scale-95 touch-manipulation"
+                    class="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors cursor-pointer touch-manipulation"
                     title="Delete FAQ"
                   >
                     <Trash2 class="w-4 h-4" />
@@ -674,7 +674,7 @@ onMounted(() => {
                     <div class="flex items-center justify-end gap-2">
                       <button
                         @click="openEdit(f)"
-                        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-[#0A51B0] hover:bg-[#0A4391] text-white transition-all cursor-pointer shadow-xs active:scale-95"
+                        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-[#0A51B0] hover:bg-[#0A4391] text-white transition-all cursor-pointer shadow-xs"
                         title="Edit FAQ"
                       >
                         <Edit3 class="w-3.5 h-3.5" />
@@ -806,7 +806,7 @@ onMounted(() => {
           <button
             type="button"
             @click="closeFormModal"
-            class="w-full sm:w-auto rounded-xl border border-[#E5EAEF] dark:border-slate-700 px-4 py-2.5 sm:py-2 text-xs font-bold text-[#475569] dark:text-slate-300 hover:bg-[#F8FAFC] dark:hover:bg-slate-800 transition-colors cursor-pointer active:scale-95 touch-manipulation text-center"
+            class="w-full sm:w-auto rounded-xl border border-[#E5EAEF] dark:border-slate-700 px-4 py-2.5 sm:py-2 text-xs font-bold text-[#475569] dark:text-slate-300 hover:bg-[#F8FAFC] dark:hover:bg-slate-800 transition-colors cursor-pointer touch-manipulation text-center"
           >
             Batal
           </button>
@@ -814,7 +814,7 @@ onMounted(() => {
             type="submit"
             form="faq-entry"
             :disabled="isSubmitting"
-            class="w-full sm:w-auto rounded-xl bg-[#0A51B0] hover:bg-[#0A4391] px-5 py-2.5 sm:py-2 text-xs font-bold text-white shadow-md shadow-[#0A51B0]/20 transition-all disabled:opacity-50 cursor-pointer active:scale-95 touch-manipulation text-center"
+            class="w-full sm:w-auto rounded-xl bg-[#0A51B0] hover:bg-[#0A4391] px-5 py-2.5 sm:py-2 text-xs font-bold text-white shadow-md shadow-[#0A51B0]/20 transition-all disabled:opacity-50 cursor-pointer touch-manipulation text-center"
           >
             {{ isSubmitting ? 'Menyimpan...' : 'Simpan FAQ' }}
           </button>
@@ -839,14 +839,14 @@ onMounted(() => {
         <div class="admin-modal-actions flex flex-col-reverse sm:flex-row justify-end gap-2 pt-2">
           <button
             @click="closeDeleteModal"
-            class="w-full sm:w-auto rounded-xl border border-[#E5EAEF] dark:border-slate-700 px-4 py-2.5 sm:py-2 text-xs font-bold text-[#475569] dark:text-slate-300 hover:bg-[#F8FAFC] dark:hover:bg-slate-800 transition-colors cursor-pointer active:scale-95 touch-manipulation text-center"
+            class="w-full sm:w-auto rounded-xl border border-[#E5EAEF] dark:border-slate-700 px-4 py-2.5 sm:py-2 text-xs font-bold text-[#475569] dark:text-slate-300 hover:bg-[#F8FAFC] dark:hover:bg-slate-800 transition-colors cursor-pointer touch-manipulation text-center"
           >
             Batal
           </button>
           <button
             @click="confirmDelete"
             :disabled="isSubmitting"
-            class="w-full sm:w-auto rounded-xl bg-rose-600 hover:bg-rose-700 px-5 py-2.5 sm:py-2 text-xs font-bold text-white shadow-xs disabled:opacity-50 cursor-pointer active:scale-95 touch-manipulation text-center"
+            class="w-full sm:w-auto rounded-xl bg-rose-600 hover:bg-rose-700 px-5 py-2.5 sm:py-2 text-xs font-bold text-white shadow-xs disabled:opacity-50 cursor-pointer touch-manipulation text-center"
           >
             Hapus
           </button>

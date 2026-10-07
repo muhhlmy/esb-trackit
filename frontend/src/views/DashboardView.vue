@@ -1253,7 +1253,7 @@ onUnmounted(() => {
 .dashboard-stats {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 10px;
+  gap: 12px;
 }
 .dash-stat-card {
   --stat-color: #0a51b0;
@@ -1261,10 +1261,10 @@ onUnmounted(() => {
   flex-direction: column;
   justify-content: space-between;
   min-width: 0;
-  min-height: 56px;
-  padding: 10px;
+  min-height: 92px;
+  padding: 14px;
   border: 1px solid #e2e8f0;
-  border-radius: 8px;
+  border-radius: 12px;
   background: white;
   transition: border-color 0.15s ease;
 }
@@ -1276,8 +1276,8 @@ onUnmounted(() => {
   align-items: center;
   justify-content: space-between;
   gap: 6px;
-  min-height: 22px;
-  font-size: 11px;
+  min-height: 24px;
+  font-size: 11.5px;
   font-weight: 500;
   line-height: 1.3;
   color: #5f7089;
@@ -1292,17 +1292,17 @@ onUnmounted(() => {
   display: grid;
   place-items: center;
   flex-shrink: 0;
-  width: 22px;
-  height: 22px;
-  border-radius: 6px;
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
   background: #eff6ff;
   color: var(--stat-color);
-  font-size: 13px;
+  font-size: 16px;
 }
 .stat-number {
   margin: 3px 0 1px;
   overflow-wrap: anywhere;
-  font-size: 16px;
+  font-size: 22px;
   font-weight: 700;
   line-height: 1.1;
   letter-spacing: -0.02em;
@@ -1523,7 +1523,14 @@ onUnmounted(() => {
 @media (min-width: 640px) and (max-width: 1023px) {
   .dashboard-stats {
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 8px;
+    gap: 10px;
+  }
+  .dash-stat-card {
+    min-height: 84px;
+    padding: 12px;
+  }
+  .stat-number {
+    font-size: 20px;
   }
   .dashboard-recent-cards {
     display: grid;
@@ -1540,29 +1547,29 @@ onUnmounted(() => {
     gap: 8px;
   }
   .dash-stat-card {
-    padding: 8px;
-    min-height: 56px;
-    border-radius: 8px;
+    padding: 10px;
+    min-height: 76px;
+    border-radius: 12px;
   }
   .stat-label {
-    font-size: 11px;
+    font-size: 10.5px;
     gap: 4px;
     min-height: 22px;
   }
   .stat-label > .material-symbols-outlined {
     width: 22px;
     height: 22px;
-    font-size: 13px;
+    font-size: 14px;
   }
   .stat-number {
-    font-size: 16px;
+    font-size: 17px;
     margin: 2px 0 1px;
   }
   .stat-caption {
-    font-size: 10.5px;
+    font-size: 10px;
   }
   .stat-bottom {
-    font-size: 10.5px;
+    font-size: 10px;
     gap: 6px;
   }
   .dashboard-panel {

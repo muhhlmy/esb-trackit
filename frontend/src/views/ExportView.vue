@@ -1,4 +1,4 @@
-<script setup>
+﻿<script setup>
 import { ref, computed, onMounted, watch } from 'vue'
 import { useApi } from '@/composables/useApi'
 import { useAuth } from '@/composables/useAuth'
@@ -388,7 +388,7 @@ onMounted(() => {
         <button
           type="button"
           @click="openResetModal"
-          class="inline-flex items-center justify-center gap-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs px-4 py-2.5 transition-all shadow-xs shrink-0 cursor-pointer active:scale-95"
+          class="inline-flex items-center justify-center gap-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs px-4 py-2.5 transition-all shadow-xs shrink-0 cursor-pointer"
         >
           <span aria-hidden="true" class="material-symbols-outlined text-[18px]">restart_alt</span>
           <span>Reset Database</span>

@@ -1,4 +1,4 @@
-<script setup>
+﻿<script setup>
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useApi } from '../composables/useApi.js'
@@ -1453,7 +1453,7 @@ function toast(message, type = 'success') {
         <button
           type="button"
           @click="openAdd"
-          class="h-9 shrink-0 whitespace-nowrap rounded-xl bg-[#0A51B0] px-3.5 sm:px-4 text-xs font-bold text-white shadow-2xs hover:bg-[#0A4391] active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+          class="h-9 shrink-0 whitespace-nowrap rounded-xl bg-[#0A51B0] px-3.5 sm:px-4 text-xs font-bold text-white shadow-2xs hover:bg-[#0A4391] transition-all flex items-center justify-center gap-1.5 cursor-pointer"
           :title="isAdmin || isSuperAdmin ? 'Buat tiket baru' : 'Request ticket baru'"
         >
           <span aria-hidden="true" class="material-symbols-outlined text-[16px]">add</span>
@@ -1462,87 +1462,92 @@ function toast(message, type = 'success') {
       </PageHeader>
 
       <!-- Quick KPI Stat Cards (4 Cards) -->
-      <div class="tickets-kpis grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-2.5">
+      <div class="tickets-kpis grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-2.5 lg:gap-3">
         <!-- 1. Total Tiket -->
         <div
-          class="flex items-center gap-2 p-2 sm:p-2.5 rounded-lg bg-white border border-[#E2E8F0] shadow-2xs hover:border-[#CBD5E1] transition-colors min-h-[56px] sm:min-h-[58px]"
+          class="flex flex-col justify-between p-2.5 sm:p-3 lg:p-3.5 rounded-xl bg-white border border-[#E2E8F0] shadow-2xs hover:border-[#CBD5E1] transition-colors min-h-[76px] sm:min-h-[84px] lg:min-h-[92px]"
         >
-          <div
-            class="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-slate-100 text-slate-700"
-          >
-            <span aria-hidden="true" class="material-symbols-outlined text-[14px]">inbox</span>
+          <div class="flex items-center justify-between gap-1.5">
+            <span class="text-[10.5px] sm:text-[11px] lg:text-[11.5px] font-medium text-[#5F7089] truncate">Total Tiket</span>
+            <div
+              class="flex h-5.5 w-5.5 sm:h-6 sm:w-6 lg:h-6.5 lg:w-6.5 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-700"
+            >
+              <span aria-hidden="true" class="material-symbols-outlined text-[14px] sm:text-[15px] lg:text-[16px]">inbox</span>
+            </div>
           </div>
-          <div class="min-w-0">
-            <span class="text-[11px] sm:text-[11.5px] font-medium text-[#5F7089] block truncate">Total Tiket</span>
-            <span class="text-base sm:text-[17px] font-bold text-[#333333] tabular-nums leading-none mt-0.5 block">{{
+          <div class="mt-1">
+            <span class="font-num block text-[17px] sm:text-[20px] lg:text-[22px] font-bold text-[#333333] tabular-nums leading-none tracking-tight">{{
               stats.totalTickets ?? 0
             }}</span>
+            <span class="mt-1 block truncate text-[10px] sm:text-[10.5px] lg:text-[11px] font-normal text-[#64748B]">Total pengajuan tiket</span>
           </div>
         </div>
 
         <!-- 2. Belum Ditugaskan / Unassigned -->
         <div
-          class="flex items-center gap-2 p-2 sm:p-2.5 rounded-lg bg-white border border-[#E2E8F0] shadow-2xs hover:border-[#CBD5E1] transition-colors min-h-[56px] sm:min-h-[58px]"
+          class="flex flex-col justify-between p-2.5 sm:p-3 lg:p-3.5 rounded-xl bg-white border border-[#E2E8F0] shadow-2xs hover:border-[#CBD5E1] transition-colors min-h-[76px] sm:min-h-[84px] lg:min-h-[92px]"
         >
-          <div
-            class="flex h-6 w-6 shrink-0 items-center justify-center rounded-md"
-            :class="
-              (stats.unassignedTickets || 0) > 0
-                ? 'bg-amber-50 text-[#B45309] border border-amber-200/80'
-                : 'bg-slate-100 text-slate-500'
-            "
-          >
-            <span aria-hidden="true" class="material-symbols-outlined text-[14px]"
-              >assignment_late</span
-            >
-          </div>
-          <div class="min-w-0">
-            <span class="text-[11px] sm:text-[11.5px] font-medium text-[#5F7089] block truncate">{{
+          <div class="flex items-center justify-between gap-1.5">
+            <span class="text-[10.5px] sm:text-[11px] lg:text-[11.5px] font-medium text-[#5F7089] truncate">{{
               isAdmin || isSuperAdmin ? 'Belum Diambil' : 'Menunggu Respon'
             }}</span>
-            <span
-              class="text-base sm:text-[17px] font-bold tabular-nums leading-none mt-0.5 block"
-              :class="(stats.unassignedTickets || 0) > 0 ? 'text-[#B45309]' : 'text-[#333333]'"
-              >{{ stats.unassignedTickets ?? 0 }}</span
+            <div
+              class="flex h-5.5 w-5.5 sm:h-6 sm:w-6 lg:h-6.5 lg:w-6.5 shrink-0 items-center justify-center rounded-lg"
+              :class="
+                (stats.unassignedTickets || 0) > 0
+                  ? 'bg-amber-50 text-[#B45309]'
+                  : 'bg-slate-100 text-slate-500'
+              "
             >
+              <span aria-hidden="true" class="material-symbols-outlined text-[14px] sm:text-[15px] lg:text-[16px]">assignment_late</span>
+            </div>
+          </div>
+          <div class="mt-1">
+            <span
+              class="font-num block text-[17px] sm:text-[20px] lg:text-[22px] font-bold tabular-nums leading-none tracking-tight"
+              :class="(stats.unassignedTickets || 0) > 0 ? 'text-[#B45309]' : 'text-[#333333]'"
+            >{{ stats.unassignedTickets ?? 0 }}</span>
+            <span class="mt-1 block truncate text-[10px] sm:text-[10.5px] lg:text-[11px] font-normal text-[#64748B]">Menunggu alokasi teknisi</span>
           </div>
         </div>
 
         <!-- 3. Sedang Diproses -->
         <div
-          class="flex items-center gap-2 p-2 sm:p-2.5 rounded-lg bg-white border border-[#E2E8F0] shadow-2xs hover:border-[#CBD5E1] transition-colors min-h-[56px] sm:min-h-[58px]"
+          class="flex flex-col justify-between p-2.5 sm:p-3 lg:p-3.5 rounded-xl bg-white border border-[#E2E8F0] shadow-2xs hover:border-[#CBD5E1] transition-colors min-h-[76px] sm:min-h-[84px] lg:min-h-[92px]"
         >
-          <div
-            class="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-[#EDF5FF] text-[#0A51B0] border border-[#B8D4F5]/40"
-          >
-            <span aria-hidden="true" class="material-symbols-outlined text-[14px]"
-              >pending_actions</span
+          <div class="flex items-center justify-between gap-1.5">
+            <span class="text-[10.5px] sm:text-[11px] lg:text-[11.5px] font-medium text-[#5F7089] truncate">Sedang Diproses</span>
+            <div
+              class="flex h-5.5 w-5.5 sm:h-6 sm:w-6 lg:h-6.5 lg:w-6.5 shrink-0 items-center justify-center rounded-lg bg-[#EFF6FF] text-[#0A51B0]"
             >
+              <span aria-hidden="true" class="material-symbols-outlined text-[14px] sm:text-[15px] lg:text-[16px]">pending_actions</span>
+            </div>
           </div>
-          <div class="min-w-0">
-            <span class="text-[11px] sm:text-[11.5px] font-medium text-[#5F7089] block truncate"
-              >Sedang Diproses</span
-            >
-            <span class="text-base sm:text-[17px] font-bold text-[#333333] tabular-nums leading-none mt-0.5 block">{{
+          <div class="mt-1">
+            <span class="font-num block text-[17px] sm:text-[20px] lg:text-[22px] font-bold text-[#333333] tabular-nums leading-none tracking-tight">{{
               (stats.openTickets || 0) + (stats.pendingTickets || 0)
             }}</span>
+            <span class="mt-1 block truncate text-[10px] sm:text-[10.5px] lg:text-[11px] font-normal text-[#64748B]">Dalam penanganan aktif</span>
           </div>
         </div>
 
         <!-- 4. Selesai / Resolved -->
         <div
-          class="flex items-center gap-2 p-2 sm:p-2.5 rounded-lg bg-white border border-[#E2E8F0] shadow-2xs hover:border-[#CBD5E1] transition-colors min-h-[56px] sm:min-h-[58px]"
+          class="flex flex-col justify-between p-2.5 sm:p-3 lg:p-3.5 rounded-xl bg-white border border-[#E2E8F0] shadow-2xs hover:border-[#CBD5E1] transition-colors min-h-[76px] sm:min-h-[84px] lg:min-h-[92px]"
         >
-          <div
-            class="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-emerald-50 text-emerald-600 border border-emerald-200/60"
-          >
-            <span aria-hidden="true" class="material-symbols-outlined text-[14px]">task_alt</span>
+          <div class="flex items-center justify-between gap-1.5">
+            <span class="text-[10.5px] sm:text-[11px] lg:text-[11.5px] font-medium text-[#5F7089] truncate">Tiket Selesai</span>
+            <div
+              class="flex h-5.5 w-5.5 sm:h-6 sm:w-6 lg:h-6.5 lg:w-6.5 shrink-0 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600"
+            >
+              <span aria-hidden="true" class="material-symbols-outlined text-[14px] sm:text-[15px] lg:text-[16px]">task_alt</span>
+            </div>
           </div>
-          <div class="min-w-0">
-            <span class="text-[11px] sm:text-[11.5px] font-medium text-[#5F7089] block truncate">Tiket Selesai</span>
-            <span class="text-base sm:text-[17px] font-bold text-emerald-600 tabular-nums leading-none mt-0.5 block">{{
+          <div class="mt-1">
+            <span class="font-num block text-[17px] sm:text-[20px] lg:text-[22px] font-bold text-emerald-600 tabular-nums leading-none tracking-tight">{{
               stats.closedTickets ?? 0
             }}</span>
+            <span class="mt-1 block truncate text-[10px] sm:text-[10.5px] lg:text-[11px] font-normal text-[#64748B]">Penanganan selesai</span>
           </div>
         </div>
       </div>
@@ -1574,7 +1579,7 @@ function toast(message, type = 'success') {
               :key="tab.key"
               type="button"
               @click="switchTab(tab.key)"
-              class="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[11px] font-bold transition-all whitespace-nowrap cursor-pointer shrink-0 active:scale-95"
+              class="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[11px] font-bold transition-all whitespace-nowrap cursor-pointer shrink-0"
               :class="
                 activeTab === tab.key
                   ? 'bg-[#0A51B0] text-white shadow-2xs'
@@ -2392,7 +2397,7 @@ function toast(message, type = 'success') {
                 type="button"
                 @click="setSupportUnit('IT')"
                 :aria-pressed="selectedSupportUnit === 'IT'"
-                class="flex h-[72px] sm:h-[60px] flex-col sm:flex-row items-center justify-center sm:justify-start gap-1.5 sm:gap-3 rounded-xl border p-2 sm:p-3 text-center sm:text-left transition-all cursor-pointer select-none active:scale-95"
+                class="flex h-[72px] sm:h-[60px] flex-col sm:flex-row items-center justify-center sm:justify-start gap-1.5 sm:gap-3 rounded-xl border p-2 sm:p-3 text-center sm:text-left transition-all cursor-pointer select-none"
                 :class="
                   selectedSupportUnit === 'IT'
                     ? 'border-[#0A51B0] bg-[#ECF2FF] text-[#333333] ring-2 ring-[#0A51B0]/20 shadow-xs'
@@ -2427,7 +2432,7 @@ function toast(message, type = 'success') {
                 type="button"
                 @click="setSupportUnit('HR')"
                 :aria-pressed="selectedSupportUnit === 'HR'"
-                class="flex h-[72px] sm:h-[60px] flex-col sm:flex-row items-center justify-center sm:justify-start gap-1.5 sm:gap-3 rounded-xl border p-2 sm:p-3 text-center sm:text-left transition-all cursor-pointer select-none active:scale-95"
+                class="flex h-[72px] sm:h-[60px] flex-col sm:flex-row items-center justify-center sm:justify-start gap-1.5 sm:gap-3 rounded-xl border p-2 sm:p-3 text-center sm:text-left transition-all cursor-pointer select-none"
                 :class="
                   selectedSupportUnit === 'HR'
                     ? 'border-[#0A51B0] bg-[#ECF2FF] text-[#333333] ring-2 ring-[#0A51B0]/20 shadow-xs'
@@ -2462,7 +2467,7 @@ function toast(message, type = 'success') {
                 type="button"
                 @click="setSupportUnit('GA')"
                 :aria-pressed="selectedSupportUnit === 'GA'"
-                class="flex h-[72px] sm:h-[60px] flex-col sm:flex-row items-center justify-center sm:justify-start gap-1.5 sm:gap-3 rounded-xl border p-2 sm:p-3 text-center sm:text-left transition-all cursor-pointer select-none active:scale-95"
+                class="flex h-[72px] sm:h-[60px] flex-col sm:flex-row items-center justify-center sm:justify-start gap-1.5 sm:gap-3 rounded-xl border p-2 sm:p-3 text-center sm:text-left transition-all cursor-pointer select-none"
                 :class="
                   selectedSupportUnit === 'GA'
                     ? 'border-[#0A51B0] bg-[#ECF2FF] text-[#333333] ring-2 ring-[#0A51B0]/20 shadow-xs'
@@ -2507,7 +2512,7 @@ function toast(message, type = 'success') {
                 type="button"
                 @click="form.kategori = cat.value"
                 :aria-pressed="form.kategori === cat.value"
-                class="flex h-[56px] sm:h-[68px] flex-col items-center sm:items-start justify-center sm:justify-between rounded-xl border p-2 sm:p-2.5 text-center sm:text-left transition-all cursor-pointer select-none active:scale-95"
+                class="flex h-[56px] sm:h-[68px] flex-col items-center sm:items-start justify-center sm:justify-between rounded-xl border p-2 sm:p-2.5 text-center sm:text-left transition-all cursor-pointer select-none"
                 :class="
                   form.kategori === cat.value
                     ? 'border-[#0A51B0] bg-[#ECF2FF] text-[#333333] ring-2 ring-[#0A51B0]/20 shadow-xs'
@@ -3230,7 +3235,7 @@ function toast(message, type = 'success') {
                 <button
                   type="submit"
                   :disabled="isSubmittingComment || (!newCommentText.trim() && !commentAttachment)"
-                  class="flex h-10 px-3.5 sm:px-4 items-center justify-center gap-1.5 rounded-xl bg-[#0A51B0] text-xs font-bold text-white shadow-2xs hover:bg-[#0A4391] disabled:opacity-40 transition-all cursor-pointer shrink-0 active:scale-95"
+                  class="flex h-10 px-3.5 sm:px-4 items-center justify-center gap-1.5 rounded-xl bg-[#0A51B0] text-xs font-bold text-white shadow-2xs hover:bg-[#0A4391] disabled:opacity-40 transition-all cursor-pointer shrink-0"
                 >
                   <span aria-hidden="true" class="material-symbols-outlined text-[16px]">send</span>
                   <span class="hidden sm:inline">Kirim</span>
@@ -3263,7 +3268,7 @@ function toast(message, type = 'success') {
                 aria-label="Ubah status tiket"
                 aria-haspopup="true"
                 :aria-expanded="showStatusDropdown"
-                class="inline-flex h-9 w-full sm:w-auto items-center justify-between sm:justify-center gap-2 rounded-xl border bg-white px-3.5 text-xs font-bold text-[#2A3547] shadow-2xs hover:bg-[#F8FAFC] hover:border-[#0A51B0] transition-all cursor-pointer disabled:opacity-50 active:scale-95"
+                class="inline-flex h-9 w-full sm:w-auto items-center justify-between sm:justify-center gap-2 rounded-xl border bg-white px-3.5 text-xs font-bold text-[#2A3547] shadow-2xs hover:bg-[#F8FAFC] hover:border-[#0A51B0] transition-all cursor-pointer disabled:opacity-50"
                 :class="
                   showStatusDropdown
                     ? 'border-[#0A51B0] ring-2 ring-[#0A51B0]/15'
@@ -3333,7 +3338,7 @@ function toast(message, type = 'success') {
               type="button"
               @click="claimTicket(selectedTicket)"
               :disabled="isClaiming === selectedTicket.id"
-              class="h-9 w-full sm:w-auto inline-flex items-center justify-center gap-1.5 rounded-xl bg-[#0A51B0] px-3.5 text-xs font-bold text-white shadow-2xs hover:bg-[#0A4391] disabled:opacity-50 transition-all cursor-pointer whitespace-nowrap active:scale-95"
+              class="h-9 w-full sm:w-auto inline-flex items-center justify-center gap-1.5 rounded-xl bg-[#0A51B0] px-3.5 text-xs font-bold text-white shadow-2xs hover:bg-[#0A4391] disabled:opacity-50 transition-all cursor-pointer whitespace-nowrap"
             >
               <span aria-hidden="true" class="material-symbols-outlined text-[16px]"
                 >person_add</span
@@ -3355,7 +3360,7 @@ function toast(message, type = 'success') {
                 aria-label="Assign tiket ke admin unit"
                 aria-haspopup="true"
                 :aria-expanded="showReassignDropdown"
-                class="inline-flex h-9 w-full sm:w-auto items-center justify-between sm:justify-center gap-1.5 rounded-xl border border-[#E5EAEF] bg-white px-3.5 text-xs font-bold text-[#2A3547] shadow-2xs hover:bg-[#F8FAFC] hover:border-[#0A51B0] transition-all cursor-pointer disabled:opacity-50 whitespace-nowrap active:scale-95"
+                class="inline-flex h-9 w-full sm:w-auto items-center justify-between sm:justify-center gap-1.5 rounded-xl border border-[#E5EAEF] bg-white px-3.5 text-xs font-bold text-[#2A3547] shadow-2xs hover:bg-[#F8FAFC] hover:border-[#0A51B0] transition-all cursor-pointer disabled:opacity-50 whitespace-nowrap"
               >
                 <div class="flex items-center gap-1.5">
                   <span
@@ -3420,7 +3425,7 @@ function toast(message, type = 'success') {
           <button
             type="button"
             @click="closeModal"
-            class="h-10 w-full sm:w-auto rounded-xl bg-[#0A51B0] px-5 text-xs font-semibold text-white hover:bg-[#0A4391] transition-colors cursor-pointer active:scale-95"
+            class="h-10 w-full sm:w-auto rounded-xl bg-[#0A51B0] px-5 text-xs font-semibold text-white hover:bg-[#0A4391] transition-colors cursor-pointer"
           >
             Tutup
           </button>

@@ -16,11 +16,11 @@ const { isAuthenticated, isAdmin } = useAuth()
     <RouterLink
       to="/"
       aria-label="Halaman Beranda"
-      class="flex flex-col items-center justify-center gap-0.5 px-3 py-1 rounded-xl text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors min-w-[56px] min-h-[44px] touch-manipulation active:scale-95"
+      class="flex flex-col items-center justify-center gap-0.5 px-3 py-1 rounded-xl text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors min-w-[56px] min-h-[44px] touch-manipulation"
       active-class="bg-[#EAF1FC] text-[#234B83] dark:text-indigo-400 font-semibold"
     >
       <Home class="w-4 h-4" />
-      <span class="text-[10px]">Home</span>
+      <span class="text-[10.5px] sm:text-[11px] font-medium leading-tight">Home</span>
     </RouterLink>
 
     <!-- Authenticated Nav Links -->
@@ -28,21 +28,21 @@ const { isAuthenticated, isAdmin } = useAuth()
       <RouterLink
         to="/tickets"
         aria-label="Daftar Tiket"
-        class="flex flex-col items-center justify-center gap-0.5 px-3 py-1 rounded-xl text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors min-w-[56px] min-h-[44px] touch-manipulation active:scale-95"
+        class="flex flex-col items-center justify-center gap-0.5 px-3 py-1 rounded-xl text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors min-w-[56px] min-h-[44px] touch-manipulation"
         active-class="text-[#333333] dark:text-indigo-400 font-bold"
       >
         <Ticket class="w-4 h-4" />
-        <span class="text-[10px]">Tickets</span>
+        <span class="text-[10.5px] sm:text-[11px] font-medium leading-tight">Tickets</span>
       </RouterLink>
 
       <RouterLink
         :to="isAdmin ? '/dashboard' : '/my-assets'"
         aria-label="Dashboard"
-        class="flex flex-col items-center justify-center gap-0.5 px-3 py-1 rounded-xl text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors min-w-[56px] min-h-[44px] touch-manipulation active:scale-95"
+        class="flex flex-col items-center justify-center gap-0.5 px-3 py-1 rounded-xl text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors min-w-[56px] min-h-[44px] touch-manipulation"
         active-class="text-[#333333] dark:text-indigo-400 font-bold"
       >
         <LayoutDashboard class="w-4 h-4" />
-        <span class="text-[10px]">Dashboard</span>
+        <span class="text-[10.5px] sm:text-[11px] font-medium leading-tight">Dashboard</span>
       </RouterLink>
     </template>
 
@@ -52,10 +52,10 @@ const { isAuthenticated, isAdmin } = useAuth()
       type="button"
       aria-label="Masuk ke Akun"
       @click="router.push('/login')"
-      class="flex flex-col items-center justify-center gap-0.5 px-3 py-1 rounded-xl text-[#333333] font-bold hover:text-[#0A4391] transition-colors cursor-pointer min-w-[56px] min-h-[44px] touch-manipulation active:scale-95"
+      class="flex flex-col items-center justify-center gap-0.5 px-3 py-1 rounded-xl text-[#333333] font-bold hover:text-[#0A4391] transition-colors cursor-pointer min-w-[56px] min-h-[44px] touch-manipulation"
     >
       <LogIn class="w-4 h-4" />
-      <span class="text-[10px]">Sign In</span>
+      <span class="text-[10.5px] sm:text-[11px] font-medium leading-tight">Sign In</span>
     </button>
   </nav>
 </template>

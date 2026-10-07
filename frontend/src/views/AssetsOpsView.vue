@@ -428,7 +428,7 @@ function formatDate(dateStr) {
               v-if="canWriteAssets"
               type="button"
               @click="openAdd"
-              class="inventory-primary-action inline-flex h-9 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg bg-[#0A51B0] px-3 sm:px-3.5 text-xs font-semibold text-white shadow-2xs transition-all hover:bg-[#0A4391] active:scale-95"
+              class="inventory-primary-action inline-flex h-9 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg bg-[#0A51B0] px-3 sm:px-3.5 text-xs font-semibold text-white shadow-2xs transition-all hover:bg-[#0A4391]"
               title="Tambah Aset OPS baru"
             >
               <span aria-hidden="true" class="material-symbols-outlined text-[16px]">add</span>
@@ -513,7 +513,7 @@ function formatDate(dateStr) {
     <section
       aria-label="Ringkasan aset"
       :aria-busy="isLoading"
-      class="grid grid-cols-1 min-[360px]:grid-cols-2 xl:grid-cols-4 gap-3"
+      class="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-2.5 lg:gap-3"
     >
       <StatCard
         v-for="stat in assetStats"

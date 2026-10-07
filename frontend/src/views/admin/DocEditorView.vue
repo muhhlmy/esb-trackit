@@ -1,4 +1,4 @@
-<script setup>
+﻿<script setup>
 import { ref, computed, onMounted, onBeforeUnmount, watch, nextTick } from 'vue'
 import { useRoute, useRouter, RouterLink } from 'vue-router'
 import { useCases } from '@/composables/useCases'
@@ -763,7 +763,7 @@ function goToAdminCases() {
         <!-- Back to Admin CMS -->
         <RouterLink
           to="/admin/cases"
-          class="p-1.5 rounded-lg text-[#5F7089] hover:text-[#333333] dark:hover:text-white hover:bg-[#F1F5F9] dark:hover:bg-slate-800 transition-colors flex items-center gap-1 text-xs font-semibold shrink-0 active:scale-95 touch-manipulation"
+          class="p-1.5 rounded-lg text-[#5F7089] hover:text-[#333333] dark:hover:text-white hover:bg-[#F1F5F9] dark:hover:bg-slate-800 transition-colors flex items-center gap-1 text-xs font-semibold shrink-0 touch-manipulation"
           title="Kembali ke Admin CMS"
         >
           <ArrowLeft class="w-4 h-4" />
@@ -810,7 +810,7 @@ function goToAdminCases() {
         <!-- Preview as Employee (Available on mobile as icon button, with text on sm+) -->
         <button
           @click="isPreviewModalOpen = true"
-          class="flex items-center gap-1.5 text-xs font-semibold px-2 sm:px-3 py-1.5 rounded-lg border border-[#E2E8F0] dark:border-slate-700 bg-white dark:bg-slate-900 text-[#333333] dark:text-slate-200 hover:bg-[#F8FAFC] dark:hover:bg-slate-800 transition-colors cursor-pointer active:scale-95 touch-manipulation"
+          class="flex items-center gap-1.5 text-xs font-semibold px-2 sm:px-3 py-1.5 rounded-lg border border-[#E2E8F0] dark:border-slate-700 bg-white dark:bg-slate-900 text-[#333333] dark:text-slate-200 hover:bg-[#F8FAFC] dark:hover:bg-slate-800 transition-colors cursor-pointer touch-manipulation"
           title="Preview Tampilan Employee"
         >
           <Eye class="w-3.5 h-3.5 text-[#5F7089] dark:text-slate-400" />
@@ -822,7 +822,7 @@ function goToAdminCases() {
           v-if="canWrite"
           @click="handleSaveDraft"
           :disabled="isSaving"
-          class="px-2.5 sm:px-3.5 py-1.5 rounded-lg text-xs font-semibold border border-[#E2E8F0] dark:border-slate-700 text-[#333333] dark:text-slate-200 bg-white dark:bg-slate-900 hover:bg-[#F8FAFC] dark:hover:bg-slate-800 transition-colors cursor-pointer disabled:opacity-50 active:scale-95 touch-manipulation"
+          class="px-2.5 sm:px-3.5 py-1.5 rounded-lg text-xs font-semibold border border-[#E2E8F0] dark:border-slate-700 text-[#333333] dark:text-slate-200 bg-white dark:bg-slate-900 hover:bg-[#F8FAFC] dark:hover:bg-slate-800 transition-colors cursor-pointer disabled:opacity-50 touch-manipulation"
         >
           Draft
         </button>
@@ -832,7 +832,7 @@ function goToAdminCases() {
           v-if="canWrite"
           @click="handlePublish"
           :disabled="isSaving"
-          class="px-3 sm:px-4 py-1.5 rounded-lg text-xs font-bold bg-[#0A51B0] hover:bg-[#0A4391] text-white shadow-xs transition-all cursor-pointer flex items-center gap-1 disabled:opacity-50 active:scale-95 touch-manipulation"
+          class="px-3 sm:px-4 py-1.5 rounded-lg text-xs font-bold bg-[#0A51B0] hover:bg-[#0A4391] text-white shadow-xs transition-all cursor-pointer flex items-center gap-1 disabled:opacity-50 touch-manipulation"
         >
           <CheckCircle2 class="w-3.5 h-3.5" />
           <span>{{ isSaving ? '...' : 'Publish' }}</span>
@@ -842,7 +842,7 @@ function goToAdminCases() {
         <button
           type="button"
           @click="toggleInspector"
-          class="p-1.5 sm:p-2 rounded-lg text-[#5F7089] dark:text-slate-400 hover:bg-[#F8FAFC] dark:hover:bg-slate-800 transition-colors cursor-pointer active:scale-95 touch-manipulation"
+          class="p-1.5 sm:p-2 rounded-lg text-[#5F7089] dark:text-slate-400 hover:bg-[#F8FAFC] dark:hover:bg-slate-800 transition-colors cursor-pointer touch-manipulation"
           :class="{ 'text-[#333333] bg-blue-50 dark:bg-blue-950/40': isInspectorActive }"
           title="Pengaturan Artikel (Metadata Inspector)"
         >
@@ -876,7 +876,7 @@ function goToAdminCases() {
           @mousedown.prevent
           @click="handleUndo"
           :disabled="!canUndo"
-          class="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center text-[#5F7089] dark:text-slate-400 hover:bg-[#F1F5F9] dark:hover:bg-slate-800 rounded-lg disabled:opacity-30 cursor-pointer active:scale-95 touch-manipulation"
+          class="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center text-[#5F7089] dark:text-slate-400 hover:bg-[#F1F5F9] dark:hover:bg-slate-800 rounded-lg disabled:opacity-30 cursor-pointer touch-manipulation"
           title="Undo (Ctrl+Z)"
         >
           <Undo class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
@@ -885,7 +885,7 @@ function goToAdminCases() {
           @mousedown.prevent
           @click="handleRedo"
           :disabled="!canRedo"
-          class="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center text-[#5F7089] dark:text-slate-400 hover:bg-[#F1F5F9] dark:hover:bg-slate-800 rounded-lg disabled:opacity-30 cursor-pointer active:scale-95 touch-manipulation"
+          class="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center text-[#5F7089] dark:text-slate-400 hover:bg-[#F1F5F9] dark:hover:bg-slate-800 rounded-lg disabled:opacity-30 cursor-pointer touch-manipulation"
           title="Redo (Ctrl+Y)"
         >
           <Redo class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
@@ -914,7 +914,7 @@ function goToAdminCases() {
       >
         <button
           @click="editor.chain().focus().toggleBold().run()"
-          class="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-lg transition-colors cursor-pointer active:scale-95 touch-manipulation"
+          class="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-lg transition-colors cursor-pointer touch-manipulation"
           :class="
             editor.isActive('bold')
               ? 'bg-[#0A51B0] text-white shadow-2xs'
@@ -927,7 +927,7 @@ function goToAdminCases() {
 
         <button
           @click="editor.chain().focus().toggleItalic().run()"
-          class="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-lg transition-colors italic cursor-pointer active:scale-95 touch-manipulation"
+          class="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-lg transition-colors italic cursor-pointer touch-manipulation"
           :class="
             editor.isActive('italic')
               ? 'bg-[#0A51B0] text-white shadow-2xs'
@@ -940,7 +940,7 @@ function goToAdminCases() {
 
         <button
           @click="editor.chain().focus().toggleUnderline().run()"
-          class="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-lg transition-colors underline cursor-pointer active:scale-95 touch-manipulation"
+          class="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-lg transition-colors underline cursor-pointer touch-manipulation"
           :class="
             editor.isActive('underline')
               ? 'bg-[#0A51B0] text-white shadow-2xs'
@@ -958,7 +958,7 @@ function goToAdminCases() {
       >
         <button
           @click="editor.chain().focus().toggleBulletList().run()"
-          class="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-lg transition-colors cursor-pointer active:scale-95 touch-manipulation"
+          class="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-lg transition-colors cursor-pointer touch-manipulation"
           :class="
             editor.isActive('bulletList')
               ? 'bg-blue-50 dark:bg-blue-950/40 text-[#333333] dark:text-blue-400'
@@ -971,7 +971,7 @@ function goToAdminCases() {
 
         <button
           @click="editor.chain().focus().toggleOrderedList().run()"
-          class="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-lg transition-colors cursor-pointer active:scale-95 touch-manipulation"
+          class="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-lg transition-colors cursor-pointer touch-manipulation"
           :class="
             editor.isActive('orderedList')
               ? 'bg-blue-50 dark:bg-blue-950/40 text-[#333333] dark:text-blue-400'
@@ -984,7 +984,7 @@ function goToAdminCases() {
 
         <button
           @click="editor.chain().focus().toggleBlockquote().run()"
-          class="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-lg transition-colors cursor-pointer active:scale-95 touch-manipulation"
+          class="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-lg transition-colors cursor-pointer touch-manipulation"
           :class="
             editor.isActive('blockquote')
               ? 'bg-blue-50 dark:bg-blue-950/40 text-[#333333] dark:text-blue-400'
@@ -997,7 +997,7 @@ function goToAdminCases() {
 
         <button
           @click="editor.chain().focus().toggleCodeBlock().run()"
-          class="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-lg transition-colors cursor-pointer active:scale-95 touch-manipulation"
+          class="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-lg transition-colors cursor-pointer touch-manipulation"
           :class="
             editor.isActive('codeBlock')
               ? 'bg-[#0A51B0] text-white shadow-2xs'
@@ -1010,7 +1010,7 @@ function goToAdminCases() {
 
         <button
           @click="setLink"
-          class="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-lg transition-colors cursor-pointer active:scale-95 touch-manipulation"
+          class="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-lg transition-colors cursor-pointer touch-manipulation"
           :class="
             editor.isActive('link')
               ? 'bg-[#0A51B0] text-white shadow-2xs'
@@ -1026,7 +1026,7 @@ function goToAdminCases() {
       <div class="flex items-center gap-1 sm:gap-1.5 shrink-0">
         <button
           @click="openImageModal"
-          class="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-1 rounded-lg bg-[#ECF2FF] dark:bg-indigo-950/60 text-[#333333] dark:text-indigo-300 font-bold cursor-pointer hover:bg-[#0A51B0] hover:text-white transition-colors text-[11px] sm:text-[11px] shadow-2xs active:scale-95 touch-manipulation shrink-0"
+          class="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-1 rounded-lg bg-[#ECF2FF] dark:bg-indigo-950/60 text-[#333333] dark:text-indigo-300 font-bold cursor-pointer hover:bg-[#0A51B0] hover:text-white transition-colors text-[11px] sm:text-[11px] shadow-2xs touch-manipulation shrink-0"
         >
           <ImageIcon class="w-3.5 h-3.5" />
           <span>+ Gambar</span>
@@ -1034,7 +1034,7 @@ function goToAdminCases() {
 
         <button
           @click="insertInfoCallout"
-          class="flex items-center gap-1 px-2 sm:px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-[#475569] dark:text-slate-300 font-semibold cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors text-[11px] sm:text-[11px] active:scale-95 touch-manipulation shrink-0"
+          class="flex items-center gap-1 px-2 sm:px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-[#475569] dark:text-slate-300 font-semibold cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors text-[11px] sm:text-[11px] touch-manipulation shrink-0"
         >
           <Info class="w-3.5 h-3.5" />
           <span>Info Callout</span>
@@ -1042,7 +1042,7 @@ function goToAdminCases() {
 
         <button
           @click="insertWarningCallout"
-          class="flex items-center gap-1 px-2 sm:px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-[#475569] dark:text-slate-300 font-semibold cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors text-[11px] sm:text-[11px] active:scale-95 touch-manipulation shrink-0"
+          class="flex items-center gap-1 px-2 sm:px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-[#475569] dark:text-slate-300 font-semibold cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors text-[11px] sm:text-[11px] touch-manipulation shrink-0"
         >
           <AlertTriangle class="w-3.5 h-3.5" />
           <span>Warning Banner</span>
@@ -1050,7 +1050,7 @@ function goToAdminCases() {
 
         <button
           @click="insertStep"
-          class="flex items-center gap-1 px-2 sm:px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-[#475569] dark:text-slate-300 font-semibold cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors text-[11px] sm:text-[11px] active:scale-95 touch-manipulation shrink-0"
+          class="flex items-center gap-1 px-2 sm:px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-[#475569] dark:text-slate-300 font-semibold cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors text-[11px] sm:text-[11px] touch-manipulation shrink-0"
         >
           <Plus class="w-3.5 h-3.5" />
           <span>Step</span>
@@ -1238,7 +1238,7 @@ function goToAdminCases() {
               <button
                 type="button"
                 @click="isMobileInspectorOpen = false"
-                class="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer active:scale-95 touch-manipulation"
+                class="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer touch-manipulation"
                 title="Tutup Panel"
               >
                 <X class="w-5 h-5" />

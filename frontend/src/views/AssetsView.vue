@@ -1,4 +1,4 @@
-<script setup>
+﻿<script setup>
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useApi } from '../composables/useApi.js'
@@ -47,7 +47,7 @@ const assetStats = computed(() => [
     title: 'Stok',
     value: assets.value.filter((asset) => asset.status_aset === 'Stock').length,
     icon: 'inventory_2',
-    color: 'cyan',
+    color: 'neutral',
   },
   {
     title: 'Rusak',
@@ -879,7 +879,7 @@ onMounted(async () => {
               v-if="canWriteAssets"
               type="button"
               @click="openAdd"
-              class="inventory-primary-action inline-flex h-9 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg bg-[#0A51B0] px-3 sm:px-3.5 text-xs font-semibold text-white shadow-2xs transition-all hover:bg-[#0A4391] active:scale-95"
+              class="inventory-primary-action inline-flex h-9 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg bg-[#0A51B0] px-3 sm:px-3.5 text-xs font-semibold text-white shadow-2xs transition-all hover:bg-[#0A4391]"
               title="Tambah aset baru"
             >
               <span aria-hidden="true" class="material-symbols-outlined text-[16px]">add</span>
@@ -957,7 +957,7 @@ onMounted(async () => {
     <section
       aria-label="Ringkasan aset"
       :aria-busy="isLoading"
-      class="grid grid-cols-1 min-[360px]:grid-cols-2 xl:grid-cols-4 gap-3"
+      class="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-2.5 lg:gap-3"
     >
       <StatCard
         v-for="stat in assetStats"
@@ -1676,7 +1676,7 @@ onMounted(async () => {
             type="button"
             :disabled="isSubmitting"
             @click="closeModal"
-            class="h-9.5 px-4 rounded-lg border border-[#E2E8F0] bg-white text-[12px] font-bold text-[#5F7089] hover:bg-[#F8FAFC] hover:text-[#333333] hover:border-[#CBD5E1] active:scale-95 transition-all cursor-pointer touch-manipulation flex items-center justify-center gap-1.5"
+            class="h-9.5 px-4 rounded-lg border border-[#E2E8F0] bg-white text-[12px] font-bold text-[#5F7089] hover:bg-[#F8FAFC] hover:text-[#333333] hover:border-[#CBD5E1] transition-all cursor-pointer touch-manipulation flex items-center justify-center gap-1.5"
           >
             <span>Batal</span>
           </button>
@@ -1686,7 +1686,7 @@ onMounted(async () => {
               v-if="activeTab !== 'info'"
               type="button"
               @click="activeTab = activeTab === 'specifications' ? 'placement' : 'info'"
-              class="h-9.5 flex-1 sm:flex-initial rounded-lg border border-[#E2E8F0] bg-white px-3.5 text-[12px] font-bold text-[#0A4391] hover:bg-[#EDF5FF] hover:border-[#B8D4F5] active:scale-95 transition-all flex items-center justify-center gap-1 cursor-pointer touch-manipulation shadow-2xs"
+              class="h-9.5 flex-1 sm:flex-initial rounded-lg border border-[#E2E8F0] bg-white px-3.5 text-[12px] font-bold text-[#0A4391] hover:bg-[#EDF5FF] hover:border-[#B8D4F5] transition-all flex items-center justify-center gap-1 cursor-pointer touch-manipulation shadow-2xs"
             >
               <span aria-hidden="true" class="material-symbols-outlined text-[16px]"
                 >arrow_back</span
@@ -1699,7 +1699,7 @@ onMounted(async () => {
               type="button"
               @click="nextStep"
               :disabled="isSubmitting || hasValidationErrors"
-              class="h-9.5 flex-1 sm:flex-initial rounded-lg bg-[#0A51B0] hover:bg-[#0A4391] active:bg-[#0F1F38] px-4.5 text-[12px] font-bold text-white shadow-sm disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer touch-manipulation"
+              class="h-9.5 flex-1 sm:flex-initial rounded-lg bg-[#0A51B0] hover:bg-[#0A4391] active:bg-[#0F1F38] px-4.5 text-[12px] font-bold text-white shadow-sm disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-1.5 cursor-pointer touch-manipulation"
             >
               <span>Lanjutkan</span>
               <span aria-hidden="true" class="material-symbols-outlined text-[16px]"
@@ -1712,7 +1712,7 @@ onMounted(async () => {
               type="submit"
               form="crud-AssetsView"
               :disabled="isSubmitting || !canWriteAssets || hasValidationErrors"
-              class="h-9.5 flex-1 sm:flex-initial rounded-lg bg-[#0A51B0] hover:bg-[#0A4391] active:bg-[#0F1F38] px-5 text-[12px] font-bold text-white shadow-sm disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer touch-manipulation"
+              class="h-9.5 flex-1 sm:flex-initial rounded-lg bg-[#0A51B0] hover:bg-[#0A4391] active:bg-[#0F1F38] px-5 text-[12px] font-bold text-white shadow-sm disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-1.5 cursor-pointer touch-manipulation"
             >
               <span
                 v-if="isSubmitting"
@@ -2205,14 +2205,14 @@ onMounted(async () => {
           <button
             type="button"
             @click="closeModal"
-            class="h-10 w-full sm:w-auto rounded-xl border border-[#DCE3EC] px-5 text-[12px] font-semibold text-[#475569] hover:bg-[#F8FAFC] active:scale-95 transition-all cursor-pointer touch-manipulation"
+            class="h-10 w-full sm:w-auto rounded-xl border border-[#DCE3EC] px-5 text-[12px] font-semibold text-[#475569] hover:bg-[#F8FAFC] transition-all cursor-pointer touch-manipulation"
           >
             Batal
           </button>
           <button
             type="submit"
             :disabled="isExporting"
-            class="h-10 w-full sm:w-auto rounded-xl bg-brand px-5 text-[12px] font-bold text-white shadow-md shadow-brand/20 hover:bg-brand-dark active:scale-95 disabled:opacity-50 transition-all cursor-pointer touch-manipulation"
+            class="h-10 w-full sm:w-auto rounded-xl bg-brand px-5 text-[12px] font-bold text-white shadow-md shadow-brand/20 hover:bg-brand-dark disabled:opacity-50 transition-all cursor-pointer touch-manipulation"
           >
             {{
               isExporting ? 'Mengekspor...' : exportFormat === 'xlsx' ? 'Unduh XLSX' : 'Unduh PDF'

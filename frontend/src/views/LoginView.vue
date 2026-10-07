@@ -493,17 +493,17 @@ const finishResetAndLogin = () => {
       <a
         href="/"
         aria-label="Halaman Beranda"
-        class="flex flex-col items-center justify-center gap-0.5 px-3 py-1 rounded-xl text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors min-w-[56px] min-h-[44px] touch-manipulation active:scale-95"
+        class="flex flex-col items-center justify-center gap-0.5 px-3 py-1 rounded-xl text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors min-w-[56px] min-h-[44px] touch-manipulation"
       ><Home class="w-4 h-4" />
-        <span class="text-[10px]">Home</span>
+        <span class="text-[10.5px] sm:text-[11px] font-medium leading-tight">Home</span>
       </a>
       <button
         type="button"
         aria-label="Masuk ke Akun"
         @click="scrollToLogin"
-        class="flex flex-col items-center justify-center gap-0.5 px-3 py-1 rounded-xl text-[#333333] font-bold hover:text-[#0A4391] transition-colors cursor-pointer min-w-[56px] min-h-[44px] touch-manipulation active:scale-95"
+        class="flex flex-col items-center justify-center gap-0.5 px-3 py-1 rounded-xl text-[#333333] font-bold hover:text-[#0A4391] transition-colors cursor-pointer min-w-[56px] min-h-[44px] touch-manipulation"
       ><LogIn class="w-4 h-4" />
-        <span class="text-[10px]">Sign In</span>
+        <span class="text-[10.5px] sm:text-[11px] font-medium leading-tight">Sign In</span>
       </button>
     </nav>
     <Teleport to="body">
@@ -548,7 +548,7 @@ const finishResetAndLogin = () => {
               </div>
               <button
                 @click="closeForgotModal"
-                class="w-8 h-8 sm:w-9 sm:h-9 rounded-lg hover:bg-slate-200/70 text-slate-400 hover:text-slate-600 flex items-center justify-center transition-colors cursor-pointer active:scale-95 touch-manipulation"
+                class="w-8 h-8 sm:w-9 sm:h-9 rounded-lg hover:bg-slate-200/70 text-slate-400 hover:text-slate-600 flex items-center justify-center transition-colors cursor-pointer touch-manipulation"
                 aria-label="Tutup"
               >
                 <span

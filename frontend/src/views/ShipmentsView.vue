@@ -427,70 +427,70 @@ onMounted(() => {
     <!-- Summary Cards -->
     <div class="shipment-summary">
       <div
-        class="rounded-xl border border-[#E2E8F0] bg-white p-2.5 sm:p-3 shadow-2xs flex items-center gap-2.5"
+        class="rounded-lg border border-[#E2E8F0] bg-white p-2 sm:p-2.5 shadow-2xs flex items-center gap-2 hover:border-[#CBD5E1] transition-colors min-h-[56px] sm:min-h-[58px]"
       >
         <div
-          class="h-8 w-8 rounded-lg bg-blue-50 text-[#333333] flex items-center justify-center shrink-0"
+          class="h-6 w-6 rounded-md bg-[#EDF5FF] text-[#0A51B0] flex items-center justify-center shrink-0"
         >
-          <Package class="w-4 h-4" />
+          <Package class="w-3.5 h-3.5" />
         </div>
         <div class="min-w-0">
-          <p class="text-[10px] font-semibold text-[#5F7089] uppercase tracking-wider">
+          <p class="text-[11px] sm:text-[11.5px] font-medium text-[#5F7089] truncate">
             Total Pengiriman
           </p>
-          <p class="text-base sm:text-lg font-bold text-[#333333] mt-0.5 leading-none">
+          <p class="text-base sm:text-[17px] font-bold text-[#333333] mt-0.5 leading-none tabular-nums">
             {{ summary.total }}
           </p>
         </div>
       </div>
 
       <div
-        class="rounded-xl border border-[#E2E8F0] bg-white p-2.5 sm:p-3 shadow-2xs flex items-center gap-2.5"
+        class="rounded-lg border border-[#E2E8F0] bg-white p-2 sm:p-2.5 shadow-2xs flex items-center gap-2 hover:border-[#CBD5E1] transition-colors min-h-[56px] sm:min-h-[58px]"
       >
         <div
-          class="h-8 w-8 rounded-lg bg-slate-100 text-[#475569] flex items-center justify-center shrink-0"
+          class="h-6 w-6 rounded-md bg-slate-100 text-[#475569] flex items-center justify-center shrink-0"
         >
-          <Package class="w-4 h-4" />
+          <Package class="w-3.5 h-3.5" />
         </div>
         <div class="min-w-0">
-          <p class="text-[10px] font-semibold text-[#5F7089] uppercase tracking-wider">
+          <p class="text-[11px] sm:text-[11.5px] font-medium text-[#5F7089] truncate">
             Belum Dikirim
           </p>
-          <p class="text-base sm:text-lg font-bold text-[#333333] mt-0.5 leading-none">
+          <p class="text-base sm:text-[17px] font-bold text-[#333333] mt-0.5 leading-none tabular-nums">
             {{ summary.belum_dikirim }}
           </p>
         </div>
       </div>
 
       <div
-        class="rounded-xl border border-[#E2E8F0] bg-white p-2.5 sm:p-3 shadow-2xs flex items-center gap-2.5"
+        class="rounded-lg border border-[#E2E8F0] bg-white p-2 sm:p-2.5 shadow-2xs flex items-center gap-2 hover:border-[#CBD5E1] transition-colors min-h-[56px] sm:min-h-[58px]"
       >
         <div
-          class="h-8 w-8 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center shrink-0"
+          class="h-6 w-6 rounded-md bg-sky-50 text-sky-600 flex items-center justify-center shrink-0"
         >
-          <Truck class="w-4 h-4" />
+          <Truck class="w-3.5 h-3.5" />
         </div>
         <div class="min-w-0">
-          <p class="text-[10px] font-semibold text-[#5F7089] uppercase tracking-wider">
+          <p class="text-[11px] sm:text-[11.5px] font-medium text-[#5F7089] truncate">
             Sedang Dikirim
           </p>
-          <p class="text-base sm:text-lg font-bold text-[#333333] mt-0.5 leading-none">
+          <p class="text-base sm:text-[17px] font-bold text-[#333333] mt-0.5 leading-none tabular-nums">
             {{ summary.sedang_dikirim }}
           </p>
         </div>
       </div>
 
       <div
-        class="rounded-xl border border-[#E2E8F0] bg-white p-2.5 sm:p-3 shadow-2xs flex items-center gap-2.5"
+        class="rounded-lg border border-[#E2E8F0] bg-white p-2 sm:p-2.5 shadow-2xs flex items-center gap-2 hover:border-[#CBD5E1] transition-colors min-h-[56px] sm:min-h-[58px]"
       >
         <div
-          class="h-8 w-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0"
+          class="h-6 w-6 rounded-md bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0"
         >
-          <Truck class="w-4 h-4" />
+          <Truck class="w-3.5 h-3.5" />
         </div>
         <div class="min-w-0">
-          <p class="text-[10px] font-semibold text-[#5F7089] uppercase tracking-wider">Diterima</p>
-          <p class="text-base sm:text-lg font-bold text-[#333333] mt-0.5 leading-none">
+          <p class="text-[11px] sm:text-[11.5px] font-medium text-[#5F7089] truncate">Diterima</p>
+          <p class="text-base sm:text-[17px] font-bold text-[#333333] mt-0.5 leading-none tabular-nums">
             {{ summary.diterima }}
           </p>
         </div>

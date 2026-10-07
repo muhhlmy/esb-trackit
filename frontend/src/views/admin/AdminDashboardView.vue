@@ -15,7 +15,7 @@ import {
   Trash2,
   Search,
   CheckCircle,
-  Sparkles,
+  PenTool,
   X,
   ChevronRight,
   FolderOpen,
@@ -237,22 +237,22 @@ function getCategoryBadgeClass(category) {
     </div>
 
     <!-- Stats Row (Balanced 3 columns on mobile and desktop) -->
-    <div class="grid grid-cols-3 gap-1.5 sm:gap-2 gsap-admin-el">
+    <div class="grid grid-cols-3 gap-1.5 sm:gap-2.5 gsap-admin-el">
       <!-- Total -->
       <div
-        class="flex items-center gap-2 p-1.5 sm:p-2 rounded-lg bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 transition-colors min-h-[44px] sm:min-h-[48px]"
+        class="flex items-center gap-2 p-2 sm:p-2.5 rounded-lg bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 transition-colors min-h-[52px] sm:min-h-[56px]"
       >
         <div
-          class="w-5.5 h-5.5 sm:w-6 sm:h-6 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center shrink-0"
+          class="w-6 h-6 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center shrink-0"
         >
           <FileText class="w-3.5 h-3.5" />
         </div>
         <div class="min-w-0">
-          <span class="text-[9.5px] sm:text-[10px] font-medium text-[#5F7089] dark:text-slate-400 block truncate"
+          <span class="text-[11px] sm:text-[11.5px] font-medium text-[#5F7089] dark:text-slate-400 block truncate"
             >Total Artikel</span
           >
           <p
-            class="text-sm sm:text-base font-bold text-[#333333] dark:text-white tabular-nums leading-none mt-0.5"
+            class="text-base sm:text-[17px] font-bold text-[#333333] dark:text-white tabular-nums leading-none mt-0.5"
           >
             {{ stats.total }}
           </p>
@@ -261,19 +261,19 @@ function getCategoryBadgeClass(category) {
 
       <!-- Published -->
       <div
-        class="flex items-center gap-2 p-1.5 sm:p-2 rounded-lg bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 transition-colors min-h-[44px] sm:min-h-[48px]"
+        class="flex items-center gap-2 p-2 sm:p-2.5 rounded-lg bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 transition-colors min-h-[52px] sm:min-h-[56px]"
       >
         <div
-          class="w-5.5 h-5.5 sm:w-6 sm:h-6 rounded-md bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0"
+          class="w-6 h-6 rounded-md bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0"
         >
           <CheckCircle class="w-3.5 h-3.5" />
         </div>
         <div class="min-w-0">
-          <span class="text-[9.5px] sm:text-[10px] font-medium text-[#5F7089] dark:text-slate-400 block truncate"
+          <span class="text-[11px] sm:text-[11.5px] font-medium text-[#5F7089] dark:text-slate-400 block truncate"
             >Terbit</span
           >
           <p
-            class="text-sm sm:text-base font-bold text-[#333333] dark:text-white tabular-nums leading-none mt-0.5"
+            class="text-base sm:text-[17px] font-bold text-[#333333] dark:text-white tabular-nums leading-none mt-0.5"
           >
             {{ stats.published }}
           </p>
@@ -282,19 +282,19 @@ function getCategoryBadgeClass(category) {
 
       <!-- Custom -->
       <div
-        class="flex items-center gap-2 p-1.5 sm:p-2 rounded-lg bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 transition-colors min-h-[44px] sm:min-h-[48px]"
+        class="flex items-center gap-2 p-2 sm:p-2.5 rounded-lg bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 transition-colors min-h-[52px] sm:min-h-[56px]"
       >
         <div
-          class="w-5.5 h-5.5 sm:w-6 sm:h-6 rounded-md bg-[#EDF5FF] dark:bg-blue-950/60 text-[#0A51B0] dark:text-blue-400 flex items-center justify-center shrink-0"
+          class="w-6 h-6 rounded-md bg-[#EDF5FF] dark:bg-blue-950/60 text-[#0A51B0] dark:text-blue-400 flex items-center justify-center shrink-0"
         >
-          <Sparkles class="w-3.5 h-3.5" />
+          <PenTool class="w-3.5 h-3.5" />
         </div>
         <div class="min-w-0">
-          <span class="text-[9.5px] sm:text-[10px] font-medium text-[#5F7089] dark:text-slate-400 block truncate"
-            >Kustom</span
+          <span class="text-[11px] sm:text-[11.5px] font-medium text-[#5F7089] dark:text-slate-400 block truncate"
+            >Khusus</span
           >
           <p
-            class="text-sm sm:text-base font-bold text-[#333333] dark:text-white tabular-nums leading-none mt-0.5"
+            class="text-base sm:text-[17px] font-bold text-[#333333] dark:text-white tabular-nums leading-none mt-0.5"
           >
             {{ stats.custom }}
           </p>

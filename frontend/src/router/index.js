@@ -59,7 +59,7 @@ const routes = [
   // Management Routes (TrackIT Monitoring)
   page('/dashboard', 'dashboard', () => import('../views/DashboardView.vue'), {
     title: 'Dashboard',
-    subtitle: 'Ringkasan aset, status perangkat, dan tiket aktif',
+    subtitle: 'Overview & analytics',
     permission: 'dashboard',
   }),
   page('/assets', 'assets', () => import('../views/AssetsView.vue'), {
@@ -69,35 +69,35 @@ const routes = [
   }),
   page('/assets-ga', 'assets-ga', () => import('../views/AssetsGaView.vue'), {
     title: 'Aset GA',
-    subtitle: 'Inventaris fasilitas dan sarana kerja umum',
+    subtitle: 'Kelola aset GA',
     permission: 'assets_ga',
     alias: '/assets/ga',
   }),
   page('/assets-ops', 'assets-ops', () => import('../views/AssetsOpsView.vue'), {
     title: 'Aset Ops',
-    subtitle: 'Perangkat operasional armada dan outlet',
+    subtitle: 'Kelola aset operasional',
     permission: 'assets_ops',
     alias: '/assets/ops',
   }),
   page('/my-assets', 'my-assets', () => import('../views/MyAssetsView.vue'), {
     title: 'Aset Karyawan',
-    subtitle: 'Alokasi inventaris yang dipegang staf',
+    subtitle: 'Kelola aset karyawan',
     permission: 'my_assets',
     alias: '/assets/karyawan',
   }),
   page('/karyawan', 'karyawan', () => import('../views/EmployeesView.vue'), {
     title: 'Karyawan',
-    subtitle: 'Direktori staf, departemen, dan unit penempatan',
+    subtitle: 'Kelola data karyawan',
     permission: 'karyawan',
   }),
   page('/tickets', 'tickets', () => import('../views/TicketsView.vue'), {
     title: 'Tiket',
-    subtitle: 'Antrean layanan, resolusi gangguan, dan eskalasi IT',
+    subtitle: 'Kelola tiket helpdesk',
     permission: 'tickets',
   }),
   page('/users', 'users', () => import('../views/UsersView.vue'), {
     title: 'Pengguna',
-    subtitle: 'Hak akses, role pengguna, dan autentikasi tim',
+    subtitle: 'Kelola data pengguna',
     permission: 'users',
   }),
   page('/faqs', 'faqs', () => import('../views/FaqAdminView.vue'), {
@@ -116,7 +116,7 @@ const routes = [
   }),
   page('/submissions', 'submissions', () => import('../views/SubmissionsView.vue'), {
     title: 'Pengajuan',
-    subtitle: 'Permohonan pengadaan, mutasi, dan perbaikan',
+    subtitle: 'Kelola pengajuan',
     permission: 'submissions',
     alias: '/pengajuan',
   }),
@@ -133,7 +133,7 @@ const routes = [
   }),
   page('/export', 'export', () => import('../views/ExportView.vue'), {
     title: 'Ekspor Data',
-    subtitle: 'Unduh laporan berkala format CSV dan Excel',
+    subtitle: 'Ekspor dan kelola data',
     permission: 'export',
     superadminOnly: true,
   }),

@@ -512,7 +512,7 @@ function formatKondisiPill(kondisi) {
     <section
       aria-label="Ringkasan aset"
       :aria-busy="isLoading"
-      class="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-2.5 lg:gap-3"
+      class="grid grid-cols-1 min-[360px]:grid-cols-2 xl:grid-cols-4 gap-2 sm:gap-2.5 lg:gap-3"
     >
       <StatCard
         v-for="stat in assetStats"
@@ -521,7 +521,7 @@ function formatKondisiPill(kondisi) {
         :value="isLoading || pageError ? '—' : stat.value"
         :icon="stat.icon"
         :color="stat.color"
-        :subtitle="isLoading ? 'Memuat…' : pageError ? 'Tidak tersedia' : 'Seluruh data kategori aset'"
+        :subtitle="isLoading ? 'Memuat…' : pageError ? 'Tidak tersedia' : 'Seluruh data kategori'"
       />
     </section>
 

@@ -57,7 +57,7 @@
 .ws-data-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 11.5px;
+  font-size: 12px;
   table-layout: fixed;
 }
 .ws-data-table thead th {
@@ -70,7 +70,7 @@
   border-bottom: 1px solid #e2e8f0;
   padding: 6.5px 10px;
   text-align: left;
-  font-size: 9.5px;
+  font-size: 11px;
   font-weight: 650;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -121,7 +121,7 @@
   display: block;
 }
 .ws-data-table .ws-cell-sub {
-  font-size: 10px;
+  font-size: 11px;
   color: #667283;
   overflow: hidden;
   text-overflow: ellipsis;

@@ -110,7 +110,7 @@ function handleSelectCase(id) {
         <input
           v-model="sidebarSearch"
           type="text"
-          class="w-full bg-white dark:bg-slate-900 border border-[#c4c5d9] dark:border-slate-800 rounded-lg pl-8 pr-7 py-1.5 text-xs text-[#1a1c1d] dark:text-slate-100 placeholder-[#5F7089] dark:placeholder-slate-500 focus:outline-none focus:border-[#0040e5] transition-all shadow-2xs"
+          class="w-full bg-white dark:bg-slate-900 border border-[#c4c5d9] dark:border-slate-800 rounded-lg pl-8 pr-7 py-1.5 text-xs text-[#1a1c1d] dark:text-slate-100 placeholder-[#5F7089] dark:placeholder-slate-500 focus:outline-none focus:border-[#0A51B0] transition-all shadow-2xs"
           placeholder="Cari judul atau ringkasan…"
           aria-label="Cari artikel dalam daftar"
         />
@@ -146,7 +146,7 @@ function handleSelectCase(id) {
             />
             <component
               :is="categoryMeta[catKey]?.icon || Folder"
-              class="w-3.5 h-3.5 text-[#0040e5] dark:text-indigo-400 shrink-0"
+              class="w-3.5 h-3.5 text-[#0A51B0] dark:text-blue-400 shrink-0"
             />
             <span class="font-semibold text-xs truncate">
               {{ categoryMeta[catKey]?.label || catKey }}
@@ -174,7 +174,7 @@ function handleSelectCase(id) {
             class="case-tree-article w-full flex items-center justify-between px-2.5 py-1.5 rounded-md text-left transition-all cursor-pointer group"
             :class="
               activeCaseId === item.id
-                ? 'bg-[#f2f1ff] dark:bg-indigo-950/50 text-[#0040e5] dark:text-indigo-300 font-semibold shadow-2xs'
+                ? 'bg-[#eff6ff] dark:bg-blue-950/50 text-[#0A51B0] dark:text-blue-300 font-semibold shadow-2xs'
                 : 'text-[#434656] dark:text-slate-400 hover:text-[#1a1c1d] dark:hover:text-slate-200 hover:bg-[#edeef0]/70 dark:hover:bg-slate-900/60'
             "
           >
@@ -183,7 +183,7 @@ function handleSelectCase(id) {
                 class="w-3.5 h-3.5 shrink-0"
                 :class="
                   activeCaseId === item.id
-                    ? 'text-[#0040e5] dark:text-indigo-400'
+                    ? 'text-[#0A51B0] dark:text-blue-400'
                     : 'text-[#5F7089] group-hover:text-[#1a1c1d]'
                 "
               />
@@ -193,7 +193,7 @@ function handleSelectCase(id) {
             <div class="flex items-center gap-1 shrink-0">
               <span
                 v-if="isBookmarked(item.id)"
-                class="w-1.5 h-1.5 rounded-full bg-[#0040e5] dark:bg-indigo-400"
+                class="w-1.5 h-1.5 rounded-full bg-[#0A51B0] dark:bg-blue-400"
                 title="Bookmarked"
               ></span>
             </div>
@@ -317,7 +317,7 @@ function handleSelectCase(id) {
 }
 .case-tree button:focus-visible,
 .case-tree input:focus-visible {
-  outline: 2px solid #0040e5;
+  outline: 2px solid #0A51B0;
   outline-offset: 2px;
 }
 @media (min-width: 768px) {

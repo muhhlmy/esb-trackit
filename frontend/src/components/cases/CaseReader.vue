@@ -106,9 +106,9 @@ const severityClass = computed(() => {
         <div class="case-actions flex items-center gap-2">
           <button
             @click="toggleBookmark(caseItem.id)"
-            class="p-2 rounded-lg border border-[#c4c5d9] dark:border-slate-800 bg-white dark:bg-slate-900 hover:bg-[#f3f3f5] dark:hover:bg-slate-800 text-[#575d7a] dark:text-slate-400 hover:text-[#0040e5] transition-colors cursor-pointer"
+            class="p-2 rounded-lg border border-[#c4c5d9] dark:border-slate-800 bg-white dark:bg-slate-900 hover:bg-[#f3f3f5] dark:hover:bg-slate-800 text-[#575d7a] dark:text-slate-400 hover:text-[#0A51B0] transition-colors cursor-pointer"
             :class="{
-              'text-[#0040e5] dark:text-indigo-400 border-[#0040e5]/40': isBookmarked(caseItem.id),
+              'text-[#0A51B0] dark:text-blue-400 border-[#0A51B0]/40': isBookmarked(caseItem.id),
             }"
             :title="isBookmarked(caseItem.id) ? 'Hapus bookmark' : 'Simpan bookmark'"
             :aria-label="isBookmarked(caseItem.id) ? 'Hapus bookmark' : 'Simpan bookmark'"
@@ -122,7 +122,7 @@ const severityClass = computed(() => {
             @click="$emit('edit', caseItem)"
             class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#c4c5d9] dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-[#f3f3f5] dark:hover:bg-slate-700 font-semibold text-[#1a1c1d] dark:text-slate-200 transition-all cursor-pointer shadow-2xs"
           >
-            <Edit3 class="w-3.5 h-3.5 text-[#0040e5] dark:text-indigo-400" />
+            <Edit3 class="w-3.5 h-3.5 text-[#0A51B0] dark:text-blue-400" />
             <span>Edit Document</span>
           </button>
         </div>
@@ -149,7 +149,7 @@ const severityClass = computed(() => {
         class="case-summary p-4 rounded-xl bg-white dark:bg-slate-900 border border-[#c4c5d9] dark:border-slate-800 shadow-2xs flex items-start gap-3"
       >
         <div
-          class="p-2 rounded-lg bg-[#f2f1ff] dark:bg-indigo-500/10 text-[#0040e5] dark:text-indigo-400 shrink-0"
+          class="p-2 rounded-lg bg-[#eff6ff] dark:bg-blue-950/40 text-[#0A51B0] dark:text-blue-400 shrink-0"
         >
           <Lightbulb class="w-4 h-4" />
         </div>
@@ -177,7 +177,7 @@ const severityClass = computed(() => {
 
     <!-- Bottom Escalation Banner (CTA) -->
     <div
-      class="case-escalation p-6 rounded-2xl bg-gradient-to-r from-[#f2f1ff] to-white dark:from-slate-900 dark:to-slate-950 border border-[#c4c5d9] dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4"
+      class="case-escalation p-6 rounded-2xl bg-gradient-to-r from-[#eff6ff] to-white dark:from-slate-900 dark:to-slate-950 border border-[#E2E8F0] dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4"
     >
       <div class="space-y-1 text-center sm:text-left">
         <h3 class="text-base font-bold text-[#1a1c1d] dark:text-slate-100">
@@ -191,7 +191,7 @@ const severityClass = computed(() => {
       <div class="flex items-center gap-2.5">
         <button
           @click="$emit('submitTicket')"
-          class="px-4 py-2.5 rounded-lg text-xs font-semibold bg-[#0040e5] hover:bg-[#0034bf] text-white shadow-xs transition-all cursor-pointer flex items-center gap-1.5"
+          class="px-4 py-2.5 rounded-lg text-xs font-semibold bg-[#0A51B0] hover:bg-[#0A4391] text-white shadow-xs transition-all cursor-pointer flex items-center gap-1.5"
         >
           <MessageSquare class="w-3.5 h-3.5" />
           <span>Submit a Ticket</span>
@@ -256,7 +256,7 @@ const severityClass = computed(() => {
 }
 
 .doc-body :deep(blockquote) {
-  border-left: 3px solid #0040e5;
+  border-left: 3px solid #0A51B0;
   background-color: #f8fafc;
   padding: 0.75rem 1rem;
   border-radius: 0.5rem;
@@ -295,7 +295,7 @@ const severityClass = computed(() => {
 }
 
 .doc-body :deep(a) {
-  color: #0040e5;
+  color: #0A51B0;
   text-decoration: underline;
   text-underline-offset: 2px;
 }
@@ -435,7 +435,7 @@ const severityClass = computed(() => {
   flex-shrink: 0;
 }
 .case-reader button:focus-visible {
-  outline: 2px solid #0040e5;
+  outline: 2px solid #0A51B0;
   outline-offset: 3px;
 }
 .case-reader h1 {

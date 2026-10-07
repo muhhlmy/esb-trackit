@@ -868,7 +868,7 @@ function formatDate(dateStr) {
         </div>
 
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <h3 class="asset-form-section-title"><span>01</span>Identitas aset</h3>
+          <h3 class="asset-form-section-title">Identitas aset</h3>
           <!-- Hostname -->
           <div>
             <label for="ops-hostname" class="block text-[12px] font-bold text-[#333333] mb-1">
@@ -901,7 +901,7 @@ function formatDate(dateStr) {
         </div>
 
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <h3 class="asset-form-section-title"><span>02</span>Kategori & penempatan</h3>
+          <h3 class="asset-form-section-title">Kategori & penempatan</h3>
           <!-- Kategori -->
           <div>
             <label class="block text-[12px] font-bold text-[#333333] mb-1">
@@ -932,7 +932,7 @@ function formatDate(dateStr) {
         </div>
 
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <h3 class="asset-form-section-title"><span>03</span>Penanggung jawab & pembelian</h3>
+          <h3 class="asset-form-section-title">Penanggung jawab & pembelian</h3>
           <!-- PIC Penanggung Jawab -->
           <div>
             <label for="ops-pic" class="block text-[12px] font-bold text-[#333333] mb-1"
@@ -962,7 +962,7 @@ function formatDate(dateStr) {
         </div>
 
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
-          <h3 class="asset-form-section-title"><span>04</span>Nilai & kondisi</h3>
+          <h3 class="asset-form-section-title">Nilai & kondisi</h3>
           <!-- Total Asset Amount -->
           <div>
             <label for="ops-total-amount" class="block text-[12px] font-bold text-[#333333] mb-1"

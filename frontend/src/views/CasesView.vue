@@ -143,10 +143,10 @@ onMounted(async () => {
             <button
               @click="toggleSidebar"
               :aria-expanded="!isSidebarCollapsed"
-              class="hidden md:flex items-center gap-1.5 py-1 px-2 rounded-lg text-[#575d7a] hover:text-[#0040e5] dark:text-slate-400 hover:bg-[#f3f3f5] dark:hover:bg-slate-800 transition-colors cursor-pointer"
+              class="hidden md:flex items-center gap-1.5 py-1 px-2 rounded-lg text-[#575d7a] hover:text-[#0A51B0] dark:text-slate-400 hover:bg-[#f3f3f5] dark:hover:bg-slate-800 transition-colors cursor-pointer"
               :title="isSidebarCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar'"
             >
-              <PanelLeft v-if="isSidebarCollapsed" class="w-4 h-4 text-[#0040e5]" />
+              <PanelLeft v-if="isSidebarCollapsed" class="w-4 h-4 text-[#0A51B0]" />
               <PanelLeftClose v-else class="w-4 h-4" />
               <span class="font-medium text-[11px]">{{
                 isSidebarCollapsed ? 'Show Tree' : 'Hide Tree'
@@ -160,7 +160,7 @@ onMounted(async () => {
               aria-label="Buka daftar artikel"
               class="md:hidden flex items-center gap-1.5 py-1 px-2 rounded-lg bg-[#f3f3f5] dark:bg-slate-800 text-[#1a1c1d] dark:text-slate-200 font-medium"
             >
-              <Menu class="w-4 h-4 text-[#0040e5]" />
+              <Menu class="w-4 h-4 text-[#0A51B0]" />
               <span>Pilih Artikel</span>
             </button>
           </div>
@@ -194,7 +194,7 @@ onMounted(async () => {
               </button>
               <button
                 @click="goToTicket"
-                class="px-4 py-2 rounded-lg text-xs font-semibold bg-[#0040e5] hover:bg-[#0034bf] text-white shadow-xs transition-all cursor-pointer"
+                class="px-4 py-2 rounded-lg text-xs font-semibold bg-[#0A51B0] hover:bg-[#0A4391] text-white shadow-xs transition-all cursor-pointer"
               >
                 {{ isAuthenticated ? 'Buat Tiket' : 'Masuk untuk Buat Tiket' }}
               </button>
@@ -292,7 +292,7 @@ onMounted(async () => {
   padding: 12px 16px;
 }
 .cases-page button:focus-visible {
-  outline: 2px solid #0040e5;
+  outline: 2px solid #0A51B0;
   outline-offset: 3px;
 }
 @media (max-width: 767px) {

@@ -867,7 +867,7 @@ function formatKondisiPill(kondisi) {
         </div>
 
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <h3 class="asset-form-section-title"><span>01</span>Identitas aset</h3>
+          <h3 class="asset-form-section-title">Identitas aset</h3>
           <!-- Hostname -->
           <div>
             <label for="ga-hostname" class="block text-[12px] font-bold text-[#333333] mb-1">
@@ -900,7 +900,7 @@ function formatKondisiPill(kondisi) {
         </div>
 
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
-          <h3 class="asset-form-section-title"><span>02</span>Jumlah & kondisi</h3>
+          <h3 class="asset-form-section-title">Jumlah & kondisi</h3>
           <!-- Quantity -->
           <div>
             <label for="ga-quantity" class="block text-[12px] font-bold text-[#333333] mb-1">
@@ -947,7 +947,7 @@ function formatKondisiPill(kondisi) {
         </div>
 
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <h3 class="asset-form-section-title"><span>03</span>Penempatan</h3>
+          <h3 class="asset-form-section-title">Penempatan</h3>
           <!-- Lokasi Utama -->
           <div>
             <label class="block text-[12px] font-bold text-[#333333] mb-1">
@@ -978,7 +978,7 @@ function formatKondisiPill(kondisi) {
         </div>
 
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <h3 class="asset-form-section-title"><span>04</span>Spesifikasi tambahan</h3>
+          <h3 class="asset-form-section-title">Spesifikasi tambahan</h3>
           <!-- Ukuran -->
           <div>
             <label for="ga-ukuran" class="block text-[12px] font-bold text-[#333333] mb-1"

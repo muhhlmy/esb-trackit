@@ -947,7 +947,7 @@ onMounted(fetchData)
     <!-- ── Page Header ─────────────────────────────────────────── -->
     <div
       v-if="isFormOpen"
-      class="submission-page-header flex items-center gap-3 bg-white dark:bg-slate-900 p-3.5 sm:p-4 rounded-2xl border border-[#E2E8F0]/80 dark:border-slate-800 shadow-2xs"
+      class="submission-page-header flex items-center gap-3 bg-white dark:bg-slate-900 p-3.5 sm:p-4 rounded-xl border border-[#E2E8F0]/80 dark:border-slate-800 shadow-2xs"
     >
       <div
         class="flex h-9 w-9 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-xl bg-[#EDF5FF] dark:bg-sky-950/50 text-[#0A5DBD] dark:text-sky-400 border border-[#B8D4F5]/40 dark:border-sky-800/50"
@@ -988,7 +988,7 @@ onMounted(fetchData)
       aria-labelledby="submission-history-title"
     >
       <div
-        class="asset-toolbar flex flex-col gap-3 rounded-2xl border border-[#E2E8F0]/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-3.5 shadow-2xs"
+        class="asset-toolbar flex flex-col gap-3 rounded-xl border border-[#E2E8F0]/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-3.5 shadow-2xs"
       >
         <div class="flex items-center justify-between gap-2.5">
           <div>
@@ -1049,7 +1049,7 @@ onMounted(fetchData)
       </div>
       <div
         v-if="!filteredSubmissions.length"
-        class="mt-3 rounded-2xl border border-[#E2E8F0] dark:border-slate-800 bg-white dark:bg-slate-900 px-4 py-12 text-center text-xs text-[#5F7089] dark:text-slate-400"
+        class="mt-3 rounded-xl border border-[#E2E8F0] dark:border-slate-800 bg-white dark:bg-slate-900 px-4 py-12 text-center text-xs text-[#5F7089] dark:text-slate-400"
       >
         Belum ada BAST yang sesuai.<button
           type="button"
@@ -1194,7 +1194,7 @@ onMounted(fetchData)
     >
       <!-- Section 1 Skeleton: Profil Pihak Terkait -->
       <div
-        class="rounded-2xl border border-[#E2E8F0]/80 bg-white p-4 sm:p-6 shadow-2xs flex flex-col gap-4"
+        class="rounded-xl border border-[#E2E8F0]/80 bg-white p-4 sm:p-6 shadow-2xs flex flex-col gap-4"
       >
         <div class="flex items-center gap-2.5 border-b border-[#F1F5F9] pb-3.5">
           <BaseSkeleton width="24px" height="24px" radius="md" />
@@ -1207,7 +1207,7 @@ onMounted(fetchData)
           <div
             v-for="i in 2"
             :key="'pihak-skel-' + i"
-            class="flex flex-col gap-3.5 rounded-2xl border border-slate-200/80 bg-slate-50/50 p-4"
+            class="flex flex-col gap-3.5 rounded-xl border border-slate-200/80 bg-slate-50/50 p-4"
           >
             <BaseSkeleton width="150px" height="14px" radius="md" />
             <BaseSkeleton width="100%" height="40px" radius="xl" />
@@ -1221,7 +1221,7 @@ onMounted(fetchData)
 
       <!-- Section 2 Skeleton: Tujuan Serah Terima Aset -->
       <div
-        class="rounded-2xl border border-[#E2E8F0]/80 bg-white p-4 sm:p-6 shadow-2xs flex flex-col gap-4"
+        class="rounded-xl border border-[#E2E8F0]/80 bg-white p-4 sm:p-6 shadow-2xs flex flex-col gap-4"
       >
         <div class="flex items-center gap-2.5 border-b border-[#F1F5F9] pb-3.5">
           <BaseSkeleton width="24px" height="24px" radius="md" />
@@ -1245,7 +1245,7 @@ onMounted(fetchData)
       <!-- Section 3 Skeleton: Data Unit -->
       <div class="grid grid-cols-1 gap-5 lg:grid-cols-2">
         <div
-          class="rounded-2xl border border-[#E2E8F0]/80 bg-white p-4 sm:p-6 shadow-2xs flex flex-col gap-4"
+          class="rounded-xl border border-[#E2E8F0]/80 bg-white p-4 sm:p-6 shadow-2xs flex flex-col gap-4"
         >
           <div class="flex items-center gap-2.5 border-b border-[#F1F5F9] pb-3.5">
             <BaseSkeleton width="24px" height="24px" radius="md" />
@@ -1254,7 +1254,7 @@ onMounted(fetchData)
           <BaseSkeleton width="100%" height="120px" radius="xl" />
         </div>
         <div
-          class="rounded-2xl border border-[#E2E8F0]/80 bg-white p-4 sm:p-6 shadow-2xs flex flex-col gap-4"
+          class="rounded-xl border border-[#E2E8F0]/80 bg-white p-4 sm:p-6 shadow-2xs flex flex-col gap-4"
         >
           <div class="flex items-center gap-2.5 border-b border-[#F1F5F9] pb-3.5">
             <BaseSkeleton width="24px" height="24px" radius="md" />
@@ -1266,7 +1266,7 @@ onMounted(fetchData)
 
       <!-- Section 4 Skeleton: Diketahui Oleh -->
       <div
-        class="rounded-2xl border border-[#E2E8F0]/80 bg-white p-4 sm:p-6 shadow-2xs flex flex-col gap-4"
+        class="rounded-xl border border-[#E2E8F0]/80 bg-white p-4 sm:p-6 shadow-2xs flex flex-col gap-4"
       >
         <div class="flex items-center gap-2.5 border-b border-[#F1F5F9] pb-3.5">
           <BaseSkeleton width="24px" height="24px" radius="md" />
@@ -1293,7 +1293,7 @@ onMounted(fetchData)
       @submit.prevent="generatePdf"
     >
       <div
-        class="submission-form-heading flex items-center justify-between rounded-2xl border border-[#E2E8F0] bg-white px-4 py-3 shadow-2xs"
+        class="submission-form-heading flex items-center justify-between rounded-xl border border-[#E2E8F0] bg-white px-4 py-3 shadow-2xs"
       >
         <div>
           <h2 class="text-sm font-bold text-[#333333]">
@@ -1317,7 +1317,7 @@ onMounted(fetchData)
         v-if="validationError"
         role="alert"
         aria-live="assertive"
-        class="flex items-start sm:items-center gap-3 p-4 rounded-2xl border border-rose-300 bg-rose-50 text-rose-800 text-[12px] font-semibold shadow-2xs"
+        class="flex items-start sm:items-center gap-3 p-4 rounded-xl border border-rose-300 bg-rose-50 text-rose-800 text-[12px] font-semibold shadow-2xs"
       >
         <span
           aria-hidden="true"
@@ -1342,7 +1342,7 @@ onMounted(fetchData)
       >
         <!-- Section 1: Profil Pihak Terkait -->
         <div
-          class="submission-section bg-white rounded-2xl border border-[#E2E8F0]/80 p-4 sm:p-6 shadow-2xs flex flex-col gap-4"
+          class="submission-section bg-white rounded-xl border border-[#E2E8F0]/80 p-4 sm:p-6 shadow-2xs flex flex-col gap-4"
         >
           <div class="flex items-center justify-between gap-2 border-b border-[#F1F5F9] pb-3.5">
             <div class="flex items-center gap-2.5">
@@ -1365,7 +1365,7 @@ onMounted(fetchData)
           <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
             <!-- Pihak Pemberi (Karyawan) -->
             <div
-              class="flex flex-col gap-3.5 rounded-xl sm:rounded-2xl border border-slate-200/80 bg-slate-50/50 p-4"
+              class="flex flex-col gap-3.5 rounded-xl sm:rounded-xl border border-slate-200/80 bg-slate-50/50 p-4"
             >
               <div class="flex items-center gap-2">
                 <span
@@ -1427,7 +1427,7 @@ onMounted(fetchData)
 
             <!-- Pihak Penerima -->
             <div
-              class="flex flex-col gap-3.5 rounded-xl sm:rounded-2xl border border-slate-200/80 bg-slate-50/50 p-4"
+              class="flex flex-col gap-3.5 rounded-xl sm:rounded-xl border border-slate-200/80 bg-slate-50/50 p-4"
             >
               <div class="flex flex-wrap items-center justify-between gap-2">
                 <div class="flex items-center gap-2">
@@ -1535,7 +1535,7 @@ onMounted(fetchData)
 
         <!-- Section 2: Tujuan Serah Terima -->
         <div
-          class="submission-section bg-white rounded-2xl border border-[#E2E8F0]/80 p-4 sm:p-6 shadow-2xs flex flex-col gap-4"
+          class="submission-section bg-white rounded-xl border border-[#E2E8F0]/80 p-4 sm:p-6 shadow-2xs flex flex-col gap-4"
         >
           <div class="flex items-center justify-between gap-2 border-b border-[#F1F5F9] pb-3.5">
             <div class="flex items-center gap-2.5">
@@ -1655,7 +1655,7 @@ onMounted(fetchData)
         <div class="submission-assets-grid grid grid-cols-1 gap-5 xl:grid-cols-2">
           <!-- Aset Baru (Diserahkan) -->
           <div
-            class="submission-section bg-white rounded-2xl border border-[#E2E8F0]/80 p-4 sm:p-6 shadow-2xs flex flex-col gap-4"
+            class="submission-section bg-white rounded-xl border border-[#E2E8F0]/80 p-4 sm:p-6 shadow-2xs flex flex-col gap-4"
           >
             <div class="flex items-center justify-between gap-2 border-b border-[#F1F5F9] pb-3.5">
               <div class="flex items-center gap-2.5 min-w-0">
@@ -1688,7 +1688,7 @@ onMounted(fetchData)
               <div
                 v-for="(row, index) in asetBaruList"
                 :key="index"
-                class="submission-unit flex flex-col gap-3 rounded-xl sm:rounded-2xl border border-slate-200/80 bg-slate-50/50 p-3.5 sm:p-4 transition-all"
+                class="submission-unit flex flex-col gap-3 rounded-xl sm:rounded-xl border border-slate-200/80 bg-slate-50/50 p-3.5 sm:p-4 transition-all"
               >
                 <!-- Card Unit Header -->
                 <div
@@ -1796,7 +1796,7 @@ onMounted(fetchData)
 
           <!-- Aset Lama (Dikembalikan) -->
           <div
-            class="submission-section bg-white rounded-2xl border border-[#E2E8F0]/80 p-4 sm:p-6 shadow-2xs flex flex-col gap-4"
+            class="submission-section bg-white rounded-xl border border-[#E2E8F0]/80 p-4 sm:p-6 shadow-2xs flex flex-col gap-4"
           >
             <div class="flex items-center justify-between gap-2 border-b border-[#F1F5F9] pb-3.5">
               <div class="flex items-center gap-2.5 min-w-0">
@@ -1829,7 +1829,7 @@ onMounted(fetchData)
               <div
                 v-for="(row, index) in asetLamaList"
                 :key="index"
-                class="submission-unit flex flex-col gap-3 rounded-xl sm:rounded-2xl border border-slate-200/80 bg-slate-50/50 p-3.5 sm:p-4 transition-all"
+                class="submission-unit flex flex-col gap-3 rounded-xl sm:rounded-xl border border-slate-200/80 bg-slate-50/50 p-3.5 sm:p-4 transition-all"
               >
                 <!-- Card Unit Header -->
                 <div
@@ -1938,7 +1938,7 @@ onMounted(fetchData)
 
         <!-- Section 4: Lembar Tanda Tangan: Diketahui Oleh -->
         <div
-          class="submission-section bg-white rounded-2xl border border-[#E2E8F0]/80 p-4 sm:p-6 shadow-2xs flex flex-col gap-4"
+          class="submission-section bg-white rounded-xl border border-[#E2E8F0]/80 p-4 sm:p-6 shadow-2xs flex flex-col gap-4"
         >
           <div class="flex items-center justify-between gap-2 border-b border-[#F1F5F9] pb-3.5">
             <div class="flex items-center gap-2.5">
@@ -2036,7 +2036,7 @@ onMounted(fetchData)
       </fieldset>
       <!-- Action Footer -->
       <div
-        class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 rounded-2xl border border-[#E2E8F0]/80 bg-white p-4 sm:p-5 shadow-2xs"
+        class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 rounded-xl border border-[#E2E8F0]/80 bg-white p-4 sm:p-5 shadow-2xs"
       >
         <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
           <span

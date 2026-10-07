@@ -379,7 +379,7 @@ function systemAuditChanges(log) {
 
     <!-- Filters Bar Card -->
     <div
-      class="logs-filters shadow-card grid grid-cols-[minmax(0,1fr)_auto] min-w-0 items-center gap-3 rounded-2xl border border-[#E8EDF3] dark:border-slate-800 bg-white dark:bg-slate-900 p-3"
+      class="logs-filters shadow-card grid grid-cols-[minmax(0,1fr)_auto] min-w-0 items-center gap-3 rounded-xl border border-[#E8EDF3] dark:border-slate-800 bg-white dark:bg-slate-900 p-3"
     >
       <!-- Search -->
       <div class="relative h-9 min-w-0">

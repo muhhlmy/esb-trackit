@@ -425,93 +425,97 @@ onMounted(() => {
     </div>
 
     <!-- Summary Cards -->
-    <div class="shipment-summary">
+    <div class="shipment-summary grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-2.5 lg:gap-3">
       <div
-        class="rounded-xl border border-[#E2E8F0] bg-white p-2.5 sm:p-3 lg:p-3.5 shadow-2xs flex flex-col justify-between hover:border-[#CBD5E1] transition-colors min-h-[76px] sm:min-h-[84px] lg:min-h-[92px]"
+        class="kpi-focusable flex flex-col justify-between p-[var(--kpi-padding)] sm:p-[var(--kpi-padding-sm)] lg:p-[var(--kpi-padding-lg)] rounded-[var(--kpi-radius)] bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 shadow-2xs hover:border-[#CBD5E1] dark:hover:border-slate-700 transition-colors min-h-[var(--kpi-height)] sm:min-h-[var(--kpi-height-sm)] lg:min-h-[var(--kpi-height-lg)]"
+        tabindex="0"
       >
-        <div class="flex items-center justify-between gap-1.5">
-          <p class="text-[10.5px] sm:text-[11px] lg:text-[11.5px] font-medium text-[#5F7089] truncate">
+        <div class="flex items-center justify-between gap-[var(--kpi-gap)]">
+          <span class="text-[var(--kpi-title-font-size)] sm:text-[var(--kpi-title-font-size-sm)] lg:text-[var(--kpi-title-font-size-lg)] font-medium text-[#5F7089] dark:text-slate-400 truncate">
             Total Pengiriman
-          </p>
+          </span>
           <div
-            class="h-5.5 w-5.5 sm:h-6 sm:w-6 lg:h-6.5 lg:w-6.5 rounded-lg bg-[#EFF6FF] text-[#0A51B0] flex items-center justify-center shrink-0"
+            class="flex h-[var(--kpi-icon-container-size)] w-[var(--kpi-icon-container-size)] sm:h-[var(--kpi-icon-container-size-sm)] sm:w-[var(--kpi-icon-container-size-sm)] lg:h-[var(--kpi-icon-container-size-lg)] lg:w-[var(--kpi-icon-container-size-lg)] shrink-0 items-center justify-center rounded-md bg-[#EFF6FF] text-[#0A51B0] dark:bg-blue-950/60 dark:text-blue-400"
           >
             <Package class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           </div>
         </div>
-        <div class="mt-1">
-          <p class="font-num text-[17px] sm:text-[20px] lg:text-[22px] font-bold text-[#333333] leading-none tabular-nums tracking-tight">
+        <div class="mt-0.5">
+          <span class="font-num block text-[var(--kpi-value-font-size)] sm:text-[var(--kpi-value-font-size-sm)] lg:text-[var(--kpi-value-font-size-lg)] font-bold text-[#333333] dark:text-white tabular-nums leading-none tracking-tight">
             {{ summary.total }}
-          </p>
-          <p class="mt-1 text-[10px] sm:text-[10.5px] lg:text-[11px] text-[#64748B] truncate">Semua data resi</p>
+          </span>
+          <span class="mt-0.5 block truncate text-[var(--kpi-caption-font-size)] sm:text-[var(--kpi-caption-font-size-sm)] lg:text-[var(--kpi-caption-font-size-lg)] font-normal text-[#64748B] dark:text-slate-400">Semua data resi</span>
         </div>
       </div>
 
       <div
-        class="rounded-xl border border-[#E2E8F0] bg-white p-2.5 sm:p-3 lg:p-3.5 shadow-2xs flex flex-col justify-between hover:border-[#CBD5E1] transition-colors min-h-[76px] sm:min-h-[84px] lg:min-h-[92px]"
+        class="kpi-focusable flex flex-col justify-between p-[var(--kpi-padding)] sm:p-[var(--kpi-padding-sm)] lg:p-[var(--kpi-padding-lg)] rounded-[var(--kpi-radius)] bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 shadow-2xs hover:border-[#CBD5E1] dark:hover:border-slate-700 transition-colors min-h-[var(--kpi-height)] sm:min-h-[var(--kpi-height-sm)] lg:min-h-[var(--kpi-height-lg)]"
+        tabindex="0"
       >
-        <div class="flex items-center justify-between gap-1.5">
-          <p class="text-[10.5px] sm:text-[11px] lg:text-[11.5px] font-medium text-[#5F7089] truncate">
+        <div class="flex items-center justify-between gap-[var(--kpi-gap)]">
+          <span class="text-[var(--kpi-title-font-size)] sm:text-[var(--kpi-title-font-size-sm)] lg:text-[var(--kpi-title-font-size-lg)] font-medium text-[#5F7089] dark:text-slate-400 truncate">
             Belum Dikirim
-          </p>
+          </span>
           <div
-            class="h-5.5 w-5.5 sm:h-6 sm:w-6 lg:h-6.5 lg:w-6.5 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center shrink-0"
+            class="flex h-[var(--kpi-icon-container-size)] w-[var(--kpi-icon-container-size)] sm:h-[var(--kpi-icon-container-size-sm)] sm:w-[var(--kpi-icon-container-size-sm)] lg:h-[var(--kpi-icon-container-size-lg)] lg:w-[var(--kpi-icon-container-size-lg)] shrink-0 items-center justify-center rounded-md bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400"
           >
             <Package class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           </div>
         </div>
-        <div class="mt-1">
-          <p class="font-num text-[17px] sm:text-[20px] lg:text-[22px] font-bold text-[#333333] leading-none tabular-nums tracking-tight">
+        <div class="mt-0.5">
+          <span class="font-num block text-[var(--kpi-value-font-size)] sm:text-[var(--kpi-value-font-size-sm)] lg:text-[var(--kpi-value-font-size-lg)] font-bold text-[#333333] dark:text-white tabular-nums leading-none tracking-tight">
             {{ summary.belum_dikirim }}
-          </p>
-          <p class="mt-1 text-[10px] sm:text-[10.5px] lg:text-[11px] text-[#64748B] truncate">Siap diproses</p>
+          </span>
+          <span class="mt-0.5 block truncate text-[var(--kpi-caption-font-size)] sm:text-[var(--kpi-caption-font-size-sm)] lg:text-[var(--kpi-caption-font-size-lg)] font-normal text-[#64748B] dark:text-slate-400">Siap diproses</span>
         </div>
       </div>
 
       <div
-        class="rounded-xl border border-[#E2E8F0] bg-white p-2.5 sm:p-3 lg:p-3.5 shadow-2xs flex flex-col justify-between hover:border-[#CBD5E1] transition-colors min-h-[76px] sm:min-h-[84px] lg:min-h-[92px]"
+        class="kpi-focusable flex flex-col justify-between p-[var(--kpi-padding)] sm:p-[var(--kpi-padding-sm)] lg:p-[var(--kpi-padding-lg)] rounded-[var(--kpi-radius)] bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 shadow-2xs hover:border-[#CBD5E1] dark:hover:border-slate-700 transition-colors min-h-[var(--kpi-height)] sm:min-h-[var(--kpi-height-sm)] lg:min-h-[var(--kpi-height-lg)]"
+        tabindex="0"
       >
-        <div class="flex items-center justify-between gap-1.5">
-          <p class="text-[10.5px] sm:text-[11px] lg:text-[11.5px] font-medium text-[#5F7089] truncate">
+        <div class="flex items-center justify-between gap-[var(--kpi-gap)]">
+          <span class="text-[var(--kpi-title-font-size)] sm:text-[var(--kpi-title-font-size-sm)] lg:text-[var(--kpi-title-font-size-lg)] font-medium text-[#5F7089] dark:text-slate-400 truncate">
             Sedang Dikirim
-          </p>
+          </span>
           <div
-            class="h-5.5 w-5.5 sm:h-6 sm:w-6 lg:h-6.5 lg:w-6.5 rounded-lg bg-[#EFF6FF] text-[#0A51B0] flex items-center justify-center shrink-0"
+            class="flex h-[var(--kpi-icon-container-size)] w-[var(--kpi-icon-container-size)] sm:h-[var(--kpi-icon-container-size-sm)] sm:w-[var(--kpi-icon-container-size-sm)] lg:h-[var(--kpi-icon-container-size-lg)] lg:w-[var(--kpi-icon-container-size-lg)] shrink-0 items-center justify-center rounded-md bg-[#EFF6FF] text-[#0A51B0] dark:bg-blue-950/60 dark:text-blue-400"
           >
             <Truck class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           </div>
         </div>
-        <div class="mt-1">
-          <p class="font-num text-[17px] sm:text-[20px] lg:text-[22px] font-bold text-[#333333] leading-none tabular-nums tracking-tight">
+        <div class="mt-0.5">
+          <span class="font-num block text-[var(--kpi-value-font-size)] sm:text-[var(--kpi-value-font-size-sm)] lg:text-[var(--kpi-value-font-size-lg)] font-bold text-[#333333] dark:text-white tabular-nums leading-none tracking-tight">
             {{ summary.sedang_dikirim }}
-          </p>
-          <p class="mt-1 text-[10px] sm:text-[10.5px] lg:text-[11px] text-[#64748B] truncate">Dalam perjalanan</p>
+          </span>
+          <span class="mt-0.5 block truncate text-[var(--kpi-caption-font-size)] sm:text-[var(--kpi-caption-font-size-sm)] lg:text-[var(--kpi-caption-font-size-lg)] font-normal text-[#64748B] dark:text-slate-400">Dalam perjalanan</span>
         </div>
       </div>
 
       <div
-        class="rounded-xl border border-[#E2E8F0] bg-white p-2.5 sm:p-3 lg:p-3.5 shadow-2xs flex flex-col justify-between hover:border-[#CBD5E1] transition-colors min-h-[76px] sm:min-h-[84px] lg:min-h-[92px]"
+        class="kpi-focusable flex flex-col justify-between p-[var(--kpi-padding)] sm:p-[var(--kpi-padding-sm)] lg:p-[var(--kpi-padding-lg)] rounded-[var(--kpi-radius)] bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 shadow-2xs hover:border-[#CBD5E1] dark:hover:border-slate-700 transition-colors min-h-[var(--kpi-height)] sm:min-h-[var(--kpi-height-sm)] lg:min-h-[var(--kpi-height-lg)]"
+        tabindex="0"
       >
-        <div class="flex items-center justify-between gap-1.5">
-          <p class="text-[10.5px] sm:text-[11px] lg:text-[11.5px] font-medium text-[#5F7089] truncate">Diterima</p>
+        <div class="flex items-center justify-between gap-[var(--kpi-gap)]">
+          <span class="text-[var(--kpi-title-font-size)] sm:text-[var(--kpi-title-font-size-sm)] lg:text-[var(--kpi-title-font-size-lg)] font-medium text-[#5F7089] dark:text-slate-400 truncate">Diterima</span>
           <div
-            class="h-5.5 w-5.5 sm:h-6 sm:w-6 lg:h-6.5 lg:w-6.5 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0"
+            class="flex h-[var(--kpi-icon-container-size)] w-[var(--kpi-icon-container-size)] sm:h-[var(--kpi-icon-container-size-sm)] sm:w-[var(--kpi-icon-container-size-sm)] lg:h-[var(--kpi-icon-container-size-lg)] lg:w-[var(--kpi-icon-container-size-lg)] shrink-0 items-center justify-center rounded-md bg-emerald-50 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-400"
           >
             <Truck class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           </div>
         </div>
-        <div class="mt-1">
-          <p class="font-num text-[17px] sm:text-[20px] lg:text-[22px] font-bold text-emerald-600 leading-none tabular-nums tracking-tight">
+        <div class="mt-0.5">
+          <span class="font-num block text-[var(--kpi-value-font-size)] sm:text-[var(--kpi-value-font-size-sm)] lg:text-[var(--kpi-value-font-size-lg)] font-bold text-emerald-600 dark:text-emerald-400 leading-none tabular-nums tracking-tight">
             {{ summary.diterima }}
-          </p>
-          <p class="mt-1 text-[10px] sm:text-[10.5px] lg:text-[11px] text-[#64748B] truncate">Terkirim ke tujuan</p>
+          </span>
+          <span class="mt-0.5 block truncate text-[var(--kpi-caption-font-size)] sm:text-[var(--kpi-caption-font-size-sm)] lg:text-[var(--kpi-caption-font-size-lg)] font-normal text-[#64748B] dark:text-slate-400">Terkirim ke tujuan</span>
         </div>
       </div>
     </div>
 
     <!-- Main Content: Table & List -->
     <div
-      class="shipment-list-surface rounded-2xl border border-[#E2E8F0]/80 bg-white shadow-2xs overflow-hidden"
+      class="shipment-list-surface rounded-xl border border-[#E2E8F0]/80 bg-white shadow-2xs overflow-hidden"
     >
       <div v-if="isLoading" aria-busy="true">
         <SkeletonTable preset="assets" :rows="6" />
@@ -728,7 +732,7 @@ onMounted(() => {
         </div>
 
         <section class="shipment-entry-section">
-          <h3><span>01</span>Informasi pengiriman</h3>
+          <h3>Informasi pengiriman</h3>
           <p class="shipment-entry-hint">Tentukan tanggal pengajuan dan status pengiriman.</p>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
             <div>
@@ -763,7 +767,7 @@ onMounted(() => {
           </div>
         </section>
         <section class="shipment-entry-section shipment-recipient-section">
-          <h3><span>02</span>Penerima & barang</h3>
+          <h3>Penerima & barang</h3>
           <p class="shipment-entry-hint">
             Lengkapi penerima, tujuan, dan rincian barang yang dikirim.
           </p>
@@ -819,7 +823,7 @@ onMounted(() => {
           </div>
         </section>
         <section class="shipment-entry-section">
-          <h3><span>03</span>Pelacakan & bukti</h3>
+          <h3>Pelacakan & bukti</h3>
           <p class="shipment-entry-hint">
             Opsional. Lengkapi setelah nomor resi atau bukti tersedia.
           </p>
@@ -1402,7 +1406,6 @@ onMounted(() => {
 }
 .shipment-summary > div {
   min-width: 0;
-  padding: 10px 12px;
 }
 .shipment-summary p {
   overflow-wrap: anywhere;

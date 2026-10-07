@@ -631,7 +631,7 @@ onMounted(() => {
     </div>
 
     <!-- Table Section -->
-    <div class="rounded-2xl border border-[#E2E8F0]/80 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-2xs overflow-hidden">
+    <div class="rounded-xl border border-[#E2E8F0]/80 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-2xs overflow-hidden">
       <div v-if="isLoading" aria-busy="true">
         <SkeletonTable preset="employees" :rows="6" />
       </div>

@@ -1465,16 +1465,16 @@ function toast(message, type = 'success') {
       <div class="tickets-kpis grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-2.5">
         <!-- 1. Total Tiket -->
         <div
-          class="flex items-center gap-2 p-2 sm:p-2.5 rounded-xl bg-white border border-[#E2E8F0]/80 shadow-2xs hover:border-[#CBD5E1] transition-all min-h-[58px]"
+          class="flex items-center gap-2 p-2 sm:p-2.5 rounded-lg bg-white border border-[#E2E8F0] shadow-2xs hover:border-[#CBD5E1] transition-colors min-h-[56px] sm:min-h-[58px]"
         >
           <div
-            class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-700"
+            class="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-slate-100 text-slate-700"
           >
-            <span aria-hidden="true" class="material-symbols-outlined text-[15px]">inbox</span>
+            <span aria-hidden="true" class="material-symbols-outlined text-[14px]">inbox</span>
           </div>
           <div class="min-w-0">
-            <span class="text-[9.5px] sm:text-[10px] font-medium text-[#5F7089] block truncate">Total Tiket</span>
-            <span class="text-sm sm:text-base font-bold text-[#333333] tabular-nums leading-none mt-0.5 block">{{
+            <span class="text-[11px] sm:text-[11.5px] font-medium text-[#5F7089] block truncate">Total Tiket</span>
+            <span class="text-base sm:text-[17px] font-bold text-[#333333] tabular-nums leading-none mt-0.5 block">{{
               stats.totalTickets ?? 0
             }}</span>
           </div>
@@ -1482,27 +1482,27 @@ function toast(message, type = 'success') {
 
         <!-- 2. Belum Ditugaskan / Unassigned -->
         <div
-          class="flex items-center gap-2 p-2 sm:p-2.5 rounded-xl bg-white border border-[#E2E8F0]/80 shadow-2xs hover:border-[#CBD5E1] transition-all min-h-[58px]"
+          class="flex items-center gap-2 p-2 sm:p-2.5 rounded-lg bg-white border border-[#E2E8F0] shadow-2xs hover:border-[#CBD5E1] transition-colors min-h-[56px] sm:min-h-[58px]"
         >
           <div
-            class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg"
+            class="flex h-6 w-6 shrink-0 items-center justify-center rounded-md"
             :class="
               (stats.unassignedTickets || 0) > 0
-                ? 'bg-amber-50 text-amber-600 border border-amber-200/60'
+                ? 'bg-amber-50 text-[#B45309] border border-amber-200/80'
                 : 'bg-slate-100 text-slate-500'
             "
           >
-            <span aria-hidden="true" class="material-symbols-outlined text-[15px]"
+            <span aria-hidden="true" class="material-symbols-outlined text-[14px]"
               >assignment_late</span
             >
           </div>
           <div class="min-w-0">
-            <span class="text-[9.5px] sm:text-[10px] font-medium text-[#5F7089] block truncate">{{
+            <span class="text-[11px] sm:text-[11.5px] font-medium text-[#5F7089] block truncate">{{
               isAdmin || isSuperAdmin ? 'Belum Diambil' : 'Menunggu Respon'
             }}</span>
             <span
-              class="text-sm sm:text-base font-bold tabular-nums leading-none mt-0.5 block"
-              :class="(stats.unassignedTickets || 0) > 0 ? 'text-amber-600' : 'text-[#333333]'"
+              class="text-base sm:text-[17px] font-bold tabular-nums leading-none mt-0.5 block"
+              :class="(stats.unassignedTickets || 0) > 0 ? 'text-[#B45309]' : 'text-[#333333]'"
               >{{ stats.unassignedTickets ?? 0 }}</span
             >
           </div>
@@ -1510,20 +1510,20 @@ function toast(message, type = 'success') {
 
         <!-- 3. Sedang Diproses -->
         <div
-          class="flex items-center gap-2 p-2 sm:p-2.5 rounded-xl bg-white border border-[#E2E8F0]/80 shadow-2xs hover:border-[#CBD5E1] transition-all min-h-[58px]"
+          class="flex items-center gap-2 p-2 sm:p-2.5 rounded-lg bg-white border border-[#E2E8F0] shadow-2xs hover:border-[#CBD5E1] transition-colors min-h-[56px] sm:min-h-[58px]"
         >
           <div
-            class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#EDF5FF] text-[#333333] border border-[#B8D4F5]/40"
+            class="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-[#EDF5FF] text-[#0A51B0] border border-[#B8D4F5]/40"
           >
-            <span aria-hidden="true" class="material-symbols-outlined text-[15px]"
+            <span aria-hidden="true" class="material-symbols-outlined text-[14px]"
               >pending_actions</span
             >
           </div>
           <div class="min-w-0">
-            <span class="text-[9.5px] sm:text-[10px] font-medium text-[#5F7089] block truncate"
+            <span class="text-[11px] sm:text-[11.5px] font-medium text-[#5F7089] block truncate"
               >Sedang Diproses</span
             >
-            <span class="text-sm sm:text-base font-bold text-[#333333] tabular-nums leading-none mt-0.5 block">{{
+            <span class="text-base sm:text-[17px] font-bold text-[#333333] tabular-nums leading-none mt-0.5 block">{{
               (stats.openTickets || 0) + (stats.pendingTickets || 0)
             }}</span>
           </div>
@@ -1531,16 +1531,16 @@ function toast(message, type = 'success') {
 
         <!-- 4. Selesai / Resolved -->
         <div
-          class="flex items-center gap-2 p-2 sm:p-2.5 rounded-xl bg-white border border-[#E2E8F0]/80 shadow-2xs hover:border-[#CBD5E1] transition-all min-h-[58px]"
+          class="flex items-center gap-2 p-2 sm:p-2.5 rounded-lg bg-white border border-[#E2E8F0] shadow-2xs hover:border-[#CBD5E1] transition-colors min-h-[56px] sm:min-h-[58px]"
         >
           <div
-            class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600 border border-emerald-200/60"
+            class="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-emerald-50 text-emerald-600 border border-emerald-200/60"
           >
-            <span aria-hidden="true" class="material-symbols-outlined text-[15px]">task_alt</span>
+            <span aria-hidden="true" class="material-symbols-outlined text-[14px]">task_alt</span>
           </div>
           <div class="min-w-0">
-            <span class="text-[9.5px] sm:text-[10px] font-medium text-[#5F7089] block truncate">Tiket Selesai</span>
-            <span class="text-sm sm:text-base font-bold text-emerald-600 tabular-nums leading-none mt-0.5 block">{{
+            <span class="text-[11px] sm:text-[11.5px] font-medium text-[#5F7089] block truncate">Tiket Selesai</span>
+            <span class="text-base sm:text-[17px] font-bold text-emerald-600 tabular-nums leading-none mt-0.5 block">{{
               stats.closedTickets ?? 0
             }}</span>
           </div>

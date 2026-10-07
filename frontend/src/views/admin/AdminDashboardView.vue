@@ -182,27 +182,27 @@ function getCategoryBadgeClass(category) {
         </div>
 
         <h1
-          class="text-xl sm:text-3xl font-extrabold text-[#333333] dark:text-white tracking-tight flex items-center gap-2"
+          class="text-lg sm:text-2xl font-extrabold text-[#333333] dark:text-white tracking-tight flex items-center gap-2"
         >
           <span>Knowledge Base</span>
           <span
-            class="text-[11px] sm:text-xs px-2 sm:px-2.5 py-0.5 rounded-full font-bold bg-[#ECF2FF] dark:bg-indigo-950/80 text-[#333333] dark:text-indigo-300 border border-[#0A51B0]/20"
+            class="text-[10px] sm:text-[11px] px-2 py-0.5 rounded-full font-bold bg-[#ECF2FF] dark:bg-indigo-950/80 text-[#0A51B0] dark:text-indigo-300 border border-[#0A51B0]/20"
           >
             Admin CMS
           </span>
         </h1>
 
-        <p class="text-xs sm:text-sm text-[#5F7089] dark:text-slate-400 font-medium">
-          Kelola panduan dan artikel knowledge base.
+        <p class="text-xs text-[#5F7089] dark:text-slate-400 font-medium">
+          Kelola panduan teknis dan artikel bantuan pengguna.
         </p>
       </div>
 
       <button
         v-if="canWrite"
         @click="createNewDoc"
-        class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-[#0A51B0] hover:bg-[#0A4391] text-white shadow-md shadow-[#0A51B0]/25 hover:shadow-lg transition-all cursor-pointer active:scale-95 shrink-0 touch-manipulation"
+        class="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 h-8 sm:h-8.5 px-3.5 sm:px-4 rounded-lg text-xs font-semibold bg-[#0A51B0] hover:bg-[#0A4391] text-white shadow-2xs transition-all cursor-pointer active:scale-95 shrink-0"
       >
-        <Plus class="w-4 h-4" />
+        <Plus class="w-3.5 h-3.5" />
         <span>Dokumen Baru</span>
       </button>
     </div>
@@ -211,97 +211,94 @@ function getCategoryBadgeClass(category) {
     <div class="gsap-admin-el">
       <RouterLink
         to="/admin/kb-categories"
-        class="flex items-center justify-between p-3.5 sm:p-4 rounded-xl bg-white dark:bg-slate-900 border border-[#E5EAEF] dark:border-slate-800 hover:border-[#0A51B0] dark:hover:border-[#0A51B0] transition-colors group shadow-2xs"
+        class="flex items-center justify-between p-2.5 sm:p-3 rounded-lg bg-white dark:bg-slate-900 border border-[#E5EAEF] dark:border-slate-800 hover:border-[#0A51B0] dark:hover:border-[#0A51B0] transition-colors group shadow-2xs"
       >
-        <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
+        <div class="flex items-center gap-2.5 min-w-0">
           <div
-            class="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-[#ECF2FF] dark:bg-slate-800 text-[#333333] dark:text-indigo-300 flex items-center justify-center group-hover:bg-[#0A51B0] group-hover:text-white transition-colors shrink-0"
+            class="w-7 h-7 sm:w-7.5 sm:h-7.5 rounded-md bg-[#ECF2FF] dark:bg-slate-800 text-[#0A51B0] dark:text-indigo-300 flex items-center justify-center group-hover:bg-[#0A51B0] group-hover:text-white transition-colors shrink-0"
           >
-            <LayoutGrid class="w-4 h-4" />
+            <LayoutGrid class="w-3.5 h-3.5" />
           </div>
           <div class="min-w-0">
-            <div class="text-xs sm:text-sm font-semibold text-[#333333] dark:text-white truncate">
+            <div class="text-xs sm:text-[13px] font-semibold text-[#333333] dark:text-white truncate">
               Kategori Knowledge Base
             </div>
             <div
-              class="text-[11px] sm:text-xs text-[#5F7089] dark:text-slate-400 font-normal truncate"
+              class="text-[10.5px] sm:text-[11px] text-[#5F7089] dark:text-slate-400 font-normal truncate"
             >
-              Kelola topic cards yang tampil di Browse Topics Help Center.
+              Kelola kategori topik pada pusat bantuan pengguna.
             </div>
           </div>
         </div>
         <ChevronRight
-          class="w-4 h-4 text-[#687281] group-hover:text-[#333333] group-hover:translate-x-0.5 transition-all shrink-0 ml-2"
+          class="w-3.5 h-3.5 text-[#687281] group-hover:text-[#333333] group-hover:translate-x-0.5 transition-all shrink-0 ml-2"
         />
       </RouterLink>
     </div>
 
     <!-- Stats Row (Balanced 3 columns on mobile and desktop) -->
-    <div class="grid grid-cols-3 gap-2 sm:gap-4 gsap-admin-el">
+    <div class="grid grid-cols-3 gap-1.5 sm:gap-2 gsap-admin-el">
       <!-- Total -->
       <div
-        class="p-3 sm:p-5 rounded-xl bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 transition-colors hover:border-slate-300 dark:hover:border-slate-700"
+        class="flex items-center gap-2 p-1.5 sm:p-2 rounded-lg bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 transition-colors min-h-[44px] sm:min-h-[48px]"
       >
-        <div class="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-1.5 sm:mb-3">
-          <div
-            class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center shrink-0"
-          >
-            <FileText class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-          </div>
-          <span
-            class="text-[10px] sm:text-xs font-semibold text-[#5F7089] dark:text-slate-400 truncate"
-            >Total Panduan</span
-          >
-        </div>
-        <p
-          class="text-lg sm:text-2xl font-bold text-[#333333] dark:text-white tracking-tight tabular-nums"
+        <div
+          class="w-5.5 h-5.5 sm:w-6 sm:h-6 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center shrink-0"
         >
-          {{ stats.total }}
-        </p>
+          <FileText class="w-3.5 h-3.5" />
+        </div>
+        <div class="min-w-0">
+          <span class="text-[9.5px] sm:text-[10px] font-medium text-[#5F7089] dark:text-slate-400 block truncate"
+            >Total Artikel</span
+          >
+          <p
+            class="text-sm sm:text-base font-bold text-[#333333] dark:text-white tabular-nums leading-none mt-0.5"
+          >
+            {{ stats.total }}
+          </p>
+        </div>
       </div>
 
       <!-- Published -->
       <div
-        class="p-3 sm:p-5 rounded-xl bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 transition-colors hover:border-slate-300 dark:hover:border-slate-700"
+        class="flex items-center gap-2 p-1.5 sm:p-2 rounded-lg bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 transition-colors min-h-[44px] sm:min-h-[48px]"
       >
-        <div class="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-1.5 sm:mb-3">
-          <div
-            class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0"
-          >
-            <CheckCircle class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-          </div>
-          <span
-            class="text-[10px] sm:text-xs font-semibold text-[#5F7089] dark:text-slate-400 truncate"
-            >Published</span
-          >
-        </div>
-        <p
-          class="text-lg sm:text-2xl font-bold text-[#333333] dark:text-white tracking-tight tabular-nums"
+        <div
+          class="w-5.5 h-5.5 sm:w-6 sm:h-6 rounded-md bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0"
         >
-          {{ stats.published }}
-        </p>
+          <CheckCircle class="w-3.5 h-3.5" />
+        </div>
+        <div class="min-w-0">
+          <span class="text-[9.5px] sm:text-[10px] font-medium text-[#5F7089] dark:text-slate-400 block truncate"
+            >Terbit</span
+          >
+          <p
+            class="text-sm sm:text-base font-bold text-[#333333] dark:text-white tabular-nums leading-none mt-0.5"
+          >
+            {{ stats.published }}
+          </p>
+        </div>
       </div>
 
       <!-- Custom -->
       <div
-        class="p-3 sm:p-5 rounded-xl bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 transition-colors hover:border-slate-300 dark:hover:border-slate-700"
+        class="flex items-center gap-2 p-1.5 sm:p-2 rounded-lg bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 transition-colors min-h-[44px] sm:min-h-[48px]"
       >
-        <div class="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-1.5 sm:mb-3">
-          <div
-            class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-violet-50 dark:bg-violet-950/60 text-violet-600 dark:text-violet-400 flex items-center justify-center shrink-0"
-          >
-            <Sparkles class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-          </div>
-          <span
-            class="text-[10px] sm:text-xs font-semibold text-[#5F7089] dark:text-slate-400 truncate"
-            >Custom</span
-          >
-        </div>
-        <p
-          class="text-lg sm:text-2xl font-bold text-[#333333] dark:text-white tracking-tight tabular-nums"
+        <div
+          class="w-5.5 h-5.5 sm:w-6 sm:h-6 rounded-md bg-[#EDF5FF] dark:bg-blue-950/60 text-[#0A51B0] dark:text-blue-400 flex items-center justify-center shrink-0"
         >
-          {{ stats.custom }}
-        </p>
+          <Sparkles class="w-3.5 h-3.5" />
+        </div>
+        <div class="min-w-0">
+          <span class="text-[9.5px] sm:text-[10px] font-medium text-[#5F7089] dark:text-slate-400 block truncate"
+            >Kustom</span
+          >
+          <p
+            class="text-sm sm:text-base font-bold text-[#333333] dark:text-white tabular-nums leading-none mt-0.5"
+          >
+            {{ stats.custom }}
+          </p>
+        </div>
       </div>
     </div>
 

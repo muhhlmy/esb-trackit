@@ -365,7 +365,7 @@ onMounted(() => {
       </div>
     </PageHeader>
 
-    <!-- Danger Zone: Reset Database Card (Superadmin only) -->
+    <!-- Tindakan Kritis: Reset Database (Superadmin only) -->
     <div
       v-if="isSuperAdmin"
       class="bg-rose-50/70 border border-rose-200/80 rounded-2xl p-4 sm:p-5 shadow-2xs transition-all"
@@ -376,7 +376,7 @@ onMounted(() => {
             class="flex items-center gap-1.5 text-xs text-rose-700 font-bold tracking-wide uppercase"
           >
             <span aria-hidden="true" class="material-symbols-outlined text-[16px]">warning</span>
-            <span>Danger Zone — Pemeliharaan Database</span>
+            <span>Tindakan Kritis: Reset Database</span>
           </div>
           <h3 class="text-sm font-bold text-rose-900">Reset &amp; Kosongkan Database</h3>
           <p class="text-xs text-rose-700/90 leading-relaxed max-w-2xl">
@@ -433,9 +433,6 @@ onMounted(() => {
             >tune</span
           >
           <span>Ekspor Kustom</span>
-          <span class="rounded-md bg-[#EFF6FF] px-1.5 py-0.2 text-[10px] font-medium text-[#333333]"
-            >Advanced</span
-          >
         </button>
 
         <button

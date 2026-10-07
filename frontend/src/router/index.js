@@ -59,7 +59,7 @@ const routes = [
   // Management Routes (TrackIT Monitoring)
   page('/dashboard', 'dashboard', () => import('../views/DashboardView.vue'), {
     title: 'Dashboard',
-    subtitle: 'Overview & analytics',
+    subtitle: 'Ringkasan aset, status perangkat, dan tiket aktif',
     permission: 'dashboard',
   }),
   page('/assets', 'assets', () => import('../views/AssetsView.vue'), {
@@ -69,40 +69,40 @@ const routes = [
   }),
   page('/assets-ga', 'assets-ga', () => import('../views/AssetsGaView.vue'), {
     title: 'Aset GA',
-    subtitle: 'Kelola aset GA',
+    subtitle: 'Inventaris fasilitas dan sarana kerja umum',
     permission: 'assets_ga',
     alias: '/assets/ga',
   }),
   page('/assets-ops', 'assets-ops', () => import('../views/AssetsOpsView.vue'), {
     title: 'Aset Ops',
-    subtitle: 'Kelola aset operasional',
+    subtitle: 'Perangkat operasional armada dan outlet',
     permission: 'assets_ops',
     alias: '/assets/ops',
   }),
   page('/my-assets', 'my-assets', () => import('../views/MyAssetsView.vue'), {
     title: 'Aset Karyawan',
-    subtitle: 'Kelola aset karyawan',
+    subtitle: 'Alokasi inventaris yang dipegang staf',
     permission: 'my_assets',
     alias: '/assets/karyawan',
   }),
   page('/karyawan', 'karyawan', () => import('../views/EmployeesView.vue'), {
     title: 'Karyawan',
-    subtitle: 'Kelola data karyawan',
+    subtitle: 'Direktori staf, departemen, dan unit penempatan',
     permission: 'karyawan',
   }),
   page('/tickets', 'tickets', () => import('../views/TicketsView.vue'), {
     title: 'Tiket',
-    subtitle: 'Kelola tiket helpdesk',
+    subtitle: 'Antrean layanan, resolusi gangguan, dan eskalasi IT',
     permission: 'tickets',
   }),
   page('/users', 'users', () => import('../views/UsersView.vue'), {
     title: 'Pengguna',
-    subtitle: 'Kelola data pengguna',
+    subtitle: 'Hak akses, role pengguna, dan autentikasi tim',
     permission: 'users',
   }),
   page('/faqs', 'faqs', () => import('../views/FaqAdminView.vue'), {
     title: 'FAQ',
-    subtitle: 'Kelola FAQ Help Center',
+    subtitle: 'Pertanyaan umum dan solusi cepat pengguna',
     permission: 'knowledge_base',
   }),
   page('/submissions/new', 'submission-new', () => import('../views/SubmissionsView.vue'), {
@@ -116,7 +116,7 @@ const routes = [
   }),
   page('/submissions', 'submissions', () => import('../views/SubmissionsView.vue'), {
     title: 'Pengajuan',
-    subtitle: 'Kelola pengajuan',
+    subtitle: 'Permohonan pengadaan, mutasi, dan perbaikan',
     permission: 'submissions',
     alias: '/pengajuan',
   }),
@@ -133,7 +133,7 @@ const routes = [
   }),
   page('/export', 'export', () => import('../views/ExportView.vue'), {
     title: 'Ekspor Data',
-    subtitle: 'Ekspor dan kelola data',
+    subtitle: 'Unduh laporan berkala format CSV dan Excel',
     permission: 'export',
     superadminOnly: true,
   }),
@@ -146,7 +146,7 @@ const routes = [
   // Help Center Admin CMS Routes
   page('/admin/cases', 'admin-cases', () => import('../views/admin/AdminDashboardView.vue'), {
     title: 'Admin CMS',
-    subtitle: 'Kelola Artikel Knowledge Base',
+    subtitle: 'Pusat panduan teknis dan standard operating procedure',
     adminOnly: true,
     permission: 'knowledge_base',
   }),
@@ -156,14 +156,14 @@ const routes = [
     () => import('../views/admin/KbCategoriesView.vue'),
     {
       title: 'Kategori KB',
-      subtitle: 'Kelola Topic Cards Help Center',
+      subtitle: 'Kategori topik dan navigasi pusat bantuan',
       adminOnly: true,
       permission: 'knowledge_base',
     },
   ),
   page('/admin/editor/:id?', 'article-editor', () => import('../views/admin/DocEditorView.vue'), {
     title: 'Article Editor',
-    subtitle: 'Editor Artikel Knowledge Base',
+    subtitle: 'Penyusunan panduan teknis dan dokumentasi sistem',
     adminOnly: true,
     permission: 'knowledge_base',
     alias: '/admin/article-editor/:id?',

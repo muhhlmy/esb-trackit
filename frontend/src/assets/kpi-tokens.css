@@ -1,0 +1,93 @@
+/* kpi-tokens.css — Anti-Slop Centralized Design Tokens for KPI Cards */
+:root {
+  /* Height */
+  --kpi-height: 76px;               /* base / mobile */
+  --kpi-height-sm: 84px;            /* tablet */
+  --kpi-height-lg: 92px;            /* desktop */
+
+  /* Padding */
+  --kpi-padding: 10px;              /* base / mobile */
+  --kpi-padding-sm: 12px;           /* tablet */
+  --kpi-padding-lg: 14px;           /* desktop */
+
+  /* Title font */
+  --kpi-title-font-size: 10.5px;
+  --kpi-title-font-size-sm: 11px;
+  --kpi-title-font-size-lg: 11.5px;
+  --kpi-title-font-weight: 500;
+
+  /* Value font */
+  --kpi-value-font-size: 17px;
+  --kpi-value-font-size-sm: 20px;
+  --kpi-value-font-size-lg: 22px;
+  --kpi-value-font-weight: 700;
+  --kpi-value-font-numeric: tabular-nums;
+
+  /* Caption / subtitle font */
+  --kpi-caption-font-size: 10px;
+  --kpi-caption-font-size-sm: 10.5px;
+  --kpi-caption-font-size-lg: 11px;
+  --kpi-caption-font-weight: 400;
+
+  /* Icon size (the symbol itself) */
+  --kpi-icon-size: 14px;
+  --kpi-icon-size-sm: 15px;
+  --kpi-icon-size-lg: 16px;
+
+  /* Icon container (square that holds the icon) */
+  --kpi-icon-container-size: 22px;
+  --kpi-icon-container-size-sm: 24px;
+  --kpi-icon-container-size-lg: 26px;
+
+  /* Gap between icon and text */
+  --kpi-gap: 6px;
+  --kpi-gap-sm: 6px;
+  --kpi-gap-lg: 6px;
+
+  /* Border radius */
+  --kpi-radius: 12px;
+
+  /* Shadow */
+  --kpi-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+
+  /* Hover border (light) */
+  --kpi-hover-border: #cbd5e1;
+
+  /* Hover border (dark) */
+  --kpi-hover-border-dark: #64748b;
+
+  /* Background colors */
+  --kpi-bg: #ffffff;
+  --kpi-bg-dark: #0f172a;
+
+  /* Border colors */
+  --kpi-border: #e2e8f0;
+  --kpi-border-dark: #1e293b;
+
+  /* Text colors (light) */
+  --kpi-label-color: #5f7089;
+  --kpi-value-color: #333333;
+  --kpi-caption-color: #64748b;
+
+  /* Text colors (dark) */
+  --kpi-label-color-dark: #94a3b8;
+  --kpi-value-color-dark: #f8fafc;
+  --kpi-caption-color-dark: #94a3b8;
+
+  /* Icon container background (light) */
+  --kpi-icon-bg: #eff6ff;
+  /* Icon container background (dark) */
+  --kpi-icon-bg-dark: #1e293b;
+}
+
+/* Ensure keyboard focus is visible (Step 5) */
+.kpi-focusable:focus-visible {
+  outline: 2px solid #0a51b0;
+  outline-offset: 2px;
+}
+
+/* Dark mode variant */
+.dark .kpi-focusable:focus-visible {
+  outline: 2px solid #60a5fa;
+  outline-offset: 2px;
+}

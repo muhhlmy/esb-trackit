@@ -29,7 +29,7 @@ const dictionaries = {
 
     // Topics
     browse_topics: 'Kategori Panduan',
-    view_all_articles: 'Lihat Semua Artikel',
+    view_all_articles: 'Lihat semua artikel',
     learn_more: 'Buka Panduan',
 
     // Topic Cards (fallback & translations)
@@ -42,7 +42,7 @@ const dictionaries = {
 
     // Featured Articles
     featured_articles: 'Artikel Unggulan',
-    view_all_sops: 'Lihat Semua Artikel',
+    view_all_sops: 'Lihat semua artikel',
 
     // FAQ
     faq_tag: 'FAQ',

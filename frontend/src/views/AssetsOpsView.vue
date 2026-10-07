@@ -28,7 +28,7 @@ const { viewMode } = useViewMode('assets-ops', 'table')
 const assets = ref([])
 // Count complete category records, independent of table filters and pagination.
 const assetStats = computed(() => [
-  { title: 'Total Aset Ops', value: assets.value.length, icon: 'inventory_2', color: 'primary' },
+  { title: 'Total aset Ops', value: assets.value.length, icon: 'inventory_2', color: 'primary' },
   {
     title: 'Aktif',
     value: assets.value.filter((asset) => asset.status === 'Aktif').length,
@@ -36,7 +36,7 @@ const assetStats = computed(() => [
     color: 'success',
   },
   {
-    title: 'Maintenance',
+    title: 'Perawatan',
     value: assets.value.filter((asset) => asset.status === 'Maintenance').length,
     icon: 'build',
     color: 'warning',
@@ -522,7 +522,7 @@ function formatDate(dateStr) {
         :value="isLoading || pageError ? '—' : stat.value"
         :icon="stat.icon"
         :color="stat.color"
-        :subtitle="isLoading ? 'Memuat…' : pageError ? 'Tidak tersedia' : 'Seluruh data kategori'"
+        :subtitle="isLoading ? 'Memuat…' : pageError ? 'Tidak tersedia' : 'Seluruh data kategori aset'"
       />
     </section>
 

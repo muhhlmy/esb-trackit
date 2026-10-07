@@ -15,10 +15,11 @@ defineProps({
 
 <template>
   <div
-    class="bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 rounded-xl p-2.5 sm:p-3 lg:p-3.5 shadow-2xs hover:border-[#CBD5E1] dark:hover:border-slate-700 transition-colors flex flex-col justify-between min-h-[76px] sm:min-h-[84px] lg:min-h-[92px]"
+    class="kpi-focusable bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 rounded-xl p-2.5 sm:p-3 lg:p-3.5 shadow-2xs hover:border-[#CBD5E1] dark:hover:border-slate-700 transition-colors flex flex-col justify-between min-h-[var(--kpi-height)] sm:min-h-[var(--kpi-height-sm)] lg:min-h-[var(--kpi-height-lg)]"
+    tabindex="0"
   >
-    <div class="flex items-center justify-between gap-1.5">
-      <span class="text-[10.5px] sm:text-[11px] lg:text-[11.5px] font-medium text-[#5F7089] dark:text-slate-400 truncate">{{
+    <div class="flex items-center justify-between gap-[var(--kpi-gap)]">
+      <span class="text-[var(--kpi-title-font-size)] sm:text-[var(--kpi-title-font-size-sm)] lg:text-[var(--kpi-title-font-size-lg)] font-medium text-[#5F7089] dark:text-slate-400 truncate">{{
         title
       }}</span>
       <div
@@ -31,16 +32,16 @@ defineProps({
           'bg-[#FEF2F2] text-[#DC2626] dark:bg-rose-950/60 dark:text-rose-400': color === 'danger',
         }"
       >
-        <span aria-hidden="true" class="material-symbols-outlined text-[14px] sm:text-[15px] lg:text-[16px]">{{ icon }}</span>
+        <span aria-hidden="true" class="material-symbols-outlined text-[var(--kpi-icon-size)] sm:text-[var(--kpi-icon-size-sm)] lg:text-[var(--kpi-icon-size-lg)]">{{ icon }}</span>
       </div>
     </div>
 
     <div class="mt-1">
       <span
-        class="font-num block text-[17px] sm:text-[20px] lg:text-[22px] font-bold leading-none tracking-tight text-[#333333] dark:text-white tabular-nums"
+        class="font-num block text-[var(--kpi-value-font-size)] sm:text-[var(--kpi-value-font-size-sm)] lg:text-[var(--kpi-value-font-size-lg)] font-bold leading-none tracking-tight text-[#333333] dark:text-white tabular-nums"
         >{{ value }}</span
       >
-      <span v-if="subtitle" class="mt-1 block truncate text-[10px] sm:text-[10.5px] lg:text-[11px] font-normal text-[#64748B] dark:text-slate-400">{{
+      <span v-if="subtitle" class="mt-1 block truncate text-[var(--kpi-caption-font-size)] sm:text-[var(--kpi-caption-font-size-sm)] lg:text-[var(--kpi-caption-font-size-lg)] font-normal text-[#64748B] dark:text-slate-400">{{
         subtitle
       }}</span>
     </div>

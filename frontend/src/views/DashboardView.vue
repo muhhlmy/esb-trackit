@@ -624,9 +624,9 @@ onUnmounted(() => {
          ═════════════════════════════════════════════ -->
     <template v-else-if="stats">
       <div class="dashboard-stats">
-        <div class="dash-stat-card stat-total shadow-2xs">
+        <div class="dash-stat-card stat-total shadow-2xs kpi-focusable" tabindex="0">
           <div class="stat-label">
-            <span class="stat-label-text">Total Aset</span>
+            <span class="stat-label-text">Total aset</span>
             <span class="material-symbols-outlined" aria-hidden="true">inventory_2</span>
           </div>
           <p class="stat-number">{{ totalAssets }}</p>
@@ -664,7 +664,8 @@ onUnmounted(() => {
             },
           ]"
           :key="item.label"
-          class="dash-stat-card shadow-2xs"
+          class="dash-stat-card shadow-2xs kpi-focusable"
+          tabindex="0"
           :class="'stat-' + item.tone"
         >
           <div class="stat-label">
@@ -1261,26 +1262,26 @@ onUnmounted(() => {
   flex-direction: column;
   justify-content: space-between;
   min-width: 0;
-  min-height: 92px;
-  padding: 14px;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  background: white;
+  min-height: var(--kpi-height-lg);
+  padding: var(--kpi-padding-lg);
+  border: 1px solid var(--kpi-border);
+  border-radius: var(--kpi-radius);
+  background: var(--kpi-bg);
   transition: border-color 0.15s ease;
 }
 .dash-stat-card:hover {
-  border-color: #cbd5e1;
+  border-color: var(--kpi-hover-border);
 }
 .stat-label {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 6px;
+  gap: var(--kpi-gap-lg);
   min-height: 24px;
-  font-size: 11.5px;
-  font-weight: 500;
+  font-size: var(--kpi-title-font-size-lg);
+  font-weight: var(--kpi-title-font-weight);
   line-height: 1.3;
-  color: #5f7089;
+  color: var(--kpi-label-color);
 }
 .stat-label-text {
   min-width: 0;
@@ -1292,26 +1293,27 @@ onUnmounted(() => {
   display: grid;
   place-items: center;
   flex-shrink: 0;
-  width: 26px;
-  height: 26px;
+  width: var(--kpi-icon-container-size-lg);
+  height: var(--kpi-icon-container-size-lg);
   border-radius: 8px;
-  background: #eff6ff;
+  background: var(--kpi-icon-bg);
   color: var(--stat-color);
-  font-size: 16px;
+  font-size: var(--kpi-icon-size-lg);
 }
 .stat-number {
   margin: 3px 0 1px;
   overflow-wrap: anywhere;
-  font-size: 22px;
-  font-weight: 700;
+  font-size: var(--kpi-value-font-size-lg);
+  font-weight: var(--kpi-value-font-weight);
   line-height: 1.1;
   letter-spacing: -0.02em;
-  font-variant-numeric: tabular-nums;
-  color: #333333;
+  font-variant-numeric: var(--kpi-value-font-numeric);
+  color: var(--kpi-value-color);
 }
 .stat-caption {
-  font-size: 11px;
-  color: #64748b;
+  font-size: var(--kpi-caption-font-size-lg);
+  font-weight: var(--kpi-caption-font-weight);
+  color: var(--kpi-caption-color);
   margin-top: auto;
   white-space: nowrap;
   overflow: hidden;
@@ -1526,11 +1528,22 @@ onUnmounted(() => {
     gap: 10px;
   }
   .dash-stat-card {
-    min-height: 84px;
-    padding: 12px;
+    min-height: var(--kpi-height-sm);
+    padding: var(--kpi-padding-sm);
+  }
+  .stat-label {
+    font-size: var(--kpi-title-font-size-sm);
+  }
+  .stat-label > .material-symbols-outlined {
+    width: var(--kpi-icon-container-size-sm);
+    height: var(--kpi-icon-container-size-sm);
+    font-size: var(--kpi-icon-size-sm);
   }
   .stat-number {
-    font-size: 20px;
+    font-size: var(--kpi-value-font-size-sm);
+  }
+  .stat-caption {
+    font-size: var(--kpi-caption-font-size-sm);
   }
   .dashboard-recent-cards {
     display: grid;
@@ -1547,30 +1560,30 @@ onUnmounted(() => {
     gap: 8px;
   }
   .dash-stat-card {
-    padding: 10px;
-    min-height: 76px;
-    border-radius: 12px;
+    padding: var(--kpi-padding);
+    min-height: var(--kpi-height);
+    border-radius: var(--kpi-radius);
   }
   .stat-label {
-    font-size: 10.5px;
-    gap: 4px;
+    font-size: var(--kpi-title-font-size);
+    gap: var(--kpi-gap);
     min-height: 22px;
   }
   .stat-label > .material-symbols-outlined {
-    width: 22px;
-    height: 22px;
-    font-size: 14px;
+    width: var(--kpi-icon-container-size);
+    height: var(--kpi-icon-container-size);
+    font-size: var(--kpi-icon-size);
   }
   .stat-number {
-    font-size: 17px;
+    font-size: var(--kpi-value-font-size);
     margin: 2px 0 1px;
   }
   .stat-caption {
-    font-size: 10px;
+    font-size: var(--kpi-caption-font-size);
   }
   .stat-bottom {
-    font-size: 10px;
-    gap: 6px;
+    font-size: var(--kpi-caption-font-size);
+    gap: var(--kpi-gap);
   }
   .dashboard-panel {
     padding: 12px 14px;

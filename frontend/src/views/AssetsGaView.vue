@@ -27,7 +27,7 @@ const { viewMode } = useViewMode('assets-ga', 'table')
 const assets = ref([])
 // Count complete category records, independent of table filters and pagination.
 const assetStats = computed(() => [
-  { title: 'Total Aset GA', value: assets.value.length, icon: 'inventory_2', color: 'primary' },
+  { title: 'Total aset GA', value: assets.value.length, icon: 'inventory_2', color: 'primary' },
   {
     title: 'Baik',
     value: assets.value.filter((asset) => asset.kondisi === 'Baik').length,
@@ -35,13 +35,13 @@ const assetStats = computed(() => [
     color: 'success',
   },
   {
-    title: 'Rusak Ringan',
+    title: 'Rusak ringan',
     value: assets.value.filter((asset) => asset.kondisi === 'Rusak Ringan').length,
     icon: 'build',
     color: 'warning',
   },
   {
-    title: 'Rusak Berat',
+    title: 'Rusak berat',
     value: assets.value.filter((asset) => asset.kondisi === 'Rusak Berat').length,
     icon: 'warning',
     color: 'danger',
@@ -521,7 +521,7 @@ function formatKondisiPill(kondisi) {
         :value="isLoading || pageError ? '—' : stat.value"
         :icon="stat.icon"
         :color="stat.color"
-        :subtitle="isLoading ? 'Memuat…' : pageError ? 'Tidak tersedia' : 'Seluruh data kategori'"
+        :subtitle="isLoading ? 'Memuat…' : pageError ? 'Tidak tersedia' : 'Seluruh data kategori aset'"
       />
     </section>
 

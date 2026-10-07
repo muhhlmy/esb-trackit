@@ -1,5 +1,6 @@
 @import 'tailwindcss';
 @import '../styles/tokens.css';
+@import './kpi-tokens.css';
 
 /* Enable class-based dark mode (Tailwind v4 — darkMode:"class" in config is a v3 no-op).
    Without this, dark: utilities key off prefers-color-scheme instead of the .dark class. */

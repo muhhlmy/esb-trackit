@@ -1,4 +1,4 @@
-﻿<script setup>
+<script setup>
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useApi } from '../composables/useApi.js'
@@ -36,7 +36,7 @@ const { viewMode } = useViewMode('assets-it', 'table')
 const assets = ref([])
 // Count complete category records, independent of table filters and pagination.
 const assetStats = computed(() => [
-  { title: 'Total Aset IT', value: assets.value.length, icon: 'inventory_2', color: 'primary' },
+  { title: 'Total aset IT', value: assets.value.length, icon: 'inventory_2', color: 'primary' },
   {
     title: 'Digunakan',
     value: assets.value.filter((asset) => asset.status_aset === 'In Use').length,

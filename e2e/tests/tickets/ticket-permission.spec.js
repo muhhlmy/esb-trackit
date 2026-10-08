@@ -22,10 +22,14 @@ test.describe('Ticket Management - Permissions Suite', () => {
     const page = userPage
 
     // Verify user is authenticated first
-    await page.goto('/my-assets', { waitUntil: 'domcontentloaded' })
+    await page.goto('/my-assets', { waitUntil: 'domcontentloaded' }).catch((err) => {
+      if (!err.message.includes('NS_BINDING_ABORTED')) throw err
+    })
     await expect(page).not.toHaveURL(/\/login/)
 
-    await page.goto('/tickets', { waitUntil: 'domcontentloaded' })
+    await page.goto('/tickets', { waitUntil: 'domcontentloaded' }).catch((err) => {
+      if (!err.message.includes('NS_BINDING_ABORTED')) throw err
+    })
 
     // Normal user should NOT see admin-only controls
     await expect(page.getByRole('button', { name: /kelola queue/i })).not.toBeVisible()

@@ -72,19 +72,19 @@ defineProps({
   min-width: 0;
 }
 .chart-card > div:first-child:has(h3) {
-  margin-bottom: 24px;
-  padding-bottom: 18px;
-  gap: 16px;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  gap: 10px;
 }
 .chart-card h3 {
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 650;
-  line-height: 1.5;
-  letter-spacing: -0.02em;
+  line-height: 1.35;
+  letter-spacing: -0.015em;
 }
 .chart-card h3 + p {
-  margin-top: 6px;
-  font-size: 12px;
-  line-height: 1.6;
+  margin-top: 2px;
+  font-size: 11px;
+  line-height: 1.45;
 }
 </style>

@@ -193,12 +193,12 @@ function clearFilters() {
   >
     <!-- Header Card -->
     <div
-      class="admin-page-header ws-toolbar-flat flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3.5 bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 p-3 sm:p-4 rounded-xl shadow-2xs gsap-admin-el"
+      class="admin-page-header ws-toolbar-flat flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 p-2.5 sm:p-3 rounded-[6px] shadow-2xs gsap-admin-el"
     >
-      <div class="space-y-1 sm:space-y-1.5 w-full sm:w-auto">
+      <div class="space-y-0.5 sm:space-y-1 w-full sm:w-auto">
         <!-- Breadcrumb -->
         <div
-          class="flex items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs font-semibold text-[#5F7089] dark:text-slate-400"
+          class="flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-[11px] font-medium text-[#5F7089] dark:text-slate-400"
         >
           <RouterLink
             to="/dashboard"
@@ -211,22 +211,22 @@ function clearFilters() {
             <span>Admin CMS</span>
           </RouterLink>
           <ChevronRight class="w-3 h-3 text-slate-400" />
-          <span class="text-[#333333] dark:text-white font-bold">Kategori</span>
+          <span class="text-[#333333] dark:text-white font-semibold">Kategori</span>
         </div>
 
         <h1
-          class="text-base sm:text-lg font-bold text-[#333333] dark:text-white tracking-tight flex items-center gap-2 flex-wrap"
+          class="text-[16px] sm:text-[18px] font-semibold text-[#333333] dark:text-white tracking-tight flex items-center gap-2 flex-wrap"
         >
           <span>Kategori Knowledge Base</span>
           <span
-            class="text-[10px] sm:text-[11px] px-2 py-0.5 rounded-full font-bold bg-[#ECF2FF] dark:bg-indigo-950/80 text-[#0A51B0] dark:text-indigo-300 border border-[#0A51B0]/20"
+            class="text-[10px] sm:text-[11px] px-2 py-0.5 rounded-full font-medium bg-[#ECF2FF] dark:bg-indigo-950/80 text-[#0A51B0] dark:text-indigo-300 border border-[#0A51B0]/20"
           >
             Admin CMS
           </span>
         </h1>
 
         <p
-          class="text-[11px] sm:text-xs text-[#5F7089] dark:text-slate-400 font-medium leading-relaxed"
+          class="text-[10px] sm:text-[11px] text-[#5F7089] dark:text-slate-400 leading-normal"
         >
           Kelola topic cards yang tampil di halaman Browse Topics Help Center.
         </p>
@@ -235,7 +235,7 @@ function clearFilters() {
       <button
         v-if="canWrite"
         @click="openCreateDrawer"
-        class="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 h-8.5 sm:h-9 px-3.5 sm:px-4 rounded-lg text-xs font-semibold bg-[#0A51B0] hover:bg-[#0A4391] text-white shadow-2xs transition-all cursor-pointer shrink-0"
+        class="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 h-8 px-3 rounded-[6px] text-xs font-medium bg-[#0A51B0] hover:bg-[#0A4391] text-white shadow-2xs transition-all cursor-pointer shrink-0"
       >
         <Plus class="w-3.5 h-3.5" />
         <span>Kategori Baru</span>
@@ -251,23 +251,23 @@ function clearFilters() {
       >
         <div class="flex items-center justify-between gap-[var(--kpi-gap)]">
           <span
-            class="text-[var(--kpi-title-font-size)] sm:text-[var(--kpi-title-font-size-sm)] lg:text-[var(--kpi-title-font-size-lg)] font-medium text-[#5F7089] dark:text-slate-400 truncate"
+            class="text-[length:var(--kpi-title-font-size)] sm:text-[length:var(--kpi-title-font-size-sm)] lg:text-[length:var(--kpi-title-font-size-lg)] font-medium text-[#5F7089] dark:text-slate-400 truncate"
             >Total kategori</span
           >
           <div
-            class="flex h-[var(--kpi-icon-container-size)] w-[var(--kpi-icon-container-size)] sm:h-[var(--kpi-icon-container-size-sm)] sm:w-[var(--kpi-icon-container-size-sm)] lg:h-[var(--kpi-icon-container-size-lg)] lg:w-[var(--kpi-icon-container-size-lg)] shrink-0 items-center justify-center rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300"
+            class="flex h-[var(--kpi-icon-container-size)] w-[var(--kpi-icon-container-size)] sm:h-[var(--kpi-icon-container-size-sm)] sm:w-[var(--kpi-icon-container-size-sm)] lg:h-[var(--kpi-icon-container-size-lg)] lg:w-[var(--kpi-icon-container-size-lg)] shrink-0 items-center justify-center rounded-[6px] bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300"
           >
             <LayoutGrid class="w-[var(--kpi-icon-size)] h-[var(--kpi-icon-size)] sm:w-[var(--kpi-icon-size-sm)] sm:h-[var(--kpi-icon-size-sm)] lg:w-[var(--kpi-icon-size-lg)] lg:h-[var(--kpi-icon-size-lg)]" />
           </div>
         </div>
         <div class="mt-0.5">
           <p
-            class="font-num text-[var(--kpi-value-font-size)] sm:text-[var(--kpi-value-font-size-sm)] lg:text-[var(--kpi-value-font-size-lg)] font-bold text-[#333333] dark:text-white tabular-nums leading-none tracking-tight"
+            class="font-num text-[length:var(--kpi-value-font-size)] sm:text-[length:var(--kpi-value-font-size-sm)] lg:text-[length:var(--kpi-value-font-size-lg)] font-semibold text-[#333333] dark:text-white tabular-nums leading-none tracking-tight"
           >
             {{ stats.total }}
           </p>
           <span
-            class="mt-0.5 block truncate text-[var(--kpi-caption-font-size)] sm:text-[var(--kpi-caption-font-size-sm)] lg:text-[var(--kpi-caption-font-size-lg)] font-normal text-[#64748B] dark:text-slate-400"
+            class="mt-0.5 block truncate text-[length:var(--kpi-caption-font-size)] sm:text-[length:var(--kpi-caption-font-size-sm)] lg:text-[length:var(--kpi-caption-font-size-lg)] font-normal text-[#64748B] dark:text-slate-400"
           >
             Seluruh kategori KB
           </span>
@@ -281,23 +281,23 @@ function clearFilters() {
       >
         <div class="flex items-center justify-between gap-[var(--kpi-gap)]">
           <span
-            class="text-[var(--kpi-title-font-size)] sm:text-[var(--kpi-title-font-size-sm)] lg:text-[var(--kpi-title-font-size-lg)] font-medium text-[#5F7089] dark:text-slate-400 truncate"
+            class="text-[length:var(--kpi-title-font-size)] sm:text-[length:var(--kpi-title-font-size-sm)] lg:text-[length:var(--kpi-title-font-size-lg)] font-medium text-[#5F7089] dark:text-slate-400 truncate"
             >Terbit</span
           >
           <div
-            class="flex h-[var(--kpi-icon-container-size)] w-[var(--kpi-icon-container-size)] sm:h-[var(--kpi-icon-container-size-sm)] sm:w-[var(--kpi-icon-container-size-sm)] lg:h-[var(--kpi-icon-container-size-lg)] lg:w-[var(--kpi-icon-container-size-lg)] shrink-0 items-center justify-center rounded-md bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400"
+            class="flex h-[var(--kpi-icon-container-size)] w-[var(--kpi-icon-container-size)] sm:h-[var(--kpi-icon-container-size-sm)] sm:w-[var(--kpi-icon-container-size-sm)] lg:h-[var(--kpi-icon-container-size-lg)] lg:w-[var(--kpi-icon-container-size-lg)] shrink-0 items-center justify-center rounded-[6px] bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400"
           >
             <CheckCircle class="w-[var(--kpi-icon-size)] h-[var(--kpi-icon-size)] sm:w-[var(--kpi-icon-size-sm)] sm:h-[var(--kpi-icon-size-sm)] lg:w-[var(--kpi-icon-size-lg)] lg:h-[var(--kpi-icon-size-lg)]" />
           </div>
         </div>
         <div class="mt-0.5">
           <p
-            class="font-num text-[var(--kpi-value-font-size)] sm:text-[var(--kpi-value-font-size-sm)] lg:text-[var(--kpi-value-font-size-lg)] font-bold text-[#333333] dark:text-white tabular-nums leading-none tracking-tight"
+            class="font-num text-[length:var(--kpi-value-font-size)] sm:text-[length:var(--kpi-value-font-size-sm)] lg:text-[length:var(--kpi-value-font-size-lg)] font-semibold text-[#333333] dark:text-white tabular-nums leading-none tracking-tight"
           >
             {{ stats.published }}
           </p>
           <span
-            class="mt-0.5 block truncate text-[var(--kpi-caption-font-size)] sm:text-[var(--kpi-caption-font-size-sm)] lg:text-[var(--kpi-caption-font-size-lg)] font-normal text-[#64748B] dark:text-slate-400"
+            class="mt-0.5 block truncate text-[length:var(--kpi-caption-font-size)] sm:text-[length:var(--kpi-caption-font-size-sm)] lg:text-[length:var(--kpi-caption-font-size-lg)] font-normal text-[#64748B] dark:text-slate-400"
           >
             Kategori aktif
           </span>
@@ -311,23 +311,23 @@ function clearFilters() {
       >
         <div class="flex items-center justify-between gap-[var(--kpi-gap)]">
           <span
-            class="text-[var(--kpi-title-font-size)] sm:text-[var(--kpi-title-font-size-sm)] lg:text-[var(--kpi-title-font-size-lg)] font-medium text-[#5F7089] dark:text-slate-400 truncate"
+            class="text-[length:var(--kpi-title-font-size)] sm:text-[length:var(--kpi-title-font-size-sm)] lg:text-[length:var(--kpi-title-font-size-lg)] font-medium text-[#5F7089] dark:text-slate-400 truncate"
             >Unggulan</span
           >
           <div
-            class="flex h-[var(--kpi-icon-container-size)] w-[var(--kpi-icon-container-size)] sm:h-[var(--kpi-icon-container-size-sm)] sm:w-[var(--kpi-icon-container-size-sm)] lg:h-[var(--kpi-icon-container-size-lg)] lg:w-[var(--kpi-icon-container-size-lg)] shrink-0 items-center justify-center rounded-md bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400"
+            class="flex h-[var(--kpi-icon-container-size)] w-[var(--kpi-icon-container-size)] sm:h-[var(--kpi-icon-container-size-sm)] sm:w-[var(--kpi-icon-container-size-sm)] lg:h-[var(--kpi-icon-container-size-lg)] lg:w-[var(--kpi-icon-container-size-lg)] shrink-0 items-center justify-center rounded-[6px] bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400"
           >
             <Star class="w-[var(--kpi-icon-size)] h-[var(--kpi-icon-size)] sm:w-[var(--kpi-icon-size-sm)] sm:h-[var(--kpi-icon-size-sm)] lg:w-[var(--kpi-icon-size-lg)] lg:h-[var(--kpi-icon-size-lg)]" />
           </div>
         </div>
         <div class="mt-0.5">
           <p
-            class="font-num text-[var(--kpi-value-font-size)] sm:text-[var(--kpi-value-font-size-sm)] lg:text-[var(--kpi-value-font-size-lg)] font-bold text-[#333333] dark:text-white tabular-nums leading-none tracking-tight"
+            class="font-num text-[length:var(--kpi-value-font-size)] sm:text-[length:var(--kpi-value-font-size-sm)] lg:text-[length:var(--kpi-value-font-size-lg)] font-semibold text-[#333333] dark:text-white tabular-nums leading-none tracking-tight"
           >
             {{ stats.featured }}
           </p>
           <span
-            class="mt-0.5 block truncate text-[var(--kpi-caption-font-size)] sm:text-[var(--kpi-caption-font-size-sm)] lg:text-[var(--kpi-caption-font-size-lg)] font-normal text-[#64748B] dark:text-slate-400"
+            class="mt-0.5 block truncate text-[length:var(--kpi-caption-font-size)] sm:text-[length:var(--kpi-caption-font-size-sm)] lg:text-[length:var(--kpi-caption-font-size-lg)] font-normal text-[#64748B] dark:text-slate-400"
           >
             Tampil di beranda
           </span>
@@ -348,7 +348,7 @@ function clearFilters() {
           v-model="searchQuery"
           type="text"
           placeholder="Cari kategori…"
-          class="w-full bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-700 rounded-xl pl-9 pr-9 py-2 text-xs sm:text-sm font-normal text-[#333333] dark:text-white placeholder-[#687281] dark:placeholder-slate-500 focus:outline-none focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 transition-all"
+          class="w-full bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-700 rounded-[6px] pl-9 pr-9 h-8 text-xs font-normal text-[#333333] dark:text-white placeholder-[#687281] dark:placeholder-slate-500 focus:outline-none focus:border-[#0A51B0] focus:ring-1 focus:ring-[#0A51B0]/20 transition-all"
         />
         <button
           v-if="searchQuery"
@@ -364,7 +364,7 @@ function clearFilters() {
       <div class="flex items-center gap-2">
         <!-- Status Segmented Control -->
         <div
-          class="flex items-center p-0.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-xs flex-1 sm:flex-none"
+          class="flex items-center p-0.5 rounded-[6px] bg-slate-100 dark:bg-slate-800 text-xs flex-1 sm:flex-none"
         >
           <button
             v-for="st in [
@@ -374,10 +374,10 @@ function clearFilters() {
             ]"
             :key="st.key"
             @click="selectedStatus = st.key"
-            class="flex-1 sm:flex-none px-3 py-1.5 rounded-lg font-medium transition-all cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0A51B0] text-center touch-manipulation"
+            class="flex-1 sm:flex-none px-3 py-1 rounded-[6px] font-medium transition-all cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0A51B0] text-center touch-manipulation"
             :class="
               selectedStatus === st.key
-                ? 'bg-white dark:bg-slate-900 text-[#333333] dark:text-white shadow-2xs font-bold'
+                ? 'bg-white dark:bg-slate-900 text-[#333333] dark:text-white shadow-2xs font-semibold'
                 : 'text-[#5F7089] dark:text-slate-400 hover:text-[#333333] dark:hover:text-slate-200'
             "
           >
@@ -389,7 +389,7 @@ function clearFilters() {
         <button
           v-if="searchQuery || selectedStatus !== 'all'"
           @click="clearFilters"
-          class="px-3 py-1.5 rounded-xl text-xs font-semibold text-[#5F7089] dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors cursor-pointer touch-manipulation shrink-0"
+          class="px-2.5 py-1 rounded-[6px] text-xs font-medium text-[#5F7089] dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors cursor-pointer touch-manipulation shrink-0"
         >
           Reset
         </button>
@@ -398,22 +398,22 @@ function clearFilters() {
 
     <!-- MOBILE CARD VIEW (< md) -->
     <div
-      class="xl:hidden divide-y divide-[#F1F5F9] dark:divide-slate-800/60 bg-white dark:bg-slate-900 rounded-xl border border-[#E2E8F0] dark:border-slate-800 overflow-hidden gsap-admin-el"
+      class="xl:hidden divide-y divide-[#F1F5F9] dark:divide-slate-800/60 bg-white dark:bg-slate-900 rounded-[6px] border border-[#E2E8F0] dark:border-slate-800 overflow-hidden gsap-admin-el"
     >
       <!-- Empty State Mobile -->
       <div v-if="filteredCategories.length === 0" class="py-12 px-4 text-center">
         <div
-          class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center justify-center mx-auto mb-2"
+          class="w-10 h-10 rounded-[6px] bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center justify-center mx-auto mb-2"
         >
           <FolderOpen class="w-5 h-5" />
         </div>
-        <p class="text-sm font-semibold text-[#333333] dark:text-slate-200">Tidak ada kategori</p>
-        <p class="text-xs text-[#5F7089] dark:text-slate-400 font-normal mt-1">
+        <p class="text-xs font-semibold text-[#333333] dark:text-slate-200">Tidak ada kategori</p>
+        <p class="text-[11px] text-[#5F7089] dark:text-slate-400 font-normal mt-1">
           Tidak ada kategori yang cocok dengan filter atau pencarian.
         </p>
         <button
           @click="clearFilters"
-          class="mt-3 px-4 py-2 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-[#333333] dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors cursor-pointer touch-manipulation"
+          class="mt-3 px-3 py-1.5 rounded-[6px] text-xs font-medium bg-slate-100 dark:bg-slate-800 text-[#333333] dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors cursor-pointer touch-manipulation"
         >
           Reset Filter
         </button>
@@ -523,7 +523,7 @@ function clearFilters() {
 
     <!-- DESKTOP TABLE VIEW (>= md) -->
     <div
-      class="hidden xl:block bg-white dark:bg-slate-900 rounded-xl border border-[#E2E8F0] dark:border-slate-800 overflow-hidden gsap-admin-el"
+      class="hidden xl:block bg-white dark:bg-slate-900 rounded-[6px] border border-[#E2E8F0] dark:border-slate-800 overflow-hidden gsap-admin-el"
     >
       <div class="overflow-x-auto">
         <table class="w-full text-left text-sm border-collapse">
@@ -870,15 +870,15 @@ function clearFilters() {
         class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm"
       >
         <div
-          class="bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 rounded-2xl p-5 sm:p-6 max-w-sm w-full shadow-xl space-y-4"
+          class="bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 rounded-[6px] p-4 sm:p-5 max-w-sm w-full shadow-xl space-y-3"
         >
           <div
-            class="w-10 h-10 rounded-xl bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center"
+            class="w-9 h-9 rounded-[6px] bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center"
           >
-            <AlertTriangle class="w-5 h-5" />
+            <AlertTriangle class="w-4 h-4" />
           </div>
           <div>
-            <h3 class="text-sm sm:text-base font-bold text-[#333333] dark:text-white">
+            <h3 class="text-sm font-bold text-[#333333] dark:text-white">
               Hapus kategori?
             </h3>
             <p class="text-xs text-[#5F7089] dark:text-slate-400 mt-1 leading-relaxed font-normal">
@@ -889,13 +889,13 @@ function clearFilters() {
           <div class="flex items-center justify-end gap-2 pt-1">
             <button
               @click="deleteConfirmId = null"
-              class="px-4 py-2 rounded-xl text-xs font-semibold text-[#333333] dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer touch-manipulation"
+              class="h-8 px-3 rounded-[6px] border border-[#CBD5E1] dark:border-slate-700 text-xs font-semibold text-[#333333] dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer touch-manipulation"
             >
               Batal
             </button>
             <button
               @click="executeDelete"
-              class="px-4 py-2 rounded-xl text-xs font-bold bg-rose-600 hover:bg-rose-700 text-white shadow-xs transition-colors cursor-pointer touch-manipulation"
+              class="h-8 px-3 rounded-[6px] text-xs font-semibold bg-rose-600 hover:bg-rose-700 text-white shadow-xs transition-colors cursor-pointer touch-manipulation"
             >
               Hapus
             </button>
@@ -934,7 +934,7 @@ function clearFilters() {
 }
 .kb-management table td:first-child :is(p, h3) {
   white-space: normal;
-  line-height: 1.7;
+  line-height: 1.5;
 }
 .kb-management table td:first-child h3 {
   font-size: 14px;
@@ -944,29 +944,29 @@ function clearFilters() {
   background: #f8fafc;
 }
 .kb-management .xl\:hidden > div {
-  padding: 20px;
-  gap: 14px;
+  padding: 10px 12px;
+  gap: 10px;
 }
 .kb-management .xl\:hidden h3 {
-  font-size: 15px;
-  line-height: 1.6;
+  font-size: 14px;
+  line-height: 1.4;
 }
 .kb-management .xl\:hidden p {
-  line-height: 1.7;
+  line-height: 1.5;
 }
 .kb-category-drawer {
   max-width: 520px;
 }
 .kb-category-drawer > div:first-child {
-  padding: 20px 24px;
+  padding: 10px 12px;
 }
 .kb-category-drawer > div:nth-child(2) {
-  padding: 24px;
+  padding: 12px 14px;
 }
 .kb-category-drawer :is(input, textarea, select) {
-  min-height: 44px;
-  border-radius: 8px;
-  font-size: 13px;
+  min-height: 34px;
+  border-radius: 6px;
+  font-size: 12px;
   border-color: #dce4ef;
 }
 .kb-category-drawer label {
@@ -974,27 +974,27 @@ function clearFilters() {
   font-weight: 500;
 }
 .kb-category-drawer > div:last-child {
-  padding: 16px 24px;
+  padding: 10px 12px;
 }
 .kb-category-drawer button {
-  min-height: 40px;
+  min-height: 32px;
 }
 .kb-category-drawer > div:last-child button {
-  min-height: 44px;
-  border-radius: 8px;
+  min-height: 32px;
+  border-radius: 6px;
 }
 @media (max-width: 639px) {
   .kb-management .xl\:hidden > div {
-    padding: 16px;
+    padding: 10px 12px;
   }
   .kb-management button {
-    min-height: 44px;
+    min-height: 32px;
   }
   .kb-category-drawer :is(input, textarea, select) {
     font-size: 16px;
   }
   .kb-category-drawer > div:nth-child(2) {
-    padding: 20px 16px;
+    padding: 10px 12px;
   }
   .kb-category-drawer > div:last-child button {
     flex: 1;
@@ -1006,7 +1006,7 @@ function clearFilters() {
 .category-form {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 18px;
+  gap: 12px;
 }
 .category-section-title {
   grid-column: 1 / -1;
@@ -1028,26 +1028,26 @@ function clearFilters() {
   font-weight: 500;
 }
 .category-form :is(input, select, textarea) {
-  min-height: 44px;
-  font-size: 13px;
-  border-radius: 8px;
+  min-height: 34px;
+  font-size: 12px;
+  border-radius: 6px;
   background: #fafbfd;
 }
 .category-form textarea {
-  min-height: 96px;
+  min-height: 80px;
   resize: vertical;
-  line-height: 1.7;
+  line-height: 1.5;
 }
 .category-form p {
-  line-height: 1.6;
+  line-height: 1.5;
 }
 .category-icon-grid {
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 8px;
 }
 .category-icon-grid button {
-  min-height: 62px;
-  padding: 12px 6px;
+  min-height: 48px;
+  padding: 8px 4px;
 }
 .category-icon-grid button[aria-pressed='true'] {
   background: #edf5ff;
@@ -1058,19 +1058,19 @@ function clearFilters() {
   font-size: 10px;
 }
 .category-form > label {
-  padding: 16px;
+  padding: 10px 12px;
   background: #f8fafc;
 }
 .category-footer {
   display: flex;
   justify-content: flex-end;
-  gap: 10px;
+  gap: 8px;
 }
 .category-footer button {
-  min-height: 44px;
-  padding: 0 20px;
+  min-height: 32px;
+  padding: 0 12px;
   border: 1px solid #e2e8f0;
-  border-radius: 8px;
+  border-radius: 6px;
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
@@ -1092,7 +1092,7 @@ function clearFilters() {
 @media (max-width: 639px) {
   .category-form {
     grid-template-columns: minmax(0, 1fr);
-    gap: 16px;
+    gap: 12px;
   }
   .category-form :is(input, select, textarea) {
     font-size: 16px;

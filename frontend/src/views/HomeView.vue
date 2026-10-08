@@ -572,9 +572,9 @@ onMounted(async () => {
 .help-search {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 7px 7px 7px 18px;
-  border-radius: 14px;
+  gap: 10px;
+  padding: 5px 5px 5px 14px;
+  border-radius: 6px;
   background: white;
   color: #5f7089;
   box-shadow: 0 12px 30px #071b3733;
@@ -586,9 +586,9 @@ onMounted(async () => {
 .help-search input {
   min-width: 0;
   flex: 1;
-  height: 44px;
+  height: var(--control-height-lg, 34px);
   color: var(--ink);
-  font-size: 15px;
+  font-size: 12px;
   letter-spacing: -0.005em;
   outline: none;
   background: transparent;
@@ -610,13 +610,13 @@ onMounted(async () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  min-height: 44px;
-  padding: 0 20px;
+  gap: 6px;
+  min-height: var(--control-height-lg, 34px);
+  padding: 0 14px;
   background: #0a51b0;
   color: white;
-  border-radius: 9px;
-  font-size: 13px;
+  border-radius: 6px;
+  font-size: 12px;
   font-weight: 650;
   letter-spacing: -0.005em;
   box-shadow: 0 4px 12px rgba(10, 81, 176, 0.25);
@@ -631,8 +631,8 @@ onMounted(async () => {
   display: grid;
   place-items: center;
   flex-shrink: 0;
-  width: 28px;
-  height: 40px;
+  width: 26px;
+  height: 28px;
 }
 .search-suggestions {
   position: absolute;
@@ -642,8 +642,8 @@ onMounted(async () => {
   background: var(--surface);
   color: var(--ink);
   border: 1px solid var(--line);
-  border-radius: 12px;
-  padding: 6px;
+  border-radius: 6px;
+  padding: 5px;
   box-shadow: 0 18px 35px #071b3726;
 }
 .search-suggestions button {
@@ -651,11 +651,11 @@ onMounted(async () => {
   align-items: center;
   gap: 12px;
   width: 100%;
-  min-height: 48px;
+  min-height: 32px;
   text-align: left;
-  padding: 10px;
-  border-radius: 8px;
-  font-size: 13px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  font-size: 12px;
 }
 .search-suggestions button:hover {
   background: var(--canvas);
@@ -736,14 +736,14 @@ onMounted(async () => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 12px;
-  min-height: 44px;
+  gap: 10px;
+  min-height: var(--control-height-lg, 34px);
   width: 100%;
-  padding: 10px 14px;
+  padding: 6px 12px;
   border: 1px solid rgba(255, 255, 255, 0.25);
   background: rgba(255, 255, 255, 0.1);
-  border-radius: 9px;
-  font-size: 13px;
+  border-radius: 6px;
+  font-size: 12px;
   font-weight: 650;
   text-align: left;
   transition: all 0.2s ease;
@@ -771,8 +771,8 @@ onMounted(async () => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 20px;
-  margin-bottom: 18px;
+  gap: 12px;
+  margin-bottom: 12px;
 }
 .section-kicker {
   display: block;
@@ -784,9 +784,8 @@ onMounted(async () => {
   margin-bottom: 7px;
 }
 .section-heading h2 {
-  font-size: 21px;
   font-weight: 700;
-  letter-spacing: -0.035em;
+  letter-spacing: -0.02em;
   line-height: 1.3;
 }
 .text-link {
@@ -796,7 +795,7 @@ onMounted(async () => {
   color: var(--blue);
   font-size: 12px;
   font-weight: 650;
-  min-height: 44px;
+  min-height: 28px;
 }
 .text-link svg {
   flex-shrink: 0;
@@ -808,18 +807,18 @@ onMounted(async () => {
 .topic-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 16px;
+  gap: 12px;
 }
 .topic-card {
   position: relative;
   display: flex;
   align-items: flex-start;
-  gap: 16px;
+  gap: 12px;
   text-align: left;
   border: 1px solid var(--line);
   background: var(--surface);
-  padding: 22px;
-  border-radius: 16px;
+  padding: var(--ui-card-padding, 12px);
+  border-radius: var(--ui-radius-card, 6px);
   transition:
     border-color 0.18s,
     box-shadow 0.18s,
@@ -832,14 +831,14 @@ onMounted(async () => {
 }
 .topic-featured {
   border-top: 3px solid #0a51b0;
-  padding-top: 20px;
+  padding-top: 12px;
 }
 .topic-icon {
   display: grid;
   place-items: center;
-  width: 44px;
-  height: 44px;
-  border-radius: 13px;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
   flex-shrink: 0;
 }
 .topic-tone-0 {
@@ -862,14 +861,14 @@ onMounted(async () => {
   padding-right: 4px;
 }
 .topic-title {
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 700;
   letter-spacing: -0.01em;
   line-height: 1.45;
 }
 .topic-description {
-  font-size: 13px;
-  line-height: 1.65;
+  font-size: 12px;
+  line-height: 1.5;
   color: var(--muted);
 }
 .topic-arrow {
@@ -888,20 +887,20 @@ onMounted(async () => {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   align-items: start;
-  gap: 36px;
-  margin-top: 38px;
+  gap: 24px;
+  margin-top: 24px;
 }
 .article-list {
   background: var(--surface);
   border: 1px solid var(--line);
-  border-radius: 16px;
+  border-radius: var(--ui-radius-card, 6px);
   overflow: hidden;
 }
 .article-row {
   display: flex;
   align-items: flex-start;
-  gap: 16px;
-  padding: 22px;
+  gap: 12px;
+  padding: 10px 12px;
   border-bottom: 1px solid var(--line);
   transition: background 0.18s ease;
 }
@@ -961,24 +960,24 @@ onMounted(async () => {
   display: grid;
   justify-items: center;
   gap: 12px;
-  padding: 36px 20px;
+  padding: 24px 12px;
   color: var(--muted);
-  font-size: 13px;
+  font-size: 12px;
   text-align: center;
 }
 .all-articles {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  min-height: 48px;
-  margin-top: 14px;
-  padding: 0 20px;
+  gap: 6px;
+  min-height: var(--control-height-lg, 34px);
+  margin-top: 12px;
+  padding: 0 14px;
   border: 1px solid var(--line);
-  border-radius: 12px;
+  border-radius: 6px;
   color: var(--blue);
   background: var(--surface);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 650;
   transition: all 0.18s ease;
 }
@@ -1000,11 +999,11 @@ onMounted(async () => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 20px;
+  gap: 12px;
   width: 100%;
-  padding: 22px 0;
+  padding: 10px 0;
   text-align: left;
-  font-size: 14px;
+  font-size: 13px;
   line-height: 1.6;
   font-weight: 600;
   letter-spacing: -0.005em;
@@ -1021,10 +1020,10 @@ onMounted(async () => {
   transform: rotate(180deg);
 }
 .faq-answer {
-  padding: 0 6px 22px 0;
+  padding: 0 6px 12px 0;
   color: var(--muted);
-  font-size: 13px;
-  line-height: 1.75;
+  font-size: 12px;
+  line-height: 1.6;
   overflow-wrap: anywhere;
 }
 .faq-answer p {
@@ -1044,8 +1043,8 @@ onMounted(async () => {
   background: #072652;
   border: 1px solid #0a4391;
   color: #c5f2e1;
-  padding: 13px;
-  border-radius: 8px;
+  padding: 10px 12px;
+  border-radius: 6px;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
@@ -1053,8 +1052,8 @@ onMounted(async () => {
   background: #fff1f2;
   color: #9f1239;
   border: 1px solid #fecdd3;
-  border-radius: 12px;
-  padding: 14px 16px;
+  border-radius: 6px;
+  padding: 10px 12px;
 }
 .faq-emergency strong {
   display: flex;
@@ -1100,13 +1099,13 @@ onMounted(async () => {
   }
   .topic-card {
     flex-direction: column;
-    padding: 20px;
+    padding: 12px;
   }
   .topic-featured {
-    padding-top: 18px;
+    padding-top: 12px;
   }
   .knowledge-grid {
-    gap: 26px;
+    gap: 20px;
   }
 }
 @media (max-width: 767px) {
@@ -1169,8 +1168,8 @@ onMounted(async () => {
   }
   .topic-card {
     flex-direction: row;
-    padding: 18px;
-    gap: 14px;
+    padding: 10px;
+    gap: 12px;
   }
   .topic-featured {
     border-top: 1px solid var(--line);
@@ -1188,15 +1187,15 @@ onMounted(async () => {
   }
   .knowledge-grid {
     grid-template-columns: 1fr;
-    gap: 30px;
-    margin-top: 30px;
+    gap: 20px;
+    margin-top: 20px;
   }
   .section-heading {
     gap: 12px;
     margin-bottom: 14px;
   }
   .section-heading h2 {
-    font-size: 19px;
+    font-size: 16px;
   }
   .section-heading > .text-link {
     font-size: 11px;
@@ -1210,8 +1209,8 @@ onMounted(async () => {
     margin-top: 26px;
   }
   .article-row {
-    padding: 18px;
-    gap: 13px;
+    padding: 10px;
+    gap: 10px;
   }
   .help-footer {
     flex-wrap: wrap;
@@ -1236,8 +1235,8 @@ onMounted(async () => {
     padding: 0 10px;
   }
   .topic-icon {
-    width: 38px;
-    height: 38px;
+    width: 30px;
+    height: 30px;
   }
   .topic-card {
     gap: 11px;

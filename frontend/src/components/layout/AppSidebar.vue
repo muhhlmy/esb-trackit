@@ -164,11 +164,11 @@ function closeFlyoutSubmenu() {
   >
     <!-- ── Brand Logo Top Header Area ── -->
     <div
-      class="sidebar-brand relative flex h-[64px] shrink-0 items-center border-b border-[#F1F5F9] transition-all"
+      class="sidebar-brand relative flex h-[52px] shrink-0 items-center border-b border-[#F1F5F9] transition-all"
       :class="
         isEffectiveCollapsed
           ? 'justify-center flex-col gap-1 px-0 py-1'
-          : 'justify-between gap-2 px-3.5'
+          : 'justify-between gap-2 px-3'
       "
     >
       <!-- Logo saat Expanded -->
@@ -178,7 +178,7 @@ function closeFlyoutSubmenu() {
         title="Kembali ke Help Center"
         class="flex items-center justify-center shrink-0 hover:opacity-80 transition-opacity cursor-pointer"
       >
-        <img src="/logo.svg" alt="TrackIT logo" class="h-6 w-8 object-contain shrink-0" />
+        <img src="/logo.svg" alt="TrackIT logo" class="h-5 w-7 object-contain shrink-0" />
         <span class="sidebar-wordmark">TrackIT</span>
       </RouterLink>
 
@@ -190,7 +190,7 @@ function closeFlyoutSubmenu() {
             title="Kembali ke Help Center"
             class="flex h-7 w-7 items-center justify-center rounded-lg hover:bg-[#ECF2FF] transition-all cursor-pointer shrink-0"
           >
-            <img src="/logo.svg" alt="TrackIT logo" class="h-6 w-6 object-contain shrink-0 block" />
+            <img src="/logo.svg" alt="TrackIT logo" class="h-5 w-5 object-contain shrink-0 block" />
           </RouterLink>
 
           <button
@@ -200,7 +200,7 @@ function closeFlyoutSubmenu() {
             class="flex h-6 w-6 items-center justify-center rounded-md text-[#637288] hover:bg-[#ECF2FF] hover:text-[#333333] transition-all cursor-pointer shrink-0"
             @click="emit('toggle-collapse')"
           >
-            <span aria-hidden="true" class="material-symbols-outlined text-[16px]"
+            <span aria-hidden="true" class="material-symbols-outlined text-[15px]"
               >chevron_right</span
             >
           </button>
@@ -213,18 +213,18 @@ function closeFlyoutSubmenu() {
         type="button"
         aria-label="Ciutkan Sidebar"
         title="Ciutkan Sidebar"
-        class="flex h-7 w-7 items-center justify-center rounded-lg text-[#637288] hover:bg-[#ECF2FF] hover:text-[#333333] transition-all cursor-pointer shrink-0"
+        class="flex h-6 w-6 items-center justify-center rounded-md text-[#637288] hover:bg-[#ECF2FF] hover:text-[#333333] transition-all cursor-pointer shrink-0"
         @click="emit('toggle-collapse')"
       >
-        <span aria-hidden="true" class="material-symbols-outlined text-[18px]">menu_open</span>
+        <span aria-hidden="true" class="material-symbols-outlined text-[16px]">menu_open</span>
       </button>
     </div>
 
     <!-- ── Sidebar Scrollable Menu / Navigation Rail Container ── -->
     <nav
-      class="sidebar-menu relative flex-1 overflow-y-auto py-3 transition-all"
+      class="sidebar-menu relative flex-1 overflow-y-auto py-2 transition-all"
       aria-label="Navigasi utama"
-      :class="isEffectiveCollapsed ? 'px-0 space-y-3' : 'px-2.5 space-y-4'"
+      :class="isEffectiveCollapsed ? 'px-0 space-y-2' : 'px-2 space-y-2.5'"
     >
       <div
         v-for="group in menuGroups"
@@ -256,8 +256,8 @@ function closeFlyoutSubmenu() {
                 class="group flex items-center transition-all duration-150 relative cursor-pointer"
                 :class="[
                   isEffectiveCollapsed
-                    ? 'h-10 w-10 justify-center rounded-xl'
-                    : 'w-full gap-2.5 rounded-lg px-2.5 py-2 text-[13px]',
+                    ? 'h-9 w-9 justify-center rounded-lg'
+                    : 'w-full gap-2 rounded-md px-2 py-1.5 text-[12px]',
                   route.path === item.to
                     ? 'bg-[#EAF1FC] text-[#234B83] font-semibold'
                     : 'text-[#2A3547] hover:bg-[#ECF2FF] hover:text-[#333333] font-medium',
@@ -267,7 +267,7 @@ function closeFlyoutSubmenu() {
                   aria-hidden="true"
                   class="material-symbols-outlined transition-colors shrink-0"
                   :class="[
-                    isEffectiveCollapsed ? 'text-[20px]' : 'text-[18px]',
+                    isEffectiveCollapsed ? 'text-[18px]' : 'text-[16px]',
                     route.path === item.to
                       ? 'text-[#234B83]'
                       : 'text-[#637288] group-hover:text-[#333333]',
@@ -323,8 +323,8 @@ function closeFlyoutSubmenu() {
                 class="group flex items-center transition-all duration-150 cursor-pointer select-none"
                 :class="[
                   isEffectiveCollapsed
-                    ? 'h-10 w-10 justify-center rounded-xl'
-                    : 'w-full gap-2.5 rounded-lg px-2.5 py-2 text-[13px] font-semibold justify-between',
+                    ? 'h-9 w-9 justify-center rounded-lg'
+                    : 'w-full gap-2 rounded-md px-2 py-1.5 text-[12px] font-semibold justify-between',
                   parent.items.some((child) => route.path === child.to)
                     ? isEffectiveCollapsed
                       ? 'bg-[#ECF2FF] text-[#333333]'
@@ -334,14 +334,14 @@ function closeFlyoutSubmenu() {
                 @click="handleParentClick(parent, $event)"
               >
                 <div
-                  class="flex items-center gap-2.5 min-w-0"
+                  class="flex items-center gap-2 min-w-0"
                   :class="isEffectiveCollapsed ? 'justify-center' : ''"
                 >
                   <span
                     aria-hidden="true"
                     class="material-symbols-outlined transition-colors shrink-0"
                     :class="[
-                      isEffectiveCollapsed ? 'text-[20px]' : 'text-[18px]',
+                      isEffectiveCollapsed ? 'text-[18px]' : 'text-[16px]',
                       parent.items.some((child) => route.path === child.to)
                         ? 'text-[#333333]'
                         : 'text-[#637288] group-hover:text-[#333333]',
@@ -361,7 +361,7 @@ function closeFlyoutSubmenu() {
                 <span
                   v-if="!isEffectiveCollapsed"
                   aria-hidden="true"
-                  class="material-symbols-outlined text-[16px] text-[#637288] transition-transform duration-200 shrink-0"
+                  class="material-symbols-outlined text-[15px] text-[#637288] transition-transform duration-200 shrink-0"
                   :class="{ 'rotate-180': isParentExpanded(parent.key) }"
                 >
                   keyboard_arrow_down
@@ -375,23 +375,23 @@ function closeFlyoutSubmenu() {
                 v-show="isParentExpanded(parent.key)"
                 role="region"
                 :aria-label="parent.label"
-                class="pl-5 space-y-0.5 mt-0.5 transition-all"
+                class="pl-3.5 space-y-0.5 mt-0.5 transition-all"
               >
                 <RouterLink
                   v-for="sub in parent.items"
                   :key="sub.to"
                   :to="sub.to"
                   :aria-current="route.path === sub.to ? 'page' : undefined"
-                  class="group flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-[12px] transition-all duration-150 relative"
+                  class="group flex items-center gap-1.5 rounded-md px-2 py-1 text-[11.5px] transition-all duration-150 relative"
                   :class="
                     route.path === sub.to
-                      ? 'bg-[#ECF2FF] text-[#333333] font-bold shadow-2xs border-l-2 border-[#0A51B0] rounded-r-lg'
+                      ? 'bg-[#ECF2FF] text-[#333333] font-bold shadow-2xs border-l-2 border-[#0A51B0] rounded-r-md'
                       : 'text-[#5F7089] hover:bg-[#F8FAFC] hover:text-[#333333] font-medium'
                   "
                 >
                   <span
                     aria-hidden="true"
-                    class="material-symbols-outlined text-[16px] transition-colors shrink-0"
+                    class="material-symbols-outlined text-[14px] transition-colors shrink-0"
                     :class="
                       route.path === sub.to
                         ? 'text-[#333333]'
@@ -473,11 +473,12 @@ function closeFlyoutSubmenu() {
   color: #333333;
 }
 .sidebar-brand {
+  height: 52px;
   border-color: #edf1f6;
 }
 .sidebar-wordmark {
-  margin-left: 9px;
-  font-size: 18px;
+  margin-left: 8px;
+  font-size: 16px;
   font-weight: 700;
   letter-spacing: -0.045em;
   color: #333333;
@@ -485,26 +486,27 @@ function closeFlyoutSubmenu() {
 .sidebar-menu {
   scrollbar-width: thin;
   scrollbar-color: #d9e2ef transparent;
-  padding-top: 20px;
-  padding-bottom: 24px;
+  padding-top: 12px;
+  padding-bottom: 16px;
 }
 .sidebar-group-title {
-  font-size: 11px;
+  font-size: 10px;
   letter-spacing: 0.08em;
-  margin-bottom: 9px;
+  margin-bottom: 4px;
 }
 .sidebar-menu nav > div > a,
 .sidebar-menu nav > div > button {
-  min-height: 42px;
+  min-height: 32px;
 }
 .sidebar-menu [role='region'] {
-  margin-left: 17px;
-  padding-left: 10px;
+  margin-left: 12px;
+  padding-left: 8px;
   border-left: 1px solid #e5ebf3;
 }
 .sidebar-menu [role='region'] a {
-  min-height: 38px;
+  min-height: 28px;
   font-weight: 500;
+  font-size: 11.5px;
 }
 .clean-sidebar :is(a, button):focus-visible {
   outline: 2px solid #097cde;

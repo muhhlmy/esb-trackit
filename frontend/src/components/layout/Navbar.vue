@@ -207,17 +207,17 @@ onUnmounted(() => {
 .navbar-actions {
   display: flex;
   align-items: center;
-  gap: 18px;
+  gap: 12px;
   min-width: 0;
 }
 .navbar-search {
   display: flex;
   align-items: center;
   gap: 10px;
-  min-height: 40px;
-  padding: 0 12px;
+  min-height: 32px;
+  padding: 0 10px;
   border: 1px solid var(--nav-line);
-  border-radius: 8px;
+  border-radius: 6px;
   background: var(--nav-hover);
   color: var(--nav-muted);
   font-size: 12px;
@@ -254,8 +254,8 @@ onUnmounted(() => {
 }
 .navbar-language select {
   appearance: none;
-  min-height: 44px;
-  padding: 0 17px 0 5px;
+  min-height: 32px;
+  padding: 0 14px 0 5px;
   background: transparent;
   color: var(--nav-ink);
   font-size: 12px;
@@ -283,9 +283,9 @@ onUnmounted(() => {
   align-items: center;
   justify-content: center;
   gap: 12px;
-  min-height: 42px;
-  padding: 0 17px;
-  border-radius: 8px;
+  min-height: 30px;
+  padding: 0 12px;
+  border-radius: 6px;
   background: #0a51b0;
   color: #fff;
   font-size: 12px;
@@ -302,10 +302,10 @@ onUnmounted(() => {
 .profile-trigger {
   display: flex;
   align-items: center;
-  gap: 9px;
-  min-height: 44px;
-  padding: 4px 0 4px 4px;
-  border-radius: 8px;
+  gap: 8px;
+  min-height: 32px;
+  padding: 3px 0 3px 3px;
+  border-radius: 6px;
   cursor: pointer;
 }
 .profile-trigger:hover {
@@ -344,22 +344,22 @@ onUnmounted(() => {
   top: calc(100% + 12px);
   width: 264px;
   max-width: calc(100vw - 32px);
-  padding: 7px;
+  padding: 6px;
   border: 1px solid var(--nav-line);
-  border-radius: 12px;
+  border-radius: 6px;
   background: var(--nav-surface);
   box-shadow: 0 12px 35px #172b4d1a;
 }
 .profile-identity {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  padding: 12px;
+  gap: 3px;
+  padding: 10px;
   border-bottom: 1px solid var(--nav-line);
   overflow-wrap: anywhere;
 }
 .profile-identity strong {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 650;
 }
 .profile-identity span {
@@ -379,12 +379,12 @@ onUnmounted(() => {
 .profile-logout {
   display: flex;
   align-items: center;
-  gap: 10px;
-  min-height: 44px;
+  gap: 8px;
+  min-height: 32px;
   width: 100%;
-  padding: 10px 12px;
+  padding: 6px 10px;
   font-size: 12px;
-  border-radius: 7px;
+  border-radius: 6px;
   text-align: left;
 }
 .profile-links a:hover {

@@ -34,7 +34,7 @@ defineEmits(['action', 'secondary-action'])
       <span aria-hidden="true" class="material-symbols-outlined text-[28px]">{{ icon }}</span>
     </div>
 
-    <h3 class="text-base font-bold text-[#333333]">{{ title }}</h3>
+    <h3 class="font-bold text-[#333333]">{{ title }}</h3>
 
     <p v-if="description" class="mt-1.5 max-w-xs text-xs leading-relaxed text-[#5F7089]">
       {{ description }}
@@ -44,7 +44,7 @@ defineEmits(['action', 'secondary-action'])
       <button
         v-if="actionLabel"
         type="button"
-        class="inline-flex h-9 items-center gap-1.5 rounded-xl bg-[#0A51B0] px-4 text-xs font-bold text-white shadow-2xs transition-all duration-150 hover:bg-[#0A4391] active:scale-[0.98] cursor-pointer"
+        class="inline-flex h-8 items-center gap-1.5 rounded-[6px] bg-[#0A51B0] px-4 text-xs font-bold text-white shadow-2xs transition-all duration-150 hover:bg-[#0A4391] active:scale-[0.98] cursor-pointer"
         @click="$emit('action')"
       >
         <span aria-hidden="true" class="material-symbols-outlined text-[16px]">add</span>
@@ -54,7 +54,7 @@ defineEmits(['action', 'secondary-action'])
       <button
         v-if="secondaryLabel"
         type="button"
-        class="inline-flex h-9 items-center rounded-xl border border-[#E2E8F0] bg-white px-4 text-xs font-bold text-[#475569] transition-colors duration-150 hover:bg-[#F8FAFC] cursor-pointer"
+        class="inline-flex h-8 items-center rounded-[6px] border border-[#E2E8F0] bg-white px-4 text-xs font-bold text-[#475569] transition-colors duration-150 hover:bg-[#F8FAFC] cursor-pointer"
         @click="$emit('secondary-action')"
       >
         {{ secondaryLabel }}

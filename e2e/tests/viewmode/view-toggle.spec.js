@@ -109,6 +109,7 @@ async function seedAndOpen(page, mod) {
   await page.goto(mod.route, { waitUntil: 'domcontentloaded' })
   // 30s: saat full suite paralel, Vite meng-compile chunk view on-demand
   // dan bisa lambat — bukan indikasi bug aplikasi.
+  await expect(getToggle(page)).toBeVisible({ timeout: 30000 })
   await expect(page.locator('[aria-busy="true"]')).toBeHidden({ timeout: 30000 })
 }
 
@@ -184,9 +185,10 @@ test.describe('View Toggle Tabel/Kartu', () => {
         expect(stored).toBe('card')
 
         await page.reload({ waitUntil: 'domcontentloaded' })
+        const toggle = getToggle(page)
+        await expect(toggle).toBeVisible({ timeout: 30000 })
         await expect(page.locator('[aria-busy="true"]')).toBeHidden({ timeout: 20000 })
 
-        const toggle = getToggle(page)
         await expect(toggle.getByRole('button', { name: /^Kartu$/ })).toHaveAttribute(
           'aria-pressed',
           'true',

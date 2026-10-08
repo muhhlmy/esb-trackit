@@ -390,7 +390,7 @@ onUnmounted(() => {
       <div class="space-y-3.5">
         <!-- Aset Terbaru Skeleton Table / Card List -->
         <div
-          class="shadow-sm rounded-xl border border-[#E2E8F0] bg-white overflow-hidden p-3.5 sm:p-4"
+          class="shadow-sm rounded-[6px] border border-[#E2E8F0] bg-white overflow-hidden p-3 sm:p-3.5"
         >
           <div class="mb-3 flex items-center justify-between">
             <BaseSkeleton width="120px" height="16px" radius="md" />
@@ -497,7 +497,7 @@ onUnmounted(() => {
 
         <!-- Tiket Terbaru Skeleton Table / Card List -->
         <div
-          class="shadow-sm rounded-xl border border-[#E2E8F0] bg-white overflow-hidden p-3.5 sm:p-4"
+          class="shadow-sm rounded-[6px] border border-[#E2E8F0] bg-white overflow-hidden p-3 sm:p-3.5"
         >
           <div class="mb-3 flex items-center justify-between">
             <BaseSkeleton width="120px" height="16px" radius="md" />
@@ -626,7 +626,7 @@ onUnmounted(() => {
       <div class="dashboard-stats">
         <div class="dash-stat-card stat-total shadow-2xs kpi-focusable" tabindex="0">
           <div class="stat-label">
-            <span class="stat-label-text">Total aset</span>
+            <span class="stat-label-text">Total Aset</span>
             <span class="material-symbols-outlined" aria-hidden="true">inventory_2</span>
           </div>
           <p class="stat-number">{{ totalAssets }}</p>
@@ -642,7 +642,7 @@ onUnmounted(() => {
               tone: 'green',
             },
             {
-              label: 'Stok tersedia',
+              label: 'Stok',
               count: countTersedia,
               pct: pctTersedia,
               icon: 'inventory',
@@ -656,7 +656,7 @@ onUnmounted(() => {
               tone: 'red',
             },
             {
-              label: 'Dalam perawatan',
+              label: 'Dalam Perawatan',
               count: countMaintenance,
               pct: pctMaintenance,
               icon: 'build',
@@ -1009,7 +1009,7 @@ onUnmounted(() => {
                       >
                         {{ asset.label_aset }}
                       </p>
-                      <p class="text-[11px] font-mono text-slate-400 mt-0.5">
+                      <p class="text-[11px] font-mono text-slate-500 mt-0.5">
                         ID #{{ asset.id_aset }}
                       </p>
                     </div>
@@ -1024,7 +1024,7 @@ onUnmounted(() => {
                       </p>
                       <p
                         v-if="asset.tipe_perangkat"
-                        class="text-[11px] text-slate-400 truncate mt-0.5"
+                        class="text-[11px] text-slate-500 truncate mt-0.5"
                       >
                         {{ asset.tipe_perangkat }}
                       </p>
@@ -1059,14 +1059,14 @@ onUnmounted(() => {
                     />
                   </td>
                   <td class="py-3 px-4 align-middle text-right whitespace-nowrap">
-                    <span class="text-xs font-medium text-slate-400">
+                    <span class="text-xs font-medium text-slate-500">
                       {{ formatDate(asset.dibuat_pada) }}
                     </span>
                   </td>
                 </tr>
                 <tr v-if="recentAssets.length === 0">
                   <td colspan="6" class="py-8 text-center">
-                    <p class="text-xs text-slate-400">Belum ada aset terdaftar.</p>
+                    <p class="text-xs text-slate-500">Belum ada aset terdaftar.</p>
                   </td>
                 </tr>
               </tbody>
@@ -1140,7 +1140,7 @@ onUnmounted(() => {
                   >person</span
                 >
                 <span class="truncate">
-                  <span class="text-slate-400">Ditangani:</span>
+                  <span class="text-slate-500">Ditangani:</span>
                   <strong class="font-semibold text-slate-700 ml-0.5">{{
                     ticket.assigned_to || 'Belum ditugaskan'
                   }}</strong>
@@ -1220,14 +1220,14 @@ onUnmounted(() => {
                   <td class="py-3 px-4 align-middle">
                     <div class="min-w-0 pr-2">
                       <p
-                        class="text-xs sm:text-[13px] font-semibold text-slope-900 leading-snug line-clamp-2 group-hover:text-blue-600 transition-colors"
+                        class="text-xs sm:text-[13px] font-semibold text-slate-900 leading-snug line-clamp-2 group-hover:text-blue-600 transition-colors"
                         :title="ticket.judul"
                       >
                         {{ ticket.judul }}
                       </p>
-                      <p class="text-[11px] text-slope-400 mt-0.5 truncate flex items-center gap-1">
+                      <p class="text-[11px] text-slate-500 mt-0.5 truncate flex items-center gap-1">
                         <span>Pelapor:</span>
-                        <span class="font-medium text-slope-600">{{ ticket.pelapor || 'User' }}</span>
+                        <span class="font-medium text-slate-700">{{ ticket.pelapor || 'User' }}</span>
                       </p>
                     </div>
                   </td>
@@ -1243,7 +1243,7 @@ onUnmounted(() => {
 .dashboard-view {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
   width: 100%;
   min-width: 0;
   max-width: 100%;
@@ -1295,7 +1295,7 @@ onUnmounted(() => {
   flex-shrink: 0;
   width: var(--kpi-icon-container-size-lg);
   height: var(--kpi-icon-container-size-lg);
-  border-radius: 8px;
+  border-radius: 6px;
   background: var(--kpi-icon-bg);
   color: var(--stat-color);
   font-size: var(--kpi-icon-size-lg);
@@ -1337,25 +1337,25 @@ onUnmounted(() => {
   color: #64748b;
 }
 .stat-green {
-  --stat-color: #059669;
+  --stat-color: #047857;
 }
 .stat-green .stat-label > .material-symbols-outlined {
   background: #ecfdf5;
 }
 .stat-blue {
-  --stat-color: #0284c7;
+  --stat-color: #0369a1;
 }
 .stat-blue .stat-label > .material-symbols-outlined {
   background: #f0f9ff;
 }
 .stat-red {
-  --stat-color: #dc2626;
+  --stat-color: #b91c1c;
 }
 .stat-red .stat-label > .material-symbols-outlined {
   background: #fef2f2;
 }
 .stat-amber {
-  --stat-color: #b45309;
+  --stat-color: #92400e;
 }
 .stat-amber .stat-label > .material-symbols-outlined {
   background: #fffbeb;
@@ -1365,7 +1365,8 @@ onUnmounted(() => {
   align-items: center;
   gap: 8px;
   margin-top: auto;
-  font-size: 11px;
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-xs);
   font-weight: 500;
   color: #64748b;
   font-variant-numeric: tabular-nums;
@@ -1385,30 +1386,34 @@ onUnmounted(() => {
   border-radius: inherit;
 }
 .dashboard-chart-grid {
-  gap: 14px;
+  gap: 12px;
 }
 .dashboard-panel {
   display: flex;
   flex-direction: column;
   min-width: 0;
-  padding: 14px 16px;
+  padding: 10px 12px;
   border: 1px solid #e2e8f0;
-  border-radius: 12px;
+  border-radius: 6px;
   background: white;
 }
 .dashboard-panel > div:first-child {
   flex-shrink: 0;
   flex-wrap: wrap;
-  gap: 10px;
-  margin-bottom: 12px;
+  gap: 8px;
+  margin-bottom: 10px;
 }
 .dashboard-panel h3,
 .dashboard-table h3 {
-  font-size: 14px;
-  font-weight: 650;
-  line-height: 1.4;
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold, 600);
+  line-height: 1.35;
   letter-spacing: -0.015em;
   color: #1e293b;
+}
+@media (max-width:639px){
+  .dashboard-panel h3, .dashboard-table h3 { font-size: var(--font-size-md); }
 }
 .dashboard-panel :deep(canvas) {
   max-width: 100%;
@@ -1421,27 +1426,27 @@ onUnmounted(() => {
 }
 .location-card {
   min-width: 0;
-  padding: 12px 14px;
+  padding: 10px 12px;
   border: 1px solid #e7ecf3;
-  border-radius: 10px;
+  border-radius: 6px;
   background: #fafbfd;
 }
 .dashboard-table {
   min-width: 0;
   background: white;
   border: 1px solid #e2e8f0;
-  border-radius: 12px;
+  border-radius: 6px;
   overflow: hidden;
 }
 .dashboard-table > div:first-child {
-  padding: 12px 14px;
-  gap: 10px;
+  padding: 10px 12px;
+  gap: 8px;
 }
 .dashboard-table > div:first-child :is(h3, p) {
   white-space: normal;
 }
 .dashboard-table > div:first-child p {
-  margin-top: 4px;
+  margin-top: 2px;
   line-height: 1.4;
 }
 .dashboard-table table {
@@ -1451,16 +1456,22 @@ onUnmounted(() => {
   background: #f8fafc;
 }
 .dashboard-table table th {
+  font-family: var(--font-family-sans);
   text-transform: none;
   letter-spacing: 0;
-  font-size: 12px;
-  font-weight: 600;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold, 600);
   color: #5b6b84;
-  padding-block: 8px;
+  padding-block: 7px;
 }
 .dashboard-table table td {
-  padding-block: 8px;
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-sm);
+  padding-block: 7px;
   overflow-wrap: anywhere;
+}
+@media (max-width:639px){
+  .dashboard-table table td { font-size: var(--font-size-xs); }
 }
 .table-link,
 .dashboard-retry {
@@ -1469,11 +1480,11 @@ onUnmounted(() => {
   justify-content: center;
   flex-shrink: 0;
   gap: 6px;
-  min-width: 110px;
-  min-height: 32px;
-  padding: 6px 12px;
-  border-radius: 8px;
-  font-size: 12px;
+  min-width: 100px;
+  min-height: 30px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11px;
   font-weight: 600;
   line-height: 1.4;
   touch-action: manipulation;
@@ -1508,12 +1519,12 @@ onUnmounted(() => {
 }
 .dashboard-recent-cards > div {
   min-width: 0;
-  padding: 22px 24px;
-  gap: 14px;
+  padding: 10px 12px;
+  gap: 10px;
 }
 .dashboard-recent-cards > div > div:first-child {
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 8px;
 }
 .dashboard-recent-cards p {
   overflow-wrap: anywhere;
@@ -1586,23 +1597,24 @@ onUnmounted(() => {
     gap: var(--kpi-gap);
   }
   .dashboard-panel {
-    padding: 12px 14px;
-    border-radius: 10px;
+    padding: 10px 12px;
+    border-radius: 6px;
   }
   .dashboard-chart-grid {
-    gap: 12px;
+    gap: 10px;
   }
   .dashboard-panel > div:first-child {
-    margin-bottom: 12px;
+    margin-bottom: 10px;
   }
   .location-card {
-    padding: 12px;
+    padding: 10px 12px;
+    border-radius: 6px;
   }
   .dashboard-table {
-    border-radius: 10px;
+    border-radius: 6px;
   }
   .dashboard-table > div:first-child {
-    padding: 12px 14px;
+    padding: 10px 12px;
     flex-wrap: wrap;
   }
   .dashboard-table > div:first-child > div {
@@ -1611,12 +1623,15 @@ onUnmounted(() => {
   }
   .table-link {
     width: 100%;
+    border-radius: 6px;
   }
   .dashboard-recent-cards > div {
-    padding: 12px 14px;
+    padding: 10px 12px;
+    border-radius: 6px;
   }
   .dashboard-retry {
     width: 100%;
+    border-radius: 6px;
   }
 }
 @media (min-width: 640px) {
@@ -1634,17 +1649,17 @@ onUnmounted(() => {
   }
 }
 .dark .dash-stat-card {
-  background: #1e293b;
-  border-color: #334155;
+  background: var(--kpi-bg-dark);
+  border-color: var(--kpi-border-dark);
 }
 .dark .dash-stat-card .stat-label,
 .dark .dash-stat-card .stat-caption {
-  color: #e2e8f0;
+  color: var(--kpi-label-color-dark);
 }
 .dark .dash-stat-card .stat-number {
-  color: #f8fafc;
+  color: var(--kpi-value-color-dark);
 }
 .dark .dash-stat-card .stat-label > .material-symbols-outlined {
-  background: #334155;
+  background: var(--kpi-icon-bg-dark);
 }
 </style>

@@ -91,6 +91,18 @@ a:active:not(:disabled),
   --fs-placeholder: clamp(11px, calc(1em - 2px), 1em);
   --color-placeholder: #5f7089;
   --fs-form-label: 12px;
+
+  /* Radius scale kompak — satu keluarga radius untuk seluruh aplikasi
+     (kartu, kontrol, modal, menu ≈ 6px; permukaan kecil 4px; toast/panel 8px).
+     Definisi token ini menyeragamkan kelas rounded-lg/xl/2xl yang tersebar
+     di template tanpa override per halaman. */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 6px;
+  --radius-xl: 6px;
+  --radius-2xl: 8px;
+  --radius-3xl: 10px;
+  --radius-4xl: 12px;
 }
 
 :root {
@@ -98,19 +110,6 @@ a:active:not(:disabled),
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
-
-  /* Typography scaling support - desktop mode */
-  /* Default: compact (0.7) for ~30% density reduction */
-  --fs-scale-factor: 0.7;
-
-  /* Compact typography (30% smaller) - apply to html[data-typography="compact"] */
-  --fs-2xs: 9px;
-  --fs-xs: 10px;
-  --fs-sm: 11px;
-  --fs-base: 13px;
-  --fs-lg: 14px;
-  --fs-xl: 15px;
-  --fs-2xl: 17px;
 
   /* Brand Gradients */
   --gradient-brand-blue: linear-gradient(135deg, #0a51b0 0%, #0a5dbd 26%, #097cde 72%, #0892f5 100%);
@@ -123,15 +122,17 @@ a:active:not(:disabled),
     #faa425 100%
   );
 
-  /* Shared component geometry. 30% compact SaaS precision scale. */
-  --ui-radius-control: 0.45rem;
-  --ui-radius-card: 0.65rem;
+  /* Shared component geometry. Compact SaaS precision scale. */
+  --ui-radius-control: 6px;
+  --ui-radius-card: 6px;
+  --ui-card-padding: 12px;
+  --ui-card-padding-mobile: 10px;
   --ui-border: #e2e8f0;
   --ui-border-strong: #dfe5ef;
   --ui-surface-muted: #f8fafc;
   --ui-shadow-control: 0 1px 2px rgba(15, 23, 42, 0.04);
-  --ui-shadow-card: 0 1.5px 6px rgba(15, 23, 42, 0.03);
-  --ui-focus-ring: 0 0 0 2.5px rgba(10, 81, 176, 0.14);
+  --ui-shadow-card: 0 1px 3px rgba(15, 23, 42, 0.04);
+  --ui-focus-ring: 0 0 0 2px rgba(10, 81, 176, 0.16);
 }
 
 .bg-gradient-brand-blue {
@@ -206,17 +207,56 @@ body {
   font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   background: #f4f6f9;
   color: #2a3547;
+  font-size: 12px;
   line-height: 1.45;
   letter-spacing: -0.005em;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
+@media (max-width: 639px) {
+  body {
+    font-size: 11px;
+  }
+}
+
 /* Headings optical tracking & tight leading */
-h1, h2, h3, h4, h5, h6 {
+h1 {
   font-family: inherit;
-  letter-spacing: -0.02em;
+  font-size: 18px;
+  font-weight: 600;
   line-height: 1.25;
+  letter-spacing: -0.02em;
+}
+@media (max-width: 639px) {
+  h1 {
+    font-size: 16px;
+  }
+}
+
+h2, h3 {
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -0.015em;
+}
+@media (max-width: 639px) {
+  h2, h3 {
+    font-size: 13px;
+  }
+}
+
+h4, h5, h6 {
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+@media (max-width: 639px) {
+  h4, h5, h6 {
+    font-size: 11px;
+  }
 }
 
 button,
@@ -228,15 +268,30 @@ textarea {
 }
 
 button {
-  font-size: 0.8125rem; /* 13px */
+  font-size: 12px;
+  font-weight: 500;
   letter-spacing: -0.005em;
+  line-height: 1.3;
+}
+@media (max-width: 639px) {
+  button {
+    font-size: 11px;
+  }
 }
 
 input:not([type='checkbox']):not([type='radio']),
 select,
 textarea {
-  font-size: 0.8125rem; /* 13px */
+  font-size: 12px;
   letter-spacing: -0.005em;
+  line-height: 1.4;
+}
+@media (max-width: 639px) {
+  input:not([type='checkbox']):not([type='radio']),
+  select,
+  textarea {
+    font-size: 11px;
+  }
 }
 
 button:not(:disabled),
@@ -292,11 +347,20 @@ textarea {
 }
 
 /* Modernize Clean Cards */
-.shadow-card {
+.shadow-card,
+.ui-card {
   background: #ffffff;
   border: 1px solid var(--ui-border);
   border-radius: var(--ui-radius-card);
   box-shadow: var(--ui-shadow-card);
+  padding: var(--ui-card-padding, 11px);
+}
+
+@media (max-width: 639px) {
+  .shadow-card,
+  .ui-card {
+    padding: var(--ui-card-padding-mobile, 9px);
+  }
 }
 
 .shadow-card-hover {
@@ -305,19 +369,8 @@ textarea {
 
 .shadow-card-hover:hover {
   transform: translateY(-1px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
   border-color: #d2e3ff;
-}
-
-/* ── Shared UI primitives ──
-   These semantic classes are used by shared Vue components and the main list
-   toolbars. They prevent each page from drifting in border, radius, focus, and
-   elevation while allowing page-specific layout to remain flexible. */
-.ui-card {
-  background: #ffffff;
-  border: 1px solid var(--ui-border);
-  border-radius: var(--ui-radius-card);
-  box-shadow: var(--ui-shadow-card);
 }
 
 .ui-search-input,
@@ -548,13 +601,13 @@ label > span:first-child,
 
 /* ── Modernize Buttons Design System ── */
 .btn-primary {
-  background-color: #0a51b0;
-  color: #ffffff;
-  font-weight: 700;
+  background-color: var(--btn-primary-bg);
+  color: var(--btn-primary-color);
+  font-weight: var(--btn-font-weight);
   font-size: 0.75rem;
   padding: 0.375rem 0.875rem;
   border-radius: var(--ui-radius-control);
-  box-shadow: 0 2px 8px rgba(93, 135, 255, 0.2);
+  box-shadow: var(--btn-primary-shadow);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -570,7 +623,7 @@ label > span:first-child,
 }
 
 .btn-primary:hover {
-  background-color: #0a4391;
+  background-color: var(--btn-primary-hover-bg);
   box-shadow: 0 4px 12px rgba(69, 112, 234, 0.3);
 }
 
@@ -579,9 +632,9 @@ label > span:first-child,
 }
 
 .btn-secondary {
-  background-color: #ffffff;
-  color: #2a3547;
-  border: 1px solid #dfe5ef;
+  background-color: var(--btn-secondary-bg);
+  color: var(--btn-secondary-color);
+  border: 1px solid var(--btn-secondary-border);
   font-weight: 700;
   font-size: 0.75rem;
   padding: 0.375rem 0.875rem;
@@ -602,9 +655,9 @@ label > span:first-child,
 }
 
 .btn-secondary:hover {
-  background-color: #f2f6fa;
-  border-color: #0a51b0;
-  color: #333333;
+  background-color: var(--btn-secondary-hover-bg);
+  border-color: var(--btn-secondary-hover-border);
+  color: var(--btn-secondary-hover-color);
 }
 
 .btn-secondary:active {
@@ -882,92 +935,6 @@ svg circle {
     'wght' 400,
     'GRAD' 0,
     'opsz' 24 !important;
-}
-
-/* Typography Scaling: Desktop Density Mode - 7 levels (100% → 40%) */
-/* Default is compact (0.7) for ~30% density reduction per UI/UX spec. */
-html[data-typography='normal'] {
-  --fs-scale-factor: 0.85;
-}
-html:not([data-typography]),
-html[data-typography='compact'] {
-  --fs-scale-factor: 0.7;
-}
-html[data-typography='compact-80'] {
-  --fs-scale-factor: 0.8;
-}
-html[data-typography='compact-70'] {
-  --fs-scale-factor: 0.7;
-}
-html[data-typography='compact-60'] {
-  --fs-scale-factor: 0.6;
-}
-html[data-typography='compact-50'] {
-  --fs-scale-factor: 0.5;
-}
-html[data-typography='compact-40'] {
-  --fs-scale-factor: 0.4;
-}
-
-html:not([data-typography='normal']) .dashboard-view {
-  font-size: calc(1em * var(--fs-scale-factor));
-}
-
-/* Compact SaaS density: ~30% tighter padding and gaps */
-:where(html:not([data-typography='normal'])) :is(.ui-card, .shadow-card, .stat-card, .dash-stat-card, .dashboard-panel, .admin-page-header, .shipment-toolbar, .employee-profile, .asset-profile-banner) {
-  padding: calc(0.65rem * var(--fs-scale-factor)) calc(0.85rem * var(--fs-scale-factor));
-}
-
-:where(html:not([data-typography='normal'])) .dashboard-stats {
-  gap: calc(14px * var(--fs-scale-factor));
-}
-
-:where(html:not([data-typography='normal'])) .dashboard-chart-grid {
-  gap: calc(14px * var(--fs-scale-factor));
-}
-
-:where(html:not([data-typography='normal'])) :is(.grid-cols-1\.sm\:grid-cols-3, .grid-cols-2\.lg\:grid-cols-4) {
-  gap: calc(0.75rem * var(--fs-scale-factor));
-}
-
-:where(html:not([data-typography='normal'])) :is(.toolbar-primary-action, .toolbar-action-button, .toolbar-filter-button) {
-  height: calc(34px * var(--fs-scale-factor)) !important;
-  min-height: calc(34px * var(--fs-scale-factor)) !important;
-  max-height: calc(34px * var(--fs-scale-factor)) !important;
-}
-
-:where(html:not([data-typography='normal'])) .toolbar-search-input {
-  height: calc(34px * var(--fs-scale-factor)) !important;
-  min-height: calc(34px * var(--fs-scale-factor)) !important;
-  max-height: calc(34px * var(--fs-scale-factor)) !important;
-}
-html[data-typography]:not([data-typography='normal']) .dashboard-panel h3,
-html[data-typography]:not([data-typography='normal']) .dashboard-table h3 {
-  font-size: calc(var(--fs-lg) * var(--fs-scale-factor));
-}
-
-html[data-typography]:not([data-typography='normal']) .dashboard-intro h2 {
-  font-size: calc(20px * var(--fs-scale-factor));
-}
-
-html[data-typography]:not([data-typography='normal']) .stat-number {
-  font-size: var(--kpi-value-font-size-lg);
-}
-
-/* Tooltip and small text — WCAG 1.4.4 floor (never below 11px).
-   Replaced the old .text-[10px]/.text-[11px]/.text-[12px] selector list:
-   arbitrary-value class names inside a selector are re-parsed by Tailwind v4
-   and emit "No qualified name in attribute selector" build errors, AND the old
-   rule multiplied 12px by 0.7 → 8.4px, below the legibility floor. */
-html[data-typography]:not([data-typography='normal']) .tooltip,
-html[data-typography]:not([data-typography='normal']) .text-xs {
-  font-size: max(11px, calc(0.75rem * var(--fs-scale-factor)));
-}
-
-/* Ensure buttons remain accessible */
-html[data-typography]:not([data-typography='normal']) .btn-primary,
-html[data-typography]:not([data-typography='normal']) .btn-secondary {
-  font-size: calc(0.75rem * var(--fs-scale-factor));
 }
 
 /* ═══════════════════════════════════════════════════════════════

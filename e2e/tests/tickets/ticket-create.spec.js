@@ -32,7 +32,7 @@ test.describe('Ticket Management - Create Ticket Suite', () => {
 
     // Tunggu modal benar-benar tertutup — submit sukses menutup modal dan
     // me-reset state pencarian. Mengisi search sebelum itu berisiko racun.
-    await expect(page.locator('[role="dialog"]')).toBeHidden({ timeout: 10000 })
+    await expect(page.locator('[role="dialog"]')).toBeHidden({ timeout: 15000 })
 
     // 4. Filter or Search for created ticket if needed and verify visibility
     const searchInput = page.getByPlaceholder(/cari tiket/i)

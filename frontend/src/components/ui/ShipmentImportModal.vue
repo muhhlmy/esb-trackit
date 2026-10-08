@@ -157,9 +157,9 @@ watch(
     size="lg"
     @close="close"
   >
-    <div class="shipment-import-flow space-y-4">
+    <div class="shipment-import-flow space-y-3">
       <div
-        class="shipment-import-steps grid grid-cols-3 gap-2 rounded-xl border border-slate-200 bg-slate-50 p-2"
+        class="shipment-import-steps grid grid-cols-3 gap-2 rounded-[6px] border border-slate-200 bg-slate-50 p-2"
       >
         <div class="rounded-lg bg-white px-3 py-2 shadow-xs">
           <p class="text-[10px] font-bold uppercase tracking-wide text-slate-400">Langkah 1</p>
@@ -175,14 +175,14 @@ watch(
         </div>
       </div>
       <div
-        class="flex flex-col gap-3 rounded-2xl border border-[#CFE0F8] bg-[#F4F8FF] p-4 sm:flex-row sm:items-center sm:justify-between"
+        class="flex flex-col gap-3 rounded-[6px] border border-[#CFE0F8] bg-[#F4F8FF] p-3 sm:flex-row sm:items-center sm:justify-between"
       >
         <div class="min-w-0">
           <div class="flex items-center gap-2">
             <span aria-hidden="true" class="material-symbols-outlined text-[20px] text-[#0A51B0]"
               >table_view</span
             >
-            <h3 class="text-sm font-bold text-slate-800">Template Pengiriman</h3>
+            <h3 class="text-xs font-bold text-slate-800">Template Pengiriman</h3>
           </div>
           <p class="mt-1 text-[11px] leading-relaxed text-slate-500">
             Sheet
@@ -195,7 +195,7 @@ watch(
         <button
           type="button"
           @click="downloadTemplate"
-          class="inline-flex min-h-10 shrink-0 items-center justify-center gap-2 rounded-xl bg-[#0A51B0] px-4 text-xs font-bold text-white shadow-sm hover:bg-[#08458f]"
+          class="inline-flex min-h-8 shrink-0 items-center justify-center gap-2 rounded-[6px] bg-[#0A51B0] px-4 text-xs font-bold text-white shadow-sm hover:bg-[#08458f]"
         >
           <span aria-hidden="true" class="material-symbols-outlined text-[17px]">download</span
           >Unduh Template
@@ -211,7 +211,7 @@ watch(
       <button
         v-if="!file"
         type="button"
-        class="flex min-h-36 w-full flex-col items-center justify-center rounded-2xl border-2 border-dashed p-5 text-center transition-colors"
+        class="flex min-h-36 w-full flex-col items-center justify-center rounded-[6px] border-2 border-dashed p-4 text-center transition-colors"
         :class="
           isDragging
             ? 'border-[#0A51B0] bg-[#EEF5FF]'
@@ -224,15 +224,15 @@ watch(
       >
         <span aria-hidden="true" class="material-symbols-outlined text-[34px] text-[#0A51B0]"
           >cloud_upload</span
-        ><span class="mt-2 text-sm font-bold text-slate-700">Tarik file ke sini</span
+        ><span class="mt-2 text-xs font-bold text-slate-700">Tarik file ke sini</span
         ><span class="mt-1 text-[11px] text-slate-500"
           >atau klik untuk memilih · .xlsx, .xls, .csv</span
         >
       </button>
-      <div v-else class="rounded-2xl border border-slate-200 bg-white p-3 shadow-xs">
+      <div v-else class="rounded-[6px] border border-slate-200 bg-white p-3 shadow-xs">
         <div class="flex items-center gap-3">
           <span
-            class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600"
+            class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[6px] bg-emerald-50 text-emerald-600"
             ><span aria-hidden="true" class="material-symbols-outlined">description</span></span
           >
           <div class="min-w-0 flex-1">
@@ -252,7 +252,7 @@ watch(
           </button>
         </div>
       </div>
-      <div v-if="rows.length" class="overflow-hidden rounded-2xl border border-slate-200">
+      <div v-if="rows.length" class="overflow-hidden rounded-[6px] border border-slate-200">
         <div
           class="flex items-center justify-between border-b border-slate-200 bg-slate-50 px-3 py-2"
         >
@@ -290,7 +290,7 @@ watch(
           </table>
         </div>
       </div>
-      <fieldset class="rounded-2xl border border-slate-200 p-3">
+      <fieldset class="rounded-[6px] border border-slate-200 p-3">
         <legend class="px-1 text-xs font-bold text-slate-700">Mode import</legend>
         <label class="flex gap-2 text-xs text-slate-700"
           ><input v-model="importMode" type="radio" value="append" />Tambah Data</label
@@ -307,26 +307,26 @@ watch(
       <p
         v-if="error"
         role="alert"
-        class="flex items-start gap-2 rounded-xl border border-rose-200 bg-rose-50 p-3 text-xs font-semibold text-rose-700"
+        class="flex items-start gap-2 rounded-[6px] border border-rose-200 bg-rose-50 p-3 text-xs font-semibold text-rose-700"
       >
         <span aria-hidden="true" class="material-symbols-outlined text-[17px]">error</span
         >{{ error }}
       </p>
       <p
         v-if="success"
-        class="flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-xs font-semibold text-emerald-700"
+        class="flex items-center gap-2 rounded-[6px] border border-emerald-200 bg-emerald-50 p-3 text-xs font-semibold text-emerald-700"
       >
         <span aria-hidden="true" class="material-symbols-outlined text-[17px]">check_circle</span
         >{{ success }}
       </p>
       <div
-        class="flex flex-col-reverse gap-2 border-t border-slate-200 pt-4 sm:flex-row sm:justify-end"
+        class="flex flex-col-reverse gap-2 border-t border-slate-200 pt-3 sm:flex-row sm:justify-end"
       >
         <button
           type="button"
           :disabled="submitting"
           @click="close"
-          class="min-h-10 rounded-xl border border-slate-200 px-4 text-xs font-bold text-slate-600 hover:bg-slate-50 disabled:opacity-50"
+          class="min-h-8 rounded-[6px] border border-slate-200 px-4 text-xs font-bold text-slate-600 hover:bg-slate-50 disabled:opacity-50"
         >
           Batal</button
         ><button
@@ -338,7 +338,7 @@ watch(
             (importMode === 'replace' && replaceConfirmation !== 'GANTI')
           "
           @click="submit"
-          class="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl bg-[#0A51B0] px-5 text-xs font-bold text-white hover:bg-[#08458f] disabled:cursor-not-allowed disabled:opacity-50"
+          class="inline-flex min-h-8 items-center justify-center gap-2 rounded-[6px] bg-[#0A51B0] px-4 text-xs font-bold text-white hover:bg-[#08458f] disabled:cursor-not-allowed disabled:opacity-50"
         >
           <span
             v-if="submitting"
@@ -365,12 +365,9 @@ watch(
   background: white;
 }
 .shipment-import-flow fieldset label {
-  min-height: 44px;
+  min-height: 32px;
   align-items: center;
   cursor: pointer;
-}
-.shipment-import-flow button {
-  min-height: 44px;
 }
 .shipment-import-flow button:focus-visible,
 .shipment-import-flow input:focus-visible {

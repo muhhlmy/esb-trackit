@@ -114,7 +114,7 @@ onBeforeUnmount(() => {
           aria-modal="true"
           :aria-labelledby="titleId"
           tabindex="-1"
-          class="modal-panel app-modal-panel ui-modal-panel flex max-h-[90dvh] sm:max-h-[85vh] w-full flex-col overflow-hidden rounded-t-2xl sm:rounded-xl border-t sm:border border-[#E2E8F0] bg-white shadow-2xl outline-none"
+          class="modal-panel app-modal-panel ui-modal-panel flex max-h-[90dvh] sm:max-h-[85vh] w-full flex-col overflow-hidden rounded-t-[6px] sm:rounded-[6px] border-t sm:border border-[#E2E8F0] bg-white shadow-2xl outline-none"
           :class="[
             panelClass,
             {
@@ -132,11 +132,11 @@ onBeforeUnmount(() => {
 
           <!-- Header Modal (Fixed Non-Scrollable Header) -->
           <div
-            class="flex shrink-0 items-center justify-between gap-2.5 border-b border-[#F1F5F9] bg-white px-3.5 sm:px-4 py-2.5 sm:py-3"
+            class="flex shrink-0 items-center justify-between gap-2 border-b border-[#F1F5F9] bg-white px-3 sm:px-3.5 py-2 sm:py-2.5"
           >
             <div class="flex items-center gap-2 min-w-0">
               <span
-                class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#EDF5FF] text-[#333333] border border-[#B8D4F5]/30"
+                class="flex h-7 w-7 shrink-0 items-center justify-center rounded-[6px] bg-[#EDF5FF] text-[#333333] border border-[#B8D4F5]/30"
               >
                 <span aria-hidden="true" class="material-symbols-outlined text-[16px]">{{
                   icon || 'devices'
@@ -145,7 +145,7 @@ onBeforeUnmount(() => {
               <div class="min-w-0">
                 <h2
                   :id="titleId"
-                  class="text-[13px] sm:text-sm font-bold text-[#333333] leading-tight wrap-anywhere sm:truncate"
+                  class="text-[13px] sm:text-[14px] font-semibold text-[#333333] leading-tight wrap-anywhere sm:truncate"
                 >
                   {{ title }}
                 </h2>
@@ -161,19 +161,19 @@ onBeforeUnmount(() => {
               type="button"
               aria-label="Tutup dialog"
               @click="close"
-              class="flex h-7.5 w-7.5 sm:h-7 sm:w-7 shrink-0 items-center justify-center rounded-lg text-[#475569] transition-colors hover:bg-[#F8FAFC] hover:text-[#333333] cursor-pointer"
+              class="flex h-7 w-7 shrink-0 items-center justify-center rounded-[6px] text-[#475569] transition-colors hover:bg-[#F8FAFC] hover:text-[#333333] cursor-pointer"
             >
-              <span aria-hidden="true" class="material-symbols-outlined text-[17px]">close</span>
+              <span aria-hidden="true" class="material-symbols-outlined text-[16px]">close</span>
             </button>
           </div>
 
           <!-- Body Konten Modal (Sole Scrollable Area) -->
-          <div class="modal-body flex-1 min-h-0 overflow-y-auto p-3 sm:p-3.5">
+          <div class="modal-body flex-1 min-h-0 overflow-y-auto p-2.5 sm:p-3">
             <slot />
           </div>
           <div
             v-if="$slots.footer"
-            class="modal-footer shrink-0 border-t border-[#F1F5F9] bg-white px-3.5 py-2.5 sm:px-4"
+            class="modal-footer shrink-0 border-t border-[#F1F5F9] bg-white px-3 py-2 sm:px-3.5 sm:py-2.5"
           >
             <slot name="footer" />
           </div>

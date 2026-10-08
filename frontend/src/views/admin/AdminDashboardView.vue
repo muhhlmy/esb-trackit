@@ -200,7 +200,7 @@ function getCategoryBadgeClass(category) {
       <button
         v-if="canWrite"
         @click="createNewDoc"
-        class="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 h-8 sm:h-8.5 px-3.5 sm:px-4 rounded-lg text-xs font-semibold bg-[#0A51B0] hover:bg-[#0A4391] text-white shadow-2xs transition-all cursor-pointer shrink-0"
+        class="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 h-8 px-3 rounded-[6px] text-[11px] sm:text-[12px] font-semibold bg-[#0A51B0] hover:bg-[#0A4391] text-white shadow-2xs transition-all cursor-pointer shrink-0"
       >
         <Plus class="w-3.5 h-3.5" />
         <span>Dokumen Baru</span>
@@ -211,11 +211,11 @@ function getCategoryBadgeClass(category) {
     <div class="gsap-admin-el">
       <RouterLink
         to="/admin/kb-categories"
-        class="flex items-center justify-between p-2.5 sm:p-3 rounded-lg bg-white dark:bg-slate-900 border border-[#E5EAEF] dark:border-slate-800 hover:border-[#0A51B0] dark:hover:border-[#0A51B0] transition-colors group shadow-2xs"
+        class="flex items-center justify-between p-2.5 sm:p-3 rounded-[6px] bg-white dark:bg-slate-900 border border-[#E5EAEF] dark:border-slate-800 hover:border-[#0A51B0] dark:hover:border-[#0A51B0] transition-colors group shadow-2xs"
       >
         <div class="flex items-center gap-2.5 min-w-0">
           <div
-            class="w-7 h-7 sm:w-7.5 sm:h-7.5 rounded-md bg-[#ECF2FF] dark:bg-slate-800 text-[#0A51B0] dark:text-indigo-300 flex items-center justify-center group-hover:bg-[#0A51B0] group-hover:text-white transition-colors shrink-0"
+            class="w-7 h-7 sm:w-7.5 sm:h-7.5 rounded-[6px] bg-[#ECF2FF] dark:bg-slate-800 text-[#0A51B0] dark:text-indigo-300 flex items-center justify-center group-hover:bg-[#0A51B0] group-hover:text-white transition-colors shrink-0"
           >
             <LayoutGrid class="w-3.5 h-3.5" />
           </div>
@@ -240,76 +240,76 @@ function getCategoryBadgeClass(category) {
     <div class="grid grid-cols-3 gap-2 sm:gap-2.5 lg:gap-3 gsap-admin-el">
       <!-- Total -->
       <div
-        class="kpi-focusable flex flex-col justify-between p-[var(--kpi-padding)] sm:p-[var(--kpi-padding-sm)] lg:p-[var(--kpi-padding-lg)] rounded-[var(--kpi-radius)] bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 shadow-2xs hover:border-[#CBD5E1] dark:hover:border-slate-700 transition-colors min-h-[var(--kpi-height)] sm:min-h-[var(--kpi-height-sm)] lg:min-h-[var(--kpi-height-lg)]"
+        class="kpi-focusable flex flex-col justify-between p-[var(--kpi-padding)] sm:p-[var(--kpi-padding-sm)] lg:p-[var(--kpi-padding-lg)] rounded-[var(--kpi-radius)] min-h-[var(--kpi-height)] sm:min-h-[var(--kpi-height-sm)] lg:min-h-[var(--kpi-height-lg)] transition-colors" 
         tabindex="0"
       >
         <div class="flex items-center justify-between gap-[var(--kpi-gap)]">
-          <span class="text-[var(--kpi-title-font-size)] sm:text-[var(--kpi-title-font-size-sm)] lg:text-[var(--kpi-title-font-size-lg)] font-medium text-[#5F7089] dark:text-slate-400 truncate"
+          <span class="text-[length:var(--kpi-title-font-size)] sm:text-[length:var(--kpi-title-font-size-sm)] lg:text-[length:var(--kpi-title-font-size-lg)] font-medium text-[#5F7089] dark:text-slate-400 truncate"
             >Total artikel</span
           >
           <div
-            class="flex h-[var(--kpi-icon-container-size)] w-[var(--kpi-icon-container-size)] sm:h-[var(--kpi-icon-container-size-sm)] sm:w-[var(--kpi-icon-container-size-sm)] lg:h-[var(--kpi-icon-container-size-lg)] lg:w-[var(--kpi-icon-container-size-lg)] shrink-0 items-center justify-center rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300"
+            class="flex h-[var(--kpi-icon-container-size)] w-[var(--kpi-icon-container-size)] sm:h-[var(--kpi-icon-container-size-sm)] sm:w-[var(--kpi-icon-container-size-sm)] lg:h-[var(--kpi-icon-container-size-lg)] lg:w-[var(--kpi-icon-container-size-lg)] shrink-0 items-center justify-center rounded-[6px] bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300"
           >
             <FileText class="w-[var(--kpi-icon-size)] h-[var(--kpi-icon-size)] sm:w-[var(--kpi-icon-size-sm)] sm:h-[var(--kpi-icon-size-sm)] lg:w-[var(--kpi-icon-size-lg)] lg:h-[var(--kpi-icon-size-lg)]" />
           </div>
         </div>
         <div class="mt-0.5">
           <p
-            class="font-num text-[var(--kpi-value-font-size)] sm:text-[var(--kpi-value-font-size-sm)] lg:text-[var(--kpi-value-font-size-lg)] font-bold text-[#333333] dark:text-white tabular-nums leading-none tracking-tight"
+            class="font-num text-[length:var(--kpi-value-font-size)] sm:text-[length:var(--kpi-value-font-size-sm)] lg:text-[length:var(--kpi-value-font-size-lg)] font-semibold text-[#333333] dark:text-white tabular-nums leading-none tracking-tight"
           >
             {{ stats.total }}
           </p>
-          <span class="mt-0.5 block truncate text-[var(--kpi-caption-font-size)] sm:text-[var(--kpi-caption-font-size-sm)] lg:text-[var(--kpi-caption-font-size-lg)] font-normal text-[#64748B] dark:text-slate-400">Seluruh data artikel</span>
+          <span class="mt-0.5 block truncate text-[length:var(--kpi-caption-font-size)] sm:text-[length:var(--kpi-caption-font-size-sm)] lg:text-[length:var(--kpi-caption-font-size-lg)] font-normal text-[#64748B] dark:text-slate-400">Seluruh data artikel</span>
         </div>
       </div>
 
       <!-- Published -->
       <div
-        class="kpi-focusable flex flex-col justify-between p-[var(--kpi-padding)] sm:p-[var(--kpi-padding-sm)] lg:p-[var(--kpi-padding-lg)] rounded-[var(--kpi-radius)] bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 shadow-2xs hover:border-[#CBD5E1] dark:hover:border-slate-700 transition-colors min-h-[var(--kpi-height)] sm:min-h-[var(--kpi-height-sm)] lg:min-h-[var(--kpi-height-lg)]"
+        class="kpi-focusable flex flex-col justify-between p-[var(--kpi-padding)] sm:p-[var(--kpi-padding-sm)] lg:p-[var(--kpi-padding-lg)] rounded-[var(--kpi-radius)] min-h-[var(--kpi-height)] sm:min-h-[var(--kpi-height-sm)] lg:min-h-[var(--kpi-height-lg)] transition-colors" 
         tabindex="0"
       >
         <div class="flex items-center justify-between gap-[var(--kpi-gap)]">
-          <span class="text-[var(--kpi-title-font-size)] sm:text-[var(--kpi-title-font-size-sm)] lg:text-[var(--kpi-title-font-size-lg)] font-medium text-[#5F7089] dark:text-slate-400 truncate"
+          <span class="text-[length:var(--kpi-title-font-size)] sm:text-[length:var(--kpi-title-font-size-sm)] lg:text-[length:var(--kpi-title-font-size-lg)] font-medium text-[#5F7089] dark:text-slate-400 truncate"
             >Terbit</span
           >
           <div
-            class="flex h-[var(--kpi-icon-container-size)] w-[var(--kpi-icon-container-size)] sm:h-[var(--kpi-icon-container-size-sm)] sm:w-[var(--kpi-icon-container-size-sm)] lg:h-[var(--kpi-icon-container-size-lg)] lg:w-[var(--kpi-icon-container-size-lg)] shrink-0 items-center justify-center rounded-md bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400"
+            class="flex h-[var(--kpi-icon-container-size)] w-[var(--kpi-icon-container-size)] sm:h-[var(--kpi-icon-container-size-sm)] sm:w-[var(--kpi-icon-container-size-sm)] lg:h-[var(--kpi-icon-container-size-lg)] lg:w-[var(--kpi-icon-container-size-lg)] shrink-0 items-center justify-center rounded-[6px] bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400"
           >
             <CheckCircle class="w-[var(--kpi-icon-size)] h-[var(--kpi-icon-size)] sm:w-[var(--kpi-icon-size-sm)] sm:h-[var(--kpi-icon-size-sm)] lg:w-[var(--kpi-icon-size-lg)] lg:h-[var(--kpi-icon-size-lg)]" />
           </div>
         </div>
         <div class="mt-0.5">
           <p
-            class="font-num text-[var(--kpi-value-font-size)] sm:text-[var(--kpi-value-font-size-sm)] lg:text-[var(--kpi-value-font-size-lg)] font-bold text-[#333333] dark:text-white tabular-nums leading-none tracking-tight"
+            class="font-num text-[length:var(--kpi-value-font-size)] sm:text-[length:var(--kpi-value-font-size-sm)] lg:text-[length:var(--kpi-value-font-size-lg)] font-semibold text-[#333333] dark:text-white tabular-nums leading-none tracking-tight"
           >
             {{ stats.published }}
           </p>
-          <span class="mt-0.5 block truncate text-[var(--kpi-caption-font-size)] sm:text-[var(--kpi-caption-font-size-sm)] lg:text-[var(--kpi-caption-font-size-lg)] font-normal text-[#64748B] dark:text-slate-400">Telah dipublikasi</span>
+          <span class="mt-0.5 block truncate text-[length:var(--kpi-caption-font-size)] sm:text-[length:var(--kpi-caption-font-size-sm)] lg:text-[length:var(--kpi-caption-font-size-lg)] font-normal text-[#64748B] dark:text-slate-400">Telah dipublikasi</span>
         </div>
       </div>
 
       <!-- Custom -->
       <div
-        class="kpi-focusable flex flex-col justify-between p-[var(--kpi-padding)] sm:p-[var(--kpi-padding-sm)] lg:p-[var(--kpi-padding-lg)] rounded-[var(--kpi-radius)] bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 shadow-2xs hover:border-[#CBD5E1] dark:hover:border-slate-700 transition-colors min-h-[var(--kpi-height)] sm:min-h-[var(--kpi-height-sm)] lg:min-h-[var(--kpi-height-lg)]"
+        class="kpi-focusable flex flex-col justify-between p-[var(--kpi-padding)] sm:p-[var(--kpi-padding-sm)] lg:p-[var(--kpi-padding-lg)] rounded-[var(--kpi-radius)] min-h-[var(--kpi-height)] sm:min-h-[var(--kpi-height-sm)] lg:min-h-[var(--kpi-height-lg)] transition-colors" 
         tabindex="0"
       >
         <div class="flex items-center justify-between gap-[var(--kpi-gap)]">
-          <span class="text-[var(--kpi-title-font-size)] sm:text-[var(--kpi-title-font-size-sm)] lg:text-[var(--kpi-title-font-size-lg)] font-medium text-[#5F7089] dark:text-slate-400 truncate"
+          <span class="text-[length:var(--kpi-title-font-size)] sm:text-[length:var(--kpi-title-font-size-sm)] lg:text-[length:var(--kpi-title-font-size-lg)] font-medium text-[#5F7089] dark:text-slate-400 truncate"
             >Khusus</span
           >
           <div
-            class="flex h-[var(--kpi-icon-container-size)] w-[var(--kpi-icon-container-size)] sm:h-[var(--kpi-icon-container-size-sm)] sm:w-[var(--kpi-icon-container-size-sm)] lg:h-[var(--kpi-icon-container-size-lg)] lg:w-[var(--kpi-icon-container-size-lg)] shrink-0 items-center justify-center rounded-md bg-[#EFF6FF] dark:bg-blue-950/60 text-[#0A51B0] dark:text-blue-400"
+            class="flex h-[var(--kpi-icon-container-size)] w-[var(--kpi-icon-container-size)] sm:h-[var(--kpi-icon-container-size-sm)] sm:w-[var(--kpi-icon-container-size-sm)] lg:h-[var(--kpi-icon-container-size-lg)] lg:w-[var(--kpi-icon-container-size-lg)] shrink-0 items-center justify-center rounded-[6px] bg-[#EFF6FF] dark:bg-blue-950/60 text-[#0A51B0] dark:text-blue-400"
           >
             <PenTool class="w-[var(--kpi-icon-size)] h-[var(--kpi-icon-size)] sm:w-[var(--kpi-icon-size-sm)] sm:h-[var(--kpi-icon-size-sm)] lg:w-[var(--kpi-icon-size-lg)] lg:h-[var(--kpi-icon-size-lg)]" />
           </div>
         </div>
         <div class="mt-0.5">
           <p
-            class="font-num text-[var(--kpi-value-font-size)] sm:text-[var(--kpi-value-font-size-sm)] lg:text-[var(--kpi-value-font-size-lg)] font-bold text-[#333333] dark:text-white tabular-nums leading-none tracking-tight"
+            class="font-num text-[length:var(--kpi-value-font-size)] sm:text-[length:var(--kpi-value-font-size-sm)] lg:text-[length:var(--kpi-value-font-size-lg)] font-semibold text-[#333333] dark:text-white tabular-nums leading-none tracking-tight"
           >
             {{ stats.custom }}
           </p>
-          <span class="mt-0.5 block truncate text-[var(--kpi-caption-font-size)] sm:text-[var(--kpi-caption-font-size-sm)] lg:text-[var(--kpi-caption-font-size-lg)] font-normal text-[#64748B] dark:text-slate-400">Artikel kustom</span>
+          <span class="mt-0.5 block truncate text-[length:var(--kpi-caption-font-size)] sm:text-[length:var(--kpi-caption-font-size-sm)] lg:text-[length:var(--kpi-caption-font-size-lg)] font-normal text-[#64748B] dark:text-slate-400">Artikel kustom</span>
         </div>
       </div>
     </div>
@@ -328,12 +328,12 @@ function getCategoryBadgeClass(category) {
           type="text"
           aria-label="Cari kasus"
           placeholder="Cari judul, deskripsi, atau tag…"
-          class="w-full bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-700 rounded-xl pl-9 pr-9 py-2 sm:py-2.5 text-xs sm:text-sm font-normal text-[#333333] dark:text-white placeholder-[#687281] dark:placeholder-slate-500 focus:outline-none focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 transition-all shadow-2xs"
+          class="w-full bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-700 rounded-[6px] pl-9 pr-9 py-1.5 text-xs font-normal text-[#333333] dark:text-white placeholder-[#687281] dark:placeholder-slate-500 focus:outline-none focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 transition-all shadow-2xs"
         />
         <button
           v-if="searchQuery"
           @click="searchQuery = ''"
-          class="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors cursor-pointer touch-manipulation"
+          class="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 rounded-md text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors cursor-pointer touch-manipulation"
           title="Hapus pencarian"
         >
           <X class="w-3.5 h-3.5" />
@@ -344,7 +344,7 @@ function getCategoryBadgeClass(category) {
       <div class="flex flex-wrap items-center gap-2">
         <!-- Status Segmented Control -->
         <div
-          class="flex items-center p-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-xs shrink-0 overflow-x-auto no-scrollbar"
+          class="flex items-center p-0.5 rounded-[6px] bg-slate-100 dark:bg-slate-800 text-xs shrink-0 overflow-x-auto no-scrollbar"
         >
           <button
             v-for="st in [
@@ -373,7 +373,7 @@ function getCategoryBadgeClass(category) {
             aria-label="Kategori"
             placeholder="Semua kategori"
             :block="true"
-            height-class="h-9"
+            height-class="h-8"
           />
         </div>
 
@@ -707,7 +707,7 @@ function getCategoryBadgeClass(category) {
       icon="delete"
       @close="deleteConfirmId = null"
     >
-      <p class="text-sm text-slate-500 leading-relaxed">
+      <p class="text-xs text-slate-500 leading-relaxed">
         Dokumen ini akan dihapus permanen. Tindakan ini tidak dapat dibatalkan.
       </p>
       <template #footer
@@ -734,33 +734,23 @@ function getCategoryBadgeClass(category) {
 </style>
 
 <style scoped>
-.cms-page {
-  max-width: 1500px;
-}
+/* Ukuran mengikuti token & aturan global (h1 18/16px, tombol 12px/32px,
+   tabel kompak) — sejajar dengan admin-workspace.css di halaman admin lain. */
 .cms-page > div:first-child {
   background: transparent;
   border: 0;
   padding: 4px 0 12px;
   box-shadow: none;
 }
-.cms-page h1 {
-  font-size: 25px;
-  font-weight: 650;
-  letter-spacing: -0.04em;
-}
-.cms-page button {
-  min-height: 40px;
-  box-shadow: none;
-}
 .cms-page table th {
-  font-weight: 500;
+  font-weight: 600;
   text-transform: none;
   letter-spacing: 0;
   font-size: 11px;
-  padding-block: 16px;
+  padding-block: 7px;
 }
 .cms-page table td {
-  padding-block: 20px;
+  padding-block: 7px;
 }
 .cms-page table td:first-child {
   width: 36%;
@@ -769,23 +759,23 @@ function getCategoryBadgeClass(category) {
   white-space: normal;
 }
 .cms-cards > div {
-  padding: 20px;
-  gap: 16px;
+  padding: 10px 12px;
+  gap: 10px;
 }
 .cms-cards h3 {
-  font-size: 15px;
-  line-height: 1.6;
+  font-size: 14px;
+  line-height: 1.4;
 }
 .cms-dialog-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 10px;
+  gap: 8px;
 }
 .cms-dialog-actions button {
-  min-height: 44px;
-  padding: 0 18px;
+  min-height: 32px;
+  padding: 0 12px;
   border: 1px solid #e2e8f0;
-  border-radius: 8px;
+  border-radius: 6px;
   font-size: 12px;
   cursor: pointer;
 }
@@ -801,13 +791,10 @@ function getCategoryBadgeClass(category) {
   }
   .cms-cards > div {
     border: 1px solid #e2e8f0;
-    border-radius: 12px;
+    border-radius: 6px;
   }
 }
 @media (max-width: 639px) {
-  .cms-page h1 {
-    font-size: 23px;
-  }
   .cms-page button {
     min-height: 44px;
   }

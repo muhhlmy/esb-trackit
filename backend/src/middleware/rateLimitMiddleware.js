@@ -141,21 +141,22 @@ export const apiRateLimiter = publicApiRateLimiter
 
 export const loginRateLimiter = createBoundedRateLimiter({
   windowMs: 15 * 60_000,
-  max: 10,
+  max: env.rateLimit?.authMax || 10,
   keyGenerator: (req) => {
     const ipKey = `login:ip:${getClientIp(req)}`
     const email = normalizedLoginEmail(req)
+    const authMax = env.rateLimit?.authMax || 10
     const configs = [
       {
         key: ipKey,
-        max: 60,
+        max: Math.max(authMax * 3, 60),
         message: 'Terlalu banyak permintaan login dari alamat IP ini. Silakan coba lagi nanti.',
       },
     ]
     if (email) {
       configs.push({
         key: `login:account:${email}`,
-        max: 10,
+        max: authMax,
         message: 'Terlalu banyak percobaan login untuk akun ini. Silakan coba lagi nanti.',
       })
     }

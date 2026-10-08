@@ -15,7 +15,7 @@ const props = defineProps({
   customLabelPrefix: { type: String, default: '+ Gunakan' },
   ariaLabel: { type: String, default: '' },
   loading: { type: Boolean, default: false },
-  heightClass: { type: String, default: 'h-10' },
+  heightClass: { type: String, default: 'h-8' },
   triggerClass: { type: String, default: '' },
   dropDirection: { type: String, default: 'down' }, // 'down' | 'up'
 })
@@ -316,7 +316,7 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside))
             :key="option[valueKey]"
             role="option"
             :aria-selected="option[valueKey] === modelValue"
-            class="flex cursor-pointer items-center justify-between rounded-lg px-2.5 py-1.5 text-xs font-medium text-[#2A3547] hover:bg-[#F8FAFC] transition-colors"
+            class="flex cursor-pointer items-center justify-between rounded-[6px] px-2.5 py-1 text-xs font-medium text-[#2A3547] hover:bg-[#F8FAFC] transition-colors"
             :class="{
               'bg-[#ECF2FF] font-bold text-[#333333]': option[valueKey] === modelValue,
               'ring-1 ring-inset ring-[#0A51B0]/30':

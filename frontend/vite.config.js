@@ -133,6 +133,8 @@ export default defineConfig(({ mode = 'development' }) => {
           target: proxyTarget,
           changeOrigin: true,
           ws: true,
+          timeout: 60000,
+          proxyTimeout: 60000,
         },
       },
     },

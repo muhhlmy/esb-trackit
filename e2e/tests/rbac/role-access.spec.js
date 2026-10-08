@@ -18,11 +18,15 @@ test.describe('Role-Based Access Control (RBAC) Suite', () => {
     const page = userPage
 
     // First confirm user is authenticated via /my-assets
-    await page.goto('/my-assets', { waitUntil: 'domcontentloaded' })
+    await page.goto('/my-assets', { waitUntil: 'domcontentloaded' }).catch((err) => {
+      if (!err.message.includes('NS_BINDING_ABORTED')) throw err
+    })
     await expect(page).not.toHaveURL(/\/login/)
 
     // Then attempt to access restricted route
-    await page.goto('/users', { waitUntil: 'domcontentloaded' })
+    await page.goto('/users', { waitUntil: 'domcontentloaded' }).catch((err) => {
+      if (!err.message.includes('NS_BINDING_ABORTED')) throw err
+    })
 
     // Should redirect away from /users (either to /my-assets or /)
     await expect(page).not.toHaveURL(/\/users$/)
@@ -34,11 +38,15 @@ test.describe('Role-Based Access Control (RBAC) Suite', () => {
     const page = userPage
 
     // First confirm user is authenticated
-    await page.goto('/my-assets', { waitUntil: 'domcontentloaded' })
+    await page.goto('/my-assets', { waitUntil: 'domcontentloaded' }).catch((err) => {
+      if (!err.message.includes('NS_BINDING_ABORTED')) throw err
+    })
     await expect(page).not.toHaveURL(/\/login/)
 
     // Then attempt to access restricted route
-    await page.goto('/export', { waitUntil: 'domcontentloaded' })
+    await page.goto('/export', { waitUntil: 'domcontentloaded' }).catch((err) => {
+      if (!err.message.includes('NS_BINDING_ABORTED')) throw err
+    })
 
     // Should redirect away from /export
     await expect(page).not.toHaveURL(/\/export$/)
@@ -50,12 +58,16 @@ test.describe('Role-Based Access Control (RBAC) Suite', () => {
     const page = superAdminPage
 
     // First confirm superadmin is authenticated
-    await page.goto('/dashboard', { waitUntil: 'domcontentloaded' })
+    await page.goto('/dashboard', { waitUntil: 'domcontentloaded' }).catch((err) => {
+      if (!err.message.includes('NS_BINDING_ABORTED')) throw err
+    })
     await expect(page).not.toHaveURL(/\/login/)
     await expect(page.getByText('Total Aset', { exact: true }).first()).toBeVisible({ timeout: 10000 })
 
     // Then verify access to /users
-    await page.goto('/users', { waitUntil: 'domcontentloaded' })
+    await page.goto('/users', { waitUntil: 'domcontentloaded' }).catch((err) => {
+      if (!err.message.includes('NS_BINDING_ABORTED')) throw err
+    })
     await expect(page).toHaveURL(/\/users$/)
     await expect(page.getByRole('heading', { name: /pengguna|user management/i }).first()).toBeVisible()
   })
@@ -66,12 +78,16 @@ test.describe('Role-Based Access Control (RBAC) Suite', () => {
     const page = adminPage
 
     // First confirm admin is authenticated via Dashboard
-    await page.goto('/dashboard', { waitUntil: 'domcontentloaded' })
+    await page.goto('/dashboard', { waitUntil: 'domcontentloaded' }).catch((err) => {
+      if (!err.message.includes('NS_BINDING_ABORTED')) throw err
+    })
     await expect(page).not.toHaveURL(/\/login/)
     await expect(page.getByText('Total Aset', { exact: true }).first()).toBeVisible({ timeout: 10000 })
 
     // Then verify access to /assets
-    await page.goto('/assets', { waitUntil: 'domcontentloaded' })
+    await page.goto('/assets', { waitUntil: 'domcontentloaded' }).catch((err) => {
+      if (!err.message.includes('NS_BINDING_ABORTED')) throw err
+    })
     await expect(page).toHaveURL(/\/assets$/)
     await expect(page.getByRole('heading', { name: /aset/i }).first()).toBeVisible()
   })

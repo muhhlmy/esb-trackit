@@ -1408,7 +1408,7 @@ function toast(message, type = 'success') {
   </div>
   <div
     v-else
-    class="tickets-workspace flex min-w-0 flex-col gap-5"
+    class="tickets-workspace flex min-w-0 flex-col gap-3"
     :data-testid="!isLoading ? 'page-ready' : undefined"
   >
     <!-- Toast Notification -->
@@ -1417,7 +1417,7 @@ function toast(message, type = 'success') {
         v-if="notification"
         :role="notification.type === 'error' ? 'alert' : 'status'"
         :aria-live="notification.type === 'error' ? 'assertive' : 'polite'"
-        class="fixed left-4 right-4 top-4 z-[60] flex items-center gap-3 rounded-2xl px-4 py-3 text-white shadow-xl sm:left-auto sm:right-5 sm:max-w-md"
+        class="fixed left-4 right-4 top-4 z-[60] flex items-center gap-3 rounded-[6px] px-4 py-3 text-white shadow-xl sm:left-auto sm:right-5 sm:max-w-md"
         :class="
           notification.type === 'error'
             ? 'bg-[#DC2626]'
@@ -1453,7 +1453,7 @@ function toast(message, type = 'success') {
         <button
           type="button"
           @click="openAdd"
-          class="h-9 shrink-0 whitespace-nowrap rounded-xl bg-[#0A51B0] px-3.5 sm:px-4 text-xs font-bold text-white shadow-2xs hover:bg-[#0A4391] transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+          class="h-8 shrink-0 whitespace-nowrap rounded-[6px] bg-[#0A51B0] px-3 text-[11px] sm:text-[12px] font-semibold text-white shadow-2xs hover:bg-[#0A4391] transition-all flex items-center justify-center gap-1.5 cursor-pointer"
           :title="isAdmin || isSuperAdmin ? 'Buat tiket baru' : 'Request ticket baru'"
         >
           <span aria-hidden="true" class="material-symbols-outlined text-[16px]">add</span>
@@ -1465,93 +1465,93 @@ function toast(message, type = 'success') {
       <div class="tickets-kpis grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-2.5 lg:gap-3">
         <!-- 1. Total tiket -->
         <div
-          class="kpi-focusable flex flex-col justify-between p-[var(--kpi-padding)] sm:p-[var(--kpi-padding-sm)] lg:p-[var(--kpi-padding-lg)] rounded-[var(--kpi-radius)] bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 shadow-2xs hover:border-[#CBD5E1] dark:hover:border-slate-700 transition-colors min-h-[var(--kpi-height)] sm:min-h-[var(--kpi-height-sm)] lg:min-h-[var(--kpi-height-lg)]"
+          class="kpi-focusable flex flex-col justify-between p-[var(--kpi-padding)] sm:p-[var(--kpi-padding-sm)] lg:p-[var(--kpi-padding-lg)] rounded-[var(--kpi-radius)] min-h-[var(--kpi-height)] sm:min-h-[var(--kpi-height-sm)] lg:min-h-[var(--kpi-height-lg)] transition-colors" :style="{ '--kpi-bg': 'var(--kpi-bg)', '--kpi-bg-dark': 'var(--kpi-bg-dark)', '--kpi-border': 'var(--kpi-border)', '--kpi-border-dark': 'var(--kpi-border-dark)', '--kpi-shadow': 'var(--kpi-shadow)', '--kpi-hover-border': 'var(--kpi-hover-border)', '--kpi-hover-border-dark': 'var(--kpi-hover-border-dark)' }"
           tabindex="0"
         >
           <div class="flex items-center justify-between gap-[var(--kpi-gap)]">
-            <span class="text-[var(--kpi-title-font-size)] sm:text-[var(--kpi-title-font-size-sm)] lg:text-[var(--kpi-title-font-size-lg)] font-medium text-[#5F7089] dark:text-slate-400 truncate">Total tiket</span>
+            <span class="text-[length:var(--kpi-title-font-size)] sm:text-[length:var(--kpi-title-font-size-sm)] lg:text-[length:var(--kpi-title-font-size-lg)] font-medium text-[#5F7089] dark:text-slate-400 truncate">Total tiket</span>
             <div
-              class="flex h-[var(--kpi-icon-container-size)] w-[var(--kpi-icon-container-size)] sm:h-[var(--kpi-icon-container-size-sm)] sm:w-[var(--kpi-icon-container-size-sm)] lg:h-[var(--kpi-icon-container-size-lg)] lg:w-[var(--kpi-icon-container-size-lg)] shrink-0 items-center justify-center rounded-md bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300"
+              class="flex h-[var(--kpi-icon-container-size)] w-[var(--kpi-icon-container-size)] sm:h-[var(--kpi-icon-container-size-sm)] sm:w-[var(--kpi-icon-container-size-sm)] lg:h-[var(--kpi-icon-container-size-lg)] lg:w-[var(--kpi-icon-container-size-lg)] shrink-0 items-center justify-center rounded-[6px] bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300"
             >
-              <span aria-hidden="true" class="material-symbols-outlined text-[var(--kpi-icon-size)] sm:text-[var(--kpi-icon-size-sm)] lg:text-[var(--kpi-icon-size-lg)]">inbox</span>
+              <span aria-hidden="true" class="material-symbols-outlined text-[length:var(--kpi-icon-size)] sm:text-[length:var(--kpi-icon-size-sm)] lg:text-[length:var(--kpi-icon-size-lg)]">inbox</span>
             </div>
           </div>
           <div class="mt-0.5">
-            <span class="font-num block text-[var(--kpi-value-font-size)] sm:text-[var(--kpi-value-font-size-sm)] lg:text-[var(--kpi-value-font-size-lg)] font-bold text-[#333333] dark:text-white tabular-nums leading-none tracking-tight">{{
+            <span class="font-num block text-[length:var(--kpi-value-font-size)] sm:text-[length:var(--kpi-value-font-size-sm)] lg:text-[length:var(--kpi-value-font-size-lg)] font-semibold text-[#333333] dark:text-white tabular-nums leading-none tracking-tight">{{
               stats.totalTickets ?? 0
             }}</span>
-            <span class="mt-0.5 block truncate text-[var(--kpi-caption-font-size)] sm:text-[var(--kpi-caption-font-size-sm)] lg:text-[var(--kpi-caption-font-size-lg)] font-normal text-[#64748B] dark:text-slate-400">Total tiket masuk</span>
+            <span class="mt-0.5 block truncate text-[length:var(--kpi-caption-font-size)] sm:text-[length:var(--kpi-caption-font-size-sm)] lg:text-[length:var(--kpi-caption-font-size-lg)] font-normal text-[#64748B] dark:text-slate-400">Total tiket masuk</span>
           </div>
         </div>
 
         <!-- 2. Belum diambil / Menunggu respon -->
         <div
-          class="kpi-focusable flex flex-col justify-between p-[var(--kpi-padding)] sm:p-[var(--kpi-padding-sm)] lg:p-[var(--kpi-padding-lg)] rounded-[var(--kpi-radius)] bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 shadow-2xs hover:border-[#CBD5E1] dark:hover:border-slate-700 transition-colors min-h-[var(--kpi-height)] sm:min-h-[var(--kpi-height-sm)] lg:min-h-[var(--kpi-height-lg)]"
+          class="kpi-focusable flex flex-col justify-between p-[var(--kpi-padding)] sm:p-[var(--kpi-padding-sm)] lg:p-[var(--kpi-padding-lg)] rounded-[var(--kpi-radius)] min-h-[var(--kpi-height)] sm:min-h-[var(--kpi-height-sm)] lg:min-h-[var(--kpi-height-lg)] transition-colors" :style="{ '--kpi-bg': 'var(--kpi-bg)', '--kpi-bg-dark': 'var(--kpi-bg-dark)', '--kpi-border': 'var(--kpi-border)', '--kpi-border-dark': 'var(--kpi-border-dark)', '--kpi-shadow': 'var(--kpi-shadow)', '--kpi-hover-border': 'var(--kpi-hover-border)', '--kpi-hover-border-dark': 'var(--kpi-hover-border-dark)' }"
           tabindex="0"
         >
           <div class="flex items-center justify-between gap-[var(--kpi-gap)]">
-            <span class="text-[var(--kpi-title-font-size)] sm:text-[var(--kpi-title-font-size-sm)] lg:text-[var(--kpi-title-font-size-lg)] font-medium text-[#5F7089] dark:text-slate-400 truncate">{{
+            <span class="text-[length:var(--kpi-title-font-size)] sm:text-[length:var(--kpi-title-font-size-sm)] lg:text-[length:var(--kpi-title-font-size-lg)] font-medium text-[#5F7089] dark:text-slate-400 truncate">{{
               isAdmin || isSuperAdmin ? 'Belum diambil' : 'Menunggu respon'
             }}</span>
             <div
-              class="flex h-[var(--kpi-icon-container-size)] w-[var(--kpi-icon-container-size)] sm:h-[var(--kpi-icon-container-size-sm)] sm:w-[var(--kpi-icon-container-size-sm)] lg:h-[var(--kpi-icon-container-size-lg)] lg:w-[var(--kpi-icon-container-size-lg)] shrink-0 items-center justify-center rounded-md"
+              class="flex h-[var(--kpi-icon-container-size)] w-[var(--kpi-icon-container-size)] sm:h-[var(--kpi-icon-container-size-sm)] sm:w-[var(--kpi-icon-container-size-sm)] lg:h-[var(--kpi-icon-container-size-lg)] lg:w-[var(--kpi-icon-container-size-lg)] shrink-0 items-center justify-center rounded-[6px]"
               :class="
                 (stats.unassignedTickets || 0) > 0
                   ? 'bg-amber-50 dark:bg-amber-950/60 text-[#B45309] dark:text-amber-400'
                   : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
               "
             >
-              <span aria-hidden="true" class="material-symbols-outlined text-[var(--kpi-icon-size)] sm:text-[var(--kpi-icon-size-sm)] lg:text-[var(--kpi-icon-size-lg)]">assignment_late</span>
+              <span aria-hidden="true" class="material-symbols-outlined text-[length:var(--kpi-icon-size)] sm:text-[length:var(--kpi-icon-size-sm)] lg:text-[length:var(--kpi-icon-size-lg)]">assignment_late</span>
             </div>
           </div>
           <div class="mt-0.5">
             <span
-              class="font-num block text-[var(--kpi-value-font-size)] sm:text-[var(--kpi-value-font-size-sm)] lg:text-[var(--kpi-value-font-size-lg)] font-bold tabular-nums leading-none tracking-tight"
+              class="font-num block text-[length:var(--kpi-value-font-size)] sm:text-[length:var(--kpi-value-font-size-sm)] lg:text-[length:var(--kpi-value-font-size-lg)] font-semibold tabular-nums leading-none tracking-tight"
               :class="(stats.unassignedTickets || 0) > 0 ? 'text-[#B45309] dark:text-amber-400' : 'text-[#333333] dark:text-white'"
             >{{ stats.unassignedTickets ?? 0 }}</span>
-            <span class="mt-0.5 block truncate text-[var(--kpi-caption-font-size)] sm:text-[var(--kpi-caption-font-size-sm)] lg:text-[var(--kpi-caption-font-size-lg)] font-normal text-[#64748B] dark:text-slate-400">Menunggu penanganan</span>
+            <span class="mt-0.5 block truncate text-[length:var(--kpi-caption-font-size)] sm:text-[length:var(--kpi-caption-font-size-sm)] lg:text-[length:var(--kpi-caption-font-size-lg)] font-normal text-[#64748B] dark:text-slate-400">Menunggu penanganan</span>
           </div>
         </div>
 
         <!-- 3. Sedang diproses -->
         <div
-          class="kpi-focusable flex flex-col justify-between p-[var(--kpi-padding)] sm:p-[var(--kpi-padding-sm)] lg:p-[var(--kpi-padding-lg)] rounded-[var(--kpi-radius)] bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 shadow-2xs hover:border-[#CBD5E1] dark:hover:border-slate-700 transition-colors min-h-[var(--kpi-height)] sm:min-h-[var(--kpi-height-sm)] lg:min-h-[var(--kpi-height-lg)]"
+          class="kpi-focusable flex flex-col justify-between p-[var(--kpi-padding)] sm:p-[var(--kpi-padding-sm)] lg:p-[var(--kpi-padding-lg)] rounded-[var(--kpi-radius)] min-h-[var(--kpi-height)] sm:min-h-[var(--kpi-height-sm)] lg:min-h-[var(--kpi-height-lg)] transition-colors" :style="{ '--kpi-bg': 'var(--kpi-bg)', '--kpi-bg-dark': 'var(--kpi-bg-dark)', '--kpi-border': 'var(--kpi-border)', '--kpi-border-dark': 'var(--kpi-border-dark)', '--kpi-shadow': 'var(--kpi-shadow)', '--kpi-hover-border': 'var(--kpi-hover-border)', '--kpi-hover-border-dark': 'var(--kpi-hover-border-dark)' }"
           tabindex="0"
         >
           <div class="flex items-center justify-between gap-[var(--kpi-gap)]">
-            <span class="text-[var(--kpi-title-font-size)] sm:text-[var(--kpi-title-font-size-sm)] lg:text-[var(--kpi-title-font-size-lg)] font-medium text-[#5F7089] dark:text-slate-400 truncate">Sedang diproses</span>
+            <span class="text-[length:var(--kpi-title-font-size)] sm:text-[length:var(--kpi-title-font-size-sm)] lg:text-[length:var(--kpi-title-font-size-lg)] font-medium text-[#5F7089] dark:text-slate-400 truncate">Sedang diproses</span>
             <div
-              class="flex h-[var(--kpi-icon-container-size)] w-[var(--kpi-icon-container-size)] sm:h-[var(--kpi-icon-container-size-sm)] sm:w-[var(--kpi-icon-container-size-sm)] lg:h-[var(--kpi-icon-container-size-lg)] lg:w-[var(--kpi-icon-container-size-lg)] shrink-0 items-center justify-center rounded-md bg-[#EFF6FF] dark:bg-blue-950/60 text-[#0A51B0] dark:text-blue-400"
+              class="flex h-[var(--kpi-icon-container-size)] w-[var(--kpi-icon-container-size)] sm:h-[var(--kpi-icon-container-size-sm)] sm:w-[var(--kpi-icon-container-size-sm)] lg:h-[var(--kpi-icon-container-size-lg)] lg:w-[var(--kpi-icon-container-size-lg)] shrink-0 items-center justify-center rounded-[6px] bg-[#EFF6FF] dark:bg-blue-950/60 text-[#0A51B0] dark:text-blue-400"
             >
-              <span aria-hidden="true" class="material-symbols-outlined text-[var(--kpi-icon-size)] sm:text-[var(--kpi-icon-size-sm)] lg:text-[var(--kpi-icon-size-lg)]">pending_actions</span>
+              <span aria-hidden="true" class="material-symbols-outlined text-[length:var(--kpi-icon-size)] sm:text-[length:var(--kpi-icon-size-sm)] lg:text-[length:var(--kpi-icon-size-lg)]">pending_actions</span>
             </div>
           </div>
           <div class="mt-0.5">
-            <span class="font-num block text-[var(--kpi-value-font-size)] sm:text-[var(--kpi-value-font-size-sm)] lg:text-[var(--kpi-value-font-size-lg)] font-bold text-[#333333] dark:text-white tabular-nums leading-none tracking-tight">{{
+            <span class="font-num block text-[length:var(--kpi-value-font-size)] sm:text-[length:var(--kpi-value-font-size-sm)] lg:text-[length:var(--kpi-value-font-size-lg)] font-semibold text-[#333333] dark:text-white tabular-nums leading-none tracking-tight">{{
               (stats.openTickets || 0) + (stats.pendingTickets || 0)
             }}</span>
-            <span class="mt-0.5 block truncate text-[var(--kpi-caption-font-size)] sm:text-[var(--kpi-caption-font-size-sm)] lg:text-[var(--kpi-caption-font-size-lg)] font-normal text-[#64748B] dark:text-slate-400">Dalam pengerjaan tim</span>
+            <span class="mt-0.5 block truncate text-[length:var(--kpi-caption-font-size)] sm:text-[length:var(--kpi-caption-font-size-sm)] lg:text-[length:var(--kpi-caption-font-size-lg)] font-normal text-[#64748B] dark:text-slate-400">Dalam pengerjaan tim</span>
           </div>
         </div>
 
         <!-- 4. Tiket selesai -->
         <div
-          class="kpi-focusable flex flex-col justify-between p-[var(--kpi-padding)] sm:p-[var(--kpi-padding-sm)] lg:p-[var(--kpi-padding-lg)] rounded-[var(--kpi-radius)] bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 shadow-2xs hover:border-[#CBD5E1] dark:hover:border-slate-700 transition-colors min-h-[var(--kpi-height)] sm:min-h-[var(--kpi-height-sm)] lg:min-h-[var(--kpi-height-lg)]"
+          class="kpi-focusable flex flex-col justify-between p-[var(--kpi-padding)] sm:p-[var(--kpi-padding-sm)] lg:p-[var(--kpi-padding-lg)] rounded-[var(--kpi-radius)] min-h-[var(--kpi-height)] sm:min-h-[var(--kpi-height-sm)] lg:min-h-[var(--kpi-height-lg)] transition-colors" :style="{ '--kpi-bg': 'var(--kpi-bg)', '--kpi-bg-dark': 'var(--kpi-bg-dark)', '--kpi-border': 'var(--kpi-border)', '--kpi-border-dark': 'var(--kpi-border-dark)', '--kpi-shadow': 'var(--kpi-shadow)', '--kpi-hover-border': 'var(--kpi-hover-border)', '--kpi-hover-border-dark': 'var(--kpi-hover-border-dark)' }"
           tabindex="0"
         >
           <div class="flex items-center justify-between gap-[var(--kpi-gap)]">
-            <span class="text-[var(--kpi-title-font-size)] sm:text-[var(--kpi-title-font-size-sm)] lg:text-[var(--kpi-title-font-size-lg)] font-medium text-[#5F7089] dark:text-slate-400 truncate">Tiket selesai</span>
+            <span class="text-[length:var(--kpi-title-font-size)] sm:text-[length:var(--kpi-title-font-size-sm)] lg:text-[length:var(--kpi-title-font-size-lg)] font-medium text-[#5F7089] dark:text-slate-400 truncate">Tiket selesai</span>
             <div
-              class="flex h-[var(--kpi-icon-container-size)] w-[var(--kpi-icon-container-size)] sm:h-[var(--kpi-icon-container-size-sm)] sm:w-[var(--kpi-icon-container-size-sm)] lg:h-[var(--kpi-icon-container-size-lg)] lg:w-[var(--kpi-icon-container-size-lg)] shrink-0 items-center justify-center rounded-md bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400"
+              class="flex h-[var(--kpi-icon-container-size)] w-[var(--kpi-icon-container-size)] sm:h-[var(--kpi-icon-container-size-sm)] sm:w-[var(--kpi-icon-container-size-sm)] lg:h-[var(--kpi-icon-container-size-lg)] lg:w-[var(--kpi-icon-container-size-lg)] shrink-0 items-center justify-center rounded-[6px] bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400"
             >
-              <span aria-hidden="true" class="material-symbols-outlined text-[var(--kpi-icon-size)] sm:text-[var(--kpi-icon-size-sm)] lg:text-[var(--kpi-icon-size-lg)]">task_alt</span>
+              <span aria-hidden="true" class="material-symbols-outlined text-[length:var(--kpi-icon-size)] sm:text-[length:var(--kpi-icon-size-sm)] lg:text-[length:var(--kpi-icon-size-lg)]">task_alt</span>
             </div>
           </div>
           <div class="mt-0.5">
-            <span class="font-num block text-[var(--kpi-value-font-size)] sm:text-[var(--kpi-value-font-size-sm)] lg:text-[var(--kpi-value-font-size-lg)] font-bold text-emerald-600 dark:text-emerald-400 tabular-nums leading-none tracking-tight">{{
+            <span class="font-num block text-[length:var(--kpi-value-font-size)] sm:text-[length:var(--kpi-value-font-size-sm)] lg:text-[length:var(--kpi-value-font-size-lg)] font-semibold text-emerald-600 dark:text-emerald-400 tabular-nums leading-none tracking-tight">{{
               stats.closedTickets ?? 0
             }}</span>
-            <span class="mt-0.5 block truncate text-[var(--kpi-caption-font-size)] sm:text-[var(--kpi-caption-font-size-sm)] lg:text-[var(--kpi-caption-font-size-lg)] font-normal text-[#64748B] dark:text-slate-400">Tiket terselesaikan</span>
+            <span class="mt-0.5 block truncate text-[length:var(--kpi-caption-font-size)] sm:text-[length:var(--kpi-caption-font-size-sm)] lg:text-[length:var(--kpi-caption-font-size-lg)] font-normal text-[#64748B] dark:text-slate-400">Tiket terselesaikan</span>
           </div>
         </div>
       </div>
@@ -1560,7 +1560,7 @@ function toast(message, type = 'success') {
     <!-- ── 2. Integrated Control Bar & Workspace Navigation (sticky mengikuti scroll) ─ -->
     <div class="tck-toolbar-sticky">
       <div
-        class="flex flex-col gap-2.5 bg-white p-2.5 sm:p-3 rounded-xl border border-[#E2E8F0]/80 shadow-2xs"
+        class="flex flex-col gap-2.5 bg-white p-2.5 sm:p-3 rounded-[6px] border border-[#E2E8F0]/80 shadow-2xs"
       >
         <!-- Top Row: Queue Tabs Switcher -->
         <div class="border-b border-[#F1F5F9] pb-2">
@@ -1583,7 +1583,7 @@ function toast(message, type = 'success') {
               :key="tab.key"
               type="button"
               @click="switchTab(tab.key)"
-              class="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[11px] font-bold transition-all whitespace-nowrap cursor-pointer shrink-0"
+              class="flex items-center gap-1.5 rounded-[6px] px-2.5 py-1 text-[11px] font-semibold transition-all whitespace-nowrap cursor-pointer shrink-0"
               :class="
                 activeTab === tab.key
                   ? 'bg-[#0A51B0] text-white shadow-2xs'
@@ -1680,7 +1680,7 @@ function toast(message, type = 'success') {
         <div
           v-for="r in 4"
           :key="'tck-skel-' + r"
-          class="bg-white rounded-xl border border-[#E2E8F0] p-4 lg:px-5 lg:py-4 select-none shadow-2xs"
+          class="bg-white rounded-[6px] border border-[#E2E8F0] p-3 lg:p-3.5 select-none shadow-2xs"
         >
           <!-- Desktop Skeleton (>= 1024px / lg) -->
           <div
@@ -1856,7 +1856,7 @@ function toast(message, type = 'success') {
           :aria-label="'Lihat tiket ' + ticket.judul"
           @keydown.enter.self.prevent="openDetail(ticket)"
           @keydown.space.self.prevent="openDetail(ticket)"
-          class="tck-list-item group relative bg-white rounded-xl border border-[#E2E8F0] hover:border-[#B8D4F5] hover:shadow-[0_2px_8px_rgba(23,43,77,0.05)] p-2.5 sm:p-3 lg:px-3.5 lg:py-2.5 transition-all duration-150 cursor-pointer select-none active:scale-[0.997]"
+          class="tck-list-item group relative bg-white rounded-[6px] border border-[#E2E8F0] hover:border-[#B8D4F5] hover:shadow-[0_2px_8px_rgba(23,43,77,0.05)] p-2.5 sm:p-3 lg:px-3.5 lg:py-2.5 transition-all duration-150 cursor-pointer select-none active:scale-[0.997]"
         >
           <!-- ── DESKTOP VIEW (>= 1024px / lg) ── -->
           <!-- 5-Column SaaS Grid: Identitas (2.3fr) | Pelapor (1.2fr) | Penanggung Jawab (1.2fr) | Status & Prioritas (1.3fr) | Aksi (36px) -->
@@ -2207,7 +2207,7 @@ function toast(message, type = 'success') {
         <!-- ── EMPTY STATES ── -->
         <div
           v-if="filteredTickets.length === 0"
-          class="py-16 px-4 text-center bg-white rounded-2xl border border-slate-200/80 shadow-2xs"
+          class="py-12 px-4 text-center bg-white rounded-[6px] border border-slate-200/80 shadow-2xs"
         >
           <EmptyState
             icon="inbox"
@@ -2288,7 +2288,7 @@ function toast(message, type = 'success') {
       <select
         v-model="filterKategori"
         aria-label="Filter kategori"
-        class="h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-xs"
+        class="h-9 w-full rounded-[6px] border border-slate-200 bg-white px-3 text-xs"
       >
         <option value="">Semua Kategori</option>
         <option value="Incident">Incident</option>
@@ -2374,7 +2374,7 @@ function toast(message, type = 'success') {
               maxlength="150"
               aria-label="Judul Tiket"
               placeholder="Contoh: Laptop tidak dapat terhubung ke Wi-Fi"
-              class="h-10 w-full rounded-lg border border-[#E5EAEF] bg-white px-3 text-[12px] font-medium text-[#2A3547] placeholder-[#687281] focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
+              class="h-9 w-full rounded-lg border border-[#E5EAEF] bg-white px-3 text-[12px] font-medium text-[#2A3547] placeholder-[#687281] focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
             />
           </label>
 
@@ -2401,7 +2401,7 @@ function toast(message, type = 'success') {
                 type="button"
                 @click="setSupportUnit('IT')"
                 :aria-pressed="selectedSupportUnit === 'IT'"
-                class="flex h-[72px] sm:h-[60px] flex-col sm:flex-row items-center justify-center sm:justify-start gap-1.5 sm:gap-3 rounded-xl border p-2 sm:p-3 text-center sm:text-left transition-all cursor-pointer select-none"
+                class="flex h-[64px] sm:h-[52px] flex-col sm:flex-row items-center justify-center sm:justify-start gap-1.5 sm:gap-3 rounded-[6px] border p-2 sm:p-3 text-center sm:text-left transition-all cursor-pointer select-none"
                 :class="
                   selectedSupportUnit === 'IT'
                     ? 'border-[#0A51B0] bg-[#ECF2FF] text-[#333333] ring-2 ring-[#0A51B0]/20 shadow-xs'
@@ -2436,7 +2436,7 @@ function toast(message, type = 'success') {
                 type="button"
                 @click="setSupportUnit('HR')"
                 :aria-pressed="selectedSupportUnit === 'HR'"
-                class="flex h-[72px] sm:h-[60px] flex-col sm:flex-row items-center justify-center sm:justify-start gap-1.5 sm:gap-3 rounded-xl border p-2 sm:p-3 text-center sm:text-left transition-all cursor-pointer select-none"
+                class="flex h-[64px] sm:h-[52px] flex-col sm:flex-row items-center justify-center sm:justify-start gap-1.5 sm:gap-3 rounded-[6px] border p-2 sm:p-3 text-center sm:text-left transition-all cursor-pointer select-none"
                 :class="
                   selectedSupportUnit === 'HR'
                     ? 'border-[#0A51B0] bg-[#ECF2FF] text-[#333333] ring-2 ring-[#0A51B0]/20 shadow-xs'
@@ -2471,7 +2471,7 @@ function toast(message, type = 'success') {
                 type="button"
                 @click="setSupportUnit('GA')"
                 :aria-pressed="selectedSupportUnit === 'GA'"
-                class="flex h-[72px] sm:h-[60px] flex-col sm:flex-row items-center justify-center sm:justify-start gap-1.5 sm:gap-3 rounded-xl border p-2 sm:p-3 text-center sm:text-left transition-all cursor-pointer select-none"
+                class="flex h-[64px] sm:h-[52px] flex-col sm:flex-row items-center justify-center sm:justify-start gap-1.5 sm:gap-3 rounded-[6px] border p-2 sm:p-3 text-center sm:text-left transition-all cursor-pointer select-none"
                 :class="
                   selectedSupportUnit === 'GA'
                     ? 'border-[#0A51B0] bg-[#ECF2FF] text-[#333333] ring-2 ring-[#0A51B0]/20 shadow-xs'
@@ -2516,7 +2516,7 @@ function toast(message, type = 'success') {
                 type="button"
                 @click="form.kategori = cat.value"
                 :aria-pressed="form.kategori === cat.value"
-                class="flex h-[56px] sm:h-[68px] flex-col items-center sm:items-start justify-center sm:justify-between rounded-xl border p-2 sm:p-2.5 text-center sm:text-left transition-all cursor-pointer select-none"
+                class="flex h-[52px] sm:h-[56px] flex-col items-center sm:items-start justify-center sm:justify-between rounded-[6px] border p-2 sm:p-2.5 text-center sm:text-left transition-all cursor-pointer select-none"
                 :class="
                   form.kategori === cat.value
                     ? 'border-[#0A51B0] bg-[#ECF2FF] text-[#333333] ring-2 ring-[#0A51B0]/20 shadow-xs'
@@ -2553,7 +2553,7 @@ function toast(message, type = 'success') {
                 aria-label="Prioritas"
                 placeholder="Pilih prioritas"
                 :block="true"
-                height-class="h-10"
+                height-class="h-9"
               />
             </div>
 
@@ -2566,7 +2566,7 @@ function toast(message, type = 'success') {
                 aria-label="Status Tiket"
                 placeholder="Pilih status"
                 :block="true"
-                height-class="h-10"
+                height-class="h-9"
               />
             </div>
           </div>
@@ -2576,7 +2576,7 @@ function toast(message, type = 'success') {
             <span class="text-[12px] font-semibold text-[#2A3547]">Lampiran (Opsional)</span>
             <div class="flex items-center gap-3 flex-wrap">
               <label
-                class="inline-flex h-10 items-center gap-2 rounded-lg border border-[#E5EAEF] bg-white px-3.5 text-[12px] font-bold text-[#2A3547] hover:bg-[#F8FAFC] hover:border-[#0A51B0] transition-all cursor-pointer select-none shadow-2xs"
+                class="inline-flex h-9 items-center gap-2 rounded-lg border border-[#E5EAEF] bg-white px-3.5 text-[12px] font-bold text-[#2A3547] hover:bg-[#F8FAFC] hover:border-[#0A51B0] transition-all cursor-pointer select-none shadow-2xs"
               >
                 <span
                   aria-hidden="true"
@@ -2615,11 +2615,11 @@ function toast(message, type = 'success') {
               <li
                 v-for="(att, i) in form.attachments"
                 :key="i"
-                class="relative mt-2 flex items-center justify-between gap-3 rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] p-3"
+                class="relative mt-2 flex items-center justify-between gap-3 rounded-[6px] border border-[#E5EAEF] bg-[#F8FAFC] p-3"
               >
                 <div class="flex items-center gap-3 min-w-0">
                   <div
-                    class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#ECF2FF] text-[#333333]"
+                    class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#ECF2FF] text-[#333333]"
                   >
                     <span aria-hidden="true" class="material-symbols-outlined text-[20px]">{{
                       getAttachmentIcon(att.data, att.name)
@@ -2703,7 +2703,7 @@ function toast(message, type = 'success') {
       <div v-if="selectedTicket" class="flex min-w-0 flex-col text-[#333333] wrap-anywhere">
         <!-- HEADER AREA (Compact SaaS Title Block) -->
         <div
-          class="tickets-detail-summary flex items-center justify-between gap-4 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] p-4 mb-4"
+          class="tickets-detail-summary flex items-center justify-between gap-4 rounded-[6px] border border-[#E2E8F0] bg-[#F8FAFC] p-3 mb-3"
         >
           <div class="flex flex-col gap-2.5 min-w-0 flex-1">
             <div class="flex items-center gap-2 flex-wrap">
@@ -2735,7 +2735,7 @@ function toast(message, type = 'success') {
         </div>
 
         <!-- NAVIGATION TABS (Clean Segmented Bar with Hover Effects) -->
-        <div class="tickets-detail-tabs grid grid-cols-3 gap-1 rounded-xl bg-[#F1F5F9] p-1 mb-5">
+        <div class="tickets-detail-tabs grid grid-cols-3 gap-1 rounded-[6px] bg-[#F1F5F9] p-1 mb-5">
           <button
             type="button"
             @click="activeDetailTab = 'detail'"
@@ -2831,7 +2831,7 @@ function toast(message, type = 'success') {
           <!-- TAB 1: OVERVIEW -->
           <div v-if="activeDetailTab === 'detail'" class="space-y-4">
             <!-- Deskripsi Kendala -->
-            <div class="space-y-2 rounded-xl border border-[#E2E8F0] p-4">
+            <div class="space-y-2 rounded-[6px] border border-[#E2E8F0] p-3">
               <h3 class="text-[11px] font-semibold uppercase tracking-wider text-[#687281]">
                 Deskripsi
               </h3>
@@ -2841,7 +2841,7 @@ function toast(message, type = 'success') {
             </div>
 
             <!-- Detail Tiket Grid (2-Column Desktop, 1-Column Mobile) -->
-            <div class="rounded-xl border border-[#E2E8F0] bg-[#F8FAFC]/60 p-4 space-y-4">
+            <div class="rounded-[6px] border border-[#E2E8F0] bg-[#F8FAFC]/60 p-3 space-y-3">
               <h3 class="text-[11px] font-semibold uppercase tracking-wider text-[#687281]">
                 Detail Tiket
               </h3>
@@ -2938,11 +2938,11 @@ function toast(message, type = 'success') {
                 <li
                   v-for="(att, i) in selectedTicket.attachments"
                   :key="att.id"
-                  class="flex items-center justify-between gap-3 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] p-3"
+                  class="flex items-center justify-between gap-3 rounded-[6px] border border-[#E2E8F0] bg-[#F8FAFC] p-3"
                 >
                   <div class="flex items-center gap-3 min-w-0">
                     <div
-                      class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#ECF2FF] text-[#333333]"
+                      class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#ECF2FF] text-[#333333]"
                     >
                       <span aria-hidden="true" class="material-symbols-outlined text-[20px]">{{
                         getAttachmentIcon(att.attachment, att.name)
@@ -3045,7 +3045,7 @@ function toast(message, type = 'success') {
             <!-- Messages Container (scrollable inside the chat area) -->
             <div
               ref="chatContainer"
-              class="flex max-h-[340px] min-h-[180px] flex-1 flex-col gap-4 overflow-y-auto rounded-xl border border-[#E2E8F0] bg-[#F8FAFC]/50 p-3 sm:p-4"
+              class="flex max-h-[340px] min-h-[180px] flex-1 flex-col gap-4 overflow-y-auto rounded-[6px] border border-[#E2E8F0] bg-[#F8FAFC]/50 p-3 sm:p-4"
             >
               <div
                 v-if="isCommentsLoading"
@@ -3154,7 +3154,7 @@ function toast(message, type = 'success') {
             <!-- Comment Composer or Locked Notice -->
             <div
               v-if="['Resolved', 'Closed', 'Cancelled'].includes(selectedTicket.status_tiket)"
-              class="flex shrink-0 items-center gap-2 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] p-3 text-xs font-medium text-[#5F7089]"
+              class="flex shrink-0 items-center gap-2 rounded-[6px] bg-[#F8FAFC] border border-[#E2E8F0] p-3 text-xs font-medium text-[#5F7089]"
             >
               <span aria-hidden="true" class="material-symbols-outlined text-[16px] text-[#687281]"
                 >lock</span
@@ -3166,7 +3166,7 @@ function toast(message, type = 'success') {
 
             <div
               v-else
-              class="flex shrink-0 flex-col gap-2 rounded-xl border border-[#E2E8F0] bg-white p-3"
+              class="flex shrink-0 flex-col gap-2 rounded-[6px] border border-[#E2E8F0] bg-white p-3"
             >
               <div
                 v-if="commentAttachment"
@@ -3201,7 +3201,7 @@ function toast(message, type = 'success') {
                 <label
                   title="Lampirkan file (Gambar / Dokumen)"
                   aria-label="Lampirkan file"
-                  class="group/btn flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-100/80 hover:bg-slate-200/80 text-slate-500 hover:text-blue-600 transition-all cursor-pointer select-none"
+                  class="group/btn flex h-9 w-9 shrink-0 items-center justify-center rounded-[6px] bg-slate-100/80 hover:bg-slate-200/80 text-slate-500 hover:text-blue-600 transition-all cursor-pointer select-none"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -3233,13 +3233,13 @@ function toast(message, type = 'success') {
                   type="text"
                   aria-label="Tulis komentar tiket"
                   placeholder="Tulis komentar atau catatan perbaikan…"
-                  class="h-10 flex-1 min-w-0 rounded-xl border border-slate-200 bg-slate-50/70 px-3.5 text-xs font-medium text-slate-900 placeholder-[#5F7089] outline-none transition-all focus:bg-white focus:border-[#0A51B0] focus:ring-1 focus:ring-[#0A51B0]/20"
+                  class="h-9 flex-1 min-w-0 rounded-[6px] border border-slate-200 bg-slate-50/70 px-3.5 text-xs font-medium text-slate-900 placeholder-[#5F7089] outline-none transition-all focus:bg-white focus:border-[#0A51B0] focus:ring-1 focus:ring-[#0A51B0]/20"
                 />
 
                 <button
                   type="submit"
                   :disabled="isSubmittingComment || (!newCommentText.trim() && !commentAttachment)"
-                  class="flex h-10 px-3.5 sm:px-4 items-center justify-center gap-1.5 rounded-xl bg-[#0A51B0] text-xs font-bold text-white shadow-2xs hover:bg-[#0A4391] disabled:opacity-40 transition-all cursor-pointer shrink-0"
+                  class="flex h-9 px-3.5 sm:px-4 items-center justify-center gap-1.5 rounded-[6px] bg-[#0A51B0] text-xs font-bold text-white shadow-2xs hover:bg-[#0A4391] disabled:opacity-40 transition-all cursor-pointer shrink-0"
                 >
                   <span aria-hidden="true" class="material-symbols-outlined text-[16px]">send</span>
                   <span class="hidden sm:inline">Kirim</span>
@@ -3252,7 +3252,7 @@ function toast(message, type = 'success') {
         <!-- Ticket management actions -->
         <div
           v-if="isAdmin || isSuperAdmin"
-          class="tickets-management flex flex-col gap-3 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] p-3.5 mt-5"
+          class="tickets-management flex flex-col gap-3 rounded-[6px] border border-[#E2E8F0] bg-[#F8FAFC] p-3.5 mt-5"
         >
           <p class="text-[11px] font-semibold uppercase tracking-wider text-[#5F7089]">
             Kelola tiket
@@ -3272,7 +3272,7 @@ function toast(message, type = 'success') {
                 aria-label="Ubah status tiket"
                 aria-haspopup="true"
                 :aria-expanded="showStatusDropdown"
-                class="inline-flex h-9 w-full sm:w-auto items-center justify-between sm:justify-center gap-2 rounded-xl border bg-white px-3.5 text-xs font-bold text-[#2A3547] shadow-2xs hover:bg-[#F8FAFC] hover:border-[#0A51B0] transition-all cursor-pointer disabled:opacity-50"
+                class="inline-flex h-9 w-full sm:w-auto items-center justify-between sm:justify-center gap-2 rounded-[6px] border bg-white px-3.5 text-xs font-bold text-[#2A3547] shadow-2xs hover:bg-[#F8FAFC] hover:border-[#0A51B0] transition-all cursor-pointer disabled:opacity-50"
                 :class="
                   showStatusDropdown
                     ? 'border-[#0A51B0] ring-2 ring-[#0A51B0]/15'
@@ -3298,7 +3298,7 @@ function toast(message, type = 'success') {
               <Transition name="fade">
                 <div
                   v-if="showStatusDropdown"
-                  class="absolute bottom-full left-0 mb-1.5 w-full sm:w-44 rounded-xl border border-[#E5EAEF] bg-white p-1.5 shadow-lg z-50 focus:outline-none"
+                  class="absolute bottom-full left-0 mb-1.5 w-full sm:w-44 rounded-[6px] border border-[#E5EAEF] bg-white p-1.5 shadow-lg z-50 focus:outline-none"
                 >
                   <button
                     v-for="st in [
@@ -3342,7 +3342,7 @@ function toast(message, type = 'success') {
               type="button"
               @click="claimTicket(selectedTicket)"
               :disabled="isClaiming === selectedTicket.id"
-              class="h-9 w-full sm:w-auto inline-flex items-center justify-center gap-1.5 rounded-xl bg-[#0A51B0] px-3.5 text-xs font-bold text-white shadow-2xs hover:bg-[#0A4391] disabled:opacity-50 transition-all cursor-pointer whitespace-nowrap"
+              class="h-9 w-full sm:w-auto inline-flex items-center justify-center gap-1.5 rounded-[6px] bg-[#0A51B0] px-3.5 text-xs font-bold text-white shadow-2xs hover:bg-[#0A4391] disabled:opacity-50 transition-all cursor-pointer whitespace-nowrap"
             >
               <span aria-hidden="true" class="material-symbols-outlined text-[16px]"
                 >person_add</span
@@ -3364,7 +3364,7 @@ function toast(message, type = 'success') {
                 aria-label="Assign tiket ke admin unit"
                 aria-haspopup="true"
                 :aria-expanded="showReassignDropdown"
-                class="inline-flex h-9 w-full sm:w-auto items-center justify-between sm:justify-center gap-1.5 rounded-xl border border-[#E5EAEF] bg-white px-3.5 text-xs font-bold text-[#2A3547] shadow-2xs hover:bg-[#F8FAFC] hover:border-[#0A51B0] transition-all cursor-pointer disabled:opacity-50 whitespace-nowrap"
+                class="inline-flex h-9 w-full sm:w-auto items-center justify-between sm:justify-center gap-1.5 rounded-[6px] border border-[#E5EAEF] bg-white px-3.5 text-xs font-bold text-[#2A3547] shadow-2xs hover:bg-[#F8FAFC] hover:border-[#0A51B0] transition-all cursor-pointer disabled:opacity-50 whitespace-nowrap"
               >
                 <div class="flex items-center gap-1.5">
                   <span
@@ -3384,7 +3384,7 @@ function toast(message, type = 'success') {
               <Transition name="fade">
                 <div
                   v-if="showReassignDropdown"
-                  class="absolute bottom-full left-0 mb-1.5 w-full sm:w-64 rounded-xl border border-[#E5EAEF] bg-white p-1.5 shadow-lg z-50"
+                  class="absolute bottom-full left-0 mb-1.5 w-full sm:w-64 rounded-[6px] border border-[#E5EAEF] bg-white p-1.5 shadow-lg z-50"
                 >
                   <p
                     class="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-[#687281]"
@@ -3429,7 +3429,7 @@ function toast(message, type = 'success') {
           <button
             type="button"
             @click="closeModal"
-            class="h-10 w-full sm:w-auto rounded-xl bg-[#0A51B0] px-5 text-xs font-semibold text-white hover:bg-[#0A4391] transition-colors cursor-pointer"
+            class="h-9 w-full sm:w-auto rounded-[6px] bg-[#0A51B0] px-5 text-xs font-semibold text-white hover:bg-[#0A4391] transition-colors cursor-pointer"
           >
             Tutup
           </button>
@@ -3448,12 +3448,12 @@ function toast(message, type = 'success') {
       <div class="flex flex-col items-center gap-4 text-center">
         <div
           v-if="modalError"
-          class="w-full rounded-xl bg-[#FDEDE8] p-3 text-left text-[12px] font-bold text-[#FA896B]"
+          class="w-full rounded-[6px] bg-[#FDEDE8] p-3 text-left text-[12px] font-bold text-[#FA896B]"
         >
           {{ modalError }}
         </div>
         <div
-          class="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#FDEDE8] text-[#FA896B]"
+          class="flex h-14 w-14 items-center justify-center rounded-[6px] bg-[#FDEDE8] text-[#FA896B]"
         >
           <span aria-hidden="true" class="material-symbols-outlined text-[28px]">warning</span>
         </div>
@@ -3470,7 +3470,7 @@ function toast(message, type = 'success') {
             type="button"
             :disabled="isSubmitting"
             @click="closeModal"
-            class="h-10 flex-1 rounded-xl border border-[#DFE5EF] text-[12px] font-semibold text-[#2A3547]"
+            class="h-9 flex-1 rounded-[6px] border border-[#DFE5EF] text-[12px] font-semibold text-[#2A3547]"
           >
             Batal
           </button>
@@ -3478,7 +3478,7 @@ function toast(message, type = 'success') {
             type="button"
             :disabled="isSubmitting"
             @click="confirmDeleteTicket"
-            class="h-10 flex-1 rounded-xl bg-[#FA896B] text-[12px] font-bold text-white hover:bg-[#E06748]"
+            class="h-9 flex-1 rounded-[6px] bg-[#FA896B] text-[12px] font-bold text-white hover:bg-[#E06748]"
           >
             {{ isSubmitting ? 'Menghapus...' : 'Ya, Hapus' }}
           </button>
@@ -3514,65 +3514,21 @@ function toast(message, type = 'success') {
   }
 }
 
-/* Ticket controls opt out of compact shared toolbar sizing. */
-.tickets-workspace {
-  gap: 24px;
-}
+/* Tickets mengikuti ukuran compact bersama (token --kpi-*, --control-height-*
+   dan kelas template); blok "opt-out" lama dihapus agar konsisten antarhalaman. */
 .tickets-header {
-  padding: 24px;
   box-shadow: none;
-}
-.tickets-header :deep(.page-header-title) {
-  font-size: clamp(22px, 2vw, 28px);
-  line-height: 1.25;
 }
 .tickets-header :deep(.page-header-subtitle) {
   margin-top: 6px;
   white-space: normal;
-  line-height: 1.6;
+  line-height: 1.5;
 }
 .tickets-kpis > div {
   min-width: 0;
-  padding: 20px;
-  align-items: flex-start;
-  box-shadow: none;
 }
 .tickets-kpis > div > div:last-child > span:first-child {
   white-space: normal;
-  font-size: 12px;
-  line-height: 1.5;
-}
-.tickets-kpis > div > div:last-child > span:last-child {
-  display: block;
-  margin-top: 6px;
-  font-size: 28px;
-  line-height: 1.15;
-  letter-spacing: -0.035em;
-  overflow-wrap: anywhere;
-}
-.tickets-workspace :deep(button) {
-  min-width: 44px;
-  min-height: 44px;
-}
-.tickets-header button,
-.tickets-filter-button,
-.tickets-queue-tabs > button {
-  height: 44px;
-  padding-inline: 16px;
-  border-radius: 10px;
-  font-size: 13px;
-  font-weight: 600;
-  justify-content: center;
-}
-.tickets-search {
-  height: 44px;
-}
-.tickets-search-input {
-  font-size: 13px;
-  padding-right: 48px;
-}
-.tickets-search > button {
-  right: 0;
 }
 .tck-toolbar-sticky,
 .tck-toolbar-sticky > div,
@@ -3595,19 +3551,11 @@ function toast(message, type = 'success') {
   margin-top: 0;
 }
 .tck-heading-sticky h2 {
-  font-size: 16px;
+  font-size: 14px;
 }
 .tickets-workspace .ws-data-table thead th {
-  padding: 16px 12px;
   font-size: 11px;
   white-space: normal;
-}
-.tickets-workspace .ws-data-table tbody td {
-  padding: 16px 12px;
-}
-.tickets-workspace .ws-cell-main {
-  font-size: 13px;
-  line-height: 1.6;
 }
 .tickets-workspace .ws-cell-sub {
   margin-top: 4px;
@@ -3626,34 +3574,24 @@ function toast(message, type = 'success') {
   margin-top: 8px;
 }
 @media (max-width: 639px) {
-  .tickets-workspace {
-    gap: 20px;
-  }
   .tickets-header {
     flex-direction: column;
     align-items: stretch;
-    padding: 20px;
-    gap: 18px;
   }
   .tickets-header :deep(.page-header-actions),
   .tickets-header button {
     width: 100%;
-  }
-  .tickets-kpis > div {
-    flex-direction: column;
-    gap: 12px;
-    padding: 16px;
   }
   .tickets-search-input {
     font-size: 16px;
   }
 }
 .ticket-card-list {
-  gap: 12px;
+  gap: 10px;
 }
 .ticket-card-list .tck-list-item {
-  padding: 20px;
-  border-radius: 14px;
+  padding: 10px 12px;
+  border-radius: 6px;
   border-color: #e2e8f0;
   box-shadow: none;
 }
@@ -3703,8 +3641,8 @@ function toast(message, type = 'success') {
   align-items: flex-start;
 }
 .ticket-identity > div:first-child {
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   border: 0;
   margin-top: 2px;
 }
@@ -3779,8 +3717,8 @@ function toast(message, type = 'success') {
   animation: none;
 }
 .ticket-mobile :deep(button) {
-  min-width: 44px;
-  min-height: 44px;
+  min-width: 32px;
+  min-height: 32px;
 }
 @media (min-width: 768px) and (max-width: 1279px) {
   .ticket-card-list {
@@ -3791,16 +3729,8 @@ function toast(message, type = 'success') {
 }
 @media (min-width: 1280px) {
   .ticket-desktop {
-    grid-template-columns: minmax(0, 2.8fr) minmax(0, 1.1fr) minmax(0, 1.2fr) minmax(0, 1.2fr) 44px;
-    gap: 24px;
-  }
-  .ticket-card-list .tck-list-item {
-    padding: 22px;
-  }
-}
-@media (max-width: 639px) {
-  .ticket-card-list .tck-list-item {
-    padding: 16px;
+    grid-template-columns: minmax(0, 2.8fr) minmax(0, 1.1fr) minmax(0, 1.2fr) minmax(0, 1.2fr) 32px;
+    gap: 16px;
   }
 }
 </style>
@@ -3812,7 +3742,7 @@ function toast(message, type = 'success') {
 .ticket-entry-fields {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 12px;
 }
 .ticket-entry-fields > * {
   margin: 0;
@@ -3821,7 +3751,7 @@ function toast(message, type = 'success') {
   font-size: 14px;
   font-weight: 650;
   color: #333;
-  padding-bottom: 12px;
+  padding-bottom: 8px;
   border-bottom: 1px solid #edf1f6;
 }
 .ticket-entry-heading:not(:first-child) {
@@ -3831,26 +3761,25 @@ function toast(message, type = 'success') {
 .ticket-entry-form textarea {
   background: #fafbfd;
   border-color: #dce4ef;
-  border-radius: 8px;
-  font-size: 13px;
+  border-radius: 6px;
+  font-size: 12px;
   font-weight: 400;
-  min-height: 44px;
+  min-height: 34px;
 }
 .ticket-entry-form textarea {
-  min-height: 150px;
-  max-height: 360px;
-  padding: 14px;
-  line-height: 1.8;
+  min-height: 110px;
+  max-height: 280px;
+  padding: 8px 10px;
+  line-height: 1.5;
 }
 .ticket-entry-form :deep(button[aria-haspopup='listbox']) {
-  min-height: 44px;
-  border-radius: 8px;
-  font-size: 13px;
+  min-height: 34px;
+  border-radius: 6px;
+  font-size: 12px;
 }
 .ticket-entry-form button[aria-pressed] {
   box-shadow: none;
-  min-height: 64px;
-  border-radius: 10px;
+  border-radius: 6px;
 }
 .ticket-entry-form button[aria-pressed='true'] {
   background: #edf5ff;
@@ -3862,20 +3791,20 @@ function toast(message, type = 'success') {
   font-weight: 550;
 }
 .ticket-entry-form li button {
-  min-width: 44px;
-  min-height: 44px;
+  min-width: 32px;
+  min-height: 32px;
 }
 .ticket-entry-footer {
   display: flex;
   width: 100%;
   flex-wrap: wrap;
   justify-content: flex-end;
-  gap: 10px;
+  gap: 8px;
 }
 .ticket-entry-footer button {
-  min-height: 44px;
-  border-radius: 8px;
-  padding: 0 20px;
+  min-height: 32px;
+  border-radius: 6px;
+  padding: 0 12px;
   font-size: 12px;
   font-weight: 600;
 }
@@ -3897,11 +3826,10 @@ function toast(message, type = 'success') {
     font-size: 16px;
   }
   .ticket-entry-form textarea {
-    min-height: 170px;
+    min-height: 130px;
   }
   .ticket-entry-form button[aria-pressed] {
-    padding: 10px 5px;
-    min-height: 72px;
+    padding: 8px 5px;
   }
   .ticket-entry-footer button {
     flex: 1;
@@ -3916,35 +3844,32 @@ function toast(message, type = 'success') {
   overflow-wrap: anywhere;
 }
 .tickets-dialog > div:first-child {
-  padding: 20px 24px;
+  padding: 10px 12px;
 }
 .tickets-dialog > div:first-child h2 {
-  font-size: 18px;
-  line-height: 1.4;
+  font-size: 14px;
+  line-height: 1.35;
   white-space: normal;
 }
 .tickets-dialog > div:first-child p {
   white-space: normal;
-  line-height: 1.6;
-  margin-top: 4px;
-  font-size: 12px;
+  line-height: 1.5;
+  margin-top: 2px;
+  font-size: 11px;
 }
 .tickets-dialog .modal-body {
-  padding: 24px;
+  padding: 12px 14px;
   min-width: 0;
   overscroll-behavior: contain;
 }
 .tickets-dialog .modal-footer {
-  padding: 16px 24px;
+  padding: 10px 12px;
 }
 .tickets-dialog button,
 .tickets-dialog select,
 .tickets-dialog input:not([type='file']),
 .tickets-dialog [role='option'] {
-  min-height: 44px;
-}
-.tickets-dialog button {
-  min-width: 44px;
+  min-height: 32px;
 }
 .tickets-dialog button:focus-visible,
 .tickets-dialog select:focus-visible {
@@ -3952,8 +3877,8 @@ function toast(message, type = 'success') {
   outline-offset: 2px;
 }
 .tickets-dialog label:has(> input[type='file']) {
-  min-height: 44px;
-  min-width: 44px;
+  min-height: 32px;
+  min-width: 32px;
 }
 .tickets-dialog .ui-select-menu {
   width: 100%;
@@ -3969,15 +3894,15 @@ function toast(message, type = 'success') {
 .tickets-dialog .modal-footer button,
 .tickets-delete-dialog button,
 .tickets-filter-dialog button {
-  border-radius: 10px;
-  font-size: 13px;
+  border-radius: 6px;
+  font-size: 12px;
   font-weight: 600;
 }
 .tickets-filter-dialog .modal-body > div > div:last-child > button {
-  padding-inline: 20px;
+  padding-inline: 12px;
 }
 .tickets-action-menu [role='menuitem'] {
-  min-height: 44px;
+  min-height: 32px;
 }
 @media (prefers-reduced-motion: reduce) {
   .ui-action-menu.tickets-action-menu {
@@ -3986,29 +3911,26 @@ function toast(message, type = 'success') {
   }
 }
 .tickets-detail-summary {
-  padding: 20px;
-  margin-bottom: 20px;
+  padding: 10px 12px;
+  margin-bottom: 12px;
 }
 .tickets-detail-summary h2 {
-  font-size: 20px;
-  line-height: 1.5;
+  font-size: 14px;
+  line-height: 1.35;
 }
 .tickets-detail-tabs {
-  margin-bottom: 24px;
-}
-.tickets-management {
-  padding: 20px;
+  margin-bottom: 12px;
 }
 .tickets-delete-dialog .modal-body > div {
-  gap: 20px;
+  gap: 12px;
 }
 @media (max-width: 639px) {
   .tickets-dialog > div:first-child,
   .tickets-dialog .modal-body {
-    padding: 16px;
+    padding: 10px 12px;
   }
   .tickets-dialog .modal-footer {
-    padding: 14px 16px;
+    padding: 10px 12px;
   }
   .tickets-dialog input:not([type='file']),
   .tickets-dialog textarea,
@@ -4017,7 +3939,7 @@ function toast(message, type = 'success') {
   }
   .tickets-detail-summary,
   .tickets-management {
-    padding: 16px;
+    padding: 10px 12px;
   }
   .tickets-detail-tabs > button {
     padding-inline: 4px;

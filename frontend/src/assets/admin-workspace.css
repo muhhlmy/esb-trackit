@@ -11,10 +11,10 @@
 .admin-entry-form select,
 .admin-entry-form textarea {
   min-width: 0;
-  min-height: 42px;
+  min-height: 32px;
   border-color: #dce4ef;
-  border-radius: 8px;
-  font-size: 13px;
+  border-radius: 6px;
+  font-size: 12px;
   box-shadow: none;
 }
 .admin-workspace table th {
@@ -23,10 +23,10 @@
   font-weight: 600;
   text-transform: none;
   letter-spacing: 0;
-  padding: 7px 10px;
+  padding: 6px 10px;
 }
 .admin-workspace table td {
-  padding: 7px 10px;
+  padding: 6px 10px;
   font-size: 12px;
 }
 .admin-workspace table tbody tr {
@@ -43,9 +43,9 @@
   padding: 0;
 }
 .admin-person-cards > :is(li, div) {
-  padding: 11px 13px;
+  padding: 10px 12px;
   border: 1px solid #e2e8f0;
-  border-radius: 10px;
+  border-radius: 6px;
   background: white;
   box-shadow: none;
   min-width: 0;
@@ -60,19 +60,19 @@
   color: #667283;
 }
 .admin-person-cards :deep(button) {
-  min-width: 32px;
-  min-height: 36px;
+  min-width: 30px;
+  min-height: 30px;
 }
 .admin-tabs {
   border: 1px solid #e2e8f0;
-  padding: 3px;
-  border-radius: 8px;
-  gap: 3px;
+  padding: 2px;
+  border-radius: 6px;
+  gap: 2px;
   background: #f1f5f9;
 }
 .admin-tabs button {
-  min-height: 32px;
-  padding: 6px 12px;
+  min-height: 30px;
+  padding: 4px 10px;
   margin: 0;
   border: 0;
   border-radius: 6px;
@@ -92,30 +92,31 @@
 }
 .admin-log-list > div {
   border: 1px solid #e2e8f0;
-  border-radius: 10px;
-  padding: 11px 13px;
+  border-radius: 6px;
+  padding: 10px 12px;
   background: white;
 }
 .admin-log-list p {
   line-height: 1.5;
 }
 .admin-export-cards > div {
-  border-radius: 10px;
-  padding: 12px 14px;
-  gap: 12px;
+  border-radius: 6px;
+  padding: 10px 12px;
+  gap: 10px;
 }
 .admin-export-cards h3 {
   color: #333333;
-  font-weight: 650;
+  font-weight: 600;
   font-size: 14px;
 }
 .admin-export-cards button {
-  min-height: 34px;
-  border-radius: 7px;
+  min-height: 32px;
+  border-radius: 6px;
+  font-size: 12px;
 }
 .admin-entry-form {
   padding: 2px;
-  gap: 20px;
+  gap: 16px;
 }
 .admin-entry-form label {
   font-size: 12px;
@@ -125,33 +126,33 @@
   letter-spacing: 0;
 }
 .admin-entry-form > .grid {
-  gap: 18px;
+  gap: 14px;
 }
 .admin-entry-form :deep(button[aria-haspopup='listbox']) {
-  min-height: 42px;
-  border-radius: 8px;
-  font-size: 13px;
+  min-height: 32px;
+  border-radius: 6px;
+  font-size: 12px;
 }
 .admin-entry-form :deep([role='option']) {
-  min-height: 40px;
+  min-height: 30px;
 }
 .admin-modal-actions {
   display: flex;
   justify-content: flex-end;
   align-items: center;
   width: 100%;
-  gap: 10px;
+  gap: 8px;
   margin: 0;
   padding: 0;
   border: 0;
 }
 .admin-modal-actions button {
-  min-height: 44px;
-  border-radius: 8px;
-  padding-inline: 18px;
+  min-height: 32px;
+  border-radius: 6px;
+  padding-inline: 14px;
   box-shadow: none;
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 550;
 }
 .admin-modal-actions button[type='submit'] {
   background: #0a51b0;
@@ -167,8 +168,8 @@
   outline-offset: 3px;
 }
 .database-modal {
-  font-size: 13px;
-  line-height: 1.7;
+  font-size: 12px;
+  line-height: 1.6;
 }
 @media (min-width: 768px) and (max-width: 1279px) {
   .admin-workspace .admin-person-cards {
@@ -179,7 +180,7 @@
    vs table sepenuhnya dikendalikan viewMode (lihat v-if di EmployeesView). */
 @media (min-width: 1280px) {
   .admin-workspace ul.admin-person-cards {
-    gap: 14px;
+    gap: 12px;
   }
 }
 @media (max-width: 639px) {
@@ -190,14 +191,14 @@
   .admin-entry-form select,
   .admin-entry-form textarea,
   .admin-entry-form :deep(button[aria-haspopup='listbox']) {
-    min-height: 44px;
-    font-size: 16px;
+    min-height: 32px;
+    font-size: 12px;
   }
   .admin-person-cards > :is(li, div) {
-    padding: 16px;
+    padding: 8px 10px;
   }
   .admin-tabs button {
-    padding: 10px 8px;
+    padding: 6px 8px;
     font-size: 11px;
   }
   .admin-modal-actions {

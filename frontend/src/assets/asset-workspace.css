@@ -4,30 +4,25 @@
   color: #333333;
 }
 .asset-toolbar {
-  border-radius: 10px;
-  padding: 12px 14px;
+  border-radius: 6px;
+  padding: 10px 12px;
   border-color: #e2e8f0;
   box-shadow: none;
   gap: 10px;
-}
-.asset-toolbar h2 {
-  font-size: 16px;
-  font-weight: 650;
-  letter-spacing: -0.03em;
 }
 .asset-toolbar > div:first-child {
   gap: 10px;
 }
 .asset-toolbar > div:first-child p {
   font-size: 11px;
-  line-height: 1.5;
+  line-height: 1.45;
   color: #637288;
 }
 .asset-toolbar > div:first-child > button {
   background: #0a51b0;
-  min-height: 32px;
+  min-height: 30px;
   padding: 0 12px;
-  border-radius: 7px;
+  border-radius: 6px;
   font-size: 11.5px;
   box-shadow: none;
 }
@@ -52,14 +47,14 @@
 }
 .asset-card-list > div {
   min-width: 0;
-  padding: 11px 13px;
-  border-radius: 10px;
+  padding: 10px 12px;
+  border-radius: 6px;
   border-color: #e2e8f0;
   box-shadow: none;
 }
 .asset-card-list > div:hover {
   border-color: #b8d4f5;
-  box-shadow: 0 3px 12px #172b4d06;
+  box-shadow: 0 2px 8px #172b4d06;
 }
 .asset-card-list > div:focus-visible {
   outline: 2px solid #097cde;
@@ -68,53 +63,53 @@
 .asset-card-list > div > div:first-child > div:first-child > div:first-child {
   background: #edf5ff;
   color: #0a5dbd;
-  border-radius: 10px;
+  border-radius: 6px;
 }
 .asset-detail {
   color: #333333;
   overflow-wrap: anywhere;
 }
 .asset-detail-identity {
-  padding: 20px;
+  padding: 12px 14px;
   border: 1px solid #e2e8f0;
-  border-radius: 12px;
+  border-radius: 6px;
   background: #f7f9fc;
-  margin-bottom: 18px;
+  margin-bottom: 14px;
   align-items: center;
 }
 .asset-detail-identity > div:first-child {
-  width: 46px;
-  height: 46px;
+  width: 40px;
+  height: 40px;
   flex-shrink: 0;
   background: #e8effa;
   color: #0a5dbd;
-  border-radius: 12px;
+  border-radius: 6px;
 }
 .asset-detail-identity > div:last-child {
   min-width: 0;
 }
 .asset-detail-identity :is(h3, h4) {
-  font-size: 18px;
-  line-height: 1.5;
-  font-weight: 650;
+  font-size: 14px;
+  line-height: 1.4;
+  font-weight: 600;
   color: #333333;
-  letter-spacing: -0.025em;
+  letter-spacing: -0.02em;
 }
 .asset-detail-identity p {
   font-size: 11px;
-  line-height: 1.7;
+  line-height: 1.5;
   color: #637288;
 }
 .asset-detail-fields {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0 24px;
+  gap: 0 20px;
   padding: 0 4px;
 }
 .asset-detail-fields > div {
   min-width: 0;
   border-bottom: 1px solid #edf1f6;
-  padding: 14px 0;
+  padding: 10px 0;
 }
 .asset-detail-fields dt,
 .asset-detail-fields > div > span:first-child {
@@ -123,32 +118,32 @@
   font-size: 11px;
   font-weight: 500;
   text-transform: none;
-  margin-bottom: 6px;
+  margin-bottom: 4px;
 }
 .asset-detail-fields dd {
   color: #333333;
-  font-size: 13px;
-  line-height: 1.7;
+  font-size: 12px;
+  line-height: 1.5;
   font-weight: 550;
 }
 .asset-detail-fields > div > span + span {
-  line-height: 1.7;
+  line-height: 1.5;
 }
 .asset-detail-tabs {
   background: #f1f5f9;
-  border-radius: 9px;
+  border-radius: 6px;
   border: 0;
-  padding: 4px;
-  gap: 4px;
+  padding: 3px;
+  gap: 3px;
 }
 .asset-detail-tabs button {
   flex: 1;
   min-width: 0;
   justify-content: center;
-  min-height: 42px;
-  padding: 8px;
+  min-height: 32px;
+  padding: 6px;
   border: 0;
-  border-radius: 7px;
+  border-radius: 6px;
   font-size: 12px;
   font-weight: 550;
 }
@@ -162,11 +157,11 @@
   justify-content: flex-end;
 }
 .asset-detail-footer button {
-  min-height: 42px;
-  padding: 0 22px;
+  min-height: 32px;
+  padding: 0 12px;
   background: #0a51b0;
   color: white;
-  border-radius: 8px;
+  border-radius: 6px;
   border: 0;
   font-size: 12px;
   font-weight: 600;
@@ -194,9 +189,6 @@
 @media (max-width: 767px) {
   .asset-toolbar {
     padding: 10px 12px;
-  }
-  .asset-toolbar h2 {
-    font-size: 15px;
   }
   .asset-toolbar > div:first-child {
     align-items: flex-start;
@@ -251,33 +243,33 @@
   color: #333333;
 }
 .asset-crud-form > .grid {
-  gap: 20px;
-  padding: 18px;
+  gap: 12px;
+  padding: 12px 14px;
   background: #fafbfd;
   border: 1px solid #e7ecf3;
-  border-radius: 12px;
+  border-radius: 6px;
 }
 .asset-crud-form label {
   font-weight: 550;
   color: #52647e;
   font-size: 12px;
-  line-height: 1.6;
+  line-height: 1.5;
 }
 .asset-crud-form :is(input:not([type='checkbox']):not([type='radio']), select, textarea) {
   border: 1px solid #dce4ef;
-  border-radius: 8px;
+  border-radius: 6px;
   background: white;
   color: #333333;
-  font-size: 13px;
+  font-size: 12px;
   box-shadow: none;
 }
 .asset-crud-form :is(input:not([type='checkbox']):not([type='radio']), select) {
-  min-height: 42px;
+  min-height: 32px;
 }
 .asset-crud-form textarea {
-  min-height: 100px;
-  padding: 12px;
-  line-height: 1.7;
+  min-height: 80px;
+  padding: 8px 10px;
+  line-height: 1.5;
   resize: vertical;
 }
 .asset-crud-form :is(input, select, textarea):focus {
@@ -286,25 +278,25 @@
   box-shadow: 0 0 0 3px #0a51b00d;
 }
 .asset-crud-form fieldset {
-  gap: 18px;
+  gap: 14px;
 }
 .asset-crud-actions {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 10px;
+  gap: 8px;
   width: 100%;
   border: 0;
   padding: 0;
   margin: 0;
 }
 .asset-crud-actions button {
-  min-height: 42px;
-  border-radius: 8px;
+  min-height: 32px;
+  border-radius: 6px;
   font-size: 12px;
   font-weight: 600;
-  padding-left: 18px;
-  padding-right: 18px;
+  padding-left: 14px;
+  padding-right: 14px;
   cursor: pointer;
   box-shadow: none;
 }
@@ -329,12 +321,12 @@
 .asset-delete-content {
   padding: 12px 6px;
   color: #52647e;
-  font-size: 13px;
-  line-height: 1.8;
+  font-size: 12px;
+  line-height: 1.6;
   overflow-wrap: anywhere;
 }
 .asset-delete-content h4 {
-  font-size: 17px;
+  font-size: 14px;
   font-weight: 650;
   color: #333333;
 }
@@ -391,8 +383,8 @@
 .asset-inventory .asset-toolbar > div:nth-child(2) {
   background: white;
   border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  padding: 14px;
+  border-radius: 6px;
+  padding: 10px 12px;
   margin-top: 4px;
 }
 .asset-inventory .asset-toolbar > div:nth-child(2) > div:first-child {
@@ -402,7 +394,7 @@
   flex-wrap: wrap;
 }
 .asset-inventory .asset-toolbar h2 {
-  font-size: 17px;
+  font-size: 14px;
 }
 .it-list-heading {
   display: flex;
@@ -444,8 +436,8 @@
   gap: 8px;
 }
 .asset-inventory .asset-card-list > div {
-  border-radius: 10px;
-  padding: 11px 13px;
+  border-radius: 6px;
+  padding: 10px 12px;
 }
 .asset-inventory .asset-card-list > div > .grid {
   gap: 16px;
@@ -479,33 +471,33 @@
     padding-bottom: 4px;
   }
   .asset-inventory .asset-toolbar h2 {
-    font-size: 23px;
+    font-size: 15px;
   }
   .asset-inventory .asset-toolbar > div:first-child > button {
     width: 100%;
   }
   .asset-inventory .asset-toolbar > div:nth-child(2) {
-    padding: 13px;
-    gap: 12px;
+    padding: 10px 12px;
+    gap: 10px;
   }
   .asset-inventory .asset-toolbar > div:nth-child(2) > div:first-child {
     flex-basis: auto;
   }
   .asset-inventory .asset-toolbar > div:nth-child(2) button {
-    min-height: 44px;
+    min-height: 32px;
   }
   .asset-inventory .asset-toolbar button[aria-label='Bersihkan pencarian'] {
-    width: 32px;
+    width: 30px;
     right: 4px;
   }
   .it-list-heading {
     align-items: flex-start;
     flex-wrap: wrap;
     gap: 8px;
-    margin-top: 20px;
+    margin-top: 14px;
   }
   .asset-inventory .asset-card-list > div {
-    padding: 18px;
+    padding: 10px 12px;
   }
 }
 
@@ -513,11 +505,11 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 28px;
   grid-template-areas: 'identity identity actions' 'holder location location' 'state state state';
-  gap: 10px 12px;
-  padding: 11px 13px;
+  gap: 8px 10px;
+  padding: 10px 12px;
   background: #fff;
   border: 1px solid #e2e8f0;
-  border-radius: 10px;
+  border-radius: 6px;
   cursor: pointer;
   transition:
     border-color 150ms,
@@ -631,16 +623,16 @@
 }
 .laptop-actions :deep(button) {
   min-width: 28px;
-  min-height: 32px;
+  min-height: 28px;
 }
 @media (min-width: 1280px) {
   .asset-inventory .laptop-list > .laptop-row {
     grid-template-columns: minmax(0, 2.2fr) minmax(0, 1.35fr) minmax(0, 1fr) minmax(0, 1.15fr) 28px;
     grid-template-areas: 'identity holder location state actions';
     align-items: start;
-    gap: 14px;
-    padding: 11px 14px;
-    border-radius: 10px;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: 6px;
   }
   .laptop-identity {
     align-items: flex-start;
@@ -658,8 +650,8 @@
 }
 @media (max-width: 767px) {
   .laptop-actions :deep(button) {
-    min-width: 40px;
-    min-height: 44px;
+    min-width: 32px;
+    min-height: 32px;
   }
 }
 
@@ -673,39 +665,39 @@
 /* Asset entry dialogs */
 .asset-entry-form {
   padding: 0;
-  gap: 20px;
+  gap: 16px;
 }
 .asset-entry-form > .grid {
-  padding: 18px;
-  gap: 16px 20px;
+  padding: 12px 14px;
+  gap: 12px;
   background: #fff;
   border-color: #e2e8f0;
-  border-radius: 12px;
+  border-radius: 6px;
 }
 .asset-form-section-title {
   grid-column: 1 / -1;
   display: flex;
   align-items: center;
-  gap: 9px;
+  gap: 8px;
   margin: 0 0 2px;
   color: #333333;
   font-size: 13px;
-  font-weight: 650;
+  font-weight: 600;
 }
 .asset-form-section-title > span {
   display: grid;
   place-items: center;
-  width: 26px;
-  height: 26px;
+  width: 24px;
+  height: 24px;
   background: #edf5ff;
   color: #0a5dbd;
-  border-radius: 7px;
+  border-radius: 6px;
   font-size: 10px;
   font-weight: 650;
 }
 .asset-entry-form label {
   display: block;
-  margin-bottom: 6px;
+  margin-bottom: 4px;
   color: #52647e;
   font-size: 12px;
   font-weight: 500;
@@ -715,6 +707,8 @@
   min-width: 0;
   border-color: #dce4ef;
   background: #fafbfd;
+  font-size: 12px;
+  border-radius: 6px;
 }
 /* Placeholder (warna, ukuran, weight) diatur global di main.css — audit v2.
    Token lama #5F7089 duplikat di sini dihapus (Nielsen #4 Consistency). */
@@ -722,34 +716,35 @@
   background: #fff;
 }
 .asset-entry-form :deep(button[aria-haspopup='listbox']) {
-  min-height: 42px;
-  border-radius: 8px;
+  min-height: 32px;
+  border-radius: 6px;
   border-color: #dce4ef;
   box-shadow: none;
-  font-size: 13px;
+  font-size: 12px;
 }
 .asset-entry-form :deep([role='option']) {
-  min-height: 40px;
+  min-height: 30px;
 }
 .asset-entry-form fieldset {
   border: 0;
-  padding-top: 10px;
-  gap: 18px;
+  padding-top: 8px;
+  gap: 14px;
   min-width: 0;
 }
 .asset-entry-stepper {
-  padding: 10px;
+  padding: 8px;
   background: #f8fafc;
   box-shadow: none;
-  border-radius: 12px;
+  border-radius: 6px;
 }
 .asset-entry-stepper > div {
   gap: 8px;
 }
 .asset-entry-stepper button {
-  min-height: 44px;
-  border-radius: 8px;
-  padding: 6px;
+  min-height: 32px;
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 11.5px;
 }
 .asset-entry-stepper button[aria-current='step'] {
   background: #fff;
@@ -761,17 +756,17 @@
 }
 @media (max-width: 639px) {
   .asset-entry-form > .grid {
-    padding: 14px;
-    gap: 16px;
+    padding: 10px 12px;
+    gap: 12px;
   }
   .asset-entry-form :is(input:not([type='checkbox']):not([type='radio']), select, textarea),
   .asset-entry-form :deep(button[aria-haspopup='listbox']),
   .asset-entry-form :deep(input[role='combobox']) {
-    min-height: 44px;
-    font-size: 16px;
+    min-height: 32px;
+    font-size: 12px;
   }
   .asset-entry-form :deep([role='option']) {
-    min-height: 44px;
+    min-height: 30px;
   }
   .asset-entry-stepper > div {
     display: grid;
@@ -786,16 +781,16 @@
     align-items: center;
     justify-content: center;
     text-align: center;
-    gap: 7px;
-    padding: 8px 2px;
+    gap: 4px;
+    padding: 6px 2px;
   }
   .asset-entry-stepper {
-    padding: 6px;
+    padding: 4px;
   }
   .asset-crud-actions:not(.asset-delete-actions) {
     gap: 8px;
   }
   .asset-crud-actions:not(.asset-delete-actions) button {
-    min-height: 44px;
+    min-height: 32px;
   }
 }

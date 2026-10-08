@@ -366,9 +366,9 @@ const severityClass = computed(() => {
   min-height: 400px;
 }
 .case-reader-empty p {
-  font-size: 14px;
-  line-height: 1.75;
-  margin-top: 12px;
+  font-size: 12px;
+  line-height: 1.6;
+  margin-top: 10px;
 }
 .case-breadcrumb {
   flex-wrap: wrap;
@@ -387,8 +387,8 @@ const severityClass = computed(() => {
 .case-document-header {
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  padding-bottom: 28px;
+  gap: 12px;
+  padding-bottom: 12px;
 }
 .case-document-header > * {
   margin-block: 0;
@@ -396,7 +396,7 @@ const severityClass = computed(() => {
 .case-document-controls {
   flex-wrap: wrap;
   align-items: flex-start;
-  gap: 16px;
+  gap: 12px;
 }
 .case-badges {
   min-width: 0;
@@ -417,14 +417,15 @@ const severityClass = computed(() => {
   flex-shrink: 0;
   gap: 8px;
 }
+/* Tombol kompak mengikuti skala global; 44px tetap untuk layar sentuh
+   (media query di bawah). */
 .case-reader button {
-  min-height: 44px;
-  min-width: 44px;
-  padding: 12px;
-  border-radius: 10px;
-  font-size: 13px;
+  min-height: 30px;
+  min-width: 30px;
+  padding: 4px 10px;
+  border-radius: 6px;
   line-height: 18px;
-  gap: 8px;
+  gap: 6px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -444,14 +445,14 @@ const severityClass = computed(() => {
   letter-spacing: -0.035em;
 }
 .case-summary {
-  padding: 20px;
-  gap: 12px;
+  padding: 10px 12px;
+  gap: 10px;
   box-shadow: none;
 }
 .case-summary > div:last-child {
   min-width: 0;
-  font-size: 14px;
-  line-height: 1.8;
+  font-size: 12px;
+  line-height: 1.6;
 }
 .doc-body {
   min-width: 0;
@@ -481,8 +482,8 @@ const severityClass = computed(() => {
   max-width: 100%;
 }
 .case-escalation {
-  padding: 24px;
-  gap: 20px;
+  padding: 10px 12px;
+  gap: 12px;
   flex-direction: column;
   align-items: stretch;
 }
@@ -490,12 +491,18 @@ const severityClass = computed(() => {
   text-align: left;
 }
 .case-escalation p {
-  font-size: 13px;
-  line-height: 1.75;
-  margin-top: 8px;
+  font-size: 12px;
+  line-height: 1.6;
+  margin-top: 6px;
 }
 .case-escalation button {
   width: 100%;
+}
+@media (max-width: 767px) {
+  .case-reader button {
+    min-height: 44px;
+    min-width: 44px;
+  }
 }
 @media (min-width: 1024px) {
   .case-reader {

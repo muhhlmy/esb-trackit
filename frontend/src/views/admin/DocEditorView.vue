@@ -1,4 +1,4 @@
-﻿<script setup>
+<script setup>
 import { ref, computed, onMounted, onBeforeUnmount, watch, nextTick } from 'vue'
 import { useRoute, useRouter, RouterLink } from 'vue-router'
 import { useCases } from '@/composables/useCases'
@@ -1064,7 +1064,7 @@ function goToAdminCases() {
       <main class="cms-editor-canvas flex-1 flex justify-center pb-24 overflow-y-auto px-2 sm:px-6">
         <!-- Live Document Sheet (White Sheet Paper) -->
         <article
-          class="cms-editor-sheet bg-white dark:bg-slate-900 rounded-2xl border border-[#E2E8F0] dark:border-slate-800 shadow-xs w-full max-w-[840px] min-h-[600px] sm:min-h-[900px] mt-3 sm:mt-6 mb-8 sm:mb-12 p-3.5 sm:p-10 relative space-y-4 sm:space-y-6 transition-all"
+          class="cms-editor-sheet bg-white dark:bg-slate-900 rounded-[6px] border border-[#E2E8F0] dark:border-slate-800 shadow-xs w-full max-w-[840px] min-h-[600px] sm:min-h-[900px] mt-3 sm:mt-6 mb-8 sm:mb-12 p-3.5 sm:p-10 relative space-y-4 sm:space-y-6 transition-all"
         >
           <!-- Document Breadcrumbs & Category Bar -->
           <div
@@ -1102,7 +1102,7 @@ function goToAdminCases() {
 
           <!-- Summary Box -->
           <div
-            class="bg-[#F8FAFC] dark:bg-slate-800/50 border border-[#E2E8F0] dark:border-slate-700/60 rounded-xl p-3 sm:p-4"
+            class="bg-[#F8FAFC] dark:bg-slate-800/50 border border-[#E2E8F0] dark:border-slate-700/60 rounded-[6px] p-3 sm:p-4"
           >
             <label
               class="block text-[11px] sm:text-[11px] font-bold uppercase tracking-wide text-[#5F7089] dark:text-slate-400 mb-1"
@@ -1370,11 +1370,11 @@ function goToAdminCases() {
       class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm animate-in fade-in duration-150"
     >
       <div
-        class="relative w-full max-w-md bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 rounded-2xl shadow-2xl overflow-hidden flex flex-col"
+        class="relative w-full max-w-md bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 rounded-[6px] shadow-2xl overflow-hidden flex flex-col"
       >
         <!-- Modal Header -->
         <div
-          class="px-5 py-4 border-b border-[#E2E8F0] dark:border-slate-800 flex items-center justify-between"
+          class="px-5 py-3.5 border-b border-[#E2E8F0] dark:border-slate-800 flex items-center justify-between"
         >
           <div
             class="flex items-center gap-2 text-xs font-extrabold text-[#333333] dark:text-white"
@@ -1384,21 +1384,21 @@ function goToAdminCases() {
           </div>
           <button
             @click="isImageModalOpen = false"
-            class="p-1 rounded-lg text-[#5F7089] hover:bg-[#F1F5F9] dark:hover:bg-slate-800 transition-colors cursor-pointer"
+            class="p-1 rounded-[6px] text-[#5F7089] hover:bg-[#F1F5F9] dark:hover:bg-slate-800 transition-colors cursor-pointer"
           >
             <X class="w-4 h-4" />
           </button>
         </div>
 
         <!-- Modal Body & Tab Switcher -->
-        <div class="p-5 space-y-4">
+        <div class="p-4 sm:p-5 space-y-3 sm:space-y-4">
           <!-- Tabs: Upload File vs URL -->
           <div
-            class="flex items-center p-1 bg-[#F1F5F9] dark:bg-slate-800 rounded-xl text-xs font-bold"
+            class="flex items-center p-1 bg-[#F1F5F9] dark:bg-slate-800 rounded-[6px] text-xs font-bold"
           >
             <button
               @click="imageInputTab = 'upload'"
-              class="flex-1 py-1.5 rounded-lg transition-all cursor-pointer text-center"
+              class="flex-1 py-1.5 rounded-[6px] transition-all cursor-pointer text-center"
               :class="
                 imageInputTab === 'upload'
                   ? 'bg-white dark:bg-slate-900 text-[#333333] shadow-2xs'
@@ -1409,7 +1409,7 @@ function goToAdminCases() {
             </button>
             <button
               @click="imageInputTab = 'url'"
-              class="flex-1 py-1.5 rounded-lg transition-all cursor-pointer text-center"
+              class="flex-1 py-1.5 rounded-[6px] transition-all cursor-pointer text-center"
               :class="
                 imageInputTab === 'url'
                   ? 'bg-white dark:bg-slate-900 text-[#333333] shadow-2xs'
@@ -1426,7 +1426,7 @@ function goToAdminCases() {
               @click="imageFileInputRef?.click()"
               @dragover.prevent
               @drop.prevent="handleDropImage"
-              class="border-2 border-dashed border-[#CBD5E1] dark:border-slate-700 hover:border-[#0A51B0] dark:hover:border-[#0A51B0] rounded-2xl p-6 text-center cursor-pointer transition-colors bg-[#F8FAFC] dark:bg-slate-800/40 group flex flex-col items-center justify-center gap-2"
+              class="border-2 border-dashed border-[#CBD5E1] dark:border-slate-700 hover:border-[#0A51B0] dark:hover:border-[#0A51B0] rounded-[6px] p-5 text-center cursor-pointer transition-colors bg-[#F8FAFC] dark:bg-slate-800/40 group flex flex-col items-center justify-center gap-2"
             >
               <input
                 ref="imageFileInputRef"

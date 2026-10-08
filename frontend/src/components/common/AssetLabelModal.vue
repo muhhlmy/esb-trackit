@@ -104,11 +104,11 @@ function handlePrint() {
     size="md"
     @close="emit('close')"
   >
-    <div class="space-y-4">
+    <div class="space-y-3">
       <!-- Asset Summary Info -->
-      <div class="rounded-xl border border-slate-200/80 bg-slate-50/80 p-3 flex items-start gap-3">
+      <div class="rounded-[6px] border border-slate-200/80 bg-slate-50/80 p-3 flex items-start gap-3">
         <div
-          class="h-9 w-9 rounded-lg bg-blue-100/70 text-blue-600 flex items-center justify-center shrink-0"
+          class="h-9 w-9 rounded-[6px] bg-blue-100/70 text-blue-600 flex items-center justify-center shrink-0"
         >
           <span aria-hidden="true" class="material-symbols-outlined text-lg">qr_code_2</span>
         </div>
@@ -136,7 +136,7 @@ function handlePrint() {
             v-model="customHostname"
             type="text"
             placeholder="Masukkan hostname aset (cth: IT-UPS-052026-01)"
-            class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-mono font-semibold text-slate-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none transition-colors"
+            class="w-full rounded-[6px] border border-slate-300 bg-white px-3 py-2 text-xs font-mono font-semibold text-slate-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none transition-colors"
           />
         </div>
         <p class="mt-1 text-[11px] text-slate-500">
@@ -159,10 +159,10 @@ function handlePrint() {
 
         <!-- Physical Label Canvas Preview -->
         <div
-          class="w-full rounded-xl border border-slate-300 bg-slate-100/90 p-3 sm:p-4 flex items-center justify-center shadow-inner"
+          class="w-full rounded-[6px] border border-slate-300 bg-slate-100/90 p-3 flex items-center justify-center shadow-inner"
         >
           <div
-            class="relative w-full max-w-[360px] aspect-[217/98] rounded-xl bg-white border border-slate-400 p-2 sm:p-2.5 flex flex-col justify-between shadow-md select-none overflow-hidden text-black font-sans"
+            class="relative w-full max-w-[360px] aspect-[217/98] rounded-[6px] bg-white border border-slate-400 p-2 sm:p-2.5 flex flex-col justify-between shadow-md select-none overflow-hidden text-black font-sans"
           >
             <!-- Header -->
             <div
@@ -223,7 +223,7 @@ function handlePrint() {
         <button
           type="button"
           @click="emit('close')"
-          class="rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 focus:outline-none transition-colors cursor-pointer"
+          class="rounded-[6px] border border-slate-300 bg-white px-3.5 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 focus:outline-none transition-colors cursor-pointer"
         >
           Batal
         </button>
@@ -231,7 +231,7 @@ function handlePrint() {
           type="button"
           :disabled="!activeHostname || isPrinting"
           @click="handlePrint"
-          class="inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-4 py-2 text-xs font-semibold text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
+          class="inline-flex items-center gap-1.5 rounded-[6px] bg-blue-600 px-4 py-2 text-xs font-semibold text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
         >
           <span aria-hidden="true" class="material-symbols-outlined text-[16px]">print</span>
           <span>{{ isPrinting ? 'Membuka Cetak...' : 'Cetak Label' }}</span>

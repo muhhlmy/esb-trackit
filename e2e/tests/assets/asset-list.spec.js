@@ -10,7 +10,7 @@ test.describe('Asset Management - List & Search Suite', () => {
 
     // Verify main page title and table or asset list surface
     await expect(page.getByRole('heading', { name: /aset|karyawan/i }).first()).toBeVisible()
-    await expect(page.locator('table').or(page.getByText(/perangkat|belum ada|status/i).first())).toBeVisible({
+    await expect(page.locator('table').or(page.getByText(/perangkat|belum ada|status/i)).first()).toBeVisible({
       timeout: 10000,
     })
   })

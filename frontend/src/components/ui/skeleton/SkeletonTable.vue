@@ -33,7 +33,7 @@ defineProps({
        ═══════════════════════════════════════════════════════════════════════ -->
   <div
     v-if="preset === 'users'"
-    class="w-full max-w-full overflow-hidden rounded-xl border border-[#E2E8F0]/80 bg-white shadow-2xs"
+    class="w-full max-w-full overflow-hidden rounded-[6px] border border-[#E2E8F0]/80 bg-white shadow-2xs"
   >
     <table class="w-full max-w-full text-left border-collapse table-fixed">
       <colgroup>
@@ -125,7 +125,7 @@ defineProps({
        ═══════════════════════════════════════════════════════════════════════ -->
   <div
     v-else-if="preset === 'employees'"
-    class="w-full max-w-full overflow-hidden rounded-xl border border-[#E2E8F0]/80 bg-white shadow-2xs"
+    class="w-full max-w-full overflow-hidden rounded-[6px] border border-[#E2E8F0]/80 bg-white shadow-2xs"
   >
     <table class="w-full max-w-full text-left border-collapse table-fixed">
       <colgroup>
@@ -225,7 +225,7 @@ defineProps({
        ═══════════════════════════════════════════════════════════════════════ -->
   <div
     v-else-if="preset === 'logs'"
-    class="w-full overflow-x-auto rounded-xl border border-[#E2E8F0]/80 bg-white shadow-2xs"
+    class="w-full overflow-x-auto rounded-[6px] border border-[#E2E8F0]/80 bg-white shadow-2xs"
   >
     <table class="w-full text-left border-collapse">
       <thead class="border-b border-[#E2E8F0]/80 bg-[#F8FAFC]/80 select-none">
@@ -287,7 +287,7 @@ defineProps({
        ═══════════════════════════════════════════════════════════════════════ -->
   <div
     v-else-if="preset === 'tickets'"
-    class="w-full overflow-x-auto rounded-xl border border-[#E2E8F0]/80 bg-white shadow-2xs"
+    class="w-full overflow-x-auto rounded-[6px] border border-[#E2E8F0]/80 bg-white shadow-2xs"
   >
     <table class="w-full text-left border-collapse">
       <thead class="border-b border-[#E2E8F0]/80 bg-[#F8FAFC]/80 select-none">
@@ -363,7 +363,7 @@ defineProps({
        ═══════════════════════════════════════════════════════════════════════ -->
   <div
     v-else
-    class="w-full overflow-x-auto rounded-xl border border-[#E2E8F0]/80 bg-white shadow-2xs"
+    class="w-full overflow-x-auto rounded-[6px] border border-[#E2E8F0]/80 bg-white shadow-2xs"
   >
     <table class="w-full text-left border-collapse">
       <thead>

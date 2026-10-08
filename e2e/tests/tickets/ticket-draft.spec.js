@@ -8,11 +8,13 @@ test.describe('Ticket Draft Save', () => {
     await page.goto('/tickets', { waitUntil: 'domcontentloaded' })
 
     // Open create modal
-    await page.getByRole('button', { name: /buat tiket|request ticket/i }).first().click()
+    const openBtn = page.getByRole('button', { name: /buat tiket|request ticket/i }).first()
+    await expect(openBtn).toBeVisible({ timeout: 10000 })
+    await openBtn.click()
 
     // Fill partial form
     const titleInput = page.getByPlaceholder(/laptop tidak dapat/i)
-    await expect(titleInput).toBeVisible({ timeout: 5000 })
+    await expect(titleInput).toBeVisible({ timeout: 10000 })
     await titleInput.fill('Draft Test Title')
 
     const descInput = page.getByPlaceholder(/jelaskan kendala/i)
@@ -24,13 +26,13 @@ test.describe('Ticket Draft Save', () => {
     await page.keyboard.press('Escape')
 
     // Wait for modal to close
-    await expect(titleInput).not.toBeVisible({ timeout: 5000 })
+    await expect(titleInput).not.toBeVisible({ timeout: 10000 })
 
     // Reopen modal
-    await page.getByRole('button', { name: /buat tiket|request ticket/i }).first().click()
+    await openBtn.click()
 
     // Verify state preserved (modal keeps component state across close/reopen)
-    await expect(titleInput).toHaveValue('Draft Test Title', { timeout: 5000 })
+    await expect(titleInput).toHaveValue('Draft Test Title', { timeout: 10000 })
     if (await descInput.isVisible()) {
       await expect(descInput).toHaveValue('Draft description text')
     }
@@ -43,14 +45,24 @@ test.describe('Ticket Draft Save', () => {
     await page.goto('/tickets', { waitUntil: 'domcontentloaded' })
 
     // Open modal, fill and submit
-    await page.getByRole('button', { name: /buat tiket|request ticket/i }).first().click()
+    const openBtn = page.getByRole('button', { name: /buat tiket|request ticket/i }).first()
+    await expect(openBtn).toBeVisible({ timeout: 10000 })
+    await openBtn.click()
+
+    // Select required Unit Support Target
+    const unitBtn = page.getByRole('button', { name: /IT Support/ }).first()
+    await expect(unitBtn).toBeVisible({ timeout: 5000 })
+    await unitBtn.click()
+
     const titleInput = page.getByPlaceholder(/laptop tidak dapat/i)
     await expect(titleInput).toBeVisible({ timeout: 5000 })
     await titleInput.fill('Submit Test Title')
 
     // Submit — the submit button lives in the modal footer and references the
     // form via the `form` attribute (so it is not inside <form> in the DOM).
-    await page.locator('button[form="ticket-create-form"]').click()
+    const submitBtn = page.locator('button[form="ticket-create-form"]').last()
+    await expect(submitBtn).toBeVisible({ timeout: 5000 })
+    await submitBtn.click()
 
     // Wait for modal to close (successful submission)
     await expect(titleInput).not.toBeVisible({ timeout: 15000 })

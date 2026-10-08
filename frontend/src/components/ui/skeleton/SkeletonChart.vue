@@ -8,7 +8,7 @@ defineProps({
     validator: (v) => ['bar', 'line', 'donut', 'pie'].includes(v),
   },
   height: {
-    type: String,
+    type: [String, Number],
     default: '240px',
   },
 })
@@ -16,8 +16,8 @@ defineProps({
 
 <template>
   <div
-    class="flex flex-col justify-between w-full p-4 rounded-xl bg-[#F8FAFC] border border-[#E5EAEF]"
-    :style="{ height: height }"
+    class="flex flex-col justify-between w-full p-3 rounded-[6px] bg-[#F8FAFC] border border-[#E5EAEF]"
+    :style="{ height: typeof height === 'number' ? `${height}px` : height }"
   >
     <!-- Top info -->
     <div class="flex items-center justify-between">

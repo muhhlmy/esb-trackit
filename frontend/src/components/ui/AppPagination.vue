@@ -139,12 +139,12 @@ function goToPage(page) {
 
 <style scoped>
 .asset-pagination {
-  margin-top: 16px;
-  padding: 16px 20px;
+  margin-top: 12px;
+  padding: 10px 12px;
   border: 1px solid #e2e8f0;
-  border-radius: 12px;
+  border-radius: 6px;
   background: white;
-  gap: 16px;
+  gap: 10px;
   color: #637288;
   font-size: 12px;
   font-variant-numeric: tabular-nums;
@@ -157,10 +157,10 @@ function goToPage(page) {
   gap: 6px;
 }
 .asset-pagination button {
-  min-width: 38px;
-  height: 38px;
+  min-width: 30px;
+  height: 30px;
   border: 1px solid #e2e8f0;
-  border-radius: 8px;
+  border-radius: 6px;
   box-shadow: none;
   font-weight: 600;
 }
@@ -176,8 +176,8 @@ function goToPage(page) {
 }
 @media (width < 40rem) {
   .asset-pagination {
-    padding: 16px;
-    gap: 14px;
+    padding: 10px 12px;
+    gap: 10px;
   }
   .asset-pagination [role='navigation'] {
     width: 100%;
@@ -192,7 +192,7 @@ function goToPage(page) {
     border-color: #e2e8f0;
     text-align: center;
     font-size: 16px;
-    border-radius: 8px;
+    border-radius: 6px;
   }
 }
 @media (width < 40rem) {

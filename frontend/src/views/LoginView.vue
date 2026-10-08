@@ -517,16 +517,16 @@ const finishResetAndLogin = () => {
             role="dialog"
             aria-modal="true"
             aria-labelledby="forgot-modal-title"
-            class="w-full max-w-md bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden animate-scale-up max-h-[92dvh] sm:max-h-[88vh] flex flex-col"
+            class="w-full max-w-md bg-white rounded-[6px] shadow-2xl border border-slate-200 overflow-hidden animate-scale-up max-h-[92dvh] sm:max-h-[88vh] flex flex-col"
             @click.stop
           >
             <!-- Modal Header -->
             <div
-              class="px-4 sm:px-6 pt-5 sm:pt-6 pb-3.5 sm:pb-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50 shrink-0"
+              class="px-3 pt-3 pb-2.5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50 shrink-0"
             >
               <div class="flex items-center gap-2.5">
                 <div
-                  class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-blue-50 text-[#333333] flex items-center justify-center font-bold shrink-0"
+                  class="w-8 h-8 sm:w-9 sm:h-9 rounded-[6px] bg-blue-50 text-[#333333] flex items-center justify-center font-bold shrink-0"
                 >
                   <span
                     aria-hidden="true"
@@ -619,7 +619,7 @@ const finishResetAndLogin = () => {
             </div>
 
             <!-- Modal Body Content -->
-            <div class="p-4 sm:p-6 overflow-y-auto flex-1">
+            <div class="p-3 overflow-y-auto flex-1">
               <!-- Error Alert in Modal -->
               <div
                 v-if="forgotError"
@@ -652,7 +652,7 @@ const finishResetAndLogin = () => {
 
               <!-- ── STEP 1: Masukkan Email ── -->
               <div v-if="forgotStep === 1" class="space-y-4">
-                <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                <p class="text-xs text-slate-600 leading-relaxed">
                   Masukkan alamat email akun Anda. Kami akan mengirimkan
                   <strong>6 digit kode verifikasi (OTP)</strong> yang berlaku selama
                   <strong>5 menit</strong>.
@@ -679,7 +679,7 @@ const finishResetAndLogin = () => {
                         required
                         autocomplete="email"
                         placeholder="nama@example.com"
-                        class="h-11 sm:h-12 w-full rounded-xl border border-slate-300 bg-slate-50/50 pl-10 pr-4 text-sm text-slate-900 transition-all placeholder:text-slate-400 focus:border-[#0A51B0] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#0A51B0]/10"
+                        class="h-9 w-full rounded-xl border border-slate-300 bg-slate-50/50 pl-10 pr-4 text-sm text-slate-900 transition-all placeholder:text-slate-400 focus:border-[#0A51B0] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#0A51B0]/10"
                       />
                     </div>
                   </div>
@@ -687,7 +687,7 @@ const finishResetAndLogin = () => {
                   <button
                     type="submit"
                     :disabled="forgotLoading"
-                    class="w-full h-11 sm:h-12 rounded-xl bg-[#0A51B0] hover:bg-[#0A4391] text-white font-semibold text-sm transition-all shadow-xs flex items-center justify-center gap-2 disabled:opacity-60 cursor-pointer active:scale-[0.98] touch-manipulation"
+                    class="w-full h-9 rounded-xl bg-[#0A51B0] hover:bg-[#0A4391] text-white font-semibold text-sm transition-all shadow-xs flex items-center justify-center gap-2 disabled:opacity-60 cursor-pointer active:scale-[0.98] touch-manipulation"
                   >
                     <span v-if="forgotLoading" class="flex items-center gap-2">
                       <span
@@ -710,7 +710,7 @@ const finishResetAndLogin = () => {
               <!-- ── STEP 2: Masukkan Kode OTP ── -->
               <div v-else-if="forgotStep === 2" class="space-y-4 sm:space-y-5">
                 <div class="text-center">
-                  <p class="text-xs sm:text-sm text-slate-600">
+                  <p class="text-xs text-slate-600">
                     Kode verifikasi telah dikirimkan ke:
                   </p>
                   <p class="text-sm font-bold text-slate-900 mt-0.5 break-all">
@@ -745,7 +745,7 @@ const finishResetAndLogin = () => {
                       autocomplete="one-time-code"
                       :aria-label="`Digit OTP ${idx + 1}`"
                       maxlength="1"
-                      class="w-9 h-11 sm:w-11 sm:h-12 text-center text-lg sm:text-xl font-bold rounded-lg sm:rounded-xl border border-slate-300 bg-slate-50/50 text-slate-900 focus:border-[#0A51B0] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#0A51B0]/10 transition-all shrink-0"
+                      class="w-10 h-10 text-center text-lg font-bold rounded-[6px] border border-slate-300 bg-slate-50/50 text-slate-900 focus:border-[#0A51B0] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#0A51B0]/10 transition-all shrink-0"
                       @input="handleOtpInput(idx, $event)"
                       @keydown="handleOtpKeyDown(idx, $event)"
                     />
@@ -760,7 +760,7 @@ const finishResetAndLogin = () => {
                       forgotLoading || otpDigits.join('').length !== 6 || otpExpirySeconds <= 0
                     "
                     @click="handleVerifyOtp"
-                    class="w-full h-11 sm:h-12 rounded-xl bg-[#0A51B0] hover:bg-[#0A4391] text-white font-semibold text-sm transition-all shadow-xs flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer active:scale-[0.98] touch-manipulation"
+                    class="w-full h-9 rounded-xl bg-[#0A51B0] hover:bg-[#0A4391] text-white font-semibold text-sm transition-all shadow-xs flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer active:scale-[0.98] touch-manipulation"
                   >
                     <span v-if="forgotLoading" class="flex items-center gap-2">
                       <span
@@ -802,7 +802,7 @@ const finishResetAndLogin = () => {
 
               <!-- ── STEP 3: Password Baru ── -->
               <div v-else-if="forgotStep === 3" class="space-y-4">
-                <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                <p class="text-xs text-slate-600 leading-relaxed">
                   Kode OTP terverifikasi! Masukkan kata sandi baru untuk akun Anda.
                 </p>
 
@@ -826,7 +826,7 @@ const finishResetAndLogin = () => {
                         :type="showNewPassword ? 'text' : 'password'"
                         required
                         placeholder="Minimal 8 karakter"
-                        class="h-11 sm:h-12 w-full rounded-xl border border-slate-300 bg-slate-50/50 pl-10 pr-11 text-sm text-slate-900 transition-all placeholder:text-slate-400 focus:border-[#0A51B0] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#0A51B0]/10"
+                        class="h-9 w-full rounded-xl border border-slate-300 bg-slate-50/50 pl-10 pr-11 text-sm text-slate-900 transition-all placeholder:text-slate-400 focus:border-[#0A51B0] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#0A51B0]/10"
                       />
                       <button
                         type="button"
@@ -867,7 +867,7 @@ const finishResetAndLogin = () => {
                         :type="showConfirmPassword ? 'text' : 'password'"
                         required
                         placeholder="Ketik ulang kata sandi baru"
-                        class="h-11 sm:h-12 w-full rounded-xl border border-slate-300 bg-slate-50/50 pl-10 pr-11 text-sm text-slate-900 transition-all placeholder:text-slate-400 focus:border-[#0A51B0] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#0A51B0]/10"
+                        class="h-9 w-full rounded-xl border border-slate-300 bg-slate-50/50 pl-10 pr-11 text-sm text-slate-900 transition-all placeholder:text-slate-400 focus:border-[#0A51B0] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#0A51B0]/10"
                       />
                       <button
                         type="button"
@@ -926,7 +926,7 @@ const finishResetAndLogin = () => {
                       forgotNewPassword.length < 8 ||
                       forgotNewPassword !== forgotConfirmPassword
                     "
-                    class="w-full h-11 sm:h-12 mt-2 rounded-xl bg-[#0A51B0] hover:bg-[#0A4391] text-white font-semibold text-sm transition-all shadow-xs flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer active:scale-[0.98] touch-manipulation"
+                    class="w-full h-9 mt-2 rounded-xl bg-[#0A51B0] hover:bg-[#0A4391] text-white font-semibold text-sm transition-all shadow-xs flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer active:scale-[0.98] touch-manipulation"
                   >
                     <span v-if="forgotLoading" class="flex items-center gap-2">
                       <span
@@ -962,7 +962,7 @@ const finishResetAndLogin = () => {
                   <h4 class="text-base sm:text-lg font-bold text-slate-900">
                     Kata Sandi Berhasil Direset!
                   </h4>
-                  <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                  <p class="text-xs text-slate-600 leading-relaxed">
                     Kata sandi akun Anda telah diperbarui. Silakan masuk kembali dengan kata sandi
                     baru Anda.
                   </p>
@@ -971,7 +971,7 @@ const finishResetAndLogin = () => {
                 <button
                   type="button"
                   @click="finishResetAndLogin"
-                  class="w-full h-11 sm:h-12 mt-3 rounded-xl bg-[#0A51B0] hover:bg-[#0A4391] text-white font-semibold text-sm transition-all shadow-xs flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98] touch-manipulation"
+                  class="w-full h-9 mt-3 rounded-xl bg-[#0A51B0] hover:bg-[#0A4391] text-white font-semibold text-sm transition-all shadow-xs flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98] touch-manipulation"
                 >
                   <span>Masuk ke Akun Anda</span>
                   <span aria-hidden="true" class="material-symbols-outlined text-[18px]"
@@ -1216,16 +1216,16 @@ const finishResetAndLogin = () => {
   max-width: 310px;
 }
 .login-intro {
-  margin-top: 12px;
+  margin-top: 10px;
   color: #5f7089;
-  font-size: 13px;
-  line-height: 1.8;
+  font-size: 12px;
+  line-height: 1.6;
 }
 .login-form {
-  margin-top: 30px;
+  margin-top: 16px;
 }
 .login-field + .login-field {
-  margin-top: 20px;
+  margin-top: 12px;
 }
 .login-field > label {
   display: block;
@@ -1236,11 +1236,11 @@ const finishResetAndLogin = () => {
 .input-wrap {
   display: flex;
   align-items: center;
-  gap: 11px;
-  padding-left: 14px;
+  gap: 10px;
+  padding-left: 12px;
   border: 1px solid #d9e1ec;
   background: #fff;
-  border-radius: 9px;
+  border-radius: 6px;
   color: #667283;
   transition:
     border-color 0.15s,
@@ -1256,12 +1256,12 @@ const finishResetAndLogin = () => {
 .input-wrap input {
   width: 100%;
   min-width: 0;
-  height: 49px;
+  height: var(--control-height-lg, 34px);
   border: 0;
   background: transparent;
   outline: none;
-  padding-right: 12px;
-  font-size: 14px;
+  padding-right: 10px;
+  font-size: 12px;
   color: #333333;
 }
 .input-wrap input::placeholder {
@@ -1270,8 +1270,8 @@ const finishResetAndLogin = () => {
 .password-toggle {
   display: grid;
   place-items: center;
-  width: 44px;
-  height: 44px;
+  width: 32px;
+  height: 32px;
   flex-shrink: 0;
   margin-right: 3px;
   color: #637288;
@@ -1287,15 +1287,15 @@ const finishResetAndLogin = () => {
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 4px 16px;
-  margin: 12px 0 18px;
+  gap: 4px 12px;
+  margin: 10px 0 14px;
   font-size: 12px;
 }
 .login-options label {
   display: flex;
   align-items: center;
   gap: 8px;
-  min-height: 44px;
+  min-height: 32px;
   cursor: pointer;
   color: #52647e;
 }
@@ -1306,7 +1306,7 @@ const finishResetAndLogin = () => {
 }
 .login-options button {
   color: #0a51b0;
-  min-height: 44px;
+  min-height: 32px;
   font-weight: 600;
   cursor: pointer;
 }
@@ -1317,13 +1317,13 @@ const finishResetAndLogin = () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 8px;
   width: 100%;
-  min-height: 49px;
-  border-radius: 9px;
+  min-height: var(--control-height-lg, 34px);
+  border-radius: 6px;
   background: linear-gradient(135deg, #0a51b0 0%, #0a5dbd 50%, #0892f5 100%);
   color: white;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 650;
   cursor: pointer;
   box-shadow: 0 4px 14px rgba(10, 81, 176, 0.22);
@@ -1396,7 +1396,7 @@ const finishResetAndLogin = () => {
   }
 }
 .login-reset input:not([maxlength]) {
-  font-size: 16px;
+  font-size: 12px;
 }
 .login-reset button:focus-visible {
   outline: 2px solid #0892f5;
@@ -1576,6 +1576,9 @@ const finishResetAndLogin = () => {
   .input-wrap input {
     font-size: 16px;
     height: 50px;
+  }
+  .login-reset input:not([maxlength]) {
+    font-size: 16px;
   }
   .login-options {
     font-size: 12px;

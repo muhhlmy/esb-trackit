@@ -19,7 +19,7 @@ const { toasts, removeToast } = useToast()
       <div
         v-for="toast in toasts"
         :key="toast.id"
-        class="pointer-events-auto flex items-center justify-between gap-3 p-4 rounded-xl border shadow-xl backdrop-blur-md transition-all text-sm font-medium"
+        class="pointer-events-auto flex items-center justify-between gap-3 p-3 rounded-xl border shadow-xl backdrop-blur-md transition-all text-xs font-medium"
         :role="toast.type === 'error' ? 'alert' : 'status'"
         :aria-live="toast.type === 'error' ? 'assertive' : 'polite'"
         :class="{

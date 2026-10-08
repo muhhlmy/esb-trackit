@@ -59,14 +59,14 @@ function close(action = 'cancel') {
     size="sm"
     @close="close('cancel')"
   >
-    <p class="text-[13px] leading-relaxed text-[#475569]">{{ message }}</p>
+    <p class="text-xs leading-relaxed text-[#475569]">{{ message }}</p>
 
     <template #footer>
       <div class="flex items-center justify-end gap-2">
         <button
           ref="cancelRef"
           type="button"
-          class="inline-flex h-9 items-center rounded-xl border border-[#E2E8F0] bg-white px-4 text-xs font-bold text-[#475569] transition-colors duration-150 hover:bg-[#F8FAFC] cursor-pointer"
+          class="inline-flex h-8 items-center rounded-[6px] border border-[#E2E8F0] bg-white px-4 text-xs font-bold text-[#475569] transition-colors duration-150 hover:bg-[#F8FAFC] cursor-pointer"
           @click="close('cancel')"
         >
           {{ cancelLabel }}
@@ -75,7 +75,7 @@ function close(action = 'cancel') {
         <button
           type="button"
           :disabled="loading"
-          class="inline-flex h-9 items-center gap-1.5 rounded-xl px-4 text-xs font-bold text-white shadow-2xs transition-all duration-150 active:scale-[0.98] disabled:opacity-60 disabled:cursor-wait cursor-pointer"
+          class="inline-flex h-8 items-center gap-1.5 rounded-[6px] px-4 text-xs font-bold text-white shadow-2xs transition-all duration-150 active:scale-[0.98] disabled:opacity-60 disabled:cursor-wait cursor-pointer"
           :class="
             destructive
               ? 'bg-[#DC2626] hover:bg-[#B91C1C]'

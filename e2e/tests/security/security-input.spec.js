@@ -146,7 +146,7 @@ test.describe('SECURITY — Input, Headers, Upload, Errors @security', () => {
     let blocked = false
     for (let i = 0; i < 6; i++) {
       const res = await request.post(`${API}/api/auth/login`, {
-        data: { email: TEST_USERS.user.email, password: `salah-${i}` },
+        data: { email: 'ratelimit-probe@example.test', password: `salah-${i}` },
       })
       if (res.status() === 429) {
         blocked = true

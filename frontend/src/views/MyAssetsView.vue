@@ -11,6 +11,7 @@ import MyAssetsEmployeeList from '../components/assets/MyAssetsEmployeeList.vue'
 import CustomSelect from '../components/ui/CustomSelect.vue'
 import FilterModal from '../components/ui/FilterModal.vue'
 import StatCard from '../components/ui/StatCard.vue'
+import AppPagination from '../components/ui/AppPagination.vue'
 
 const { get } = useApi()
 const { isAdmin, isSuperAdmin, user, refreshUser, hasPermission } = useAuth()
@@ -550,7 +551,7 @@ onMounted(() => {
 </script>
 <template>
   <div
-    class="employee-assets-page flex min-w-0 flex-col gap-5"
+    class="employee-assets-page flex min-w-0 flex-col gap-3"
     :data-testid="!isLoading ? 'page-ready' : undefined"
   >
     <MyAssetsEmployeeList
@@ -610,7 +611,7 @@ onMounted(() => {
           v-if="canBrowseOtherAssets"
           type="button"
           @click="goToLevel1"
-          class="flex items-center gap-1 shrink-0 rounded-lg border border-[#E2E8F0] dark:border-slate-700 bg-white dark:bg-slate-800 px-2.5 sm:px-3 py-1.5 text-xs font-semibold text-[#475569] dark:text-slate-300 hover:bg-[#F8FAFC] dark:hover:bg-slate-700 hover:text-[#333333] dark:hover:text-white transition-all cursor-pointer shadow-2xs touch-manipulation"
+          class="flex items-center gap-1 shrink-0 h-8 rounded-[6px] border border-[#E2E8F0] dark:border-slate-700 bg-white dark:bg-slate-800 px-2.5 text-xs font-medium text-[#475569] dark:text-slate-300 hover:bg-[#F8FAFC] dark:hover:bg-slate-700 hover:text-[#333333] dark:hover:text-white transition-all cursor-pointer shadow-2xs touch-manipulation"
           title="Kembali ke Daftar Karyawan"
         >
           <span aria-hidden="true" class="material-symbols-outlined text-[16px]">arrow_back</span>
@@ -620,19 +621,19 @@ onMounted(() => {
 
       <!-- Employee Hero Profile Identity Header -->
       <div
-        class="employee-profile rounded-xl border border-[#E2E8F0] dark:border-slate-800 bg-white dark:bg-slate-900 p-3.5 sm:p-5 shadow-2xs flex flex-col gap-3.5 sm:flex-row sm:items-center sm:justify-between"
+        class="employee-profile rounded-[6px] border border-[#E2E8F0] dark:border-slate-800 bg-white dark:bg-slate-900 p-2.5 sm:p-3 shadow-2xs flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
       >
-        <div class="flex items-start sm:items-center gap-3 sm:gap-4 min-w-0">
+        <div class="flex items-start sm:items-center gap-3 min-w-0">
           <div
-            class="flex h-11 w-11 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#0A51B0] to-[#0A4391] text-sm font-bold text-white shadow-2xs"
+            class="flex h-10 w-10 sm:h-11 sm:w-11 shrink-0 items-center justify-center rounded-[6px] bg-gradient-to-br from-[#0A51B0] to-[#0A4391] text-xs font-bold text-white shadow-2xs"
           >
             {{ getInitials(selectedEmployee.nama_karyawan) }}
           </div>
           <div class="min-w-0 flex-1">
             <div class="flex items-center gap-2 flex-wrap">
-              <h2 class="text-base sm:text-lg font-bold text-[#333333] dark:text-white tracking-tight truncate">
+              <h1 class="text-[16px] sm:text-[18px] font-semibold text-[#333333] dark:text-white tracking-tight truncate">
                 {{ selectedEmployee.nama_karyawan }}
-              </h2>
+              </h1>
               <AppBadge
                 v-if="selectedEmployee.status_karyawan || selectedEmployee.status"
                 :type="
@@ -681,29 +682,29 @@ onMounted(() => {
 
         <!-- Employee Summary Stat Badges -->
         <div
-          class="grid grid-cols-2 sm:flex sm:items-stretch gap-2.5 shrink-0 border-t border-[#F1F5F9] dark:border-slate-800 pt-3 sm:border-t-0 sm:pt-0"
+          class="grid grid-cols-2 sm:flex sm:items-stretch gap-2 shrink-0 border-t border-[#F1F5F9] dark:border-slate-800 pt-2.5 sm:border-t-0 sm:pt-0"
         >
           <div
-            class="flex flex-col justify-center h-[54px] sm:h-[58px] min-w-[110px] sm:min-w-[125px] rounded-xl bg-[#F8FAFC] dark:bg-slate-800 px-3.5 py-2 border border-[#E2E8F0] dark:border-slate-700 text-center sm:text-right shadow-2xs"
+            class="flex flex-col justify-center h-auto min-w-[100px] sm:min-w-[110px] rounded-[6px] bg-[#F8FAFC] dark:bg-slate-800 px-3 py-1.5 border border-[#E2E8F0] dark:border-slate-700 text-center sm:text-right shadow-2xs"
           >
             <span
-              class="block text-[10px] font-bold uppercase tracking-wider text-[#5F7089] dark:text-slate-400 leading-tight"
+              class="block text-[10px] font-medium uppercase tracking-wider text-[#5F7089] dark:text-slate-400 leading-tight"
               >Total aset</span
             >
             <span
-              class="font-num text-sm sm:text-base font-bold text-[#333333] dark:text-white leading-snug mt-0.5 block"
+              class="font-num text-[14px] sm:text-[15px] font-semibold text-[#333333] dark:text-white leading-snug mt-0.5 block"
               >{{ myAssets.length }} Unit</span
             >
           </div>
           <div
-            class="flex flex-col justify-center h-[54px] sm:h-[58px] min-w-[110px] sm:min-w-[125px] rounded-xl bg-[#F8FAFC] dark:bg-slate-800 px-3.5 py-2 border border-[#E2E8F0] dark:border-slate-700 text-center sm:text-right shadow-2xs"
+            class="flex flex-col justify-center h-auto min-w-[100px] sm:min-w-[110px] rounded-[6px] bg-[#F8FAFC] dark:bg-slate-800 px-3 py-1.5 border border-[#E2E8F0] dark:border-slate-700 text-center sm:text-right shadow-2xs"
           >
             <span
-              class="block text-[10px] font-bold uppercase tracking-wider text-[#5F7089] dark:text-slate-400 leading-tight"
+              class="block text-[10px] font-medium uppercase tracking-wider text-[#5F7089] dark:text-slate-400 leading-tight"
               >Penugasan awal</span
             >
             <span
-              class="font-num text-xs sm:text-[13px] font-semibold text-[#333333] dark:text-white leading-snug mt-0.5 block truncate"
+              class="font-num text-[12px] sm:text-[13px] font-semibold text-[#333333] dark:text-white leading-snug mt-0.5 block truncate"
               >{{ employeeAssignedSince }}</span
             >
           </div>
@@ -767,7 +768,7 @@ onMounted(() => {
               v-model="assetSearch"
               type="text"
               placeholder="Cari label / serial…"
-              class="h-8.5 w-full rounded-lg border border-[#E2E8F0] bg-white pl-8 pr-8 text-xs text-[#333333] focus:border-[#0A51B0] focus:outline-none shadow-2xs"
+              class="h-8 w-full rounded-[6px] border border-[#E2E8F0] bg-white pl-8 pr-8 text-xs text-[#333333] focus:border-[#0A51B0] focus:outline-none shadow-2xs"
             />
             <button
               v-if="assetSearch"
@@ -784,7 +785,7 @@ onMounted(() => {
         <!-- Loading Assets -->
         <div
           v-if="isLoadingAssets"
-          class="flex flex-col items-center justify-center py-12 text-[#5F7089] rounded-xl border border-[#E2E8F0] bg-white"
+          class="flex flex-col items-center justify-center py-12 text-[#5F7089] rounded-[6px] border border-[#E2E8F0] bg-white"
         >
           <div
             class="h-6 w-6 animate-spin rounded-full border-2 border-[#0A51B0] border-t-transparent mb-2"
@@ -795,7 +796,7 @@ onMounted(() => {
         <!-- Error Assets -->
         <div
           v-else-if="assetError"
-          class="p-6 text-center text-rose-600 text-xs rounded-xl border border-[#E2E8F0] bg-white"
+          class="p-3 text-center text-rose-600 text-xs rounded-[6px] border border-[#E2E8F0] bg-white"
         >
           <p class="font-semibold">{{ assetError }}</p>
           <button
@@ -810,7 +811,7 @@ onMounted(() => {
         <!-- Empty State: Unlinked Employee -->
         <div
           v-else-if="selectedEmployee.hasEmployeeRecord === false"
-          class="flex flex-col items-center justify-center gap-2 py-12 px-4 text-center rounded-xl border border-[#FEF3C7] bg-[#FFFBEB]"
+          class="flex flex-col items-center justify-center gap-2 py-8 px-3 text-center rounded-[6px] border border-[#FEF3C7] bg-[#FFFBEB]"
         >
           <span aria-hidden="true" class="material-symbols-outlined text-[32px] text-[#D97706]"
             >account_box_off</span
@@ -828,7 +829,7 @@ onMounted(() => {
         <!-- Empty State: No Assets -->
         <div
           v-else-if="myAssets.length === 0"
-          class="flex flex-col items-center justify-center gap-2 py-12 px-4 text-center rounded-xl border border-[#E2E8F0] bg-white"
+          class="flex flex-col items-center justify-center gap-2 py-12 px-4 text-center rounded-[6px] border border-[#E2E8F0] bg-white"
         >
           <span aria-hidden="true" class="material-symbols-outlined text-[32px] text-[#CBD5E1]"
             >devices_off</span
@@ -842,7 +843,7 @@ onMounted(() => {
         <!-- Assigned Asset Cards Grid -->
         <div
           v-else
-          class="assigned-assets-grid grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3.5 sm:gap-4"
+          class="assigned-assets-grid grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-2.5 sm:gap-3"
         >
           <div
             v-for="asset in paginatedAssets"
@@ -852,13 +853,13 @@ onMounted(() => {
             @keydown.enter.self="goToLevel3(asset)"
             @keydown.space.prevent.self="goToLevel3(asset)"
             aria-label="Lihat detail dan riwayat aset"
-            class="assigned-asset-card group relative flex flex-col justify-between rounded-xl border border-[#E2E8F0] bg-white p-3.5 sm:p-4 shadow-2xs hover:border-[#0A51B0] hover:shadow-md active:scale-[0.99] transition-all duration-200 cursor-pointer touch-manipulation"
+            class="assigned-asset-card group relative flex flex-col justify-between rounded-[6px] border border-[#E2E8F0] bg-white p-3 sm:p-3 shadow-2xs hover:border-[#0A51B0] hover:shadow-md active:scale-[0.99] transition-all duration-200 cursor-pointer touch-manipulation"
           >
             <div>
               <!-- Top Row: Device Icon & Status Pill -->
-              <div class="flex items-center justify-between gap-2 mb-3">
+              <div class="flex items-center justify-between gap-2 mb-2.5">
                 <div
-                  class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#EFF6FF] text-[#333333]"
+                  class="flex h-8 w-8 shrink-0 items-center justify-center rounded-[6px] bg-[#EFF6FF] text-[#333333]"
                 >
                   <span aria-hidden="true" class="material-symbols-outlined text-[20px]">{{
                     getDeviceIcon(asset.tipe_perangkat)
@@ -983,7 +984,7 @@ onMounted(() => {
         <button
           type="button"
           @click="currentLevel = 2"
-          class="hidden sm:flex items-center gap-1.5 rounded-lg border border-[#E2E8F0] bg-white px-3 py-1.5 text-xs font-semibold text-[#475569] hover:bg-[#F8FAFC] hover:text-[#333333] transition-all cursor-pointer shadow-2xs touch-manipulation shrink-0"
+          class="hidden sm:flex items-center gap-1.5 h-8 rounded-[6px] border border-[#E2E8F0] bg-white px-3 text-xs font-medium text-[#475569] hover:bg-[#F8FAFC] hover:text-[#333333] transition-all cursor-pointer shadow-2xs touch-manipulation shrink-0"
         >
           <span aria-hidden="true" class="material-symbols-outlined text-[16px]">arrow_back</span>
           <span>Kembali ke Detail Karyawan</span>
@@ -992,43 +993,43 @@ onMounted(() => {
 
       <!-- Asset Title Header Banner -->
       <div
-        class="asset-profile-banner rounded-xl border border-[#E2E8F0] bg-white p-4 sm:p-5 shadow-2xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3.5"
+        class="asset-profile-banner rounded-[6px] border border-[#E2E8F0] bg-white p-3 sm:p-3 shadow-2xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
       >
-        <div class="flex items-start sm:items-center gap-3.5 min-w-0">
+        <div class="flex items-start sm:items-center gap-3 min-w-0">
           <div
-            class="flex h-11 w-11 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-xl bg-[#EFF6FF] text-[#333333]"
+            class="flex h-10 w-10 sm:h-11 sm:w-11 shrink-0 items-center justify-center rounded-[6px] bg-[#EFF6FF] text-[#333333]"
           >
-            <span aria-hidden="true" class="material-symbols-outlined text-[24px]">{{
+            <span aria-hidden="true" class="material-symbols-outlined text-[22px]">{{
               getDeviceIcon(selectedAsset.tipe_perangkat)
             }}</span>
           </div>
           <div class="min-w-0 flex-1">
             <div class="flex items-center gap-2 flex-wrap">
-              <h2 class="text-base sm:text-lg font-bold text-[#333333] tracking-tight truncate">
+              <h1 class="text-[16px] sm:text-[18px] font-semibold text-[#333333] tracking-tight truncate">
                 {{
                   selectedAsset.label_aset ||
                   [selectedAsset.merek, selectedAsset.model].filter(Boolean).join(' ') ||
                   'Aset IT'
                 }}
-              </h2>
+              </h1>
               <AppBadge
                 :type="getStatusBadgeType(selectedAsset.status_aset)"
                 :text="selectedAsset.status_aset || 'In Use'"
               />
             </div>
-            <div class="mt-2 flex flex-wrap items-center gap-1.5 text-[11px] text-[#5F7089]">
+            <div class="mt-1.5 flex flex-wrap items-center gap-1.5 text-[10px] sm:text-[11px] text-[#5F7089]">
               <span
-                class="inline-flex items-center font-mono font-medium px-2 py-0.5 rounded-md bg-[#F1F5F9] text-[#333333]"
+                class="inline-flex items-center font-mono font-medium px-2 py-0.5 rounded-[6px] bg-[#F1F5F9] text-[#333333]"
               >
                 AST-IT-{{ String(selectedAsset.id_aset).padStart(5, '0') }}
               </span>
               <span
-                class="inline-flex items-center font-mono px-2 py-0.5 rounded-md bg-[#F8FAFC] border border-[#E2E8F0] text-[#475569]"
+                class="inline-flex items-center font-mono px-2 py-0.5 rounded-[6px] bg-[#F8FAFC] border border-[#E2E8F0] text-[#475569]"
               >
                 SN: {{ selectedAsset.nomor_seri || '—' }}
               </span>
               <span
-                class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#F8FAFC] border border-[#E2E8F0] text-[#475569]"
+                class="inline-flex items-center gap-1 px-2 py-0.5 rounded-[6px] bg-[#F8FAFC] border border-[#E2E8F0] text-[#475569]"
               >
                 <span
                   aria-hidden="true"
@@ -1044,7 +1045,7 @@ onMounted(() => {
         <button
           type="button"
           @click="openSpecification(selectedAsset)"
-          class="w-full sm:w-auto h-9 inline-flex items-center justify-center gap-1.5 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-3.5 text-xs font-semibold text-[#333333] hover:bg-[#EFF6FF] cursor-pointer transition-colors shadow-2xs touch-manipulation shrink-0"
+          class="w-full sm:w-auto h-8 inline-flex items-center justify-center gap-1.5 rounded-[6px] border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-medium text-[#333333] hover:bg-[#EFF6FF] cursor-pointer transition-colors shadow-2xs touch-manipulation shrink-0"
         >
           <span aria-hidden="true" class="material-symbols-outlined text-[16px]">description</span>
           <span>Lihat Spesifikasi</span>
@@ -1052,11 +1053,11 @@ onMounted(() => {
       </div>
 
       <!-- Main Two-Column View: Specs Grid (Left) & Audit Timeline (Right) -->
-      <div class="asset-audit-layout grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5 items-start">
+      <div class="asset-audit-layout grid grid-cols-1 lg:grid-cols-12 gap-3 items-start">
         <!-- LEFT COLUMN: Asset Metadata Grid (lg:col-span-6) -->
         <div class="lg:col-span-6 flex flex-col gap-4">
           <!-- Information Card -->
-          <div class="rounded-xl border border-[#E2E8F0] bg-white p-3.5 sm:p-4 shadow-2xs">
+          <div class="rounded-[6px] border border-[#E2E8F0] bg-white p-3.5 sm:p-4 shadow-2xs">
             <div class="flex items-center gap-2 pb-2.5 mb-3 border-b border-[#F1F5F9]">
               <span aria-hidden="true" class="material-symbols-outlined text-[18px] text-[#333333]"
                 >info</span
@@ -1131,7 +1132,7 @@ onMounted(() => {
           </div>
 
           <!-- Current Holder Identity Card -->
-          <div class="rounded-xl border border-[#E2E8F0] bg-white p-3.5 sm:p-4 shadow-2xs">
+          <div class="rounded-[6px] border border-[#E2E8F0] bg-white p-3.5 sm:p-4 shadow-2xs">
             <div class="flex items-center justify-between pb-2.5 mb-3 border-b border-[#F1F5F9]">
               <div class="flex items-center gap-2">
                 <span
@@ -1173,7 +1174,7 @@ onMounted(() => {
 
         <!-- RIGHT COLUMN: Modern SaaS Audit Timeline (lg:col-span-6) -->
         <div
-          class="lg:col-span-6 rounded-xl border border-[#E2E8F0] bg-white p-3.5 sm:p-4 shadow-2xs"
+          class="lg:col-span-6 rounded-[6px] border border-[#E2E8F0] bg-white p-3.5 sm:p-4 shadow-2xs"
         >
           <div class="flex items-center justify-between pb-2.5 mb-3.5 border-b border-[#F1F5F9]">
             <div class="flex items-center gap-2">
@@ -1329,23 +1330,15 @@ onMounted(() => {
 
 .employee-profile,
 .asset-profile-banner {
-  padding: 24px;
-  border-radius: 13px;
+  padding: 10px 12px;
+  border-radius: 6px;
   box-shadow: none;
   background: #fff;
 }
-.employee-profile h2,
-.asset-profile-banner h2 {
-  font-weight: 650;
-  font-size: 21px;
-  letter-spacing: -0.03em;
-  white-space: normal;
-  overflow-wrap: anywhere;
-}
 .assigned-asset-card {
-  padding: 22px;
+  padding: 10px 12px;
   box-shadow: none;
-  border-radius: 13px;
+  border-radius: 6px;
 }
 .assigned-asset-card:hover {
   border-color: #9fb8da;
@@ -1353,8 +1346,8 @@ onMounted(() => {
   transform: none;
 }
 .assigned-asset-card h4 {
-  font-size: 15px;
-  line-height: 1.6;
+  font-size: 14px;
+  line-height: 1.4;
   font-weight: 650;
 }
 .assigned-asset-card h4 + div {
@@ -1363,28 +1356,28 @@ onMounted(() => {
 }
 .assigned-asset-card > div:last-child {
   color: #0a5dbd;
-  padding-top: 15px;
-  margin-top: 20px;
-  min-height: 44px;
+  padding-top: 10px;
+  margin-top: 12px;
+  min-height: 32px;
 }
 .asset-audit-layout > div {
   min-width: 0;
 }
 .asset-audit-layout > div > div {
-  border-radius: 13px;
+  border-radius: 6px;
   box-shadow: none;
 }
 .asset-audit-layout dl {
-  gap: 18px;
+  gap: 14px;
 }
 .asset-audit-layout dl > div {
   min-width: 0;
-  padding-bottom: 12px;
+  padding-bottom: 8px;
   border-bottom: 1px solid #edf1f6;
 }
 .asset-audit-layout dd {
   overflow-wrap: anywhere;
-  line-height: 1.7;
+  line-height: 1.5;
 }
 .asset-audit-layout dt {
   color: #637288;
@@ -1394,27 +1387,23 @@ onMounted(() => {
 .asset-audit-layout h3 {
   text-transform: none;
   font-size: 14px;
-  font-weight: 650;
+  font-weight: 600;
   letter-spacing: -0.015em;
 }
 
 @media (max-width: 767px) {
   .employee-profile,
   .asset-profile-banner {
-    padding: 18px;
-  }
-  .employee-profile h2,
-  .asset-profile-banner h2 {
-    font-size: 18px;
+    padding: 8px 10px;
   }
   .assigned-asset-card {
-    padding: 18px;
+    padding: 8px 10px;
   }
   .asset-profile-banner > button {
-    min-height: 44px;
+    min-height: 32px;
   }
   .asset-audit-layout dl {
-    gap: 14px;
+    gap: 10px;
   }
 }
 @media (prefers-reduced-motion: reduce) {

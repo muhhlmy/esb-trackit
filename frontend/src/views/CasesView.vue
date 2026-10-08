@@ -83,7 +83,7 @@ onMounted(async () => {
     class="cases-page w-full flex-1 flex flex-col items-center bg-[#F8FAFC] dark:bg-slate-950 text-[#333333] dark:text-slate-100 py-6 px-4 sm:px-6 lg:px-8 transition-colors duration-200"
   >
     <div
-      class="cases-workspace max-w-[1200px] mx-auto w-full h-[calc(100vh-7rem)] overflow-hidden flex relative rounded-2xl border border-[#E5EAEF] dark:border-slate-800 bg-white dark:bg-slate-950 shadow-xs"
+      class="cases-workspace max-w-[1200px] mx-auto w-full h-[calc(100vh-7rem)] overflow-hidden flex relative rounded-[6px] border border-[#E5EAEF] dark:border-slate-800 bg-white dark:bg-slate-950 shadow-xs"
     >
       <!-- Desktop Left Collapsible Notion Tree Sidebar -->
       <div class="cases-desktop-tree hidden md:flex h-full transition-all duration-300">
@@ -174,27 +174,27 @@ onMounted(async () => {
             class="cases-no-results h-full flex flex-col items-center justify-center p-8 text-center text-[#575d7a] dark:text-slate-500"
           >
             <div
-              class="w-16 h-16 rounded-2xl bg-[#edeef0] dark:bg-slate-900 flex items-center justify-center mb-4"
+              class="w-12 h-12 rounded-[6px] bg-[#edeef0] dark:bg-slate-900 flex items-center justify-center mb-3"
             >
-              <SearchX class="w-8 h-8 text-[#5F7089] dark:text-slate-600" />
+              <SearchX class="w-6 h-6 text-[#5F7089] dark:text-slate-600" />
             </div>
-            <h3 class="text-base font-bold text-[#1a1c1d] dark:text-slate-300">
+            <h3 class="text-sm font-semibold text-[#1a1c1d] dark:text-slate-300">
               Tidak ada hasil untuk "{{ searchQuery }}"
             </h3>
-            <p class="text-xs text-[#575d7a] dark:text-slate-500 mt-1 max-w-sm">
+            <p class="text-[11px] text-[#575d7a] dark:text-slate-500 mt-1 max-w-sm">
               Artikel / panduan yang Anda cari belum tersedia. Ajukan tiket agar tim IT dapat
               membantu.
             </p>
-            <div class="cases-empty-actions flex items-center gap-2 mt-5">
+            <div class="cases-empty-actions flex items-center gap-2 mt-4">
               <button
                 @click="clearSearch"
-                class="px-4 py-2 rounded-lg text-xs font-semibold border border-[#c4c5d9] dark:border-slate-700 bg-white dark:bg-slate-800 text-[#1a1c1d] dark:text-slate-200 hover:bg-[#f3f3f5] transition-all cursor-pointer"
+                class="px-3 py-1.5 rounded-[6px] text-xs font-medium border border-[#c4c5d9] dark:border-slate-700 bg-white dark:bg-slate-800 text-[#1a1c1d] dark:text-slate-200 hover:bg-[#f3f3f5] transition-all cursor-pointer"
               >
                 Hapus Pencarian
               </button>
               <button
                 @click="goToTicket"
-                class="px-4 py-2 rounded-lg text-xs font-semibold bg-[#0A51B0] hover:bg-[#0A4391] text-white shadow-xs transition-all cursor-pointer"
+                class="px-3 py-1.5 rounded-[6px] text-xs font-medium bg-[#0A51B0] hover:bg-[#0A4391] text-white shadow-xs transition-all cursor-pointer"
               >
                 {{ isAuthenticated ? 'Buat Tiket' : 'Masuk untuk Buat Tiket' }}
               </button>
@@ -216,7 +216,7 @@ onMounted(async () => {
 <style scoped>
 .cases-page {
   min-width: 0;
-  font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+  font-family: inherit;
   padding-block: 16px 24px;
 }
 .cases-workspace {
@@ -235,25 +235,19 @@ onMounted(async () => {
   border-left: 0;
 }
 .cases-toolbar {
-  padding: 10px 16px;
-  min-height: 64px;
+  padding: 10px 12px;
+  min-height: 44px;
   flex-shrink: 0;
 }
 .cases-scroll {
   overscroll-behavior: contain;
 }
-.cases-page button {
-  min-height: 44px;
-  min-width: 44px;
-}
+/* Ukuran tombol kompak diikuti dari token global; 44px touch target
+   hanya untuk layar sentuh (≤767px). */
 .cases-toolbar button {
-  padding: 10px 12px;
-  gap: 8px;
-  font-size: 13px;
-  border-radius: 10px;
-}
-.cases-toolbar button span {
-  font-size: 13px;
+  padding: 5px 10px;
+  gap: 6px;
+  border-radius: 6px;
 }
 .cases-drawer {
   max-width: calc(100vw - 32px);
@@ -264,7 +258,7 @@ onMounted(async () => {
   place-items: center;
 }
 .cases-drawer > div:first-child {
-  padding: 16px;
+  padding: 12px;
 }
 .cases-drawer > div:first-child span {
   font-size: 14px;
@@ -278,18 +272,17 @@ onMounted(async () => {
   line-height: 1.5;
 }
 .cases-no-results p {
-  font-size: 14px;
-  line-height: 1.75;
-  margin-top: 12px;
+  font-size: 12px;
+  line-height: 1.6;
+  margin-top: 10px;
 }
 .cases-empty-actions {
   flex-wrap: wrap;
   justify-content: center;
-  gap: 12px;
+  gap: 10px;
 }
 .cases-empty-actions button {
-  font-size: 13px;
-  padding: 12px 16px;
+  padding: 6px 12px;
 }
 .cases-page button:focus-visible {
   outline: 2px solid #0A51B0;
@@ -300,6 +293,10 @@ onMounted(async () => {
   .cases-canvas,
   .cases-scroll {
     overflow: visible;
+  }
+  .cases-page button {
+    min-height: 44px;
+    min-width: 44px;
   }
   .cases-empty-actions button {
     flex: 1 1 160px;

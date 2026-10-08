@@ -330,19 +330,19 @@ async function submitImport() {
 
 <template>
   <AppModal :is-open="isOpen" title="Import Data Karyawan (Excel)" size="xl" @close="handleClose">
-    <div class="space-y-4">
+    <div class="space-y-3">
       <!-- Alert Notifikasi -->
       <div
         v-if="modalError"
         role="alert"
-        class="rounded-xl bg-rose-50 p-3 text-[12px] font-bold text-rose-600 border border-rose-200"
+        class="rounded-[6px] bg-rose-50 p-3 text-[12px] font-bold text-rose-600 border border-rose-200"
       >
         {{ modalError }}
       </div>
 
       <div
         v-if="successResult"
-        class="rounded-xl bg-emerald-50 p-4 text-[12px] font-bold text-emerald-700 border border-emerald-200 flex flex-col gap-2"
+        class="rounded-[6px] bg-emerald-50 p-3 text-[12px] font-bold text-emerald-700 border border-emerald-200 flex flex-col gap-2"
       >
         <div class="flex items-center gap-2">
           <span aria-hidden="true" class="material-symbols-outlined text-[20px]">check_circle</span>
@@ -357,7 +357,7 @@ async function submitImport() {
             class="bg-white/60 rounded-lg p-2.5 space-y-2"
           >
             <p class="font-bold text-[12px] text-emerald-900">Data Karyawan</p>
-            <div class="flex gap-4 flex-wrap">
+            <div class="flex gap-3 flex-wrap">
               <span
                 >Total Excel: <b>{{ importDetails.totalKaryawanRows }}</b></span
               >
@@ -375,7 +375,7 @@ async function submitImport() {
             <p class="font-bold text-[12px] text-emerald-900 pt-1 border-t border-emerald-200/60">
               Akun Pengguna (Users)
             </p>
-            <div class="flex gap-4 flex-wrap">
+            <div class="flex gap-3 flex-wrap">
               <span
                 >User Baru (Dibuat): <b>{{ importDetails.createdUserCount || 0 }}</b></span
               >
@@ -394,7 +394,7 @@ async function submitImport() {
             class="bg-white/60 rounded-lg p-2.5 space-y-1"
           >
             <p class="font-bold text-[12px] text-emerald-900">Data Asset</p>
-            <div class="flex gap-4 flex-wrap">
+            <div class="flex gap-3 flex-wrap">
               <span
                 >Total Excel: <b>{{ importDetails.totalAssetRows }}</b></span
               >
@@ -434,7 +434,7 @@ async function submitImport() {
            kosong, dst. Sebelumnya tersembunyi di balik successResult.) -->
       <div
         v-if="importDetails && !successResult"
-        class="rounded-xl bg-rose-50 p-4 text-[12px] font-bold text-rose-700 border border-rose-200 flex flex-col gap-2"
+        class="rounded-[6px] bg-rose-50 p-3 text-[12px] font-bold text-rose-700 border border-rose-200 flex flex-col gap-2"
       >
         <div class="flex items-center gap-2">
           <span aria-hidden="true" class="material-symbols-outlined text-[20px]">error</span>
@@ -447,7 +447,7 @@ async function submitImport() {
             class="bg-white/60 rounded-lg p-2.5 space-y-2"
           >
             <p class="font-bold text-[12px] text-rose-900">Data Karyawan</p>
-            <div class="flex gap-4 flex-wrap">
+            <div class="flex gap-3 flex-wrap">
               <span
                 >Total Excel: <b>{{ importDetails.totalKaryawanRows }}</b></span
               >
@@ -464,7 +464,7 @@ async function submitImport() {
             <p class="font-bold text-[12px] text-rose-900 pt-1 border-t border-rose-200/60">
               Akun Pengguna (Users)
             </p>
-            <div class="flex gap-4 flex-wrap">
+            <div class="flex gap-3 flex-wrap">
               <span
                 >User Baru (Dibuat): <b>{{ importDetails.createdUserCount || 0 }}</b></span
               >
@@ -482,7 +482,7 @@ async function submitImport() {
             class="bg-white/60 rounded-lg p-2.5 space-y-1"
           >
             <p class="font-bold text-[12px] text-rose-900">Data Asset</p>
-            <div class="flex gap-4 flex-wrap">
+            <div class="flex gap-3 flex-wrap">
               <span
                 >Total Excel: <b>{{ importDetails.totalAssetRows }}</b></span
               >
@@ -513,10 +513,10 @@ async function submitImport() {
 
       <!-- Action Banner: Download Template -->
       <div
-        class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 rounded-2xl bg-[#ECF2FF] border border-[#D2E3FF] p-4"
+        class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 rounded-[6px] bg-[#ECF2FF] border border-[#D2E3FF] p-3"
       >
         <div>
-          <h4 class="text-[13px] font-bold text-[#2A3547]">Format / Template Import Excel</h4>
+          <h4 class="text-xs font-bold text-[#2A3547]">Format / Template Import Excel</h4>
           <p class="text-[11px] text-[#66728d] mt-0.5">
             Gunakan template Excel resmi dengan Sheet <code>Table Karyawan</code>.
           </p>
@@ -524,7 +524,7 @@ async function submitImport() {
         <button
           type="button"
           @click="downloadTemplate"
-          class="flex min-h-11 sm:min-h-0 justify-center items-center gap-2 rounded-xl bg-[#0A51B0] px-4 py-2 text-[12px] font-bold text-white shadow-md hover:bg-[#0A4391] transition-all cursor-pointer shrink-0"
+          class="flex min-h-11 sm:min-h-0 justify-center items-center gap-2 rounded-[6px] bg-[#0A51B0] px-4 py-2 text-[12px] font-bold text-white shadow-md hover:bg-[#0A4391] transition-all cursor-pointer shrink-0"
         >
           <span aria-hidden="true" class="material-symbols-outlined text-[16px]">download</span>
           <span>Unduh Template (.xlsx)</span>
@@ -540,7 +540,7 @@ async function submitImport() {
         @keydown.space.prevent="fileInputRef?.click()"
         @dragover.prevent
         @drop="onDropFile"
-        class="relative flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-[#DFE5EF] bg-[#F8FAFC] p-6 text-center hover:border-[#0A51B0] hover:bg-[#ECF2FF]/40 transition-all cursor-pointer"
+        class="relative flex flex-col items-center justify-center rounded-[6px] border-2 border-dashed border-[#DFE5EF] bg-[#F8FAFC] p-4 text-center hover:border-[#0A51B0] hover:bg-[#ECF2FF]/40 transition-all cursor-pointer"
         @click="fileInputRef?.click()"
       >
         <input
@@ -552,16 +552,16 @@ async function submitImport() {
         />
 
         <div
-          class="flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-[#333333] shadow-sm mb-2"
+          class="flex h-12 w-12 items-center justify-center rounded-[6px] bg-white text-[#333333] shadow-sm mb-2"
         >
           <span aria-hidden="true" class="material-symbols-outlined text-[28px]">upload_file</span>
         </div>
 
-        <p v-if="!selectedFile" class="text-[13px] font-bold text-[#2A3547]">
+        <p v-if="!selectedFile" class="text-xs font-bold text-[#2A3547]">
           Tarik &amp; lepas file Excel di sini, atau
           <span class="text-[#333333] underline">pilih file</span>
         </p>
-        <p v-else class="text-[13px] font-bold text-[#333333] max-w-full wrap-anywhere sm:max-w-md">
+        <p v-else class="text-xs font-bold text-[#333333] max-w-full wrap-anywhere sm:max-w-md">
           📄 {{ selectedFile.name }} ({{ (selectedFile.size / 1024).toFixed(1) }} KB)
         </p>
 
@@ -588,7 +588,7 @@ async function submitImport() {
           <button
             type="button"
             @click="activeTab = 'karyawan'"
-            class="flex min-h-11 sm:min-h-0 items-center gap-2 rounded-xl px-4 py-2 text-[12px] font-bold transition-all cursor-pointer"
+            class="flex min-h-11 sm:min-h-0 items-center gap-2 rounded-[6px] px-4 py-2 text-[12px] font-bold transition-all cursor-pointer"
             :class="
               activeTab === 'karyawan'
                 ? 'bg-[#0A51B0] text-white shadow-sm'
@@ -602,7 +602,7 @@ async function submitImport() {
           <button
             type="button"
             @click="activeTab = 'assets'"
-            class="flex min-h-11 sm:min-h-0 items-center gap-2 rounded-xl px-4 py-2 text-[12px] font-bold transition-all cursor-pointer"
+            class="flex min-h-11 sm:min-h-0 items-center gap-2 rounded-[6px] px-4 py-2 text-[12px] font-bold transition-all cursor-pointer"
             :class="
               activeTab === 'assets'
                 ? 'bg-[#0A51B0] text-white shadow-sm'
@@ -617,7 +617,7 @@ async function submitImport() {
         <!-- Preview Table Karyawan -->
         <div
           v-if="activeTab === 'karyawan'"
-          class="rounded-xl border border-[#E5EAEF] overflow-hidden"
+          class="rounded-[6px] border border-[#E5EAEF] overflow-hidden"
         >
           <div class="max-h-[220px] overflow-auto">
             <table v-if="parsedKaryawanRows.length > 0" class="w-full text-left text-[11px]">
@@ -670,7 +670,7 @@ async function submitImport() {
                 </tr>
               </tbody>
             </table>
-            <p v-else class="p-4 text-center text-[12px] text-[#66728d]">
+            <p v-else class="p-3 text-center text-[12px] text-[#66728d]">
               Tidak ada baris data Karyawan.
             </p>
           </div>
@@ -686,7 +686,7 @@ async function submitImport() {
         <!-- Preview Table Asset -->
         <div
           v-if="activeTab === 'assets'"
-          class="rounded-xl border border-[#E5EAEF] overflow-hidden"
+          class="rounded-[6px] border border-[#E5EAEF] overflow-hidden"
         >
           <div class="max-h-[220px] overflow-auto">
             <table v-if="parsedAssetRows.length > 0" class="w-full text-left text-[11px]">
@@ -767,7 +767,7 @@ async function submitImport() {
                 </tr>
               </tbody>
             </table>
-            <p v-else class="p-4 text-center text-[12px] text-[#66728d]">
+            <p v-else class="p-3 text-center text-[12px] text-[#66728d]">
               Tidak ada baris data Aset IT.
             </p>
           </div>
@@ -783,12 +783,12 @@ async function submitImport() {
 
       <!-- Action Buttons -->
       <div
-        class="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-3 pt-4 border-t border-[#E5EAEF]"
+        class="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-3 pt-3 border-t border-[#E5EAEF]"
       >
         <button
           type="button"
           @click="handleClose"
-          class="min-h-11 sm:min-h-0 rounded-xl border border-[#E5EAEF] px-4 py-2 text-[12px] font-bold text-[#66728d] hover:bg-gray-50 transition-all cursor-pointer"
+          class="min-h-11 sm:min-h-0 rounded-[6px] border border-[#E5EAEF] px-4 py-2 text-[12px] font-bold text-[#66728d] hover:bg-gray-50 transition-all cursor-pointer"
         >
           Batal
         </button>
@@ -798,7 +798,7 @@ async function submitImport() {
             isSubmitting || (parsedKaryawanRows.length === 0 && parsedAssetRows.length === 0)
           "
           @click="submitImport"
-          class="flex min-h-11 sm:min-h-0 justify-center items-center gap-2 rounded-xl bg-[#0A51B0] px-5 py-2 text-[12px] font-bold text-white shadow-md hover:bg-[#0A4391] transition-all cursor-pointer disabled:opacity-50"
+          class="flex min-h-11 sm:min-h-0 justify-center items-center gap-2 rounded-[6px] bg-[#0A51B0] px-4 py-2 text-[12px] font-bold text-white shadow-md hover:bg-[#0A4391] transition-all cursor-pointer disabled:opacity-50"
         >
           <span
             v-if="isSubmitting"

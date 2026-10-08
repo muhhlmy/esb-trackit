@@ -680,7 +680,7 @@ async function generatePdf({
           margin: 10mm 15mm;
         }
         body {
-          font-family: Arial, sans-serif;
+          font-family: 'Plus Jakarta Sans', Arial, sans-serif;
           color: #000000;
           background: #ffffff;
           margin: 0;
@@ -947,20 +947,20 @@ onMounted(fetchData)
     <!-- ── Page Header ─────────────────────────────────────────── -->
     <div
       v-if="isFormOpen"
-      class="submission-page-header flex items-center gap-3 bg-white dark:bg-slate-900 p-3.5 sm:p-4 rounded-xl border border-[#E2E8F0]/80 dark:border-slate-800 shadow-2xs"
+      class="submission-page-header flex items-center gap-3 bg-white dark:bg-slate-900 p-2.5 sm:p-3 rounded-[6px] border border-[#E2E8F0]/80 dark:border-slate-800 shadow-2xs"
     >
       <div
-        class="flex h-9 w-9 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-xl bg-[#EDF5FF] dark:bg-sky-950/50 text-[#0A5DBD] dark:text-sky-400 border border-[#B8D4F5]/40 dark:border-sky-800/50"
+        class="flex h-9 w-9 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-[6px] bg-[#EDF5FF] dark:bg-sky-950/50 text-[#0A5DBD] dark:text-sky-400 border border-[#B8D4F5]/40 dark:border-sky-800/50"
       >
         <span aria-hidden="true" class="material-symbols-outlined text-[20px] sm:text-[22px]"
           >assignment</span
         >
       </div>
       <div class="min-w-0">
-        <h1 class="text-base sm:text-lg font-bold text-[#333333] dark:text-white tracking-tight truncate">
+        <h1 class="text-[16px] sm:text-[18px] font-semibold text-[#333333] dark:text-white tracking-tight truncate">
           Formulir Serah Terima Aset
         </h1>
-        <p class="text-xs font-normal text-[#5F7089] dark:text-slate-400 mt-0.5 truncate">
+        <p class="text-[10px] sm:text-[11px] font-normal text-[#5F7089] dark:text-slate-400 mt-0.5 truncate">
           Dokumentasi &amp; Berita Acara Serah Terima (BAST) perangkat IT &amp; inventaris
         </p>
       </div>
@@ -977,7 +977,7 @@ onMounted(fetchData)
       v-if="saveMessage"
       role="status"
       aria-live="polite"
-      class="rounded-xl border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/40 px-4 py-3 text-xs font-semibold text-emerald-800 dark:text-emerald-300"
+      class="rounded-[6px] border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/40 px-3.5 py-2.5 text-xs font-semibold text-emerald-800 dark:text-emerald-300"
     >
       {{ saveMessage }}
     </div>
@@ -988,37 +988,37 @@ onMounted(fetchData)
       aria-labelledby="submission-history-title"
     >
       <div
-        class="asset-toolbar flex flex-col gap-3 rounded-xl border border-[#E2E8F0]/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-3.5 shadow-2xs"
+        class="asset-toolbar flex flex-col gap-2.5 rounded-[6px] border border-[#E2E8F0]/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-2.5 sm:p-3 shadow-2xs"
       >
         <div class="flex items-center justify-between gap-2.5">
           <div>
             <h2
               id="submission-history-title"
-              class="text-base font-bold tracking-tight text-[#333333] dark:text-white"
+              class="text-sm font-semibold tracking-tight text-[#333333] dark:text-white"
             >
               Riwayat BAST / Pengajuan
             </h2>
-            <p class="mt-0.5 text-xs text-[#5F7089] dark:text-slate-400">
+            <p class="mt-0.5 text-[11px] text-[#5F7089] dark:text-slate-400">
               Kelola dokumen serah terima seperti daftar Aset IT.
             </p>
           </div>
           <button
             v-if="canWriteSubmissions"
             type="button"
-            class="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-lg bg-[#0A51B0] px-3 text-xs font-semibold text-white hover:bg-[#0A4391] transition-colors"
+            class="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-[6px] bg-[#0A51B0] px-3 text-xs font-semibold text-white hover:bg-[#0A4391] transition-colors"
             @click="router.push('/submissions/new')"
           >
             <span aria-hidden="true" class="material-symbols-outlined text-[16px]">add</span>BAST
             Baru
           </button>
         </div>
-        <div class="grid grid-cols-1 items-center gap-2 border-t border-[#F1F5F9] dark:border-slate-800 pt-2.5">
+        <div class="grid grid-cols-1 items-center gap-2 border-t border-[#F1F5F9] dark:border-slate-800 pt-2">
           <input
             v-model="searchQuery"
             type="search"
             aria-label="Cari nomor BAST atau nama pihak"
             placeholder="Cari nomor BAST atau nama pihak…"
-            class="h-9 w-full rounded-lg border border-[#E2E8F0] dark:border-slate-700 bg-white dark:bg-slate-800 px-3 text-xs text-[#333333] dark:text-slate-100 placeholder:text-slate-400 focus:border-[#0A51B0] focus:outline-none"
+            class="h-8 w-full rounded-[6px] border border-[#E2E8F0] dark:border-slate-700 bg-white dark:bg-slate-800 px-3 text-xs text-[#333333] dark:text-slate-100 placeholder:text-slate-400 focus:border-[#0A51B0] focus:outline-none"
           />
         </div>
       </div>
@@ -1049,7 +1049,7 @@ onMounted(fetchData)
       </div>
       <div
         v-if="!filteredSubmissions.length"
-        class="mt-3 rounded-xl border border-[#E2E8F0] dark:border-slate-800 bg-white dark:bg-slate-900 px-4 py-12 text-center text-xs text-[#5F7089] dark:text-slate-400"
+        class="mt-3 rounded-[6px] border border-[#E2E8F0] dark:border-slate-800 bg-white dark:bg-slate-900 px-4 py-12 text-center text-xs text-[#5F7089] dark:text-slate-400"
       >
         Belum ada BAST yang sesuai.<button
           type="button"
@@ -1194,26 +1194,26 @@ onMounted(fetchData)
     >
       <!-- Section 1 Skeleton: Profil Pihak Terkait -->
       <div
-        class="rounded-xl border border-[#E2E8F0]/80 bg-white p-4 sm:p-6 shadow-2xs flex flex-col gap-4"
+        class="rounded-[6px] border border-[#E2E8F0]/80 bg-white p-3 sm:p-4 shadow-2xs flex flex-col gap-3"
       >
-        <div class="flex items-center gap-2.5 border-b border-[#F1F5F9] pb-3.5">
+        <div class="flex items-center gap-2.5 border-b border-[#F1F5F9] pb-3">
           <BaseSkeleton width="24px" height="24px" radius="md" />
           <div class="flex flex-col gap-1">
             <BaseSkeleton width="180px" height="16px" radius="md" />
             <BaseSkeleton width="120px" height="12px" radius="sm" />
           </div>
         </div>
-        <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
           <div
             v-for="i in 2"
             :key="'pihak-skel-' + i"
-            class="flex flex-col gap-3.5 rounded-xl border border-slate-200/80 bg-slate-50/50 p-4"
+            class="flex flex-col gap-3 rounded-[6px] border border-slate-200/80 bg-slate-50/50 p-3"
           >
             <BaseSkeleton width="150px" height="14px" radius="md" />
-            <BaseSkeleton width="100%" height="40px" radius="xl" />
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <BaseSkeleton width="100%" height="40px" radius="xl" />
-              <BaseSkeleton width="100%" height="40px" radius="xl" />
+            <BaseSkeleton width="100%" height="32px" radius="md" />
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              <BaseSkeleton width="100%" height="32px" radius="md" />
+              <BaseSkeleton width="100%" height="32px" radius="md" />
             </div>
           </div>
         </div>
@@ -1221,20 +1221,20 @@ onMounted(fetchData)
 
       <!-- Section 2 Skeleton: Tujuan Serah Terima Aset -->
       <div
-        class="rounded-xl border border-[#E2E8F0]/80 bg-white p-4 sm:p-6 shadow-2xs flex flex-col gap-4"
+        class="rounded-[6px] border border-[#E2E8F0]/80 bg-white p-3 sm:p-4 shadow-2xs flex flex-col gap-3"
       >
-        <div class="flex items-center gap-2.5 border-b border-[#F1F5F9] pb-3.5">
+        <div class="flex items-center gap-2.5 border-b border-[#F1F5F9] pb-3">
           <BaseSkeleton width="24px" height="24px" radius="md" />
           <div class="flex flex-col gap-1">
             <BaseSkeleton width="210px" height="16px" radius="md" />
             <BaseSkeleton width="140px" height="12px" radius="sm" />
           </div>
         </div>
-        <div class="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3">
+        <div class="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-2.5">
           <div
             v-for="i in 7"
             :key="'tujuan-skel-' + i"
-            class="flex items-center gap-2.5 rounded-xl border border-slate-200/80 bg-slate-50/50 p-3"
+            class="flex items-center gap-2 rounded-[6px] border border-slate-200/80 bg-slate-50/50 p-2.5"
           >
             <BaseSkeleton width="24px" height="24px" radius="md" />
             <BaseSkeleton width="90px" height="14px" radius="sm" />
@@ -1243,42 +1243,42 @@ onMounted(fetchData)
       </div>
 
       <!-- Section 3 Skeleton: Data Unit -->
-      <div class="grid grid-cols-1 gap-5 lg:grid-cols-2">
+      <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <div
-          class="rounded-xl border border-[#E2E8F0]/80 bg-white p-4 sm:p-6 shadow-2xs flex flex-col gap-4"
+          class="rounded-[6px] border border-[#E2E8F0]/80 bg-white p-3 sm:p-4 shadow-2xs flex flex-col gap-3"
         >
-          <div class="flex items-center gap-2.5 border-b border-[#F1F5F9] pb-3.5">
+          <div class="flex items-center gap-2.5 border-b border-[#F1F5F9] pb-3">
             <BaseSkeleton width="24px" height="24px" radius="md" />
             <BaseSkeleton width="190px" height="16px" radius="md" />
           </div>
-          <BaseSkeleton width="100%" height="120px" radius="xl" />
+          <BaseSkeleton width="100%" height="90px" radius="md" />
         </div>
         <div
-          class="rounded-xl border border-[#E2E8F0]/80 bg-white p-4 sm:p-6 shadow-2xs flex flex-col gap-4"
+          class="rounded-[6px] border border-[#E2E8F0]/80 bg-white p-3 sm:p-4 shadow-2xs flex flex-col gap-3"
         >
-          <div class="flex items-center gap-2.5 border-b border-[#F1F5F9] pb-3.5">
+          <div class="flex items-center gap-2.5 border-b border-[#F1F5F9] pb-3">
             <BaseSkeleton width="24px" height="24px" radius="md" />
             <BaseSkeleton width="190px" height="16px" radius="md" />
           </div>
-          <BaseSkeleton width="100%" height="120px" radius="xl" />
+          <BaseSkeleton width="100%" height="90px" radius="md" />
         </div>
       </div>
 
       <!-- Section 4 Skeleton: Diketahui Oleh -->
       <div
-        class="rounded-xl border border-[#E2E8F0]/80 bg-white p-4 sm:p-6 shadow-2xs flex flex-col gap-4"
+        class="rounded-[6px] border border-[#E2E8F0]/80 bg-white p-3 sm:p-4 shadow-2xs flex flex-col gap-3"
       >
-        <div class="flex items-center gap-2.5 border-b border-[#F1F5F9] pb-3.5">
+        <div class="flex items-center gap-2.5 border-b border-[#F1F5F9] pb-3">
           <BaseSkeleton width="24px" height="24px" radius="md" />
           <div class="flex flex-col gap-1">
             <BaseSkeleton width="230px" height="16px" radius="md" />
             <BaseSkeleton width="320px" height="12px" radius="sm" />
           </div>
         </div>
-        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <BaseSkeleton width="100%" height="40px" radius="xl" />
-          <BaseSkeleton width="100%" height="40px" radius="xl" />
-          <BaseSkeleton width="100%" height="40px" radius="xl" />
+        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <BaseSkeleton width="100%" height="32px" radius="md" />
+          <BaseSkeleton width="100%" height="32px" radius="md" />
+          <BaseSkeleton width="100%" height="32px" radius="md" />
         </div>
       </div>
     </div>
@@ -1289,11 +1289,11 @@ onMounted(fetchData)
     <!-- Main Submission Form -->
     <form
       v-else-if="isFormOpen"
-      class="asset-crud-form asset-entry-form submission-form flex flex-col gap-5"
+      class="asset-crud-form asset-entry-form submission-form flex flex-col gap-4"
       @submit.prevent="generatePdf"
     >
       <div
-        class="submission-form-heading flex items-center justify-between rounded-xl border border-[#E2E8F0] bg-white px-4 py-3 shadow-2xs"
+        class="submission-form-heading flex items-center justify-between rounded-[6px] border border-[#E2E8F0] bg-white px-3.5 py-2.5 shadow-2xs"
       >
         <div>
           <h2 class="text-sm font-bold text-[#333333]">
@@ -1305,7 +1305,7 @@ onMounted(fetchData)
         </div>
         <button
           type="button"
-          class="h-8 rounded-lg border border-[#CBD5E1] px-3 text-xs font-bold text-[#334155] hover:bg-[#F8FAFC]"
+          class="h-8 rounded-[6px] border border-[#CBD5E1] px-3 text-xs font-semibold text-[#334155] hover:bg-[#F8FAFC]"
           :disabled="isSaving"
           @click="router.push('/submissions')"
         >
@@ -1317,21 +1317,21 @@ onMounted(fetchData)
         v-if="validationError"
         role="alert"
         aria-live="assertive"
-        class="flex items-start sm:items-center gap-3 p-4 rounded-xl border border-rose-300 bg-rose-50 text-rose-800 text-[12px] font-semibold shadow-2xs"
+        class="flex items-start sm:items-center gap-3 p-3 rounded-[6px] border border-rose-300 bg-rose-50 text-rose-800 text-[12px] font-semibold shadow-2xs"
       >
         <span
           aria-hidden="true"
-          class="material-symbols-outlined shrink-0 text-[20px] text-rose-600"
+          class="material-symbols-outlined shrink-0 text-[18px] text-rose-600"
           >error</span
         >
         <span class="flex-1 leading-relaxed">{{ validationError }}</span>
         <button
           type="button"
-          class="text-rose-500 hover:text-rose-700 p-1 rounded-lg hover:bg-rose-100 transition-colors cursor-pointer"
+          class="text-rose-500 hover:text-rose-700 p-1 rounded-[6px] hover:bg-rose-100 transition-colors cursor-pointer"
           @click="validationError = ''"
           title="Tutup pesan error"
         >
-          <span aria-hidden="true" class="material-symbols-outlined text-[18px]">close</span>
+          <span aria-hidden="true" class="material-symbols-outlined text-[16px]">close</span>
         </button>
       </div>
 
@@ -1342,35 +1342,35 @@ onMounted(fetchData)
       >
         <!-- Section 1: Profil Pihak Terkait -->
         <div
-          class="submission-section bg-white rounded-xl border border-[#E2E8F0]/80 p-4 sm:p-6 shadow-2xs flex flex-col gap-4"
+          class="submission-section bg-white rounded-[6px] border border-[#E2E8F0]/80 p-3 sm:p-4 shadow-2xs flex flex-col gap-3"
         >
-          <div class="flex items-center justify-between gap-2 border-b border-[#F1F5F9] pb-3.5">
-            <div class="flex items-center gap-2.5">
+          <div class="flex items-center justify-between gap-2 border-b border-[#F1F5F9] pb-2.5">
+            <div class="flex items-center gap-2">
               <span
-                class="flex h-6 w-6 items-center justify-center rounded-lg bg-[#EDF5FF] text-[#333333] text-[11px] font-bold"
+                class="flex h-5.5 w-5.5 items-center justify-center rounded-[4px] bg-[#EDF5FF] text-[#333333] text-[11px] font-bold"
               >
                 01
               </span>
               <div>
-                <h2 class="text-[14px] sm:text-[15px] font-bold text-[#333333]">
+                <h2 class="text-sm font-semibold text-[#333333]">
                   Profil Pihak Terkait
                 </h2>
-                <p class="text-[12px] text-[#5F7089]">
+                <p class="text-[11px] text-[#5F7089]">
                   Tentukan identitas pihak pemberi dan penerima aset
                 </p>
               </div>
             </div>
           </div>
 
-          <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+          <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
             <!-- Pihak Pemberi (Karyawan) -->
             <div
-              class="flex flex-col gap-3.5 rounded-xl sm:rounded-xl border border-slate-200/80 bg-slate-50/50 p-4"
+              class="flex flex-col gap-3 rounded-[6px] border border-slate-200/80 bg-slate-50/50 p-3"
             >
               <div class="flex items-center gap-2">
                 <span
                   aria-hidden="true"
-                  class="material-symbols-outlined text-[18px] text-[#333333]"
+                  class="material-symbols-outlined text-[17px] text-[#333333]"
                   >person_outline</span
                 >
                 <h3 class="text-xs font-bold uppercase tracking-wider text-[#333333]">
@@ -1388,12 +1388,12 @@ onMounted(fetchData)
                   secondary-label-key="nik"
                   placeholder="Pilih karyawan pemberi"
                   search-placeholder="Cari nama atau NIK…"
-                  height-class="h-10"
+                  height-class="h-8"
                 />
               </label>
 
-              <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                <label class="flex flex-col gap-1.5">
+              <div class="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+                <label class="flex flex-col gap-1">
                   <span class="text-[10px] font-bold uppercase text-[#5F7089]"
                     >Nama Lengkap (Auto)</span
                   >
@@ -1402,13 +1402,13 @@ onMounted(fetchData)
                     required
                     type="text"
                     aria-label="Nama Lengkap Pemberi (Auto)"
-                    class="h-10 w-full rounded-xl border border-slate-200 bg-slate-100/70 px-3 text-xs font-medium text-slate-600 outline-none cursor-default"
+                    class="h-8 w-full rounded-[6px] border border-slate-200 bg-slate-100/70 px-3 text-xs font-medium text-slate-600 outline-none cursor-default"
                     readonly
                     placeholder="Terisi otomatis"
                   />
                 </label>
 
-                <label class="flex flex-col gap-1.5">
+                <label class="flex flex-col gap-1">
                   <span class="text-[10px] font-bold uppercase text-[#5F7089]"
                     >Direktorat (Auto)</span
                   >
@@ -1417,7 +1417,7 @@ onMounted(fetchData)
                     required
                     type="text"
                     aria-label="Direktorat Pemberi (Auto)"
-                    class="h-10 w-full rounded-xl border border-slate-200 bg-slate-100/70 px-3 text-xs font-medium text-slate-600 outline-none cursor-default"
+                    class="h-8 w-full rounded-[6px] border border-slate-200 bg-slate-100/70 px-3 text-xs font-medium text-slate-600 outline-none cursor-default"
                     readonly
                     placeholder="Terisi otomatis"
                   />
@@ -1427,13 +1427,13 @@ onMounted(fetchData)
 
             <!-- Pihak Penerima -->
             <div
-              class="flex flex-col gap-3.5 rounded-xl sm:rounded-xl border border-slate-200/80 bg-slate-50/50 p-4"
+              class="flex flex-col gap-3 rounded-[6px] border border-slate-200/80 bg-slate-50/50 p-3"
             >
               <div class="flex flex-wrap items-center justify-between gap-2">
                 <div class="flex items-center gap-2">
                   <span
                     aria-hidden="true"
-                    class="material-symbols-outlined text-[18px] text-amber-600"
+                    class="material-symbols-outlined text-[17px] text-amber-600"
                     >person_add</span
                   >
                   <h3 class="text-xs font-bold uppercase tracking-wider text-amber-600">
@@ -1446,7 +1446,7 @@ onMounted(fetchData)
                     v-model="form.isPenerimaLainnya"
                     type="checkbox"
                     aria-label="Penerima Non-Karyawan (Vendor/Lainnya)"
-                    class="rounded border-slate-300 accent-[#0A51B0] h-4 w-4 cursor-pointer"
+                    class="rounded-[4px] border-slate-300 accent-[#0A51B0] h-4 w-4 cursor-pointer"
                   />
                   <span class="text-[11px] font-bold text-[#475569]"
                     >Non-Karyawan (Vendor/Lainnya)</span
@@ -1464,7 +1464,7 @@ onMounted(fetchData)
                   secondary-label-key="nik"
                   placeholder="Pilih karyawan penerima"
                   search-placeholder="Cari nama atau NIK…"
-                  height-class="h-10"
+                  height-class="h-8"
                 />
               </label>
 
@@ -1477,13 +1477,13 @@ onMounted(fetchData)
                   required
                   type="text"
                   aria-label="Nama Lengkap / Vendor Penerima"
-                  class="h-10 w-full rounded-xl border border-[#E2E8F0] bg-white px-3 text-xs font-medium text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 focus:outline-none transition-all"
+                  class="h-8 w-full rounded-[6px] border border-[#E2E8F0] bg-white px-3 text-xs font-medium text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 focus:outline-none transition-all"
                   placeholder="Tulis nama lengkap penerima atau vendor…"
                 />
               </div>
 
-              <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                <label v-if="!form.isPenerimaLainnya" class="flex flex-col gap-1.5">
+              <div class="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+                <label v-if="!form.isPenerimaLainnya" class="flex flex-col gap-1">
                   <span class="text-[10px] font-bold uppercase text-[#5F7089]"
                     >Nama Lengkap (Auto)</span
                   >
@@ -1492,14 +1492,14 @@ onMounted(fetchData)
                     required
                     type="text"
                     aria-label="Nama Lengkap Penerima (Auto)"
-                    class="h-10 w-full rounded-xl border border-slate-200 bg-slate-100/70 px-3 text-xs font-medium text-slate-600 outline-none cursor-default"
+                    class="h-8 w-full rounded-[6px] border border-slate-200 bg-slate-100/70 px-3 text-xs font-medium text-slate-600 outline-none cursor-default"
                     readonly
                     placeholder="Terisi otomatis"
                   />
                 </label>
 
                 <label
-                  class="flex flex-col gap-1.5"
+                  class="flex flex-col gap-1"
                   :class="form.isPenerimaLainnya ? 'sm:col-span-2' : ''"
                 >
                   <span class="text-[10px] font-bold uppercase text-[#5F7089]">
@@ -1514,7 +1514,7 @@ onMounted(fetchData)
                         ? 'Direktorat / Perusahaan Penerima'
                         : 'Direktorat Penerima (Auto)'
                     "
-                    class="h-10 w-full rounded-xl border px-3 text-xs font-medium outline-none transition-all"
+                    class="h-8 w-full rounded-[6px] border px-3 text-xs font-medium outline-none transition-all"
                     :class="
                       !form.isPenerimaLainnya
                         ? 'border-slate-200 bg-slate-100/70 text-slate-600 cursor-default'
@@ -1535,27 +1535,27 @@ onMounted(fetchData)
 
         <!-- Section 2: Tujuan Serah Terima -->
         <div
-          class="submission-section bg-white rounded-xl border border-[#E2E8F0]/80 p-4 sm:p-6 shadow-2xs flex flex-col gap-4"
+          class="submission-section bg-white rounded-[6px] border border-[#E2E8F0]/80 p-3 sm:p-4 shadow-2xs flex flex-col gap-3"
         >
-          <div class="flex items-center justify-between gap-2 border-b border-[#F1F5F9] pb-3.5">
-            <div class="flex items-center gap-2.5">
+          <div class="flex items-center justify-between gap-2 border-b border-[#F1F5F9] pb-2.5">
+            <div class="flex items-center gap-2">
               <span
-                class="flex h-6 w-6 items-center justify-center rounded-lg bg-[#EDF5FF] text-[#333333] text-[11px] font-bold"
+                class="flex h-5.5 w-5.5 items-center justify-center rounded-[4px] bg-[#EDF5FF] text-[#333333] text-[11px] font-bold"
               >
                 02
               </span>
               <div>
-                <h2 class="text-[14px] sm:text-[15px] font-bold text-[#333333]">
+                <h2 class="text-sm font-semibold text-[#333333]">
                   Tujuan Serah Terima Aset
                 </h2>
-                <p class="text-[12px] text-[#5F7089]">
+                <p class="text-[11px] text-[#5F7089]">
                   Pilih salah satu keperluan serah terima perangkat
                 </p>
               </div>
             </div>
           </div>
 
-          <div class="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3">
+          <div class="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-2.5">
             <label
               v-for="t in [
                 {
@@ -1602,24 +1602,24 @@ onMounted(fetchData)
                 },
               ]"
               :key="t.key"
-              class="flex cursor-pointer items-center justify-between min-h-[48px] rounded-xl border p-3 transition-all active:scale-[0.99] select-none"
+              class="flex cursor-pointer items-center justify-between min-h-[36px] rounded-[6px] border p-2.5 transition-all active:scale-[0.99] select-none"
               :class="
                 form.tujuan === t.key
-                  ? 'border-[#0A51B0] bg-[#EDF5FF]/60 ring-2 ring-[#0A51B0]/15 shadow-2xs'
+                  ? 'border-[#0A51B0] bg-[#EDF5FF]/60 ring-1 ring-[#0A51B0]/20 shadow-2xs'
                   : 'border-[#E2E8F0] bg-white hover:bg-slate-50 hover:border-slate-300'
               "
             >
-              <div class="flex items-center gap-2.5 min-w-0 pr-2">
+              <div class="flex items-center gap-2 min-w-0 pr-1.5">
                 <span
-                  class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-[16px]"
+                  class="flex h-6 w-6 shrink-0 items-center justify-center rounded-[4px] text-[15px]"
                   :class="form.tujuan === t.key ? 'bg-white text-[#333333] shadow-2xs' : t.color"
                 >
-                  <span aria-hidden="true" class="material-symbols-outlined text-[16px]">{{
+                  <span aria-hidden="true" class="material-symbols-outlined text-[15px]">{{
                     t.icon
                   }}</span>
                 </span>
                 <span
-                  class="text-xs font-bold truncate"
+                  class="text-xs font-semibold truncate"
                   :class="form.tujuan === t.key ? 'text-[#333333]' : 'text-[#334155]'"
                 >
                   {{ t.label }}
@@ -1636,7 +1636,7 @@ onMounted(fetchData)
             </label>
           </div>
 
-          <div v-if="form.tujuan === 'lainnya'" class="mt-1 flex flex-col gap-1.5">
+          <div v-if="form.tujuan === 'lainnya'" class="mt-0.5 flex flex-col gap-1">
             <span class="text-[10px] font-bold uppercase text-[#475569]"
               >Keterangan Tujuan Lainnya *</span
             >
@@ -1645,7 +1645,7 @@ onMounted(fetchData)
               required
               type="text"
               aria-label="Keterangan Tujuan Serah Terima Lainnya"
-              class="h-10 w-full rounded-xl border border-[#E2E8F0] bg-white px-3 text-xs font-medium text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 focus:outline-none transition-all"
+              class="h-8 w-full rounded-[6px] border border-[#E2E8F0] bg-white px-3 text-xs font-medium text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 focus:outline-none transition-all"
               placeholder="Tuliskan tujuan serah terima aset lainnya…"
             />
           </div>
@@ -1655,20 +1655,20 @@ onMounted(fetchData)
         <div class="submission-assets-grid grid grid-cols-1 gap-5 xl:grid-cols-2">
           <!-- Aset Baru (Diserahkan) -->
           <div
-            class="submission-section bg-white rounded-xl border border-[#E2E8F0]/80 p-4 sm:p-6 shadow-2xs flex flex-col gap-4"
+            class="submission-section bg-white rounded-[6px] border border-[#E2E8F0]/80 p-3 sm:p-4 shadow-2xs flex flex-col gap-3"
           >
-            <div class="flex items-center justify-between gap-2 border-b border-[#F1F5F9] pb-3.5">
-              <div class="flex items-center gap-2.5 min-w-0">
+            <div class="flex items-center justify-between gap-2 border-b border-[#F1F5F9] pb-2.5">
+              <div class="flex items-center gap-2 min-w-0">
                 <span
-                  class="flex h-6 w-6 items-center justify-center rounded-lg bg-[#EDF5FF] text-[#333333] text-[11px] font-bold shrink-0"
+                  class="flex h-5.5 w-5.5 items-center justify-center rounded-[4px] bg-[#EDF5FF] text-[#333333] text-[11px] font-bold shrink-0"
                 >
                   03
                 </span>
                 <div class="min-w-0">
-                  <h2 class="text-[14px] sm:text-[15px] font-bold text-[#333333] truncate">
+                  <h2 class="text-sm font-semibold text-[#333333] truncate">
                     Aset Baru (Diserahkan)
                   </h2>
-                  <p class="text-[12px] text-[#5F7089] truncate">
+                  <p class="text-[11px] text-[#5F7089] truncate">
                     Perangkat yang diserahkan ke penerima
                   </p>
                 </div>
@@ -1677,27 +1677,27 @@ onMounted(fetchData)
               <button
                 type="button"
                 @click="addAssetBaruRow"
-                class="h-8.5 shrink-0 whitespace-nowrap rounded-xl bg-[#0A51B0] px-3 text-xs font-bold text-white shadow-2xs hover:bg-[#0A4391] transition-all flex items-center justify-center gap-1 cursor-pointer"
+                class="h-8 shrink-0 whitespace-nowrap rounded-[6px] bg-[#0A51B0] px-3 text-xs font-semibold text-white shadow-2xs hover:bg-[#0A4391] transition-all flex items-center justify-center gap-1 cursor-pointer"
               >
                 <span aria-hidden="true" class="material-symbols-outlined text-[15px]">add</span>
                 <span>Tambah Unit</span>
               </button>
             </div>
 
-            <div class="flex flex-col gap-3.5">
+            <div class="flex flex-col gap-3">
               <div
                 v-for="(row, index) in asetBaruList"
                 :key="index"
-                class="submission-unit flex flex-col gap-3 rounded-xl sm:rounded-xl border border-slate-200/80 bg-slate-50/50 p-3.5 sm:p-4 transition-all"
+                class="submission-unit flex flex-col gap-2.5 rounded-[6px] border border-slate-200/80 bg-slate-50/50 p-3 transition-all"
               >
                 <!-- Card Unit Header -->
                 <div
-                  class="flex items-center justify-between border-b border-slate-200/60 pb-2 mb-0.5"
+                  class="flex items-center justify-between border-b border-slate-200/60 pb-1.5 mb-0.5"
                 >
                   <span
-                    class="inline-flex items-center gap-1.5 rounded-lg bg-[#EDF5FF] px-2.5 py-0.5 text-[11px] font-bold text-[#333333] border border-[#B8D4F5]/40"
+                    class="inline-flex items-center gap-1.5 rounded-[4px] bg-[#EDF5FF] px-2 py-0.5 text-[11px] font-semibold text-[#333333] border border-[#B8D4F5]/40"
                   >
-                    <span aria-hidden="true" class="material-symbols-outlined text-[14px]"
+                    <span aria-hidden="true" class="material-symbols-outlined text-[13px]"
                       >devices</span
                     >
                     Unit Baru #{{ index + 1 }}
@@ -1707,17 +1707,17 @@ onMounted(fetchData)
                     v-if="asetBaruList.length > 1"
                     type="button"
                     @click="removeAssetBaruRow(index)"
-                    class="flex h-7 items-center gap-1 rounded-lg bg-rose-50 px-2 text-[11px] font-bold text-rose-600 hover:bg-rose-100 transition-all cursor-pointer border border-rose-200/60"
+                    class="flex h-6.5 items-center gap-1 rounded-[4px] bg-rose-50 px-2 text-[11px] font-semibold text-rose-600 hover:bg-rose-100 transition-all cursor-pointer border border-rose-200/60"
                     title="Hapus baris unit ini"
                   >
-                    <span aria-hidden="true" class="material-symbols-outlined text-[14px]"
+                    <span aria-hidden="true" class="material-symbols-outlined text-[13px]"
                       >delete</span
                     >
                     <span>Hapus</span>
                   </button>
                 </div>
 
-                <label class="flex flex-col gap-1.5">
+                <label class="flex flex-col gap-1">
                   <span class="text-[10px] font-bold uppercase text-[#475569]"
                     >Pilih Aset IT *</span
                   >
@@ -1730,7 +1730,7 @@ onMounted(fetchData)
                     secondary-label-key="nomor_seri"
                     placeholder="Pilih Aset IT"
                     search-placeholder="Cari label, hostname, atau nomor seri…"
-                    height-class="h-10"
+                    height-class="h-8"
                     @update:model-value="onAssetBaruSelect(index, $event)"
                   />
                   <span
@@ -1749,8 +1749,8 @@ onMounted(fetchData)
                   </span>
                 </label>
 
-                <div class="grid grid-cols-1 sm:grid-cols-4 gap-2.5 sm:gap-2">
-                  <label class="flex flex-col gap-1.5 sm:col-span-3">
+                <div class="grid grid-cols-1 sm:grid-cols-4 gap-2">
+                  <label class="flex flex-col gap-1 sm:col-span-3">
                     <span class="text-[9.5px] font-bold uppercase text-[#5F7089]"
                       >Deskripsi / Tipe (Auto)</span
                     >
@@ -1758,13 +1758,13 @@ onMounted(fetchData)
                       v-model="row.tipe"
                       type="text"
                       :aria-label="`Deskripsi Aset Baru Baris ${index + 1}`"
-                      class="h-9.5 w-full rounded-xl border border-slate-200 bg-slate-100/70 px-3 text-[12px] font-medium text-slate-600 outline-none cursor-default"
+                      class="h-8 w-full rounded-[6px] border border-slate-200 bg-slate-100/70 px-3 text-xs font-medium text-slate-600 outline-none cursor-default"
                       readonly
                       placeholder="Tipe perangkat"
                     />
                   </label>
 
-                  <label class="flex flex-col gap-1.5 sm:col-span-1">
+                  <label class="flex flex-col gap-1 sm:col-span-1">
                     <span class="text-[9.5px] font-bold uppercase text-[#5F7089]">Qty</span>
                     <input
                       v-model="row.qty"
@@ -1772,12 +1772,12 @@ onMounted(fetchData)
                       type="number"
                       min="1"
                       :aria-label="`Jumlah (Qty) Aset Baru Baris ${index + 1}`"
-                      class="h-9.5 w-full rounded-xl border border-[#E2E8F0] bg-white px-2.5 text-[12px] font-bold text-center text-[#333333] focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 focus:outline-none transition-all"
+                      class="h-8 w-full rounded-[6px] border border-[#E2E8F0] bg-white px-2.5 text-xs font-bold text-center text-[#333333] focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 focus:outline-none transition-all"
                     />
                   </label>
                 </div>
 
-                <label class="flex flex-col gap-1.5">
+                <label class="flex flex-col gap-1">
                   <span class="text-[9.5px] font-bold uppercase text-[#5F7089]"
                     >Spesifikasi Lengkap (Auto)</span
                   >
@@ -1785,7 +1785,7 @@ onMounted(fetchData)
                     v-model="row.spesifikasi"
                     type="text"
                     :aria-label="`Spesifikasi Aset Baru Baris ${index + 1}`"
-                    class="h-9.5 w-full rounded-xl border border-slate-200 bg-slate-100/70 px-3 text-[12px] font-medium text-slate-600 outline-none cursor-default"
+                    class="h-8 w-full rounded-[6px] border border-slate-200 bg-slate-100/70 px-3 text-xs font-medium text-slate-600 outline-none cursor-default"
                     readonly
                     placeholder="Merek / Model / Serial Number"
                   />
@@ -1796,20 +1796,20 @@ onMounted(fetchData)
 
           <!-- Aset Lama (Dikembalikan) -->
           <div
-            class="submission-section bg-white rounded-xl border border-[#E2E8F0]/80 p-4 sm:p-6 shadow-2xs flex flex-col gap-4"
+            class="submission-section bg-white rounded-[6px] border border-[#E2E8F0]/80 p-3 sm:p-4 shadow-2xs flex flex-col gap-3"
           >
-            <div class="flex items-center justify-between gap-2 border-b border-[#F1F5F9] pb-3.5">
-              <div class="flex items-center gap-2.5 min-w-0">
+            <div class="flex items-center justify-between gap-2 border-b border-[#F1F5F9] pb-2.5">
+              <div class="flex items-center gap-2 min-w-0">
                 <span
-                  class="flex h-6 w-6 items-center justify-center rounded-lg bg-amber-50 text-amber-600 border border-amber-200/60 text-[11px] font-bold shrink-0"
+                  class="flex h-5.5 w-5.5 items-center justify-center rounded-[4px] bg-amber-50 text-amber-600 border border-amber-200/60 text-[11px] font-bold shrink-0"
                 >
                   03
                 </span>
                 <div class="min-w-0">
-                  <h2 class="text-[14px] sm:text-[15px] font-bold text-[#333333] truncate">
+                  <h2 class="text-sm font-semibold text-[#333333] truncate">
                     Aset Lama (Dikembalikan)
                   </h2>
-                  <p class="text-[12px] text-[#5F7089] truncate">
+                  <p class="text-[11px] text-[#5F7089] truncate">
                     Perangkat lama jika ada penggantian
                   </p>
                 </div>
@@ -1818,27 +1818,27 @@ onMounted(fetchData)
               <button
                 type="button"
                 @click="addAssetLamaRow"
-                class="h-8.5 shrink-0 whitespace-nowrap rounded-xl bg-slate-800 px-3 text-xs font-bold text-white shadow-2xs hover:bg-slate-900 transition-all flex items-center justify-center gap-1 cursor-pointer"
+                class="h-8 shrink-0 whitespace-nowrap rounded-[6px] bg-slate-800 px-3 text-xs font-semibold text-white shadow-2xs hover:bg-slate-900 transition-all flex items-center justify-center gap-1 cursor-pointer"
               >
                 <span aria-hidden="true" class="material-symbols-outlined text-[15px]">add</span>
                 <span>Tambah Unit</span>
               </button>
             </div>
 
-            <div class="flex flex-col gap-3.5">
+            <div class="flex flex-col gap-3">
               <div
                 v-for="(row, index) in asetLamaList"
                 :key="index"
-                class="submission-unit flex flex-col gap-3 rounded-xl sm:rounded-xl border border-slate-200/80 bg-slate-50/50 p-3.5 sm:p-4 transition-all"
+                class="submission-unit flex flex-col gap-2.5 rounded-[6px] border border-slate-200/80 bg-slate-50/50 p-3 transition-all"
               >
                 <!-- Card Unit Header -->
                 <div
-                  class="flex items-center justify-between border-b border-slate-200/60 pb-2 mb-0.5"
+                  class="flex items-center justify-between border-b border-slate-200/60 pb-1.5 mb-0.5"
                 >
                   <span
-                    class="inline-flex items-center gap-1.5 rounded-lg bg-amber-50 px-2.5 py-0.5 text-[11px] font-bold text-amber-700 border border-amber-200/60"
+                    class="inline-flex items-center gap-1.5 rounded-[4px] bg-amber-50 px-2 py-0.5 text-[11px] font-semibold text-amber-700 border border-amber-200/60"
                   >
-                    <span aria-hidden="true" class="material-symbols-outlined text-[14px]"
+                    <span aria-hidden="true" class="material-symbols-outlined text-[13px]"
                       >history_toggle_drop_down</span
                     >
                     Unit Lama #{{ index + 1 }}
@@ -1848,17 +1848,17 @@ onMounted(fetchData)
                     v-if="asetLamaList.length > 1"
                     type="button"
                     @click="removeAssetLamaRow(index)"
-                    class="flex h-7 items-center gap-1 rounded-lg bg-rose-50 px-2 text-[11px] font-bold text-rose-600 hover:bg-rose-100 transition-all cursor-pointer border border-rose-200/60"
+                    class="flex h-6.5 items-center gap-1 rounded-[4px] bg-rose-50 px-2 text-[11px] font-semibold text-rose-600 hover:bg-rose-100 transition-all cursor-pointer border border-rose-200/60"
                     title="Hapus baris unit lama ini"
                   >
-                    <span aria-hidden="true" class="material-symbols-outlined text-[14px]"
+                    <span aria-hidden="true" class="material-symbols-outlined text-[13px]"
                       >delete</span
                     >
                     <span>Hapus</span>
                   </button>
                 </div>
 
-                <label class="flex flex-col gap-1.5">
+                <label class="flex flex-col gap-1">
                   <span class="text-[10px] font-bold uppercase text-[#475569]"
                     >Aset IT Lama (Opsional)</span
                   >
@@ -1871,7 +1871,7 @@ onMounted(fetchData)
                     secondary-label-key="nomor_seri"
                     placeholder="Pilih Aset IT Lama"
                     search-placeholder="Cari label, hostname, atau nomor seri…"
-                    height-class="h-10"
+                    height-class="h-8"
                     @update:model-value="onAssetLamaSelect(index, $event)"
                   />
                   <span
@@ -1890,8 +1890,8 @@ onMounted(fetchData)
                   </span>
                 </label>
 
-                <div class="grid grid-cols-1 sm:grid-cols-4 gap-2.5 sm:gap-2">
-                  <label class="flex flex-col gap-1.5 sm:col-span-3">
+                <div class="grid grid-cols-1 sm:grid-cols-4 gap-2">
+                  <label class="flex flex-col gap-1 sm:col-span-3">
                     <span class="text-[9.5px] font-bold uppercase text-[#5F7089]"
                       >Deskripsi / Tipe (Auto)</span
                     >
@@ -1899,13 +1899,13 @@ onMounted(fetchData)
                       v-model="row.tipe"
                       type="text"
                       :aria-label="`Deskripsi Aset Lama Baris ${index + 1}`"
-                      class="h-9.5 w-full rounded-xl border border-slate-200 bg-slate-100/70 px-3 text-[12px] font-medium text-slate-600 outline-none cursor-default"
+                      class="h-8 w-full rounded-[6px] border border-slate-200 bg-slate-100/70 px-3 text-xs font-medium text-slate-600 outline-none cursor-default"
                       readonly
                       placeholder="Tipe perangkat"
                     />
                   </label>
 
-                  <label class="flex flex-col gap-1.5 sm:col-span-1">
+                  <label class="flex flex-col gap-1 sm:col-span-1">
                     <span class="text-[9.5px] font-bold uppercase text-[#5F7089]">Qty</span>
                     <input
                       v-model="row.qty"
@@ -1913,12 +1913,12 @@ onMounted(fetchData)
                       type="number"
                       min="1"
                       :aria-label="`Jumlah (Qty) Aset Lama Baris ${index + 1}`"
-                      class="h-9.5 w-full rounded-xl border border-[#E2E8F0] bg-white px-2.5 text-[12px] font-bold text-center text-[#333333] focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 focus:outline-none transition-all"
+                      class="h-8 w-full rounded-[6px] border border-[#E2E8F0] bg-white px-2.5 text-xs font-bold text-center text-[#333333] focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 focus:outline-none transition-all"
                     />
                   </label>
                 </div>
 
-                <label class="flex flex-col gap-1.5">
+                <label class="flex flex-col gap-1">
                   <span class="text-[9.5px] font-bold uppercase text-[#5F7089]"
                     >Spesifikasi Lengkap (Auto)</span
                   >
@@ -1926,7 +1926,7 @@ onMounted(fetchData)
                     v-model="row.spesifikasi"
                     type="text"
                     :aria-label="`Spesifikasi Aset Lama Baris ${index + 1}`"
-                    class="h-9.5 w-full rounded-xl border border-slate-200 bg-slate-100/70 px-3 text-[12px] font-medium text-slate-600 outline-none cursor-default"
+                    class="h-8 w-full rounded-[6px] border border-slate-200 bg-slate-100/70 px-3 text-xs font-medium text-slate-600 outline-none cursor-default"
                     readonly
                     placeholder="Merek / Model / Serial Number"
                   />
@@ -1937,19 +1937,20 @@ onMounted(fetchData)
         </div>
 
         <!-- Section 4: Lembar Tanda Tangan: Diketahui Oleh -->
+        <!-- Section 4: Lembar Tanda Tangan: Diketahui Oleh -->
         <div
-          class="submission-section bg-white rounded-xl border border-[#E2E8F0]/80 p-4 sm:p-6 shadow-2xs flex flex-col gap-4"
+          class="submission-section bg-white rounded-[6px] border border-[#E2E8F0]/80 p-3 sm:p-4 shadow-2xs flex flex-col gap-3"
         >
-          <div class="flex items-center justify-between gap-2 border-b border-[#F1F5F9] pb-3.5">
-            <div class="flex items-center gap-2.5">
+          <div class="flex items-center justify-between gap-2 border-b border-[#F1F5F9] pb-2.5">
+            <div class="flex items-center gap-2">
               <span
-                class="flex h-6 w-6 items-center justify-center rounded-lg bg-[#EDF5FF] text-[#333333] text-[11px] font-bold"
+                class="flex h-5.5 w-5.5 items-center justify-center rounded-[4px] bg-[#EDF5FF] text-[#333333] text-[11px] font-bold"
               >
                 04
               </span>
               <div>
-                <h2 class="text-[14px] sm:text-[15px] font-bold text-[#333333]">Diketahui Oleh</h2>
-                <p class="text-[12px] text-[#5F7089]">
+                <h2 class="text-sm font-semibold text-[#333333]">Diketahui Oleh</h2>
+                <p class="text-[11px] text-[#5F7089]">
                   Pilih atau tulis identitas pihak yang mengetahui untuk dicantumkan pada lembar
                   tanda tangan formulir
                 </p>
@@ -1961,15 +1962,15 @@ onMounted(fetchData)
                 v-model="form.isMengetahuiKustom"
                 type="checkbox"
                 aria-label="Input Manual Pihak Mengetahui"
-                class="rounded border-slate-300 accent-[#0A51B0] h-4 w-4 cursor-pointer"
+                class="rounded-[4px] border-slate-300 accent-[#0A51B0] h-4 w-4 cursor-pointer"
               />
               <span class="text-[11px] font-bold text-[#475569]">Input Manual</span>
             </label>
           </div>
 
-          <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
             <!-- Pilih Karyawan / PBP -->
-            <div v-if="!form.isMengetahuiKustom" class="flex flex-col gap-1.5">
+            <div v-if="!form.isMengetahuiKustom" class="flex flex-col gap-1">
               <div class="flex items-center justify-between">
                 <span class="text-[11px] font-bold uppercase text-[#475569]"
                   >Pilih Karyawan / PBP</span
@@ -1984,24 +1985,24 @@ onMounted(fetchData)
                 secondary-label-key="nik"
                 placeholder="Pilih nama yang mengetahui…"
                 search-placeholder="Cari nama atau NIK…"
-                height-class="h-10"
+                height-class="h-8"
                 :clearable="true"
               />
             </div>
 
-            <div v-else class="flex flex-col gap-1.5">
+            <div v-else class="flex flex-col gap-1">
               <span class="text-[11px] font-bold uppercase text-[#475569]">Nama Lengkap</span>
               <input
                 v-model="form.mengetahuiNama"
                 type="text"
                 aria-label="Nama Lengkap yang Mengetahui"
-                class="h-10 w-full rounded-xl border border-[#E2E8F0] bg-white px-3 text-xs font-medium text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 focus:outline-none transition-all"
+                class="h-8 w-full rounded-[6px] border border-[#E2E8F0] bg-white px-3 text-xs font-medium text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 focus:outline-none transition-all"
                 placeholder="Tulis nama lengkap yang mengetahui…"
               />
             </div>
 
             <!-- Nama Terpilih (Auto) -->
-            <div v-if="!form.isMengetahuiKustom" class="flex flex-col gap-1.5">
+            <div v-if="!form.isMengetahuiKustom" class="flex flex-col gap-1">
               <span class="text-[10px] font-bold uppercase text-[#5F7089]"
                 >Nama Lengkap Terpilih</span
               >
@@ -2009,7 +2010,7 @@ onMounted(fetchData)
                 v-model="form.mengetahuiNama"
                 type="text"
                 aria-label="Nama Lengkap Mengetahui (Auto)"
-                class="h-10 w-full rounded-xl border border-slate-200 bg-slate-100/70 px-3 text-xs font-medium text-slate-600 outline-none cursor-default"
+                class="h-8 w-full rounded-[6px] border border-slate-200 bg-slate-100/70 px-3 text-xs font-medium text-slate-600 outline-none cursor-default"
                 readonly
                 placeholder="Kosong (tanda tangan manual)"
               />
@@ -2017,7 +2018,7 @@ onMounted(fetchData)
 
             <!-- Jabatan / Keterangan Tanda Tangan -->
             <div
-              class="flex flex-col gap-1.5"
+              class="flex flex-col gap-1"
               :class="form.isMengetahuiKustom ? 'sm:col-span-1 lg:col-span-2' : ''"
             >
               <span class="text-[10px] font-bold uppercase text-[#5F7089]">
@@ -2027,7 +2028,7 @@ onMounted(fetchData)
                 v-model="form.mengetahuiJabatan"
                 type="text"
                 aria-label="Jabatan atau Unit yang Mengetahui"
-                class="h-10 w-full rounded-xl border border-[#E2E8F0] bg-white px-3 text-xs font-medium text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 focus:outline-none transition-all"
+                class="h-8 w-full rounded-[6px] border border-[#E2E8F0] bg-white px-3 text-xs font-medium text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 focus:outline-none transition-all"
                 placeholder="People Business Partner atau Asset Management"
               />
             </div>
@@ -2036,13 +2037,13 @@ onMounted(fetchData)
       </fieldset>
       <!-- Action Footer -->
       <div
-        class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 rounded-xl border border-[#E2E8F0]/80 bg-white p-4 sm:p-5 shadow-2xs"
+        class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 rounded-[6px] border border-[#E2E8F0]/80 bg-white p-3 sm:p-3.5 shadow-2xs"
       >
-        <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
+        <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-2.5 w-full sm:w-auto">
           <span
-            class="text-xs font-bold text-[#333333] whitespace-nowrap flex items-center gap-1.5"
+            class="text-xs font-semibold text-[#333333] whitespace-nowrap flex items-center gap-1.5"
           >
-            <span aria-hidden="true" class="material-symbols-outlined text-[18px] text-slate-400"
+            <span aria-hidden="true" class="material-symbols-outlined text-[16px] text-slate-400"
               >calendar_today</span
             >
             Tanggal Serah Terima:
@@ -2053,7 +2054,7 @@ onMounted(fetchData)
             type="date"
             aria-label="Tanggal Formulir Serah Terima"
             :disabled="!canWriteSubmissions || isSaving"
-            class="h-10 w-full sm:w-48 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-medium text-[#333333] focus:border-[#0A51B0] focus:bg-white focus:ring-2 focus:ring-[#0A51B0]/10 focus:outline-none transition-all cursor-pointer"
+            class="h-8 w-full sm:w-44 rounded-[6px] border border-[#E2E8F0] bg-[#F8FAFC] px-2.5 text-xs font-medium text-[#333333] focus:border-[#0A51B0] focus:bg-white focus:ring-2 focus:ring-[#0A51B0]/10 focus:outline-none transition-all cursor-pointer"
           />
         </div>
 
@@ -2061,28 +2062,28 @@ onMounted(fetchData)
           <button
             type="button"
             :disabled="isSaving"
-            class="h-11 w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl border border-[#CBD5E1] bg-white px-5 text-xs font-bold text-[#334155] hover:bg-[#F8FAFC] disabled:opacity-60"
+            class="h-8 w-full sm:w-auto inline-flex items-center justify-center gap-1.5 rounded-[6px] border border-[#CBD5E1] bg-white px-3.5 text-xs font-semibold text-[#334155] hover:bg-[#F8FAFC] disabled:opacity-60 cursor-pointer"
             @click="router.push('/submissions')"
           >
-            <span aria-hidden="true" class="material-symbols-outlined text-[18px]">close</span>
-            <span>Cancel</span>
+            <span aria-hidden="true" class="material-symbols-outlined text-[16px]">close</span>
+            <span>Batal</span>
           </button>
           <button
             type="button"
             :disabled="isSaving"
-            class="h-11 w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl border border-[#0A51B0] bg-white px-5 text-xs font-bold text-[#0A51B0] hover:bg-[#EDF5FF] disabled:opacity-60"
+            class="h-8 w-full sm:w-auto inline-flex items-center justify-center gap-1.5 rounded-[6px] border border-[#0A51B0] bg-white px-3.5 text-xs font-semibold text-[#0A51B0] hover:bg-[#EDF5FF] disabled:opacity-60 cursor-pointer"
             v-if="canWriteSubmissions"
             @click="saveAndReturn"
           >
-            <span aria-hidden="true" class="material-symbols-outlined text-[18px]">save</span>
+            <span aria-hidden="true" class="material-symbols-outlined text-[16px]">save</span>
             <span>{{ isSaving ? 'Menyimpan…' : 'Simpan' }}</span>
           </button>
           <button
             type="submit"
             :disabled="isSaving"
-            class="h-11 w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-[#0A51B0] px-6 text-xs font-bold text-white shadow-2xs hover:bg-[#0A4391] transition-all cursor-pointer disabled:opacity-60"
+            class="h-8 w-full sm:w-auto inline-flex items-center justify-center gap-1.5 rounded-[6px] bg-[#0A51B0] px-4 text-xs font-semibold text-white shadow-2xs hover:bg-[#0A4391] transition-all cursor-pointer disabled:opacity-60"
           >
-            <span aria-hidden="true" class="material-symbols-outlined text-[18px]"
+            <span aria-hidden="true" class="material-symbols-outlined text-[16px]"
               >picture_as_pdf</span
             >
             <span>{{ isSaving ? 'Menyimpan…' : 'Cetak' }}</span>
@@ -2114,13 +2115,13 @@ onMounted(fetchData)
   width: 100%;
   max-width: 1440px;
   margin-inline: auto;
-  gap: 24px;
+  gap: 12px;
 }
 
 .submission-history {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
 }
 .submission-table-wrap {
   overflow-x: auto;
@@ -2139,7 +2140,7 @@ onMounted(fetchData)
 .submission-form .submission-fields {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 12px;
   min-width: 0;
   margin: 0;
   padding: 0;
@@ -2147,29 +2148,31 @@ onMounted(fetchData)
 }
 .submission-history .asset-toolbar {
   padding: 0;
-  gap: 24px;
+  gap: 12px;
   box-shadow: none;
 }
 .submission-history .it-list-heading {
   margin: 0;
-  padding: 16px;
+  padding: 10px 12px;
   flex-wrap: wrap;
 }
 .submission-history .ws-cell-sub {
-  margin-top: 5px;
+  margin-top: 3px;
+  font-size: 11px;
 }
 .submission-history .ws-cell-main {
-  font-size: 13px;
-  line-height: 1.6;
+  font-size: 12px;
+  line-height: 1.4;
 }
 .submission-history .asset-toolbar input {
-  height: 44px;
-  font-size: 14px;
+  height: 32px;
+  font-size: 12px;
+  border-radius: 6px;
 }
 .submission-card-list {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
   margin-top: 0;
 }
 
@@ -2181,7 +2184,7 @@ onMounted(fetchData)
 .submission-form label:not(:has(input[type='checkbox'], input[type='radio'])) {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 4px;
   min-width: 0;
   margin-bottom: 0;
 }
@@ -2191,36 +2194,37 @@ onMounted(fetchData)
   margin-bottom: 0;
 }
 .submission-form label:has(input[type='radio']) {
-  min-height: 56px;
+  min-height: 36px;
 }
 .submission-assets-grid {
   align-items: start;
-  gap: 24px;
+  gap: 14px;
 }
 .submission-form .submission-section {
-  gap: 20px;
-  padding: 24px;
+  gap: 12px;
+  padding: 10px 12px;
   border: 1px solid #e7ecf3;
-  border-radius: 12px;
+  border-radius: 6px;
   background: #fafbfd;
   box-shadow: none;
 }
 .submission-form .submission-unit {
-  gap: 16px;
-  padding: 16px;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 6px;
 }
 .submission-form > :last-child {
-  gap: 20px;
-  padding: 20px;
+  gap: 12px;
+  padding: 10px 12px;
   flex-wrap: wrap;
 }
 .submission-form input:not([type='checkbox']):not([type='radio']) {
-  padding-inline: 12px;
+  padding-inline: 10px;
 }
 @media (max-width: 639px) {
   .submission-form .submission-section,
   .submission-form > :last-child {
-    padding: 16px;
+    padding: 8px 10px;
   }
 }
 .submission-form input[readonly] {
@@ -2228,41 +2232,41 @@ onMounted(fetchData)
   color: #64748b;
 }
 .submission-form .submission-section h2 {
-  font-size: 16px;
-  line-height: 1.5;
-  font-weight: 650;
-  letter-spacing: -0.015em;
+  font-size: 14px;
+  line-height: 1.4;
+  font-weight: 600;
+  letter-spacing: -0.01em;
   text-transform: none;
 }
 .submission-steps {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   align-items: center;
-  gap: 12px;
+  gap: 8px;
   margin: 0;
-  padding: 16px 20px;
+  padding: 8px 12px;
   list-style: none;
   border: 1px solid #e2e8f0;
-  border-radius: 12px;
+  border-radius: 6px;
   background: #fff;
 }
 .submission-steps li {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   min-width: 0;
   font-size: 12px;
-  line-height: 1.5;
+  line-height: 1.4;
   color: #5f7089;
   font-weight: 500;
 }
 .submission-steps li > span {
   display: grid;
   place-items: center;
-  width: 28px;
-  height: 28px;
+  width: 22px;
+  height: 22px;
   flex-shrink: 0;
-  border-radius: 8px;
+  border-radius: 4px;
   color: #0a5dbd;
   background: #edf5ff;
   font-size: 11px;
@@ -2274,35 +2278,38 @@ onMounted(fetchData)
   overflow: visible;
 }
 .submission-page-header {
-  padding: 24px;
+  padding: 10px 12px;
+  border-radius: 6px;
   align-items: flex-start;
 }
 .submission-page-header h1 {
-  font-size: clamp(20px, 2vw, 26px);
+  font-size: 18px;
   line-height: 1.3;
 }
 .submission-page-header p {
-  margin-top: 8px;
-  line-height: 1.7;
+  margin-top: 2px;
+  font-size: 11px;
+  line-height: 1.4;
 }
 .submission-form {
   padding: 0;
-  gap: 24px;
+  gap: 12px;
 }
 .submission-form-heading {
-  gap: 16px;
-  padding: 20px 24px;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 6px;
 }
 .submission-form-heading p {
-  margin-top: 6px;
-  font-size: 12px;
-  line-height: 1.6;
+  margin-top: 2px;
+  font-size: 11px;
+  line-height: 1.4;
 }
 .submission-section > div:first-child {
   flex-wrap: wrap;
-  gap: 16px;
+  gap: 12px;
   align-items: flex-start;
-  padding-bottom: 16px;
+  padding-bottom: 10px;
 }
 .submission-section > div:first-child > div {
   flex: 1 1 220px;
@@ -2315,30 +2322,33 @@ onMounted(fetchData)
   text-overflow: clip;
 }
 .submission-section > div:first-child p {
-  margin-top: 4px;
-  line-height: 1.6;
+  margin-top: 2px;
+  line-height: 1.4;
+  font-size: 11px;
 }
 .submission-form .submission-section h3 {
   text-transform: none;
   letter-spacing: 0;
-  font-size: 13px;
+  font-size: 12px;
 }
 .submission-section label > span:first-child,
 .submission-section div:has(> input) > span:first-child {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 500;
   text-transform: none;
-  line-height: 1.5;
+  line-height: 1.4;
 }
 .submission-form input:not([type='checkbox']):not([type='radio']),
 .submission-form :deep(button[aria-haspopup='listbox']) {
   min-width: 0;
-  min-height: 44px;
-  border-radius: 8px;
+  min-height: 32px;
+  height: 32px;
+  border-radius: 6px;
+  font-size: 12px;
 }
 .submission-section label:has(input[type='checkbox']) {
-  min-height: 44px;
-  gap: 8px;
+  min-height: 32px;
+  gap: 6px;
   flex-shrink: 0;
 }
 .submission-history .asset-toolbar > div:first-child > button,
@@ -2350,16 +2360,16 @@ onMounted(fetchData)
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  gap: 8px;
-  min-width: 112px;
-  height: 44px;
-  padding: 0 16px;
-  border-radius: 8px;
+  gap: 6px;
+  min-width: 80px;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 6px;
   font-size: 12px;
   font-weight: 600;
 }
 .submission-actions {
-  gap: 12px;
+  gap: 8px;
   flex-wrap: wrap;
 }
 .submission-actions > button {
@@ -2369,12 +2379,12 @@ onMounted(fetchData)
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 44px;
-  min-height: 44px;
+  min-width: 32px;
+  min-height: 32px;
   flex-shrink: 0;
 }
 .submission-unit label > span > button {
-  min-height: 44px;
+  min-height: 32px;
   padding-inline: 8px;
 }
 .submission-asset-snapshot {
@@ -2382,20 +2392,20 @@ onMounted(fetchData)
   overflow-wrap: anywhere;
 }
 .submission-history :deep(button[aria-pressed]) {
-  min-height: 44px;
-  min-width: 44px;
+  min-height: 32px;
+  min-width: 32px;
 }
 .submission-actions > button .material-symbols-outlined,
 .submission-section > div:first-child > button .material-symbols-outlined {
-  font-size: 18px;
+  font-size: 16px;
 }
 .submissions-page button:focus-visible {
   outline: 2px solid #0a51b0;
   outline-offset: 3px;
 }
 .submission-history :deep(button[aria-haspopup='menu']) {
-  min-width: 30px;
-  min-height: 30px;
+  min-width: 28px;
+  min-height: 28px;
 }
 .submissions-page .submission-card-list > .submission-laptop-row {
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 28px;
@@ -2410,23 +2420,26 @@ onMounted(fetchData)
   .submissions-page,
   .submission-form,
   .submission-form .submission-fields {
-    gap: 20px;
+    gap: 12px;
   }
   .submission-page-header,
   .submission-form-heading {
-    padding: 16px;
+    padding: 8px 10px;
+  }
+  .submission-page-header h1 {
+    font-size: 16px;
   }
   .submission-form-heading {
     flex-wrap: wrap;
   }
   .submission-form-heading > button {
     width: 100%;
+    height: 32px;
   }
   .submission-section > div:first-child > button,
   .submission-actions {
     width: 100%;
   }
-  .submission-form :deep(button[aria-haspopup='listbox']),
   .submission-history .asset-toolbar input {
     font-size: 16px;
   }
@@ -2435,12 +2448,12 @@ onMounted(fetchData)
   }
   .submission-steps {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 14px 10px;
-    padding: 14px;
+    gap: 6px 8px;
+    padding: 8px 10px;
   }
   .submission-steps li {
     font-size: 11px;
-    gap: 8px;
+    gap: 6px;
   }
 }
 </style>

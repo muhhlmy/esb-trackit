@@ -109,7 +109,7 @@ function getDeviceIcon(tipe) {
 </script>
 
 <template>
-  <div class="flex flex-col gap-4 sm:gap-5">
+  <div class="flex flex-col gap-3">
     <!-- Enterprise Header & Title -->
     <div
       class="employee-assets-heading flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between"
@@ -144,21 +144,21 @@ function getDeviceIcon(tipe) {
           },
         ]"
         :key="item.label"
-        class="kpi-focusable flex flex-col justify-between p-[var(--kpi-padding)] sm:p-[var(--kpi-padding-sm)] lg:p-[var(--kpi-padding-lg)] rounded-xl bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 shadow-2xs hover:border-[#CBD5E1] dark:hover:border-slate-700 transition-colors min-h-[var(--kpi-height)] sm:min-h-[var(--kpi-height-sm)] lg:min-h-[var(--kpi-height-lg)]"
+        class="kpi-focusable flex flex-col justify-between p-[var(--kpi-padding)] sm:p-[var(--kpi-padding-sm)] lg:p-[var(--kpi-padding-lg)] rounded-[6px] bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 shadow-2xs hover:border-[#CBD5E1] dark:hover:border-slate-700 transition-colors min-h-[var(--kpi-height)] sm:min-h-[var(--kpi-height-sm)] lg:min-h-[var(--kpi-height-lg)]"
         tabindex="0"
       >
         <div class="flex items-center justify-between gap-[var(--kpi-gap)]">
           <span
-            class="text-[var(--kpi-title-font-size)] sm:text-[var(--kpi-title-font-size-sm)] lg:text-[var(--kpi-title-font-size-lg)] font-medium text-[#5F7089] dark:text-slate-400 truncate"
+            class="text-[length:var(--kpi-title-font-size)] sm:text-[length:var(--kpi-title-font-size-sm)] lg:text-[length:var(--kpi-title-font-size-lg)] font-medium text-[#5F7089] dark:text-slate-400 truncate"
           >
             {{ item.label }}
           </span>
           <div
-            class="flex h-5.5 w-5.5 sm:h-6 sm:w-6 lg:h-6.5 lg:w-6.5 shrink-0 items-center justify-center rounded-lg bg-[#EFF6FF] dark:bg-blue-950/60 text-[#0A51B0] dark:text-blue-400"
+            class="flex h-5.5 w-5.5 sm:h-6 sm:w-6 lg:h-6 lg:w-6 shrink-0 items-center justify-center rounded-lg bg-[#EFF6FF] dark:bg-blue-950/60 text-[#0A51B0] dark:text-blue-400"
           >
             <span
               aria-hidden="true"
-              class="material-symbols-outlined text-[var(--kpi-icon-size)] sm:text-[var(--kpi-icon-size-sm)] lg:text-[var(--kpi-icon-size-lg)]"
+              class="material-symbols-outlined text-[length:var(--kpi-icon-size)] sm:text-[length:var(--kpi-icon-size-sm)] lg:text-[length:var(--kpi-icon-size-lg)]"
             >
               {{ item.icon }}
             </span>
@@ -166,12 +166,12 @@ function getDeviceIcon(tipe) {
         </div>
         <div class="mt-1">
           <span
-            class="font-num block text-[var(--kpi-value-font-size)] sm:text-[var(--kpi-value-font-size-sm)] lg:text-[var(--kpi-value-font-size-lg)] font-bold text-[#333333] dark:text-white tabular-nums leading-none tracking-tight"
+            class="font-num block text-[length:var(--kpi-value-font-size)] sm:text-[length:var(--kpi-value-font-size-sm)] lg:text-[length:var(--kpi-value-font-size-lg)] font-bold text-[#333333] dark:text-white tabular-nums leading-none tracking-tight"
           >
             {{ item.value }}
           </span>
           <span
-            class="mt-1 block truncate text-[var(--kpi-caption-font-size)] sm:text-[var(--kpi-caption-font-size-sm)] lg:text-[var(--kpi-caption-font-size-lg)] font-normal text-[#64748B] dark:text-slate-400"
+            class="mt-1 block truncate text-[length:var(--kpi-caption-font-size)] sm:text-[length:var(--kpi-caption-font-size-sm)] lg:text-[length:var(--kpi-caption-font-size-lg)] font-normal text-[#64748B] dark:text-slate-400"
           >
             {{ item.caption }}
           </span>
@@ -181,7 +181,7 @@ function getDeviceIcon(tipe) {
     <!-- Toolbar: Elegant Single Search & Compact Filters (sticky mengikuti scroll) -->
     <div
       v-if="canBrowseOtherAssets"
-      class="employee-assets-toolbar ws-toolbar-sticky grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2.5 rounded-xl border border-[#E2E8F0] dark:border-slate-800 bg-white dark:bg-slate-900 p-2.5 sm:p-3 shadow-2xs"
+      class="employee-assets-toolbar ws-toolbar-sticky grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2.5 rounded-[6px] border border-[#E2E8F0] dark:border-slate-800 bg-white dark:bg-slate-900 p-2.5 sm:p-3 shadow-2xs"
     >
       <div class="relative h-8.5 sm:h-9 w-full sm:flex-1 sm:min-w-[200px]">
         <label for="emp-search" class="sr-only">Cari karyawan dengan aset</label>
@@ -224,7 +224,7 @@ function getDeviceIcon(tipe) {
     </div>
     <!-- Main Hybrid Employee Table/List -->
     <div
-      class="employee-list rounded-xl border border-[#E2E8F0] dark:border-slate-800 bg-white dark:bg-slate-900 shadow-2xs overflow-hidden"
+      class="employee-list rounded-[6px] border border-[#E2E8F0] dark:border-slate-800 bg-white dark:bg-slate-900 shadow-2xs overflow-hidden"
     >
       <!-- Loading State -->
       <div v-if="isLoadingEmployees" aria-busy="true">
@@ -232,7 +232,7 @@ function getDeviceIcon(tipe) {
       </div>
 
       <!-- Error State -->
-      <div v-else-if="employeeError" class="p-6 text-center text-rose-600 text-xs">
+      <div v-else-if="employeeError" class="p-3 text-center text-rose-600 text-xs">
         <p class="font-semibold">{{ employeeError }}</p>
         <button
           type="button"
@@ -244,7 +244,7 @@ function getDeviceIcon(tipe) {
       </div>
 
       <!-- Empty State -->
-      <div v-else-if="filteredEmployees.length === 0" class="p-12 text-center text-[#5F7089]">
+      <div v-else-if="filteredEmployees.length === 0" class="p-6 text-center text-[#5F7089]">
         <span aria-hidden="true" class="material-symbols-outlined text-[36px] text-[#CBD5E1]"
           >person_search</span
         >
@@ -399,19 +399,19 @@ function getDeviceIcon(tipe) {
             v-for="(employee, idx) in paginatedEmployees"
             :key="'mob-' + (employee.id_karyawan || employee.nik)"
             @click="goToLevel2(employee)"
-            class="p-3.5 hover:bg-[#F8FAFC] active:bg-[#F1F5F9] transition-colors cursor-pointer select-none"
+            class="p-2.5 sm:p-3 hover:bg-[#F8FAFC] active:bg-[#F1F5F9] transition-colors cursor-pointer select-none"
           >
             <!-- Card Header: Avatar, Name, NIK, Total Aset Badge & Chevron -->
             <div class="flex items-center justify-between gap-2.5">
               <div class="flex items-center gap-2.5 min-w-0 flex-1">
                 <div
-                  class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br text-xs font-bold text-white shadow-2xs"
+                  class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[6px] bg-gradient-to-br text-xs font-bold text-white shadow-2xs"
                   :class="getAvatarGradient(idx)"
                 >
                   {{ getInitials(employee.nama_karyawan) }}
                 </div>
                 <div class="flex flex-col min-w-0 flex-1">
-                  <span class="text-[13.5px] font-bold text-[#333333] truncate block">
+                  <span class="text-xs font-bold text-[#333333] truncate block">
                     {{ employee.nama_karyawan }}
                   </span>
                   <span class="font-mono text-[11px] text-[#5F7089] truncate block">
@@ -541,21 +541,21 @@ function getDeviceIcon(tipe) {
 .employee-assets-heading {
   padding: 4px 0;
 }
+/* Judul halaman mengikuti skala global main.css (h1 18px / 16px mobile). */
 .employee-assets-heading h1 {
-  font-size: 25px;
-  letter-spacing: -0.04em;
+  letter-spacing: -0.02em;
   font-weight: 650;
 }
 .employee-assets-heading p {
-  margin-top: 7px;
+  margin-top: 4px;
   color: #637288;
-  line-height: 1.7;
+  line-height: 1.5;
 }
 .employee-assets-toolbar {
   box-shadow: none;
 }
 .employee-assets-toolbar input {
-  border-radius: 8px;
+  border-radius: 6px;
 }
 .employee-assets-toolbar > div:first-child {
   flex-basis: 260px;
@@ -566,17 +566,13 @@ function getDeviceIcon(tipe) {
   color: #5f7089;
 }
 .employee-list {
-  border-radius: 13px;
+  border-radius: 6px;
   box-shadow: none;
 }
 .employee-list th {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 600;
   color: #637288;
-}
-.employee-list td {
-  padding-top: 18px;
-  padding-bottom: 18px;
 }
 .employee-list tr {
   border-color: #edf1f6;
@@ -598,7 +594,7 @@ function getDeviceIcon(tipe) {
   .employee-assets-toolbar input {
     height: 100%;
     min-height: 0;
-    font-size: 13px;
+    font-size: 16px;
   }
 }
 </style>

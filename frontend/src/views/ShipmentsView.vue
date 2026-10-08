@@ -352,7 +352,7 @@ onMounted(() => {
     <Transition name="fade">
       <div
         v-if="notification"
-        class="fixed bottom-5 right-5 z-50 rounded-xl px-4 py-3 text-xs font-semibold text-white shadow-xl flex items-center gap-2"
+        class="fixed bottom-5 right-5 z-50 rounded-[6px] px-4 py-3 text-xs font-semibold text-white shadow-xl flex items-center gap-2"
         :class="notification.type === 'danger' ? 'bg-rose-600' : 'bg-emerald-600'"
       >
         <span>{{ notification.message }}</span>
@@ -408,7 +408,7 @@ onMounted(() => {
           aria-label="Cari pengiriman"
           type="text"
           placeholder="Cari penerima, barang, tujuan, atau no resi…"
-          class="h-full min-h-0 w-full rounded-xl border border-[#E2E8F0] bg-white pl-9 pr-3 text-xs text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
+          class="h-full min-h-0 w-full rounded-[6px] border border-[#E2E8F0] bg-white pl-9 pr-3 text-xs text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
         />
       </div>
 
@@ -431,20 +431,20 @@ onMounted(() => {
         tabindex="0"
       >
         <div class="flex items-center justify-between gap-[var(--kpi-gap)]">
-          <span class="text-[var(--kpi-title-font-size)] sm:text-[var(--kpi-title-font-size-sm)] lg:text-[var(--kpi-title-font-size-lg)] font-medium text-[#5F7089] dark:text-slate-400 truncate">
+          <span class="text-[length:var(--kpi-title-font-size)] sm:text-[length:var(--kpi-title-font-size-sm)] lg:text-[length:var(--kpi-title-font-size-lg)] font-medium text-[#5F7089] dark:text-slate-400 truncate">
             Total Pengiriman
           </span>
           <div
-            class="flex h-[var(--kpi-icon-container-size)] w-[var(--kpi-icon-container-size)] sm:h-[var(--kpi-icon-container-size-sm)] sm:w-[var(--kpi-icon-container-size-sm)] lg:h-[var(--kpi-icon-container-size-lg)] lg:w-[var(--kpi-icon-container-size-lg)] shrink-0 items-center justify-center rounded-md bg-[#EFF6FF] text-[#0A51B0] dark:bg-blue-950/60 dark:text-blue-400"
+            class="flex h-[var(--kpi-icon-container-size)] w-[var(--kpi-icon-container-size)] sm:h-[var(--kpi-icon-container-size-sm)] sm:w-[var(--kpi-icon-container-size-sm)] lg:h-[var(--kpi-icon-container-size-lg)] lg:w-[var(--kpi-icon-container-size-lg)] shrink-0 items-center justify-center rounded-[6px] bg-[#EFF6FF] text-[#0A51B0] dark:bg-blue-950/60 dark:text-blue-400"
           >
             <Package class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           </div>
         </div>
         <div class="mt-0.5">
-          <span class="font-num block text-[var(--kpi-value-font-size)] sm:text-[var(--kpi-value-font-size-sm)] lg:text-[var(--kpi-value-font-size-lg)] font-bold text-[#333333] dark:text-white tabular-nums leading-none tracking-tight">
+          <span class="font-num block text-[length:var(--kpi-value-font-size)] sm:text-[length:var(--kpi-value-font-size-sm)] lg:text-[length:var(--kpi-value-font-size-lg)] font-semibold text-[#333333] dark:text-white tabular-nums leading-none tracking-tight">
             {{ summary.total }}
           </span>
-          <span class="mt-0.5 block truncate text-[var(--kpi-caption-font-size)] sm:text-[var(--kpi-caption-font-size-sm)] lg:text-[var(--kpi-caption-font-size-lg)] font-normal text-[#64748B] dark:text-slate-400">Semua data resi</span>
+          <span class="mt-0.5 block truncate text-[length:var(--kpi-caption-font-size)] sm:text-[length:var(--kpi-caption-font-size-sm)] lg:text-[length:var(--kpi-caption-font-size-lg)] font-normal text-[#64748B] dark:text-slate-400">Semua data resi</span>
         </div>
       </div>
 
@@ -453,20 +453,20 @@ onMounted(() => {
         tabindex="0"
       >
         <div class="flex items-center justify-between gap-[var(--kpi-gap)]">
-          <span class="text-[var(--kpi-title-font-size)] sm:text-[var(--kpi-title-font-size-sm)] lg:text-[var(--kpi-title-font-size-lg)] font-medium text-[#5F7089] dark:text-slate-400 truncate">
+          <span class="text-[length:var(--kpi-title-font-size)] sm:text-[length:var(--kpi-title-font-size-sm)] lg:text-[length:var(--kpi-title-font-size-lg)] font-medium text-[#5F7089] dark:text-slate-400 truncate">
             Belum Dikirim
           </span>
           <div
-            class="flex h-[var(--kpi-icon-container-size)] w-[var(--kpi-icon-container-size)] sm:h-[var(--kpi-icon-container-size-sm)] sm:w-[var(--kpi-icon-container-size-sm)] lg:h-[var(--kpi-icon-container-size-lg)] lg:w-[var(--kpi-icon-container-size-lg)] shrink-0 items-center justify-center rounded-md bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400"
+            class="flex h-[var(--kpi-icon-container-size)] w-[var(--kpi-icon-container-size)] sm:h-[var(--kpi-icon-container-size-sm)] sm:w-[var(--kpi-icon-container-size-sm)] lg:h-[var(--kpi-icon-container-size-lg)] lg:w-[var(--kpi-icon-container-size-lg)] shrink-0 items-center justify-center rounded-[6px] bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400"
           >
             <Package class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           </div>
         </div>
         <div class="mt-0.5">
-          <span class="font-num block text-[var(--kpi-value-font-size)] sm:text-[var(--kpi-value-font-size-sm)] lg:text-[var(--kpi-value-font-size-lg)] font-bold text-[#333333] dark:text-white tabular-nums leading-none tracking-tight">
+          <span class="font-num block text-[length:var(--kpi-value-font-size)] sm:text-[length:var(--kpi-value-font-size-sm)] lg:text-[length:var(--kpi-value-font-size-lg)] font-semibold text-[#333333] dark:text-white tabular-nums leading-none tracking-tight">
             {{ summary.belum_dikirim }}
           </span>
-          <span class="mt-0.5 block truncate text-[var(--kpi-caption-font-size)] sm:text-[var(--kpi-caption-font-size-sm)] lg:text-[var(--kpi-caption-font-size-lg)] font-normal text-[#64748B] dark:text-slate-400">Siap diproses</span>
+          <span class="mt-0.5 block truncate text-[length:var(--kpi-caption-font-size)] sm:text-[length:var(--kpi-caption-font-size-sm)] lg:text-[length:var(--kpi-caption-font-size-lg)] font-normal text-[#64748B] dark:text-slate-400">Siap diproses</span>
         </div>
       </div>
 
@@ -475,20 +475,20 @@ onMounted(() => {
         tabindex="0"
       >
         <div class="flex items-center justify-between gap-[var(--kpi-gap)]">
-          <span class="text-[var(--kpi-title-font-size)] sm:text-[var(--kpi-title-font-size-sm)] lg:text-[var(--kpi-title-font-size-lg)] font-medium text-[#5F7089] dark:text-slate-400 truncate">
+          <span class="text-[length:var(--kpi-title-font-size)] sm:text-[length:var(--kpi-title-font-size-sm)] lg:text-[length:var(--kpi-title-font-size-lg)] font-medium text-[#5F7089] dark:text-slate-400 truncate">
             Sedang Dikirim
           </span>
           <div
-            class="flex h-[var(--kpi-icon-container-size)] w-[var(--kpi-icon-container-size)] sm:h-[var(--kpi-icon-container-size-sm)] sm:w-[var(--kpi-icon-container-size-sm)] lg:h-[var(--kpi-icon-container-size-lg)] lg:w-[var(--kpi-icon-container-size-lg)] shrink-0 items-center justify-center rounded-md bg-[#EFF6FF] text-[#0A51B0] dark:bg-blue-950/60 dark:text-blue-400"
+            class="flex h-[var(--kpi-icon-container-size)] w-[var(--kpi-icon-container-size)] sm:h-[var(--kpi-icon-container-size-sm)] sm:w-[var(--kpi-icon-container-size-sm)] lg:h-[var(--kpi-icon-container-size-lg)] lg:w-[var(--kpi-icon-container-size-lg)] shrink-0 items-center justify-center rounded-[6px] bg-[#EFF6FF] text-[#0A51B0] dark:bg-blue-950/60 dark:text-blue-400"
           >
             <Truck class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           </div>
         </div>
         <div class="mt-0.5">
-          <span class="font-num block text-[var(--kpi-value-font-size)] sm:text-[var(--kpi-value-font-size-sm)] lg:text-[var(--kpi-value-font-size-lg)] font-bold text-[#333333] dark:text-white tabular-nums leading-none tracking-tight">
+          <span class="font-num block text-[length:var(--kpi-value-font-size)] sm:text-[length:var(--kpi-value-font-size-sm)] lg:text-[length:var(--kpi-value-font-size-lg)] font-semibold text-[#333333] dark:text-white tabular-nums leading-none tracking-tight">
             {{ summary.sedang_dikirim }}
           </span>
-          <span class="mt-0.5 block truncate text-[var(--kpi-caption-font-size)] sm:text-[var(--kpi-caption-font-size-sm)] lg:text-[var(--kpi-caption-font-size-lg)] font-normal text-[#64748B] dark:text-slate-400">Dalam perjalanan</span>
+          <span class="mt-0.5 block truncate text-[length:var(--kpi-caption-font-size)] sm:text-[length:var(--kpi-caption-font-size-sm)] lg:text-[length:var(--kpi-caption-font-size-lg)] font-normal text-[#64748B] dark:text-slate-400">Dalam perjalanan</span>
         </div>
       </div>
 
@@ -497,18 +497,18 @@ onMounted(() => {
         tabindex="0"
       >
         <div class="flex items-center justify-between gap-[var(--kpi-gap)]">
-          <span class="text-[var(--kpi-title-font-size)] sm:text-[var(--kpi-title-font-size-sm)] lg:text-[var(--kpi-title-font-size-lg)] font-medium text-[#5F7089] dark:text-slate-400 truncate">Diterima</span>
+          <span class="text-[length:var(--kpi-title-font-size)] sm:text-[length:var(--kpi-title-font-size-sm)] lg:text-[length:var(--kpi-title-font-size-lg)] font-medium text-[#5F7089] dark:text-slate-400 truncate">Diterima</span>
           <div
-            class="flex h-[var(--kpi-icon-container-size)] w-[var(--kpi-icon-container-size)] sm:h-[var(--kpi-icon-container-size-sm)] sm:w-[var(--kpi-icon-container-size-sm)] lg:h-[var(--kpi-icon-container-size-lg)] lg:w-[var(--kpi-icon-container-size-lg)] shrink-0 items-center justify-center rounded-md bg-emerald-50 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-400"
+            class="flex h-[var(--kpi-icon-container-size)] w-[var(--kpi-icon-container-size)] sm:h-[var(--kpi-icon-container-size-sm)] sm:w-[var(--kpi-icon-container-size-sm)] lg:h-[var(--kpi-icon-container-size-lg)] lg:w-[var(--kpi-icon-container-size-lg)] shrink-0 items-center justify-center rounded-[6px] bg-emerald-50 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-400"
           >
             <Truck class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           </div>
         </div>
         <div class="mt-0.5">
-          <span class="font-num block text-[var(--kpi-value-font-size)] sm:text-[var(--kpi-value-font-size-sm)] lg:text-[var(--kpi-value-font-size-lg)] font-bold text-emerald-600 dark:text-emerald-400 leading-none tabular-nums tracking-tight">
+          <span class="font-num block text-[length:var(--kpi-value-font-size)] sm:text-[length:var(--kpi-value-font-size-sm)] lg:text-[length:var(--kpi-value-font-size-lg)] font-semibold text-emerald-600 dark:text-emerald-400 leading-none tabular-nums tracking-tight">
             {{ summary.diterima }}
           </span>
-          <span class="mt-0.5 block truncate text-[var(--kpi-caption-font-size)] sm:text-[var(--kpi-caption-font-size-sm)] lg:text-[var(--kpi-caption-font-size-lg)] font-normal text-[#64748B] dark:text-slate-400">Terkirim ke tujuan</span>
+          <span class="mt-0.5 block truncate text-[length:var(--kpi-caption-font-size)] sm:text-[length:var(--kpi-caption-font-size-sm)] lg:text-[length:var(--kpi-caption-font-size-lg)] font-normal text-[#64748B] dark:text-slate-400">Terkirim ke tujuan</span>
         </div>
       </div>
     </div>
@@ -518,7 +518,7 @@ onMounted(() => {
       class="shipment-list-surface rounded-xl border border-[#E2E8F0]/80 bg-white shadow-2xs overflow-hidden"
     >
       <div v-if="isLoading" aria-busy="true">
-        <SkeletonTable preset="assets" :rows="6" />
+        <SkeletonTable preset="default" :rows="6" />
       </div>
 
       <ErrorState v-else-if="pageError" :message="pageError" @retry="fetchData" />
@@ -999,10 +999,10 @@ onMounted(() => {
   font-size: var(--fs-xs, 11px);
   font-weight: 600;
   color: #667283;
-  padding: 16px 12px;
+  padding: 6.5px 10px;
 }
 .shipment-table td {
-  padding: 20px 12px;
+  padding: 7px 10px;
   font-size: var(--fs-sm, 12px);
   overflow-wrap: anywhere;
 }
@@ -1036,17 +1036,17 @@ onMounted(() => {
 .shipment-cards {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  gap: 14px;
+  gap: 10px;
 }
 .shipment-cards > li {
   background: white;
   border: 1px solid var(--ui-border, #e2e8f0);
-  border-radius: var(--ui-radius-card, 0.875rem);
-  padding: 20px;
+  border-radius: var(--ui-radius-card, 6px);
+  padding: 10px 12px;
   min-width: 0;
 }
 .shipment-cards > li > div:first-child {
-  gap: 12px;
+  gap: 10px;
 }
 .shipment-cards > li > div:first-child > div {
   min-width: 0;
@@ -1062,10 +1062,10 @@ onMounted(() => {
   margin-top: 6px;
 }
 .shipment-cards > li > p {
-  padding: 12px;
-  line-height: 1.7;
-  margin-top: 14px;
-  margin-bottom: 14px;
+  padding: 8px 10px;
+  line-height: 1.5;
+  margin-top: 10px;
+  margin-bottom: 10px;
   overflow-wrap: anywhere;
 }
 .shipment-cards > li > div:nth-of-type(2) {
@@ -1078,16 +1078,16 @@ onMounted(() => {
 }
 .shipment-cards button,
 .shipment-cards a {
-  min-height: var(--bottom-nav-item-min-height, 44px);
+  min-height: 32px;
 }
 .shipment-cards button {
-  padding-inline: 14px;
+  padding-inline: 12px;
   cursor: pointer;
 }
 .shipment-form {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 12px;
   padding: 0;
 }
 .shipment-form > * {
@@ -1103,20 +1103,20 @@ onMounted(() => {
   margin-bottom: 7px;
 }
 .shipment-form :is(input, textarea) {
-  min-height: var(--control-height-lg, 44px);
-  font-size: var(--fs-md, 13px);
-  border-radius: var(--ui-radius-control, 0.625rem);
+  min-height: var(--control-height-lg, 34px);
+  font-size: var(--fs-sm, 12px);
+  border-radius: var(--ui-radius-control, 6px);
   border-color: #dce4ef;
   background: #fafbfd;
 }
 .shipment-form textarea {
   resize: vertical;
-  min-height: 96px;
-  line-height: 1.7;
+  min-height: 80px;
+  line-height: 1.5;
 }
 .shipment-form :deep(button[aria-haspopup='listbox']) {
-  min-height: var(--control-height-lg, 44px);
-  border-radius: var(--ui-radius-control, 0.625rem);
+  min-height: var(--control-height-lg, 34px);
+  border-radius: var(--ui-radius-control, 6px);
 }
 .shipment-form :is(input, textarea):focus {
   background: white;
@@ -1132,9 +1132,9 @@ onMounted(() => {
   border: 0;
 }
 .shipment-form-actions button {
-  min-height: var(--control-height-lg, 44px);
-  padding-inline: 20px;
-  border-radius: var(--ui-radius-control, 0.625rem);
+  min-height: var(--control-height-lg, 34px);
+  padding-inline: 12px;
+  border-radius: var(--ui-radius-control, 6px);
   font-weight: 600;
 }
 .shipment-form-actions button[type='submit'] {
@@ -1145,9 +1145,9 @@ onMounted(() => {
   cursor: not-allowed;
 }
 .shipment-entry-section {
-  padding: 20px;
+  padding: 10px 12px;
   border: 1px solid var(--ui-border, #e2e8f0);
-  border-radius: var(--ui-radius-card, 0.875rem);
+  border-radius: var(--ui-radius-card, 6px);
 }
 .shipment-entry-section h3 {
   display: flex;
@@ -1168,13 +1168,13 @@ onMounted(() => {
   font-size: var(--fs-2xs, 10px);
 }
 .shipment-entry-hint {
-  margin: 7px 0 18px;
+  margin: 7px 0 12px;
   font-size: var(--fs-xs, 11px);
-  line-height: 1.7;
+  line-height: 1.5;
   color: #637288;
 }
 .shipment-entry-section > .grid {
-  gap: 18px;
+  gap: 12px;
 }
 .shipment-recipient-section > div + div {
   margin-top: 18px;
@@ -1184,16 +1184,16 @@ onMounted(() => {
   font-weight: 500;
 }
 .shipment-entry-section :is(input, textarea) {
-  font-size: var(--fs-md, 13px);
-  min-height: var(--control-height-lg, 44px);
+  font-size: var(--fs-sm, 12px);
+  min-height: var(--control-height-lg, 34px);
   background: #fafbfd;
 }
 .shipment-entry-section textarea {
-  min-height: 120px;
-  line-height: 1.8;
+  min-height: 96px;
+  line-height: 1.5;
 }
 .shipment-entry-section :deep(button[aria-haspopup='listbox']) {
-  min-height: var(--control-height-lg, 44px);
+  min-height: var(--control-height-lg, 34px);
   background: #fafbfd;
 }
 .shipment-pagination {
@@ -1223,17 +1223,17 @@ onMounted(() => {
 }
 @media (max-width: 639px) {
   .shipment-cards > li {
-    padding: 16px;
+    padding: 8px 10px;
   }
   .shipment-form :is(input, textarea),
   .shipment-form :deep(button[aria-haspopup='listbox']) {
     font-size: 16px;
   }
   .shipment-entry-section {
-    padding: 16px;
+    padding: 10px 12px;
   }
   .shipment-entry-hint {
-    margin-bottom: 16px;
+    margin-bottom: 12px;
   }
   .shipment-form-actions button {
     flex: 1;
@@ -1241,15 +1241,12 @@ onMounted(() => {
   }
 }
 
-/* Page-owned spacing and controls; shared surfaces stay unchanged. */
+/* Page-owned spacing and controls; shared surfaces stay unchanged.
+   Padding/radius mengikuti PageHeader.vue & token --ui-* (konsisten antarhalaman). */
 .shipment-header {
-  padding: 20px 24px;
   border-color: #dce5f1;
-  box-shadow: 0 4px 18px #0a51b00a;
+  box-shadow: none;
   flex-wrap: wrap;
-}
-.shipment-header :deep(.page-header-title) {
-  font-size: clamp(1.25rem, 2vw, 1.5rem);
 }
 .shipment-header :deep(.page-header-subtitle) {
   white-space: normal;
@@ -1258,11 +1255,11 @@ onMounted(() => {
 .shipments-page .shipment-transfer-actions {
   padding: 3px;
   border: 1px solid #dce5f1;
-  border-radius: 12px;
+  border-radius: 6px;
   background: #f4f8ff;
 }
 .shipments-page .shipment-transfer-actions button {
-  min-width: 88px;
+  min-width: 0;
   color: #0a51b0;
 }
 .shipments-page :is(button, input):focus-visible {
@@ -1270,18 +1267,18 @@ onMounted(() => {
   outline-offset: 2px;
 }
 .shipment-toolbar {
-  padding: 16px;
+  padding: 10px 12px;
   border: 1px solid #dce5f1;
-  border-radius: 16px;
+  border-radius: 6px;
   background: white;
   box-shadow: 0 2px 10px #0a51b008;
 }
 .shipment-toolbar > button {
-  padding-inline: 16px;
+  padding-inline: 12px;
   color: #0a51b0;
 }
 .shipment-search input {
-  font-size: 13px;
+  font-size: 12px;
   border-color: #dce5f1;
 }
 .shipment-summary > div {
@@ -1302,7 +1299,7 @@ onMounted(() => {
   background: #f4f8ff;
 }
 .shipment-table a {
-  min-height: 44px;
+  min-height: 32px;
   color: #0a51b0;
 }
 .shipment-cards > li {
@@ -1317,7 +1314,7 @@ onMounted(() => {
   color: #0a51b0;
 }
 :global(.shipment-dialog > div:first-child) {
-  padding: 20px 24px;
+  padding: 10px 12px;
   border-color: #dce5f1;
 }
 :global(.shipment-dialog .modal-body) {
@@ -1333,40 +1330,29 @@ onMounted(() => {
   outline-offset: 2px;
 }
 :global(.shipment-dialog fieldset label) {
-  min-height: 44px;
+  min-height: 34px;
   align-items: center;
 }
 @media (max-width: 639px) {
-  .shipment-header {
-    padding: 18px;
-  }
   .shipment-toolbar {
-    padding: 12px;
+    padding: 8px 10px;
   }
   :global(.shipment-dialog > div:first-child) {
-    padding: 16px;
+    padding: 10px 12px;
   }
   :global(.shipment-dialog .shipment-entry-section) {
-    padding: 16px;
+    padding: 10px 12px;
   }
 }
 
 .shipments-page {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 12px;
   width: 100%;
 }
 .shipments-page > * {
   margin-block: 0;
-}
-.shipment-header {
-  padding: 20px 24px;
-}
-@media (max-width: 639px) {
-  .shipment-header {
-    padding: 18px;
-  }
 }
 .shipment-header-actions,
 .shipment-transfer-actions {
@@ -1375,10 +1361,10 @@ onMounted(() => {
   gap: 8px;
 }
 .shipments-page .shipment-header-actions button {
-  height: 44px;
-  min-width: 96px;
-  padding: 0 16px;
-  border-radius: 10px;
+  height: 34px;
+  min-width: 0;
+  padding: 0 12px;
+  border-radius: 6px;
   font-size: 12px;
   font-weight: 600;
   justify-content: center;
@@ -1387,17 +1373,17 @@ onMounted(() => {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 10px;
 }
 .shipment-search {
   flex: 1;
   min-width: 200px;
-  height: 44px;
+  height: 34px;
 }
 .shipment-toolbar > button,
 .shipment-toolbar :deep(button) {
-  min-height: 44px;
-  min-width: 44px;
+  min-height: 32px;
+  min-width: 32px;
 }
 .shipment-summary {
   display: grid;
@@ -1416,8 +1402,8 @@ onMounted(() => {
   box-shadow: none;
 }
 .shipment-list-surface button {
-  min-height: 44px;
-  min-width: 44px;
+  min-height: 32px;
+  min-width: 32px;
 }
 .shipment-table th:last-child {
   width: 112px;
@@ -1439,20 +1425,20 @@ onMounted(() => {
 :global(.shipment-dialog .modal-header),
 :global(.shipment-dialog .modal-body),
 :global(.shipment-dialog .modal-footer) {
-  padding: 24px;
+  padding: 12px 14px;
 }
 :global(.shipment-dialog button) {
-  min-height: 44px;
-  min-width: 44px;
+  min-height: 32px;
+  min-width: 32px;
 }
 :global(.shipment-dialog .modal-footer button) {
-  padding-inline: 20px;
-  border-radius: 10px;
+  padding-inline: 12px;
+  border-radius: 6px;
   font-size: 12px;
 }
 :global(.shipment-dialog input:not([type='radio']):not([type='checkbox']):not([type='file'])),
 :global(.shipment-dialog select) {
-  min-height: 44px;
+  min-height: 34px;
 }
 :global(.shipment-dialog .modal-body) {
   overflow-wrap: anywhere;
@@ -1497,7 +1483,7 @@ onMounted(() => {
   :global(.shipment-dialog .modal-header),
   :global(.shipment-dialog .modal-body),
   :global(.shipment-dialog .modal-footer) {
-    padding: 20px;
+    padding: 10px 12px;
   }
 }
 </style>

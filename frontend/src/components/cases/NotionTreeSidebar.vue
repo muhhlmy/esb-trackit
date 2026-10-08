@@ -206,7 +206,7 @@ function handleSelectCase(id) {
 <style scoped>
 .case-tree {
   min-width: 0;
-  font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+  font-family: inherit;
 }
 .case-tree-list {
   overscroll-behavior: contain;
@@ -224,17 +224,17 @@ function handleSelectCase(id) {
   width: 100%;
 }
 .case-tree-header {
-  padding: 20px 16px;
+  padding: 12px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 8px;
 }
 .case-tree-header > div:first-child {
   gap: 8px;
   padding: 0;
 }
 .case-tree-header > div:first-child > span:first-child {
-  font-size: 13px;
+  font-size: 11px;
   text-transform: none;
   letter-spacing: 0;
 }
@@ -245,26 +245,26 @@ function handleSelectCase(id) {
   font-variant-numeric: tabular-nums;
 }
 .case-tree-search input {
-  min-height: 44px;
-  padding: 12px 12px 12px 36px;
-  font-size: 13px;
-  border-radius: 10px;
+  min-height: var(--control-height-md, 30px);
+  padding: 5px 10px 5px 32px;
+  font-size: 12px;
+  border-radius: 6px;
 }
 .case-tree-search svg {
-  left: 12px;
-  width: 16px;
-  height: 16px;
+  left: 10px;
+  width: 15px;
+  height: 15px;
 }
 .case-tree-search kbd {
   display: none;
 }
 .case-tree-list {
-  padding: 12px;
+  padding: 10px;
 }
 .case-tree-category {
-  min-height: 44px;
+  min-height: 28px;
   gap: 8px;
-  padding: 12px 8px;
+  padding: 6px 8px;
   text-align: left;
 }
 .case-tree-category > div {
@@ -279,41 +279,41 @@ function handleSelectCase(id) {
   font-variant-numeric: tabular-nums;
 }
 .case-tree-children {
-  margin: 4px 0 16px;
+  margin: 4px 0 12px;
   padding-left: 0;
   border-left: 0;
   display: grid;
-  gap: 8px;
+  gap: 6px;
 }
 .case-tree-article {
-  min-height: 60px;
-  padding: 14px 12px;
-  border-radius: 12px;
+  min-height: 30px;
+  padding: 8px 10px;
+  border-radius: 6px;
 }
 .case-tree-article > div:first-child {
   min-width: 0;
   align-items: flex-start;
-  gap: 10px;
+  gap: 8px;
 }
 .case-tree-article svg {
-  margin-top: 3px;
-  width: 16px;
-  height: 16px;
+  margin-top: 2px;
+  width: 14px;
+  height: 14px;
 }
 .case-tree-title {
   white-space: normal;
   overflow-wrap: anywhere;
-  font-size: 13px;
-  line-height: 1.65;
+  font-size: 12px;
+  line-height: 1.5;
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
 .case-tree-empty {
-  padding: 16px 8px;
-  font-size: 13px;
-  line-height: 1.7;
+  padding: 12px 8px;
+  font-size: 12px;
+  line-height: 1.6;
 }
 .case-tree button:focus-visible,
 .case-tree input:focus-visible {

@@ -145,7 +145,7 @@ onMounted(() => {
     <!-- Header CSAT Section -->
     <div class="csat-heading flex items-center justify-between gap-3">
       <div class="min-w-0">
-        <h3 class="text-base font-bold tracking-tight text-[#1E293B] leading-tight">
+        <h3 class="text-sm font-bold tracking-tight text-[#1E293B] leading-tight">
           Kepuasan Penanganan Tiket
         </h3>
         <p class="mt-0.5 text-xs font-medium text-[#5B6B84]">
@@ -226,14 +226,14 @@ onMounted(() => {
         <div v-else class="flex flex-1 flex-col justify-center">
           <div class="flex items-end gap-2 mt-4">
             <p
-              class="font-num text-[36px] font-extrabold leading-none tracking-tight text-[#1E293B]"
+              class="font-num text-[22px] font-extrabold leading-none tracking-tight text-[#1E293B]"
             >
               {{ stats.averageRating.toFixed(1) }}
             </p>
-            <p class="mb-1 text-sm font-bold text-[#5B6B84]">/ 5.0</p>
+            <p class="mb-0.5 text-[11px] font-bold text-[#5B6B84]">/ 5.0</p>
           </div>
           <div class="mt-2">
-            <CsatStars :value="stats.averageRating" size="26px" />
+            <CsatStars :value="stats.averageRating" size="22px" />
           </div>
           <div class="mt-3 flex items-center gap-2">
             <span
@@ -316,53 +316,53 @@ onMounted(() => {
 
 <style scoped>
 .csat-section {
-  gap: 24px;
+  gap: 12px;
   min-width: 0;
 }
 .csat-heading {
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 10px;
 }
 .csat-heading h3 {
-  font-size: 18px;
-  line-height: 1.5;
+  font-size: 14px;
+  line-height: 1.35;
   font-weight: 650;
 }
 .csat-heading p {
-  margin-top: 6px;
-  line-height: 1.6;
+  margin-top: 2px;
+  line-height: 1.45;
 }
 .csat-grid {
-  gap: 24px;
+  gap: 12px;
 }
 .csat-panel,
 .csat-trend {
   min-width: 0;
-  padding: 24px;
-  border-radius: 16px;
+  padding: 10px 12px;
+  border-radius: 6px;
   box-shadow: none;
 }
 .csat-panel h3 {
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 650;
-  line-height: 1.5;
+  line-height: 1.35;
 }
 .csat-panel > div:first-child {
-  padding-bottom: 18px;
+  padding-bottom: 10px;
 }
 .csat-panel > div:first-child p {
-  margin-top: 6px;
-  font-size: 12px;
-  line-height: 1.6;
+  margin-top: 2px;
+  font-size: 11px;
+  line-height: 1.45;
 }
 .csat-retry {
-  min-width: 132px;
-  min-height: 44px;
-  padding: 10px 16px;
-  border-radius: 10px;
+  min-width: 100px;
+  min-height: 30px;
+  padding: 5px 12px;
+  border-radius: 6px;
   font-size: 12px;
   font-weight: 600;
-  line-height: 1.5;
+  line-height: 1.4;
 }
 .csat-retry:focus-visible {
   outline: 2px solid #0a51b0;
@@ -370,15 +370,15 @@ onMounted(() => {
 }
 @media (max-width: 767px) {
   .csat-section {
-    gap: 20px;
+    gap: 10px;
   }
   .csat-grid {
-    gap: 20px;
+    gap: 10px;
   }
   .csat-panel,
   .csat-trend {
-    padding: 18px;
-    border-radius: 12px;
+    padding: 10px 12px;
+    border-radius: 6px;
   }
 }
 </style>

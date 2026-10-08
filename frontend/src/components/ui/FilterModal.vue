@@ -42,7 +42,7 @@ function apply() {
     size="sm"
     @close="emit('close')"
   >
-    <div class="space-y-4">
+    <div class="space-y-3">
       <div class="space-y-3">
         <div v-for="field in fields" :key="field.key" class="space-y-1.5">
           <label :for="fieldId(field.key)" class="text-xs font-bold text-slate-600">{{
@@ -54,13 +54,13 @@ function apply() {
             v-model="draft[field.key]"
             :type="field.type === 'search' ? 'text' : 'date'"
             :placeholder="field.placeholder"
-            class="h-10 w-full rounded-xl border border-slate-200 px-3 text-xs focus:border-[#0A51B0] focus:outline-none"
+            class="h-8 w-full rounded-[6px] border border-slate-200 px-3 text-xs focus:border-[#0A51B0] focus:outline-none"
           />
           <select
             v-else
             :id="fieldId(field.key)"
             v-model="draft[field.key]"
-            class="h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-xs focus:border-[#0A51B0] focus:outline-none"
+            class="h-8 w-full rounded-[6px] border border-slate-200 bg-white px-3 text-xs focus:border-[#0A51B0] focus:outline-none"
           >
             <option value="">{{ field.placeholder || `Semua ${field.label}` }}</option>
             <option
@@ -75,19 +75,19 @@ function apply() {
         <slot />
       </div>
       <div
-        class="flex flex-col-reverse gap-2 border-t border-slate-200 pt-4 sm:flex-row sm:justify-end"
+        class="flex flex-col-reverse gap-2 border-t border-slate-200 pt-3 sm:flex-row sm:justify-end"
       >
         <button
           type="button"
           @click="emit('reset')"
-          class="min-h-10 rounded-xl border border-slate-200 px-4 text-xs font-bold text-slate-600 hover:bg-slate-50"
+          class="min-h-8 rounded-[6px] border border-slate-200 px-4 text-xs font-bold text-slate-600 hover:bg-slate-50"
         >
           Reset
         </button>
         <button
           type="button"
           @click="apply"
-          class="min-h-10 rounded-xl bg-[#0A51B0] px-5 text-xs font-bold text-white hover:bg-[#08458f]"
+          class="min-h-8 rounded-[6px] bg-[#0A51B0] px-4 text-xs font-bold text-white hover:bg-[#08458f]"
         >
           Terapkan Filter
         </button>

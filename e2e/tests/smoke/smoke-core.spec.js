@@ -84,7 +84,7 @@ test.describe('SMOKE — Demo Readiness @smoke', () => {
 
   test('S-07 Sesi bertahan navigasi & reload @smoke', async ({ superAdminPage: page }) => {
     await page.goto('/assets', { waitUntil: 'domcontentloaded' })
-    await page.goto('/tickets', { waitUntil: 'domcontentloaded' })
+    await page.goto('/tickets', { waitUntil: 'domcontentloaded' }).catch(() => page.goto('/tickets', { waitUntil: 'domcontentloaded' }))
     await page.reload({ waitUntil: 'domcontentloaded' })
     await expect(page).toHaveURL(/\/tickets/)
     await expect(page).not.toHaveURL(/\/login/)
@@ -108,7 +108,10 @@ test.describe('SMOKE — Demo Readiness @smoke', () => {
     if (await userMenu.isVisible({ timeout: 4000 }).catch(() => false)) {
       await userMenu.click()
       const logoutBtn = page.getByRole('button', { name: i('keluar|log out|logout') }).first()
-      if (await logoutBtn.isVisible({ timeout: 3000 }).catch(() => false)) await logoutBtn.click()
+      if (await logoutBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
+        await logoutBtn.click()
+        await expect(page).toHaveURL(/\/login/, { timeout: 10000 })
+      }
     }
 
     // Setelah logout, akses langsung route terproteksi harus kembali ke login

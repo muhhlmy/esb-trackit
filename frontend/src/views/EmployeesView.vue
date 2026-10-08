@@ -467,14 +467,14 @@ onMounted(() => {
 
 <template>
   <div
-    class="admin-workspace employees-page flex min-w-0 flex-col gap-4 sm:gap-5"
+    class="admin-workspace employees-page flex min-w-0 flex-col gap-3"
     :data-testid="!isLoading ? 'page-ready' : undefined"
   >
     <!-- Notification Toast -->
     <Transition name="fade">
       <div
         v-if="notification"
-        class="fixed top-3 left-3 right-3 sm:top-5 sm:left-auto sm:right-5 sm:max-w-md z-50 flex items-center gap-3 rounded-2xl px-5 py-3.5 shadow-2xl text-white font-semibold text-[13px]"
+        class="fixed top-3 left-3 right-3 sm:top-5 sm:left-auto sm:right-5 sm:max-w-md z-50 flex items-center gap-3 rounded-[6px] px-4 py-3 shadow-2xl text-white font-semibold text-xs"
         :class="notification.type === 'error' ? 'bg-rose-600' : 'bg-emerald-600'"
       >
         <span aria-hidden="true" class="material-symbols-outlined text-[20px]">
@@ -489,23 +489,23 @@ onMounted(() => {
       subtitle="Pengelolaan dan integrasi data karyawan perusahaan"
       icon="person_search"
     >
-      <div class="flex items-center gap-2">
+      <div class="flex items-center gap-1.5">
         <button
           v-if="canWriteKaryawan"
           type="button"
           @click="openAdd"
-          class="h-9 shrink-0 whitespace-nowrap rounded-lg bg-[#0A51B0] px-3 sm:px-3.5 text-xs font-semibold text-white shadow-2xs hover:bg-[#0A4391] transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+          class="h-8 shrink-0 whitespace-nowrap rounded-[6px] bg-[#0A51B0] px-3 text-xs font-medium text-white shadow-2xs hover:bg-[#0A4391] transition-all flex items-center justify-center gap-1.5 cursor-pointer"
           title="Tambah karyawan baru"
         >
           <span aria-hidden="true" class="material-symbols-outlined text-[16px]">person_add</span>
           <span>Tambah Karyawan</span>
         </button>
-        <div class="flex items-center gap-1 rounded-lg border border-[#D7E3F2] bg-[#F8FAFC] p-1">
+        <div class="flex items-center gap-1 rounded-[6px] border border-[#D7E3F2] bg-[#F8FAFC] p-0.5">
           <button
             v-if="canWriteKaryawan"
             type="button"
             @click="showImportModal = true"
-            class="inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-[11px] font-bold text-[#0A51B0] hover:bg-white"
+            class="inline-flex h-7 items-center gap-1 rounded-[6px] px-2 text-[11px] font-semibold text-[#0A51B0] hover:bg-white"
             title="Import data karyawan dari Excel"
           >
             <span aria-hidden="true" class="material-symbols-outlined text-[15px]">upload_file</span
@@ -514,7 +514,7 @@ onMounted(() => {
           <button
             type="button"
             @click="exportEmployees"
-            class="inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-[11px] font-bold text-[#0A51B0] hover:bg-white"
+            class="inline-flex h-7 items-center gap-1 rounded-[6px] px-2 text-[11px] font-semibold text-[#0A51B0] hover:bg-white"
             title="Export data karyawan"
           >
             <span aria-hidden="true" class="material-symbols-outlined text-[15px]">download</span
@@ -526,10 +526,10 @@ onMounted(() => {
 
     <!-- Search & Filter Bar -->
     <div class="flex items-center gap-2.5 w-full min-w-0">
-      <div class="relative h-9 min-w-0 flex-1">
+      <div class="relative h-8 min-w-0 flex-1">
         <span
           aria-hidden="true"
-          class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[18px] text-[#687281] dark:text-slate-400 pointer-events-none"
+          class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[17px] text-[#687281] dark:text-slate-400 pointer-events-none"
           >search</span
         >
         <input
@@ -537,14 +537,14 @@ onMounted(() => {
           aria-label="Cari karyawan"
           type="text"
           placeholder="Cari NIK, nama, atau jabatan…"
-          class="h-full min-h-0 w-full rounded-xl border border-[#E2E8F0] dark:border-slate-700 bg-white dark:bg-slate-800 pl-9.5 pr-3 text-xs text-[#333333] dark:text-slate-100 placeholder-[#687281] dark:placeholder-slate-400 focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
+          class="h-full min-h-0 w-full rounded-[6px] border border-[#E2E8F0] dark:border-slate-700 bg-white dark:bg-slate-800 pl-9 pr-3 text-xs text-[#333333] dark:text-slate-100 placeholder-[#687281] dark:placeholder-slate-400 focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
         />
       </div>
 
       <button
         type="button"
         @click="showFilterModal = true"
-        class="h-9 shrink-0 rounded-lg border border-[#E2E8F0] dark:border-slate-700 bg-[#F8FAFC] dark:bg-slate-800 px-3 text-xs font-semibold text-[#5F7089] dark:text-slate-300 hover:bg-white dark:hover:bg-slate-700"
+        class="h-8 shrink-0 rounded-[6px] border border-[#E2E8F0] dark:border-slate-700 bg-[#F8FAFC] dark:bg-slate-800 px-3 text-xs font-medium text-[#5F7089] dark:text-slate-300 hover:bg-white dark:hover:bg-slate-700"
       >
         <span aria-hidden="true" class="material-symbols-outlined mr-1 align-middle text-[16px]"
           >filter_alt</span
@@ -562,7 +562,7 @@ onMounted(() => {
     >
       <select
         v-model="filterDepartemen"
-        class="h-10 w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 px-3 text-xs"
+        class="h-8 w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 px-3 text-xs"
       >
         <option value="">Semua Departemen</option>
         <option v-for="item in availableDepartemenOptions" :key="item" :value="item">
@@ -571,14 +571,14 @@ onMounted(() => {
       </select>
       <select
         v-model="filterLokasi"
-        class="h-10 w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 px-3 text-xs"
+        class="h-8 w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 px-3 text-xs"
       >
         <option value="">Semua Lokasi</option>
         <option v-for="item in availableLokasiOptions" :key="item" :value="item">{{ item }}</option>
       </select>
       <select
         v-model="filterStatus"
-        class="h-10 w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 px-3 text-xs"
+        class="h-8 w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 px-3 text-xs"
       >
         <option value="">Semua Status</option>
         <option value="Active">Active</option>
@@ -631,14 +631,14 @@ onMounted(() => {
     </div>
 
     <!-- Table Section -->
-    <div class="rounded-xl border border-[#E2E8F0]/80 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-2xs overflow-hidden">
+    <div class="rounded-[6px] border border-[#E2E8F0]/80 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-2xs overflow-hidden">
       <div v-if="isLoading" aria-busy="true">
         <SkeletonTable preset="employees" :rows="6" />
       </div>
 
       <ErrorState v-else-if="pageError" :message="pageError" @retry="fetchData" />
 
-      <div v-else-if="filteredEmployees.length === 0" class="px-4 py-8 sm:p-12">
+      <div v-else-if="filteredEmployees.length === 0" class="px-4 py-8 sm:p-8">
         <EmptyState
           icon="person_off"
           title="Tidak Ada Data Karyawan"
@@ -651,7 +651,7 @@ onMounted(() => {
           <li
             v-for="emp in paginatedEmployees"
             :key="emp.id_karyawan || emp.nik"
-            class="min-w-0 p-2.5 sm:p-3 space-y-2 wrap-anywhere rounded-xl border border-[#E2E8F0] bg-white shadow-2xs"
+            class="min-w-0 p-2.5 sm:p-3 space-y-2 wrap-anywhere rounded-[6px] border border-[#E2E8F0] bg-white shadow-2xs"
           >
             <div class="space-y-0.5">
               <h3 class="text-[13px] font-bold leading-snug text-[#333333]">{{ emp.nama_karyawan }}</h3>
@@ -700,7 +700,7 @@ onMounted(() => {
               <button
                 type="button"
                 :aria-label="'Edit ' + emp.nama_karyawan"
-                class="flex min-h-8 items-center justify-center gap-1.5 rounded-lg border border-[#E2E8F0] text-xs font-semibold text-[#334155] hover:bg-[#F8FAFC] cursor-pointer"
+                class="flex min-h-8 items-center justify-center gap-1.5 rounded-[6px] border border-[#E2E8F0] text-xs font-medium text-[#334155] hover:bg-[#F8FAFC] cursor-pointer"
                 @click="openEdit(emp)"
               >
                 <span aria-hidden="true" class="material-symbols-outlined text-[16px]">edit</span
@@ -709,7 +709,7 @@ onMounted(() => {
               <button
                 type="button"
                 :aria-label="'Hapus ' + emp.nama_karyawan"
-                class="flex min-h-8 items-center justify-center gap-1.5 rounded-lg border border-[#E2E8F0] text-xs font-semibold text-rose-700 hover:bg-rose-50 cursor-pointer"
+                class="flex min-h-8 items-center justify-center gap-1.5 rounded-[6px] border border-[#E2E8F0] text-xs font-medium text-rose-700 hover:bg-rose-50 cursor-pointer"
                 @click="openDelete(emp)"
               >
                 <span aria-hidden="true" class="material-symbols-outlined text-[16px]">delete</span
@@ -735,44 +735,44 @@ onMounted(() => {
             <tr>
               <th
                 scope="col"
-                class="py-3 pl-5 pr-4 text-[11px] font-semibold uppercase tracking-wider text-[#5F7089] text-left whitespace-nowrap"
+                class="py-1.5 px-2.5 text-[11px] font-semibold uppercase tracking-wider text-[#5F7089] text-left whitespace-nowrap"
               >
                 Karyawan
               </th>
               <th
                 scope="col"
-                class="py-3 px-4 text-[11px] font-semibold uppercase tracking-wider text-[#5F7089] text-left whitespace-nowrap"
+                class="py-1.5 px-2.5 text-[11px] font-semibold uppercase tracking-wider text-[#5F7089] text-left whitespace-nowrap"
               >
                 NIK
               </th>
               <th
                 scope="col"
-                class="py-3 px-4 text-[11px] font-semibold uppercase tracking-wider text-[#5F7089] text-left whitespace-nowrap"
+                class="py-1.5 px-2.5 text-[11px] font-semibold uppercase tracking-wider text-[#5F7089] text-left whitespace-nowrap"
               >
                 Title / Jabatan
               </th>
               <th
                 scope="col"
-                class="py-3 px-4 text-[11px] font-semibold uppercase tracking-wider text-[#5F7089] text-left whitespace-nowrap"
+                class="py-1.5 px-2.5 text-[11px] font-semibold uppercase tracking-wider text-[#5F7089] text-left whitespace-nowrap"
               >
                 Departemen / Direktorat
               </th>
               <th
                 scope="col"
-                class="py-3 px-4 text-[11px] font-semibold uppercase tracking-wider text-[#5F7089] text-left whitespace-nowrap"
+                class="py-1.5 px-2.5 text-[11px] font-semibold uppercase tracking-wider text-[#5F7089] text-left whitespace-nowrap"
               >
                 Status
               </th>
               <th
                 scope="col"
-                class="py-3 px-4 text-[11px] font-semibold uppercase tracking-wider text-[#5F7089] text-left whitespace-nowrap"
+                class="py-1.5 px-2.5 text-[11px] font-semibold uppercase tracking-wider text-[#5F7089] text-left whitespace-nowrap"
               >
                 Lokasi Kerja
               </th>
               <th
                 scope="col"
                 v-if="canWriteKaryawan"
-                class="py-3 pr-5 pl-4 text-right text-[11px] font-semibold uppercase tracking-wider text-[#5F7089] whitespace-nowrap"
+                class="py-1.5 px-2.5 text-right text-[11px] font-semibold uppercase tracking-wider text-[#5F7089] whitespace-nowrap"
               >
                 Aksi
               </th>
@@ -784,10 +784,10 @@ onMounted(() => {
               :key="emp.id_karyawan || emp.nik"
               class="group hover:bg-[#F8FAFC] transition-colors duration-150"
             >
-              <td class="py-4 pl-5 pr-4 overflow-hidden">
+              <td class="py-2 px-2.5 overflow-hidden">
                 <div class="flex flex-col min-w-0">
                   <span
-                    class="text-[13.5px] font-bold text-[#333333] leading-snug truncate group-hover:text-[#333333] transition-colors block"
+                    class="text-[12px] font-bold text-[#333333] leading-snug truncate group-hover:text-[#333333] transition-colors block"
                     :title="emp.nama_karyawan"
                   >
                     {{ emp.nama_karyawan }}
@@ -802,23 +802,23 @@ onMounted(() => {
               </td>
 
               <td
-                class="py-4 px-4 font-mono text-[12px] font-semibold text-[#333333] overflow-hidden"
+                class="py-2 px-2.5 font-mono text-[12px] font-semibold text-[#333333] overflow-hidden"
               >
                 <span class="truncate block" :title="emp.nik">{{ emp.nik }}</span>
               </td>
 
-              <td class="py-4 px-4 overflow-hidden">
+              <td class="py-2 px-2.5 overflow-hidden">
                 <span
-                  class="text-[13px] font-medium text-[#333333] truncate block"
+                  class="text-xs font-medium text-[#333333] truncate block"
                   :title="emp.jabatan || emp.title || '—'"
                   >{{ emp.jabatan || emp.title || '—' }}</span
                 >
               </td>
 
-              <td class="py-4 px-4 overflow-hidden">
+              <td class="py-2 px-2.5 overflow-hidden">
                 <div class="flex flex-col min-w-0">
                   <span
-                    class="text-[13px] font-medium text-[#333333] leading-snug truncate block"
+                    class="text-xs font-medium text-[#333333] leading-snug truncate block"
                     :title="emp.departemen || '—'"
                   >
                     {{ emp.departemen || '—' }}
@@ -832,7 +832,7 @@ onMounted(() => {
                 </div>
               </td>
 
-              <td class="py-4 px-4 overflow-hidden">
+              <td class="py-2 px-2.5 overflow-hidden">
                 <AppBadge
                   :type="
                     (emp.status_karyawan || emp.status) === 'Active'
@@ -844,7 +844,7 @@ onMounted(() => {
                   :text="emp.status_karyawan || emp.status || 'Active'"
                 />
               </td>
-              <td class="py-4 px-4 text-[13px] font-normal text-[#333333] overflow-hidden">
+              <td class="py-2 px-2.5 text-xs font-normal text-[#333333] overflow-hidden">
                 <span
                   class="truncate block"
                   :title="normalizeLocation(emp.lokasi_kerja || emp.work_location) || '—'"
@@ -853,7 +853,7 @@ onMounted(() => {
               </td>
               <td
                 v-if="canWriteKaryawan"
-                class="py-4 pr-5 pl-4 text-right overflow-hidden"
+                class="py-2 px-2.5 text-right overflow-hidden"
                 @click.stop
               >
                 <AppRowActions
@@ -907,7 +907,7 @@ onMounted(() => {
               type="text"
               required
               placeholder="cth: 2026001"
-              class="min-w-0 min-h-11 sm:min-h-0 w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-base sm:text-[13px] text-[#2A3547] focus:outline-none focus:border-[#0A51B0]"
+              class="min-w-0 min-h-11 sm:min-h-0 w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-base sm:text-xs text-[#2A3547] focus:outline-none focus:border-[#0A51B0]"
             />
           </div>
 
@@ -923,7 +923,7 @@ onMounted(() => {
               type="text"
               required
               placeholder="Nama lengkap"
-              class="min-w-0 min-h-11 sm:min-h-0 w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-base sm:text-[13px] text-[#2A3547] focus:outline-none focus:border-[#0A51B0]"
+              class="min-w-0 min-h-11 sm:min-h-0 w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-base sm:text-xs text-[#2A3547] focus:outline-none focus:border-[#0A51B0]"
             />
           </div>
         </div>
@@ -941,7 +941,7 @@ onMounted(() => {
               type="email"
               required
               placeholder="nama@example.com"
-              class="min-w-0 min-h-11 sm:min-h-0 w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-base sm:text-[13px] text-[#2A3547] focus:outline-none focus:border-[#0A51B0]"
+              class="min-w-0 min-h-11 sm:min-h-0 w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-base sm:text-xs text-[#2A3547] focus:outline-none focus:border-[#0A51B0]"
             />
           </div>
 
@@ -957,7 +957,7 @@ onMounted(() => {
               type="text"
               required
               placeholder="cth: JKT, SLO, GS"
-              class="min-w-0 min-h-11 sm:min-h-0 w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-base sm:text-[13px] text-[#2A3547] focus:outline-none focus:border-[#0A51B0]"
+              class="min-w-0 min-h-11 sm:min-h-0 w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-base sm:text-xs text-[#2A3547] focus:outline-none focus:border-[#0A51B0]"
             />
           </div>
         </div>
@@ -975,7 +975,7 @@ onMounted(() => {
               type="text"
               required
               placeholder="cth: Software Engineer"
-              class="min-w-0 min-h-11 sm:min-h-0 w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-base sm:text-[13px] text-[#2A3547] focus:outline-none focus:border-[#0A51B0]"
+              class="min-w-0 min-h-11 sm:min-h-0 w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-base sm:text-xs text-[#2A3547] focus:outline-none focus:border-[#0A51B0]"
             />
           </div>
 
@@ -990,7 +990,7 @@ onMounted(() => {
               aria-label="Job Level"
               placeholder="Pilih level"
               :block="true"
-              height-class="h-10"
+              height-class="h-8"
             />
           </div>
         </div>
@@ -1008,7 +1008,7 @@ onMounted(() => {
               type="text"
               required
               placeholder="cth: Technology"
-              class="min-w-0 min-h-11 sm:min-h-0 w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-base sm:text-[13px] text-[#2A3547] focus:outline-none focus:border-[#0A51B0]"
+              class="min-w-0 min-h-11 sm:min-h-0 w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-base sm:text-xs text-[#2A3547] focus:outline-none focus:border-[#0A51B0]"
             />
           </div>
 
@@ -1024,7 +1024,7 @@ onMounted(() => {
               type="text"
               required
               placeholder="cth: Technology"
-              class="min-w-0 min-h-11 sm:min-h-0 w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-base sm:text-[13px] text-[#2A3547] focus:outline-none focus:border-[#0A51B0]"
+              class="min-w-0 min-h-11 sm:min-h-0 w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-base sm:text-xs text-[#2A3547] focus:outline-none focus:border-[#0A51B0]"
             />
           </div>
         </div>
@@ -1041,7 +1041,7 @@ onMounted(() => {
               aria-label="Status Karyawan"
               placeholder="Pilih status"
               :block="true"
-              height-class="h-10"
+              height-class="h-8"
             />
           </div>
 
@@ -1056,7 +1056,7 @@ onMounted(() => {
               aria-label="Status Kepegawaian"
               placeholder="Pilih status"
               :block="true"
-              height-class="h-10"
+              height-class="h-8"
             />
           </div>
 
@@ -1071,7 +1071,7 @@ onMounted(() => {
               v-model="form.tanggal_mulai_bekerja"
               type="date"
               required
-              class="min-w-0 min-h-11 sm:min-h-0 w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-base sm:text-[13px] text-[#2A3547] focus:outline-none"
+              class="min-w-0 min-h-11 sm:min-h-0 w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-base sm:text-xs text-[#2A3547] focus:outline-none"
             />
           </div>
         </div>
@@ -1089,7 +1089,7 @@ onMounted(() => {
             placeholder="Tanpa atasan"
             search-placeholder="Cari NIK, nama, atau posisi atasan…"
             aria-label="NIK Atasan Langsung"
-            height-class="h-10"
+            height-class="h-8"
             :clearable="true"
           />
         </div>
@@ -1101,7 +1101,7 @@ onMounted(() => {
           <button
             type="button"
             @click="closeModal"
-            class="min-h-11 sm:min-h-0 rounded-xl border border-[#E5EAEF] px-4 py-2 text-[12px] font-bold text-[#66728d] hover:bg-gray-50 transition-all cursor-pointer"
+            class="h-8 rounded-[6px] border border-[#E5EAEF] px-3.5 text-[12px] font-medium text-[#66728d] hover:bg-gray-50 transition-all cursor-pointer"
           >
             Batal
           </button>
@@ -1109,7 +1109,7 @@ onMounted(() => {
             type="submit"
             form="admin-employee-form"
             :disabled="isSubmitting || !canWriteKaryawan"
-            class="min-h-11 sm:min-h-0 rounded-xl bg-[#0A51B0] px-4 py-2 text-[12px] font-bold text-white shadow-md hover:bg-[#0A4391] transition-all cursor-pointer disabled:opacity-60"
+            class="h-8 rounded-[6px] bg-[#0A51B0] px-3.5 text-[12px] font-medium text-white shadow-md hover:bg-[#0A4391] transition-all cursor-pointer disabled:opacity-60"
           >
             {{ isSubmitting ? 'Menyimpan...' : 'Simpan Data' }}
           </button>
@@ -1127,7 +1127,7 @@ onMounted(() => {
           {{ modalError }}
         </div>
 
-        <p class="text-[13px] text-[#2A3547]">
+        <p class="text-xs text-[#2A3547]">
           Apakah Anda yakin ingin menghapus data karyawan
           <strong>{{ selectedEmployee?.nama_karyawan }}</strong> (NIK: {{ selectedEmployee?.nik }})?
         </p>
@@ -1157,7 +1157,7 @@ onMounted(() => {
           <button
             type="button"
             @click="closeModal"
-            class="min-h-11 sm:min-h-0 rounded-xl border border-[#E5EAEF] px-4 py-2 text-[12px] font-bold text-[#66728d] hover:bg-gray-50 transition-all cursor-pointer"
+            class="h-8 rounded-[6px] border border-[#E5EAEF] px-3.5 text-[12px] font-medium text-[#66728d] hover:bg-gray-50 transition-all cursor-pointer"
           >
             Batal
           </button>
@@ -1165,7 +1165,7 @@ onMounted(() => {
             type="button"
             @click="deleteEmployee"
             :disabled="isSubmitting || !canWriteKaryawan"
-            class="min-h-11 sm:min-h-0 rounded-xl bg-rose-600 px-4 py-2 text-[12px] font-bold text-white shadow-md hover:bg-rose-700 transition-all cursor-pointer disabled:opacity-60"
+            class="h-8 rounded-[6px] bg-rose-600 px-3.5 text-[12px] font-medium text-white shadow-md hover:bg-rose-700 transition-all cursor-pointer disabled:opacity-60"
           >
             {{ isSubmitting ? 'Menghapus...' : 'Ya, Hapus Karyawan' }}
           </button>
@@ -1183,27 +1183,13 @@ onMounted(() => {
 </template>
 
 <style scoped>
-.toolbar-search-input {
-  height: 36px;
-  min-height: 36px;
-  max-height: 36px;
-  box-sizing: border-box;
-}
-.toolbar-filter-button {
-  height: 36px;
-  min-height: 36px !important;
-  max-height: 36px;
-  box-sizing: border-box;
-}
-@media (width < 64rem) {
+/* Ukuran kontrol toolbar diasumsikan dari token global (--control-height-*)
+   dan kelas template; aturan lama 36px dihapus (dead code). */
+@media (width < 48rem) {
   .employee-stats :deep(.truncate),
   .employee-filters :deep(.truncate) {
     white-space: normal;
     overflow-wrap: anywhere;
-  }
-  .employee-stats :deep(.tracking-wider) {
-    font-size: 0.75rem;
-    letter-spacing: normal;
   }
   .employee-stats :deep(.items-center) {
     align-items: flex-start;
@@ -1256,15 +1242,15 @@ onMounted(() => {
    admin-workspace.css menimpanya dengan padding 4px 0 8px karena
    specificity lebih tinggi, sehingga header terlihat menempel. */
 .admin-workspace .admin-page-header {
-  padding: 0.875rem;
+  padding: 8px 10px;
   border: 1px solid rgba(226, 232, 240, 0.8);
-  border-radius: 1rem;
+  border-radius: 6px;
   background: #ffffff;
   box-shadow: 0 1px 2px rgba(23, 43, 77, 0.04);
 }
 @media (min-width: 640px) {
   .admin-workspace .admin-page-header {
-    padding: 1.125rem;
+    padding: 10px 12px;
   }
 }
 </style>

@@ -13,6 +13,7 @@ build/
 playwright-report/
 test-results/
 qa-reports/
+reports/
 coverage/
 
 # E2E auth state & generated QA outputs

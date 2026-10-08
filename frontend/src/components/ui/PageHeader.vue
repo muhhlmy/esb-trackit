@@ -23,7 +23,7 @@ defineProps({
     <div class="flex items-center gap-2.5 min-w-0">
       <div
         v-if="icon"
-        class="page-header-icon flex h-7 w-7 sm:h-8 sm:w-8 shrink-0 items-center justify-center rounded-lg border border-[#B8D4F5]/40"
+        class="page-header-icon flex h-7 w-7 sm:h-8 sm:w-8 shrink-0 items-center justify-center rounded-[6px] border border-[#B8D4F5]/40"
         :class="[iconBg, iconColor]"
       >
         <span aria-hidden="true" class="material-symbols-outlined text-[16px] sm:text-[18px]">{{
@@ -32,13 +32,13 @@ defineProps({
       </div>
       <div class="min-w-0">
         <h1
-          class="page-header-title text-sm sm:text-base font-bold text-[#333333] dark:text-slate-100 tracking-tight truncate"
+          class="page-header-title text-[16px] sm:text-[18px] font-semibold text-[#333333] dark:text-slate-100 tracking-tight truncate"
         >
           {{ title }}
         </h1>
         <p
           v-if="subtitle"
-          class="page-header-subtitle text-[11px] font-normal text-[#5F7089] dark:text-slate-400 mt-0.5 truncate"
+          class="page-header-subtitle text-[10px] sm:text-[11px] font-normal text-[#5F7089] dark:text-slate-400 mt-0.5 truncate"
         >
           {{ subtitle }}
         </p>
@@ -52,10 +52,10 @@ defineProps({
 
 <style scoped>
 .page-header {
-  padding: 8px 12px;
+  padding: 8px 10px;
   background: #fff;
   border: 1px solid #e2e8f0;
-  border-radius: var(--ui-radius-card, 0.65rem);
+  border-radius: var(--ui-radius-card, 6px);
   box-shadow: var(--ui-shadow-card, 0 1.5px 6px rgba(15, 23, 42, 0.03));
   transition: background-color 0.15s ease, border-color 0.15s ease;
 }
@@ -68,7 +68,7 @@ defineProps({
 
 @media (min-width: 640px) {
   .page-header {
-    padding: 10px 14px;
+    padding: 10px 12px;
   }
 }
 

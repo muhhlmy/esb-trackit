@@ -401,47 +401,47 @@ function formatDate(dateStr) {
 
 <template>
   <div
-    class="asset-workspace asset-inventory inventory-polish space-y-4"
+    class="asset-workspace asset-inventory inventory-polish space-y-3"
     :data-testid="!isLoading ? 'page-ready' : undefined"
   >
     <!-- Simplified SaaS Header & Toolbar Container (sticky mengikuti scroll) -->
     <div class="asset-toolbar-sticky">
       <div
-        class="asset-toolbar flex flex-col gap-3 sm:gap-3.5 bg-white dark:bg-slate-900 p-3 sm:p-3.5 rounded-xl border border-[#E2E8F0] dark:border-slate-800 shadow-2xs"
+        class="asset-toolbar flex flex-col gap-2.5 sm:gap-3 bg-white dark:bg-slate-900 p-2.5 sm:p-3 rounded-[6px] border border-[#E2E8F0] dark:border-slate-800 shadow-2xs"
       >
         <!-- Row 1: Page Title & Primary CTA -->
         <div class="flex items-center justify-between gap-2.5">
           <div class="min-w-0">
-            <h2 class="text-base sm:text-lg font-bold text-[#333333] dark:text-white tracking-tight truncate">
+            <h1 class="text-[16px] sm:text-[18px] font-semibold text-[#333333] dark:text-white tracking-tight truncate">
               Aset Ops
-            </h2>
+            </h1>
             <p
-              class="text-[11px] sm:text-xs text-[#5F7089] dark:text-slate-400 mt-0.5 leading-normal line-clamp-1 sm:line-clamp-none"
+              class="text-[10px] sm:text-[11px] text-[#5F7089] dark:text-slate-400 mt-0.5 leading-normal line-clamp-1 sm:line-clamp-none"
             >
               Kelola perangkat & mesin operasional outlet / store (POS, KIOSK, Payment, Display).
             </p>
           </div>
 
           <!-- Primary Action CTA -->
-          <div class="inventory-actions flex shrink-0 items-center gap-2">
+          <div class="inventory-actions flex shrink-0 items-center gap-1.5">
             <button
               v-if="canWriteAssets"
               type="button"
               @click="openAdd"
-              class="inventory-primary-action inline-flex h-8.5 sm:h-9 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg bg-[#0A51B0] px-3 sm:px-3.5 text-xs font-semibold text-white shadow-2xs transition-all hover:bg-[#0A4391]"
+              class="inventory-primary-action inline-flex h-8 items-center justify-center gap-1.5 whitespace-nowrap rounded-[6px] bg-[#0A51B0] px-3 text-[11px] sm:text-[12px] font-semibold text-white shadow-2xs transition-all hover:bg-[#0A4391]"
               title="Tambah Aset Ops baru"
             >
               <span aria-hidden="true" class="material-symbols-outlined text-[16px]">add</span>
               <span>Tambah Aset Ops</span>
             </button>
             <div
-              class="inventory-action-group flex items-center gap-1 rounded-lg border border-[#D7E3F2] dark:border-slate-700 bg-[#F8FAFC] dark:bg-slate-800 p-1"
+              class="inventory-action-group flex items-center gap-1 rounded-[6px] border border-[#D7E3F2] dark:border-slate-700 bg-[#F8FAFC] dark:bg-slate-800 p-0.5"
             >
               <button
                 v-if="canWriteAssets"
                 type="button"
                 @click="showImportModal = true"
-                class="inventory-action-button inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-[11px] font-bold text-[#0A51B0] dark:text-blue-400 hover:bg-white dark:hover:bg-slate-700"
+                class="inventory-action-button inline-flex h-7 items-center gap-1 rounded-[6px] px-2 text-[11px] font-semibold text-[#0A51B0] dark:text-blue-400 hover:bg-white dark:hover:bg-slate-700"
                 title="Impor data Aset Ops dari Excel"
               >
                 <span aria-hidden="true" class="material-symbols-outlined text-[15px]"
@@ -451,7 +451,7 @@ function formatDate(dateStr) {
               <button
                 type="button"
                 @click="showExportModal = true"
-                class="inventory-action-button inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-[11px] font-bold text-[#0A51B0] dark:text-blue-400 hover:bg-white dark:hover:bg-slate-700"
+                class="inventory-action-button inline-flex h-7 items-center gap-1 rounded-[6px] px-2 text-[11px] font-semibold text-[#0A51B0] dark:text-blue-400 hover:bg-white dark:hover:bg-slate-700"
                 title="Export data Aset Ops"
               >
                 <span aria-hidden="true" class="material-symbols-outlined text-[15px]"
@@ -464,13 +464,13 @@ function formatDate(dateStr) {
 
         <!-- Row 2: Search, Filters & Actions -->
         <div
-          class="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 w-full min-w-0 pt-2.5 border-t border-[#F1F5F9] dark:border-slate-800"
+          class="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 w-full min-w-0 pt-2 border-t border-[#F1F5F9] dark:border-slate-800"
         >
           <!-- Search Input -->
-          <div class="relative h-8.5 sm:h-9 w-full sm:flex-1 sm:min-w-[200px]">
+          <div class="relative h-8 w-full sm:flex-1 sm:min-w-[200px]">
             <span
               aria-hidden="true"
-              class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-[17px] text-[#687281] dark:text-slate-400 pointer-events-none"
+              class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-[16px] text-[#687281] dark:text-slate-400 pointer-events-none"
               >search</span
             >
             <input
@@ -478,7 +478,7 @@ function formatDate(dateStr) {
               type="text"
               aria-label="Cari aset Ops"
               placeholder="Cari hostname, nama asset, PIC, lokasi…"
-              class="h-full w-full rounded-lg border border-[#E2E8F0] dark:border-slate-800 bg-white dark:bg-slate-800 pl-8 pr-8 text-xs text-[#333333] dark:text-white placeholder-[#687281] dark:placeholder-slate-400 focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
+              class="h-full w-full rounded-[6px] border border-[#E2E8F0] dark:border-slate-800 bg-white dark:bg-slate-800 pl-8 pr-8 text-[12px] text-[#333333] dark:text-white placeholder-[#687281] dark:placeholder-slate-400 focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
             />
             <!-- Inline Clear Button -->
             <button
@@ -497,7 +497,7 @@ function formatDate(dateStr) {
             <button
               type="button"
               @click="showFilterModal = true"
-              class="h-9 shrink-0 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-semibold text-[#5F7089] hover:bg-white"
+              class="h-8 shrink-0 rounded-[6px] border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-[12px] font-medium text-[#5F7089] hover:bg-white"
             >
               <span
                 aria-hidden="true"
@@ -545,7 +545,7 @@ function formatDate(dateStr) {
       <div
         v-if="pageError"
         role="alert"
-        class="flex items-center gap-2 bg-rose-50 px-5 py-4 text-[13px] text-rose-600 rounded-2xl border border-rose-200"
+        class="flex items-center gap-2 bg-rose-50 px-4 py-3 text-xs text-rose-600 rounded-[6px] border border-rose-200"
       >
         <span aria-hidden="true" class="material-symbols-outlined text-[18px]">error</span>
         <span class="flex-1 font-semibold">{{ pageError }}</span>
@@ -559,7 +559,7 @@ function formatDate(dateStr) {
         <div
           v-for="r in 6"
           :key="'ops-skel-' + r"
-          class="ops-row-grid gap-3 xl:gap-4 rounded-xl border border-[#E2E8F0]/80 bg-white p-3.5 sm:p-4 shadow-2xs select-none"
+          class="ops-row-grid gap-3 xl:gap-4 rounded-[6px] border border-[#E2E8F0]/80 bg-white p-2.5 sm:p-3 shadow-2xs select-none"
         >
           <!-- Mobile Skeleton Structure (< 768px) -->
           <div class="flex items-start justify-between gap-2.5 min-w-0 xl:hidden">
@@ -638,18 +638,18 @@ function formatDate(dateStr) {
       <!-- Empty State -->
       <div
         v-else-if="filteredAssets.length === 0"
-        class="py-12 px-4 text-center bg-white rounded-2xl border border-[#E2E8F0]/80"
+        class="py-8 px-3 text-center bg-white rounded-[6px] border border-[#E2E8F0]/80"
       >
         <div class="flex flex-col items-center justify-center gap-2 max-w-sm mx-auto">
           <span
-            class="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#F1F5F9] text-[#5F7089]"
+            class="flex h-10 w-10 items-center justify-center rounded-[6px] bg-[#F1F5F9] text-[#5F7089]"
           >
-            <span aria-hidden="true" class="material-symbols-outlined text-[24px]"
+            <span aria-hidden="true" class="material-symbols-outlined text-[20px]"
               >precision_manufacturing</span
             >
           </span>
-          <h3 class="text-[14px] font-bold text-[#333333] mt-1">Belum Ada Aset OPS</h3>
-          <p class="text-[12px] text-[#5F7089] leading-relaxed">
+          <h3 class="text-[14px] font-semibold text-[#333333] mt-1">Belum Ada Aset OPS</h3>
+          <p class="text-[11px] text-[#5F7089] leading-relaxed">
             Belum ada perangkat operasional yang terdaftar dalam inventaris atau sesuai dengan kata
             kunci pencarian.
           </p>
@@ -657,7 +657,7 @@ function formatDate(dateStr) {
             v-if="canWriteAssets"
             type="button"
             @click="openAdd"
-            class="mt-2 h-9 rounded-lg bg-[#0A51B0] px-4 text-[12px] font-semibold text-white shadow-2xs hover:bg-[#0A4391] transition-all flex items-center gap-1.5 cursor-pointer"
+            class="mt-2 h-8 rounded-[6px] bg-[#0A51B0] px-3.5 text-[12px] font-medium text-white shadow-2xs hover:bg-[#0A4391] transition-all flex items-center gap-1.5 cursor-pointer"
           >
             <span aria-hidden="true" class="material-symbols-outlined text-[16px]">add</span>
             <span>Tambah Aset OPS</span>
@@ -826,21 +826,21 @@ function formatDate(dateStr) {
         :options="locationFilterOptions"
         aria-label="Filter lokasi"
         :block="true"
-        height-class="h-9"
+        height-class="h-8"
       />
       <CustomSelect
         v-model="selectedKategori"
         :options="kategoriFilterOptions"
         aria-label="Filter kategori"
         :block="true"
-        height-class="h-9"
+        height-class="h-8"
       />
       <CustomSelect
         v-model="selectedStatus"
         :options="statusFilterOptions"
         aria-label="Filter status"
         :block="true"
-        height-class="h-9"
+        height-class="h-8"
       />
     </FilterModal>
 
@@ -857,17 +857,17 @@ function formatDate(dateStr) {
       <form
         @submit.prevent="submitForm"
         id="crud-AssetsOpsView"
-        class="asset-crud-form asset-entry-form space-y-4"
+        class="asset-crud-form asset-entry-form space-y-3"
       >
         <div
           v-if="modalError"
           role="alert"
-          class="p-3 bg-[#FEF2F2] border border-[#FECACA] rounded-xl text-[#991B1B] text-[12px]"
+          class="p-3 bg-[#FEF2F2] border border-[#FECACA] rounded-[6px] text-[#991B1B] text-[12px]"
         >
           {{ modalError }}
         </div>
 
-        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <h3 class="asset-form-section-title">Identitas aset</h3>
           <!-- Hostname -->
           <div>
@@ -880,7 +880,7 @@ function formatDate(dateStr) {
               type="text"
               required
               placeholder="cth: OPS-PL-001"
-              class="w-full h-10 px-3 text-[13px] rounded-xl border border-[#E2E8F0] bg-white focus:border-[#0A51B0] focus:outline-none"
+              class="w-full h-8 px-3 text-[12px] rounded-[6px] border border-[#E2E8F0] bg-white focus:border-[#0A51B0] focus:outline-none"
             />
           </div>
 
@@ -895,12 +895,12 @@ function formatDate(dateStr) {
               type="text"
               required
               placeholder="cth: KIOSK Self Service Station"
-              class="w-full h-10 px-3 text-[13px] rounded-xl border border-[#E2E8F0] bg-white focus:border-[#0A51B0] focus:outline-none"
+              class="w-full h-8 px-3 text-[12px] rounded-[6px] border border-[#E2E8F0] bg-white focus:border-[#0A51B0] focus:outline-none"
             />
           </div>
         </div>
 
-        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <h3 class="asset-form-section-title">Kategori & penempatan</h3>
           <!-- Kategori -->
           <div>
@@ -931,7 +931,7 @@ function formatDate(dateStr) {
           </div>
         </div>
 
-        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <h3 class="asset-form-section-title">Penanggung jawab & pembelian</h3>
           <!-- PIC Penanggung Jawab -->
           <div>
@@ -943,7 +943,7 @@ function formatDate(dateStr) {
               v-model="form.pic"
               type="text"
               placeholder="cth: Store Manager / Spv Kasir"
-              class="w-full h-10 px-3 text-[13px] rounded-xl border border-[#E2E8F0] bg-white focus:border-[#0A51B0] focus:outline-none"
+              class="w-full h-8 px-3 text-[12px] rounded-[6px] border border-[#E2E8F0] bg-white focus:border-[#0A51B0] focus:outline-none"
             />
           </div>
 
@@ -956,12 +956,12 @@ function formatDate(dateStr) {
               id="ops-tanggal-beli"
               v-model="form.tanggal_beli"
               type="date"
-              class="w-full h-10 px-3 text-[13px] rounded-xl border border-[#E2E8F0] bg-white focus:border-[#0A51B0] focus:outline-none"
+              class="w-full h-8 px-3 text-[12px] rounded-[6px] border border-[#E2E8F0] bg-white focus:border-[#0A51B0] focus:outline-none"
             />
           </div>
         </div>
 
-        <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
           <h3 class="asset-form-section-title">Nilai & kondisi</h3>
           <!-- Total Asset Amount -->
           <div>
@@ -975,7 +975,7 @@ function formatDate(dateStr) {
               min="0"
               step="1000"
               placeholder="0"
-              class="w-full h-10 px-3 text-[13px] rounded-xl border border-[#E2E8F0] bg-white focus:border-[#0A51B0] focus:outline-none"
+              class="w-full h-8 px-3 text-[12px] rounded-[6px] border border-[#E2E8F0] bg-white focus:border-[#0A51B0] focus:outline-none"
             />
           </div>
 
@@ -988,7 +988,7 @@ function formatDate(dateStr) {
               aria-label="Kondisi Ops"
               placeholder="Pilih kondisi"
               :block="true"
-              height-class="h-10"
+              height-class="h-8"
             />
           </div>
 
@@ -1003,7 +1003,7 @@ function formatDate(dateStr) {
               aria-label="Status Operasional"
               placeholder="Pilih status"
               :block="true"
-              height-class="h-10"
+              height-class="h-8"
             />
           </div>
         </div>
@@ -1017,7 +1017,7 @@ function formatDate(dateStr) {
             type="button"
             :disabled="isSubmitting"
             @click="closeModal"
-            class="h-10 px-4 rounded-xl border border-[#E2E8F0] text-[13px] font-semibold text-[#5F7089] hover:bg-[#F8FAFC]"
+            class="h-8 px-4 rounded-[6px] border border-[#E2E8F0] text-[12px] font-semibold text-[#5F7089] hover:bg-[#F8FAFC]"
           >
             Batal
           </button>
@@ -1025,7 +1025,7 @@ function formatDate(dateStr) {
             type="submit"
             form="crud-AssetsOpsView"
             :disabled="isSubmitting || !canWriteAssets"
-            class="h-10 px-5 rounded-xl bg-[#0A51B0] text-[13px] font-bold text-white shadow-2xs hover:bg-[#0A4391] disabled:opacity-50 flex items-center gap-2"
+            class="h-8 px-4 rounded-[6px] bg-[#0A51B0] text-[12px] font-bold text-white shadow-2xs hover:bg-[#0A4391] disabled:opacity-50 flex items-center gap-2"
           >
             <span
               v-if="isSubmitting"
@@ -1046,8 +1046,8 @@ function formatDate(dateStr) {
       size="sm"
       @close="closeModal"
     >
-      <div class="asset-delete-content space-y-4">
-        <p class="text-[13px] text-[#475569]">
+      <div class="asset-delete-content space-y-3">
+        <p class="text-[12px] text-[#475569]">
           Apakah Anda yakin ingin menghapus Aset OPS
           <strong class="text-[#333333]">{{ selectedAsset?.nama_asset }}</strong> ({{
             selectedAsset?.hostname
@@ -1062,7 +1062,7 @@ function formatDate(dateStr) {
             type="button"
             :disabled="isSubmitting"
             @click="closeModal"
-            class="h-10 px-4 rounded-xl border border-[#E2E8F0] text-[13px] font-semibold text-[#5F7089] hover:bg-[#F8FAFC]"
+            class="h-8 px-4 rounded-[6px] border border-[#E2E8F0] text-[12px] font-semibold text-[#5F7089] hover:bg-[#F8FAFC]"
           >
             Batal
           </button>
@@ -1070,7 +1070,7 @@ function formatDate(dateStr) {
             type="button"
             :disabled="isSubmitting || !canWriteAssets"
             @click="confirmDelete"
-            class="h-10 px-5 rounded-xl bg-rose-600 text-[13px] font-bold text-white shadow-2xs hover:bg-rose-700 disabled:opacity-50"
+            class="h-8 px-4 rounded-[6px] bg-rose-600 text-[12px] font-bold text-white shadow-2xs hover:bg-rose-700 disabled:opacity-50"
           >
             {{ isSubmitting ? 'Menghapus...' : 'Ya, Hapus' }}
           </button>
@@ -1086,9 +1086,9 @@ function formatDate(dateStr) {
       size="lg"
       @close="closeModal"
     >
-      <div v-if="selectedAsset" class="asset-detail space-y-4">
+      <div v-if="selectedAsset" class="asset-detail space-y-3">
         <div
-          class="asset-detail-identity flex items-center gap-3 p-3 bg-[#F8FAFC] rounded-xl border border-[#E2E8F0]"
+          class="asset-detail-identity flex items-center gap-3 p-3 bg-[#F8FAFC] rounded-[6px] border border-[#E2E8F0]"
         >
           <div
             class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#EFF6FF] text-[#333333]"
@@ -1128,7 +1128,7 @@ function formatDate(dateStr) {
 
           <div>
             <span class="text-[#5F7089] block text-[11px] font-medium">Total Asset Amount</span>
-            <span class="font-bold text-[#333333] text-[13.5px]">{{
+            <span class="font-bold text-[#333333] text-[12px]">{{
               formatCurrency(selectedAsset.total_asset_amount)
             }}</span>
           </div>
@@ -1153,7 +1153,7 @@ function formatDate(dateStr) {
 
         <div class="pt-2 border-t border-[#E2E8F0]">
           <span class="text-[#5F7089] block text-[11px] font-medium">Kondisi Perangkat</span>
-          <p class="text-[13px] text-[#333333] font-semibold mt-0.5">
+          <p class="text-[12px] text-[#333333] font-semibold mt-0.5">
             {{ selectedAsset.kondisi || 'Baik' }}
           </p>
         </div>
@@ -1163,7 +1163,7 @@ function formatDate(dateStr) {
           <button
             type="button"
             @click="closeModal"
-            class="h-10 px-5 rounded-xl bg-[#0A51B0] text-[13px] font-bold text-white shadow-2xs hover:bg-[#0A4391]"
+            class="h-8 px-4 rounded-[6px] bg-[#0A51B0] text-[12px] font-bold text-white shadow-2xs hover:bg-[#0A4391]"
           >
             Tutup
           </button>
@@ -1223,15 +1223,15 @@ function formatDate(dateStr) {
   top: auto;
 }
 .asset-inventory .asset-toolbar {
-  padding: 0.875rem;
+  padding: 8px 10px;
   border: 1px solid rgba(226, 232, 240, 0.8);
-  border-radius: 1rem;
+  border-radius: 6px;
   background: #ffffff;
   box-shadow: 0 1px 2px rgba(23, 43, 77, 0.04);
 }
 @media (min-width: 640px) {
   .asset-inventory .asset-toolbar {
-    padding: 1.125rem;
+    padding: 10px 12px;
   }
 }
 </style>

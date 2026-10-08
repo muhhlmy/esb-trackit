@@ -858,41 +858,41 @@ onMounted(async () => {
     <!-- Simplified SaaS Header & Toolbar Container -->
     <div class="asset-toolbar-sticky">
       <div
-        class="asset-toolbar flex flex-col gap-3 sm:gap-3.5 bg-white dark:bg-slate-900 p-3 sm:p-3.5 rounded-xl border border-[#E2E8F0] dark:border-slate-800 shadow-2xs"
+        class="asset-toolbar flex flex-col gap-2.5 sm:gap-3 bg-white dark:bg-slate-900 p-2.5 sm:p-3 rounded-[6px] border border-[#E2E8F0] dark:border-slate-800 shadow-2xs"
       >
         <!-- Row 1: Page Title & Primary CTA -->
         <div class="flex items-center justify-between gap-2.5">
           <div class="min-w-0">
-            <h2 class="text-base sm:text-lg font-bold text-[#333333] dark:text-white tracking-tight truncate">
+            <h1 class="text-[16px] sm:text-[18px] font-semibold text-[#333333] dark:text-white tracking-tight truncate">
               Aset IT
-            </h2>
+            </h1>
             <p
-              class="text-[11px] sm:text-xs text-[#5F7089] dark:text-slate-400 mt-0.5 leading-normal line-clamp-1 sm:line-clamp-none"
+              class="text-[10px] sm:text-[11px] text-[#5F7089] dark:text-slate-400 mt-0.5 leading-normal line-clamp-1 sm:line-clamp-none"
             >
               Monitor dan kelola seluruh perangkat IT perusahaan
             </p>
           </div>
 
           <!-- Primary Action CTA -->
-          <div class="inventory-actions flex shrink-0 items-center gap-2">
+          <div class="inventory-actions flex shrink-0 items-center gap-1.5">
             <button
               v-if="canWriteAssets"
               type="button"
               @click="openAdd"
-              class="inventory-primary-action inline-flex h-8.5 sm:h-9 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg bg-[#0A51B0] px-3 sm:px-3.5 text-xs font-semibold text-white shadow-2xs transition-all hover:bg-[#0A4391]"
+              class="inventory-primary-action inline-flex h-8 items-center justify-center gap-1.5 whitespace-nowrap rounded-[6px] bg-[#0A51B0] px-3 text-[11px] sm:text-[12px] font-semibold text-white shadow-2xs transition-all hover:bg-[#0A4391]"
               title="Tambah aset baru"
             >
               <span aria-hidden="true" class="material-symbols-outlined text-[16px]">add</span>
               <span>Tambah Aset</span>
             </button>
             <div
-              class="inventory-action-group flex items-center gap-1 rounded-lg border border-[#D7E3F2] dark:border-slate-700 bg-[#F8FAFC] dark:bg-slate-800 p-1"
+              class="inventory-action-group flex items-center gap-1 rounded-[6px] border border-[#D7E3F2] dark:border-slate-700 bg-[#F8FAFC] dark:bg-slate-800 p-0.5"
             >
               <button
                 v-if="canWriteAssets"
                 type="button"
                 @click="showImportModal = true"
-                class="inventory-action-button inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-[11px] font-bold text-[#0A51B0] dark:text-blue-400 hover:bg-white dark:hover:bg-slate-700"
+                class="inventory-action-button inline-flex h-7 items-center gap-1 rounded-[6px] px-2 text-[11px] font-semibold text-[#0A51B0] dark:text-blue-400 hover:bg-white dark:hover:bg-slate-700"
               >
                 <span aria-hidden="true" class="material-symbols-outlined text-[15px]"
                   >upload_file</span
@@ -901,7 +901,7 @@ onMounted(async () => {
               <button
                 type="button"
                 @click="openExport"
-                class="inventory-action-button inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-[11px] font-bold text-[#0A51B0] dark:text-blue-400 hover:bg-white dark:hover:bg-slate-700"
+                class="inventory-action-button inline-flex h-7 items-center gap-1 rounded-[6px] px-2 text-[11px] font-semibold text-[#0A51B0] dark:text-blue-400 hover:bg-white dark:hover:bg-slate-700"
               >
                 <span aria-hidden="true" class="material-symbols-outlined text-[15px]"
                   >download</span
@@ -913,13 +913,13 @@ onMounted(async () => {
 
         <!-- Row 2: Search, Filters & Actions -->
         <div
-          class="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 w-full min-w-0 pt-2.5 border-t border-[#F1F5F9] dark:border-slate-800"
+          class="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 w-full min-w-0 pt-2 border-t border-[#F1F5F9] dark:border-slate-800"
         >
           <!-- Search Input -->
-          <div class="relative h-8.5 sm:h-9 w-full sm:flex-1 sm:min-w-[200px]">
+          <div class="relative h-8 w-full sm:flex-1 sm:min-w-[200px]">
             <span
               aria-hidden="true"
-              class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-[17px] text-[#687281] dark:text-slate-400 pointer-events-none"
+              class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-[16px] text-[#687281] dark:text-slate-400 pointer-events-none"
               >search</span
             >
             <input
@@ -927,7 +927,7 @@ onMounted(async () => {
               type="text"
               aria-label="Cari aset, serial number, atau pemegang"
               placeholder="Cari aset, serial number, atau pemegang…"
-              class="h-full w-full rounded-lg border border-[#E2E8F0] dark:border-slate-800 bg-white dark:bg-slate-800 pl-8 pr-8 text-xs text-[#333333] dark:text-white placeholder-[#687281] dark:placeholder-slate-400 focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
+              class="h-full w-full rounded-[6px] border border-[#E2E8F0] dark:border-slate-800 bg-white dark:bg-slate-800 pl-8 pr-8 text-[12px] text-[#333333] dark:text-white placeholder-[#687281] dark:placeholder-slate-400 focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
             />
             <!-- Inline Clear Button -->
             <button
@@ -945,9 +945,9 @@ onMounted(async () => {
           <button
             type="button"
             @click="showFilterModal = true"
-            class="h-9 shrink-0 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-semibold text-[#5F7089] hover:bg-white"
+            class="h-8 shrink-0 rounded-[6px] border border-[#E2E8F0] bg-[#F8FAFC] px-2.5 text-[11px] sm:text-[12px] font-semibold text-[#5F7089] hover:bg-white"
           >
-            <span aria-hidden="true" class="material-symbols-outlined mr-1 align-middle text-[16px]"
+            <span aria-hidden="true" class="material-symbols-outlined mr-1 align-middle text-[15px]"
               >filter_alt</span
             >Filter
           </button>
@@ -1002,7 +1002,7 @@ onMounted(async () => {
         <div
           v-for="r in 6"
           :key="'asset-skel-' + r"
-          class="asset-row-grid gap-3 xl:gap-4 rounded-xl border border-[#E2E8F0]/80 bg-white p-3.5 sm:p-4 shadow-2xs select-none"
+          class="asset-row-grid gap-3 xl:gap-4 rounded-[6px] border border-[#E2E8F0]/80 bg-white p-2.5 sm:p-3 shadow-2xs select-none"
         >
           <!-- Mobile Skeleton Structure (< 768px) -->
           <div class="flex items-start justify-between gap-2.5 min-w-0 xl:hidden">
@@ -1084,7 +1084,7 @@ onMounted(async () => {
       <!-- Empty State -->
       <div
         v-else-if="filteredAssets.length === 0"
-        class="py-8 px-4 bg-white rounded-2xl border border-[#E2E8F0]/80"
+        class="bg-white rounded-[6px] border border-[#E2E8F0]/80"
       >
         <EmptyState
           icon="devices_off"
@@ -1360,7 +1360,7 @@ onMounted(async () => {
                   maxlength="100"
                   aria-label="Hostname Aset"
                   placeholder="cth: LAPTOP-IT-04 atau WS-FINANCE-01"
-                  class="h-10 w-full rounded-lg border border-[#E2E8F0] bg-white pl-9 pr-3 text-[12px] font-medium text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 focus:outline-none transition-all shadow-2xs"
+                  class="h-8 w-full rounded-[6px] border border-[#E2E8F0] bg-white pl-9 pr-3 text-[12px] font-medium text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 focus:outline-none transition-all shadow-2xs"
                 />
               </div>
             </div>
@@ -1383,7 +1383,7 @@ onMounted(async () => {
                   maxlength="100"
                   aria-label="Serial Number Aset"
                   placeholder="cth: PF3ABCDE atau 5CD1234XYZ"
-                  class="h-10 w-full rounded-lg border border-[#E2E8F0] bg-white pl-9 pr-3 text-[12px] font-medium text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 focus:outline-none transition-all shadow-2xs"
+                  class="h-8 w-full rounded-[6px] border border-[#E2E8F0] bg-white pl-9 pr-3 text-[12px] font-medium text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 focus:outline-none transition-all shadow-2xs"
                 />
               </div>
             </div>
@@ -1399,7 +1399,7 @@ onMounted(async () => {
                 aria-label="Tipe Perangkat Aset"
                 placeholder="Pilih tipe perangkat"
                 :block="true"
-                height-class="h-10"
+                height-class="h-8"
               />
             </div>
 
@@ -1471,7 +1471,7 @@ onMounted(async () => {
                 </div>
                 <div class="min-w-0 flex-1">
                   <div class="flex items-center gap-2 flex-wrap">
-                    <span class="text-[13px] font-bold text-[#333333] truncate">
+                    <span class="text-[12px] font-bold text-[#333333] truncate">
                       {{ form.nama_karyawan_pemegang_asset || 'Karyawan Terpilih' }}
                     </span>
                     <span
@@ -1601,7 +1601,7 @@ onMounted(async () => {
                   v-model="form.model"
                   maxlength="100"
                   placeholder="cth: ThinkPad T14 Gen 3"
-                  class="h-10 w-full rounded-lg border border-[#E2E8F0] bg-white pl-9 pr-3 text-[12px] font-medium text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 focus:outline-none transition-all shadow-2xs"
+                  class="h-8 w-full rounded-[6px] border border-[#E2E8F0] bg-white pl-9 pr-3 text-[12px] font-medium text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 focus:outline-none transition-all shadow-2xs"
                 />
               </div>
             </div>
@@ -1617,7 +1617,7 @@ onMounted(async () => {
                 aria-label="Status Aset"
                 placeholder="Pilih status aset"
                 :block="true"
-                height-class="h-10"
+                height-class="h-8"
               />
             </div>
 
@@ -1632,7 +1632,7 @@ onMounted(async () => {
                 aria-label="Kondisi Aset"
                 placeholder="Pilih kondisi aset"
                 :block="true"
-                height-class="h-10"
+                height-class="h-8"
               />
             </div>
 
@@ -1676,7 +1676,7 @@ onMounted(async () => {
             type="button"
             :disabled="isSubmitting"
             @click="closeModal"
-            class="h-9.5 px-4 rounded-lg border border-[#E2E8F0] bg-white text-[12px] font-bold text-[#5F7089] hover:bg-[#F8FAFC] hover:text-[#333333] hover:border-[#CBD5E1] transition-all cursor-pointer touch-manipulation flex items-center justify-center gap-1.5"
+            class="h-8 px-4 rounded-[6px] border border-[#E2E8F0] bg-white text-[12px] font-bold text-[#5F7089] hover:bg-[#F8FAFC] hover:text-[#333333] hover:border-[#CBD5E1] transition-all cursor-pointer touch-manipulation flex items-center justify-center gap-1.5"
           >
             <span>Batal</span>
           </button>
@@ -1686,7 +1686,7 @@ onMounted(async () => {
               v-if="activeTab !== 'info'"
               type="button"
               @click="activeTab = activeTab === 'specifications' ? 'placement' : 'info'"
-              class="h-9.5 flex-1 sm:flex-initial rounded-lg border border-[#E2E8F0] bg-white px-3.5 text-[12px] font-bold text-[#0A4391] hover:bg-[#EDF5FF] hover:border-[#B8D4F5] transition-all flex items-center justify-center gap-1 cursor-pointer touch-manipulation shadow-2xs"
+              class="h-8 flex-1 sm:flex-initial rounded-[6px] border border-[#E2E8F0] bg-white px-3.5 text-[12px] font-bold text-[#0A4391] hover:bg-[#EDF5FF] hover:border-[#B8D4F5] transition-all flex items-center justify-center gap-1 cursor-pointer touch-manipulation shadow-2xs"
             >
               <span aria-hidden="true" class="material-symbols-outlined text-[16px]"
                 >arrow_back</span
@@ -1699,7 +1699,7 @@ onMounted(async () => {
               type="button"
               @click="nextStep"
               :disabled="isSubmitting || hasValidationErrors"
-              class="h-9.5 flex-1 sm:flex-initial rounded-lg bg-[#0A51B0] hover:bg-[#0A4391] active:bg-[#0F1F38] px-4.5 text-[12px] font-bold text-white shadow-sm disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-1.5 cursor-pointer touch-manipulation"
+              class="h-8 flex-1 sm:flex-initial rounded-[6px] bg-[#0A51B0] hover:bg-[#0A4391] active:bg-[#0F1F38] px-4 text-[12px] font-bold text-white shadow-sm disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-1.5 cursor-pointer touch-manipulation"
             >
               <span>Lanjutkan</span>
               <span aria-hidden="true" class="material-symbols-outlined text-[16px]"
@@ -1712,7 +1712,7 @@ onMounted(async () => {
               type="submit"
               form="crud-AssetsView"
               :disabled="isSubmitting || !canWriteAssets || hasValidationErrors"
-              class="h-9.5 flex-1 sm:flex-initial rounded-lg bg-[#0A51B0] hover:bg-[#0A4391] active:bg-[#0F1F38] px-5 text-[12px] font-bold text-white shadow-sm disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-1.5 cursor-pointer touch-manipulation"
+              class="h-8 flex-1 sm:flex-initial rounded-[6px] bg-[#0A51B0] hover:bg-[#0A4391] active:bg-[#0F1F38] px-4 text-[12px] font-bold text-white shadow-sm disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-1.5 cursor-pointer touch-manipulation"
             >
               <span
                 v-if="isSubmitting"
@@ -1755,7 +1755,7 @@ onMounted(async () => {
           >
         </div>
         <div>
-          <h4 class="text-[15px] font-black text-[#111827]">
+          <h4 class="text-[14px] font-black text-[#111827]">
             Hapus {{ selectedAsset?.label_aset }}?
           </h4>
           <p class="mt-1 text-[12px] text-[#9CA3AF]">Data aset akan dihapus permanen.</p>
@@ -1767,14 +1767,14 @@ onMounted(async () => {
             type="button"
             :disabled="isSubmitting"
             @click="closeModal"
-            class="h-10 flex-1 rounded-lg border"
+            class="h-8 flex-1 rounded-[6px] border"
           >
             Batal</button
           ><button
             type="button"
             :disabled="isSubmitting"
             @click="deleteAsset"
-            class="h-10 flex-1 rounded-lg bg-[#EF4444] font-bold text-white"
+            class="h-8 flex-1 rounded-[6px] bg-[#EF4444] font-bold text-white"
           >
             {{ isSubmitting ? 'Menghapus...' : 'Ya, Hapus' }}
           </button>
@@ -1790,11 +1790,11 @@ onMounted(async () => {
       @close="closeModal"
     >
       <div v-if="selectedAsset" class="space-y-4">
-        <div class="flex items-center gap-3 rounded-2xl border border-[#E8EDF3] bg-[#F8FAFC] p-4">
+        <div class="flex items-center gap-3 rounded-[6px] border border-[#E8EDF3] bg-[#F8FAFC] p-3">
           <div
-            class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-brand-light text-brand"
+            class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[6px] bg-brand-light text-brand"
           >
-            <span aria-hidden="true" class="material-symbols-outlined text-[21px]">{{
+            <span aria-hidden="true" class="material-symbols-outlined text-[20px]">{{
               getDeviceIcon(selectedAsset.tipe_perangkat)
             }}</span>
           </div>
@@ -1813,7 +1813,7 @@ onMounted(async () => {
             Spesifikasi Perangkat
           </p>
           <div
-            class="min-h-28 whitespace-pre-wrap rounded-2xl border border-[#DCE3EC] bg-white p-4 text-[11px] font-medium leading-6 text-[#334155]"
+            class="min-h-24 whitespace-pre-wrap rounded-[6px] border border-[#DCE3EC] bg-white p-3 text-[11px] font-medium leading-5 text-[#334155]"
           >
             {{ selectedAsset.spesifikasi || 'Belum ada informasi spesifikasi untuk aset ini.' }}
           </div>
@@ -1823,7 +1823,7 @@ onMounted(async () => {
         <div class="flex justify-end">
           <button
             type="button"
-            class="h-9 rounded-xl bg-brand px-5 font-bold text-white hover:bg-brand-dark"
+            class="h-8 rounded-[6px] bg-brand px-4 text-xs font-semibold text-white hover:bg-brand-dark"
             @click="closeModal"
           >
             Tutup
@@ -1842,7 +1842,7 @@ onMounted(async () => {
       <div v-if="selectedAsset" class="asset-detail flex flex-col gap-0">
         <!-- Header Aset -->
         <div class="asset-detail-identity flex items-center gap-3 pb-4">
-          <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-brand text-white">
+          <div class="flex h-10 w-10 items-center justify-center rounded-[6px] bg-brand text-white">
             <span aria-hidden="true" class="material-symbols-outlined">{{
               getDeviceIcon(selectedAsset.tipe_perangkat)
             }}</span>
@@ -1851,7 +1851,7 @@ onMounted(async () => {
             <p class="text-[10px] font-bold uppercase text-brand">
               ID #{{ selectedAsset.id_aset }}
             </p>
-            <h4 class="text-[17px] font-black text-[#111827]">{{ selectedAsset.label_aset }}</h4>
+            <h4 class="text-[14px] font-black text-[#111827]">{{ selectedAsset.label_aset }}</h4>
           </div>
         </div>
 
@@ -1911,18 +1911,18 @@ onMounted(async () => {
               :key="item[0]"
             >
               <dt class="text-[10px] font-bold uppercase text-[#9CA3AF]">{{ item[0] }}</dt>
-              <dd class="mt-1 text-[13px] font-semibold text-[#111827]">{{ item[1] || '—' }}</dd>
+              <dd class="mt-1 text-[12px] font-semibold text-[#111827]">{{ item[1] || '—' }}</dd>
             </div>
           </dl>
           <div>
             <p class="mb-1 text-[10px] font-bold uppercase text-[#9CA3AF]">Spesifikasi</p>
-            <p class="whitespace-pre-wrap rounded-xl bg-[#F9FAFB] p-3 text-[13px] text-[#374151]">
+            <p class="whitespace-pre-wrap rounded-xl bg-[#F9FAFB] p-3 text-[12px] text-[#374151]">
               {{ selectedAsset.spesifikasi || '—' }}
             </p>
           </div>
           <div>
             <p class="mb-1 text-[10px] font-bold uppercase text-[#9CA3AF]">Catatan Aset</p>
-            <p class="whitespace-pre-wrap rounded-xl bg-[#FFFDF5] p-3 text-[13px] text-[#374151]">
+            <p class="whitespace-pre-wrap rounded-xl bg-[#FFFDF5] p-3 text-[12px] text-[#374151]">
               {{ selectedAsset.note_asset || selectedAsset.catatan_aset || '—' }}
             </p>
           </div>
@@ -2092,7 +2092,7 @@ onMounted(async () => {
           <button
             type="button"
             @click="closeModal"
-            class="h-9 rounded-lg bg-[#111827] px-5 text-[13px] font-bold text-white"
+            class="h-8 rounded-[6px] bg-[#111827] px-4 text-[12px] font-bold text-white"
           >
             Tutup
           </button>
@@ -2178,7 +2178,7 @@ onMounted(async () => {
               aria-label="Filter Status"
               placeholder="Semua status"
               :block="true"
-              height-class="h-10"
+              height-class="h-8"
             />
           </div>
           <div class="flex flex-col gap-1.5">
@@ -2194,7 +2194,7 @@ onMounted(async () => {
               aria-label="Filter Tipe Perangkat"
               placeholder="Semua tipe"
               :block="true"
-              height-class="h-10"
+              height-class="h-8"
             />
           </div>
         </div>
@@ -2205,14 +2205,14 @@ onMounted(async () => {
           <button
             type="button"
             @click="closeModal"
-            class="h-10 w-full sm:w-auto rounded-xl border border-[#DCE3EC] px-5 text-[12px] font-semibold text-[#475569] hover:bg-[#F8FAFC] transition-all cursor-pointer touch-manipulation"
+            class="h-8 w-full sm:w-auto rounded-[6px] border border-[#DCE3EC] px-4 text-[12px] font-semibold text-[#475569] hover:bg-[#F8FAFC] transition-all cursor-pointer touch-manipulation"
           >
             Batal
           </button>
           <button
             type="submit"
             :disabled="isExporting"
-            class="h-10 w-full sm:w-auto rounded-xl bg-brand px-5 text-[12px] font-bold text-white shadow-md shadow-brand/20 hover:bg-brand-dark disabled:opacity-50 transition-all cursor-pointer touch-manipulation"
+            class="h-8 w-full sm:w-auto rounded-[6px] bg-brand px-4 text-[12px] font-bold text-white shadow-md shadow-brand/20 hover:bg-brand-dark disabled:opacity-50 transition-all cursor-pointer touch-manipulation"
           >
             {{
               isExporting ? 'Mengekspor...' : exportFormat === 'xlsx' ? 'Unduh XLSX' : 'Unduh PDF'
@@ -2289,21 +2289,8 @@ onMounted(async () => {
   }
 }
 
-.form-control {
-  height: 2.625rem;
-  border: 1px solid #dce3ec;
-  border-radius: 0.75rem;
-  background: #ffffff;
-  padding-left: 0.75rem;
-  padding-right: 0.75rem;
-  font-size: 0.8125rem; /* 13px — audit v2: input text floor, align global */
-  color: #334155;
-  outline: none;
-}
-.form-control:focus {
-  border-color: var(--color-brand);
-  box-shadow: 0 0 0 3px rgb(9 124 222 / 10%);
-}
+/* .form-control lama dihapus — dead code (tidak dipakai template) dan
+   menduplikasi styling input global main.css dengan nilai non-konform. */
 </style>
 
 <style scoped src="../assets/asset-workspace.css"></style>
@@ -2324,15 +2311,15 @@ onMounted(async () => {
    4px 0 8px / transparent / border 0 karena specificity (0,2,0)
    lebih tinggi dari utility Tailwind (0,1,0) — header menempel. */
 .asset-inventory .asset-toolbar {
-  padding: 0.875rem;
+  padding: 8px 10px;
   border: 1px solid rgba(226, 232, 240, 0.8);
-  border-radius: 1rem;
+  border-radius: 6px;
   background: #ffffff;
   box-shadow: 0 1px 2px rgba(23, 43, 77, 0.04);
 }
 @media (min-width: 640px) {
   .asset-inventory .asset-toolbar {
-    padding: 1.125rem;
+    padding: 10px 12px;
   }
 }
 </style>
@@ -2342,9 +2329,9 @@ onMounted(async () => {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 6px;
-  margin-bottom: 22px;
+  margin-bottom: 12px;
   padding: 6px;
-  border-radius: 12px;
+  border-radius: 6px;
   background: #f1f5f9;
 }
 .it-create-steps button {
@@ -2352,10 +2339,10 @@ onMounted(async () => {
   align-items: center;
   gap: 10px;
   min-width: 0;
-  min-height: 60px;
-  padding: 10px;
+  min-height: 34px;
+  padding: 6px 10px;
   border: 1px solid transparent;
-  border-radius: 9px;
+  border-radius: 6px;
   text-align: left;
   cursor: pointer;
   color: #637288;
@@ -2396,21 +2383,21 @@ onMounted(async () => {
   color: #667283;
 }
 .it-create-panel {
-  padding: 20px;
+  padding: 10px 12px;
   border: 1px solid #e2e8f0;
-  border-radius: 12px;
+  border-radius: 6px;
   background: white;
 }
 .it-create-panel > div:first-child {
   gap: 12px;
   align-items: center;
-  padding-bottom: 14px;
+  padding-bottom: 10px;
   border-color: #edf1f6;
 }
 .it-create-panel > div:first-child > div > span:last-child {
   text-transform: none;
   letter-spacing: 0;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
 }
 .it-create-panel > div:first-child > span {
@@ -2419,7 +2406,7 @@ onMounted(async () => {
   color: #667283;
 }
 .it-create-form fieldset {
-  gap: 18px;
+  gap: 12px;
   padding-top: 4px;
 }
 .it-create-form label {
@@ -2428,19 +2415,19 @@ onMounted(async () => {
   font-weight: 550;
 }
 .it-create-form input {
-  min-height: 44px;
-  border-radius: 8px;
+  min-height: 32px;
+  border-radius: 6px;
   background: #fafbfd;
 }
 .it-create-form :deep(button[aria-haspopup='listbox']) {
-  min-height: 44px;
+  min-height: 32px;
   background: #fafbfd;
 }
 .it-create-actions {
   justify-content: space-between;
 }
 .it-create-actions button {
-  min-height: 44px;
+  min-height: 32px;
 }
 .it-create-steps button:focus-visible {
   outline: 2px solid #097cde;
@@ -2466,7 +2453,7 @@ onMounted(async () => {
     display: none;
   }
   .it-create-panel {
-    padding: 14px;
+    padding: 10px 12px;
   }
   .it-create-panel > div:first-child {
     align-items: flex-start;
@@ -2498,23 +2485,23 @@ onMounted(async () => {
 .it-entry-summary {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 16px;
-  margin-bottom: 16px;
-  border-radius: 12px;
+  gap: 10px;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+  border-radius: 6px;
   background: #edf5ff;
   border: 1px solid #dceafb;
 }
 .it-entry-icon {
   display: grid;
   place-items: center;
-  width: 42px;
-  height: 42px;
+  width: 32px;
+  height: 32px;
   flex-shrink: 0;
-  border-radius: 10px;
+  border-radius: 6px;
   background: white;
   color: #0a51b0;
-  font-size: 23px;
+  font-size: 18px;
 }
 .it-entry-summary > div {
   min-width: 0;
@@ -2536,13 +2523,13 @@ onMounted(async () => {
   padding: 0;
   background: transparent;
   gap: 10px;
-  margin-bottom: 22px;
+  margin-bottom: 12px;
 }
 .it-create-steps button {
-  min-height: 62px;
+  min-height: 34px;
   border: 1px solid #e2e8f0;
-  padding: 10px;
-  border-radius: 10px;
+  padding: 6px 10px;
+  border-radius: 6px;
 }
 .it-create-steps button[aria-current='step'] {
   background: #edf5ff;
@@ -2565,18 +2552,18 @@ onMounted(async () => {
   display: none;
 }
 .it-create-panel > div:first-child > div > span:last-child {
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 650;
 }
 .it-entry-guidance {
   font-size: 12px;
-  line-height: 1.7;
+  line-height: 1.5;
   color: #637288;
-  margin-top: 5px;
-  margin-bottom: 20px;
+  margin-top: 4px;
+  margin-bottom: 12px;
 }
 .it-create-form fieldset {
-  gap: 20px;
+  gap: 12px;
   padding: 0;
 }
 .it-create-form label {
@@ -2585,20 +2572,20 @@ onMounted(async () => {
 }
 .it-create-form input {
   background: #fafbfd;
-  min-height: 44px;
-  font-size: 13px;
+  min-height: 32px;
+  font-size: 12px;
 }
 .it-create-form input:focus {
   background: white;
 }
 .it-create-form :deep(button[aria-haspopup='listbox']) {
-  min-height: 44px;
+  min-height: 32px;
   background: #fafbfd;
 }
 .it-create-form fieldset > div:has(> p) {
   border: 0;
   background: #f8fafc;
-  border-radius: 9px;
+  border-radius: 6px;
 }
 .it-create-actions {
   flex-direction: row;
@@ -2612,17 +2599,17 @@ onMounted(async () => {
 }
 @media (max-width: 639px) {
   .it-entry-summary {
-    padding: 14px;
+    padding: 10px 12px;
   }
   .it-create-steps {
     gap: 6px;
   }
   .it-create-steps button {
-    min-height: 76px;
-    padding: 9px 3px;
+    min-height: 60px;
+    padding: 8px 3px;
   }
   .it-create-form fieldset {
-    gap: 18px;
+    gap: 12px;
   }
   .it-create-form input,
   .it-create-form :deep(button[aria-haspopup='listbox']) {

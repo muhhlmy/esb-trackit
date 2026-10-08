@@ -200,5 +200,14 @@ async function seedDemoData(client) {
     ON CONFLICT DO NOTHING
   `)
 
-  console.log('[seed] demo data seeded (aset IT/GA/Ops, kb_categories, faq, cases).')
+  // Tickets (untuk ticket inbox & search)
+  await client.query(`
+    INSERT INTO tickets (nomor_tiket, judul, deskripsi, kategori, prioritas, status_tiket, queue_id, pelapor_user_id)
+    VALUES
+      ('TCK-202610-0001', 'E2E Ticket Issue Printer Offline', 'Kendala printer di lantai 2 tidak terhubung', 'Hardware', 'Medium', 'Open', 1, 1),
+      ('TCK-202610-0002', 'E2E Ticket Issue VPN Disconnect', 'VPN terputus saat jam kerja', 'Network', 'High', 'Open', 1, 1)
+    ON CONFLICT (nomor_tiket) DO NOTHING
+  `)
+
+  console.log('[seed] demo data seeded (aset IT/GA/Ops, kb_categories, faq, cases, tickets).')
 }

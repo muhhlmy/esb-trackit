@@ -9,7 +9,7 @@ export const pool = new pg.Pool({
   password: env.database.password,
   database: env.database.database,
   ssl: env.database.ssl,
-  max: 10,
+  max: env.nodeEnv === 'test' ? 25 : 10,
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 15000,
 })

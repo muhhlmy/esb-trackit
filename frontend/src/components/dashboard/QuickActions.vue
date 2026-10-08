@@ -82,33 +82,33 @@ const quickActions = computed(() => allQuickActions.filter((action) => action.av
   min-width: 0;
 }
 .quick-access-heading {
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 .quick-access-heading h2 {
   font-size: 14px;
-  font-weight: 650;
+  font-weight: 600;
   color: var(--color-text-primary);
 }
 .quick-access-heading p {
-  margin-top: 4px;
-  font-size: 12px;
+  margin-top: 2px;
+  font-size: 11px;
   color: var(--color-text-secondary);
 }
 .quick-actions {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 10px;
 }
 .quick-action-card {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   min-width: 0;
-  min-height: 88px;
-  padding: 16px;
+  min-height: 48px;
+  padding: 8px 10px;
   text-align: left;
   border: 1px solid var(--color-border);
-  border-radius: 12px;
+  border-radius: 6px;
   background: var(--color-background-surface);
   color: var(--color-text-primary);
   cursor: pointer;
@@ -131,31 +131,31 @@ const quickActions = computed(() => allQuickActions.filter((action) => action.av
   display: grid;
   place-items: center;
   flex-shrink: 0;
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
-  font-size: 22px;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  font-size: 18px;
   background: var(--color-background-surface-muted);
   color: var(--color-primary);
 }
 .quick-action-copy {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
   min-width: 0;
   flex: 1;
 }
 .quick-action-label {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
 }
 .quick-action-description {
-  font-size: 11px;
-  line-height: 1.5;
+  font-size: 10.5px;
+  line-height: 1.4;
   color: var(--color-text-secondary);
 }
 .quick-action-arrow {
-  font-size: 16px;
+  font-size: 15px;
   color: var(--color-text-secondary);
 }
 @media (max-width: 639px) {
@@ -166,23 +166,23 @@ const quickActions = computed(() => allQuickActions.filter((action) => action.av
   }
   .quick-actions {
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 8px;
+    gap: 6px;
   }
   .quick-action-card {
     flex-direction: column;
     justify-content: flex-start;
-    gap: 8px;
-    min-height: 96px;
-    padding: 8px 2px;
+    gap: 4px;
+    min-height: 56px;
+    padding: 6px 2px;
     text-align: center;
     border: 0;
     background: transparent;
   }
   .quick-action-icon {
-    width: 48px;
-    height: 48px;
-    border-radius: 14px;
-    font-size: 24px;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    font-size: 18px;
   }
   .quick-action-copy {
     flex: none;
@@ -190,7 +190,7 @@ const quickActions = computed(() => allQuickActions.filter((action) => action.av
   }
   .quick-action-label {
     font-size: 11px;
-    line-height: 1.4;
+    line-height: 1.3;
     overflow-wrap: anywhere;
   }
 }

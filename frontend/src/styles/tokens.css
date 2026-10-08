@@ -129,15 +129,15 @@
   --chart-height-lg: 260px;
   --chart-height-md: 200px;
   --chart-height-sm: 140px;
-  --control-height-lg: 38px;
-  --control-height-md: 32px;
+  --control-height-lg: 34px;
+  --control-height-md: 30px;
   --control-height-sm: 26px;
   --header-height: 48px;
   --header-height-mobile: 44px;
   --sidebar-width-collapsed: 64px;
   --sidebar-width-expanded-desktop: 220px;
   --sidebar-width-mobile: 240px;
-  --table-row-height: 36px;
+  --table-row-height: 34px;
   --duration-fast: 150ms;
   --duration-fastest: 50ms;
   --duration-normal: 250ms;

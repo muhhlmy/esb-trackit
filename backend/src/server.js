@@ -76,3 +76,5 @@ try {
 
 console.log(`API berjalan di http://${env.host}:${env.port}`);
 server = app.listen(env.port, env.host);
+server.keepAliveTimeout = 65000;
+server.headersTimeout = 66000;

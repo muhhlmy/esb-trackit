@@ -149,7 +149,10 @@ export const env = {
     secret: jwtSecret,
   },
   password: {
-    bcryptRounds: readBoundedInteger("PASSWORD_BCRYPT_ROUNDS", 12, 10, 14),
+    bcryptRounds:
+      process.env.NODE_ENV === "test"
+        ? readBoundedInteger("PASSWORD_BCRYPT_ROUNDS", 4, 4, 14)
+        : readBoundedInteger("PASSWORD_BCRYPT_ROUNDS", 12, 10, 14),
   },
   auth: {
     // Umur akses JWT (dipangkas dari 12 jam menjadi 15 menit; sesi server 12 jam

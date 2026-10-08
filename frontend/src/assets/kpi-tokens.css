@@ -1,83 +1,113 @@
 /* kpi-tokens.css — Anti-Slop Centralized Design Tokens for KPI Cards */
 :root {
   /* Height (compact SaaS scale) */
-  --kpi-height: 66px;               /* base / mobile */
-  --kpi-height-sm: 70px;            /* tablet */
-  --kpi-height-lg: 74px;            /* desktop */
+  --kpi-height: 52px;               /* base / mobile */
+  --kpi-height-sm: 54px;            /* tablet */
+  --kpi-height-lg: 56px;            /* desktop */
 
   /* Padding */
-  --kpi-padding: 8px 10px;          /* base / mobile */
-  --kpi-padding-sm: 9px 12px;       /* tablet */
-  --kpi-padding-lg: 10px 14px;      /* desktop */
+  --kpi-padding: 8px 10px;          /* base / mobile: 8-10px */
+  --kpi-padding-sm: 8px 10px;       /* tablet */
+  --kpi-padding-lg: 10px 12px;      /* desktop: 10-12px */
 
-  /* Title font */
-  --kpi-title-font-size: 11.5px;
-  --kpi-title-font-size-sm: 12px;
-  --kpi-title-font-size-lg: 12.5px;
+  /* Title / Label font (Desktop 11px, Mobile 10px, medium 500) */
+  --kpi-title-font-size: 10px;
+  --kpi-title-font-size-sm: 10.5px;
+  --kpi-title-font-size-lg: 11px;
   --kpi-title-font-weight: 500;
 
-  /* Value font (15px-16px compact scale) */
-  --kpi-value-font-size: 15px;
-  --kpi-value-font-size-sm: 15.5px;
-  --kpi-value-font-size-lg: 16px;
-  --kpi-value-font-weight: 700;
+  /* Value font (Desktop 18-20px, Mobile 16-18px, semibold 600) */
+  --kpi-value-font-size: 16px;
+  --kpi-value-font-size-sm: 17px;
+  --kpi-value-font-size-lg: 18px;
+  --kpi-value-font-weight: 600;
   --kpi-value-font-numeric: tabular-nums;
 
-  /* Caption / subtitle font (11px-12px natural hierarchy) */
-  --kpi-caption-font-size: 11px;
-  --kpi-caption-font-size-sm: 11.5px;
-  --kpi-caption-font-size-lg: 12px;
+  /* Caption / subtitle font (Desktop 10-11px, Mobile 10px) */
+  --kpi-caption-font-size: 10px;
+  --kpi-caption-font-size-sm: 10px;
+  --kpi-caption-font-size-lg: 11px;
   --kpi-caption-font-weight: 400;
 
   /* Icon size (the symbol itself) */
   --kpi-icon-size: 13px;
-  --kpi-icon-size-sm: 14px;
-  --kpi-icon-size-lg: 15px;
+  --kpi-icon-size-sm: 13px;
+  --kpi-icon-size-lg: 14px;
 
   /* Icon container (square that holds the icon) */
-  --kpi-icon-container-size: 20px;
+  --kpi-icon-container-size: 22px;
   --kpi-icon-container-size-sm: 22px;
   --kpi-icon-container-size-lg: 24px;
 
   /* Gap between icon and text */
-  --kpi-gap: 5px;
-  --kpi-gap-sm: 6px;
+  --kpi-gap: 6px;
+  --kpi-gap-sm: 5px;
   --kpi-gap-lg: 6px;
 
-  /* Border radius */
-  --kpi-radius: 10px;
+  /* Border radius (6px compact SaaS precision) */
+  --kpi-radius: 6px;
 
   /* Shadow */
-  --kpi-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --kpi-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
 
   /* Hover border (light) */
-  --kpi-hover-border: #cbd5e1;
+  --kpi-hover-border: var(--ui-border-strong, #dfe5ef);
 
   /* Hover border (dark) */
-  --kpi-hover-border-dark: #64748b;
+  --kpi-hover-border-dark: #64748b; /* slate-400 */
 
   /* Background colors */
-  --kpi-bg: #ffffff;
-  --kpi-bg-dark: #0f172a;
+  --kpi-bg: var(--color-surface, #ffffff);
+  --kpi-bg-dark: #0f172a; /* dark surface slate-900 */
 
   /* Border colors */
-  --kpi-border: #e2e8f0;
-  --kpi-border-dark: #1e293b;
+  --kpi-border: var(--ui-border, #e2e8f0);
+  --kpi-border-dark: #334155; /* dark border slate-800 */
 
   /* Text colors (light) */
   --kpi-label-color: #5f7089;
-  --kpi-value-color: #333333;
+  --kpi-value-color: #1e293b;
   --kpi-caption-color: #64748b;
 
   /* Text colors (dark) */
-  --kpi-label-color-dark: #94a3b8;
+  --kpi-label-color-dark: #e2e8f0;
   --kpi-value-color-dark: #f8fafc;
-  --kpi-caption-color-dark: #94a3b8;
+  --kpi-caption-color-dark: #e2e8f0;
 
   /* Icon container background (light) */
   --kpi-icon-bg: #eff6ff;
   /* Icon container background (dark) */
-  --kpi-icon-bg-dark: #1e293b;
+  --kpi-icon-bg-dark: #334155;
+
+  /* Button tokens (Desktop 12px, Mobile 11px, compact height 32-34px) */
+  --btn-height: 30px;
+  --btn-height-sm: 32px;
+  --btn-height-lg: 32px;
+  --btn-padding: 0 10px;
+  --btn-padding-sm: 0 11px;
+  --btn-padding-lg: 0 12px;
+  --btn-font-size: 11px;
+  --btn-font-size-sm: 11.5px;
+  --btn-font-size-lg: 12px;
+  --btn-font-weight: 500;
+  --btn-radius: 6px;
+  --btn-primary-bg: #0a51b0;
+  --btn-primary-color: #ffffff;
+  --btn-primary-hover-bg: #0a4391;
+  --btn-primary-hover-color: #ffffff;
+  --btn-primary-shadow: 0 1px 3px rgba(10,81,176,0.18);
+  --btn-secondary-bg: #ffffff;
+  --btn-secondary-color: #2a3547;
+  --btn-secondary-border: #dfe5ef;
+  --btn-secondary-hover-bg: #f2f6fa;
+  --btn-secondary-hover-color: #1e293b;
+  --btn-secondary-hover-border: #0a51b0;
+  --btn-danger-bg: #fdede8;
+  --btn-danger-color: #fa896b;
+  --btn-danger-border: #fdede8;
+  --btn-danger-hover-bg: #fa896b;
+  --btn-danger-hover-color: #ffffff;
+  --btn-danger-hover-border: #fa896b;
 }
 
 /* Ensure keyboard focus is visible (Step 5) */

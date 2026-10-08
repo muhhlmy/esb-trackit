@@ -23,7 +23,7 @@ defineEmits(['retry'])
 <template>
   <div
     role="alert"
-    class="flex flex-wrap items-center gap-3 rounded-2xl border border-[#FECACA] bg-[#FEF2F2] p-4 sm:p-5 text-[13px] text-[#B91C1C] shadow-2xs"
+    class="flex flex-wrap items-center gap-3 rounded-[6px] border border-[#FECACA] bg-[#FEF2F2] p-4 text-xs text-[#B91C1C] shadow-2xs"
   >
     <span aria-hidden="true" class="material-symbols-outlined text-[20px] shrink-0 text-[#DC2626]">
       error

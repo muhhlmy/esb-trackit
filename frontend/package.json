@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && chmod -R o+rX dist",
+    "build": "vite build && node -e \"if (process.platform !== 'win32') { try { require('child_process').execSync('chmod -R o+rX dist'); } catch (e) {} }\"",
     "test": "node --test",
     "preview": "vite preview",
     "lint": "npm run lint:check",

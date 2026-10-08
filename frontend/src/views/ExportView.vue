@@ -339,7 +339,7 @@ onMounted(() => {
 
 <template>
   <div
-    class="admin-workspace export-page min-w-0 space-y-4 sm:space-y-6 text-[#333333] wrap-anywhere"
+    class="admin-workspace export-page min-w-0 space-y-3 text-[#333333] wrap-anywhere"
     :data-testid="!isLoading ? 'page-ready' : undefined"
   >
     <!-- Page Header -->
@@ -349,7 +349,7 @@ onMounted(() => {
       icon="output"
     >
       <!-- Compact Metrics -->
-      <div class="flex items-center gap-6 shrink-0">
+      <div class="flex items-center gap-4 shrink-0">
         <div class="flex flex-col">
           <span class="text-[11px] font-medium text-[#687281] dark:text-slate-400 uppercase tracking-wider">Tabel</span>
           <span class="text-base font-bold text-[#333333] dark:text-white font-mono">{{ tables.length }}</span>
@@ -368,18 +368,18 @@ onMounted(() => {
     <!-- Tindakan Kritis: Reset Database (Superadmin only) -->
     <div
       v-if="isSuperAdmin"
-      class="bg-rose-50/70 dark:bg-rose-950/20 border border-rose-200/80 dark:border-rose-900/40 rounded-2xl p-4 sm:p-5 shadow-2xs transition-all"
+      class="bg-rose-50/70 dark:bg-rose-950/20 border border-rose-200/80 dark:border-rose-900/40 rounded-[6px] p-3 sm:p-3.5 shadow-2xs transition-all"
     >
-      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div class="space-y-1">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div class="space-y-0.5">
           <div
-            class="flex items-center gap-1.5 text-xs text-rose-700 dark:text-rose-400 font-bold tracking-wide uppercase"
+            class="flex items-center gap-1.5 text-[11px] text-rose-700 dark:text-rose-400 font-semibold tracking-wide uppercase"
           >
             <span aria-hidden="true" class="material-symbols-outlined text-[16px]">warning</span>
             <span>Tindakan Kritis: Reset Database</span>
           </div>
-          <h3 class="text-sm font-bold text-rose-900 dark:text-rose-200">Reset &amp; Kosongkan Database</h3>
-          <p class="text-xs text-rose-700/90 dark:text-rose-300/80 leading-relaxed max-w-2xl">
+          <h3 class="text-[13px] sm:text-[14px] font-semibold text-rose-900 dark:text-rose-200">Reset &amp; Kosongkan Database</h3>
+          <p class="text-[11px] text-rose-700/90 dark:text-rose-300/80 leading-normal max-w-2xl">
             Menghapus secara permanen seluruh data aset TI, aset GA, aset OPS, tiket helpdesk,
             karyawan, dan log aktivitas. Akun Superadmin yang dikonfigurasi administrator pada
             backend akan diprovisi kembali secara otomatis.
@@ -388,9 +388,9 @@ onMounted(() => {
         <button
           type="button"
           @click="openResetModal"
-          class="inline-flex items-center justify-center gap-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs px-4 py-2.5 transition-all shadow-xs shrink-0 cursor-pointer"
+          class="inline-flex items-center justify-center gap-1.5 h-8 rounded-[6px] bg-rose-600 hover:bg-rose-700 text-white font-medium text-xs px-3 transition-all shadow-xs shrink-0 cursor-pointer"
         >
-          <span aria-hidden="true" class="material-symbols-outlined text-[18px]">restart_alt</span>
+          <span aria-hidden="true" class="material-symbols-outlined text-[16px]">restart_alt</span>
           <span>Reset Database</span>
         </button>
       </div>
@@ -405,14 +405,14 @@ onMounted(() => {
           type="button"
           :aria-pressed="activeTab === 'quick'"
           @click="activeTab === 'quick'"
-          class="flex items-center gap-2 px-3.5 py-2 text-xs font-semibold rounded-lg transition-all cursor-pointer whitespace-normal sm:whitespace-nowrap select-none"
+          class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[6px] transition-all cursor-pointer whitespace-normal sm:whitespace-nowrap select-none"
           :class="
             activeTab === 'quick'
-              ? 'bg-[#F1F5F9] dark:bg-slate-800 text-[#333333] dark:text-white'
+              ? 'bg-[#F1F5F9] dark:bg-slate-800 text-[#333333] dark:text-white font-semibold'
               : 'text-[#5F7089] dark:text-slate-400 hover:bg-[#F8FAFC] dark:hover:bg-slate-800/50 hover:text-[#333333] dark:hover:text-white'
           "
         >
-          <span aria-hidden="true" class="material-symbols-outlined text-[18px] text-[#5F7089] dark:text-slate-400"
+          <span aria-hidden="true" class="material-symbols-outlined text-[16px] text-[#5F7089] dark:text-slate-400"
             >bolt</span
           >
           <span>Ekspor Cepat per Tabel</span>
@@ -422,14 +422,14 @@ onMounted(() => {
           type="button"
           :aria-pressed="activeTab === 'custom'"
           @click="activeTab === 'custom'"
-          class="flex items-center gap-2 px-3.5 py-2 text-xs font-semibold rounded-lg transition-all cursor-pointer whitespace-normal sm:whitespace-nowrap select-none"
+          class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[6px] transition-all cursor-pointer whitespace-normal sm:whitespace-nowrap select-none"
           :class="
             activeTab === 'custom'
-              ? 'bg-[#F1F5F9] dark:bg-slate-800 text-[#333333] dark:text-white'
+              ? 'bg-[#F1F5F9] dark:bg-slate-800 text-[#333333] dark:text-white font-semibold'
               : 'text-[#5F7089] dark:text-slate-400 hover:bg-[#F8FAFC] dark:hover:bg-slate-800/50 hover:text-[#333333] dark:hover:text-white'
           "
         >
-          <span aria-hidden="true" class="material-symbols-outlined text-[18px] text-[#5F7089] dark:text-slate-400"
+          <span aria-hidden="true" class="material-symbols-outlined text-[16px] text-[#5F7089] dark:text-slate-400"
             >tune</span
           >
           <span>Ekspor Kustom</span>
@@ -439,14 +439,14 @@ onMounted(() => {
           type="button"
           :aria-pressed="activeTab === 'presets'"
           @click="activeTab === 'presets'"
-          class="flex items-center gap-2 px-3.5 py-2 text-xs font-semibold rounded-lg transition-all cursor-pointer whitespace-normal sm:whitespace-nowrap select-none"
+          class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[6px] transition-all cursor-pointer whitespace-normal sm:whitespace-nowrap select-none"
           :class="
             activeTab === 'presets'
-              ? 'bg-[#F1F5F9] dark:bg-slate-800 text-[#333333] dark:text-white'
+              ? 'bg-[#F1F5F9] dark:bg-slate-800 text-[#333333] dark:text-white font-semibold'
               : 'text-[#5F7089] dark:text-slate-400 hover:bg-[#F8FAFC] dark:hover:bg-slate-800/50 hover:text-[#333333] dark:hover:text-white'
           "
         >
-          <span aria-hidden="true" class="material-symbols-outlined text-[18px] text-[#5F7089] dark:text-slate-400"
+          <span aria-hidden="true" class="material-symbols-outlined text-[16px] text-[#5F7089] dark:text-slate-400"
             >bookmark</span
           >
           <span>Template Laporan</span>
@@ -467,29 +467,29 @@ onMounted(() => {
     <div v-if="activeTab === 'quick'" class="space-y-4">
       <div
         v-if="isLoading"
-        class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4"
+        class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3"
         aria-busy="true"
       >
         <SkeletonCard v-for="i in 8" :key="i" variant="simple" />
       </div>
 
-      <div v-else class="admin-export-cards grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+      <div v-else class="admin-export-cards grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
         <div
           v-for="table in tables"
           :key="table.tableName"
-          class="group min-w-0 flex flex-col justify-between rounded-2xl border border-[#E2E8F0] dark:border-slate-800 bg-white dark:bg-slate-900 p-4 transition-all duration-150 hover:border-[#CBD5E1] dark:hover:border-slate-700 hover:shadow-2xs"
+          class="group min-w-0 flex flex-col justify-between rounded-[6px] border border-[#E2E8F0] dark:border-slate-800 bg-white dark:bg-slate-900 p-3 sm:p-3.5 transition-all duration-150 hover:border-[#CBD5E1] dark:hover:border-slate-700 hover:shadow-2xs"
         >
-          <div class="space-y-3">
+          <div class="space-y-2.5">
             <div class="flex items-center justify-between gap-2">
               <div
-                class="flex h-8 w-8 items-center justify-center rounded-lg bg-[#F8FAFC] dark:bg-slate-800 border border-[#E2E8F0] dark:border-slate-700 text-[#475569] dark:text-slate-300 group-hover:text-[#333333] dark:group-hover:text-white group-hover:border-[#BFDBFE] transition-colors"
+                class="flex h-7 w-7 items-center justify-center rounded-[6px] bg-[#F8FAFC] dark:bg-slate-800 border border-[#E2E8F0] dark:border-slate-700 text-[#475569] dark:text-slate-300 group-hover:text-[#333333] dark:group-hover:text-white group-hover:border-[#BFDBFE] transition-colors"
               >
-                <span aria-hidden="true" class="material-symbols-outlined text-[18px]">{{
+                <span aria-hidden="true" class="material-symbols-outlined text-[16px]">{{
                   table.icon
                 }}</span>
               </div>
               <span
-                class="rounded-full bg-[#F1F5F9] dark:bg-slate-800 px-2 py-0.5 font-mono text-[11px] font-semibold text-[#5F7089] dark:text-slate-400"
+                class="rounded-full bg-[#F1F5F9] dark:bg-slate-800 px-2 py-0.5 font-mono text-[10px] sm:text-[11px] font-semibold text-[#5F7089] dark:text-slate-400"
               >
                 {{ table.rowCount.toLocaleString('id-ID') }} rekaman
               </span>
@@ -497,18 +497,18 @@ onMounted(() => {
 
             <div>
               <h3
-                class="font-bold text-[#333333] dark:text-white text-sm group-hover:text-[#333333] dark:group-hover:text-white transition-colors"
+                class="font-semibold text-[#333333] dark:text-white text-[13px] sm:text-[14px] group-hover:text-[#333333] dark:group-hover:text-white transition-colors"
               >
                 {{ table.label }}
               </h3>
-              <p class="mt-1 text-xs text-[#5F7089] dark:text-slate-400 sm:line-clamp-2 leading-relaxed">
+              <p class="mt-0.5 text-[11px] text-[#5F7089] dark:text-slate-400 sm:line-clamp-2 leading-normal">
                 {{ table.description }}
               </p>
             </div>
           </div>
 
-          <div class="mt-4 pt-3 border-t border-[#F1F5F9] dark:border-slate-800 space-y-2">
-            <span class="text-[10px] font-semibold uppercase tracking-wider text-[#687281] dark:text-slate-400"
+          <div class="mt-3 pt-2.5 border-t border-[#F1F5F9] dark:border-slate-800 space-y-1.5">
+            <span class="text-[10px] font-medium uppercase tracking-wider text-[#687281] dark:text-slate-400"
               >Format Didukung</span
             >
             <div class="grid grid-cols-4 gap-1.5">
@@ -516,7 +516,7 @@ onMounted(() => {
                 type="button"
                 @click="handleQuickExport(table.tableName, 'csv')"
                 title="Unduh berkas CSV"
-                class="flex items-center justify-center rounded-lg bg-[#F0FDF4] dark:bg-emerald-950/40 border border-[#DCFCE7] dark:border-emerald-800/60 py-1.5 text-[11px] font-bold text-[#166534] dark:text-emerald-400 hover:bg-[#166534] hover:text-white hover:border-[#166534] transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+                class="flex items-center justify-center rounded-[6px] bg-[#F0FDF4] dark:bg-emerald-950/40 border border-[#DCFCE7] dark:border-emerald-800/60 py-1 text-[11px] font-medium text-[#166534] dark:text-emerald-400 hover:bg-[#166534] hover:text-white hover:border-[#166534] transition-all cursor-pointer focus:outline-none focus:ring-1 focus:ring-emerald-500/20"
               >
                 CSV
               </button>
@@ -524,7 +524,7 @@ onMounted(() => {
                 type="button"
                 @click="handleQuickExport(table.tableName, 'excel')"
                 title="Unduh berkas Excel (.xls)"
-                class="flex items-center justify-center rounded-lg bg-[#ECFDF5] border border-[#D1FAE5] py-1.5 text-[11px] font-bold text-[#047857] hover:bg-[#047857] hover:text-white hover:border-[#047857] transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+                class="flex items-center justify-center rounded-[6px] bg-[#ECFDF5] border border-[#D1FAE5] py-1 text-[11px] font-medium text-[#047857] hover:bg-[#047857] hover:text-white hover:border-[#047857] transition-all cursor-pointer focus:outline-none focus:ring-1 focus:ring-emerald-500/20"
               >
                 XLS
               </button>
@@ -532,7 +532,7 @@ onMounted(() => {
                 type="button"
                 @click="handleQuickExport(table.tableName, 'json')"
                 title="Unduh berkas JSON"
-                class="flex items-center justify-center rounded-lg bg-[#FFFBEB] border border-[#FEF3C7] py-1.5 text-[11px] font-bold text-[#B45309] hover:bg-[#B45309] hover:text-white hover:border-[#B45309] transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-amber-500/20"
+                class="flex items-center justify-center rounded-[6px] bg-[#FFFBEB] border border-[#FEF3C7] py-1 text-[11px] font-medium text-[#B45309] hover:bg-[#B45309] hover:text-white hover:border-[#B45309] transition-all cursor-pointer focus:outline-none focus:ring-1 focus:ring-amber-500/20"
               >
                 JSON
               </button>
@@ -540,7 +540,7 @@ onMounted(() => {
                 type="button"
                 @click="handleQuickExport(table.tableName, 'pdf')"
                 title="Cetak Laporan PDF"
-                class="flex items-center justify-center rounded-lg bg-[#FEF2F2] border border-[#FEE2E2] py-1.5 text-[11px] font-bold text-[#B91C1C] hover:bg-[#B91C1C] hover:text-white hover:border-[#B91C1C] transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-rose-500/20"
+                class="flex items-center justify-center rounded-[6px] bg-[#FEF2F2] border border-[#FEE2E2] py-1 text-[11px] font-medium text-[#B91C1C] hover:bg-[#B91C1C] hover:text-white hover:border-[#B91C1C] transition-all cursor-pointer focus:outline-none focus:ring-1 focus:ring-rose-500/20"
               >
                 PDF
               </button>
@@ -553,31 +553,31 @@ onMounted(() => {
     <!-- TAB 2: EKSPOR KUSTOM (CUSTOM QUERY & FIELD PICKER) -->
     <div v-if="activeTab === 'custom'" class="grid grid-cols-1 lg:grid-cols-12 gap-6">
       <!-- Left Column: Table & Field Selector -->
-      <div class="min-w-0 lg:col-span-8 space-y-4 sm:space-y-6">
+      <div class="min-w-0 lg:col-span-8 space-y-3">
         <!-- Step 1: Select Table -->
-        <div class="rounded-2xl border border-[#E2E8F0] bg-white p-3.5 sm:p-5 space-y-4">
+        <div class="rounded-[6px] border border-[#E2E8F0] bg-white p-3 space-y-3">
           <div
             class="flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-between"
           >
-            <h2 class="text-sm font-bold text-[#333333] flex items-center gap-2">
+            <h2 class="text-[13px] sm:text-[14px] font-semibold text-[#333333] flex items-center gap-2">
               <span
                 class="flex h-5 w-5 items-center justify-center rounded-full bg-[#0A51B0] text-white text-[10px]"
                 >1</span
               >
               <span>Pilih Tabel Utama Database</span>
             </h2>
-            <span class="text-xs text-[#5F7089] font-medium" v-if="currentTableSchema">
+            <span class="text-[11px] text-[#5F7089] font-medium" v-if="currentTableSchema">
               {{ currentTableSchema.columns.length }} Kolom Tersedia
             </span>
           </div>
 
-          <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-2.5">
+          <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-2">
             <button
               v-for="tbl in tables"
               :key="tbl.tableName"
               type="button"
               @click="selectedTableKey = tbl.tableName"
-              class="flex min-w-0 flex-col p-3 rounded-xl border text-left transition-all cursor-pointer"
+              class="flex min-w-0 flex-col p-2.5 rounded-[6px] border text-left transition-all cursor-pointer"
               :class="
                 selectedTableKey === tbl.tableName
                   ? 'border-[#0A51B0] bg-[#EFF6FF] text-[#1E3A8A]'
@@ -598,11 +598,11 @@ onMounted(() => {
         </div>
 
         <!-- Step 2: Choose Columns / Fields -->
-        <div class="rounded-2xl border border-[#E2E8F0] bg-white p-3.5 sm:p-5 space-y-4">
+        <div class="rounded-[6px] border border-[#E2E8F0] bg-white p-3 space-y-3">
           <div
             class="flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-between"
           >
-            <h2 class="text-sm font-bold text-[#333333] flex items-center gap-2">
+            <h2 class="text-[13px] sm:text-[14px] font-semibold text-[#333333] flex items-center gap-2">
               <span
                 class="flex h-5 w-5 items-center justify-center rounded-full bg-[#0A51B0] text-white text-[10px]"
                 >2</span
@@ -665,8 +665,8 @@ onMounted(() => {
         </div>
 
         <!-- Step 3: Date & Filter Settings -->
-        <div class="rounded-2xl border border-[#E2E8F0] bg-white p-3.5 sm:p-5 space-y-4">
-          <h2 class="text-sm font-bold text-[#333333] flex items-center gap-2">
+        <div class="rounded-[6px] border border-[#E2E8F0] bg-white p-3 space-y-3">
+          <h2 class="text-[13px] sm:text-[14px] font-semibold text-[#333333] flex items-center gap-2">
             <span
               class="flex h-5 w-5 items-center justify-center rounded-full bg-[#0A51B0] text-white text-[10px]"
               >3</span
@@ -709,7 +709,7 @@ onMounted(() => {
                 aria-label="Batas Maksimal Baris"
                 placeholder="Pilih batas baris"
                 :block="true"
-                height-class="h-10"
+                height-class="h-8"
               />
             </div>
           </div>
@@ -757,11 +757,11 @@ onMounted(() => {
       </div>
 
       <!-- Right Column: Export Output Controls & Preview Trigger -->
-      <div class="min-w-0 lg:col-span-4 space-y-4 sm:space-y-6">
+      <div class="min-w-0 lg:col-span-4 space-y-3 sm:space-y-4">
         <div
-          class="lg:sticky lg:top-6 rounded-2xl border border-[#E2E8F0] bg-white p-3.5 sm:p-5 space-y-4"
+          class="lg:sticky lg:top-6 rounded-[6px] border border-[#E2E8F0] bg-white p-3 space-y-3"
         >
-          <h2 class="text-sm font-bold text-[#333333] flex items-center gap-2">
+          <h2 class="text-[13px] sm:text-[14px] font-semibold text-[#333333] flex items-center gap-2">
             <span
               class="flex h-5 w-5 items-center justify-center rounded-full bg-[#0A51B0] text-white text-[10px]"
               >4</span
@@ -845,7 +845,7 @@ onMounted(() => {
           </div>
 
           <!-- Summary Box -->
-          <div class="rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] p-3.5 space-y-1.5 text-xs">
+          <div class="rounded-[6px] bg-[#F8FAFC] border border-[#E2E8F0] p-3 space-y-1.5 text-xs">
             <div class="flex flex-wrap justify-between gap-x-3 gap-y-1 text-[#5F7089]">
               <span>Tabel Terpilih:</span>
               <strong class="text-[#333333] font-mono">{{ selectedTableKey }}</strong>
@@ -890,28 +890,28 @@ onMounted(() => {
 
     <!-- TAB 3: TEMPLAT LAPORAN POPULER -->
     <div v-if="activeTab === 'presets'" class="space-y-4">
-      <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
         <!-- Preset 1 -->
         <div
-          class="rounded-2xl border border-[#E2E8F0] bg-white p-4 transition-all flex flex-col justify-between hover:border-[#CBD5E1]"
+          class="rounded-[6px] border border-[#E2E8F0] bg-white p-3 transition-all flex flex-col justify-between hover:border-[#CBD5E1]"
         >
           <div class="space-y-2">
             <div
-              class="flex h-8 w-8 items-center justify-center rounded-lg bg-[#EFF6FF] text-[#333333]"
+              class="flex h-7 w-7 items-center justify-center rounded-[6px] bg-[#EFF6FF] text-[#333333]"
             >
-              <span aria-hidden="true" class="material-symbols-outlined text-[18px]"
+              <span aria-hidden="true" class="material-symbols-outlined text-[16px]"
                 >devices_other</span
               >
             </div>
-            <h3 class="font-bold text-[#333333] text-sm">Laporan Aset IT Aktif</h3>
-            <p class="text-xs text-[#5F7089] leading-relaxed">
+            <h3 class="font-semibold text-[#333333] text-[13px]">Laporan Aset IT Aktif</h3>
+            <p class="text-[11px] text-[#5F7089] leading-relaxed">
               Daftar aset IT status 'Digunakan' lengkap dengan nama karyawan pemegang.
             </p>
           </div>
           <button
             type="button"
             @click="applyPreset('assets_active')"
-            class="mt-4 w-full rounded-xl border border-[#DBEAFE] bg-[#EFF6FF] hover:bg-[#0A51B0] hover:text-white text-[#333333] py-2 text-xs font-bold transition-all cursor-pointer"
+            class="mt-3 w-full rounded-[6px] border border-[#DBEAFE] bg-[#EFF6FF] hover:bg-[#0A51B0] hover:text-white text-[#333333] py-1.5 text-xs font-medium transition-all cursor-pointer"
           >
             Gunakan Templat Ini
           </button>
@@ -919,23 +919,23 @@ onMounted(() => {
 
         <!-- Preset 2 -->
         <div
-          class="rounded-2xl border border-[#E2E8F0] bg-white p-4 transition-all flex flex-col justify-between hover:border-[#CBD5E1]"
+          class="rounded-[6px] border border-[#E2E8F0] bg-white p-3 transition-all flex flex-col justify-between hover:border-[#CBD5E1]"
         >
           <div class="space-y-2">
             <div
-              class="flex h-8 w-8 items-center justify-center rounded-lg bg-[#ECFDF5] text-[#047857]"
+              class="flex h-7 w-7 items-center justify-center rounded-[6px] bg-[#ECFDF5] text-[#047857]"
             >
-              <span aria-hidden="true" class="material-symbols-outlined text-[18px]">badge</span>
+              <span aria-hidden="true" class="material-symbols-outlined text-[16px]">badge</span>
             </div>
-            <h3 class="font-bold text-[#333333] text-sm">Master Data Karyawan</h3>
-            <p class="text-xs text-[#5F7089] leading-relaxed">
+            <h3 class="font-semibold text-[#333333] text-[13px]">Master Data Karyawan</h3>
+            <p class="text-[11px] text-[#5F7089] leading-relaxed">
               Profil karyawan, NIK, jabatan, departemen, dan lokasi kantor untuk audit.
             </p>
           </div>
           <button
             type="button"
             @click="applyPreset('employees_dept')"
-            class="mt-4 w-full rounded-xl border border-[#D1FAE5] bg-[#ECFDF5] hover:bg-[#047857] hover:text-white text-[#047857] py-2 text-xs font-bold transition-all cursor-pointer"
+            class="mt-3 w-full rounded-[6px] border border-[#D1FAE5] bg-[#ECFDF5] hover:bg-[#047857] hover:text-white text-[#047857] py-1.5 text-xs font-medium transition-all cursor-pointer"
           >
             Gunakan Templat Ini
           </button>
@@ -943,23 +943,23 @@ onMounted(() => {
 
         <!-- Preset 3 -->
         <div
-          class="rounded-2xl border border-[#E2E8F0] bg-white p-4 transition-all flex flex-col justify-between hover:border-[#CBD5E1]"
+          class="rounded-[6px] border border-[#E2E8F0] bg-white p-3 transition-all flex flex-col justify-between hover:border-[#CBD5E1]"
         >
           <div class="space-y-2">
             <div
-              class="flex h-8 w-8 items-center justify-center rounded-lg bg-[#F3E8FF] text-[#7E22CE]"
+              class="flex h-7 w-7 items-center justify-center rounded-[6px] bg-[#F3E8FF] text-[#7E22CE]"
             >
-              <span aria-hidden="true" class="material-symbols-outlined text-[18px]">task_alt</span>
+              <span aria-hidden="true" class="material-symbols-outlined text-[16px]">task_alt</span>
             </div>
-            <h3 class="font-bold text-[#333333] text-sm">Rekapitulasi Tiket Resolved</h3>
-            <p class="text-xs text-[#5F7089] leading-relaxed">
+            <h3 class="font-semibold text-[#333333] text-[13px]">Rekapitulasi Tiket Resolved</h3>
+            <p class="text-[11px] text-[#5F7089] leading-relaxed">
               Daftar tiket IT yang telah diselesaikan teknisi beserta durasinya.
             </p>
           </div>
           <button
             type="button"
             @click="applyPreset('tickets_resolved')"
-            class="mt-4 w-full rounded-xl border border-[#E9D5FF] bg-[#F3E8FF] hover:bg-[#7E22CE] hover:text-white text-[#7E22CE] py-2 text-xs font-bold transition-all cursor-pointer"
+            class="mt-3 w-full rounded-[6px] border border-[#E9D5FF] bg-[#F3E8FF] hover:bg-[#7E22CE] hover:text-white text-[#7E22CE] py-1.5 text-xs font-medium transition-all cursor-pointer"
           >
             Gunakan Templat Ini
           </button>
@@ -967,15 +967,15 @@ onMounted(() => {
 
         <!-- Preset 4 -->
         <div
-          class="rounded-2xl border border-[#E2E8F0] bg-white p-4 transition-all flex flex-col justify-between hover:border-[#CBD5E1]"
+          class="rounded-[6px] border border-[#E2E8F0] bg-white p-3 transition-all flex flex-col justify-between hover:border-[#CBD5E1]"
         >
           <div class="space-y-2">
             <div
-              class="flex h-8 w-8 items-center justify-center rounded-lg bg-[#FEF3C7] text-[#B45309]"
+              class="flex h-7 w-7 items-center justify-center rounded-[6px] bg-[#FEF3C7] text-[#B45309]"
             >
-              <span aria-hidden="true" class="material-symbols-outlined text-[18px]">security</span>
+              <span aria-hidden="true" class="material-symbols-outlined text-[16px]">security</span>
             </div>
-            <h3 class="font-bold text-[#333333] text-sm">Log Security & Audit Login</h3>
+            <h3 class="font-semibold text-[#333333] text-[13px]">Log Security & Audit Login</h3>
             <p class="text-xs text-[#5F7089] leading-relaxed">
               Riwayat login pengguna sistem, alamat IP, dan waktu autentikasi.
             </p>
@@ -1013,7 +1013,7 @@ onMounted(() => {
           role="region"
           aria-label="Pratinjau tabel ekspor, geser untuk melihat seluruh kolom"
         >
-          <div v-if="previewData.length === 0" class="py-12 text-center text-xs text-[#687281]">
+          <div v-if="previewData.length === 0" class="py-8 text-center text-xs text-[#687281]">
             Tidak ada data untuk ditampilkan.
           </div>
           <table v-else class="w-full text-left text-xs border-collapse">
@@ -1025,7 +1025,7 @@ onMounted(() => {
                   scope="col"
                   v-for="col in previewColumns"
                   :key="col.name"
-                  class="p-3 whitespace-nowrap"
+                  class="px-2.5 py-1.5 whitespace-nowrap"
                 >
                   {{ col.label }}
                 </th>
@@ -1036,7 +1036,7 @@ onMounted(() => {
                 <td
                   v-for="col in previewColumns"
                   :key="col.name"
-                  class="p-3 text-[#334155] min-w-36 max-w-xs whitespace-normal wrap-anywhere"
+                  class="px-2.5 py-2 text-[#334155] min-w-36 max-w-xs whitespace-normal wrap-anywhere"
                 >
                   {{ row[col.name] !== null && row[col.name] !== undefined ? row[col.name] : '—' }}
                 </td>
@@ -1076,15 +1076,15 @@ onMounted(() => {
     >
       <div class="reset-database-content export-modal space-y-4 text-[#333333] wrap-anywhere">
         <div
-          class="reset-impact rounded-xl bg-rose-50 p-4 border border-rose-200 flex items-start gap-3"
+          class="reset-impact rounded-[6px] bg-rose-50 p-3 border border-rose-200 flex items-start gap-3"
         >
           <span
             aria-hidden="true"
-            class="material-symbols-outlined text-rose-600 text-[22px] shrink-0 mt-0.5"
+            class="material-symbols-outlined text-rose-600 text-[18px] shrink-0 mt-0.5"
             >error</span
           >
           <div class="text-xs text-rose-900 space-y-1">
-            <p class="font-bold text-sm">Data akan dihapus permanen</p>
+            <p class="font-bold text-xs">Data akan dihapus permanen</p>
             <p class="leading-relaxed text-rose-800">
               Tindakan ini <strong>tidak dapat dibatalkan</strong>. Seluruh data aset TI/GA/OPS,
               tiket bantuan, riwayat log audit, karyawan, dan sesi pengguna akan dihapus secara
@@ -1113,7 +1113,7 @@ onMounted(() => {
             :spellcheck="false"
             aria-describedby="reset-confirmation-hint"
             placeholder="Ketik RESET"
-            class="h-10 w-full rounded-xl border border-slate-300 bg-white px-3.5 text-xs text-slate-900 font-mono tracking-wider focus:border-rose-500 focus:outline-none focus:ring-2 focus:ring-rose-500/20"
+            class="h-8 w-full rounded-[6px] border border-slate-300 bg-white px-3.5 text-xs text-slate-900 font-mono tracking-wider focus:border-rose-500 focus:outline-none focus:ring-2 focus:ring-rose-500/20"
             @keydown.enter="
               confirmResetInput.trim().toUpperCase() === 'RESET' && handleConfirmResetDatabase()
             "
@@ -1194,70 +1194,70 @@ onMounted(() => {
 .reset-database-content {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 12px;
 }
 .reset-database-content > * {
   margin: 0;
 }
 .reset-impact {
-  padding: 18px;
-  border-radius: 12px;
+  padding: 10px 12px;
+  border-radius: 6px;
   background: #fff5f5;
   border-color: #fecdd3;
-  gap: 12px;
+  gap: 8px;
 }
 .reset-impact > span {
-  font-size: 22px;
+  font-size: 18px;
 }
 .reset-impact p:first-child {
-  font-size: 14px;
-  font-weight: 650;
-  line-height: 1.5;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.4;
 }
 .reset-impact p {
-  font-size: 12px;
-  line-height: 1.8;
+  font-size: 11px;
+  line-height: 1.5;
 }
 .reset-impact .reset-after-note {
-  margin-top: 14px;
-  padding-top: 14px;
+  margin-top: 10px;
+  padding-top: 10px;
   border-top: 1px solid #fecdd3;
-  font-size: 11px;
-  line-height: 1.8;
+  font-size: 10px;
+  line-height: 1.5;
 }
 .reset-after-note code {
   overflow-wrap: anywhere;
 }
 .reset-confirmation {
-  padding: 18px;
+  padding: 10px 12px;
   border: 1px solid #e2e8f0;
-  border-radius: 12px;
+  border-radius: 6px;
   background: #fafbfd;
 }
 .reset-confirmation label {
-  font-size: 12px;
-  font-weight: 500;
-  line-height: 1.8;
-}
-.reset-confirmation input {
-  min-height: 46px;
-  border-radius: 8px;
-  background: white;
-  font-size: 15px;
-}
-.reset-confirmation-hint {
-  margin-top: 8px;
   font-size: 11px;
-  color: #637288;
+  font-weight: 500;
   line-height: 1.6;
 }
+.reset-confirmation input {
+  min-height: 32px;
+  border-radius: 6px;
+  background: white;
+  font-size: 12px;
+}
+.reset-confirmation-hint {
+  margin-top: 6px;
+  font-size: 10px;
+  color: #637288;
+  line-height: 1.5;
+}
 .reset-database-actions {
-  gap: 10px;
+  gap: 8px;
 }
 .reset-database-actions button {
-  min-height: 44px;
+  min-height: 32px;
   font-size: 12px;
-  border-radius: 8px;
+  border-radius: 6px;
   justify-content: center;
 }
 .reset-database-actions button:last-child {
@@ -1272,7 +1272,7 @@ onMounted(() => {
 @media (max-width: 639px) {
   .reset-impact,
   .reset-confirmation {
-    padding: 16px;
+    padding: 8px 10px;
   }
   .reset-confirmation input {
     font-size: 16px;

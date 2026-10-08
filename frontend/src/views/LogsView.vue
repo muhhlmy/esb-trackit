@@ -294,7 +294,7 @@ function systemAuditChanges(log) {
 
 <template>
   <div
-    class="admin-workspace logs-page flex min-w-0 flex-col gap-4"
+    class="admin-workspace logs-page flex min-w-0 flex-col gap-3"
     :data-testid="!isLoading ? 'page-ready' : undefined"
   >
     <!-- Page Header -->
@@ -312,14 +312,14 @@ function systemAuditChanges(log) {
     <div
       v-if="pageError"
       role="alert"
-      class="shadow-card flex flex-wrap items-center gap-2 rounded-[20px] border border-red-200 bg-red-50/60 px-5 py-4 text-[13px] text-red-700 backdrop-blur-xl"
+      class="shadow-card flex flex-wrap items-center gap-2 rounded-[6px] border border-red-200 bg-red-50/60 px-4 py-3 text-[12px] text-red-700 backdrop-blur-xl"
     >
       <span aria-hidden="true" class="material-symbols-outlined text-[18px]">error</span>
       <span class="min-w-0 flex-1 wrap-anywhere">{{ pageError }}</span>
       <button
         @click="fetchLogs"
         type="button"
-        class="min-h-11 px-2 ml-auto text-xs font-extrabold uppercase tracking-wider text-red-800 hover:underline"
+        class="h-8 px-2.5 ml-auto text-xs font-semibold uppercase tracking-wider text-red-800 hover:underline"
       >
         Coba Lagi
       </button>
@@ -335,14 +335,14 @@ function systemAuditChanges(log) {
         type="button"
         :aria-pressed="activeTab === 'assets'"
         @click="activeTab = 'assets'"
-        class="flex min-w-0 min-h-11 items-center justify-center sm:justify-start gap-2 px-2 sm:px-5 py-3.5 text-xs leading-relaxed text-left font-bold transition-all duration-150 border-b-2 -mb-[2px]"
+        class="flex min-w-0 min-h-8 items-center justify-center sm:justify-start gap-1.5 px-2 sm:px-4 py-2 text-xs leading-normal text-left font-semibold transition-all duration-150 border-b-2 -mb-[2px]"
         :class="
           activeTab === 'assets'
-            ? 'border-brand text-brand dark:text-sky-400 font-black'
+            ? 'border-brand text-brand dark:text-sky-400 font-bold'
             : 'border-transparent text-[#5F7089] dark:text-slate-400 hover:text-[#172033] dark:hover:text-slate-200'
         "
       >
-        <span aria-hidden="true" class="material-symbols-outlined text-[18px]">history</span>
+        <span aria-hidden="true" class="material-symbols-outlined text-[16px]">history</span>
         Riwayat Perubahan Aset
       </button>
       <button
@@ -350,14 +350,14 @@ function systemAuditChanges(log) {
         type="button"
         :aria-pressed="activeTab === 'audit'"
         @click="activeTab = 'audit'"
-        class="flex min-w-0 min-h-11 items-center justify-center sm:justify-start gap-2 px-2 sm:px-5 py-3.5 text-xs leading-relaxed text-left font-bold transition-all duration-150 border-b-2 -mb-[2px]"
+        class="flex min-w-0 min-h-8 items-center justify-center sm:justify-start gap-1.5 px-2 sm:px-4 py-2 text-xs leading-normal text-left font-semibold transition-all duration-150 border-b-2 -mb-[2px]"
         :class="
           activeTab === 'audit'
-            ? 'border-brand text-brand dark:text-sky-400 font-black'
+            ? 'border-brand text-brand dark:text-sky-400 font-bold'
             : 'border-transparent text-[#5F7089] dark:text-slate-400 hover:text-[#172033] dark:hover:text-slate-200'
         "
       >
-        <span aria-hidden="true" class="material-symbols-outlined text-[18px]">security</span>
+        <span aria-hidden="true" class="material-symbols-outlined text-[16px]">security</span>
         Audit Aktivitas Login
       </button>
       <button
@@ -365,27 +365,27 @@ function systemAuditChanges(log) {
         type="button"
         :aria-pressed="activeTab === 'system'"
         @click="activeTab = 'system'"
-        class="flex min-w-0 min-h-11 items-center justify-center sm:justify-start gap-2 px-2 sm:px-5 py-3.5 text-xs leading-relaxed text-left font-bold transition-all duration-150 border-b-2 -mb-[2px]"
+        class="flex min-w-0 min-h-8 items-center justify-center sm:justify-start gap-1.5 px-2 sm:px-4 py-2 text-xs leading-normal text-left font-semibold transition-all duration-150 border-b-2 -mb-[2px]"
         :class="
           activeTab === 'system'
-            ? 'border-brand text-brand dark:text-sky-400 font-black'
+            ? 'border-brand text-brand dark:text-sky-400 font-bold'
             : 'border-transparent text-[#5F7089] dark:text-slate-400 hover:text-[#172033] dark:hover:text-slate-200'
         "
       >
-        <span aria-hidden="true" class="material-symbols-outlined text-[18px]">receipt_long</span>
+        <span aria-hidden="true" class="material-symbols-outlined text-[16px]">receipt_long</span>
         Audit Sistem
       </button>
     </div>
 
     <!-- Filters Bar Card -->
     <div
-      class="logs-filters shadow-card grid grid-cols-[minmax(0,1fr)_auto] min-w-0 items-center gap-3 rounded-xl border border-[#E8EDF3] dark:border-slate-800 bg-white dark:bg-slate-900 p-3"
+      class="logs-filters shadow-card grid grid-cols-[minmax(0,1fr)_auto] min-w-0 items-center gap-2.5 rounded-[6px] border border-[#E8EDF3] dark:border-slate-800 bg-white dark:bg-slate-900 p-2.5 sm:p-3"
     >
       <!-- Search -->
-      <div class="relative h-9 min-w-0">
+      <div class="relative h-8 min-w-0">
         <span
           aria-hidden="true"
-          class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-[18px] text-[#687281] dark:text-slate-400 pointer-events-none"
+          class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[17px] text-[#687281] dark:text-slate-400 pointer-events-none"
         >
           search
         </span>
@@ -394,7 +394,7 @@ function systemAuditChanges(log) {
           aria-label="Cari kata kunci log"
           type="text"
           placeholder="Cari kata kunci log…"
-          class="toolbar-search-input h-full min-h-0 w-full rounded-lg border border-[#DCE3EC] dark:border-slate-700 bg-white dark:bg-slate-800 pl-10 pr-3 text-[11px] font-semibold text-[#334155] dark:text-slate-100 placeholder:text-slate-400 outline-none transition-all focus:border-brand focus:ring-1 focus:ring-brand/10"
+          class="toolbar-search-input h-full min-h-0 w-full rounded-[6px] border border-[#DCE3EC] dark:border-slate-700 bg-white dark:bg-slate-800 pl-9 pr-3 text-[12px] font-normal text-[#334155] dark:text-slate-100 placeholder:text-slate-400 outline-none transition-all focus:border-brand focus:ring-1 focus:ring-brand/10"
         />
       </div>
 
@@ -411,7 +411,7 @@ function systemAuditChanges(log) {
               { value: 'HAPUS', label: 'Hapus Aset' },
             ]"
             aria-label="Filter aksi"
-            height-class="h-9"
+            height-class="h-8"
             block
           />
         </div>
@@ -429,7 +429,7 @@ function systemAuditChanges(log) {
               { value: 'LOGOUT', label: 'Logout' },
             ]"
             aria-label="Filter aktivitas"
-            height-class="h-9"
+            height-class="h-8"
             block
           />
         </div>
@@ -439,11 +439,11 @@ function systemAuditChanges(log) {
           type="button"
           @click="fetchLogs"
           :disabled="isLoading"
-          class="logs-refresh-button h-9 items-center justify-center gap-2 rounded-lg border border-[#DCE3EC] dark:border-slate-700 bg-white/50 dark:bg-slate-800 px-4 text-[12px] font-bold text-[#334155] dark:text-slate-200 shadow-sm hover:bg-[#F8FAFC] dark:hover:bg-slate-700 disabled:opacity-50"
+          class="logs-refresh-button h-8 items-center justify-center gap-1.5 rounded-[6px] border border-[#DCE3EC] dark:border-slate-700 bg-white/50 dark:bg-slate-800 px-3 text-xs font-medium text-[#334155] dark:text-slate-200 shadow-sm hover:bg-[#F8FAFC] dark:hover:bg-slate-700 disabled:opacity-50"
         >
           <span
             aria-hidden="true"
-            class="material-symbols-outlined text-[18px]"
+            class="material-symbols-outlined text-[16px]"
             :class="{ 'animate-spin': isLoading }"
             >refresh</span
           >
@@ -456,7 +456,7 @@ function systemAuditChanges(log) {
     </div>
 
     <!-- Content Container -->
-    <div class="shadow-card overflow-hidden rounded-[20px] border border-[#E8EDF3] dark:border-slate-800 bg-white dark:bg-slate-900">
+    <div class="shadow-card overflow-hidden rounded-[6px] border border-[#E8EDF3] dark:border-slate-800 bg-white dark:bg-slate-900">
       <!-- Loading State -->
       <div v-if="isLoading" aria-busy="true">
         <SkeletonTable preset="logs" :rows="6" />
@@ -467,12 +467,12 @@ function systemAuditChanges(log) {
         <!-- Empty State -->
         <div
           v-if="filteredAssetLogs.length === 0"
-          class="flex flex-col items-center justify-center px-4 py-10 sm:py-20 gap-3 text-center"
+          class="flex flex-col items-center justify-center px-4 py-8 sm:py-12 gap-3 text-center"
         >
           <span aria-hidden="true" class="material-symbols-outlined text-[40px] text-[#D1D5DB]"
             >history_toggle_off</span
           >
-          <p class="text-[13px] font-semibold text-[#5F7089]">
+          <p class="text-xs font-semibold text-[#5F7089]">
             Tidak ada riwayat perubahan aset ditemukan.
           </p>
         </div>
@@ -492,31 +492,31 @@ function systemAuditChanges(log) {
               <tr class="text-left border-b border-[#F3F4F6] dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40">
                 <th
                   scope="col"
-                  class="px-5 py-3 text-[10px] font-bold text-[#9CA3AF] dark:text-slate-400 uppercase tracking-wider w-48"
+                  class="px-2.5 py-1.5 text-[10px] font-bold text-[#9CA3AF] dark:text-slate-400 uppercase tracking-wider w-48"
                 >
                   Waktu
                 </th>
                 <th
                   scope="col"
-                  class="px-5 py-3 text-[10px] font-bold text-[#9CA3AF] dark:text-slate-400 uppercase tracking-wider w-24"
+                  class="px-2.5 py-1.5 text-[10px] font-bold text-[#9CA3AF] dark:text-slate-400 uppercase tracking-wider w-24"
                 >
                   Aksi
                 </th>
                 <th
                   scope="col"
-                  class="px-5 py-3 text-[10px] font-bold text-[#9CA3AF] dark:text-slate-400 uppercase tracking-wider"
+                  class="px-2.5 py-1.5 text-[10px] font-bold text-[#9CA3AF] dark:text-slate-400 uppercase tracking-wider"
                 >
                   Aset
                 </th>
                 <th
                   scope="col"
-                  class="px-5 py-3 text-[10px] font-bold text-[#9CA3AF] dark:text-slate-400 uppercase tracking-wider"
+                  class="px-2.5 py-1.5 text-[10px] font-bold text-[#9CA3AF] dark:text-slate-400 uppercase tracking-wider"
                 >
                   Perubahan
                 </th>
                 <th
                   scope="col"
-                  class="px-5 py-3 text-[10px] font-bold text-[#9CA3AF] dark:text-slate-400 uppercase tracking-wider w-40"
+                  class="px-2.5 py-1.5 text-[10px] font-bold text-[#9CA3AF] dark:text-slate-400 uppercase tracking-wider w-40"
                 >
                   Oleh
                 </th>
@@ -528,31 +528,31 @@ function systemAuditChanges(log) {
                 :key="log.id"
                 class="hover:bg-[#F9FAFB]/50 dark:hover:bg-slate-800/50 transition-colors align-top"
               >
-                <td class="px-5 py-3.5 text-[11px] font-semibold text-[#374151] dark:text-slate-300 font-mono">
+                <td class="px-2.5 py-2 text-[11px] font-semibold text-[#374151] dark:text-slate-300 font-mono">
                   {{ formatDateTime(log.dibuat_pada) }}
                 </td>
-                <td class="px-5 py-3.5">
+                <td class="px-2.5 py-2">
                   <AppBadge :type="getActionBadgeType(log.aksi)" :text="log.aksi" />
                 </td>
-                <td class="px-5 py-3.5 text-[12px] font-bold text-[#111827] dark:text-white font-mono">
+                <td class="px-2.5 py-2 text-[12px] font-bold text-[#111827] dark:text-white font-mono">
                   {{ log.label_aset }}
                 </td>
-                <td class="px-5 py-3.5 text-[11px] font-medium text-[#5F7089] dark:text-slate-400 wrap-anywhere">
+                <td class="px-2.5 py-2 text-[11px] font-medium text-[#5F7089] dark:text-slate-400 wrap-anywhere">
                   {{ log.perubahan || '—' }}
                 </td>
-                <td class="px-5 py-3.5 text-[12px] font-semibold text-[#374151] dark:text-slate-200">
+                <td class="px-2.5 py-2 text-[12px] font-semibold text-[#374151] dark:text-slate-200">
                   {{ log.oleh_pengguna }}
                 </td>
               </tr>
               <tr v-if="filteredAssetLogs.length === 0">
-                <td colspan="5" class="px-5 py-12 text-center">
+                <td colspan="5" class="px-4 py-8 text-center">
                   <div class="flex flex-col items-center gap-3">
                     <span
                       aria-hidden="true"
                       class="material-symbols-outlined text-[40px] text-[#D1D5DB]"
                       >history_toggle_off</span
                     >
-                    <p class="text-[13px] font-semibold text-[#5F7089]">
+                    <p class="text-xs font-semibold text-[#5F7089]">
                       Tidak ada riwayat perubahan aset ditemukan.
                     </p>
                   </div>
@@ -575,7 +575,7 @@ function systemAuditChanges(log) {
           <div
             v-for="log in paginatedAssetLogs"
             :key="log.id"
-            class="group flex min-w-0 gap-4 px-3.5 sm:px-5 py-4 hover:bg-[#FAFBFD] dark:hover:bg-slate-800/40 transition-colors border-b border-slate-100 dark:border-slate-800/60 last:border-b-0"
+            class="group flex min-w-0 gap-3 px-3 sm:px-3.5 py-2.5 hover:bg-[#FAFBFD] dark:hover:bg-slate-800/40 transition-colors border-b border-slate-100 dark:border-slate-800/60 last:border-b-0"
           >
             <!-- Left: Icon + Timeline connector -->
             <div class="hidden sm:flex flex-col items-center pt-0.5">
@@ -595,7 +595,7 @@ function systemAuditChanges(log) {
               <div class="flex flex-wrap items-center gap-2 mb-3 sm:mb-2">
                 <AppBadge :type="getActionBadgeType(log.aksi)" :text="log.aksi" />
                 <span
-                  class="w-full sm:w-auto min-w-0 text-sm sm:text-[13px] font-extrabold text-[#111827] dark:text-white font-mono tracking-tight"
+                  class="w-full sm:w-auto min-w-0 text-xs font-extrabold text-[#111827] dark:text-white font-mono tracking-tight"
                   >{{ log.label_aset }}</span
                 >
                 <span
@@ -622,7 +622,7 @@ function systemAuditChanges(log) {
                 <div
                   v-for="(row, idx) in parsePerubahan(log.perubahan, log.aksi)"
                   :key="idx"
-                  class="flex flex-col sm:flex-row sm:items-baseline gap-1.5 sm:gap-2 text-[13px] sm:text-[11px]"
+                  class="flex flex-col sm:flex-row sm:items-baseline gap-1.5 sm:gap-2 text-xs sm:text-[11px]"
                 >
                   <span
                     class="sm:w-28 shrink-0 text-xs sm:text-[10px] font-bold text-[#6B7280] uppercase tracking-wide"
@@ -632,7 +632,7 @@ function systemAuditChanges(log) {
                     class="flex flex-col items-start sm:flex-row sm:items-center gap-1.5 min-w-0 max-w-full flex-wrap"
                   >
                     <span
-                      class="inline-block max-w-full rounded-md bg-[#FEF2F2] px-2 py-0.5 text-[13px] sm:text-[10px] font-semibold text-[#991B1B] line-through decoration-[#FECACA]"
+                      class="inline-block max-w-full rounded-md bg-[#FEF2F2] px-2 py-0.5 text-xs sm:text-[10px] font-semibold text-[#991B1B] line-through decoration-[#FECACA]"
                       ><span class="sr-only">Sebelum: </span>{{ displayValue(row.old) }}</span
                     >
                     <span
@@ -641,7 +641,7 @@ function systemAuditChanges(log) {
                       >arrow_forward</span
                     >
                     <span
-                      class="inline-block max-w-full rounded-md bg-[#F0FDF4] px-2 py-0.5 text-[13px] sm:text-[10px] font-bold text-[#166534]"
+                      class="inline-block max-w-full rounded-md bg-[#F0FDF4] px-2 py-0.5 text-xs sm:text-[10px] font-bold text-[#166534]"
                       ><span class="sr-only">Sesudah: </span>{{ displayValue(row.new) }}</span
                     >
                   </span>
@@ -658,7 +658,7 @@ function systemAuditChanges(log) {
                 <span
                   v-for="(row, idx) in parsePerubahan(log.perubahan, log.aksi)"
                   :key="idx"
-                  class="text-[13px] sm:text-[10px] text-[#6B7280]"
+                  class="text-xs sm:text-[10px] text-[#6B7280]"
                 >
                   <span class="font-bold uppercase tracking-wide">{{ row.field }}:</span>
                   <span class="ml-1 font-semibold text-[#374151]">{{
@@ -670,7 +670,7 @@ function systemAuditChanges(log) {
               <!-- Fallback text -->
               <p
                 v-else
-                class="text-[13px] sm:text-[11px] font-medium text-[#5F7089] leading-relaxed whitespace-pre-line"
+                class="text-xs sm:text-[11px] font-medium text-[#5F7089] leading-relaxed whitespace-pre-line"
               >
                 {{ log.perubahan }}
               </p>
@@ -714,7 +714,7 @@ function systemAuditChanges(log) {
           <span aria-hidden="true" class="material-symbols-outlined text-[40px] text-[#D1D5DB]"
             >shield_person</span
           >
-          <p class="mt-3 text-[13px] font-semibold text-[#5F7089]">
+          <p class="mt-3 text-xs font-semibold text-[#5F7089]">
             Tidak ada audit aktivitas login ditemukan.
           </p>
         </div>
@@ -722,7 +722,7 @@ function systemAuditChanges(log) {
           <li
             v-for="log in paginatedAuditLogs"
             :key="log.id"
-            class="min-w-0 space-y-3 p-3.5 sm:p-4 wrap-anywhere"
+            class="min-w-0 space-y-2.5 p-2.5 sm:p-3 wrap-anywhere"
           >
             <AppBadge
               :type="getActivityBadgeType(log.aktifitas)"
@@ -732,7 +732,7 @@ function systemAuditChanges(log) {
               <h3 class="text-sm font-bold leading-relaxed text-[#111827]">
                 {{ log.nama_pengguna }}
               </h3>
-              <p class="text-[13px] leading-relaxed text-[#374151]">{{ log.email }}</p>
+              <p class="text-xs leading-relaxed text-[#374151]">{{ log.email }}</p>
             </div>
             <dl class="text-xs leading-relaxed text-[#5F7089]">
               <dt class="font-semibold">Waktu aktivitas</dt>
@@ -753,25 +753,25 @@ function systemAuditChanges(log) {
               <tr class="text-left border-b border-[#F3F4F6] dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40">
                 <th
                   scope="col"
-                  class="px-5 py-3 text-[10px] font-bold text-[#9CA3AF] dark:text-slate-400 uppercase tracking-wider w-48"
+                  class="px-2.5 py-1.5 text-[10px] font-bold text-[#9CA3AF] dark:text-slate-400 uppercase tracking-wider w-48"
                 >
                   Waktu Login
                 </th>
                 <th
                   scope="col"
-                  class="px-5 py-3 text-[10px] font-bold text-[#9CA3AF] dark:text-slate-400 uppercase tracking-wider"
+                  class="px-2.5 py-1.5 text-[10px] font-bold text-[#9CA3AF] dark:text-slate-400 uppercase tracking-wider"
                 >
                   Nama Pengguna
                 </th>
                 <th
                   scope="col"
-                  class="px-5 py-3 text-[10px] font-bold text-[#9CA3AF] dark:text-slate-400 uppercase tracking-wider"
+                  class="px-2.5 py-1.5 text-[10px] font-bold text-[#9CA3AF] dark:text-slate-400 uppercase tracking-wider"
                 >
                   Email
                 </th>
                 <th
                   scope="col"
-                  class="px-5 py-3 text-[10px] font-bold text-[#9CA3AF] dark:text-slate-400 uppercase tracking-wider w-36"
+                  class="px-2.5 py-1.5 text-[10px] font-bold text-[#9CA3AF] dark:text-slate-400 uppercase tracking-wider w-36"
                 >
                   Status
                 </th>
@@ -783,16 +783,16 @@ function systemAuditChanges(log) {
                 :key="log.id"
                 class="hover:bg-[#F9FAFB]/50 dark:hover:bg-slate-800/50 transition-colors"
               >
-                <td class="px-5 py-3.5 text-[11px] font-semibold text-[#374151] dark:text-slate-300 font-mono">
+                <td class="px-2.5 py-2 text-[11px] font-semibold text-[#374151] dark:text-slate-300 font-mono">
                   {{ formatDateTime(log.dibuat_pada) }}
                 </td>
-                <td class="px-5 py-3.5 text-[12px] font-bold text-[#111827] dark:text-white">
+                <td class="px-2.5 py-2 text-[12px] font-bold text-[#111827] dark:text-white">
                   {{ log.nama_pengguna }}
                 </td>
-                <td class="px-5 py-3.5 text-[11px] text-[#374151] dark:text-slate-300 font-mono">
+                <td class="px-2.5 py-2 text-[11px] text-[#374151] dark:text-slate-300 font-mono">
                   {{ log.email }}
                 </td>
-                <td class="px-5 py-3.5">
+                <td class="px-2.5 py-2">
                   <AppBadge
                     :type="getActivityBadgeType(log.aktifitas)"
                     :text="getActivityBadgeText(log.aktifitas)"
@@ -800,14 +800,14 @@ function systemAuditChanges(log) {
                 </td>
               </tr>
               <tr v-if="filteredAuditLogs.length === 0">
-                <td colspan="4" class="px-5 py-12 text-center">
+                <td colspan="4" class="px-4 py-8 text-center">
                   <div class="flex flex-col items-center gap-3">
                     <span
                       aria-hidden="true"
                       class="material-symbols-outlined text-[40px] text-[#D1D5DB]"
                       >shield_person</span
                     >
-                    <p class="text-[13px] font-semibold text-[#5F7089]">
+                    <p class="text-xs font-semibold text-[#5F7089]">
                       Tidak ada audit aktivitas login ditemukan.
                     </p>
                   </div>
@@ -834,7 +834,7 @@ function systemAuditChanges(log) {
           <span aria-hidden="true" class="material-symbols-outlined text-[40px] text-[#D1D5DB]"
             >receipt_long</span
           >
-          <p class="mt-3 text-[13px] font-semibold text-[#5F7089]">
+          <p class="mt-3 text-xs font-semibold text-[#5F7089]">
             Belum ada aktivitas sistem tercatat.
           </p>
         </div>
@@ -845,12 +845,12 @@ function systemAuditChanges(log) {
             role="button"
             tabindex="0"
             :aria-expanded="expandedSystemLogId === log.id"
-            class="flex min-w-0 cursor-pointer gap-3 p-4 transition-colors hover:bg-[#F8FAFC] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand sm:px-5"
+            class="flex min-w-0 cursor-pointer gap-3 p-2.5 sm:p-3 transition-colors hover:bg-[#F8FAFC] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand sm:px-5"
             @click="toggleSystemLogDetail(log.id)"
             @keydown.enter.prevent="toggleSystemLogDetail(log.id)"
             @keydown.space.prevent="toggleSystemLogDetail(log.id)"
           >
-            <span aria-hidden="true" class="material-symbols-outlined mt-0.5 text-[20px] text-brand"
+            <span aria-hidden="true" class="material-symbols-outlined mt-0.5 text-[16px] text-brand"
               >history</span
             >
             <div class="min-w-0 flex-1 wrap-anywhere">
@@ -949,10 +949,10 @@ function systemAuditChanges(log) {
 .toolbar-search-input,
 .logs-refresh-button,
 .logs-filters :deep(button[aria-haspopup='listbox']) {
-  height: 36px;
-  min-height: 36px !important;
-  max-height: 36px;
-  border-radius: 8px;
+  height: 32px;
+  min-height: 32px !important;
+  max-height: 32px;
+  border-radius: 6px;
   box-sizing: border-box;
 }
 .logs-refresh-button {

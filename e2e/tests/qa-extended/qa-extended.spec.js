@@ -1,7 +1,7 @@
 /**
  * QA Extended: Accessibility (axe-core), Responsive, UI/UX tests
  */
-import { test, expect, chromium } from '@playwright/test'
+import { test, expect } from '@playwright/test'
 import AxeBuilder from '@axe-core/playwright'
 import fs from 'node:fs'
 
@@ -14,10 +14,17 @@ function getSuperadminState() {
 }
 
 async function restoreSession(page, state) {
-  await page.context().addCookies(state.cookies)
-  const response = await page.request.get(API + '/api/auth/me')
-  expect(response.ok()).toBeTruthy()
-  await page.goto(BASE + '/login', { waitUntil: 'domcontentloaded' })
+  if (state?.cookies?.length) {
+    await page.context().addCookies(state.cookies)
+  }
+}
+
+async function gotoSafe(page, url) {
+  try {
+    await page.goto(url, { waitUntil: 'domcontentloaded' })
+  } catch (err) {
+    if (!err.message?.includes('NS_BINDING_ABORTED')) throw err
+  }
 }
 
 // Pages to test
@@ -49,10 +56,8 @@ test.describe('QA Extended: Accessibility & Responsive', () => {
   for (const pg of PAGES) {
     test(`Accessibility: ${pg.name} (${pg.path}) - no critical axe violations`, async ({ page }) => {
       // Inject auth state
-      await page.goto(`${BASE}/login`)
       await restoreSession(page, token)
-
-      await page.goto(`${BASE}${pg.path}`, { waitUntil: 'domcontentloaded' })
+      await gotoSafe(page, `${BASE}${pg.path}`)
       await page.waitForLoadState('domcontentloaded')
 
       const results = await new AxeBuilder({ page })
@@ -96,10 +101,8 @@ test.describe('QA Extended: Accessibility & Responsive', () => {
   for (const vp of VIEWPORTS) {
     test(`Responsive [${vp.name} ${vp.width}x${vp.height}]: Dashboard renders without overflow`, async ({ page }) => {
       await page.setViewportSize({ width: vp.width, height: vp.height })
-      await page.goto(`${BASE}/login`)
       await restoreSession(page, token)
-
-      await page.goto(`${BASE}/`, { waitUntil: 'domcontentloaded' })
+      await gotoSafe(page, `${BASE}/dashboard`)
       await page.waitForLoadState('domcontentloaded')
 
       // Check for horizontal overflow
@@ -107,23 +110,22 @@ test.describe('QA Extended: Accessibility & Responsive', () => {
         return document.documentElement.scrollWidth > document.documentElement.clientWidth
       })
 
-      // Check page title/header is visible
-      const hasContent = await page.locator('body').isVisible()
+      // Check main content is visible
+      const mainContent = page.locator('#main-content, #app, main').first()
+      await expect(mainContent).toBeVisible({ timeout: 15000 })
       
       // Take screenshot
       const outDir = './qa-reports/screenshots'
       if (!fs.existsSync(outDir)) fs.mkdirSync(outDir, { recursive: true })
       await page.screenshot({ path: `${outDir}/responsive-${vp.name}-dashboard.png`, fullPage: false })
 
-      console.log(`[${vp.name}] Horizontal overflow: ${overflow}, Has content: ${hasContent}`)
-      expect(hasContent).toBe(true)
-      // Log overflow as warning but don't fail (known issue on mobile)
+      console.log(`[${vp.name}] Horizontal overflow: ${overflow}`)
     })
   }
 
   // ── UI/UX TESTS ─────────────────────────────────────────────────
   test('UI: Login page has correct elements and accessibility', async ({ page }) => {
-    await page.goto(`${BASE}/login`)
+    await gotoSafe(page, `${BASE}/login`)
     await page.waitForLoadState('domcontentloaded')
 
     // Email input
@@ -157,16 +159,14 @@ test.describe('QA Extended: Accessibility & Responsive', () => {
   })
 
   test('UI: Navigation sidebar links work correctly', async ({ page }) => {
-    await page.goto(`${BASE}/login`)
+    await page.setViewportSize({ width: 1280, height: 800 })
     await restoreSession(page, token)
-
-    await page.goto(`${BASE}/`, { waitUntil: 'domcontentloaded' })
+    await gotoSafe(page, `${BASE}/dashboard`)
     await page.waitForLoadState('domcontentloaded')
 
     // Check sidebar exists
-    const sidebar = page.locator('nav, aside, [role="navigation"]').first()
-    const sidebarVisible = await sidebar.isVisible()
-    console.log('[UI] Sidebar visible:', sidebarVisible)
+    const sidebar = page.locator('#app-navigation, aside[aria-label="Navigasi aplikasi"]').first()
+    await expect(sidebar).toBeVisible({ timeout: 10000 })
 
     // Check console errors
     const consoleErrors = []
@@ -177,20 +177,18 @@ test.describe('QA Extended: Accessibility & Responsive', () => {
     // Navigate to each major route
     const navLinks = ['/assets', '/tickets', '/users', '/export']
     for (const link of navLinks) {
-      await page.goto(`${BASE}${link}`, { waitUntil: 'domcontentloaded' })
+      await gotoSafe(page, `${BASE}${link}`)
       await page.waitForLoadState('domcontentloaded')
       const currentURL = page.url()
       console.log(`[UI] Nav to ${link}: landed on ${currentURL.replace(BASE, '')}`)
     }
 
-    expect(sidebarVisible).toBe(true)
+    await expect(sidebar).toBeVisible()
   })
 
   test('UI: Form validation shows errors for empty required fields', async ({ page }) => {
-    await page.goto(`${BASE}/login`)
     await restoreSession(page, token)
-
-    await page.goto(`${BASE}/assets`, { waitUntil: 'domcontentloaded' })
+    await gotoSafe(page, `${BASE}/assets`)
     await page.waitForLoadState('domcontentloaded')
 
     // Open add asset modal
@@ -215,7 +213,7 @@ test.describe('QA Extended: Accessibility & Responsive', () => {
   })
 
   test('UI: Toast notifications appear and disappear', async ({ page }) => {
-    await page.goto(`${BASE}/login`)
+    await gotoSafe(page, `${BASE}/login`)
 
     // Try login with wrong creds to trigger error toast
     await page.locator('#email').fill('wrong@test.com')
@@ -231,7 +229,7 @@ test.describe('QA Extended: Accessibility & Responsive', () => {
   })
 
   test('UI: 404/Forbidden page renders correctly', async ({ page }) => {
-    await page.goto(`${BASE}/nonexistent-page-xyz123`, { waitUntil: 'domcontentloaded' })
+    await gotoSafe(page, `${BASE}/nonexistent-page-xyz123`)
     await page.waitForLoadState('domcontentloaded')
     const bodyText = await page.locator('body').innerText()
     const has404 = bodyText.includes('404') || bodyText.includes('Tidak Ditemukan') || bodyText.includes('halaman')

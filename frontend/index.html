@@ -10,7 +10,7 @@
     <meta name="application-name" content="ESB-TrackIT" />
 
     <!-- PWA Settings & Apple Mobile Web App -->
-    <meta name="theme-color" content="#0a51b0" />
+    <meta name="theme-color" content="#ffffff" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="ESB-TrackIT" />
@@ -55,18 +55,22 @@
       }
 
       /* ==========================================================
-         Flashscreen / Splash Screen & vue-spinner Styles
+         Flashscreen / Splash Screen Full White (Cardless & Responsive)
          ========================================================== */
       #app-splashscreen {
         position: fixed;
         inset: 0;
         z-index: 99999;
         display: flex;
+        flex-direction: column;
         align-items: center;
         justify-content: center;
-        background-color: #f4f6f9;
+        background-color: #ffffff;
         font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-        padding: 16px;
+        padding: max(24px, env(safe-area-inset-top)) max(20px, env(safe-area-inset-right)) max(24px, env(safe-area-inset-bottom)) max(20px, env(safe-area-inset-left));
+        width: 100vw;
+        height: 100vh;
+        height: 100dvh;
         transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
         will-change: opacity, transform;
         cursor: default;
@@ -81,42 +85,44 @@
         visibility: hidden;
       }
 
-      .splash-card {
+      /* Seamless cardless full-white container */
+      .splash-card,
+      .splash-container {
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        padding: 36px 40px;
-        background: #ffffff;
-        border-radius: 24px;
-        box-shadow: 0 20px 40px -12px rgba(10, 81, 176, 0.1), 0 4px 16px rgba(15, 23, 42, 0.04);
-        border: 1px solid rgba(226, 232, 240, 0.85);
-        max-width: 320px;
+        background: transparent;
+        border: none;
+        box-shadow: none;
+        padding: 0;
+        margin: 0;
         width: 100%;
+        max-width: 480px;
         text-align: center;
-        animation: splashCardAppear 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
         pointer-events: none;
         cursor: default;
+        animation: splashContentAppear 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
       }
 
       .splash-logo-container {
         position: relative;
-        width: 84px;
-        height: 84px;
+        width: clamp(76px, 20vw, 92px);
+        height: clamp(76px, 20vw, 92px);
         display: flex;
         align-items: center;
         justify-content: center;
-        margin-bottom: 18px;
+        margin-bottom: clamp(16px, 4vw, 24px);
         pointer-events: none;
         cursor: default;
       }
 
       .splash-logo-img {
-        width: 56px;
-        height: 56px;
+        width: clamp(52px, 14vw, 64px);
+        height: clamp(52px, 14vw, 64px);
         object-fit: contain;
         display: block;
-        filter: drop-shadow(0 4px 12px rgba(10, 81, 176, 0.18));
+        filter: drop-shadow(0 4px 14px rgba(10, 81, 176, 0.16));
         pointer-events: none;
         user-select: none;
         -webkit-user-drag: none;
@@ -128,7 +134,7 @@
         position: absolute;
         inset: 0;
         border-radius: 50%;
-        border: 2.5px solid rgba(10, 81, 176, 0.12);
+        border: 2.5px solid rgba(10, 81, 176, 0.1);
         border-top-color: #0a51b0;
         border-right-color: #ff4f1b;
         animation: splashClipRotate 0.85s linear infinite;
@@ -139,14 +145,14 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 3px;
-        margin-bottom: 18px;
+        gap: 4px;
+        margin-bottom: clamp(20px, 5vw, 28px);
         pointer-events: none;
       }
 
       .splash-brand-title {
         margin: 0;
-        font-size: 21px;
+        font-size: clamp(20px, 5.5vw, 25px);
         font-weight: 800;
         letter-spacing: -0.025em;
         color: #0f172a;
@@ -155,10 +161,10 @@
 
       .splash-brand-tagline {
         margin: 0;
-        font-size: 11px;
+        font-size: clamp(11px, 2.8vw, 12.5px);
         font-weight: 600;
         color: #64748b;
-        letter-spacing: 0.03em;
+        letter-spacing: 0.04em;
         text-transform: uppercase;
       }
 
@@ -167,14 +173,14 @@
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        gap: 8px;
-        margin-bottom: 10px;
+        gap: 9px;
+        margin-bottom: 12px;
         pointer-events: none;
       }
 
       .splash-pulse-dot {
-        width: 9px;
-        height: 9px;
+        width: clamp(9px, 2.5vw, 11px);
+        height: clamp(9px, 2.5vw, 11px);
         border-radius: 50%;
         background-color: #0a51b0;
         display: inline-block;
@@ -199,7 +205,7 @@
       }
 
       .splash-status-text {
-        font-size: 12px;
+        font-size: clamp(12px, 3vw, 13px);
         font-weight: 600;
         color: #94a3b8;
         letter-spacing: 0.01em;
@@ -223,30 +229,31 @@
         }
       }
 
-      @keyframes splashCardAppear {
+      @keyframes splashContentAppear {
         0% {
           opacity: 0;
-          transform: translateY(8px) scale(0.97);
+          transform: scale(0.96);
         }
         100% {
           opacity: 1;
-          transform: translateY(0) scale(1);
+          transform: scale(1);
         }
       }
 
       @media (prefers-reduced-motion: reduce) {
         .splash-clip-ring,
         .splash-pulse-dot,
-        .splash-card {
+        .splash-card,
+        .splash-container {
           animation: none !important;
         }
       }
     </style>
   </head>
   <body class="bg-[#F4F6F9]">
-    <!-- Flashscreen / Startup Splash Screen (Tanpa Hover & Ditahan 3-5 Detik Layaknya Native App) -->
+    <!-- Flashscreen / Startup Splash Screen Full White Tanpa Card (Responsif Mobile & Tahan 3-5 Detik) -->
     <div id="app-splashscreen" role="status" aria-live="polite" aria-label="Memuat aplikasi ESB-TrackIT">
-      <div class="splash-card">
+      <div class="splash-container">
         <div class="splash-logo-container">
           <img src="/logo.svg" alt="ESB-TrackIT App Logo" class="splash-logo-img" width="56" height="56" />
           <div class="splash-clip-ring" aria-hidden="true"></div>

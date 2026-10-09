@@ -1,4 +1,5 @@
 import { ref } from 'vue'
+import { playToneNotification } from './useNotificationSound.js'
 
 const toasts = ref([])
 
@@ -8,6 +9,7 @@ export function useToast() {
     const toast = { id, message, type }
 
     toasts.value.push(toast)
+    playToneNotification(type === 'error' ? 'ALERT' : 'SUCCESS')
 
     setTimeout(() => {
       removeToast(id)

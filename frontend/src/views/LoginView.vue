@@ -378,8 +378,8 @@ const finishResetAndLogin = () => {
     <main class="login-main">
       <aside class="login-story" aria-labelledby="story-title">
         <div class="story-content">
-          <h2 id="story-title">Aset terkelola.<br />Kerja lebih mudah.</h2>
-          <p>Akses inventaris perangkat dan bantuan tim support dalam satu tempat.</p>
+          <h2 id="story-title">Alur kerja rapi.<br />Operasional terkendali.</h2>
+          <p>Akses kebutuhan kerja, layanan bantuan, dan dukungan tim dalam satu tempat.</p>
           <div class="story-features">
             <div>
               <span class="feature-icon"><Laptop :size="21" aria-hidden="true" /></span

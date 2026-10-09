@@ -42,10 +42,10 @@ function apply() {
     size="sm"
     @close="emit('close')"
   >
-    <div class="space-y-3">
-      <div class="space-y-3">
-        <div v-for="field in fields" :key="field.key" class="space-y-1.5">
-          <label :for="fieldId(field.key)" class="text-xs font-bold text-slate-600">{{
+    <div class="space-y-2.5">
+      <div class="space-y-2.5">
+        <div v-for="field in fields" :key="field.key" class="space-y-1">
+          <label :for="fieldId(field.key)" class="text-[10px] font-bold text-slate-600">{{
             field.label
           }}</label>
           <input
@@ -54,13 +54,13 @@ function apply() {
             v-model="draft[field.key]"
             :type="field.type === 'search' ? 'text' : 'date'"
             :placeholder="field.placeholder"
-            class="h-8 w-full rounded-[6px] border border-slate-200 px-3 text-xs focus:border-[#0A51B0] focus:outline-none"
+            class="h-7 w-full rounded-[5px] border border-slate-200 px-2.5 text-[10.5px] focus:border-[#0A51B0] focus:outline-none"
           />
           <select
             v-else
             :id="fieldId(field.key)"
             v-model="draft[field.key]"
-            class="h-8 w-full rounded-[6px] border border-slate-200 bg-white px-3 text-xs focus:border-[#0A51B0] focus:outline-none"
+            class="h-7 w-full rounded-[5px] border border-slate-200 bg-white px-2.5 text-[10.5px] focus:border-[#0A51B0] focus:outline-none"
           >
             <option value="">{{ field.placeholder || `Semua ${field.label}` }}</option>
             <option
@@ -75,19 +75,19 @@ function apply() {
         <slot />
       </div>
       <div
-        class="flex flex-col-reverse gap-2 border-t border-slate-200 pt-3 sm:flex-row sm:justify-end"
+        class="flex flex-col-reverse gap-1.5 border-t border-slate-200 pt-2.5 sm:flex-row sm:justify-end"
       >
         <button
           type="button"
           @click="emit('reset')"
-          class="min-h-8 rounded-[6px] border border-slate-200 px-4 text-xs font-bold text-slate-600 hover:bg-slate-50"
+          class="min-h-7 rounded-[5px] border border-slate-200 px-3 text-[10px] font-bold text-slate-600 hover:bg-slate-50 cursor-pointer"
         >
           Reset
         </button>
         <button
           type="button"
           @click="apply"
-          class="min-h-8 rounded-[6px] bg-[#0A51B0] px-4 text-xs font-bold text-white hover:bg-[#08458f]"
+          class="min-h-7 rounded-[5px] bg-[#0A51B0] px-3 text-[10px] font-bold text-white hover:bg-[#08458f] cursor-pointer"
         >
           Terapkan Filter
         </button>

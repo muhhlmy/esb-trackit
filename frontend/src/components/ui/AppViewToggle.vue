@@ -1,6 +1,6 @@
 <script setup>
 // ============================================================
-// AppViewToggle.vue — Segmented control Tabel / Kartu.
+// AppViewToggle.vue - Segmented control Tabel / Kartu.
 // Dipakai bersama semua list modul agar pola tampilan konsisten.
 // ============================================================
 defineProps({
@@ -18,7 +18,7 @@ const options = [
 
 <template>
   <div
-    class="app-view-toggle inline-flex shrink-0 items-center gap-0.5 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] p-0.5"
+    class="app-view-toggle inline-flex shrink-0 items-center gap-0.5 rounded-md border border-[#E2E8F0] bg-[#F8FAFC] p-0.5"
     role="group"
     aria-label="Mode tampilan daftar"
   >
@@ -29,7 +29,7 @@ const options = [
       :disabled="disabled"
       :aria-pressed="modelValue === opt.value ? 'true' : 'false'"
       :title="`Tampilan ${opt.label}`"
-      class="inline-flex h-7 items-center gap-1 rounded-md px-2 text-[11px] font-semibold transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+      class="inline-flex h-6 sm:h-6.5 items-center gap-1 rounded-sm px-1.5 sm:px-2 text-[9.5px] sm:text-[10px] font-semibold transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
       :class="
         modelValue === opt.value
           ? 'bg-white text-[#0A51B0] shadow-2xs border border-[#D7E3F2]'
@@ -37,7 +37,7 @@ const options = [
       "
       @click="$emit('update:modelValue', opt.value)"
     >
-      <span aria-hidden="true" class="material-symbols-outlined text-[15px]">{{ opt.icon }}</span>
+      <span aria-hidden="true" class="material-symbols-outlined text-[13px] sm:text-[13.5px]">{{ opt.icon }}</span>
       <span class="hidden sm:inline">{{ opt.label }}</span>
     </button>
   </div>

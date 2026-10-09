@@ -150,7 +150,7 @@ onUnmounted(() => {
         <main
           id="main-content"
           tabindex="-1"
-          class="app-main flex-1 overflow-y-auto p-2 outline-none sm:p-2.5 lg:p-3.5 pb-[calc(48px+0.5rem+env(safe-area-inset-bottom,0px))] sm:pb-[calc(48px+0.75rem+env(safe-area-inset-bottom,0px))] lg:pb-3.5"
+          class="app-main flex-1 overflow-y-auto p-2 outline-none sm:p-2.5 lg:p-3.5 pb-[calc(44px+0.5rem+env(safe-area-inset-bottom,0px))] sm:pb-[calc(44px+0.75rem+env(safe-area-inset-bottom,0px))] lg:pb-3.5"
         >
           <div class="mx-auto w-full max-w-[1560px]">
             <RouterView v-slot="{ Component, route: currentRoute }">

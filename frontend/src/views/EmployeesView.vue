@@ -53,6 +53,14 @@ const filterLokasi = ref('')
 const filterStatus = ref('')
 const showFilterModal = ref(false)
 
+const activeFilterCount = computed(() => {
+  let count = 0
+  if (filterDepartemen.value) count++
+  if (filterLokasi.value) count++
+  if (filterStatus.value) count++
+  return count
+})
+
 // ── Modal State ──────────────────────────────────────────────
 const showFormModal = ref(false)
 const showDeleteModal = ref(false)
@@ -489,7 +497,7 @@ onMounted(() => {
       subtitle="Pengelolaan dan integrasi data karyawan perusahaan"
       icon="person_search"
     >
-      <div class="flex items-center gap-1.5">
+      <div class="flex flex-wrap sm:flex-nowrap items-center gap-1.5">
         <button
           v-if="canWriteKaryawan"
           type="button"
@@ -500,12 +508,12 @@ onMounted(() => {
           <span aria-hidden="true" class="material-symbols-outlined text-[16px]">person_add</span>
           <span>Tambah Karyawan</span>
         </button>
-        <div class="flex items-center gap-1 rounded-[6px] border border-[#D7E3F2] bg-[#F8FAFC] p-0.5">
+        <div class="flex items-center gap-1 rounded-[6px] border border-[#D7E3F2] dark:border-slate-700 bg-[#F8FAFC] dark:bg-slate-800 p-0.5 h-8">
           <button
             v-if="canWriteKaryawan"
             type="button"
             @click="showImportModal = true"
-            class="inline-flex h-7 items-center gap-1 rounded-[6px] px-2 text-[11px] font-semibold text-[#0A51B0] hover:bg-white"
+            class="inline-flex h-full items-center gap-1 rounded-[4px] px-2 text-[11px] font-semibold text-[#0A51B0] dark:text-blue-400 hover:bg-white dark:hover:bg-slate-700"
             title="Import data karyawan dari Excel"
           >
             <span aria-hidden="true" class="material-symbols-outlined text-[15px]">upload_file</span
@@ -514,7 +522,7 @@ onMounted(() => {
           <button
             type="button"
             @click="exportEmployees"
-            class="inline-flex h-7 items-center gap-1 rounded-[6px] px-2 text-[11px] font-semibold text-[#0A51B0] hover:bg-white"
+            class="inline-flex h-full items-center gap-1 rounded-[4px] px-2 text-[11px] font-semibold text-[#0A51B0] dark:text-blue-400 hover:bg-white dark:hover:bg-slate-700"
             title="Export data karyawan"
           >
             <span aria-hidden="true" class="material-symbols-outlined text-[15px]">download</span
@@ -524,70 +532,7 @@ onMounted(() => {
       </div>
     </PageHeader>
 
-    <!-- Search & Filter Bar -->
-    <div class="flex items-center gap-2.5 w-full min-w-0">
-      <div class="relative h-8 min-w-0 flex-1">
-        <span
-          aria-hidden="true"
-          class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[17px] text-[#687281] dark:text-slate-400 pointer-events-none"
-          >search</span
-        >
-        <input
-          v-model="searchQuery"
-          aria-label="Cari karyawan"
-          type="text"
-          placeholder="Cari NIK, nama, atau jabatan…"
-          class="h-full min-h-0 w-full rounded-[6px] border border-[#E2E8F0] dark:border-slate-700 bg-white dark:bg-slate-800 pl-9 pr-3 text-xs text-[#333333] dark:text-slate-100 placeholder-[#687281] dark:placeholder-slate-400 focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
-        />
-      </div>
-
-      <button
-        type="button"
-        @click="showFilterModal = true"
-        class="h-8 shrink-0 rounded-[6px] border border-[#E2E8F0] dark:border-slate-700 bg-[#F8FAFC] dark:bg-slate-800 px-3 text-xs font-medium text-[#5F7089] dark:text-slate-300 hover:bg-white dark:hover:bg-slate-700"
-      >
-        <span aria-hidden="true" class="material-symbols-outlined mr-1 align-middle text-[16px]"
-          >filter_alt</span
-        >Filter
-      </button>
-      <AppViewToggle v-model="viewMode" />
-    </div>
-
-    <FilterModal
-      :is-open="showFilterModal"
-      title="Filter Karyawan"
-      @close="showFilterModal = false"
-      @apply="showFilterModal = false"
-      @reset="resetFilters"
-    >
-      <select
-        v-model="filterDepartemen"
-        class="h-8 w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 px-3 text-xs"
-      >
-        <option value="">Semua Departemen</option>
-        <option v-for="item in availableDepartemenOptions" :key="item" :value="item">
-          {{ item }}
-        </option>
-      </select>
-      <select
-        v-model="filterLokasi"
-        class="h-8 w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 px-3 text-xs"
-      >
-        <option value="">Semua Lokasi</option>
-        <option v-for="item in availableLokasiOptions" :key="item" :value="item">{{ item }}</option>
-      </select>
-      <select
-        v-model="filterStatus"
-        class="h-8 w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 px-3 text-xs"
-      >
-        <option value="">Semua Status</option>
-        <option value="Active">Active</option>
-        <option value="Outsource">Outsource</option>
-        <option value="Resigned">Resigned</option>
-      </select>
-    </FilterModal>
-
-    <!-- ── Card Stats Karyawan ── -->
+    <!-- ── Card Stats Karyawan (Directly below Header) ── -->
     <div
       v-if="!isLoading && stats"
       class="employee-stats grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-2.5 lg:gap-3"
@@ -630,6 +575,74 @@ onMounted(() => {
       />
     </div>
 
+    <!-- Search & Filter Bar -->
+    <div class="flex items-center gap-2.5 w-full min-w-0">
+      <div class="relative h-8 min-w-0 flex-1">
+        <span
+          aria-hidden="true"
+          class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[17px] text-[#687281] dark:text-slate-400 pointer-events-none"
+          >search</span
+        >
+        <input
+          v-model="searchQuery"
+          aria-label="Cari karyawan"
+          type="text"
+          placeholder="Cari NIK, nama, atau jabatan…"
+          class="h-full min-h-0 w-full rounded-[6px] border border-[#E2E8F0] dark:border-slate-700 bg-white dark:bg-slate-800 pl-9 pr-3 text-xs text-[#333333] dark:text-slate-100 placeholder-[#687281] dark:placeholder-slate-400 focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
+        />
+      </div>
+
+      <button
+        type="button"
+        @click="showFilterModal = true"
+        class="relative inline-flex items-center gap-1.5 h-8 shrink-0 rounded-[6px] border border-[#E2E8F0] dark:border-slate-700 bg-[#F8FAFC] dark:bg-slate-800 px-3 text-xs font-medium text-[#5F7089] dark:text-slate-300 hover:bg-white dark:hover:bg-slate-700 cursor-pointer"
+      >
+        <span aria-hidden="true" class="material-symbols-outlined text-[16px]">tune</span>
+        <span>Filter</span>
+        <span
+          v-if="activeFilterCount > 0"
+          class="ml-0.5 inline-flex items-center justify-center min-w-[16px] h-4 px-1 rounded-full text-[10px] font-bold bg-[#0A51B0] text-white"
+        >
+          {{ activeFilterCount }}
+        </span>
+      </button>
+      <AppViewToggle v-model="viewMode" />
+    </div>
+
+    <FilterModal
+      :is-open="showFilterModal"
+      title="Filter Karyawan"
+      @close="showFilterModal = false"
+      @apply="showFilterModal = false"
+      @reset="resetFilters"
+    >
+      <select
+        v-model="filterDepartemen"
+        class="h-8 w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 px-3 text-xs"
+      >
+        <option value="">Semua Departemen</option>
+        <option v-for="item in availableDepartemenOptions" :key="item" :value="item">
+          {{ item }}
+        </option>
+      </select>
+      <select
+        v-model="filterLokasi"
+        class="h-8 w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 px-3 text-xs"
+      >
+        <option value="">Semua Lokasi</option>
+        <option v-for="item in availableLokasiOptions" :key="item" :value="item">{{ item }}</option>
+      </select>
+      <select
+        v-model="filterStatus"
+        class="h-8 w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 px-3 text-xs"
+      >
+        <option value="">Semua Status</option>
+        <option value="Active">Active</option>
+        <option value="Outsource">Outsource</option>
+        <option value="Resigned">Resigned</option>
+      </select>
+    </FilterModal>
+
     <!-- Table Section -->
     <div class="rounded-[6px] border border-[#E2E8F0]/80 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-2xs overflow-hidden">
       <div v-if="isLoading" aria-busy="true">
@@ -656,7 +669,7 @@ onMounted(() => {
             <div class="space-y-0.5">
               <h3 class="text-[13px] font-bold leading-snug text-[#333333]">{{ emp.nama_karyawan }}</h3>
               <p class="text-[11.5px] leading-relaxed text-[#5F7089]">
-                {{ emp.email_kantor || '—' }}
+                {{ emp.email_kantor || '-' }}
               </p>
             </div>
             <AppBadge
@@ -676,20 +689,20 @@ onMounted(() => {
               </div>
               <div>
                 <dt class="text-[10px] text-[#5F7089]">Title / Jabatan</dt>
-                <dd class="text-[#333333]">{{ emp.jabatan || emp.title || '—' }}</dd>
+                <dd class="text-[#333333]">{{ emp.jabatan || emp.title || '-' }}</dd>
               </div>
               <div>
                 <dt class="text-[10px] text-[#5F7089]">Departemen</dt>
-                <dd class="text-[#333333]">{{ emp.departemen || '—' }}</dd>
+                <dd class="text-[#333333]">{{ emp.departemen || '-' }}</dd>
               </div>
               <div>
                 <dt class="text-[10px] text-[#5F7089]">Direktorat</dt>
-                <dd class="text-[#333333]">{{ emp.direktorat || emp.directorate || '—' }}</dd>
+                <dd class="text-[#333333]">{{ emp.direktorat || emp.directorate || '-' }}</dd>
               </div>
               <div>
                 <dt class="text-[10px] text-[#5F7089]">Lokasi Kerja</dt>
                 <dd class="text-[#333333]">
-                  {{ normalizeLocation(emp.lokasi_kerja || emp.work_location) || '—' }}
+                  {{ normalizeLocation(emp.lokasi_kerja || emp.work_location) || '-' }}
                 </dd>
               </div>
             </dl>
@@ -718,10 +731,11 @@ onMounted(() => {
             </div>
           </li>
         </ul>
-        <table
-          v-if="viewMode === 'table'"
-          class="hidden w-full max-w-full text-left border-collapse table-fixed xl:table"
-        >
+
+        <div v-if="viewMode === 'table'" class="w-full max-w-full overflow-x-auto">
+          <table
+            class="w-full min-w-[700px] text-left border-collapse table-fixed"
+          >
           <colgroup>
             <col :class="canWriteKaryawan ? 'w-[22%]' : 'w-[24%]'" />
             <col :class="canWriteKaryawan ? 'w-[11%]' : 'w-[12%]'" />
@@ -794,9 +808,9 @@ onMounted(() => {
                   </span>
                   <span
                     class="text-[12px] font-normal text-[#5F7089] mt-0.5 truncate block"
-                    :title="emp.email_kantor || '—'"
+                    :title="emp.email_kantor || '-'"
                   >
-                    {{ emp.email_kantor || '—' }}
+                    {{ emp.email_kantor || '-' }}
                   </span>
                 </div>
               </td>
@@ -810,8 +824,8 @@ onMounted(() => {
               <td class="py-2 px-2.5 overflow-hidden">
                 <span
                   class="text-xs font-medium text-[#333333] truncate block"
-                  :title="emp.jabatan || emp.title || '—'"
-                  >{{ emp.jabatan || emp.title || '—' }}</span
+                  :title="emp.jabatan || emp.title || '-'"
+                  >{{ emp.jabatan || emp.title || '-' }}</span
                 >
               </td>
 
@@ -819,15 +833,15 @@ onMounted(() => {
                 <div class="flex flex-col min-w-0">
                   <span
                     class="text-xs font-medium text-[#333333] leading-snug truncate block"
-                    :title="emp.departemen || '—'"
+                    :title="emp.departemen || '-'"
                   >
-                    {{ emp.departemen || '—' }}
+                    {{ emp.departemen || '-' }}
                   </span>
                   <span
                     class="text-[12px] font-normal text-[#5F7089] mt-0.5 truncate block"
-                    :title="emp.direktorat || emp.directorate || '—'"
+                    :title="emp.direktorat || emp.directorate || '-'"
                   >
-                    {{ emp.direktorat || emp.directorate || '—' }}
+                    {{ emp.direktorat || emp.directorate || '-' }}
                   </span>
                 </div>
               </td>
@@ -847,8 +861,8 @@ onMounted(() => {
               <td class="py-2 px-2.5 text-xs font-normal text-[#333333] overflow-hidden">
                 <span
                   class="truncate block"
-                  :title="normalizeLocation(emp.lokasi_kerja || emp.work_location) || '—'"
-                  >{{ normalizeLocation(emp.lokasi_kerja || emp.work_location) || '—' }}</span
+                  :title="normalizeLocation(emp.lokasi_kerja || emp.work_location) || '-'"
+                  >{{ normalizeLocation(emp.lokasi_kerja || emp.work_location) || '-' }}</span
                 >
               </td>
               <td
@@ -864,8 +878,9 @@ onMounted(() => {
             </tr>
           </tbody>
         </table>
+      </div>
 
-        <AppPagination
+      <AppPagination
           asset-style
           mobile-compact
           v-model:currentPage="currentPage"
@@ -1231,7 +1246,7 @@ onMounted(() => {
 <style scoped src="../assets/ws-table.css"></style>
 
 <style scoped>
-/* Header tidak sticky di modul Master Data — scroll bersama konten.
+/* Header tidak sticky di modul Master Data - scroll bersama konten.
    HARUS setelah import ws-table.css agar menang. */
 .ws-toolbar-sticky {
   position: static;

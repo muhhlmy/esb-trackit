@@ -1,5 +1,5 @@
 /**
- * navigationConfig.js — Single source of truth for the application menu.
+ * navigationConfig.js - Single source of truth for the application menu.
  *
  * Consumed by:
  *   - components/layout/AppSidebar.vue   (desktop sidebar + mobile drawer)
@@ -12,7 +12,7 @@
  *   - superadminOnly: true      -> isSuperAdmin
  *   - (neither)                 -> public / always visible
  *
- * ponytail: no framework, no reactivity, no router import — plain data + one
+ * ponytail: no framework, no reactivity, no router import - plain data + one
  * pure filter function. Upgrade path: if groups grow, split into per-domain
  * modules and aggregate here.
  */
@@ -112,13 +112,6 @@ export const menuGroups = [
             lucide: 'Cog',
             permission: 'assets_ops',
           },
-          {
-            to: '/my-assets',
-            label: 'Aset Karyawan',
-            icon: 'badge',
-            lucide: 'BadgeCheck',
-            permission: 'my_assets',
-          },
         ],
       },
     ],
@@ -137,11 +130,10 @@ export const menuGroups = [
             icon: 'confirmation_number',
             lucide: 'Ticket',
             permission: 'tickets',
-            badge: 'New',
           },
           {
             to: '/submissions',
-            label: 'BAST/Asset Form',
+            label: 'Pengajuan BAST',
             icon: 'assignment',
             lucide: 'FilePen',
             permission: 'submissions',
@@ -172,6 +164,13 @@ export const menuGroups = [
             icon: 'person_search',
             lucide: 'UserSearch',
             permission: 'karyawan',
+          },
+          {
+            to: '/my-assets',
+            label: 'Profil',
+            icon: 'badge',
+            lucide: 'BadgeCheck',
+            permission: 'my_assets',
           },
         ],
       },
@@ -264,7 +263,7 @@ export const primaryBottomNav = [
   {
     key: 'my-assets',
     to: '/my-assets',
-    label: 'Aset Saya',
+    label: 'Profil',
     lucide: 'BadgeCheck',
     permission: 'my_assets',
   },
@@ -296,7 +295,7 @@ export function resolveHomeRoute(gate) {
     return { to: '/dashboard', label: 'Beranda', lucide: 'Home' }
   }
   if (gate.hasPermission('my_assets')) {
-    return { to: '/my-assets', label: 'Aset Saya', lucide: 'BadgeCheck' }
+    return { to: '/my-assets', label: 'Profil', lucide: 'BadgeCheck' }
   }
   return { to: '/', label: 'Beranda', lucide: 'Home' }
 }

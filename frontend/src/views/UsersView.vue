@@ -1,6 +1,6 @@
 <script setup>
 // ============================================================
-// UsersView.vue — Manajemen Pengguna Sistem, bergaya Fynix
+// UsersView.vue - Manajemen Pengguna Sistem, bergaya Fynix
 // Fitur: tampil, tambah, edit, hapus user dari tabel users
 // ============================================================
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
@@ -50,6 +50,12 @@ const itemsPerPage = ref(10)
 const searchQuery = ref('')
 const filterRole = ref('')
 const showFilterModal = ref(false)
+
+const activeFilterCount = computed(() => {
+  let count = 0
+  if (filterRole.value) count++
+  return count
+})
 
 // ── Modal State ──────────────────────────────────────────────
 const showFormModal = ref(false)
@@ -433,7 +439,7 @@ const employeeOptions = computed(() => {
   return employees.value.map((emp) => ({
     id_karyawan: emp.id_karyawan,
     nama_karyawan: emp.nama_karyawan,
-    detail: `${emp.nik ? 'NIK: ' + emp.nik : ''}${emp.jabatan ? ' — ' + emp.jabatan : ''}${emp.departemen ? ' (' + emp.departemen + ')' : ''}`,
+    detail: `${emp.nik ? 'NIK: ' + emp.nik : ''}${emp.jabatan ? ' - ' + emp.jabatan : ''}${emp.departemen ? ' (' + emp.departemen + ')' : ''}`,
     email_kantor: emp.email_kantor,
     nik: emp.nik,
     jabatan: emp.jabatan,
@@ -699,68 +705,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
       </button>
     </PageHeader>
 
-    <!-- Search & Filters -->
-    <div class="flex items-center gap-2.5 w-full min-w-0">
-      <div class="relative h-8 min-w-0">
-        <span
-          aria-hidden="true"
-          class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-[17px] text-[#687281] pointer-events-none"
-          >search</span
-        >
-        <input
-          id="user-search"
-          v-model="searchQuery"
-          type="search"
-          autocomplete="off"
-          aria-label="Cari pengguna"
-          placeholder="Cari nama atau email pengguna…"
-          class="h-full min-h-0 w-full rounded-[6px] border border-[#E2E8F0] dark:border-slate-700 bg-white dark:bg-slate-800 pl-8 text-xs text-[#333333] dark:text-slate-100 placeholder-[#687281] dark:placeholder-slate-400 focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
-          :class="searchQuery ? 'pr-8' : 'pr-2.5'"
-        />
-        <button
-          v-if="searchQuery"
-          type="button"
-          @click="searchQuery = ''"
-          class="absolute right-2 top-1/2 -translate-y-1/2 flex h-5 w-5 items-center justify-center rounded-full bg-[#E2E8F0] text-[#5F7089] hover:bg-[#CBD5E1] hover:text-[#333333] transition-colors cursor-pointer"
-          title="Hapus pencarian"
-        >
-          <span aria-hidden="true" class="material-symbols-outlined text-[13px]">close</span>
-        </button>
-      </div>
-
-      <button
-        type="button"
-        @click="showFilterModal = true"
-        class="h-8 shrink-0 rounded-[6px] border border-[#E2E8F0] dark:border-slate-700 bg-[#F8FAFC] dark:bg-slate-800 px-3 text-xs font-medium text-[#5F7089] dark:text-slate-300 hover:bg-white dark:hover:bg-slate-700"
-      >
-        <span aria-hidden="true" class="material-symbols-outlined mr-1 align-middle text-[16px]"
-          >filter_alt</span
-        >Filter
-      </button>
-      <AppViewToggle v-model="viewMode" />
-    </div>
-
-    <FilterModal
-      :is-open="showFilterModal"
-      title="Filter Pengguna"
-      @close="showFilterModal = false"
-      @apply="showFilterModal = false"
-      @reset="resetFilters"
-    >
-      <CustomSelect
-        v-model="filterRole"
-        :options="[
-          { value: '', label: 'Semua Role' },
-          { value: 'admin', label: 'ADMIN' },
-          { value: 'superadmin', label: 'SUPERADMIN' },
-          { value: 'user', label: 'USER' },
-        ]"
-        aria-label="Filter role"
-        :block="true"
-      />
-    </FilterModal>
-
-    <!-- ── Card Stats Pengguna ── -->
+    <!-- ── Card Stats Pengguna (Directly below Header) ── -->
     <div v-if="!isLoading && users.length" class="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-2.5 lg:gap-3">
       <StatCard
         title="Total pengguna"
@@ -791,6 +736,72 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
         subtitle="Akses operasional standar"
       />
     </div>
+
+    <!-- Search & Filters -->
+    <div class="flex items-center gap-2.5 w-full min-w-0">
+      <div class="relative h-8 min-w-0 flex-1">
+        <span
+          aria-hidden="true"
+          class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-[17px] text-[#687281] pointer-events-none"
+          >search</span
+        >
+        <input
+          id="user-search"
+          v-model="searchQuery"
+          type="search"
+          autocomplete="off"
+          aria-label="Cari pengguna"
+          placeholder="Cari nama atau email pengguna…"
+          class="h-full min-h-0 w-full rounded-[6px] border border-[#E2E8F0] dark:border-slate-700 bg-white dark:bg-slate-800 pl-8 text-xs text-[#333333] dark:text-slate-100 placeholder-[#687281] dark:placeholder-slate-400 focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
+          :class="searchQuery ? 'pr-8' : 'pr-2.5'"
+        />
+        <button
+          v-if="searchQuery"
+          type="button"
+          @click="searchQuery = ''"
+          class="absolute right-2 top-1/2 -translate-y-1/2 flex h-5 w-5 items-center justify-center rounded-full bg-[#E2E8F0] text-[#5F7089] hover:bg-[#CBD5E1] hover:text-[#333333] transition-colors cursor-pointer"
+          title="Hapus pencarian"
+        >
+          <span aria-hidden="true" class="material-symbols-outlined text-[13px]">close</span>
+        </button>
+      </div>
+
+      <button
+        type="button"
+        @click="showFilterModal = true"
+        class="relative inline-flex items-center gap-1.5 h-8 shrink-0 rounded-[6px] border border-[#E2E8F0] dark:border-slate-700 bg-[#F8FAFC] dark:bg-slate-800 px-3 text-xs font-medium text-[#5F7089] dark:text-slate-300 hover:bg-white dark:hover:bg-slate-700 cursor-pointer"
+      >
+        <span aria-hidden="true" class="material-symbols-outlined text-[16px]">tune</span>
+        <span>Filter</span>
+        <span
+          v-if="activeFilterCount > 0"
+          class="ml-0.5 inline-flex items-center justify-center min-w-[16px] h-4 px-1 rounded-full text-[10px] font-bold bg-[#0A51B0] text-white"
+        >
+          {{ activeFilterCount }}
+        </span>
+      </button>
+      <AppViewToggle v-model="viewMode" />
+    </div>
+
+    <FilterModal
+      :is-open="showFilterModal"
+      title="Filter Pengguna"
+      @close="showFilterModal = false"
+      @apply="showFilterModal = false"
+      @reset="resetFilters"
+    >
+      <CustomSelect
+        v-model="filterRole"
+        :options="[
+          { value: '', label: 'Semua Role' },
+          { value: 'admin', label: 'ADMIN' },
+          { value: 'superadmin', label: 'SUPERADMIN' },
+          { value: 'user', label: 'USER' },
+        ]"
+        aria-label="Filter role"
+        :block="true"
+      />
+    </FilterModal>
 
     <!-- ── Tabel Pengguna ─────────────────────────────────── -->
     <div class="rounded-[6px] border border-[#E2E8F0]/80 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-2xs overflow-hidden">
@@ -831,14 +842,14 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
       <ErrorState v-else-if="pageError" :message="pageError" @retry="fetchUsers" />
 
       <template v-else>
-        <!-- ═══ Desktop Table (≥ 1280px, mode Tabel) ═══ -->
+        <!-- Mode Tabel (Tampil penuh dan scrollable horizontal di mobile) -->
         <div
           v-if="viewMode === 'table'"
-          class="hidden xl:block w-full max-w-full overflow-x-auto"
+          class="w-full max-w-full overflow-x-auto"
           tabindex="0"
           aria-label="Tabel pengguna"
         >
-          <table class="w-full max-w-full text-left border-collapse table-fixed">
+          <table class="w-full min-w-[700px] text-left border-collapse table-fixed">
             <caption class="sr-only">
               Daftar pengguna sistem
             </caption>
@@ -987,8 +998,8 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
           </table>
         </div>
 
-        <!-- ═══ Kartu (< 1280px, atau saat mode Kartu dipilih) ═══ -->
-        <div :class="viewMode === 'card' ? '' : 'xl:hidden'">
+        <!-- Mode Kartu -->
+        <div v-if="viewMode === 'card'">
           <!-- Empty State -->
           <EmptyState
             v-if="filteredUsers.length === 0"
@@ -1085,7 +1096,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
                       >{{ q.kode }}</span
                     >
                   </div>
-                  <span v-else class="text-[11px] text-[#687281] italic leading-tight">—</span>
+                  <span v-else class="text-[11px] text-[#687281] italic leading-tight">-</span>
                 </div>
 
                 <!-- Hak Akses -->
@@ -1116,7 +1127,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
     </div>
 
     <!-- ═══════════════════════════════════════════════════════
-         MODAL FORM — TAMBAH / EDIT USER & RBAC PERMISSIONS
+         MODAL FORM - TAMBAH / EDIT USER & RBAC PERMISSIONS
          ═══════════════════════════════════════════════════════ -->
     <AppModal
       :is-open="showFormModal"
@@ -1226,7 +1237,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
               <label for="user-password" class="text-xs font-semibold text-[#333333]">
                 {{
                   modalMode === 'add'
-                    ? 'Password Awal (terisi otomatis — ganti bila perlu)'
+                    ? 'Password Awal (terisi otomatis - ganti bila perlu)'
                     : 'Password Baru'
                 }}
               </label>

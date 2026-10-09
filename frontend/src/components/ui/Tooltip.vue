@@ -3,7 +3,7 @@
      ConfirmDialog/EmptyState lain di folder ini. -->
 <script setup>
 /**
- * Tooltip.vue — CSS-only tooltip (zero JS, zero deps).
+ * Tooltip.vue - CSS-only tooltip (zero JS, zero deps).
  *
  * Alternatif lokal untuk Tooltip shadcn/Radix: muncul pada hover dan
  * focus-within (keyboard), posisi atas/bawah, transition 150ms dengan
@@ -29,8 +29,8 @@ defineProps({
     <slot />
     <span
       role="tooltip"
-      class="tt-bubble pointer-events-none absolute left-1/2 z-40 w-max max-w-60 rounded-lg bg-[#1E293B] px-2.5 py-1.5 text-[11px] font-semibold text-white opacity-0 shadow-lg"
-      :class="position === 'top' ? 'bottom-[calc(100%+6px)]' : 'top-[calc(100%+6px)]'"
+      class="tt-bubble pointer-events-none absolute left-1/2 z-40 w-max max-w-60 rounded-md bg-[#1E293B] px-2 py-0.5 text-[9.5px] font-semibold text-white opacity-0 shadow-md"
+      :class="position === 'top' ? 'bottom-[calc(100%+5px)]' : 'top-[calc(100%+5px)]'"
     >
       {{ text }}
       <span

@@ -53,14 +53,14 @@
 }
 
 .inventory-polish .inventory-actions button {
-  height: 32px;
-  min-height: 32px;
-  padding: 0 12px;
+  height: 28px;
+  min-height: 28px;
+  padding: 0 10px;
   border-radius: 6px;
-  font-size: 12px;
+  font-size: 10.5px;
   font-weight: 600;
   justify-content: center;
-  gap: 6px;
+  gap: 5px;
 }
 
 .inventory-polish .inventory-primary-action {
@@ -94,15 +94,15 @@
 }
 
 .inventory-polish .inventory-actions button > span[aria-hidden] {
-  font-size: 16px;
+  font-size: 14px;
 }
 
 .inventory-polish .asset-toolbar > div:nth-child(2) {
-  padding: 6px 8px;
+  padding: 5px 7px;
   margin-top: 0;
   background: #f8fafc;
   border-radius: 6px;
-  gap: 8px;
+  gap: 7px;
 }
 
 .dark .inventory-polish .asset-toolbar > div:nth-child(2) {
@@ -111,15 +111,15 @@
 }
 
 .inventory-polish .asset-toolbar > div:nth-child(2) > div:first-child {
-  height: 32px;
+  height: 28px;
   min-width: 0;
 }
 
 .inventory-polish .asset-toolbar input {
-  height: 32px;
-  padding-right: 32px;
+  height: 28px;
+  padding-right: 28px;
   background: #ffffff;
-  font-size: 12px;
+  font-size: 10.5px;
   border-radius: 6px;
   border: 1px solid #e2e8f0;
   color: #333333;
@@ -132,25 +132,25 @@
 }
 
 .inventory-polish .asset-toolbar button {
-  min-height: 36px;
+  min-height: 28px;
 }
 
 .inventory-polish .asset-toolbar button[aria-label='Bersihkan pencarian'] {
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   right: 2px;
 }
 
 .inventory-polish .it-list-heading {
-  padding: 4px 0;
-  margin-bottom: 12px;
-  gap: 12px;
+  padding: 3px 0;
+  margin-bottom: 8px;
+  gap: 8px;
   flex-wrap: wrap;
   box-shadow: none;
 }
 
 .inventory-polish .it-list-heading h3 {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
   color: #333333;
 }
@@ -161,8 +161,8 @@
 
 .inventory-polish .it-list-heading p,
 .inventory-polish .it-result-range {
-  font-size: 11px;
-  line-height: 1.5;
+  font-size: 10px;
+  line-height: 1.4;
   color: #64748b;
 }
 
@@ -170,8 +170,8 @@
 .inventory-polish .asset-card-list button,
 .inventory-polish .ws-data-table button,
 .inventory-polish [role='alert'] button {
-  min-height: 32px;
-  min-width: 32px;
+  min-height: 28px;
+  min-width: 28px;
 }
 
 .inventory-polish.asset-inventory .asset-card-list {
@@ -180,18 +180,18 @@
 
 .inventory-polish.asset-inventory .asset-card-list > div {
   border-radius: 6px;
-  padding: 10px 12px;
+  padding: 8px 10px;
 }
 
 .inventory-polish .ws-data-table thead th {
-  padding: 6px 10px;
-  font-size: 11px;
+  padding: 4.5px 8px;
+  font-size: 9px;
   font-weight: 600;
 }
 
 .inventory-polish .ws-data-table tbody td {
-  padding: 6px 10px;
-  font-size: 12px;
+  padding: 4.5px 8px;
+  font-size: 10px;
 }
 
 .inventory-polish .asset-card-list > div:hover {
@@ -214,12 +214,12 @@
 }
 
 .inventory-dialog.app-modal-panel > div:first-child {
-  padding: 10px 12px;
-  gap: 8px;
+  padding: 8px 10px;
+  gap: 6px;
 }
 
 .inventory-dialog.app-modal-panel > div:first-child h2 {
-  font-size: 14px;
+  font-size: 12.5px;
   line-height: 1.35;
   white-space: normal;
   letter-spacing: -0.015em;
@@ -228,53 +228,53 @@
 
 .inventory-dialog.app-modal-panel > div:first-child p {
   white-space: normal;
-  font-size: 11px;
-  line-height: 1.45;
-  margin-top: 2px;
+  font-size: 9.5px;
+  line-height: 1.4;
+  margin-top: 1px;
 }
 
 .inventory-dialog.app-modal-panel .modal-body {
-  padding: 12px 14px;
+  padding: 8px 10px;
 }
 
 .inventory-dialog.app-modal-panel .modal-footer {
-  padding: 10px 12px;
+  padding: 8px 10px;
 }
 
 .inventory-dialog.app-modal-panel.ui-modal-panel button {
-  min-height: 32px !important;
-  min-width: 32px;
-  font-size: 12px;
-  border-radius: 6px;
+  min-height: 28px !important;
+  min-width: 28px;
+  font-size: 10.5px;
+  border-radius: 5px;
 }
 
 .inventory-dialog.app-modal-panel :is(input:not([type='checkbox']):not([type='radio']), select) {
-  min-height: 32px;
-  font-size: 12px;
-  border-radius: 6px;
+  min-height: 28px;
+  font-size: 10.5px;
+  border-radius: 5px;
 }
 
 .inventory-dialog.app-modal-panel :is(input, select, textarea) {
-  font-size: 12px;
+  font-size: 10.5px;
 }
 
 .inventory-dialog .asset-detail-fields {
-  gap: 0 16px;
+  gap: 0 14px;
 }
 
 .inventory-dialog .asset-detail-fields > div {
-  padding: 8px 0;
+  padding: 6px 0;
 }
 
 .inventory-dialog .asset-crud-actions button {
-  font-size: 12px;
-  border-radius: 6px;
-  min-height: 32px;
+  font-size: 10.5px;
+  border-radius: 5px;
+  min-height: 28px;
 }
 
 @media (min-width: 640px) {
   .inventory-polish.asset-inventory .asset-toolbar {
-    padding: 10px 12px;
+    padding: 8px 10px;
   }
 }
 
@@ -287,7 +287,7 @@
 
 @media (max-width: 767px) {
   .inventory-polish.asset-inventory .asset-toolbar {
-    padding: 8px 10px;
+    padding: 6px 8px;
   }
   .inventory-polish .inventory-actions {
     width: 100%;
@@ -302,10 +302,10 @@
     flex: 1;
   }
   .inventory-polish .asset-toolbar > div:nth-child(2) {
-    padding: 6px 8px;
+    padding: 5px 6px;
   }
   .inventory-polish .asset-toolbar input {
-    font-size: 12px;
+    font-size: 10px;
   }
   .inventory-polish.asset-inventory .asset-card-list {
     grid-template-columns: minmax(0, 1fr);
@@ -313,10 +313,10 @@
   .inventory-dialog.app-modal-panel > div:first-child,
   .inventory-dialog.app-modal-panel .modal-body,
   .inventory-dialog.app-modal-panel .modal-footer {
-    padding: 10px 12px;
+    padding: 8px 10px;
   }
   .inventory-dialog.app-modal-panel :is(input, select, textarea) {
-    font-size: 12px;
+    font-size: 10px;
   }
   .inventory-dialog .asset-detail-fields {
     grid-template-columns: minmax(0, 1fr);

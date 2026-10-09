@@ -80,8 +80,8 @@ const routes = [
     alias: '/assets/ops',
   }),
   page('/my-assets', 'my-assets', () => import('../views/MyAssetsView.vue'), {
-    title: 'Aset Karyawan',
-    subtitle: 'Kelola aset karyawan',
+    title: 'Profil',
+    subtitle: 'Detail aset, tiket, riwayat aktivitas, dan profil akun',
     permission: 'my_assets',
     alias: '/assets/karyawan',
   }),
@@ -112,6 +112,7 @@ const routes = [
   }),
   page('/submissions/:id', 'submission-detail', () => import('../views/SubmissionsView.vue'), {
     title: 'Detail BAST',
+    subtitle: 'Detail dokumen serah terima aset',
     permission: 'submissions',
   }),
   page('/submissions', 'submissions', () => import('../views/SubmissionsView.vue'), {

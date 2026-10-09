@@ -65,12 +65,12 @@ function goToPage(page) {
 <template>
   <div
     :class="{ 'mobile-compact': mobileCompact, 'asset-pagination': assetStyle }"
-    class="flex flex-col sm:flex-row items-center justify-between gap-3 px-5 py-4 border-t border-[#F1F5F9] text-[12px] text-[#475569] select-none"
+    class="flex flex-col sm:flex-row items-center justify-between gap-2 px-3 py-2 sm:px-4 sm:py-2.5 border-t border-[#F1F5F9] text-[9.5px] sm:text-[10.5px] text-[#475569] select-none"
   >
     <div class="flex items-center gap-1 font-medium">
       <span>Menampilkan</span>
       <span class="font-bold text-[#333333]">{{ startIndex }}</span>
-      <span>–</span>
+      <span>-</span>
       <span class="font-bold text-[#333333]">{{ endIndex }}</span>
       <span>dari</span>
       <span class="font-bold text-[#333333]">{{ totalItems }}</span>
@@ -89,16 +89,16 @@ function goToPage(page) {
         :disabled="currentPage <= 1"
         aria-label="Halaman Sebelumnya"
         title="Halaman Sebelumnya"
-        class="ui-pagination-button flex h-8 w-8 items-center justify-center rounded-lg border border-[#CBD5E1] bg-white text-[#334155] shadow-2xs hover:bg-[#F8FAFC] hover:text-[#333333] transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+        class="ui-pagination-button flex h-6.5 w-6.5 sm:h-7 sm:w-7 items-center justify-center rounded-[5px] border border-[#CBD5E1] bg-white text-[#334155] shadow-2xs hover:bg-[#F8FAFC] hover:text-[#333333] transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
       >
-        <span aria-hidden="true" class="material-symbols-outlined text-[18px]">chevron_left</span>
+        <span aria-hidden="true" class="material-symbols-outlined text-[14px]">chevron_left</span>
       </button>
 
       <select
         v-if="mobileCompact"
         :value="currentPage"
         aria-label="Pilih halaman"
-        class="min-h-11 min-w-0 rounded-lg border border-[#CBD5E1] bg-white px-2 text-base text-[#334155] sm:hidden"
+        class="min-h-7 min-w-0 rounded-[5px] border border-[#CBD5E1] bg-white px-1.5 text-xs text-[#334155] sm:hidden"
         @change="goToPage(Number($event.target.value))"
       >
         <option v-for="page in totalPages" :key="page" :value="page">
@@ -111,7 +111,7 @@ function goToPage(page) {
           @click="goToPage(page)"
           :aria-label="`Halaman ${page}`"
           :aria-current="page === currentPage ? 'page' : undefined"
-          class="ui-pagination-button flex h-8 min-w-[32px] px-2 items-center justify-center rounded-lg text-[12px] font-bold transition-all cursor-pointer"
+          class="ui-pagination-button flex h-6.5 min-w-[26px] sm:h-7 sm:min-w-[28px] px-1.5 items-center justify-center rounded-[5px] text-[9.5px] sm:text-[10px] font-bold transition-all cursor-pointer"
           :class="[
             mobileCompact ? 'hidden sm:flex' : '',
             page === currentPage
@@ -129,9 +129,9 @@ function goToPage(page) {
         :disabled="currentPage >= totalPages"
         aria-label="Halaman Selanjutnya"
         title="Halaman Selanjutnya"
-        class="ui-pagination-button flex h-8 w-8 items-center justify-center rounded-lg border border-[#CBD5E1] bg-white text-[#334155] shadow-2xs hover:bg-[#F8FAFC] hover:text-[#333333] transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+        class="ui-pagination-button flex h-6.5 w-6.5 sm:h-7 sm:w-7 items-center justify-center rounded-[5px] border border-[#CBD5E1] bg-white text-[#334155] shadow-2xs hover:bg-[#F8FAFC] hover:text-[#333333] transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
       >
-        <span aria-hidden="true" class="material-symbols-outlined text-[18px]">chevron_right</span>
+        <span aria-hidden="true" class="material-symbols-outlined text-[14px]">chevron_right</span>
       </button>
     </div>
   </div>
@@ -139,28 +139,28 @@ function goToPage(page) {
 
 <style scoped>
 .asset-pagination {
-  margin-top: 12px;
-  padding: 10px 12px;
+  margin-top: 8px;
+  padding: 6px 8px;
   border: 1px solid #e2e8f0;
   border-radius: 6px;
   background: white;
-  gap: 10px;
+  gap: 8px;
   color: #637288;
-  font-size: 12px;
+  font-size: 10px;
   font-variant-numeric: tabular-nums;
 }
 .asset-pagination > div:first-child {
   flex-wrap: wrap;
-  gap: 5px;
+  gap: 4px;
 }
 .asset-pagination [role='navigation'] {
-  gap: 6px;
+  gap: 4px;
 }
 .asset-pagination button {
-  min-width: 30px;
-  height: 30px;
+  min-width: 26px;
+  height: 26px;
   border: 1px solid #e2e8f0;
-  border-radius: 6px;
+  border-radius: 5px;
   box-shadow: none;
   font-weight: 600;
 }
@@ -176,36 +176,36 @@ function goToPage(page) {
 }
 @media (width < 40rem) {
   .asset-pagination {
-    padding: 10px 12px;
-    gap: 10px;
+    padding: 6px 8px;
+    gap: 8px;
   }
   .asset-pagination [role='navigation'] {
     width: 100%;
     display: flex;
     justify-content: space-between;
-    gap: 12px;
+    gap: 8px;
   }
   .asset-pagination select {
     flex: 1;
-    max-width: 180px;
-    min-height: 44px;
+    max-width: 150px;
+    min-height: 28px;
     border-color: #e2e8f0;
     text-align: center;
-    font-size: 16px;
-    border-radius: 6px;
+    font-size: 11px;
+    border-radius: 5px;
   }
 }
 @media (width < 40rem) {
   .mobile-compact {
-    padding-inline: 0.75rem;
+    padding-inline: 0.5rem;
   }
   .mobile-compact > div:first-child {
     flex-wrap: wrap;
     justify-content: center;
   }
   .mobile-compact button {
-    min-width: 2.75rem;
-    min-height: 2.75rem;
+    min-width: 1.75rem;
+    min-height: 1.75rem;
   }
 }
 </style>

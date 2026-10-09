@@ -1,5 +1,5 @@
 <script setup>
-// AppModal.vue — Modal pop-up yang dipakai di seluruh aplikasi
+// AppModal.vue - Modal pop-up yang dipakai di seluruh aplikasi
 import { nextTick, onBeforeUnmount, onMounted, ref, useId, watch } from 'vue'
 
 const props = defineProps({
@@ -132,26 +132,26 @@ onBeforeUnmount(() => {
 
           <!-- Header Modal (Fixed Non-Scrollable Header) -->
           <div
-            class="flex shrink-0 items-center justify-between gap-2 border-b border-[#F1F5F9] bg-white px-3 sm:px-3.5 py-2 sm:py-2.5"
+            class="flex shrink-0 items-center justify-between gap-1.5 border-b border-[#F1F5F9] bg-white px-2.5 sm:px-3 py-1.5 sm:py-2"
           >
-            <div class="flex items-center gap-2 min-w-0">
+            <div class="flex items-center gap-1.5 min-w-0">
               <span
-                class="flex h-7 w-7 shrink-0 items-center justify-center rounded-[6px] bg-[#EDF5FF] text-[#333333] border border-[#B8D4F5]/30"
+                class="flex h-6 w-6 sm:h-6.5 sm:w-6.5 shrink-0 items-center justify-center rounded-[5px] bg-[#EDF5FF] text-[#333333] border border-[#B8D4F5]/30"
               >
-                <span aria-hidden="true" class="material-symbols-outlined text-[16px]">{{
+                <span aria-hidden="true" class="material-symbols-outlined text-[13.5px] sm:text-[14.5px]">{{
                   icon || 'devices'
                 }}</span>
               </span>
               <div class="min-w-0">
                 <h2
                   :id="titleId"
-                  class="text-[13px] sm:text-[14px] font-semibold text-[#333333] leading-tight wrap-anywhere sm:truncate"
+                  class="text-[11.5px] sm:text-[12.5px] font-semibold text-[#333333] leading-tight wrap-anywhere sm:truncate"
                 >
                   {{ title }}
                 </h2>
                 <p
                   v-if="subtitle"
-                  class="text-[10px] sm:text-[11px] font-normal text-[#5F7089] mt-0.5 leading-none truncate"
+                  class="text-[9px] sm:text-[9.5px] font-normal text-[#5F7089] mt-0.5 leading-none truncate"
                 >
                   {{ subtitle }}
                 </p>
@@ -161,19 +161,19 @@ onBeforeUnmount(() => {
               type="button"
               aria-label="Tutup dialog"
               @click="close"
-              class="flex h-7 w-7 shrink-0 items-center justify-center rounded-[6px] text-[#475569] transition-colors hover:bg-[#F8FAFC] hover:text-[#333333] cursor-pointer"
+              class="flex h-6 w-6 shrink-0 items-center justify-center rounded-[5px] text-[#475569] transition-colors hover:bg-[#F8FAFC] hover:text-[#333333] cursor-pointer"
             >
-              <span aria-hidden="true" class="material-symbols-outlined text-[16px]">close</span>
+              <span aria-hidden="true" class="material-symbols-outlined text-[14px]">close</span>
             </button>
           </div>
 
           <!-- Body Konten Modal (Sole Scrollable Area) -->
-          <div class="modal-body flex-1 min-h-0 overflow-y-auto p-2.5 sm:p-3">
+          <div class="modal-body flex-1 min-h-0 overflow-y-auto p-2 sm:p-2.5">
             <slot />
           </div>
           <div
             v-if="$slots.footer"
-            class="modal-footer shrink-0 border-t border-[#F1F5F9] bg-white px-3 py-2 sm:px-3.5 sm:py-2.5"
+            class="modal-footer shrink-0 border-t border-[#F1F5F9] bg-white px-2.5 py-1.5 sm:px-3 sm:py-2"
           >
             <slot name="footer" />
           </div>

@@ -411,7 +411,7 @@ function formatDate(dateStr) {
       subtitle="Kelola perangkat & mesin operasional outlet / store (POS, KIOSK, Payment, Display)."
       icon="precision_manufacturing"
     >
-      <div class="inventory-actions flex shrink-0 items-center gap-1.5">
+      <div class="inventory-actions flex flex-wrap sm:flex-nowrap items-center gap-1.5">
         <button
           v-if="canWriteAssets"
           type="button"
@@ -423,13 +423,13 @@ function formatDate(dateStr) {
           <span>Tambah Aset Ops</span>
         </button>
         <div
-          class="inventory-action-group flex items-center gap-1 rounded-[6px] border border-[#D7E3F2] dark:border-slate-700 bg-[#F8FAFC] dark:bg-slate-800 p-0.5"
+          class="inventory-action-group flex items-center gap-1 rounded-[6px] border border-[#D7E3F2] dark:border-slate-700 bg-[#F8FAFC] dark:bg-slate-800 p-0.5 h-8"
         >
           <button
             v-if="canWriteAssets"
             type="button"
             @click="showImportModal = true"
-            class="inventory-action-button inline-flex h-7 items-center gap-1 rounded-[6px] px-2 text-[11px] font-semibold text-[#0A51B0] dark:text-blue-400 hover:bg-white dark:hover:bg-slate-700"
+            class="inventory-action-button inline-flex h-full items-center gap-1 rounded-[4px] px-2 text-[11px] font-semibold text-[#0A51B0] dark:text-blue-400 hover:bg-white dark:hover:bg-slate-700"
             title="Impor data Aset Ops dari Excel"
           >
             <span aria-hidden="true" class="material-symbols-outlined text-[15px]"
@@ -439,7 +439,7 @@ function formatDate(dateStr) {
           <button
             type="button"
             @click="showExportModal = true"
-            class="inventory-action-button inline-flex h-7 items-center gap-1 rounded-[6px] px-2 text-[11px] font-semibold text-[#0A51B0] dark:text-blue-400 hover:bg-white dark:hover:bg-slate-700"
+            class="inventory-action-button inline-flex h-full items-center gap-1 rounded-[4px] px-2 text-[11px] font-semibold text-[#0A51B0] dark:text-blue-400 hover:bg-white dark:hover:bg-slate-700"
             title="Export data Aset Ops"
           >
             <span aria-hidden="true" class="material-symbols-outlined text-[15px]"
@@ -449,6 +449,23 @@ function formatDate(dateStr) {
         </div>
       </div>
     </PageHeader>
+
+    <!-- ── Quick KPI Stat Cards (Directly below Header) ── -->
+    <section
+      aria-label="Ringkasan aset"
+      :aria-busy="isLoading"
+      class="grid grid-cols-1 min-[360px]:grid-cols-2 xl:grid-cols-4 gap-2 sm:gap-2.5 lg:gap-3"
+    >
+      <StatCard
+        v-for="stat in assetStats"
+        :key="stat.title"
+        :title="stat.title"
+        :value="isLoading || pageError ? '—' : stat.value"
+        :icon="stat.icon"
+        :color="stat.color"
+        :subtitle="isLoading ? 'Memuat…' : pageError ? 'Tidak tersedia' : 'Seluruh data kategori'"
+      />
+    </section>
 
     <!-- Toolbar sticky mengikuti scroll (app-main adalah scroll container) -->
     <div class="asset-toolbar-sticky">
@@ -502,22 +519,6 @@ function formatDate(dateStr) {
         </div>
       </div>
     </div>
-
-    <section
-      aria-label="Ringkasan aset"
-      :aria-busy="isLoading"
-      class="grid grid-cols-1 min-[360px]:grid-cols-2 xl:grid-cols-4 gap-2 sm:gap-2.5 lg:gap-3"
-    >
-      <StatCard
-        v-for="stat in assetStats"
-        :key="stat.title"
-        :title="stat.title"
-        :value="isLoading || pageError ? '—' : stat.value"
-        :icon="stat.icon"
-        :color="stat.color"
-        :subtitle="isLoading ? 'Memuat…' : pageError ? 'Tidak tersedia' : 'Seluruh data kategori'"
-      />
-    </section>
 
     <!-- ─── MODERN ENTERPRISE SAAS DATA MANAGEMENT CONTAINER ──────────────── -->
     <div>
@@ -660,8 +661,8 @@ function formatDate(dateStr) {
 
       <!-- Asset list -->
       <div v-else :class="{ 'ws-table-mode': viewMode === 'table' }">
-        <!-- Mode Tabel (tampil ≥ 1280px) -->
-        <div v-if="viewMode === 'table'" class="ws-data-table-wrap hidden xl:block">
+        <!-- Mode Tabel (tampil di semua breakpoint saat dipilih) -->
+        <div v-if="viewMode === 'table'" class="ws-data-table-wrap">
           <table class="ws-data-table">
             <caption class="sr-only">
               Daftar aset Ops
@@ -738,8 +739,8 @@ function formatDate(dateStr) {
           </table>
         </div>
 
-        <!-- Mode Kartu (default < 1280px, atau saat dipilih) -->
-        <div class="asset-card-list laptop-list">
+        <!-- Mode Kartu -->
+        <div v-if="viewMode === 'card'" class="asset-card-list laptop-list">
           <div
             v-for="asset in paginatedAssets"
             :key="asset.id"

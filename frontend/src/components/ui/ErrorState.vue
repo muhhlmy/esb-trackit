@@ -1,6 +1,6 @@
 <script setup>
 /**
- * ErrorState.vue — primitive error state halaman/kartu dengan retry.
+ * ErrorState.vue - primitive error state halaman/kartu dengan retry.
  *
  * Menggantikan 3 markup inline berbeda (Users/Tickets/Submissions) dengan
  * satu pola: icon + pesan + tombol retry, role="alert" agar dibacakan
@@ -23,9 +23,9 @@ defineEmits(['retry'])
 <template>
   <div
     role="alert"
-    class="flex flex-wrap items-center gap-3 rounded-[6px] border border-[#FECACA] bg-[#FEF2F2] p-4 text-xs text-[#B91C1C] shadow-2xs"
+    class="flex flex-wrap items-center gap-2 rounded-[5px] border border-[#FECACA] bg-[#FEF2F2] p-2.5 text-[10.5px] text-[#B91C1C] shadow-2xs"
   >
-    <span aria-hidden="true" class="material-symbols-outlined text-[20px] shrink-0 text-[#DC2626]">
+    <span aria-hidden="true" class="material-symbols-outlined text-[16px] shrink-0 text-[#DC2626]">
       error
     </span>
 
@@ -33,7 +33,7 @@ defineEmits(['retry'])
 
     <button
       type="button"
-      class="inline-flex h-8.5 items-center rounded-xl bg-[#DC2626] px-3.5 text-xs font-bold text-white transition-colors duration-150 hover:bg-[#B91C1C] active:scale-[0.98] cursor-pointer"
+      class="inline-flex h-6.5 items-center rounded-[5px] bg-[#DC2626] px-2.5 text-[10px] font-bold text-white transition-colors duration-150 hover:bg-[#B91C1C] active:scale-[0.98] cursor-pointer"
       @click="$emit('retry')"
     >
       {{ retryLabel }}

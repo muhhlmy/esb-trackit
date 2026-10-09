@@ -7,7 +7,7 @@ import tailwindcss from '@tailwindcss/vite'
 const FRONTEND_SECURITY_HEADERS = {
   'Content-Security-Policy':
     "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'; worker-src 'self' blob:;",
-  'Permissions-Policy': 'camera=(), geolocation=(), microphone=(), payment=(), usb=()',
+  'Permissions-Policy': 'camera=(self), geolocation=(), microphone=(), payment=(), usb=()',
   'Referrer-Policy': 'strict-origin-when-cross-origin',
   'X-Content-Type-Options': 'nosniff',
   'X-Frame-Options': 'DENY',
@@ -116,6 +116,7 @@ export default defineConfig(({ mode = 'development' }) => {
         '@tiptap/extension-placeholder',
         '@tiptap/extension-image',
         'xlsx',
+        'tone',
       ],
     },
     resolve: {

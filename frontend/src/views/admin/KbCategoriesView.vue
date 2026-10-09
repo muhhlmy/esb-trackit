@@ -1,10 +1,15 @@
 <script setup>
 import AppModal from '../../components/ui/AppModal.vue'
 import PageHeader from '../../components/ui/PageHeader.vue'
+import StatCard from '../../components/ui/StatCard.vue'
+import FilterModal from '../../components/ui/FilterModal.vue'
+import CustomSelect from '../../components/ui/CustomSelect.vue'
+import AppViewToggle from '../../components/ui/AppViewToggle.vue'
 import { ref, computed, onMounted, nextTick } from 'vue'
 import { RouterLink } from 'vue-router'
 import { useKbCategories } from '@/composables/useKbCategories'
 import { useAuth } from '@/composables/useAuth'
+import { useViewMode } from '@/composables/useViewMode.js'
 import { animateIn, isReducedMotion } from '@/composables/useGsap'
 import {
   LayoutGrid,
@@ -32,9 +37,19 @@ import {
 const { categories, fetchAllCategories, saveCategory, deleteCategory } = useKbCategories()
 const { hasWritePermission } = useAuth()
 const canWrite = computed(() => hasWritePermission('knowledge_base'))
+const { viewMode } = useViewMode('admin-kb-categories', 'table')
 
 const searchQuery = ref('')
 const selectedStatus = ref('all') // 'all', 'PUBLISHED', 'DRAFT'
+const selectedFeatured = ref('all') // 'all', 'featured', 'standard'
+const showFilterModal = ref(false)
+
+const activeFilterCount = computed(() => {
+  let count = 0
+  if (selectedStatus.value !== 'all') count++
+  if (selectedFeatured.value !== 'all') count++
+  return count
+})
 const deleteConfirmId = ref(null)
 const actionMenu = ref(null) // { id, top, left }
 const mainScope = ref(null)
@@ -101,6 +116,8 @@ onMounted(async () => {
 const filteredCategories = computed(() => {
   return categories.value.filter((c) => {
     if (selectedStatus.value !== 'all' && c.status !== selectedStatus.value) return false
+    if (selectedFeatured.value === 'featured' && !c.is_featured) return false
+    if (selectedFeatured.value === 'standard' && c.is_featured) return false
 
     if (!searchQuery.value.trim()) return true
     const q = searchQuery.value.toLowerCase().trim()
@@ -184,6 +201,7 @@ async function executeDelete() {
 function clearFilters() {
   searchQuery.value = ''
   selectedStatus.value = 'all'
+  selectedFeatured.value = 'all'
 }
 </script>
 
@@ -232,95 +250,27 @@ function clearFilters() {
 
     <!-- Stats Row (3 Columns Balanced) -->
     <div class="grid grid-cols-3 gap-2 sm:gap-2.5 lg:gap-3 gsap-admin-el">
-      <!-- Total -->
-      <div
-        class="kpi-focusable flex flex-col justify-between p-[var(--kpi-padding)] sm:p-[var(--kpi-padding-sm)] lg:p-[var(--kpi-padding-lg)] rounded-[var(--kpi-radius)] bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 shadow-2xs hover:border-[#CBD5E1] dark:hover:border-slate-700 transition-colors min-h-[var(--kpi-height)] sm:min-h-[var(--kpi-height-sm)] lg:min-h-[var(--kpi-height-lg)]"
-        tabindex="0"
-      >
-        <div class="flex items-center justify-between gap-[var(--kpi-gap)]">
-          <span
-            class="text-[length:var(--kpi-title-font-size)] sm:text-[length:var(--kpi-title-font-size-sm)] lg:text-[length:var(--kpi-title-font-size-lg)] font-medium text-[#5F7089] dark:text-slate-400 truncate"
-            >Total kategori</span
-          >
-          <div
-            class="flex h-[var(--kpi-icon-container-size)] w-[var(--kpi-icon-container-size)] sm:h-[var(--kpi-icon-container-size-sm)] sm:w-[var(--kpi-icon-container-size-sm)] lg:h-[var(--kpi-icon-container-size-lg)] lg:w-[var(--kpi-icon-container-size-lg)] shrink-0 items-center justify-center rounded-[6px] bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300"
-          >
-            <LayoutGrid class="w-[var(--kpi-icon-size)] h-[var(--kpi-icon-size)] sm:w-[var(--kpi-icon-size-sm)] sm:h-[var(--kpi-icon-size-sm)] lg:w-[var(--kpi-icon-size-lg)] lg:h-[var(--kpi-icon-size-lg)]" />
-          </div>
-        </div>
-        <div class="mt-0.5">
-          <p
-            class="font-num text-[length:var(--kpi-value-font-size)] sm:text-[length:var(--kpi-value-font-size-sm)] lg:text-[length:var(--kpi-value-font-size-lg)] font-semibold text-[#333333] dark:text-white tabular-nums leading-none tracking-tight"
-          >
-            {{ stats.total }}
-          </p>
-          <span
-            class="mt-0.5 block truncate text-[length:var(--kpi-caption-font-size)] sm:text-[length:var(--kpi-caption-font-size-sm)] lg:text-[length:var(--kpi-caption-font-size-lg)] font-normal text-[#64748B] dark:text-slate-400"
-          >
-            Seluruh kategori KB
-          </span>
-        </div>
-      </div>
-
-      <!-- Published -->
-      <div
-        class="kpi-focusable flex flex-col justify-between p-[var(--kpi-padding)] sm:p-[var(--kpi-padding-sm)] lg:p-[var(--kpi-padding-lg)] rounded-[var(--kpi-radius)] bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 shadow-2xs hover:border-[#CBD5E1] dark:hover:border-slate-700 transition-colors min-h-[var(--kpi-height)] sm:min-h-[var(--kpi-height-sm)] lg:min-h-[var(--kpi-height-lg)]"
-        tabindex="0"
-      >
-        <div class="flex items-center justify-between gap-[var(--kpi-gap)]">
-          <span
-            class="text-[length:var(--kpi-title-font-size)] sm:text-[length:var(--kpi-title-font-size-sm)] lg:text-[length:var(--kpi-title-font-size-lg)] font-medium text-[#5F7089] dark:text-slate-400 truncate"
-            >Terbit</span
-          >
-          <div
-            class="flex h-[var(--kpi-icon-container-size)] w-[var(--kpi-icon-container-size)] sm:h-[var(--kpi-icon-container-size-sm)] sm:w-[var(--kpi-icon-container-size-sm)] lg:h-[var(--kpi-icon-container-size-lg)] lg:w-[var(--kpi-icon-container-size-lg)] shrink-0 items-center justify-center rounded-[6px] bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400"
-          >
-            <CheckCircle class="w-[var(--kpi-icon-size)] h-[var(--kpi-icon-size)] sm:w-[var(--kpi-icon-size-sm)] sm:h-[var(--kpi-icon-size-sm)] lg:w-[var(--kpi-icon-size-lg)] lg:h-[var(--kpi-icon-size-lg)]" />
-          </div>
-        </div>
-        <div class="mt-0.5">
-          <p
-            class="font-num text-[length:var(--kpi-value-font-size)] sm:text-[length:var(--kpi-value-font-size-sm)] lg:text-[length:var(--kpi-value-font-size-lg)] font-semibold text-[#333333] dark:text-white tabular-nums leading-none tracking-tight"
-          >
-            {{ stats.published }}
-          </p>
-          <span
-            class="mt-0.5 block truncate text-[length:var(--kpi-caption-font-size)] sm:text-[length:var(--kpi-caption-font-size-sm)] lg:text-[length:var(--kpi-caption-font-size-lg)] font-normal text-[#64748B] dark:text-slate-400"
-          >
-            Kategori aktif
-          </span>
-        </div>
-      </div>
-
-      <!-- Featured -->
-      <div
-        class="kpi-focusable flex flex-col justify-between p-[var(--kpi-padding)] sm:p-[var(--kpi-padding-sm)] lg:p-[var(--kpi-padding-lg)] rounded-[var(--kpi-radius)] bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 shadow-2xs hover:border-[#CBD5E1] dark:hover:border-slate-700 transition-colors min-h-[var(--kpi-height)] sm:min-h-[var(--kpi-height-sm)] lg:min-h-[var(--kpi-height-lg)]"
-        tabindex="0"
-      >
-        <div class="flex items-center justify-between gap-[var(--kpi-gap)]">
-          <span
-            class="text-[length:var(--kpi-title-font-size)] sm:text-[length:var(--kpi-title-font-size-sm)] lg:text-[length:var(--kpi-title-font-size-lg)] font-medium text-[#5F7089] dark:text-slate-400 truncate"
-            >Unggulan</span
-          >
-          <div
-            class="flex h-[var(--kpi-icon-container-size)] w-[var(--kpi-icon-container-size)] sm:h-[var(--kpi-icon-container-size-sm)] sm:w-[var(--kpi-icon-container-size-sm)] lg:h-[var(--kpi-icon-container-size-lg)] lg:w-[var(--kpi-icon-container-size-lg)] shrink-0 items-center justify-center rounded-[6px] bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400"
-          >
-            <Star class="w-[var(--kpi-icon-size)] h-[var(--kpi-icon-size)] sm:w-[var(--kpi-icon-size-sm)] sm:h-[var(--kpi-icon-size-sm)] lg:w-[var(--kpi-icon-size-lg)] lg:h-[var(--kpi-icon-size-lg)]" />
-          </div>
-        </div>
-        <div class="mt-0.5">
-          <p
-            class="font-num text-[length:var(--kpi-value-font-size)] sm:text-[length:var(--kpi-value-font-size-sm)] lg:text-[length:var(--kpi-value-font-size-lg)] font-semibold text-[#333333] dark:text-white tabular-nums leading-none tracking-tight"
-          >
-            {{ stats.featured }}
-          </p>
-          <span
-            class="mt-0.5 block truncate text-[length:var(--kpi-caption-font-size)] sm:text-[length:var(--kpi-caption-font-size-sm)] lg:text-[length:var(--kpi-caption-font-size-lg)] font-normal text-[#64748B] dark:text-slate-400"
-          >
-            Tampil di beranda
-          </span>
-        </div>
-      </div>
+      <StatCard
+        title="Total kategori"
+        :value="stats.total"
+        icon="category"
+        color="primary"
+        subtitle="Seluruh kategori KB"
+      />
+      <StatCard
+        title="Terbit"
+        :value="stats.published"
+        icon="task_alt"
+        color="success"
+        subtitle="Kategori aktif"
+      />
+      <StatCard
+        title="Unggulan"
+        :value="stats.featured"
+        icon="star"
+        color="warning"
+        subtitle="Tampil di beranda"
+      />
     </div>
 
     <!-- Toolbar -->
@@ -373,20 +323,40 @@ function clearFilters() {
           </button>
         </div>
 
+        <!-- Tombol Filter Lanjutan -->
+        <button
+          type="button"
+          @click="showFilterModal = true"
+          class="relative inline-flex items-center gap-1.5 h-8 px-3 rounded-[6px] border border-[#E2E8F0] dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-semibold text-[#333333] dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer shadow-2xs"
+          title="Filter lanjutan"
+        >
+          <span class="material-symbols-outlined text-[16px] text-[#5F7089]">tune</span>
+          <span>Filter</span>
+          <span
+            v-if="activeFilterCount > 0"
+            class="ml-0.5 inline-flex items-center justify-center min-w-[16px] h-4 px-1 rounded-full text-[10px] font-bold bg-[#0A51B0] text-white"
+          >
+            {{ activeFilterCount }}
+          </span>
+        </button>
+
         <!-- Clear Filters -->
         <button
-          v-if="searchQuery || selectedStatus !== 'all'"
+          v-if="searchQuery || activeFilterCount > 0"
           @click="clearFilters"
           class="px-2.5 py-1 rounded-[6px] text-xs font-medium text-[#5F7089] dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors cursor-pointer touch-manipulation shrink-0"
         >
           Reset
         </button>
+
+        <AppViewToggle v-model="viewMode" class="shrink-0" />
       </div>
     </div>
 
-    <!-- MOBILE CARD VIEW (< md) -->
+    <!-- CARD VIEW -->
     <div
-      class="xl:hidden divide-y divide-[#F1F5F9] dark:divide-slate-800/60 bg-white dark:bg-slate-900 rounded-[6px] border border-[#E2E8F0] dark:border-slate-800 overflow-hidden gsap-admin-el"
+      v-if="viewMode === 'card'"
+      class="divide-y divide-[#F1F5F9] dark:divide-slate-800/60 bg-white dark:bg-slate-900 rounded-[6px] border border-[#E2E8F0] dark:border-slate-800 overflow-hidden gsap-admin-el"
     >
       <!-- Empty State Mobile -->
       <div v-if="filteredCategories.length === 0" class="py-12 px-4 text-center">
@@ -509,12 +479,13 @@ function clearFilters() {
       </div>
     </div>
 
-    <!-- DESKTOP TABLE VIEW (>= md) -->
+    <!-- TABLE VIEW -->
     <div
-      class="hidden xl:block bg-white dark:bg-slate-900 rounded-[6px] border border-[#E2E8F0] dark:border-slate-800 overflow-hidden gsap-admin-el"
+      v-else
+      class="bg-white dark:bg-slate-900 rounded-[6px] border border-[#E2E8F0] dark:border-slate-800 overflow-hidden gsap-admin-el"
     >
       <div class="overflow-x-auto">
-        <table class="w-full text-left text-sm border-collapse">
+        <table class="w-full min-w-[700px] text-left text-sm border-collapse">
           <thead
             class="border-b border-[#E2E8F0] dark:border-slate-800 text-[#5F7089] dark:text-slate-400 font-medium text-xs"
           >
@@ -597,7 +568,7 @@ function clearFilters() {
                   >
                     <component :is="iconComponent(c.icon)" class="w-3.5 h-3.5" />
                   </span>
-                  <span class="text-[11px]">{{ c.icon || '—' }}</span>
+                  <span class="text-[11px]">{{ c.icon || '-' }}</span>
                 </div>
               </td>
 
@@ -891,6 +862,48 @@ function clearFilters() {
         </div>
       </div>
     </Transition>
+
+    <!-- Advance Filter Modal -->
+    <FilterModal
+      :is-open="showFilterModal"
+      title="Filter Kategori Knowledge Base"
+      @close="showFilterModal = false"
+      @apply="showFilterModal = false"
+      @reset="clearFilters"
+    >
+      <div class="space-y-3">
+        <div>
+          <label class="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
+            Status Kategori
+          </label>
+          <CustomSelect
+            v-model="selectedStatus"
+            :options="[
+              { value: 'all', label: 'Semua Status' },
+              { value: 'PUBLISHED', label: 'Published' },
+              { value: 'DRAFT', label: 'Draft' },
+            ]"
+            placeholder="Semua Status"
+            :block="true"
+          />
+        </div>
+        <div>
+          <label class="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
+            Status Unggulan (Featured)
+          </label>
+          <CustomSelect
+            v-model="selectedFeatured"
+            :options="[
+              { value: 'all', label: 'Semua' },
+              { value: 'featured', label: 'Unggulan Saja (Featured)' },
+              { value: 'standard', label: 'Standar (Non-Featured)' },
+            ]"
+            placeholder="Semua"
+            :block="true"
+          />
+        </div>
+      </div>
+    </FilterModal>
   </div>
 </template>
 

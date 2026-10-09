@@ -1,5 +1,5 @@
 <script setup>
-// AppBadge.vue — Pill badge Modernize style.
+// AppBadge.vue - Pill badge Modernize style.
 // Tone didelegasikan ke sistem semantik sentral (config/design-system.js)
 // agar semua badge di aplikasi memakai palet yang sama.
 import { STATE_TONES } from '../../config/design-system.js'
@@ -36,12 +36,12 @@ const dotColors = {
 
 <template>
   <span
-    class="inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] tracking-[0.01em] transition-all"
+    class="inline-flex items-center gap-1 rounded-full border px-1.5 py-0.2 sm:px-2 sm:py-0.5 text-[8.5px] sm:text-[9.5px] tracking-[0.01em] transition-all"
     :class="classes[type] || classes.default"
   >
     <span
       aria-hidden="true"
-      class="h-1.5 w-1.5 rounded-full"
+      class="h-1 w-1 sm:h-1.2 sm:w-1.2 rounded-full"
       :class="dotColors[type] || dotColors.default"
     ></span>
     {{ text }}

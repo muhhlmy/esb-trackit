@@ -14,6 +14,7 @@ import ShipmentImportModal from '../components/ui/ShipmentImportModal.vue'
 import ShipmentExportModal from '../components/ui/ShipmentExportModal.vue'
 import FilterModal from '../components/ui/FilterModal.vue'
 import PageHeader from '../components/ui/PageHeader.vue'
+import StatCard from '../components/ui/StatCard.vue'
 import EmptyState from '../components/ui/EmptyState.vue'
 import ErrorState from '../components/ui/ErrorState.vue'
 import {
@@ -346,7 +347,7 @@ onMounted(() => {
 <template>
   <div
     :data-testid="!isLoading ? 'page-ready' : undefined"
-    class="shipments-page space-y-4 sm:space-y-6 pb-12"
+    class="admin-workspace shipments-workspace shipments-page flex min-w-0 flex-col gap-3"
   >
     <!-- Notification Toast -->
     <Transition name="fade">
@@ -366,36 +367,70 @@ onMounted(() => {
       subtitle="Pantau proses pengiriman barang dan aset kantor."
       icon="local_shipping"
     >
-      <div v-if="canWriteShipments" class="shipment-header-actions">
+      <div v-if="canWriteShipments" class="shipment-header-actions flex flex-wrap sm:flex-nowrap items-center gap-1.5">
         <button
           type="button"
           @click="openAdd"
-          class="inline-flex h-9 shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg bg-[#0A51B0] px-3 text-xs font-semibold text-white shadow-2xs transition-all hover:bg-[#0A4391] sm:px-3.5"
+          class="inventory-primary-action inline-flex h-8 shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-[6px] bg-[#0A51B0] px-3 text-[11px] sm:text-[12px] font-semibold text-white shadow-2xs transition-all hover:bg-[#0A4391]"
           title="Tambah pengiriman baru"
         >
           <span aria-hidden="true" class="material-symbols-outlined text-[16px]">add</span>
           <span>Tambah Pengiriman</span>
         </button>
-        <div class="shipment-transfer-actions flex items-center gap-2">
+        <div
+          class="inventory-action-group flex items-center gap-1 rounded-[6px] border border-[#D7E3F2] dark:border-slate-700 bg-[#F8FAFC] dark:bg-slate-800 p-0.5 h-8"
+        >
           <button
             type="button"
             @click="showImportModal = true"
-            class="inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-[11px] font-bold text-[#0A51B0] hover:bg-white"
+            class="inventory-action-button inline-flex h-full items-center gap-1 rounded-[4px] px-2 text-[11px] font-semibold text-[#0A51B0] dark:text-blue-400 hover:bg-white dark:hover:bg-slate-700"
           >
-            <span aria-hidden="true" class="material-symbols-outlined text-[15px]">upload_file</span
-            >Import
+            <span aria-hidden="true" class="material-symbols-outlined text-[15px]">upload_file</span>
+            Import
           </button>
           <button
             type="button"
             @click="showExportModal = true"
-            class="inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-[11px] font-bold text-[#0A51B0] hover:bg-white"
+            class="inventory-action-button inline-flex h-full items-center gap-1 rounded-[4px] px-2 text-[11px] font-semibold text-[#0A51B0] dark:text-blue-400 hover:bg-white dark:hover:bg-slate-700"
           >
-            <span aria-hidden="true" class="material-symbols-outlined text-[15px]">download</span
-            >Export
+            <span aria-hidden="true" class="material-symbols-outlined text-[15px]">download</span>
+            Export
           </button>
         </div>
       </div>
     </PageHeader>
+
+    <!-- Summary Cards (Directly below Header) -->
+    <div class="shipment-summary grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-2.5 lg:gap-3">
+      <StatCard
+        title="Total Pengiriman"
+        :value="summary.total"
+        icon="local_shipping"
+        color="primary"
+        subtitle="Semua data resi"
+      />
+      <StatCard
+        title="Belum Dikirim"
+        :value="summary.belum_dikirim"
+        icon="pending_actions"
+        color="warning"
+        subtitle="Siap diproses"
+      />
+      <StatCard
+        title="Sedang Dikirim"
+        :value="summary.sedang_dikirim"
+        icon="local_shipping"
+        color="cyan"
+        subtitle="Dalam perjalanan"
+      />
+      <StatCard
+        title="Diterima"
+        :value="summary.diterima"
+        icon="task_alt"
+        color="success"
+        subtitle="Terkirim ke tujuan"
+      />
+    </div>
 
     <!-- Search & Filter Bar -->
     <div class="shipment-toolbar">
@@ -415,102 +450,13 @@ onMounted(() => {
       <button
         type="button"
         @click="showFilterModal = true"
-        class="h-9 shrink-0 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs font-semibold text-[#5F7089] hover:bg-white"
+        class="h-8 shrink-0 rounded-[6px] border border-[#E2E8F0] dark:border-slate-700 bg-[#F8FAFC] dark:bg-slate-800 px-2.5 sm:px-3 text-xs font-medium text-[#5F7089] dark:text-slate-300 hover:bg-white dark:hover:bg-slate-700 transition-colors"
       >
         <span aria-hidden="true" class="material-symbols-outlined mr-1 align-middle text-[16px]"
           >filter_alt</span
         >Filter
       </button>
       <AppViewToggle v-model="viewMode" />
-    </div>
-
-    <!-- Summary Cards -->
-    <div class="shipment-summary grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-2.5 lg:gap-3">
-      <div
-        class="kpi-focusable flex flex-col justify-between p-[var(--kpi-padding)] sm:p-[var(--kpi-padding-sm)] lg:p-[var(--kpi-padding-lg)] rounded-[var(--kpi-radius)] bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 shadow-2xs hover:border-[#CBD5E1] dark:hover:border-slate-700 transition-colors min-h-[var(--kpi-height)] sm:min-h-[var(--kpi-height-sm)] lg:min-h-[var(--kpi-height-lg)]"
-        tabindex="0"
-      >
-        <div class="flex items-center justify-between gap-[var(--kpi-gap)]">
-          <span class="text-[length:var(--kpi-title-font-size)] sm:text-[length:var(--kpi-title-font-size-sm)] lg:text-[length:var(--kpi-title-font-size-lg)] font-medium text-[#5F7089] dark:text-slate-400 truncate">
-            Total Pengiriman
-          </span>
-          <div
-            class="flex h-[var(--kpi-icon-container-size)] w-[var(--kpi-icon-container-size)] sm:h-[var(--kpi-icon-container-size-sm)] sm:w-[var(--kpi-icon-container-size-sm)] lg:h-[var(--kpi-icon-container-size-lg)] lg:w-[var(--kpi-icon-container-size-lg)] shrink-0 items-center justify-center rounded-[6px] bg-[#EFF6FF] text-[#0A51B0] dark:bg-blue-950/60 dark:text-blue-400"
-          >
-            <Package class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-          </div>
-        </div>
-        <div class="mt-0.5">
-          <span class="font-num block text-[length:var(--kpi-value-font-size)] sm:text-[length:var(--kpi-value-font-size-sm)] lg:text-[length:var(--kpi-value-font-size-lg)] font-semibold text-[#333333] dark:text-white tabular-nums leading-none tracking-tight">
-            {{ summary.total }}
-          </span>
-          <span class="mt-0.5 block truncate text-[length:var(--kpi-caption-font-size)] sm:text-[length:var(--kpi-caption-font-size-sm)] lg:text-[length:var(--kpi-caption-font-size-lg)] font-normal text-[#64748B] dark:text-slate-400">Semua data resi</span>
-        </div>
-      </div>
-
-      <div
-        class="kpi-focusable flex flex-col justify-between p-[var(--kpi-padding)] sm:p-[var(--kpi-padding-sm)] lg:p-[var(--kpi-padding-lg)] rounded-[var(--kpi-radius)] bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 shadow-2xs hover:border-[#CBD5E1] dark:hover:border-slate-700 transition-colors min-h-[var(--kpi-height)] sm:min-h-[var(--kpi-height-sm)] lg:min-h-[var(--kpi-height-lg)]"
-        tabindex="0"
-      >
-        <div class="flex items-center justify-between gap-[var(--kpi-gap)]">
-          <span class="text-[length:var(--kpi-title-font-size)] sm:text-[length:var(--kpi-title-font-size-sm)] lg:text-[length:var(--kpi-title-font-size-lg)] font-medium text-[#5F7089] dark:text-slate-400 truncate">
-            Belum Dikirim
-          </span>
-          <div
-            class="flex h-[var(--kpi-icon-container-size)] w-[var(--kpi-icon-container-size)] sm:h-[var(--kpi-icon-container-size-sm)] sm:w-[var(--kpi-icon-container-size-sm)] lg:h-[var(--kpi-icon-container-size-lg)] lg:w-[var(--kpi-icon-container-size-lg)] shrink-0 items-center justify-center rounded-[6px] bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400"
-          >
-            <Package class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-          </div>
-        </div>
-        <div class="mt-0.5">
-          <span class="font-num block text-[length:var(--kpi-value-font-size)] sm:text-[length:var(--kpi-value-font-size-sm)] lg:text-[length:var(--kpi-value-font-size-lg)] font-semibold text-[#333333] dark:text-white tabular-nums leading-none tracking-tight">
-            {{ summary.belum_dikirim }}
-          </span>
-          <span class="mt-0.5 block truncate text-[length:var(--kpi-caption-font-size)] sm:text-[length:var(--kpi-caption-font-size-sm)] lg:text-[length:var(--kpi-caption-font-size-lg)] font-normal text-[#64748B] dark:text-slate-400">Siap diproses</span>
-        </div>
-      </div>
-
-      <div
-        class="kpi-focusable flex flex-col justify-between p-[var(--kpi-padding)] sm:p-[var(--kpi-padding-sm)] lg:p-[var(--kpi-padding-lg)] rounded-[var(--kpi-radius)] bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 shadow-2xs hover:border-[#CBD5E1] dark:hover:border-slate-700 transition-colors min-h-[var(--kpi-height)] sm:min-h-[var(--kpi-height-sm)] lg:min-h-[var(--kpi-height-lg)]"
-        tabindex="0"
-      >
-        <div class="flex items-center justify-between gap-[var(--kpi-gap)]">
-          <span class="text-[length:var(--kpi-title-font-size)] sm:text-[length:var(--kpi-title-font-size-sm)] lg:text-[length:var(--kpi-title-font-size-lg)] font-medium text-[#5F7089] dark:text-slate-400 truncate">
-            Sedang Dikirim
-          </span>
-          <div
-            class="flex h-[var(--kpi-icon-container-size)] w-[var(--kpi-icon-container-size)] sm:h-[var(--kpi-icon-container-size-sm)] sm:w-[var(--kpi-icon-container-size-sm)] lg:h-[var(--kpi-icon-container-size-lg)] lg:w-[var(--kpi-icon-container-size-lg)] shrink-0 items-center justify-center rounded-[6px] bg-[#EFF6FF] text-[#0A51B0] dark:bg-blue-950/60 dark:text-blue-400"
-          >
-            <Truck class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-          </div>
-        </div>
-        <div class="mt-0.5">
-          <span class="font-num block text-[length:var(--kpi-value-font-size)] sm:text-[length:var(--kpi-value-font-size-sm)] lg:text-[length:var(--kpi-value-font-size-lg)] font-semibold text-[#333333] dark:text-white tabular-nums leading-none tracking-tight">
-            {{ summary.sedang_dikirim }}
-          </span>
-          <span class="mt-0.5 block truncate text-[length:var(--kpi-caption-font-size)] sm:text-[length:var(--kpi-caption-font-size-sm)] lg:text-[length:var(--kpi-caption-font-size-lg)] font-normal text-[#64748B] dark:text-slate-400">Dalam perjalanan</span>
-        </div>
-      </div>
-
-      <div
-        class="kpi-focusable flex flex-col justify-between p-[var(--kpi-padding)] sm:p-[var(--kpi-padding-sm)] lg:p-[var(--kpi-padding-lg)] rounded-[var(--kpi-radius)] bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 shadow-2xs hover:border-[#CBD5E1] dark:hover:border-slate-700 transition-colors min-h-[var(--kpi-height)] sm:min-h-[var(--kpi-height-sm)] lg:min-h-[var(--kpi-height-lg)]"
-        tabindex="0"
-      >
-        <div class="flex items-center justify-between gap-[var(--kpi-gap)]">
-          <span class="text-[length:var(--kpi-title-font-size)] sm:text-[length:var(--kpi-title-font-size-sm)] lg:text-[length:var(--kpi-title-font-size-lg)] font-medium text-[#5F7089] dark:text-slate-400 truncate">Diterima</span>
-          <div
-            class="flex h-[var(--kpi-icon-container-size)] w-[var(--kpi-icon-container-size)] sm:h-[var(--kpi-icon-container-size-sm)] sm:w-[var(--kpi-icon-container-size-sm)] lg:h-[var(--kpi-icon-container-size-lg)] lg:w-[var(--kpi-icon-container-size-lg)] shrink-0 items-center justify-center rounded-[6px] bg-emerald-50 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-400"
-          >
-            <Truck class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-          </div>
-        </div>
-        <div class="mt-0.5">
-          <span class="font-num block text-[length:var(--kpi-value-font-size)] sm:text-[length:var(--kpi-value-font-size-sm)] lg:text-[length:var(--kpi-value-font-size-lg)] font-semibold text-emerald-600 dark:text-emerald-400 leading-none tabular-nums tracking-tight">
-            {{ summary.diterima }}
-          </span>
-          <span class="mt-0.5 block truncate text-[length:var(--kpi-caption-font-size)] sm:text-[length:var(--kpi-caption-font-size-sm)] lg:text-[length:var(--kpi-caption-font-size-lg)] font-normal text-[#64748B] dark:text-slate-400">Terkirim ke tujuan</span>
-        </div>
-      </div>
     </div>
 
     <!-- Main Content: Table & List -->
@@ -538,8 +484,8 @@ onMounted(() => {
       </div>
 
       <div v-else class="w-full max-w-full overflow-hidden">
-        <!-- Desktop Table (>= lg) -->
-        <div v-if="viewMode === 'table'" class="shipment-table hidden xl:block overflow-x-auto">
+        <!-- Mode Tabel (Scrollable horizontal di mobile) -->
+        <div v-if="viewMode === 'table'" class="shipment-table overflow-x-auto">
           <table class="w-full text-left border-collapse">
             <thead>
               <tr
@@ -627,11 +573,10 @@ onMounted(() => {
           </table>
         </div>
 
-        <!-- Mobile Card List (< xl, atau saat mode Kartu dipilih) -->
+        <!-- Mode Kartu -->
         <ul
+          v-if="viewMode === 'card'"
           class="shipment-cards"
-          :data-layout="viewMode"
-          :class="viewMode === 'card' ? '' : 'xl:hidden'"
           aria-label="Daftar pengiriman"
         >
           <li

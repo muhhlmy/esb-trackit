@@ -104,7 +104,8 @@ export async function login(req, res) {
         k.lokasi_kerja AS lokasi_kerja,
         k.tanggal_mulai_bekerja AS tanggal_mulai_bekerja,
         k.employeement_status AS employeement_status,
-        k.email_kantor AS email_kantor
+        k.email_kantor AS email_kantor,
+        k.nik_atasan_langsung AS nik_atasan_langsung
       FROM users u
       LEFT JOIN karyawan k ON LOWER(TRIM(u.email)) = LOWER(TRIM(k.email_kantor))
       WHERE u.email = $1
@@ -165,6 +166,7 @@ export async function login(req, res) {
           tanggal_mulai_bekerja: userRow.tanggal_mulai_bekerja || null,
           employeement_status: userRow.employeement_status || '',
           email_kantor: userRow.email_kantor || userRow.email,
+          nik_atasan_langsung: userRow.nik_atasan_langsung || null,
         }
       : null
 
@@ -176,6 +178,7 @@ export async function login(req, res) {
       is_active: userRow.is_active,
       permissions,
       nik: userRow.nik || '',
+      nik_atasan_langsung: userRow.nik_atasan_langsung || '',
       title: userRow.title || userRow.role,
       jabatan: userRow.title || userRow.role,
       departemen: userRow.departemen || '',
@@ -266,7 +269,8 @@ export async function getMe(req, res) {
         k.lokasi_kerja AS lokasi_kerja,
         k.tanggal_mulai_bekerja AS tanggal_mulai_bekerja,
         k.employeement_status AS employeement_status,
-        k.email_kantor AS email_kantor
+        k.email_kantor AS email_kantor,
+        k.nik_atasan_langsung AS nik_atasan_langsung
       FROM users u
       LEFT JOIN karyawan k ON LOWER(TRIM(u.email)) = LOWER(TRIM(k.email_kantor))
       WHERE u.id = $1
@@ -301,6 +305,7 @@ export async function getMe(req, res) {
           tanggal_mulai_bekerja: userRow.tanggal_mulai_bekerja || null,
           employeement_status: userRow.employeement_status || '',
           email_kantor: userRow.email_kantor || userRow.email,
+          nik_atasan_langsung: userRow.nik_atasan_langsung || null,
         }
       : null
 
@@ -313,6 +318,7 @@ export async function getMe(req, res) {
       created_at: userRow.created_at,
       permissions,
       nik: userRow.nik || '',
+      nik_atasan_langsung: userRow.nik_atasan_langsung || '',
       title: userRow.title || userRow.role,
       jabatan: userRow.title || userRow.role,
       departemen: userRow.departemen || '',

@@ -1,6 +1,6 @@
 <script setup>
 /**
- * StatusBadge.vue — sistem status semantik terpusat.
+ * StatusBadge.vue - sistem status semantik terpusat.
  *
  * Satu pemetaan untuk semua entitas (tiket, aset, pengajuan, pengiriman).
  * Sumber kebenaran tone & mapping ada di config/design-system.js agar
@@ -14,7 +14,7 @@
  *   dot    – Tampilkan titik status (default true)
  *   size   – 'sm' | 'md'
  *
- * Kontras semua pasangan fg/bg ≥ 4.5:1 (WCAG AA) — diverifikasi oleh
+ * Kontras semua pasangan fg/bg >= 4.5:1 (WCAG AA) - diverifikasi oleh
  * frontend/tests/defect0708Accessibility.test.js.
  */
 import { computed } from 'vue'
@@ -43,13 +43,13 @@ const dotColor = computed(() => STATE_TONES[resolvedTone.value].dot)
 
 <template>
   <span
-    class="inline-flex items-center gap-1.5 rounded-full border font-bold whitespace-nowrap"
+    class="inline-flex items-center gap-1 rounded-full border font-bold whitespace-nowrap"
     :class="[
       toneClasses,
-      size === 'sm' ? 'px-2 py-0.5 text-[10.5px]' : 'px-2.5 py-1 text-xs',
+      size === 'sm' ? 'px-1.5 py-0.2 text-[9px]' : 'px-2 py-0.5 text-[10px]',
     ]"
   >
-    <span v-if="dot" aria-hidden="true" class="h-1.5 w-1.5 rounded-full" :class="dotColor" />
+    <span v-if="dot" aria-hidden="true" class="h-1 w-1 rounded-full" :class="dotColor" />
     <span class="truncate">{{ text }}</span>
   </span>
 </template>

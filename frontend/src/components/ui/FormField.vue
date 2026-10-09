@@ -17,24 +17,24 @@ defineProps({
 </template>
 
 <style scoped>
-.form-field { display:flex; flex-direction:column; gap:6px; }
+.form-field { display:flex; flex-direction:column; gap:4px; }
 .form-field__label {
   font-family: var(--font-family-sans);
-  font-size: var(--font-size-sm,12px);
-  font-weight: 500;
+  font-size: var(--fs-2xs, 10px);
+  font-weight: 600;
   color: #334155;
 }
 .form-field__input {
-  height:36px; padding:0 10px;
-  border:1px solid var(--ui-border,#e2e8f0);
-  border-radius: var(--ui-radius-control,6px);
+  height: 28px; padding: 0 8px;
+  border: 1px solid var(--ui-border, #e2e8f0);
+  border-radius: var(--ui-radius-control, 5px);
   font-family: var(--font-family-sans);
-  font-size: var(--font-size-sm,12px);
-  background: var(--color-surface,#fff);
+  font-size: var(--fs-xs, 10.5px);
+  background: var(--color-surface, #fff);
 }
 .form-field__error {
   font-family: var(--font-family-sans);
-  font-size: var(--font-size-xs,11px);
-  color:#dc2626;
+  font-size: var(--fs-2xs, 9px);
+  color: #dc2626;
 }
 </style>

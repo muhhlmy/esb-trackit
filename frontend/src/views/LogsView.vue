@@ -1,6 +1,6 @@
 <script setup>
 // ============================================================
-// LogsView.vue — Menampilkan Log Riwayat Aset & Audit Log Login
+// LogsView.vue - Menampilkan Log Riwayat Aset & Audit Log Login
 // Fitur: Dua tab navigasi, pencarian, filter aksi, gaya glassmorphism
 // ============================================================
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
@@ -14,6 +14,7 @@ import CustomSelect from '../components/ui/CustomSelect.vue'
 import AppViewToggle from '../components/ui/AppViewToggle.vue'
 import PageHeader from '../components/ui/PageHeader.vue'
 import SkeletonTable from '../components/ui/skeleton/SkeletonTable.vue'
+import FilterModal from '../components/ui/FilterModal.vue'
 
 const { get } = useApi()
 const { isSuperAdmin } = useAuth()
@@ -38,6 +39,30 @@ const systemLogTotal = ref(0)
 const searchQuery = ref('')
 const filterAction = ref('') // Untuk log aset ('TAMBAH' | 'UBAH' | 'HAPUS')
 const filterActivity = ref('') // Untuk log audit ('LOGIN' | 'LOGOUT' | 'GAGAL_LOGIN')
+const filterDateFrom = ref('')
+const filterDateTo = ref('')
+const filterActor = ref('')
+const showFilterModal = ref(false)
+
+const activeFilterCount = computed(() => {
+  let c = 0
+  if (filterAction.value || filterActivity.value) c++
+  if (filterDateFrom.value || filterDateTo.value) c++
+  if (filterActor.value) c++
+  return c
+})
+
+function resetLogsFilters() {
+  searchQuery.value = ''
+  filterAction.value = ''
+  filterActivity.value = ''
+  filterDateFrom.value = ''
+  filterDateTo.value = ''
+  filterActor.value = ''
+  currentPageAssets.value = 1
+  currentPageAudit.value = 1
+  currentPageSystem.value = 1
+}
 
 // ── Ambil Data ───────────────────────────────────────────────
 async function fetchLogs() {
@@ -93,7 +118,16 @@ const filteredAssetLogs = computed(() => {
         .includes(query)
 
     const matchAction = !filterAction.value || log.aksi === filterAction.value
-    return matchSearch && matchAction
+
+    const rawDate = log.dibuat_pada ? String(log.dibuat_pada).substring(0, 10) : ''
+    const matchFrom = !filterDateFrom.value || (rawDate && rawDate >= filterDateFrom.value)
+    const matchTo = !filterDateTo.value || (rawDate && rawDate <= filterDateTo.value)
+
+    const matchActor =
+      !filterActor.value ||
+      String(log.oleh_pengguna || '').toLowerCase().includes(filterActor.value.toLowerCase())
+
+    return matchSearch && matchAction && matchFrom && matchTo && matchActor
   })
 })
 
@@ -117,14 +151,22 @@ const filteredAuditLogs = computed(() => {
         .includes(query)
 
     const matchActivity = !filterActivity.value || log.aktifitas === filterActivity.value
-    return matchSearch && matchActivity
+
+    const rawDate = log.waktu || log.dibuat_pada ? String(log.waktu || log.dibuat_pada).substring(0, 10) : ''
+    const matchFrom = !filterDateFrom.value || (rawDate && rawDate >= filterDateFrom.value)
+    const matchTo = !filterDateTo.value || (rawDate && rawDate <= filterDateTo.value)
+
+    const actorStr = `${log.nama_pengguna || ''} ${log.email || ''}`.toLowerCase()
+    const matchActor = !filterActor.value || actorStr.includes(filterActor.value.toLowerCase())
+
+    return matchSearch && matchActivity && matchFrom && matchTo && matchActor
   })
 })
 
 const filteredSystemLogs = computed(() => {
   const query = searchQuery.value.trim().toLowerCase()
-  return systemLogs.value.filter(
-    (log) =>
+  return systemLogs.value.filter((log) => {
+    const matchSearch =
       !query ||
       [
         log.module,
@@ -138,11 +180,23 @@ const filteredSystemLogs = computed(() => {
         String(value || '')
           .toLowerCase()
           .includes(query),
-      ),
-  )
+      )
+
+    const rawDate =
+      log.created_at || log.timestamp
+        ? String(log.created_at || log.timestamp).substring(0, 10)
+        : ''
+    const matchFrom = !filterDateFrom.value || (rawDate && rawDate >= filterDateFrom.value)
+    const matchTo = !filterDateTo.value || (rawDate && rawDate <= filterDateTo.value)
+
+    const actorStr = `${log.actor_name || ''} ${log.actor_email || ''}`.toLowerCase()
+    const matchActor = !filterActor.value || actorStr.includes(filterActor.value.toLowerCase())
+
+    return matchSearch && matchFrom && matchTo && matchActor
+  })
 })
 
-watch([searchQuery, filterAction, filterActivity, activeTab], () => {
+watch([searchQuery, filterAction, filterActivity, filterDateFrom, filterDateTo, filterActor, activeTab], () => {
   const shouldReloadSystemLogs = activeTab.value === 'system' && currentPageSystem.value === 1
   currentPageAssets.value = 1
   currentPageAudit.value = 1
@@ -205,7 +259,7 @@ function getActivityBadgeText(activity) {
   if (activity === 'LOGOUT') return 'Logout'
   if (activity === 'RESET_PASSWORD') return 'Reset Sandi (OTP)'
   if (activity === 'UBAH_PASSWORD') return 'Ubah Kata Sandi'
-  return activity || '—'
+  return activity || '-'
 }
 
 // Format Tanggal
@@ -219,7 +273,7 @@ function formatDateTime(dateStr) {
 }
 
 function displayValue(val) {
-  if (!val || val === '(kosong)') return '—'
+  if (!val || val === '(kosong)') return '-'
   return val
 }
 
@@ -270,7 +324,7 @@ function formatAuditField(field) {
 }
 
 function formatAuditValue(value) {
-  if (value === undefined || value === null || value === '') return '—'
+  if (value === undefined || value === null || value === '') return '-'
   if (typeof value === 'boolean') return value ? 'Ya' : 'Tidak'
   if (typeof value === 'object') return JSON.stringify(value, null, 2)
   return String(value)
@@ -399,47 +453,39 @@ function systemAuditChanges(log) {
       </div>
 
       <!-- Filter + Refresh grouped (kept together) -->
-      <div class="flex min-w-0 items-center gap-2">
-        <!-- Action Filter (Asset Tab only) -->
-        <div v-if="activeTab === 'assets'" class="min-w-0 w-36">
-          <CustomSelect
-            v-model="filterAction"
-            :options="[
-              { value: '', label: 'Semua Aksi' },
-              { value: 'TAMBAH', label: 'Tambah Aset' },
-              { value: 'UBAH', label: 'Ubah Aset' },
-              { value: 'HAPUS', label: 'Hapus Aset' },
-            ]"
-            aria-label="Filter aksi"
-            height-class="h-8"
-            block
-          />
-        </div>
+      <div class="flex min-w-0 items-center gap-1.5 sm:gap-2">
+        <button
+          type="button"
+          @click="showFilterModal = true"
+          class="relative inline-flex h-8 items-center gap-1 rounded-[6px] border border-[#DCE3EC] dark:border-slate-700 bg-white/50 dark:bg-slate-800 px-2.5 sm:px-3 text-xs font-semibold text-[#334155] dark:text-slate-200 hover:bg-[#F8FAFC] dark:hover:bg-slate-700 transition-colors cursor-pointer"
+        >
+          <span aria-hidden="true" class="material-symbols-outlined text-[15px]">filter_alt</span>
+          <span>Filter</span>
+          <span
+            v-if="activeFilterCount > 0"
+            class="ml-0.5 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-[#0A51B0] px-1 text-[9px] font-bold text-white"
+          >
+            {{ activeFilterCount }}
+          </span>
+        </button>
 
-        <!-- Activity Filter (Audit Login Tab only) -->
-        <div v-if="activeTab === 'audit'" class="min-w-0 w-44">
-          <CustomSelect
-            v-model="filterActivity"
-            :options="[
-              { value: '', label: 'Semua Aktifitas' },
-              { value: 'LOGIN', label: 'Berhasil Login' },
-              { value: 'GAGAL_LOGIN', label: 'Gagal Login' },
-              { value: 'RESET_PASSWORD', label: 'Reset Sandi (OTP)' },
-              { value: 'UBAH_PASSWORD', label: 'Ubah Kata Sandi' },
-              { value: 'LOGOUT', label: 'Logout' },
-            ]"
-            aria-label="Filter aktivitas"
-            height-class="h-8"
-            block
-          />
-        </div>
+        <button
+          v-if="activeFilterCount > 0 || searchQuery"
+          type="button"
+          @click="resetLogsFilters"
+          class="inline-flex h-8 items-center rounded-[6px] border border-rose-200 dark:border-rose-900 bg-rose-50/50 dark:bg-rose-950/30 px-2 text-xs font-medium text-rose-600 dark:text-rose-400 hover:bg-rose-100/60 transition-colors cursor-pointer"
+          title="Reset Filter"
+        >
+          <span aria-hidden="true" class="material-symbols-outlined text-[14px] mr-0.5">refresh</span>
+          <span>Reset</span>
+        </button>
 
         <!-- Refresh button -->
         <button
           type="button"
           @click="fetchLogs"
           :disabled="isLoading"
-          class="logs-refresh-button h-8 items-center justify-center gap-1.5 rounded-[6px] border border-[#DCE3EC] dark:border-slate-700 bg-white/50 dark:bg-slate-800 px-3 text-xs font-medium text-[#334155] dark:text-slate-200 shadow-sm hover:bg-[#F8FAFC] dark:hover:bg-slate-700 disabled:opacity-50"
+          class="logs-refresh-button h-8 items-center justify-center gap-1.5 rounded-[6px] border border-[#DCE3EC] dark:border-slate-700 bg-white/50 dark:bg-slate-800 px-2.5 sm:px-3 text-xs font-medium text-[#334155] dark:text-slate-200 shadow-sm hover:bg-[#F8FAFC] dark:hover:bg-slate-700 disabled:opacity-50"
         >
           <span
             aria-hidden="true"
@@ -447,11 +493,11 @@ function systemAuditChanges(log) {
             :class="{ 'animate-spin': isLoading }"
             >refresh</span
           >
-          Segarkan
+          <span class="hidden sm:inline">Segarkan</span>
         </button>
 
-        <!-- Mode Tampilan (Tab Riwayat Aset saja) -->
-        <AppViewToggle v-if="activeTab === 'assets'" v-model="assetLogViewMode" />
+        <!-- Mode Tampilan (Tersedia untuk Tab Riwayat Aset dan Audit) -->
+        <AppViewToggle v-if="activeTab === 'assets' || activeTab === 'audit'" v-model="assetLogViewMode" />
       </div>
     </div>
 
@@ -477,10 +523,10 @@ function systemAuditChanges(log) {
           </p>
         </div>
 
-        <!-- Desktop Tabel Log Aset (mode Tabel) -->
+        <!-- Tabel Log Aset (mode Tabel) -->
         <div
           v-else-if="assetLogViewMode === 'table'"
-          class="hidden xl:block overflow-x-auto"
+          class="w-full max-w-full overflow-x-auto"
           tabindex="0"
           aria-label="Tabel riwayat perubahan aset"
         >
@@ -538,7 +584,7 @@ function systemAuditChanges(log) {
                   {{ log.label_aset }}
                 </td>
                 <td class="px-2.5 py-2 text-[11px] font-medium text-[#5F7089] dark:text-slate-400 wrap-anywhere">
-                  {{ log.perubahan || '—' }}
+                  {{ log.perubahan || '-' }}
                 </td>
                 <td class="px-2.5 py-2 text-[12px] font-semibold text-[#374151] dark:text-slate-200">
                   {{ log.oleh_pengguna }}
@@ -561,16 +607,10 @@ function systemAuditChanges(log) {
             </tbody>
           </table>
         </div>
-        <!-- Timeline Log Cards (mobile saat mode Tabel, atau selalu saat mode Kartu).
-             v-if mandiri (bukan v-else-if) agar tetap dirender untuk viewport < xl
-             meskipun wrapper tabel terpilih via mode Tabel. -->
+        <!-- Timeline Log Cards (hanya saat mode Kartu dipilih) -->
         <div
-          v-if="
-            filteredAssetLogs.length > 0 &&
-            (assetLogViewMode === 'card' || assetLogViewMode === 'table')
-          "
+          v-if="filteredAssetLogs.length > 0 && assetLogViewMode === 'card'"
           class="admin-log-list"
-          :class="assetLogViewMode === 'card' ? '' : 'xl:hidden'"
         >
           <div
             v-for="log in paginatedAssetLogs"
@@ -710,7 +750,7 @@ function systemAuditChanges(log) {
 
       <!-- ── TAB 2: Login Audit Log Table ────────────────────── -->
       <div v-else-if="activeTab === 'audit'">
-        <div v-if="filteredAuditLogs.length === 0" class="px-4 py-10 text-center lg:hidden">
+        <div v-if="filteredAuditLogs.length === 0" class="px-4 py-10 text-center">
           <span aria-hidden="true" class="material-symbols-outlined text-[40px] text-[#D1D5DB]"
             >shield_person</span
           >
@@ -718,7 +758,7 @@ function systemAuditChanges(log) {
             Tidak ada audit aktivitas login ditemukan.
           </p>
         </div>
-        <ul v-else class="divide-y divide-[#F3F4F6] lg:hidden" aria-label="Audit aktivitas login">
+        <ul v-else-if="assetLogViewMode === 'card'" class="divide-y divide-[#F3F4F6] dark:divide-slate-800" aria-label="Audit aktivitas login">
           <li
             v-for="log in paginatedAuditLogs"
             :key="log.id"
@@ -741,7 +781,8 @@ function systemAuditChanges(log) {
           </li>
         </ul>
         <div
-          class="hidden lg:block overflow-x-auto"
+          v-else
+          class="w-full max-w-full overflow-x-auto"
           tabindex="0"
           aria-label="Tabel log audit login"
         >
@@ -942,6 +983,93 @@ function systemAuditChanges(log) {
         />
       </div>
     </div>
+
+    <!-- Filter Modal Lanjutan untuk Logs -->
+    <FilterModal
+      :is-open="showFilterModal"
+      title="Filter Log Aktivitas"
+      subtitle="Saring log berdasarkan aksi, periode tanggal, atau nama pengguna."
+      @close="showFilterModal = false"
+      @apply="showFilterModal = false"
+      @reset="resetLogsFilters"
+    >
+      <div class="space-y-2.5">
+        <div v-if="activeTab === 'assets'">
+          <label class="block text-[10px] font-bold text-slate-600 dark:text-slate-300 mb-1">
+            Aksi Perubahan Aset
+          </label>
+          <CustomSelect
+            v-model="filterAction"
+            :options="[
+              { value: '', label: 'Semua Aksi' },
+              { value: 'TAMBAH', label: 'Tambah Aset' },
+              { value: 'UBAH', label: 'Ubah Aset' },
+              { value: 'HAPUS', label: 'Hapus Aset' },
+            ]"
+            aria-label="Filter aksi"
+            height-class="h-8"
+            block
+          />
+        </div>
+
+        <div v-if="activeTab === 'audit'">
+          <label class="block text-[10px] font-bold text-slate-600 dark:text-slate-300 mb-1">
+            Jenis Aktivitas Login
+          </label>
+          <CustomSelect
+            v-model="filterActivity"
+            :options="[
+              { value: '', label: 'Semua Aktifitas' },
+              { value: 'LOGIN', label: 'Berhasil Login' },
+              { value: 'GAGAL_LOGIN', label: 'Gagal Login' },
+              { value: 'RESET_PASSWORD', label: 'Reset Sandi (OTP)' },
+              { value: 'UBAH_PASSWORD', label: 'Ubah Kata Sandi' },
+              { value: 'LOGOUT', label: 'Logout' },
+            ]"
+            aria-label="Filter aktivitas"
+            height-class="h-8"
+            block
+          />
+        </div>
+
+        <div>
+          <label class="block text-[10px] font-bold text-slate-600 dark:text-slate-300 mb-1">
+            Pengguna / Aktor
+          </label>
+          <input
+            v-model="filterActor"
+            type="text"
+            placeholder="Cari nama atau email pengguna…"
+            class="h-8 w-full rounded-[5px] border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-2.5 text-[10.5px] text-[#333333] dark:text-white focus:border-[#0A51B0] focus:outline-none"
+          />
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-[10px] font-bold text-slate-600 dark:text-slate-300 mb-1">
+              Dari Tanggal
+            </label>
+            <input
+              v-model="filterDateFrom"
+              type="date"
+              aria-label="Dari tanggal log"
+              class="h-8 w-full rounded-[5px] border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-2 text-[10.5px] text-[#333333] dark:text-white focus:border-[#0A51B0] focus:outline-none"
+            />
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold text-slate-600 dark:text-slate-300 mb-1">
+              Sampai Tanggal
+            </label>
+            <input
+              v-model="filterDateTo"
+              type="date"
+              aria-label="Sampai tanggal log"
+              class="h-8 w-full rounded-[5px] border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-2 text-[10.5px] text-[#333333] dark:text-white focus:border-[#0A51B0] focus:outline-none"
+            />
+          </div>
+        </div>
+      </div>
+    </FilterModal>
   </div>
 </template>
 

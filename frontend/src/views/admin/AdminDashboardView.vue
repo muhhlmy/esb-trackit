@@ -1,6 +1,8 @@
 <script setup>
 import AppModal from '../../components/ui/AppModal.vue'
 import PageHeader from '../../components/ui/PageHeader.vue'
+import StatCard from '../../components/ui/StatCard.vue'
+import FilterModal from '../../components/ui/FilterModal.vue'
 import { ref, computed, onMounted, nextTick } from 'vue'
 import { useRouter, RouterLink } from 'vue-router'
 import { useCases } from '@/composables/useCases'
@@ -32,6 +34,8 @@ const canWrite = computed(() => hasWritePermission('knowledge_base'))
 const searchQuery = ref('')
 const selectedCategory = ref('all')
 const selectedStatus = ref('all') // 'all', 'PUBLISHED', 'DRAFT'
+const selectedSeverity = ref('all') // 'all', 'low', 'medium', 'high'
+const showFilterModal = ref(false)
 const { viewMode } = useViewMode('admin-cms', 'table')
 
 const CATEGORY_OPTIONS = [
@@ -98,6 +102,12 @@ const filteredCases = computed(() => {
       if (caseStatus !== selectedStatus.value) return false
     }
 
+    // Severity match
+    if (selectedSeverity.value !== 'all') {
+      const caseSev = (c.severity || 'low').toLowerCase()
+      if (caseSev !== selectedSeverity.value.toLowerCase()) return false
+    }
+
     // Search query match
     if (!searchQuery.value.trim()) return true
     const q = searchQuery.value.toLowerCase().trim()
@@ -108,6 +118,14 @@ const filteredCases = computed(() => {
       (c.tags || []).some((t) => t.toLowerCase().includes(q))
     )
   })
+})
+
+const activeFilterCount = computed(() => {
+  let count = 0
+  if (selectedCategory.value !== 'all') count++
+  if (selectedStatus.value !== 'all') count++
+  if (selectedSeverity.value !== 'all') count++
+  return count
 })
 
 const stats = computed(() => {
@@ -144,6 +162,7 @@ function clearFilters() {
   searchQuery.value = ''
   selectedCategory.value = 'all'
   selectedStatus.value = 'all'
+  selectedSeverity.value = 'all'
 }
 
 function getCategoryBadgeClass(category) {
@@ -228,80 +247,27 @@ function getCategoryBadgeClass(category) {
 
     <!-- Stats Row (Balanced 3 columns on mobile and desktop) -->
     <div class="grid grid-cols-3 gap-2 sm:gap-2.5 lg:gap-3 gsap-admin-el">
-      <!-- Total -->
-      <div
-        class="kpi-focusable flex flex-col justify-between p-[var(--kpi-padding)] sm:p-[var(--kpi-padding-sm)] lg:p-[var(--kpi-padding-lg)] rounded-[var(--kpi-radius)] min-h-[var(--kpi-height)] sm:min-h-[var(--kpi-height-sm)] lg:min-h-[var(--kpi-height-lg)] transition-colors" 
-        tabindex="0"
-      >
-        <div class="flex items-center justify-between gap-[var(--kpi-gap)]">
-          <span class="text-[length:var(--kpi-title-font-size)] sm:text-[length:var(--kpi-title-font-size-sm)] lg:text-[length:var(--kpi-title-font-size-lg)] font-medium text-[#5F7089] dark:text-slate-400 truncate"
-            >Total artikel</span
-          >
-          <div
-            class="flex h-[var(--kpi-icon-container-size)] w-[var(--kpi-icon-container-size)] sm:h-[var(--kpi-icon-container-size-sm)] sm:w-[var(--kpi-icon-container-size-sm)] lg:h-[var(--kpi-icon-container-size-lg)] lg:w-[var(--kpi-icon-container-size-lg)] shrink-0 items-center justify-center rounded-[6px] bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300"
-          >
-            <FileText class="w-[var(--kpi-icon-size)] h-[var(--kpi-icon-size)] sm:w-[var(--kpi-icon-size-sm)] sm:h-[var(--kpi-icon-size-sm)] lg:w-[var(--kpi-icon-size-lg)] lg:h-[var(--kpi-icon-size-lg)]" />
-          </div>
-        </div>
-        <div class="mt-0.5">
-          <p
-            class="font-num text-[length:var(--kpi-value-font-size)] sm:text-[length:var(--kpi-value-font-size-sm)] lg:text-[length:var(--kpi-value-font-size-lg)] font-semibold text-[#333333] dark:text-white tabular-nums leading-none tracking-tight"
-          >
-            {{ stats.total }}
-          </p>
-          <span class="mt-0.5 block truncate text-[length:var(--kpi-caption-font-size)] sm:text-[length:var(--kpi-caption-font-size-sm)] lg:text-[length:var(--kpi-caption-font-size-lg)] font-normal text-[#64748B] dark:text-slate-400">Seluruh data artikel</span>
-        </div>
-      </div>
-
-      <!-- Published -->
-      <div
-        class="kpi-focusable flex flex-col justify-between p-[var(--kpi-padding)] sm:p-[var(--kpi-padding-sm)] lg:p-[var(--kpi-padding-lg)] rounded-[var(--kpi-radius)] min-h-[var(--kpi-height)] sm:min-h-[var(--kpi-height-sm)] lg:min-h-[var(--kpi-height-lg)] transition-colors" 
-        tabindex="0"
-      >
-        <div class="flex items-center justify-between gap-[var(--kpi-gap)]">
-          <span class="text-[length:var(--kpi-title-font-size)] sm:text-[length:var(--kpi-title-font-size-sm)] lg:text-[length:var(--kpi-title-font-size-lg)] font-medium text-[#5F7089] dark:text-slate-400 truncate"
-            >Terbit</span
-          >
-          <div
-            class="flex h-[var(--kpi-icon-container-size)] w-[var(--kpi-icon-container-size)] sm:h-[var(--kpi-icon-container-size-sm)] sm:w-[var(--kpi-icon-container-size-sm)] lg:h-[var(--kpi-icon-container-size-lg)] lg:w-[var(--kpi-icon-container-size-lg)] shrink-0 items-center justify-center rounded-[6px] bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400"
-          >
-            <CheckCircle class="w-[var(--kpi-icon-size)] h-[var(--kpi-icon-size)] sm:w-[var(--kpi-icon-size-sm)] sm:h-[var(--kpi-icon-size-sm)] lg:w-[var(--kpi-icon-size-lg)] lg:h-[var(--kpi-icon-size-lg)]" />
-          </div>
-        </div>
-        <div class="mt-0.5">
-          <p
-            class="font-num text-[length:var(--kpi-value-font-size)] sm:text-[length:var(--kpi-value-font-size-sm)] lg:text-[length:var(--kpi-value-font-size-lg)] font-semibold text-[#333333] dark:text-white tabular-nums leading-none tracking-tight"
-          >
-            {{ stats.published }}
-          </p>
-          <span class="mt-0.5 block truncate text-[length:var(--kpi-caption-font-size)] sm:text-[length:var(--kpi-caption-font-size-sm)] lg:text-[length:var(--kpi-caption-font-size-lg)] font-normal text-[#64748B] dark:text-slate-400">Telah dipublikasi</span>
-        </div>
-      </div>
-
-      <!-- Custom -->
-      <div
-        class="kpi-focusable flex flex-col justify-between p-[var(--kpi-padding)] sm:p-[var(--kpi-padding-sm)] lg:p-[var(--kpi-padding-lg)] rounded-[var(--kpi-radius)] min-h-[var(--kpi-height)] sm:min-h-[var(--kpi-height-sm)] lg:min-h-[var(--kpi-height-lg)] transition-colors" 
-        tabindex="0"
-      >
-        <div class="flex items-center justify-between gap-[var(--kpi-gap)]">
-          <span class="text-[length:var(--kpi-title-font-size)] sm:text-[length:var(--kpi-title-font-size-sm)] lg:text-[length:var(--kpi-title-font-size-lg)] font-medium text-[#5F7089] dark:text-slate-400 truncate"
-            >Khusus</span
-          >
-          <div
-            class="flex h-[var(--kpi-icon-container-size)] w-[var(--kpi-icon-container-size)] sm:h-[var(--kpi-icon-container-size-sm)] sm:w-[var(--kpi-icon-container-size-sm)] lg:h-[var(--kpi-icon-container-size-lg)] lg:w-[var(--kpi-icon-container-size-lg)] shrink-0 items-center justify-center rounded-[6px] bg-[#EFF6FF] dark:bg-blue-950/60 text-[#0A51B0] dark:text-blue-400"
-          >
-            <PenTool class="w-[var(--kpi-icon-size)] h-[var(--kpi-icon-size)] sm:w-[var(--kpi-icon-size-sm)] sm:h-[var(--kpi-icon-size-sm)] lg:w-[var(--kpi-icon-size-lg)] lg:h-[var(--kpi-icon-size-lg)]" />
-          </div>
-        </div>
-        <div class="mt-0.5">
-          <p
-            class="font-num text-[length:var(--kpi-value-font-size)] sm:text-[length:var(--kpi-value-font-size-sm)] lg:text-[length:var(--kpi-value-font-size-lg)] font-semibold text-[#333333] dark:text-white tabular-nums leading-none tracking-tight"
-          >
-            {{ stats.custom }}
-          </p>
-          <span class="mt-0.5 block truncate text-[length:var(--kpi-caption-font-size)] sm:text-[length:var(--kpi-caption-font-size-sm)] lg:text-[length:var(--kpi-caption-font-size-lg)] font-normal text-[#64748B] dark:text-slate-400">Artikel kustom</span>
-        </div>
-      </div>
+      <StatCard
+        title="Total artikel"
+        :value="stats.total"
+        icon="article"
+        color="primary"
+        subtitle="Seluruh data artikel"
+      />
+      <StatCard
+        title="Terbit"
+        :value="stats.published"
+        icon="task_alt"
+        color="success"
+        subtitle="Telah dipublikasi"
+      />
+      <StatCard
+        title="Khusus"
+        :value="stats.custom"
+        icon="edit_note"
+        color="primary"
+        subtitle="Artikel kustom"
+      />
     </div>
 
     <!-- Toolbar -->
@@ -367,9 +333,26 @@ function getCategoryBadgeClass(category) {
           />
         </div>
 
+        <!-- Tombol Filter Lanjutan -->
+        <button
+          type="button"
+          @click="showFilterModal = true"
+          class="relative inline-flex items-center gap-1.5 h-8 px-3 rounded-[6px] border border-[#E2E8F0] dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-semibold text-[#333333] dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer shadow-2xs"
+          title="Filter lanjutan"
+        >
+          <span class="material-symbols-outlined text-[16px] text-[#5F7089]">tune</span>
+          <span>Filter</span>
+          <span
+            v-if="activeFilterCount > 0"
+            class="ml-0.5 inline-flex items-center justify-center min-w-[16px] h-4 px-1 rounded-full text-[10px] font-bold bg-[#0A51B0] text-white"
+          >
+            {{ activeFilterCount }}
+          </span>
+        </button>
+
         <!-- Clear Filters -->
         <button
-          v-if="searchQuery || selectedCategory !== 'all' || selectedStatus !== 'all'"
+          v-if="searchQuery || activeFilterCount > 0"
           @click="clearFilters"
           class="px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-semibold text-[#5F7089] dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors cursor-pointer shrink-0 touch-manipulation"
         >
@@ -384,10 +367,10 @@ function getCategoryBadgeClass(category) {
     <div
       class="bg-white dark:bg-slate-900 rounded-xl border border-[#E2E8F0] dark:border-slate-800 overflow-hidden gsap-admin-el shadow-sm"
     >
-      <!-- MOBILE CARD VIEW (< xl, atau saat mode Kartu dipilih) -->
+      <!-- CARD VIEW -->
       <div
+        v-if="viewMode === 'card'"
         class="cms-cards divide-y divide-[#F1F5F9] dark:divide-slate-800/60"
-        :class="viewMode === 'card' ? '' : 'xl:hidden'"
       >
         <!-- Mobile Empty State -->
         <div v-if="filteredCases.length === 0" class="py-12 px-4 text-center">
@@ -517,9 +500,9 @@ function getCategoryBadgeClass(category) {
         </div>
       </div>
 
-      <!-- DESKTOP TABLE VIEW (>= xl, mode Tabel) -->
-      <div v-if="viewMode === 'table'" class="hidden xl:block overflow-x-auto">
-        <table class="w-full text-left text-sm border-collapse">
+      <!-- TABLE VIEW -->
+      <div v-else class="overflow-x-auto">
+        <table class="w-full min-w-[700px] text-left text-sm border-collapse">
           <thead
             class="border-b border-[#E2E8F0] dark:border-slate-800 text-[#5F7089] dark:text-slate-400 font-medium text-xs"
           >
@@ -707,6 +690,60 @@ function getCategoryBadgeClass(category) {
         </div></template
       >
     </AppModal>
+
+    <!-- Advance Filter Modal -->
+    <FilterModal
+      :is-open="showFilterModal"
+      title="Filter Dokumen Knowledge Base"
+      @close="showFilterModal = false"
+      @apply="showFilterModal = false"
+      @reset="clearFilters"
+    >
+      <div class="space-y-3">
+        <div>
+          <label class="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
+            Kategori
+          </label>
+          <CustomSelect
+            v-model="selectedCategory"
+            :options="CATEGORY_OPTIONS"
+            placeholder="Semua Kategori"
+            :block="true"
+          />
+        </div>
+        <div>
+          <label class="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
+            Status Publikasi
+          </label>
+          <CustomSelect
+            v-model="selectedStatus"
+            :options="[
+              { value: 'all', label: 'Semua Status' },
+              { value: 'PUBLISHED', label: 'Published' },
+              { value: 'DRAFT', label: 'Draft' },
+            ]"
+            placeholder="Semua Status"
+            :block="true"
+          />
+        </div>
+        <div>
+          <label class="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
+            Tingkat Keparahan (Severity)
+          </label>
+          <CustomSelect
+            v-model="selectedSeverity"
+            :options="[
+              { value: 'all', label: 'Semua Severity' },
+              { value: 'low', label: 'Low' },
+              { value: 'medium', label: 'Medium' },
+              { value: 'high', label: 'High' },
+            ]"
+            placeholder="Semua Severity"
+            :block="true"
+          />
+        </div>
+      </div>
+    </FilterModal>
   </div>
 </template>
 
@@ -725,7 +762,7 @@ function getCategoryBadgeClass(category) {
 
 <style scoped>
 /* Ukuran mengikuti token & aturan global (h1 18/16px, tombol 12px/32px,
-   tabel kompak) — sejajar dengan admin-workspace.css di halaman admin lain. */
+   tabel kompak) - sejajar dengan admin-workspace.css di halaman admin lain. */
 .cms-page table th {
   font-weight: 600;
   text-transform: none;

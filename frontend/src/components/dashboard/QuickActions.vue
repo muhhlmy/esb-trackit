@@ -85,27 +85,27 @@ const quickActions = computed(() => allQuickActions.filter((action) => action.av
   margin-bottom: 10px;
 }
 .quick-access-heading h2 {
-  font-size: 14px;
+  font-size: 12.5px;
   font-weight: 600;
   color: var(--color-text-primary);
 }
 .quick-access-heading p {
   margin-top: 2px;
-  font-size: 11px;
+  font-size: 9.5px;
   color: var(--color-text-secondary);
 }
 .quick-actions {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 8px;
 }
 .quick-action-card {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   min-width: 0;
-  min-height: 48px;
-  padding: 8px 10px;
+  min-height: 40px;
+  padding: 6px 8px;
   text-align: left;
   border: 1px solid var(--color-border);
   border-radius: 6px;
@@ -131,31 +131,31 @@ const quickActions = computed(() => allQuickActions.filter((action) => action.av
   display: grid;
   place-items: center;
   flex-shrink: 0;
-  width: 32px;
-  height: 32px;
-  border-radius: 6px;
-  font-size: 18px;
+  width: 26px;
+  height: 26px;
+  border-radius: 5px;
+  font-size: 15px;
   background: var(--color-background-surface-muted);
   color: var(--color-primary);
 }
 .quick-action-copy {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 1px;
   min-width: 0;
   flex: 1;
 }
 .quick-action-label {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
 }
 .quick-action-description {
-  font-size: 10.5px;
-  line-height: 1.4;
+  font-size: 9.5px;
+  line-height: 1.35;
   color: var(--color-text-secondary);
 }
 .quick-action-arrow {
-  font-size: 15px;
+  font-size: 13px;
   color: var(--color-text-secondary);
 }
 @media (max-width: 639px) {
@@ -166,31 +166,31 @@ const quickActions = computed(() => allQuickActions.filter((action) => action.av
   }
   .quick-actions {
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 6px;
+    gap: 4px;
   }
   .quick-action-card {
     flex-direction: column;
     justify-content: flex-start;
-    gap: 4px;
-    min-height: 56px;
-    padding: 6px 2px;
+    gap: 3px;
+    min-height: 46px;
+    padding: 4px 2px;
     text-align: center;
     border: 0;
     background: transparent;
   }
   .quick-action-icon {
-    width: 28px;
-    height: 28px;
-    border-radius: 6px;
-    font-size: 18px;
+    width: 24px;
+    height: 24px;
+    border-radius: 5px;
+    font-size: 14px;
   }
   .quick-action-copy {
     flex: none;
     width: 100%;
   }
   .quick-action-label {
-    font-size: 11px;
-    line-height: 1.3;
+    font-size: 9.5px;
+    line-height: 1.25;
     overflow-wrap: anywhere;
   }
 }

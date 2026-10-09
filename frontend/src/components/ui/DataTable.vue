@@ -36,30 +36,30 @@ defineProps({
 .data-table { width:100%; }
 .data-table__title {
   font-family: var(--font-family-sans);
-  font-size: var(--font-size-base, 14px);
+  font-size: var(--fs-md, 12px);
   font-weight: 600;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 .data-table__wrapper { overflow-x:auto; }
 .data-table__table { width:100%; border-collapse:collapse; font-family: var(--font-family-sans); }
 .data-table__table th {
-  font-size: var(--font-size-xs, 11px);
+  font-size: var(--fs-2xs, 9px);
   font-weight: 600;
   text-align:left;
-  padding: 8px 12px;
+  padding: 5px 8px;
   border-bottom:1px solid var(--ui-border, #e2e8f0);
   background: #f8fafc;
 }
 .data-table__table td {
-  font-size: var(--font-size-sm, 12px);
-  padding: 8px 12px;
+  font-size: var(--fs-xs, 10px);
+  padding: 5px 8px;
   border-bottom:1px solid var(--ui-border, #e2e8f0);
 }
 .data-table__empty {
   font-family: var(--font-family-sans);
-  font-size: var(--font-size-xs, 11px);
+  font-size: var(--fs-2xs, 9.5px);
   color:#5B6B84;
   text-align:center;
-  padding:24px;
+  padding:16px;
 }
 </style>

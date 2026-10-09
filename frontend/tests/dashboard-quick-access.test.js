@@ -7,9 +7,8 @@ const actions = readFileSync(
   'utf8',
 )
 
-test('Quick Access stands below compact header, outside loading/error branches', () => {
-  assert.match(dashboard, /<PageHeader[\s\S]*?\/>\s*<QuickActions \/>/)
-  assert.ok(dashboard.indexOf('<QuickActions />') < dashboard.indexOf('v-if="isLoading"'))
+test('Quick Access stands below KPI cards', () => {
+  assert.ok(dashboard.indexOf('<QuickActions />') > dashboard.indexOf('class="dashboard-stats"'))
   assert.match(actions, /aria-labelledby="quick-access-title"/)
   assert.match(actions, /v-if="quickActions.length"/)
   assert.match(actions, /action.tooltip/)

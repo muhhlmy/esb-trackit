@@ -14,6 +14,9 @@ import { normalizeLocation } from '../utils/locationNormalizer.js'
 import ErrorState from '../components/ui/ErrorState.vue'
 import PageHeader from '../components/ui/PageHeader.vue'
 import ConfirmDialog from '../components/ui/ConfirmDialog.vue'
+import StatCard from '../components/ui/StatCard.vue'
+import FilterModal from '../components/ui/FilterModal.vue'
+import CustomSelect from '../components/ui/CustomSelect.vue'
 
 const { get, getAllPages, post, put, del } = useApi()
 const route = useRoute()
@@ -39,22 +42,123 @@ const currentPage = ref(1)
 const itemsPerPage = 10
 const viewMode = ref('table')
 
+// ── State Filter Lanjutan & KPI BAST ─────────────────────────
+const showFilterModal = ref(false)
+const filterTujuan = ref('')
+const filterDirektorat = ref('')
+const filterDateFrom = ref('')
+const filterDateTo = ref('')
+
+const TUJUAN_FILTER_OPTIONS = [
+  { value: '', label: 'Semua Tujuan BAST' },
+  { value: 'baru', label: 'Serah Terima Baru' },
+  { value: 'peminjaman', label: 'Peminjaman Aset' },
+  { value: 'perbaikan', label: 'Perbaikan / Servis' },
+  { value: 'disposal', label: 'Disposal Aset' },
+  { value: 'lainnya', label: 'Tujuan Lainnya' },
+]
+
+const availableDirektoratOptions = computed(() => {
+  const depts = new Set()
+  for (const s of savedSubmissions.value) {
+    const payload = s.payload || {}
+    if (payload.pemberiDirektorat && payload.pemberiDirektorat.trim() && payload.pemberiDirektorat !== '-') {
+      depts.add(payload.pemberiDirektorat.trim())
+    }
+    if (payload.penerimaDirektorat && payload.penerimaDirektorat.trim() && payload.penerimaDirektorat !== '-') {
+      depts.add(payload.penerimaDirektorat.trim())
+    }
+  }
+  const sorted = Array.from(depts).sort()
+  return [
+    { value: '', label: 'Semua Direktorat / Unit' },
+    ...sorted.map((d) => ({ value: d, label: d })),
+  ]
+})
+
+const submissionStats = computed(() => {
+  const all = savedSubmissions.value || []
+  let baru = 0
+  let peminjamanPerbaikan = 0
+  let pengembalian = 0
+
+  for (const s of all) {
+    const t = String(s.payload?.tujuan || '').toLowerCase()
+    if (t === 'baru') {
+      baru++
+    } else if (t === 'peminjaman' || t === 'perbaikan') {
+      peminjamanPerbaikan++
+    } else if (t === 'disposal' || t === 'lainnya') {
+      pengembalian++
+    }
+  }
+
+  return {
+    total: all.length,
+    baru,
+    peminjamanPerbaikan,
+    pengembalian,
+  }
+})
+
+const activeFilterCount = computed(() => {
+  let count = 0
+  if (filterTujuan.value) count++
+  if (filterDirektorat.value) count++
+  if (filterDateFrom.value || filterDateTo.value) count++
+  return count
+})
+
 const filteredSubmissions = computed(() => {
   const query = searchQuery.value.trim().toLocaleLowerCase('id-ID')
+  const tujuan = filterTujuan.value.trim().toLowerCase()
+  const dept = filterDirektorat.value.trim().toLowerCase()
+  const from = filterDateFrom.value
+  const to = filterDateTo.value
+
   return savedSubmissions.value.filter((submission) => {
     const payload = submission.payload || {}
-    const searchable = [submission.submission_number, payload.pemberiNama, payload.penerimaNama]
+    const searchable = [
+      submission.submission_number,
+      payload.pemberiNama,
+      payload.pemberiNik,
+      payload.penerimaNama,
+      payload.penerimaNik,
+      payload.tujuanLainnya,
+    ]
       .filter(Boolean)
       .join(' ')
       .toLocaleLowerCase('id-ID')
-    return !query || searchable.includes(query)
+
+    if (query && !searchable.includes(query)) return false
+
+    // Filter Tujuan BAST
+    if (tujuan && String(payload.tujuan || '').toLowerCase() !== tujuan) {
+      return false
+    }
+
+    // Filter Direktorat / Unit Kerja Pihak
+    if (dept) {
+      const pDept = String(payload.pemberiDirektorat || '').toLowerCase()
+      const rDept = String(payload.penerimaDirektorat || '').toLowerCase()
+      if (!pDept.includes(dept) && !rDept.includes(dept)) {
+        return false
+      }
+    }
+
+    // Filter Rentang Tanggal
+    const rawDate = payload.tanggal || (submission.created_at ? submission.created_at.substring(0, 10) : '')
+    if (from && rawDate && rawDate < from) return false
+    if (to && rawDate && rawDate > to) return false
+
+    return true
   })
 })
 const paginatedSubmissions = computed(() => {
   const start = (currentPage.value - 1) * itemsPerPage
   return filteredSubmissions.value.slice(start, start + itemsPerPage)
 })
-watch(searchQuery, () => {
+watch([searchQuery, filterTujuan, filterDirektorat, filterDateFrom, filterDateTo], () => {
   currentPage.value = 1
 })
 watch(
@@ -65,10 +169,14 @@ watch(
 )
 function resetSubmissionFilters() {
   searchQuery.value = ''
+  filterTujuan.value = ''
+  filterDirektorat.value = ''
+  filterDateFrom.value = ''
+  filterDateTo.value = ''
   currentPage.value = 1
 }
 function formatSubmissionDate(value) {
-  if (!value) return '—'
+  if (!value) return '-'
   return new Intl.DateTimeFormat('id-ID', { dateStyle: 'medium' }).format(new Date(value))
 }
 function getSubmissionActions(submission) {
@@ -846,12 +954,12 @@ async function generatePdf({
           <tr>
             <td class="font-bold">Nama Lengkap</td>
             <td>${form.value.pemberiNama}</td>
-            <td>${form.value.penerimaNama || '—'}</td>
+            <td>${form.value.penerimaNama || '-'}</td>
           </tr>
           <tr>
             <td class="font-bold">Direktorat</td>
             <td>${form.value.pemberiDirektorat}</td>
-            <td>${form.value.penerimaDirektorat || '—'}</td>
+            <td>${form.value.penerimaDirektorat || '-'}</td>
           </tr>
         </tbody>
       </table>
@@ -973,7 +1081,7 @@ onMounted(fetchData)
     <PageHeader
       v-if="!isLoading && !isFormOpen"
       title="Riwayat BAST / Pengajuan"
-      subtitle="Kelola dokumen serah terima seperti daftar Aset IT."
+      subtitle="Kelola dan pantau arsip dokumen berita acara serah terima aset"
       icon="assignment"
     >
       <button
@@ -987,22 +1095,100 @@ onMounted(fetchData)
       </button>
     </PageHeader>
 
+    <!-- ── KPI Summary Cards (Riwayat BAST / Pengajuan) ──────────── -->
+    <div
+      v-if="!isLoading && !isFormOpen"
+      class="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-2.5 lg:gap-3"
+    >
+      <StatCard
+        title="Total Dokumen BAST"
+        :value="submissionStats.total"
+        icon="assignment"
+        color="primary"
+        subtitle="Dokumen terdaftar"
+        is-total
+      />
+      <StatCard
+        title="Serah Terima Baru"
+        :value="submissionStats.baru"
+        icon="devices"
+        color="neutral"
+        subtitle="Unit baru dialokasikan"
+      />
+      <StatCard
+        title="Peminjaman & Servis"
+        :value="submissionStats.peminjamanPerbaikan"
+        icon="build"
+        color="warning"
+        subtitle="Pinjam atau servis"
+      />
+      <StatCard
+        title="Pengembalian / Lainnya"
+        :value="submissionStats.pengembalian"
+        icon="published_with_changes"
+        color="success"
+        subtitle="Disposal / kembali"
+      />
+    </div>
+
     <section
       v-if="!isLoading && !isFormOpen"
       class="submission-history"
       aria-label="Riwayat pengajuan BAST"
     >
       <div
-        class="asset-toolbar flex flex-col gap-2.5 rounded-[6px] border border-[#E2E8F0]/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-2.5 sm:p-3 shadow-2xs"
+        class="asset-toolbar flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 sm:gap-2.5 rounded-[6px] border border-[#E2E8F0]/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-2 sm:p-2.5 shadow-2xs"
       >
-        <div class="grid grid-cols-1 items-center gap-2">
+        <div class="relative flex-1 min-w-0">
+          <span
+            aria-hidden="true"
+            class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-[15px] text-[#687281] dark:text-slate-400 pointer-events-none"
+            >search</span
+          >
           <input
             v-model="searchQuery"
             type="search"
             aria-label="Cari nomor BAST atau nama pihak"
-            placeholder="Cari nomor BAST atau nama pihak…"
-            class="h-8 w-full rounded-[6px] border border-[#E2E8F0] dark:border-slate-700 bg-white dark:bg-slate-800 px-3 text-xs text-[#333333] dark:text-slate-100 placeholder:text-slate-400 focus:border-[#0A51B0] focus:outline-none"
+            placeholder="Cari nomor BAST, nama pihak, atau NIK…"
+            class="h-8 w-full rounded-[6px] border border-[#E2E8F0] dark:border-slate-700 bg-white dark:bg-slate-800 pl-8.5 pr-8 text-xs text-[#333333] dark:text-slate-100 placeholder:text-slate-400 focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
           />
+          <button
+            v-if="searchQuery"
+            type="button"
+            @click="searchQuery = ''"
+            aria-label="Bersihkan pencarian"
+            class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-white cursor-pointer"
+          >
+            <span aria-hidden="true" class="material-symbols-outlined text-[14px]">close</span>
+          </button>
+        </div>
+
+        <div class="flex items-center gap-1.5 shrink-0">
+          <button
+            type="button"
+            @click="showFilterModal = true"
+            class="relative inline-flex h-8 items-center gap-1 rounded-[6px] border border-[#E2E8F0] dark:border-slate-700 bg-[#F8FAFC] dark:bg-slate-800 px-2.5 sm:px-3 text-xs font-semibold text-[#5F7089] dark:text-slate-300 hover:bg-white dark:hover:bg-slate-700 transition-colors cursor-pointer"
+          >
+            <span aria-hidden="true" class="material-symbols-outlined text-[15px]">filter_alt</span>
+            <span>Filter</span>
+            <span
+              v-if="activeFilterCount > 0"
+              class="ml-0.5 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-[#0A51B0] px-1 text-[9px] font-bold text-white"
+            >
+              {{ activeFilterCount }}
+            </span>
+          </button>
+
+          <button
+            v-if="activeFilterCount > 0 || searchQuery"
+            type="button"
+            @click="resetSubmissionFilters"
+            class="inline-flex h-8 items-center rounded-[6px] border border-rose-200 dark:border-rose-900 bg-rose-50/50 dark:bg-rose-950/30 px-2 text-xs font-medium text-rose-600 dark:text-rose-400 hover:bg-rose-100/60 transition-colors cursor-pointer"
+            title="Reset Filter"
+          >
+            <span aria-hidden="true" class="material-symbols-outlined text-[14px] mr-0.5">refresh</span>
+            <span>Reset</span>
+          </button>
         </div>
       </div>
       <div class="it-list-heading-sticky">
@@ -1079,16 +1265,16 @@ onMounted(fetchData)
               </td>
               <td>
                 <span class="ws-cell-main" :title="submission.payload?.pemberiNama">{{
-                  submission.payload?.pemberiNama || '—'
+                  submission.payload?.pemberiNama || '-'
                 }}</span
-                ><span class="ws-cell-sub">{{ submission.payload?.pemberiDirektorat || '—' }}</span>
+                ><span class="ws-cell-sub">{{ submission.payload?.pemberiDirektorat || '-' }}</span>
               </td>
               <td>
                 <span class="ws-cell-main" :title="submission.payload?.penerimaNama">{{
-                  submission.payload?.penerimaNama || '—'
+                  submission.payload?.penerimaNama || '-'
                 }}</span
                 ><span class="ws-cell-sub">{{
-                  submission.payload?.penerimaDirektorat || '—'
+                  submission.payload?.penerimaDirektorat || '-'
                 }}</span>
               </td>
               <td>
@@ -1132,17 +1318,17 @@ onMounted(fetchData)
           <div class="laptop-holder laptop-field">
             <span class="laptop-label">Pemberi</span>
             <strong :title="submission.payload?.pemberiNama">{{
-              submission.payload?.pemberiNama || '—'
+              submission.payload?.pemberiNama || '-'
             }}</strong>
-            <span class="laptop-secondary">{{ submission.payload?.pemberiDirektorat || '—' }}</span>
+            <span class="laptop-secondary">{{ submission.payload?.pemberiDirektorat || '-' }}</span>
           </div>
           <div class="laptop-location laptop-field">
             <span class="laptop-label">Penerima</span>
             <strong :title="submission.payload?.penerimaNama">{{
-              submission.payload?.penerimaNama || '—'
+              submission.payload?.penerimaNama || '-'
             }}</strong>
             <span class="laptop-secondary">{{
-              submission.payload?.penerimaDirektorat || '—'
+              submission.payload?.penerimaDirektorat || '-'
             }}</span>
           </div>
           <div class="laptop-state">
@@ -2073,11 +2259,76 @@ onMounted(fetchData)
           </button>
         </div>
         <p v-if="!canWriteSubmissions" class="text-xs font-semibold text-[#5F7089]">
-          Mode hanya baca — Anda tidak memiliki izin mengubah pengajuan.
+          Mode hanya baca - Anda tidak memiliki izin mengubah pengajuan.
         </p>
       </div>
     </form>
   </div>
+
+    <FilterModal
+      :is-open="showFilterModal"
+      title="Filter Riwayat BAST"
+      subtitle="Saring arsip serah terima berdasarkan tujuan, unit kerja, atau periode tanggal."
+      @close="showFilterModal = false"
+      @apply="showFilterModal = false"
+      @reset="resetSubmissionFilters"
+    >
+      <div class="space-y-2.5">
+        <div>
+          <label class="block text-[10px] font-bold text-slate-600 dark:text-slate-300 mb-1">
+            Tujuan BAST / Pengajuan
+          </label>
+          <CustomSelect
+            v-model="filterTujuan"
+            :options="TUJUAN_FILTER_OPTIONS"
+            placeholder="Semua Tujuan BAST"
+            aria-label="Filter tujuan BAST"
+            :block="true"
+            height-class="h-8"
+          />
+        </div>
+
+        <div>
+          <label class="block text-[10px] font-bold text-slate-600 dark:text-slate-300 mb-1">
+            Direktorat / Unit Kerja Pihak
+          </label>
+          <CustomSelect
+            v-model="filterDirektorat"
+            :options="availableDirektoratOptions"
+            placeholder="Semua Direktorat / Unit"
+            aria-label="Filter direktorat pihak"
+            :block="true"
+            height-class="h-8"
+          />
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-[10px] font-bold text-slate-600 dark:text-slate-300 mb-1">
+              Dari Tanggal
+            </label>
+            <input
+              v-model="filterDateFrom"
+              type="date"
+              aria-label="Tanggal awal BAST"
+              class="h-8 w-full rounded-[5px] border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-2 text-[10.5px] text-[#333333] dark:text-white focus:border-[#0A51B0] focus:outline-none"
+            />
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold text-slate-600 dark:text-slate-300 mb-1">
+              Sampai Tanggal
+            </label>
+            <input
+              v-model="filterDateTo"
+              type="date"
+              aria-label="Tanggal akhir BAST"
+              class="h-8 w-full rounded-[5px] border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-2 text-[10.5px] text-[#333333] dark:text-white focus:border-[#0A51B0] focus:outline-none"
+            />
+          </div>
+        </div>
+      </div>
+    </FilterModal>
+
     <ConfirmDialog
       :open="Boolean(pendingDelete)"
       title="Hapus Pengajuan?"

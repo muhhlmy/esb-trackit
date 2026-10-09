@@ -7,6 +7,7 @@ import { onTicketEvent } from '../composables/useTicketRealtime.js'
 import { getStatusDotInfo, getPriorityInfo } from '../utils/ticketPresentation.js'
 import { STATE_TONES } from '../config/design-system.js'
 import { validateAttachmentFile } from '../utils/attachmentPolicy.js'
+import { playToneNotification } from '../composables/useNotificationSound.js'
 import AppModal from '../components/ui/AppModal.vue'
 import AppRowActions from '../components/ui/AppRowActions.vue'
 import { useViewMode } from '../composables/useViewMode.js'
@@ -15,6 +16,7 @@ import AppPagination from '../components/ui/AppPagination.vue'
 import SearchableSelect from '../components/ui/SearchableSelect.vue'
 import CustomSelect from '../components/ui/CustomSelect.vue'
 import PageHeader from '../components/ui/PageHeader.vue'
+import StatCard from '../components/ui/StatCard.vue'
 import PanelCard from '../components/ui/PanelCard.vue'
 import FilterBar from '../components/ui/FilterBar.vue'
 import FilterModal from '../components/ui/FilterModal.vue'
@@ -1394,6 +1396,7 @@ let toastTimer
 function toast(message, type = 'success') {
   window.clearTimeout(toastTimer)
   notification.value = { message, type }
+  playToneNotification(type === 'error' ? 'ALERT' : 'SUCCESS')
   toastTimer = window.setTimeout(() => {
     notification.value = null
   }, 3500)
@@ -1444,7 +1447,7 @@ function toast(message, type = 'success') {
       <!-- Title Bar -->
       <PageHeader
         class="tickets-header"
-        :title="isAdmin || isSuperAdmin ? 'Ticket Inbox' : 'Tiket'"
+        :title="isAdmin || isSuperAdmin ? 'Tiket Helpdesk' : 'Tiket'"
         :subtitle="
           isAdmin || isSuperAdmin
             ? 'Mengelola pengajuan dan penanganan kendala IT'
@@ -1456,106 +1459,45 @@ function toast(message, type = 'success') {
           type="button"
           @click="openAdd"
           class="h-8 shrink-0 whitespace-nowrap rounded-[6px] bg-[#0A51B0] px-3 text-[11px] sm:text-[12px] font-semibold text-white shadow-2xs hover:bg-[#0A4391] transition-all flex items-center justify-center gap-1.5 cursor-pointer"
-          :title="isAdmin || isSuperAdmin ? 'Buat tiket baru' : 'Request ticket baru'"
+          :title="isAdmin || isSuperAdmin ? 'Buat tiket baru' : 'Ajukan tiket baru'"
         >
           <span aria-hidden="true" class="material-symbols-outlined text-[16px]">add</span>
-          <span>{{ isAdmin || isSuperAdmin ? 'Buat Tiket' : 'Request Ticket' }}</span>
+          <span>{{ isAdmin || isSuperAdmin ? 'Buat Tiket' : 'Ajukan Tiket' }}</span>
         </button>
       </PageHeader>
 
       <!-- Quick KPI Stat Cards (4 Cards) -->
       <div class="tickets-kpis grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-2.5 lg:gap-3">
-        <!-- 1. Total tiket -->
-        <div
-          class="kpi-focusable flex flex-col justify-between p-[var(--kpi-padding)] sm:p-[var(--kpi-padding-sm)] lg:p-[var(--kpi-padding-lg)] rounded-[var(--kpi-radius)] min-h-[var(--kpi-height)] sm:min-h-[var(--kpi-height-sm)] lg:min-h-[var(--kpi-height-lg)] transition-colors" :style="{ '--kpi-bg': 'var(--kpi-bg)', '--kpi-bg-dark': 'var(--kpi-bg-dark)', '--kpi-border': 'var(--kpi-border)', '--kpi-border-dark': 'var(--kpi-border-dark)', '--kpi-shadow': 'var(--kpi-shadow)', '--kpi-hover-border': 'var(--kpi-hover-border)', '--kpi-hover-border-dark': 'var(--kpi-hover-border-dark)' }"
-          tabindex="0"
-        >
-          <div class="flex items-center justify-between gap-[var(--kpi-gap)]">
-            <span class="text-[length:var(--kpi-title-font-size)] sm:text-[length:var(--kpi-title-font-size-sm)] lg:text-[length:var(--kpi-title-font-size-lg)] font-medium text-[#5F7089] dark:text-slate-400 truncate">Total tiket</span>
-            <div
-              class="flex h-[var(--kpi-icon-container-size)] w-[var(--kpi-icon-container-size)] sm:h-[var(--kpi-icon-container-size-sm)] sm:w-[var(--kpi-icon-container-size-sm)] lg:h-[var(--kpi-icon-container-size-lg)] lg:w-[var(--kpi-icon-container-size-lg)] shrink-0 items-center justify-center rounded-[6px] bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300"
-            >
-              <span aria-hidden="true" class="material-symbols-outlined text-[length:var(--kpi-icon-size)] sm:text-[length:var(--kpi-icon-size-sm)] lg:text-[length:var(--kpi-icon-size-lg)]">inbox</span>
-            </div>
-          </div>
-          <div class="mt-0.5">
-            <span class="font-num block text-[length:var(--kpi-value-font-size)] sm:text-[length:var(--kpi-value-font-size-sm)] lg:text-[length:var(--kpi-value-font-size-lg)] font-semibold text-[#333333] dark:text-white tabular-nums leading-none tracking-tight">{{
-              stats.totalTickets ?? 0
-            }}</span>
-            <span class="mt-0.5 block truncate text-[length:var(--kpi-caption-font-size)] sm:text-[length:var(--kpi-caption-font-size-sm)] lg:text-[length:var(--kpi-caption-font-size-lg)] font-normal text-[#64748B] dark:text-slate-400">Total tiket masuk</span>
-          </div>
-        </div>
-
-        <!-- 2. Belum diambil / Menunggu respon -->
-        <div
-          class="kpi-focusable flex flex-col justify-between p-[var(--kpi-padding)] sm:p-[var(--kpi-padding-sm)] lg:p-[var(--kpi-padding-lg)] rounded-[var(--kpi-radius)] min-h-[var(--kpi-height)] sm:min-h-[var(--kpi-height-sm)] lg:min-h-[var(--kpi-height-lg)] transition-colors" :style="{ '--kpi-bg': 'var(--kpi-bg)', '--kpi-bg-dark': 'var(--kpi-bg-dark)', '--kpi-border': 'var(--kpi-border)', '--kpi-border-dark': 'var(--kpi-border-dark)', '--kpi-shadow': 'var(--kpi-shadow)', '--kpi-hover-border': 'var(--kpi-hover-border)', '--kpi-hover-border-dark': 'var(--kpi-hover-border-dark)' }"
-          tabindex="0"
-        >
-          <div class="flex items-center justify-between gap-[var(--kpi-gap)]">
-            <span class="text-[length:var(--kpi-title-font-size)] sm:text-[length:var(--kpi-title-font-size-sm)] lg:text-[length:var(--kpi-title-font-size-lg)] font-medium text-[#5F7089] dark:text-slate-400 truncate">{{
-              isAdmin || isSuperAdmin ? 'Belum diambil' : 'Menunggu respon'
-            }}</span>
-            <div
-              class="flex h-[var(--kpi-icon-container-size)] w-[var(--kpi-icon-container-size)] sm:h-[var(--kpi-icon-container-size-sm)] sm:w-[var(--kpi-icon-container-size-sm)] lg:h-[var(--kpi-icon-container-size-lg)] lg:w-[var(--kpi-icon-container-size-lg)] shrink-0 items-center justify-center rounded-[6px]"
-              :class="
-                (stats.unassignedTickets || 0) > 0
-                  ? 'bg-amber-50 dark:bg-amber-950/60 text-[#B45309] dark:text-amber-400'
-                  : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
-              "
-            >
-              <span aria-hidden="true" class="material-symbols-outlined text-[length:var(--kpi-icon-size)] sm:text-[length:var(--kpi-icon-size-sm)] lg:text-[length:var(--kpi-icon-size-lg)]">assignment_late</span>
-            </div>
-          </div>
-          <div class="mt-0.5">
-            <span
-              class="font-num block text-[length:var(--kpi-value-font-size)] sm:text-[length:var(--kpi-value-font-size-sm)] lg:text-[length:var(--kpi-value-font-size-lg)] font-semibold tabular-nums leading-none tracking-tight"
-              :class="(stats.unassignedTickets || 0) > 0 ? 'text-[#B45309] dark:text-amber-400' : 'text-[#333333] dark:text-white'"
-            >{{ stats.unassignedTickets ?? 0 }}</span>
-            <span class="mt-0.5 block truncate text-[length:var(--kpi-caption-font-size)] sm:text-[length:var(--kpi-caption-font-size-sm)] lg:text-[length:var(--kpi-caption-font-size-lg)] font-normal text-[#64748B] dark:text-slate-400">Menunggu penanganan</span>
-          </div>
-        </div>
-
-        <!-- 3. Sedang diproses -->
-        <div
-          class="kpi-focusable flex flex-col justify-between p-[var(--kpi-padding)] sm:p-[var(--kpi-padding-sm)] lg:p-[var(--kpi-padding-lg)] rounded-[var(--kpi-radius)] min-h-[var(--kpi-height)] sm:min-h-[var(--kpi-height-sm)] lg:min-h-[var(--kpi-height-lg)] transition-colors" :style="{ '--kpi-bg': 'var(--kpi-bg)', '--kpi-bg-dark': 'var(--kpi-bg-dark)', '--kpi-border': 'var(--kpi-border)', '--kpi-border-dark': 'var(--kpi-border-dark)', '--kpi-shadow': 'var(--kpi-shadow)', '--kpi-hover-border': 'var(--kpi-hover-border)', '--kpi-hover-border-dark': 'var(--kpi-hover-border-dark)' }"
-          tabindex="0"
-        >
-          <div class="flex items-center justify-between gap-[var(--kpi-gap)]">
-            <span class="text-[length:var(--kpi-title-font-size)] sm:text-[length:var(--kpi-title-font-size-sm)] lg:text-[length:var(--kpi-title-font-size-lg)] font-medium text-[#5F7089] dark:text-slate-400 truncate">Sedang diproses</span>
-            <div
-              class="flex h-[var(--kpi-icon-container-size)] w-[var(--kpi-icon-container-size)] sm:h-[var(--kpi-icon-container-size-sm)] sm:w-[var(--kpi-icon-container-size-sm)] lg:h-[var(--kpi-icon-container-size-lg)] lg:w-[var(--kpi-icon-container-size-lg)] shrink-0 items-center justify-center rounded-[6px] bg-[#EFF6FF] dark:bg-blue-950/60 text-[#0A51B0] dark:text-blue-400"
-            >
-              <span aria-hidden="true" class="material-symbols-outlined text-[length:var(--kpi-icon-size)] sm:text-[length:var(--kpi-icon-size-sm)] lg:text-[length:var(--kpi-icon-size-lg)]">pending_actions</span>
-            </div>
-          </div>
-          <div class="mt-0.5">
-            <span class="font-num block text-[length:var(--kpi-value-font-size)] sm:text-[length:var(--kpi-value-font-size-sm)] lg:text-[length:var(--kpi-value-font-size-lg)] font-semibold text-[#333333] dark:text-white tabular-nums leading-none tracking-tight">{{
-              (stats.openTickets || 0) + (stats.pendingTickets || 0)
-            }}</span>
-            <span class="mt-0.5 block truncate text-[length:var(--kpi-caption-font-size)] sm:text-[length:var(--kpi-caption-font-size-sm)] lg:text-[length:var(--kpi-caption-font-size-lg)] font-normal text-[#64748B] dark:text-slate-400">Dalam pengerjaan tim</span>
-          </div>
-        </div>
-
-        <!-- 4. Tiket selesai -->
-        <div
-          class="kpi-focusable flex flex-col justify-between p-[var(--kpi-padding)] sm:p-[var(--kpi-padding-sm)] lg:p-[var(--kpi-padding-lg)] rounded-[var(--kpi-radius)] min-h-[var(--kpi-height)] sm:min-h-[var(--kpi-height-sm)] lg:min-h-[var(--kpi-height-lg)] transition-colors" :style="{ '--kpi-bg': 'var(--kpi-bg)', '--kpi-bg-dark': 'var(--kpi-bg-dark)', '--kpi-border': 'var(--kpi-border)', '--kpi-border-dark': 'var(--kpi-border-dark)', '--kpi-shadow': 'var(--kpi-shadow)', '--kpi-hover-border': 'var(--kpi-hover-border)', '--kpi-hover-border-dark': 'var(--kpi-hover-border-dark)' }"
-          tabindex="0"
-        >
-          <div class="flex items-center justify-between gap-[var(--kpi-gap)]">
-            <span class="text-[length:var(--kpi-title-font-size)] sm:text-[length:var(--kpi-title-font-size-sm)] lg:text-[length:var(--kpi-title-font-size-lg)] font-medium text-[#5F7089] dark:text-slate-400 truncate">Tiket selesai</span>
-            <div
-              class="flex h-[var(--kpi-icon-container-size)] w-[var(--kpi-icon-container-size)] sm:h-[var(--kpi-icon-container-size-sm)] sm:w-[var(--kpi-icon-container-size-sm)] lg:h-[var(--kpi-icon-container-size-lg)] lg:w-[var(--kpi-icon-container-size-lg)] shrink-0 items-center justify-center rounded-[6px] bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400"
-            >
-              <span aria-hidden="true" class="material-symbols-outlined text-[length:var(--kpi-icon-size)] sm:text-[length:var(--kpi-icon-size-sm)] lg:text-[length:var(--kpi-icon-size-lg)]">task_alt</span>
-            </div>
-          </div>
-          <div class="mt-0.5">
-            <span class="font-num block text-[length:var(--kpi-value-font-size)] sm:text-[length:var(--kpi-value-font-size-sm)] lg:text-[length:var(--kpi-value-font-size-lg)] font-semibold text-emerald-600 dark:text-emerald-400 tabular-nums leading-none tracking-tight">{{
-              stats.closedTickets ?? 0
-            }}</span>
-            <span class="mt-0.5 block truncate text-[length:var(--kpi-caption-font-size)] sm:text-[length:var(--kpi-caption-font-size-sm)] lg:text-[length:var(--kpi-caption-font-size-lg)] font-normal text-[#64748B] dark:text-slate-400">Tiket terselesaikan</span>
-          </div>
-        </div>
+        <StatCard
+          title="Total tiket"
+          :value="stats.totalTickets ?? 0"
+          icon="inbox"
+          color="primary"
+          subtitle="Total tiket masuk"
+        />
+        <StatCard
+          :title="isAdmin || isSuperAdmin ? 'Belum diambil' : 'Menunggu respon'"
+          :value="stats.unassignedTickets ?? 0"
+          icon="assignment_late"
+          :color="(stats.unassignedTickets || 0) > 0 ? 'warning' : 'neutral'"
+          :value-class="(stats.unassignedTickets || 0) > 0 ? 'text-[#B45309] dark:text-amber-400' : 'text-[#333333] dark:text-white'"
+          subtitle="Menunggu penanganan"
+        />
+        <StatCard
+          title="Sedang diproses"
+          :value="(stats.openTickets || 0) + (stats.pendingTickets || 0)"
+          icon="pending_actions"
+          color="primary"
+          subtitle="Dalam pengerjaan tim"
+        />
+        <StatCard
+          title="Tiket selesai"
+          :value="stats.closedTickets ?? 0"
+          icon="task_alt"
+          color="success"
+          value-class="text-emerald-600 dark:text-emerald-400"
+          subtitle="Tiket terselesaikan"
+        />
       </div>
     </div>
 
@@ -1765,10 +1707,10 @@ function toast(message, type = 'success') {
 
       <!-- Content Surface (Clean & Modern Card-Row Components) -->
       <div v-else class="ticket-card-list flex flex-col gap-2.5">
-        <!-- Mode Tabel (tampil ≥ 1280px) -->
+        <!-- Mode Tabel (Tampil di semua breakpoint saat dipilih) -->
         <div
           v-if="viewMode === 'table' && filteredTickets.length > 0"
-          class="ws-data-table-wrap hidden xl:block"
+          class="ws-data-table-wrap overflow-x-auto"
         >
           <table class="ws-data-table">
             <caption class="sr-only">
@@ -1850,9 +1792,10 @@ function toast(message, type = 'success') {
           </table>
         </div>
         <!-- ── UNIFIED TICKET CARDS (5-Column SaaS Card-Row based on Design.md Section 12) ── -->
-        <div
-          v-for="ticket in paginatedTickets"
-          :key="ticket.id"
+        <template v-if="viewMode === 'card'">
+          <div
+            v-for="ticket in paginatedTickets"
+            :key="ticket.id"
           @click="openDetail(ticket)"
           tabindex="0"
           :aria-label="'Lihat tiket ' + ticket.judul"
@@ -2205,6 +2148,7 @@ function toast(message, type = 'success') {
             </div>
           </div>
         </div>
+      </template>
 
         <!-- ── EMPTY STATES ── -->
         <div
@@ -2590,6 +2534,24 @@ function toast(message, type = 'success') {
                   type="file"
                   multiple
                   accept="image/png,image/jpeg,image/gif,image/webp,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation"
+                  class="hidden"
+                  @change="handleFileChange"
+                />
+              </label>
+              <label
+                class="inline-flex h-9 items-center gap-2 rounded-lg border border-[#E5EAEF] bg-white px-3 text-[12px] font-bold text-[#2A3547] hover:bg-[#F8FAFC] hover:border-[#0A51B0] transition-all cursor-pointer select-none shadow-2xs"
+                title="Ambil foto langsung dari kamera perangkat"
+              >
+                <span
+                  aria-hidden="true"
+                  class="material-symbols-outlined text-[18px] text-[#0A51B0]"
+                  >photo_camera</span
+                >
+                <span>Foto Kamera</span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  capture="environment"
                   class="hidden"
                   @change="handleFileChange"
                 />
@@ -3225,6 +3187,21 @@ function toast(message, type = 'success') {
                   <input
                     type="file"
                     accept="image/png,image/jpeg,image/gif,image/webp,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation"
+                    class="hidden"
+                    @change="handleCommentFileChange"
+                  />
+                </label>
+
+                <label
+                  title="Ambil foto langsung dari kamera"
+                  aria-label="Ambil foto dari kamera"
+                  class="group/btn flex h-9 w-9 shrink-0 items-center justify-center rounded-[6px] bg-slate-100/80 hover:bg-slate-200/80 text-slate-500 hover:text-blue-600 transition-all cursor-pointer select-none"
+                >
+                  <span aria-hidden="true" class="material-symbols-outlined text-[18px]">photo_camera</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    capture="environment"
                     class="hidden"
                     @change="handleCommentFileChange"
                   />

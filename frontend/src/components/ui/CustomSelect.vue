@@ -1,5 +1,5 @@
 <script setup>
-// CustomSelect.vue — Dropdown custom dengan gaya konsisten (Design.md Bagian 13)
+// CustomSelect.vue - Dropdown custom dengan gaya konsisten (Design.md Bagian 13)
 import { computed, onBeforeUnmount, onMounted, ref, useId } from 'vue'
 
 const props = defineProps({
@@ -97,7 +97,7 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside))
       aria-haspopup="listbox"
       :aria-expanded="isOpen"
       @click="toggle"
-      class="ui-select-trigger inline-flex w-full items-center justify-between gap-1.5 rounded-xl border bg-white px-3 text-xs font-bold text-[#2A3547] shadow-2xs hover:bg-[#F8FAFC] hover:border-[#0A51B0] transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+      class="ui-select-trigger inline-flex w-full items-center justify-between gap-1.5 rounded-lg border bg-white px-2.5 text-[10.5px] font-bold text-[#2A3547] shadow-2xs hover:bg-[#F8FAFC] hover:border-[#0A51B0] transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
       :class="[
         heightClass,
         isOpen ? 'border-[#0A51B0] ring-2 ring-[#0A51B0]/15' : 'border-[#E5EAEF]',
@@ -106,7 +106,7 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside))
       <div class="flex items-center gap-1.5 min-w-0 flex-1">
         <span
           v-if="selectedOption && selectedOption.dot"
-          class="h-2 w-2 rounded-full shrink-0"
+          class="h-1.5 w-1.5 rounded-full shrink-0"
           :class="selectedOption.dot"
         ></span>
         <span class="truncate" :title="selectedOption ? selectedOption.label : placeholder">{{
@@ -115,7 +115,7 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside))
       </div>
       <span
         aria-hidden="true"
-        class="material-symbols-outlined text-[16px] text-[#66728d] shrink-0 transition-transform duration-200"
+        class="material-symbols-outlined text-[14px] text-[#66728d] shrink-0 transition-transform duration-200"
         :class="{ 'rotate-180 text-[#333333]': isOpen }"
         >expand_more</span
       >
@@ -125,10 +125,10 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside))
       v-if="clearable && selectedOption"
       type="button"
       aria-label="Hapus pilihan"
-      class="absolute right-7 top-1/2 z-10 flex h-5 w-5 -translate-y-1/2 items-center justify-center rounded-md text-[#475569] transition-colors hover:bg-red-50 hover:text-[#DC2626]"
+      class="absolute right-7 top-1/2 z-10 flex h-4.5 w-4.5 -translate-y-1/2 items-center justify-center rounded-md text-[#475569] transition-colors hover:bg-red-50 hover:text-[#DC2626]"
       @click.stop="clear"
     >
-      <span aria-hidden="true" class="material-symbols-outlined text-[14px]">close</span>
+      <span aria-hidden="true" class="material-symbols-outlined text-[13px]">close</span>
     </button>
 
     <Transition name="fade">
@@ -136,11 +136,11 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside))
         v-if="isOpen"
         :id="listboxId"
         role="listbox"
-        class="ui-select-menu absolute z-50 max-h-64 overflow-y-auto rounded-xl border border-[#E5EAEF] bg-white p-1.5 shadow-lg"
+        class="ui-select-menu absolute z-50 max-h-60 overflow-y-auto rounded-lg border border-[#E5EAEF] bg-white p-1 shadow-lg"
         :class="[
           widthClass === 'w-full' ? 'min-w-full w-max max-w-[340px]' : widthClass,
           align === 'right' ? 'right-0' : 'left-0',
-          dropDirection === 'up' ? 'bottom-full mb-1.5' : 'top-full mt-1.5',
+          dropDirection === 'up' ? 'bottom-full mb-1' : 'top-full mt-1',
         ]"
       >
         <button
@@ -149,18 +149,18 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside))
           type="button"
           role="option"
           :aria-selected="opt.value === modelValue"
-          class="flex h-8 w-full items-center justify-between rounded-lg px-2.5 text-xs font-medium text-[#2A3547] hover:bg-[#F8FAFC] transition-colors cursor-pointer"
+          class="flex h-7 w-full items-center justify-between rounded-md px-2 text-[10.5px] font-medium text-[#2A3547] hover:bg-[#F8FAFC] transition-colors cursor-pointer"
           :class="opt.value === modelValue ? 'bg-[#ECF2FF] font-bold text-[#333333]' : ''"
           @click="select(opt)"
         >
-          <div class="flex items-center gap-2 min-w-0">
-            <span v-if="opt.dot" class="h-2 w-2 rounded-full shrink-0" :class="opt.dot"></span>
+          <div class="flex items-center gap-1.5 min-w-0">
+            <span v-if="opt.dot" class="h-1.5 w-1.5 rounded-full shrink-0" :class="opt.dot"></span>
             <span class="truncate">{{ opt.label }}</span>
           </div>
           <span
             v-if="opt.value === modelValue"
             aria-hidden="true"
-            class="material-symbols-outlined text-[15px] text-[#333333] shrink-0"
+            class="material-symbols-outlined text-[13.5px] text-[#333333] shrink-0"
             >check</span
           >
         </button>

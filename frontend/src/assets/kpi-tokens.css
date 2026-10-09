@@ -1,48 +1,48 @@
-/* kpi-tokens.css — Anti-Slop Centralized Design Tokens for KPI Cards */
+/* kpi-tokens.css - Anti-Slop Centralized Design Tokens for KPI Cards */
 :root {
   /* Height (compact SaaS scale) */
-  --kpi-height: 52px;               /* base / mobile */
-  --kpi-height-sm: 54px;            /* tablet */
-  --kpi-height-lg: 56px;            /* desktop */
+  --kpi-height: 42px;               /* base / mobile */
+  --kpi-height-sm: 44px;            /* tablet */
+  --kpi-height-lg: 46px;            /* desktop */
 
   /* Padding */
-  --kpi-padding: 8px 10px;          /* base / mobile: 8-10px */
-  --kpi-padding-sm: 8px 10px;       /* tablet */
-  --kpi-padding-lg: 10px 12px;      /* desktop: 10-12px */
+  --kpi-padding: 5px 7px;           /* base / mobile */
+  --kpi-padding-sm: 6px 8px;        /* tablet */
+  --kpi-padding-lg: 7px 9px;        /* desktop */
 
-  /* Title / Label font (Desktop 11px, Mobile 10px, medium 500) */
-  --kpi-title-font-size: 10px;
-  --kpi-title-font-size-sm: 10.5px;
-  --kpi-title-font-size-lg: 11px;
+  /* Title / Label font (Desktop 9px, Mobile 8px, medium 500) */
+  --kpi-title-font-size: 8px;
+  --kpi-title-font-size-sm: 8.5px;
+  --kpi-title-font-size-lg: 9px;
   --kpi-title-font-weight: 500;
 
-  /* Value font (Desktop 18-20px, Mobile 16-18px, semibold 600) */
-  --kpi-value-font-size: 16px;
-  --kpi-value-font-size-sm: 17px;
-  --kpi-value-font-size-lg: 18px;
+  /* Value font (Desktop 14.5px, Mobile 12.5px, semibold 600) */
+  --kpi-value-font-size: 12.5px;
+  --kpi-value-font-size-sm: 13.5px;
+  --kpi-value-font-size-lg: 14.5px;
   --kpi-value-font-weight: 600;
   --kpi-value-font-numeric: tabular-nums;
 
-  /* Caption / subtitle font (Desktop 10-11px, Mobile 10px) */
-  --kpi-caption-font-size: 10px;
-  --kpi-caption-font-size-sm: 10px;
-  --kpi-caption-font-size-lg: 11px;
+  /* Caption / subtitle font (Desktop 8.5px, Mobile 8px) */
+  --kpi-caption-font-size: 8px;
+  --kpi-caption-font-size-sm: 8px;
+  --kpi-caption-font-size-lg: 8.5px;
   --kpi-caption-font-weight: 400;
 
   /* Icon size (the symbol itself) */
-  --kpi-icon-size: 13px;
-  --kpi-icon-size-sm: 13px;
-  --kpi-icon-size-lg: 14px;
+  --kpi-icon-size: 10px;
+  --kpi-icon-size-sm: 10.5px;
+  --kpi-icon-size-lg: 11px;
 
   /* Icon container (square that holds the icon) */
-  --kpi-icon-container-size: 22px;
-  --kpi-icon-container-size-sm: 22px;
-  --kpi-icon-container-size-lg: 24px;
+  --kpi-icon-container-size: 18px;
+  --kpi-icon-container-size-sm: 19px;
+  --kpi-icon-container-size-lg: 20px;
 
   /* Gap between icon and text */
-  --kpi-gap: 6px;
+  --kpi-gap: 4px;
   --kpi-gap-sm: 5px;
-  --kpi-gap-lg: 6px;
+  --kpi-gap-lg: 5px;
 
   /* Border radius (6px compact SaaS precision) */
   --kpi-radius: 6px;
@@ -108,6 +108,36 @@
   --btn-danger-hover-bg: #fa896b;
   --btn-danger-hover-color: #ffffff;
   --btn-danger-hover-border: #fa896b;
+}
+
+/* KPI Card Surface & Container */
+.kpi-focusable,
+.dash-stat-card,
+.stat-card-surface {
+  background-color: var(--kpi-bg, #ffffff);
+  border: 1px solid var(--kpi-border, #e2e8f0);
+  border-radius: var(--kpi-radius, 6px);
+  box-shadow: var(--kpi-shadow, 0 1px 2px rgba(15, 23, 42, 0.04));
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.kpi-focusable:hover,
+.dash-stat-card:hover,
+.stat-card-surface:hover {
+  border-color: var(--kpi-hover-border, #cbd5e1);
+}
+
+.dark .kpi-focusable,
+.dark .dash-stat-card,
+.dark .stat-card-surface {
+  background-color: var(--kpi-bg-dark, #0f172a);
+  border-color: var(--kpi-border-dark, #334155);
+}
+
+.dark .kpi-focusable:hover,
+.dark .dash-stat-card:hover,
+.dark .stat-card-surface:hover {
+  border-color: var(--kpi-hover-border-dark, #64748b);
 }
 
 /* Ensure keyboard focus is visible (Step 5) */

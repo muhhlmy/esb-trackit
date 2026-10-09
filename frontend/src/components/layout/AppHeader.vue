@@ -4,8 +4,15 @@ import { useRoute, useRouter } from 'vue-router'
 import { useAuth } from '@/composables/useAuth'
 import { useApi } from '@/composables/useApi'
 import { useTicketEvents } from '@/composables/useTicketEvents'
+import { playToneNotification, useNotificationSound, ensureAudioReady } from '@/composables/useNotificationSound'
+import {
+  notificationPermission,
+  requestNotificationPermission,
+  showNativeNotification,
+} from '@/composables/useBrowserPermissions'
 import SkeletonList from '../ui/skeleton/SkeletonList.vue'
 import AppModal from '../ui/AppModal.vue'
+import BrowserPermissionsModal from '../ui/BrowserPermissionsModal.vue'
 
 defineProps({
   isCollapsed: { type: Boolean, default: false },
@@ -17,6 +24,8 @@ const router = useRouter()
 const { user, logout, hasPermission, isSuperAdmin } = useAuth()
 const { get, post } = useApi()
 const { connect: connectSSE, disconnect: disconnectSSE, on: onSSE, off: offSSE } = useTicketEvents()
+const { isSoundEnabled, toggleSound, testSound } = useNotificationSound()
+const showPermissionsModal = ref(false)
 
 // Search & UI State
 const searchQuery = ref('')
@@ -122,7 +131,7 @@ function showRealtimeToast(title, message, nomorTiket = '', type = 'CREATED') {
   if (realtimeToast.value?.timer) clearTimeout(realtimeToast.value.timer)
   const timer = setTimeout(() => {
     realtimeToast.value = null
-  }, 5000)
+  }, 6000)
   realtimeToast.value = {
     id: `toast_${Date.now()}`,
     title,
@@ -131,6 +140,25 @@ function showRealtimeToast(title, message, nomorTiket = '', type = 'CREATED') {
     type,
     timer,
   }
+
+  // Play Tone.js synthesized sound
+  playToneNotification(type)
+
+  // Trigger system desktop notification if permission granted
+  showNativeNotification({
+    title,
+    body: message,
+    icon: '/logo.svg',
+    badge: '/logo.svg',
+    tag: `ticket-${nomorTiket || Date.now()}`,
+    onClick: () => {
+      if (nomorTiket) {
+        router.push({ path: '/tickets', query: { search: nomorTiket } })
+      } else {
+        router.push('/tickets')
+      }
+    },
+  })
 }
 
 function loadNotifications() {
@@ -627,7 +655,7 @@ watch(
 function handleSseTicketCreated(data) {
   if (data && typeof data === 'object') {
     const title = 'Tiket Baru Masuk'
-    const msg = `${data.nomor_tiket ? data.nomor_tiket + ': ' : ''}${data.judul || 'Tanpa Judul'}${data.pelapor ? ' — oleh ' + data.pelapor : ''}`
+    const msg = `${data.nomor_tiket ? data.nomor_tiket + ': ' : ''}${data.judul || 'Tanpa Judul'}${data.pelapor ? ' - oleh ' + data.pelapor : ''}`
     addNotificationItem({
       ticketId: data.id,
       type: 'CREATED',
@@ -654,7 +682,7 @@ function handleSseTicketUpdated(data) {
         ? data.changes.join('. ')
         : 'Detail tiket diperbarui'
     const title = data.nomor_tiket ? `Perubahan Tiket ${data.nomor_tiket}` : 'Perubahan Tiket'
-    const msg = `${data.judul ? data.judul + ' — ' : ''}${changesText}`
+    const msg = `${data.judul ? data.judul + ' - ' : ''}${changesText}`
 
     addNotificationItem({
       ticketId: data.id,
@@ -698,10 +726,23 @@ function handleSseCommentCreated(data) {
   fetchTickets()
 }
 
+function primeAudioOnGesture() {
+  ensureAudioReady()
+  window.removeEventListener('click', primeAudioOnGesture)
+  window.removeEventListener('keydown', primeAudioOnGesture)
+  window.removeEventListener('touchstart', primeAudioOnGesture)
+}
+
 onMounted(() => {
   window.addEventListener('keydown', handleGlobalKeydown)
   window.addEventListener('resize', handleWindowResize)
   document.addEventListener('click', handleClickOutside)
+
+  // Prime Web Audio / Tone.js on first user gesture to comply with browser autoplay rules
+  window.addEventListener('click', primeAudioOnGesture, { once: true, passive: true })
+  window.addEventListener('keydown', primeAudioOnGesture, { once: true, passive: true })
+  window.addEventListener('touchstart', primeAudioOnGesture, { once: true, passive: true })
+
   if (!hasPermission('tickets')) return
   loadNotifications()
   fetchTickets()
@@ -725,27 +766,27 @@ onBeforeUnmount(() => {
 
 <template>
   <header
-    class="app-header relative z-30 flex h-11 md:h-12 items-center justify-between px-2.5 md:px-4 shrink-0 border-b border-[#E5EAEF] dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md"
+    class="app-header relative z-30 flex h-[46px] items-center justify-between px-2.5 md:px-3.5 shrink-0 border-b border-[#E5EAEF] dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md"
   >
     <!-- 1. LEFT: Navigation Drawer Toggle, Brand Logo & Page Titles -->
     <div class="flex items-center gap-2 md:gap-2.5 md:shrink-0 min-w-0">
-      <!-- Brand Logo Mark (Anchored in header beside page title across all screen sizes) -->
+      <!-- Brand Logo Mark (Mobile only; clean logo without background, border, or rounded container) -->
       <RouterLink
         to="/"
         title="Kembali ke Beranda TrackIT"
-        class="flex items-center justify-center shrink-0 h-7 w-7 rounded-lg bg-slate-50 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 hover:bg-[#ECF2FF] dark:hover:bg-slate-700 transition-all active:scale-95 touch-manipulation cursor-pointer"
+        class="flex md:hidden items-center shrink-0"
       >
-        <img src="/logo.svg" alt="TrackIT logo" class="h-4.5 w-4.5 object-contain shrink-0 block" />
+        <img src="/logo.svg" alt="TrackIT logo" class="h-4.5 w-auto object-contain shrink-0 block" />
       </RouterLink>
 
       <div class="min-w-0">
         <h1
-          class="text-xs wrap-anywhere md:truncate md:text-sm font-semibold tracking-tight text-[#333333] dark:text-white leading-tight"
+          class="text-[11px] wrap-anywhere md:truncate md:text-xs font-semibold tracking-tight text-[#333333] dark:text-white leading-tight"
         >
           {{ pageTitle }}
         </h1>
         <p
-          class="hidden md:block truncate text-[11px] font-medium text-[#637288] dark:text-slate-400 leading-relaxed mt-0.5"
+          class="hidden md:block truncate text-[9.5px] font-medium text-[#637288] dark:text-slate-400 leading-normal mt-0.5"
         >
           {{ pageSubtitle }}
         </p>
@@ -766,10 +807,10 @@ onBeforeUnmount(() => {
         :aria-expanded="isSearchOpen"
         aria-controls="global-main-search"
         title="Cari (Ctrl K)"
-        class="hidden md:flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-[#475569] hover:bg-[#F1F5F9] focus-visible:outline-2 focus-visible:outline-[#0A51B0] cursor-pointer"
+        class="hidden md:flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-[#475569] hover:bg-[#F1F5F9] focus-visible:outline-2 focus-visible:outline-[#0A51B0] cursor-pointer"
         @click="initGlobalSearchData"
       >
-        <span aria-hidden="true" class="material-symbols-outlined text-[18px]">search</span>
+        <span aria-hidden="true" class="material-symbols-outlined text-[15px]">search</span>
       </button>
       <form
         v-show="isSearchOpen"
@@ -781,7 +822,7 @@ onBeforeUnmount(() => {
 
         <span
           aria-hidden="true"
-          class="material-symbols-outlined absolute left-2.5 text-[15px] text-[#475569] pointer-events-none transition-colors"
+          class="material-symbols-outlined absolute left-2.5 text-[14px] text-[#475569] pointer-events-none transition-colors"
         >
           search
         </span>
@@ -793,34 +834,34 @@ onBeforeUnmount(() => {
           type="search"
           autocomplete="off"
           :placeholder="searchPlaceholder"
-          class="h-8 w-full rounded-md border border-[#DFE5EF] bg-[#F8FAFC] pl-8 pr-16 text-[11px] font-medium text-[#333333] placeholder-[#5F7089] outline-none transition-all focus:bg-white focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/20 [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden"
+          class="h-7 w-full rounded-md border border-[#DFE5EF] bg-[#F8FAFC] pl-7.5 pr-13 text-[10px] font-medium text-[#333333] placeholder-[#5F7089] outline-none transition-all focus:bg-white focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/20 [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden"
         />
 
         <!-- Action Buttons / Hotkey Indicator -->
-        <div class="absolute right-0 md:right-2 flex items-center gap-1">
+        <div class="absolute right-0 md:right-1.5 flex items-center gap-1">
           <button
             v-if="searchQuery"
             type="button"
             @click="clearSearch"
             aria-label="Bersihkan pencarian"
-            class="flex h-11 w-11 md:h-6 md:w-6 items-center justify-center rounded-full text-[#475569] hover:bg-[#F1F5F9] hover:text-[#333333] transition-all cursor-pointer touch-manipulation"
+            class="flex h-5.5 w-5.5 items-center justify-center rounded-full text-[#475569] hover:bg-[#F1F5F9] hover:text-[#333333] transition-all cursor-pointer touch-manipulation"
             title="Bersihkan Pencarian"
           >
-            <span aria-hidden="true" class="material-symbols-outlined text-[15px]">close</span>
+            <span aria-hidden="true" class="material-symbols-outlined text-[13px]">close</span>
           </button>
 
           <button
             type="submit"
             :disabled="!searchQuery.trim()"
             v-if="searchQuery.trim()"
-            class="hidden md:flex items-center gap-1 rounded-lg bg-[#EFF6FF] px-2.5 py-1 text-[10px] font-extrabold text-[#0A4391] hover:bg-[#0A4391] hover:text-white disabled:opacity-40 transition-all cursor-pointer"
+            class="hidden md:flex items-center gap-1 rounded-md bg-[#EFF6FF] px-1.5 py-0.5 text-[9px] font-extrabold text-[#0A4391] hover:bg-[#0A4391] hover:text-white disabled:opacity-40 transition-all cursor-pointer"
           >
             Cari
           </button>
 
           <kbd
             v-if="!searchQuery"
-            class="hidden md:inline-flex items-center rounded-md border border-[#E2E8F0] bg-white px-1.5 py-0.5 text-[10px] font-mono font-semibold text-[#475569] shadow-2xs"
+            class="hidden md:inline-flex items-center rounded border border-[#E2E8F0] bg-white px-1.5 py-0.5 text-[8.5px] font-mono font-semibold text-[#475569] shadow-2xs"
           >
             Ctrl K
           </kbd>
@@ -1240,7 +1281,7 @@ onBeforeUnmount(() => {
                 :disabled="!searchQuery.trim() || isFetchingSearch"
                 class="text-[#333333] hover:text-[#0A4391] hover:underline font-bold transition-colors cursor-pointer touch-manipulation ml-auto"
               >
-                Lihat Hasil Lengkap →
+                Lihat Hasil Lengkap
               </button>
             </div>
           </div>
@@ -1256,16 +1297,16 @@ onBeforeUnmount(() => {
     </div>
 
     <!-- 3. RIGHT: Actions (Desktop Scale Control, Mobile Search, Notifications, Profile) -->
-    <div class="flex shrink-0 items-center gap-1 sm:gap-1.5 md:gap-2.5 z-40">
+    <div class="flex shrink-0 items-center gap-1 sm:gap-1.5 md:gap-2 z-40">
       <!-- Mobile Search Trigger Button (md:hidden) -->
       <button
         type="button"
         @click="initGlobalSearchData"
         aria-label="Cari Global"
         title="Cari Global (Aset, Tiket, Karyawan, User)"
-        class="flex md:hidden h-8 w-8 items-center justify-center rounded-lg text-[#5F7089] hover:bg-[#F8FAFC] hover:text-[#333333] transition-all cursor-pointer select-none touch-manipulation"
+        class="flex md:hidden h-7 w-7 items-center justify-center rounded-md text-[#5F7089] hover:bg-[#F8FAFC] hover:text-[#333333] transition-all cursor-pointer select-none touch-manipulation"
       >
-        <span aria-hidden="true" class="material-symbols-outlined text-[18px]">search</span>
+        <span aria-hidden="true" class="material-symbols-outlined text-[16px]">search</span>
       </button>
 
       <!-- Notification Bell -->
@@ -1278,16 +1319,16 @@ onBeforeUnmount(() => {
           type="button"
           :title="unreadCount > 0 ? `Notifikasi (${unreadCount})` : 'Notifikasi'"
           @click="toggleNotif"
-          class="relative flex h-8 w-8 items-center justify-center rounded-lg text-[#5F7089] hover:bg-[#F8FAFC] hover:text-[#333333] transition-all cursor-pointer select-none touch-manipulation"
+          class="relative flex h-7 w-7 items-center justify-center rounded-md text-[#5F7089] hover:bg-[#F8FAFC] hover:text-[#333333] transition-all cursor-pointer select-none touch-manipulation"
           :class="isNotifOpen ? 'bg-[#EDF5FF] text-[#333333]' : ''"
         >
-          <span aria-hidden="true" class="material-symbols-outlined text-[18px]"
+          <span aria-hidden="true" class="material-symbols-outlined text-[16px]"
             >notifications</span
           >
           <Transition name="badge-pop">
             <span
               v-if="unreadCount > 0"
-              class="absolute -top-0.5 -right-0.5 flex h-3.5 min-w-[14px] items-center justify-center rounded-full bg-[#0A51B0] px-1 text-[8.5px] font-bold text-white shadow-2xs"
+              class="absolute -top-0.5 -right-0.5 flex h-3.5 min-w-[14px] items-center justify-center rounded-full bg-[#0A51B0] px-1 text-[8px] font-bold text-white shadow-2xs"
               >{{ unreadCount > 9 ? '9+' : unreadCount }}</span
             >
           </Transition>
@@ -1298,46 +1339,86 @@ onBeforeUnmount(() => {
           <div
             v-if="isNotifOpen"
             id="header-notifications"
-            class="header-popover fixed left-3 right-3 top-[4rem] max-h-[calc(100dvh-4.75rem)] flex flex-col md:max-h-[calc(100dvh-4.5rem)] md:absolute md:left-auto md:top-auto md:right-0 md:mt-2 md:w-96 rounded-2xl border border-[#E2E8F0] bg-white shadow-xl z-50 overflow-hidden outline-none"
+            class="header-popover fixed left-3 right-3 top-[3.75rem] max-h-[calc(100dvh-4.75rem)] flex flex-col md:max-h-[calc(100dvh-4.5rem)] md:absolute md:left-auto md:top-auto md:right-0 md:mt-2 md:w-96 rounded-2xl border border-[#E2E8F0] bg-white shadow-xl z-50 overflow-hidden outline-none"
             @click.stop
           >
             <!-- 1. Header -->
             <div
-              class="flex items-center justify-between px-4 py-3 border-b border-[#F1F5F9] bg-white"
+              class="flex items-center justify-between px-3.5 py-2.5 border-b border-[#F1F5F9] bg-white"
             >
-              <div class="flex items-center gap-2">
+              <div class="flex items-center gap-1.5">
                 <span
                   aria-hidden="true"
-                  class="material-symbols-outlined text-[18px] text-[#333333]"
+                  class="material-symbols-outlined text-[16px] text-[#333333]"
                   >notifications</span
                 >
-                <h3 class="text-xs font-bold text-[#333333]">Notifikasi</h3>
+                <h3 class="text-[11px] font-bold text-[#333333]">Notifikasi</h3>
                 <span
                   v-if="unreadCount > 0"
-                  class="inline-flex h-4 min-w-[16px] items-center justify-center rounded-full bg-[#EFF6FF] px-1.5 text-[10px] font-bold text-[#333333] border border-[#BFDBFE]"
+                  class="inline-flex h-3.5 min-w-[14px] items-center justify-center rounded-full bg-[#EFF6FF] px-1 text-[9px] font-bold text-[#333333] border border-[#BFDBFE]"
                   >{{ unreadCount }}</span
                 >
               </div>
+              <div class="flex items-center gap-1">
+                <button
+                  type="button"
+                  @click="toggleSound"
+                  class="flex h-5.5 w-5.5 items-center justify-center rounded-md hover:bg-[#F8FAFC] text-[#5F7089] transition-colors cursor-pointer"
+                  :title="isSoundEnabled ? 'Suara Tone.js Aktif (Klik untuk bisukan)' : 'Suara Senyap (Klik untuk aktifkan)'"
+                  :aria-label="isSoundEnabled ? 'Bisukan suara notifikasi' : 'Aktifkan suara notifikasi'"
+                >
+                  <span aria-hidden="true" class="material-symbols-outlined text-[14px]">
+                    {{ isSoundEnabled ? 'volume_up' : 'volume_off' }}
+                  </span>
+                </button>
+                <button
+                  type="button"
+                  @click="showPermissionsModal = true"
+                  class="flex h-5.5 w-5.5 items-center justify-center rounded-md hover:bg-[#F8FAFC] text-[#5F7089] transition-colors cursor-pointer"
+                  title="Izin & Akses Browser (Notifikasi, Suara, Kamera, File)"
+                  aria-label="Buka pengaturan izin browser"
+                >
+                  <span aria-hidden="true" class="material-symbols-outlined text-[14px]">tune</span>
+                </button>
+                <button
+                  type="button"
+                  @click="isNotifOpen = false"
+                  class="flex h-5.5 w-5.5 items-center justify-center rounded-md hover:bg-[#F8FAFC] text-[#5F7089] transition-colors cursor-pointer"
+                  aria-label="Tutup notifikasi"
+                >
+                  <span aria-hidden="true" class="material-symbols-outlined text-[14px]">close</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Permission Alert Banner -->
+            <div
+              v-if="notificationPermission !== 'granted'"
+              class="px-3 py-1.5 bg-blue-50/90 dark:bg-blue-950/40 border-b border-blue-100 dark:border-blue-900/50 flex items-center justify-between gap-2 text-[10px]"
+            >
+              <div class="flex items-center gap-1 min-w-0 text-[#0A51B0] dark:text-blue-300">
+                <span class="material-symbols-outlined text-[14px] shrink-0">notifications_active</span>
+                <span class="truncate">Aktifkan notifikasi browser & suara</span>
+              </div>
               <button
                 type="button"
-                @click="isNotifOpen = false"
-                class="flex h-6 w-6 items-center justify-center rounded-lg hover:bg-[#F8FAFC] text-[#5F7089] transition-colors cursor-pointer"
-                aria-label="Tutup notifikasi"
+                @click="showPermissionsModal = true"
+                class="shrink-0 h-5 px-1.5 rounded-[4px] bg-[#0A51B0] hover:bg-[#0A4391] text-white text-[9px] font-semibold transition-colors cursor-pointer"
               >
-                <span aria-hidden="true" class="material-symbols-outlined text-[16px]">close</span>
+                Atur Izin
               </button>
             </div>
 
             <!-- 2. Segmented Tab Navigation -->
             <div
-              class="flex items-center gap-1 px-3 py-2 border-b border-[#F1F5F9] bg-[#F8FAFC]/60 overflow-x-auto custom-scrollbar"
+              class="flex items-center gap-1 px-2.5 py-1.5 border-b border-[#F1F5F9] bg-[#F8FAFC]/60 overflow-x-auto custom-scrollbar"
             >
               <button
                 v-for="tab in notifTabs"
                 :key="tab.key"
                 type="button"
                 @click="notifFilter = tab.key"
-                class="flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs transition-all cursor-pointer select-none whitespace-nowrap"
+                class="flex items-center gap-1 rounded-md px-2 py-0.5 text-[10px] transition-all cursor-pointer select-none whitespace-nowrap"
                 :class="
                   notifFilter === tab.key
                     ? 'bg-[#EFF6FF] text-[#333333] font-semibold border border-[#BFDBFE]/60'
@@ -1347,7 +1428,7 @@ onBeforeUnmount(() => {
                 <span>{{ tab.label }}</span>
                 <span
                   v-if="tab.count > 0"
-                  class="text-[10px] px-1 rounded-md"
+                  class="text-[9px] px-1 rounded"
                   :class="notifFilter === tab.key ? 'text-[#333333] font-bold' : 'text-[#687281]'"
                   >{{ tab.count }}</span
                 >
@@ -1464,7 +1545,7 @@ onBeforeUnmount(() => {
         <div v-if="isNotifOpen" class="fixed inset-0 z-40" @click="isNotifOpen = false"></div>
       </div>
 
-      <div class="hidden md:block h-6 w-px bg-[#E5EAEF] mx-1"></div>
+      <div class="hidden md:block h-5 w-px bg-[#E5EAEF] dark:bg-slate-800 mx-0.5"></div>
 
       <!-- User Profile (Top-Right Primary User Identity) -->
       <div class="relative">
@@ -1475,27 +1556,27 @@ onBeforeUnmount(() => {
           aria-label="Menu profil"
           :aria-expanded="isProfileOpen"
           aria-controls="header-profile"
-          class="flex items-center gap-2 rounded-[6px] p-1 transition-all hover:bg-[#F8FAFC] cursor-pointer select-none"
+          class="flex items-center gap-1.5 rounded-lg px-1.5 py-0.5 transition-all hover:bg-[#F8FAFC] cursor-pointer select-none"
           :class="isProfileOpen ? 'bg-[#F8FAFC]' : ''"
         >
           <div
-            class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#0A51B0] text-[11px] font-bold text-white shadow-2xs"
+            class="flex h-6 w-6 shrink-0 items-center justify-center rounded-[5px] bg-[#0A51B0] text-[9.5px] font-bold text-white shadow-2xs"
           >
             {{ (user && user.nama ? user.nama.charAt(0) : 'U').toUpperCase() }}
           </div>
           <div class="hidden text-left lg:block">
-            <p class="text-[11.5px] font-bold text-[#333333] leading-tight truncate max-w-[130px]">
+            <p class="text-[10.5px] font-bold text-[#333333] dark:text-white leading-tight truncate max-w-[125px]">
               {{ user ? user.nama : 'Pengguna' }}
             </p>
             <p
-              class="text-[11px] font-normal text-[#5F7089] leading-tight truncate max-w-[140px] capitalize"
+              class="text-[9px] font-normal text-[#5F7089] dark:text-slate-400 leading-tight truncate max-w-[130px] capitalize"
             >
               {{ user?.role || 'Guest' }} {{ user?.nik ? '· ' + user.nik : '' }}
             </p>
           </div>
           <span
             aria-hidden="true"
-            class="material-symbols-outlined text-[16px] header-profile-chevron text-[#687281] hidden lg:block"
+            class="material-symbols-outlined text-[13px] header-profile-chevron text-[#687281] hidden lg:block"
             >expand_more</span
           >
         </button>
@@ -1505,18 +1586,18 @@ onBeforeUnmount(() => {
           <div
             v-if="isProfileOpen"
             id="header-profile"
-            class="header-popover fixed left-3 right-3 top-[4rem] max-h-[calc(100dvh-4.75rem)] overflow-y-auto md:absolute md:left-auto md:top-auto md:right-0 md:mt-2 md:w-56 rounded-2xl border border-[#E2E8F0] bg-white p-1.5 shadow-xl z-50 outline-none"
+            class="header-popover fixed left-3 right-3 top-[3.75rem] max-h-[calc(100dvh-4.75rem)] overflow-y-auto md:absolute md:left-auto md:top-auto md:right-0 md:mt-2 md:w-56 rounded-2xl border border-[#E2E8F0] bg-white p-1.5 shadow-xl z-50 outline-none"
             @click.stop
           >
             <!-- Account Header -->
-            <div class="px-3 py-2 border-b border-[#F1F5F9] mb-1">
-              <p class="text-xs font-bold text-[#333333] truncate">
+            <div class="px-2.5 py-1.5 border-b border-[#F1F5F9] mb-1">
+              <p class="text-[11px] font-bold text-[#333333] truncate">
                 {{ user ? user.nama : 'Pengguna' }}
               </p>
-              <p class="text-[11px] font-normal text-[#5F7089] truncate capitalize mt-0.5">
+              <p class="text-[9.5px] font-normal text-[#5F7089] truncate capitalize mt-0.5">
                 {{ user?.role || 'Guest' }} {{ user?.nik ? '· ' + user.nik : '' }}
               </p>
-              <p v-if="user?.email" class="text-[11px] text-[#687281] truncate mt-0.5">
+              <p v-if="user?.email" class="text-[9.5px] text-[#687281] truncate mt-0.5">
                 {{ user.email }}
               </p>
             </div>
@@ -1526,27 +1607,45 @@ onBeforeUnmount(() => {
               <button
                 type="button"
                 @click="openMyAssets"
-                class="w-full flex items-center gap-2 rounded-xl px-2.5 py-1.5 text-xs font-medium text-[#334155] hover:bg-[#F8FAFC] hover:text-[#333333] transition-colors text-left cursor-pointer"
+                class="w-full flex items-center gap-2 rounded-lg px-2 py-1 text-[10.5px] font-medium text-[#334155] hover:bg-[#F8FAFC] hover:text-[#333333] transition-colors text-left cursor-pointer"
               >
                 <span
                   aria-hidden="true"
-                  class="material-symbols-outlined text-[16px] text-[#5F7089]"
+                  class="material-symbols-outlined text-[14px] text-[#5F7089]"
                   >badge</span
                 >
-                <span>Aset Saya</span>
+                <span>Profil</span>
               </button>
 
               <button
                 type="button"
                 @click="openChangePassword"
+                class="w-full flex items-center gap-2 rounded-lg px-2 py-1 text-[10.5px] font-medium text-[#334155] hover:bg-[#F8FAFC] hover:text-[#333333] transition-colors text-left cursor-pointer"
+              >
+                <span
+                  aria-hidden="true"
+                  class="material-symbols-outlined text-[14px] text-[#5F7089]"
+                  >key</span
+                >
+                <span>Ganti Password</span>
+              </button>
+
+              <button
+                type="button"
+                @click="
+                  () => {
+                    showPermissionsModal = true
+                    isProfileOpen = false
+                  }
+                "
                 class="w-full flex items-center gap-2 rounded-xl px-2.5 py-1.5 text-xs font-medium text-[#334155] hover:bg-[#F8FAFC] hover:text-[#333333] transition-colors text-left cursor-pointer"
               >
                 <span
                   aria-hidden="true"
                   class="material-symbols-outlined text-[16px] text-[#5F7089]"
-                  >key</span
+                  >tune</span
                 >
-                <span>Ganti Password</span>
+                <span>Izin & Suara Browser</span>
               </button>
 
               <button
@@ -1585,6 +1684,92 @@ onBeforeUnmount(() => {
       </div>
     </div>
   </header>
+
+  <!-- Floating Realtime Toast Notification (Screen Popup) -->
+  <Transition name="dropdown">
+    <div
+      v-if="realtimeToast"
+      role="status"
+      aria-live="polite"
+      class="fixed top-16 right-4 z-50 max-w-sm sm:max-w-md rounded-[6px] border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-3 shadow-xl flex items-start gap-3"
+    >
+      <div
+        class="flex h-8 w-8 shrink-0 items-center justify-center rounded-[6px]"
+        :class="
+          realtimeToast.type === 'CREATED'
+            ? 'bg-blue-100 text-[#0A51B0] dark:bg-blue-900/40 dark:text-blue-300'
+            : realtimeToast.type === 'COMMENT'
+              ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/40 dark:text-emerald-300'
+              : 'bg-amber-100 text-amber-600 dark:bg-amber-900/40 dark:text-amber-300'
+        "
+      >
+        <span class="material-symbols-outlined text-[18px]">
+          {{
+            realtimeToast.type === 'CREATED'
+              ? 'confirmation_number'
+              : realtimeToast.type === 'COMMENT'
+                ? 'chat'
+                : 'edit_note'
+          }}
+        </span>
+      </div>
+      <div class="min-w-0 flex-1">
+        <div class="flex items-center justify-between gap-2">
+          <p class="text-xs font-bold text-slate-900 dark:text-white truncate">
+            {{ realtimeToast.title }}
+          </p>
+          <span
+            v-if="realtimeToast.nomorTiket"
+            class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 shrink-0"
+          >
+            {{ realtimeToast.nomorTiket }}
+          </span>
+        </div>
+        <p class="text-[11px] text-slate-600 dark:text-slate-400 mt-0.5 line-clamp-2 leading-relaxed">
+          {{ realtimeToast.message }}
+        </p>
+        <div class="mt-2 flex items-center gap-2">
+          <button
+            type="button"
+            @click="
+              () => {
+                if (realtimeToast.nomorTiket) {
+                  router.push({ path: '/tickets', query: { search: realtimeToast.nomorTiket } })
+                } else {
+                  router.push('/tickets')
+                }
+                realtimeToast = null
+              }
+            "
+            class="h-6 px-2.5 rounded-[4px] bg-[#0A51B0] hover:bg-[#0A4391] text-white text-[11px] font-semibold transition-colors cursor-pointer"
+          >
+            Lihat Tiket
+          </button>
+          <button
+            type="button"
+            @click="realtimeToast = null"
+            class="h-6 px-2 text-[11px] text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition-colors cursor-pointer"
+          >
+            Tutup
+          </button>
+        </div>
+      </div>
+      <button
+        type="button"
+        @click="realtimeToast = null"
+        class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
+        aria-label="Tutup notifikasi"
+      >
+        <span class="material-symbols-outlined text-[16px]">close</span>
+      </button>
+    </div>
+  </Transition>
+
+  <!-- Modal Izin & Akses Perangkat Browser -->
+  <BrowserPermissionsModal
+    :is-open="showPermissionsModal"
+    @close="showPermissionsModal = false"
+  />
 
   <!-- Modal Ganti Password Akun -->
   <AppModal :is-open="showPasswordModal" title="Ganti Password Akun" @close="closePasswordModal">
@@ -1812,7 +1997,7 @@ onBeforeUnmount(() => {
     right: 0;
     left: auto;
     max-height: min(560px, calc(100dvh - 88px));
-    border-radius: 8px;
+    border-radius: 12px;
     box-shadow: 0 14px 42px #172b4d20;
   }
   .search-filter-tabs {
@@ -1865,7 +2050,8 @@ onBeforeUnmount(() => {
 }
 
 .app-header {
-  border-color: #e3e9f1;
+  height: 46px;
+  border-color: #e5eaef;
   background: #fff;
 }
 .app-header #global-main-search {
@@ -1878,11 +2064,12 @@ onBeforeUnmount(() => {
 .app-header button[aria-label='Menu profil'] > div:first-child {
   background: #eaf1fc;
   color: #234b83;
-  border-radius: 50%;
+  border-radius: 5px;
   box-shadow: none;
 }
 .app-header button[aria-label='Menu profil'] {
-  min-height: 44px;
+  min-height: 28px;
+  height: 28px;
 }
 .app-header button[aria-label='Menu profil'] p:first-child {
   font-weight: 600;
@@ -1892,7 +2079,7 @@ onBeforeUnmount(() => {
 }
 @media (min-width: 768px) {
   .app-header #global-main-search {
-    height: 40px;
+    height: 28px;
   }
 }
 

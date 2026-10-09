@@ -15,7 +15,7 @@ const dictionaries = {
     search_placeholder_nav: 'Cari panduan & artikel...',
     sign_in: 'Masuk',
     dashboard: 'Dashboard',
-    my_asset: 'Aset Saya',
+    my_asset: 'Profil',
     my_tickets: 'Tiket Saya',
     sign_out: 'Keluar',
 
@@ -70,7 +70,7 @@ const dictionaries = {
     search_placeholder_nav: 'Search guides & articles...',
     sign_in: 'Sign In',
     dashboard: 'Dashboard',
-    my_asset: 'My Asset',
+    my_asset: 'Profile',
     my_tickets: 'My Tickets',
     sign_out: 'Sign Out',
 

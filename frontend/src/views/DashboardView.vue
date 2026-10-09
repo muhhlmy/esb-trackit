@@ -136,6 +136,12 @@ const pctDipakai = computed(() => percentage(countDipakai.value, statusChartTota
 const pctTersedia = computed(() => percentage(countTersedia.value, statusChartTotal.value))
 const pctMaintenance = computed(() => percentage(countMaintenance.value, statusChartTotal.value))
 const pctRusak = computed(() => percentage(countRusak.value, statusChartTotal.value))
+const countPerawatanDanRusak = computed(
+  () => countMaintenance.value + countRusak.value,
+)
+const pctPerawatanDanRusak = computed(() =>
+  percentage(countPerawatanDanRusak.value, statusChartTotal.value),
+)
 
 // Kondisi sehat dihitung dari aset berkondisi Baru + Baik, bukan dari status penggunaan.
 // ── Computed: tipe breakdown ─────────────────────────────────
@@ -357,14 +363,13 @@ onUnmounted(() => {
       subtitle="Kondisi aset, status penggunaan, dan aktivitas tiket IT terbaru."
       icon="grid_view"
     />
-    <QuickActions />
     <!-- ════════════════════════════════════════════
          LOADING
          ═════════════════════════════════════════════ -->
     <div v-if="isLoading" class="space-y-4" role="status" aria-live="polite" aria-busy="true">
-      <!-- Row 1: 5 Stat Cards Skeleton -->
+      <!-- Row 1: 4 Stat Cards Skeleton -->
       <div class="dashboard-stats dashboard-stat-skeleton">
-        <SkeletonCard v-for="i in 5" :key="i" variant="summary" />
+        <SkeletonCard v-for="i in 4" :key="i" variant="summary" />
       </div>
 
       <!-- Row 2: Monthly Trend (8 col) + Status Donut (4 col) Skeleton -->
@@ -650,16 +655,9 @@ onUnmounted(() => {
               tone: 'blue',
             },
             {
-              label: 'Rusak',
-              count: countRusak,
-              pct: pctRusak,
-              icon: 'report_problem',
-              tone: 'red',
-            },
-            {
-              label: 'Dalam Perawatan',
-              count: countMaintenance,
-              pct: pctMaintenance,
+              label: 'Perawatan & Rusak',
+              count: countPerawatanDanRusak,
+              pct: pctPerawatanDanRusak,
               icon: 'build',
               tone: 'amber',
             },
@@ -680,6 +678,9 @@ onUnmounted(() => {
           </div>
         </div>
       </div>
+
+      <!-- Quick Access (diposisikan tepat di bawah KPI Cards) -->
+      <QuickActions />
 
       <!-- ─── ROW 2: Line Chart (8 col) + Donut Chart (4 col) ── -->
       <div class="dashboard-chart-grid grid grid-cols-1 xl:grid-cols-12">
@@ -1250,7 +1251,7 @@ onUnmounted(() => {
 }
 .dashboard-stats {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 12px;
 }
 .dash-stat-card {
@@ -1317,21 +1318,29 @@ onUnmounted(() => {
   text-overflow: ellipsis;
 }
 .stat-total {
-  background: white;
-  border-color: #e2e8f0;
+  background: linear-gradient(135deg, #0a51b0 0%, #0a4391 100%);
+  border-color: #0a51b0;
+  color: #ffffff;
+}
+.stat-total:hover {
+  background: linear-gradient(135deg, #094799 0%, #083b7f 100%);
+  border-color: #094799;
 }
 .stat-total .stat-number {
-  color: #333333;
+  color: #ffffff;
 }
 .stat-total .stat-label {
-  color: #5f7089;
+  color: rgba(255, 255, 255, 0.9);
+}
+.stat-total .stat-label-text {
+  color: rgba(255, 255, 255, 0.9);
 }
 .stat-total .stat-label > .material-symbols-outlined {
-  background: #eff6ff;
-  color: #0a51b0;
+  background: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
 }
 .stat-total .stat-caption {
-  color: #64748b;
+  color: rgba(255, 255, 255, 0.85);
 }
 .stat-green {
   --stat-color: #047857;
@@ -1532,7 +1541,7 @@ onUnmounted(() => {
 }
 @media (min-width: 640px) and (max-width: 1023px) {
   .dashboard-stats {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 10px;
   }
   .dash-stat-card {
@@ -1648,6 +1657,21 @@ onUnmounted(() => {
 .dark .dash-stat-card {
   background: var(--kpi-bg-dark);
   border-color: var(--kpi-border-dark);
+}
+.dark .stat-total {
+  background: linear-gradient(135deg, #0a51b0 0%, #0a4391 100%);
+  border-color: #0a51b0;
+}
+.dark .stat-total .stat-number {
+  color: #ffffff;
+}
+.dark .stat-total .stat-label,
+.dark .stat-total .stat-caption {
+  color: rgba(255, 255, 255, 0.9);
+}
+.dark .stat-total .stat-label > .material-symbols-outlined {
+  background: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
 }
 .dark .dash-stat-card .stat-label,
 .dark .dash-stat-card .stat-caption {

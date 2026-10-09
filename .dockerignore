@@ -1,0 +1,26 @@
+# Root .dockerignore for TrackIT stack
+node_modules
+.env
+.env.*
+!.env.example
+!.env.e2e.example
+.git
+.agents
+.claude
+storage
+*.dump
+*.log
+*.pid
+dist
+coverage
+test-results
+playwright-report
+qa-reports
+reports
+.cache
+.backups
+NetSendo
+certificate
+*.crt
+*.key
+*.enc.zip

@@ -15,7 +15,11 @@
     "test:e2e:report": "playwright show-report",
     "docs:manual:pdf": "node scripts/generate-user-manual-pdf.mjs",
     "build:tokens": "node scripts/build-tokens.js",
-    "deploy:frontend": "bash scripts/deploy-frontend.sh"
+    "deploy:frontend": "bash scripts/deploy-frontend.sh",
+    "docker:build": "docker compose build",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down",
+    "docker:logs": "docker compose logs -f"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.13.0",

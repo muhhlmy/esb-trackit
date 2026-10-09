@@ -1,7 +1,6 @@
 <script setup>
 import { computed, ref, watch } from 'vue'
 import AppPagination from '../ui/AppPagination.vue'
-import PageHeader from '../ui/PageHeader.vue'
 import StatCard from '../ui/StatCard.vue'
 import SkeletonTable from '../ui/skeleton/SkeletonTable.vue'
 import { normalizeLocation } from '../../utils/locationNormalizer.js'
@@ -155,17 +154,6 @@ const myDirectSupervisor = computed(() => {
   )
 })
 
-// Rekan satu tim di bawah supervisor yang sama
-const myTeamPeers = computed(() => {
-  if (!myDirectSupervisor.value) return []
-  const myNik = currentManagerInfo.value.nik
-  return props.allEmployees.filter(
-    (e) =>
-      e.nik_atasan_langsung &&
-      String(e.nik_atasan_langsung).trim() === String(myDirectSupervisor.value.nik).trim() &&
-      String(e.nik).trim() !== String(myNik).trim(),
-  )
-})
 
 // Untuk Super Admin: Struktur hierarki per departemen / pimpinan teratas
 const companyOrgRoots = computed(() => {

@@ -134,8 +134,6 @@ function percentage(count, total = totalAssets.value) {
 // Persentase penggunaan untuk bar dan kartu ringkasan.
 const pctDipakai = computed(() => percentage(countDipakai.value, statusChartTotal.value))
 const pctTersedia = computed(() => percentage(countTersedia.value, statusChartTotal.value))
-const pctMaintenance = computed(() => percentage(countMaintenance.value, statusChartTotal.value))
-const pctRusak = computed(() => percentage(countRusak.value, statusChartTotal.value))
 const countPerawatanDanRusak = computed(
   () => countMaintenance.value + countRusak.value,
 )

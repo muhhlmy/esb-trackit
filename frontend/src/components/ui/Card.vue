@@ -1,4 +1,5 @@
 <script setup>
+defineOptions({ name: 'UiCard' })
 defineProps({ padding:{type:String,default:'12px'} })
 </script>
 <template>

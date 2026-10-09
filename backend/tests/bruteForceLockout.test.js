@@ -306,8 +306,11 @@ test('Brute-Force Lockout & Account Protection Suite (DEFECT-04 / SEC-11)', asyn
 
   await t.test('TEST 8 — Failed logins do NOT create sessions in database', async () => {
     resetAllRateLimiters()
-    const freshEmail = `sessiontest.${Date.now()}@company.com`
-    const initialSessionCountRes = await pool.query('SELECT COUNT(*)::int as cnt FROM user_sessions')
+    await resetFailedLogin(testUserEmail)
+    const initialSessionCountRes = await pool.query(
+      'SELECT COUNT(*)::int as cnt FROM user_sessions WHERE user_id = $1',
+      [testUserId],
+    )
     const initialCount = initialSessionCountRes.rows[0].cnt
 
     await makeRequest(
@@ -315,12 +318,15 @@ test('Brute-Force Lockout & Account Protection Suite (DEFECT-04 / SEC-11)', asyn
       '/api/auth/login',
       {},
       {
-        email: freshEmail,
+        email: testUserEmail,
         password: 'WrongPasswordNoSession',
       },
     )
 
-    const finalSessionCountRes = await pool.query('SELECT COUNT(*)::int as cnt FROM user_sessions')
+    const finalSessionCountRes = await pool.query(
+      'SELECT COUNT(*)::int as cnt FROM user_sessions WHERE user_id = $1',
+      [testUserId],
+    )
     const finalCount = finalSessionCountRes.rows[0].cnt
 
     assert.equal(initialCount, finalCount)

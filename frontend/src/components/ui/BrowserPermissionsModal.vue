@@ -5,7 +5,6 @@ import AppBadge from './AppBadge.vue'
 import {
   notificationPermission,
   cameraPermission,
-  clipboardPermission,
   requestNotificationPermission,
   showNativeNotification,
   requestCameraAccess,

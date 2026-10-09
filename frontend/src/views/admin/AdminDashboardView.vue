@@ -12,13 +12,10 @@ import { useViewMode } from '@/composables/useViewMode.js'
 import CustomSelect from '@/components/ui/CustomSelect.vue'
 import AppViewToggle from '@/components/ui/AppViewToggle.vue'
 import {
-  FileText,
   Plus,
   Edit3,
   Trash2,
   Search,
-  CheckCircle,
-  PenTool,
   X,
   ChevronRight,
   FolderOpen,

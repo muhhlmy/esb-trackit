@@ -12,12 +12,10 @@ import { useAuth } from '@/composables/useAuth'
 import { useViewMode } from '@/composables/useViewMode.js'
 import { animateIn, isReducedMotion } from '@/composables/useGsap'
 import {
-  LayoutGrid,
   Plus,
   Edit3,
   Trash2,
   Search,
-  CheckCircle,
   Star,
   X,
   ChevronRight,

@@ -19,11 +19,9 @@ import EmptyState from '../components/ui/EmptyState.vue'
 import ErrorState from '../components/ui/ErrorState.vue'
 import {
   ExternalLink,
-  Package,
   Pencil,
   Search,
   Trash2,
-  Truck,
 } from 'lucide-vue-next'
 
 const { isSuperAdmin, hasWritePermission } = useAuth()

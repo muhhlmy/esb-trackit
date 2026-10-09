@@ -18,7 +18,6 @@ import { useNotificationSound } from '../composables/useNotificationSound.js'
 import {
   notificationPermission,
   cameraPermission,
-  clipboardPermission,
   requestNotificationPermission,
   showNativeNotification,
   requestCameraAccess,

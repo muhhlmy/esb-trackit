@@ -7,7 +7,6 @@ import { useTicketEvents } from '@/composables/useTicketEvents'
 import { playToneNotification, useNotificationSound, ensureAudioReady } from '@/composables/useNotificationSound'
 import {
   notificationPermission,
-  requestNotificationPermission,
   showNativeNotification,
 } from '@/composables/useBrowserPermissions'
 import SkeletonList from '../ui/skeleton/SkeletonList.vue'
@@ -24,7 +23,7 @@ const router = useRouter()
 const { user, logout, hasPermission, isSuperAdmin } = useAuth()
 const { get, post } = useApi()
 const { connect: connectSSE, disconnect: disconnectSSE, on: onSSE, off: offSSE } = useTicketEvents()
-const { isSoundEnabled, toggleSound, testSound } = useNotificationSound()
+const { isSoundEnabled, toggleSound } = useNotificationSound()
 const showPermissionsModal = ref(false)
 
 // Search & UI State

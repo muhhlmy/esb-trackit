@@ -175,9 +175,11 @@ onBeforeUnmount(() => {
         <RouterLink
           v-for="item in items"
           :key="item.to"
+          :to="item.to"
+          @click="isLainnyaOpen = false"
           :aria-label="item.label"
           :aria-current="isItemActive(item.to) ? 'page' : undefined"
-          class="flex flex-col items-center justify-center gap-0.5 px-1 py-0.5 rounded-lg transition-colors min-w-[44px] min-h-[34px] touch-manipulation"
+          class="flex flex-col items-center justify-center gap-0.5 px-1 py-0.5 rounded-lg transition-colors min-w-[44px] min-h-[34px] touch-manipulation cursor-pointer"
           :class="
             isItemActive(item.to)
               ? 'text-[#234B83] bg-[#EAF1FC] font-semibold'
@@ -239,8 +241,10 @@ onBeforeUnmount(() => {
               v-for="item in lainnyaItems"
               :key="item.to"
               :to="item.to"
+              @click="isLainnyaOpen = false"
+              :aria-label="item.label"
               :aria-current="isLainnyaItemActive(item.to) ? 'page' : undefined"
-              class="flex flex-col items-center justify-center gap-1 px-1.5 py-2 rounded-lg transition-colors text-center"
+              class="flex flex-col items-center justify-center gap-1 px-1.5 py-2 rounded-lg transition-colors text-center cursor-pointer"
               :class="
                 isLainnyaItemActive(item.to)
                   ? 'text-[#333333] bg-[#0A51B0]/10 dark:bg-[#0A51B0]/20 font-bold'

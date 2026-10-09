@@ -285,7 +285,7 @@ export function isNavItemVisible(item, gate) {
 
 /**
  * Resolve the Home slot of the mobile bottom nav for the current user.
- * Always returns a real destination — the nav must never lose its Home slot.
+ * Always returns a real destination - the nav must never lose its Home slot.
  *
  * @param {{hasPermission: (k: string|null) => boolean}} gate
  * @returns {{to: string, label: string, lucide: string}}

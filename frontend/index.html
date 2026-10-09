@@ -28,6 +28,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600;1,700;1,800&display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=block" rel="stylesheet" />
 
+    <script>
+      // Catat waktu awal peluncuran flashscreen untuk memastikan durasi tahan 3-5 detik
+      window.__SPLASH_START__ = Date.now();
+    </script>
+
     <style>
       [v-cloak] { display: none !important; }
       .material-symbols-outlined {
@@ -62,8 +67,11 @@
         background-color: #f4f6f9;
         font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
         padding: 16px;
-        transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
         will-change: opacity, transform;
+        cursor: default;
+        user-select: none;
+        -webkit-user-select: none;
       }
 
       #app-splashscreen.splash-hidden {
@@ -78,33 +86,41 @@
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        padding: 32px 36px;
+        padding: 36px 40px;
         background: #ffffff;
-        border-radius: 20px;
-        box-shadow: 0 16px 36px -8px rgba(10, 81, 176, 0.08), 0 4px 12px rgba(15, 23, 42, 0.04);
+        border-radius: 24px;
+        box-shadow: 0 20px 40px -12px rgba(10, 81, 176, 0.1), 0 4px 16px rgba(15, 23, 42, 0.04);
         border: 1px solid rgba(226, 232, 240, 0.85);
         max-width: 320px;
         width: 100%;
         text-align: center;
         animation: splashCardAppear 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+        pointer-events: none;
+        cursor: default;
       }
 
       .splash-logo-container {
         position: relative;
-        width: 78px;
-        height: 78px;
+        width: 84px;
+        height: 84px;
         display: flex;
         align-items: center;
         justify-content: center;
-        margin-bottom: 16px;
+        margin-bottom: 18px;
+        pointer-events: none;
+        cursor: default;
       }
 
       .splash-logo-img {
-        width: 52px;
-        height: 52px;
+        width: 56px;
+        height: 56px;
         object-fit: contain;
         display: block;
-        filter: drop-shadow(0 4px 10px rgba(10, 81, 176, 0.16));
+        filter: drop-shadow(0 4px 12px rgba(10, 81, 176, 0.18));
+        pointer-events: none;
+        user-select: none;
+        -webkit-user-drag: none;
+        cursor: default;
       }
 
       /* vue-spinner: ClipLoader Ring Spinner */
@@ -116,6 +132,7 @@
         border-top-color: #0a51b0;
         border-right-color: #ff4f1b;
         animation: splashClipRotate 0.85s linear infinite;
+        pointer-events: none;
       }
 
       .splash-brand {
@@ -124,6 +141,7 @@
         align-items: center;
         gap: 3px;
         margin-bottom: 18px;
+        pointer-events: none;
       }
 
       .splash-brand-title {
@@ -151,6 +169,7 @@
         justify-content: center;
         gap: 8px;
         margin-bottom: 10px;
+        pointer-events: none;
       }
 
       .splash-pulse-dot {
@@ -161,6 +180,7 @@
         display: inline-block;
         animation: splashPulseStretch 0.75s infinite cubic-bezier(0.2, 0.68, 0.18, 1.08);
         animation-fill-mode: both;
+        pointer-events: none;
       }
 
       .splash-pulse-dot:nth-child(1) {
@@ -183,6 +203,7 @@
         font-weight: 600;
         color: #94a3b8;
         letter-spacing: 0.01em;
+        pointer-events: none;
       }
 
       /* Keyframes */
@@ -223,11 +244,11 @@
     </style>
   </head>
   <body class="bg-[#F4F6F9]">
-    <!-- Flashscreen / Startup Splash Screen -->
+    <!-- Flashscreen / Startup Splash Screen (Tanpa Hover & Ditahan 3-5 Detik Layaknya Native App) -->
     <div id="app-splashscreen" role="status" aria-live="polite" aria-label="Memuat aplikasi ESB-TrackIT">
       <div class="splash-card">
         <div class="splash-logo-container">
-          <img src="/logo.svg" alt="ESB-TrackIT App Logo" class="splash-logo-img" width="52" height="52" />
+          <img src="/logo.svg" alt="ESB-TrackIT App Logo" class="splash-logo-img" width="56" height="56" />
           <div class="splash-clip-ring" aria-hidden="true"></div>
         </div>
         <div class="splash-brand">
@@ -248,7 +269,7 @@
     <div id="app" v-cloak></div>
 
     <script>
-      // Fallback safeguard: jika terjadi latensi jaringan atau script, splashscreen otomatis hilang setelah 4 detik
+      // Fallback safeguard: jika terjadi latensi jaringan atau script, splashscreen otomatis hilang setelah 5.5 detik
       window.addEventListener('load', function () {
         setTimeout(function () {
           var el = document.getElementById('app-splashscreen');
@@ -256,9 +277,9 @@
             el.classList.add('splash-hidden');
             setTimeout(function () {
               if (el && el.parentNode) el.parentNode.removeChild(el);
-            }, 450);
+            }, 500);
           }
-        }, 4000);
+        }, 5500);
       });
     </script>
 

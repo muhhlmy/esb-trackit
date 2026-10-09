@@ -52,14 +52,23 @@ test('PWA ESB-TrackIT & Startup Flashscreen Suite', async (t) => {
     assert.ok(htmlContent.includes('splash-pulse-loader'), 'flashscreen must include PulseLoader dots')
     assert.ok(htmlContent.includes('splash-pulse-dot'), 'flashscreen must include PulseLoader dot keyframes')
     assert.ok(htmlContent.includes('splash-hidden'), 'flashscreen must support splash-hidden transition')
+    // No hover state on logo & card (pointer-events: none, cursor: default)
+    assert.ok(htmlContent.includes('pointer-events: none'), 'flashscreen card and logo must have pointer-events: none')
+    assert.ok(htmlContent.includes('cursor: default'), 'flashscreen must have default cursor')
   })
 
-  await t.test('3. main.js triggers flashscreen dismissal on router.isReady and mount', () => {
+  await t.test('3. main.js holds flashscreen for 3-5 seconds like a native app before dismissal', () => {
     const mainJsPath = path.join(frontendRoot, 'src', 'main.js')
     const mainJsContent = fs.readFileSync(mainJsPath, 'utf-8')
 
     assert.ok(mainJsContent.includes("document.getElementById('app-splashscreen')"))
     assert.ok(mainJsContent.includes("classList.add('splash-hidden')"))
+    assert.ok(mainJsContent.includes('SPLASH_MIN_HOLD_MS'), 'main.js must define SPLASH_MIN_HOLD_MS')
+    // Verify hold time is between 3000ms and 5000ms
+    const match = mainJsContent.match(/SPLASH_MIN_HOLD_MS\s*=\s*(\d+)/)
+    assert.ok(match, 'Must define numeric SPLASH_MIN_HOLD_MS')
+    const holdMs = parseInt(match[1], 10)
+    assert.ok(holdMs >= 3000 && holdMs <= 5000, `Hold duration ${holdMs}ms must be between 3000ms and 5000ms`)
   })
 
   await t.test('4. VueSpinner.vue component implements vue-spinner collection', () => {

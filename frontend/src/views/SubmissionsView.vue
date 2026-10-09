@@ -12,6 +12,7 @@ import { animateStagger } from '../composables/useGsap.js'
 import { escapeHtml, printHtmlDocument } from '../utils/printDocument.js'
 import { normalizeLocation } from '../utils/locationNormalizer.js'
 import ErrorState from '../components/ui/ErrorState.vue'
+import PageHeader from '../components/ui/PageHeader.vue'
 import ConfirmDialog from '../components/ui/ConfirmDialog.vue'
 
 const { get, getAllPages, post, put, del } = useApi()
@@ -941,30 +942,16 @@ onMounted(fetchData)
 
 <template>
   <div
-    class="submissions-page asset-inventory flex min-w-0 flex-col gap-5"
+    class="submissions-page asset-inventory flex min-w-0 flex-col gap-3"
     :data-testid="!isLoading ? 'page-ready' : undefined"
   >
-    <!-- ── Page Header ─────────────────────────────────────────── -->
-    <div
+    <!-- ── Page Header (komponen bersama; sama dengan halaman lain) ─────────── -->
+    <PageHeader
       v-if="isFormOpen"
-      class="submission-page-header flex items-center gap-3 bg-white dark:bg-slate-900 p-2.5 sm:p-3 rounded-[6px] border border-[#E2E8F0]/80 dark:border-slate-800 shadow-2xs"
-    >
-      <div
-        class="flex h-9 w-9 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-[6px] bg-[#EDF5FF] dark:bg-sky-950/50 text-[#0A5DBD] dark:text-sky-400 border border-[#B8D4F5]/40 dark:border-sky-800/50"
-      >
-        <span aria-hidden="true" class="material-symbols-outlined text-[20px] sm:text-[22px]"
-          >assignment</span
-        >
-      </div>
-      <div class="min-w-0">
-        <h1 class="text-[16px] sm:text-[18px] font-semibold text-[#333333] dark:text-white tracking-tight truncate">
-          Formulir Serah Terima Aset
-        </h1>
-        <p class="text-[10px] sm:text-[11px] font-normal text-[#5F7089] dark:text-slate-400 mt-0.5 truncate">
-          Dokumentasi &amp; Berita Acara Serah Terima (BAST) perangkat IT &amp; inventaris
-        </p>
-      </div>
-    </div>
+      title="Formulir Serah Terima Aset"
+      subtitle="Dokumentasi & Berita Acara Serah Terima (BAST) perangkat IT & inventaris"
+      icon="assignment"
+    />
 
     <ol v-if="isFormOpen" class="submission-steps" aria-label="Tahapan pengisian">
       <li><span>1</span>Pihak terkait</li>
@@ -982,37 +969,33 @@ onMounted(fetchData)
       {{ saveMessage }}
     </div>
 
+    <!-- ── Page Header mode daftar (komponen bersama) ──────────── -->
+    <PageHeader
+      v-if="!isLoading && !isFormOpen"
+      title="Riwayat BAST / Pengajuan"
+      subtitle="Kelola dokumen serah terima seperti daftar Aset IT."
+      icon="assignment"
+    >
+      <button
+        v-if="canWriteSubmissions"
+        type="button"
+        class="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-[6px] bg-[#0A51B0] px-3 text-xs font-semibold text-white hover:bg-[#0A4391] transition-colors"
+        @click="router.push('/submissions/new')"
+      >
+        <span aria-hidden="true" class="material-symbols-outlined text-[16px]">add</span>BAST
+        Baru
+      </button>
+    </PageHeader>
+
     <section
       v-if="!isLoading && !isFormOpen"
       class="submission-history"
-      aria-labelledby="submission-history-title"
+      aria-label="Riwayat pengajuan BAST"
     >
       <div
         class="asset-toolbar flex flex-col gap-2.5 rounded-[6px] border border-[#E2E8F0]/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-2.5 sm:p-3 shadow-2xs"
       >
-        <div class="flex items-center justify-between gap-2.5">
-          <div>
-            <h2
-              id="submission-history-title"
-              class="text-sm font-semibold tracking-tight text-[#333333] dark:text-white"
-            >
-              Riwayat BAST / Pengajuan
-            </h2>
-            <p class="mt-0.5 text-[11px] text-[#5F7089] dark:text-slate-400">
-              Kelola dokumen serah terima seperti daftar Aset IT.
-            </p>
-          </div>
-          <button
-            v-if="canWriteSubmissions"
-            type="button"
-            class="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-[6px] bg-[#0A51B0] px-3 text-xs font-semibold text-white hover:bg-[#0A4391] transition-colors"
-            @click="router.push('/submissions/new')"
-          >
-            <span aria-hidden="true" class="material-symbols-outlined text-[16px]">add</span>BAST
-            Baru
-          </button>
-        </div>
-        <div class="grid grid-cols-1 items-center gap-2 border-t border-[#F1F5F9] dark:border-slate-800 pt-2">
+        <div class="grid grid-cols-1 items-center gap-2">
           <input
             v-model="searchQuery"
             type="search"
@@ -1190,7 +1173,7 @@ onMounted(fetchData)
       v-if="isLoading || isDetailLoading"
       role="status"
       aria-busy="true"
-      class="flex flex-col gap-5 select-none"
+      class="flex flex-col gap-3 select-none"
     >
       <!-- Section 1 Skeleton: Profil Pihak Terkait -->
       <div
@@ -1652,7 +1635,7 @@ onMounted(fetchData)
         </div>
 
         <!-- Section 3 & 4: Data Serah Terima Aset (Baru & Lama) -->
-        <div class="submission-assets-grid grid grid-cols-1 gap-5 xl:grid-cols-2">
+        <div class="submission-assets-grid grid grid-cols-1 gap-3 xl:grid-cols-2">
           <!-- Aset Baru (Diserahkan) -->
           <div
             class="submission-section bg-white rounded-[6px] border border-[#E2E8F0]/80 p-3 sm:p-4 shadow-2xs flex flex-col gap-3"
@@ -2198,7 +2181,7 @@ onMounted(fetchData)
 }
 .submission-assets-grid {
   align-items: start;
-  gap: 14px;
+  gap: 12px;
 }
 .submission-form .submission-section {
   gap: 12px;
@@ -2271,25 +2254,6 @@ onMounted(fetchData)
   background: #edf5ff;
   font-size: 11px;
   font-weight: 650;
-}
-.submission-page-header h1,
-.submission-page-header p {
-  white-space: normal;
-  overflow: visible;
-}
-.submission-page-header {
-  padding: 10px 12px;
-  border-radius: 6px;
-  align-items: flex-start;
-}
-.submission-page-header h1 {
-  font-size: 18px;
-  line-height: 1.3;
-}
-.submission-page-header p {
-  margin-top: 2px;
-  font-size: 11px;
-  line-height: 1.4;
 }
 .submission-form {
   padding: 0;

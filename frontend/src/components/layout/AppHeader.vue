@@ -1475,7 +1475,7 @@ onBeforeUnmount(() => {
           aria-label="Menu profil"
           :aria-expanded="isProfileOpen"
           aria-controls="header-profile"
-          class="flex items-center gap-2 rounded-xl p-1.5 transition-all hover:bg-[#F8FAFC] cursor-pointer select-none"
+          class="flex items-center gap-2 rounded-[6px] p-1 transition-all hover:bg-[#F8FAFC] cursor-pointer select-none"
           :class="isProfileOpen ? 'bg-[#F8FAFC]' : ''"
         >
           <div
@@ -1812,7 +1812,7 @@ onBeforeUnmount(() => {
     right: 0;
     left: auto;
     max-height: min(560px, calc(100dvh - 88px));
-    border-radius: 12px;
+    border-radius: 8px;
     box-shadow: 0 14px 42px #172b4d20;
   }
   .search-filter-tabs {

@@ -1,5 +1,6 @@
 <script setup>
 import AppModal from '../../components/ui/AppModal.vue'
+import PageHeader from '../../components/ui/PageHeader.vue'
 import { ref, computed, onMounted, nextTick } from 'vue'
 import { useRouter, RouterLink } from 'vue-router'
 import { useCases } from '@/composables/useCases'
@@ -161,42 +162,31 @@ function getCategoryBadgeClass(category) {
 </script>
 
 <template>
-  <div ref="mainScope" class="cms-page w-full max-w-7xl mx-auto space-y-4 sm:space-y-6 font-sans">
-    <!-- Page header scrolls with the content -->
-    <div
-      class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 bg-white dark:bg-slate-900 border border-[#E5EAEF] dark:border-slate-800 p-3.5 sm:p-4 rounded-xl shadow-2xs gsap-admin-el"
+  <div ref="mainScope" class="cms-page w-full max-w-7xl mx-auto space-y-3 font-sans">
+    <!-- ── Page Header (komponen bersama; sama dengan halaman lain) ── -->
+    <PageHeader
+      class="gsap-admin-el"
+      title="Knowledge Base"
+      subtitle="Kelola panduan teknis dan artikel bantuan pengguna."
+      icon="auto_stories"
     >
-      <div class="space-y-1 sm:space-y-1.5 w-full sm:w-auto">
-        <!-- Breadcrumb -->
-        <div
-          class="flex items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs font-semibold text-[#5F7089] dark:text-slate-400"
+      <template #eyebrow>
+        <RouterLink
+          to="/dashboard"
+          class="hover:text-[#333333] transition-colors flex items-center gap-1"
         >
-          <RouterLink
-            to="/dashboard"
-            class="hover:text-[#333333] transition-colors flex items-center gap-1"
-          >
-            <span>Dashboard</span>
-          </RouterLink>
-          <ChevronRight class="w-3 h-3 sm:w-3.5 sm:h-3.5 text-slate-400" />
-          <span class="text-[#333333] dark:text-slate-200 font-bold">Admin CMS</span>
-        </div>
-
-        <h1
-          class="text-sm sm:text-base font-bold text-[#333333] dark:text-white tracking-tight flex items-center gap-2"
+          <span>Dashboard</span>
+        </RouterLink>
+        <ChevronRight class="w-3 h-3 text-slate-400" />
+        <span class="text-[#333333] dark:text-slate-200 font-semibold">Admin CMS</span>
+      </template>
+      <template #title-suffix>
+        <span
+          class="text-[10px] sm:text-[11px] px-2 py-0.5 rounded-full font-medium bg-[#ECF2FF] dark:bg-indigo-950/80 text-[#0A51B0] dark:text-indigo-300 border border-[#0A51B0]/20"
         >
-          <span>Knowledge Base</span>
-          <span
-            class="text-[10px] sm:text-[11px] px-2 py-0.5 rounded-full font-bold bg-[#ECF2FF] dark:bg-indigo-950/80 text-[#0A51B0] dark:text-indigo-300 border border-[#0A51B0]/20"
-          >
-            Admin CMS
-          </span>
-        </h1>
-
-        <p class="text-xs text-[#5F7089] dark:text-slate-400 font-medium">
-          Kelola panduan teknis dan artikel bantuan pengguna.
-        </p>
-      </div>
-
+          Admin CMS
+        </span>
+      </template>
       <button
         v-if="canWrite"
         @click="createNewDoc"
@@ -205,7 +195,7 @@ function getCategoryBadgeClass(category) {
         <Plus class="w-3.5 h-3.5" />
         <span>Dokumen Baru</span>
       </button>
-    </div>
+    </PageHeader>
 
     <!-- Quick Nav: Kelola Kategori KB -->
     <div class="gsap-admin-el">
@@ -736,12 +726,6 @@ function getCategoryBadgeClass(category) {
 <style scoped>
 /* Ukuran mengikuti token & aturan global (h1 18/16px, tombol 12px/32px,
    tabel kompak) — sejajar dengan admin-workspace.css di halaman admin lain. */
-.cms-page > div:first-child {
-  background: transparent;
-  border: 0;
-  padding: 4px 0 12px;
-  box-shadow: none;
-}
 .cms-page table th {
   font-weight: 600;
   text-transform: none;

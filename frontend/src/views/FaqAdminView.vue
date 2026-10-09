@@ -8,6 +8,7 @@ import { useAuth } from '../composables/useAuth.js'
 import { useKbCategories } from '../composables/useKbCategories.js'
 import AppModal from '../components/ui/AppModal.vue'
 import CustomSelect from '../components/ui/CustomSelect.vue'
+import PageHeader from '../components/ui/PageHeader.vue'
 import {
   Plus,
   Edit3,
@@ -259,50 +260,36 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="kb-management admin-workspace max-w-7xl mx-auto space-y-6 select-none font-sans">
-    <!-- Top Navigation & Header Card -->
-    <div
-      class="faq-page-header flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3.5 bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 p-3 rounded-[6px] shadow-2xs"
+  <div class="kb-management admin-workspace max-w-7xl mx-auto space-y-3 select-none font-sans">
+    <!-- ── Page Header (komponen bersama; sama dengan halaman lain) ── -->
+    <PageHeader
+      title="Atur FAQ"
+      subtitle="Kelola daftar pertanyaan dan jawaban yang tampil di Help Center publik."
+      icon="quiz"
     >
-      <div class="space-y-1 sm:space-y-1.5 w-full sm:w-auto">
-        <!-- Breadcrumb -->
-        <div
-          class="flex items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs font-semibold text-[#5F7089] dark:text-slate-400"
+      <template #eyebrow>
+        <RouterLink to="/" class="hover:text-[#333333] dark:hover:text-white transition-colors flex items-center gap-1">
+          <span>Help Center</span>
+        </RouterLink>
+        <ChevronRight class="w-3 h-3 text-slate-400" />
+        <span class="text-[#333333] dark:text-white font-semibold">Atur FAQ</span>
+      </template>
+      <template #title-suffix>
+        <span
+          class="text-[10px] sm:text-[11px] px-2 py-0.5 rounded-full font-medium bg-[#ECF2FF] dark:bg-indigo-950/80 text-[#0A51B0] dark:text-indigo-300 border border-[#0A51B0]/20"
         >
-          <RouterLink to="/" class="hover:text-[#333333] dark:hover:text-white transition-colors flex items-center gap-1">
-            <span>Help Center</span>
-          </RouterLink>
-          <ChevronRight class="w-3 h-3 text-slate-400" />
-          <span class="text-[#333333] dark:text-white font-bold">Atur FAQ</span>
-        </div>
-
-        <h1
-          class="text-base sm:text-lg font-bold text-[#333333] dark:text-white tracking-tight flex items-center gap-2 flex-wrap"
-        >
-          <span>Atur FAQ</span>
-          <span
-            class="text-[10px] sm:text-[11px] px-2 py-0.5 rounded-full font-bold bg-[#ECF2FF] dark:bg-indigo-950/80 text-[#0A51B0] dark:text-indigo-300 border border-[#0A51B0]/20"
-          >
-            Admin CMS
-          </span>
-        </h1>
-
-        <p
-          class="text-[11px] sm:text-xs text-[#5F7089] dark:text-slate-400 font-medium leading-relaxed"
-        >
-          Kelola daftar pertanyaan dan jawaban yang tampil di Help Center publik.
-        </p>
-      </div>
-
+          Admin CMS
+        </span>
+      </template>
       <button
         v-if="canWrite"
         @click="openAdd"
-        class="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 h-8.5 sm:h-8 px-3.5 sm:px-4 rounded-lg text-xs font-semibold bg-[#0A51B0] hover:bg-[#0A4391] text-white shadow-2xs transition-all cursor-pointer shrink-0"
+        class="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 h-8 px-3.5 rounded-[6px] text-xs font-semibold bg-[#0A51B0] hover:bg-[#0A4391] text-white shadow-2xs transition-all cursor-pointer shrink-0"
       >
         <Plus class="w-3.5 h-3.5" />
         <span>Tambah FAQ</span>
       </button>
-    </div>
+    </PageHeader>
 
     <!-- Quick Metrics Grid (3 Columns Balanced) -->
     <div class="grid grid-cols-3 gap-2 sm:gap-2.5 lg:gap-3">

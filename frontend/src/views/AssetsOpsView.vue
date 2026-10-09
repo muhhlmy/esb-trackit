@@ -6,6 +6,7 @@ import { animateStagger } from '../composables/useGsap.js'
 import { useViewMode } from '../composables/useViewMode.js'
 import AppViewToggle from '../components/ui/AppViewToggle.vue'
 import StatCard from '../components/ui/StatCard.vue'
+import PageHeader from '../components/ui/PageHeader.vue'
 import { normalizeLocation } from '../utils/locationNormalizer.js'
 import { formatCurrency } from '../utils/currencyFormatter.js'
 import AppModal from '../components/ui/AppModal.vue'
@@ -404,67 +405,59 @@ function formatDate(dateStr) {
     class="asset-workspace asset-inventory inventory-polish space-y-3"
     :data-testid="!isLoading ? 'page-ready' : undefined"
   >
-    <!-- Simplified SaaS Header & Toolbar Container (sticky mengikuti scroll) -->
+    <!-- ── Page Header (komponen bersama; sama dengan halaman lain) ── -->
+    <PageHeader
+      title="Aset Ops"
+      subtitle="Kelola perangkat & mesin operasional outlet / store (POS, KIOSK, Payment, Display)."
+      icon="precision_manufacturing"
+    >
+      <div class="inventory-actions flex shrink-0 items-center gap-1.5">
+        <button
+          v-if="canWriteAssets"
+          type="button"
+          @click="openAdd"
+          class="inventory-primary-action inline-flex h-8 items-center justify-center gap-1.5 whitespace-nowrap rounded-[6px] bg-[#0A51B0] px-3 text-[11px] sm:text-[12px] font-semibold text-white shadow-2xs transition-all hover:bg-[#0A4391]"
+          title="Tambah Aset Ops baru"
+        >
+          <span aria-hidden="true" class="material-symbols-outlined text-[16px]">add</span>
+          <span>Tambah Aset Ops</span>
+        </button>
+        <div
+          class="inventory-action-group flex items-center gap-1 rounded-[6px] border border-[#D7E3F2] dark:border-slate-700 bg-[#F8FAFC] dark:bg-slate-800 p-0.5"
+        >
+          <button
+            v-if="canWriteAssets"
+            type="button"
+            @click="showImportModal = true"
+            class="inventory-action-button inline-flex h-7 items-center gap-1 rounded-[6px] px-2 text-[11px] font-semibold text-[#0A51B0] dark:text-blue-400 hover:bg-white dark:hover:bg-slate-700"
+            title="Impor data Aset Ops dari Excel"
+          >
+            <span aria-hidden="true" class="material-symbols-outlined text-[15px]"
+              >upload_file</span
+            >Import
+          </button>
+          <button
+            type="button"
+            @click="showExportModal = true"
+            class="inventory-action-button inline-flex h-7 items-center gap-1 rounded-[6px] px-2 text-[11px] font-semibold text-[#0A51B0] dark:text-blue-400 hover:bg-white dark:hover:bg-slate-700"
+            title="Export data Aset Ops"
+          >
+            <span aria-hidden="true" class="material-symbols-outlined text-[15px]"
+              >download</span
+            >Export
+          </button>
+        </div>
+      </div>
+    </PageHeader>
+
+    <!-- Toolbar sticky mengikuti scroll (app-main adalah scroll container) -->
     <div class="asset-toolbar-sticky">
       <div
-        class="asset-toolbar flex flex-col gap-2.5 sm:gap-3 bg-white dark:bg-slate-900 p-2.5 sm:p-3 rounded-[6px] border border-[#E2E8F0] dark:border-slate-800 shadow-2xs"
+        class="asset-toolbar flex flex-col gap-2.5 bg-white dark:bg-slate-900 p-2.5 sm:p-3 rounded-[6px] border border-[#E2E8F0] dark:border-slate-800 shadow-2xs"
       >
-        <!-- Row 1: Page Title & Primary CTA -->
-        <div class="flex items-center justify-between gap-2.5">
-          <div class="min-w-0">
-            <h1 class="text-[16px] sm:text-[18px] font-semibold text-[#333333] dark:text-white tracking-tight truncate">
-              Aset Ops
-            </h1>
-            <p
-              class="text-[10px] sm:text-[11px] text-[#5F7089] dark:text-slate-400 mt-0.5 leading-normal line-clamp-1 sm:line-clamp-none"
-            >
-              Kelola perangkat & mesin operasional outlet / store (POS, KIOSK, Payment, Display).
-            </p>
-          </div>
-
-          <!-- Primary Action CTA -->
-          <div class="inventory-actions flex shrink-0 items-center gap-1.5">
-            <button
-              v-if="canWriteAssets"
-              type="button"
-              @click="openAdd"
-              class="inventory-primary-action inline-flex h-8 items-center justify-center gap-1.5 whitespace-nowrap rounded-[6px] bg-[#0A51B0] px-3 text-[11px] sm:text-[12px] font-semibold text-white shadow-2xs transition-all hover:bg-[#0A4391]"
-              title="Tambah Aset Ops baru"
-            >
-              <span aria-hidden="true" class="material-symbols-outlined text-[16px]">add</span>
-              <span>Tambah Aset Ops</span>
-            </button>
-            <div
-              class="inventory-action-group flex items-center gap-1 rounded-[6px] border border-[#D7E3F2] dark:border-slate-700 bg-[#F8FAFC] dark:bg-slate-800 p-0.5"
-            >
-              <button
-                v-if="canWriteAssets"
-                type="button"
-                @click="showImportModal = true"
-                class="inventory-action-button inline-flex h-7 items-center gap-1 rounded-[6px] px-2 text-[11px] font-semibold text-[#0A51B0] dark:text-blue-400 hover:bg-white dark:hover:bg-slate-700"
-                title="Impor data Aset Ops dari Excel"
-              >
-                <span aria-hidden="true" class="material-symbols-outlined text-[15px]"
-                  >upload_file</span
-                >Import
-              </button>
-              <button
-                type="button"
-                @click="showExportModal = true"
-                class="inventory-action-button inline-flex h-7 items-center gap-1 rounded-[6px] px-2 text-[11px] font-semibold text-[#0A51B0] dark:text-blue-400 hover:bg-white dark:hover:bg-slate-700"
-                title="Export data Aset Ops"
-              >
-                <span aria-hidden="true" class="material-symbols-outlined text-[15px]"
-                  >download</span
-                >Export
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Row 2: Search, Filters & Actions -->
+        <!-- Search, Filters & Actions -->
         <div
-          class="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 w-full min-w-0 pt-2 border-t border-[#F1F5F9] dark:border-slate-800"
+          class="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 w-full min-w-0"
         >
           <!-- Search Input -->
           <div class="relative h-8 w-full sm:flex-1 sm:min-w-[200px]">

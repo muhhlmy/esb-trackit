@@ -1238,19 +1238,4 @@ onMounted(() => {
   z-index: auto;
   top: auto;
 }
-/* Pertahankan padding tebal dari class inline (p-3.5 sm:p-4.5);
-   admin-workspace.css menimpanya dengan padding 4px 0 8px karena
-   specificity lebih tinggi, sehingga header terlihat menempel. */
-.admin-workspace .admin-page-header {
-  padding: 8px 10px;
-  border: 1px solid rgba(226, 232, 240, 0.8);
-  border-radius: 6px;
-  background: #ffffff;
-  box-shadow: 0 1px 2px rgba(23, 43, 77, 0.04);
-}
-@media (min-width: 640px) {
-  .admin-workspace .admin-page-header {
-    padding: 10px 12px;
-  }
-}
 </style>

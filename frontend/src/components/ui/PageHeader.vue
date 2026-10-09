@@ -8,6 +8,11 @@
  *   icon       – Material Symbols Outlined icon name (optional)
  *   iconBg     – Background color class for the icon container (default: bg-[#EDF5FF])
  *   iconColor  – Text color class for the icon (default: text-[#0A51B0])
+ *
+ * Slots:
+ *   default      – Page-level actions, right-aligned (buttons, action groups)
+ *   eyebrow       – Optional breadcrumb / section label above the title
+ *   title-suffix  – Optional inline badge rendered beside the title
  */
 defineProps({
   title: { type: String, required: true },
@@ -31,11 +36,22 @@ defineProps({
         }}</span>
       </div>
       <div class="min-w-0">
-        <h1
-          class="page-header-title text-[16px] sm:text-[18px] font-semibold text-[#333333] dark:text-slate-100 tracking-tight truncate"
+        <div
+          v-if="$slots.eyebrow"
+          class="page-header-eyebrow flex items-center gap-1.5 text-[10px] sm:text-[11px] font-medium text-[#5F7089] dark:text-slate-400 mb-0.5"
         >
-          {{ title }}
-        </h1>
+          <slot name="eyebrow" />
+        </div>
+        <div class="flex min-w-0 items-center gap-2">
+          <h1
+            class="page-header-title text-[16px] sm:text-[18px] font-semibold text-[#333333] dark:text-slate-100 tracking-tight truncate"
+          >
+            {{ title }}
+          </h1>
+          <span v-if="$slots['title-suffix']" class="page-header-title-suffix shrink-0">
+            <slot name="title-suffix" />
+          </span>
+        </div>
         <p
           v-if="subtitle"
           class="page-header-subtitle text-[10px] sm:text-[11px] font-normal text-[#5F7089] dark:text-slate-400 mt-0.5 truncate"

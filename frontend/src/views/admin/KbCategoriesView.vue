@@ -1,5 +1,6 @@
 <script setup>
 import AppModal from '../../components/ui/AppModal.vue'
+import PageHeader from '../../components/ui/PageHeader.vue'
 import { ref, computed, onMounted, nextTick } from 'vue'
 import { RouterLink } from 'vue-router'
 import { useKbCategories } from '@/composables/useKbCategories'
@@ -189,49 +190,36 @@ function clearFilters() {
 <template>
   <div
     ref="mainScope"
-    class="kb-management admin-workspace w-full max-w-7xl mx-auto space-y-6 font-sans"
+    class="kb-management admin-workspace w-full max-w-7xl mx-auto space-y-3 font-sans"
   >
-    <!-- Header Card -->
-    <div
-      class="admin-page-header ws-toolbar-flat flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 p-2.5 sm:p-3 rounded-[6px] shadow-2xs gsap-admin-el"
+    <!-- ── Page Header (komponen bersama; sama dengan halaman lain) ── -->
+    <PageHeader
+      class="gsap-admin-el"
+      title="Kategori Knowledge Base"
+      subtitle="Kelola topic cards yang tampil di halaman Browse Topics Help Center."
+      icon="category"
     >
-      <div class="space-y-0.5 sm:space-y-1 w-full sm:w-auto">
-        <!-- Breadcrumb -->
-        <div
-          class="flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-[11px] font-medium text-[#5F7089] dark:text-slate-400"
+      <template #eyebrow>
+        <RouterLink
+          to="/dashboard"
+          class="hover:text-[#333333] dark:hover:text-white transition-colors flex items-center gap-1"
         >
-          <RouterLink
-            to="/dashboard"
-            class="hover:text-[#333333] dark:hover:text-white transition-colors flex items-center gap-1"
-          >
-            <span>Dashboard</span>
-          </RouterLink>
-          <ChevronRight class="w-3 h-3 text-slate-400" />
-          <RouterLink to="/admin/cases" class="hover:text-[#333333] dark:hover:text-white transition-colors">
-            <span>Admin CMS</span>
-          </RouterLink>
-          <ChevronRight class="w-3 h-3 text-slate-400" />
-          <span class="text-[#333333] dark:text-white font-semibold">Kategori</span>
-        </div>
-
-        <h1
-          class="text-[16px] sm:text-[18px] font-semibold text-[#333333] dark:text-white tracking-tight flex items-center gap-2 flex-wrap"
+          <span>Dashboard</span>
+        </RouterLink>
+        <ChevronRight class="w-3 h-3 text-slate-400" />
+        <RouterLink to="/admin/cases" class="hover:text-[#333333] dark:hover:text-white transition-colors">
+          <span>Admin CMS</span>
+        </RouterLink>
+        <ChevronRight class="w-3 h-3 text-slate-400" />
+        <span class="text-[#333333] dark:text-white font-semibold">Kategori</span>
+      </template>
+      <template #title-suffix>
+        <span
+          class="text-[10px] sm:text-[11px] px-2 py-0.5 rounded-full font-medium bg-[#ECF2FF] dark:bg-indigo-950/80 text-[#0A51B0] dark:text-indigo-300 border border-[#0A51B0]/20"
         >
-          <span>Kategori Knowledge Base</span>
-          <span
-            class="text-[10px] sm:text-[11px] px-2 py-0.5 rounded-full font-medium bg-[#ECF2FF] dark:bg-indigo-950/80 text-[#0A51B0] dark:text-indigo-300 border border-[#0A51B0]/20"
-          >
-            Admin CMS
-          </span>
-        </h1>
-
-        <p
-          class="text-[10px] sm:text-[11px] text-[#5F7089] dark:text-slate-400 leading-normal"
-        >
-          Kelola topic cards yang tampil di halaman Browse Topics Help Center.
-        </p>
-      </div>
-
+          Admin CMS
+        </span>
+      </template>
       <button
         v-if="canWrite"
         @click="openCreateDrawer"
@@ -240,7 +228,7 @@ function clearFilters() {
         <Plus class="w-3.5 h-3.5" />
         <span>Kategori Baru</span>
       </button>
-    </div>
+    </PageHeader>
 
     <!-- Stats Row (3 Columns Balanced) -->
     <div class="grid grid-cols-3 gap-2 sm:gap-2.5 lg:gap-3 gsap-admin-el">

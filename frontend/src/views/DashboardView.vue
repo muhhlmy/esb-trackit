@@ -9,6 +9,7 @@ import { useAuth } from '../composables/useAuth.js'
 import { onTicketEvent } from '../composables/useTicketRealtime.js'
 import AppBadge from '../components/ui/AppBadge.vue'
 import PageHeader from '../components/ui/PageHeader.vue'
+import PanelCard from '../components/ui/PanelCard.vue'
 import QuickActions from '../components/dashboard/QuickActions.vue'
 import { getAssetStatusLabel } from '../utils/assetStatus.js'
 import { normalizeLocation } from '../utils/locationNormalizer.js'
@@ -682,92 +683,88 @@ onUnmounted(() => {
 
       <!-- ─── ROW 2: Line Chart (8 col) + Donut Chart (4 col) ── -->
       <div class="dashboard-chart-grid grid grid-cols-1 xl:grid-cols-12">
-        <div class="xl:col-span-8 dashboard-panel">
-          <div class="flex items-center justify-between">
-            <h3>Tren Aset Bulanan</h3>
-          </div>
-          <AssetTrendLineChart
-            class="w-full"
-            :data="stats.monthlyTrend || []"
-            :loading="isLoading"
-            :error="error"
-            :height="260"
-            embedded
-          />
+        <div class="xl:col-span-8">
+          <PanelCard title="Tren Aset Bulanan">
+            <AssetTrendLineChart
+              class="w-full"
+              :data="stats.monthlyTrend || []"
+              :loading="isLoading"
+              :error="error"
+              :height="260"
+              embedded
+            />
+          </PanelCard>
         </div>
-        <div class="xl:col-span-4 dashboard-panel">
-          <div class="flex items-center justify-between">
-            <h3>Status Aset</h3>
-          </div>
+        <div class="xl:col-span-4">
+          <PanelCard title="Status Aset">
+            <!-- Empty State -->
+            <template v-if="!stats?.byStatus || stats.byStatus.length === 0">
+              <div class="py-6 text-center">
+                <p class="text-xs text-[#5B6B84]">Belum ada data status.</p>
+              </div>
+            </template>
 
-          <!-- Empty State -->
-          <template v-if="!stats?.byStatus || stats.byStatus.length === 0">
-            <div class="py-6 text-center">
-              <p class="text-xs text-[#5B6B84]">Belum ada data status.</p>
-            </div>
-          </template>
+            <!-- Status Content -->
+            <template v-else>
+              <!-- Horizontal Stacked Progress Bar -->
+              <div class="mb-4">
+                <div class="h-2 flex rounded-lg overflow-hidden bg-[#F1F5F9]">
+                  <div
+                    v-for="item in getSortedByStatus()"
+                    :key="item.status"
+                    class="h-full transition-all duration-300"
+                    :class="getStatusColorClass(item.status)"
+                    :style="{ width: getStatusPercentage(item.status) + '%' }"
+                    :title="`${item.status}: ${item.count} unit (${getStatusPercentage(item.status)}%)`"
+                  ></div>
+                </div>
+              </div>
 
-          <!-- Status Content -->
-          <template v-else>
-            <!-- Horizontal Stacked Progress Bar -->
-            <div class="mb-4">
-              <div class="h-2 flex rounded-lg overflow-hidden bg-[#F1F5F9]">
+              <!-- Status Rows: menyebar vertikal agar sejajar dengan panel chart -->
+              <div class="dashboard-status-rows flex flex-1 flex-col justify-center gap-2.5">
                 <div
                   v-for="item in getSortedByStatus()"
                   :key="item.status"
-                  class="h-full transition-all duration-300"
-                  :class="getStatusColorClass(item.status)"
-                  :style="{ width: getStatusPercentage(item.status) + '%' }"
-                  :title="`${item.status}: ${item.count} unit (${getStatusPercentage(item.status)}%)`"
-                ></div>
-              </div>
-            </div>
+                  class="dashboard-status-row flex items-center gap-2.5"
+                >
+                  <!-- Status Indicator -->
+                  <div
+                    class="w-2.5 h-2.5 rounded-full flex-shrink-0"
+                    :class="getStatusColorClass(item.status)"
+                  ></div>
 
-            <!-- Status Rows: menyebar vertikal agar sejajar dengan panel chart -->
-            <div class="dashboard-status-rows flex flex-1 flex-col justify-center gap-2.5">
-              <div
-                v-for="item in getSortedByStatus()"
-                :key="item.status"
-                class="dashboard-status-row flex items-center gap-2.5"
-              >
-                <!-- Status Indicator -->
-                <div
-                  class="w-2.5 h-2.5 rounded-full flex-shrink-0"
-                  :class="getStatusColorClass(item.status)"
-                ></div>
-
-                <!-- Label • count • persentase (satu baris, tidak bertumpuk) -->
-                <div class="flex flex-1 min-w-0 items-center justify-between gap-2">
-                  <span class="text-xs font-semibold text-[#475569] truncate">{{
-                    item.status
-                  }}</span>
-                  <span class="flex shrink-0 items-baseline gap-1.5 font-num">
-                    <span class="text-xs font-bold text-[#1E293B]">{{ item.count }}</span>
-                    <span class="text-[10px] font-medium text-[#5B6B84]"
-                      >{{ getStatusPercentage(item.status) }}%</span
-                    >
-                  </span>
+                  <!-- Label • count • persentase (satu baris, tidak bertumpuk) -->
+                  <div class="flex flex-1 min-w-0 items-center justify-between gap-2">
+                    <span class="text-xs font-semibold text-[#475569] truncate">{{
+                      item.status
+                    }}</span>
+                    <span class="flex shrink-0 items-baseline gap-1.5 font-num">
+                      <span class="text-xs font-bold text-[#1E293B]">{{ item.count }}</span>
+                      <span class="text-[10px] font-medium text-[#5B6B84]"
+                        >{{ getStatusPercentage(item.status) }}%</span
+                      >
+                    </span>
+                  </div>
                 </div>
               </div>
-            </div>
-          </template>
+            </template>
+          </PanelCard>
         </div>
       </div>
 
       <!-- ─── ROW 3: Bar Chart (7 col) + Pie Chart (5 col) ── -->
       <div class="dashboard-chart-grid grid grid-cols-1 xl:grid-cols-12">
-        <div class="xl:col-span-7 dashboard-panel">
-          <div class="flex items-center justify-between">
-            <h3>Aset Per Tipe</h3>
-          </div>
-          <AssetTypeBarChart
-            class="w-full"
-            :data="stats.byType || []"
-            :loading="isLoading"
-            :error="error"
-            :height="260"
-            embedded
-          />
+        <div class="xl:col-span-7">
+          <PanelCard title="Aset Per Tipe">
+            <AssetTypeBarChart
+              class="w-full"
+              :data="stats.byType || []"
+              :loading="isLoading"
+              :error="error"
+              :height="260"
+              embedded
+            />
+          </PanelCard>
         </div>
         <div class="xl:col-span-5 dashboard-panel">
           <div class="flex items-center justify-between">

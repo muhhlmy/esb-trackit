@@ -2,11 +2,25 @@
 <html lang="id">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" href="/logo.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
 
-    <!-- SEO Meta Tags -->
-    <meta name="description" content="IT Assets Monitoring - Sistem manajemen dan monitoring aset IT perusahaan" />
+    <!-- SEO & Metadata -->
+    <title>ESB-TrackIT - IT Assets Management</title>
+    <meta name="description" content="ESB-TrackIT - Sistem manajemen dan monitoring aset IT perusahaan serta operasional helpdesk terintegrasi." />
+    <meta name="application-name" content="ESB-TrackIT" />
+
+    <!-- PWA Settings & Apple Mobile Web App -->
+    <meta name="theme-color" content="#0a51b0" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="ESB-TrackIT" />
+    <link rel="manifest" href="/manifest.json" />
+
+    <!-- App Icons -->
+    <link rel="icon" type="image/svg+xml" href="/logo.svg" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
+    <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
 
     <!-- Plus Jakarta Sans & Material Symbols -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -34,30 +48,220 @@
         user-select: none;
         flex-shrink: 0;
       }
-    </style>
 
-    <title>TrackIT — IT Assets Management</title>
-    <meta name="theme-color" content="#0a51b0" />
-    <meta name="application-name" content="TrackIT" />
-    <link rel="manifest" href="/manifest.json" />
-    <link rel="apple-touch-icon" href="/logo.png" />
+      /* ==========================================================
+         Flashscreen / Splash Screen & vue-spinner Styles
+         ========================================================== */
+      #app-splashscreen {
+        position: fixed;
+        inset: 0;
+        z-index: 99999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #f4f6f9;
+        font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+        padding: 16px;
+        transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        will-change: opacity, transform;
+      }
+
+      #app-splashscreen.splash-hidden {
+        opacity: 0;
+        transform: scale(1.02);
+        pointer-events: none;
+        visibility: hidden;
+      }
+
+      .splash-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 32px 36px;
+        background: #ffffff;
+        border-radius: 20px;
+        box-shadow: 0 16px 36px -8px rgba(10, 81, 176, 0.08), 0 4px 12px rgba(15, 23, 42, 0.04);
+        border: 1px solid rgba(226, 232, 240, 0.85);
+        max-width: 320px;
+        width: 100%;
+        text-align: center;
+        animation: splashCardAppear 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+      }
+
+      .splash-logo-container {
+        position: relative;
+        width: 78px;
+        height: 78px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 16px;
+      }
+
+      .splash-logo-img {
+        width: 52px;
+        height: 52px;
+        object-fit: contain;
+        display: block;
+        filter: drop-shadow(0 4px 10px rgba(10, 81, 176, 0.16));
+      }
+
+      /* vue-spinner: ClipLoader Ring Spinner */
+      .splash-clip-ring {
+        position: absolute;
+        inset: 0;
+        border-radius: 50%;
+        border: 2.5px solid rgba(10, 81, 176, 0.12);
+        border-top-color: #0a51b0;
+        border-right-color: #ff4f1b;
+        animation: splashClipRotate 0.85s linear infinite;
+      }
+
+      .splash-brand {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 3px;
+        margin-bottom: 18px;
+      }
+
+      .splash-brand-title {
+        margin: 0;
+        font-size: 21px;
+        font-weight: 800;
+        letter-spacing: -0.025em;
+        color: #0f172a;
+        line-height: 1.2;
+      }
+
+      .splash-brand-tagline {
+        margin: 0;
+        font-size: 11px;
+        font-weight: 600;
+        color: #64748b;
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
+      }
+
+      /* vue-spinner: PulseLoader 3 Dots */
+      .splash-pulse-loader {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        margin-bottom: 10px;
+      }
+
+      .splash-pulse-dot {
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        background-color: #0a51b0;
+        display: inline-block;
+        animation: splashPulseStretch 0.75s infinite cubic-bezier(0.2, 0.68, 0.18, 1.08);
+        animation-fill-mode: both;
+      }
+
+      .splash-pulse-dot:nth-child(1) {
+        background-color: #ff4f1b;
+        animation-delay: -0.36s;
+      }
+
+      .splash-pulse-dot:nth-child(2) {
+        background-color: #fc841b;
+        animation-delay: -0.24s;
+      }
+
+      .splash-pulse-dot:nth-child(3) {
+        background-color: #0a51b0;
+        animation-delay: -0.12s;
+      }
+
+      .splash-status-text {
+        font-size: 12px;
+        font-weight: 600;
+        color: #94a3b8;
+        letter-spacing: 0.01em;
+      }
+
+      /* Keyframes */
+      @keyframes splashClipRotate {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+
+      @keyframes splashPulseStretch {
+        0%, 80% {
+          transform: scale(1);
+          opacity: 1;
+        }
+        45% {
+          transform: scale(0.2);
+          opacity: 0.5;
+        }
+      }
+
+      @keyframes splashCardAppear {
+        0% {
+          opacity: 0;
+          transform: translateY(8px) scale(0.97);
+        }
+        100% {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .splash-clip-ring,
+        .splash-pulse-dot,
+        .splash-card {
+          animation: none !important;
+        }
+      }
+    </style>
   </head>
   <body class="bg-[#F4F6F9]">
-    <!-- Vue akan me-render aplikasi ke dalam div#app ini -->
-    <div id="app" v-cloak>
-      <div style="position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; background-color: #F4F6F9; font-family: 'Plus Jakarta Sans', sans-serif;">
-        <div style="display: flex; align-items: center; gap: 12px; padding: 16px 24px; background: #ffffff; border-radius: 16px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05); border: 1px solid #E2E8F0;">
-          <div class="app-flash-spinner" style="width: 28px; height: 28px; border: 3px solid #FC841B; border-top-color: transparent; border-radius: 50%; animation: appSpin 0.8s linear infinite;"></div>
-          <span style="font-size: 14px; font-weight: 700; color: #2A3547;">Memuat IT Assets Monitoring...</span>
+    <!-- Flashscreen / Startup Splash Screen -->
+    <div id="app-splashscreen" role="status" aria-live="polite" aria-label="Memuat aplikasi ESB-TrackIT">
+      <div class="splash-card">
+        <div class="splash-logo-container">
+          <img src="/logo.svg" alt="ESB-TrackIT App Logo" class="splash-logo-img" width="52" height="52" />
+          <div class="splash-clip-ring" aria-hidden="true"></div>
         </div>
+        <div class="splash-brand">
+          <h1 class="splash-brand-title">ESB-TrackIT</h1>
+          <p class="splash-brand-tagline">IT Assets & Operations</p>
+        </div>
+        <!-- vue-spinner PulseLoader -->
+        <div class="splash-pulse-loader" aria-hidden="true">
+          <span class="splash-pulse-dot"></span>
+          <span class="splash-pulse-dot"></span>
+          <span class="splash-pulse-dot"></span>
+        </div>
+        <div class="splash-status-text">Memuat ESB-TrackIT...</div>
       </div>
-      <style>
-        @keyframes appSpin { to { transform: rotate(360deg); } }
-        @media (prefers-reduced-motion: reduce) {
-          .app-flash-spinner { animation: none !important; }
-        }
-      </style>
     </div>
+
+    <!-- Vue Application Root -->
+    <div id="app" v-cloak></div>
+
+    <script>
+      // Fallback safeguard: jika terjadi latensi jaringan atau script, splashscreen otomatis hilang setelah 4 detik
+      window.addEventListener('load', function () {
+        setTimeout(function () {
+          var el = document.getElementById('app-splashscreen');
+          if (el && !el.classList.contains('splash-hidden')) {
+            el.classList.add('splash-hidden');
+            setTimeout(function () {
+              if (el && el.parentNode) el.parentNode.removeChild(el);
+            }, 450);
+          }
+        }, 4000);
+      });
+    </script>
+
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>

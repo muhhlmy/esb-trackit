@@ -11,7 +11,6 @@ import {
   LinearScale,
 } from 'chart.js'
 import { useChartTheme } from '@/composables/useChartTheme'
-import { useLanguage } from '@/composables/useLanguage'
 import BaseChartCard from './BaseChartCard.vue'
 
 ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale)
@@ -25,15 +24,14 @@ const props = defineProps({
 })
 
 const { chartColors, fontStack } = useChartTheme()
-const { t } = useLanguage()
 
 const isEmpty = computed(() => !props.data || props.data.length === 0)
 
 const chartData = computed(() => ({
-  labels: props.data.map((d) => d.device_type || d.tipe || d.type || t('chart_no_type', 'Tanpa Tipe')),
+  labels: props.data.map((d) => d.device_type || d.tipe || d.type || 'Tanpa Tipe'),
   datasets: [
     {
-      label: t('chart_unit_count_label', 'Jumlah Unit'),
+      label: 'Jumlah Unit',
       data: props.data.map((d) => Number(d.count) || 0),
       // Satu aksen brand; bar paling tinggi disorot lebih pekat.
       backgroundColor: (context) => {
@@ -68,7 +66,7 @@ const chartOptions = computed(() => ({
       titleFont: { family: fontStack, size: 12, weight: '700' },
       bodyFont: { family: fontStack, size: 13, weight: '600' },
       callbacks: {
-        label: (ctx) => ` ${ctx.parsed.y} ${t('chart_unit_word', 'unit')}`,
+        label: (ctx) => ` ${ctx.parsed.y} unit`,
       },
     },
   },
@@ -101,8 +99,8 @@ const chartOptions = computed(() => ({
 
 <template>
   <BaseChartCard
-    :title="t('dashboard_type_chart_title', 'Sebaran Aset Berdasarkan Tipe')"
-    :subtitle="t('dashboard_type_chart_subtitle', 'Distribusi perangkat berdasarkan jenis (laptop, server, printer, dll.)')"
+    title="Sebaran Aset Berdasarkan Tipe"
+    subtitle="Distribusi perangkat berdasarkan jenis (laptop, server, printer, dll.)"
     :loading="loading"
     :empty="isEmpty"
     :error="error"

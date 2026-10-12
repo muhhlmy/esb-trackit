@@ -179,6 +179,7 @@ export const id = {
     dashboard_page_subtitle: 'Kondisi aset, status penggunaan, dan aktivitas tiket IT terbaru.',
     total_assets: 'Total Aset',
     registered_devices: 'Perangkat terdaftar',
+    status_in_use: 'Digunakan',
     status_stock: 'Stok',
     status_maintenance_broken: 'Perawatan & Rusak',
     quick_access: 'Quick Access',
@@ -333,7 +334,7 @@ export const id = {
     entries: 'data',
     page_prev: 'Sebelumnya',
     page_next: 'Selanjutnya',
-    no_data_found: 'Tidak ada data yang ditemukan',
+    no_data: 'Tidak ada data yang ditemukan',
     loading_data: 'Memuat data...',
 
     // Form & Actions

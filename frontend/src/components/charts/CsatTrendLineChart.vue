@@ -17,7 +17,6 @@ import {
   Filler,
 } from 'chart.js'
 import { useChartTheme } from '@/composables/useChartTheme'
-import { useLanguage } from '@/composables/useLanguage'
 import BaseChartCard from './BaseChartCard.vue'
 
 ChartJS.register(
@@ -39,7 +38,6 @@ const props = defineProps({
 })
 
 const { chartColors } = useChartTheme()
-const { t } = useLanguage()
 
 const isEmpty = computed(() => !props.data || props.data.length === 0)
 
@@ -47,7 +45,7 @@ const chartData = computed(() => ({
   labels: props.data.map((d) => d.period),
   datasets: [
     {
-      label: t('chart_csat_avg_label', 'Rata-rata CSAT'),
+      label: 'Rata-rata CSAT',
       data: props.data.map((d) => d.averageRating || 0),
       borderColor: chartColors.warning,
       backgroundColor: 'rgba(255, 174, 31, 0.10)',
@@ -78,7 +76,7 @@ const chartOptions = computed(() => ({
           const rating = context.parsed.y.toFixed(1)
           const idx = context.dataIndex
           const total = props.data[idx]?.totalRatings || 0
-          return ` ⭐ ${rating} / 5.0  (${total} ${t('chart_csat_reviews_word', 'ulasan')})`
+          return ` ⭐ ${rating} / 5.0  (${total} ulasan)`
         },
       },
     },
@@ -108,8 +106,8 @@ const chartOptions = computed(() => ({
 
 <template>
   <BaseChartCard
-    :title="t('csat_monthly_trend', 'Tren Kepuasan Bulanan')"
-    :subtitle="t('chart_csat_trend_subtitle', 'Rata-rata CSAT per bulan (6 Bulan Terakhir)')"
+    title="Tren Kepuasan Bulanan"
+    subtitle="Rata-rata CSAT per bulan (6 Bulan Terakhir)"
     :loading="loading"
     :empty="isEmpty"
     :error="error"

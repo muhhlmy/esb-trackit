@@ -7,7 +7,7 @@ import PageHeader from '@/components/ui/PageHeader.vue'
 
 const api = useApi()
 const { showToast } = useToast()
-const { t } = useLanguage()
+const { currentLang, t } = useLanguage()
 
 const activeTab = ref('smtp') // 'smtp' | 'templates'
 const isLoading = ref(true)

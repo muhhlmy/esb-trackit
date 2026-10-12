@@ -3,7 +3,6 @@ import { computed } from 'vue'
 import { Pie } from 'vue-chartjs'
 import { Chart as ChartJS, Title, Tooltip, Legend, ArcElement } from 'chart.js'
 import { useChartTheme } from '@/composables/useChartTheme'
-import { useLanguage } from '@/composables/useLanguage'
 import BaseChartCard from './BaseChartCard.vue'
 
 ChartJS.register(Title, Tooltip, Legend, ArcElement)
@@ -17,7 +16,6 @@ const props = defineProps({
 })
 
 const { chartColors, fontStack } = useChartTheme()
-const { t } = useLanguage()
 
 const isEmpty = computed(() => !props.data || props.data.length === 0)
 
@@ -34,7 +32,7 @@ const conditionColorMap = {
 }
 
 const chartData = computed(() => {
-  const labels = props.data.map((d) => d.condition || t('chart_condition_unknown', 'Tidak diketahui'))
+  const labels = props.data.map((d) => d.condition || 'Tidak diketahui')
   const bgColors = props.data.map((d) => {
     const key = (d.condition || '').toLowerCase()
     return conditionColorMap[key] || chartColors.gray
@@ -89,7 +87,7 @@ const chartOptions = computed(() => ({
         label: (ctx) => {
           const total = ctx.dataset.data.reduce((a, b) => a + b, 0)
           const pct = total > 0 ? Math.round((ctx.parsed / total) * 100) : 0
-          return ` ${ctx.label}: ${ctx.parsed} ${t('chart_unit_word', 'unit')} (${pct}%)`
+          return ` ${ctx.label}: ${ctx.parsed} unit (${pct}%)`
         },
       },
     },
@@ -99,8 +97,8 @@ const chartOptions = computed(() => ({
 
 <template>
   <BaseChartCard
-    :title="t('chart_condition_title', 'Kondisi Fisik Aset')"
-    :subtitle="t('chart_condition_subtitle', 'Persentase kondisi kesehatan fisik seluruh perangkat')"
+    title="Kondisi Fisik Aset"
+    subtitle="Persentase kondisi kesehatan fisik seluruh perangkat"
     :loading="loading"
     :empty="isEmpty"
     :error="error"

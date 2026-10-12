@@ -9,7 +9,6 @@ import {
   notificationPermission,
   showNativeNotification,
 } from '@/composables/useBrowserPermissions'
-import { useLanguage } from '@/composables/useLanguage.js'
 import SkeletonList from '../ui/skeleton/SkeletonList.vue'
 import AppModal from '../ui/AppModal.vue'
 import BrowserPermissionsModal from '../ui/BrowserPermissionsModal.vue'
@@ -25,7 +24,6 @@ const { user, logout, hasPermission, isSuperAdmin } = useAuth()
 const { get, post } = useApi()
 const { connect: connectSSE, disconnect: disconnectSSE, on: onSSE, off: offSSE } = useTicketEvents()
 const { isSoundEnabled, toggleSound } = useNotificationSound()
-const { t } = useLanguage()
 const showPermissionsModal = ref(false)
 
 // Search & UI State
@@ -43,9 +41,9 @@ function handleWindowResize() {
   windowWidth.value = window.innerWidth
 }
 const searchPlaceholder = computed(() => {
-  if (windowWidth.value < 640) return t('header_search_placeholder_sm')
-  if (windowWidth.value < 1024) return t('header_search_placeholder_md')
-  return t('header_search_placeholder_lg')
+  if (windowWidth.value < 640) return 'Cari aset, tiket...'
+  if (windowWidth.value < 1024) return 'Cari aset, tiket, user...'
+  return 'Cari aset, karyawan, tiket, atau user...'
 })
 
 const profileMenuButtonRef = ref(null)
@@ -81,15 +79,15 @@ function closePasswordModal() {
 async function submitChangePassword() {
   const { currentPassword, newPassword, confirmPassword } = passwordForm.value
   if (!currentPassword) {
-    passwordModalError.value = t('header_password_current_required')
+    passwordModalError.value = 'Password saat ini wajib diisi.'
     return
   }
   if (!newPassword || newPassword.length < 8) {
-    passwordModalError.value = t('header_password_min_length')
+    passwordModalError.value = 'Password baru minimal 8 karakter.'
     return
   }
   if (newPassword !== confirmPassword) {
-    passwordModalError.value = t('header_password_mismatch')
+    passwordModalError.value = 'Konfirmasi password baru tidak cocok.'
     return
   }
 
@@ -104,7 +102,7 @@ async function submitChangePassword() {
     closePasswordModal()
     await logout()
   } catch (err) {
-    passwordModalError.value = err.message || t('header_password_change_failed')
+    passwordModalError.value = err.message || 'Gagal mengganti password.'
   } finally {
     isSubmittingPassword.value = false
   }
@@ -196,8 +194,7 @@ function addNotificationItem({
 }) {
   const ts = timestamp || Date.now()
   const msg =
-    message ||
-    (type === 'CREATED' ? t('header_notif_ticket_created_msg') : t('header_notif_ticket_updated_msg'))
+    message || (type === 'CREATED' ? 'Tiket baru telah dibuat' : 'Detail tiket diperbarui')
 
   const recentDuplicate = notificationsList.value.find(
     (n) =>
@@ -215,13 +212,13 @@ function addNotificationItem({
     title:
       title ||
       (type === 'CREATED'
-        ? t('header_notif_new_ticket_title')
+        ? 'Tiket Baru Masuk'
         : type === 'COMMENT'
-          ? t('header_notif_new_comment_title')
-          : t('header_notif_ticket_change_title')),
+          ? 'Komentar Baru'
+          : 'Perubahan Tiket'),
     message: msg,
     nomor_tiket: nomor_tiket || `#${ticketId}`,
-    judul_tiket: judul_tiket || t('header_ticket_fallback'),
+    judul_tiket: judul_tiket || 'Tiket',
     status_tiket: status_tiket || 'Open',
     prioritas: prioritas || 'Medium (3d)',
     pelapor: pelapor || '',
@@ -242,13 +239,11 @@ function seedNotificationsFromTickets(ticketsList) {
     }
     return
   }
-  // Terjemahan di-hoist keluar dari loop karena variabel loop (`t`) men-shadow fungsi t()
-  const incomingTitle = t('header_notif_ticket_incoming')
   const items = ticketsList.slice(0, 10).map((t) => ({
     id: `notif_seed_${t.id}`,
     ticketId: t.id,
     type: 'CREATED',
-    title: incomingTitle,
+    title: 'Tiket Masuk',
     message: t.judul,
     nomor_tiket: t.nomor_tiket,
     judul_tiket: t.judul,
@@ -269,12 +264,6 @@ function syncTicketStatusChanges(ticketsList) {
   if (!Array.isArray(ticketsList)) return
   const isFirstLoad = Object.keys(knownTicketStates.value).length === 0
 
-  // Terjemahan di-hoist keluar dari loop karena variabel loop (`t`) men-shadow fungsi t()
-  const notifNewTicketTitle = t('header_notif_new_ticket_title')
-  const notifNewTicketMsg = t('header_notif_ticket_created_msg')
-  const notifTicketChangeTitle = t('header_notif_ticket_change_title')
-  const statusLabel = t('status')
-
   for (const t of ticketsList) {
     const ticketKey = String(t.id)
     const prev = knownTicketStates.value[t.id]
@@ -283,8 +272,8 @@ function syncTicketStatusChanges(ticketsList) {
       addNotificationItem({
         ticketId: t.id,
         type: 'CREATED',
-        title: notifNewTicketTitle,
-        message: t.judul || notifNewTicketMsg,
+        title: 'Tiket Baru Masuk',
+        message: t.judul || 'Tiket baru telah dibuat',
         nomor_tiket: t.nomor_tiket,
         judul_tiket: t.judul,
         status_tiket: t.status_tiket,
@@ -299,8 +288,8 @@ function syncTicketStatusChanges(ticketsList) {
         addNotificationItem({
           ticketId: t.id,
           type: `UPDATED`,
-          title: `${notifTicketChangeTitle}: ${t.judul}`,
-          message: `${statusLabel}: '${prev.status}' → '${t.status_tiket}'`,
+          title: `Perubahan Tiket: ${t.judul}`,
+          message: `Status: '${prev.status}' → '${t.status_tiket}'`,
           nomor_tiket: t.nomor_tiket,
           judul_tiket: t.judul,
           status_tiket: t.status_tiket,
@@ -344,10 +333,10 @@ const notifCounts = computed(() => {
 })
 
 const notifTabs = computed(() => [
-  { key: 'ALL', label: t('all'), count: notifCounts.value.ALL },
-  { key: 'CREATED', label: t('header_notif_tab_new'), count: notifCounts.value.CREATED },
-  { key: 'UPDATED', label: t('header_notif_tab_update'), count: notifCounts.value.UPDATED },
-  { key: 'COMMENT', label: t('header_notif_tab_comment'), count: notifCounts.value.COMMENT },
+  { key: 'ALL', label: 'Semua', count: notifCounts.value.ALL },
+  { key: 'CREATED', label: 'Baru', count: notifCounts.value.CREATED },
+  { key: 'UPDATED', label: 'Update', count: notifCounts.value.UPDATED },
+  { key: 'COMMENT', label: 'Komentar', count: notifCounts.value.COMMENT },
 ])
 
 function formatStatusDot(status) {
@@ -620,12 +609,12 @@ function relativeTime(dateStrOrMs) {
   const timestamp = typeof dateStrOrMs === 'number' ? dateStrOrMs : new Date(dateStrOrMs).getTime()
   const diff = Date.now() - timestamp
   const m = Math.floor(diff / 60000)
-  if (m < 1) return t('header_time_just_now')
-  if (m < 60) return `${m} ${t('header_time_minutes_ago')}`
+  if (m < 1) return 'Baru saja'
+  if (m < 60) return `${m} mnt lalu`
   const h = Math.floor(m / 60)
-  if (h < 24) return `${h} ${t('header_time_hours_ago')}`
+  if (h < 24) return `${h} jam lalu`
   const d = Math.floor(h / 24)
-  return `${d} ${t('header_time_days_ago')}`
+  return `${d} hari lalu`
 }
 
 function quickSearchPreset(query, tabKey) {
@@ -649,12 +638,8 @@ function performLogout() {
   logout()
 }
 
-const pageTitle = computed(
-  () => (route.meta?.titleKey ? t(route.meta.titleKey) : null) || route.meta?.title || t('header_default_page_title'),
-)
-const pageSubtitle = computed(
-  () => (route.meta?.subtitleKey ? t(route.meta.subtitleKey) : null) || route.meta?.subtitle || t('header_default_page_subtitle'),
-)
+const pageTitle = computed(() => route.meta?.title || 'Karyawan')
+const pageSubtitle = computed(() => route.meta?.subtitle || 'Kelola data karyawan')
 
 watch(
   () => [route.path, route.query.q, route.query.search],
@@ -668,13 +653,13 @@ watch(
 
 function handleSseTicketCreated(data) {
   if (data && typeof data === 'object') {
-    const title = t('header_notif_new_ticket_title')
-    const msg = `${data.nomor_tiket ? data.nomor_tiket + ': ' : ''}${data.judul || t('header_no_title')}${data.pelapor ? ' - ' + t('header_by') + ' ' + data.pelapor : ''}`
+    const title = 'Tiket Baru Masuk'
+    const msg = `${data.nomor_tiket ? data.nomor_tiket + ': ' : ''}${data.judul || 'Tanpa Judul'}${data.pelapor ? ' - oleh ' + data.pelapor : ''}`
     addNotificationItem({
       ticketId: data.id,
       type: 'CREATED',
       title,
-      message: data.judul || t('header_notif_ticket_created_msg'),
+      message: data.judul || 'Tiket baru telah dibuat',
       nomor_tiket: data.nomor_tiket,
       judul_tiket: data.judul,
       status_tiket: data.status_tiket,
@@ -694,15 +679,14 @@ function handleSseTicketUpdated(data) {
     const changesText =
       Array.isArray(data.changes) && data.changes.length > 0
         ? data.changes.join('. ')
-        : t('header_notif_ticket_updated_msg')
-    const ticketChangeTitle = t('header_notif_ticket_change_title')
-    const title = data.nomor_tiket ? `${ticketChangeTitle} ${data.nomor_tiket}` : ticketChangeTitle
+        : 'Detail tiket diperbarui'
+    const title = data.nomor_tiket ? `Perubahan Tiket ${data.nomor_tiket}` : 'Perubahan Tiket'
     const msg = `${data.judul ? data.judul + ' - ' : ''}${changesText}`
 
     addNotificationItem({
       ticketId: data.id,
       type: 'UPDATED',
-      title: data.judul ? `${ticketChangeTitle}: ${data.judul}` : ticketChangeTitle,
+      title: data.judul ? `Perubahan Tiket: ${data.judul}` : 'Perubahan Tiket',
       message: changesText,
       nomor_tiket: data.nomor_tiket,
       judul_tiket: data.judul,
@@ -720,17 +704,16 @@ function handleSseCommentCreated(data) {
     const ticketId = data.ticketId || data.id
     const targetTicket = allTickets.value.find((t) => t.id === ticketId)
     const nomorTiket = targetTicket?.nomor_tiket || `#${ticketId}`
-    const newCommentTitle = t('header_notif_new_comment_title')
-    const title = `${newCommentTitle} (${nomorTiket})`
+    const title = `Komentar Baru (${nomorTiket})`
     const msg = targetTicket
-      ? `${t('header_on_ticket')} '${targetTicket.judul}'`
-      : t('header_comment_added_msg')
+      ? `Pada tiket '${targetTicket.judul}'`
+      : 'Komentar baru ditambahkan pada tiket'
 
     addNotificationItem({
       ticketId,
       type: 'COMMENT',
-      title: targetTicket ? `${t('header_comment')}: ${targetTicket.judul}` : newCommentTitle,
-      message: t('header_comment_added_msg'),
+      title: targetTicket ? `Komentar: ${targetTicket.judul}` : 'Komentar Baru',
+      message: 'Komentar baru ditambahkan pada tiket',
       nomor_tiket: targetTicket?.nomor_tiket,
       judul_tiket: targetTicket?.judul,
       status_tiket: targetTicket?.status_tiket,
@@ -789,7 +772,7 @@ onBeforeUnmount(() => {
       <!-- Brand Logo Mark (Mobile only; clean logo without background, border, or rounded container) -->
       <RouterLink
         to="/"
-        :title="t('header_back_home')"
+        title="Kembali ke Beranda TrackIT"
         class="flex md:hidden items-center shrink-0"
       >
         <img src="/logo.svg" alt="TrackIT logo" class="h-4.5 w-auto object-contain shrink-0 block" />
@@ -819,10 +802,10 @@ onBeforeUnmount(() => {
         v-show="!isSearchOpen"
         ref="searchButtonRef"
         type="button"
-        :aria-label="t('header_open_search')"
+        aria-label="Buka pencarian"
         :aria-expanded="isSearchOpen"
         aria-controls="global-main-search"
-        :title="t('header_search_ctrlk')"
+        title="Cari (Ctrl K)"
         class="hidden md:flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-[#475569] hover:bg-[#F1F5F9] focus-visible:outline-2 focus-visible:outline-[#0A51B0] cursor-pointer"
         @click="initGlobalSearchData"
       >
@@ -834,7 +817,7 @@ onBeforeUnmount(() => {
         @submit.prevent="submitSearch"
         class="hidden md:flex relative items-center w-full"
       >
-        <label for="global-main-search" class="sr-only">{{ t('header_global_search') }}</label>
+        <label for="global-main-search" class="sr-only">Cari Global</label>
 
         <span
           aria-hidden="true"
@@ -859,9 +842,9 @@ onBeforeUnmount(() => {
             v-if="searchQuery"
             type="button"
             @click="clearSearch"
-            :aria-label="t('clear_search')"
+            aria-label="Bersihkan pencarian"
             class="flex h-5.5 w-5.5 items-center justify-center rounded-full text-[#475569] hover:bg-[#F1F5F9] hover:text-[#333333] transition-all cursor-pointer touch-manipulation"
-            :title="t('clear_search')"
+            title="Bersihkan Pencarian"
           >
             <span aria-hidden="true" class="material-symbols-outlined text-[13px]">close</span>
           </button>
@@ -872,7 +855,7 @@ onBeforeUnmount(() => {
             v-if="searchQuery.trim()"
             class="hidden md:flex items-center gap-1 rounded-md bg-[#EFF6FF] px-1.5 py-0.5 text-[9px] font-extrabold text-[#0A4391] hover:bg-[#0A4391] hover:text-white disabled:opacity-40 transition-all cursor-pointer"
           >
-            {{ t('search') }}
+            Cari
           </button>
 
           <kbd
@@ -899,8 +882,8 @@ onBeforeUnmount(() => {
               <button
                 type="button"
                 @click="closeSearch"
-                :aria-label="t('header_close_search')"
-                :title="t('header_close_search')"
+                aria-label="Tutup pencarian"
+                title="Tutup pencarian"
                 class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-[#5F7089] hover:bg-[#F1F5F9] touch-manipulation cursor-pointer"
               >
                 <span aria-hidden="true" class="material-symbols-outlined text-[22px]"
@@ -918,7 +901,7 @@ onBeforeUnmount(() => {
                 </span>
                 <input
                   id="mobile-overlay-search-input"
-                  :aria-label="t('header_search_aria')"
+                  aria-label="Cari aset, tiket, karyawan, atau pengguna"
                   @keydown.enter.prevent="submitSearch"
                   ref="mobileSearchInputRef"
                   v-model="searchQuery"
@@ -926,14 +909,14 @@ onBeforeUnmount(() => {
                   autocomplete="off"
                   autocapitalize="off"
                   spellcheck="false"
-                  :placeholder="t('header_search_placeholder')"
+                  placeholder="Cari aset, tiket, karyawan, user…"
                   class="h-11 w-full rounded-xl border border-[#DFE5EF] bg-[#F8FAFC] pl-9 pr-11 text-xs font-medium text-[#333333] placeholder-[#5F7089] outline-none transition-all focus:bg-white focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/20 [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden"
                 />
                 <button
                   v-if="searchQuery"
                   type="button"
                   @click="clearSearch"
-                  :aria-label="t('header_clear_keyword')"
+                  aria-label="Bersihkan kata kunci"
                   class="absolute right-0 flex h-11 w-11 items-center justify-center rounded-full text-[#5F7089] hover:bg-[#E2E8F0] active:scale-90 touch-manipulation cursor-pointer"
                 >
                   <span aria-hidden="true" class="material-symbols-outlined text-[15px]"
@@ -949,36 +932,36 @@ onBeforeUnmount(() => {
                 :disabled="!searchQuery.trim()"
                 class="flex min-h-11 shrink-0 items-center px-2 py-1 text-xs font-bold text-[#333333] disabled:opacity-30 touch-manipulation cursor-pointer"
               >
-                {{ t('search') }}
+                Cari
               </button>
             </div>
 
             <!-- Filter Tabs -->
-            <div class="search-filter-tabs" :aria-label="t('header_search_categories')">
+            <div class="search-filter-tabs" aria-label="Kategori pencarian">
               <button
                 v-for="tab in [
-                  { key: 'ALL', label: t('all'), icon: 'grid_view' },
+                  { key: 'ALL', label: 'Semua', icon: 'grid_view' },
                   {
                     key: 'ASSETS',
-                    label: t('header_search_tab_assets'),
+                    label: 'Aset',
                     icon: 'devices',
                     count: searchResults.assets.length,
                   },
                   {
                     key: 'KARYAWAN',
-                    label: t('header_search_tab_employees'),
+                    label: 'Karyawan',
                     icon: 'badge',
                     count: searchResults.karyawan.length,
                   },
                   {
                     key: 'TICKETS',
-                    label: t('header_search_tab_tickets'),
+                    label: 'Tiket',
                     icon: 'confirmation_number',
                     count: searchResults.tickets.length,
                   },
                   {
                     key: 'USERS',
-                    label: t('header_search_tab_users'),
+                    label: 'User',
                     icon: 'manage_accounts',
                     count: searchResults.users.length,
                   },
@@ -1021,7 +1004,7 @@ onBeforeUnmount(() => {
               <div
                 class="w-4 h-4 border-2 border-[#E2E8F0] border-t-[#0A51B0] rounded-full animate-spin"
               ></div>
-              {{ t('header_loading_search') }}
+              Memuat data pencarian...
             </div>
 
             <!-- Initial Prompt State (No query typed yet) -->
@@ -1032,7 +1015,7 @@ onBeforeUnmount(() => {
               <p
                 class="text-[11px] sm:text-[11px] font-bold uppercase tracking-wider text-[#687281] mb-2.5"
               >
-                {{ t('header_start_search') }}
+                Mulai pencarian Anda
               </p>
               <div class="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2">
                 <button
@@ -1047,14 +1030,14 @@ onBeforeUnmount(() => {
                   @click="quickSearchPreset('Tiket', 'TICKETS')"
                   class="rounded-full border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-1.5 text-[11px] font-semibold text-[#475569] hover:border-[#0A51B0] hover:text-[#333333] transition-all cursor-pointer touch-manipulation shadow-2xs"
                 >
-                  {{ t('header_preset_tickets') }}
+                  Tiket
                 </button>
                 <button
                   type="button"
                   @click="quickSearchPreset('Active', 'KARYAWAN')"
                   class="rounded-full border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-1.5 text-[11px] font-semibold text-[#475569] hover:border-[#0A51B0] hover:text-[#333333] transition-all cursor-pointer touch-manipulation shadow-2xs"
                 >
-                  {{ t('header_preset_active_employees') }}
+                  Karyawan aktif
                 </button>
               </div>
             </div>
@@ -1079,10 +1062,10 @@ onBeforeUnmount(() => {
                 >search_off</span
               >
               <p class="text-[12px] font-semibold text-[#5F7089] mt-1">
-                {{ t('header_no_results_prefix') }} "{{ searchQuery }}"
+                Tidak ada hasil ditemukan untuk "{{ searchQuery }}"
               </p>
               <p class="text-[11px] text-[#687281]">
-                {{ t('header_no_results_hint') }}
+                Coba kata kunci lain atau pilih kategori pencarian yang sesuai.
               </p>
             </div>
 
@@ -1098,7 +1081,7 @@ onBeforeUnmount(() => {
                 <div
                   class="px-3.5 sm:px-4 py-1.5 bg-[#F8FAFC] text-[10px] font-extrabold uppercase tracking-wider text-[#333333] flex items-center justify-between"
                 >
-                  <span>{{ t('header_group_assets_it') }} ({{ searchResults.assets.length }})</span>
+                  <span>Aset IT ({{ searchResults.assets.length }})</span>
                 </div>
                 <button
                   v-for="item in searchResults.assets"
@@ -1119,7 +1102,7 @@ onBeforeUnmount(() => {
                       <p
                         class="text-[12px] font-bold text-[#2A3547] truncate group-hover:text-[#333333]"
                       >
-                        {{ item.label_aset || item.hostname || t('header_asset_fallback') }}
+                        {{ item.label_aset || item.hostname || 'Aset' }}
                       </p>
                       <p class="text-[10px] font-medium text-[#637288] truncate">
                         {{ item.nomor_seri ? 'SN: ' + item.nomor_seri : '' }}
@@ -1149,7 +1132,7 @@ onBeforeUnmount(() => {
                 <div
                   class="px-3.5 sm:px-4 py-1.5 bg-[#F8FAFC] text-[10px] font-extrabold uppercase tracking-wider text-[#13DEB9] flex items-center justify-between"
                 >
-                  <span>{{ t('header_group_employees') }} ({{ searchResults.karyawan.length }})</span>
+                  <span>Karyawan ({{ searchResults.karyawan.length }})</span>
                 </div>
                 <button
                   v-for="item in searchResults.karyawan"
@@ -1196,7 +1179,7 @@ onBeforeUnmount(() => {
                 <div
                   class="px-3.5 sm:px-4 py-1.5 bg-[#F8FAFC] text-[10px] font-extrabold uppercase tracking-wider text-[#FA896B] flex items-center justify-between"
                 >
-                  <span>{{ t('header_group_tickets') }} ({{ searchResults.tickets.length }})</span>
+                  <span>Tiket Helpdesk ({{ searchResults.tickets.length }})</span>
                 </div>
                 <button
                   v-for="item in searchResults.tickets"
@@ -1220,7 +1203,7 @@ onBeforeUnmount(() => {
                         {{ item.nomor_tiket }}: {{ item.judul }}
                       </p>
                       <p class="text-[10px] font-medium text-[#637288] truncate">
-                        {{ t('reporter') }} {{ item.pelapor || 'User' }} · {{ t('status') }}: {{ item.status_tiket }}
+                        Pelapor: {{ item.pelapor || 'User' }} · Status: {{ item.status_tiket }}
                       </p>
                     </div>
                   </div>
@@ -1242,7 +1225,7 @@ onBeforeUnmount(() => {
                 <div
                   class="px-3.5 sm:px-4 py-1.5 bg-[#F8FAFC] text-[10px] font-extrabold uppercase tracking-wider text-[#7C3AED] flex items-center justify-between"
                 >
-                  <span>{{ t('header_group_users') }} ({{ searchResults.users.length }})</span>
+                  <span>Pengguna ({{ searchResults.users.length }})</span>
                 </div>
                 <button
                   v-for="item in searchResults.users"
@@ -1284,12 +1267,12 @@ onBeforeUnmount(() => {
               class="search-popup-footer px-3.5 sm:px-4 py-2.5 sm:py-2.5 border-t border-[#F1F5F9] bg-[#FAFBFC] flex items-center justify-between text-[11px] font-semibold text-[#637288] shrink-0 pb-[max(0.625rem,env(safe-area-inset-bottom))]"
             >
               <span class="hidden md:inline">
-                {{ t('header_press_enter') }}
+                Tekan
                 <kbd class="font-mono bg-white px-1 border border-[#E2E8F0] rounded">ENTER</kbd>
-                {{ t('header_enter_hint') }}
+                untuk cari semua
               </span>
               <span class="md:hidden text-[#687281] text-[11px]">
-                {{ searchResults.totalCount }} {{ t('header_results_found') }}
+                {{ searchResults.totalCount }} hasil ditemukan
               </span>
               <button
                 type="button"
@@ -1297,7 +1280,7 @@ onBeforeUnmount(() => {
                 :disabled="!searchQuery.trim() || isFetchingSearch"
                 class="text-[#333333] hover:text-[#0A4391] hover:underline font-bold transition-colors cursor-pointer touch-manipulation ml-auto"
               >
-                {{ t('header_view_full_results') }}
+                Lihat Hasil Lengkap
               </button>
             </div>
           </div>
@@ -1318,8 +1301,8 @@ onBeforeUnmount(() => {
       <button
         type="button"
         @click="initGlobalSearchData"
-        :aria-label="t('header_global_search')"
-        :title="t('header_global_search_full')"
+        aria-label="Cari Global"
+        title="Cari Global (Aset, Tiket, Karyawan, User)"
         class="flex md:hidden h-7 w-7 items-center justify-center rounded-md text-[#5F7089] hover:bg-[#F8FAFC] hover:text-[#333333] transition-all cursor-pointer select-none touch-manipulation"
       >
         <span aria-hidden="true" class="material-symbols-outlined text-[16px]">search</span>
@@ -1329,11 +1312,11 @@ onBeforeUnmount(() => {
       <div class="relative">
         <button
           id="notif-bell-btn"
-          :aria-label="t('header_notifications')"
+          aria-label="Notifikasi"
           :aria-expanded="isNotifOpen"
           aria-controls="header-notifications"
           type="button"
-          :title="unreadCount > 0 ? `${t('header_notifications')} (${unreadCount})` : t('header_notifications')"
+          :title="unreadCount > 0 ? `Notifikasi (${unreadCount})` : 'Notifikasi'"
           @click="toggleNotif"
           class="relative flex h-7 w-7 items-center justify-center rounded-md text-[#5F7089] hover:bg-[#F8FAFC] hover:text-[#333333] transition-all cursor-pointer select-none touch-manipulation"
           :class="isNotifOpen ? 'bg-[#EDF5FF] text-[#333333]' : ''"
@@ -1368,7 +1351,7 @@ onBeforeUnmount(() => {
                   class="material-symbols-outlined text-[16px] text-[#333333]"
                   >notifications</span
                 >
-                <h3 class="text-[11px] font-bold text-[#333333]">{{ t('header_notifications') }}</h3>
+                <h3 class="text-[11px] font-bold text-[#333333]">Notifikasi</h3>
                 <span
                   v-if="unreadCount > 0"
                   class="inline-flex h-3.5 min-w-[14px] items-center justify-center rounded-full bg-[#EFF6FF] px-1 text-[9px] font-bold text-[#333333] border border-[#BFDBFE]"
@@ -1380,8 +1363,8 @@ onBeforeUnmount(() => {
                   type="button"
                   @click="toggleSound"
                   class="flex h-5.5 w-5.5 items-center justify-center rounded-md hover:bg-[#F8FAFC] text-[#5F7089] transition-colors cursor-pointer"
-                  :title="isSoundEnabled ? t('header_sound_on_title') : t('header_sound_off_title')"
-                  :aria-label="isSoundEnabled ? t('header_mute_sound') : t('header_enable_sound')"
+                  :title="isSoundEnabled ? 'Suara Tone.js Aktif (Klik untuk bisukan)' : 'Suara Senyap (Klik untuk aktifkan)'"
+                  :aria-label="isSoundEnabled ? 'Bisukan suara notifikasi' : 'Aktifkan suara notifikasi'"
                 >
                   <span aria-hidden="true" class="material-symbols-outlined text-[14px]">
                     {{ isSoundEnabled ? 'volume_up' : 'volume_off' }}
@@ -1400,7 +1383,7 @@ onBeforeUnmount(() => {
                   type="button"
                   @click="isNotifOpen = false"
                   class="flex h-5.5 w-5.5 items-center justify-center rounded-md hover:bg-[#F8FAFC] text-[#5F7089] transition-colors cursor-pointer"
-                  :aria-label="t('header_close_notifications')"
+                  aria-label="Tutup notifikasi"
                 >
                   <span aria-hidden="true" class="material-symbols-outlined text-[14px]">close</span>
                 </button>
@@ -1414,14 +1397,14 @@ onBeforeUnmount(() => {
             >
               <div class="flex items-center gap-1 min-w-0 text-[#0A51B0] dark:text-blue-300">
                 <span class="material-symbols-outlined text-[14px] shrink-0">notifications_active</span>
-                <span class="truncate">{{ t('header_enable_browser_notifications') }}</span>
+                <span class="truncate">Aktifkan notifikasi browser & suara</span>
               </div>
               <button
                 type="button"
                 @click="showPermissionsModal = true"
                 class="shrink-0 h-5 px-1.5 rounded-[4px] bg-[#0A51B0] hover:bg-[#0A4391] text-white text-[9px] font-semibold transition-colors cursor-pointer"
               >
-                {{ t('header_manage_permissions') }}
+                Atur Izin
               </button>
             </div>
 
@@ -1774,7 +1757,7 @@ onBeforeUnmount(() => {
         type="button"
         @click="realtimeToast = null"
         class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
-        :aria-label="t('header_close_notifications')"
+        aria-label="Tutup notifikasi"
       >
         <span class="material-symbols-outlined text-[16px]">close</span>
       </button>

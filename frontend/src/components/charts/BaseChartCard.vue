@@ -1,8 +1,5 @@
 <script setup>
-import { useLanguage } from '@/composables/useLanguage'
 import SkeletonChart from '../ui/skeleton/SkeletonChart.vue'
-
-const { t } = useLanguage()
 
 defineProps({
   title: { type: String, required: true },
@@ -59,7 +56,7 @@ defineProps({
         class="flex h-full w-full flex-col items-center justify-center gap-2 p-3 text-center text-[#5B6B84]"
       >
         <span aria-hidden="true" class="material-symbols-outlined text-[36px]">bar_chart_off</span>
-        <p class="text-[12px] font-semibold">{{ t('chart_no_data', 'Belum ada data untuk ditampilkan.') }}</p>
+        <p class="text-[12px] font-semibold">Belum ada data untuk ditampilkan.</p>
       </div>
 
       <!-- Chart Canvas Slot -->

@@ -917,9 +917,9 @@ onMounted(() => {
                 >devices_other</span
               >
             </div>
-            <h3 class="font-semibold text-[#333333] text-[13px]">Laporan Aset IT Aktif</h3>
+            <h3 class="font-semibold text-[#333333] text-[13px]">{{ t('export_preset_assets_title') }}</h3>
             <p class="text-[11px] text-[#5F7089] leading-relaxed">
-              Daftar aset IT status 'Digunakan' lengkap dengan nama karyawan pemegang.
+              {{ t('export_preset_assets_desc') }}
             </p>
           </div>
           <button
@@ -927,7 +927,7 @@ onMounted(() => {
             @click="applyPreset('assets_active')"
             class="mt-3 w-full rounded-[6px] border border-[#DBEAFE] bg-[#EFF6FF] hover:bg-[#0A51B0] hover:text-white text-[#333333] py-1.5 text-xs font-medium transition-all cursor-pointer"
           >
-            Gunakan Templat Ini
+            {{ t('export_use_preset') }}
           </button>
         </div>
 
@@ -941,9 +941,9 @@ onMounted(() => {
             >
               <span aria-hidden="true" class="material-symbols-outlined text-[16px]">badge</span>
             </div>
-            <h3 class="font-semibold text-[#333333] text-[13px]">Master Data Karyawan</h3>
+            <h3 class="font-semibold text-[#333333] text-[13px]">{{ t('export_preset_employees_title') }}</h3>
             <p class="text-[11px] text-[#5F7089] leading-relaxed">
-              Profil karyawan, NIK, jabatan, departemen, dan lokasi kantor untuk audit.
+              {{ t('export_preset_employees_desc') }}
             </p>
           </div>
           <button
@@ -951,7 +951,7 @@ onMounted(() => {
             @click="applyPreset('employees_dept')"
             class="mt-3 w-full rounded-[6px] border border-[#D1FAE5] bg-[#ECFDF5] hover:bg-[#047857] hover:text-white text-[#047857] py-1.5 text-xs font-medium transition-all cursor-pointer"
           >
-            Gunakan Templat Ini
+            {{ t('export_use_preset') }}
           </button>
         </div>
 
@@ -965,9 +965,9 @@ onMounted(() => {
             >
               <span aria-hidden="true" class="material-symbols-outlined text-[16px]">task_alt</span>
             </div>
-            <h3 class="font-semibold text-[#333333] text-[13px]">Rekapitulasi Tiket Resolved</h3>
+            <h3 class="font-semibold text-[#333333] text-[13px]">{{ t('export_preset_tickets_title') }}</h3>
             <p class="text-[11px] text-[#5F7089] leading-relaxed">
-              Daftar tiket IT yang telah diselesaikan teknisi beserta durasinya.
+              {{ t('export_preset_tickets_desc') }}
             </p>
           </div>
           <button
@@ -975,7 +975,7 @@ onMounted(() => {
             @click="applyPreset('tickets_resolved')"
             class="mt-3 w-full rounded-[6px] border border-[#E9D5FF] bg-[#F3E8FF] hover:bg-[#7E22CE] hover:text-white text-[#7E22CE] py-1.5 text-xs font-medium transition-all cursor-pointer"
           >
-            Gunakan Templat Ini
+            {{ t('export_use_preset') }}
           </button>
         </div>
 
@@ -989,9 +989,9 @@ onMounted(() => {
             >
               <span aria-hidden="true" class="material-symbols-outlined text-[16px]">security</span>
             </div>
-            <h3 class="font-semibold text-[#333333] text-[13px]">Log Security & Audit Login</h3>
+            <h3 class="font-semibold text-[#333333] text-[13px]">{{ t('export_preset_logins_title') }}</h3>
             <p class="text-xs text-[#5F7089] leading-relaxed">
-              Riwayat login pengguna sistem, alamat IP, dan waktu autentikasi.
+              {{ t('export_preset_logins_desc') }}
             </p>
           </div>
           <button
@@ -999,7 +999,7 @@ onMounted(() => {
             @click="applyPreset('login_audit')"
             class="mt-4 w-full rounded-xl border border-[#FDE68A] bg-[#FEF3C7] hover:bg-[#B45309] hover:text-white text-[#B45309] py-2 text-xs font-bold transition-all cursor-pointer"
           >
-            Gunakan Templat Ini
+            {{ t('export_use_preset') }}
           </button>
         </div>
       </div>
@@ -1008,27 +1008,36 @@ onMounted(() => {
     <!-- Live preview reuses the shared modal for viewport bounds and keyboard focus. -->
     <AppModal
       :is-open="showPreviewModal"
-      :title="'Pratinjau Data Ekspor (Sampel ' + previewData.length + ' Baris)'"
-      :subtitle="'Tabel: ' + selectedTableKey"
+      :title="
+        t('export_preview_title') +
+        ' (' +
+        t('export_sample_word') +
+        ' ' +
+        previewData.length +
+        ' ' +
+        t('export_rows_word') +
+        ')'
+      "
+      :subtitle="t('export_table_word') + ': ' + selectedTableKey"
       icon="preview"
       size="xl"
       @close="showPreviewModal = false"
     >
       <div class="export-modal min-w-0 space-y-4 wrap-anywhere">
         <p class="text-xs text-[#5F7089]">
-          Menampilkan maksimal 10 baris pertama sebagai gambaran format.
+          {{ t('export_preview_note') }}
         </p>
         <p class="text-xs text-[#5F7089] sm:hidden">
-          Geser tabel ke samping untuk melihat seluruh kolom.
+          {{ t('export_preview_scroll_hint') }}
         </p>
         <div
           class="max-h-[50dvh] overflow-auto rounded-xl border border-[#E2E8F0]"
           tabindex="0"
           role="region"
-          aria-label="Pratinjau tabel ekspor, geser untuk melihat seluruh kolom"
+          :aria-label="t('export_preview_table_aria')"
         >
           <div v-if="previewData.length === 0" class="py-8 text-center text-xs text-[#687281]">
-            Tidak ada data yang dapat ditampilkan.
+            {{ t('export_preview_no_data') }}
           </div>
           <table v-else class="w-full text-left text-xs border-collapse">
             <thead>
@@ -1066,14 +1075,14 @@ onMounted(() => {
             @click="showPreviewModal = false"
             class="rounded-xl border border-[#E2E8F0] bg-white px-4 py-2 text-xs font-semibold text-[#5F7089] hover:bg-[#F8FAFC]"
           >
-            Tutup
+            {{ t('btn_close') }}
           </button>
           <button
             type="button"
             @click="handleConfirmExportModal"
             class="rounded-xl bg-[#0A51B0] px-4 py-2 text-xs font-bold text-white hover:bg-[#0A4391]"
           >
-            Unduh Sekarang
+            {{ t('export_download_now') }}
           </button>
         </div>
       </template>
@@ -1082,8 +1091,8 @@ onMounted(() => {
     <!-- Reset Database Confirmation Modal -->
     <AppModal
       :is-open="showResetModal"
-      title="Reset & Kosongkan Database"
-      subtitle="Tinjau dampaknya sebelum mengonfirmasi reset."
+      :title="t('export_reset_modal_title')"
+      :subtitle="t('export_reset_modal_subtitle')"
       icon="warning"
       size="md"
       @close="closeResetModal"
@@ -1098,26 +1107,25 @@ onMounted(() => {
             >error</span
           >
           <div class="text-xs text-rose-900 space-y-1">
-            <p class="font-bold text-xs">Data akan dihapus permanen</p>
+            <p class="font-bold text-xs">{{ t('export_reset_impact_title') }}</p>
             <p class="leading-relaxed text-rose-800">
-              Tindakan ini <strong>tidak dapat dibatalkan</strong>. Seluruh data aset TI/GA/OPS,
-              tiket bantuan, riwayat log audit, karyawan, dan sesi pengguna akan dihapus secara
-              permanen.
+              {{ t('export_reset_impact_prefix') }}
+              <strong>{{ t('export_reset_impact_strong') }}</strong
+              >{{ t('export_reset_impact_suffix') }}
             </p>
             <p class="reset-after-note text-[11px] text-rose-700">
-              Setelah reset, akun Superadmin dari konfigurasi backend dan unit helpdesk default akan
-              disiapkan kembali secara otomatis. Password tidak ditampilkan di aplikasi.
+              {{ t('export_reset_after_note') }}
             </p>
           </div>
         </div>
 
         <div class="reset-confirmation space-y-2 pt-1">
           <label for="confirm-reset-input" class="block text-xs font-bold text-slate-800">
-            Ketik
+            {{ t('export_reset_type_label_prefix') }}
             <span class="font-mono text-rose-700 bg-rose-100 px-1.5 py-0.5 rounded font-bold"
               >RESET</span
             >
-            di bawah ini untuk mengonfirmasi:
+            {{ t('export_reset_type_label_suffix') }}
           </label>
           <input
             id="confirm-reset-input"
@@ -1126,14 +1134,14 @@ onMounted(() => {
             autocomplete="off"
             :spellcheck="false"
             aria-describedby="reset-confirmation-hint"
-            placeholder="Ketik RESET"
+            :placeholder="t('export_reset_placeholder')"
             class="h-8 w-full rounded-[6px] border border-slate-300 bg-white px-3.5 text-xs text-slate-900 font-mono tracking-wider focus:border-rose-500 focus:outline-none focus:ring-2 focus:ring-rose-500/20"
             @keydown.enter="
               confirmResetInput.trim().toUpperCase() === 'RESET' && handleConfirmResetDatabase()
             "
           />
           <p id="reset-confirmation-hint" class="reset-confirmation-hint">
-            Tombol reset aktif setelah kata konfirmasi sesuai.
+            {{ t('export_reset_hint') }}
           </p>
         </div>
       </div>
@@ -1146,7 +1154,7 @@ onMounted(() => {
             @click="closeResetModal"
             class="rounded-xl border border-[#E2E8F0] bg-white px-4 py-2 text-xs font-semibold text-[#5F7089] hover:bg-[#F8FAFC] hover:text-[#333333] transition-colors cursor-pointer"
           >
-            Batal
+            {{ t('cancel') }}
           </button>
           <button
             type="button"
@@ -1163,7 +1171,7 @@ onMounted(() => {
             <span aria-hidden="true" v-else class="material-symbols-outlined text-[16px]"
               >restart_alt</span
             >
-            <span>{{ isResetting ? 'Me-reset...' : 'Reset database' }}</span>
+            <span>{{ isResetting ? t('export_resetting') : t('export_reset_database_btn') }}</span>
           </button>
         </div>
       </template>

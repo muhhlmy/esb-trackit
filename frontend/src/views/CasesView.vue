@@ -87,10 +87,11 @@ onMounted(async () => {
 
 <template>
   <div
-    class="cases-page w-full flex-1 flex flex-col items-center bg-[#F8FAFC] dark:bg-slate-950 text-[#333333] dark:text-slate-100 py-6 px-4 sm:px-6 lg:px-8 transition-colors duration-200"
+    class="cases-page w-full flex-1 flex flex-col items-center bg-[#F8FAFC] dark:bg-slate-950 text-[#333333] dark:text-slate-100 py-1 sm:py-2 transition-colors duration-200"
+    :data-testid="!isLoading ? 'page-ready' : undefined"
   >
     <div
-      class="cases-workspace max-w-[1200px] mx-auto w-full h-[calc(100vh-7rem)] overflow-hidden flex relative rounded-[6px] border border-[#E5EAEF] dark:border-slate-800 bg-white dark:bg-slate-950 shadow-xs"
+      class="cases-workspace max-w-[1400px] mx-auto w-full h-[calc(100vh-6.5rem)] overflow-hidden flex relative rounded-[6px] border border-[#E5EAEF] dark:border-slate-800 bg-white dark:bg-slate-950 shadow-xs"
     >
       <!-- Desktop Left Collapsible Notion Tree Sidebar -->
       <div class="cases-desktop-tree hidden md:flex h-full transition-all duration-300">

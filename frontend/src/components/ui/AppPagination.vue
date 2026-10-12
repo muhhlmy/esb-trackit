@@ -1,5 +1,8 @@
 <script setup>
 import { computed, watch } from 'vue'
+import { useLanguage } from '@/composables/useLanguage.js'
+
+const { t } = useLanguage()
 
 const props = defineProps({
   currentPage: { type: Number, required: true, default: 1 },
@@ -68,27 +71,27 @@ function goToPage(page) {
     class="flex flex-col sm:flex-row items-center justify-between gap-2 px-3 py-2 sm:px-4 sm:py-2.5 border-t border-[#F1F5F9] text-[9.5px] sm:text-[10.5px] text-[#475569] select-none"
   >
     <div class="flex items-center gap-1 font-medium">
-      <span>Menampilkan</span>
+      <span>{{ t('showing_entries') }}</span>
       <span class="font-bold text-[#333333]">{{ startIndex }}</span>
       <span>-</span>
       <span class="font-bold text-[#333333]">{{ endIndex }}</span>
-      <span>dari</span>
+      <span>{{ t('of_entries') }}</span>
       <span class="font-bold text-[#333333]">{{ totalItems }}</span>
-      <span>data</span>
+      <span>{{ t('entries') }}</span>
     </div>
 
     <div
       v-if="totalPages > 1"
       class="flex items-center gap-1"
       role="navigation"
-      aria-label="Navigasi Halaman"
+      :aria-label="t('ui_pagination_aria')"
     >
       <button
         type="button"
         @click="goToPage(currentPage - 1)"
         :disabled="currentPage <= 1"
-        aria-label="Halaman Sebelumnya"
-        title="Halaman Sebelumnya"
+        :aria-label="t('ui_page_prev')"
+        :title="t('ui_page_prev')"
         class="ui-pagination-button flex h-6.5 w-6.5 sm:h-7 sm:w-7 items-center justify-center rounded-[5px] border border-[#CBD5E1] bg-white text-[#334155] shadow-2xs hover:bg-[#F8FAFC] hover:text-[#333333] transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
       >
         <span aria-hidden="true" class="material-symbols-outlined text-[14px]">chevron_left</span>
@@ -97,7 +100,7 @@ function goToPage(page) {
       <select
         v-if="mobileCompact"
         :value="currentPage"
-        aria-label="Pilih halaman"
+        :aria-label="t('ui_page_select')"
         class="min-h-7 min-w-0 rounded-[5px] border border-[#CBD5E1] bg-white px-1.5 text-xs text-[#334155] sm:hidden"
         @change="goToPage(Number($event.target.value))"
       >
@@ -109,7 +112,7 @@ function goToPage(page) {
         <button
           type="button"
           @click="goToPage(page)"
-          :aria-label="`Halaman ${page}`"
+          :aria-label="`${t('ui_page_number')} ${page}`"
           :aria-current="page === currentPage ? 'page' : undefined"
           class="ui-pagination-button flex h-6.5 min-w-[26px] sm:h-7 sm:min-w-[28px] px-1.5 items-center justify-center rounded-[5px] text-[9.5px] sm:text-[10px] font-bold transition-all cursor-pointer"
           :class="[
@@ -127,8 +130,8 @@ function goToPage(page) {
         type="button"
         @click="goToPage(currentPage + 1)"
         :disabled="currentPage >= totalPages"
-        aria-label="Halaman Selanjutnya"
-        title="Halaman Selanjutnya"
+        :aria-label="t('ui_page_next')"
+        :title="t('ui_page_next')"
         class="ui-pagination-button flex h-6.5 w-6.5 sm:h-7 sm:w-7 items-center justify-center rounded-[5px] border border-[#CBD5E1] bg-white text-[#334155] shadow-2xs hover:bg-[#F8FAFC] hover:text-[#333333] transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
       >
         <span aria-hidden="true" class="material-symbols-outlined text-[14px]">chevron_right</span>

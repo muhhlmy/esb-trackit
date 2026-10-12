@@ -6,6 +6,13 @@ import { normalizeLocation } from "../utils/locationNormalizer.js";
 import { canReadITAsset, canWriteITAsset, canReadOtherAssets } from "../security/resourceAuthorizationPolicy.js";
 import { parsePaginationQuery, setPaginationHeaders } from "../security/requestValidation.js";
 import { sanitizePlainText } from "../security/htmlSanitizer.js";
+import {
+  calculateStraightLineDepreciation,
+  calculateDoubleDecliningDepreciation,
+  generateDepreciationSchedule,
+  resolveLifecycleRule,
+  DEPRECIATION_METHODS,
+} from "../services/assetDepreciationService.js";
 
 function createHttpError(statusCode, message) {
   const error = new Error(message);
@@ -590,6 +597,60 @@ export async function listAssets(req, res) {
     }
     console.error('Error listing assets:', error)
     res.status(500).json({ error: 'Gagal memuat daftar aset.' })
+  }
+}
+
+// POST /api/assets/depreciation/calculate
+export async function calculateAssetDepreciation(req, res) {
+  try {
+    const {
+      cost,
+      salvageValue,
+      usefulLifeMonths,
+      acquisitionDate,
+      method = DEPRECIATION_METHODS.STRAIGHT_LINE,
+      deviceType,
+    } = req.body || {}
+
+    if (cost == null || isNaN(Number(cost)) || Number(cost) < 0) {
+      return res.status(400).json({ error: 'Nilai perolehan (cost) harus berupa angka valid >= 0.' })
+    }
+
+    const defaultRule = resolveLifecycleRule(deviceType)
+    const effectiveUsefulLife = usefulLifeMonths || defaultRule.usefulLifeMonths
+    const effectiveSalvage = salvageValue != null
+      ? Number(salvageValue)
+      : Math.round((Number(cost) * (defaultRule.salvagePercent / 100)) * 100) / 100
+
+    const calculation = method === DEPRECIATION_METHODS.DOUBLE_DECLINING
+      ? calculateDoubleDecliningDepreciation({
+          cost: Number(cost),
+          salvageValue: effectiveSalvage,
+          usefulLifeMonths: effectiveUsefulLife,
+          acquisitionDate: acquisitionDate || new Date(),
+        })
+      : calculateStraightLineDepreciation({
+          cost: Number(cost),
+          salvageValue: effectiveSalvage,
+          usefulLifeMonths: effectiveUsefulLife,
+          acquisitionDate: acquisitionDate || new Date(),
+        })
+
+    const schedule = generateDepreciationSchedule({
+      cost: Number(cost),
+      salvageValue: effectiveSalvage,
+      usefulLifeMonths: effectiveUsefulLife,
+      acquisitionDate: acquisitionDate || new Date(),
+      method,
+    })
+
+    res.json({
+      ...calculation,
+      schedule,
+    })
+  } catch (error) {
+    console.error('Error calculating depreciation:', error)
+    res.status(500).json({ error: 'Gagal menghitung penyusutan aset.' })
   }
 }
 

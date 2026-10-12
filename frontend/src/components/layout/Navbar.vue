@@ -77,7 +77,7 @@ onUnmounted(() => {
         </RouterLink>
         <label v-if="route.path === '/'" class="navbar-language">
           <Globe :size="16" aria-hidden="true" />
-          <span class="sr-only">Bahasa / Language</span>
+          <span class="sr-only">{{ t('nav_language_toggle_label') }}</span>
           <select :value="currentLang" @change="setLanguage($event.target.value)">
             <option value="id">ID</option>
             <option value="en">EN</option>

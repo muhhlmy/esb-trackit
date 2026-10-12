@@ -18,6 +18,8 @@ import AssetLabelModal from '../components/common/AssetLabelModal.vue'
 import BaseSkeleton from '../components/ui/skeleton/BaseSkeleton.vue'
 import SkeletonAvatar from '../components/ui/skeleton/SkeletonAvatar.vue'
 import AssetCategoryImportModal from '../components/ui/AssetCategoryImportModal.vue'
+import ErrorState from '../components/ui/ErrorState.vue'
+import EmptyState from '../components/ui/EmptyState.vue'
 import FilterModal from '../components/ui/FilterModal.vue'
 import AssetCategoryExportModal from '../components/ui/AssetCategoryExportModal.vue'
 
@@ -581,18 +583,8 @@ function formatDate(dateStr) {
           </div>
         </div>
       </div>
-      <!-- Error Alert -->
-      <div
-        v-if="pageError"
-        role="alert"
-        class="flex items-center gap-2 bg-rose-50 px-4 py-3 text-xs text-rose-600 rounded-[6px] border border-rose-200"
-      >
-        <span aria-hidden="true" class="material-symbols-outlined text-[18px]">error</span>
-        <span class="flex-1 font-semibold">{{ pageError }}</span>
-        <button type="button" class="font-bold underline cursor-pointer" @click="fetchData">
-          {{ t('retry') }}
-        </button>
-      </div>
+      <!-- Error State -->
+      <ErrorState v-if="pageError" :message="pageError" @retry="fetchData" />
 
       <!-- Loading State Skeleton -->
       <div v-else-if="isLoading" aria-busy="true" class="space-y-2.5">
@@ -678,30 +670,15 @@ function formatDate(dateStr) {
       <!-- Empty State -->
       <div
         v-else-if="filteredAssets.length === 0"
-        class="py-8 px-3 text-center bg-white rounded-[6px] border border-[#E2E8F0]/80"
+        class="bg-white rounded-[6px] border border-[#E2E8F0]/80"
       >
-        <div class="flex flex-col items-center justify-center gap-2 max-w-sm mx-auto">
-          <span
-            class="flex h-10 w-10 items-center justify-center rounded-[6px] bg-[#F1F5F9] text-[#5F7089]"
-          >
-            <span aria-hidden="true" class="material-symbols-outlined text-[20px]"
-              >precision_manufacturing</span
-            >
-          </span>
-          <h3 class="text-[14px] font-semibold text-[#333333] mt-1">{{ t('ops_empty_title') }}</h3>
-          <p class="text-[11px] text-[#5F7089] leading-relaxed">
-            {{ t('ops_empty_desc') }}
-          </p>
-          <button
-            v-if="canWriteAssets"
-            type="button"
-            @click="openAdd"
-            class="mt-2 h-8 rounded-[6px] bg-[#0A51B0] px-3.5 text-[12px] font-medium text-white shadow-2xs hover:bg-[#0A4391] transition-all flex items-center gap-1.5 cursor-pointer"
-          >
-            <span aria-hidden="true" class="material-symbols-outlined text-[16px]">add</span>
-            <span>{{ t('ops_add_asset_caps') }}</span>
-          </button>
-        </div>
+        <EmptyState
+          icon="precision_manufacturing"
+          :title="t('ops_empty_title')"
+          :description="t('ops_empty_desc')"
+          :action-label="canWriteAssets ? t('ops_add_asset_caps') : ''"
+          @action="openAdd"
+        />
       </div>
 
       <!-- Asset list -->

@@ -180,7 +180,11 @@ function getCategoryBadgeClass(category) {
 </script>
 
 <template>
-  <div ref="mainScope" class="cms-page w-full max-w-7xl mx-auto space-y-3 font-sans">
+  <div
+    ref="mainScope"
+    class="cms-page w-full space-y-2 sm:space-y-2.5 font-sans"
+    :data-testid="!loading ? 'page-ready' : undefined"
+  >
     <!-- ── Page Header (komponen bersama; sama dengan halaman lain) ── -->
     <PageHeader
       class="gsap-admin-el"

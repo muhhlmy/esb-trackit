@@ -17,8 +17,11 @@ import AssetLabelModal from '../components/common/AssetLabelModal.vue'
 import BaseSkeleton from '../components/ui/skeleton/BaseSkeleton.vue'
 import SkeletonAvatar from '../components/ui/skeleton/SkeletonAvatar.vue'
 import AssetCategoryImportModal from '../components/ui/AssetCategoryImportModal.vue'
+import ErrorState from '../components/ui/ErrorState.vue'
+import EmptyState from '../components/ui/EmptyState.vue'
 import FilterModal from '../components/ui/FilterModal.vue'
 import AssetCategoryExportModal from '../components/ui/AssetCategoryExportModal.vue'
+import BarcodeScannerModal from '../components/common/BarcodeScannerModal.vue'
 
 import { useLanguage } from '../composables/useLanguage.js'
 
@@ -75,6 +78,13 @@ const isSubmitting = ref(false)
 const modalError = ref('')
 const showImportModal = ref(false)
 const showExportModal = ref(false)
+const showScannerModal = ref(false)
+
+function handleBarcodeScanned(code) {
+  if (typeof code === 'string' && code.trim()) {
+    searchQuery.value = code.trim()
+  }
+}
 
 function openLabelModal(asset) {
   selectedLabelAsset.value = asset
@@ -538,7 +548,17 @@ function formatKondisiPill(kondisi) {
             </button>
           </div>
 
-          <div class="flex w-full items-center justify-end">
+          <div class="flex w-full items-center justify-end gap-1.5">
+            <button
+              type="button"
+              @click="showScannerModal = true"
+              class="h-8 shrink-0 inline-flex items-center gap-1 rounded-[6px] border border-[#E2E8F0] dark:border-slate-800 bg-[#F8FAFC] dark:bg-slate-800 px-2 sm:px-2.5 text-[11px] sm:text-[12px] font-semibold text-[#5F7089] dark:text-slate-300 hover:bg-white dark:hover:bg-slate-700 hover:text-[#0A51B0] transition cursor-pointer"
+              :title="t('scan_barcode_title', 'Pindai Barcode / QR Code')"
+              :aria-label="t('scan_barcode_btn', 'Pindai Barcode')"
+            >
+              <span aria-hidden="true" class="material-symbols-outlined text-[16px]">qr_code_scanner</span>
+              <span class="hidden sm:inline">{{ t('scan_barcode_btn', 'Pindai') }}</span>
+            </button>
             <button
               type="button"
               @click="showFilterModal = true"
@@ -570,18 +590,8 @@ function formatKondisiPill(kondisi) {
           </div>
         </div>
       </div>
-      <!-- Error Alert -->
-      <div
-        v-if="pageError"
-        role="alert"
-        class="flex items-center gap-2 bg-rose-50 px-3 py-2.5 text-[12px] text-rose-600 rounded-[6px] border border-rose-200"
-      >
-        <span aria-hidden="true" class="material-symbols-outlined text-[18px]">error</span>
-        <span class="flex-1 font-semibold">{{ pageError }}</span>
-        <button type="button" class="font-bold underline cursor-pointer" @click="fetchData">
-          {{ t('retry') }}
-        </button>
-      </div>
+      <!-- Error State -->
+      <ErrorState v-if="pageError" :message="pageError" @retry="fetchData" />
 
       <!-- Loading State Skeleton -->
       <div v-else-if="isLoading" aria-busy="true" class="space-y-2.5">
@@ -667,30 +677,15 @@ function formatKondisiPill(kondisi) {
       <!-- Empty State -->
       <div
         v-else-if="filteredAssets.length === 0"
-        class="py-8 px-3 text-center bg-white rounded-[6px] border border-[#E2E8F0]/80"
+        class="bg-white rounded-[6px] border border-[#E2E8F0]/80"
       >
-        <div class="flex flex-col items-center justify-center gap-2 max-w-sm mx-auto">
-          <span
-            class="flex h-10 w-10 items-center justify-center rounded-[6px] bg-[#F1F5F9] text-[#5F7089]"
-          >
-            <span aria-hidden="true" class="material-symbols-outlined text-[20px]"
-              >domain_disabled</span
-            >
-          </span>
-          <h3 class="text-[14px] font-semibold text-[#333333] mt-1">{{ t('ga_empty_title') }}</h3>
-          <p class="text-[12px] text-[#5F7089] leading-relaxed">
-            {{ t('ga_empty_desc') }}
-          </p>
-          <button
-            v-if="canWriteAssets"
-            type="button"
-            @click="openAdd"
-            class="mt-2 h-8 rounded-[6px] bg-[#0A51B0] px-4 text-[12px] font-semibold text-white shadow-2xs hover:bg-[#0A4391] transition-all flex items-center gap-1.5 cursor-pointer"
-          >
-            <span aria-hidden="true" class="material-symbols-outlined text-[16px]">add</span>
-            <span>{{ t('ga_add_asset') }}</span>
-          </button>
-        </div>
+        <EmptyState
+          icon="domain_disabled"
+          :title="t('ga_empty_title')"
+          :description="t('ga_empty_desc')"
+          :action-label="canWriteAssets ? t('ga_add_asset') : ''"
+          @action="openAdd"
+        />
       </div>
 
       <!-- Asset list -->
@@ -1217,6 +1212,11 @@ function formatKondisiPill(kondisi) {
       asset-type="ga"
       :assets="filteredAssets"
       @close="showExportModal = false"
+    />
+    <BarcodeScannerModal
+      :is-open="showScannerModal"
+      @close="showScannerModal = false"
+      @scan="handleBarcodeScanned"
     />
   </div>
 </template>

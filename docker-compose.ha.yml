@@ -1,20 +1,83 @@
+# =============================================================================
+# ESB-TrackIT High-Availability Deployment
+# Edge load balancer + 2 active backend nodes + 1 hot-standby + 2 SPA replicas
+# + shared PostgreSQL. Layered LB: edge NGINX (least_conn) -> node cluster.js
+# (master/worker per container) -> pg connection pool.
+#
+# Quick start (no certs needed — plain HTTP edge profile):
+#   docker compose -f docker-compose.ha.yml up -d
+#   → http://localhost
+#
+# Production TLS profile:
+#   1. Generate/copy certs into deploy/nginx/ssl/ (see deploy/nginx/ssl/README.md)
+#   2. Set LB_CONF=load-balancer.conf below (or export it as an env var)
+#   docker compose -f docker-compose.ha.yml up -d
+#   → https://localhost
+# =============================================================================
+
+x-backend-env: &backend-env
+  NODE_ENV: production
+  PORT: 3000
+  HOST: 0.0.0.0
+  # Edge LB terminates TLS and injects X-Forwarded-Proto; trust the docker
+  # networks so req.ip / rate-limit keys resolve to the real client IP.
+  TRUST_PROXY: 172.16.0.0/12,10.0.0.0/8,127.0.0.1
+  DATABASE_URL: postgres://trackit:${DB_PASSWORD:-trackit_secret}@db:5432/trackit
+  JWT_SECRET: ${JWT_SECRET:?JWT_SECRET must be set (min 32 characters)}
+  # In-container multi-core load balancing: master forks N workers and shares
+  # the listening socket (SO_REUSEPORT) across them.
+  WEB_CONCURRENCY: 2
+  CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost,https://localhost}
+  EMAIL_ENABLED: ${EMAIL_ENABLED:-false}
+  SMTP_HOST: ${SMTP_HOST:-}
+  SMTP_PORT: ${SMTP_PORT:-587}
+  SMTP_SECURE: ${SMTP_SECURE:-false}
+  SMTP_USER: ${SMTP_USER:-}
+  SMTP_PASS: ${SMTP_PASS:-}
+  EMAIL_FROM: ${EMAIL_FROM:-}
+
+x-backend-health: &backend-health
+  test: ["CMD-SHELL", "node -e \"fetch('http://127.0.0.1:3000/health/ready').then(r => r.ok ? process.exit(0) : process.exit(1)).catch(() => process.exit(1))\""]
+  interval: 10s
+  timeout: 5s
+  retries: 3
+  start_period: 15s
+
+x-hardening: &hardening
+  security_opt:
+    - no-new-privileges:true
+  cap_drop:
+    - ALL
+
 services:
   load-balancer:
     image: nginx:1.27-alpine
     container_name: trackit-load-balancer
     restart: always
+    # load-balancer.conf        → TLS profile (requires certs in ./deploy/nginx/ssl)
+    # load-balancer.http.conf   → plain HTTP profile (default, zero-setup)
+    volumes:
+      - ${LB_CONF:-./deploy/nginx/load-balancer.http.conf}:/etc/nginx/nginx.conf:ro
+      - ./deploy/nginx/ssl:/etc/nginx/ssl:ro
     ports:
       - "80:80"
       - "443:443"
-    volumes:
-      - ./deploy/nginx/load-balancer.conf:/etc/nginx/nginx.conf:ro
     depends_on:
       backend-1:
         condition: service_healthy
       backend-2:
         condition: service_healthy
+      frontend-1:
+        condition: service_healthy
+      frontend-2:
+        condition: service_healthy
     networks:
       - trackit-network
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://127.0.0.1/health/live || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
 
   backend-1:
     build:
@@ -23,18 +86,14 @@ services:
     container_name: trackit-backend-1
     restart: always
     environment:
-      - NODE_ENV=production
-      - PORT=5000
-      - HOST=0.0.0.0
-      - TRUST_PROXY=172.16.0.0/12,10.0.0.0/8,127.0.0.1
-      - DATABASE_URL=postgres://trackit:trackit_secret@db:5432/trackit
-      - WEB_CONCURRENCY=2
-    healthcheck:
-      test: ["CMD-SHELL", "node -e \"fetch('http://127.0.0.1:5000/health/ready').then(r => r.ok ? process.exit(0) : process.exit(1)).catch(() => process.exit(1))\""]
-      interval: 10s
-      timeout: 5s
-      retries: 3
-      start_period: 15s
+      <<: *backend-env
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: trackit
+      DB_PASSWORD: ${DB_PASSWORD:-trackit_secret}
+      DB_NAME: trackit
+      ALLOW_DB_MIGRATIONS: "false"
+    healthcheck: *backend-health
     depends_on:
       db:
         condition: service_healthy
@@ -48,23 +107,76 @@ services:
     container_name: trackit-backend-2
     restart: always
     environment:
-      - NODE_ENV=production
-      - PORT=5000
-      - HOST=0.0.0.0
-      - TRUST_PROXY=172.16.0.0/12,10.0.0.0/8,127.0.0.1
-      - DATABASE_URL=postgres://trackit:trackit_secret@db:5432/trackit
-      - WEB_CONCURRENCY=2
-    healthcheck:
-      test: ["CMD-SHELL", "node -e \"fetch('http://127.0.0.1:5000/health/ready').then(r => r.ok ? process.exit(0) : process.exit(1)).catch(() => process.exit(1))\""]
-      interval: 10s
-      timeout: 5s
-      retries: 3
-      start_period: 15s
+      <<: *backend-env
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: trackit
+      DB_PASSWORD: ${DB_PASSWORD:-trackit_secret}
+      DB_NAME: trackit
+      ALLOW_DB_MIGRATIONS: "false"
+    healthcheck: *backend-health
     depends_on:
       db:
         condition: service_healthy
     networks:
       - trackit-network
+
+  backend-3:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: trackit-backend-3
+    restart: always
+    environment:
+      <<: *backend-env
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: trackit
+      DB_PASSWORD: ${DB_PASSWORD:-trackit_secret}
+      DB_NAME: trackit
+      ALLOW_DB_MIGRATIONS: "false"
+    healthcheck: *backend-health
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - trackit-network
+
+  frontend-1:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: trackit-frontend-1
+    restart: always
+    depends_on:
+      - backend-1
+    <<: *hardening
+    networks:
+      - trackit-network
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+  frontend-2:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: trackit-frontend-2
+    restart: always
+    depends_on:
+      - backend-2
+    <<: *hardening
+    networks:
+      - trackit-network
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
 
   db:
     image: postgres:16-alpine
@@ -72,7 +184,7 @@ services:
     restart: always
     environment:
       - POSTGRES_USER=trackit
-      - POSTGRES_PASSWORD=trackit_secret
+      - POSTGRES_PASSWORD=${DB_PASSWORD:-trackit_secret}
       - POSTGRES_DB=trackit
     volumes:
       - pgdata:/var/lib/postgresql/data
@@ -84,8 +196,36 @@ services:
     networks:
       - trackit-network
 
+  migrate:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: trackit-migrate
+    restart: "no"
+    profiles: ["migrate"]
+    environment:
+      <<: *backend-env
+      ALLOW_DB_MIGRATIONS: "true"
+      MIGRATION_MODE: ${MIGRATION_MODE:-fresh}
+      MIGRATION_EXPECTED_HOST: db
+      MIGRATION_EXPECTED_DATABASE: trackit
+      MIGRATION_RECOVERY_PROOF_ID: ${MIGRATION_RECOVERY_PROOF_ID:?MIGRATION_RECOVERY_PROOF_ID must be set}
+      MIGRATION_CHANGE_ID: ${MIGRATION_CHANGE_ID:?MIGRATION_CHANGE_ID must be set}
+      SEED_SUPERADMIN_NAME: ${SEED_SUPERADMIN_NAME:-}
+      SEED_SUPERADMIN_EMAIL: ${SEED_SUPERADMIN_EMAIL:-}
+      SEED_SUPERADMIN_PASSWORD: ${SEED_SUPERADMIN_PASSWORD:-}
+    volumes:
+      - backups:/app/storage/backups
+    command: ["npm", "run", "db:migrate:apply"]
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - trackit-network
+
 volumes:
   pgdata:
+  backups:
 
 networks:
   trackit-network:

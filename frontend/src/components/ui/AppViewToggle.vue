@@ -3,6 +3,11 @@
 // AppViewToggle.vue - Segmented control Tabel / Kartu.
 // Dipakai bersama semua list modul agar pola tampilan konsisten.
 // ============================================================
+import { computed } from 'vue'
+import { useLanguage } from '@/composables/useLanguage.js'
+
+const { t } = useLanguage()
+
 defineProps({
   modelValue: { type: String, required: true },
   disabled: { type: Boolean, default: false },
@@ -10,17 +15,17 @@ defineProps({
 
 defineEmits(['update:modelValue'])
 
-const options = [
-  { value: 'table', label: 'Tabel', icon: 'table_rows' },
-  { value: 'card', label: 'Kartu', icon: 'grid_view' },
-]
+const options = computed(() => [
+  { value: 'table', label: t('table_view'), icon: 'table_rows' },
+  { value: 'card', label: t('card_view'), icon: 'grid_view' },
+])
 </script>
 
 <template>
   <div
     class="app-view-toggle inline-flex shrink-0 items-center gap-0.5 rounded-md border border-[#E2E8F0] bg-[#F8FAFC] p-0.5"
     role="group"
-    aria-label="Mode tampilan daftar"
+    :aria-label="t('ui_view_toggle_aria')"
   >
     <button
       v-for="opt in options"
@@ -28,7 +33,7 @@ const options = [
       type="button"
       :disabled="disabled"
       :aria-pressed="modelValue === opt.value ? 'true' : 'false'"
-      :title="`Tampilan ${opt.label}`"
+      :title="opt.value === 'table' ? t('ui_view_table_title') : t('ui_view_card_title')"
       class="inline-flex h-6 sm:h-6.5 items-center gap-1 rounded-sm px-1.5 sm:px-2 text-[9.5px] sm:text-[10px] font-semibold transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
       :class="
         modelValue === opt.value

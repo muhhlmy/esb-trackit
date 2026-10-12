@@ -31,6 +31,11 @@ assetRouter.get('/stats',
   assetController.showAssetStats
 )
 
+assetRouter.post('/depreciation/calculate',
+  authorizeAnyPermission(['dashboard', 'assets', 'export'], 'read'),
+  assetController.calculateAssetDepreciation
+)
+
 // GET /:id is guarded by resource-level authorization in fetchAsset controller (allows non-admin users to read own asset)
 assetRouter.get('/:id', assetController.fetchAsset)
 

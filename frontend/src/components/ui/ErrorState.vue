@@ -1,4 +1,9 @@
 <script setup>
+import { computed } from 'vue'
+import { useLanguage } from '@/composables/useLanguage.js'
+
+const { t } = useLanguage()
+
 /**
  * ErrorState.vue - primitive error state halaman/kartu dengan retry.
  *
@@ -8,14 +13,17 @@
  *
  * Props:
  *   message      – Pesan error (required)
- *   retryLabel   – Label tombol coba lagi (default 'Coba lagi')
+ *   retryLabel   – Label tombol coba lagi (default diterjemahkan)
  * Emits:
  *   retry
  */
-defineProps({
+const props = defineProps({
   message: { type: String, required: true },
-  retryLabel: { type: String, default: 'Coba lagi' },
+  retryLabel: { type: String, default: '' },
 })
+
+// Label default diterjemahkan saat runtime agar ikut bahasa aktif.
+const effectiveRetryLabel = computed(() => props.retryLabel || t('retry'))
 
 defineEmits(['retry'])
 </script>
@@ -36,7 +44,7 @@ defineEmits(['retry'])
       class="inline-flex h-6.5 items-center rounded-[5px] bg-[#DC2626] px-2.5 text-[10px] font-bold text-white transition-colors duration-150 hover:bg-[#B91C1C] active:scale-[0.98] cursor-pointer"
       @click="$emit('retry')"
     >
-      {{ retryLabel }}
+      {{ effectiveRetryLabel }}
     </button>
   </div>
 </template>

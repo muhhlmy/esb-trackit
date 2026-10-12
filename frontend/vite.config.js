@@ -80,11 +80,11 @@ export default defineConfig(({ mode = 'development' }) => {
   const allowedHosts =
     rawAllowedHosts === 'true' || rawAllowedHosts === '*'
       ? true
-      : Array.from(new Set(['.trycloudflare.com', ...parsedAllowedHosts]))
+      : Array.from(new Set(['localhost', '127.0.0.1', '[::1]', '.trycloudflare.com', ...parsedAllowedHosts]))
 
   const hostList = Array.isArray(allowedHosts) ? allowedHosts : []
-  const hmrHosts = new Set(['localhost', '127.0.0.1', ...hostList.filter((host) => !host.startsWith('.'))])
-  if (env.VITE_HOST && !['0.0.0.0', '::'].includes(env.VITE_HOST)) hmrHosts.add(env.VITE_HOST)
+  const hmrHosts = new Set(['localhost', '127.0.0.1', ...hostList.filter((host) => !host.startsWith('.') && !host.includes(':'))])
+  if (env.VITE_HOST && !['0.0.0.0', '::'].includes(env.VITE_HOST) && !env.VITE_HOST.includes(':')) hmrHosts.add(env.VITE_HOST)
   const hmrOrigins = [...hmrHosts].flatMap((host) => ['ws', 'wss'].map((scheme) => scheme + '://' + host + ':' + port))
   const devHeaders = {
     ...FRONTEND_SECURITY_HEADERS,
@@ -124,12 +124,13 @@ export default defineConfig(({ mode = 'development' }) => {
       },
     },
     server: {
-      host: env.VITE_HOST || process.env.VITE_HOST || '127.0.0.1',
+      host: env.VITE_HOST || process.env.VITE_HOST || '::',
       port,
       allowedHosts,
       headers: devHeaders,
+      historyApiFallback: true,
       proxy: {
-        '/api': {
+        '^/api/': {
           target: proxyTarget,
           onProxyReq: (proxyReq, req) => {
             if (req.headers.cookie) {
@@ -144,7 +145,7 @@ export default defineConfig(({ mode = 'development' }) => {
       },
     },
     preview: {
-      host: env.VITE_HOST || process.env.VITE_HOST || '127.0.0.1',
+      host: env.VITE_HOST || process.env.VITE_HOST || '::',
       port,
       allowedHosts,
       headers: FRONTEND_SECURITY_HEADERS,
@@ -153,7 +154,7 @@ export default defineConfig(({ mode = 'development' }) => {
       // Bundel ditaruh di 'static/', BUKAN 'assets/'.
       // Alasan: route SPA '/assets' (AssetsView) bertabrakan dengan direktori
       // build di web root. nginx `try_files $uri $uri/ /index.html` menemukan
-      // direktori 'assets/' pada langkah $uri/, jadi fallback /index.html tidak
+      // direttori 'assets/' pada langkah $uri/, jadi fallback /index.html tidak
       // pernah jalan -> 301 ke /assets/ lalu 403 (tidak ada index, autoindex off).
       // Refresh di /assets gagal sementara navigasi klien berhasil.
       assetsDir: 'static',

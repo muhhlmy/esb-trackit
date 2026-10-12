@@ -18,20 +18,27 @@
  * Emits:
  *   update:open, confirm, cancel
  */
-import { nextTick, ref, watch } from 'vue'
+import { nextTick, ref, watch, computed } from 'vue'
+import { useLanguage } from '@/composables/useLanguage.js'
 import AppModal from './AppModal.vue'
+
+const { t } = useLanguage()
 
 const props = defineProps({
   open: { type: Boolean, default: false },
   title: { type: String, required: true },
   message: { type: String, default: '' },
-  confirmLabel: { type: String, default: 'Konfirmasi' },
-  cancelLabel: { type: String, default: 'Batal' },
+  confirmLabel: { type: String, default: '' },
+  cancelLabel: { type: String, default: '' },
   destructive: { type: Boolean, default: false },
   loading: { type: Boolean, default: false },
 })
 
 const emit = defineEmits(['update:open', 'confirm', 'cancel'])
+
+// Label default diterjemahkan saat runtime agar ikut bahasa aktif.
+const effectiveConfirmLabel = computed(() => props.confirmLabel || t('btn_confirm'))
+const effectiveCancelLabel = computed(() => props.cancelLabel || t('btn_cancel'))
 
 const cancelRef = ref(null)
 
@@ -69,7 +76,7 @@ function close(action = 'cancel') {
           class="inline-flex h-7 items-center rounded-[5px] border border-[#E2E8F0] bg-white px-3 text-[10px] font-bold text-[#475569] transition-colors duration-150 hover:bg-[#F8FAFC] cursor-pointer"
           @click="close('cancel')"
         >
-          {{ cancelLabel }}
+          {{ effectiveCancelLabel }}
         </button>
 
         <button
@@ -90,7 +97,7 @@ function close(action = 'cancel') {
           >
             progress_activity
           </span>
-          {{ confirmLabel }}
+          {{ effectiveConfirmLabel }}
         </button>
       </div>
     </template>

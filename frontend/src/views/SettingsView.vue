@@ -58,42 +58,43 @@ const activeTemplate = ref({
 const previewDevice = ref('desktop')
 
 // Sample Mockup Data for Realistic Live Preview (All 8 Events)
-const previewMockData = {
+// Computed agar data contoh mengikuti bahasa aktif (tidak menampilkan teks Indonesia saat EN aktif).
+const previewMockData = computed(() => ({
   '{{recipient_name}}': 'Budi Santoso',
   '{{nomor_tiket}}': '#TIC26-0142',
-  '{{judul_tiket}}': 'Kendala Koneksi Jaringan Lantai 3',
+  '{{judul_tiket}}': t('settings_mock_ticket_title'),
   '{{status_tiket}}': 'In Progress',
-  '{{prioritas_tiket}}': 'Tinggi',
-  '{{unit_support}}': 'Infrastruktur & Jaringan',
+  '{{prioritas_tiket}}': t('settings_mock_priority'),
+  '{{unit_support}}': t('settings_mock_support_unit'),
   '{{pelapor_nama}}': 'Ahmad Fauzi',
   '{{status_sebelumnya}}': 'Open',
   '{{status_baru}}': 'In Progress',
-  '{{catatan_update}}': 'Pemeriksaan port access point dan kabel LAN sedang berlangsung.',
+  '{{catatan_update}}': t('settings_mock_update_note'),
   '{{comment_author}}': 'Hendra Wijaya (IT Support)',
-  '{{comment_pesan}}': 'Kami telah melakukan konfigurasi ulang pada switch rack. Silakan coba sambungkan kembali perangkat Anda.',
+  '{{comment_pesan}}': t('settings_mock_comment'),
   '{{nama_teknisi}}': 'Hendra Wijaya',
   '{{ticket_url}}': 'https://trackit.company.id/tickets/TIC26-0142',
   '{{nomor_bast}}': 'BAST-2026-IT-0089',
-  '{{tanggal_bast}}': '10 Oktober 2026',
+  '{{tanggal_bast}}': t('settings_mock_bast_date'),
   '{{nama_aset}}': 'MacBook Pro 14" M3 Pro (Space Grey)',
   '{{serial_number}}': 'C02G41ABMD6M',
   '{{bast_url}}': 'https://trackit.company.id/submissions/BAST-2026-IT-0089',
   '{{tracking_number}}': 'TRK-2026-X8921',
   '{{ekspedisi}}': 'JNE Express (YES)',
-  '{{status_pengiriman}}': 'Dalam Perjalanan',
-  '{{tujuan_pengiriman}}': 'Kantor Cabang Surabaya - Jl. Pemuda No. 45',
+  '{{status_pengiriman}}': t('settings_mock_shipment_status'),
+  '{{tujuan_pengiriman}}': t('settings_mock_destination'),
   '{{shipment_url}}': 'https://trackit.company.id/shipments/TRK-2026-X8921',
   '{{user_name}}': 'Budi Santoso',
   '{{user_email}}': 'budi.santoso@perusahaan.co.id',
-  '{{user_role}}': 'Staff Operasional',
+  '{{user_role}}': t('settings_mock_user_role'),
   '{{app_url}}': 'https://trackit.company.id/login',
   '{{otp_code}}': '749102',
   '{{expiry_minutes}}': '15',
-}
+}))
 
 const renderedPreviewSubject = computed(() => {
   let subj = activeTemplate.value.subject || ''
-  for (const [placeholder, val] of Object.entries(previewMockData)) {
+  for (const [placeholder, val] of Object.entries(previewMockData.value)) {
     subj = subj.replaceAll(placeholder, val)
   }
   return subj
@@ -101,48 +102,49 @@ const renderedPreviewSubject = computed(() => {
 
 const renderedPreviewHtml = computed(() => {
   let html = activeTemplate.value.body_html || ''
-  for (const [placeholder, val] of Object.entries(previewMockData)) {
+  for (const [placeholder, val] of Object.entries(previewMockData.value)) {
     html = html.replaceAll(placeholder, val)
   }
   return html
 })
 
-const dynamicVariables = [
-  { key: '{{recipient_name}}', desc: 'Nama lengkap penerima email' },
-  { key: '{{nomor_tiket}}', desc: 'Nomor referensi tiket (misal: #TIC26-0142)' },
-  { key: '{{judul_tiket}}', desc: 'Judul tiket keluhan / permohonan' },
-  { key: '{{status_tiket}}', desc: 'Status tiket terkini (Open, In Progress, Resolved)' },
-  { key: '{{prioritas_tiket}}', desc: 'Tingkat urgensi (Rendah, Sedang, Tinggi)' },
-  { key: '{{unit_support}}', desc: 'Unit penanganan tiket (IT Support, GA, dll)' },
-  { key: '{{pelapor_nama}}', desc: 'Nama pelapor tiket' },
-  { key: '{{status_sebelumnya}}', desc: 'Status tiket sebelum pembaruan' },
-  { key: '{{status_baru}}', desc: 'Status tiket baru setelah diperbarui' },
-  { key: '{{catatan_update}}', desc: 'Catatan teknis pembaruan status' },
-  { key: '{{comment_author}}', desc: 'Nama pengirim komentar' },
-  { key: '{{comment_pesan}}', desc: 'Isi teks komentar' },
-  { key: '{{nama_teknisi}}', desc: 'Nama teknisi / PIC yang ditugaskan' },
-  { key: '{{ticket_url}}', desc: 'Tautan langsung ke detail tiket' },
-  { key: '{{nomor_bast}}', desc: 'Nomor dokumen BAST serah terima aset' },
-  { key: '{{tanggal_bast}}', desc: 'Tanggal pelaksanaan serah terima' },
-  { key: '{{nama_aset}}', desc: 'Nama perangkat / spesifikasi aset' },
-  { key: '{{serial_number}}', desc: 'Nomor seri (Serial Number / SN) aset' },
-  { key: '{{bast_url}}', desc: 'Tautan dokumen BAST' },
-  { key: '{{tracking_number}}', desc: 'Nomor resi pengiriman logistik' },
-  { key: '{{ekspedisi}}', desc: 'Nama jasa ekspedisi kurir' },
-  { key: '{{status_pengiriman}}', desc: 'Status pelacakan pengiriman aset' },
-  { key: '{{tujuan_pengiriman}}', desc: 'Alamat kantor / cabang tujuan kirim' },
-  { key: '{{shipment_url}}', desc: 'Tautan pelacakan pengiriman' },
-  { key: '{{user_name}}', desc: 'Nama pengguna yang didaftarkan' },
-  { key: '{{user_email}}', desc: 'Alamat email akun pengguna' },
-  { key: '{{user_role}}', desc: 'Peran / hak akses akun pengguna' },
-  { key: '{{app_url}}', desc: 'Tautan login atau aplikasi' },
-  { key: '{{otp_code}}', desc: 'Kode 6-digit OTP pemulihan kata sandi' },
-  { key: '{{expiry_minutes}}', desc: 'Masa berlaku kode OTP dalam menit' },
-]
+// Computed agar deskripsi variabel mengikuti bahasa aktif.
+const dynamicVariables = computed(() => [
+  { key: '{{recipient_name}}', desc: t('settings_var_recipient_name') },
+  { key: '{{nomor_tiket}}', desc: t('settings_var_nomor_tiket') },
+  { key: '{{judul_tiket}}', desc: t('settings_var_judul_tiket') },
+  { key: '{{status_tiket}}', desc: t('settings_var_status_tiket') },
+  { key: '{{prioritas_tiket}}', desc: t('settings_var_prioritas_tiket') },
+  { key: '{{unit_support}}', desc: t('settings_var_unit_support') },
+  { key: '{{pelapor_nama}}', desc: t('settings_var_pelapor_nama') },
+  { key: '{{status_sebelumnya}}', desc: t('settings_var_status_sebelumnya') },
+  { key: '{{status_baru}}', desc: t('settings_var_status_baru') },
+  { key: '{{catatan_update}}', desc: t('settings_var_catatan_update') },
+  { key: '{{comment_author}}', desc: t('settings_var_comment_author') },
+  { key: '{{comment_pesan}}', desc: t('settings_var_comment_pesan') },
+  { key: '{{nama_teknisi}}', desc: t('settings_var_nama_teknisi') },
+  { key: '{{ticket_url}}', desc: t('settings_var_ticket_url') },
+  { key: '{{nomor_bast}}', desc: t('settings_var_nomor_bast') },
+  { key: '{{tanggal_bast}}', desc: t('settings_var_tanggal_bast') },
+  { key: '{{nama_aset}}', desc: t('settings_var_nama_aset') },
+  { key: '{{serial_number}}', desc: t('settings_var_serial_number') },
+  { key: '{{bast_url}}', desc: t('settings_var_bast_url') },
+  { key: '{{tracking_number}}', desc: t('settings_var_tracking_number') },
+  { key: '{{ekspedisi}}', desc: t('settings_var_ekspedisi') },
+  { key: '{{status_pengiriman}}', desc: t('settings_var_status_pengiriman') },
+  { key: '{{tujuan_pengiriman}}', desc: t('settings_var_tujuan_pengiriman') },
+  { key: '{{shipment_url}}', desc: t('settings_var_shipment_url') },
+  { key: '{{user_name}}', desc: t('settings_var_user_name') },
+  { key: '{{user_email}}', desc: t('settings_var_user_email') },
+  { key: '{{user_role}}', desc: t('settings_var_user_role') },
+  { key: '{{app_url}}', desc: t('settings_var_app_url') },
+  { key: '{{otp_code}}', desc: t('settings_var_otp_code') },
+  { key: '{{expiry_minutes}}', desc: t('settings_var_expiry_minutes') },
+])
 
 function copyVariable(varKey) {
   navigator.clipboard?.writeText(varKey)
-  showToast(`${varKey} disalin ke clipboard!`, 'info')
+  showToast(`${varKey} ${t('settings_var_copied_suffix')}`, 'info')
 }
 
 async function loadData() {
@@ -167,7 +169,7 @@ async function loadData() {
       }
     }
   } catch (err) {
-    showToast(err.message || 'Gagal memuat pengaturan.', 'error')
+    showToast(err.message || t('settings_err_load'), 'error')
   } finally {
     isLoading.value = false
   }
@@ -192,10 +194,10 @@ async function handleSaveSettings() {
         smtpSettings.value.smtp_pass = '••••••••'
       }
     } else {
-      throw new Error(res?.message || 'Gagal menyimpan pengaturan.')
+      throw new Error(res?.message || t('settings_err_save'))
     }
   } catch (err) {
-    showToast(err.message || t('test_email_failed', 'Gagal menyimpan pengaturan.'), 'error')
+    showToast(err.message || t('settings_err_save'), 'error')
   } finally {
     isSavingSettings.value = false
   }
@@ -203,7 +205,7 @@ async function handleSaveSettings() {
 
 async function handleSendTestEmail() {
   if (!testEmailTarget.value && !smtpSettings.value.email_from_address) {
-    showToast('Tentukan alamat email penerima uji coba.', 'error')
+    showToast(t('settings_err_test_target'), 'error')
     return
   }
 
@@ -215,7 +217,7 @@ async function handleSendTestEmail() {
     if (res?.success) {
       showToast(t('test_email_success', 'Email pengujian berhasil dikirim!'), 'success')
     } else {
-      throw new Error(res?.message || 'Pengiriman email uji coba gagal.')
+      throw new Error(res?.message || t('settings_err_test_send'))
     }
   } catch (err) {
     showToast(err.message || t('test_email_failed', 'Gagal mengirim email pengujian.'), 'error')
@@ -238,10 +240,10 @@ async function handleSaveTemplate() {
         templates.value[idx] = { ...res.data }
       }
     } else {
-      throw new Error(res?.message || 'Gagal menyimpan template.')
+      throw new Error(res?.message || t('settings_err_save_template'))
     }
   } catch (err) {
-    showToast(err.message || 'Gagal menyimpan template email.', 'error')
+    showToast(err.message || t('settings_err_save_template'), 'error')
   } finally {
     isSavingTemplate.value = false
   }
@@ -252,17 +254,17 @@ async function handleResetTemplate() {
   try {
     const res = await api.post(`/api/settings/email/templates/${selectedTemplateKey.value}/reset`)
     if (res?.success) {
-      showToast('Template berhasil direset ke bawaan sistem.', 'success')
+      showToast(t('settings_template_reset_success'), 'success')
       activeTemplate.value = { ...res.data }
       const idx = templates.value.findIndex((t) => t.template_key === selectedTemplateKey.value)
       if (idx !== -1) {
         templates.value[idx] = { ...res.data }
       }
     } else {
-      throw new Error(res?.message || 'Gagal mereset template.')
+      throw new Error(res?.message || t('settings_err_reset_template'))
     }
   } catch (err) {
-    showToast(err.message || 'Gagal mereset template.', 'error')
+    showToast(err.message || t('settings_err_reset_template'), 'error')
   } finally {
     isResettingTemplate.value = false
   }
@@ -275,7 +277,7 @@ onMounted(() => {
 
 <template>
   <div
-    class="settings-view p-3 sm:p-5 max-w-7xl mx-auto space-y-4"
+    class="settings-view w-full space-y-3 font-sans"
     :data-testid="!isLoading ? 'page-ready' : undefined"
   >
     <!-- Page Header -->
@@ -322,7 +324,7 @@ onMounted(() => {
     <!-- Tab Navigation Bar -->
     <div
       role="tablist"
-      aria-label="Kategori Pengaturan"
+      :aria-label="t('settings_tablist_aria')"
       class="flex gap-1 rounded-[6px] bg-[#F1F5F9] dark:bg-slate-800 p-1 w-full sm:w-fit border border-[#E2E8F0] dark:border-slate-700"
     >
       <button
@@ -376,16 +378,16 @@ onMounted(() => {
           <div class="flex items-center justify-between border-b border-[#F1F5F9] dark:border-slate-800 pb-3">
             <div>
               <h2 class="text-xs sm:text-sm font-bold text-[#1E293B] dark:text-slate-100">
-                {{ t('tab_smtp', 'Konfigurasi Server SMTP') }}
+                {{ t('settings_smtp_config_title') }}
               </h2>
               <p class="text-[11px] text-[#5F7089] dark:text-slate-400 mt-0.5">
-                Pengaturan koneksi pengiriman pesan keluar melalui server mail internal / relay.
+                {{ t('settings_smtp_card_desc') }}
               </p>
             </div>
 
             <!-- Master Toggle -->
             <label class="inline-flex items-center gap-2 cursor-pointer select-none">
-              <span class="text-[11px] font-semibold text-[#334155] dark:text-slate-300">Layanan Email:</span>
+              <span class="text-[11px] font-semibold text-[#334155] dark:text-slate-300">{{ t('settings_email_service_label') }}</span>
               <input
                 type="checkbox"
                 v-model="smtpSettings.email_enabled"
@@ -468,12 +470,12 @@ onMounted(() => {
                   id="smtp-pass"
                   v-model="smtpSettings.smtp_pass"
                   :type="showPassword ? 'text' : 'password'"
-                  placeholder="Ketik password baru..."
+                  :placeholder="t('settings_pass_placeholder')"
                   class="h-8 w-full rounded-[6px] border border-[#CBD5E1] dark:border-slate-700 bg-white dark:bg-slate-900 pl-2.5 pr-8 text-xs text-[#1E293B] dark:text-slate-100 placeholder-[#94A3B8] focus:border-[#0A51B0] focus:ring-1 focus:ring-[#0A51B0] outline-none"
                 />
                 <button
                   type="button"
-                  aria-label="Toggle visibilitas password"
+                  :aria-label="t('settings_toggle_pass_aria')"
                   @click="showPassword = !showPassword"
                   class="absolute right-2 top-1/2 -translate-y-1/2 text-[#94A3B8] hover:text-[#333333] cursor-pointer"
                 >
@@ -521,7 +523,7 @@ onMounted(() => {
               {{ t('notification_events', 'Pemicu Notifikasi Email') }}
             </h2>
             <p class="text-[11px] text-[#5F7089] dark:text-slate-400 mt-0.5">
-              Tentukan event apa saja yang secara otomatis mengirimkan notifikasi email ke pengguna atau teknisi.
+              {{ t('settings_notify_desc') }}
             </p>
           </div>
 
@@ -583,10 +585,10 @@ onMounted(() => {
         <div class="rounded-[8px] border border-[#E2E8F0] dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-2xs space-y-3">
           <div class="border-b border-[#F1F5F9] dark:border-slate-800 pb-2">
             <h2 class="text-xs sm:text-sm font-bold text-[#1E293B] dark:text-slate-100">
-              {{ t('test_email_btn', 'Pengujian Koneksi SMTP') }}
+              {{ t('settings_smtp_test_title') }}
             </h2>
             <p class="text-[11px] text-[#5F7089] dark:text-slate-400 mt-0.5">
-              Kirimkan email uji coba ke alamat Anda untuk memverifikasi handshake server.
+              {{ t('settings_test_card_desc') }}
             </p>
           </div>
 
@@ -598,7 +600,7 @@ onMounted(() => {
               id="test-email-input"
               v-model="testEmailTarget"
               type="email"
-              placeholder="nama@emailanda.com"
+              :placeholder="t('settings_test_email_placeholder')"
               class="h-8 w-full rounded-[6px] border border-[#CBD5E1] dark:border-slate-700 bg-white dark:bg-slate-900 px-2.5 text-xs text-[#1E293B] dark:text-slate-100 placeholder-[#94A3B8] focus:border-[#0A51B0] focus:ring-1 focus:ring-[#0A51B0] outline-none"
             />
             <button
@@ -613,7 +615,7 @@ onMounted(() => {
                 class="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-[#0A51B0] border-t-transparent"
               ></span>
               <span aria-hidden="true" v-else class="material-symbols-outlined text-[15px]">send</span>
-              <span>{{ isSendingTest ? 'Mengirim Uji Coba...' : t('test_email_btn', 'Kirim Email Uji Coba') }}</span>
+              <span>{{ isSendingTest ? t('settings_sending_test') : t('test_email_btn', 'Kirim Email Uji Coba') }}</span>
             </button>
           </div>
         </div>
@@ -622,10 +624,10 @@ onMounted(() => {
         <div class="rounded-[8px] border border-[#BFDBFE] bg-[#EFF6FF] dark:bg-slate-800/80 p-3.5 text-xs text-[#1E3A8A] dark:text-blue-300 space-y-1.5">
           <div class="flex items-center gap-1.5 font-bold">
             <span aria-hidden="true" class="material-symbols-outlined text-[16px] text-[#0A51B0]">verified_user</span>
-            <span>Keamanan Kredensial</span>
+            <span>{{ t('settings_security_title') }}</span>
           </div>
           <p class="text-[11px] leading-relaxed text-[#2B4365] dark:text-slate-300">
-            Password SMTP disimpan dengan aman di database terenkripsi dan tidak pernah ditampilkan dalam bentuk teks biasa di layar browser.
+            {{ t('settings_security_desc') }}
           </p>
         </div>
       </div>
@@ -680,7 +682,7 @@ onMounted(() => {
               {{ t('available_vars', 'Variabel Dinamis') }}
             </h3>
             <p class="text-[10px] text-[#64748B] dark:text-slate-400">
-              Klik variabel untuk menyalin ke clipboard:
+              {{ t('settings_vars_click_hint') }}
             </p>
           </div>
 
@@ -752,7 +754,7 @@ onMounted(() => {
           <!-- Plain Text Fallback -->
           <div>
             <label for="template-body-text" class="block text-[11px] font-semibold text-[#334155] dark:text-slate-300 mb-1">
-              Isi Email Cadangan (Plain Text)
+              {{ t('settings_template_body_text') }}
             </label>
             <textarea
               id="template-body-text"
@@ -813,15 +815,15 @@ onMounted(() => {
                     <span class="text-[10px] text-slate-400 font-normal">&lt;{{ smtpSettings.email_from_address || 'no-reply@trackit.local' }}&gt;</span>
                   </div>
                   <div class="text-[10.5px] text-slate-500 dark:text-slate-400">
-                    Kepada: <span class="font-medium text-slate-700 dark:text-slate-300">Budi Santoso &lt;budi.santoso@perusahaan.co.id&gt;</span>
+                    {{ t('settings_preview_to') }} <span class="font-medium text-slate-700 dark:text-slate-300">Budi Santoso &lt;budi.santoso@perusahaan.co.id&gt;</span>
                   </div>
                 </div>
               </div>
-              <span class="text-[10px] text-slate-400 shrink-0">Hari ini, 10:42 WIB</span>
+              <span class="text-[10px] text-slate-400 shrink-0">{{ t('settings_preview_today') }}</span>
             </div>
 
             <div class="pt-1 border-t border-slate-100 dark:border-slate-800 text-[11px] text-slate-700 dark:text-slate-200">
-              <span class="text-slate-400 font-normal">Subjek: </span>
+              <span class="text-slate-400 font-normal">{{ t('settings_preview_subject_label') }} </span>
               <strong class="font-semibold text-slate-900 dark:text-white">{{ renderedPreviewSubject }}</strong>
             </div>
           </div>

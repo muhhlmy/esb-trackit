@@ -1,3 +1,16 @@
+# =============================================================================
+# ESB-TrackIT — Standard Deployment (single node, load-balanced)
+# postgres -> migrate -> backend (node cluster: multi-worker LB) -> frontend
+# Optional edge: set COMPOSE_PROFILES=lb to add the NGINX edge load balancer
+# in front of backend + frontend (publishes :80/:443; frontend keeps serving
+# on the internal network only).
+#
+#   docker compose --profile lb up -d        → edge LB on http://localhost
+#   docker compose up -d                    → direct frontend on :80
+#
+# For the multi-node HA topology see docker-compose.ha.yml.
+# =============================================================================
+
 services:
   postgres:
     image: postgres:16-alpine
@@ -65,6 +78,9 @@ services:
     environment:
       PORT: 3000
       HOST: 0.0.0.0
+      # In-container load balancing: master process forks worker processes
+      # (WEB_CONCURRENCY) sharing one listening socket. Auto-respawn on crash.
+      WEB_CONCURRENCY: ${WEB_CONCURRENCY:-2}
       DB_HOST: postgres
       DB_PORT: 5432
       DB_USER: ${DB_USER:-postgres}
@@ -102,7 +118,7 @@ services:
     volumes:
       - backups:/app/storage/backups
     healthcheck:
-      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/health').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/health/ready').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -130,6 +146,29 @@ services:
       timeout: 5s
       retries: 3
       start_period: 20s
+
+  # ── Optional edge load balancer (COMPOSE_PROFILES=lb) ─────────────────────
+  # Fronts backend + frontend with NGINX: least-conn upstream, failover,
+  # edge rate limits, SSE sticky routing, TLS-ready. When this profile is
+  # active, remove the frontend ports mapping above (LB owns :80/:443).
+  load-balancer:
+    image: nginx:1.27-alpine
+    container_name: trackit-load-balancer
+    profiles: ["lb"]
+    restart: unless-stopped
+    volumes:
+      - ./deploy/nginx/single-node.conf:/etc/nginx/nginx.conf:ro
+      - ./deploy/nginx/ssl:/etc/nginx/ssl:ro
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      backend:
+        condition: service_healthy
+      frontend:
+        condition: service_healthy
+    networks:
+      - app-network
 
 networks:
   app-network:

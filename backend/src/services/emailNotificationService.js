@@ -152,8 +152,8 @@ export async function handleTicketEventNotification(
            t.queue_id,
            t.assigned_to_user_id,
            t.pelapor_user_id,
-           q.nama_antrean AS queue_nama,
-           q.kode_antrean AS queue_kode,
+           q.nama AS queue_nama,
+           q.kode AS queue_kode,
            COALESCE(u.nama, k.nama_karyawan) AS pelapor_nama
          FROM tickets t
          LEFT JOIN ticket_queues q ON q.id = t.queue_id

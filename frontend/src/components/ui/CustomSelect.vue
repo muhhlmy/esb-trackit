@@ -1,11 +1,14 @@
 <script setup>
 // CustomSelect.vue - Dropdown custom dengan gaya konsisten (Design.md Bagian 13)
 import { computed, onBeforeUnmount, onMounted, ref, useId } from 'vue'
+import { useLanguage } from '@/composables/useLanguage.js'
+
+const { t } = useLanguage()
 
 const props = defineProps({
   modelValue: { type: [String, Number, null], default: null },
   options: { type: Array, default: () => [] },
-  placeholder: { type: String, default: 'Pilih opsi' },
+  placeholder: { type: String, default: '' },
   disabled: { type: Boolean, default: false },
   ariaLabel: { type: String, default: '' },
   clearable: { type: Boolean, default: false },
@@ -20,6 +23,9 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['update:modelValue', 'change'])
+
+// Default placeholder diterjemahkan saat runtime agar ikut bahasa aktif.
+const effectivePlaceholder = computed(() => props.placeholder || t('ui_select_placeholder'))
 
 const listboxId = useId()
 const isOpen = ref(false)
@@ -93,7 +99,7 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside))
     <button
       type="button"
       :disabled="disabled"
-      :aria-label="ariaLabel || placeholder"
+      :aria-label="ariaLabel || effectivePlaceholder"
       aria-haspopup="listbox"
       :aria-expanded="isOpen"
       @click="toggle"
@@ -109,8 +115,8 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside))
           class="h-1.5 w-1.5 rounded-full shrink-0"
           :class="selectedOption.dot"
         ></span>
-        <span class="truncate" :title="selectedOption ? selectedOption.label : placeholder">{{
-          selectedOption ? selectedOption.label : placeholder
+        <span class="truncate" :title="selectedOption ? selectedOption.label : effectivePlaceholder">{{
+          selectedOption ? selectedOption.label : effectivePlaceholder
         }}</span>
       </div>
       <span
@@ -124,7 +130,7 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside))
     <button
       v-if="clearable && selectedOption"
       type="button"
-      aria-label="Hapus pilihan"
+      :aria-label="t('ui_clear_selection')"
       class="absolute right-7 top-1/2 z-10 flex h-4.5 w-4.5 -translate-y-1/2 items-center justify-center rounded-md text-[#475569] transition-colors hover:bg-red-50 hover:text-[#DC2626]"
       @click.stop="clear"
     >

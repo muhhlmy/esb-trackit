@@ -22,6 +22,7 @@ import AppRowActions from '../components/ui/AppRowActions.vue'
 import AssetCategoryImportModal from '../components/ui/AssetCategoryImportModal.vue'
 import FilterModal from '../components/ui/FilterModal.vue'
 import AssetLabelModal from '../components/common/AssetLabelModal.vue'
+import BarcodeScannerModal from '../components/common/BarcodeScannerModal.vue'
 import AppPagination from '../components/ui/AppPagination.vue'
 import BaseSkeleton from '../components/ui/skeleton/BaseSkeleton.vue'
 import SkeletonAvatar from '../components/ui/skeleton/SkeletonAvatar.vue'
@@ -95,6 +96,13 @@ const showSpecificationModal = ref(false)
 const showExportModal = ref(false)
 const showLabelModal = ref(false)
 const selectedLabelAsset = ref(null)
+const showScannerModal = ref(false)
+
+function handleBarcodeScanned(code) {
+  if (typeof code === 'string' && code.trim()) {
+    searchQuery.value = code.trim()
+  }
+}
 
 function openLabelModal(asset) {
   selectedLabelAsset.value = asset
@@ -1032,10 +1040,10 @@ onMounted(async () => {
       >
         <!-- Search, Filters & Actions -->
         <div
-          class="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 w-full min-w-0"
+          class="flex items-center gap-1.5 sm:gap-2 w-full min-w-0"
         >
           <!-- Search Input -->
-          <div class="relative h-8 w-full sm:flex-1 sm:min-w-[200px]">
+          <div class="relative h-8 flex-1 min-w-[140px]">
             <span
               aria-hidden="true"
               class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-[16px] text-[#687281] dark:text-slate-400 pointer-events-none"
@@ -1060,6 +1068,18 @@ onMounted(async () => {
               <span aria-hidden="true" class="material-symbols-outlined text-[15px]">close</span>
             </button>
           </div>
+
+          <!-- Scanner Trigger Button -->
+          <button
+            type="button"
+            @click="showScannerModal = true"
+            class="h-8 shrink-0 inline-flex items-center gap-1 rounded-[6px] border border-[#E2E8F0] dark:border-slate-800 bg-[#F8FAFC] dark:bg-slate-800 px-2 sm:px-2.5 text-[11px] sm:text-[12px] font-semibold text-[#5F7089] dark:text-slate-300 hover:bg-white dark:hover:bg-slate-700 hover:text-[#0A51B0] transition cursor-pointer"
+            :title="t('scan_barcode_title', 'Pindai Barcode / QR Code')"
+            :aria-label="t('scan_barcode_btn', 'Pindai Barcode')"
+          >
+            <span aria-hidden="true" class="material-symbols-outlined text-[16px]">qr_code_scanner</span>
+            <span class="hidden sm:inline">{{ t('scan_barcode_btn', 'Pindai') }}</span>
+          </button>
 
           <button
             type="button"
@@ -2440,6 +2460,13 @@ onMounted(async () => {
       :is-open="showLabelModal"
       :asset="selectedLabelAsset"
       @close="showLabelModal = false"
+    />
+
+    <!-- Modal Scanner Barcode / QR Mobile -->
+    <BarcodeScannerModal
+      :is-open="showScannerModal"
+      @close="showScannerModal = false"
+      @scan="handleBarcodeScanned"
     />
   </div>
 </template>

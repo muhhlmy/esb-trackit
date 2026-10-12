@@ -42,7 +42,7 @@ describe('ExportView.vue & Export Engine Regression Tests', () => {
     // 15. Error state handling
     assert.match(viewSource, /showToast.*error/)
     // 16. Empty-data state handling
-    assert.match(viewSource, /Tidak ada data yang/)
+    assert.match(viewSource, /export_preview_no_data|Tidak ada data/)
   })
 
   test('Export Engine handles empty dataset and format conversion safely', async () => {

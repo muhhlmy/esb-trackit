@@ -15,6 +15,8 @@ import AppViewToggle from '../components/ui/AppViewToggle.vue'
 import PageHeader from '../components/ui/PageHeader.vue'
 import SkeletonTable from '../components/ui/skeleton/SkeletonTable.vue'
 import FilterModal from '../components/ui/FilterModal.vue'
+import ErrorState from '../components/ui/ErrorState.vue'
+import EmptyState from '../components/ui/EmptyState.vue'
 import { useLanguage } from '../composables/useLanguage.js'
 
 const { get } = useApi()
@@ -365,21 +367,7 @@ function systemAuditChanges(log) {
     />
 
     <!-- Error state -->
-    <div
-      v-if="pageError"
-      role="alert"
-      class="shadow-card flex flex-wrap items-center gap-2 rounded-[6px] border border-red-200 bg-red-50/60 px-4 py-3 text-[12px] text-red-700 backdrop-blur-xl"
-    >
-      <span aria-hidden="true" class="material-symbols-outlined text-[18px]">error</span>
-      <span class="min-w-0 flex-1 wrap-anywhere">{{ pageError }}</span>
-      <button
-        @click="fetchLogs"
-        type="button"
-        class="h-8 px-2.5 ml-auto text-xs font-semibold uppercase tracking-wider text-red-800 hover:underline"
-      >
-        {{ t('retry') }}
-      </button>
-    </div>
+    <ErrorState v-if="pageError" :message="pageError" @retry="fetchLogs" />
 
     <!-- Tab Selection Navigation -->
     <div
@@ -514,17 +502,12 @@ function systemAuditChanges(log) {
       <!-- ── TAB 1: Asset History Log ──────────────────────────── -->
       <div v-else-if="activeTab === 'assets'">
         <!-- Empty State -->
-        <div
+        <EmptyState
           v-if="filteredAssetLogs.length === 0"
-          class="flex flex-col items-center justify-center px-4 py-8 sm:py-12 gap-3 text-center"
-        >
-          <span aria-hidden="true" class="material-symbols-outlined text-[40px] text-[#D1D5DB]"
-            >history_toggle_off</span
-          >
-          <p class="text-xs font-semibold text-[#5F7089]">
-            Tidak ada riwayat perubahan aset ditemukan.
-          </p>
-        </div>
+          icon="history_toggle_off"
+          :title="t('tab_asset_history')"
+          description="Tidak ada riwayat perubahan aset ditemukan."
+        />
 
         <!-- Tabel Log Aset (mode Tabel) -->
         <div
@@ -753,14 +736,12 @@ function systemAuditChanges(log) {
 
       <!-- ── TAB 2: Login Audit Log Table ────────────────────── -->
       <div v-else-if="activeTab === 'audit'">
-        <div v-if="filteredAuditLogs.length === 0" class="px-4 py-10 text-center">
-          <span aria-hidden="true" class="material-symbols-outlined text-[40px] text-[#D1D5DB]"
-            >shield_person</span
-          >
-          <p class="mt-3 text-xs font-semibold text-[#5F7089]">
-            Tidak ada audit aktivitas login ditemukan.
-          </p>
-        </div>
+        <EmptyState
+          v-if="filteredAuditLogs.length === 0"
+          icon="shield_person"
+          :title="t('tab_login_audit')"
+          description="Tidak ada audit aktivitas login ditemukan."
+        />
         <ul v-else-if="assetLogViewMode === 'card'" class="divide-y divide-[#F3F4F6] dark:divide-slate-800" aria-label="Audit aktivitas login">
           <li
             v-for="log in paginatedAuditLogs"
@@ -874,14 +855,12 @@ function systemAuditChanges(log) {
 
       <!-- ── TAB 3: System Audit ────────────────────────────── -->
       <div v-else-if="activeTab === 'system'">
-        <div v-if="filteredSystemLogs.length === 0" class="px-4 py-12 text-center">
-          <span aria-hidden="true" class="material-symbols-outlined text-[40px] text-[#D1D5DB]"
-            >receipt_long</span
-          >
-          <p class="mt-3 text-xs font-semibold text-[#5F7089]">
-            Belum ada aktivitas sistem tercatat.
-          </p>
-        </div>
+        <EmptyState
+          v-if="filteredSystemLogs.length === 0"
+          icon="receipt_long"
+          title="Audit Sistem"
+          description="Belum ada aktivitas sistem tercatat."
+        />
         <div v-else class="divide-y divide-[#F3F4F6]">
           <article
             v-for="log in paginatedSystemLogs"

@@ -1,5 +1,8 @@
 <script setup>
-import { ref, onMounted, onBeforeUnmount, nextTick } from 'vue'
+import { ref, onMounted, onBeforeUnmount, nextTick, computed } from 'vue'
+import { useLanguage } from '@/composables/useLanguage.js'
+
+const { t } = useLanguage()
 
 const props = defineProps({
   actions: {
@@ -9,10 +12,13 @@ const props = defineProps({
   },
   label: {
     type: String,
-    default: 'Opsi Aksi',
+    default: '',
   },
   menuClass: { type: String, default: '' },
 })
+
+// Label default diterjemahkan saat runtime agar ikut bahasa aktif.
+const effectiveLabel = computed(() => props.label || t('ui_row_actions_label'))
 
 const isOpen = ref(false)
 const buttonRef = ref(null)
@@ -168,8 +174,8 @@ onBeforeUnmount(() => {
       ref="buttonRef"
       type="button"
       @click.stop="toggleDropdown"
-      :aria-label="label"
-      :title="label"
+      :aria-label="effectiveLabel"
+      :title="effectiveLabel"
       :aria-haspopup="'menu'"
       :aria-expanded="isOpen ? 'true' : 'false'"
       class="ui-menu-trigger flex h-7 w-7 items-center justify-center text-[#66728d] hover:bg-[#F8FAFC] hover:text-[#333333] transition-all cursor-pointer"
@@ -186,7 +192,7 @@ onBeforeUnmount(() => {
           :style="dropdownStyle"
           :class="menuClass"
           role="menu"
-          :aria-label="label"
+          :aria-label="effectiveLabel"
           class="ui-action-menu border border-[#E5EAEF] bg-white p-1.5 shadow-2xl outline-none select-none"
           @keydown="handleMenuKeydown"
         >

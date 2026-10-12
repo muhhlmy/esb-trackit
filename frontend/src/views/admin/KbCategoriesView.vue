@@ -2,6 +2,7 @@
 import AppModal from '../../components/ui/AppModal.vue'
 import PageHeader from '../../components/ui/PageHeader.vue'
 import StatCard from '../../components/ui/StatCard.vue'
+import EmptyState from '../../components/ui/EmptyState.vue'
 import FilterModal from '../../components/ui/FilterModal.vue'
 import CustomSelect from '../../components/ui/CustomSelect.vue'
 import AppViewToggle from '../../components/ui/AppViewToggle.vue'
@@ -21,7 +22,6 @@ import {
   X,
   ChevronRight,
   AlertTriangle,
-  FolderOpen,
   MoreVertical,
   Laptop,
   AppWindow,
@@ -208,7 +208,8 @@ function clearFilters() {
 <template>
   <div
     ref="mainScope"
-    class="kb-management admin-workspace w-full max-w-7xl mx-auto space-y-3 font-sans"
+    class="kb-management admin-workspace w-full space-y-2 sm:space-y-2.5 font-sans"
+    :data-testid="!loading ? 'page-ready' : undefined"
   >
     <!-- ── Page Header (komponen bersama; sama dengan halaman lain) ── -->
     <PageHeader
@@ -361,25 +362,14 @@ function clearFilters() {
       class="divide-y divide-[#F1F5F9] dark:divide-slate-800/60 bg-white dark:bg-slate-900 rounded-[6px] border border-[#E2E8F0] dark:border-slate-800 overflow-hidden gsap-admin-el"
     >
       <!-- Empty State Mobile -->
-      <div v-if="filteredCategories.length === 0" class="py-12 px-4 text-center">
-        <div
-          class="w-10 h-10 rounded-[6px] bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center justify-center mx-auto mb-2"
-        >
-          <FolderOpen class="w-5 h-5" />
-        </div>
-        <p class="text-xs font-semibold text-[#333333] dark:text-slate-200">{{
-          t('kb_cat_empty_title')
-        }}</p>
-        <p class="text-[11px] text-[#5F7089] dark:text-slate-400 font-normal mt-1">
-          {{ t('kb_cat_empty_desc') }}
-        </p>
-        <button
-          @click="clearFilters"
-          class="mt-3 px-3 py-1.5 rounded-[6px] text-xs font-medium bg-slate-100 dark:bg-slate-800 text-[#333333] dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors cursor-pointer touch-manipulation"
-        >
-          {{ t('filter_reset') }}
-        </button>
-      </div>
+      <EmptyState
+        v-if="filteredCategories.length === 0"
+        icon="category"
+        :title="t('kb_cat_empty_title')"
+        :description="t('kb_cat_empty_desc')"
+        :secondary-label="t('filter_reset')"
+        @secondary-action="clearFilters"
+      />
 
       <!-- Mobile Card Item -->
       <div
@@ -505,26 +495,14 @@ function clearFilters() {
           <tbody class="divide-y divide-[#F1F5F9] dark:divide-slate-800/60">
             <!-- Empty State -->
             <tr v-if="filteredCategories.length === 0">
-              <td :colspan="canWrite ? 6 : 5" class="py-16 px-6 text-center">
-                <div class="flex flex-col items-center justify-center gap-2 max-w-xs mx-auto">
-                  <div
-                    class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center justify-center mb-1"
-                  >
-                    <FolderOpen class="w-5 h-5" />
-                  </div>
-                  <p class="text-sm font-semibold text-[#333333] dark:text-slate-200">
-                    {{ t('kb_cat_empty_title') }}
-                  </p>
-                  <p class="text-xs text-[#5F7089] dark:text-slate-400 font-normal">
-                    {{ t('kb_cat_empty_desc') }}
-                  </p>
-                  <button
-                    @click="clearFilters"
-                    class="mt-3 px-4 py-2 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-[#333333] dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors cursor-pointer"
-                  >
-                    {{ t('filter_reset') }}
-                  </button>
-                </div>
+              <td :colspan="canWrite ? 6 : 5" class="py-10 px-6 text-center">
+                <EmptyState
+                  icon="category"
+                  :title="t('kb_cat_empty_title')"
+                  :description="t('kb_cat_empty_desc')"
+                  :secondary-label="t('filter_reset')"
+                  @secondary-action="clearFilters"
+                />
               </td>
             </tr>
 

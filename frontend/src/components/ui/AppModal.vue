@@ -1,6 +1,9 @@
 <script setup>
 // AppModal.vue - Modal pop-up yang dipakai di seluruh aplikasi
 import { nextTick, onBeforeUnmount, onMounted, ref, useId, watch } from 'vue'
+import { useLanguage } from '@/composables/useLanguage.js'
+
+const { t } = useLanguage()
 
 const props = defineProps({
   isOpen: { type: Boolean, default: false },
@@ -159,7 +162,7 @@ onBeforeUnmount(() => {
             </div>
             <button
               type="button"
-              aria-label="Tutup dialog"
+              :aria-label="t('ui_modal_close')"
               @click="close"
               class="flex h-6 w-6 shrink-0 items-center justify-center rounded-[5px] text-[#475569] transition-colors hover:bg-[#F8FAFC] hover:text-[#333333] cursor-pointer"
             >

@@ -4,6 +4,7 @@ import { useApi } from '@/composables/useApi'
 import { useToast } from '@/composables/useToast'
 import { useLanguage } from '@/composables/useLanguage'
 import PageHeader from '@/components/ui/PageHeader.vue'
+import EmptyState from '@/components/ui/EmptyState.vue'
 
 const api = useApi()
 const { showToast } = useToast()
@@ -205,7 +206,7 @@ function copyCurlStatus() {
 </script>
 
 <template>
-  <div class="space-y-6 max-w-7xl mx-auto px-4 sm:px-6 py-6" data-testid="page-ready">
+  <div class="w-full space-y-3 font-sans" data-testid="page-ready">
     <PageHeader
       :title="t('api_portal_title', 'API & Integrasi Enterprise')"
       :subtitle="t('api_portal_sub', 'Kelola API Clients, Webhook Subscriptions, dan Integrasi BI / Automasi')"
@@ -308,8 +309,14 @@ function copyCurlStatus() {
           </thead>
           <tbody class="divide-y divide-slate-200 dark:divide-slate-800">
             <tr v-if="clients.length === 0">
-              <td colspan="7" class="py-8 text-center text-slate-500">
-                {{ t('api_portal_clients_empty') }}
+              <td colspan="7" class="py-10 px-4 text-center">
+                <EmptyState
+                  icon="key_off"
+                  :title="t('api_portal_clients_empty')"
+                  description="Buat kredensial klien baru untuk menghubungkan integrasi eksternal."
+                  :action-label="t('btn_create_client')"
+                  @action="showCreateClientModal = true"
+                />
               </td>
             </tr>
             <tr v-for="client in clients" :key="client.id" class="hover:bg-slate-50/50 dark:hover:bg-slate-800/40">
@@ -411,8 +418,14 @@ function copyCurlStatus() {
           </thead>
           <tbody class="divide-y divide-slate-200 dark:divide-slate-800">
             <tr v-if="subscriptions.length === 0">
-              <td colspan="6" class="py-8 text-center text-slate-500">
-                {{ t('webhook_empty') }}
+              <td colspan="6" class="py-10 px-4 text-center">
+                <EmptyState
+                  icon="webhook"
+                  :title="t('webhook_empty')"
+                  description="Daftarkan URL webhook untuk menerima pembaruan status data secara realtime."
+                  :action-label="t('btn_create_webhook')"
+                  @action="showCreateWebhookModal = true"
+                />
               </td>
             </tr>
             <tr v-for="sub in subscriptions" :key="sub.id" class="hover:bg-slate-50/50 dark:hover:bg-slate-800/40">

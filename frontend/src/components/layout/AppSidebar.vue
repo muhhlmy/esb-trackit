@@ -400,7 +400,7 @@ function closeFlyoutSubmenu() {
                 :id="`submenu-${parent.key}`"
                 v-show="isParentExpanded(parent.key)"
                 role="region"
-                :aria-label="parent.label"
+                :aria-label="getParentLabel(parent)"
                 class="pl-3 space-y-0.5 mt-0.5 transition-all"
               >
                 <RouterLink
@@ -454,7 +454,7 @@ function closeFlyoutSubmenu() {
           :class="currentLang === 'id' ? 'bg-[#0A51B0] text-white font-bold shadow-2xs' : 'text-[#637288] hover:text-[#333333] font-medium'"
           class="rounded px-1.5 py-0.5 transition-colors cursor-pointer"
           @click="setLanguage('id')"
-          aria-label="Pilih Bahasa Indonesia"
+          :aria-label="t('nav_select_indonesian')"
         >
           ID
         </button>
@@ -463,7 +463,7 @@ function closeFlyoutSubmenu() {
           :class="currentLang === 'en' ? 'bg-[#0A51B0] text-white font-bold shadow-2xs' : 'text-[#637288] hover:text-[#333333] font-medium'"
           class="rounded px-1.5 py-0.5 transition-colors cursor-pointer"
           @click="setLanguage('en')"
-          aria-label="Select English Language"
+          :aria-label="t('nav_select_english')"
         >
           EN
         </button>

@@ -178,7 +178,7 @@ onBeforeUnmount(() => {
     <div class="mobile-navigation lg:hidden fixed bottom-0 left-0 right-0 z-40">
       <nav
         role="navigation"
-        aria-label="Navigasi Mobile Bawah"
+        :aria-label="t('nav_aria_mobile_bottom')"
         class="clean-bottom-nav relative z-10 border-t border-slate-200/90 dark:border-slate-800 bg-white/95 dark:bg-slate-950/95 backdrop-blur-lg px-2 py-0.5 pb-[max(0.2rem,env(safe-area-inset-bottom))] flex items-center justify-around select-none shadow-none min-h-[44px]"
       >
         <RouterLink
@@ -201,7 +201,7 @@ onBeforeUnmount(() => {
 
         <button
           type="button"
-          :aria-label="currentLang === 'en' ? 'More menu' : 'Menu lainnya'"
+          :aria-label="t('nav_more_menu')"
           aria-controls="mobile-more-menu"
           :aria-expanded="isLainnyaOpen"
           @click="isLainnyaOpen = !isLainnyaOpen"
@@ -213,7 +213,7 @@ onBeforeUnmount(() => {
           "
         >
           <MoreHorizontal class="w-3.5 h-3.5" />
-          <span class="text-[9px] sm:text-[9.5px] leading-tight font-medium">{{ currentLang === 'en' ? 'More' : 'Lainnya' }}</span>
+          <span class="text-[9px] sm:text-[9.5px] leading-tight font-medium">{{ t('nav_more') }}</span>
         </button>
       </nav>
 
@@ -222,7 +222,7 @@ onBeforeUnmount(() => {
           v-if="isLainnyaOpen"
           id="mobile-more-menu"
           role="navigation"
-          aria-label="Menu lainnya"
+          :aria-label="t('nav_more_menu')"
           class="clean-more-menu absolute left-0 right-0 bottom-full rounded-t-xl bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 p-2"
         >
           <!-- Native Drag Handle Notch -->
@@ -233,7 +233,7 @@ onBeforeUnmount(() => {
           <div class="flex items-center justify-between px-1.5 pt-0.5 pb-1">
             <span
               class="text-[9.5px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500"
-              >{{ currentLang === 'en' ? 'More Menu' : 'Menu Lainnya' }}</span
+              >{{ t('nav_more_menu') }}</span
             >
             <div class="flex items-center gap-1.5">
               <div class="inline-flex items-center rounded border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 p-0.5 text-[9px]">
@@ -242,7 +242,7 @@ onBeforeUnmount(() => {
                   :class="currentLang === 'id' ? 'bg-[#0A51B0] text-white font-bold' : 'text-slate-500 hover:text-slate-900'"
                   class="rounded px-1.5 py-0.5 transition-colors cursor-pointer"
                   @click="setLanguage('id')"
-                  aria-label="Pilih Bahasa Indonesia"
+                  :aria-label="t('nav_select_indonesian')"
                 >
                   ID
                 </button>
@@ -251,14 +251,14 @@ onBeforeUnmount(() => {
                   :class="currentLang === 'en' ? 'bg-[#0A51B0] text-white font-bold' : 'text-slate-500 hover:text-slate-900'"
                   class="rounded px-1.5 py-0.5 transition-colors cursor-pointer"
                   @click="setLanguage('en')"
-                  aria-label="Select English"
+                  :aria-label="t('nav_select_english')"
                 >
                   EN
                 </button>
               </div>
               <button
                 type="button"
-                :aria-label="currentLang === 'en' ? 'Close menu' : 'Tutup menu'"
+                :aria-label="t('nav_close_menu')"
                 @click="isLainnyaOpen = false"
                 class="p-1 rounded-md text-slate-400 dark:text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-700 dark:hover:text-slate-200 transition-colors cursor-pointer"
               >
@@ -292,7 +292,7 @@ onBeforeUnmount(() => {
             class="px-2 py-4 text-center text-[10px] text-slate-400"
             role="status"
           >
-            Belum ada menu lain yang tersedia untuk akun Anda.
+            {{ t('nav_more_empty') }}
           </p>
         </div>
       </Transition>

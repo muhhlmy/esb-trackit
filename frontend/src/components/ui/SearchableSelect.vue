@@ -1,18 +1,21 @@
 <script setup>
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, useId, watch } from 'vue'
+import { useLanguage } from '@/composables/useLanguage.js'
 import SkeletonList from './skeleton/SkeletonList.vue'
+
+const { t } = useLanguage()
 
 const props = defineProps({
   modelValue: { type: [String, Number], default: '' },
   options: { type: Array, required: true },
-  placeholder: { type: String, default: 'Pilih opsi' },
-  searchPlaceholder: { type: String, default: 'Cari...' },
+  placeholder: { type: String, default: '' },
+  searchPlaceholder: { type: String, default: '' },
   valueKey: { type: String, required: true },
   labelKey: { type: String, required: true },
   secondaryLabelKey: { type: String, default: '' },
   clearable: { type: Boolean, default: false },
   allowCustom: { type: Boolean, default: false },
-  customLabelPrefix: { type: String, default: '+ Gunakan' },
+  customLabelPrefix: { type: String, default: '' },
   ariaLabel: { type: String, default: '' },
   loading: { type: Boolean, default: false },
   heightClass: { type: String, default: 'h-8' },
@@ -21,6 +24,11 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['update:modelValue'])
+
+// Default teks diterjemahkan saat runtime agar ikut bahasa aktif.
+const effectivePlaceholder = computed(() => props.placeholder || t('ui_select_placeholder'))
+const effectiveSearchPlaceholder = computed(() => props.searchPlaceholder || t('filter_search'))
+const effectiveCustomLabelPrefix = computed(() => props.customLabelPrefix || t('ui_select_use_custom'))
 
 const componentId = useId()
 const listboxId = `${componentId}-listbox`
@@ -67,7 +75,7 @@ const filteredOptions = computed(() => {
     if (!exactMatch) {
       const customOpt = {
         [props.valueKey]: rawQuery,
-        [props.labelKey]: `${props.customLabelPrefix} "${rawQuery}"`,
+        [props.labelKey]: `${effectiveCustomLabelPrefix.value} "${rawQuery}"`,
         isCustomNew: true,
         actualValue: rawQuery,
       }
@@ -223,7 +231,7 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside))
     <button
       ref="triggerRef"
       type="button"
-      :aria-label="ariaLabel || placeholder"
+      :aria-label="ariaLabel || effectivePlaceholder"
       aria-haspopup="listbox"
       :aria-expanded="isOpen"
       :aria-controls="listboxId"
@@ -252,7 +260,7 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside))
             ({{ selectedOption[secondaryLabelKey] }})
           </span>
         </span>
-        <span v-else class="truncate text-xs text-[#687281] font-normal">{{ placeholder }}</span>
+        <span v-else class="truncate text-xs text-[#687281] font-normal">{{ effectivePlaceholder }}</span>
       </div>
       <span
         aria-hidden="true"
@@ -265,7 +273,7 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside))
     <button
       v-if="clearable && selectedOption"
       type="button"
-      :aria-label="`Hapus pilihan ${selectedOption[labelKey]}`"
+      :aria-label="`${t('ui_clear_selection')} ${selectedOption[labelKey]}`"
       class="absolute right-7 top-1/2 z-10 flex h-5 w-5 -translate-y-1/2 items-center justify-center rounded-md text-[#475569] transition-colors hover:bg-red-50 hover:text-[#DC2626]"
       @click.stop="clearSelection"
     >
@@ -289,11 +297,11 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside))
           type="text"
           role="combobox"
           aria-autocomplete="list"
-          :aria-label="`Cari ${ariaLabel || placeholder}`"
+          :aria-label="`${t('search')} ${ariaLabel || effectivePlaceholder}`"
           :aria-expanded="true"
           :aria-controls="listboxId"
           :aria-activedescendant="activeDescendant"
-          :placeholder="searchPlaceholder"
+          :placeholder="effectiveSearchPlaceholder"
           class="ui-search-input h-8 w-full border border-[#E5EAEF] bg-[#F8FAFC] pl-8 pr-2.5 text-xs font-medium text-[#2A3547] placeholder-[#687281] focus:bg-white focus:border-[#0A51B0] focus:outline-none focus:ring-2 focus:ring-[#0A51B0]/15 transition-all"
           @keydown.stop="handleSearchKeydown"
         />
@@ -302,7 +310,7 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside))
       <ul
         :id="listboxId"
         role="listbox"
-        :aria-label="ariaLabel || placeholder"
+        :aria-label="ariaLabel || effectivePlaceholder"
         class="max-h-52 overflow-y-auto space-y-0.5"
         :aria-busy="loading"
       >
@@ -359,7 +367,7 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside))
             role="status"
             class="px-3 py-4 text-center text-xs text-[#687281]"
           >
-            Tidak ada hasil ditemukan.
+            {{ t('ui_select_no_results') }}
           </li>
         </template>
       </ul>

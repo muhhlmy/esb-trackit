@@ -8,6 +8,7 @@ import { useLanguage } from '../composables/useLanguage.js'
 import AppViewToggle from '../components/ui/AppViewToggle.vue'
 import AppModal from '../components/ui/AppModal.vue'
 import AppBadge from '../components/ui/AppBadge.vue'
+import AppRowActions from '../components/ui/AppRowActions.vue'
 import AppPagination from '../components/ui/AppPagination.vue'
 import CustomSelect from '../components/ui/CustomSelect.vue'
 import SkeletonTable from '../components/ui/skeleton/SkeletonTable.vue'
@@ -250,6 +251,24 @@ function openDelete(item) {
   selectedShipment.value = item
   modalError.value = ''
   showDeleteModal.value = true
+}
+
+function getShipmentActions(item) {
+  return [
+    {
+      label: t('edit'),
+      icon: 'edit',
+      hidden: !canWriteShipments.value,
+      onClick: () => openEdit(item),
+    },
+    {
+      label: t('delete'),
+      icon: 'delete',
+      danger: true,
+      hidden: !canWriteShipments.value,
+      onClick: () => openDelete(item),
+    },
+  ]
 }
 
 function closeModal() {
@@ -546,27 +565,11 @@ onMounted(() => {
                   </a>
                   <span v-else class="text-[#687281]">-</span>
                 </td>
-                <td v-if="canWriteShipments" class="py-3 px-4 text-right whitespace-nowrap">
-                  <div class="flex items-center justify-end gap-1">
-                    <button
-                      type="button"
-                      @click="openEdit(item)"
-                      class="p-1.5 rounded-lg text-[#5F7089] hover:text-[#333333] hover:bg-[#F1F5F9] transition-colors cursor-pointer"
-                      :title="t('shipments_edit_shipment')"
-                      :aria-label="t('shipments_edit_shipment')"
-                    >
-                      <Pencil class="w-3.5 h-3.5" />
-                    </button>
-                    <button
-                      type="button"
-                      @click="openDelete(item)"
-                      class="p-1.5 rounded-lg text-[#5F7089] hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
-                      :title="t('shipments_delete_shipment')"
-                      :aria-label="t('shipments_delete_shipment')"
-                    >
-                      <Trash2 class="w-3.5 h-3.5" />
-                    </button>
-                  </div>
+                <td v-if="canWriteShipments" class="py-3 px-4 text-right whitespace-nowrap" @click.stop>
+                  <AppRowActions
+                    :actions="getShipmentActions(item)"
+                    :label="`${t('ui_row_actions_label')} ${item.tracking_number || item.recipient_name || ''}`"
+                  />
                 </td>
               </tr>
             </tbody>

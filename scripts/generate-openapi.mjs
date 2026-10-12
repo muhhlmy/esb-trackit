@@ -181,7 +181,7 @@ crud('/api/employees', 'Employees', admin, {
 paths['/api/employees/with-assets'] = { get: op('Employees with Asset Assignments', 'Employees', user) }
 paths['/api/employees/locations'] = { get: op('Distinct Employee Locations', 'Employees', user) }
 paths['/api/employees/stats'] = { get: op('Employee Stats', 'Employees', user) }
-paths['/api/karyawan'] = { get: op('List Employees (legacy alias)', 'Employees', admin, { description: 'Deprecated alias of /api/employees.' } }
+paths['/api/karyawan'] = { get: op('List Employees (legacy alias)', 'Employees', admin, { description: 'Deprecated alias of /api/employees.' }) }
 crud('/api/users', 'Users', admin, {
   createBody: { required: true, content: { 'application/json': { schema: { type: 'object', required: ['nama', 'email', 'role'], properties: { nama: { type: 'string' }, email: { type: 'string', format: 'email' }, role: { type: 'string', enum: ['user', 'admin', 'superadmin'] }, permissions: { type: 'object', additionalProperties: { type: 'object', properties: { read: { type: 'boolean' }, write: { type: 'boolean' } } } } } } } } },
 })
@@ -266,11 +266,11 @@ crud('/api/shipments', 'Shipments', admin, {
   listParams: [{ name: 'status', in: 'query', schema: { type: 'string' } }, { name: 'tracking', in: 'query', schema: { type: 'string' } }],
 })
 paths['/api/shipments/import'] = { post: op('Bulk Import Shipments', 'Shipments', admin, { parameters: [idempotencyHeader], description: 'Accepts a JSON array of parsed shipment rows (from client-side Excel parsing).' }) }
-paths['/api/pengiriman'] = { get: op('List Shipments (legacy alias)', 'Shipments', user, { description: 'Deprecated alias of /api/shipments.' } }
+paths['/api/pengiriman'] = { get: op('List Shipments (legacy alias)', 'Shipments', user, { description: 'Deprecated alias of /api/shipments.' }) }
 
 // ───────────────────────────── Knowledge Base ─────────────────────────────
 paths['/api/cases/public'] = { get: op('List Public Cases', 'Knowledge Base', [], { description: 'Unauthenticated article listing for the Help Center.' }) }
-crud('/api/cases', 'Knowledge Base', admin, { createBody: { required: true, content: { 'application/json': { schema: { type: 'object', required: ['judul'], properties: { judul: { type: 'string' }, kategori: { type: 'string' }, severity: { type: 'string', enum: ['high', 'medium', 'low'] }, summary: { type: 'string' }, content: { type: 'string', description: 'Rich HTML (sanitized server-side).' } } } } } } } })
+crud('/api/cases', 'Knowledge Base', admin, { createBody: { required: true, content: { 'application/json': { schema: { type: 'object', required: ['judul'], properties: { judul: { type: 'string' }, kategori: { type: 'string' }, severity: { type: 'string', enum: ['high', 'medium', 'low'] }, summary: { type: 'string' }, content: { type: 'string', description: 'Rich HTML (sanitized server-side).' } } } } } } })
 paths['/api/kb-categories/public'] = { get: op('List Public KB Categories', 'Knowledge Base', [], { description: 'Topic cards for the Help Center landing page.' }) }
 crud('/api/kb-categories', 'Knowledge Base', admin, { createBody: { required: true, content: { 'application/json': { schema: { type: 'object', required: ['name'], properties: { name: { type: 'string' }, slug: { type: 'string' }, description: { type: 'string' }, is_published: { type: 'boolean' }, is_featured: { type: 'boolean' } } } } } } })
 paths['/api/faqs/public'] = { get: op('List Public FAQs', 'Knowledge Base', [], { description: 'Published FAQ entries for the Help Center.' }) }

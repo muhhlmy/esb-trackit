@@ -3,6 +3,7 @@ import { ref, onMounted } from 'vue'
 import { useApi } from '@/composables/useApi'
 import { clearAuthSession } from '@/utils/authStorage.js'
 import AppModal from '@/components/ui/AppModal.vue'
+import EmptyState from '@/components/ui/EmptyState.vue'
 import PageHeader from '@/components/ui/PageHeader.vue'
 import SkeletonCard from '@/components/ui/skeleton/SkeletonCard.vue'
 import { useToast } from '@/composables/useToast.js'
@@ -545,12 +546,13 @@ function switchTab(tab) {
         <div v-if="isLoadingBackups" class="p-3 lg:hidden" role="status">
           Memuat riwayat backup...
         </div>
-        <p
+        <EmptyState
           v-else-if="backups.length === 0"
-          class="px-4 py-10 text-center text-xs text-[#5F7089] lg:hidden"
-        >
-          Belum ada backup
-        </p>
+          icon="database_off"
+          title="Belum ada backup"
+          description="Gunakan tombol Cadangkan Sekarang untuk membuat snapshot database baru."
+          class="lg:hidden"
+        />
         <ul v-else class="divide-y divide-[#F1F5F9] lg:hidden" aria-label="Riwayat backup">
           <li v-for="backup in backups" :key="backup.id" class="min-w-0 space-y-2.5 p-2.5 sm:p-3">
             <h3 class="text-sm font-semibold text-[#333333]">{{ backup.filename }}</h3>
@@ -615,11 +617,12 @@ function switchTab(tab) {
             </thead>
             <tbody class="divide-y divide-[#F1F5F9]">
               <tr v-if="backups.length === 0 && !isLoadingBackups">
-                <td colspan="7" class="px-4 py-8 text-center text-[#687281]">
-                  <span aria-hidden="true" class="material-symbols-outlined mb-2 block text-3xl"
-                    >database_off</span
-                  >
-                  Belum ada backup
+                <td colspan="7" class="py-8 px-4 text-center">
+                  <EmptyState
+                    icon="database_off"
+                    title="Belum ada backup"
+                    description="Gunakan tombol Cadangkan Sekarang untuk membuat snapshot database baru."
+                  />
                 </td>
               </tr>
               <tr

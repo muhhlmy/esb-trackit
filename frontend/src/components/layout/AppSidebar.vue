@@ -237,8 +237,8 @@ function closeFlyoutSubmenu() {
       <button
         v-if="!isEffectiveCollapsed"
         type="button"
-        aria-label="Ciutkan Sidebar"
-        title="Ciutkan Sidebar"
+        :aria-label="t('nav_collapse_sidebar')"
+        :title="t('nav_collapse_sidebar')"
         class="flex h-5.5 w-5.5 items-center justify-center rounded-md text-[#637288] hover:bg-[#ECF2FF] hover:text-[#333333] transition-all cursor-pointer shrink-0"
         @click="emit('toggle-collapse')"
       >
@@ -249,7 +249,7 @@ function closeFlyoutSubmenu() {
     <!-- Sidebar Scrollable Menu / Navigation Rail Container -->
     <nav
       class="sidebar-menu relative flex-1 overflow-y-auto py-2 transition-all"
-      aria-label="Navigasi utama"
+      :aria-label="t('nav_aria_main_navigation')"
       :class="isEffectiveCollapsed ? 'px-0 space-y-2' : 'px-2 space-y-2.5'"
     >
       <div
@@ -318,7 +318,7 @@ function closeFlyoutSubmenu() {
                       : 'bg-[#ECF2FF] text-[#333333]'
                   "
                 >
-                  {{ item.badge }}
+                  {{ getBadgeLabel(item) }}
                 </span>
               </RouterLink>
             </div>

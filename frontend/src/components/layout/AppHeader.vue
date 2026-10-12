@@ -269,52 +269,46 @@ function syncTicketStatusChanges(ticketsList) {
   if (!Array.isArray(ticketsList)) return
   const isFirstLoad = Object.keys(knownTicketStates.value).length === 0
 
-  // Terjemahan di-hoist keluar dari loop karena variabel loop (`t`) men-shadow fungsi t()
-  const notifNewTicketTitle = t('header_notif_new_ticket_title')
-  const notifNewTicketMsg = t('header_notif_ticket_created_msg')
-  const notifTicketChangeTitle = t('header_notif_ticket_change_title')
-  const statusLabel = t('status')
-
-  for (const t of ticketsList) {
-    const ticketKey = String(t.id)
-    const prev = knownTicketStates.value[t.id]
+  for (const item of ticketsList) {
+    const ticketKey = String(item.id)
+    const prev = knownTicketStates.value[item.id]
 
     if (!isFirstLoad && !knownTicketIds.value.has(ticketKey)) {
       addNotificationItem({
-        ticketId: t.id,
+        ticketId: item.id,
         type: 'CREATED',
-        title: 'Tiket Baru Masuk',
-        message: t.judul || 'Tiket baru telah dibuat',
-        nomor_tiket: t.nomor_tiket,
-        judul_tiket: t.judul,
-        status_tiket: t.status_tiket,
-        prioritas: t.prioritas,
-        pelapor: t.pelapor || t.pelapor_nama || '',
-        timestamp: new Date(t.dibuat_pada || Date.now()).getTime(),
+        title: t('header_notif_new_ticket_title'),
+        message: item.judul || t('header_notif_ticket_created_msg'),
+        nomor_tiket: item.nomor_tiket,
+        judul_tiket: item.judul,
+        status_tiket: item.status_tiket,
+        prioritas: item.prioritas,
+        pelapor: item.pelapor || item.pelapor_nama || '',
+        timestamp: new Date(item.dibuat_pada || Date.now()).getTime(),
       })
     }
 
     if (prev && !isFirstLoad) {
-      if (prev.status && prev.status !== t.status_tiket) {
+      if (prev.status && prev.status !== item.status_tiket) {
         addNotificationItem({
-          ticketId: t.id,
+          ticketId: item.id,
           type: `UPDATED`,
-          title: `Perubahan Tiket: ${t.judul}`,
-          message: `Status: '${prev.status}' → '${t.status_tiket}'`,
-          nomor_tiket: t.nomor_tiket,
-          judul_tiket: t.judul,
-          status_tiket: t.status_tiket,
-          prioritas: t.prioritas,
-          pelapor: t.pelapor || t.pelapor_nama || '',
-          timestamp: new Date(t.diperbarui_pada || Date.now()).getTime(),
+          title: `${t('header_notif_ticket_change_title')}: ${item.judul}`,
+          message: `${t('status')}: '${prev.status}' → '${item.status_tiket}'`,
+          nomor_tiket: item.nomor_tiket,
+          judul_tiket: item.judul,
+          status_tiket: item.status_tiket,
+          prioritas: item.prioritas,
+          pelapor: item.pelapor || item.pelapor_nama || '',
+          timestamp: new Date(item.diperbarui_pada || Date.now()).getTime(),
         })
       }
     }
 
-    knownTicketStates.value[t.id] = {
-      status: t.status_tiket,
-      assignedTo: t.assigned_to,
-      updatedAt: t.diperbarui_pada,
+    knownTicketStates.value[item.id] = {
+      status: item.status_tiket,
+      assignedTo: item.assigned_to,
+      updatedAt: item.diperbarui_pada,
     }
     knownTicketIds.value.add(ticketKey)
   }
@@ -344,10 +338,10 @@ const notifCounts = computed(() => {
 })
 
 const notifTabs = computed(() => [
-  { key: 'ALL', label: 'Semua', count: notifCounts.value.ALL },
-  { key: 'CREATED', label: 'Baru', count: notifCounts.value.CREATED },
-  { key: 'UPDATED', label: 'Update', count: notifCounts.value.UPDATED },
-  { key: 'COMMENT', label: 'Komentar', count: notifCounts.value.COMMENT },
+  { key: 'ALL', label: t('all'), count: notifCounts.value.ALL },
+  { key: 'CREATED', label: t('header_notif_tab_new'), count: notifCounts.value.CREATED },
+  { key: 'UPDATED', label: t('header_notif_tab_update'), count: notifCounts.value.UPDATED },
+  { key: 'COMMENT', label: t('header_notif_tab_comment'), count: notifCounts.value.COMMENT },
 ])
 
 function formatStatusDot(status) {
@@ -620,12 +614,12 @@ function relativeTime(dateStrOrMs) {
   const timestamp = typeof dateStrOrMs === 'number' ? dateStrOrMs : new Date(dateStrOrMs).getTime()
   const diff = Date.now() - timestamp
   const m = Math.floor(diff / 60000)
-  if (m < 1) return 'Baru saja'
-  if (m < 60) return `${m} mnt lalu`
+  if (m < 1) return t('header_time_just_now')
+  if (m < 60) return `${m} ${t('header_time_minutes_ago')}`
   const h = Math.floor(m / 60)
-  if (h < 24) return `${h} jam lalu`
+  if (h < 24) return `${h} ${t('header_time_hours_ago')}`
   const d = Math.floor(h / 24)
-  return `${d} hari lalu`
+  return `${d} ${t('header_time_days_ago')}`
 }
 
 function quickSearchPreset(query, tabKey) {

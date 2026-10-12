@@ -857,13 +857,13 @@ function clearFilters() {
               @click="deleteConfirmId = null"
               class="h-8 px-3 rounded-[6px] border border-[#CBD5E1] dark:border-slate-700 text-xs font-semibold text-[#333333] dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer touch-manipulation"
             >
-              Batal
+              {{ t('cancel') }}
             </button>
             <button
               @click="executeDelete"
               class="h-8 px-3 rounded-[6px] text-xs font-semibold bg-rose-600 hover:bg-rose-700 text-white shadow-xs transition-colors cursor-pointer touch-manipulation"
             >
-              Hapus
+              {{ t('delete') }}
             </button>
           </div>
         </div>
@@ -873,7 +873,7 @@ function clearFilters() {
     <!-- Advance Filter Modal -->
     <FilterModal
       :is-open="showFilterModal"
-      title="Filter Kategori Knowledge Base"
+      :title="t('kb_cat_filter_modal_title')"
       @close="showFilterModal = false"
       @apply="showFilterModal = false"
       @reset="clearFilters"
@@ -881,31 +881,31 @@ function clearFilters() {
       <div class="space-y-3">
         <div>
           <label class="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
-            Status Kategori
+            {{ t('kb_cat_filter_status_label') }}
           </label>
           <CustomSelect
             v-model="selectedStatus"
             :options="[
-              { value: 'all', label: 'Semua Status' },
-              { value: 'PUBLISHED', label: 'Published' },
-              { value: 'DRAFT', label: 'Draft' },
+              { value: 'all', label: t('kb_cat_all_statuses') },
+              { value: 'PUBLISHED', label: t('stat_published') },
+              { value: 'DRAFT', label: t('stat_draft') },
             ]"
-            placeholder="Semua Status"
+            :placeholder="t('kb_cat_all_statuses')"
             :block="true"
           />
         </div>
         <div>
           <label class="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
-            Status Unggulan (Featured)
+            {{ t('kb_cat_filter_featured_label') }}
           </label>
           <CustomSelect
             v-model="selectedFeatured"
             :options="[
-              { value: 'all', label: 'Semua' },
-              { value: 'featured', label: 'Unggulan Saja (Featured)' },
-              { value: 'standard', label: 'Standar (Non-Featured)' },
+              { value: 'all', label: t('filter_all') },
+              { value: 'featured', label: t('kb_cat_featured_only') },
+              { value: 'standard', label: t('kb_cat_standard_non_featured') },
             ]"
-            placeholder="Semua"
+            :placeholder="t('filter_all')"
             :block="true"
           />
         </div>

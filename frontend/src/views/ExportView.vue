@@ -687,37 +687,37 @@ onMounted(() => {
           <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
             <div>
               <label for="export-start-date" class="block text-xs font-medium text-[#5F7089] mb-1"
-                >Tanggal Mulai</label
+                >{{ t('export_start_date') }}</label
               >
               <input
                 id="export-start-date"
                 type="date"
-                aria-label="Tanggal Mulai Ekspor"
+                :aria-label="t('export_start_date_aria')"
                 v-model="startDate"
                 class="min-w-0 max-w-full w-full rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-2 text-xs font-medium text-[#333333] focus:border-[#0A51B0] focus:bg-white focus:outline-none"
               />
             </div>
             <div>
               <label for="export-end-date" class="block text-xs font-medium text-[#5F7089] mb-1"
-                >Tanggal Selesai</label
+                >{{ t('export_end_date') }}</label
               >
               <input
                 id="export-end-date"
                 type="date"
-                aria-label="Tanggal Selesai Ekspor"
+                :aria-label="t('export_end_date_aria')"
                 v-model="endDate"
                 class="min-w-0 max-w-full w-full rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-2 text-xs font-medium text-[#333333] focus:border-[#0A51B0] focus:bg-white focus:outline-none"
               />
             </div>
             <div>
               <span class="block text-xs font-medium text-[#5F7089] mb-1"
-                >Batas Maksimal Baris</span
+                >{{ t('export_max_rows') }}</span
               >
               <CustomSelect
                 v-model="rowLimit"
                 :options="ROW_LIMIT_OPTIONS"
-                aria-label="Batas Maksimal Baris"
-                placeholder="Pilih batas baris"
+                :aria-label="t('export_max_rows')"
+                :placeholder="t('export_max_rows_placeholder')"
                 :block="true"
                 height-class="h-8"
               />
@@ -727,7 +727,7 @@ onMounted(() => {
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
             <div>
               <label for="export-search-query" class="block text-xs font-medium text-[#5F7089] mb-1"
-                >Pencarian Kata Kunci</label
+                >{{ t('export_keyword_search') }}</label
               >
               <div class="relative">
                 <span
@@ -738,10 +738,10 @@ onMounted(() => {
                 <input
                   id="export-search-query"
                   type="text"
-                  aria-label="Pencarian Kata Kunci Data"
+                  :aria-label="t('export_keyword_search_aria')"
                   v-model="searchQuery"
                   maxlength="200"
-                  placeholder="Cari kata kunci data…"
+                  :placeholder="t('export_keyword_search_placeholder')"
                   class="min-w-0 max-w-full w-full rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] pl-9 pr-3 py-2 text-xs font-medium text-[#333333] focus:border-[#0A51B0] focus:bg-white focus:outline-none"
                 />
               </div>
@@ -751,14 +751,14 @@ onMounted(() => {
               <label
                 for="export-status-filter"
                 class="block text-xs font-medium text-[#5F7089] mb-1"
-                >Filter Status (Jika Ada)</label
+                >{{ t('export_status_filter') }}</label
               >
               <input
                 type="text"
                 id="export-status-filter"
                 v-model="statusFilter"
                 maxlength="100"
-                placeholder="misal: Digunakan, Rusak, Resolved…"
+                :placeholder="t('export_status_filter_placeholder')"
                 class="min-w-0 max-w-full w-full rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-2 text-xs font-medium text-[#333333] focus:border-[#0A51B0] focus:bg-white focus:outline-none"
               />
             </div>

@@ -795,7 +795,7 @@ function clearFilters() {
             <button
               type="button"
               role="switch"
-              aria-label="Kategori unggulan"
+              :aria-label="t('kb_cat_featured_toggle')"
               :aria-checked="Boolean(editingCategory.is_featured)"
               @click.prevent="editingCategory.is_featured = !editingCategory.is_featured"
               class="relative w-9 h-5 rounded-full transition-colors shrink-0 cursor-pointer"
@@ -817,14 +817,14 @@ function clearFilters() {
       </template>
       <template #footer>
         <div class="category-footer">
-          <button type="button" :disabled="isSaving" @click="closeDrawer">Batal</button>
+          <button type="button" :disabled="isSaving" @click="closeDrawer">{{ t('cancel') }}</button>
           <button
             type="button"
             class="category-save"
             :disabled="isSaving || !editingCategory?.title || !editingCategory?.key"
             @click="handleSave"
           >
-            {{ isSaving ? 'Menyimpan...' : 'Simpan kategori' }}
+            {{ isSaving ? t('kb_cat_saving') : t('kb_cat_save_button') }}
           </button>
         </div>
       </template>
@@ -846,11 +846,10 @@ function clearFilters() {
           </div>
           <div>
             <h3 class="text-sm font-bold text-[#333333] dark:text-white">
-              Hapus kategori?
+              {{ t('kb_cat_delete_confirm_title') }}
             </h3>
             <p class="text-xs text-[#5F7089] dark:text-slate-400 mt-1 leading-relaxed font-normal">
-              Kategori ini akan dihapus permanen dan tidak lagi tampil di Help Center. Tindakan ini
-              tidak dapat dibatalkan.
+              {{ t('kb_cat_delete_confirm_msg') }}
             </p>
           </div>
           <div class="flex items-center justify-end gap-2 pt-1">

@@ -172,7 +172,7 @@ paths['/api/assets/stats'] = { get: op('Asset Portfolio Stats', 'Assets (IT)', u
 crud('/api/ga-assets', 'Assets (GA)', admin, { createBody: { required: true, content: { 'application/json': { schema: { type: 'object' } } } }, listParams: [{ name: 'status', in: 'query', schema: { type: 'string' } }] })
 paths['/api/assets-ga'] = { get: op('List GA Assets (alias)', 'Assets (GA)', user, { description: 'Alias of /api/ga-assets.' }) }
 crud('/api/ops-assets', 'Assets (Ops)', admin, { createBody: { required: true, content: { 'application/json': { schema: { type: 'object' } } } } })
-paths['/api/assets-ops'] = { get: op('List Ops Assets (alias)', 'Assets (Ops)', user, { description: 'Alias of /api/ops-assets.' } }
+paths['/api/assets-ops'] = { get: op('List Ops Assets (alias)', 'Assets (Ops)', user, { description: 'Alias of /api/ops-assets.' }) }
 
 // ───────────────────────────── Employees & Users ─────────────────────────────
 crud('/api/employees', 'Employees', admin, {

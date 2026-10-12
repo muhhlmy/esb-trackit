@@ -184,7 +184,7 @@ function closeFlyoutSubmenu() {
        navigasi mobile sepenuhnya ditangani AppBottomNav + Menu Lainnya. -->
   <aside
     id="app-navigation"
-    aria-label="Navigasi aplikasi"
+    :aria-label="t('nav_aria_application')"
     class="clean-sidebar hidden h-dvh shrink-0 flex-col border-r border-[#E5EAEF] bg-white text-[#2A3547] transition-all duration-300 ease-in-out lg:flex select-none"
     :class="[isEffectiveCollapsed ? 'w-[70px]' : 'w-[235px]']"
   >
@@ -201,7 +201,7 @@ function closeFlyoutSubmenu() {
       <RouterLink
         v-if="!isEffectiveCollapsed"
         to="/"
-        title="Kembali ke Help Center"
+        :title="t('nav_back_to_help_center')"
         class="flex items-center justify-center shrink-0 cursor-pointer"
       >
         <img src="/logo.svg" alt="TrackIT logo" class="h-4.5 w-6 object-contain shrink-0" />

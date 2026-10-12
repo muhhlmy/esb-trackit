@@ -196,7 +196,8 @@ function addNotificationItem({
 }) {
   const ts = timestamp || Date.now()
   const msg =
-    message || (type === 'CREATED' ? 'Tiket baru telah dibuat' : 'Detail tiket diperbarui')
+    message ||
+    (type === 'CREATED' ? t('header_notif_ticket_created_msg') : t('header_notif_ticket_updated_msg'))
 
   const recentDuplicate = notificationsList.value.find(
     (n) =>
@@ -214,13 +215,13 @@ function addNotificationItem({
     title:
       title ||
       (type === 'CREATED'
-        ? 'Tiket Baru Masuk'
+        ? t('header_notif_new_ticket_title')
         : type === 'COMMENT'
-          ? 'Komentar Baru'
-          : 'Perubahan Tiket'),
+          ? t('header_notif_new_comment_title')
+          : t('header_notif_ticket_change_title')),
     message: msg,
     nomor_tiket: nomor_tiket || `#${ticketId}`,
-    judul_tiket: judul_tiket || 'Tiket',
+    judul_tiket: judul_tiket || t('header_ticket_fallback'),
     status_tiket: status_tiket || 'Open',
     prioritas: prioritas || 'Medium (3d)',
     pelapor: pelapor || '',
@@ -241,11 +242,13 @@ function seedNotificationsFromTickets(ticketsList) {
     }
     return
   }
+  // Terjemahan di-hoist keluar dari loop karena variabel loop (`t`) men-shadow fungsi t()
+  const incomingTitle = t('header_notif_ticket_incoming')
   const items = ticketsList.slice(0, 10).map((t) => ({
     id: `notif_seed_${t.id}`,
     ticketId: t.id,
     type: 'CREATED',
-    title: 'Tiket Masuk',
+    title: incomingTitle,
     message: t.judul,
     nomor_tiket: t.nomor_tiket,
     judul_tiket: t.judul,
@@ -265,6 +268,12 @@ function seedNotificationsFromTickets(ticketsList) {
 function syncTicketStatusChanges(ticketsList) {
   if (!Array.isArray(ticketsList)) return
   const isFirstLoad = Object.keys(knownTicketStates.value).length === 0
+
+  // Terjemahan di-hoist keluar dari loop karena variabel loop (`t`) men-shadow fungsi t()
+  const notifNewTicketTitle = t('header_notif_new_ticket_title')
+  const notifNewTicketMsg = t('header_notif_ticket_created_msg')
+  const notifTicketChangeTitle = t('header_notif_ticket_change_title')
+  const statusLabel = t('status')
 
   for (const t of ticketsList) {
     const ticketKey = String(t.id)

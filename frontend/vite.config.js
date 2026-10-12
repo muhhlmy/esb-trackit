@@ -1,5 +1,4 @@
 import { fileURLToPath, URL } from 'node:url'
-
 import { defineConfig, loadEnv } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import tailwindcss from '@tailwindcss/vite'
@@ -37,7 +36,7 @@ function securityHeadersPlugin(devHeaders) {
     // Block sensitive dotfiles like /.env, /.git, and package lockfiles
     if (
       /^\/\.[a-zA-Z0-9_-]/i.test(rawUrl) ||
-      /\/\.(env|git|svn|hg|DS_Store|dockerignore)/i.test(rawUrl) ||
+      /\/(.env|git|svn|hg|DS_Store|dockerignore)/i.test(rawUrl) ||
       /\/(package(-lock)?\.json|yarn\.lock|pnpm-lock\.yaml)/i.test(rawUrl)
     ) {
       res.statusCode = 404
@@ -153,8 +152,9 @@ export default defineConfig(({ mode = 'development' }) => {
     build: {
       // Bundel ditaruh di 'static/', BUKAN 'assets/'.
       // Alasan: route SPA '/assets' (AssetsView) bertabrakan dengan direktori
-      // build di web root. nginx try_files menemukan direktori 'assets/'
-      // pada langkah uri, jadi fallback /index.html tidak pernah jalan.
+      // build di web root. nginx `try_files $uri $uri/ /index.html` menemukan
+      // direktori 'assets/' pada langkah $uri/, jadi fallback /index.html tidak
+      // pernah jalan -> 301 ke /assets/ lalu 403 (tidak ada index, autoindex off).
       // Refresh di /assets gagal sementara navigasi klien berhasil.
       assetsDir: 'static',
       sourcemap: false,

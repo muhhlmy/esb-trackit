@@ -17,6 +17,7 @@ import AppRowActions from '../components/ui/AppRowActions.vue'
 import AppPagination from '../components/ui/AppPagination.vue'
 import SearchableSelect from '../components/ui/SearchableSelect.vue'
 import { useViewMode } from '../composables/useViewMode.js'
+import { useLanguage } from '../composables/useLanguage.js'
 import AppViewToggle from '../components/ui/AppViewToggle.vue'
 import CustomSelect from '../components/ui/CustomSelect.vue'
 import ErrorState from '../components/ui/ErrorState.vue'
@@ -30,6 +31,7 @@ const { isSuperAdmin, hasWritePermission } = useAuth()
 const { user: currentUser } = useAuth()
 const canWriteUsers = computed(() => hasWritePermission('users'))
 const { viewMode } = useViewMode('users', 'table')
+const { currentLang, t } = useLanguage()
 
 // ── State Utama ──────────────────────────────────────────────
 const users = ref([])
@@ -64,85 +66,92 @@ const modalMode = ref('add') // 'add' | 'edit'
 const isSubmitting = ref(false)
 const selectedUser = ref(null)
 
-const OPERATIONAL_FEATURES = [
+const OPERATIONAL_FEATURES = computed(() => [
   {
     key: 'dashboard',
-    label: 'Dashboard Overview',
+    label: t('users_feature_dashboard'),
     icon: 'space_dashboard',
-    desc: 'Ringkasan sistem & statistik',
+    desc: t('users_feature_dashboard_desc'),
   },
   {
     key: 'assets',
-    label: 'Manajemen Aset IT',
+    label: t('users_feature_assets'),
     icon: 'devices',
-    desc: 'Inventaris & pengolahan data aset',
+    desc: t('users_feature_assets_desc'),
   },
   {
     key: 'assets_ga',
-    label: 'Manajemen Aset GA',
+    label: currentLang.value === 'en' ? 'GA Assets' : 'Manajemen Aset GA',
+    // label: 'Manajemen Aset GA'
     icon: 'domain',
-    desc: 'Inventaris fasilitas & mebel kantor',
+    desc: t('users_feature_assets_ga_desc'),
   },
   {
     key: 'assets_ops',
-    label: 'Manajemen Aset Ops',
+    label: currentLang.value === 'en' ? 'Ops Assets' : 'Manajemen Aset Ops',
+    // label: 'Manajemen Aset Ops'
     icon: 'precision_manufacturing',
-    desc: 'Inventaris mesin & operasional outlet',
+    desc: t('users_feature_assets_ops_desc'),
   },
   {
     key: 'my_assets',
-    label: 'Aset Saya / Karyawan',
+    label: t('users_feature_my_assets'),
     icon: 'badge',
-    desc: 'Daftar aset per karyawan',
+    desc: t('users_feature_my_assets_desc'),
   },
   {
     key: 'tickets',
-    label: 'Tiket Kendala',
+    label: t('users_feature_tickets'),
     icon: 'confirmation_number',
-    desc: 'Pengajuan & riwayat tiket kendala',
+    desc: t('users_feature_tickets_desc'),
   },
   {
     key: 'submissions',
-    label: 'Pengajuan Form',
+    label: t('users_feature_submissions'),
     icon: 'assignment',
-    desc: 'Formulir serah terima & layanan',
+    desc: t('users_feature_submissions_desc'),
   },
   {
     key: 'shipments',
-    label: 'Pengiriman',
+    label: currentLang.value === 'en' ? 'Shipments' : 'Pengiriman',
+    // label: 'Pengiriman'
     icon: 'local_shipping',
-    desc: 'Tracker pengiriman barang & aset',
+    desc: t('users_feature_shipments_desc'),
   },
-]
+])
 
-const ADMINISTRATIVE_FEATURES = [
+const ADMINISTRATIVE_FEATURES = computed(() => [
   {
     key: 'knowledge_base',
-    label: 'Knowledge Base & CMS',
+    label: currentLang.value === 'en' ? 'Knowledge Base & CMS' : 'Knowledge Base & CMS',
+    // label: 'Knowledge Base & CMS'
     icon: 'menu_book',
-    desc: 'Pengaturan artikel, FAQ & kategori KB',
+    desc: t('users_feature_knowledge_base_desc'),
   },
   {
     key: 'users',
-    label: 'Manajemen Pengguna',
+    label: t('users_feature_users'),
     icon: 'manage_accounts',
-    desc: 'Pengaturan akun & hak akses RBAC',
+    desc: t('users_feature_users_desc'),
   },
   {
     key: 'logs',
-    label: 'Audit Log & History',
+    label: t('users_feature_logs'),
     icon: 'receipt_long',
-    desc: 'Riwayat audit login & aset',
+    desc: t('users_feature_logs_desc'),
   },
   {
     key: 'karyawan',
-    label: 'Master Data Karyawan',
+    label: t('users_feature_karyawan'),
     icon: 'badge',
-    desc: 'Integrasi data karyawan',
+    desc: t('users_feature_karyawan_desc'),
   },
-]
+])
 
-const ALL_FEATURES = [...OPERATIONAL_FEATURES, ...ADMINISTRATIVE_FEATURES]
+const ALL_FEATURES = computed(() => [
+  ...OPERATIONAL_FEATURES.value,
+  ...ADMINISTRATIVE_FEATURES.value,
+])
 
 const selectedEmployee = computed(() => {
   if (!selectedEmployeeId.value) return null
@@ -243,7 +252,7 @@ function setPermissionLevel(featureKey, level) {
 }
 
 function selectAllPermissions(val) {
-  ALL_FEATURES.forEach((f) => {
+  ALL_FEATURES.value.forEach((f) => {
     setPermissionLevel(f.key, val)
   })
 }
@@ -261,13 +270,16 @@ function handleRoleChange() {
 function getPermissionBadge(u) {
   const isSuper = isRoleSuperAdmin(u.role)
   if (isSuper) {
-    return { text: `${ALL_FEATURES.length}/${ALL_FEATURES.length} Akses Penuh`, type: 'primary' }
+    return {
+      text: `${ALL_FEATURES.value.length}/${ALL_FEATURES.value.length} ${t('users_access_full')}`,
+      type: 'primary',
+    }
   }
   const perms = u.permissions || {}
   const fullCount = Object.values(perms).filter((v) => v === 'full').length
   const readCount = Object.values(perms).filter((v) => v === 'read_only').length
   const totalGranted = fullCount + readCount
-  if (totalGranted === 0) return { text: 'Tidak Ada Akses', type: 'default' }
+  if (totalGranted === 0) return { text: t('users_no_access'), type: 'default' }
   const parts = []
   if (fullCount > 0) parts.push(`${fullCount} Full`)
   if (readCount > 0) parts.push(`${readCount} Read`)
@@ -327,7 +339,7 @@ async function fetchQueues() {
     const data = await get('/api/ticket-queues')
     if (Array.isArray(data)) queues.value = data
   } catch (err) {
-    toast('Gagal memuat data antrean unit: ' + (err.message || 'Kesalahan jaringan'), 'error')
+    toast(t('users_load_queues_failed') + (err.message || t('users_network_error')), 'error')
   } finally {
     isQueuesLoading.value = false
   }
@@ -358,21 +370,21 @@ const unitOptions = computed(() => {
     {
       key: 'IT',
       kode: 'IT Support',
-      nama: 'Perangkat, Network & Software',
+      nama: t('users_unit_it_desc'),
       icon: 'computer',
       queueIds: itQueues.map((q) => Number(q.id)),
     },
     {
       key: 'HR',
       kode: 'HR Support',
-      nama: 'Kepegawaian, Dokumen & QNA',
+      nama: t('users_unit_hr_desc'),
       icon: 'badge',
       queueIds: hrQueues.map((q) => Number(q.id)),
     },
     {
       key: 'GA',
       kode: 'GA Support',
-      nama: 'Fasilitas, Gedung & Logistik',
+      nama: t('users_unit_ga_desc'),
       icon: 'corporate_fare',
       queueIds: gaQueues.map((q) => Number(q.id)),
     },
@@ -411,10 +423,10 @@ async function fetchUsers() {
   pageError.value = ''
   try {
     const data = await getAllPages('/api/users')
-    if (!Array.isArray(data)) throw new Error('Format data pengguna dari server tidak valid.')
+    if (!Array.isArray(data)) throw new Error(t('users_invalid_format'))
     users.value = data
   } catch (e) {
-    pageError.value = e.message || 'Gagal memuat daftar pengguna.'
+    pageError.value = e.message || t('users_load_failed')
     console.error(e)
   } finally {
     isLoading.value = false
@@ -429,7 +441,7 @@ async function fetchEmployees() {
     const data = await get('/api/karyawan?all=true')
     if (Array.isArray(data)) employees.value = data
   } catch (err) {
-    toast('Gagal memuat data karyawan: ' + (err.message || 'Kesalahan jaringan'), 'error')
+    toast(t('users_load_employees_failed') + (err.message || t('users_network_error')), 'error')
   } finally {
     isEmployeesLoading.value = false
   }
@@ -532,11 +544,11 @@ function requestCloseModal() {
 
 async function saveUser() {
   if (!canWriteUsers.value) {
-    modalError.value = 'Anda hanya memiliki akses baca untuk pengguna.'
+    modalError.value = t('users_no_write_access')
     return
   }
   if (modalMode.value === 'edit' && !canManageUser(selectedUser.value)) {
-    modalError.value = 'Anda tidak dapat mengubah pengguna ini.'
+    modalError.value = t('users_cannot_edit')
     return
   }
   isSubmitting.value = true
@@ -547,7 +559,7 @@ async function saveUser() {
   const role = isSuperAdmin.value ? form.value.role.trim() : 'user'
 
   if (!nama || !email || !role) {
-    modalError.value = 'Nama, email, dan role wajib diisi.'
+    modalError.value = t('users_validation_required')
     isSubmitting.value = false
     return
   }
@@ -556,8 +568,7 @@ async function saveUser() {
   }
   const PASSWORD_COMPLEXITY_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[\d\W_]).{8,}$/
   if (form.value.password && !PASSWORD_COMPLEXITY_REGEX.test(form.value.password)) {
-    modalError.value =
-      'Password minimal 8 karakter dan harus mengandung kombinasi huruf besar, huruf kecil, serta angka atau simbol.'
+    modalError.value = t('users_password_requirements')
     isSubmitting.value = false
     return
   }
@@ -582,15 +593,15 @@ async function saveUser() {
 
     if (modalMode.value === 'add') {
       await post('/api/users', payload)
-      toast('Pengguna baru berhasil ditambahkan.')
+      toast(t('users_add_success'))
     } else {
       await put(`/api/users/${selectedUser.value.id}`, payload)
-      toast('Data pengguna & hak akses berhasil diperbarui.')
+      toast(t('users_update_success'))
     }
     closeModal()
     await fetchUsers()
   } catch (e) {
-    modalError.value = e.message || 'Gagal menyimpan data pengguna.'
+    modalError.value = e.message || t('users_save_failed')
     console.error(e)
   } finally {
     isSubmitting.value = false
@@ -604,11 +615,11 @@ async function deleteUser() {
   modalError.value = ''
   try {
     await del(`/api/users/${selectedUser.value.id}`)
-    toast('Pengguna berhasil dihapus!')
+    toast(t('users_delete_success'))
     closeModal()
     await fetchUsers()
   } catch (e) {
-    modalError.value = e.message || 'Gagal menghapus pengguna.'
+    modalError.value = e.message || t('users_delete_failed')
   } finally {
     isSubmitting.value = false
   }
@@ -638,14 +649,14 @@ function getUserActions(u) {
   const actions = []
   if (canWriteUsers.value && (isSuperAdmin.value || !isRoleSuperAdmin(u.role))) {
     actions.push({
-      label: 'Edit Hak Akses',
+      label: t('users_edit_access_action'),
       icon: 'edit',
       onClick: () => openEdit(u),
     })
   }
   if (isSuperAdmin.value && !isRoleSuperAdmin(u.role)) {
     actions.push({
-      label: 'Hapus Pengguna',
+      label: t('users_delete_action'),
       icon: 'delete',
       danger: true,
       onClick: () => openDelete(u),
@@ -689,8 +700,8 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
 
     <!-- Page Header -->
     <PageHeader
-      title="Data Pengguna"
-      subtitle="Pengelolaan akun, role, dan hak akses pengguna sistem"
+      :title="t('users_title')"
+      :subtitle="t('users_subtitle')"
       icon="group"
     >
       <button
@@ -698,42 +709,42 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
         type="button"
         @click="openAdd"
         class="h-8 shrink-0 rounded-[6px] bg-[#0A51B0] px-2.5 sm:px-3 text-xs font-medium text-white shadow-2xs hover:bg-[#0A4391] active:scale-[0.98] transition-all flex items-center justify-center gap-1.5 cursor-pointer"
-        title="Tambah admin baru atau promosikan akses"
+        :title="t('btn_add_user')"
       >
         <span aria-hidden="true" class="material-symbols-outlined text-[16px]">person_add</span>
-        <span class="hidden sm:inline whitespace-nowrap">Tambah Admin / Akses</span>
+        <span class="hidden sm:inline whitespace-nowrap">{{ t('btn_add_user') }}</span>
       </button>
     </PageHeader>
 
     <!-- ── Card Stats Pengguna (Directly below Header) ── -->
     <div v-if="!isLoading && users.length" class="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-2.5 lg:gap-3">
       <StatCard
-        title="Total pengguna"
+        :title="t('stat_total_users')"
         :value="userStats.total"
         icon="manage_accounts"
         color="primary"
-        subtitle="Seluruh pengguna terdaftar"
+        :subtitle="t('users_stat_total_sub')"
       />
       <StatCard
-        title="Superadmin"
+        :title="t('stat_superadmin')"
         :value="userStats.superadmin"
         icon="shield_person"
         color="neutral"
-        subtitle="Hak akses tertinggi"
+        :subtitle="t('users_stat_superadmin_sub')"
       />
       <StatCard
-        title="Admin"
+        :title="t('stat_admin')"
         :value="userStats.admin"
         icon="admin_panel_settings"
         color="primary"
-        subtitle="Pengelola sistem"
+        :subtitle="t('users_stat_admin_sub')"
       />
       <StatCard
-        title="Pengguna"
+        :title="t('stat_users')"
         :value="userStats.reporter"
         icon="support_agent"
         color="neutral"
-        subtitle="Akses operasional standar"
+        :subtitle="t('users_stat_users_sub')"
       />
     </div>
 
@@ -750,8 +761,8 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
           v-model="searchQuery"
           type="search"
           autocomplete="off"
-          aria-label="Cari pengguna"
-          placeholder="Cari nama atau email pengguna…"
+          :aria-label="t('users_search_label')"
+          :placeholder="t('users_search_placeholder')"
           class="h-full min-h-0 w-full rounded-[6px] border border-[#E2E8F0] dark:border-slate-700 bg-white dark:bg-slate-800 pl-8 text-xs text-[#333333] dark:text-slate-100 placeholder-[#687281] dark:placeholder-slate-400 focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
           :class="searchQuery ? 'pr-8' : 'pr-2.5'"
         />
@@ -760,7 +771,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
           type="button"
           @click="searchQuery = ''"
           class="absolute right-2 top-1/2 -translate-y-1/2 flex h-5 w-5 items-center justify-center rounded-full bg-[#E2E8F0] text-[#5F7089] hover:bg-[#CBD5E1] hover:text-[#333333] transition-colors cursor-pointer"
-          title="Hapus pencarian"
+          :title="t('clear_search')"
         >
           <span aria-hidden="true" class="material-symbols-outlined text-[13px]">close</span>
         </button>
@@ -772,7 +783,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
         class="relative inline-flex items-center gap-1.5 h-8 shrink-0 rounded-[6px] border border-[#E2E8F0] dark:border-slate-700 bg-[#F8FAFC] dark:bg-slate-800 px-3 text-xs font-medium text-[#5F7089] dark:text-slate-300 hover:bg-white dark:hover:bg-slate-700 cursor-pointer"
       >
         <span aria-hidden="true" class="material-symbols-outlined text-[16px]">tune</span>
-        <span>Filter</span>
+        <span>{{ t('filter') }}</span>
         <span
           v-if="activeFilterCount > 0"
           class="ml-0.5 inline-flex items-center justify-center min-w-[16px] h-4 px-1 rounded-full text-[10px] font-bold bg-[#0A51B0] text-white"
@@ -785,7 +796,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
 
     <FilterModal
       :is-open="showFilterModal"
-      title="Filter Pengguna"
+      :title="t('users_filter_title')"
       @close="showFilterModal = false"
       @apply="showFilterModal = false"
       @reset="resetFilters"
@@ -793,12 +804,12 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
       <CustomSelect
         v-model="filterRole"
         :options="[
-          { value: '', label: 'Semua Role' },
+          { value: '', label: t('users_filter_all_roles') },
           { value: 'admin', label: 'ADMIN' },
           { value: 'superadmin', label: 'SUPERADMIN' },
           { value: 'user', label: 'USER' },
         ]"
-        aria-label="Filter role"
+        :aria-label="t('users_filter_role_aria')"
         :block="true"
       />
     </FilterModal>
@@ -847,11 +858,11 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
           v-if="viewMode === 'table'"
           class="w-full max-w-full overflow-x-auto"
           tabindex="0"
-          aria-label="Tabel pengguna"
+          :aria-label="t('users_table_label')"
         >
           <table class="w-full min-w-[700px] text-left border-collapse table-fixed">
             <caption class="sr-only">
-              Daftar pengguna sistem
+              {{ t('users_table_caption') }}
             </caption>
             <colgroup>
               <col class="w-[31%]" />
@@ -867,37 +878,37 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
                   scope="col"
                   class="py-2.5 pl-3 pr-3 text-[11px] font-semibold uppercase tracking-wider text-[#5F7089] dark:text-slate-400 text-left whitespace-nowrap"
                 >
-                  Pengguna
+                  {{ t('users_th_user') }}
                 </th>
                 <th
                   scope="col"
                   class="py-2.5 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#5F7089] dark:text-slate-400 text-left whitespace-nowrap"
                 >
-                  Role Akses
+                  {{ t('users_role_access') }}
                 </th>
                 <th
                   scope="col"
                   class="py-2.5 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#5F7089] dark:text-slate-400 text-left whitespace-nowrap"
                 >
-                  Sub Role / Unit Ditangani
+                  {{ t('users_th_unit') }}
                 </th>
                 <th
                   scope="col"
                   class="py-2.5 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#5F7089] dark:text-slate-400 text-left whitespace-nowrap"
                 >
-                  Hak Akses Fitur
+                  {{ t('users_th_permissions') }}
                 </th>
                 <th
                   scope="col"
                   class="py-2.5 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#5F7089] dark:text-slate-400 text-left whitespace-nowrap"
                 >
-                  Status
+                  {{ t('status') }}
                 </th>
                 <th
                   scope="col"
                   class="py-2.5 pr-3 pl-3 text-right text-[11px] font-semibold uppercase tracking-wider text-[#5F7089] dark:text-slate-400 whitespace-nowrap"
                 >
-                  Aksi
+                  {{ t('actions') }}
                 </th>
               </tr>
             </thead>
@@ -939,7 +950,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
                     v-if="isRoleSuperAdmin(user.role)"
                     class="text-[11px] font-semibold text-[#333333] truncate block"
                   >
-                    Semua Unit (Superadmin)
+                    {{ t('users_all_units_superadmin') }}
                   </div>
                   <div
                     v-else-if="user.queues && user.queues.length > 0"
@@ -953,7 +964,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
                     >
                   </div>
                   <span v-else class="text-[11px] text-[#687281] italic truncate block"
-                    >Tidak ada unit</span
+                    >{{ t('users_no_unit') }}</span
                   >
                 </td>
 
@@ -969,7 +980,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
                 <td class="py-2.5 px-3 overflow-hidden">
                   <AppBadge
                     :type="user.is_active === false ? 'danger' : 'success'"
-                    :text="user.is_active === false ? 'NONAKTIF' : 'AKTIF'"
+                    :text="user.is_active === false ? t('users_status_inactive') : t('users_status_active')"
                   />
                 </td>
 
@@ -977,7 +988,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
                 <td class="py-2.5 pr-3 pl-3 text-right overflow-hidden" @click.stop>
                   <AppRowActions
                     :actions="getUserActions(user)"
-                    :label="`Aksi pengguna ${user.nama || ''}`"
+                    :label="t('users_row_actions_label') + ' ' + (user.nama || '')"
                   />
                 </td>
               </tr>
@@ -987,9 +998,9 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
                 <td colspan="6">
                   <EmptyState
                     icon="group"
-                    :title="searchQuery || filterRole ? 'Tidak ada pengguna yang cocok' : 'Belum ada pengguna'"
-                    :description="searchQuery || filterRole ? 'Coba ubah kata kunci atau reset filter Anda.' : 'Akun pengguna akan muncul di sini setelah dibuat.'"
-                    :secondary-label="searchQuery || filterRole ? 'Reset Filter' : ''"
+                    :title="searchQuery || filterRole ? t('users_empty_filtered_title') : t('users_empty_title')"
+                    :description="searchQuery || filterRole ? t('users_empty_filtered_desc') : t('users_empty_desc')"
+                    :secondary-label="searchQuery || filterRole ? t('filter_reset') : ''"
                     @secondary-action="resetFilters"
                   />
                 </td>
@@ -1004,9 +1015,9 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
           <EmptyState
             v-if="filteredUsers.length === 0"
             icon="group"
-            :title="searchQuery || filterRole ? 'Tidak ada pengguna yang cocok' : 'Belum ada pengguna'"
-            :description="searchQuery || filterRole ? 'Coba ubah kata kunci atau reset filter Anda.' : 'Akun pengguna akan muncul di sini setelah dibuat.'"
-            :secondary-label="searchQuery || filterRole ? 'Reset Filter' : ''"
+            :title="searchQuery || filterRole ? t('users_empty_filtered_title') : t('users_empty_title')"
+            :description="searchQuery || filterRole ? t('users_empty_filtered_desc') : t('users_empty_desc')"
+            :secondary-label="searchQuery || filterRole ? t('filter_reset') : ''"
             @secondary-action="resetFilters"
           />
 
@@ -1045,7 +1056,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
                 <div @click.stop>
                   <AppRowActions
                     :actions="getUserActions(user)"
-                    :label="`Aksi pengguna ${user.nama || ''}`"
+                    :label="t('users_row_actions_label') + ' ' + (user.nama || '')"
                   />
                 </div>
               </div>
@@ -1066,11 +1077,11 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
                 <!-- Status -->
                 <div class="flex flex-col gap-0.5 rounded-[6px] bg-[#F8FAFC] px-2 py-1.5">
                   <span class="text-[9.5px] font-semibold uppercase tracking-wider text-[#687281]"
-                    >Status</span
+                    >{{ t('status') }}</span
                   >
                   <AppBadge
                     :type="user.is_active === false ? 'danger' : 'success'"
-                    :text="user.is_active === false ? 'NONAKTIF' : 'AKTIF'"
+                    :text="user.is_active === false ? t('users_status_inactive') : t('users_status_active')"
                   />
                 </div>
 
@@ -1083,7 +1094,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
                     v-if="isRoleSuperAdmin(user.role)"
                     class="text-[11px] font-semibold text-[#333333] leading-tight"
                   >
-                    Semua Unit
+                    {{ t('users_all_units') }}
                   </div>
                   <div
                     v-else-if="user.queues && user.queues.length > 0"
@@ -1102,7 +1113,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
                 <!-- Hak Akses -->
                 <div class="flex flex-col gap-0.5 rounded-[6px] bg-[#F8FAFC] px-2.5 py-2">
                   <span class="text-[10px] font-semibold uppercase tracking-wider text-[#687281]"
-                    >Hak Akses</span
+                    >{{ t('users_permissions_title') }}</span
                   >
                   <AppBadge
                     :type="getPermissionBadge(user).type"
@@ -1131,11 +1142,11 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
          ═══════════════════════════════════════════════════════ -->
     <AppModal
       :is-open="showFormModal"
-      :title="modalMode === 'add' ? 'Tambah Pengguna' : 'Edit Pengguna & Hak Akses'"
+      :title="modalMode === 'add' ? t('users_modal_add_title') : t('users_modal_edit_title')"
       :subtitle="
         modalMode === 'add'
-          ? 'Buat akun dan atur hak akses pengguna'
-          : 'Perbarui informasi dan hak akses pengguna'
+          ? t('users_modal_add_subtitle')
+          : t('users_modal_edit_subtitle')
       "
       size="xl"
       @close="requestCloseModal"
@@ -1146,22 +1157,22 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
         class="admin-entry-form user-entry-form flex flex-col gap-4"
       >
         <section class="user-entry-section">
-          <h3 class="user-entry-title">Identitas & akun</h3>
+          <h3 class="user-entry-title">{{ t('users_form_identity_title') }}</h3>
           <p class="user-entry-hint">
-            Lengkapi profil pengguna dan informasi untuk masuk ke aplikasi.
+            {{ t('users_form_identity_hint') }}
           </p>
           <!-- 1. Employee Selection (Searchable Combobox) -->
           <div v-if="modalMode === 'add' && employees.length > 0" class="flex flex-col gap-1.5">
-            <label class="text-xs font-semibold text-[#333333]">Karyawan</label>
+            <label class="text-xs font-semibold text-[#333333]">{{ t('users_employee_label') }}</label>
             <SearchableSelect
               v-model="selectedEmployeeId"
               :options="employeeOptions"
               value-key="id_karyawan"
               label-key="nama_karyawan"
               secondary-label-key="detail"
-              placeholder="Pilih karyawan yang akan diberikan akses…"
-              search-placeholder="Cari nama, NIK, jabatan, atau departemen…"
-              aria-label="Pilih karyawan"
+              :placeholder="t('users_select_employee_placeholder')"
+              :search-placeholder="t('users_employee_search_placeholder')"
+              :aria-label="t('users_employee_select_aria')"
               clearable
               @update:modelValue="handleEmployeeSelect"
             />
@@ -1182,7 +1193,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
                     {{ selectedEmployee.nama_karyawan }}
                   </p>
                   <p class="text-[11px] text-[#5F7089] truncate">
-                    {{ selectedEmployee.email_kantor || 'Tanpa Email' }} • NIK:
+                    {{ selectedEmployee.email_kantor || t('users_no_email') }} • NIK:
                     {{ selectedEmployee.nik }}
                   </p>
                 </div>
@@ -1192,7 +1203,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
                 @click="clearSelectedEmployee"
                 class="text-xs text-[#687281] hover:text-[#E11D48] font-medium cursor-pointer"
               >
-                Batal
+                {{ t('cancel') }}
               </button>
             </div>
           </div>
@@ -1202,7 +1213,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
             <!-- Nama Lengkap -->
             <div class="flex flex-col gap-1">
               <label for="user-name" class="text-xs font-semibold text-[#333333]"
-                >Nama Lengkap *</label
+                >{{ t('users_full_name_label') }} *</label
               >
               <input
                 id="user-name"
@@ -1212,7 +1223,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
                 type="text"
                 autocomplete="name"
                 :disabled="modalMode === 'edit' && !isSuperAdmin"
-                placeholder="Nama lengkap pengguna"
+                :placeholder="t('users_full_name_placeholder')"
                 class="h-8 w-full rounded-[6px] border border-[#E2E8F0] bg-white px-3 text-xs text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs disabled:bg-[#F8FAFC] disabled:opacity-60 disabled:cursor-not-allowed"
               />
             </div>
@@ -1227,7 +1238,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
                 type="email"
                 autocomplete="email"
                 :disabled="modalMode === 'edit' && !isSuperAdmin"
-                placeholder="email@perusahaan.com"
+                :placeholder="t('users_email_placeholder')"
                 class="h-8 w-full rounded-[6px] border border-[#E2E8F0] bg-white px-3 text-xs text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs disabled:bg-[#F8FAFC] disabled:opacity-60 disabled:cursor-not-allowed"
               />
             </div>
@@ -1237,8 +1248,8 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
               <label for="user-password" class="text-xs font-semibold text-[#333333]">
                 {{
                   modalMode === 'add'
-                    ? 'Password Awal (terisi otomatis - ganti bila perlu)'
-                    : 'Password Baru'
+                    ? t('users_password_initial_label')
+                    : t('users_password_new_label')
                 }}
               </label>
               <input
@@ -1248,7 +1259,9 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
                 type="password"
                 autocomplete="new-password"
                 :placeholder="
-                  modalMode === 'add' ? 'Terisi otomatis & acak' : 'Kosongkan jika tidak diubah'
+                  modalMode === 'add'
+                    ? t('users_password_auto_placeholder')
+                    : t('users_password_keep_placeholder')
                 "
                 class="h-8 w-full rounded-[6px] border border-[#E2E8F0] bg-white px-3 text-xs text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
               />
@@ -1256,12 +1269,12 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
 
             <!-- Role -->
             <div class="flex flex-col gap-1">
-              <label class="text-xs font-semibold text-[#333333]">Role Akses *</label>
+              <label class="text-xs font-semibold text-[#333333]">{{ t('users_role_access') }} *</label>
               <CustomSelect
                 v-model="form.role"
                 :options="formattedRoleOptions"
-                aria-label="Role Akses"
-                placeholder="Pilih role"
+                :aria-label="t('users_role_access')"
+                :placeholder="t('users_select_role')"
                 :block="true"
                 height-class="h-8"
                 :disabled="
@@ -1274,7 +1287,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
                 v-if="modalMode === 'edit' && Number(selectedUser?.id) === Number(currentUser?.id)"
                 class="text-[11px] font-normal text-amber-600"
               >
-                Role tidak dapat diubah untuk akun milik sendiri.
+                {{ t('users_role_self_notice') }}
               </p>
             </div>
           </div>
@@ -1283,10 +1296,10 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
         <div v-if="form.role !== 'user'" class="flex flex-col gap-2 pt-2 border-t border-[#F1F5F9]">
           <div>
             <span class="block text-xs font-semibold text-[#333333]"
-              >Unit Tiket yang Ditangani</span
+              >{{ t('users_queue_section_title') }}</span
             >
             <span class="block text-[11px] text-[#5F7089]"
-              >Pilih unit tiket yang dapat diakses &amp; ditangani pengguna ini:</span
+              >{{ t('users_queue_section_hint') }}</span
             >
           </div>
 
@@ -1294,7 +1307,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
             v-if="form.role === 'superadmin'"
             class="text-xs font-semibold text-[#333333] bg-[#EFF6FF] p-2.5 rounded-[6px] border border-[#BFDBFE]"
           >
-            ⚡ Superadmin memiliki akses otomatis ke seluruh unit (IT, HR, GA).
+            {{ t('users_superadmin_queue_notice') }}
           </div>
           <div v-else class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
             <div
@@ -1334,9 +1347,9 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
         <div class="user-permission-section flex flex-col gap-3">
           <div class="flex items-center justify-between gap-3 flex-wrap">
             <div>
-              <h3 class="text-xs font-semibold text-[#333333]">Hak Akses</h3>
+              <h3 class="text-xs font-semibold text-[#333333]">{{ t('users_permissions_title') }}</h3>
               <p class="text-[11px] text-[#5F7089]">
-                Tentukan level akses pengguna untuk setiap fitur
+                {{ t('users_permissions_hint') }}
               </p>
             </div>
 
@@ -1346,7 +1359,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
                 @click="selectAllPermissions('full')"
                 class="font-semibold text-[#059669] hover:underline cursor-pointer"
               >
-                Akses penuh semua
+                {{ t('users_perm_all_full') }}
               </button>
               <span class="text-[#CBD5E1]">•</span>
               <button
@@ -1354,7 +1367,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
                 @click="selectAllPermissions('read_only')"
                 class="font-semibold text-[#333333] hover:underline cursor-pointer"
               >
-                Baca saja semua
+                {{ t('users_perm_all_read') }}
               </button>
               <span class="text-[#CBD5E1]">•</span>
               <button
@@ -1362,7 +1375,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
                 @click="selectAllPermissions('none')"
                 class="font-semibold text-[#5F7089] hover:underline cursor-pointer"
               >
-                Reset
+                {{ t('reset') }}
               </button>
             </div>
           </div>
@@ -1375,7 +1388,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
             <span aria-hidden="true" class="material-symbols-outlined text-[18px]"
               >verified_user</span
             >
-            <span>Superadmin memiliki akses penuh ke seluruh fitur sistem secara otomatis.</span>
+            <span>{{ t('users_superadmin_perm_notice') }}</span>
           </div>
 
           <!-- Grouped Permission Rows -->
@@ -1383,7 +1396,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
             <!-- Group 1: Operasional -->
             <div class="flex flex-col gap-1.5">
               <span class="text-[11px] font-semibold uppercase tracking-wider text-[#687281]"
-                >Operasional</span
+                >{{ t('users_perm_group_operational') }}</span
               >
               <div
                 class="divide-y divide-[#F1F5F9] rounded-[6px] border border-[#E2E8F0] bg-white overflow-hidden shadow-2xs"
@@ -1407,7 +1420,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
 
                   <select
                     v-model="form.permissions[f.key]"
-                    :aria-label="'Hak akses ' + f.label"
+                    :aria-label="t('users_perm_aria_prefix') + ' ' + f.label"
                     class="h-8 rounded-[6px] border px-2.5 text-xs font-semibold focus:outline-none transition-all cursor-pointer shadow-2xs select-none shrink-0"
                     :class="
                       form.permissions[f.key] === 'full'
@@ -1417,9 +1430,9 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
                           : 'bg-[#F8FAFC] text-[#5F7089] border-[#E2E8F0]'
                     "
                   >
-                    <option value="none">Tanpa akses</option>
-                    <option value="read_only">Baca saja</option>
-                    <option value="full">Akses penuh</option>
+                    <option value="none">{{ t('users_perm_none') }}</option>
+                    <option value="read_only">{{ t('users_perm_read_only') }}</option>
+                    <option value="full">{{ t('users_perm_full') }}</option>
                   </select>
                 </div>
               </div>
@@ -1428,7 +1441,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
             <!-- Group 2: Administrasi & Audit -->
             <div class="flex flex-col gap-1.5">
               <span class="text-[11px] font-semibold uppercase tracking-wider text-[#687281]"
-                >Administrasi &amp; Audit</span
+                >{{ t('users_perm_group_admin') }}</span
               >
               <div
                 class="divide-y divide-[#F1F5F9] rounded-[6px] border border-[#E2E8F0] bg-white overflow-hidden shadow-2xs"
@@ -1452,7 +1465,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
 
                   <select
                     v-model="form.permissions[f.key]"
-                    :aria-label="'Hak akses ' + f.label"
+                    :aria-label="t('users_perm_aria_prefix') + ' ' + f.label"
                     class="h-8 rounded-[6px] border px-2.5 text-xs font-semibold focus:outline-none transition-all cursor-pointer shadow-2xs select-none shrink-0"
                     :class="
                       form.permissions[f.key] === 'full'
@@ -1462,9 +1475,9 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
                           : 'bg-[#F8FAFC] text-[#5F7089] border-[#E2E8F0]'
                     "
                   >
-                    <option value="none">Tanpa akses</option>
-                    <option value="read_only">Baca saja</option>
-                    <option value="full">Akses penuh</option>
+                    <option value="none">{{ t('users_perm_none') }}</option>
+                    <option value="read_only">{{ t('users_perm_read_only') }}</option>
+                    <option value="full">{{ t('users_perm_full') }}</option>
                   </select>
                 </div>
               </div>
@@ -1478,9 +1491,9 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
           class="flex items-center justify-between gap-4 rounded-[6px] border border-[#E2E8F0] bg-[#F8FAFC] px-3.5 py-2.5 cursor-pointer select-none"
         >
           <div>
-            <span class="block text-xs font-semibold text-[#333333]">Status Akun Aktif</span>
+            <span class="block text-xs font-semibold text-[#333333]">{{ t('users_account_active') }}</span>
             <span class="block text-[11px] text-[#5F7089]"
-              >Pengguna nonaktif tidak dapat login ke dalam sistem.</span
+              >{{ t('users_account_active_hint') }}</span
             >
           </div>
           <input
@@ -1510,7 +1523,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
               @click="requestCloseModal"
               class="h-8 w-full sm:w-auto px-3.5 rounded-[6px] border border-[#E2E8F0] bg-white text-xs font-semibold text-[#475569] hover:bg-[#F8FAFC] hover:text-[#333333] active:scale-[0.98] transition-all cursor-pointer shadow-2xs"
             >
-              Batal
+              {{ t('cancel') }}
             </button>
 
             <button
@@ -1525,10 +1538,10 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
               ></span>
               <span>{{
                 isSubmitting
-                  ? 'Menyimpan...'
+                  ? t('users_saving')
                   : modalMode === 'add'
-                    ? 'Tambah Pengguna'
-                    : 'Simpan Perubahan'
+                    ? t('users_add_btn')
+                    : t('users_save_changes')
               }}</span>
             </button>
           </div>
@@ -1541,7 +1554,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
          ═══════════════════════════════════════════════════════ -->
     <AppModal
       :is-open="showDeleteModal"
-      title="Hapus Pengguna"
+      :title="t('users_delete_modal_title')"
       size="sm"
       @close="requestCloseModal"
     >
@@ -1560,8 +1573,8 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
         </div>
 
         <div>
-          <h4 class="text-sm font-bold text-[#111827]">Yakin ingin menghapus?</h4>
-          <p class="text-[11px] text-[#687281] mt-0.5">Tindakan ini tidak dapat dibatalkan.</p>
+          <h4 class="text-sm font-bold text-[#111827]">{{ t('users_delete_confirm_title') }}</h4>
+          <p class="text-[11px] text-[#687281] mt-0.5">{{ t('users_delete_confirm_desc') }}</p>
         </div>
 
         <!-- Info user yang akan dihapus -->
@@ -1569,7 +1582,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
           class="w-full bg-[#F9FAFB] border border-[#E5E7EB] rounded-[6px] p-3 text-left space-y-1.5"
         >
           <div class="flex justify-between text-xs">
-            <span class="text-[#687281]">Nama</span>
+            <span class="text-[#687281]">{{ t('users_name_label') }}</span>
             <span class="font-bold text-[#111827]">{{ selectedUser?.nama }}</span>
           </div>
           <div class="flex justify-between text-xs">
@@ -1593,7 +1606,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
             @click="requestCloseModal"
             class="flex-1 h-8 bg-[#F9FAFB] border border-[#E5E7EB] rounded-[6px] text-xs font-semibold text-[#374151] hover:bg-[#F3F4F6] transition-colors"
           >
-            Batal
+            {{ t('cancel') }}
           </button>
           <button
             type="button"
@@ -1605,7 +1618,7 @@ onBeforeUnmount(() => window.clearTimeout(toastTimer))
               v-if="isSubmitting"
               class="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin"
             ></span>
-            {{ isSubmitting ? 'Menghapus...' : 'Ya, Hapus' }}
+            {{ isSubmitting ? t('users_deleting') : t('btn_yes_delete') }}
           </button>
         </div>
       </template>

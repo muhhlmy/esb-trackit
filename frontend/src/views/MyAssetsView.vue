@@ -15,6 +15,7 @@ import FilterModal from '../components/ui/FilterModal.vue'
 import StatCard from '../components/ui/StatCard.vue'
 import AppPagination from '../components/ui/AppPagination.vue'
 import { useNotificationSound } from '../composables/useNotificationSound.js'
+import { useLanguage } from '../composables/useLanguage.js'
 import {
   notificationPermission,
   cameraPermission,
@@ -27,6 +28,7 @@ import {
 const router = useRouter()
 const { get, post } = useApi()
 const { isAdmin, isSuperAdmin, user, refreshUser, hasPermission } = useAuth()
+const { t, currentLang } = useLanguage()
 const canBrowseOtherAssets = computed(
   () => isSuperAdmin.value || (isAdmin.value && hasPermission('assets')),
 )
@@ -92,7 +94,26 @@ const passwordForm = ref({
 })
 
 // ── State & Handlers: Izin Browser & Suara Tone.js ─────────────────────────
-const { isSoundEnabled, toggleSound, testSound } = useNotificationSound()
+const {
+  isSoundEnabled,
+  toggleSound,
+  testSound,
+  soundStatusMap,
+  soundPresets,
+  setStatusSound,
+  playSoundById,
+} = useNotificationSound()
+
+const showProfileSoundCustomizer = ref(false)
+
+const NOTIFICATION_STATUS_ITEMS = computed(() => [
+  { key: 'CREATED', label: t('my_assets_notif_status_created'), desc: t('my_assets_notif_status_created_desc'), icon: 'confirmation_number' },
+  { key: 'UPDATED', label: t('my_assets_notif_status_updated'), desc: t('my_assets_notif_status_updated_desc'), icon: 'sync' },
+  { key: 'COMMENT', label: t('my_assets_notif_status_comment'), desc: t('my_assets_notif_status_comment_desc'), icon: 'chat' },
+  { key: 'ALERT', label: t('my_assets_notif_status_alert'), desc: t('my_assets_notif_status_alert_desc'), icon: 'warning' },
+  { key: 'SUCCESS', label: t('my_assets_notif_status_success'), desc: t('my_assets_notif_status_success_desc'), icon: 'check_circle' },
+])
+
 const permissionFeedback = ref('')
 const permissionFeedbackType = ref('info')
 
@@ -107,9 +128,9 @@ function showPermFeedback(msg, type = 'info') {
 async function handleProfileEnableNotif() {
   const res = await requestNotificationPermission()
   if (res === 'granted') {
-    showPermFeedback('Notifikasi desktop browser berhasil diaktifkan.', 'success')
+    showPermFeedback(t('my_assets_perm_notif_enabled'), 'success')
   } else if (res === 'denied') {
-    showPermFeedback('Izin notifikasi diblokir browser. Buka setelan situs browser untuk mengizinkan.', 'error')
+    showPermFeedback(t('my_assets_perm_notif_blocked'), 'error')
   }
 }
 
@@ -117,11 +138,11 @@ function handleProfileTestNotif() {
   if (notificationPermission.value === 'granted') {
     testSound()
     showNativeNotification({
-      title: 'Uji Notifikasi TrackIT',
-      body: 'Notifikasi desktop dan nada suara Tone.js berjalan lancar.',
+      title: t('my_assets_test_notif_title'),
+      body: t('my_assets_test_notif_body'),
       icon: '/logo.svg',
     })
-    showPermFeedback('Uji coba notifikasi dan suara berhasil.', 'success')
+    showPermFeedback(t('my_assets_test_notif_success'), 'success')
   } else {
     handleProfileEnableNotif()
   }
@@ -213,12 +234,12 @@ const lokasiOptions = computed(() => {
 })
 
 const departemenFilterOptions = computed(() => [
-  { value: '', label: 'Semua Departemen' },
+  { value: '', label: t('my_assets_all_departments') },
   ...departemenOptions.value.map((dep) => ({ value: dep, label: dep })),
 ])
 
 const lokasiFilterOptions = computed(() => [
-  { value: '', label: 'Semua Lokasi' },
+  { value: '', label: t('my_assets_all_locations') },
   ...lokasiOptions.value.map((loc) => ({ value: loc, label: loc })),
 ])
 
@@ -230,7 +251,7 @@ const tipeFilterOptions = computed(() => {
   const types = [...new Set([...employeeAssetTypes, ...loadedAssetTypes].filter(Boolean))].sort()
 
   return [
-    { value: '', label: 'Semua Tipe Perangkat' },
+    { value: '', label: t('my_assets_all_device_types') },
     ...types.map((type) => ({ value: type, label: type })),
   ]
 })
@@ -303,7 +324,7 @@ const employeeAssignedSince = computed(() => {
     .filter(Boolean)
     .map((d) => new Date(d).getTime())
     .filter((t) => !isNaN(t))
-  if (dates.length === 0) return '—'
+  if (dates.length === 0) return '-'
   const minTimestamp = Math.min(...dates)
   return formatDate(new Date(minTimestamp).toISOString())
 })
@@ -323,10 +344,10 @@ const assetHistoryTimeline = computed(() => {
       let type = 'status_change'
       let actionTitle =
         log.aksi === 'TAMBAH'
-          ? 'Aset Didaftarkan ke Sistem'
+          ? t('my_assets_tl_registered')
           : log.aksi === 'UBAH'
-            ? 'Pembaruan Informasi Aset'
-            : 'Aset Dihapus'
+            ? t('my_assets_tl_updated')
+            : t('my_assets_tl_deleted')
 
       if (log.aksi === 'TAMBAH') {
         icon = 'add_circle'
@@ -341,11 +362,11 @@ const assetHistoryTimeline = computed(() => {
       ) {
         icon = 'person_add'
         type = 'assignment'
-        actionTitle = 'Penugasan Aset Diperbarui'
+        actionTitle = t('my_assets_tl_assignment_updated')
       } else if (log.perubahan?.includes('Lokasi')) {
         icon = 'pin_drop'
         type = 'relocation'
-        actionTitle = 'Lokasi Aset Dipindahkan'
+        actionTitle = t('my_assets_tl_relocated')
       }
 
       list.push({
@@ -353,7 +374,7 @@ const assetHistoryTimeline = computed(() => {
         action: actionTitle,
         actor: log.oleh_pengguna || log.nama_user || log.username || 'Super Administrator',
         status: log.aksi,
-        detail: log.perubahan || 'Perubahan data aset tercatat oleh sistem',
+        detail: log.perubahan || t('my_assets_tl_change_recorded'),
         icon,
         type,
       })
@@ -371,20 +392,20 @@ const assetHistoryTimeline = computed(() => {
   cycles.forEach((c) => {
     list.push({
       date: c.tanggal_mulai,
-      action: `Aset ditugaskan kepada ${emp?.nama_karyawan || 'Karyawan'}`,
+      action: `${t('my_assets_tl_assigned_to')} ${emp?.nama_karyawan || t('my_assets_employee')}`,
       actor: 'Admin IT System',
-      status: c.status_pemakaian || 'Aktif',
-      detail: `Catatan Penugasan: ${c.catatan || 'Aset aktif digunakan oleh pemegang'}`,
+      status: c.status_pemakaian || t('my_assets_tl_active'),
+      detail: `${t('my_assets_tl_assignment_note')}: ${c.catatan || t('my_assets_tl_active_use')}`,
       icon: 'person_pin',
       type: 'assignment',
     })
     if (c.tanggal_selesai) {
       list.push({
         date: c.tanggal_selesai,
-        action: 'Penugasan aset selesai / dikembalikan',
+        action: t('my_assets_tl_returned'),
         actor: 'Admin IT System',
-        status: 'Selesai',
-        detail: 'Aset telah dikembalikan ke stok inventaris IT',
+        status: t('my_assets_tl_done'),
+        detail: t('my_assets_tl_returned_to_stock'),
         icon: 'assignment_return',
         type: 'return',
       })
@@ -395,10 +416,10 @@ const assetHistoryTimeline = computed(() => {
   if (list.length === 0) {
     list.push({
       date: asset.created_at || new Date().toISOString(),
-      action: `Aset ditugaskan kepada ${emp?.nama_karyawan || 'Karyawan'}`,
-      actor: 'Sistem Inventory IT',
+      action: `${t('my_assets_tl_assigned_to')} ${emp?.nama_karyawan || t('my_assets_employee')}`,
+      actor: t('my_assets_tl_it_inventory_system'),
       status: asset.status_aset || 'In Use',
-      detail: `Pemegang Aktif: ${emp?.nama_karyawan || 'Karyawan'} (NIK: ${emp?.nik || '-'})`,
+      detail: `${t('my_assets_tl_active_holder')}: ${emp?.nama_karyawan || t('my_assets_employee')} (NIK: ${emp?.nik || '-'})`,
       icon: 'person_check',
       type: 'assignment',
     })
@@ -488,7 +509,7 @@ async function goToLevel2(employee) {
       }
     }
   } catch (err) {
-    assetError.value = err.message || 'Gagal memuat data aset karyawan.'
+    assetError.value = err.message || t('my_assets_error_load_employee_assets')
   } finally {
     isLoadingAssets.value = false
   }
@@ -527,7 +548,7 @@ async function fetchEmployees() {
     const data = await get('/api/karyawan/with-assets')
     employees.value = Array.isArray(data) ? data : []
   } catch (err) {
-    employeeError.value = err.message || 'Gagal memuat daftar karyawan.'
+    employeeError.value = err.message || t('my_assets_error_load_employees')
   } finally {
     isLoadingEmployees.value = false
   }
@@ -546,7 +567,7 @@ async function loadMyOwnAssets() {
       selectedEmployee.value = {
         id_karyawan: empData.id || empData.id_karyawan,
         nik: empData.nik,
-        nama_karyawan: empData.nama_karyawan || currentUser?.nama || 'Saya',
+        nama_karyawan: empData.nama_karyawan || currentUser?.nama || t('my_assets_self'),
         title:
           empData.title || empData.jabatan || currentUser?.title || currentUser?.jabatan || 'Staff',
         jabatan:
@@ -561,7 +582,7 @@ async function loadMyOwnAssets() {
     } else {
       selectedEmployee.value = {
         nik: '',
-        nama_karyawan: currentUser?.nama || 'Pengguna',
+        nama_karyawan: currentUser?.nama || t('my_assets_user'),
         title: currentUser?.role || 'User',
         jabatan: currentUser?.role || 'User',
         departemen: '-',
@@ -586,7 +607,7 @@ async function loadMyOwnAssets() {
     const assetData = await get('/api/assets/my')
     myAssets.value = Array.isArray(assetData) ? assetData.map(normalizeAsset) : []
   } catch (err) {
-    assetError.value = err.message || 'Gagal memuat data aset Anda.'
+    assetError.value = err.message || t('my_assets_error_load_my_assets')
   } finally {
     isLoadingAssets.value = false
   }
@@ -599,7 +620,7 @@ async function fetchUserTickets() {
     const data = await get('/api/tickets?tab=reported')
     userTickets.value = Array.isArray(data) ? data : []
   } catch (err) {
-    userTicketsError.value = err.message || 'Gagal memuat riwayat tiket.'
+    userTicketsError.value = err.message || t('my_assets_error_load_tickets')
   } finally {
     isLoadingUserTickets.value = false
   }
@@ -615,19 +636,19 @@ async function handleChangePassword() {
   passwordSuccess.value = ''
   passwordError.value = ''
   if (!passwordForm.value.currentPassword) {
-    passwordError.value = 'Password saat ini harus diisi.'
+    passwordError.value = t('my_assets_err_current_password_required')
     return
   }
   if (!passwordForm.value.newPassword) {
-    passwordError.value = 'Password baru harus diisi.'
+    passwordError.value = t('my_assets_err_new_password_required')
     return
   }
   if (passwordForm.value.newPassword.length < 8) {
-    passwordError.value = 'Password baru minimal 8 karakter.'
+    passwordError.value = t('my_assets_err_password_min')
     return
   }
   if (passwordForm.value.newPassword !== passwordForm.value.confirmPassword) {
-    passwordError.value = 'Konfirmasi password baru tidak cocok.'
+    passwordError.value = t('my_assets_err_password_mismatch')
     return
   }
 
@@ -637,14 +658,14 @@ async function handleChangePassword() {
       currentPassword: passwordForm.value.currentPassword,
       newPassword: passwordForm.value.newPassword,
     })
-    passwordSuccess.value = 'Password berhasil diperbarui!'
+    passwordSuccess.value = t('my_assets_password_updated')
     passwordForm.value = {
       currentPassword: '',
       newPassword: '',
       confirmPassword: '',
     }
   } catch (err) {
-    passwordError.value = err.message || 'Gagal mengubah password. Pastikan password lama benar.'
+    passwordError.value = err.message || t('my_assets_err_password_change')
   } finally {
     isChangingPassword.value = false
   }
@@ -668,11 +689,14 @@ function closeModal() {
 }
 
 // ── UI Helper Utilities ───────────────────────────────────────────────────────
+// Locale tanggal mengikuti bahasa aktif agar nama bulan tidak bocor ke bahasa lain.
+const dateLocale = computed(() => (currentLang.value === 'en' ? 'en-GB' : 'id-ID'))
+
 function formatDate(dateStr) {
   if (!dateStr) return '-'
   const d = new Date(dateStr)
   if (isNaN(d.getTime())) return dateStr
-  return d.toLocaleDateString('id-ID', {
+  return d.toLocaleDateString(dateLocale.value, {
     day: 'numeric',
     month: 'short',
     year: 'numeric',
@@ -684,13 +708,13 @@ function formatDateTime(dateStr) {
   const d = new Date(dateStr)
   if (isNaN(d.getTime())) return dateStr
   return (
-    d.toLocaleDateString('id-ID', {
+    d.toLocaleDateString(dateLocale.value, {
       day: 'numeric',
       month: 'short',
       year: 'numeric',
     }) +
     ' ' +
-    d.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
+    d.toLocaleTimeString(dateLocale.value, { hour: '2-digit', minute: '2-digit' })
   )
 }
 
@@ -741,8 +765,8 @@ onMounted(async () => {
     <template v-if="currentLevel === 1">
       <!-- Enterprise Page Header -->
       <PageHeader
-        title="Profil"
-        subtitle="Detail aset, tiket, riwayat aktivitas, dan profil akun"
+        :title="t('nav_profile')"
+        :subtitle="t('my_assets_profile_subtitle')"
       >
         <template #actions>
           <div class="flex items-center gap-1.5 sm:gap-2">
@@ -752,16 +776,16 @@ onMounted(async () => {
               class="inline-flex items-center gap-1 h-7 sm:h-7.5 px-2 sm:px-2.5 rounded-[5px] bg-[#0A51B0] hover:bg-[#0A4391] text-white text-[10px] sm:text-[11px] font-semibold shadow-2xs transition-all cursor-pointer touch-manipulation"
             >
               <span class="material-symbols-outlined text-[14px] sm:text-[15px]">add_circle</span>
-              <span>Buat Tiket</span>
+              <span>{{ t('btn_create_ticket') }}</span>
             </button>
             <button
               type="button"
               @click="loadMyOwnAssets(); fetchUserTickets()"
               class="inline-flex items-center gap-1 h-7 sm:h-7.5 px-2 sm:px-2.5 rounded-[5px] border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-[10px] sm:text-[11px] font-medium shadow-2xs transition-all cursor-pointer touch-manipulation"
-              title="Segarkan data aset dan profil"
+              :title="t('my_assets_refresh_profile_tip')"
             >
               <span class="material-symbols-outlined text-[14px] sm:text-[15px]">refresh</span>
-              <span class="hidden sm:inline">Segarkan</span>
+              <span class="hidden sm:inline">{{ t('refresh') }}</span>
             </button>
           </div>
         </template>
@@ -776,16 +800,16 @@ onMounted(async () => {
             <div
               class="flex h-7.5 w-7.5 sm:h-8.5 sm:w-8.5 shrink-0 items-center justify-center rounded-[5px] bg-gradient-to-br from-[#0A51B0] to-[#0A4391] text-[10px] sm:text-[11px] font-bold text-white shadow-2xs"
             >
-              {{ getInitials(selectedEmployee?.nama_karyawan || user?.nama || 'Saya') }}
+              {{ getInitials(selectedEmployee?.nama_karyawan || user?.nama || t('my_assets_self')) }}
             </div>
             <div class="min-w-0">
               <div class="flex items-center gap-1.5 flex-wrap">
                 <h2 class="text-[11px] sm:text-xs font-semibold text-[#333333] dark:text-white tracking-tight truncate">
-                  {{ selectedEmployee?.nama_karyawan || user?.nama || 'Pengguna TrackIT' }}
+                  {{ selectedEmployee?.nama_karyawan || user?.nama || t('my_assets_trackit_user') }}
                 </h2>
                 <AppBadge
                   type="success"
-                  :text="selectedEmployee?.status_karyawan || 'Aktif'"
+                  :text="selectedEmployee?.status_karyawan || t('badge_active')"
                 />
               </div>
               <p class="text-[9.5px] sm:text-[10px] font-medium text-slate-600 dark:text-slate-400 mt-0.5 truncate">
@@ -800,7 +824,7 @@ onMounted(async () => {
               class="inline-flex items-center gap-1 px-1.5 py-0.5 sm:px-2 sm:py-0.5 rounded-[5px] bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-[9px] sm:text-[9.5px] font-medium"
             >
               <span class="material-symbols-outlined text-[12px] text-[#0A51B0]">verified_user</span>
-              <span>Hak Akses: {{ user?.role || 'User' }}</span>
+              <span>{{ t('access_role') }}: {{ user?.role || 'User' }}</span>
             </span>
           </div>
         </div>
@@ -808,25 +832,25 @@ onMounted(async () => {
         <!-- Identity Details Row -->
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-1.5 sm:gap-2 pt-1.5 mt-1.5 border-t border-slate-100 dark:border-slate-800/80">
           <div class="min-w-0">
-            <span class="block text-[8.5px] sm:text-[9px] font-medium text-slate-500 dark:text-slate-400">Nomor Induk (NIK)</span>
+            <span class="block text-[8.5px] sm:text-[9px] font-medium text-slate-500 dark:text-slate-400">{{ t('id_nik') }}</span>
             <span class="font-semibold text-slate-800 dark:text-slate-200 font-mono truncate block text-[9.5px] sm:text-[10px] mt-0.5">
               {{ selectedEmployee?.nik || user?.nik || '-' }}
             </span>
           </div>
           <div class="min-w-0">
-            <span class="block text-[8.5px] sm:text-[9px] font-medium text-slate-500 dark:text-slate-400">Departemen</span>
+            <span class="block text-[8.5px] sm:text-[9px] font-medium text-slate-500 dark:text-slate-400">{{ t('department') }}</span>
             <span class="font-semibold text-slate-800 dark:text-slate-200 truncate block text-[9.5px] sm:text-[10px] mt-0.5">
               {{ selectedEmployee?.departemen || user?.departemen || '-' }}
             </span>
           </div>
           <div class="min-w-0">
-            <span class="block text-[8.5px] sm:text-[9px] font-medium text-slate-500 dark:text-slate-400">Lokasi Kantor</span>
+            <span class="block text-[8.5px] sm:text-[9px] font-medium text-slate-500 dark:text-slate-400">{{ t('office_location') }}</span>
             <span class="font-semibold text-slate-800 dark:text-slate-200 truncate block text-[9.5px] sm:text-[10px] mt-0.5">
               {{ selectedEmployee?.lokasi_kerja || user?.lokasi_kerja || '-' }}
             </span>
           </div>
           <div class="min-w-0">
-            <span class="block text-[8.5px] sm:text-[9px] font-medium text-slate-500 dark:text-slate-400">Email Perusahaan</span>
+            <span class="block text-[8.5px] sm:text-[9px] font-medium text-slate-500 dark:text-slate-400">{{ t('company_email') }}</span>
             <span class="font-semibold text-slate-800 dark:text-slate-200 truncate block text-[9.5px] sm:text-[10px] mt-0.5">
               {{ selectedEmployee?.email_kantor || user?.email || '-' }}
             </span>
@@ -837,31 +861,31 @@ onMounted(async () => {
       <!-- 4 Personal Summary Stat Cards -->
       <div class="grid grid-cols-2 lg:grid-cols-4 gap-1.5 sm:gap-2 lg:gap-2.5">
         <StatCard
-          title="Total Aset Digunakan"
+          :title="t('total_assets_used')"
           :value="myAssets.length"
-          subtitle="Unit perangkat aktif"
+          :subtitle="t('active_units_sub')"
           is-total
           color="primary"
           icon="devices"
         />
         <StatCard
-          label="Tiket Aktif"
+          :label="t('active_tickets_label')"
           :value="activeTicketsCount"
-          help-text="Perlu tindak lanjut"
+          :help-text="t('followup_needed')"
           tone="amber"
           icon="confirmation_number"
         />
         <StatCard
-          label="Riwayat Tiket"
+          :label="t('ticket_history_label')"
           :value="userTickets.length"
-          help-text="Total diajukan"
+          :help-text="t('total_submitted')"
           tone="teal"
           icon="history_toggle_off"
         />
         <StatCard
-          label="Log Aktivitas"
+          :label="t('activity_log_label')"
           :value="deviceCycle.length"
-          help-text="Riwayat siklus & mutasi"
+          :help-text="t('lifecycle_history')"
           tone="indigo"
           icon="sync_alt"
         />
@@ -885,7 +909,7 @@ onMounted(async () => {
           "
         >
           <span class="material-symbols-outlined text-[13px] sm:text-[14px]">devices</span>
-          <span>Aset Saya</span>
+          <span>{{ t('my_assets_title') }}</span>
           <span
             class="ml-0.5 px-1 py-0.2 rounded-full text-[8.5px] sm:text-[9px] font-bold"
             :class="
@@ -911,7 +935,7 @@ onMounted(async () => {
           "
         >
           <span class="material-symbols-outlined text-[13px] sm:text-[14px]">confirmation_number</span>
-          <span>Riwayat Tiket</span>
+          <span>{{ t('ticket_history_label') }}</span>
           <span
             class="ml-0.5 px-1 py-0.2 rounded-full text-[8.5px] sm:text-[9px] font-bold"
             :class="
@@ -937,7 +961,7 @@ onMounted(async () => {
           "
         >
           <span class="material-symbols-outlined text-[13px] sm:text-[14px]">history</span>
-          <span>Histori Log & Siklus</span>
+          <span>{{ t('my_activity_tab') }}</span>
           <span
             class="ml-0.5 px-1 py-0.2 rounded-full text-[8.5px] sm:text-[9px] font-bold"
             :class="
@@ -963,7 +987,7 @@ onMounted(async () => {
           "
         >
           <span class="material-symbols-outlined text-[13px] sm:text-[14px]">tune</span>
-          <span>Keamanan & Izin Browser</span>
+          <span>{{ t('my_assets_tab_security') }}</span>
         </button>
 
         <button
@@ -980,7 +1004,7 @@ onMounted(async () => {
           "
         >
           <span class="material-symbols-outlined text-[13px] sm:text-[14px]">{{ hasSubordinates && !isSuperAdmin ? 'account_tree' : 'group' }}</span>
-          <span>{{ hasSubordinates && !isSuperAdmin ? 'Tim & Org Chart' : 'Direktori Karyawan' }}</span>
+          <span>{{ hasSubordinates && !isSuperAdmin ? t('my_assets_team_org_chart') : t('employee_directory_tab') }}</span>
           <span
             class="ml-0.5 px-1 py-0.2 rounded-full text-[8.5px] sm:text-[9px] font-bold"
             :class="
@@ -1009,7 +1033,7 @@ onMounted(async () => {
             <input
               v-model="assetSearch"
               type="text"
-              placeholder="Cari label, nomor seri, merek, atau model..."
+              :placeholder="t('my_assets_search_assets_ph')"
               class="w-full h-7 sm:h-7.5 pl-6.5 pr-2 rounded-[5px] border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-[10px] sm:text-[10.5px] text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-[#0A51B0] focus:ring-1 focus:ring-[#0A51B0] transition-colors"
             />
           </div>
@@ -1018,7 +1042,7 @@ onMounted(async () => {
               v-model="filterTipe"
               class="h-7 sm:h-7.5 px-2 rounded-[5px] border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-[9.5px] sm:text-[10px] text-slate-700 dark:text-slate-200 focus:outline-none focus:border-[#0A51B0] transition-colors cursor-pointer"
             >
-              <option value="">Semua Tipe Perangkat</option>
+              <option value="">{{ t('my_assets_all_device_types') }}</option>
               <option
                 v-for="opt in tipeFilterOptions.filter((o) => o.value)"
                 :key="opt.value"
@@ -1033,7 +1057,7 @@ onMounted(async () => {
               @click="assetSearch = ''; filterTipe = ''"
               class="h-7 sm:h-7.5 px-2 rounded-[5px] text-[9.5px] sm:text-[10px] font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
             >
-              Reset
+              {{ t('reset') }}
             </button>
           </div>
         </div>
@@ -1065,7 +1089,7 @@ onMounted(async () => {
             @click="loadMyOwnAssets"
             class="font-semibold underline hover:no-underline cursor-pointer"
           >
-            Coba Lagi
+            {{ t('retry') }}
           </button>
         </div>
 
@@ -1080,13 +1104,13 @@ onMounted(async () => {
             <span class="material-symbols-outlined text-[17px]">devices_off</span>
           </div>
           <h3 class="text-[11px] sm:text-xs font-semibold text-slate-800 dark:text-slate-200">
-            {{ assetSearch || filterTipe ? 'Aset Tidak Ditemukan' : 'Belum Ada Aset Ditugaskan' }}
+            {{ assetSearch || filterTipe ? t('my_assets_assets_not_found') : t('my_assets_no_assigned_assets_title') }}
           </h3>
           <p class="text-[9.5px] sm:text-[10px] text-slate-500 dark:text-slate-400 mt-1 max-w-md mx-auto leading-relaxed">
             {{
               assetSearch || filterTipe
-                ? 'Tidak ada perangkat yang cocok dengan kriteria pencarian atau filter yang dipilih.'
-                : 'Saat ini tidak ada perangkat IT yang terdaftar aktif atas nama Anda. Jika membutuhkan perangkat, hubungi tim IT Helpdesk.'
+                ? t('my_assets_no_match_desc')
+                : t('my_assets_no_assets_desc')
             }}
           </p>
           <div class="mt-3 flex items-center justify-center gap-2">
@@ -1096,7 +1120,7 @@ onMounted(async () => {
               @click="assetSearch = ''; filterTipe = ''"
               class="h-7 px-2.5 rounded-[5px] border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-[10px] sm:text-[10.5px] font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-50"
             >
-              Hapus Filter
+              {{ t('filter_reset') }}
             </button>
             <button
               v-else
@@ -1104,7 +1128,7 @@ onMounted(async () => {
               @click="router.push('/tickets')"
               class="h-7 px-2.5 rounded-[5px] bg-[#0A51B0] hover:bg-[#0A4391] text-[10px] sm:text-[10.5px] font-semibold text-white shadow-2xs transition-colors"
             >
-              Ajukan Permintaan Perangkat
+              {{ t('my_assets_request_device_btn') }}
             </button>
           </div>
         </div>
@@ -1129,7 +1153,7 @@ onMounted(async () => {
                   </div>
                   <div class="min-w-0">
                     <h4 class="text-[10.5px] sm:text-[11px] font-semibold text-slate-900 dark:text-white truncate">
-                      {{ asset.label_aset || asset.hostname || 'Perangkat IT' }}
+                      {{ asset.label_aset || asset.hostname || t('my_assets_it_device') }}
                     </h4>
                     <span class="text-[9px] sm:text-[9.5px] font-mono text-slate-500 dark:text-slate-400 truncate block">
                       {{ asset.nomor_seri || asset.serial_number || '-' }}
@@ -1150,25 +1174,25 @@ onMounted(async () => {
               <!-- Metadata Grid -->
               <div class="rounded-[5px] bg-slate-50 dark:bg-slate-800/60 p-1.5 space-y-0.5 text-[9.5px] sm:text-[10px] border border-slate-100 dark:border-slate-800">
                 <div class="flex items-center justify-between text-slate-600 dark:text-slate-400">
-                  <span class="font-medium text-[8.5px] sm:text-[9px]">Merek / Model</span>
+                  <span class="font-medium text-[8.5px] sm:text-[9px]">{{ t('my_assets_brand_model') }}</span>
                   <span class="font-semibold text-slate-800 dark:text-slate-200 truncate ml-2">
                     {{ [asset.merek, asset.model].filter(Boolean).join(' ') || '-' }}
                   </span>
                 </div>
                 <div class="flex items-center justify-between text-slate-600 dark:text-slate-400">
-                  <span class="font-medium text-[8.5px] sm:text-[9px]">Tipe</span>
+                  <span class="font-medium text-[8.5px] sm:text-[9px]">{{ t('my_assets_type') }}</span>
                   <span class="font-semibold text-slate-800 dark:text-slate-200 truncate ml-2">
                     {{ asset.tipe_perangkat || '-' }}
                   </span>
                 </div>
                 <div class="flex items-center justify-between text-slate-600 dark:text-slate-400">
-                  <span class="font-medium text-[8.5px] sm:text-[9px]">Kondisi</span>
+                  <span class="font-medium text-[8.5px] sm:text-[9px]">{{ t('filter_condition') }}</span>
                   <span class="font-semibold text-slate-800 dark:text-slate-200 truncate ml-2">
                     {{ asset.kondisi_aset || asset.kondisi || 'Normal' }}
                   </span>
                 </div>
                 <div class="flex items-center justify-between text-slate-600 dark:text-slate-400">
-                  <span class="font-medium text-[8.5px] sm:text-[9px]">Lokasi</span>
+                  <span class="font-medium text-[8.5px] sm:text-[9px]">{{ t('filter_location') }}</span>
                   <span class="font-semibold text-slate-800 dark:text-slate-200 truncate ml-2">
                     {{ asset.lokasi_aset || asset.lokasi || '-' }}
                   </span>
@@ -1184,7 +1208,7 @@ onMounted(async () => {
                 class="flex items-center gap-1 text-[9.5px] sm:text-[10px] font-semibold text-[#0A51B0] hover:text-[#0A4391] dark:text-blue-400 hover:underline cursor-pointer"
               >
                 <span class="material-symbols-outlined text-[12px] sm:text-[13px]">info</span>
-                <span>Spesifikasi</span>
+                <span>{{ t('my_assets_specifications') }}</span>
               </button>
 
               <div class="flex items-center gap-1">
@@ -1194,16 +1218,16 @@ onMounted(async () => {
                   class="flex items-center gap-1 h-6 px-1.5 rounded-[4px] border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-[9px] sm:text-[9.5px] font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 cursor-pointer transition-colors"
                 >
                   <span class="material-symbols-outlined text-[11px] sm:text-[12px]">history</span>
-                  <span>Riwayat</span>
+                  <span>{{ t('my_assets_history') }}</span>
                 </button>
                 <button
                   type="button"
                   @click="router.push('/tickets?search=' + encodeURIComponent(asset.label_aset || asset.nomor_seri))"
                   class="flex items-center gap-1 h-6 px-1.5 rounded-[4px] bg-[#0A51B0] hover:bg-[#0A4391] text-[9px] sm:text-[9.5px] font-semibold text-white cursor-pointer transition-colors shadow-2xs"
-                  title="Laporkan kendala terkait perangkat ini"
+                  :title="t('my_assets_report_issue_tip')"
                 >
                   <span class="material-symbols-outlined text-[11px] sm:text-[12px]">report_problem</span>
-                  <span>Lapor</span>
+                  <span>{{ t('my_assets_report') }}</span>
                 </button>
               </div>
             </div>
@@ -1234,7 +1258,7 @@ onMounted(async () => {
             <input
               v-model="ticketSearch"
               type="text"
-              placeholder="Cari tiket berdasarkan nomor, judul, status, atau prioritas..."
+              :placeholder="t('my_assets_search_tickets_ph')"
               class="w-full h-7 sm:h-7.5 pl-6.5 pr-2 rounded-[5px] border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-[10px] sm:text-[10.5px] text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-[#0A51B0] focus:ring-1 focus:ring-[#0A51B0] transition-colors"
             />
           </div>
@@ -1245,7 +1269,7 @@ onMounted(async () => {
               class="inline-flex items-center gap-1 h-7 sm:h-7.5 px-2.5 rounded-[5px] bg-[#0A51B0] hover:bg-[#0A4391] text-white text-[10px] sm:text-[10.5px] font-semibold shadow-2xs transition-colors cursor-pointer"
             >
               <span class="material-symbols-outlined text-[13px] sm:text-[14px]">add_circle</span>
-              <span>Buat Tiket Baru</span>
+              <span>{{ t('my_assets_btn_create_ticket_new') }}</span>
             </button>
           </div>
         </div>
@@ -1276,7 +1300,7 @@ onMounted(async () => {
             @click="fetchUserTickets"
             class="font-semibold underline hover:no-underline cursor-pointer"
           >
-            Coba Lagi
+            {{ t('retry') }}
           </button>
         </div>
 
@@ -1291,13 +1315,13 @@ onMounted(async () => {
             <span class="material-symbols-outlined text-[17px]">confirmation_number</span>
           </div>
           <h3 class="text-[11px] sm:text-xs font-semibold text-slate-800 dark:text-slate-200">
-            {{ ticketSearch ? 'Tiket Tidak Ditemukan' : 'Belum Ada Tiket yang Diajukan' }}
+            {{ ticketSearch ? t('my_assets_tickets_not_found') : t('my_assets_tickets_empty_title') }}
           </h3>
           <p class="text-[9.5px] sm:text-[10px] text-slate-500 dark:text-slate-400 mt-1 max-w-md mx-auto leading-relaxed">
             {{
               ticketSearch
-                ? 'Tidak ada tiket yang sesuai dengan kata kunci pencarian Anda.'
-                : 'Anda belum pernah melaporkan keluhan atau kendala IT. Jika ada gangguan perangkat, ajukan tiket baru.'
+                ? t('my_assets_tickets_no_match_desc')
+                : t('my_assets_tickets_empty_desc')
             }}
           </p>
           <div class="mt-3 flex items-center justify-center gap-2">
@@ -1307,7 +1331,7 @@ onMounted(async () => {
               @click="ticketSearch = ''"
               class="h-7 px-2.5 rounded-[5px] border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-[10px] sm:text-[10.5px] font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-50"
             >
-              Hapus Pencarian
+              {{ t('clear_search') }}
             </button>
             <button
               v-else
@@ -1315,7 +1339,7 @@ onMounted(async () => {
               @click="router.push('/tickets')"
               class="h-7 px-2.5 rounded-[5px] bg-[#0A51B0] hover:bg-[#0A4391] text-[10px] sm:text-[10.5px] font-semibold text-white shadow-2xs transition-colors"
             >
-              Ajukan Tiket Sekarang
+              {{ t('my_assets_submit_ticket_now') }}
             </button>
           </div>
         </div>
@@ -1329,13 +1353,13 @@ onMounted(async () => {
             <table class="w-full text-left text-[10px] sm:text-[10.5px]">
               <thead class="bg-slate-50 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 font-semibold text-[9px] sm:text-[9.5px]">
                 <tr>
-                  <th class="py-1.5 px-2">Nomor Tiket</th>
-                  <th class="py-1.5 px-2">Judul & Kategori</th>
-                  <th class="py-1.5 px-2">Prioritas</th>
-                  <th class="py-1.5 px-2">Status</th>
-                  <th class="py-1.5 px-2">Teknisi IT</th>
-                  <th class="py-1.5 px-2">Tanggal Dibuat</th>
-                  <th class="py-1.5 px-2 text-right">Aksi</th>
+                  <th class="py-1.5 px-2">{{ t('th_ticket_no') }}</th>
+                  <th class="py-1.5 px-2">{{ t('my_assets_th_title_category') }}</th>
+                  <th class="py-1.5 px-2">{{ t('th_priority') }}</th>
+                  <th class="py-1.5 px-2">{{ t('th_status') }}</th>
+                  <th class="py-1.5 px-2">{{ t('my_assets_th_technician') }}</th>
+                  <th class="py-1.5 px-2">{{ t('my_assets_th_date_created') }}</th>
+                  <th class="py-1.5 px-2 text-right">{{ t('th_action') }}</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
@@ -1352,7 +1376,7 @@ onMounted(async () => {
                       {{ ticket.judul }}
                     </span>
                     <span class="text-[9px] sm:text-[9.5px] text-slate-500 dark:text-slate-400 block truncate">
-                      {{ ticket.kategori || 'Umum' }}
+                      {{ ticket.kategori || t('my_assets_general') }}
                     </span>
                   </td>
                   <td class="py-1.5 px-2 whitespace-nowrap">
@@ -1390,7 +1414,7 @@ onMounted(async () => {
                       @click="router.push('/tickets?search=' + encodeURIComponent(ticket.nomor_tiket || ''))"
                       class="h-6 px-1.5 rounded-[4px] border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 text-[9px] sm:text-[9.5px] font-medium cursor-pointer transition-colors"
                     >
-                      Buka Tiket
+                      {{ t('my_assets_open_ticket') }}
                     </button>
                   </td>
                 </tr>
@@ -1425,10 +1449,10 @@ onMounted(async () => {
             <span class="material-symbols-outlined text-[17px]">history_toggle_off</span>
           </div>
           <h3 class="text-[11px] sm:text-xs font-semibold text-slate-800 dark:text-slate-200">
-            Belum Ada Log Siklus Aset
+            {{ t('my_assets_no_cycle_logs') }}
           </h3>
           <p class="text-[9.5px] sm:text-[10px] text-slate-500 dark:text-slate-400 mt-1 max-w-md mx-auto leading-relaxed">
-            Riwayat serah terima, pengembalian, pergantian, atau mutasi perangkat IT untuk akun Anda akan tercatat secara otomatis di sini.
+            {{ t('my_assets_no_cycle_logs_desc') }}
           </p>
         </div>
 
@@ -1455,7 +1479,7 @@ onMounted(async () => {
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-[10px] mb-1">
                   <div class="flex items-center gap-1.5 flex-wrap">
                     <span class="font-bold text-slate-900 dark:text-white text-[10px] sm:text-[10.5px]">
-                      {{ cycle.action || cycle.event || 'Aktivitas Perangkat' }}
+                      {{ cycle.action || cycle.event || t('my_assets_device_activity') }}
                     </span>
                     <span
                       v-if="cycle.status || cycle.status_aset"
@@ -1471,13 +1495,13 @@ onMounted(async () => {
 
                 <div class="text-[9.5px] sm:text-[10px] text-slate-600 dark:text-slate-300 space-y-0.5">
                   <p v-if="cycle.asset_label || cycle.nomor_seri" class="font-semibold text-slate-800 dark:text-slate-200">
-                    Perangkat: {{ cycle.asset_label || 'Aset' }} (S/N: {{ cycle.nomor_seri || '-' }})
+                    {{ t('my_assets_device_label') }}: {{ cycle.asset_label || t('my_assets_asset') }} (S/N: {{ cycle.nomor_seri || '-' }})
                   </p>
                   <p v-if="cycle.detail || cycle.keterangan || cycle.notes">
                     {{ cycle.detail || cycle.keterangan || cycle.notes }}
                   </p>
                   <p v-if="cycle.actor || cycle.petugas_it" class="text-[9px] sm:text-[9.5px] text-slate-500 dark:text-slate-400">
-                    Petugas: {{ cycle.actor || cycle.petugas_it }}
+                    {{ t('my_assets_staff_label') }}: {{ cycle.actor || cycle.petugas_it }}
                   </p>
                 </div>
               </div>
@@ -1495,10 +1519,10 @@ onMounted(async () => {
           <div class="mb-2.5">
             <h3 class="text-[11px] sm:text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
               <span class="material-symbols-outlined text-[15px] text-[#0A51B0]">lock_reset</span>
-              <span>Ganti Password Akun</span>
+              <span>{{ t('my_assets_change_password_title') }}</span>
             </h3>
             <p class="text-[9.5px] sm:text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed">
-              Perbarui kata sandi akun TrackIT Anda. Gunakan kombinasi minimal 8 karakter dengan huruf dan angka untuk keamanan optimal.
+              {{ t('my_assets_change_password_desc') }}
             </p>
           </div>
 
@@ -1523,14 +1547,14 @@ onMounted(async () => {
           <form @submit.prevent="handleChangePassword" class="space-y-2 text-[10px] sm:text-[10.5px]">
             <div>
               <label for="current-pwd" class="block font-semibold text-slate-700 dark:text-slate-300 mb-0.5 text-[9.5px] sm:text-[10px]">
-                Password Saat Ini <span class="text-rose-500">*</span>
+                {{ t('my_assets_current_password') }} <span class="text-rose-500">*</span>
               </label>
               <div class="relative">
                 <input
                   id="current-pwd"
                   v-model="passwordForm.currentPassword"
                   :type="showCurrentPassword ? 'text' : 'password'"
-                  placeholder="Masukkan password saat ini"
+                  :placeholder="t('my_assets_current_password_ph')"
                   autocomplete="current-password"
                   required
                   class="w-full h-7 sm:h-7.5 pl-2 pr-7 rounded-[5px] border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-[10px] sm:text-[10.5px] text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-[#0A51B0] focus:ring-1 focus:ring-[#0A51B0] transition-colors"
@@ -1539,7 +1563,7 @@ onMounted(async () => {
                   type="button"
                   @click="showCurrentPassword = !showCurrentPassword"
                   class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
-                  :title="showCurrentPassword ? 'Sembunyikan password' : 'Lihat password'"
+                  :title="showCurrentPassword ? t('my_assets_hide_password') : t('my_assets_show_password')"
                 >
                   <span class="material-symbols-outlined text-[14px]">
                     {{ showCurrentPassword ? 'visibility_off' : 'visibility' }}
@@ -1550,14 +1574,14 @@ onMounted(async () => {
 
             <div>
               <label for="new-pwd" class="block font-semibold text-slate-700 dark:text-slate-300 mb-0.5 text-[9.5px] sm:text-[10px]">
-                Password Baru <span class="text-rose-500">*</span>
+                {{ t('my_assets_new_password') }} <span class="text-rose-500">*</span>
               </label>
               <div class="relative">
                 <input
                   id="new-pwd"
                   v-model="passwordForm.newPassword"
                   :type="showNewPassword ? 'text' : 'password'"
-                  placeholder="Minimal 8 karakter"
+                  :placeholder="t('my_assets_min_8_chars')"
                   autocomplete="new-password"
                   required
                   minlength="8"
@@ -1567,7 +1591,7 @@ onMounted(async () => {
                   type="button"
                   @click="showNewPassword = !showNewPassword"
                   class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
-                  :title="showNewPassword ? 'Sembunyikan password' : 'Lihat password'"
+                  :title="showNewPassword ? t('my_assets_hide_password') : t('my_assets_show_password')"
                 >
                   <span class="material-symbols-outlined text-[14px]">
                     {{ showNewPassword ? 'visibility_off' : 'visibility' }}
@@ -1578,14 +1602,14 @@ onMounted(async () => {
 
             <div>
               <label for="confirm-pwd" class="block font-semibold text-slate-700 dark:text-slate-300 mb-0.5 text-[9.5px] sm:text-[10px]">
-                Konfirmasi Password Baru <span class="text-rose-500">*</span>
+                {{ t('my_assets_confirm_new_password') }} <span class="text-rose-500">*</span>
               </label>
               <div class="relative">
                 <input
                   id="confirm-pwd"
                   v-model="passwordForm.confirmPassword"
                   :type="showConfirmPassword ? 'text' : 'password'"
-                  placeholder="Ulangi password baru"
+                  :placeholder="t('my_assets_repeat_new_password_ph')"
                   autocomplete="new-password"
                   required
                   class="w-full h-7 sm:h-7.5 pl-2 pr-7 rounded-[5px] border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-[10px] sm:text-[10.5px] text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-[#0A51B0] focus:ring-1 focus:ring-[#0A51B0] transition-colors"
@@ -1594,7 +1618,7 @@ onMounted(async () => {
                   type="button"
                   @click="showConfirmPassword = !showConfirmPassword"
                   class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
-                  :title="showConfirmPassword ? 'Sembunyikan password' : 'Lihat password'"
+                  :title="showConfirmPassword ? t('my_assets_hide_password') : t('my_assets_show_password')"
                 >
                   <span class="material-symbols-outlined text-[14px]">
                     {{ showConfirmPassword ? 'visibility_off' : 'visibility' }}
@@ -1613,7 +1637,7 @@ onMounted(async () => {
                   progress_activity
                 </span>
                 <span v-else class="material-symbols-outlined text-[14px]">save</span>
-                <span>{{ isChangingPassword ? 'Menyimpan...' : 'Perbarui Password' }}</span>
+                <span>{{ isChangingPassword ? t('my_assets_saving') : t('my_assets_update_password_btn') }}</span>
               </button>
             </div>
           </form>
@@ -1626,10 +1650,10 @@ onMounted(async () => {
           <div>
             <h3 class="text-[11px] sm:text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
               <span class="material-symbols-outlined text-[15px] text-[#0A51B0]">tune</span>
-              <span>Izin & Akses Perangkat Browser</span>
+              <span>{{ t('my_assets_browser_permissions_title') }}</span>
             </h3>
             <p class="text-[9.5px] sm:text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed">
-              Atur izin notifikasi desktop, nada suara Tone.js, akses kamera foto aset, dan berkas lampiran di browser Anda.
+              {{ t('my_assets_browser_permissions_desc') }}
             </p>
           </div>
 
@@ -1658,14 +1682,14 @@ onMounted(async () => {
                 </div>
                 <div class="min-w-0">
                   <div class="flex items-center gap-1.5 flex-wrap">
-                    <span class="font-bold text-slate-800 dark:text-white text-[10px] sm:text-[10.5px]">Notifikasi Desktop</span>
+                    <span class="font-bold text-slate-800 dark:text-white text-[10px] sm:text-[10.5px]">{{ t('my_assets_desktop_notifications') }}</span>
                     <AppBadge
                       :type="notificationPermission === 'granted' ? 'success' : notificationPermission === 'denied' ? 'danger' : 'warning'"
-                      :text="notificationPermission === 'granted' ? 'Diizinkan' : notificationPermission === 'denied' ? 'Diblokir' : 'Belum Aktif'"
+                      :text="notificationPermission === 'granted' ? t('my_assets_perm_granted') : notificationPermission === 'denied' ? t('my_assets_perm_blocked') : t('my_assets_perm_not_active')"
                     />
                   </div>
                   <p class="text-[9px] sm:text-[9.5px] text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed">
-                    Peringatan pop-up di layar saat ada tiket baru atau perubahan status tiket.
+                    {{ t('my_assets_notif_desc') }}
                   </p>
                 </div>
               </div>
@@ -1676,7 +1700,7 @@ onMounted(async () => {
                   @click="handleProfileEnableNotif"
                   class="h-6 px-2 rounded-[4px] bg-[#0A51B0] hover:bg-[#0A4391] text-white text-[9px] sm:text-[9.5px] font-semibold transition-colors cursor-pointer shadow-2xs"
                 >
-                  Aktifkan
+                  {{ t('my_assets_enable') }}
                 </button>
                 <button
                   v-else
@@ -1684,7 +1708,7 @@ onMounted(async () => {
                   @click="handleProfileTestNotif"
                   class="h-6 px-2 rounded-[4px] border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-[9px] sm:text-[9.5px] font-medium transition-colors cursor-pointer"
                 >
-                  Uji Coba
+                  {{ t('my_assets_test_btn') }}
                 </button>
               </div>
             </div>
@@ -1697,14 +1721,14 @@ onMounted(async () => {
                 </div>
                 <div class="min-w-0">
                   <div class="flex items-center gap-1.5 flex-wrap">
-                    <span class="font-bold text-slate-800 dark:text-white text-[10px] sm:text-[10.5px]">Suara Tone.js</span>
+                    <span class="font-bold text-slate-800 dark:text-white text-[10px] sm:text-[10.5px]">{{ t('my_assets_tonejs_sound') }}</span>
                     <AppBadge
                       :type="isSoundEnabled ? 'success' : 'neutral'"
-                      :text="isSoundEnabled ? 'Suara Aktif' : 'Senyap'"
+                      :text="isSoundEnabled ? t('my_assets_sound_on') : t('my_assets_sound_off')"
                     />
                   </div>
                   <p class="text-[9px] sm:text-[9.5px] text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed">
-                    Sintesis audio nada harmonik Tone.js saat aktivitas baru diterima.
+                    {{ t('my_assets_sound_desc') }}
                   </p>
                 </div>
               </div>
@@ -1713,10 +1737,10 @@ onMounted(async () => {
                   type="button"
                   @click="testSound"
                   class="h-6 px-1.5 rounded-[4px] border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-[9px] sm:text-[9.5px] font-medium transition-colors cursor-pointer flex items-center gap-1"
-                  title="Putar nada uji coba"
+                  :title="t('my_assets_play_test_sound_tip')"
                 >
                   <span class="material-symbols-outlined text-[12px]">music_note</span>
-                  <span>Tes Suara</span>
+                  <span>{{ t('my_assets_test_sound') }}</span>
                 </button>
                 <button
                   type="button"
@@ -1732,6 +1756,61 @@ onMounted(async () => {
               </div>
             </div>
 
+            <!-- Panel Kustomisasi 15 Suara Notifikasi per Status (Profile) -->
+            <div v-if="isSoundEnabled" class="p-2 sm:p-2.5 rounded-[5px] border border-indigo-200/70 dark:border-indigo-900/50 bg-indigo-50/30 dark:bg-indigo-950/20 space-y-2">
+              <button
+                type="button"
+                @click="showProfileSoundCustomizer = !showProfileSoundCustomizer"
+                class="w-full flex items-center justify-between text-left cursor-pointer select-none"
+              >
+                <div class="flex items-center gap-1.5">
+                  <span class="material-symbols-outlined text-[14px] text-indigo-600 dark:text-indigo-400">tune</span>
+                  <span class="font-bold text-[10px] sm:text-[10.5px] text-slate-800 dark:text-white">{{ t('my_assets_sound_customizer_title') }}</span>
+                </div>
+                <span class="material-symbols-outlined text-[14px] text-slate-400 transition-transform duration-200" :class="{ 'rotate-180': showProfileSoundCustomizer }">expand_more</span>
+              </button>
+
+              <div v-if="showProfileSoundCustomizer" class="space-y-1.5 pt-1.5 border-t border-indigo-100 dark:border-indigo-900/40">
+                <div
+                  v-for="st in NOTIFICATION_STATUS_ITEMS"
+                  :key="st.key"
+                  class="p-1.5 sm:p-2 rounded-[4px] bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-1.5"
+                >
+                  <div class="min-w-0 flex items-start gap-1.5">
+                    <span class="material-symbols-outlined text-[13px] text-indigo-500 shrink-0 mt-0.5">{{ st.icon }}</span>
+                    <div>
+                      <div class="font-bold text-[9.5px] sm:text-[10px] text-slate-800 dark:text-slate-100 leading-tight">{{ st.label }}</div>
+                      <div class="text-[8.5px] sm:text-[9px] text-slate-500 dark:text-slate-400 leading-tight">{{ st.desc }}</div>
+                    </div>
+                  </div>
+
+                  <div class="flex items-center gap-1 shrink-0 self-end sm:self-center">
+                    <select
+                      :value="soundStatusMap[st.key] || 'chime_ascend'"
+                      @change="setStatusSound(st.key, $event.target.value)"
+                      class="h-5.5 text-[9px] sm:text-[9.5px] px-1 rounded-[3px] border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-medium cursor-pointer"
+                    >
+                      <option
+                        v-for="preset in soundPresets"
+                        :key="preset.id"
+                        :value="preset.id"
+                      >
+                        {{ preset.name }} ({{ preset.category }})
+                      </option>
+                    </select>
+                    <button
+                      type="button"
+                      @click="playSoundById(soundStatusMap[st.key] || 'chime_ascend')"
+                      class="h-5.5 w-5.5 flex items-center justify-center rounded-[3px] bg-indigo-50 dark:bg-indigo-900/40 hover:bg-indigo-100 dark:hover:bg-indigo-900/70 text-indigo-600 dark:text-indigo-300 transition-colors cursor-pointer"
+                      :title="t('my_assets_listen_sound_tip')"
+                    >
+                      <span class="material-symbols-outlined text-[12px]">play_arrow</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <!-- 3. Kamera & Foto -->
             <div class="p-2 sm:p-2.5 rounded-[5px] border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <div class="flex items-start gap-2 min-w-0">
@@ -1740,14 +1819,14 @@ onMounted(async () => {
                 </div>
                 <div class="min-w-0">
                   <div class="flex items-center gap-1.5 flex-wrap">
-                    <span class="font-bold text-slate-800 dark:text-white text-[10px] sm:text-[10.5px]">Kamera & Foto Aset</span>
+                    <span class="font-bold text-slate-800 dark:text-white text-[10px] sm:text-[10.5px]">{{ t('my_assets_camera_photo_title') }}</span>
                     <AppBadge
                       :type="cameraPermission === 'granted' ? 'success' : cameraPermission === 'denied' ? 'danger' : 'neutral'"
-                      :text="cameraPermission === 'granted' ? 'Diizinkan' : cameraPermission === 'denied' ? 'Ditolak' : 'Tersedia'"
+                      :text="cameraPermission === 'granted' ? t('my_assets_perm_granted') : cameraPermission === 'denied' ? t('my_assets_perm_denied') : t('my_assets_perm_available')"
                     />
                   </div>
                   <p class="text-[9px] sm:text-[9.5px] text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed">
-                    Ambil foto langsung kondisi perangkat rusak ke lampiran tiket.
+                    {{ t('my_assets_camera_desc') }}
                   </p>
                 </div>
               </div>
@@ -1757,7 +1836,7 @@ onMounted(async () => {
                   @click="handleProfileCamera"
                   class="h-6 px-2 rounded-[4px] border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-[9px] sm:text-[9.5px] font-medium transition-colors cursor-pointer"
                 >
-                  Uji Kamera
+                  {{ t('my_assets_test_camera') }}
                 </button>
               </div>
             </div>
@@ -1770,14 +1849,14 @@ onMounted(async () => {
                 </div>
                 <div class="min-w-0">
                   <div class="flex items-center gap-1.5 flex-wrap">
-                    <span class="font-bold text-slate-800 dark:text-white text-[10px] sm:text-[10.5px]">Akses File & Clipboard</span>
+                    <span class="font-bold text-slate-800 dark:text-white text-[10px] sm:text-[10.5px]">{{ t('my_assets_files_clipboard_title') }}</span>
                     <AppBadge
                       type="success"
-                      text="Mendukung File & Paste"
+                      :text="t('my_assets_supports_files_paste')"
                     />
                   </div>
                   <p class="text-[9px] sm:text-[9.5px] text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed">
-                    Unggah berkas dokumen/gambar dan paste screenshot dari clipboard (Ctrl+V).
+                    {{ t('my_assets_files_clipboard_desc') }}
                   </p>
                 </div>
               </div>
@@ -1787,7 +1866,7 @@ onMounted(async () => {
                   @click="handleProfileClipboard"
                   class="h-6 px-2 rounded-[4px] border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-[9px] sm:text-[9.5px] font-medium transition-colors cursor-pointer"
                 >
-                  Uji Clipboard
+                  {{ t('my_assets_test_clipboard') }}
                 </button>
               </div>
             </div>
@@ -1843,9 +1922,9 @@ onMounted(async () => {
             @click="goToLevel1"
             class="font-medium text-[#5F7089] hover:text-[#333333] dark:text-slate-400 dark:hover:text-white transition-colors shrink-0"
           >
-            Profil
+            {{ t('nav_profile') }}
           </button>
-          <span v-else class="font-medium text-[#5F7089] dark:text-slate-400 shrink-0">Profil</span>
+          <span v-else class="font-medium text-[#5F7089] dark:text-slate-400 shrink-0">{{ t('nav_profile') }}</span>
           <span
             aria-hidden="true"
             class="material-symbols-outlined text-[12px] sm:text-[13px] text-[#CBD5E1] dark:text-slate-600 shrink-0"
@@ -1861,10 +1940,10 @@ onMounted(async () => {
           type="button"
           @click="goToLevel1"
           class="flex items-center gap-1 shrink-0 h-7 sm:h-7.5 rounded-[5px] border border-[#E2E8F0] dark:border-slate-700 bg-white dark:bg-slate-800 px-2 sm:px-2.5 text-[10px] sm:text-[10.5px] font-medium text-[#475569] dark:text-slate-300 hover:bg-[#F8FAFC] dark:hover:bg-slate-700 hover:text-[#333333] dark:hover:text-white transition-all cursor-pointer shadow-2xs touch-manipulation"
-          title="Kembali ke Profil"
+          :title="t('my_assets_back_to_profile_tip')"
         >
           <span aria-hidden="true" class="material-symbols-outlined text-[14px]">arrow_back</span>
-          <span class="hidden xs:inline">Kembali</span>
+          <span class="hidden xs:inline">{{ t('back') }}</span>
         </button>
       </div>
 
@@ -1938,7 +2017,7 @@ onMounted(async () => {
           >
             <span
               class="block text-[8px] sm:text-[8.5px] font-medium uppercase tracking-wider text-[#5F7089] dark:text-slate-400 leading-tight"
-              >Total aset</span
+              >{{ t('my_assets_total_assets') }}</span
             >
             <span
               class="font-num text-[11px] sm:text-[12px] font-semibold text-[#333333] dark:text-white leading-snug mt-0.5 block"
@@ -1950,7 +2029,7 @@ onMounted(async () => {
           >
             <span
               class="block text-[8px] sm:text-[8.5px] font-medium uppercase tracking-wider text-[#5F7089] dark:text-slate-400 leading-tight"
-              >Penugasan awal</span
+              >{{ t('my_assets_first_assigned') }}</span
             >
             <span
               class="font-num text-[10px] sm:text-[10.5px] font-semibold text-[#333333] dark:text-white leading-snug mt-0.5 block truncate"
@@ -1963,14 +2042,14 @@ onMounted(async () => {
       <!-- KPI Cards: MyAssets Summary -->
       <div class="myassets-kpi-grid grid grid-cols-3 gap-1.5 sm:gap-2">
         <StatCard
-          title="Total aset saya"
+          :title="t('my_assets_total_my_assets')"
           :value="myAssets.length"
           icon="devices"
           color="primary"
-          subtitle="Semua perangkat terdaftar"
+          :subtitle="t('my_assets_all_registered_devices')"
         />
         <StatCard
-          title="Status"
+          :title="t('status')"
           :value="
             myAssets.filter((a) =>
               ['digunakan', 'in use'].includes((a.status_aset || '').toLowerCase()),
@@ -1978,10 +2057,10 @@ onMounted(async () => {
           "
           icon="check_circle"
           color="success"
-          subtitle="Aset sedang digunakan"
+          :subtitle="t('my_assets_assets_in_use_sub')"
         />
         <StatCard
-          title="Stok tersedia"
+          :title="t('my_assets_stock_available')"
           :value="
             filteredAssets.filter((a) =>
               ['tersedia', 'stok', 'stock'].includes((a.status_aset || '').toLowerCase()),
@@ -1989,7 +2068,7 @@ onMounted(async () => {
           "
           icon="inventory"
           color="neutral"
-          subtitle="Aset dalam stok"
+          :subtitle="t('my_assets_assets_in_stock')"
         />
       </div>
 
@@ -2000,7 +2079,7 @@ onMounted(async () => {
             <span aria-hidden="true" class="material-symbols-outlined text-[15px] text-[#333333]"
               >inventory_2</span
             >
-            <h3 class="text-[11px] sm:text-xs font-bold text-[#333333]">Aset yang ditugaskan</h3>
+            <h3 class="text-[11px] sm:text-xs font-bold text-[#333333]">{{ t('my_assets_assigned_assets') }}</h3>
             <span class="rounded-full bg-[#EFF6FF] px-1.5 py-0.2 text-[8.5px] sm:text-[9px] font-bold text-[#333333]">
               {{ myAssets.length }}
             </span>
@@ -2016,14 +2095,14 @@ onMounted(async () => {
             <input
               v-model="assetSearch"
               type="text"
-              placeholder="Cari label / serial..."
+              :placeholder="t('my_assets_search_label_serial_ph')"
               class="h-7 sm:h-7.5 w-full rounded-[5px] border border-[#E2E8F0] bg-white pl-6.5 pr-6 text-[10px] sm:text-[10.5px] text-[#333333] focus:border-[#0A51B0] focus:outline-none shadow-2xs"
             />
             <button
               v-if="assetSearch"
               type="button"
               @click="assetSearch = ''"
-              aria-label="Bersihkan"
+              :aria-label="t('clear_search')"
               class="absolute right-1.5 top-1/2 -translate-y-1/2 flex h-4 w-4 items-center justify-center rounded-full text-[#687281] hover:bg-[#F1F5F9] hover:text-[#333333] cursor-pointer"
             >
               <span aria-hidden="true" class="material-symbols-outlined text-[12px]">close</span>
@@ -2039,7 +2118,7 @@ onMounted(async () => {
           <div
             class="h-4 w-4 animate-spin rounded-full border-2 border-[#0A51B0] border-t-transparent mb-1"
           ></div>
-          <p class="text-[10px] sm:text-[10.5px] font-semibold">Memuat aset terassigned...</p>
+          <p class="text-[10px] sm:text-[10.5px] font-semibold">{{ t('my_assets_loading_assigned') }}</p>
         </div>
 
         <!-- Error Assets -->
@@ -2053,7 +2132,7 @@ onMounted(async () => {
             @click="goToLevel2(selectedEmployee)"
             class="mt-1 font-bold underline cursor-pointer"
           >
-            Coba lagi
+            {{ t('retry') }}
           </button>
         </div>
 
@@ -2066,12 +2145,11 @@ onMounted(async () => {
             >account_box_off</span
           >
           <h4 class="text-[11px] sm:text-xs font-bold text-[#92400E]">
-            Akun Belum Terhubung dengan Data Karyawan
+            {{ t('my_assets_not_linked_title') }}
           </h4>
           <p class="max-w-md text-[9.5px] sm:text-[10px] text-[#B45309]">
-            Akun Anda (<strong>{{ selectedEmployee.email_kantor }}</strong
-            >) belum terhubung ke Master Data Karyawan. Silakan hubungi Administrator IT untuk
-            mendaftarkan email Anda.
+            {{ t('my_assets_not_linked_p1') }}<strong>{{ selectedEmployee.email_kantor }}</strong
+            >{{ t('my_assets_not_linked_p2') }}
           </p>
         </div>
 
@@ -2083,9 +2161,9 @@ onMounted(async () => {
           <span aria-hidden="true" class="material-symbols-outlined text-[24px] text-[#CBD5E1]"
             >devices_off</span
           >
-          <h4 class="text-[11px] sm:text-xs font-semibold text-[#333333]">Belum Ada Aset yang ditugaskan</h4>
+          <h4 class="text-[11px] sm:text-xs font-semibold text-[#333333]">{{ t('my_assets_no_assigned_assets_title') }}</h4>
           <p class="max-w-xs text-[9.5px] sm:text-[10px] text-[#5F7089]">
-            Tidak ada aset IT yang terdaftar atas nama {{ selectedEmployee.nama_karyawan }}.
+            {{ t('my_assets_no_assets_for') }} {{ selectedEmployee.nama_karyawan }}.
           </p>
         </div>
 
@@ -2101,7 +2179,7 @@ onMounted(async () => {
             tabindex="0"
             @keydown.enter.self="goToLevel3(asset)"
             @keydown.space.prevent.self="goToLevel3(asset)"
-            aria-label="Lihat detail dan riwayat aset"
+            :aria-label="t('my_assets_view_asset_detail_aria')"
             class="assigned-asset-card group relative flex flex-col justify-between rounded-[6px] border border-[#E2E8F0] bg-white p-2 sm:p-2.5 shadow-2xs hover:border-[#0A51B0] hover:shadow-md active:scale-[0.99] transition-all duration-200 cursor-pointer touch-manipulation"
           >
             <div>
@@ -2128,7 +2206,7 @@ onMounted(async () => {
                 {{
                   asset.label_aset ||
                   [asset.merek, asset.model].filter(Boolean).join(' ') ||
-                  'Aset IT'
+                  t('my_assets_it_asset')
                 }}
               </h4>
               <div class="mt-0.5 flex items-center justify-between text-[8.5px] sm:text-[9px] text-[#5F7089]">
@@ -2143,14 +2221,14 @@ onMounted(async () => {
               <!-- Specs Grid -->
               <div class="mt-2 pt-1.5 border-t border-[#F1F5F9] grid grid-cols-2 gap-1 text-[9px] sm:text-[9.5px]">
                 <div>
-                  <span class="block text-[8px] sm:text-[8.5px] font-semibold uppercase text-[#687281]">Tipe</span>
+                  <span class="block text-[8px] sm:text-[8.5px] font-semibold uppercase text-[#687281]">{{ t('my_assets_type') }}</span>
                   <span class="font-medium text-[#333333] truncate block mt-0.5">{{
                     asset.tipe_perangkat || '-'
                   }}</span>
                 </div>
                 <div>
                   <span class="block text-[8px] sm:text-[8.5px] font-semibold uppercase text-[#687281]"
-                    >Merek / Model</span
+                    >{{ t('my_assets_brand_model') }}</span
                   >
                   <span class="font-medium text-[#333333] truncate block mt-0.5">{{
                     [asset.merek, asset.model].filter(Boolean).join(' ') || '-'
@@ -2163,7 +2241,7 @@ onMounted(async () => {
             <div
               class="mt-2 pt-1.5 border-t border-[#F1F5F9] flex items-center justify-between text-[9px] sm:text-[9.5px] font-semibold text-[#333333]"
             >
-              <span>Lihat detail & riwayat</span>
+              <span>{{ t('my_assets_view_detail_history') }}</span>
               <span
                 aria-hidden="true"
                 class="material-symbols-outlined text-[13px] group-hover:translate-x-1 transition-transform"
@@ -2196,7 +2274,7 @@ onMounted(async () => {
             @click="goToLevel1"
             class="font-medium text-[#5F7089] hover:text-[#333333] dark:text-slate-400 dark:hover:text-white transition-colors shrink-0"
           >
-            Profil
+            {{ t('nav_profile') }}
           </button>
           <button
             type="button"
@@ -2228,7 +2306,7 @@ onMounted(async () => {
           class="sm:hidden flex items-center gap-1 text-[10px] font-semibold text-[#333333] truncate"
         >
           <span aria-hidden="true" class="material-symbols-outlined text-[14px]">arrow_back</span>
-          <span class="truncate">Kembali ke {{ selectedEmployee.nama_karyawan }}</span>
+          <span class="truncate">{{ t('my_assets_back_to') }} {{ selectedEmployee.nama_karyawan }}</span>
         </button>
 
         <button
@@ -2237,7 +2315,7 @@ onMounted(async () => {
           class="hidden sm:flex items-center gap-1 h-6.5 sm:h-7 rounded-[5px] border border-[#E2E8F0] bg-white px-2 text-[10px] sm:text-[10.5px] font-medium text-[#475569] hover:bg-[#F8FAFC] hover:text-[#333333] transition-all cursor-pointer shadow-2xs touch-manipulation shrink-0"
         >
           <span aria-hidden="true" class="material-symbols-outlined text-[14px]">arrow_back</span>
-          <span>Kembali ke Detail Karyawan</span>
+          <span>{{ t('my_assets_back_to_employee_detail') }}</span>
         </button>
       </div>
 
@@ -2259,7 +2337,7 @@ onMounted(async () => {
                 {{
                   selectedAsset.label_aset ||
                   [selectedAsset.merek, selectedAsset.model].filter(Boolean).join(' ') ||
-                  'Aset IT'
+                  t('my_assets_it_asset')
                 }}
               </h1>
               <AppBadge
@@ -2298,7 +2376,7 @@ onMounted(async () => {
           class="w-full sm:w-auto h-6.5 sm:h-7 inline-flex items-center justify-center gap-1 rounded-[5px] border border-[#E2E8F0] bg-[#F8FAFC] px-2 text-[10px] sm:text-[10.5px] font-medium text-[#333333] hover:bg-[#EFF6FF] cursor-pointer transition-colors shadow-2xs touch-manipulation shrink-0"
         >
           <span aria-hidden="true" class="material-symbols-outlined text-[14px]">description</span>
-          <span>Lihat Spesifikasi</span>
+          <span>{{ t('my_assets_view_specifications') }}</span>
         </button>
       </div>
 
@@ -2313,20 +2391,20 @@ onMounted(async () => {
                 >info</span
               >
               <h3 class="text-[10px] sm:text-[10.5px] font-bold uppercase tracking-wider text-[#333333]">
-                Informasi Perangkat
+                {{ t('my_assets_device_info') }}
               </h3>
             </div>
 
             <dl class="grid grid-cols-2 gap-2 text-[10px] sm:text-[10.5px]">
               <div>
-                <dt class="text-[8px] sm:text-[8.5px] font-semibold uppercase text-[#687281]">Tipe Perangkat</dt>
+                <dt class="text-[8px] sm:text-[8.5px] font-semibold uppercase text-[#687281]">{{ t('my_assets_device_type') }}</dt>
                 <dd class="mt-0.5 font-semibold text-[#333333] truncate">
                   {{ selectedAsset.tipe_perangkat || '-' }}
                 </dd>
               </div>
 
               <div>
-                <dt class="text-[8px] sm:text-[8.5px] font-semibold uppercase text-[#687281]">Brand / Merek</dt>
+                <dt class="text-[8px] sm:text-[8.5px] font-semibold uppercase text-[#687281]">{{ t('my_assets_brand_label') }}</dt>
                 <dd class="mt-0.5 font-semibold text-[#333333] truncate">
                   {{ selectedAsset.merek || '-' }}
                 </dd>
@@ -2347,21 +2425,21 @@ onMounted(async () => {
               </div>
 
               <div>
-                <dt class="text-[8px] sm:text-[8.5px] font-semibold uppercase text-[#687281]">Kode / ID Aset</dt>
+                <dt class="text-[8px] sm:text-[8.5px] font-semibold uppercase text-[#687281]">{{ t('my_assets_asset_code') }}</dt>
                 <dd class="mt-0.5 font-mono font-medium text-[#333333] truncate">
                   AST-IT-{{ String(selectedAsset.id_aset).padStart(5, '0') }}
                 </dd>
               </div>
 
               <div>
-                <dt class="text-[8px] sm:text-[8.5px] font-semibold uppercase text-[#687281]">Lokasi Aset</dt>
+                <dt class="text-[8px] sm:text-[8.5px] font-semibold uppercase text-[#687281]">{{ t('my_assets_asset_location') }}</dt>
                 <dd class="mt-0.5 font-semibold text-[#333333] truncate">
                   {{ selectedAsset.lokasi_aset || selectedEmployee.lokasi_kerja || '-' }}
                 </dd>
               </div>
 
               <div>
-                <dt class="text-[8px] sm:text-[8.5px] font-semibold uppercase text-[#687281]">Status Pemakaian</dt>
+                <dt class="text-[8px] sm:text-[8.5px] font-semibold uppercase text-[#687281]">{{ t('my_assets_usage_status') }}</dt>
                 <dd class="mt-0.5">
                   <AppBadge
                     :type="getStatusBadgeType(selectedAsset.status_aset)"
@@ -2372,7 +2450,7 @@ onMounted(async () => {
 
               <div>
                 <dt class="text-[8px] sm:text-[8.5px] font-semibold uppercase text-[#687281]">
-                  Kondisi Perangkat
+                  {{ t('my_assets_device_condition') }}
                 </dt>
                 <dd class="mt-0.5 font-semibold text-[#333333] truncate">
                   {{ selectedAsset.kondisi_aset || 'Normal' }}
@@ -2391,7 +2469,7 @@ onMounted(async () => {
                   >person_pin</span
                 >
                 <h3 class="text-[10px] sm:text-[10.5px] font-bold uppercase tracking-wider text-[#333333]">
-                  Pemegang Aktif saat ini
+                  {{ t('my_assets_current_holder') }}
                 </h3>
               </div>
               <span
@@ -2436,7 +2514,7 @@ onMounted(async () => {
               </h3>
             </div>
             <span class="text-[9px] sm:text-[9.5px] font-semibold text-[#5F7089]"
-              >{{ assetHistoryTimeline.length }} Peristiwa</span
+              >{{ assetHistoryTimeline.length }} {{ t('my_assets_events') }}</span
             >
           </div>
 
@@ -2445,7 +2523,7 @@ onMounted(async () => {
             <div
               class="h-3.5 w-3.5 animate-spin rounded-full border-2 border-[#7C3AED] border-t-transparent mx-auto mb-1"
             ></div>
-            Memuat riwayat log...
+            {{ t('my_assets_loading_logs') }}
           </div>
 
           <!-- Audit Timeline Activity Stream -->
@@ -2471,7 +2549,7 @@ onMounted(async () => {
                   class="flex items-center justify-between gap-1.5 text-[8.5px] sm:text-[9px] text-[#5F7089] mb-0.5"
                 >
                   <span class="font-medium">{{ formatDateTime(log.date) }}</span>
-                  <span class="font-semibold text-[#475569] truncate">Oleh: {{ log.actor }}</span>
+                  <span class="font-semibold text-[#475569] truncate">{{ t('my_assets_by') }}: {{ log.actor }}</span>
                 </div>
 
                 <h4 class="font-bold text-[10px] sm:text-[10.5px] text-[#333333] leading-snug">
@@ -2490,7 +2568,7 @@ onMounted(async () => {
 
     <FilterModal
       :is-open="showFilterModal"
-      title="Filter Aset Karyawan"
+      :title="t('my_assets_filter_employee_assets')"
       @close="showFilterModal = false"
       @apply="showFilterModal = false"
       @reset="resetEmployeeFilters"
@@ -2498,26 +2576,26 @@ onMounted(async () => {
       <CustomSelect
         v-model="filterDepartemen"
         :options="departemenFilterOptions"
-        aria-label="Filter departemen"
+        :aria-label="t('my_assets_filter_department_aria')"
         :block="true"
       />
       <CustomSelect
         v-model="filterLokasi"
         :options="lokasiFilterOptions"
-        aria-label="Filter lokasi"
+        :aria-label="t('my_assets_filter_location_aria')"
         :block="true"
       />
       <CustomSelect
         v-model="filterTipe"
         :options="tipeFilterOptions"
-        aria-label="Filter tipe perangkat"
+        :aria-label="t('my_assets_filter_device_type_aria')"
         :block="true"
       />
     </FilterModal>
     <!-- ── Modal Spesifikasi Perangkat ── -->
     <AppModal
       :is-open="showSpecificationModal"
-      title="Spesifikasi Perangkat"
+      :title="t('my_assets_device_specifications')"
       size="md"
       @close="closeModal"
     >
@@ -2532,7 +2610,7 @@ onMounted(async () => {
           </div>
           <div class="min-w-0">
             <h4 class="font-bold text-[10.5px] sm:text-[11px] text-[#333333] truncate">
-              {{ activeModalAsset.label_aset || activeModalAsset.merek || 'Aset IT' }}
+              {{ activeModalAsset.label_aset || activeModalAsset.merek || t('my_assets_it_asset') }}
             </h4>
             <p class="font-mono text-[9px] sm:text-[9.5px] text-[#5F7089] mt-0.5">
               SN: {{ activeModalAsset.nomor_seri || '-' }}
@@ -2542,14 +2620,14 @@ onMounted(async () => {
 
         <div>
           <label class="block text-[9px] sm:text-[9.5px] font-semibold uppercase text-[#5F7089] mb-0.5">
-            Spesifikasi Detail
+            {{ t('my_assets_spec_detail') }}
           </label>
           <div
             class="min-h-16 whitespace-pre-wrap rounded-[5px] border border-[#E2E8F0] bg-white p-2 text-[10px] sm:text-[10.5px] text-[#333333] leading-relaxed"
           >
             {{
               activeModalAsset.spesifikasi ||
-              'Belum ada catatan spesifikasi detail untuk perangkat ini.'
+              t('my_assets_no_spec_notes')
             }}
           </div>
         </div>
@@ -2561,7 +2639,7 @@ onMounted(async () => {
             class="h-6.5 sm:h-7 rounded-[5px] bg-[#0A51B0] px-3 text-[10px] sm:text-[10.5px] font-semibold text-white hover:bg-[#0A4391] cursor-pointer transition-colors"
             @click="closeModal"
           >
-            Tutup
+            {{ t('btn_close') }}
           </button>
         </div>
       </template>

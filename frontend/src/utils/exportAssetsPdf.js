@@ -20,20 +20,20 @@ export function downloadAssetsPdf(assets, filters = {}, date = new Date()) {
       <td class="font-mono">${asset.id_aset}</td>
       <td>
         <div class="font-bold">${asset.label_aset}</div>
-        <div class="text-muted font-mono small">${asset.nomor_seri || '—'}</div>
+        <div class="text-muted font-mono small">${asset.nomor_seri || '-'}</div>
       </td>
       <td>
-        <div class="font-bold">${[asset.merek, asset.model].filter(Boolean).join(' ') || '—'}</div>
+        <div class="font-bold">${[asset.merek, asset.model].filter(Boolean).join(' ') || '-'}</div>
         <div class="text-muted small">${asset.spesifikasi || ''}</div>
       </td>
       <td>
         <div>${asset.nama_karyawan || 'Belum ditetapkan'}</div>
-        <div class="text-muted font-mono small">${asset.nik || '—'}</div>
+        <div class="text-muted font-mono small">${asset.nik || '-'}</div>
       </td>
-      <td>${asset.lokasi_kerja || '—'}</td>
-      <td>${asset.tipe_perangkat || '—'}</td>
-      <td><span class="badge badge-${statusClass}">${asset.status_aset || '—'}</span></td>
-      <td>${asset.kondisi_aset || '—'}</td>
+      <td>${asset.lokasi_kerja || '-'}</td>
+      <td>${asset.tipe_perangkat || '-'}</td>
+      <td><span class="badge badge-${statusClass}">${asset.status_aset || '-'}</span></td>
+      <td>${asset.kondisi_aset || '-'}</td>
     </tr>
   `
     })

@@ -15,6 +15,7 @@ import { getStoredUser, restoreSession } from './utils/authStorage.js'
 import { useAuth } from './composables/useAuth.js'
 import { initTicketRealtime, stopTicketRealtime } from './composables/useTicketRealtime.js'
 import { useCases } from './composables/useCases.js'
+import { useLanguage } from './composables/useLanguage.js'
 
 const route = useRoute()
 const router = useRouter()
@@ -38,6 +39,7 @@ function pageKey(currentRoute) {
 }
 const { fetchCases } = useCases()
 const { user, refreshUser } = useAuth()
+const { t } = useLanguage()
 
 const isLoginPage = computed(() => {
   return route.name === 'login' || route.path === '/login'
@@ -96,9 +98,11 @@ onUnmounted(() => {
 <template>
   <!-- 1. Halaman Login Standalone -->
   <template v-if="isLoginPage">
-    <Transition name="fade" mode="out-in" appear>
-      <RouterView />
-    </Transition>
+    <RouterView v-slot="{ Component }">
+      <Transition name="fade" mode="out-in" appear>
+        <component :is="Component" />
+      </Transition>
+    </RouterView>
   </template>
 
   <!-- 2. Halaman Editor Fullscreen (Distraction-Free Editor) -->
@@ -132,7 +136,7 @@ onUnmounted(() => {
       href="#main-content"
       class="fixed left-4 top-3 z-[100] -translate-y-20 rounded-lg bg-[#111827] px-4 py-2 text-sm font-bold text-white transition-transform focus:translate-y-0"
     >
-      Lewati ke konten utama
+      {{ t('skip_to_content') }}
     </a>
 
     <div class="app-shell relative flex h-dvh min-h-0 overflow-hidden bg-[#F8FAFC]">

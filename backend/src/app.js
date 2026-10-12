@@ -9,6 +9,7 @@ import {
   globalErrorHandler,
 } from "./middleware/errorHandlerMiddleware.js";
 import { loginRateLimiter, authRateLimiter } from "./middleware/rateLimitMiddleware.js";
+import { idempotencyMiddleware } from "./middleware/idempotencyMiddleware.js";
 import { router } from "./routes/index.js";
 import { isCorsOriginAllowed } from "./security/corsPolicy.js";
 
@@ -55,7 +56,16 @@ app.use(
   cors({
     origin: checkCorsOrigin,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Authorization", "Content-Type", "Accept", "X-Requested-With", "X-Request-ID"],
+    allowedHeaders: [
+      "Authorization",
+      "Content-Type",
+      "Accept",
+      "X-Requested-With",
+      "X-Request-ID",
+      "X-API-Key",
+      "Idempotency-Key",
+      "X-TrackIT-Signature",
+    ],
     exposedHeaders: [
       "X-Total-Count",
       "X-Page",
@@ -66,6 +76,8 @@ app.use(
       "RateLimit-Remaining",
       "RateLimit-Reset",
       "Retry-After",
+      "Idempotency-Key",
+      "X-Idempotent-Replay",
     ],
     credentials: false,
     optionsSuccessStatus: 204,
@@ -81,6 +93,7 @@ app.use((req, res, next) => {
   if (req.path.startsWith("/api/import")) return importJsonParser(req, res, next);
   return defaultJsonParser(req, res, next);
 });
+app.use(idempotencyMiddleware);
 app.use(router);
 
 // Unknown route & global error handlers (must be registered last)

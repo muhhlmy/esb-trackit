@@ -15,9 +15,11 @@ import AppViewToggle from '../components/ui/AppViewToggle.vue'
 import PageHeader from '../components/ui/PageHeader.vue'
 import SkeletonTable from '../components/ui/skeleton/SkeletonTable.vue'
 import FilterModal from '../components/ui/FilterModal.vue'
+import { useLanguage } from '../composables/useLanguage.js'
 
 const { get } = useApi()
 const { isSuperAdmin } = useAuth()
+const { t } = useLanguage()
 const { viewMode: assetLogViewMode } = useViewMode('logs-assets', 'table')
 
 // ── State Utama ──────────────────────────────────────────────
@@ -353,11 +355,11 @@ function systemAuditChanges(log) {
   >
     <!-- Page Header -->
     <PageHeader
-      title="Audit Log & Riwayat Aktivitas"
+      :title="t('logs_page_title')"
       :subtitle="
         isSuperAdmin
-          ? 'Melihat rekam jejak perubahan sistem & audit login pengguna'
-          : 'Melihat rekam jejak perubahan aset'
+          ? t('logs_page_subtitle_admin')
+          : t('logs_page_subtitle_user')
       "
       icon="receipt_long"
     />
@@ -375,7 +377,7 @@ function systemAuditChanges(log) {
         type="button"
         class="h-8 px-2.5 ml-auto text-xs font-semibold uppercase tracking-wider text-red-800 hover:underline"
       >
-        Coba Lagi
+        {{ t('retry') }}
       </button>
     </div>
 
@@ -397,11 +399,12 @@ function systemAuditChanges(log) {
         "
       >
         <span aria-hidden="true" class="material-symbols-outlined text-[16px]">history</span>
-        Riwayat Perubahan Aset
+        {{ t('tab_asset_history') }}
       </button>
       <button
         v-if="isSuperAdmin"
         type="button"
+        aria-label="Audit Aktivitas Login"
         :aria-pressed="activeTab === 'audit'"
         @click="activeTab = 'audit'"
         class="flex min-w-0 min-h-8 items-center justify-center sm:justify-start gap-1.5 px-2 sm:px-4 py-2 text-xs leading-normal text-left font-semibold transition-all duration-150 border-b-2 -mb-[2px]"
@@ -412,7 +415,7 @@ function systemAuditChanges(log) {
         "
       >
         <span aria-hidden="true" class="material-symbols-outlined text-[16px]">security</span>
-        Audit Aktivitas Login
+        {{ t('tab_login_audit') }}
       </button>
       <button
         v-if="isSuperAdmin"
@@ -427,7 +430,7 @@ function systemAuditChanges(log) {
         "
       >
         <span aria-hidden="true" class="material-symbols-outlined text-[16px]">receipt_long</span>
-        Audit Sistem
+        {{ t('tab_system_audit') }}
       </button>
     </div>
 

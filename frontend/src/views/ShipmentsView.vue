@@ -4,6 +4,7 @@ import { api } from '../services/api.js'
 import { useAuth } from '../composables/useAuth.js'
 import { animateStagger } from '../composables/useGsap.js'
 import { useViewMode } from '../composables/useViewMode.js'
+import { useLanguage } from '../composables/useLanguage.js'
 import AppViewToggle from '../components/ui/AppViewToggle.vue'
 import AppModal from '../components/ui/AppModal.vue'
 import AppBadge from '../components/ui/AppBadge.vue'
@@ -27,6 +28,7 @@ import {
 const { isSuperAdmin, hasWritePermission } = useAuth()
 const canWriteShipments = computed(() => isSuperAdmin.value || hasWritePermission('shipments'))
 const { viewMode } = useViewMode('shipments', 'table')
+const { currentLang, t } = useLanguage()
 
 // ── State Utama ──────────────────────────────────────────────
 const shipments = ref([])
@@ -54,22 +56,22 @@ const filterStatus = ref('')
 const filterDateFrom = ref('')
 const filterDateTo = ref('')
 
-const STATUS_OPTIONS = [
-  { value: '', label: 'Semua Status' },
-  { value: 'belum_dikirim', label: 'Belum Dikirim', dot: 'bg-slate-400' },
-  { value: 'pending', label: 'Pending', dot: 'bg-amber-500' },
-  { value: 'sedang_dikirim', label: 'Sedang Dikirim', dot: 'bg-blue-500' },
-  { value: 'diterima', label: 'Diterima', dot: 'bg-emerald-500' },
-  { value: 'cancel', label: 'Cancel', dot: 'bg-rose-500' },
-]
+const STATUS_OPTIONS = computed(() => [
+  { value: '', label: t('shipments_status_all') },
+  { value: 'belum_dikirim', label: t('shipments_status_belum_dikirim'), dot: 'bg-slate-400' },
+  { value: 'pending', label: t('shipments_status_pending'), dot: 'bg-amber-500' },
+  { value: 'sedang_dikirim', label: t('shipments_status_sedang_dikirim'), dot: 'bg-blue-500' },
+  { value: 'diterima', label: t('shipments_status_diterima'), dot: 'bg-emerald-500' },
+  { value: 'cancel', label: t('shipments_status_cancel'), dot: 'bg-rose-500' },
+])
 
-const FORM_STATUS_OPTIONS = [
-  { value: 'belum_dikirim', label: 'Belum Dikirim', dot: 'bg-slate-400' },
-  { value: 'pending', label: 'Pending', dot: 'bg-amber-500' },
-  { value: 'sedang_dikirim', label: 'Sedang Dikirim', dot: 'bg-blue-500' },
-  { value: 'diterima', label: 'Diterima', dot: 'bg-emerald-500' },
-  { value: 'cancel', label: 'Cancel', dot: 'bg-rose-500' },
-]
+const FORM_STATUS_OPTIONS = computed(() => [
+  { value: 'belum_dikirim', label: t('shipments_status_belum_dikirim'), dot: 'bg-slate-400' },
+  { value: 'pending', label: t('shipments_status_pending'), dot: 'bg-amber-500' },
+  { value: 'sedang_dikirim', label: t('shipments_status_sedang_dikirim'), dot: 'bg-blue-500' },
+  { value: 'diterima', label: t('shipments_status_diterima'), dot: 'bg-emerald-500' },
+  { value: 'cancel', label: t('shipments_status_cancel'), dot: 'bg-rose-500' },
+])
 
 function getTodayString() {
   return new Date().toISOString().substring(0, 10)
@@ -116,15 +118,15 @@ function getStatusBadgeType(status) {
 function getStatusLabel(status) {
   switch (status) {
     case 'belum_dikirim':
-      return 'Belum Dikirim'
+      return t('shipments_status_belum_dikirim')
     case 'pending':
-      return 'Pending'
+      return t('shipments_status_pending')
     case 'sedang_dikirim':
-      return 'Sedang Dikirim'
+      return t('shipments_status_sedang_dikirim')
     case 'diterima':
-      return 'Diterima'
+      return t('shipments_status_diterima')
     case 'cancel':
-      return 'Cancel'
+      return t('shipments_status_cancel')
     default:
       return status || '-'
   }
@@ -135,7 +137,7 @@ function formatDate(val) {
   try {
     const d = new Date(val)
     if (Number.isNaN(d.getTime())) return val
-    return d.toLocaleDateString('id-ID', {
+    return d.toLocaleDateString(currentLang.value === 'en' ? 'en-GB' : 'id-ID', {
       year: 'numeric',
       month: 'short',
       day: 'numeric',
@@ -179,7 +181,7 @@ async function fetchData() {
     }
   } catch (err) {
     if (requestId !== fetchRequestId) return
-    pageError.value = err.message || 'Gagal memuat data pengiriman.'
+    pageError.value = err.message || t('shipments_error_load')
   } finally {
     if (requestId === fetchRequestId) {
       isLoading.value = false
@@ -262,25 +264,25 @@ async function saveShipment() {
   modalError.value = ''
 
   if (!form.value.request_date) {
-    modalError.value = 'Tanggal request wajib diisi.'
+    modalError.value = t('shipments_error_request_date')
     return
   }
   if (!form.value.recipient_name?.trim()) {
-    modalError.value = 'Nama penerima wajib diisi.'
+    modalError.value = t('shipments_error_recipient')
     return
   }
   if (!form.value.item_description?.trim()) {
-    modalError.value = 'Deskripsi barang wajib diisi.'
+    modalError.value = t('shipments_error_item')
     return
   }
   if (!form.value.destination?.trim()) {
-    modalError.value = 'Tujuan pengiriman wajib diisi.'
+    modalError.value = t('shipments_error_destination')
     return
   }
   if (form.value.delivery_proof_url?.trim()) {
     const trimmedUrl = form.value.delivery_proof_url.trim()
     if (!trimmedUrl.startsWith('http://') && !trimmedUrl.startsWith('https://')) {
-      modalError.value = 'Link bukti pengiriman harus diawali dengan http:// atau https://.'
+      modalError.value = t('shipments_error_proof_url')
       return
     }
   }
@@ -300,16 +302,16 @@ async function saveShipment() {
 
     if (modalMode.value === 'add') {
       await api.createShipment(payload)
-      toast('Data pengiriman berhasil ditambahkan.')
+      toast(t('shipments_toast_added'))
     } else {
       await api.updateShipment(selectedShipment.value.id, payload)
-      toast('Data pengiriman berhasil diperbarui.')
+      toast(t('shipments_toast_updated'))
     }
 
     closeModal()
     await fetchData()
   } catch (err) {
-    modalError.value = err.message || 'Gagal menyimpan data pengiriman.'
+    modalError.value = err.message || t('shipments_error_save')
   } finally {
     isSubmitting.value = false
   }
@@ -322,11 +324,11 @@ async function confirmDelete() {
 
   try {
     await api.deleteShipment(selectedShipment.value.id)
-    toast('Data pengiriman berhasil dihapus.')
+    toast(t('shipments_toast_deleted'))
     closeModal()
     await fetchData()
   } catch (err) {
-    modalError.value = err.message || 'Gagal menghapus data pengiriman.'
+    modalError.value = err.message || t('shipments_error_delete')
   } finally {
     isSubmitting.value = false
   }
@@ -361,8 +363,8 @@ onMounted(() => {
     <!-- Page Header -->
     <PageHeader
       class="shipment-header"
-      title="Pengiriman"
-      subtitle="Pantau proses pengiriman barang dan aset kantor."
+      :title="t('shipments_title')"
+      :subtitle="t('shipments_subtitle')"
       icon="local_shipping"
     >
       <div v-if="canWriteShipments" class="shipment-header-actions flex flex-wrap sm:flex-nowrap items-center gap-1.5">
@@ -370,10 +372,10 @@ onMounted(() => {
           type="button"
           @click="openAdd"
           class="inventory-primary-action inline-flex h-8 shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-[6px] bg-[#0A51B0] px-3 text-[11px] sm:text-[12px] font-semibold text-white shadow-2xs transition-all hover:bg-[#0A4391]"
-          title="Tambah pengiriman baru"
+          :title="t('btn_add_shipment')"
         >
           <span aria-hidden="true" class="material-symbols-outlined text-[16px]">add</span>
-          <span>Tambah Pengiriman</span>
+          <span>{{ t('btn_add_shipment') }}</span>
         </button>
         <div
           class="inventory-action-group flex items-center gap-1 rounded-[6px] border border-[#D7E3F2] dark:border-slate-700 bg-[#F8FAFC] dark:bg-slate-800 p-0.5 h-8"
@@ -384,7 +386,7 @@ onMounted(() => {
             class="inventory-action-button inline-flex h-full items-center gap-1 rounded-[4px] px-2 text-[11px] font-semibold text-[#0A51B0] dark:text-blue-400 hover:bg-white dark:hover:bg-slate-700"
           >
             <span aria-hidden="true" class="material-symbols-outlined text-[15px]">upload_file</span>
-            Import
+            {{ t('btn_import') }}
           </button>
           <button
             type="button"
@@ -392,7 +394,7 @@ onMounted(() => {
             class="inventory-action-button inline-flex h-full items-center gap-1 rounded-[4px] px-2 text-[11px] font-semibold text-[#0A51B0] dark:text-blue-400 hover:bg-white dark:hover:bg-slate-700"
           >
             <span aria-hidden="true" class="material-symbols-outlined text-[15px]">download</span>
-            Export
+            {{ t('btn_export') }}
           </button>
         </div>
       </div>
@@ -401,32 +403,32 @@ onMounted(() => {
     <!-- Summary Cards (Directly below Header) -->
     <div class="shipment-summary grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-2.5 lg:gap-3">
       <StatCard
-        title="Total Pengiriman"
+        :title="currentLang === 'en' ? 'Total Shipments' : 'Total Pengiriman'"
         :value="summary.total"
         icon="local_shipping"
         color="primary"
-        subtitle="Semua data resi"
+        :subtitle="t('stat_all_tracking')"
       />
       <StatCard
-        title="Belum Dikirim"
+        :title="currentLang === 'en' ? 'Unshipped' : 'Belum Dikirim'"
         :value="summary.belum_dikirim"
         icon="pending_actions"
         color="warning"
-        subtitle="Siap diproses"
+        :subtitle="t('stat_unshipped_sub')"
       />
       <StatCard
-        title="Sedang Dikirim"
+        :title="currentLang === 'en' ? 'In Transit' : 'Sedang Dikirim'"
         :value="summary.sedang_dikirim"
         icon="local_shipping"
         color="cyan"
-        subtitle="Dalam perjalanan"
+        :subtitle="t('stat_in_transit_sub')"
       />
       <StatCard
-        title="Diterima"
+        :title="currentLang === 'en' ? 'Delivered' : 'Diterima'"
         :value="summary.diterima"
         icon="task_alt"
         color="success"
-        subtitle="Terkirim ke tujuan"
+        :subtitle="t('stat_delivered_sub')"
       />
     </div>
 
@@ -438,9 +440,9 @@ onMounted(() => {
         />
         <input
           v-model="searchQuery"
-          aria-label="Cari pengiriman"
+          :aria-label="t('filter_search')"
           type="text"
-          placeholder="Cari penerima, barang, tujuan, atau no resi…"
+          :placeholder="t('search_placeholder_general')"
           class="h-full min-h-0 w-full rounded-[6px] border border-[#E2E8F0] bg-white pl-9 pr-3 text-xs text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
         />
       </div>
@@ -452,7 +454,7 @@ onMounted(() => {
       >
         <span aria-hidden="true" class="material-symbols-outlined mr-1 align-middle text-[16px]"
           >filter_alt</span
-        >Filter
+        >{{ t('filter') }}
       </button>
       <AppViewToggle v-model="viewMode" />
     </div>
@@ -470,13 +472,13 @@ onMounted(() => {
       <div v-else-if="shipments.length === 0" class="px-4 py-8">
         <EmptyState
           icon="local_shipping"
-          title="Belum Ada Data Pengiriman"
+          :title="t('no_data')"
           :description="
             canWriteShipments
-              ? 'Tambahkan pengiriman pertama untuk mulai melakukan tracking.'
-              : 'Tidak ada data pengiriman yang cocok dengan filter yang dipilih.'
+              ? t('shipments_empty_add')
+              : t('shipments_empty_filtered')
           "
-          :action-label="canWriteShipments ? 'Tambah Pengiriman' : ''"
+          :action-label="canWriteShipments ? t('btn_add_shipment') : ''"
           @action="openAdd"
         />
       </div>
@@ -489,14 +491,14 @@ onMounted(() => {
               <tr
                 class="border-b border-[#E2E8F0] bg-[#F8FAFC] text-[11px] font-bold text-[#5F7089] uppercase tracking-wider"
               >
-                <th scope="col" class="py-3 px-4">Tanggal Request</th>
-                <th scope="col" class="py-3 px-4">Nama Penerima</th>
-                <th scope="col" class="py-3 px-4">Deskripsi Barang</th>
-                <th scope="col" class="py-3 px-4">Tujuan Pengiriman</th>
-                <th scope="col" class="py-3 px-4">No Resi</th>
-                <th scope="col" class="py-3 px-4">Status</th>
-                <th scope="col" class="py-3 px-4 text-center">Bukti</th>
-                <th scope="col" v-if="canWriteShipments" class="py-3 px-4 text-right">Aksi</th>
+                <th scope="col" class="py-3 px-4">{{ currentLang === 'en' ? 'Request Date' : 'Tanggal Request' }}</th>
+                <th scope="col" class="py-3 px-4">{{ currentLang === 'en' ? 'Recipient' : 'Nama Penerima' }}</th>
+                <th scope="col" class="py-3 px-4">{{ currentLang === 'en' ? 'Item Description' : 'Deskripsi Barang' }}</th>
+                <th scope="col" class="py-3 px-4">{{ currentLang === 'en' ? 'Destination' : 'Tujuan Pengiriman' }}</th>
+                <th scope="col" class="py-3 px-4">{{ currentLang === 'en' ? 'Tracking No' : 'No Resi' }}</th>
+                <th scope="col" class="py-3 px-4">{{ t('status') }}</th>
+                <th scope="col" class="py-3 px-4 text-center">{{ currentLang === 'en' ? 'Proof' : 'Bukti' }}</th>
+                <th scope="col" v-if="canWriteShipments" class="py-3 px-4 text-right">{{ t('actions') }}</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-[#E2E8F0] text-xs text-[#333333]">
@@ -537,9 +539,9 @@ onMounted(() => {
                     target="_blank"
                     rel="noopener noreferrer"
                     class="inline-flex items-center gap-1 text-[12px] font-bold text-[#333333] hover:text-[#0A4391] hover:underline"
-                    title="Buka link bukti pengiriman di tab baru"
+                    :title="t('shipments_proof_link_title')"
                   >
-                    <span>Lihat Bukti</span>
+                    <span>{{ t('shipments_view_proof') }}</span>
                     <ExternalLink class="w-3 h-3" />
                   </a>
                   <span v-else class="text-[#687281]">-</span>
@@ -550,8 +552,8 @@ onMounted(() => {
                       type="button"
                       @click="openEdit(item)"
                       class="p-1.5 rounded-lg text-[#5F7089] hover:text-[#333333] hover:bg-[#F1F5F9] transition-colors cursor-pointer"
-                      title="Edit pengiriman"
-                      aria-label="Edit pengiriman"
+                      :title="t('shipments_edit_shipment')"
+                      :aria-label="t('shipments_edit_shipment')"
                     >
                       <Pencil class="w-3.5 h-3.5" />
                     </button>
@@ -559,8 +561,8 @@ onMounted(() => {
                       type="button"
                       @click="openDelete(item)"
                       class="p-1.5 rounded-lg text-[#5F7089] hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
-                      title="Hapus pengiriman"
-                      aria-label="Hapus pengiriman"
+                      :title="t('shipments_delete_shipment')"
+                      :aria-label="t('shipments_delete_shipment')"
                     >
                       <Trash2 class="w-3.5 h-3.5" />
                     </button>
@@ -574,18 +576,18 @@ onMounted(() => {
         <!-- Mode Kartu -->
         <ul
           v-if="viewMode === 'card'"
-          class="shipment-cards"
-          aria-label="Daftar pengiriman"
+          class="shipment-cards grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3 p-3 sm:p-3.5"
+          :aria-label="t('shipments_list_aria')"
         >
           <li
             v-for="item in shipments"
             :key="item.id"
-            class="p-4 space-y-2 hover:bg-[#F8FAFC] transition-colors"
+            class="p-3 sm:p-3.5 space-y-2.5 rounded-[6px] border border-[#E2E8F0] bg-white shadow-2xs hover:border-[#B8D4F5] transition-all"
           >
             <div class="flex items-start justify-between gap-2">
-              <div>
-                <p class="text-sm font-bold text-[#333333]">{{ item.recipient_name }}</p>
-                <p class="text-[11px] text-[#5F7089] mt-0.5">
+              <div class="min-w-0 flex-1">
+                <p class="text-xs font-bold text-[#333333] truncate" :title="item.recipient_name">{{ item.recipient_name }}</p>
+                <p class="text-[11px] text-[#5F7089] mt-0.5 truncate" :title="`${formatDate(item.request_date)} • ${item.destination}`">
                   {{ formatDate(item.request_date) }} &bull; {{ item.destination }}
                 </p>
               </div>
@@ -595,13 +597,13 @@ onMounted(() => {
               />
             </div>
 
-            <p class="text-xs text-[#334155] bg-slate-50 p-2 rounded-lg">
+            <p class="text-xs text-[#334155] bg-slate-50 p-2 rounded-lg line-clamp-2" :title="item.item_description">
               {{ item.item_description }}
             </p>
 
             <div class="flex items-center justify-between text-xs text-[#5F7089] pt-1">
               <div class="flex items-center gap-1.5 font-mono text-[11px]">
-                <span class="text-[#687281]">Resi:</span>
+                <span class="text-[#687281]">{{ t('shipments_resi_label') }}:</span>
                 <span>{{ item.tracking_number || '-' }}</span>
               </div>
 
@@ -612,7 +614,7 @@ onMounted(() => {
                 rel="noopener noreferrer"
                 class="inline-flex items-center gap-1 text-[11px] font-bold text-[#333333]"
               >
-                <span>Lihat Bukti</span>
+                <span>{{ t('shipments_view_proof') }}</span>
                 <ExternalLink class="w-3 h-3" />
               </a>
             </div>
@@ -627,7 +629,7 @@ onMounted(() => {
                 class="px-2.5 py-1 text-xs font-semibold text-[#333333] hover:bg-blue-50 rounded-md transition-colors flex items-center gap-1"
               >
                 <Pencil class="w-3 h-3" />
-                <span>Edit</span>
+                <span>{{ t('edit') }}</span>
               </button>
               <button
                 type="button"
@@ -635,7 +637,7 @@ onMounted(() => {
                 class="px-2.5 py-1 text-xs font-semibold text-rose-600 hover:bg-rose-50 rounded-md transition-colors flex items-center gap-1"
               >
                 <Trash2 class="w-3 h-3" />
-                <span>Hapus</span>
+                <span>{{ t('delete') }}</span>
               </button>
             </div>
           </li>
@@ -659,10 +661,10 @@ onMounted(() => {
     <AppModal
       panel-class="shipment-dialog"
       :is-open="showFormModal"
-      :title="modalMode === 'add' ? 'Tambah Pengiriman' : 'Edit Pengiriman'"
+      :title="modalMode === 'add' ? t('btn_add_shipment') : t('shipments_modal_edit_title')"
       size="lg"
       icon="local_shipping"
-      subtitle="Lengkapi penerima, barang, dan tujuan. Kolom bertanda * wajib diisi."
+      :subtitle="t('shipments_form_subtitle')"
       @close="closeModal"
     >
       <form id="shipment-form" @submit.prevent="saveShipment" class="shipment-form space-y-4">
@@ -675,15 +677,15 @@ onMounted(() => {
         </div>
 
         <section class="shipment-entry-section">
-          <h3>Informasi pengiriman</h3>
-          <p class="shipment-entry-hint">Tentukan tanggal pengajuan dan status pengiriman.</p>
+          <h3>{{ t('shipments_section_info') }}</h3>
+          <p class="shipment-entry-hint">{{ t('shipments_section_info_hint') }}</p>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
             <div>
               <label
                 for="shipment-request_date"
                 class="block text-xs font-bold text-[#333333] mb-1"
               >
-                Tanggal pengajuan <span class="text-rose-500">*</span>
+                {{ t('shipments_form_request_date') }} <span class="text-rose-500">*</span>
               </label>
               <input
                 id="shipment-request_date"
@@ -696,13 +698,13 @@ onMounted(() => {
 
             <div>
               <label class="block text-xs font-bold text-[#333333] mb-1">
-                Status <span class="text-rose-500">*</span>
+                {{ t('status') }} <span class="text-rose-500">*</span>
               </label>
               <CustomSelect
                 v-model="form.status"
                 :options="FORM_STATUS_OPTIONS"
-                aria-label="Status pengiriman"
-                placeholder="Pilih status"
+                :aria-label="t('shipments_aria_status')"
+                :placeholder="t('shipments_placeholder_status')"
                 :block="true"
                 height-class="h-10"
               />
@@ -710,16 +712,16 @@ onMounted(() => {
           </div>
         </section>
         <section class="shipment-entry-section shipment-recipient-section">
-          <h3>Penerima & barang</h3>
+          <h3>{{ t('shipments_section_recipient') }}</h3>
           <p class="shipment-entry-hint">
-            Lengkapi penerima, tujuan, dan rincian barang yang dikirim.
+            {{ t('shipments_section_recipient_hint') }}
           </p>
           <div>
             <label
               for="shipment-recipient_name"
               class="block text-xs font-bold text-[#333333] mb-1"
             >
-              Nama Penerima <span class="text-rose-500">*</span>
+              {{ t('th_recipient_name') }} <span class="text-rose-500">*</span>
             </label>
             <input
               id="shipment-recipient_name"
@@ -727,7 +729,7 @@ onMounted(() => {
               type="text"
               required
               maxlength="150"
-              placeholder="Nama penerima"
+              :placeholder="t('shipments_placeholder_recipient')"
               class="h-10 w-full rounded-xl border border-[#CBD5E1] px-3 text-xs text-[#333333] focus:border-[#0A51B0] focus:outline-none"
             />
           </div>
@@ -737,7 +739,7 @@ onMounted(() => {
               for="shipment-item_description"
               class="block text-xs font-bold text-[#333333] mb-1"
             >
-              Deskripsi Barang <span class="text-rose-500">*</span>
+              {{ t('th_item_description') }} <span class="text-rose-500">*</span>
             </label>
             <textarea
               id="shipment-item_description"
@@ -745,14 +747,14 @@ onMounted(() => {
               rows="3"
               required
               maxlength="5000"
-              placeholder="Rincian barang yang dikirim"
+              :placeholder="t('shipments_placeholder_item')"
               class="w-full rounded-xl border border-[#CBD5E1] p-3 text-xs text-[#333333] focus:border-[#0A51B0] focus:outline-none"
             ></textarea>
           </div>
 
           <div>
             <label for="shipment-destination" class="block text-xs font-bold text-[#333333] mb-1">
-              Tujuan Pengiriman <span class="text-rose-500">*</span>
+              {{ t('th_delivery_destination') }} <span class="text-rose-500">*</span>
             </label>
             <input
               id="shipment-destination"
@@ -760,15 +762,15 @@ onMounted(() => {
               type="text"
               required
               maxlength="255"
-              placeholder="Kantor cabang, alamat, atau lokasi tujuan"
+              :placeholder="t('shipments_placeholder_destination')"
               class="h-10 w-full rounded-xl border border-[#CBD5E1] px-3 text-xs text-[#333333] focus:border-[#0A51B0] focus:outline-none"
             />
           </div>
         </section>
         <section class="shipment-entry-section">
-          <h3>Pelacakan & bukti</h3>
+          <h3>{{ t('shipments_section_tracking') }}</h3>
           <p class="shipment-entry-hint">
-            Opsional. Lengkapi setelah nomor resi atau bukti tersedia.
+            {{ t('shipments_section_tracking_hint') }}
           </p>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
             <div>
@@ -776,14 +778,14 @@ onMounted(() => {
                 for="shipment-tracking_number"
                 class="block text-xs font-bold text-[#333333] mb-1"
               >
-                No Resi <span class="text-[#687281] font-normal">(Opsional)</span>
+                {{ t('th_tracking_number') }} <span class="text-[#687281] font-normal">({{ t('shipments_optional') }})</span>
               </label>
               <input
                 id="shipment-tracking_number"
                 v-model="form.tracking_number"
                 type="text"
                 maxlength="100"
-                placeholder="Nomor resi ekspedisi"
+                :placeholder="t('shipments_placeholder_tracking')"
                 class="h-10 w-full rounded-xl border border-[#CBD5E1] px-3 text-xs text-[#333333] focus:border-[#0A51B0] focus:outline-none"
               />
             </div>
@@ -793,14 +795,14 @@ onMounted(() => {
                 for="shipment-delivery_proof_url"
                 class="block text-xs font-bold text-[#333333] mb-1"
               >
-                Link Bukti Pengiriman <span class="text-[#687281] font-normal">(Opsional)</span>
+                {{ t('shipments_proof_link_label') }} <span class="text-[#687281] font-normal">({{ t('shipments_optional') }})</span>
               </label>
               <input
                 id="shipment-delivery_proof_url"
                 v-model="form.delivery_proof_url"
                 type="url"
                 maxlength="2048"
-                placeholder="https://example.com/bukti.jpg"
+                :placeholder="t('shipments_placeholder_proof_url')"
                 class="h-10 w-full rounded-xl border border-[#CBD5E1] px-3 text-xs text-[#333333] focus:border-[#0A51B0] focus:outline-none"
               />
             </div>
@@ -816,7 +818,7 @@ onMounted(() => {
             @click="closeModal"
             class="h-9 rounded-lg border border-[#CBD5E1] px-4 text-xs font-semibold text-[#475569] hover:bg-[#F1F5F9] cursor-pointer"
           >
-            Batal
+            {{ t('cancel') }}
           </button>
           <button
             type="submit"
@@ -826,10 +828,10 @@ onMounted(() => {
           >
             {{
               isSubmitting
-                ? 'Menyimpan...'
+                ? t('shipments_saving')
                 : modalMode === 'add'
-                  ? 'Tambah pengiriman'
-                  : 'Simpan perubahan'
+                  ? t('btn_add_shipment')
+                  : t('shipments_save_changes')
             }}
           </button>
         </div>
@@ -839,7 +841,7 @@ onMounted(() => {
     <FilterModal
       panel-class="shipment-dialog"
       :is-open="showFilterModal"
-      title="Filter Pengiriman"
+      :title="t('shipments_filter_title')"
       @close="showFilterModal = false"
       @apply="showFilterModal = false"
       @reset="resetFilters"
@@ -847,18 +849,18 @@ onMounted(() => {
       <CustomSelect
         v-model="filterStatus"
         :options="STATUS_OPTIONS"
-        aria-label="Filter status"
+        :aria-label="t('shipments_aria_filter_status')"
         :block="true"
         height-class="h-10"
       />
       <input
-        aria-label="Tanggal awal"
+        :aria-label="t('shipments_aria_date_from')"
         v-model="filterDateFrom"
         type="date"
         class="h-10 w-full rounded-xl border border-slate-200 px-3 text-xs"
       />
       <input
-        aria-label="Tanggal akhir"
+        :aria-label="t('shipments_aria_date_to')"
         v-model="filterDateTo"
         type="date"
         class="h-10 w-full rounded-xl border border-slate-200 px-3 text-xs"
@@ -879,7 +881,7 @@ onMounted(() => {
     <AppModal
       panel-class="shipment-dialog"
       :is-open="showDeleteModal"
-      title="Hapus Data Pengiriman"
+      :title="t('shipments_delete_modal_title')"
       @close="closeModal"
     >
       <div class="space-y-4">
@@ -892,9 +894,7 @@ onMounted(() => {
         </div>
 
         <p class="text-xs text-[#475569] leading-relaxed">
-          Data pengiriman untuk
-          <strong class="text-[#333333]">{{ selectedShipment?.recipient_name }}</strong> akan
-          dihapus. Tindakan ini tidak dapat dibatalkan.
+          {{ t('shipments_delete_msg_prefix') }} <strong class="text-[#333333]">{{ selectedShipment?.recipient_name }}</strong> {{ t('shipments_delete_msg_suffix') }}
         </p>
       </div>
       <template #footer>
@@ -906,7 +906,7 @@ onMounted(() => {
             @click="closeModal"
             class="h-9 rounded-lg border border-[#CBD5E1] px-4 text-xs font-semibold text-[#475569] hover:bg-[#F1F5F9] cursor-pointer"
           >
-            Batal
+            {{ t('cancel') }}
           </button>
           <button
             type="button"
@@ -914,7 +914,7 @@ onMounted(() => {
             @click="confirmDelete"
             class="h-9 rounded-lg bg-rose-600 px-4 text-xs font-semibold text-white hover:bg-rose-700 disabled:opacity-50 cursor-pointer"
           >
-            {{ isSubmitting ? 'Menghapus...' : 'Hapus Data' }}
+            {{ isSubmitting ? t('shipments_deleting') : t('shipments_delete_data') }}
           </button>
         </div>
       </template>

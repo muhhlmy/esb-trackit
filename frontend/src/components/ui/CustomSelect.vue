@@ -13,7 +13,7 @@ const props = defineProps({
   labelKey: { type: String, default: 'label' },
   dotKey: { type: String, default: 'dot' },
   widthClass: { type: String, default: 'w-full' },
-  heightClass: { type: String, default: 'h-9' },
+  heightClass: { type: String, default: 'h-8' },
   align: { type: String, default: 'left' },
   block: { type: Boolean, default: false },
   dropDirection: { type: String, default: 'down' }, // 'down' | 'up'
@@ -97,7 +97,7 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside))
       aria-haspopup="listbox"
       :aria-expanded="isOpen"
       @click="toggle"
-      class="ui-select-trigger inline-flex w-full items-center justify-between gap-1.5 rounded-lg border bg-white px-2.5 text-[10.5px] font-bold text-[#2A3547] shadow-2xs hover:bg-[#F8FAFC] hover:border-[#0A51B0] transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+      class="ui-select-trigger inline-flex w-full items-center justify-between gap-1.5 border bg-white px-2.5 text-[10.5px] font-bold text-[#2A3547] shadow-2xs hover:bg-[#F8FAFC] hover:border-[#0A51B0] transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
       :class="[
         heightClass,
         isOpen ? 'border-[#0A51B0] ring-2 ring-[#0A51B0]/15' : 'border-[#E5EAEF]',
@@ -136,7 +136,7 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside))
         v-if="isOpen"
         :id="listboxId"
         role="listbox"
-        class="ui-select-menu absolute z-50 max-h-60 overflow-y-auto rounded-lg border border-[#E5EAEF] bg-white p-1 shadow-lg"
+        class="ui-select-menu absolute z-50 max-h-60 overflow-y-auto border border-[#E5EAEF] bg-white p-1 shadow-lg"
         :class="[
           widthClass === 'w-full' ? 'min-w-full w-max max-w-[340px]' : widthClass,
           align === 'right' ? 'right-0' : 'left-0',

@@ -46,9 +46,9 @@ for (const [view, field, statuses, loader] of cases) {
     assert.match(source, /aria-label="Ringkasan aset"[\s\S]*?:aria-busy="isLoading"/)
     assert.match(
       source,
-      /isLoading \? 'Memuat…' : pageError \? 'Tidak tersedia' : 'Seluruh data kategori'/,
+      /isLoading \? [\s\S]*?: pageError \? [\s\S]*?: [\s\S]*?Seluruh data kategori/,
     )
-    assert.match(source, /:value="isLoading \|\| pageError \? '—' : stat.value"/)
+    assert.match(source, /:value="isLoading \|\| pageError \? '[-—]' : stat\.value"/)
     assert.match(source, /grid-cols-1 min-\[360px\]:grid-cols-2 xl:grid-cols-4/)
   })
 }

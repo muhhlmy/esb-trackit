@@ -1,6 +1,6 @@
 <script setup>
 // ============================================================
-// DashboardView.vue — Dashboard monitoring bergaya Fynix
+// DashboardView.vue - Dashboard monitoring bergaya Fynix
 // Data real dari endpoint /api/assets/stats
 // ============================================================
 import { ref, computed, nextTick, onMounted, onUnmounted, defineAsyncComponent } from 'vue'
@@ -43,10 +43,54 @@ const CsatDashboardSection = defineAsyncComponent({
   delay: 150,
 })
 
+import { useLanguage } from '../composables/useLanguage.js'
+
 const { get } = useApi()
 const { hasPermission } = useAuth()
+const { currentLang, t } = useLanguage()
 const canReadAssets = computed(() => hasPermission('assets'))
 const canReadTickets = computed(() => hasPermission('tickets'))
+
+function getLocalizedAssetStatus(status) {
+  const lbl = getAssetStatusLabel(status)
+  if (lbl === 'Digunakan') return t('status_in_use', 'Digunakan')
+  if (lbl === 'Stok') return t('status_stock', 'Stok')
+  if (lbl === 'Dalam Perawatan') return t('status_maintenance', 'Dalam Perawatan')
+  if (lbl === 'Rusak') return t('status_damaged', 'Rusak')
+  if (lbl === 'Disposal') return t('status_disposed', 'Disposal')
+  return lbl
+}
+
+function getLocalizedCondition(cond) {
+  if (!cond) return '-'
+  const c = String(cond).toLowerCase().trim()
+  if (c === 'baik' || c === 'good') return t('dashboard_condition_good', 'Baik')
+  if (c === 'normal') return t('normal_condition', 'Normal')
+  if (c === 'rusak' || c === 'damaged') return t('status_damaged', 'Rusak')
+  if (c === 'dalam perawatan' || c === 'in service') return t('status_maintenance', 'Dalam Perawatan')
+  return cond
+}
+
+function getLocalizedPriority(p) {
+  if (!p) return '-'
+  const s = String(p).toLowerCase().trim()
+  if (s === 'tinggi' || s === 'high') return t('ticket_priority_high', 'Tinggi')
+  if (s === 'sedang' || s === 'medium') return t('ticket_priority_medium', 'Sedang')
+  if (s === 'rendah' || s === 'low') return t('ticket_priority_low', 'Rendah')
+  return p
+}
+
+function getLocalizedTicketStatus(st) {
+  if (!st) return '-'
+  const s = String(st).toLowerCase().trim()
+  if (s === 'open') return t('status_open', 'Open')
+  if (s === 'in progress') return t('status_in_progress', 'In Progress')
+  if (s === 'pending') return t('status_pending', 'Pending')
+  if (s === 'resolved') return t('status_resolved', 'Resolved')
+  if (s === 'closed') return t('status_closed', 'Closed')
+  if (s === 'dibatalkan' || s === 'cancelled') return t('status_cancelled', 'Dibatalkan')
+  return st
+}
 
 // ── State ────────────────────────────────────────────────────
 const stats = ref(null)
@@ -149,7 +193,7 @@ const locationBreakdown = computed(() => {
   const locMap = new Map()
   for (const row of stats.value.byLocation) {
     const raw = row?.location
-    const norm = raw && String(raw).trim() ? normalizeLocation(raw) : 'Belum ditentukan'
+    const norm = raw && String(raw).trim() ? normalizeLocation(raw) : t('dashboard_location_unassigned', 'Belum ditentukan')
     const cnt = toCount(row?.count)
     locMap.set(norm, (locMap.get(norm) || 0) + cnt)
   }
@@ -166,7 +210,7 @@ const recentAssets = computed(() => {
   if (!Array.isArray(stats.value?.recentAssets)) return []
   return stats.value.recentAssets.map((asset) => ({
     ...asset,
-    lokasi_kerja: normalizeLocation(asset.lokasi_kerja) || asset.lokasi_kerja || '—',
+    lokasi_kerja: normalizeLocation(asset.lokasi_kerja) || asset.lokasi_kerja || '-',
   }))
 })
 
@@ -188,7 +232,7 @@ async function fetchStats() {
     }
   } catch (e) {
     error.value =
-      e instanceof Error && e.message ? e.message : 'Gagal memuat statistik. Silakan coba lagi.'
+      e instanceof Error && e.message ? e.message : t('dashboard_load_stats_failed', 'Gagal memuat statistik. Silakan coba lagi.')
     console.error(e)
   } finally {
     isLoading.value = false
@@ -295,7 +339,11 @@ function formatDate(iso) {
   if (!iso) return '-'
   const date = new Date(iso)
   if (Number.isNaN(date.getTime())) return '-'
-  return date.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' })
+  return date.toLocaleDateString(currentLang.value === 'en' ? 'en-GB' : 'id-ID', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+  })
 }
 
 // ── Realtime SSE: update recent tickets tanpa full refresh ───
@@ -357,8 +405,8 @@ onUnmounted(() => {
 <template>
   <div class="dashboard-view" :data-testid="!isLoading ? 'page-ready' : undefined">
     <PageHeader
-      title="Ringkasan Aset dan Tiket"
-      subtitle="Kondisi aset, status penggunaan, dan aktivitas tiket IT terbaru."
+      :title="t('dashboard_page_title')"
+      :subtitle="t('dashboard_page_subtitle')"
       icon="grid_view"
     />
     <!-- ════════════════════════════════════════════
@@ -434,37 +482,37 @@ onUnmounted(() => {
                     scope="col"
                     class="py-2.5 px-4 text-[11px] font-semibold text-slate-500 uppercase tracking-wider w-[32%]"
                   >
-                    Perangkat
+                    {{ t('th_device') }}
                   </th>
                   <th
                     scope="col"
                     class="py-2.5 px-4 text-[11px] font-semibold text-slate-500 uppercase tracking-wider w-[20%]"
                   >
-                    Merek &amp; Tipe
+                    {{ t('th_brand_type') }}
                   </th>
                   <th
                     scope="col"
                     class="py-2.5 px-4 text-[11px] font-semibold text-slate-500 uppercase tracking-wider w-[18%]"
                   >
-                    Serial
+                    {{ t('th_serial') }}
                   </th>
                   <th
                     scope="col"
                     class="py-2.5 px-4 text-[11px] font-semibold text-slate-500 uppercase tracking-wider w-[10%]"
                   >
-                    Kondisi
+                    {{ t('th_condition') }}
                   </th>
                   <th
                     scope="col"
                     class="py-2.5 px-4 text-[11px] font-semibold text-slate-500 uppercase tracking-wider w-[10%]"
                   >
-                    Status
+                    {{ t('th_status') }}
                   </th>
                   <th
                     scope="col"
                     class="py-2.5 px-4 text-right text-[11px] font-semibold text-slate-500 uppercase tracking-wider w-[10%]"
                   >
-                    Ditambahkan
+                    {{ t('th_added') }}
                   </th>
                 </tr>
               </thead>
@@ -539,37 +587,37 @@ onUnmounted(() => {
                     scope="col"
                     class="py-2.5 px-4 text-[11px] font-semibold text-slate-500 uppercase tracking-wider w-[14%]"
                   >
-                    No. Tiket
+                    {{ t('th_ticket_no') }}
                   </th>
                   <th
                     scope="col"
                     class="py-2.5 px-4 text-[11px] font-semibold text-slate-500 uppercase tracking-wider w-[38%]"
                   >
-                    Judul
+                    {{ t('th_title') }}
                   </th>
                   <th
                     scope="col"
                     class="py-2.5 px-4 text-[11px] font-semibold text-slate-500 uppercase tracking-wider w-[18%]"
                   >
-                    Assigned To
+                    {{ t('th_assigned_to') }}
                   </th>
                   <th
                     scope="col"
                     class="py-2.5 px-4 text-[11px] font-semibold text-slate-500 uppercase tracking-wider w-[10%]"
                   >
-                    Prioritas
+                    {{ t('th_priority') }}
                   </th>
                   <th
                     scope="col"
                     class="py-2.5 px-4 text-[11px] font-semibold text-slate-500 uppercase tracking-wider w-[10%]"
                   >
-                    Status
+                    {{ t('th_status') }}
                   </th>
                   <th
                     scope="col"
                     class="py-2.5 px-4 text-right text-[11px] font-semibold text-slate-500 uppercase tracking-wider w-[10%]"
                   >
-                    Tanggal
+                    {{ t('th_date') }}
                   </th>
                 </tr>
               </thead>
@@ -619,7 +667,7 @@ onUnmounted(() => {
         class="dashboard-retry rounded-lg bg-white px-3.5 py-1.5 text-xs font-semibold text-[#DC2626] border border-[#FECACA]/40 hover:bg-[#DC2626] hover:text-white transition-all duration-200"
         @click="fetchStats"
       >
-        Coba lagi
+        {{ t('retry') }}
       </button>
     </div>
 
@@ -630,30 +678,30 @@ onUnmounted(() => {
       <div class="dashboard-stats">
         <div class="dash-stat-card stat-total shadow-2xs kpi-focusable" tabindex="0">
           <div class="stat-label">
-            <span class="stat-label-text">Total Aset</span>
+            <span class="stat-label-text">{{ t('total_assets') }}</span>
             <span class="material-symbols-outlined" aria-hidden="true">inventory_2</span>
           </div>
           <p class="stat-number">{{ totalAssets }}</p>
-          <span class="stat-caption">Perangkat terdaftar</span>
+          <span class="stat-caption">{{ t('registered_devices') }}</span>
         </div>
         <div
           v-for="item in [
             {
-              label: 'Digunakan',
+              label: t('status_in_use'),
               count: countDipakai,
               pct: pctDipakai,
               icon: 'check_circle',
               tone: 'green',
             },
             {
-              label: 'Stok',
+              label: t('status_stock'),
               count: countTersedia,
               pct: pctTersedia,
               icon: 'inventory',
               tone: 'blue',
             },
             {
-              label: 'Perawatan & Rusak',
+              label: t('status_maintenance_broken'),
               count: countPerawatanDanRusak,
               pct: pctPerawatanDanRusak,
               icon: 'build',
@@ -683,7 +731,7 @@ onUnmounted(() => {
       <!-- ─── ROW 2: Line Chart (8 col) + Donut Chart (4 col) ── -->
       <div class="dashboard-chart-grid grid grid-cols-1 xl:grid-cols-12">
         <div class="xl:col-span-8">
-          <PanelCard title="Tren Aset Bulanan">
+          <PanelCard :title="t('monthly_trend')">
             <AssetTrendLineChart
               class="w-full"
               :data="stats.monthlyTrend || []"
@@ -695,11 +743,11 @@ onUnmounted(() => {
           </PanelCard>
         </div>
         <div class="xl:col-span-4">
-          <PanelCard title="Status Aset">
+          <PanelCard :title="t('asset_status')">
             <!-- Empty State -->
             <template v-if="!stats?.byStatus || stats.byStatus.length === 0">
               <div class="py-6 text-center">
-                <p class="text-xs text-[#5B6B84]">Belum ada data status.</p>
+                <p class="text-xs text-[#5B6B84]">{{ t('no_status_data') }}</p>
               </div>
             </template>
 
@@ -714,7 +762,7 @@ onUnmounted(() => {
                     class="h-full transition-all duration-300"
                     :class="getStatusColorClass(item.status)"
                     :style="{ width: getStatusPercentage(item.status) + '%' }"
-                    :title="`${item.status}: ${item.count} unit (${getStatusPercentage(item.status)}%)`"
+                    :title="`${getLocalizedAssetStatus(item.status)}: ${item.count} unit (${getStatusPercentage(item.status)}%)`"
                   ></div>
                 </div>
               </div>
@@ -735,7 +783,7 @@ onUnmounted(() => {
                   <!-- Label • count • persentase (satu baris, tidak bertumpuk) -->
                   <div class="flex flex-1 min-w-0 items-center justify-between gap-2">
                     <span class="text-xs font-semibold text-[#475569] truncate">{{
-                      item.status
+                      getLocalizedAssetStatus(item.status)
                     }}</span>
                     <span class="flex shrink-0 items-baseline gap-1.5 font-num">
                       <span class="text-xs font-bold text-[#1E293B]">{{ item.count }}</span>
@@ -754,7 +802,7 @@ onUnmounted(() => {
       <!-- ─── ROW 3: Bar Chart (7 col) + Pie Chart (5 col) ── -->
       <div class="dashboard-chart-grid grid grid-cols-1 xl:grid-cols-12">
         <div class="xl:col-span-7">
-          <PanelCard title="Aset Per Tipe">
+          <PanelCard :title="t('assets_by_type')">
             <AssetTypeBarChart
               class="w-full"
               :data="stats.byType || []"
@@ -767,7 +815,7 @@ onUnmounted(() => {
         </div>
         <div class="xl:col-span-5 dashboard-panel">
           <div class="flex items-center justify-between">
-            <h3>Kondisi Aset</h3>
+            <h3>{{ t('asset_condition') }}</h3>
           </div>
           <AssetConditionPieChart
             class="w-full"
@@ -787,8 +835,8 @@ onUnmounted(() => {
       <div class="dashboard-panel location-panel">
         <div class="flex items-center justify-between mb-3 pb-3 border-b border-[#F1F5F9]">
           <div>
-            <h3 class="text-sm font-semibold text-[#1E293B]">Sebaran Lokasi Aset</h3>
-            <p class="text-xs text-[#5B6B84] mt-1">Lokasi penempatan perangkat saat ini</p>
+            <h3 class="text-sm font-semibold text-[#1E293B]">{{ t('location_distribution') }}</h3>
+            <p class="text-xs text-[#5B6B84] mt-1">{{ t('location_subtitle') }}</p>
           </div>
           <span
             class="inline-flex items-center gap-1.5 text-xs font-semibold text-[#0A51B0] bg-[#EDF5FF] px-3 py-1.5 rounded-full"
@@ -796,7 +844,7 @@ onUnmounted(() => {
             <span aria-hidden="true" class="material-symbols-outlined text-[16px]"
               >location_on</span
             >
-            {{ locationBreakdown.length }} Lokasi
+            {{ locationBreakdown.length }} {{ t('locations_count') }}
           </span>
         </div>
 
@@ -823,7 +871,7 @@ onUnmounted(() => {
           </div>
         </div>
         <div v-else class="py-8 text-center">
-          <p class="text-sm text-[#5B6B84]">Belum ada data lokasi.</p>
+          <p class="text-sm text-[#5B6B84]">{{ t('no_location_data') }}</p>
         </div>
       </div>
 
@@ -832,14 +880,14 @@ onUnmounted(() => {
         <div class="flex items-center justify-between border-b border-slate-100 bg-white">
           <div class="min-w-0 pr-3">
             <h3 class="text-sm sm:text-base font-bold text-slate-900 tracking-tight truncate">
-              Aset Terbaru
+              {{ t('recent_assets') }}
             </h3>
             <p class="text-[12px] sm:text-xs text-slate-500 mt-0.5 truncate">
-              Lima perangkat terbaru yang terdaftar di sistem
+              {{ t('recent_assets_subtitle') }}
             </p>
           </div>
           <RouterLink to="/assets" class="table-link touch-manipulation">
-            <span>Lihat semua</span>
+            <span>{{ t('view_all') }}</span>
             <span aria-hidden="true" class="material-symbols-outlined text-[15px]"
               >arrow_forward</span
             >
@@ -881,7 +929,7 @@ onUnmounted(() => {
 
               <AppBadge
                 :type="getStatusBadgeType(asset.status_aset)"
-                :text="getAssetStatusLabel(asset.status_aset)"
+                :text="getLocalizedAssetStatus(asset.status_aset)"
                 class="shrink-0 text-[11px] whitespace-nowrap"
               />
             </div>
@@ -892,19 +940,19 @@ onUnmounted(() => {
             >
               <div class="min-w-0">
                 <span class="block text-[10px] uppercase font-semibold text-[#5B6B84]"
-                  >Merek &amp; Tipe</span
+                  >{{ t('th_brand_type') }}</span
                 >
                 <span class="font-medium text-[#1E293B] truncate block text-[12px]">
-                  {{ asset.merek || '—' }}
+                  {{ asset.merek || '-' }}
                   <span v-if="asset.tipe_perangkat" class="text-slate-400 font-normal"
                     >({{ asset.tipe_perangkat }})</span
                   >
                 </span>
               </div>
               <div class="min-w-0">
-                <span class="block text-[10px] uppercase font-semibold text-[#5B6B84]">Serial</span>
+                <span class="block text-[10px] uppercase font-semibold text-[#5B6B84]">{{ t('th_serial') }}</span>
                 <span class="font-mono text-[11px] text-[#5B6B84] truncate block font-medium">
-                  {{ asset.nomor_seri || '—' }}
+                  {{ asset.nomor_seri || '-' }}
                 </span>
               </div>
             </div>
@@ -912,9 +960,9 @@ onUnmounted(() => {
             <!-- Bottom Row: Kondisi & Tanggal Ditambahkan -->
             <div class="flex items-center justify-between text-[11px] text-[#5B6B84] pt-0.5">
               <div class="flex items-center gap-1.5">
-                <span class="text-[#5B6B84]">Kondisi:</span>
+                <span class="text-[#5B6B84]">{{ t('th_condition') }}:</span>
                 <span class="font-semibold text-[#1E293B]">{{
-                  asset.kondisi_aset || 'Normal'
+                  getLocalizedCondition(asset.kondisi_aset)
                 }}</span>
               </div>
               <div class="flex items-center gap-1 text-[11px] text-[#5B6B84]">
@@ -927,7 +975,7 @@ onUnmounted(() => {
           </div>
 
           <div v-if="recentAssets.length === 0" class="py-7 text-center">
-            <p class="text-xs text-[#5B6B84]">Belum ada aset terdaftar.</p>
+            <p class="text-xs text-[#5B6B84]">{{ t('no_assets_registered') }}</p>
           </div>
         </div>
 
@@ -940,37 +988,37 @@ onUnmounted(() => {
                   scope="col"
                   class="w-[32%] min-w-[220px] text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider py-2.5 px-4 whitespace-nowrap"
                 >
-                  Perangkat
+                  {{ t('th_device') }}
                 </th>
                 <th
                   scope="col"
                   class="w-[20%] min-w-[140px] text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider py-2.5 px-4 whitespace-nowrap"
                 >
-                  Merek &amp; Tipe
+                  {{ t('th_brand_type') }}
                 </th>
                 <th
                   scope="col"
                   class="w-[18%] min-w-[130px] text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider py-2.5 px-4 whitespace-nowrap"
                 >
-                  Serial
+                  {{ t('th_serial') }}
                 </th>
                 <th
                   scope="col"
                   class="w-[10%] min-w-[90px] text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider py-2.5 px-4 whitespace-nowrap"
                 >
-                  Kondisi
+                  {{ t('th_condition') }}
                 </th>
                 <th
                   scope="col"
                   class="w-[10%] min-w-[90px] text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider py-2.5 px-4 whitespace-nowrap"
                 >
-                  Status
+                  {{ t('th_status') }}
                 </th>
                 <th
                   scope="col"
                   class="w-[10%] min-w-[90px] text-right text-[11px] font-semibold text-slate-500 uppercase tracking-wider py-2.5 px-4 whitespace-nowrap"
                 >
-                  Ditambahkan
+                  {{ t('th_added') }}
                 </th>
               </tr>
             </thead>
@@ -1014,9 +1062,9 @@ onUnmounted(() => {
                     <div class="min-w-0">
                       <p
                         class="text-xs font-medium text-slate-800 truncate"
-                        :title="asset.merek || '—'"
+                        :title="asset.merek || '-'"
                       >
-                        {{ asset.merek || '—' }}
+                        {{ asset.merek || '-' }}
                       </p>
                       <p
                         v-if="asset.tipe_perangkat"
@@ -1029,9 +1077,9 @@ onUnmounted(() => {
                   <td class="py-3 px-4 align-middle">
                     <span
                       class="font-mono text-xs text-slate-600 font-medium truncate block"
-                      :title="asset.nomor_seri || '—'"
+                      :title="asset.nomor_seri || '-'"
                     >
-                      {{ asset.nomor_seri || '—' }}
+                      {{ asset.nomor_seri || '-' }}
                     </span>
                   </td>
                   <td class="py-3 px-4 align-middle whitespace-nowrap">
@@ -1045,12 +1093,12 @@ onUnmounted(() => {
                         "
                       />
                     </span>
-                    {{ asset.kondisi_aset || '—' }}
+                    {{ getLocalizedCondition(asset.kondisi_aset) }}
                   </td>
                   <td class="py-3 px-4 align-middle whitespace-nowrap">
                     <AppBadge
                       :type="getStatusBadgeType(asset.status_aset)"
-                      :text="getAssetStatusLabel(asset.status_aset)"
+                      :text="getLocalizedAssetStatus(asset.status_aset)"
                       class="whitespace-nowrap"
                     />
                   </td>
@@ -1062,7 +1110,7 @@ onUnmounted(() => {
                 </tr>
                 <tr v-if="recentAssets.length === 0">
                   <td colspan="6" class="py-8 text-center">
-                    <p class="text-xs text-slate-500">Belum ada aset terdaftar.</p>
+                    <p class="text-xs text-slate-500">{{ t('no_assets_registered') }}</p>
                   </td>
                 </tr>
               </tbody>
@@ -1075,14 +1123,14 @@ onUnmounted(() => {
           <div class="flex items-center justify-between border-b border-slate-100 bg-white">
             <div class="min-w-0 pr-3">
               <h3 class="text-sm sm:text-base font-bold text-slate-900 tracking-tight truncate">
-                Tiket Terbaru
+                {{ t('recent_tickets') }}
               </h3>
               <p class="text-[12px] sm:text-xs text-slate-500 mt-0.5 truncate">
-                Lima laporan kendala &amp; permintaan IT terbaru
+                {{ t('recent_tickets_subtitle') }}
               </p>
             </div>
             <RouterLink to="/tickets" class="table-link touch-manipulation">
-              <span>Lihat semua</span>
+              <span>{{ t('view_all') }}</span>
               <span aria-hidden="true" class="material-symbols-outlined text-[15px]"
                 >arrow_forward</span
               >
@@ -1107,12 +1155,12 @@ onUnmounted(() => {
                 <div class="flex items-center gap-1.5 shrink-0">
                   <AppBadge
                     :type="getPriorityBadgeType(ticket.prioritas)"
-                    :text="ticket.prioritas"
+                    :text="getLocalizedPriority(ticket.prioritas)"
                     class="text-[10px] whitespace-nowrap shrink-0"
                   />
                   <AppBadge
                     :type="getTicketStatusBadgeType(ticket.status_tiket)"
-                    :text="ticket.status_tiket"
+                    :text="getLocalizedTicketStatus(ticket.status_tiket)"
                     class="text-[10px] whitespace-nowrap shrink-0"
                   />
                 </div>
@@ -1136,9 +1184,9 @@ onUnmounted(() => {
                   >person</span
                 >
                 <span class="truncate">
-                  <span class="text-slate-500">Ditangani:</span>
+                  <span class="text-slate-500">{{ t('assigned_to_label') }}</span>
                   <strong class="font-semibold text-slate-700 ml-0.5">{{
-                    ticket.assigned_to || 'Belum ditugaskan'
+                    ticket.assigned_to || t('unassigned')
                   }}</strong>
                 </span>
               </div>
@@ -1153,7 +1201,7 @@ onUnmounted(() => {
           </div>
 
           <div v-if="recentTickets.length === 0" class="py-7 text-center">
-            <p class="text-xs text-[#5B6B84]">Belum ada tiket masuk.</p>
+            <p class="text-xs text-[#5B6B84]">{{ t('no_tickets_found') }}</p>
           </div>
         </div>
 
@@ -1166,37 +1214,37 @@ onUnmounted(() => {
                   scope="col"
                   class="w-[14%] min-w-[125px] text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider py-2.5 px-4 whitespace-nowrap"
                 >
-                  No. Tiket
+                  {{ t('th_ticket_no') }}
                 </th>
                 <th
                   scope="col"
                   class="w-[38%] min-w-[250px] text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider py-2.5 px-4 whitespace-nowrap"
                 >
-                  Judul
+                  {{ t('th_title') }}
                 </th>
                 <th
                   scope="col"
                   class="w-[18%] min-w-[135px] text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider py-2.5 px-4 whitespace-nowrap"
                 >
-                  Assigned To
+                  {{ t('th_assigned_to') }}
                 </th>
                 <th
                   scope="col"
                   class="w-[10%] min-w-[85px] text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider py-2.5 px-4 whitespace-nowrap"
                 >
-                  Prioritas
+                  {{ t('th_priority') }}
                 </th>
                 <th
                   scope="col"
                   class="w-[10%] min-w-[90px] text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider py-2.5 px-4 whitespace-nowrap"
                 >
-                  Status
+                  {{ t('th_status') }}
                 </th>
                 <th
                   scope="col"
                   class="w-[10%] min-w-[90px] text-right text-[11px] font-semibold text-slate-500 uppercase tracking-wider py-2.5 px-4 whitespace-nowrap"
                 >
-                  Tanggal
+                  {{ t('th_date') }}
                 </th>
               </tr>
             </thead>
@@ -1222,10 +1270,39 @@ onUnmounted(() => {
                         {{ ticket.judul }}
                       </p>
                       <p class="text-[11px] text-slate-500 mt-0.5 truncate flex items-center gap-1">
-                        <span>Pelapor:</span>
+                        <span>{{ t('reporter') }}</span>
                         <span class="font-medium text-slate-700">{{ ticket.pelapor || 'User' }}</span>
                       </p>
                     </div>
+                  </td>
+                  <td class="py-3 px-4 align-middle whitespace-nowrap">
+                    <span class="text-xs font-medium text-slate-700">
+                      {{ ticket.assigned_to || t('unassigned') }}
+                    </span>
+                  </td>
+                  <td class="py-3 px-4 align-middle whitespace-nowrap">
+                    <AppBadge
+                      :type="getPriorityBadgeType(ticket.prioritas)"
+                      :text="getLocalizedPriority(ticket.prioritas)"
+                      class="text-[11px] whitespace-nowrap"
+                    />
+                  </td>
+                  <td class="py-3 px-4 align-middle whitespace-nowrap">
+                    <AppBadge
+                      :type="getTicketStatusBadgeType(ticket.status_tiket)"
+                      :text="getLocalizedTicketStatus(ticket.status_tiket)"
+                      class="text-[11px] whitespace-nowrap"
+                    />
+                  </td>
+                  <td class="py-3 px-4 align-middle text-right whitespace-nowrap">
+                    <span class="text-xs font-medium text-slate-500">
+                      {{ formatDate(ticket.dibuat_pada) }}
+                    </span>
+                  </td>
+                </tr>
+                <tr v-if="recentTickets.length === 0">
+                  <td colspan="6" class="py-8 text-center">
+                    <p class="text-xs text-slate-500">{{ t('no_tickets_found') }}</p>
                   </td>
                 </tr>
               </tbody>

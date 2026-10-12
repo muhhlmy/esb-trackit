@@ -23,6 +23,7 @@ import {
   Ticket,
   HelpCircle,
   Clock,
+  Printer,
 } from 'lucide-vue-next'
 
 const router = useRouter()
@@ -183,10 +184,18 @@ const faqs = computed(() => {
 })
 
 // FAQ dengan urutan baca: emergency → pertanyaan lain (prioritas konten kritis)
+// Dibatasi sesuai dengan jumlah yang di-show pada Panduan & pengetahuan: Artikel Unggulan
 const orderedFaqs = computed(() => {
   const list = faqs.value
-  return [...list].sort((a, b) => Number(b.isEmergency) - Number(a.isEmergency))
+  const limit = featuredSopList.value.length > 0 ? featuredSopList.value.length : 4
+  return [...list]
+    .sort((a, b) => Number(b.isEmergency) - Number(a.isEmergency))
+    .slice(0, limit)
 })
+
+function handlePrint() {
+  window.print()
+}
 
 const mainScope = ref(null)
 
@@ -374,6 +383,16 @@ onMounted(async () => {
               <span class="section-kicker">{{ t('knowledge_guides') }}</span>
               <h2 id="articles-title">{{ t('featured_articles') }}</h2>
             </div>
+            <button
+              type="button"
+              class="print-action-btn"
+              @click="handlePrint"
+              :title="t('print_page')"
+              :aria-label="t('print_page')"
+            >
+              <Printer :size="15" aria-hidden="true" />
+              <span>{{ t('print_page') }}</span>
+            </button>
           </div>
           <div class="article-list">
             <RouterLink
@@ -1240,6 +1259,43 @@ onMounted(async () => {
   }
   .topic-card {
     gap: 11px;
+  }
+}
+.print-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--line, #e2e8f0);
+  background: var(--surface, #ffffff);
+  color: var(--muted, #5f7089);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.print-action-btn:hover {
+  background: #f1f5f9;
+  color: var(--blue, #0a51b0);
+  border-color: #cbd5e1;
+}
+@media print {
+  .help-hero,
+  .topics-section,
+  .print-action-btn,
+  .help-footer,
+  .all-articles,
+  nav,
+  header {
+    display: none !important;
+  }
+  .knowledge-grid {
+    display: block !important;
+  }
+  .help-home {
+    padding: 0 !important;
+    background: #fff !important;
   }
 }
 @media (prefers-reduced-motion: reduce) {

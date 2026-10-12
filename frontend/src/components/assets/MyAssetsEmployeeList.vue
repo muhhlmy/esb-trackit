@@ -6,7 +6,9 @@ import SkeletonTable from '../ui/skeleton/SkeletonTable.vue'
 import { normalizeLocation } from '../../utils/locationNormalizer.js'
 import { useViewMode } from '../../composables/useViewMode.js'
 import AppViewToggle from '../ui/AppViewToggle.vue'
+import { useLanguage } from '../../composables/useLanguage.js'
 
+const { t, currentLang } = useLanguage()
 const { viewMode } = useViewMode('my-assets', 'table')
 
 const props = defineProps({
@@ -132,8 +134,8 @@ const currentManagerInfo = computed(() => {
   const nik = emp.nik || u.nik || ''
   return {
     nik,
-    nama_karyawan: emp.nama_karyawan || u.nama || 'Saya',
-    title: emp.title || emp.jabatan || u.title || u.jabatan || 'Manajer / Team Lead',
+    nama_karyawan: emp.nama_karyawan || u.nama || t('my_assets_self'),
+    title: emp.title || emp.jabatan || u.title || u.jabatan || t('my_assets_manager_team_lead'),
     departemen: emp.departemen || u.departemen || '-',
     lokasi_kerja: normalizeLocation(emp.lokasi_kerja || u.lokasi_kerja || ''),
     status: emp.status || 'Active',
@@ -180,9 +182,12 @@ const companyOrgRoots = computed(() => {
   })
 })
 
+// Locale tanggal mengikuti bahasa aktif agar nama bulan tidak bocor ke bahasa lain.
+const dateLocale = computed(() => (currentLang.value === 'en' ? 'en-GB' : 'id-ID'))
+
 function formatDate(dateStr) {
   if (!dateStr) return '-'
-  return new Date(dateStr).toLocaleDateString('id-ID', {
+  return new Date(dateStr).toLocaleDateString(dateLocale.value, {
     day: 'numeric',
     month: 'short',
     year: 'numeric',
@@ -249,9 +254,9 @@ function getDeviceIcon(tipe) {
             {{
               directoryMode === 'org-chart'
                 ? isSuperAdmin
-                  ? 'Bagan Organisasi Perusahaan'
-                  : 'Bagan Organisasi Tim (Org Chart)'
-                : 'Direktori Aset Seluruh Karyawan'
+                  ? t('my_assets_org_chart_company')
+                  : t('my_assets_org_chart_team')
+                : t('my_assets_all_employees_assets_dir')
             }}
           </span>
         </h2>
@@ -259,9 +264,9 @@ function getDeviceIcon(tipe) {
           {{
             directoryMode === 'org-chart'
               ? isSuperAdmin
-                ? 'Struktur hierarki tim perusahaan dan distribusi perangkat IT per divisi'
-                : 'Struktur hierarki tim dan penugasan perangkat IT di bawah supervisi Anda'
-              : 'Daftar pemegang perangkat IT aktif di seluruh perusahaan'
+                ? t('my_assets_org_chart_company_desc')
+                : t('my_assets_org_chart_team_desc')
+              : t('my_assets_all_employees_desc')
           }}
         </p>
       </div>
@@ -279,7 +284,7 @@ function getDeviceIcon(tipe) {
           "
         >
           <span aria-hidden="true" class="material-symbols-outlined text-[13px] sm:text-[14px]">account_tree</span>
-          <span>Bagan Organisasi</span>
+          <span>{{ t('my_assets_org_chart') }}</span>
           <span
             v-if="hasSubordinates && !isSuperAdmin"
             class="ml-0.5 px-1 py-0.2 rounded-full text-[8px] font-bold bg-blue-100 dark:bg-blue-900/60 text-[#0A51B0] dark:text-sky-300"
@@ -299,7 +304,7 @@ function getDeviceIcon(tipe) {
           "
         >
           <span aria-hidden="true" class="material-symbols-outlined text-[13px] sm:text-[14px]">table_rows</span>
-          <span>Daftar Karyawan</span>
+          <span>{{ t('my_assets_employee_list') }}</span>
         </button>
       </div>
     </div>
@@ -310,26 +315,26 @@ function getDeviceIcon(tipe) {
       class="grid grid-cols-1 sm:grid-cols-3 gap-1.5 sm:gap-2"
     >
       <StatCard
-        title="Karyawan dengan aset"
+        :title="t('my_assets_employees_with_assets')"
         :value="totalEmployeesHoldingAssets"
         icon="badge"
         color="primary"
-        subtitle="Pemegang aktif"
+        :subtitle="t('my_assets_active_holders')"
         is-total
       />
       <StatCard
-        title="Aset ditugaskan"
+        :title="t('my_assets_assets_assigned')"
         :value="totalAssignedAssetsCount"
         icon="devices"
         color="neutral"
-        subtitle="Unit digunakan"
+        :subtitle="t('my_assets_units_in_use')"
       />
       <StatCard
-        title="Penugasan baru"
+        :title="t('my_assets_new_assignments')"
         :value="recentlyAssignedCount"
         icon="assignment_turned_in"
         color="success"
-        subtitle="30 hari terakhir"
+        :subtitle="t('my_assets_last_30_days')"
       />
     </div>
 
@@ -339,26 +344,26 @@ function getDeviceIcon(tipe) {
       class="grid grid-cols-1 sm:grid-cols-3 gap-1.5 sm:gap-2"
     >
       <StatCard
-        title="Bawahan langsung"
+        :title="t('my_assets_direct_reports')"
         :value="mySubordinates.length"
         icon="group"
         color="primary"
-        subtitle="Direct reports aktif"
+        :subtitle="t('my_assets_direct_reports_active')"
         is-total
       />
       <StatCard
-        title="Total anggota tim"
+        :title="t('my_assets_total_team_members')"
         :value="currentManagerInfo.teamCount"
         icon="diversity_3"
         color="neutral"
-        subtitle="Seluruh hierarki tim"
+        :subtitle="t('my_assets_full_team_hierarchy')"
       />
       <StatCard
-        title="Aset dikelola tim"
+        :title="t('my_assets_team_managed_assets')"
         :value="currentManagerInfo.teamAssets"
         icon="devices"
         color="success"
-        subtitle="Perangkat di tim Anda"
+        :subtitle="t('my_assets_devices_in_team')"
       />
     </div>
 
@@ -375,23 +380,23 @@ function getDeviceIcon(tipe) {
           <span aria-hidden="true" class="material-symbols-outlined text-[20px] text-[#0A51B0] dark:text-sky-400 shrink-0 mt-0.5">shield_person</span>
           <div>
             <h3 class="text-xs font-bold text-[#1E3A8A] dark:text-sky-200">
-              Akses Pengawasan Organisasi Global (Super Admin)
+              {{ t('my_assets_superadmin_access_title') }}
             </h3>
             <p class="text-[9.5px] text-[#3B82F6] dark:text-slate-400 mt-0.5 leading-relaxed">
-              Akun Super Admin memegang mandat sistem tertinggi tanpa relasi atasan atau bawahan operasional langsung. Anda dapat meninjau struktur hierarki tim per divisi di bawah ini.
+              {{ t('my_assets_superadmin_access_desc') }}
             </p>
           </div>
         </div>
 
         <!-- Filter Departemen untuk Super Admin -->
         <div class="flex items-center gap-1.5 shrink-0">
-          <label for="org-dept-select" class="text-[9.5px] font-semibold text-[#1E3A8A] dark:text-slate-300">Divisi:</label>
+          <label for="org-dept-select" class="text-[9.5px] font-semibold text-[#1E3A8A] dark:text-slate-300">{{ t('my_assets_division') }}:</label>
           <select
             id="org-dept-select"
             v-model="orgDepartment"
             class="h-7 rounded-[4px] border border-[#BFDBFE] dark:border-slate-700 bg-white dark:bg-slate-800 px-2 text-[9.5px] font-medium text-[#333333] dark:text-white focus:outline-none focus:border-[#0A51B0]"
           >
-            <option value="">Semua Departemen ({{ availableOrgDepartments.length }})</option>
+            <option value="">{{ t('my_assets_all_departments') }} ({{ availableOrgDepartments.length }})</option>
             <option v-for="dept in availableOrgDepartments" :key="dept" :value="dept">
               {{ dept }}
             </option>
@@ -407,7 +412,7 @@ function getDeviceIcon(tipe) {
       <div v-else-if="employeeError" class="p-3 text-center text-rose-600 text-[10px] sm:text-[10.5px]">
         <p class="font-semibold">{{ employeeError }}</p>
         <button type="button" @click="fetchEmployees" class="mt-1 font-bold underline cursor-pointer">
-          Coba muat ulang
+          {{ t('my_assets_retry_reload') }}
         </button>
       </div>
 
@@ -421,7 +426,7 @@ function getDeviceIcon(tipe) {
           class="relative flex flex-col items-center rounded-[8px] border-2 border-[#0A51B0] dark:border-blue-500 bg-white dark:bg-slate-900 p-3 shadow-sm min-w-[240px] max-w-[320px] text-center"
         >
           <div class="absolute -top-2.5 px-2 py-0.5 rounded-full bg-[#0A51B0] text-white text-[8px] font-bold uppercase tracking-wider shadow-2xs">
-            Anda (Atasan Tim)
+            {{ t('my_assets_you_team_lead') }}
           </div>
 
           <div
@@ -443,12 +448,12 @@ function getDeviceIcon(tipe) {
           <div class="mt-2 pt-1.5 border-t border-[#F1F5F9] dark:border-slate-800 flex items-center justify-center gap-2 text-[8.5px] text-[#5F7089] dark:text-slate-300 w-full">
             <span class="inline-flex items-center gap-0.5 font-semibold text-[#0A51B0] dark:text-sky-300">
               <span aria-hidden="true" class="material-symbols-outlined text-[11px]">group</span>
-              {{ mySubordinates.length }} Bawahan Langsung
+              {{ mySubordinates.length }} {{ t('my_assets_direct_reports') }}
             </span>
             <span>&bull;</span>
             <span class="inline-flex items-center gap-0.5 font-semibold text-emerald-600 dark:text-emerald-400">
               <span aria-hidden="true" class="material-symbols-outlined text-[11px]">devices</span>
-              {{ currentManagerInfo.teamAssets }} Aset Tim
+              {{ currentManagerInfo.teamAssets }} {{ t('my_assets_team_assets_count') }}
             </span>
           </div>
         </div>
@@ -489,20 +494,20 @@ function getDeviceIcon(tipe) {
                 <span
                   class="inline-flex items-center justify-center rounded-full bg-[#EFF6FF] dark:bg-blue-950 px-1.5 py-0.2 text-[8.5px] font-bold text-[#0A51B0] dark:text-sky-300 border border-[#BFDBFE]/60 dark:border-blue-900 whitespace-nowrap shrink-0"
                 >
-                  {{ sub.jumlah_aset || 0 }} Aset
+                  {{ sub.jumlah_aset || 0 }} {{ t('my_assets_assets_label') }}
                 </span>
               </div>
 
               <!-- Metadata Details -->
               <div class="mt-2 pt-1.5 border-t border-[#F1F5F9] dark:border-slate-800 grid grid-cols-2 gap-1 text-[8.5px]">
                 <div>
-                  <span class="text-[#687281] dark:text-slate-400 block uppercase font-medium">Jabatan</span>
+                  <span class="text-[#687281] dark:text-slate-400 block uppercase font-medium">{{ t('my_assets_job_title') }}</span>
                   <span class="font-semibold text-[#333333] dark:text-white truncate block mt-0.2" :title="sub.jabatan || sub.title || '-'">
                     {{ sub.jabatan || sub.title || '-' }}
                   </span>
                 </div>
                 <div>
-                  <span class="text-[#687281] dark:text-slate-400 block uppercase font-medium">Lokasi</span>
+                  <span class="text-[#687281] dark:text-slate-400 block uppercase font-medium">{{ t('filter_location') }}</span>
                   <span class="font-normal text-[#333333] dark:text-slate-200 truncate block mt-0.2" :title="normalizeLocation(sub.lokasi_kerja) || '-'">
                     {{ normalizeLocation(sub.lokasi_kerja) || '-' }}
                   </span>
@@ -526,7 +531,7 @@ function getDeviceIcon(tipe) {
                     +{{ sub.asset_types.length - 2 }}
                   </span>
                 </template>
-                <span v-else class="text-[8.5px] text-[#687281] dark:text-slate-400 truncate">Tanpa perangkat</span>
+                <span v-else class="text-[8.5px] text-[#687281] dark:text-slate-400 truncate">{{ t('my_assets_no_devices') }}</span>
               </div>
 
               <!-- Nested Subordinates (Jika bawahan ini juga punya bawahan) -->
@@ -538,7 +543,7 @@ function getDeviceIcon(tipe) {
                 >
                   <span class="flex items-center gap-0.5">
                     <span aria-hidden="true" class="material-symbols-outlined text-[11px]">account_tree</span>
-                    <span>Sub-Tim: {{ getDirectSubordinates(sub.nik).length }} bawahan</span>
+                    <span>{{ t('my_assets_sub_team') }}: {{ getDirectSubordinates(sub.nik).length }} {{ t('my_assets_subordinates') }}</span>
                   </span>
                   <span aria-hidden="true" class="material-symbols-outlined text-[13px]">
                     {{ expandedNodes.has(sub.nik) ? 'expand_less' : 'expand_more' }}
@@ -570,7 +575,7 @@ function getDeviceIcon(tipe) {
                   @click="goToLevel2(sub)"
                   class="inline-flex items-center gap-1 rounded bg-[#F8FAFC] dark:bg-slate-800 hover:bg-[#0A51B0] hover:text-white dark:hover:bg-blue-600 border border-[#E2E8F0] dark:border-slate-700 px-2 py-0.5 text-[8.5px] font-semibold text-[#0A51B0] dark:text-sky-400 transition-colors cursor-pointer"
                 >
-                  <span>Lihat Detail Aset</span>
+                  <span>{{ t('my_assets_view_asset_details') }}</span>
                   <span aria-hidden="true" class="material-symbols-outlined text-[12px]">chevron_right</span>
                 </button>
               </div>
@@ -600,25 +605,25 @@ function getDeviceIcon(tipe) {
                     {{ rootLeader.nama_karyawan }}
                   </h4>
                   <span class="px-1.5 py-0.2 rounded bg-blue-100 dark:bg-blue-950 text-[#0A51B0] dark:text-sky-300 text-[8px] font-bold">
-                    {{ rootLeader.departemen || 'Umum' }}
+                    {{ rootLeader.departemen || t('my_assets_general') }}
                   </span>
                 </div>
                 <span class="text-[9.5px] text-[#5F7089] dark:text-slate-400">
-                  {{ rootLeader.jabatan || rootLeader.title || 'Pimpinan Divisi' }} &bull; NIK: {{ rootLeader.nik }}
+                  {{ rootLeader.jabatan || rootLeader.title || t('my_assets_division_leader') }} &bull; NIK: {{ rootLeader.nik }}
                 </span>
               </div>
             </div>
 
             <div class="flex items-center gap-2 self-end sm:self-center">
               <span class="text-[9px] font-semibold text-[#5F7089] dark:text-slate-400">
-                {{ getDirectSubordinates(rootLeader.nik).length }} Bawahan Langsung
+                {{ getDirectSubordinates(rootLeader.nik).length }} {{ t('my_assets_direct_reports') }}
               </span>
               <button
                 type="button"
                 @click="goToLevel2(rootLeader)"
                 class="inline-flex items-center gap-1 rounded bg-[#F8FAFC] dark:bg-slate-800 hover:bg-[#0A51B0] hover:text-white border border-[#E2E8F0] dark:border-slate-700 px-2 py-1 text-[9px] font-semibold text-[#0A51B0] dark:text-sky-400 transition-colors cursor-pointer"
               >
-                <span>Lihat Profil</span>
+                <span>{{ t('my_assets_view_profile') }}</span>
                 <span aria-hidden="true" class="material-symbols-outlined text-[12px]">chevron_right</span>
               </button>
             </div>
@@ -628,7 +633,7 @@ function getDeviceIcon(tipe) {
           <div v-if="getDirectSubordinates(rootLeader.nik).length > 0" class="mt-2.5">
             <h5 class="text-[9px] font-bold uppercase tracking-wider text-[#687281] dark:text-slate-400 mb-1.5 flex items-center gap-1">
               <span aria-hidden="true" class="material-symbols-outlined text-[12px]">subdirectory_arrow_right</span>
-              <span>Struktur Bawahan Langsung</span>
+              <span>{{ t('my_assets_direct_reports_structure') }}</span>
             </h5>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
@@ -653,7 +658,7 @@ function getDeviceIcon(tipe) {
             </div>
           </div>
           <div v-else class="mt-2 text-[9px] text-[#687281] dark:text-slate-500 italic">
-            Belum ada staf bawahan langsung yang terdata untuk posisi ini.
+            {{ t('my_assets_no_direct_staff') }}
           </div>
         </div>
       </div>
@@ -667,10 +672,10 @@ function getDeviceIcon(tipe) {
           diversity_3
         </span>
         <h3 class="mt-2 font-bold text-xs sm:text-[13px] text-[#333333] dark:text-white">
-          Belum Memiliki Bawahan Langsung
+          {{ t('my_assets_no_subordinates_title') }}
         </h3>
         <p class="text-[9.5px] sm:text-[10px] text-[#5F7089] dark:text-slate-400 mt-1 max-w-md mx-auto leading-relaxed">
-          Akun Anda saat ini tidak memiliki staf atau bawahan langsung yang terdaftar di struktur organisasi.
+          {{ t('my_assets_no_subordinates_desc') }}
         </p>
 
         <!-- Informasi Atasan Langsung Pengguna -->
@@ -679,7 +684,7 @@ function getDeviceIcon(tipe) {
           class="mt-4 pt-3 border-t border-[#F1F5F9] dark:border-slate-800 max-w-sm mx-auto text-left rounded-[6px] bg-[#F8FAFC] dark:bg-slate-800/80 p-2.5"
         >
           <span class="text-[8.5px] font-bold uppercase tracking-wider text-[#687281] dark:text-slate-400 block mb-1">
-            Atasan Langsung Anda:
+            {{ t('my_assets_your_supervisor') }}
           </span>
           <div class="flex items-center justify-between gap-2">
             <div class="flex items-center gap-2 min-w-0">
@@ -693,7 +698,7 @@ function getDeviceIcon(tipe) {
                   {{ myDirectSupervisor.nama_karyawan }}
                 </span>
                 <span class="text-[8.5px] text-[#5F7089] dark:text-slate-400 truncate">
-                  {{ myDirectSupervisor.jabatan || myDirectSupervisor.title || 'Manajer' }} &bull; NIK: {{ myDirectSupervisor.nik }}
+                  {{ myDirectSupervisor.jabatan || myDirectSupervisor.title || t('my_assets_manager') }} &bull; NIK: {{ myDirectSupervisor.nik }}
                 </span>
               </div>
             </div>
@@ -704,7 +709,7 @@ function getDeviceIcon(tipe) {
               @click="goToLevel2(myDirectSupervisor)"
               class="text-[8.5px] font-semibold text-[#0A51B0] hover:underline shrink-0"
             >
-              Lihat Aset
+              {{ t('my_assets_view_assets') }}
             </button>
           </div>
         </div>
@@ -721,7 +726,7 @@ function getDeviceIcon(tipe) {
         class="employee-assets-toolbar ws-toolbar-sticky grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 rounded-[6px] border border-[#E2E8F0] dark:border-slate-800 bg-white dark:bg-slate-900 p-2 sm:p-2.5 shadow-2xs"
       >
         <div class="relative h-7.5 sm:h-8 w-full sm:flex-1 sm:min-w-[180px]">
-          <label for="emp-search" class="sr-only">Cari karyawan dengan aset</label>
+          <label for="emp-search" class="sr-only">{{ t('my_assets_search_employees_aria') }}</label>
           <span
             aria-hidden="true"
             class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-[15px] text-[#687281] dark:text-slate-400 pointer-events-none"
@@ -731,7 +736,7 @@ function getDeviceIcon(tipe) {
             id="emp-search"
             v-model="search"
             type="text"
-            placeholder="Cari nama karyawan, NIK, atau departemen…"
+            :placeholder="t('my_assets_search_employee_ph')"
             class="h-full w-full rounded-[5px] border border-[#E2E8F0] dark:border-slate-800 bg-[#F8FAFC] dark:bg-slate-800 pl-7.5 pr-7 text-[10px] sm:text-[10.5px] text-[#333333] dark:text-white placeholder-[#687281] dark:placeholder-slate-400 focus:border-[#0A51B0] focus:bg-white dark:focus:bg-slate-800 focus:outline-none transition-all"
           />
           <!-- Inline Clear Button -->
@@ -739,9 +744,9 @@ function getDeviceIcon(tipe) {
             v-if="search"
             type="button"
             @click="search = ''"
-            aria-label="Bersihkan pencarian"
+            :aria-label="t('clear_search')"
             class="absolute right-1.5 top-1/2 -translate-y-1/2 flex h-4.5 w-4.5 items-center justify-center rounded-full text-[#687281] dark:text-slate-400 hover:bg-[#F1F5F9] dark:hover:bg-slate-700 hover:text-[#333333] dark:hover:text-white transition-all cursor-pointer touch-manipulation"
-            title="Bersihkan"
+            :title="t('clear_search')"
           >
             <span aria-hidden="true" class="material-symbols-outlined text-[13px]">close</span>
           </button>
@@ -754,7 +759,7 @@ function getDeviceIcon(tipe) {
         >
           <span aria-hidden="true" class="material-symbols-outlined mr-1 align-middle text-[14px]"
             >filter_alt</span
-          >Filter
+          >{{ t('filter') }}
         </button>
 
         <AppViewToggle v-model="viewMode" />
@@ -777,7 +782,7 @@ function getDeviceIcon(tipe) {
             @click="fetchEmployees"
             class="mt-1 font-bold underline cursor-pointer"
           >
-            Coba muat ulang
+            {{ t('my_assets_retry_reload') }}
           </button>
         </div>
 
@@ -786,9 +791,9 @@ function getDeviceIcon(tipe) {
           <span aria-hidden="true" class="material-symbols-outlined text-[28px] text-[#CBD5E1]"
             >person_search</span
           >
-          <h3 class="mt-1.5 font-semibold text-xs sm:text-[13px] text-[#333333] dark:text-white">Tidak Ada Karyawan Memegang Aset</h3>
+          <h3 class="mt-1.5 font-semibold text-xs sm:text-[13px] text-[#333333] dark:text-white">{{ t('my_assets_no_employees_with_assets') }}</h3>
           <p class="text-[9.5px] sm:text-[10px] text-[#5F7089] dark:text-slate-400 mt-0.5 max-w-sm mx-auto">
-            Tidak ditemukan karyawan yang sedang memegang aset IT sesuai kriteria pencarian.
+            {{ t('my_assets_no_employees_with_assets_desc') }}
           </p>
         </div>
 
@@ -809,12 +814,12 @@ function getDeviceIcon(tipe) {
                 <tr
                   class="border-b border-[#E2E8F0] dark:border-slate-800 bg-[#F8FAFC] dark:bg-slate-800 text-[9px] sm:text-[9.5px] font-semibold text-[#5F7089] dark:text-slate-400 uppercase tracking-wider select-none whitespace-nowrap"
                 >
-                  <th class="py-2.5 pl-3.5 pr-2.5 text-left whitespace-nowrap">Karyawan</th>
-                  <th class="py-2.5 px-2.5 text-left whitespace-nowrap">Departemen & Lokasi</th>
-                  <th class="py-2.5 px-2.5 text-left whitespace-nowrap">Kategori Aset</th>
-                  <th class="py-2.5 px-2 text-center whitespace-nowrap">Total Aset</th>
-                  <th class="py-2.5 px-2.5 text-center whitespace-nowrap">Penugasan Terakhir</th>
-                  <th class="py-2.5 pr-3.5 pl-2 text-center whitespace-nowrap">Detail</th>
+                  <th class="py-2.5 pl-3.5 pr-2.5 text-left whitespace-nowrap">{{ t('my_assets_th_employee') }}</th>
+                  <th class="py-2.5 px-2.5 text-left whitespace-nowrap">{{ t('my_assets_th_dept_location') }}</th>
+                  <th class="py-2.5 px-2.5 text-left whitespace-nowrap">{{ t('my_assets_th_asset_category') }}</th>
+                  <th class="py-2.5 px-2 text-center whitespace-nowrap">{{ t('my_assets_th_total_assets') }}</th>
+                  <th class="py-2.5 px-2.5 text-center whitespace-nowrap">{{ t('my_assets_th_last_assignment') }}</th>
+                  <th class="py-2.5 pr-3.5 pl-2 text-center whitespace-nowrap">{{ t('my_assets_th_detail') }}</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-[#F1F5F9] dark:divide-slate-800 text-[10px] sm:text-[10.5px]">
@@ -896,7 +901,7 @@ function getDeviceIcon(tipe) {
                           +{{ employee.asset_types.length - 2 }}
                         </span>
                       </template>
-                      <span v-else class="text-[9.5px] text-[#687281] dark:text-slate-400 truncate">Aset IT</span>
+                      <span v-else class="text-[9.5px] text-[#687281] dark:text-slate-400 truncate">{{ t('my_assets_it_asset') }}</span>
                     </div>
                   </td>
 
@@ -905,7 +910,7 @@ function getDeviceIcon(tipe) {
                     <span
                       class="inline-flex items-center justify-center rounded-full bg-[#EFF6FF] dark:bg-blue-950 px-1.5 py-0.2 text-[9px] sm:text-[9.5px] font-bold text-[#0A51B0] dark:text-sky-300 border border-[#BFDBFE]/60 dark:border-blue-900 whitespace-nowrap"
                     >
-                      {{ employee.jumlah_aset || 0 }} Aset
+                      {{ employee.jumlah_aset || 0 }} {{ t('my_assets_assets_label') }}
                     </span>
                   </td>
 
@@ -962,7 +967,7 @@ function getDeviceIcon(tipe) {
                   <span
                     class="inline-flex items-center justify-center rounded-full bg-[#EFF6FF] dark:bg-blue-950 px-1.5 py-0.2 text-[8.5px] sm:text-[9px] font-bold text-[#0A51B0] dark:text-sky-300 border border-[#BFDBFE]/60 dark:border-blue-900 whitespace-nowrap"
                   >
-                    {{ employee.jumlah_aset || 0 }} Aset
+                    {{ employee.jumlah_aset || 0 }} {{ t('my_assets_assets_label') }}
                   </span>
                   <span
                     aria-hidden="true"
@@ -980,7 +985,7 @@ function getDeviceIcon(tipe) {
                 <!-- 1. Departemen -->
                 <div class="flex flex-col min-w-0 overflow-hidden">
                   <span class="text-[8px] sm:text-[8.5px] font-semibold uppercase text-[#687281] dark:text-slate-400 tracking-wider"
-                    >Departemen</span
+                    >{{ t('department') }}</span
                   >
                   <span
                     class="text-[9.5px] sm:text-[10px] font-semibold text-[#333333] dark:text-white mt-0.5 truncate block"
@@ -993,7 +998,7 @@ function getDeviceIcon(tipe) {
                 <!-- 2. Lokasi -->
                 <div class="flex flex-col min-w-0 overflow-hidden">
                   <span class="text-[8px] sm:text-[8.5px] font-semibold uppercase text-[#687281] dark:text-slate-400 tracking-wider"
-                    >Lokasi</span
+                    >{{ t('filter_location') }}</span
                   >
                   <span
                     class="text-[9.5px] sm:text-[10px] font-normal text-[#333333] dark:text-slate-200 mt-0.5 truncate flex items-center gap-0.5"
@@ -1013,7 +1018,7 @@ function getDeviceIcon(tipe) {
                 <!-- 3. Kategori Aset -->
                 <div class="flex flex-col min-w-0 overflow-hidden">
                   <span class="text-[8px] sm:text-[8.5px] font-semibold uppercase text-[#687281] dark:text-slate-400 tracking-wider"
-                    >Kategori Aset</span
+                    >{{ t('my_assets_th_asset_category') }}</span
                   >
                   <div class="flex items-center gap-0.5 min-w-0 overflow-hidden mt-0.5">
                     <template v-if="employee.asset_types && employee.asset_types.length > 0">
@@ -1036,14 +1041,14 @@ function getDeviceIcon(tipe) {
                         +{{ employee.asset_types.length - 2 }}
                       </span>
                     </template>
-                    <span v-else class="text-[9px] text-[#687281] dark:text-slate-400 truncate">Aset IT</span>
+                    <span v-else class="text-[9px] text-[#687281] dark:text-slate-400 truncate">{{ t('my_assets_it_asset') }}</span>
                   </div>
                 </div>
 
                 <!-- 4. Penugasan Terakhir -->
                 <div class="flex flex-col min-w-0 overflow-hidden">
                   <span class="text-[8px] sm:text-[8.5px] font-semibold uppercase text-[#687281] dark:text-slate-400 tracking-wider"
-                    >Penugasan Terakhir</span
+                    >{{ t('my_assets_th_last_assignment') }}</span
                   >
                   <span
                     class="text-[9.5px] sm:text-[10px] font-medium text-[#5F7089] dark:text-slate-400 mt-0.5 truncate block"

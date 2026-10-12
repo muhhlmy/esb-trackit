@@ -1,0 +1,171 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "TrackIT Enterprise API Platform",
+    "version": "1.0.0",
+    "description": "Integration-ready REST API platform for IT Asset Tracking, Helpdesk Ticketing, Automation Engines, and BI Systems."
+  },
+  "servers": [
+    {
+      "url": "/",
+      "description": "Current Environment"
+    }
+  ],
+  "paths": {
+    "/health/live": {
+      "get": {
+        "summary": "Process Liveness Check",
+        "description": "Returns 200 OK if the Node.js process is active and responsive.",
+        "responses": {
+          "200": {
+            "description": "Process is live",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": { "type": "string", "example": "live" },
+                    "uptime": { "type": "number", "example": 1420.5 },
+                    "timestamp": { "type": "string", "format": "date-time" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/health/ready": {
+      "get": {
+        "summary": "Application Readiness Check",
+        "description": "Checks connectivity to PostgreSQL and returns 200 if ready, or 503 if unavailable.",
+        "responses": {
+          "200": { "description": "Database is connected and ready" },
+          "503": { "description": "Database disconnected or unavailable" }
+        }
+      }
+    },
+    "/metrics": {
+      "get": {
+        "summary": "Prometheus Metrics Exporter",
+        "description": "Returns runtime metrics in standard Prometheus text format 0.0.4.",
+        "responses": {
+          "200": {
+            "description": "Prometheus text exposition format",
+            "content": {
+              "text/plain": {}
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/system/status": {
+      "get": {
+        "summary": "System Status and Capabilities",
+        "description": "Returns platform health, version metadata, and active capability scopes.",
+        "responses": {
+          "200": {
+            "description": "Platform status payload",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": { "type": "string", "example": "operational" },
+                    "version": { "type": "string", "example": "1.0.0" },
+                    "capabilities": {
+                      "type": "array",
+                      "items": { "type": "string" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/api-clients": {
+      "get": {
+        "summary": "List API Clients",
+        "security": [{ "ApiKeyAuth": [] }, { "SessionAuth": [] }],
+        "responses": {
+          "200": { "description": "List of registered API clients" }
+        }
+      },
+      "post": {
+        "summary": "Register New API Client",
+        "security": [{ "ApiKeyAuth": [] }, { "SessionAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["name"],
+                "properties": {
+                  "name": { "type": "string" },
+                  "organization": { "type": "string" },
+                  "scopes": { "type": "array", "items": { "type": "string" } },
+                  "rateLimit": { "type": "integer", "default": 120 }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Client created with masked apiKey" }
+        }
+      }
+    },
+    "/api/v1/webhook-subscriptions": {
+      "get": {
+        "summary": "List Webhook Subscriptions",
+        "security": [{ "ApiKeyAuth": [] }, { "SessionAuth": [] }],
+        "responses": {
+          "200": { "description": "List of active subscriptions" }
+        }
+      },
+      "post": {
+        "summary": "Create Webhook Subscription",
+        "security": [{ "ApiKeyAuth": [] }, { "SessionAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["targetUrl"],
+                "properties": {
+                  "targetUrl": { "type": "string", "format": "uri" },
+                  "events": { "type": "array", "items": { "type": "string" } }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Webhook subscription created" }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-API-Key"
+      },
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer"
+      },
+      "SessionAuth": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "session"
+      }
+    }
+  }
+}

@@ -28,10 +28,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600;1,700;1,800&display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=block" rel="stylesheet" />
 
-    <script>
-      // Catat waktu awal peluncuran flashscreen untuk memastikan durasi tahan 3-5 detik
-      window.__SPLASH_START__ = Date.now();
-    </script>
 
     <style>
       [v-cloak] { display: none !important; }
@@ -159,22 +155,13 @@
         line-height: 1.2;
       }
 
-      .splash-brand-tagline {
-        margin: 0;
-        font-size: clamp(11px, 2.8vw, 12.5px);
-        font-weight: 600;
-        color: #64748b;
-        letter-spacing: 0.04em;
-        text-transform: uppercase;
-      }
-
       /* vue-spinner: PulseLoader 3 Dots */
       .splash-pulse-loader {
         display: inline-flex;
         align-items: center;
         justify-content: center;
         gap: 9px;
-        margin-bottom: 12px;
+        margin-bottom: 0;
         pointer-events: none;
       }
 
@@ -202,14 +189,6 @@
       .splash-pulse-dot:nth-child(3) {
         background-color: #0a51b0;
         animation-delay: -0.12s;
-      }
-
-      .splash-status-text {
-        font-size: clamp(12px, 3vw, 13px);
-        font-weight: 600;
-        color: #94a3b8;
-        letter-spacing: 0.01em;
-        pointer-events: none;
       }
 
       /* Keyframes */
@@ -251,7 +230,7 @@
     </style>
   </head>
   <body class="bg-[#F4F6F9]">
-    <!-- Flashscreen / Startup Splash Screen Full White Tanpa Card (Responsif Mobile & Tahan 3-5 Detik) -->
+    <!-- Flashscreen / Startup Splash Screen Full White Tanpa Card (Responsif Mobile & Tahan 5 Detik) -->
     <div id="app-splashscreen" role="status" aria-live="polite" aria-label="Memuat aplikasi ESB-TrackIT">
       <div class="splash-container">
         <div class="splash-logo-container">
@@ -260,7 +239,6 @@
         </div>
         <div class="splash-brand">
           <h1 class="splash-brand-title">ESB-TrackIT</h1>
-          <p class="splash-brand-tagline">IT Assets & Operations</p>
         </div>
         <!-- vue-spinner PulseLoader -->
         <div class="splash-pulse-loader" aria-hidden="true">
@@ -268,27 +246,13 @@
           <span class="splash-pulse-dot"></span>
           <span class="splash-pulse-dot"></span>
         </div>
-        <div class="splash-status-text">Memuat ESB-TrackIT...</div>
       </div>
     </div>
 
     <!-- Vue Application Root -->
     <div id="app" v-cloak></div>
 
-    <script>
-      // Fallback safeguard: jika terjadi latensi jaringan atau script, splashscreen otomatis hilang setelah 5.5 detik
-      window.addEventListener('load', function () {
-        setTimeout(function () {
-          var el = document.getElementById('app-splashscreen');
-          if (el && !el.classList.contains('splash-hidden')) {
-            el.classList.add('splash-hidden');
-            setTimeout(function () {
-              if (el && el.parentNode) el.parentNode.removeChild(el);
-            }, 500);
-          }
-        }, 5500);
-      });
-    </script>
+
 
     <script type="module" src="/src/main.js"></script>
   </body>

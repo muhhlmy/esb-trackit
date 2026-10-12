@@ -6,8 +6,10 @@ import AppModal from '@/components/ui/AppModal.vue'
 import PageHeader from '@/components/ui/PageHeader.vue'
 import SkeletonCard from '@/components/ui/skeleton/SkeletonCard.vue'
 import { useToast } from '@/composables/useToast.js'
+import { useLanguage } from '@/composables/useLanguage.js'
 
 const api = useApi()
+const { t } = useLanguage()
 
 // ========== State ==========
 const isLoading = ref(true)
@@ -309,7 +311,7 @@ async function handleConfirmRestore() {
     restoreResult.value = res.data
     restoreStep.value = 'done'
     showToast('Restore database berhasil! Silakan login kembali.', 'success')
-    // Session invalid setelah restore — redirect ke login
+    // Session invalid setelah restore - redirect ke login
     setTimeout(() => {
       clearAuthSession()
       window.location.href = '/login'
@@ -351,8 +353,8 @@ function switchTab(tab) {
   >
     <!-- Page Header -->
     <PageHeader
-      title="Database"
-      subtitle="Backup & restore database PostgreSQL"
+      :title="t('database_page_title')"
+      :subtitle="t('database_page_subtitle')"
       icon="database"
     >
       <button
@@ -365,7 +367,7 @@ function switchTab(tab) {
           class="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-white border-t-transparent"
         ></span>
         <span aria-hidden="true" v-else class="material-symbols-outlined text-[16px]">database</span>
-        <span>{{ isBackingUp ? 'Membuat Cadangan...' : 'Cadangkan Sekarang' }}</span>
+        <span>{{ isBackingUp ? t('btn_backing_up') : t('btn_backup_now') }}</span>
       </button>
     </PageHeader>
 
@@ -376,10 +378,10 @@ function switchTab(tab) {
     >
       <button
         v-for="tab in [
-          { key: 'overview', label: 'Ringkasan', icon: 'monitor_heart' },
-          { key: 'history', label: 'Riwayat Cadangan', icon: 'history' },
-          { key: 'restore', label: 'Pemulihan', icon: 'restore_page' },
-          { key: 'audit', label: 'Audit Log', icon: 'receipt_long' },
+          { key: 'overview', label: t('tab_db_overview'), icon: 'monitor_heart' },
+          { key: 'history', label: t('tab_db_history'), icon: 'history' },
+          { key: 'restore', label: t('tab_db_restore'), icon: 'restore_page' },
+          { key: 'audit', label: t('tab_db_audit'), icon: 'receipt_long' },
         ]"
         :key="tab.key"
         class="flex min-w-0 items-center justify-center gap-1.5 rounded-[6px] px-2.5 sm:px-3 py-1 text-xs font-medium transition-all"

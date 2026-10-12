@@ -5,6 +5,7 @@ import { useApi } from '../composables/useApi.js'
 import { useAuth } from '../composables/useAuth.js'
 import SearchableSelect from '../components/ui/SearchableSelect.vue'
 import BaseSkeleton from '../components/ui/skeleton/BaseSkeleton.vue'
+import SkeletonTable from '../components/ui/skeleton/SkeletonTable.vue'
 import AppPagination from '../components/ui/AppPagination.vue'
 import AppViewToggle from '../components/ui/AppViewToggle.vue'
 import AppRowActions from '../components/ui/AppRowActions.vue'
@@ -18,11 +19,15 @@ import StatCard from '../components/ui/StatCard.vue'
 import FilterModal from '../components/ui/FilterModal.vue'
 import CustomSelect from '../components/ui/CustomSelect.vue'
 
+import { useViewMode } from '../composables/useViewMode.js'
+import { useLanguage } from '../composables/useLanguage.js'
+
 const { get, getAllPages, post, put, del } = useApi()
 const route = useRoute()
 const router = useRouter()
 const { hasWritePermission } = useAuth()
 const canWriteSubmissions = computed(() => hasWritePermission('submissions'))
+const { currentLang, t } = useLanguage()
 
 // ── State ────────────────────────────────────────────────────
 const employees = ref([])
@@ -40,7 +45,7 @@ const isFormOpen = computed(() => ['submission-new', 'submission-detail'].includ
 const searchQuery = ref('')
 const currentPage = ref(1)
 const itemsPerPage = 10
-const viewMode = ref('table')
+const { viewMode } = useViewMode('submissions', 'table')
 
 // ── State Filter Lanjutan & KPI BAST ─────────────────────────
 const showFilterModal = ref(false)
@@ -49,14 +54,14 @@ const filterDirektorat = ref('')
 const filterDateFrom = ref('')
 const filterDateTo = ref('')
 
-const TUJUAN_FILTER_OPTIONS = [
-  { value: '', label: 'Semua Tujuan BAST' },
-  { value: 'baru', label: 'Serah Terima Baru' },
-  { value: 'peminjaman', label: 'Peminjaman Aset' },
-  { value: 'perbaikan', label: 'Perbaikan / Servis' },
-  { value: 'disposal', label: 'Disposal Aset' },
-  { value: 'lainnya', label: 'Tujuan Lainnya' },
-]
+const TUJUAN_FILTER_OPTIONS = computed(() => [
+  { value: '', label: t('submissions_filter_all_tujuan') },
+  { value: 'baru', label: t('submissions_filter_tujuan_baru') },
+  { value: 'peminjaman', label: t('submissions_filter_tujuan_peminjaman') },
+  { value: 'perbaikan', label: t('submissions_filter_tujuan_perbaikan') },
+  { value: 'disposal', label: t('submissions_filter_tujuan_disposal') },
+  { value: 'lainnya', label: t('submissions_filter_tujuan_lainnya') },
+])
 
 const availableDirektoratOptions = computed(() => {
   const depts = new Set()
@@ -71,7 +76,7 @@ const availableDirektoratOptions = computed(() => {
   }
   const sorted = Array.from(depts).sort()
   return [
-    { value: '', label: 'Semua Direktorat / Unit' },
+    { value: '', label: t('submissions_filter_all_direktorat') },
     ...sorted.map((d) => ({ value: d, label: d })),
   ]
 })
@@ -177,16 +182,22 @@ function resetSubmissionFilters() {
 }
 function formatSubmissionDate(value) {
   if (!value) return '-'
-  return new Intl.DateTimeFormat('id-ID', { dateStyle: 'medium' }).format(new Date(value))
+  return new Intl.DateTimeFormat(currentLang.value === 'en' ? 'en-GB' : 'id-ID', {
+    dateStyle: 'medium',
+  }).format(new Date(value))
 }
 function getSubmissionActions(submission) {
   const actions = [
-    { label: 'Cetak BAST', icon: 'print', onClick: () => printSubmission(submission) },
+    { label: t('bast_print_action'), icon: 'print', onClick: () => printSubmission(submission) },
   ]
   if (canWriteSubmissions.value) {
-    actions.push({ label: 'Edit BAST', icon: 'edit', onClick: () => editSubmission(submission) })
     actions.push({
-      label: 'Hapus BAST',
+      label: t('bast_edit_action'),
+      icon: 'edit',
+      onClick: () => editSubmission(submission),
+    })
+    actions.push({
+      label: t('bast_delete_action'),
       icon: 'delete',
       danger: true,
       onClick: () => requestDeleteSubmission(submission),
@@ -206,7 +217,7 @@ const emptyForm = () => ({
   isPenerimaLainnya: false,
   mengetahuiNik: '',
   mengetahuiNama: '',
-  mengetahuiJabatan: 'People Business Partner atau Asset Management',
+  mengetahuiJabatan: t('bast_pbp_role'),
   isMengetahuiKustom: false,
   tujuan: 'baru', // 'baru' | 'peminjaman' | 'perbaikan' | 'disposal' | 'lainnya'
   tujuanLainnya: '',
@@ -279,7 +290,7 @@ async function fetchData() {
     savedSubmissions.value = submissionData
     await loadRouteForm()
   } catch (error) {
-    pageError.value = error.message || 'Gagal memuat data referensi.'
+    pageError.value = error.message || t('bast_load_ref_failed')
   } finally {
     isLoading.value = false
     await nextTick()
@@ -343,10 +354,10 @@ watch(
         emp.title ||
         emp.jabatan ||
         emp.departemen ||
-        'People Business Partner atau Asset Management'
+        t('bast_pbp_role')
     } else if (!form.value.isMengetahuiKustom) {
       form.value.mengetahuiNama = ''
-      form.value.mengetahuiJabatan = 'People Business Partner atau Asset Management'
+      form.value.mengetahuiJabatan = t('bast_pbp_role')
     }
   },
 )
@@ -360,7 +371,7 @@ watch(
       form.value.mengetahuiNik = ''
     } else {
       form.value.mengetahuiNama = ''
-      form.value.mengetahuiJabatan = 'People Business Partner atau Asset Management'
+      form.value.mengetahuiJabatan = t('bast_pbp_role')
     }
   },
 )
@@ -402,9 +413,9 @@ function rememberAssetHistory() {
   for (const row of [...asetBaruList.value, ...asetLamaList.value]) historicAssetRows.add(row)
 }
 function assetSelectionError() {
-  for (const [rows, options, label] of [
-    [asetBaruList.value, assetBaruOptions.value, 'Baru'],
-    [asetLamaList.value, assetLamaOptions.value, 'Lama'],
+  for (const [rows, options, kind] of [
+    [asetBaruList.value, assetBaruOptions.value, 'baru'],
+    [asetLamaList.value, assetLamaOptions.value, 'lama'],
   ]) {
     if (
       rows.some(
@@ -414,7 +425,12 @@ function assetSelectionError() {
           !options.some((asset) => asset.id_aset === row.id_aset),
       )
     ) {
-      return `Pilihan Unit ${label} tidak sesuai pemegang saat ini. Pilih ulang atau kosongkan aset.`
+      if (typeof t === 'function') {
+        return t(kind === 'baru' ? 'bast_selection_error_baru' : 'bast_selection_error_lama')
+      }
+      return kind === 'baru'
+        ? 'Pilihan Unit Baru tidak valid atau sudah tidak tersedia.'
+        : 'Pilihan Unit Lama tidak valid atau sudah tidak tersedia.'
     }
   }
   return ''
@@ -507,7 +523,7 @@ async function loadRouteForm() {
       if (route.name === 'submission-detail' && String(route.params.id) === id)
         await hydrateSubmission(submission)
     } catch (error) {
-      if (String(route.params.id) === id) pageError.value = error.message || 'BAST tidak ditemukan.'
+      if (String(route.params.id) === id) pageError.value = error.message || (typeof t === 'function' ? t('bast_not_found') : 'Dokumen BAST tidak ditemukan')
     } finally {
       isDetailLoading.value = false
     }
@@ -553,7 +569,8 @@ async function persistSubmission(status = 'draft') {
       : await post('/api/submissions', body)
     selectedSubmissionId.value = saved.id
     rememberAssetHistory()
-    saveMessage.value = `${saved.submission_number} berhasil disimpan.`
+    const savedSuffix = typeof t === 'function' ? t('bast_saved_suffix') : 'berhasil disimpan.'
+    saveMessage.value = `${saved.submission_number || ''} ${savedSuffix}`.trim()
     savedSubmissions.value = [
       saved,
       ...savedSubmissions.value.filter((item) => item.id !== saved.id),
@@ -561,11 +578,13 @@ async function persistSubmission(status = 'draft') {
     try {
       savedSubmissions.value = await getAllPages('/api/submissions')
     } catch {
-      saveMessage.value += ' Daftar belum dapat dimuat ulang; dokumen sudah tersimpan.'
+      const reloadFailed = typeof t === 'function' ? t('bast_reload_failed_suffix') : ' (daftar belum ter-refresh)'
+      saveMessage.value += reloadFailed
     }
     return true
   } catch (error) {
-    validationError.value = error.message || 'Gagal menyimpan pengajuan.'
+    const defaultFail = typeof t === 'function' ? t('bast_save_failed') : 'Gagal menyimpan pengajuan'
+    validationError.value = error.message || defaultFail
     return false
   } finally {
     isSaving.value = false
@@ -593,10 +612,10 @@ async function deleteSubmission() {
     await del(`/api/submissions/${submission.id}`)
     if (selectedSubmissionId.value === submission.id) resetSubmissionForm()
     savedSubmissions.value = savedSubmissions.value.filter((item) => item.id !== submission.id)
-    saveMessage.value = 'Pengajuan berhasil dihapus.'
+    saveMessage.value = t('bast_deleted')
     pendingDelete.value = null
   } catch (error) {
-    validationError.value = error.message || 'Gagal menghapus pengajuan.'
+    validationError.value = error.message || t('bast_delete_failed')
   } finally {
     isDeleting.value = false
   }
@@ -613,36 +632,35 @@ async function generatePdf({
   validationError.value = ''
 
   if (!form.value.pemberiNama?.trim()) {
-    validationError.value = 'Pihak Pemberi wajib dipilih atau diisi sebelum mencetak formulir.'
+    validationError.value = t('bast_validation_giver')
     return
   }
 
   if (!form.value.penerimaNama?.trim()) {
-    validationError.value = 'Pihak Penerima wajib dipilih atau diisi sebelum mencetak formulir.'
+    validationError.value = t('bast_validation_recipient')
     return
   }
 
   if (!form.value.tanggal) {
-    validationError.value = 'Tanggal serah terima wajib diisi.'
+    validationError.value = t('bast_validation_date')
     return
   }
 
   if (form.value.tujuan === 'lainnya' && !form.value.tujuanLainnya?.trim()) {
-    validationError.value = 'Keterangan tujuan lainnya wajib diisi.'
+    validationError.value = t('bast_validation_tujuan_lainnya')
     return
   }
 
   const hasAsetBaru = asetBaruList.value.some((a) => a.id_aset)
   const hasAsetLama = asetLamaList.value.some((a) => a.id_aset)
   if (!hasAsetBaru && !hasAsetLama) {
-    validationError.value =
-      'Minimal pilih salah satu Aset (Aset Baru / Aset Lama) untuk serah terima.'
+    validationError.value = t('bast_validation_min_asset')
     return
   }
 
   const printWindow = window.open('', '_blank')
   if (!printWindow) {
-    validationError.value = 'Pop-up terblokir. Harap izinkan pop-up untuk mencetak PDF.'
+    validationError.value = t('bast_popup_blocked')
     return
   }
   if (persist && !(await persistSubmission('submitted'))) {
@@ -651,20 +669,36 @@ async function generatePdf({
   }
 
   // Format Date to Indonsian Date (e.g. 21 Juli 2026)
-  const months = [
-    'Januari',
-    'Februari',
-    'Maret',
-    'April',
-    'Mei',
-    'Juni',
-    'Juli',
-    'Agustus',
-    'September',
-    'Oktober',
-    'November',
-    'Desember',
-  ]
+  const months =
+    currentLang.value === 'en'
+      ? [
+          'January',
+          'February',
+          'March',
+          'April',
+          'May',
+          'June',
+          'July',
+          'August',
+          'September',
+          'October',
+          'November',
+          'December',
+        ]
+      : [
+          'Januari',
+          'Februari',
+          'Maret',
+          'April',
+          'Mei',
+          'Juni',
+          'Juli',
+          'Agustus',
+          'September',
+          'Oktober',
+          'November',
+          'Desember',
+        ]
   const d = new Date(form.value.tanggal)
   const formattedDate = `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`
 
@@ -680,25 +714,25 @@ async function generatePdf({
     form.value.tujuan === 'lainnya' ? escapeHtml(form.value.tujuanLainnya) : ''
 
   // Strikethrough logic for Peminjaman/Pengembalian
-  let labelPeminjamanHtml = 'Peminjaman/Pengembalian'
+  let labelPeminjamanHtml = `${t('bast_doc_loan')}/${t('bast_doc_return')}`
   if (form.value.tujuan === 'peminjaman') {
-    labelPeminjamanHtml = 'Peminjaman/<s>Pengembalian</s>'
+    labelPeminjamanHtml = `${t('bast_doc_loan')}/<s>${t('bast_doc_return')}</s>`
   } else if (form.value.tujuan === 'pengembalian') {
-    labelPeminjamanHtml = '<s>Peminjaman</s>/Pengembalian'
+    labelPeminjamanHtml = `<s>${t('bast_doc_loan')}</s>/${t('bast_doc_return')}`
   }
 
   // Strikethrough logic for Perbaikan/Penggantian
-  let labelPerbaikanHtml = 'Perbaikan/Penggantian'
+  let labelPerbaikanHtml = `${t('bast_doc_repair')}/${t('bast_doc_replacement')}`
   if (form.value.tujuan === 'perbaikan') {
-    labelPerbaikanHtml = 'Perbaikan/<s>Penggantian</s>'
+    labelPerbaikanHtml = `${t('bast_doc_repair')}/<s>${t('bast_doc_replacement')}</s>`
   } else if (form.value.tujuan === 'penggantian') {
-    labelPerbaikanHtml = '<s>Perbaikan</s>/Penggantian'
+    labelPerbaikanHtml = `<s>${t('bast_doc_repair')}</s>/${t('bast_doc_replacement')}`
   }
 
   // Section 3: Daftar Data Serah Terima Aset
   let section3Html = ''
   if (hasAsetBaru || hasAsetLama) {
-    section3Html += '<h3 class="section-title">III. Daftar Data Serah Terima Aset</h3>'
+    section3Html += `<h3 class="section-title">${t('bast_doc_section3')}</h3>`
 
     if (hasAsetBaru) {
       let rowsBaruHtml = ''
@@ -718,15 +752,15 @@ async function generatePdf({
 
       section3Html += `
         <div style="font-size: 8.5px; font-weight: bold; margin-bottom: 4px;">
-          A. &nbsp; Pihak Pemberi telah memastikan bahwa seluruh aset yang diserahkan sudah melalui proses pengecekan saat diserahkan.
+          A. &nbsp; ${t('bast_doc_list_a')}
         </div>
         <table class="border-table">
           <thead>
             <tr>
-              <th scope="col" style="width: 5%; text-align: center;">No</th>
-              <th scope="col" style="width: 25%;">Deskripsi/Jenis Aset</th>
+              <th scope="col" style="width: 5%; text-align: center;">${t('bast_doc_th_no')}</th>
+              <th scope="col" style="width: 25%;">${t('bast_doc_th_desc')}</th>
               <th scope="col" style="width: 8%; text-align: center;">Qty</th>
-              <th scope="col" style="width: 62%;">Spesifikasi Merk/Tipe/Model & Nomor Serial (S/N)/Hostname</th>
+              <th scope="col" style="width: 62%;">${t('bast_doc_th_spec')}</th>
             </tr>
           </thead>
           <tbody>
@@ -754,15 +788,15 @@ async function generatePdf({
 
       section3Html += `
         <div style="font-size: 8.5px; font-weight: bold; margin-top: 6px; margin-bottom: 4px;">
-          B. &nbsp; Tabel di bawah ini diisi dengan data aset lama, apabila aktivitas serah terima disertai dengan penggantian aset.
+          B. &nbsp; ${t('bast_doc_list_b')}
         </div>
         <table class="border-table">
           <thead>
             <tr>
-              <th scope="col" style="width: 5%; text-align: center;">No</th>
-              <th scope="col" style="width: 25%;">Deskripsi/Jenis Aset</th>
+              <th scope="col" style="width: 5%; text-align: center;">${t('bast_doc_th_no')}</th>
+              <th scope="col" style="width: 25%;">${t('bast_doc_th_desc')}</th>
               <th scope="col" style="width: 8%; text-align: center;">Qty</th>
-              <th scope="col" style="width: 62%;">Spesifikasi Merk/Tipe/Model & Nomor Serial (S/N)/Hostname</th>
+              <th scope="col" style="width: 62%;">${t('bast_doc_th_spec')}</th>
             </tr>
           </thead>
           <tbody>
@@ -779,10 +813,10 @@ async function generatePdf({
 
   const html = ((form) => `
     <!DOCTYPE html>
-    <html lang="id">
+    <html lang="${currentLang.value}">
     <head>
       <meta charset="UTF-8">
-      <title>Formulir Serah Terima Aset Perusahaan</title>
+      <title>${t('bast_doc_page_title')}</title>
       <style>
         @page {
           size: A4 portrait;
@@ -931,45 +965,45 @@ async function generatePdf({
       <div class="header">
         <img src="/logo-full.svg" alt="TrackIT logo" />
         <div class="header-title">
-          <h1>Formulir Serah Terima</h1>
-          <h2>Aset Perusahaan</h2>
+          <h1>${t('bast_doc_header_title')}</h1>
+          <h2>${t('bast_doc_header_subtitle')}</h2>
         </div>
         <div style="width: 120px;"></div> <!-- Spacer matching logo width for centering title -->
       </div>
 
       <div class="intro-text">
-        Telah dilakukan serah terima aset milik PT Esensi Solusi Buana kepada karyawan atau pihak yang bersangkutan dengan detail sebagai berikut:
+        ${t('bast_doc_intro')}
       </div>
 
-      <h3 class="section-title">I. Profil Pihak Terkait</h3>
+      <h3 class="section-title">${t('bast_doc_section1')}</h3>
       <table class="border-table">
         <thead>
           <tr>
-            <th scope="col" style="width: 25%;">Detail</th>
-            <th scope="col" style="width: 37.5%;">Pihak Pemberi</th>
-            <th scope="col" style="width: 37.5%;">Pihak Penerima</th>
+            <th scope="col" style="width: 25%;">${t('bast_doc_th_detail')}</th>
+            <th scope="col" style="width: 37.5%;">${t('bast_doc_th_pemberi')}</th>
+            <th scope="col" style="width: 37.5%;">${t('bast_doc_th_penerima')}</th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td class="font-bold">Nama Lengkap</td>
+            <td class="font-bold">${t('bast_doc_full_name')}</td>
             <td>${form.value.pemberiNama}</td>
             <td>${form.value.penerimaNama || '-'}</td>
           </tr>
           <tr>
-            <td class="font-bold">Direktorat</td>
+            <td class="font-bold">${t('bast_doc_direktorat')}</td>
             <td>${form.value.pemberiDirektorat}</td>
             <td>${form.value.penerimaDirektorat || '-'}</td>
           </tr>
         </tbody>
       </table>
 
-      <h3 class="section-title">II. Tujuan Serah Terima Aset</h3>
-      <div style="font-size: 8px; margin-bottom: 3px; font-style: italic; color: #000000;">Beri tanda centang [✓] pada kolom dan coret yang tidak sesuai.</div>
+      <h3 class="section-title">${t('bast_doc_section2')}</h3>
+      <div style="font-size: 8px; margin-bottom: 3px; font-style: italic; color: #000000;">${t('bast_doc_tujuan_hint')}</div>
       <div class="tujuan-grid">
         <div class="tujuan-item">
           <span class="tujuan-box">${isTujuanBaru}</span>
-          <span>Serah Terima Baru</span>
+          <span>${t('bast_doc_tujuan_baru')}</span>
         </div>
         <div class="tujuan-item">
           <span class="tujuan-box">${isTujuanPeminjaman}</span>
@@ -981,30 +1015,30 @@ async function generatePdf({
         </div>
         <div class="tujuan-item">
           <span class="tujuan-box">${isTujuanDisposal}</span>
-          <span>Disposal</span>
+          <span>${t('bast_doc_disposal')}</span>
         </div>
         <div class="tujuan-item">
           <span class="tujuan-box">${isTujuanLainnya}</span>
-          <span>Lainnya: ${tujuanLainnyaText || '___________'}</span>
+          <span>${t('bast_doc_other')}: ${tujuanLainnyaText || '___________'}</span>
         </div>
       </div>
 
       ${section3Html}
 
-      <h3 class="section-title">IV. Ketentuan Penggunaan Aset</h3>
-      <div style="font-size: 8px; margin-bottom: 3px; color: #000000;">Dengan menandatangani dokumen ini, Pihak Penerima menyatakan tunduk pada kebijakan dari penggunaan aset perusahaan sebagai berikut:</div>
+      <h3 class="section-title">${t('bast_doc_section4')}</h3>
+      <div style="font-size: 8px; margin-bottom: 3px; color: #000000;">${t('bast_doc_section4_intro')}</div>
       <ol class="ketentuan-list">
-        <li><strong>Tanggung Jawab & Pemeliharaan:</strong> Pihak Penerima bertanggung jawab penuh atas keamanan dan pemeliharaan aset, termasuk menjaga kebersihan serta kelayakan fungsinya. Segala kerusakan akibat tumpahan cairan, benturan, jatuh, kehilangan, atau kelalaian penyimpanan menjadi tanggung jawab Pihak Penerima sepenuhnya.</li>
-        <li><strong>Batasan Penggunaan:</strong> Aset hanya digunakan untuk kepentingan operasional <strong>PT Esensi Solusi Buana</strong>. Pihak Penerima dilarang melakukan modifikasi terhadap perangkat fisik (hardware) maupun perangkat lunak (software) tanpa izin dari <strong>People Business Partner</strong>. Penggunaan untuk kepentingan pribadi atau pihak ketiga tanpa persetujuan merupakan pelanggaran kode etik perusahaan.</li>
-        <li><strong>Pelaporan Kerusakan & Kehilangan:</strong> Jika terjadi kerusakan akibat kelalaian atau pelanggaran, maupun kehilangan, Pihak Penerima wajib melaporkan kepada Perusahaan paling lambat dalam waktu <strong>1x24 jam</strong> melalui <strong>People Business Partner</strong> terkait.. Atas kejadian tersebut, Pihak Penerima dapat dikenakan sanksi berupa biaya perbaikan, penggantian unit baru, atau penggantian senilai harga pasar aset sesuai ketentuan yang berlaku.</li>
-        <li><strong>Audit & Verifikasi:</strong> Perusahaan berhak melakukan verifikasi fisik (audit) terhadap aset sewaktu-waktu untuk memastikan kondisi dan status aset tetap terjaga. Pihak Penerima dengan ini memberikan persetujuan penuh kepada Perusahaan untuk melakukan verifikasi aset sebagai bagian dari kewajiban audit.</li>
-        <li><strong>Pengembalian Aset:</strong> Seluruh aset wajib dikembalikan dalam kondisi utuh dan berfungsi baik, kecuali apabila pengembalian dilakukan karena kerusakan yang mengharuskan penggantian unit. Dalam hal terjadi kerusakan, aset tetap wajib dikembalikan untuk proses verifikasi dan penggantian sesuai ketentuan. Semua aset yang masih dimiliki Pihak Penerima wajib diserahkan selambat-lambatnya pada saat berakhirnya hubungan kerja.</li>
-        <li><strong>Dukungan & Hak Tarik:</strong> Pihak Pemberi memberikan dukungan teknis atas kerusakan fungsional atau alami (bukan akibat kelalaian). Selain itu, Pihak Pemberi berhak menarik kembali aset sewaktu-waktu apabila ditemukan penyalahgunaan atau terdapat kebutuhan operasional mendesak.</li>
+        <li><strong>${t('bast_term_1_title')}:</strong> ${t('bast_term_1_body')}</li>
+        <li><strong>${t('bast_term_2_title')}:</strong> ${t('bast_term_2_body')}</li>
+        <li><strong>${t('bast_term_3_title')}:</strong> ${t('bast_term_3_body')}</li>
+        <li><strong>${t('bast_term_4_title')}:</strong> ${t('bast_term_4_body')}</li>
+        <li><strong>${t('bast_term_5_title')}:</strong> ${t('bast_term_5_body')}</li>
+        <li><strong>${t('bast_term_6_title')}:</strong> ${t('bast_term_6_body')}</li>
       </ol>
 
-      <h3 class="section-title">V. Pernyataan Dan Persetujuan</h3>
+      <h3 class="section-title">${t('bast_doc_section5')}</h3>
       <div class="pernyataan-box">
-        Dengan menandatangani dokumen ini, Pihak Pemberi dan Pihak Penerima menyatakan bahwa seluruh informasi yang tercantum dalam formulir ini adalah benar, lengkap, serta dibuat secara sadar tanpa paksaan dari pihak manapun, dan bahwa keduanya telah membaca, memahami, menyetujui, serta bersedia mematuhi seluruh ketentuan penggunaan aset perusahaan sebagaimana tercantum pada Bagian IV.
+        ${t('bast_doc_statement')}
       </div>
 
       <div class="sign-date">Jakarta, ${escapeHtml(formattedDate)}</div>
@@ -1013,22 +1047,22 @@ async function generatePdf({
         <tbody>
           <tr>
             <td>
-              <div class="sig-title">Diserahkan Oleh</div>
+              <div class="sig-title">${t('bast_doc_sig_giver')}</div>
               <div style="height: 50px;"></div>
               <div class="sig-name">${escapeHtml(form.value.pemberiNama)}</div>
               <div class="sig-sub">${escapeHtml(form.value.pemberiDirektorat)}</div>
             </td>
             <td>
-              <div class="sig-title">Diterima Oleh</div>
+              <div class="sig-title">${t('bast_doc_sig_recipient')}</div>
               <div style="height: 50px;"></div>
               <div class="sig-name">${form.value.penerimaNama || '__________________'}</div>
               <div class="sig-sub">${form.value.penerimaDirektorat || '__________________'}</div>
             </td>
             <td>
-              <div class="sig-title">Diketahui Oleh</div>
+              <div class="sig-title">${t('bast_doc_sig_ack')}</div>
               <div style="height: 50px;"></div>
               <div class="sig-name">${form.value.mengetahuiNama || '&nbsp;'}</div>
-              <div class="sig-sub">${form.value.mengetahuiJabatan || 'People Business Partner atau Asset Management'}</div>
+              <div class="sig-sub">${form.value.mengetahuiJabatan || t('bast_pbp_role')}</div>
             </td>
           </tr>
         </tbody>
@@ -1040,7 +1074,7 @@ async function generatePdf({
 
   return printHtmlDocument(
     html,
-    'Pop-up terblokir. Harap izinkan pop-up untuk mencetak PDF.',
+    t('bast_popup_blocked'),
     printWindow,
   )
 }
@@ -1056,16 +1090,16 @@ onMounted(fetchData)
     <!-- ── Page Header (komponen bersama; sama dengan halaman lain) ─────────── -->
     <PageHeader
       v-if="isFormOpen"
-      title="Formulir Serah Terima Aset"
-      subtitle="Dokumentasi & Berita Acara Serah Terima (BAST) perangkat IT & inventaris"
+      :title="t('bast_form_title')"
+      :subtitle="t('bast_form_subtitle')"
       icon="assignment"
     />
 
-    <ol v-if="isFormOpen" class="submission-steps" aria-label="Tahapan pengisian">
-      <li><span>1</span>Pihak terkait</li>
-      <li><span>2</span>Tujuan</li>
-      <li><span>3</span>Daftar aset</li>
-      <li><span>4</span>Pengesahan & Cetak</li>
+    <ol v-if="isFormOpen" class="submission-steps" :aria-label="t('bast_steps_aria')">
+      <li><span>1</span>{{ t('bast_step_parties') }}</li>
+      <li><span>2</span>{{ t('bast_step_purpose') }}</li>
+      <li><span>3</span>{{ t('bast_step_assets') }}</li>
+      <li><span>4</span>{{ t('bast_step_approval') }}</li>
     </ol>
 
     <div
@@ -1080,8 +1114,8 @@ onMounted(fetchData)
     <!-- ── Page Header mode daftar (komponen bersama) ──────────── -->
     <PageHeader
       v-if="!isLoading && !isFormOpen"
-      title="Riwayat BAST / Pengajuan"
-      subtitle="Kelola dan pantau arsip dokumen berita acara serah terima aset"
+      :title="t('bast_history_title')"
+      :subtitle="t('bast_history_subtitle')"
       icon="assignment"
     >
       <button
@@ -1090,8 +1124,7 @@ onMounted(fetchData)
         class="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-[6px] bg-[#0A51B0] px-3 text-xs font-semibold text-white hover:bg-[#0A4391] transition-colors"
         @click="router.push('/submissions/new')"
       >
-        <span aria-hidden="true" class="material-symbols-outlined text-[16px]">add</span>BAST
-        Baru
+        <span aria-hidden="true" class="material-symbols-outlined text-[16px]">add</span>{{ t('btn_new_bast') }}
       </button>
     </PageHeader>
 
@@ -1101,40 +1134,40 @@ onMounted(fetchData)
       class="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-2.5 lg:gap-3"
     >
       <StatCard
-        title="Total Dokumen BAST"
+        :title="t('stat_total_bast')"
         :value="submissionStats.total"
         icon="assignment"
         color="primary"
-        subtitle="Dokumen terdaftar"
+        :subtitle="t('bast_stat_registered_sub')"
         is-total
       />
       <StatCard
-        title="Serah Terima Baru"
+        :title="t('bast_stat_new_title')"
         :value="submissionStats.baru"
         icon="devices"
         color="neutral"
-        subtitle="Unit baru dialokasikan"
+        :subtitle="t('bast_stat_new_sub')"
       />
       <StatCard
-        title="Peminjaman & Servis"
+        :title="t('bast_stat_loan_repair_title')"
         :value="submissionStats.peminjamanPerbaikan"
         icon="build"
         color="warning"
-        subtitle="Pinjam atau servis"
+        :subtitle="t('bast_stat_loan_repair_sub')"
       />
       <StatCard
-        title="Pengembalian / Lainnya"
+        :title="t('bast_stat_return_title')"
         :value="submissionStats.pengembalian"
         icon="published_with_changes"
         color="success"
-        subtitle="Disposal / kembali"
+        :subtitle="t('bast_stat_return_sub')"
       />
     </div>
 
     <section
       v-if="!isLoading && !isFormOpen"
       class="submission-history"
-      aria-label="Riwayat pengajuan BAST"
+      :aria-label="t('bast_history_aria')"
     >
       <div
         class="asset-toolbar flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 sm:gap-2.5 rounded-[6px] border border-[#E2E8F0]/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-2 sm:p-2.5 shadow-2xs"
@@ -1148,15 +1181,15 @@ onMounted(fetchData)
           <input
             v-model="searchQuery"
             type="search"
-            aria-label="Cari nomor BAST atau nama pihak"
-            placeholder="Cari nomor BAST, nama pihak, atau NIK…"
+            :aria-label="t('bast_search_aria')"
+            :placeholder="t('bast_search_placeholder')"
             class="h-8 w-full rounded-[6px] border border-[#E2E8F0] dark:border-slate-700 bg-white dark:bg-slate-800 pl-8.5 pr-8 text-xs text-[#333333] dark:text-slate-100 placeholder:text-slate-400 focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
           />
           <button
             v-if="searchQuery"
             type="button"
             @click="searchQuery = ''"
-            aria-label="Bersihkan pencarian"
+            :aria-label="t('clear_search')"
             class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-white cursor-pointer"
           >
             <span aria-hidden="true" class="material-symbols-outlined text-[14px]">close</span>
@@ -1170,7 +1203,7 @@ onMounted(fetchData)
             class="relative inline-flex h-8 items-center gap-1 rounded-[6px] border border-[#E2E8F0] dark:border-slate-700 bg-[#F8FAFC] dark:bg-slate-800 px-2.5 sm:px-3 text-xs font-semibold text-[#5F7089] dark:text-slate-300 hover:bg-white dark:hover:bg-slate-700 transition-colors cursor-pointer"
           >
             <span aria-hidden="true" class="material-symbols-outlined text-[15px]">filter_alt</span>
-            <span>Filter</span>
+            <span>{{ t('filter') }}</span>
             <span
               v-if="activeFilterCount > 0"
               class="ml-0.5 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-[#0A51B0] px-1 text-[9px] font-bold text-white"
@@ -1184,10 +1217,10 @@ onMounted(fetchData)
             type="button"
             @click="resetSubmissionFilters"
             class="inline-flex h-8 items-center rounded-[6px] border border-rose-200 dark:border-rose-900 bg-rose-50/50 dark:bg-rose-950/30 px-2 text-xs font-medium text-rose-600 dark:text-rose-400 hover:bg-rose-100/60 transition-colors cursor-pointer"
-            title="Reset Filter"
+            :title="t('filter_reset')"
           >
             <span aria-hidden="true" class="material-symbols-outlined text-[14px] mr-0.5">refresh</span>
-            <span>Reset</span>
+            <span>{{ t('reset') }}</span>
           </button>
         </div>
       </div>
@@ -1195,13 +1228,13 @@ onMounted(fetchData)
         <div class="it-list-heading" aria-live="polite">
           <div>
             <h3>
-              Daftar Dokumen <span>{{ filteredSubmissions.length }}</span>
+              {{ t('bast_list_heading') }} <span>{{ filteredSubmissions.length }}</span>
             </h3>
             <p>
               {{
                 searchQuery
-                  ? 'Hasil sesuai pencarian dan filter Anda'
-                  : 'Riwayat BAST dan pengajuan aset'
+                  ? t('bast_list_sub_filtered')
+                  : t('bast_list_sub_default')
               }}
             </p>
           </div>
@@ -1211,27 +1244,30 @@ onMounted(fetchData)
               >{{ (currentPage - 1) * itemsPerPage + 1 }}–{{
                 Math.min(currentPage * itemsPerPage, filteredSubmissions.length)
               }}
-              dari {{ filteredSubmissions.length }} dokumen</span
+              {{ t('of_entries') }} {{ filteredSubmissions.length }} {{ t('bast_documents_label') }}</span
             >
           </div>
         </div>
       </div>
+      <div v-if="isLoading" aria-busy="true" class="mt-3">
+        <SkeletonTable preset="default" :rows="6" />
+      </div>
       <div
-        v-if="!filteredSubmissions.length"
+        v-else-if="!filteredSubmissions.length"
         class="mt-3 rounded-[6px] border border-[#E2E8F0] dark:border-slate-800 bg-white dark:bg-slate-900 px-4 py-12 text-center text-xs text-[#5F7089] dark:text-slate-400"
       >
-        Belum ada BAST yang sesuai.<button
+        {{ t('bast_empty') }}<button
           type="button"
           class="ml-1 font-bold text-[#0A51B0] dark:text-sky-400"
           @click="resetSubmissionFilters"
         >
-          Reset filter
+          {{ t('bast_reset_filter') }}
         </button>
       </div>
       <div v-else-if="viewMode === 'table'" class="ws-data-table-wrap submission-table-wrap">
         <table class="ws-data-table">
           <caption class="sr-only">
-            Daftar riwayat BAST
+            {{ t('bast_table_caption') }}
           </caption>
           <colgroup>
             <col class="w-[28%]" />
@@ -1242,11 +1278,11 @@ onMounted(fetchData)
           </colgroup>
           <thead>
             <tr>
-              <th scope="col">Dokumen</th>
-              <th scope="col">Pemberi</th>
-              <th scope="col">Penerima</th>
-              <th scope="col">Tanggal</th>
-              <th scope="col"><span class="sr-only">Aksi</span></th>
+              <th scope="col">{{ t('bast_th_document') }}</th>
+              <th scope="col">{{ t('bast_th_pemberi') }}</th>
+              <th scope="col">{{ t('bast_th_penerima') }}</th>
+              <th scope="col">{{ t('th_date') }}</th>
+              <th scope="col"><span class="sr-only">{{ t('actions') }}</span></th>
             </tr>
           </thead>
           <tbody>
@@ -1261,7 +1297,7 @@ onMounted(fetchData)
                   :to="`/submissions/${submission.id}`"
                   @click.stop
                   >{{ submission.submission_number }}</RouterLink
-                ><span class="ws-cell-sub">BAST / Pengajuan Aset</span>
+                ><span class="ws-cell-sub">{{ t('bast_doc_type_label') }}</span>
               </td>
               <td>
                 <span class="ws-cell-main" :title="submission.payload?.pemberiNama">{{
@@ -1285,7 +1321,7 @@ onMounted(fetchData)
               <td @click.stop>
                 <AppRowActions
                   :actions="getSubmissionActions(submission)"
-                  :label="`Aksi BAST ${submission.submission_number}`"
+                  :label="`${t('bast_row_actions_prefix')} ${submission.submission_number}`"
                 />
               </td>
             </tr>
@@ -1309,21 +1345,21 @@ onMounted(fetchData)
                   submission.submission_number
                 }}</RouterLink>
               </h4>
-              <p :title="submission.payload?.tujuanLainnya || 'BAST / Pengajuan Aset'">
-                BAST / Pengajuan Aset
+              <p :title="submission.payload?.tujuanLainnya || t('bast_doc_type_label')">
+                {{ t('bast_doc_type_label') }}
               </p>
               <span class="laptop-serial">ID: {{ submission.id }}</span>
             </div>
           </div>
           <div class="laptop-holder laptop-field">
-            <span class="laptop-label">Pemberi</span>
+            <span class="laptop-label">{{ t('bast_th_pemberi') }}</span>
             <strong :title="submission.payload?.pemberiNama">{{
               submission.payload?.pemberiNama || '-'
             }}</strong>
             <span class="laptop-secondary">{{ submission.payload?.pemberiDirektorat || '-' }}</span>
           </div>
           <div class="laptop-location laptop-field">
-            <span class="laptop-label">Penerima</span>
+            <span class="laptop-label">{{ t('bast_th_penerima') }}</span>
             <strong :title="submission.payload?.penerimaNama">{{
               submission.payload?.penerimaNama || '-'
             }}</strong>
@@ -1332,7 +1368,7 @@ onMounted(fetchData)
             }}</span>
           </div>
           <div class="laptop-state">
-            <span class="laptop-label">Tanggal</span>
+            <span class="laptop-label">{{ t('th_date') }}</span>
             <span class="laptop-condition">{{
               submission.payload?.tanggal || formatSubmissionDate(submission.updated_at)
             }}</span>
@@ -1340,7 +1376,7 @@ onMounted(fetchData)
           <div class="laptop-actions" @click.stop>
             <AppRowActions
               :actions="getSubmissionActions(submission)"
-              :label="`Aksi BAST ${submission.submission_number}`"
+              :label="`${t('bast_row_actions_prefix')} ${submission.submission_number}`"
             />
           </div>
         </div>
@@ -1453,7 +1489,7 @@ onMounted(fetchData)
     </div>
 
     <!-- Error State -->
-    <ErrorState v-else-if="pageError" :message="pageError" retry-label="Coba Lagi" @retry="fetchData" />
+    <ErrorState v-else-if="pageError" :message="pageError" :retry-label="t('retry')" @retry="fetchData" />
 
     <!-- Main Submission Form -->
     <form
@@ -1466,10 +1502,10 @@ onMounted(fetchData)
       >
         <div>
           <h2 class="text-sm font-bold text-[#333333]">
-            {{ selectedSubmissionId ? 'Detail BAST / Pengajuan' : 'BAST Baru' }}
+            {{ selectedSubmissionId ? t('bast_form_heading_detail') : t('btn_new_bast') }}
           </h2>
           <p class="text-[11px] text-[#5F7089]">
-            Lengkapi data untuk menyimpan atau mencetak dokumen.
+            {{ t('bast_form_heading_hint') }}
           </p>
         </div>
         <button
@@ -1478,7 +1514,7 @@ onMounted(fetchData)
           :disabled="isSaving"
           @click="router.push('/submissions')"
         >
-          Tutup
+          {{ t('btn_close') }}
         </button>
       </div>
       <!-- Validation Error Banner -->
@@ -1498,7 +1534,7 @@ onMounted(fetchData)
           type="button"
           class="text-rose-500 hover:text-rose-700 p-1 rounded-[6px] hover:bg-rose-100 transition-colors cursor-pointer"
           @click="validationError = ''"
-          title="Tutup pesan error"
+          :title="t('bast_close_error_title')"
         >
           <span aria-hidden="true" class="material-symbols-outlined text-[16px]">close</span>
         </button>
@@ -1522,10 +1558,10 @@ onMounted(fetchData)
               </span>
               <div>
                 <h2 class="text-sm font-semibold text-[#333333]">
-                  Profil Pihak Terkait
+                  {{ t('bast_section_parties_title') }}
                 </h2>
                 <p class="text-[11px] text-[#5F7089]">
-                  Tentukan identitas pihak pemberi dan penerima aset
+                  {{ t('bast_section_parties_subtitle') }}
                 </p>
               </div>
             </div>
@@ -1543,20 +1579,20 @@ onMounted(fetchData)
                   >person_outline</span
                 >
                 <h3 class="text-xs font-bold uppercase tracking-wider text-[#333333]">
-                  Pihak Pemberi (Karyawan)
+                  {{ t('bast_party_giver_title') }}
                 </h3>
               </div>
 
               <label class="flex flex-col gap-1.5">
-                <span class="text-[11px] font-bold uppercase text-[#475569]">Pilih Karyawan *</span>
+                <span class="text-[11px] font-bold uppercase text-[#475569]">{{ t('bast_select_employee') }}</span>
                 <SearchableSelect
                   v-model="form.pemberiNik"
                   :options="employees"
                   value-key="nik"
                   label-key="nama_karyawan"
                   secondary-label-key="nik"
-                  placeholder="Pilih karyawan pemberi"
-                  search-placeholder="Cari nama atau NIK…"
+                  :placeholder="t('bast_placeholder_giver_employee')"
+                  :search-placeholder="t('bast_search_employee')"
                   height-class="h-8"
                 />
               </label>
@@ -1564,31 +1600,31 @@ onMounted(fetchData)
               <div class="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
                 <label class="flex flex-col gap-1">
                   <span class="text-[10px] font-bold uppercase text-[#5F7089]"
-                    >Nama Lengkap (Auto)</span
+                    >{{ t('bast_full_name_auto') }}</span
                   >
                   <input
                     v-model="form.pemberiNama"
                     required
                     type="text"
-                    aria-label="Nama Lengkap Pemberi (Auto)"
+                    :aria-label="t('bast_aria_name_giver_auto')"
                     class="h-8 w-full rounded-[6px] border border-slate-200 bg-slate-100/70 px-3 text-xs font-medium text-slate-600 outline-none cursor-default"
                     readonly
-                    placeholder="Terisi otomatis"
+                    :placeholder="t('bast_auto_filled')"
                   />
                 </label>
 
                 <label class="flex flex-col gap-1">
                   <span class="text-[10px] font-bold uppercase text-[#5F7089]"
-                    >Direktorat (Auto)</span
+                    >{{ t('bast_direktorat_auto') }}</span
                   >
                   <input
                     v-model="form.pemberiDirektorat"
                     required
                     type="text"
-                    aria-label="Direktorat Pemberi (Auto)"
+                    :aria-label="t('bast_aria_direktorat_giver_auto')"
                     class="h-8 w-full rounded-[6px] border border-slate-200 bg-slate-100/70 px-3 text-xs font-medium text-slate-600 outline-none cursor-default"
                     readonly
-                    placeholder="Terisi otomatis"
+                    :placeholder="t('bast_auto_filled')"
                   />
                 </label>
               </div>
@@ -1606,7 +1642,7 @@ onMounted(fetchData)
                     >person_add</span
                   >
                   <h3 class="text-xs font-bold uppercase tracking-wider text-amber-600">
-                    Pihak Penerima
+                    {{ t('bast_party_recipient_title') }}
                   </h3>
                 </div>
 
@@ -1614,56 +1650,56 @@ onMounted(fetchData)
                   <input
                     v-model="form.isPenerimaLainnya"
                     type="checkbox"
-                    aria-label="Penerima Non-Karyawan (Vendor/Lainnya)"
+                    :aria-label="t('bast_aria_recipient_non_employee')"
                     class="rounded-[4px] border-slate-300 accent-[#0A51B0] h-4 w-4 cursor-pointer"
                   />
                   <span class="text-[11px] font-bold text-[#475569]"
-                    >Non-Karyawan (Vendor/Lainnya)</span
+                    >{{ t('bast_recipient_non_employee') }}</span
                   >
                 </label>
               </div>
 
               <label v-if="!form.isPenerimaLainnya" class="flex flex-col gap-1.5">
-                <span class="text-[11px] font-bold uppercase text-[#475569]">Pilih Karyawan *</span>
+                <span class="text-[11px] font-bold uppercase text-[#475569]">{{ t('bast_select_employee') }}</span>
                 <SearchableSelect
                   v-model="form.penerimaNik"
                   :options="employees"
                   value-key="nik"
                   label-key="nama_karyawan"
                   secondary-label-key="nik"
-                  placeholder="Pilih karyawan penerima"
-                  search-placeholder="Cari nama atau NIK…"
+                  :placeholder="t('bast_placeholder_recipient_employee')"
+                  :search-placeholder="t('bast_search_employee')"
                   height-class="h-8"
                 />
               </label>
 
               <div v-else class="flex flex-col gap-1.5">
                 <span class="text-[11px] font-bold uppercase text-[#475569]"
-                  >Nama Lengkap / Vendor *</span
+                  >{{ t('bast_name_vendor_label') }}</span
                 >
                 <input
                   v-model="form.penerimaNama"
                   required
                   type="text"
-                  aria-label="Nama Lengkap / Vendor Penerima"
+                  :aria-label="t('bast_aria_name_vendor_recipient')"
                   class="h-8 w-full rounded-[6px] border border-[#E2E8F0] bg-white px-3 text-xs font-medium text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 focus:outline-none transition-all"
-                  placeholder="Tulis nama lengkap penerima atau vendor…"
+                  :placeholder="t('bast_placeholder_name_vendor')"
                 />
               </div>
 
               <div class="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
                 <label v-if="!form.isPenerimaLainnya" class="flex flex-col gap-1">
                   <span class="text-[10px] font-bold uppercase text-[#5F7089]"
-                    >Nama Lengkap (Auto)</span
+                    >{{ t('bast_full_name_auto') }}</span
                   >
                   <input
                     v-model="form.penerimaNama"
                     required
                     type="text"
-                    aria-label="Nama Lengkap Penerima (Auto)"
+                    :aria-label="t('bast_aria_name_recipient_auto')"
                     class="h-8 w-full rounded-[6px] border border-slate-200 bg-slate-100/70 px-3 text-xs font-medium text-slate-600 outline-none cursor-default"
                     readonly
-                    placeholder="Terisi otomatis"
+                    :placeholder="t('bast_auto_filled')"
                   />
                 </label>
 
@@ -1672,7 +1708,7 @@ onMounted(fetchData)
                   :class="form.isPenerimaLainnya ? 'sm:col-span-2' : ''"
                 >
                   <span class="text-[10px] font-bold uppercase text-[#5F7089]">
-                    {{ form.isPenerimaLainnya ? 'Direktorat / Perusahaan *' : 'Direktorat (Auto)' }}
+                    {{ form.isPenerimaLainnya ? t('bast_direktorat_company_label') : t('bast_direktorat_auto') }}
                   </span>
                   <input
                     v-model="form.penerimaDirektorat"
@@ -1680,8 +1716,8 @@ onMounted(fetchData)
                     type="text"
                     :aria-label="
                       form.isPenerimaLainnya
-                        ? 'Direktorat / Perusahaan Penerima'
-                        : 'Direktorat Penerima (Auto)'
+                        ? t('bast_aria_direktorat_company_recipient')
+                        : t('bast_aria_direktorat_recipient_auto')
                     "
                     class="h-8 w-full rounded-[6px] border px-3 text-xs font-medium outline-none transition-all"
                     :class="
@@ -1692,8 +1728,8 @@ onMounted(fetchData)
                     :readonly="!form.isPenerimaLainnya"
                     :placeholder="
                       form.isPenerimaLainnya
-                        ? 'Tulis nama direktorat, departemen, atau perusahaan...'
-                        : 'Terisi otomatis'
+                        ? t('bast_placeholder_direktorat_company')
+                        : t('bast_auto_filled')
                     "
                   />
                 </label>
@@ -1715,10 +1751,10 @@ onMounted(fetchData)
               </span>
               <div>
                 <h2 class="text-sm font-semibold text-[#333333]">
-                  Tujuan Serah Terima Aset
+                  {{ t('bast_section_purpose_title') }}
                 </h2>
                 <p class="text-[11px] text-[#5F7089]">
-                  Pilih salah satu keperluan serah terima perangkat
+                  {{ t('bast_section_purpose_subtitle') }}
                 </p>
               </div>
             </div>
@@ -1729,43 +1765,43 @@ onMounted(fetchData)
               v-for="t in [
                 {
                   key: 'baru',
-                  label: 'Serah Terima Baru',
+                  label: t('bast_tujuan_baru'),
                   icon: 'fiber_new',
                   color: 'text-[#333333] bg-[#EDF5FF]',
                 },
                 {
                   key: 'peminjaman',
-                  label: 'Peminjaman',
+                  label: t('bast_tujuan_peminjaman'),
                   icon: 'handshake',
                   color: 'text-amber-600 bg-amber-50',
                 },
                 {
                   key: 'pengembalian',
-                  label: 'Pengembalian',
+                  label: t('bast_tujuan_pengembalian'),
                   icon: 'keyboard_return',
                   color: 'text-indigo-600 bg-indigo-50',
                 },
                 {
                   key: 'perbaikan',
-                  label: 'Perbaikan',
+                  label: t('bast_tujuan_perbaikan'),
                   icon: 'build',
                   color: 'text-rose-600 bg-rose-50',
                 },
                 {
                   key: 'penggantian',
-                  label: 'Penggantian',
+                  label: t('bast_tujuan_penggantian'),
                   icon: 'swap_horiz',
                   color: 'text-purple-600 bg-purple-50',
                 },
                 {
                   key: 'disposal',
-                  label: 'Disposal Aset',
+                  label: t('bast_tujuan_disposal'),
                   icon: 'delete_sweep',
                   color: 'text-slate-600 bg-slate-100',
                 },
                 {
                   key: 'lainnya',
-                  label: 'Lainnya',
+                  label: t('bast_tujuan_lainnya'),
                   icon: 'more_horiz',
                   color: 'text-teal-600 bg-teal-50',
                 },
@@ -1807,15 +1843,15 @@ onMounted(fetchData)
 
           <div v-if="form.tujuan === 'lainnya'" class="mt-0.5 flex flex-col gap-1">
             <span class="text-[10px] font-bold uppercase text-[#475569]"
-              >Keterangan Tujuan Lainnya *</span
+              >{{ t('bast_tujuan_lainnya_label') }}</span
             >
             <input
               v-model="form.tujuanLainnya"
               required
               type="text"
-              aria-label="Keterangan Tujuan Serah Terima Lainnya"
+              :aria-label="t('bast_aria_tujuan_lainnya')"
               class="h-8 w-full rounded-[6px] border border-[#E2E8F0] bg-white px-3 text-xs font-medium text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 focus:outline-none transition-all"
-              placeholder="Tuliskan tujuan serah terima aset lainnya…"
+              :placeholder="t('bast_placeholder_tujuan_lainnya')"
             />
           </div>
         </div>
@@ -1835,10 +1871,10 @@ onMounted(fetchData)
                 </span>
                 <div class="min-w-0">
                   <h2 class="text-sm font-semibold text-[#333333] truncate">
-                    Aset Baru (Diserahkan)
+                    {{ t('bast_assets_new_title') }}
                   </h2>
                   <p class="text-[11px] text-[#5F7089] truncate">
-                    Perangkat yang diserahkan ke penerima
+                    {{ t('bast_assets_new_subtitle') }}
                   </p>
                 </div>
               </div>
@@ -1849,7 +1885,7 @@ onMounted(fetchData)
                 class="h-8 shrink-0 whitespace-nowrap rounded-[6px] bg-[#0A51B0] px-3 text-xs font-semibold text-white shadow-2xs hover:bg-[#0A4391] transition-all flex items-center justify-center gap-1 cursor-pointer"
               >
                 <span aria-hidden="true" class="material-symbols-outlined text-[15px]">add</span>
-                <span>Tambah Unit</span>
+                <span>{{ t('bast_add_unit') }}</span>
               </button>
             </div>
 
@@ -1869,7 +1905,7 @@ onMounted(fetchData)
                     <span aria-hidden="true" class="material-symbols-outlined text-[13px]"
                       >devices</span
                     >
-                    Unit Baru #{{ index + 1 }}
+                    {{ t('bast_unit_new') }}{{ index + 1 }}
                   </span>
 
                   <button
@@ -1877,18 +1913,18 @@ onMounted(fetchData)
                     type="button"
                     @click="removeAssetBaruRow(index)"
                     class="flex h-6.5 items-center gap-1 rounded-[4px] bg-rose-50 px-2 text-[11px] font-semibold text-rose-600 hover:bg-rose-100 transition-all cursor-pointer border border-rose-200/60"
-                    title="Hapus baris unit ini"
+                    :title="t('bast_remove_row_title')"
                   >
                     <span aria-hidden="true" class="material-symbols-outlined text-[13px]"
                       >delete</span
                     >
-                    <span>Hapus</span>
+                    <span>{{ t('btn_delete') }}</span>
                   </button>
                 </div>
 
                 <label class="flex flex-col gap-1">
                   <span class="text-[10px] font-bold uppercase text-[#475569]"
-                    >Pilih Aset IT *</span
+                    >{{ t('bast_select_asset_it') }}</span
                   >
                   <SearchableSelect
                     :model-value="row.id_aset"
@@ -1897,8 +1933,8 @@ onMounted(fetchData)
                     value-key="id_aset"
                     label-key="label_aset"
                     secondary-label-key="nomor_seri"
-                    placeholder="Pilih Aset IT"
-                    search-placeholder="Cari label, hostname, atau nomor seri…"
+                    :placeholder="t('bast_placeholder_asset_it')"
+                    :search-placeholder="t('bast_search_asset')"
                     height-class="h-8"
                     @update:model-value="onAssetBaruSelect(index, $event)"
                   />
@@ -1906,14 +1942,14 @@ onMounted(fetchData)
                     v-if="row.id_aset && !assetBaruOptions.some((a) => a.id_aset === row.id_aset)"
                     class="submission-asset-snapshot text-xs text-amber-700"
                   >
-                    Aset #{{ row.id_aset }}: {{ row.spesifikasi || row.tipe }}.
+                    {{ t('bast_asset_label') }} #{{ row.id_aset }}: {{ row.spesifikasi || row.tipe }}.
                     {{
                       historicAssetRows.has(row)
-                        ? 'Snapshot tersimpan dipertahankan; pilih ulang untuk mengganti.'
-                        : 'Pilihan tidak sesuai pihak saat ini; pilih ulang atau kosongkan.'
+                        ? t('bast_snapshot_kept')
+                        : t('bast_snapshot_mismatch')
                     }}
                     <button type="button" class="underline" @click="onAssetBaruSelect(index, '')">
-                      Kosongkan aset
+                      {{ t('bast_clear_asset') }}
                     </button>
                   </span>
                 </label>
@@ -1921,15 +1957,15 @@ onMounted(fetchData)
                 <div class="grid grid-cols-1 sm:grid-cols-4 gap-2">
                   <label class="flex flex-col gap-1 sm:col-span-3">
                     <span class="text-[9.5px] font-bold uppercase text-[#5F7089]"
-                      >Deskripsi / Tipe (Auto)</span
+                      >{{ t('bast_desc_type_auto') }}</span
                     >
                     <input
                       v-model="row.tipe"
                       type="text"
-                      :aria-label="`Deskripsi Aset Baru Baris ${index + 1}`"
+                      :aria-label="`${t('bast_aria_desc_new')} ${index + 1}`"
                       class="h-8 w-full rounded-[6px] border border-slate-200 bg-slate-100/70 px-3 text-xs font-medium text-slate-600 outline-none cursor-default"
                       readonly
-                      placeholder="Tipe perangkat"
+                      :placeholder="t('bast_placeholder_device_type')"
                     />
                   </label>
 
@@ -1940,7 +1976,7 @@ onMounted(fetchData)
                       required
                       type="number"
                       min="1"
-                      :aria-label="`Jumlah (Qty) Aset Baru Baris ${index + 1}`"
+                      :aria-label="`${t('bast_aria_qty_new')} ${index + 1}`"
                       class="h-8 w-full rounded-[6px] border border-[#E2E8F0] bg-white px-2.5 text-xs font-bold text-center text-[#333333] focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 focus:outline-none transition-all"
                     />
                   </label>
@@ -1948,15 +1984,15 @@ onMounted(fetchData)
 
                 <label class="flex flex-col gap-1">
                   <span class="text-[9.5px] font-bold uppercase text-[#5F7089]"
-                    >Spesifikasi Lengkap (Auto)</span
+                    >{{ t('bast_spec_full_auto') }}</span
                   >
                   <input
                     v-model="row.spesifikasi"
                     type="text"
-                    :aria-label="`Spesifikasi Aset Baru Baris ${index + 1}`"
+                    :aria-label="`${t('bast_aria_spec_new')} ${index + 1}`"
                     class="h-8 w-full rounded-[6px] border border-slate-200 bg-slate-100/70 px-3 text-xs font-medium text-slate-600 outline-none cursor-default"
                     readonly
-                    placeholder="Merek / Model / Serial Number"
+                    :placeholder="t('bast_placeholder_spec_format')"
                   />
                 </label>
               </div>
@@ -1976,10 +2012,10 @@ onMounted(fetchData)
                 </span>
                 <div class="min-w-0">
                   <h2 class="text-sm font-semibold text-[#333333] truncate">
-                    Aset Lama (Dikembalikan)
+                    {{ t('bast_assets_old_title') }}
                   </h2>
                   <p class="text-[11px] text-[#5F7089] truncate">
-                    Perangkat lama jika ada penggantian
+                    {{ t('bast_assets_old_subtitle') }}
                   </p>
                 </div>
               </div>
@@ -1990,7 +2026,7 @@ onMounted(fetchData)
                 class="h-8 shrink-0 whitespace-nowrap rounded-[6px] bg-slate-800 px-3 text-xs font-semibold text-white shadow-2xs hover:bg-slate-900 transition-all flex items-center justify-center gap-1 cursor-pointer"
               >
                 <span aria-hidden="true" class="material-symbols-outlined text-[15px]">add</span>
-                <span>Tambah Unit</span>
+                <span>{{ t('bast_add_unit') }}</span>
               </button>
             </div>
 
@@ -2010,7 +2046,7 @@ onMounted(fetchData)
                     <span aria-hidden="true" class="material-symbols-outlined text-[13px]"
                       >history_toggle_drop_down</span
                     >
-                    Unit Lama #{{ index + 1 }}
+                    {{ t('bast_unit_old') }}{{ index + 1 }}
                   </span>
 
                   <button
@@ -2018,18 +2054,18 @@ onMounted(fetchData)
                     type="button"
                     @click="removeAssetLamaRow(index)"
                     class="flex h-6.5 items-center gap-1 rounded-[4px] bg-rose-50 px-2 text-[11px] font-semibold text-rose-600 hover:bg-rose-100 transition-all cursor-pointer border border-rose-200/60"
-                    title="Hapus baris unit lama ini"
+                    :title="t('bast_remove_row_old_title')"
                   >
                     <span aria-hidden="true" class="material-symbols-outlined text-[13px]"
                       >delete</span
                     >
-                    <span>Hapus</span>
+                    <span>{{ t('btn_delete') }}</span>
                   </button>
                 </div>
 
                 <label class="flex flex-col gap-1">
                   <span class="text-[10px] font-bold uppercase text-[#475569]"
-                    >Aset IT Lama (Opsional)</span
+                    >{{ t('bast_asset_old_optional') }}</span
                   >
                   <SearchableSelect
                     :model-value="row.id_aset"
@@ -2038,8 +2074,8 @@ onMounted(fetchData)
                     value-key="id_aset"
                     label-key="label_aset"
                     secondary-label-key="nomor_seri"
-                    placeholder="Pilih Aset IT Lama"
-                    search-placeholder="Cari label, hostname, atau nomor seri…"
+                    :placeholder="t('bast_placeholder_asset_it_old')"
+                    :search-placeholder="t('bast_search_asset')"
                     height-class="h-8"
                     @update:model-value="onAssetLamaSelect(index, $event)"
                   />
@@ -2047,14 +2083,14 @@ onMounted(fetchData)
                     v-if="row.id_aset && !assetLamaOptions.some((a) => a.id_aset === row.id_aset)"
                     class="submission-asset-snapshot text-xs text-amber-700"
                   >
-                    Aset #{{ row.id_aset }}: {{ row.spesifikasi || row.tipe }}.
+                    {{ t('bast_asset_label') }} #{{ row.id_aset }}: {{ row.spesifikasi || row.tipe }}.
                     {{
                       historicAssetRows.has(row)
-                        ? 'Snapshot tersimpan dipertahankan; pilih ulang untuk mengganti.'
-                        : 'Pilihan tidak sesuai pihak saat ini; pilih ulang atau kosongkan.'
+                        ? t('bast_snapshot_kept')
+                        : t('bast_snapshot_mismatch')
                     }}
                     <button type="button" class="underline" @click="onAssetLamaSelect(index, '')">
-                      Kosongkan aset
+                      {{ t('bast_clear_asset') }}
                     </button>
                   </span>
                 </label>
@@ -2062,15 +2098,15 @@ onMounted(fetchData)
                 <div class="grid grid-cols-1 sm:grid-cols-4 gap-2">
                   <label class="flex flex-col gap-1 sm:col-span-3">
                     <span class="text-[9.5px] font-bold uppercase text-[#5F7089]"
-                      >Deskripsi / Tipe (Auto)</span
+                      >{{ t('bast_desc_type_auto') }}</span
                     >
                     <input
                       v-model="row.tipe"
                       type="text"
-                      :aria-label="`Deskripsi Aset Lama Baris ${index + 1}`"
+                      :aria-label="`${t('bast_aria_desc_old')} ${index + 1}`"
                       class="h-8 w-full rounded-[6px] border border-slate-200 bg-slate-100/70 px-3 text-xs font-medium text-slate-600 outline-none cursor-default"
                       readonly
-                      placeholder="Tipe perangkat"
+                      :placeholder="t('bast_placeholder_device_type')"
                     />
                   </label>
 
@@ -2081,7 +2117,7 @@ onMounted(fetchData)
                       required
                       type="number"
                       min="1"
-                      :aria-label="`Jumlah (Qty) Aset Lama Baris ${index + 1}`"
+                      :aria-label="`${t('bast_aria_qty_old')} ${index + 1}`"
                       class="h-8 w-full rounded-[6px] border border-[#E2E8F0] bg-white px-2.5 text-xs font-bold text-center text-[#333333] focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 focus:outline-none transition-all"
                     />
                   </label>
@@ -2089,15 +2125,15 @@ onMounted(fetchData)
 
                 <label class="flex flex-col gap-1">
                   <span class="text-[9.5px] font-bold uppercase text-[#5F7089]"
-                    >Spesifikasi Lengkap (Auto)</span
+                    >{{ t('bast_spec_full_auto') }}</span
                   >
                   <input
                     v-model="row.spesifikasi"
                     type="text"
-                    :aria-label="`Spesifikasi Aset Lama Baris ${index + 1}`"
+                    :aria-label="`${t('bast_aria_spec_old')} ${index + 1}`"
                     class="h-8 w-full rounded-[6px] border border-slate-200 bg-slate-100/70 px-3 text-xs font-medium text-slate-600 outline-none cursor-default"
                     readonly
-                    placeholder="Merek / Model / Serial Number"
+                    :placeholder="t('bast_placeholder_spec_format')"
                   />
                 </label>
               </div>
@@ -2118,10 +2154,9 @@ onMounted(fetchData)
                 04
               </span>
               <div>
-                <h2 class="text-sm font-semibold text-[#333333]">Diketahui Oleh</h2>
+                <h2 class="text-sm font-semibold text-[#333333]">{{ t('bast_ack_title') }}</h2>
                 <p class="text-[11px] text-[#5F7089]">
-                  Pilih atau tulis identitas pihak yang mengetahui untuk dicantumkan pada lembar
-                  tanda tangan formulir
+                  {{ t('bast_ack_subtitle') }}
                 </p>
               </div>
             </div>
@@ -2130,10 +2165,10 @@ onMounted(fetchData)
               <input
                 v-model="form.isMengetahuiKustom"
                 type="checkbox"
-                aria-label="Input Manual Pihak Mengetahui"
+                :aria-label="t('bast_aria_ack_manual')"
                 class="rounded-[4px] border-slate-300 accent-[#0A51B0] h-4 w-4 cursor-pointer"
               />
-              <span class="text-[11px] font-bold text-[#475569]">Input Manual</span>
+              <span class="text-[11px] font-bold text-[#475569]">{{ t('bast_manual_input') }}</span>
             </label>
           </div>
 
@@ -2142,9 +2177,9 @@ onMounted(fetchData)
             <div v-if="!form.isMengetahuiKustom" class="flex flex-col gap-1">
               <div class="flex items-center justify-between">
                 <span class="text-[11px] font-bold uppercase text-[#475569]"
-                  >Pilih Karyawan / PBP</span
+                  >{{ t('bast_select_employee_pbp') }}</span
                 >
-                <span class="text-[10px] text-slate-400 font-medium">(Opsional)</span>
+                <span class="text-[10px] text-slate-400 font-medium">{{ t('bast_optional') }}</span>
               </div>
               <SearchableSelect
                 v-model="form.mengetahuiNik"
@@ -2152,36 +2187,36 @@ onMounted(fetchData)
                 value-key="nik"
                 label-key="nama_karyawan"
                 secondary-label-key="nik"
-                placeholder="Pilih nama yang mengetahui…"
-                search-placeholder="Cari nama atau NIK…"
+                :placeholder="t('bast_placeholder_ack_employee')"
+                :search-placeholder="t('bast_search_employee')"
                 height-class="h-8"
                 :clearable="true"
               />
             </div>
 
             <div v-else class="flex flex-col gap-1">
-              <span class="text-[11px] font-bold uppercase text-[#475569]">Nama Lengkap</span>
+              <span class="text-[11px] font-bold uppercase text-[#475569]">{{ t('bast_full_name') }}</span>
               <input
                 v-model="form.mengetahuiNama"
                 type="text"
-                aria-label="Nama Lengkap yang Mengetahui"
+                :aria-label="t('bast_aria_ack_name')"
                 class="h-8 w-full rounded-[6px] border border-[#E2E8F0] bg-white px-3 text-xs font-medium text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 focus:outline-none transition-all"
-                placeholder="Tulis nama lengkap yang mengetahui…"
+                :placeholder="t('bast_placeholder_ack_name')"
               />
             </div>
 
             <!-- Nama Terpilih (Auto) -->
             <div v-if="!form.isMengetahuiKustom" class="flex flex-col gap-1">
               <span class="text-[10px] font-bold uppercase text-[#5F7089]"
-                >Nama Lengkap Terpilih</span
+                >{{ t('bast_selected_name_auto') }}</span
               >
               <input
                 v-model="form.mengetahuiNama"
                 type="text"
-                aria-label="Nama Lengkap Mengetahui (Auto)"
+                :aria-label="t('bast_aria_ack_name_auto')"
                 class="h-8 w-full rounded-[6px] border border-slate-200 bg-slate-100/70 px-3 text-xs font-medium text-slate-600 outline-none cursor-default"
                 readonly
-                placeholder="Kosong (tanda tangan manual)"
+                :placeholder="t('bast_placeholder_empty_manual')"
               />
             </div>
 
@@ -2191,14 +2226,14 @@ onMounted(fetchData)
               :class="form.isMengetahuiKustom ? 'sm:col-span-1 lg:col-span-2' : ''"
             >
               <span class="text-[10px] font-bold uppercase text-[#5F7089]">
-                Jabatan / Unit Pada Dokumen
+                {{ t('bast_position_doc_label') }}
               </span>
               <input
                 v-model="form.mengetahuiJabatan"
                 type="text"
-                aria-label="Jabatan atau Unit yang Mengetahui"
+                :aria-label="t('bast_aria_position')"
                 class="h-8 w-full rounded-[6px] border border-[#E2E8F0] bg-white px-3 text-xs font-medium text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 focus:outline-none transition-all"
-                placeholder="People Business Partner atau Asset Management"
+                :placeholder="t('bast_pbp_role')"
               />
             </div>
           </div>
@@ -2215,13 +2250,13 @@ onMounted(fetchData)
             <span aria-hidden="true" class="material-symbols-outlined text-[16px] text-slate-400"
               >calendar_today</span
             >
-            Tanggal Serah Terima:
+            {{ t('bast_date_label') }}
           </span>
           <input
             v-model="form.tanggal"
             required
             type="date"
-            aria-label="Tanggal Formulir Serah Terima"
+            :aria-label="t('bast_aria_date')"
             :disabled="!canWriteSubmissions || isSaving"
             class="h-8 w-full sm:w-44 rounded-[6px] border border-[#E2E8F0] bg-[#F8FAFC] px-2.5 text-xs font-medium text-[#333333] focus:border-[#0A51B0] focus:bg-white focus:ring-2 focus:ring-[#0A51B0]/10 focus:outline-none transition-all cursor-pointer"
           />
@@ -2235,7 +2270,7 @@ onMounted(fetchData)
             @click="router.push('/submissions')"
           >
             <span aria-hidden="true" class="material-symbols-outlined text-[16px]">close</span>
-            <span>Batal</span>
+            <span>{{ t('btn_cancel') }}</span>
           </button>
           <button
             type="button"
@@ -2245,7 +2280,7 @@ onMounted(fetchData)
             @click="saveAndReturn"
           >
             <span aria-hidden="true" class="material-symbols-outlined text-[16px]">save</span>
-            <span>{{ isSaving ? 'Menyimpan…' : 'Simpan' }}</span>
+            <span>{{ isSaving ? t('bast_saving') : t('save') }}</span>
           </button>
           <button
             type="submit"
@@ -2255,11 +2290,11 @@ onMounted(fetchData)
             <span aria-hidden="true" class="material-symbols-outlined text-[16px]"
               >picture_as_pdf</span
             >
-            <span>{{ isSaving ? 'Menyimpan…' : 'Cetak' }}</span>
+            <span>{{ isSaving ? t('bast_saving') : t('print_page') }}</span>
           </button>
         </div>
         <p v-if="!canWriteSubmissions" class="text-xs font-semibold text-[#5F7089]">
-          Mode hanya baca - Anda tidak memiliki izin mengubah pengajuan.
+          {{ t('bast_readonly_mode') }}
         </p>
       </div>
     </form>
@@ -2267,8 +2302,8 @@ onMounted(fetchData)
 
     <FilterModal
       :is-open="showFilterModal"
-      title="Filter Riwayat BAST"
-      subtitle="Saring arsip serah terima berdasarkan tujuan, unit kerja, atau periode tanggal."
+      :title="t('bast_filter_modal_title')"
+      :subtitle="t('bast_filter_modal_subtitle')"
       @close="showFilterModal = false"
       @apply="showFilterModal = false"
       @reset="resetSubmissionFilters"
@@ -2276,13 +2311,13 @@ onMounted(fetchData)
       <div class="space-y-2.5">
         <div>
           <label class="block text-[10px] font-bold text-slate-600 dark:text-slate-300 mb-1">
-            Tujuan BAST / Pengajuan
+            {{ t('bast_filter_tujuan_label') }}
           </label>
           <CustomSelect
             v-model="filterTujuan"
             :options="TUJUAN_FILTER_OPTIONS"
-            placeholder="Semua Tujuan BAST"
-            aria-label="Filter tujuan BAST"
+            :placeholder="t('submissions_filter_all_tujuan')"
+            :aria-label="t('bast_aria_filter_tujuan')"
             :block="true"
             height-class="h-8"
           />
@@ -2290,13 +2325,13 @@ onMounted(fetchData)
 
         <div>
           <label class="block text-[10px] font-bold text-slate-600 dark:text-slate-300 mb-1">
-            Direktorat / Unit Kerja Pihak
+            {{ t('bast_filter_direktorat_label') }}
           </label>
           <CustomSelect
             v-model="filterDirektorat"
             :options="availableDirektoratOptions"
-            placeholder="Semua Direktorat / Unit"
-            aria-label="Filter direktorat pihak"
+            :placeholder="t('submissions_filter_all_direktorat')"
+            :aria-label="t('bast_aria_filter_direktorat')"
             :block="true"
             height-class="h-8"
           />
@@ -2305,23 +2340,23 @@ onMounted(fetchData)
         <div class="grid grid-cols-2 gap-2">
           <div>
             <label class="block text-[10px] font-bold text-slate-600 dark:text-slate-300 mb-1">
-              Dari Tanggal
+              {{ t('from_date') }}
             </label>
             <input
               v-model="filterDateFrom"
               type="date"
-              aria-label="Tanggal awal BAST"
+              :aria-label="t('bast_aria_date_from')"
               class="h-8 w-full rounded-[5px] border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-2 text-[10.5px] text-[#333333] dark:text-white focus:border-[#0A51B0] focus:outline-none"
             />
           </div>
           <div>
             <label class="block text-[10px] font-bold text-slate-600 dark:text-slate-300 mb-1">
-              Sampai Tanggal
+              {{ t('to_date') }}
             </label>
             <input
               v-model="filterDateTo"
               type="date"
-              aria-label="Tanggal akhir BAST"
+              :aria-label="t('bast_aria_date_to')"
               class="h-8 w-full rounded-[5px] border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-2 text-[10.5px] text-[#333333] dark:text-white focus:border-[#0A51B0] focus:outline-none"
             />
           </div>
@@ -2331,9 +2366,9 @@ onMounted(fetchData)
 
     <ConfirmDialog
       :open="Boolean(pendingDelete)"
-      title="Hapus Pengajuan?"
-      :message="`Pengajuan ${pendingDelete?.submission_number || ''} akan dihapus permanen. Tindakan ini tidak dapat dibatalkan.`"
-      confirm-label="Hapus"
+      :title="t('bast_confirm_delete_title')"
+      :message="`${t('bast_confirm_delete_prefix')} ${pendingDelete?.submission_number || ''} ${t('bast_confirm_delete_suffix')}`"
+      :confirm-label="t('btn_delete')"
       destructive
       :loading="isDeleting"
       @update:open="(value) => { if (!value) pendingDelete = null }"

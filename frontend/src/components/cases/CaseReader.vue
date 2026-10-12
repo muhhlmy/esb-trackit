@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { useAuth } from '@/composables/useAuth'
 import { useBookmarks } from '@/composables/useBookmarks'
+import { useLanguage } from '@/composables/useLanguage.js'
 import { sanitizeRichTextHtml } from '@/utils/htmlSanitizer'
 import {
   Bookmark,
@@ -12,6 +13,7 @@ import {
   Lightbulb,
   ShieldAlert,
   ChevronRight,
+  Printer,
 } from 'lucide-vue-next'
 
 const props = defineProps({
@@ -26,6 +28,7 @@ defineEmits(['edit', 'submitTicket'])
 const { hasWritePermission } = useAuth()
 const canEditKnowledgeBase = computed(() => hasWritePermission('knowledge_base'))
 const { isBookmarked, toggleBookmark } = useBookmarks()
+const { t } = useLanguage()
 
 // Sanitasi HTML rich-text sebelum v-html (pertahanan terhadap XSS dari konten
 // yang tersimpan di DB / output editor).
@@ -41,6 +44,22 @@ const severityClass = computed(() => {
       return 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/30'
   }
 })
+
+// Label severity mengikuti bahasa aktif (peta label reaktif terhadap toggle).
+const severityLabel = computed(() => {
+  switch (props.caseItem?.severity?.toLowerCase()) {
+    case 'high':
+      return t('case_reader_priority_high')
+    case 'medium':
+      return t('case_reader_priority_medium')
+    default:
+      return t('case_reader_priority_low')
+  }
+})
+
+function handlePrint() {
+  window.print()
+}
 </script>
 
 <template>
@@ -54,9 +73,11 @@ const severityClass = computed(() => {
     >
       <HelpCircle class="w-8 h-8 text-[#5F7089] dark:text-slate-600" />
     </div>
-    <h3 class="text-base font-bold text-[#1a1c1d] dark:text-slate-300">Pilih Artikel</h3>
+    <h3 class="text-base font-bold text-[#1a1c1d] dark:text-slate-300">
+      {{ t('kb_select_article') }}
+    </h3>
     <p class="text-xs text-[#575d7a] dark:text-slate-500 mt-1 max-w-sm">
-      Pilih panduan dari daftar artikel untuk membaca dokumentasi lengkap.
+      {{ t('case_reader_select_hint') }}
     </p>
   </div>
 
@@ -67,10 +88,10 @@ const severityClass = computed(() => {
   >
     <!-- Notion Breadcrumb Navigation -->
     <nav
-      aria-label="Lokasi artikel"
+      :aria-label="t('case_reader_breadcrumb')"
       class="case-breadcrumb flex items-center gap-1.5 text-xs text-[#575d7a] dark:text-slate-400 font-medium"
     >
-      <span>Help Center</span>
+      <span>{{ t('help_center') }}</span>
       <ChevronRight class="w-3.5 h-3.5 text-[#5F7089]" />
       <span class="capitalize">
         {{ caseItem.category }}
@@ -93,7 +114,7 @@ const severityClass = computed(() => {
             :class="severityClass"
           >
             <ShieldAlert class="w-3 h-3" />
-            {{ caseItem.severity }} Priority
+            {{ severityLabel }}
           </span>
           <span
             class="px-2.5 py-0.5 rounded-full text-xs bg-[#f3f3f5] dark:bg-slate-800 text-[#575d7a] dark:text-slate-300 font-medium capitalize border border-[#e2e2e4] dark:border-slate-700"
@@ -110,11 +131,28 @@ const severityClass = computed(() => {
             :class="{
               'text-[#0A51B0] dark:text-blue-400 border-[#0A51B0]/40': isBookmarked(caseItem.id),
             }"
-            :title="isBookmarked(caseItem.id) ? 'Hapus bookmark' : 'Simpan bookmark'"
-            :aria-label="isBookmarked(caseItem.id) ? 'Hapus bookmark' : 'Simpan bookmark'"
+            :title="
+              isBookmarked(caseItem.id)
+                ? t('case_reader_remove_bookmark')
+                : t('case_reader_save_bookmark')
+            "
+            :aria-label="
+              isBookmarked(caseItem.id)
+                ? t('case_reader_remove_bookmark')
+                : t('case_reader_save_bookmark')
+            "
             :aria-pressed="isBookmarked(caseItem.id)"
           >
             <Bookmark class="w-4 h-4" :fill="isBookmarked(caseItem.id) ? 'currentColor' : 'none'" />
+          </button>
+
+          <button
+            @click="handlePrint"
+            class="p-2 rounded-lg border border-[#c4c5d9] dark:border-slate-800 bg-white dark:bg-slate-900 hover:bg-[#f3f3f5] dark:hover:bg-slate-800 text-[#575d7a] dark:text-slate-400 hover:text-[#0A51B0] transition-colors cursor-pointer"
+            :title="t('case_reader_print_article')"
+            :aria-label="t('case_reader_print_article')"
+          >
+            <Printer class="w-4 h-4" />
           </button>
 
           <button
@@ -123,7 +161,7 @@ const severityClass = computed(() => {
             class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#c4c5d9] dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-[#f3f3f5] dark:hover:bg-slate-700 font-semibold text-[#1a1c1d] dark:text-slate-200 transition-all cursor-pointer shadow-2xs"
           >
             <Edit3 class="w-3.5 h-3.5 text-[#0A51B0] dark:text-blue-400" />
-            <span>Edit Document</span>
+            <span>{{ t('kb_edit_doc') }}</span>
           </button>
         </div>
       </div>
@@ -139,14 +177,14 @@ const severityClass = computed(() => {
       <div class="flex items-center gap-4 text-xs text-[#575d7a] dark:text-slate-400 pt-1">
         <div class="flex items-center gap-1.5">
           <User class="w-3.5 h-3.5 text-[#5F7089]" />
-          <span>Tim IT</span>
+          <span>{{ t('case_reader_it_team') }}</span>
         </div>
       </div>
 
       <!-- Notion Summary Callout Box -->
       <div
         v-if="caseItem.summary"
-        class="case-summary p-4 rounded-xl bg-white dark:bg-slate-900 border border-[#c4c5d9] dark:border-slate-800 shadow-2xs flex items-start gap-3"
+        class="case-summary p-3 rounded-[6px] bg-white dark:bg-slate-900 border border-[#c4c5d9] dark:border-slate-800 shadow-2xs flex items-start gap-3"
       >
         <div
           class="p-2 rounded-lg bg-[#eff6ff] dark:bg-blue-950/40 text-[#0A51B0] dark:text-blue-400 shrink-0"
@@ -155,7 +193,7 @@ const severityClass = computed(() => {
         </div>
         <div class="text-xs sm:text-sm text-[#434656] dark:text-slate-300 leading-relaxed pt-0.5">
           <strong class="text-[#1a1c1d] dark:text-slate-200 font-semibold block mb-1"
-            >Ringkasan Prosedur:</strong
+            >{{ t('case_reader_summary_label') }}</strong
           >
           {{ caseItem.summary }}
         </div>
@@ -170,21 +208,21 @@ const severityClass = computed(() => {
     ></section>
     <div
       v-else
-      class="p-8 rounded-xl bg-[#f9f9fb] dark:bg-slate-900 border border-[#e2e2e4] dark:border-slate-800 text-center text-xs text-[#575d7a] dark:text-slate-400"
+      class="p-3 rounded-[6px] bg-[#f9f9fb] dark:bg-slate-900 border border-[#e2e2e4] dark:border-slate-800 text-center text-xs text-[#575d7a] dark:text-slate-400"
     >
-      Dokumen ini belum memiliki isi konten.
+      {{ t('case_reader_empty_content') }}
     </div>
 
     <!-- Bottom Escalation Banner (CTA) -->
     <div
-      class="case-escalation p-6 rounded-2xl bg-gradient-to-r from-[#eff6ff] to-white dark:from-slate-900 dark:to-slate-950 border border-[#E2E8F0] dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4"
+      class="case-escalation p-3 rounded-[6px] bg-gradient-to-r from-[#eff6ff] to-white dark:from-slate-900 dark:to-slate-950 border border-[#E2E8F0] dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3"
     >
       <div class="space-y-1 text-center sm:text-left">
-        <h3 class="text-base font-bold text-[#1a1c1d] dark:text-slate-100">
-          Still need help with this issue?
+        <h3 class="font-bold text-[#1a1c1d] dark:text-slate-100">
+          {{ t('case_reader_escalation_title') }}
         </h3>
         <p class="text-xs text-[#575d7a] dark:text-slate-400">
-          Tim Helpdesk IT &amp; PBX siap membantu penanganan insiden darurat.
+          {{ t('case_reader_escalation_desc') }}
         </p>
       </div>
 
@@ -194,7 +232,7 @@ const severityClass = computed(() => {
           class="px-4 py-2.5 rounded-lg text-xs font-semibold bg-[#0A51B0] hover:bg-[#0A4391] text-white shadow-xs transition-all cursor-pointer flex items-center gap-1.5"
         >
           <MessageSquare class="w-3.5 h-3.5" />
-          <span>Submit a Ticket</span>
+          <span>{{ t('submit_ticket') }}</span>
         </button>
       </div>
     </div>
@@ -516,6 +554,16 @@ const severityClass = computed(() => {
   }
   .case-escalation > div:last-child {
     flex-shrink: 0;
+  }
+}
+@media print {
+  .case-actions,
+  .case-escalation,
+  .case-reader-empty {
+    display: none !important;
+  }
+  .case-reader {
+    padding: 0 !important;
   }
 }
 @media (prefers-reduced-motion: reduce) {

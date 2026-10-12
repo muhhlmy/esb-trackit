@@ -17,12 +17,14 @@ import {
 } from 'lucide-vue-next'
 import { useAuth } from '@/composables/useAuth'
 import { useApi } from '@/composables/useApi'
+import { useLanguage } from '@/composables/useLanguage'
 import { findFirstAllowedRoute } from '@/utils/permissionAccess.js'
 import { allowedRouteMap } from '@/router/index.js'
 
 const router = useRouter()
 const { login, user } = useAuth()
 const { post } = useApi()
+const { t } = useLanguage()
 
 const email = ref('')
 const password = ref('')
@@ -86,12 +88,12 @@ const scrollToLogin = () => {
 
 const handleLogin = async () => {
   if (!email.value || !password.value) {
-    errorMessage.value = 'Email dan kata sandi wajib diisi.'
+    errorMessage.value = t('login_err_fields_required')
     return
   }
 
   if (!EMAIL_FORMAT_PATTERN.test(email.value.trim())) {
-    errorMessage.value = 'Format email tidak valid.'
+    errorMessage.value = t('login_err_email_invalid')
     return
   }
 
@@ -109,7 +111,7 @@ const handleLogin = async () => {
       router.push({ name: firstAllowed?.name || 'dashboard' })
     }
   } catch (error) {
-    errorMessage.value = error.message || 'Login gagal. Periksa kembali kredensial Anda.'
+    errorMessage.value = error.message || t('login_err_login_failed')
   } finally {
     isLoading.value = false
   }
@@ -229,7 +231,7 @@ const closeForgotModal = () => {
 // Step 1: Request OTP
 const handleRequestOtp = async () => {
   if (!forgotEmail.value || !forgotEmail.value.includes('@')) {
-    forgotError.value = 'Silakan masukkan alamat email yang valid.'
+    forgotError.value = t('login_forgot_email_invalid')
     return
   }
 
@@ -239,7 +241,7 @@ const handleRequestOtp = async () => {
 
   try {
     const res = await post('/api/auth/forgot-password', { email: forgotEmail.value })
-    forgotSuccessMsg.value = res.message || 'Kode OTP telah dikirim ke email Anda.'
+    forgotSuccessMsg.value = res.message || t('login_otp_sent')
     forgotStep.value = 2
     otpDigits.value = ['', '', '', '', '', '']
     startResendTimer(60)
@@ -248,7 +250,7 @@ const handleRequestOtp = async () => {
     await nextTick()
     otpInputRefs.value[0]?.focus()
   } catch (error) {
-    forgotError.value = error.message || 'Gagal mengirim kode OTP. Coba lagi nanti.'
+    forgotError.value = error.message || t('login_otp_send_failed')
   } finally {
     forgotLoading.value = false
   }
@@ -299,12 +301,12 @@ const handleOtpPaste = (event) => {
 const handleVerifyOtp = async () => {
   const fullOtp = otpDigits.value.join('')
   if (fullOtp.length !== 6) {
-    forgotError.value = 'Harap masukkan 6 digit kode OTP lengkap.'
+    forgotError.value = t('login_otp_incomplete')
     return
   }
 
   if (otpExpirySeconds.value <= 0) {
-    forgotError.value = 'Kode OTP telah kadaluarsa. Silakan minta kode baru.'
+    forgotError.value = t('login_otp_expired')
     return
   }
 
@@ -320,7 +322,7 @@ const handleVerifyOtp = async () => {
     forgotStep.value = 3
     forgotSuccessMsg.value = ''
   } catch (error) {
-    forgotError.value = error.message || 'Kode OTP tidak valid atau kadaluarsa.'
+    forgotError.value = error.message || t('login_otp_invalid')
   } finally {
     forgotLoading.value = false
   }
@@ -329,12 +331,12 @@ const handleVerifyOtp = async () => {
 // Step 3: Set New Password
 const handleResetPassword = async () => {
   if (!forgotNewPassword.value || forgotNewPassword.value.length < 8) {
-    forgotError.value = 'Kata sandi baru minimal harus 8 karakter.'
+    forgotError.value = t('login_password_min')
     return
   }
 
   if (forgotNewPassword.value !== forgotConfirmPassword.value) {
-    forgotError.value = 'Konfirmasi kata sandi tidak cocok.'
+    forgotError.value = t('login_password_mismatch')
     return
   }
 
@@ -352,7 +354,7 @@ const handleResetPassword = async () => {
     clearInterval(resendInterval)
     clearInterval(expiryInterval)
   } catch (error) {
-    forgotError.value = error.message || 'Gagal mereset kata sandi. Silakan coba lagi.'
+    forgotError.value = error.message || t('login_reset_failed')
   } finally {
     forgotLoading.value = false
   }
@@ -370,7 +372,7 @@ const finishResetAndLogin = () => {
 <template>
   <div class="login-page">
     <header class="login-header">
-      <RouterLink to="/" class="login-brand" aria-label="TrackIT — Pusat Bantuan">
+      <RouterLink to="/" class="login-brand" :aria-label="'TrackIT: ' + t('hero_tag')">
         <img src="/logo.svg" alt="" width="36" height="28" />
         <span>TrackIT</span>
       </RouterLink>
@@ -378,28 +380,28 @@ const finishResetAndLogin = () => {
     <main class="login-main">
       <aside class="login-story" aria-labelledby="story-title">
         <div class="story-content">
-          <h2 id="story-title">Alur kerja rapi.<br />Operasional terkendali.</h2>
-          <p>Akses kebutuhan kerja, layanan bantuan, dan dukungan tim dalam satu tempat.</p>
+          <h2 id="story-title">{{ t('login_story_title_1') }}<br />{{ t('login_story_title_2') }}</h2>
+          <p>{{ t('login_story_desc') }}</p>
           <div class="story-features">
             <div>
               <span class="feature-icon"><Laptop :size="21" aria-hidden="true" /></span
               ><span
-                ><strong>Aset & perangkat</strong
-                ><small>Lihat inventaris dan penempatan aset.</small></span
+                ><strong>{{ t('login_story_feature_1_title') }}</strong
+                ><small>{{ t('login_story_feature_1_desc') }}</small></span
               >
             </div>
             <div>
               <span class="feature-icon"><Ticket :size="21" aria-hidden="true" /></span
               ><span
-                ><strong>Tiket bantuan</strong
-                ><small>Ajukan kendala dan pantau penanganannya.</small></span
+                ><strong>{{ t('login_story_feature_2_title') }}</strong
+                ><small>{{ t('login_story_feature_2_desc') }}</small></span
               >
             </div>
             <div>
               <span class="feature-icon"><BookOpen :size="21" aria-hidden="true" /></span
               ><span
-                ><strong>Panduan kerja</strong
-                ><small>Temukan artikel dan solusi di Help Center.</small></span
+                ><strong>{{ t('login_story_feature_3_title') }}</strong
+                ><small>{{ t('login_story_feature_3_desc') }}</small></span
               >
             </div>
           </div>
@@ -408,15 +410,15 @@ const finishResetAndLogin = () => {
       </aside>
       <section class="login-form-panel" aria-labelledby="login-title">
         <div class="login-form-inner">
-          <span class="login-eyebrow">MASUK KE TRACKIT</span>
-          <h1 id="login-title">Selamat datang kembali.</h1>
-          <p class="login-intro">Gunakan email akun Anda untuk melanjutkan.</p>
+          <span class="login-eyebrow">{{ t('login_eyebrow') }}</span>
+          <h1 id="login-title">{{ t('login_welcome') }}</h1>
+          <p class="login-intro">{{ t('login_intro') }}</p>
           <div v-if="errorMessage" id="login-error" class="login-error" role="alert">
             <CircleAlert :size="18" aria-hidden="true" /><span>{{ errorMessage }}</span>
           </div>
           <form class="login-form" :aria-busy="isLoading" @submit.prevent="handleLogin">
             <div class="login-field">
-              <label for="email">Alamat email</label>
+              <label for="email">{{ t('login_email_label') }}</label>
               <div class="input-wrap">
                 <Mail :size="18" aria-hidden="true" /><input
                   id="email"
@@ -427,7 +429,7 @@ const finishResetAndLogin = () => {
                   autocomplete="username"
                   autocapitalize="none"
                   spellcheck="false"
-                  placeholder="nama@example.com"
+                  :placeholder="t('login_email_placeholder')"
                   required
                   :disabled="isLoading"
                   :aria-describedby="errorMessage ? 'login-error' : undefined"
@@ -435,21 +437,21 @@ const finishResetAndLogin = () => {
               </div>
             </div>
             <div class="login-field">
-              <label for="password">Kata sandi</label>
+              <label for="password">{{ t('login_password_label') }}</label>
               <div class="input-wrap">
                 <LockKeyhole :size="18" aria-hidden="true" /><input
                   id="password"
                   v-model="password"
                   :type="showPassword ? 'text' : 'password'"
                   autocomplete="current-password"
-                  placeholder="Masukkan kata sandi"
+                  :placeholder="t('login_password_placeholder')"
                   required
                   :disabled="isLoading"
                   :aria-describedby="errorMessage ? 'login-error' : undefined"
                 /><button
                   type="button"
                   class="password-toggle"
-                  :aria-label="showPassword ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'"
+                  :aria-label="showPassword ? t('login_hide_password') : t('login_show_password')"
                   :aria-pressed="showPassword"
                   @click="showPassword = !showPassword"
                 >
@@ -460,10 +462,10 @@ const finishResetAndLogin = () => {
             <div class="login-options">
               <label
                 ><input v-model="rememberMe" type="checkbox" :disabled="isLoading" /><span
-                  >Ingat saya</span
+                  >{{ t('login_remember_me') }}</span
                 ></label
               ><button type="button" :disabled="isLoading" @click="openForgotModal">
-                Lupa kata sandi?
+                {{ t('login_forgot_password') }}
               </button>
             </div>
             <button type="submit" class="login-submit" :disabled="isLoading">
@@ -472,13 +474,13 @@ const finishResetAndLogin = () => {
                 :size="18"
                 class="login-spinner"
                 aria-hidden="true"
-              /><span>{{ isLoading ? 'Sedang masuk…' : 'Masuk' }}</span
+              /><span>{{ isLoading ? t('login_signing_in') : t('sign_in') }}</span
               ><ArrowRight v-if="!isLoading" :size="18" aria-hidden="true" />
             </button>
           </form>
         </div>
         <p class="form-help">
-          Butuh panduan? <RouterLink to="/">Kunjungi Pusat Bantuan</RouterLink>
+          {{ t('login_need_help') }} <RouterLink to="/">{{ t('login_visit_help_center') }}</RouterLink>
         </p>
       </section>
     </main>
@@ -487,19 +489,19 @@ const finishResetAndLogin = () => {
     </footer>
     <nav
       role="navigation"
-      aria-label="Navigasi Mobile Bawah"
+      :aria-label="t('login_aria_mobile_nav')"
       class="clean-bottom-nav md:hidden fixed bottom-0 left-0 right-0 z-40 border-t border-slate-200/90 dark:border-slate-800 bg-white/95 dark:bg-slate-950/95 backdrop-blur-lg px-2 py-1 pb-[max(0.375rem,env(safe-area-inset-bottom))] flex items-center justify-around select-none shadow-none min-h-[56px]"
     >
       <a
         href="/"
-        aria-label="Halaman Beranda"
+        :aria-label="t('login_aria_home')"
         class="flex flex-col items-center justify-center gap-0.5 px-3 py-1 rounded-xl text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors min-w-[56px] min-h-[44px] touch-manipulation"
       ><Home class="w-4 h-4" />
         <span class="text-[10.5px] sm:text-[11px] font-medium leading-tight">Home</span>
       </a>
       <button
         type="button"
-        aria-label="Masuk ke Akun"
+        :aria-label="t('login_aria_sign_in')"
         @click="scrollToLogin"
         class="flex flex-col items-center justify-center gap-0.5 px-3 py-1 rounded-xl text-[#333333] font-bold hover:text-[#0A4391] transition-colors cursor-pointer min-w-[56px] min-h-[44px] touch-manipulation"
       ><LogIn class="w-4 h-4" />
@@ -539,17 +541,17 @@ const finishResetAndLogin = () => {
                     id="forgot-modal-title"
                     class="text-sm sm:text-base font-bold text-slate-900 leading-snug"
                   >
-                    Reset Kata Sandi
+                    {{ t('login_reset_title') }}
                   </h3>
                   <p class="text-[11px] sm:text-xs text-slate-500">
-                    Verifikasi email dengan kode OTP
+                    {{ t('login_reset_subtitle') }}
                   </p>
                 </div>
               </div>
               <button
                 @click="closeForgotModal"
                 class="w-8 h-8 sm:w-9 sm:h-9 rounded-lg hover:bg-slate-200/70 text-slate-400 hover:text-slate-600 flex items-center justify-center transition-colors cursor-pointer touch-manipulation"
-                aria-label="Tutup"
+                :aria-label="t('close')"
               >
                 <span
                   aria-hidden="true"
@@ -593,7 +595,7 @@ const finishResetAndLogin = () => {
                 >
                 <span class="truncate max-w-[60px] sm:max-w-none"
                   ><span class="sm:hidden">OTP</span
-                  ><span class="hidden sm:inline">Kode OTP</span></span
+                  ><span class="hidden sm:inline">{{ t('login_otp_code') }}</span></span
                 >
               </div>
               <div
@@ -612,8 +614,8 @@ const finishResetAndLogin = () => {
                   >3</span
                 >
                 <span class="truncate max-w-[70px] sm:max-w-none"
-                  ><span class="sm:hidden">Sandi</span
-                  ><span class="hidden sm:inline">Password Baru</span></span
+                  ><span class="sm:hidden">{{ t('login_password_short') }}</span
+                  ><span class="hidden sm:inline">{{ t('login_new_password') }}</span></span
                 >
               </div>
             </div>
@@ -653,15 +655,15 @@ const finishResetAndLogin = () => {
               <!-- ── STEP 1: Masukkan Email ── -->
               <div v-if="forgotStep === 1" class="space-y-4">
                 <p class="text-xs text-slate-600 leading-relaxed">
-                  Masukkan alamat email akun Anda. Kami akan mengirimkan
-                  <strong>6 digit kode verifikasi (OTP)</strong> yang berlaku selama
-                  <strong>5 menit</strong>.
+                  {{ t('login_forgot_step1_desc_1') }}
+                  <strong>{{ t('login_forgot_step1_desc_2') }}</strong> {{ t('login_forgot_step1_desc_3') }}
+                  <strong>{{ t('login_forgot_step1_desc_4') }}</strong>.
                 </p>
 
                 <form @submit.prevent="handleRequestOtp" class="space-y-3.5 sm:space-y-4">
                   <div class="space-y-1.5">
                     <label for="forgot-email" class="block text-xs font-bold text-slate-800">
-                      Alamat Email Terdaftar
+                      {{ t('login_registered_email_label') }}
                     </label>
                     <div class="relative">
                       <span
@@ -678,7 +680,7 @@ const finishResetAndLogin = () => {
                         type="email"
                         required
                         autocomplete="email"
-                        placeholder="nama@example.com"
+                        :placeholder="t('login_email_placeholder')"
                         class="h-9 w-full rounded-xl border border-slate-300 bg-slate-50/50 pl-10 pr-4 text-sm text-slate-900 transition-all placeholder:text-slate-400 focus:border-[#0A51B0] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#0A51B0]/10"
                       />
                     </div>
@@ -695,10 +697,10 @@ const finishResetAndLogin = () => {
                         class="material-symbols-outlined animate-spin text-[18px]"
                         >progress_activity</span
                       >
-                      <span>Mengirim OTP...</span>
+                      <span>{{ t('login_sending_otp') }}</span>
                     </span>
                     <span v-else class="flex items-center gap-2">
-                      <span>Kirim Kode OTP</span>
+                      <span>{{ t('login_send_otp') }}</span>
                       <span aria-hidden="true" class="material-symbols-outlined text-[18px]"
                         >send</span
                       >
@@ -711,7 +713,7 @@ const finishResetAndLogin = () => {
               <div v-else-if="forgotStep === 2" class="space-y-4 sm:space-y-5">
                 <div class="text-center">
                   <p class="text-xs text-slate-600">
-                    Kode verifikasi telah dikirimkan ke:
+                    {{ t('login_otp_sent_to') }}
                   </p>
                   <p class="text-sm font-bold text-slate-900 mt-0.5 break-all">
                     {{ forgotEmail }}
@@ -722,14 +724,14 @@ const finishResetAndLogin = () => {
                     <span aria-hidden="true" class="material-symbols-outlined text-[14px]"
                       >timer</span
                     >
-                    <span>Berlaku: {{ formatTimer(otpExpirySeconds) }}</span>
+                    <span>{{ t('login_valid_for') }}: {{ formatTimer(otpExpirySeconds) }}</span>
                   </div>
                 </div>
 
                 <!-- 6-digit OTP Input Boxes -->
                 <div class="space-y-2">
                   <label class="block text-center text-xs font-bold text-slate-700">
-                    Masukkan 6 Digit Kode OTP
+                    {{ t('login_enter_otp') }}
                   </label>
                   <div
                     class="flex justify-center gap-1.5 sm:gap-2.5 max-w-full overflow-x-auto py-1"
@@ -743,7 +745,7 @@ const finishResetAndLogin = () => {
                       type="text"
                       inputmode="numeric"
                       autocomplete="one-time-code"
-                      :aria-label="`Digit OTP ${idx + 1}`"
+                      :aria-label="`${t('login_otp_digit')} ${idx + 1}`"
                       maxlength="1"
                       class="w-10 h-10 text-center text-lg font-bold rounded-[6px] border border-slate-300 bg-slate-50/50 text-slate-900 focus:border-[#0A51B0] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#0A51B0]/10 transition-all shrink-0"
                       @input="handleOtpInput(idx, $event)"
@@ -768,10 +770,10 @@ const finishResetAndLogin = () => {
                         class="material-symbols-outlined animate-spin text-[18px]"
                         >progress_activity</span
                       >
-                      <span>Memverifikasi...</span>
+                      <span>{{ t('login_verifying') }}</span>
                     </span>
                     <span v-else class="flex items-center gap-1.5">
-                      <span>Verifikasi OTP</span>
+                      <span>{{ t('login_verify_otp') }}</span>
                       <span aria-hidden="true" class="material-symbols-outlined text-[18px]"
                         >arrow_forward</span
                       >
@@ -784,7 +786,7 @@ const finishResetAndLogin = () => {
                       @click="forgotStep = 1"
                       class="text-slate-500 hover:text-slate-800 font-medium transition-colors cursor-pointer py-1 touch-manipulation"
                     >
-                      &larr; Ganti Email
+                      &larr; {{ t('login_change_email') }}
                     </button>
 
                     <button
@@ -793,8 +795,8 @@ const finishResetAndLogin = () => {
                       @click="handleResendOtp"
                       class="font-semibold text-[#333333] hover:text-[#0A4391] disabled:text-slate-400 disabled:cursor-not-allowed cursor-pointer transition-colors py-1 touch-manipulation"
                     >
-                      <span v-if="resendCooldown > 0">Kirim ulang dalam {{ resendCooldown }}s</span>
-                      <span v-else>Kirim Ulang Kode OTP</span>
+                      <span v-if="resendCooldown > 0">{{ t('login_resend_in') }} {{ resendCooldown }}s</span>
+                      <span v-else>{{ t('login_resend_otp') }}</span>
                     </button>
                   </div>
                 </div>
@@ -803,14 +805,14 @@ const finishResetAndLogin = () => {
               <!-- ── STEP 3: Password Baru ── -->
               <div v-else-if="forgotStep === 3" class="space-y-4">
                 <p class="text-xs text-slate-600 leading-relaxed">
-                  Kode OTP terverifikasi! Masukkan kata sandi baru untuk akun Anda.
+                  {{ t('login_otp_verified_desc') }}
                 </p>
 
                 <form @submit.prevent="handleResetPassword" class="space-y-3.5">
                   <!-- Password Baru -->
                   <div class="space-y-1.5">
                     <label for="new-password" class="block text-xs font-bold text-slate-800">
-                      Kata Sandi Baru
+                      {{ t('login_new_password') }}
                     </label>
                     <div class="relative">
                       <span
@@ -825,7 +827,7 @@ const finishResetAndLogin = () => {
                         v-model="forgotNewPassword"
                         :type="showNewPassword ? 'text' : 'password'"
                         required
-                        placeholder="Minimal 8 karakter"
+                        :placeholder="t('login_min_8_chars')"
                         class="h-9 w-full rounded-xl border border-slate-300 bg-slate-50/50 pl-10 pr-11 text-sm text-slate-900 transition-all placeholder:text-slate-400 focus:border-[#0A51B0] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#0A51B0]/10"
                       />
                       <button
@@ -834,8 +836,8 @@ const finishResetAndLogin = () => {
                         class="absolute right-1.5 top-1/2 -translate-y-1/2 w-8 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors focus:outline-none cursor-pointer touch-manipulation"
                         :aria-label="
                           showNewPassword
-                            ? 'Sembunyikan kata sandi baru'
-                            : 'Tampilkan kata sandi baru'
+                            ? t('login_hide_new_password')
+                            : t('login_show_new_password')
                         "
                       >
                         <span
@@ -851,7 +853,7 @@ const finishResetAndLogin = () => {
                   <!-- Konfirmasi Password Baru -->
                   <div class="space-y-1.5">
                     <label for="confirm-password" class="block text-xs font-bold text-slate-800">
-                      Ulangi Kata Sandi Baru
+                      {{ t('login_confirm_new_password') }}
                     </label>
                     <div class="relative">
                       <span
@@ -866,7 +868,7 @@ const finishResetAndLogin = () => {
                         v-model="forgotConfirmPassword"
                         :type="showConfirmPassword ? 'text' : 'password'"
                         required
-                        placeholder="Ketik ulang kata sandi baru"
+                        :placeholder="t('login_retype_password_placeholder')"
                         class="h-9 w-full rounded-xl border border-slate-300 bg-slate-50/50 pl-10 pr-11 text-sm text-slate-900 transition-all placeholder:text-slate-400 focus:border-[#0A51B0] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#0A51B0]/10"
                       />
                       <button
@@ -900,7 +902,7 @@ const finishResetAndLogin = () => {
                       <span aria-hidden="true" class="material-symbols-outlined text-[15px]">{{
                         forgotNewPassword.length >= 8 ? 'check_circle' : 'radio_button_unchecked'
                       }}</span>
-                      <span>Minimal 8 karakter</span>
+                      <span>{{ t('login_min_8_chars') }}</span>
                     </div>
                     <div
                       class="flex items-center gap-1.5"
@@ -915,7 +917,7 @@ const finishResetAndLogin = () => {
                           ? 'check_circle'
                           : 'radio_button_unchecked'
                       }}</span>
-                      <span>Kata sandi cocok</span>
+                      <span>{{ t('login_password_match') }}</span>
                     </div>
                   </div>
 
@@ -934,10 +936,10 @@ const finishResetAndLogin = () => {
                         class="material-symbols-outlined animate-spin text-[18px]"
                         >progress_activity</span
                       >
-                      <span>Menyimpan Password...</span>
+                      <span>{{ t('login_saving_password') }}</span>
                     </span>
                     <span v-else class="flex items-center gap-2">
-                      <span>Simpan & Perbarui Kata Sandi</span>
+                      <span>{{ t('login_save_password') }}</span>
                       <span aria-hidden="true" class="material-symbols-outlined text-[18px]"
                         >check</span
                       >
@@ -960,11 +962,10 @@ const finishResetAndLogin = () => {
 
                 <div class="space-y-1">
                   <h4 class="text-base sm:text-lg font-bold text-slate-900">
-                    Kata Sandi Berhasil Direset!
+                    {{ t('login_reset_success_title') }}
                   </h4>
                   <p class="text-xs text-slate-600 leading-relaxed">
-                    Kata sandi akun Anda telah diperbarui. Silakan masuk kembali dengan kata sandi
-                    baru Anda.
+                    {{ t('login_reset_success_desc') }}
                   </p>
                 </div>
 
@@ -973,7 +974,7 @@ const finishResetAndLogin = () => {
                   @click="finishResetAndLogin"
                   class="w-full h-9 mt-3 rounded-xl bg-[#0A51B0] hover:bg-[#0A4391] text-white font-semibold text-sm transition-all shadow-xs flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98] touch-manipulation"
                 >
-                  <span>Masuk ke Akun Anda</span>
+                  <span>{{ t('login_go_to_account') }}</span>
                   <span aria-hidden="true" class="material-symbols-outlined text-[18px]"
                     >login</span
                   >
@@ -1265,7 +1266,7 @@ const finishResetAndLogin = () => {
   color: #333333;
 }
 .input-wrap input::placeholder {
-  color: var(--color-placeholder, #5f7089); /* token global, 4.6:1 — audit v2 */
+  color: var(--color-placeholder, #5f7089); /* token global, 4.6:1 - audit v2 */
 }
 .password-toggle {
   display: grid;

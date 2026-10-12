@@ -39,7 +39,7 @@ function handleLoginRedirect() {
 
 <template>
   <div
-    class="w-full rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/90 p-4 sm:p-5 text-center shadow-sm select-none transition-all"
+    class="w-full rounded-[6px] border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/90 p-3 sm:p-3 text-center shadow-sm select-none transition-all"
   >
     <div
       class="mx-auto w-10 h-10 rounded-2xl bg-[#ECF2FF] dark:bg-indigo-950/60 text-[#333333] dark:text-indigo-400 flex items-center justify-center mb-3 border border-[#0A51B0]/20"
@@ -62,7 +62,7 @@ function handleLoginRedirect() {
     <div class="mt-4 flex justify-center">
       <button
         @click="handleLoginRedirect"
-        class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#0A51B0] hover:bg-[#0A4391] text-white text-[11px] sm:text-xs font-bold shadow-md shadow-[#0A51B0]/25 hover:shadow-lg transition-all cursor-pointer"
+        class="inline-flex items-center gap-2 px-4 py-2 rounded-[6px] bg-[#0A51B0] hover:bg-[#0A4391] text-white text-[11px] sm:text-xs font-bold shadow-md shadow-[#0A51B0]/25 hover:shadow-lg transition-all cursor-pointer"
       >
         <LogIn class="w-4 h-4" />
         <span>{{ buttonText }}</span>

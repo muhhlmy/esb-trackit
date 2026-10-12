@@ -69,6 +69,7 @@ export function normalizeLoginCredentials(body) {
 export async function login(req, res) {
   try {
     const credentials = normalizeLoginCredentials(req.body)
+    const { rememberMe = false } = req.body
 
     if (!credentials) {
       return res.status(400).json({ message: 'Format email atau password tidak valid.' })
@@ -188,7 +189,8 @@ export async function login(req, res) {
     }
 
     // Server-side session creation (UUID v4) — sumber kebenaran autentikasi.
-    const session = await createSession(userRow.id, { ttlHours: 12 })
+    const ttlHours = rememberMe ? 4320 : 2160 // 6 months vs 3 months in hours
+    const session = await createSession(userRow.id, { ttlHours })
 
     // Token pendek (15 menit, claims minimal: sub+sid+exp) dikirim sebagai
     // cookie HttpOnly. Token tidak lagi dikirim di body respons login.

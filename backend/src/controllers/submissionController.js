@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { pool } from "../config/database.js";
 import { recordSystemAudit } from "../services/systemAuditService.js";
+import { handleAssetHandoverNotification } from "../services/emailNotificationService.js";
 import {
   assertAllowedFields,
   assertPlainObject,
@@ -149,6 +150,9 @@ export async function createSubmission(req, res) {
   );
   const submission = mapRow(await findAccessibleSubmission(req, result.rows[0].id));
   await recordSystemAudit(req, { module: "submissions", action: "CREATE", entityType: "submission", entityId: submission.id, entityLabel: submission.submission_number, summary: `Pengajuan dibuat: ${submission.submission_number}`, after: submission });
+  setImmediate(() => {
+    handleAssetHandoverNotification(submission).catch(() => {});
+  });
   res.status(201).json(submission);
 }
 
@@ -181,6 +185,11 @@ export async function updateSubmission(req, res) {
   );
   const submission = mapRow(await findAccessibleSubmission(req, id));
   await recordSystemAudit(req, { module: "submissions", action: "UPDATE", entityType: "submission", entityId: id, entityLabel: submission.submission_number, summary: `Pengajuan diperbarui: ${submission.submission_number}`, before: existing, after: submission });
+  if (submission.status === 'submitted' || submission.status === 'completed') {
+    setImmediate(() => {
+      handleAssetHandoverNotification(submission).catch(() => {});
+    });
+  }
   res.json(submission);
 }
 

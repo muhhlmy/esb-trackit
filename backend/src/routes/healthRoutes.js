@@ -4,3 +4,5 @@ import * as healthController from '../controllers/healthController.js'
 export const healthRouter = Router()
 
 healthRouter.get('/', healthController.checkHealth)
+healthRouter.get('/live', healthController.checkLiveness)
+healthRouter.get('/ready', healthController.checkReadiness)

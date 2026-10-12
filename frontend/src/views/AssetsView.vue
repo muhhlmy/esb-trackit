@@ -6,7 +6,7 @@ import { useAuth } from '../composables/useAuth.js'
 import { animateStagger } from '../composables/useGsap.js'
 import { exportToExcelWorkbook } from '../utils/exportEngine.js'
 import { downloadAssetsPdf } from '../utils/exportAssetsPdf.js'
-import { ASSET_STATUSES, formatStatusPill, getAssetStatusLabel } from '../utils/assetStatus.js'
+import { ASSET_STATUSES } from '../utils/assetStatus.js'
 import { normalizeLocation } from '../utils/locationNormalizer.js'
 import { useViewMode } from '../composables/useViewMode.js'
 import AppViewToggle from '../components/ui/AppViewToggle.vue'
@@ -27,31 +27,39 @@ import BaseSkeleton from '../components/ui/skeleton/BaseSkeleton.vue'
 import SkeletonAvatar from '../components/ui/skeleton/SkeletonAvatar.vue'
 import SkeletonTable from '../components/ui/skeleton/SkeletonTable.vue'
 
+import { useLanguage } from '../composables/useLanguage.js'
+
 const { get, post, put, del } = useApi()
 const { isAdmin, isSuperAdmin, hasWritePermission } = useAuth()
 const route = useRoute()
 const router = useRouter()
 const canWriteAssets = computed(() => hasWritePermission('assets'))
 const { viewMode } = useViewMode('assets-it', 'table')
+const { currentLang, t } = useLanguage()
 
 const assets = ref([])
 // Count complete category records, independent of table filters and pagination.
 const assetStats = computed(() => [
-  { title: 'Total aset IT', value: assets.value.length, icon: 'inventory_2', color: 'primary' },
   {
-    title: 'Digunakan',
+    title: typeof t === 'function' ? t('assets_it_stat_total') : 'Total aset IT',
+    value: assets.value.length,
+    icon: 'inventory_2',
+    color: 'primary',
+  },
+  {
+    title: typeof t === 'function' ? t('status_in_use') : 'Digunakan',
     value: assets.value.filter((asset) => asset.status_aset === 'In Use').length,
     icon: 'devices',
     color: 'success',
   },
   {
-    title: 'Stok',
+    title: typeof t === 'function' ? t('status_stock') : 'Stok',
     value: assets.value.filter((asset) => asset.status_aset === 'Stock').length,
     icon: 'inventory_2',
     color: 'neutral',
   },
   {
-    title: 'Rusak',
+    title: typeof t === 'function' ? t('status_damaged') : 'Rusak',
     value: assets.value.filter((asset) => asset.status_aset === 'Damaged').length,
     icon: 'build',
     color: 'danger',
@@ -66,7 +74,7 @@ const itemsPerPage = ref(10)
 function onImported() {
   showImportModal.value = false
   fetchData()
-  notification.value = { message: 'Data Excel berhasil diimpor ke database!', type: 'success' }
+  notification.value = { message: t('assets_it_import_success'), type: 'success' }
 }
 const isLoading = ref(true)
 const isSubmitting = ref(false)
@@ -171,15 +179,63 @@ function mergeOptions(defaults, values) {
   return [...new Set([...defaults, ...values.filter(Boolean)])]
 }
 
+// Label tampilan nilai status/kondisi/tipe/merek dari DB agar mengikuti bahasa aktif.
+function statusLabel(status) {
+  if (!status) return '-'
+  const s = String(status).trim().toLowerCase()
+  if (s === 'in use' || s === 'digunakan') return t('status_in_use')
+  if (s === 'stock' || s === 'stok' || s === 'tersedia') return t('status_stock')
+  if (s === 'in service' || s === 'maintenance' || s === 'dalam perawatan')
+    return t('status_maintenance')
+  if (s === 'damaged' || s === 'rusak') return t('status_damaged')
+  if (s === 'disposal' || s === 'afkir') return t('assets_it_status_disposal')
+  return status
+}
+
+function kondisiDisplay(kondisi) {
+  if (!kondisi) return '-'
+  const k = String(kondisi).trim().toLowerCase()
+  if (k === 'normal') return t('normal_condition')
+  if (k === 'baik') return t('assets_it_kondisi_baik')
+  if (k === 'baru') return t('assets_it_kondisi_baru')
+  if (k === 'rusak ringan') return t('assets_it_kondisi_rusak_ringan')
+  if (k === 'rusak sedang') return t('assets_it_kondisi_rusak_sedang')
+  if (k === 'rusak berat') return t('assets_it_kondisi_rusak_berat')
+  return kondisi
+}
+
+function tipeDisplay(tipe) {
+  const value = String(tipe || '').trim().toLowerCase()
+  if (value === 'lainnya') return t('assets_it_other')
+  return tipe
+}
+
+function brandDisplay(brand) {
+  const value = String(brand || '').trim().toLowerCase()
+  if (value === 'lainnya') return t('assets_it_other')
+  return brand
+}
+
 const availableStatusOptions = computed(() => mergeOptions(statusOptions, [form.value.status_aset]))
-const availableKondisiOptions = computed(() =>
-  mergeOptions(kondisiOptions, [form.value.kondisi_aset]),
+const assetStatusSelectOptions = computed(() =>
+  ASSET_STATUSES.map((s) => ({ value: s.value, label: statusLabel(s.value) })),
 )
-const availableTipeOptions = computed(() => mergeOptions(tipeOptions, [form.value.tipe_perangkat]))
+const availableKondisiOptions = computed(() =>
+  mergeOptions(kondisiOptions, [form.value.kondisi_aset]).map((kondisi) => ({
+    value: kondisi,
+    label: kondisiDisplay(kondisi),
+  })),
+)
+const availableTipeOptions = computed(() =>
+  mergeOptions(tipeOptions, [form.value.tipe_perangkat]).map((tipe) => ({
+    value: tipe,
+    label: tipeDisplay(tipe),
+  })),
+)
 const brandSelectOptions = computed(() =>
   mergeOptions(brandOptions, [...assets.value.map((a) => a.merek), form.value.merek]).map((b) => ({
     value: b,
-    label: b,
+    label: brandDisplay(b),
   })),
 )
 const locationOptions = computed(() =>
@@ -193,20 +249,23 @@ const locationOptions = computed(() =>
 )
 
 const filterStatusOptions = computed(() => [
-  { value: '', label: 'Semua Status' },
-  ...ASSET_STATUSES.map((s) => ({ value: s.value, label: s.label })),
+  { value: '', label: t('assets_it_filter_all_status') },
+  ...ASSET_STATUSES.map((s) => ({ value: s.value, label: statusLabel(s.value) })),
 ])
 const filterTipeOptions = computed(() => [
-  { value: '', label: 'Semua Tipe Perangkat' },
-  ...tipeOptions.map((type) => ({ value: type, label: type })),
+  { value: '', label: t('assets_it_filter_all_type') },
+  ...tipeOptions.map((type) => ({ value: type, label: tipeDisplay(type) })),
 ])
 const filterLokasiOptions = computed(() => [
-  { value: '', label: 'Semua Lokasi' },
+  { value: '', label: t('assets_it_filter_all_location') },
   ...locationOptions.value,
 ])
 const filterKondisiOptions = computed(() => [
-  { value: '', label: 'Semua Kondisi' },
-  ...kondisiOptions.map((condition) => ({ value: condition, label: condition })),
+  { value: '', label: t('assets_it_filter_all_condition') },
+  ...kondisiOptions.map((condition) => ({
+    value: condition,
+    label: kondisiDisplay(condition),
+  })),
 ])
 
 const filteredAssets = computed(() => {
@@ -282,8 +341,7 @@ function selectStep(targetStep) {
   }
   if (targetStep === 'placement') {
     if (!isStep1Valid.value) {
-      modalError.value =
-        'Mohon lengkapi Hostname, Serial Number, dan Tipe Perangkat terlebih dahulu.'
+      modalError.value = t('assets_it_err_step1_incomplete')
       return
     }
     activeTab.value = 'placement'
@@ -292,12 +350,12 @@ function selectStep(targetStep) {
   }
   if (targetStep === 'specifications') {
     if (!isStep1Valid.value) {
-      modalError.value = 'Mohon lengkapi data Informasi Perangkat terlebih dahulu.'
+      modalError.value = t('assets_it_err_info_incomplete')
       activeTab.value = 'info'
       return
     }
     if (!isStep2Valid.value) {
-      modalError.value = 'Lokasi penempatan aset wajib dipilih terlebih dahulu.'
+      modalError.value = t('assets_it_err_location_required')
       activeTab.value = 'placement'
       return
     }
@@ -357,7 +415,7 @@ async function fetchData() {
       get('/api/karyawan/locations'),
     ])
     if (!Array.isArray(assetData) || !Array.isArray(employeeData)) {
-      throw new Error('Format data dari server tidak valid.')
+      throw new Error(t('assets_it_err_server_format'))
     }
     assets.value = assetData.map((a) => {
       const hostname = a.hostname || a.label_aset || ''
@@ -403,7 +461,7 @@ async function fetchData() {
     employees.value = employeeData
     locations.value = Array.isArray(locationData) ? locationData : []
   } catch (error) {
-    pageError.value = error.message || 'Gagal memuat data aset.'
+    pageError.value = error.message || t('assets_it_err_load')
   } finally {
     isLoading.value = false
     await nextTick()
@@ -494,14 +552,14 @@ function buildPayload() {
 async function nextStep() {
   if (activeTab.value === 'info') {
     if (!isStep1Valid.value) {
-      modalError.value = 'Hostname, Serial Number, dan Tipe Perangkat wajib diisi.'
+      modalError.value = t('assets_it_err_step1_required')
       return
     }
     activeTab.value = 'placement'
     modalError.value = ''
   } else if (activeTab.value === 'placement') {
     if (!isStep2Valid.value) {
-      modalError.value = 'Lokasi penempatan aset wajib dipilih.'
+      modalError.value = t('assets_it_err_location_required_short')
       return
     }
     activeTab.value = 'specifications'
@@ -511,16 +569,16 @@ async function nextStep() {
 
 async function saveAsset() {
   if (!canWriteAssets.value) {
-    modalError.value = 'Anda hanya memiliki akses baca untuk aset.'
+    modalError.value = t('assets_it_err_read_only')
     return
   }
   const payload = buildPayload()
   if (!payload.hostname) {
-    modalError.value = 'Hostname wajib diisi.'
+    modalError.value = t('assets_it_err_hostname_required')
     return
   }
   if (!payload.lokasi_asset && !payload.lokasi_aset) {
-    modalError.value = 'Penempatan aset wajib dipilih.'
+    modalError.value = t('assets_it_err_placement_required')
     return
   }
   isSubmitting.value = true
@@ -528,16 +586,16 @@ async function saveAsset() {
   try {
     if (modalMode.value === 'add') {
       await post('/api/assets', payload)
-      toast('Aset IT berhasil ditambahkan.')
+      toast(t('assets_it_add_success'))
     } else {
       await put(`/api/assets/${selectedAsset.value.id_aset}`, payload)
-      toast('Aset IT berhasil diperbarui.')
+      toast(t('assets_it_update_success'))
     }
     showFormModal.value = false
     selectedAsset.value = null
     await fetchData()
   } catch (error) {
-    modalError.value = error.message || 'Gagal menyimpan aset.'
+    modalError.value = error.message || t('assets_it_err_save')
   } finally {
     isSubmitting.value = false
   }
@@ -551,10 +609,10 @@ async function deleteAsset() {
     await del(`/api/assets/${selectedAsset.value.id_aset}`)
     showDeleteModal.value = false
     selectedAsset.value = null
-    toast('Aset IT berhasil dihapus.')
+    toast(t('assets_it_delete_success'))
     await fetchData()
   } catch (error) {
-    modalError.value = error.message || 'Gagal menghapus aset.'
+    modalError.value = error.message || t('assets_it_err_delete')
   } finally {
     isSubmitting.value = false
   }
@@ -600,7 +658,7 @@ async function executeExport() {
     })
 
     if (filteredData.length === 0) {
-      toast('Tidak ada data aset yang cocok dengan filter ekspor.', 'warning')
+      toast(t('assets_it_export_no_data'), 'warning')
       isExporting.value = false
       return
     }
@@ -619,56 +677,56 @@ async function executeExport() {
       exportToExcelWorkbook(
         [
           {
-            name: 'Table Karyawan',
+            name: t('assets_it_export_sheet_employees'),
             data: employees.value.filter((employee) => exportedNik.has(employee.nik)),
             columns: [
               { name: 'nik', label: 'NIK' },
-              { name: 'nama_karyawan', label: 'Nama Karyawan' },
-              { name: 'status', label: 'Status' },
+              { name: 'nama_karyawan', label: t('assets_it_employee_name') },
+              { name: 'status', label: t('status') },
               { name: 'title', label: 'Title' },
               { name: 'job_level', label: 'Job Level' },
-              { name: 'departemen', label: 'Departemen' },
+              { name: 'departemen', label: t('department') },
               { name: 'directorate', label: 'Directorate' },
-              { name: 'tanggal_mulai_bekerja', label: 'Tanggal Mulai Bekerja' },
+              { name: 'tanggal_mulai_bekerja', label: t('assets_it_export_col_start_date') },
               { name: 'employeement_status', label: 'Employeement Status' },
-              { name: 'nik_atasan_langsung', label: 'NIK Atasan Langsung' },
-              { name: 'email_kantor', label: 'Email Kantor' },
-              { name: 'lokasi_kerja', label: 'Lokasi Kerja' },
+              { name: 'nik_atasan_langsung', label: t('assets_it_export_col_supervisor_nik') },
+              { name: 'email_kantor', label: t('assets_it_export_col_office_email') },
+              { name: 'lokasi_kerja', label: t('assets_it_export_col_work_location') },
             ],
           },
           {
-            name: 'Table Asset',
+            name: t('assets_it_export_sheet_assets'),
             data: exportData,
             columns: [
               { name: 'hostname', label: 'Hostname' },
               { name: 'serial_number', label: 'Serial Number' },
-              { name: 'spesifikasi', label: 'Spesifikasi' },
-              { name: 'nik_pemegang_asset', label: 'NIK Pemegang' },
-              { name: 'nama_karyawan_pemegang_asset', label: 'Nama Karyawan Pemegang' },
-              { name: 'departemen_pemegang_asset', label: 'Departemen Pemegang' },
-              { name: 'lokasi_asset', label: 'Lokasi Aset' },
-              { name: 'tipe_perangkat', label: 'Tipe Perangkat' },
-              { name: 'brand_merek', label: 'Brand/Merek' },
+              { name: 'spesifikasi', label: t('assets_it_specs_short') },
+              { name: 'nik_pemegang_asset', label: t('assets_it_export_col_holder_nik') },
+              { name: 'nama_karyawan_pemegang_asset', label: t('assets_it_export_col_holder_name') },
+              { name: 'departemen_pemegang_asset', label: t('assets_it_export_col_holder_dept') },
+              { name: 'lokasi_asset', label: t('assets_it_asset_location') },
+              { name: 'tipe_perangkat', label: t('assets_it_device_type') },
+              { name: 'brand_merek', label: t('assets_it_export_col_brand') },
               { name: 'model', label: 'Model' },
-              { name: 'status', label: 'Status' },
-              { name: 'kondisi', label: 'Kondisi' },
+              { name: 'status', label: t('status') },
+              { name: 'kondisi', label: t('th_condition') },
               { name: 'note_asset', label: 'Note Asset' },
             ],
           },
         ],
-        'Aset_IT_Export',
+        t('assets_it_export_filename'),
       )
-      toast('XLSX aset berhasil dibuat.')
+      toast(t('assets_it_export_xlsx_success'))
     } else {
       downloadAssetsPdf(filteredData, {
         status: exportStatus.value,
         tipe: exportTipe.value,
       })
-      toast('PDF laporan berhasil dicetak.')
+      toast(t('assets_it_export_pdf_success'))
     }
     showExportModal.value = false
   } catch (error) {
-    toast(error.message || 'Gagal mengekspor aset.', 'error')
+    toast(error.message || t('assets_it_err_export'), 'error')
   } finally {
     isExporting.value = false
   }
@@ -697,7 +755,10 @@ function getDeviceIcon(type) {
 function formatLogDate(dateStr) {
   if (!dateStr) return '-'
   const date = new Date(dateStr)
-  return date.toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' })
+  return date.toLocaleString(currentLang.value === 'en' ? 'en-GB' : 'id-ID', {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+  })
 }
 
 function openAssign(asset) {
@@ -713,10 +774,10 @@ function openStatusChange(asset) {
 }
 
 function formatKondisiText(kondisi) {
-  if (!kondisi) return '—'
+  if (!kondisi) return '-'
   const k = String(kondisi).trim().toLowerCase()
-  if (k === 'normal' || k === 'baik' || k === 'baru') return 'Normal'
-  return kondisi
+  if (k === 'normal' || k === 'baik' || k === 'baru') return t('normal_condition')
+  return kondisiDisplay(kondisi)
 }
 
 function formatKondisiStyle(kondisi) {
@@ -736,40 +797,70 @@ function formatKondisiStyle(kondisi) {
 function getAssetActions(asset) {
   const actions = [
     {
-      label: 'Lihat Detail',
+      label: t('assets_it_action_view_detail'),
       icon: 'visibility',
       onClick: () => openDetails(asset),
     },
     {
-      label: 'Cetak Label',
+      label: t('assets_it_action_print_label'),
       icon: 'print',
       onClick: () => openLabelModal(asset),
     },
   ]
   if (canWriteAssets.value) {
     actions.push({
-      label: 'Edit Aset',
+      label: t('assets_it_action_edit'),
       icon: 'edit',
       onClick: () => openEdit(asset),
     })
     actions.push({
-      label: 'Assign / Pindahkan',
+      label: t('assets_it_action_assign'),
       icon: 'person_add',
       onClick: () => openAssign(asset),
     })
     actions.push({
-      label: 'Ubah Status',
+      label: t('assets_it_action_change_status'),
       icon: 'sync_alt',
       onClick: () => openStatusChange(asset),
     })
     actions.push({
-      label: 'Hapus Aset',
+      label: t('assets_it_action_delete'),
       icon: 'delete',
       danger: true,
       onClick: () => openDelete(asset),
     })
   }
   return actions
+}
+
+// Label aksi log (TAMBAH/UBAH/HAPUS) & nama field log agar mengikuti bahasa aktif.
+function logActionLabel(aksi) {
+  const a = String(aksi || '').trim().toUpperCase()
+  if (a === 'TAMBAH') return t('action_create').toUpperCase()
+  if (a === 'UBAH') return t('action_update').toUpperCase()
+  if (a === 'HAPUS') return t('action_delete').toUpperCase()
+  return aksi
+}
+
+function logFieldDisplay(field) {
+  if (!field) return ''
+  const f = String(field).trim().toLowerCase()
+  const keyMap = {
+    'tipe perangkat': 'assets_it_device_type',
+    tipe: 'assets_it_log_field_tipe',
+    merek: 'assets_it_log_field_merek',
+    status: 'status',
+    kondisi: 'th_condition',
+    'nomor seri': 'assets_it_serial_number',
+    'lokasi aset': 'assets_it_asset_location',
+    'nama karyawan': 'assets_it_employee_name',
+    departemen: 'department',
+    spesifikasi: 'assets_it_specs_short',
+    'catatan aset': 'assets_it_note_asset',
+  }
+  const key = keyMap[f]
+  if (key) return t(key)
+  return field
 }
 
 function parsePerubahan(perubahan, aksi) {
@@ -795,11 +886,15 @@ function parsePerubahan(perubahan, aksi) {
   if (aksi === 'TAMBAH' && perubahan.startsWith('Aset baru didaftarkan')) {
     const items = []
     const match = perubahan.match(/nomor seri (.+?),/)
-    if (match) items.push({ field: 'Nomor Seri', value: match[1] })
+    if (match) items.push({ field: t('assets_it_serial_number'), value: match[1] })
     const pairs = perubahan.matchAll(/(?:tipe|merek|status|kondisi):\s*([^,.]+)/gi)
     for (const m of pairs) {
       const label = perubahan.substring(m.index, perubahan.indexOf(':', m.index)).trim()
-      items.push({ field: label.charAt(0).toUpperCase() + label.slice(1), value: m[1].trim() })
+      const mappedField = logFieldDisplay(label)
+      items.push({
+        field: mappedField !== label ? mappedField : label.charAt(0).toUpperCase() + label.slice(1),
+        value: m[1].trim(),
+      })
     }
     return items
   }
@@ -857,8 +952,8 @@ onMounted(async () => {
   >
     <!-- ── Page Header (komponen bersama; sama dengan halaman lain) ── -->
     <PageHeader
-      title="Aset IT"
-      subtitle="Monitor dan kelola seluruh perangkat IT perusahaan"
+      :title="t('assets_it_title')"
+      :subtitle="t('assets_it_subtitle')"
       icon="inventory_2"
     >
       <!-- Primary Action CTA -->
@@ -868,10 +963,10 @@ onMounted(async () => {
           type="button"
           @click="openAdd"
           class="inventory-primary-action inline-flex h-8 items-center justify-center gap-1.5 whitespace-nowrap rounded-[6px] bg-[#0A51B0] px-3 text-[11px] sm:text-[12px] font-semibold text-white shadow-2xs transition-all hover:bg-[#0A4391]"
-          title="Tambah aset baru"
+          :title="t('btn_add_asset')"
         >
           <span aria-hidden="true" class="material-symbols-outlined text-[16px]">add</span>
-          <span>Tambah Aset</span>
+          <span>{{ t('btn_add_asset') }}</span>
         </button>
         <div
           class="inventory-action-group flex items-center gap-1 rounded-[6px] border border-[#D7E3F2] dark:border-slate-700 bg-[#F8FAFC] dark:bg-slate-800 p-0.5 h-8"
@@ -884,7 +979,7 @@ onMounted(async () => {
           >
             <span aria-hidden="true" class="material-symbols-outlined text-[15px]"
               >upload_file</span
-            >Import
+            >{{ t('btn_import') }}
           </button>
           <button
             type="button"
@@ -893,7 +988,7 @@ onMounted(async () => {
           >
             <span aria-hidden="true" class="material-symbols-outlined text-[15px]"
               >download</span
-            >Export
+            >{{ t('btn_export') }}
           </button>
         </div>
       </div>
@@ -909,10 +1004,10 @@ onMounted(async () => {
         v-for="stat in assetStats"
         :key="stat.title"
         :title="stat.title"
-        :value="isLoading || pageError ? '—' : stat.value"
+        :value="isLoading || pageError ? '-' : stat.value"
         :icon="stat.icon"
         :color="stat.color"
-        :subtitle="isLoading ? 'Memuat…' : pageError ? 'Tidak tersedia' : 'Seluruh data kategori'"
+        :subtitle="isLoading ? (currentLang === 'en' ? 'Loading…' : 'Memuat…') : pageError ? (currentLang === 'en' ? 'Unavailable' : 'Tidak tersedia') : (currentLang === 'en' ? 'All category records' : 'Seluruh data kategori')"
       />
     </section>
 
@@ -935,8 +1030,8 @@ onMounted(async () => {
             <input
               v-model="searchQuery"
               type="text"
-              aria-label="Cari aset, serial number, atau pemegang"
-              placeholder="Cari aset, serial number, atau pemegang…"
+              :aria-label="t('assets_it_search_aria')"
+              :placeholder="t('assets_it_search_placeholder')"
               class="h-full w-full rounded-[6px] border border-[#E2E8F0] dark:border-slate-800 bg-white dark:bg-slate-800 pl-8 pr-8 text-[12px] text-[#333333] dark:text-white placeholder-[#687281] dark:placeholder-slate-400 focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
             />
             <!-- Inline Clear Button -->
@@ -944,9 +1039,9 @@ onMounted(async () => {
               v-if="searchQuery"
               type="button"
               @click="searchQuery = ''"
-              aria-label="Bersihkan pencarian"
+              :aria-label="t('clear_search')"
               class="absolute right-2 top-1/2 -translate-y-1/2 flex h-5 w-5 items-center justify-center rounded-full text-[#687281] hover:bg-[#F1F5F9] hover:text-[#333333] transition-all cursor-pointer touch-manipulation"
-              title="Bersihkan"
+              :title="t('assets_it_btn_clear')"
             >
               <span aria-hidden="true" class="material-symbols-outlined text-[15px]">close</span>
             </button>
@@ -959,7 +1054,7 @@ onMounted(async () => {
           >
             <span aria-hidden="true" class="material-symbols-outlined mr-1 align-middle text-[15px]"
               >filter_alt</span
-            >Filter
+            >{{ t('filter') }}
           </button>
         </div>
       </div>
@@ -971,13 +1066,13 @@ onMounted(async () => {
         <div class="it-list-heading" aria-live="polite">
           <div>
             <h3>
-              Daftar perangkat <span>{{ filteredAssets.length }}</span>
+              {{ t('assets_it_list_heading') }} <span>{{ filteredAssets.length }}</span>
             </h3>
             <p>
               {{
                 searchQuery || filterStatus || filterTipe
-                  ? 'Hasil sesuai pencarian dan filter Anda'
-                  : 'Inventaris perangkat IT perusahaan'
+                  ? t('assets_it_list_filtered_sub')
+                  : t('assets_it_list_sub')
               }}
             </p>
           </div>
@@ -987,7 +1082,8 @@ onMounted(async () => {
               >{{ (currentPage - 1) * itemsPerPage + 1 }}–{{
                 Math.min(currentPage * itemsPerPage, filteredAssets.length)
               }}
-              dari {{ filteredAssets.length }} aset</span
+              {{ t('of_entries') }} {{ filteredAssets.length }}
+              {{ t('assets_it_assets_word') }}</span
             >
           </div>
         </div>
@@ -1083,9 +1179,9 @@ onMounted(async () => {
       >
         <EmptyState
           icon="devices_off"
-          title="Belum Ada Aset IT"
-          description="Belum ada aset IT yang terdaftar dalam inventaris atau sesuai dengan kata kunci pencarian."
-          :action-label="canWriteAssets ? 'Tambah Aset' : ''"
+          :title="t('assets_it_empty_title')"
+          :description="t('assets_it_empty_desc')"
+          :action-label="canWriteAssets ? t('btn_add_asset') : ''"
           @action="openAdd"
         />
       </div>
@@ -1096,7 +1192,7 @@ onMounted(async () => {
         <div v-if="viewMode === 'table'" class="ws-data-table-wrap">
           <table class="ws-data-table">
             <caption class="sr-only">
-              Daftar aset IT
+              {{ t('assets_it_table_caption') }}
             </caption>
             <colgroup>
               <col class="w-[24%]" />
@@ -1109,13 +1205,13 @@ onMounted(async () => {
             </colgroup>
             <thead>
               <tr>
-                <th scope="col">Perangkat</th>
-                <th scope="col">Pengguna</th>
-                <th scope="col">Lokasi</th>
-                <th scope="col">Tipe</th>
-                <th scope="col">Status</th>
-                <th scope="col">Kondisi</th>
-                <th scope="col"><span class="sr-only">Aksi</span></th>
+                <th scope="col">{{ t('th_device') }}</th>
+                <th scope="col">{{ t('assets_it_th_user') }}</th>
+                <th scope="col">{{ t('filter_location') }}</th>
+                <th scope="col">{{ t('assets_it_th_type') }}</th>
+                <th scope="col">{{ t('status') }}</th>
+                <th scope="col">{{ t('th_condition') }}</th>
+                <th scope="col"><span class="sr-only">{{ t('actions') }}</span></th>
               </tr>
             </thead>
             <tbody>
@@ -1123,37 +1219,43 @@ onMounted(async () => {
                 v-for="asset in paginatedAssets"
                 :key="asset.id_aset"
                 tabindex="0"
-                :aria-label="'Lihat detail ' + (asset.hostname || asset.label_aset || 'aset')"
+                :aria-label="
+                  t('assets_it_view_detail_aria') +
+                  ' ' +
+                  (asset.hostname || asset.label_aset || t('assets_it_asset_word'))
+                "
                 @click="openDetails(asset)"
                 @keydown.enter.self="openDetails(asset)"
                 @keydown.space.prevent.self="openDetails(asset)"
               >
                 <td>
                   <span class="ws-cell-main" :title="asset.hostname || asset.label_aset">{{
-                    asset.hostname || asset.label_aset || '—'
+                    asset.hostname || asset.label_aset || '-'
                   }}</span>
                   <span class="ws-cell-sub" :title="asset.serial_number || asset.nomor_seri"
-                    >SN: {{ asset.serial_number || asset.nomor_seri || '—' }}</span
+                    >SN: {{ asset.serial_number || asset.nomor_seri || '-' }}</span
                   >
                 </td>
                 <td>
                   <span class="ws-cell-main" :title="asset.nama_karyawan">{{
-                    asset.nama_karyawan || 'Belum ditetapkan'
+                    asset.nama_karyawan || t('unassigned')
                   }}</span>
                 </td>
                 <td>
                   <span class="ws-cell-main" :title="asset.lokasi_kerja || asset.lokasi_aset">{{
-                    asset.lokasi_kerja || asset.lokasi_aset || '—'
+                    asset.lokasi_kerja || asset.lokasi_aset || '-'
                   }}</span>
                 </td>
                 <td>
-                  <span class="ws-cell-main">{{ asset.tipe_perangkat || '—' }}</span>
+                  <span class="ws-cell-main">{{ tipeDisplay(asset.tipe_perangkat) || '-' }}</span>
                   <span v-if="asset.merek || asset.brand_merek" class="ws-cell-sub">{{
-                    [asset.merek || asset.brand_merek, asset.model].filter(Boolean).join(' ')
+                    [brandDisplay(asset.merek || asset.brand_merek), asset.model]
+                      .filter(Boolean)
+                      .join(' ')
                   }}</span>
                 </td>
                 <td>
-                  <span class="ws-cell-main">{{ formatStatusPill(asset.status_aset).label }}</span>
+                  <span class="ws-cell-main">{{ statusLabel(asset.status_aset) }}</span>
                 </td>
                 <td>
                   <span class="ws-cell-main">{{ formatKondisiText(asset.kondisi_aset) }}</span>
@@ -1161,7 +1263,11 @@ onMounted(async () => {
                 <td @click.stop>
                   <AppRowActions
                     :actions="getAssetActions(asset)"
-                    :label="`Aksi aset ${asset.label_aset || asset.id_aset || ''}`"
+                    :label="
+                      t('assets_it_actions_aria') +
+                      ' ' +
+                      (asset.label_aset || asset.id_aset || '')
+                    "
                   />
                 </td>
               </tr>
@@ -1176,7 +1282,11 @@ onMounted(async () => {
             :key="asset.id_aset"
             class="laptop-row"
             tabindex="0"
-            :aria-label="'Lihat detail ' + (asset.hostname || asset.label_aset || 'aset')"
+            :aria-label="
+              t('assets_it_view_detail_aria') +
+              ' ' +
+              (asset.hostname || asset.label_aset || t('assets_it_asset_word'))
+            "
             @click="openDetails(asset)"
             @keydown.enter.self="openDetails(asset)"
             @keydown.space.prevent.self="openDetails(asset)"
@@ -1189,28 +1299,32 @@ onMounted(async () => {
               </div>
               <div class="laptop-identity-text">
                 <h4 :title="asset.hostname || asset.label_aset">
-                  {{ asset.hostname || asset.label_aset || '—' }}
+                  {{ asset.hostname || asset.label_aset || '-' }}
                 </h4>
                 <p
-                  :title="[asset.merek || asset.brand_merek, asset.model].filter(Boolean).join(' ')"
+                  :title="
+                    [brandDisplay(asset.merek || asset.brand_merek), asset.model]
+                      .filter(Boolean)
+                      .join(' ')
+                  "
                 >
                   {{
-                    [asset.merek || asset.brand_merek, asset.model].filter(Boolean).join(' ') ||
-                    asset.tipe_perangkat ||
-                    '—'
+                    [brandDisplay(asset.merek || asset.brand_merek), asset.model]
+                      .filter(Boolean)
+                      .join(' ') || tipeDisplay(asset.tipe_perangkat) || '-'
                   }}
                 </p>
                 <span class="laptop-serial" :title="asset.serial_number || asset.nomor_seri"
-                  >SN: {{ asset.serial_number || asset.nomor_seri || '—' }}</span
+                  >SN: {{ asset.serial_number || asset.nomor_seri || '-' }}</span
                 >
               </div>
             </div>
             <div class="laptop-holder laptop-field">
-              <span class="laptop-label">Pengguna</span>
+              <span class="laptop-label">{{ t('assets_it_th_user') }}</span>
               <strong
                 :class="{ 'laptop-unassigned': !asset.nama_karyawan }"
-                :title="asset.nama_karyawan || 'Belum ditetapkan'"
-                >{{ asset.nama_karyawan || 'Belum ditetapkan' }}</strong
+                :title="asset.nama_karyawan || t('unassigned')"
+                >{{ asset.nama_karyawan || t('unassigned') }}</strong
               >
               <span
                 v-if="asset.nama_karyawan && asset.nik"
@@ -1220,14 +1334,14 @@ onMounted(async () => {
               >
             </div>
             <div class="laptop-location laptop-field">
-              <span class="laptop-label">Lokasi</span>
+              <span class="laptop-label">{{ t('filter_location') }}</span>
               <strong :title="asset.lokasi_kerja || asset.lokasi_aset">{{
-                asset.lokasi_kerja || asset.lokasi_aset || '—'
+                asset.lokasi_kerja || asset.lokasi_aset || '-'
               }}</strong>
             </div>
             <div class="laptop-state">
-              <span class="laptop-label">Status</span>
-              <span class="laptop-status">{{ formatStatusPill(asset.status_aset).label }}</span>
+              <span class="laptop-label">{{ t('status') }}</span>
+              <span class="laptop-status">{{ statusLabel(asset.status_aset) }}</span>
               <span class="laptop-condition" :class="formatKondisiStyle(asset.kondisi_aset)">
                 {{ formatKondisiText(asset.kondisi_aset) }}
               </span>
@@ -1235,7 +1349,9 @@ onMounted(async () => {
             <div class="laptop-actions" @click.stop>
               <AppRowActions
                 :actions="getAssetActions(asset)"
-                :label="`Aksi aset ${asset.label_aset || asset.id_aset || ''}`"
+                :label="
+                  t('assets_it_actions_aria') + ' ' + (asset.label_aset || asset.id_aset || '')
+                "
               />
             </div>
           </div>
@@ -1257,11 +1373,11 @@ onMounted(async () => {
     <AppModal
       panel-class="inventory-dialog"
       :is-open="showFormModal"
-      :title="modalMode === 'add' ? 'Tambah Aset IT' : 'Edit Aset IT'"
+      :title="modalMode === 'add' ? t('assets_it_form_add_title') : t('assets_it_form_edit_title')"
       :subtitle="
         modalMode === 'add'
-          ? 'Lengkapi data perangkat. Kolom bertanda * wajib diisi.'
-          : 'Perbarui spesifikasi dan konfigurasi unit aset IT.'
+          ? t('assets_it_form_add_subtitle')
+          : t('assets_it_form_edit_subtitle')
       "
       :icon="modalMode === 'add' ? 'devices' : 'edit_note'"
       size="lg"
@@ -1270,20 +1386,32 @@ onMounted(async () => {
       <div class="it-entry-summary">
         <span class="it-entry-icon material-symbols-outlined" aria-hidden="true">devices</span>
         <div>
-          <strong>{{ form.hostname || 'Perangkat baru' }}</strong>
+          <strong>{{ form.hostname || t('assets_it_new_device') }}</strong>
           <p>
             {{
-              form.tipe_perangkat || 'Lengkapi identitas, penempatan, dan spesifikasi perangkat.'
+              tipeDisplay(form.tipe_perangkat) || t('assets_it_form_summary_hint')
             }}
           </p>
         </div>
       </div>
-      <nav class="it-create-steps" aria-label="Langkah pengisian aset">
+      <nav class="it-create-steps" :aria-label="t('assets_it_steps_aria')">
         <button
           v-for="(step, index) in [
-            { key: 'info', label: 'Perangkat', hint: 'Identitas utama' },
-            { key: 'placement', label: 'Penempatan', hint: 'Pengguna & lokasi' },
-            { key: 'specifications', label: 'Spesifikasi', hint: 'Detail & kondisi' },
+            {
+              key: 'info',
+              label: t('assets_it_step_info'),
+              hint: t('assets_it_step_info_hint'),
+            },
+            {
+              key: 'placement',
+              label: t('assets_it_step_placement'),
+              hint: t('assets_it_step_placement_hint'),
+            },
+            {
+              key: 'specifications',
+              label: t('assets_it_step_specs'),
+              hint: t('assets_it_step_specs_hint'),
+            },
           ]"
           :key="step.key"
           type="button"
@@ -1329,18 +1457,20 @@ onMounted(async () => {
                 >
               </span>
               <span class="text-[12px] font-bold text-[#333333] uppercase tracking-wider">
-                Identitas perangkat
+                {{ t('assets_it_device_identity') }}
               </span>
             </div>
-            <span class="text-[11px] font-medium text-[#5F7089]">Langkah 1 dari 3</span>
+            <span class="text-[11px] font-medium text-[#5F7089]">{{
+              t('assets_it_step_1_of_3')
+            }}</span>
           </div>
 
-          <p class="it-entry-guidance">Mulai dengan identitas yang tertera pada perangkat.</p>
+          <p class="it-entry-guidance">{{ t('assets_it_step1_guidance') }}</p>
           <fieldset class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
             <!-- Hostname Input -->
             <div class="flex flex-col gap-1.5">
               <label class="text-[12px] font-bold text-[#333333] flex items-center justify-between">
-                <span>Hostname / Label Aset <span class="text-[#DC2626]">*</span></span>
+                <span>{{ t('assets_it_hostname_label') }} <span class="text-[#DC2626]">*</span></span>
               </label>
               <div class="relative flex items-center">
                 <span
@@ -1353,8 +1483,8 @@ onMounted(async () => {
                   v-model="form.hostname"
                   required
                   maxlength="100"
-                  aria-label="Hostname Aset"
-                  placeholder="cth: LAPTOP-IT-04 atau WS-FINANCE-01"
+                  :aria-label="t('assets_it_hostname_aria')"
+                  :placeholder="t('assets_it_hostname_ph')"
                   class="h-8 w-full rounded-[6px] border border-[#E2E8F0] bg-white pl-9 pr-3 text-[12px] font-medium text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 focus:outline-none transition-all shadow-2xs"
                 />
               </div>
@@ -1376,8 +1506,8 @@ onMounted(async () => {
                   v-model="form.serial_number"
                   required
                   maxlength="100"
-                  aria-label="Serial Number Aset"
-                  placeholder="cth: PF3ABCDE atau 5CD1234XYZ"
+                  :aria-label="t('assets_it_serial_aria')"
+                  :placeholder="t('assets_it_serial_ph')"
                   class="h-8 w-full rounded-[6px] border border-[#E2E8F0] bg-white pl-9 pr-3 text-[12px] font-medium text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 focus:outline-none transition-all shadow-2xs"
                 />
               </div>
@@ -1386,13 +1516,13 @@ onMounted(async () => {
             <!-- Tipe Perangkat -->
             <div class="flex flex-col gap-1.5 col-span-1 sm:col-span-2">
               <label class="text-[12px] font-bold text-[#333333]">
-                Tipe Perangkat <span class="text-[#DC2626]">*</span>
+                {{ t('assets_it_device_type') }} <span class="text-[#DC2626]">*</span>
               </label>
               <CustomSelect
                 v-model="form.tipe_perangkat"
                 :options="availableTipeOptions"
-                aria-label="Tipe Perangkat Aset"
-                placeholder="Pilih tipe perangkat"
+                :aria-label="t('assets_it_device_type_aria')"
+                :placeholder="t('assets_it_device_type_ph')"
                 :block="true"
                 height-class="h-8"
               />
@@ -1408,7 +1538,7 @@ onMounted(async () => {
                 >info</span
               >
               <p class="text-[12px] leading-relaxed text-[#0A4391]">
-                Gunakan hostname dan serial number yang tertera pada perangkat.
+                {{ t('assets_it_step1_tip') }}
               </p>
             </div>
           </fieldset>
@@ -1424,21 +1554,25 @@ onMounted(async () => {
                 <span aria-hidden="true" class="material-symbols-outlined text-[15px]">badge</span>
               </span>
               <span class="text-[12px] font-bold text-[#333333] uppercase tracking-wider">
-                Pengguna dan lokasi
+                {{ t('assets_it_placement_section') }}
               </span>
             </div>
-            <span class="text-[11px] font-medium text-[#5F7089]">Langkah 2 dari 3</span>
+            <span class="text-[11px] font-medium text-[#5F7089]">{{
+              t('assets_it_step_2_of_3')
+            }}</span>
           </div>
 
-          <p class="it-entry-guidance">Tentukan pengguna dan lokasi penyimpanan perangkat.</p>
+          <p class="it-entry-guidance">{{ t('assets_it_step2_guidance') }}</p>
           <fieldset class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
             <!-- Pemegang Aset SearchableSelect -->
             <div class="flex flex-col gap-1.5 col-span-1 sm:col-span-2">
               <div class="flex items-center justify-between">
                 <label class="text-[12px] font-bold text-[#333333]"
-                  >Pemegang Aset / User Penanggung Jawab</label
+                  >{{ t('assets_it_holder_label') }}</label
                 >
-                <span class="text-[11px] font-medium text-[#5F7089]">Opsional</span>
+                <span class="text-[11px] font-medium text-[#5F7089]">{{
+                  t('assets_it_optional')
+                }}</span>
               </div>
               <SearchableSelect
                 v-model="form.nik_pemegang_asset"
@@ -1446,8 +1580,8 @@ onMounted(async () => {
                 value-key="nik"
                 label-key="nama_karyawan"
                 secondary-label-key="nik"
-                placeholder="Pilih karyawan pemegang (Biarkan kosong jika disimpan sebagai Stok IT)"
-                search-placeholder="Cari berdasarkan nama atau NIK karyawan…"
+                :placeholder="t('assets_it_holder_ph')"
+                :search-placeholder="t('assets_it_holder_search_ph')"
                 clearable
                 class="w-full"
               />
@@ -1467,7 +1601,7 @@ onMounted(async () => {
                 <div class="min-w-0 flex-1">
                   <div class="flex items-center gap-2 flex-wrap">
                     <span class="text-[12px] font-bold text-[#333333] truncate">
-                      {{ form.nama_karyawan_pemegang_asset || 'Karyawan Terpilih' }}
+                      {{ form.nama_karyawan_pemegang_asset || t('assets_it_employee_selected') }}
                     </span>
                     <span
                       class="inline-flex items-center gap-1 rounded-full bg-[#0A5DBD]/15 px-2 py-0.5 text-[11px] font-bold text-[#0A4391]"
@@ -1475,7 +1609,7 @@ onMounted(async () => {
                       <span aria-hidden="true" class="material-symbols-outlined text-[12px]"
                         >business</span
                       >
-                      {{ form.departemen_pemegang_asset || 'Umum' }}
+                      {{ form.departemen_pemegang_asset || t('assets_it_dept_default') }}
                     </span>
                   </div>
                   <div class="flex items-center gap-2 mt-0.5 text-[11px] text-[#5F7089]">
@@ -1488,7 +1622,7 @@ onMounted(async () => {
                       <span aria-hidden="true" class="material-symbols-outlined text-[13px]"
                         >check_circle</span
                       >
-                      Akan ditugaskan
+                      {{ t('assets_it_will_be_assigned') }}
                     </span>
                   </div>
                 </div>
@@ -1497,7 +1631,7 @@ onMounted(async () => {
                 type="button"
                 @click="clearEmployee"
                 class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-[#E2E8F0] bg-white text-[#5F7089] hover:text-[#DC2626] hover:bg-rose-50 hover:border-rose-200 transition-colors cursor-pointer"
-                title="Batal pilih karyawan (Jadikan Stock)"
+                :title="t('assets_it_clear_employee_title')"
               >
                 <span aria-hidden="true" class="material-symbols-outlined text-[16px]">close</span>
               </button>
@@ -1516,9 +1650,9 @@ onMounted(async () => {
                 >
               </div>
               <div class="text-[12px] leading-snug">
-                <p class="font-bold text-[#333333]">Status Unit: Stok Tersedia (Stock)</p>
+                <p class="font-bold text-[#333333]">{{ t('assets_it_stock_title') }}</p>
                 <p class="text-[#5F7089] text-[11px] mt-0.5">
-                  Perangkat tidak terikat ke karyawan mana pun dan tersimpan di pool inventaris IT.
+                  {{ t('assets_it_stock_desc') }}
                 </p>
               </div>
             </div>
@@ -1527,19 +1661,19 @@ onMounted(async () => {
             <div class="flex flex-col gap-1.5 col-span-1 sm:col-span-2">
               <div class="flex items-center justify-between">
                 <label class="text-[12px] font-bold text-[#333333]">
-                  Lokasi Penempatan Aset <span class="text-[#DC2626]">*</span>
+                  {{ t('assets_it_location_label') }} <span class="text-[#DC2626]">*</span>
                 </label>
-                <span class="text-[11px] text-[#5F7089]">Kantor cabang atau area fisik</span>
+                <span class="text-[11px] text-[#5F7089]">{{ t('assets_it_location_hint') }}</span>
               </div>
               <SearchableSelect
                 v-model="form.lokasi_asset"
                 :options="locationOptions"
                 value-key="value"
                 label-key="label"
-                placeholder="Pilih atau ketik lokasi (cth: Solo, Pluit, Gudang IT)"
-                search-placeholder="Cari atau ketik lokasi baru…"
+                :placeholder="t('assets_it_location_ph')"
+                :search-placeholder="t('assets_it_location_search_ph')"
                 allow-custom
-                custom-label-prefix="+ Gunakan lokasi baru"
+                :custom-label-prefix="t('assets_it_use_new_location')"
                 drop-direction="up"
                 class="w-full"
               />
@@ -1557,26 +1691,30 @@ onMounted(async () => {
                 <span aria-hidden="true" class="material-symbols-outlined text-[15px]">tune</span>
               </span>
               <span class="text-[12px] font-bold text-[#333333] uppercase tracking-wider">
-                Spesifikasi & Kondisi Teknis
+                {{ t('assets_it_specs_section') }}
               </span>
             </div>
-            <span class="text-[11px] font-medium text-[#5F7089]">Langkah 3 dari 3</span>
+            <span class="text-[11px] font-medium text-[#5F7089]">{{
+              t('assets_it_step_3_of_3')
+            }}</span>
           </div>
 
-          <p class="it-entry-guidance">Lengkapi spesifikasi dan kondisi sebelum menyimpan.</p>
+          <p class="it-entry-guidance">{{ t('assets_it_step3_guidance') }}</p>
           <fieldset class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
             <!-- Brand / Merek -->
             <div class="flex flex-col gap-1.5">
-              <label class="text-[12px] font-bold text-[#333333]">Brand / Merek</label>
+              <label class="text-[12px] font-bold text-[#333333]">{{
+                t('assets_it_brand_label')
+              }}</label>
               <SearchableSelect
                 v-model="form.brand_merek"
                 :options="brandSelectOptions"
                 value-key="value"
                 label-key="label"
-                placeholder="Pilih atau ketik merek"
-                search-placeholder="Cari merek (Lenovo, Dell, HP, Apple)…"
+                :placeholder="t('assets_it_brand_ph')"
+                :search-placeholder="t('assets_it_brand_search_ph')"
                 allow-custom
-                custom-label-prefix="+ Gunakan merek baru"
+                :custom-label-prefix="t('assets_it_use_new_brand')"
                 clearable
                 class="w-full"
               />
@@ -1584,7 +1722,9 @@ onMounted(async () => {
 
             <!-- Model -->
             <div class="flex flex-col gap-1.5">
-              <label class="text-[12px] font-bold text-[#333333]">Model / Seri</label>
+              <label class="text-[12px] font-bold text-[#333333]">{{
+                t('assets_it_model_label')
+              }}</label>
               <div class="relative flex items-center">
                 <span
                   aria-hidden="true"
@@ -1595,7 +1735,7 @@ onMounted(async () => {
                 <input
                   v-model="form.model"
                   maxlength="100"
-                  placeholder="cth: ThinkPad T14 Gen 3"
+                  :placeholder="t('assets_it_model_ph')"
                   class="h-8 w-full rounded-[6px] border border-[#E2E8F0] bg-white pl-9 pr-3 text-[12px] font-medium text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 focus:outline-none transition-all shadow-2xs"
                 />
               </div>
@@ -1604,13 +1744,13 @@ onMounted(async () => {
             <!-- Status Aset -->
             <div class="flex flex-col gap-1.5">
               <label class="text-[12px] font-bold text-[#333333]">
-                Status Aset <span class="text-[#DC2626]">*</span>
+                {{ t('assets_it_status_label') }} <span class="text-[#DC2626]">*</span>
               </label>
               <CustomSelect
                 v-model="form.status"
-                :options="ASSET_STATUSES"
-                aria-label="Status Aset"
-                placeholder="Pilih status aset"
+                :options="assetStatusSelectOptions"
+                :aria-label="t('assets_it_status_label')"
+                :placeholder="t('assets_it_status_ph')"
                 :block="true"
                 height-class="h-8"
               />
@@ -1619,13 +1759,13 @@ onMounted(async () => {
             <!-- Kondisi Aset -->
             <div class="flex flex-col gap-1.5">
               <label class="text-[12px] font-bold text-[#333333]">
-                Kondisi Fisik <span class="text-[#DC2626]">*</span>
+                {{ t('assets_it_condition_physical') }} <span class="text-[#DC2626]">*</span>
               </label>
               <CustomSelect
                 v-model="form.kondisi"
                 :options="availableKondisiOptions"
-                aria-label="Kondisi Aset"
-                placeholder="Pilih kondisi aset"
+                :aria-label="t('assets_it_condition_label')"
+                :placeholder="t('assets_it_condition_ph')"
                 :block="true"
                 height-class="h-8"
               />
@@ -1634,13 +1774,15 @@ onMounted(async () => {
             <!-- Spesifikasi Detail -->
             <div class="flex flex-col gap-1.5 col-span-1 sm:col-span-2">
               <div class="flex items-center justify-between">
-                <label class="text-[12px] font-bold text-[#333333]">Spesifikasi Teknis</label>
-                <span class="text-[11px] text-[#5F7089]">CPU, RAM, SSD, OS, dll.</span>
+                <label class="text-[12px] font-bold text-[#333333]">{{
+                  t('assets_it_specs_label')
+                }}</label>
+                <span class="text-[11px] text-[#5F7089]">{{ t('assets_it_specs_hint') }}</span>
               </div>
               <textarea
                 v-model="form.spesifikasi"
                 rows="2"
-                placeholder="cth: Intel Core i7-12700H, 16GB DDR5, 512GB NVMe SSD, Windows 11 Pro"
+                :placeholder="t('assets_it_specs_ph')"
                 class="min-h-[56px] max-h-[100px] w-full rounded-lg border border-[#E2E8F0] bg-white p-2.5 text-[12px] font-medium text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 focus:outline-none transition-all resize-y shadow-2xs"
               ></textarea>
             </div>
@@ -1648,13 +1790,15 @@ onMounted(async () => {
             <!-- Catatan Aset -->
             <div class="flex flex-col gap-1.5 col-span-1 sm:col-span-2">
               <div class="flex items-center justify-between">
-                <label class="text-[12px] font-bold text-[#333333]">Catatan Tambahan</label>
-                <span class="text-[11px] text-[#5F7089]">Kelengkapan atau riwayat khusus</span>
+                <label class="text-[12px] font-bold text-[#333333]">{{
+                  t('assets_it_note_label')
+                }}</label>
+                <span class="text-[11px] text-[#5F7089]">{{ t('assets_it_note_hint') }}</span>
               </div>
               <textarea
                 v-model="form.note_asset"
                 rows="2"
-                placeholder="cth: Lengkap dengan charger original 65W USB-C dan tas laptop"
+                :placeholder="t('assets_it_note_ph')"
                 class="min-h-[56px] max-h-[100px] w-full rounded-lg border border-[#E2E8F0] bg-white p-2.5 text-[12px] font-medium text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 focus:outline-none transition-all resize-y shadow-2xs"
               ></textarea>
             </div>
@@ -1673,7 +1817,7 @@ onMounted(async () => {
             @click="closeModal"
             class="h-8 px-4 rounded-[6px] border border-[#E2E8F0] bg-white text-[12px] font-bold text-[#5F7089] hover:bg-[#F8FAFC] hover:text-[#333333] hover:border-[#CBD5E1] transition-all cursor-pointer touch-manipulation flex items-center justify-center gap-1.5"
           >
-            <span>Batal</span>
+            <span>{{ t('cancel') }}</span>
           </button>
 
           <div class="flex items-center gap-2.5 w-full sm:w-auto">
@@ -1686,7 +1830,7 @@ onMounted(async () => {
               <span aria-hidden="true" class="material-symbols-outlined text-[16px]"
                 >arrow_back</span
               >
-              <span>Kembali</span>
+              <span>{{ t('back') }}</span>
             </button>
 
             <button
@@ -1696,7 +1840,7 @@ onMounted(async () => {
               :disabled="isSubmitting || hasValidationErrors"
               class="h-8 flex-1 sm:flex-initial rounded-[6px] bg-[#0A51B0] hover:bg-[#0A4391] active:bg-[#0F1F38] px-4 text-[12px] font-bold text-white shadow-sm disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-1.5 cursor-pointer touch-manipulation"
             >
-              <span>Lanjutkan</span>
+              <span>{{ t('assets_it_continue') }}</span>
               <span aria-hidden="true" class="material-symbols-outlined text-[16px]"
                 >arrow_forward</span
               >
@@ -1718,10 +1862,10 @@ onMounted(async () => {
               </span>
               <span>{{
                 isSubmitting
-                  ? 'Menyimpan...'
+                  ? t('assets_it_saving')
                   : modalMode === 'add'
-                    ? 'Tambah Aset'
-                    : 'Simpan Perubahan'
+                    ? t('btn_add_asset')
+                    : t('assets_it_save_changes')
               }}</span>
             </button>
           </div>
@@ -1732,7 +1876,7 @@ onMounted(async () => {
     <AppModal
       panel-class="inventory-dialog"
       :is-open="showDeleteModal"
-      title="Hapus Aset IT"
+      :title="t('assets_it_delete_title')"
       size="sm"
       @close="closeModal"
     >
@@ -1751,9 +1895,9 @@ onMounted(async () => {
         </div>
         <div>
           <h4 class="text-[14px] font-black text-[#111827]">
-            Hapus {{ selectedAsset?.label_aset }}?
+            {{ t('assets_it_delete_word') }} {{ selectedAsset?.label_aset }}?
           </h4>
-          <p class="mt-1 text-[12px] text-[#9CA3AF]">Data aset akan dihapus permanen.</p>
+          <p class="mt-1 text-[12px] text-[#9CA3AF]">{{ t('assets_it_delete_confirm') }}</p>
         </div>
       </div>
       <template #footer>
@@ -1764,14 +1908,14 @@ onMounted(async () => {
             @click="closeModal"
             class="h-8 flex-1 rounded-[6px] border"
           >
-            Batal</button
+            {{ t('cancel') }}</button
           ><button
             type="button"
             :disabled="isSubmitting"
             @click="deleteAsset"
             class="h-8 flex-1 rounded-[6px] bg-[#EF4444] font-bold text-white"
           >
-            {{ isSubmitting ? 'Menghapus...' : 'Ya, Hapus' }}
+            {{ isSubmitting ? t('assets_it_deleting') : t('btn_yes_delete') }}
           </button>
         </div>
       </template>
@@ -1780,7 +1924,7 @@ onMounted(async () => {
     <AppModal
       panel-class="inventory-dialog"
       :is-open="showSpecificationModal"
-      title="Detail Spesifikasi"
+      :title="t('assets_it_spec_title')"
       size="md"
       @close="closeModal"
     >
@@ -1795,7 +1939,7 @@ onMounted(async () => {
           </div>
           <div class="min-w-0">
             <p class="truncate font-mono text-[11px] font-bold text-[#172033]">
-              {{ selectedAsset.nomor_seri || '—' }}
+              {{ selectedAsset.nomor_seri || '-' }}
             </p>
             <p class="mt-1 truncate text-[10px] font-semibold text-[#687281]">
               {{ selectedAsset.label_aset }}
@@ -1805,12 +1949,12 @@ onMounted(async () => {
 
         <div>
           <p class="mb-2 text-[10px] font-bold uppercase tracking-[0.1em] text-[#687281]">
-            Spesifikasi Perangkat
+            {{ t('assets_it_spec_section') }}
           </p>
           <div
             class="min-h-24 whitespace-pre-wrap rounded-[6px] border border-[#DCE3EC] bg-white p-3 text-[11px] font-medium leading-5 text-[#334155]"
           >
-            {{ selectedAsset.spesifikasi || 'Belum ada informasi spesifikasi untuk aset ini.' }}
+            {{ selectedAsset.spesifikasi || t('assets_it_spec_empty') }}
           </div>
         </div>
       </div>
@@ -1821,7 +1965,7 @@ onMounted(async () => {
             class="h-8 rounded-[6px] bg-brand px-4 text-xs font-semibold text-white hover:bg-brand-dark"
             @click="closeModal"
           >
-            Tutup
+            {{ t('close') }}
           </button>
         </div>
       </template>
@@ -1830,7 +1974,7 @@ onMounted(async () => {
     <AppModal
       panel-class="inventory-dialog"
       :is-open="showDetailsModal"
-      title="Detail Aset"
+      :title="t('assets_it_detail_title')"
       size="lg"
       @close="closeModal"
     >
@@ -1863,7 +2007,7 @@ onMounted(async () => {
             "
           >
             <span aria-hidden="true" class="material-symbols-outlined text-[16px]">info</span>
-            Informasi Detail
+            {{ t('assets_it_detail_tab_info') }}
           </button>
           <button
             v-if="isAdmin || isSuperAdmin"
@@ -1877,7 +2021,7 @@ onMounted(async () => {
             "
           >
             <span aria-hidden="true" class="material-symbols-outlined text-[16px]">history</span>
-            Log Perubahan
+            {{ t('assets_it_detail_tab_logs') }}
             <span
               v-if="deviceLogs.length"
               class="ml-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-brand/10 px-1.5 text-[10px] font-black text-brand"
@@ -1892,33 +2036,37 @@ onMounted(async () => {
           <dl class="asset-detail-fields">
             <div
               v-for="item in [
-                ['Nomor Seri', selectedAsset.nomor_seri],
-                ['Tipe Perangkat', selectedAsset.tipe_perangkat],
-                ['Merek', selectedAsset.merek],
+                [t('assets_it_serial_number'), selectedAsset.nomor_seri],
+                [t('assets_it_device_type'), tipeDisplay(selectedAsset.tipe_perangkat)],
+                [t('assets_it_brand'), brandDisplay(selectedAsset.merek)],
                 ['Model', selectedAsset.model],
-                ['Status Aset', getAssetStatusLabel(selectedAsset.status_aset)],
-                ['Kondisi Aset', selectedAsset.kondisi_aset],
+                [t('assets_it_status_label'), statusLabel(selectedAsset.status_aset)],
+                [t('assets_it_condition_label'), kondisiDisplay(selectedAsset.kondisi_aset)],
                 ['NIK', selectedAsset.nik],
-                ['Nama Karyawan', selectedAsset.nama_karyawan],
-                ['Departemen', selectedAsset.departemen],
-                ['Lokasi Aset', selectedAsset.lokasi_kerja],
+                [t('assets_it_employee_name'), selectedAsset.nama_karyawan],
+                [t('department'), selectedAsset.departemen],
+                [t('assets_it_asset_location'), selectedAsset.lokasi_kerja],
               ]"
               :key="item[0]"
             >
               <dt class="text-[10px] font-bold uppercase text-[#9CA3AF]">{{ item[0] }}</dt>
-              <dd class="mt-1 text-[12px] font-semibold text-[#111827]">{{ item[1] || '—' }}</dd>
+              <dd class="mt-1 text-[12px] font-semibold text-[#111827]">{{ item[1] || '-' }}</dd>
             </div>
           </dl>
           <div>
-            <p class="mb-1 text-[10px] font-bold uppercase text-[#9CA3AF]">Spesifikasi</p>
+            <p class="mb-1 text-[10px] font-bold uppercase text-[#9CA3AF]">
+              {{ t('assets_it_specs_short') }}
+            </p>
             <p class="whitespace-pre-wrap rounded-xl bg-[#F9FAFB] p-3 text-[12px] text-[#374151]">
-              {{ selectedAsset.spesifikasi || '—' }}
+              {{ selectedAsset.spesifikasi || '-' }}
             </p>
           </div>
           <div>
-            <p class="mb-1 text-[10px] font-bold uppercase text-[#9CA3AF]">Catatan Aset</p>
+            <p class="mb-1 text-[10px] font-bold uppercase text-[#9CA3AF]">
+              {{ t('assets_it_note_asset') }}
+            </p>
             <p class="whitespace-pre-wrap rounded-xl bg-[#FFFDF5] p-3 text-[12px] text-[#374151]">
-              {{ selectedAsset.note_asset || selectedAsset.catatan_aset || '—' }}
+              {{ selectedAsset.note_asset || selectedAsset.catatan_aset || '-' }}
             </p>
           </div>
         </div>
@@ -1939,7 +2087,7 @@ onMounted(async () => {
               >history_toggle_off</span
             >
             <p class="text-[12px] font-semibold text-[#9CA3AF]">
-              Belum ada riwayat perubahan untuk perangkat ini.
+              {{ t('assets_it_logs_empty') }}
             </p>
           </div>
 
@@ -1984,7 +2132,7 @@ onMounted(async () => {
                             : 'rusak',
                       )
                     "
-                    :text="log.aksi"
+                    :text="logActionLabel(log.aksi)"
                   />
                   <span class="text-[10px] font-mono text-[#9CA3AF]">{{
                     formatLogDate(log.dibuat_pada)
@@ -2013,13 +2161,13 @@ onMounted(async () => {
                           scope="col"
                           class="py-1 px-2 text-left font-bold text-[#9CA3AF] uppercase tracking-wider"
                         >
-                          Sebelum
+                          {{ t('assets_it_log_col_before') }}
                         </th>
                         <th
                           scope="col"
                           class="py-1 pl-2 text-left font-bold text-[#9CA3AF] uppercase tracking-wider"
                         >
-                          Sesudah
+                          {{ t('assets_it_log_col_after') }}
                         </th>
                       </tr>
                     </thead>
@@ -2029,7 +2177,9 @@ onMounted(async () => {
                         :key="idx"
                         class="border-b border-[#F3F4F6] last:border-0"
                       >
-                        <td class="py-1.5 pr-2 font-bold text-[#475569]">{{ row.field }}</td>
+                        <td class="py-1.5 pr-2 font-bold text-[#475569]">{{
+                          logFieldDisplay(row.field)
+                        }}</td>
                         <td class="py-1.5 px-2 text-[#DC2626] line-through">{{ row.old }}</td>
                         <td class="py-1.5 pl-2 font-semibold text-[#059669]">{{ row.new }}</td>
                       </tr>
@@ -2089,7 +2239,7 @@ onMounted(async () => {
             @click="closeModal"
             class="h-8 rounded-[6px] bg-[#111827] px-4 text-[12px] font-bold text-white"
           >
-            Tutup
+            {{ t('close') }}
           </button>
         </div>
       </template>
@@ -2098,14 +2248,14 @@ onMounted(async () => {
     <AppModal
       panel-class="inventory-dialog"
       :is-open="showExportModal"
-      title="Ekspor Aset IT"
+      :title="t('assets_it_export_title')"
       size="md"
       @close="closeModal"
     >
       <form class="flex flex-col gap-4" @submit.prevent="executeExport">
         <fieldset class="flex flex-col gap-2">
           <legend class="text-[11px] font-bold uppercase tracking-wider text-[#374151] mb-2">
-            Pilih Format Ekspor
+            {{ t('assets_it_export_format_label') }}
           </legend>
           <div class="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 gap-2.5 sm:gap-3">
             <label
@@ -2146,7 +2296,9 @@ onMounted(async () => {
                   class="material-symbols-outlined text-[20px] text-[#DC4C4C]"
                   >picture_as_pdf</span
                 >
-                <span class="text-[12px] font-bold text-[#172033]">PDF Laporan</span>
+                <span class="text-[12px] font-bold text-[#172033]">{{
+                  t('assets_it_export_pdf_label')
+                }}</span>
               </span>
               <input
                 v-model="exportFormat"
@@ -2162,32 +2314,32 @@ onMounted(async () => {
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div class="flex flex-col gap-1.5">
             <span class="text-[11px] font-bold uppercase tracking-wider text-[#374151]"
-              >Filter Status</span
+              >{{ t('assets_it_filter_status_label') }}</span
             >
             <CustomSelect
               v-model="exportStatus"
               :options="[
-                { value: '', label: 'Semua Status' },
+                { value: '', label: t('assets_it_filter_all_status') },
                 ...availableStatusOptions.map((s) => ({ value: s, label: s })),
               ]"
-              aria-label="Filter Status"
-              placeholder="Semua status"
+              :aria-label="t('assets_it_filter_status_label')"
+              :placeholder="t('assets_it_all_status_ph')"
               :block="true"
               height-class="h-8"
             />
           </div>
           <div class="flex flex-col gap-1.5">
             <span class="text-[11px] font-bold uppercase tracking-wider text-[#374151]"
-              >Filter Tipe Perangkat</span
+              >{{ t('assets_it_filter_type_label') }}</span
             >
             <CustomSelect
               v-model="exportTipe"
               :options="[
-                { value: '', label: 'Semua Tipe' },
-                ...availableTipeOptions.map((t) => ({ value: t, label: t })),
+                { value: '', label: t('assets_it_filter_all_types_short') },
+                ...availableTipeOptions.map((opt) => ({ value: opt.value, label: opt.label })),
               ]"
-              aria-label="Filter Tipe Perangkat"
-              placeholder="Semua tipe"
+              :aria-label="t('assets_it_filter_type_label')"
+              :placeholder="t('assets_it_all_types_ph')"
               :block="true"
               height-class="h-8"
             />
@@ -2202,7 +2354,7 @@ onMounted(async () => {
             @click="closeModal"
             class="h-8 w-full sm:w-auto rounded-[6px] border border-[#DCE3EC] px-4 text-[12px] font-semibold text-[#475569] hover:bg-[#F8FAFC] transition-all cursor-pointer touch-manipulation"
           >
-            Batal
+            {{ t('cancel') }}
           </button>
           <button
             type="submit"
@@ -2210,7 +2362,11 @@ onMounted(async () => {
             class="h-8 w-full sm:w-auto rounded-[6px] bg-brand px-4 text-[12px] font-bold text-white shadow-md shadow-brand/20 hover:bg-brand-dark disabled:opacity-50 transition-all cursor-pointer touch-manipulation"
           >
             {{
-              isExporting ? 'Mengekspor...' : exportFormat === 'xlsx' ? 'Unduh XLSX' : 'Unduh PDF'
+              isExporting
+                ? t('assets_it_exporting')
+                : exportFormat === 'xlsx'
+                  ? t('btn_download') + ' XLSX'
+                  : t('btn_download') + ' PDF'
             }}
           </button>
         </div>
@@ -2228,7 +2384,7 @@ onMounted(async () => {
     <FilterModal
       panel-class="inventory-dialog"
       :is-open="showFilterModal"
-      title="Filter Aset IT"
+      :title="t('assets_it_filter_title')"
       @close="showFilterModal = false"
       @apply="showFilterModal = false"
       @reset="resetFilters"
@@ -2236,25 +2392,25 @@ onMounted(async () => {
       <CustomSelect
         v-model="filterStatus"
         :options="filterStatusOptions"
-        aria-label="Filter status"
+        :aria-label="t('assets_it_filter_aria_status')"
         :block="true"
       />
       <CustomSelect
         v-model="filterTipe"
         :options="filterTipeOptions"
-        aria-label="Filter tipe perangkat"
+        :aria-label="t('assets_it_filter_aria_type')"
         :block="true"
       />
       <CustomSelect
         v-model="filterLokasi"
         :options="filterLokasiOptions"
-        aria-label="Filter lokasi"
+        :aria-label="t('assets_it_filter_aria_location')"
         :block="true"
       />
       <CustomSelect
         v-model="filterKondisi"
         :options="filterKondisiOptions"
-        aria-label="Filter kondisi"
+        :aria-label="t('assets_it_filter_aria_condition')"
         :block="true"
       />
     </FilterModal>
@@ -2284,7 +2440,7 @@ onMounted(async () => {
   }
 }
 
-/* .form-control lama dihapus — dead code (tidak dipakai template) dan
+/* .form-control lama dihapus - dead code (tidak dipakai template) dan
    menduplikasi styling input global main.css dengan nilai non-konform. */
 </style>
 
@@ -2293,7 +2449,7 @@ onMounted(async () => {
 <style src="../assets/inventory-polish.css"></style>
 
 <style scoped>
-/* Header & list heading tidak sticky di modul Inventaris — scroll
+/* Header & list heading tidak sticky di modul Inventaris - scroll
    bersama konten. HARUS setelah import ws-table.css agar menang. */
 .asset-toolbar-sticky,
 .it-list-heading-sticky {
@@ -2304,7 +2460,7 @@ onMounted(async () => {
 /* Pertahankan padding tebal dari class inline (p-3.5 sm:p-4.5);
    asset-inventory asset-workspace.css menimpanya dengan padding
    4px 0 8px / transparent / border 0 karena specificity (0,2,0)
-   lebih tinggi dari utility Tailwind (0,1,0) — header menempel. */
+   lebih tinggi dari utility Tailwind (0,1,0) - header menempel. */
 .asset-inventory .asset-toolbar {
   padding: 8px 10px;
   border: 1px solid rgba(226, 232, 240, 0.8);

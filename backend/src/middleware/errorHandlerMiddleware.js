@@ -98,6 +98,12 @@ export function globalErrorHandler(err, req, res, next) {
   }
 
   const responseBody = {
+    // RFC 9457 Problem Details standard fields for enterprise clients
+    type: `https://trackit.esb.co.id/errors/${errorCode.toLowerCase().replace(/_/g, '-')}`,
+    title: errorCode.replace(/_/g, ' '),
+    status: statusCode,
+    detail: message,
+    instance: req.originalUrl || req.path,
     error: {
       code: errorCode,
       message,
@@ -105,6 +111,7 @@ export function globalErrorHandler(err, req, res, next) {
       requestId,
     },
     message,
+    requestId,
   }
 
   res.status(statusCode).json(responseBody)

@@ -6,10 +6,12 @@ import { useAuth } from '@/composables/useAuth'
 import { useBookmarks } from '@/composables/useBookmarks'
 import NotionTreeSidebar from '@/components/cases/NotionTreeSidebar.vue'
 import CaseReader from '@/components/cases/CaseReader.vue'
-import { PanelLeft, PanelLeftClose, Menu, X, SearchX } from 'lucide-vue-next'
+import { PanelLeft, PanelLeftClose, Menu, X, SearchX, Printer } from 'lucide-vue-next'
+import { useLanguage } from '@/composables/useLanguage.js'
 
 const router = useRouter()
 const route = useRoute()
+const { t } = useLanguage()
 const {
   cases,
   activeCaseId,
@@ -19,6 +21,7 @@ const {
   searchQuery,
   hasNoSearchResult,
   clearSearch,
+  isLoading,
 } = useCases()
 const { isAuthenticated } = useAuth()
 const { syncBookmarks } = useBookmarks()
@@ -43,6 +46,10 @@ function handleEditDoc(caseItem) {
   if (caseItem?.id) {
     router.push(`/admin/editor/${caseItem.id}`)
   }
+}
+
+function handlePrint() {
+  window.print()
 }
 
 function selectCaseFromRoute(id) {
@@ -96,7 +103,7 @@ onMounted(async () => {
         class="cases-mobile-tree md:hidden fixed inset-0 z-50 flex"
         role="dialog"
         aria-modal="true"
-        aria-label="Daftar artikel"
+        :aria-label="t('cases_article_list')"
         @keydown.esc="isMobileSidebarOpen = false"
       >
         <!-- Backdrop -->
@@ -112,10 +119,10 @@ onMounted(async () => {
           <div
             class="p-3 border-b border-[#e2e2e4] dark:border-slate-800 flex items-center justify-between"
           >
-            <span class="text-xs font-bold text-[#1a1c1d] dark:text-slate-100">Daftar Dokumen</span>
+            <span class="text-xs font-bold text-[#1a1c1d] dark:text-slate-100">{{ t('kb_doc_list') }}</span>
             <button
               @click="isMobileSidebarOpen = false"
-              aria-label="Tutup daftar artikel"
+              :aria-label="t('kb_close_sidebar')"
               class="p-1.5 rounded-lg text-[#575d7a] hover:bg-[#f3f3f5] dark:hover:bg-slate-800"
             >
               <X class="w-4 h-4" />
@@ -144,12 +151,12 @@ onMounted(async () => {
               @click="toggleSidebar"
               :aria-expanded="!isSidebarCollapsed"
               class="hidden md:flex items-center gap-1.5 py-1 px-2 rounded-lg text-[#575d7a] hover:text-[#0A51B0] dark:text-slate-400 hover:bg-[#f3f3f5] dark:hover:bg-slate-800 transition-colors cursor-pointer"
-              :title="isSidebarCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar'"
+              :title="isSidebarCollapsed ? t('kb_show_tree') : t('kb_hide_tree')"
             >
               <PanelLeft v-if="isSidebarCollapsed" class="w-4 h-4 text-[#0A51B0]" />
               <PanelLeftClose v-else class="w-4 h-4" />
               <span class="font-medium text-[11px]">{{
-                isSidebarCollapsed ? 'Show Tree' : 'Hide Tree'
+                isSidebarCollapsed ? t('kb_show_tree') : t('kb_hide_tree')
               }}</span>
             </button>
 
@@ -157,20 +164,45 @@ onMounted(async () => {
             <button
               @click="isMobileSidebarOpen = true"
               :aria-expanded="isMobileSidebarOpen"
-              aria-label="Buka daftar artikel"
+              :aria-label="t('kb_open_sidebar')"
               class="md:hidden flex items-center gap-1.5 py-1 px-2 rounded-lg bg-[#f3f3f5] dark:bg-slate-800 text-[#1a1c1d] dark:text-slate-200 font-medium"
             >
               <Menu class="w-4 h-4 text-[#0A51B0]" />
-              <span>Pilih Artikel</span>
+              <span>{{ t('kb_select_article') }}</span>
             </button>
           </div>
+
+          <!-- Print Action Button -->
+          <button
+            @click="handlePrint"
+            class="flex items-center gap-1.5 py-1 px-2.5 rounded-lg border border-[#e2e2e4] dark:border-slate-800 bg-white dark:bg-slate-900 text-[#575d7a] hover:text-[#0A51B0] dark:text-slate-400 hover:bg-[#f3f3f5] dark:hover:bg-slate-800 transition-colors cursor-pointer text-[11px] font-semibold"
+            :title="t('kb_print')"
+            :aria-label="t('kb_print')"
+          >
+            <Printer class="w-3.5 h-3.5 text-[#0A51B0]" />
+            <span>{{ t('kb_print') }}</span>
+          </button>
         </div>
 
         <!-- Main Dynamic Document Reader -->
         <div class="cases-scroll flex-1 overflow-y-auto">
+          <!-- Loading skeleton state -->
+          <div v-if="isLoading" class="p-6 sm:p-10 space-y-4 max-w-3xl animate-pulse">
+            <div class="h-4 w-32 bg-slate-200 dark:bg-slate-800 rounded"></div>
+            <div class="h-8 w-3/4 bg-slate-200 dark:bg-slate-800 rounded"></div>
+            <div class="h-4 w-full bg-slate-100 dark:bg-slate-800/60 rounded mt-4"></div>
+            <div class="h-4 w-5/6 bg-slate-100 dark:bg-slate-800/60 rounded"></div>
+            <div class="h-40 w-full bg-slate-100 dark:bg-slate-800/40 rounded-lg mt-6"></div>
+            <div class="space-y-2.5 mt-6">
+              <div class="h-4 w-full bg-slate-100 dark:bg-slate-800/60 rounded"></div>
+              <div class="h-4 w-4/5 bg-slate-100 dark:bg-slate-800/60 rounded"></div>
+              <div class="h-4 w-2/3 bg-slate-100 dark:bg-slate-800/60 rounded"></div>
+            </div>
+          </div>
+
           <!-- No search result state -->
           <div
-            v-if="hasNoSearchResult"
+            v-else-if="hasNoSearchResult"
             class="cases-no-results h-full flex flex-col items-center justify-center p-8 text-center text-[#575d7a] dark:text-slate-500"
           >
             <div
@@ -179,24 +211,23 @@ onMounted(async () => {
               <SearchX class="w-6 h-6 text-[#5F7089] dark:text-slate-600" />
             </div>
             <h3 class="text-sm font-semibold text-[#1a1c1d] dark:text-slate-300">
-              Tidak ada hasil untuk "{{ searchQuery }}"
+              {{ t('cases_no_results_for') }} "{{ searchQuery }}"
             </h3>
             <p class="text-[11px] text-[#575d7a] dark:text-slate-500 mt-1 max-w-sm">
-              Artikel / panduan yang Anda cari belum tersedia. Ajukan tiket agar tim IT dapat
-              membantu.
+              {{ t('cases_no_results_desc') }}
             </p>
             <div class="cases-empty-actions flex items-center gap-2 mt-4">
               <button
                 @click="clearSearch"
                 class="px-3 py-1.5 rounded-[6px] text-xs font-medium border border-[#c4c5d9] dark:border-slate-700 bg-white dark:bg-slate-800 text-[#1a1c1d] dark:text-slate-200 hover:bg-[#f3f3f5] transition-all cursor-pointer"
               >
-                Hapus Pencarian
+                {{ t('clear_search') }}
               </button>
               <button
                 @click="goToTicket"
                 class="px-3 py-1.5 rounded-[6px] text-xs font-medium bg-[#0A51B0] hover:bg-[#0A4391] text-white shadow-xs transition-all cursor-pointer"
               >
-                {{ isAuthenticated ? 'Buat Tiket' : 'Masuk untuk Buat Tiket' }}
+                {{ isAuthenticated ? t('btn_create_ticket') : t('sign_in_to_submit') }}
               </button>
             </div>
           </div>
@@ -314,6 +345,30 @@ onMounted(async () => {
   }
   .cases-toolbar {
     padding-inline: 24px;
+  }
+}
+@media print {
+  .cases-desktop-tree,
+  .cases-mobile-tree,
+  .cases-toolbar,
+  nav,
+  header {
+    display: none !important;
+  }
+  .cases-page {
+    padding: 0 !important;
+    background: transparent !important;
+  }
+  .cases-workspace {
+    height: auto !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+  .cases-canvas {
+    border: none !important;
+  }
+  .cases-scroll {
+    overflow: visible !important;
   }
 }
 @media (prefers-reduced-motion: reduce) {

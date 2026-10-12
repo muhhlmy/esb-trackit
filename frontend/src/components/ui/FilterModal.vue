@@ -7,6 +7,8 @@ const props = defineProps({
   panelClass: { type: String, default: '' },
   title: { type: String, default: 'Filter Data' },
   subtitle: { type: String, default: 'Sesuaikan filter untuk mempersempit hasil.' },
+  icon: { type: String, default: 'tune' },
+  size: { type: String, default: 'sm' },
   fields: { type: Array, default: () => [] },
   modelValue: { type: Object, default: () => ({}) },
 })
@@ -38,8 +40,8 @@ function apply() {
     :is-open="isOpen"
     :title="title"
     :subtitle="subtitle"
-    icon="filter_alt"
-    size="sm"
+    :icon="icon"
+    :size="size"
     @close="emit('close')"
   >
     <div class="space-y-2.5">

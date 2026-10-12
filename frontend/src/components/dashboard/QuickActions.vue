@@ -2,56 +2,58 @@
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuth } from '@/composables/useAuth'
+import { useLanguage } from '@/composables/useLanguage'
 
 // Keep destination permission guards and create-query contracts in sync.
 const router = useRouter()
 const { hasPermission, hasWritePermission } = useAuth()
+const { t } = useLanguage()
 
-const allQuickActions = [
+const allQuickActions = computed(() => [
   {
     id: 'add-asset',
-    label: 'Tambah Aset',
+    label: t('action_add_asset', 'Tambah Aset'),
     icon: 'devices',
-    tooltip: 'Daftarkan perangkat baru',
-    available: computed(() => hasWritePermission('assets')),
+    tooltip: t('action_add_asset_tip', 'Daftarkan perangkat baru'),
+    available: hasWritePermission('assets'),
     action: () => router.push({ path: '/assets', query: { action: 'add' } }),
   },
   {
     id: 'create-ticket',
-    label: 'Buat Tiket',
+    label: t('action_create_ticket', 'Buat Tiket'),
     icon: 'add_circle',
-    tooltip: 'Ajukan tiket baru',
+    tooltip: t('action_create_ticket_tip', 'Ajukan tiket baru'),
     // Self-service for every authenticated role (matches TicketsView, where the
     // create button is shown to admins and reporters alike).
-    available: computed(() => hasPermission('tickets')),
+    available: hasPermission('tickets'),
     action: () => router.push({ path: '/tickets', query: { action: 'new' } }),
   },
   {
     id: 'add-employee',
-    label: 'Tambah Karyawan',
+    label: t('action_add_employee', 'Tambah Karyawan'),
     icon: 'person_add',
-    tooltip: 'Daftarkan karyawan baru',
-    available: computed(() => hasWritePermission('karyawan')),
+    tooltip: t('action_add_employee_tip', 'Daftarkan karyawan baru'),
+    available: hasWritePermission('karyawan'),
     action: () => router.push({ path: '/karyawan', query: { action: 'add' } }),
   },
   {
     id: 'new-submission',
-    label: 'Pengajuan BAST',
+    label: t('action_new_submission', 'Pengajuan BAST'),
     icon: 'assignment',
-    tooltip: 'Buat berita acara serah terima',
-    available: computed(() => hasPermission('submissions')),
+    tooltip: t('action_new_submission_tip', 'Buat berita acara serah terima'),
+    available: hasPermission('submissions'),
     action: () => router.push('/submissions'),
   },
-]
+])
 
-const quickActions = computed(() => allQuickActions.filter((action) => action.available.value))
+const quickActions = computed(() => allQuickActions.value.filter((action) => action.available))
 </script>
 
 <template>
   <section v-if="quickActions.length" class="quick-access" aria-labelledby="quick-access-title">
     <div class="quick-access-heading">
-      <h2 id="quick-access-title">Quick Access</h2>
-      <p>Mulai pekerjaan harian Anda.</p>
+      <h2 id="quick-access-title">{{ t('quick_access', 'Quick Access') }}</h2>
+      <p>{{ t('quick_access_subtitle', 'Mulai pekerjaan harian Anda.') }}</p>
     </div>
     <div class="quick-actions">
       <button

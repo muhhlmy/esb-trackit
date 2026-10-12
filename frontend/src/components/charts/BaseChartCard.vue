@@ -7,7 +7,7 @@ defineProps({
   loading: { type: Boolean, default: false },
   empty: { type: Boolean, default: false },
   error: { type: String, default: '' },
-  // Tinggi canvas chart dalam pixel. WAJIB nilai tetap — Chart.js dengan
+  // Tinggi canvas chart dalam pixel. WAJIB nilai tetap - Chart.js dengan
   // `maintainAspectRatio: false` membutuhkan parent berukuran pasti,
   // kalau tidak ResizeObserver-nya loop dan canvas terus membesar.
   height: { type: Number, default: 260 },
@@ -20,7 +20,7 @@ defineProps({
 <template>
   <div
     class="chart-card flex flex-col transition-all"
-    :class="embedded ? 'w-full' : 'shadow-card rounded-xl border border-[#E2E8F0] bg-white p-4'"
+    :class="embedded ? 'w-full' : 'shadow-card border border-[#E2E8F0] bg-white'"
   >
     <!-- Header kartu (hanya mode standalone) -->
     <div
@@ -44,7 +44,7 @@ defineProps({
       <!-- Error State -->
       <div
         v-else-if="error"
-        class="flex flex-col items-center gap-2 p-4 text-center text-[#DC2626]"
+        class="flex flex-col items-center gap-2 p-3 text-center text-[#DC2626]"
       >
         <span aria-hidden="true" class="material-symbols-outlined text-[32px]">error</span>
         <p class="text-[12px] font-semibold">{{ error }}</p>
@@ -53,7 +53,7 @@ defineProps({
       <!-- Empty State -->
       <div
         v-else-if="empty"
-        class="flex h-full w-full flex-col items-center justify-center gap-2 p-4 text-center text-[#5B6B84]"
+        class="flex h-full w-full flex-col items-center justify-center gap-2 p-3 text-center text-[#5B6B84]"
       >
         <span aria-hidden="true" class="material-symbols-outlined text-[36px]">bar_chart_off</span>
         <p class="text-[12px] font-semibold">Belum ada data untuk ditampilkan.</p>

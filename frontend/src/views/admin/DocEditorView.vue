@@ -83,7 +83,7 @@ const isPreviewModalOpen = ref(false)
 const isSaving = ref(false)
 const saveStatus = ref('Tersimpan') // 'Tersimpan' | 'Belum disimpan' | 'Menyimpan...'
 
-// Sanitasi output editor sebelum dirender via v-html (preview) — pertahanan
+// Sanitasi output editor sebelum dirender via v-html (preview) - pertahanan
 // terhadap XSS bila konten DB/editor mengandung payload berbahaya.
 const safePreviewHtml = computed(() => sanitizeRichTextHtml(editor?.value?.getHTML() || ''))
 

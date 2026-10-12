@@ -1,6 +1,6 @@
 <script setup>
 // ============================================================
-// CsatStars.vue — Bintang kepuasan (CSAT/CASP) reusable.
+// CsatStars.vue - Bintang kepuasan (CSAT/CASP) reusable.
 // Pakai Material Symbols "star" dengan class fill-1 (solid) + warna amber,
 // konsisten dengan TicketCaspRating.vue. Bisa read-only maupun dipakai untuk
 // menampilkan rata-rata di dashboard.

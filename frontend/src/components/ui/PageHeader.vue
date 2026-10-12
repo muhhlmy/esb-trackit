@@ -61,9 +61,10 @@ defineProps({
       </div>
     </div>
     <div
-      v-if="$slots.default"
+      v-if="$slots.default || $slots.actions"
       class="page-header-actions shrink-0 flex flex-wrap sm:flex-nowrap items-center gap-1.5 w-full sm:w-auto justify-start sm:justify-end"
     >
+      <slot name="actions" />
       <slot />
     </div>
   </div>

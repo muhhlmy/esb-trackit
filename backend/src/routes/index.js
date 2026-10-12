@@ -29,19 +29,35 @@ import {
 import { caseBookmarkRouter } from "./caseBookmarkRoutes.js";
 import { shipmentRouter } from "./shipmentRoutes.js";
 import { submissionRouter } from "./submissionRoutes.js";
+import { settingsRouter } from "./settingsRoutes.js";
 import authRoutes from "./authRoutes.js";
+import { getPrometheusMetrics } from "../controllers/metricsController.js";
+import { apiManagementRouter } from "./apiManagementRoutes.js";
 import {
   apiRateLimiter,
   authenticatedUserRateLimiter,
 } from "../middleware/rateLimitMiddleware.js";
 import { systemAuditFallback } from "../middleware/systemAuditMiddleware.js";
+import { fileURLToPath } from "node:url";
+import path from "node:path";
+
+const openapiSpecPath = path.resolve(
+  path.dirname(fileURLToPath(import.meta.url)),
+  "../contracts/openapi.json",
+);
 
 export const router = Router();
 
-// Layer 1: Public/Global IP abuse protection
+// Layer 1: Public/Global IP abuse protection, Observability & Contract Discovery
 router.use("/health", healthRouter);
+router.get("/metrics", getPrometheusMetrics);
+router.get("/openapi.json", (req, res) => {
+  res.sendFile(openapiSpecPath);
+});
+
 router.use("/api", apiRateLimiter);
 router.use("/api/auth", authRoutes);
+router.use("/api/v1", apiManagementRouter);
 
 // Layer 2: Authenticated per-user rate limiting middleware combination
 const authStack = [authenticateToken, authenticatedUserRateLimiter, systemAuditFallback];
@@ -89,3 +105,6 @@ router.use("/api/users", authStack, requireAdmin, userRouter);
 router.use("/api/logs", authStack, requireAdmin, logRouter);
 router.use("/api/import", authStack, requireAdmin, importRouter);
 router.use("/api/admin/database", authStack, backupRouter);
+
+const requireSuperadmin = authorizeRoles("superadmin", "super admin");
+router.use("/api/settings", authStack, requireSuperadmin, settingsRouter);

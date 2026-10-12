@@ -21,29 +21,37 @@ import AssetCategoryImportModal from '../components/ui/AssetCategoryImportModal.
 import FilterModal from '../components/ui/FilterModal.vue'
 import AssetCategoryExportModal from '../components/ui/AssetCategoryExportModal.vue'
 
+import { useLanguage } from '../composables/useLanguage.js'
+
 const { getAllPages, post, put, del } = useApi()
 const { hasWritePermission } = useAuth()
 const canWriteAssets = computed(() => hasWritePermission('assets_ops'))
 const { viewMode } = useViewMode('assets-ops', 'table')
+const { currentLang, t } = useLanguage()
 
 const assets = ref([])
 // Count complete category records, independent of table filters and pagination.
 const assetStats = computed(() => [
-  { title: 'Total aset Ops', value: assets.value.length, icon: 'inventory_2', color: 'primary' },
   {
-    title: 'Aktif',
+    title: typeof t === 'function' ? t('ops_stat_total') : 'Total aset Ops',
+    value: assets.value.length,
+    icon: 'inventory_2',
+    color: 'primary',
+  },
+  {
+    title: typeof t === 'function' ? t('ops_status_active') : 'Aktif',
     value: assets.value.filter((asset) => asset.status === 'Aktif').length,
     icon: 'check_circle',
     color: 'success',
   },
   {
-    title: 'Perawatan',
+    title: typeof t === 'function' ? t('ops_status_maintenance') : 'Maintenance',
     value: assets.value.filter((asset) => asset.status === 'Maintenance').length,
     icon: 'build',
     color: 'warning',
   },
   {
-    title: 'Rusak',
+    title: typeof t === 'function' ? t('ops_status_damaged') : 'Rusak',
     value: assets.value.filter((asset) => asset.status === 'Rusak').length,
     icon: 'warning',
     color: 'danger',
@@ -93,6 +101,44 @@ const kategoriOptions = [
 const kondisiOptions = ['Baik', 'Rusak Ringan', 'Rusak Sedang', 'Rusak Berat']
 const statusOptions = ['Aktif', 'Tidak Aktif', 'Maintenance', 'Rusak', 'Disposed']
 
+// Label map (reaktif terhadap perubahan bahasa) untuk tampilan kondisi, status & kategori
+const opsKondisiLabels = computed(() => ({
+  Baik: t('ops_kondisi_baik'),
+  'Rusak Ringan': t('ops_kondisi_ringan'),
+  'Rusak Sedang': t('ops_kondisi_sedang'),
+  'Rusak Berat': t('ops_kondisi_berat'),
+}))
+
+function opsKondisiLabel(kondisi) {
+  return opsKondisiLabels.value[kondisi] || kondisi
+}
+
+const opsKondisiSelectOptions = computed(() =>
+  kondisiOptions.map((kondisi) => ({ value: kondisi, label: opsKondisiLabel(kondisi) })),
+)
+
+const opsStatusLabels = computed(() => ({
+  Aktif: t('ops_status_active'),
+  'Tidak Aktif': t('ops_status_inactive'),
+  Rusak: t('ops_status_damaged'),
+}))
+
+function opsStatusLabel(status) {
+  return opsStatusLabels.value[status] || status
+}
+
+const opsStatusSelectOptions = computed(() =>
+  statusOptions.map((status) => ({ value: status, label: opsStatusLabel(status) })),
+)
+
+const opsKategoriLabels = computed(() => ({
+  Lainnya: t('ops_category_other'),
+}))
+
+function opsKategoriLabel(kategori) {
+  return opsKategoriLabels.value[kategori] || kategori
+}
+
 const defaultLocations = [
   'Solo',
   'Pluit',
@@ -117,25 +163,25 @@ const locationOptions = computed(() =>
 
 const kategoriSelectOptions = computed(() =>
   mergeOptions(kategoriOptions, [...assets.value.map((a) => a.kategori), form.value.kategori]).map(
-    (k) => ({ value: k, label: k }),
+    (k) => ({ value: k, label: opsKategoriLabel(k) }),
   ),
 )
 
 // Filter option lists (include an empty "all" entry for CustomSelect)
 const locationFilterOptions = computed(() => [
-  { value: '', label: 'Semua Lokasi' },
+  { value: '', label: t('ops_filter_all_lokasi') },
   ...locationOptions.value,
 ])
 
 const kategoriFilterOptions = computed(() => [
-  { value: '', label: 'Semua Kategori' },
+  { value: '', label: t('ops_filter_all_kategori') },
   ...kategoriSelectOptions.value,
 ])
 
-const statusFilterOptions = [
-  { value: '', label: 'Semua Status' },
-  ...statusOptions.map((s) => ({ value: s, label: s })),
-]
+const statusFilterOptions = computed(() => [
+  { value: '', label: t('ops_filter_all_status') },
+  ...statusOptions.map((s) => ({ value: s, label: opsStatusLabel(s) })),
+])
 
 // Form State
 const emptyForm = () => ({
@@ -214,7 +260,7 @@ async function fetchData() {
       lokasi: normalizeLocation(a.lokasi),
     }))
   } catch (error) {
-    pageError.value = error.message || 'Gagal memuat data Aset OPS.'
+    pageError.value = error.message || t('ops_error_load')
   } finally {
     isLoading.value = false
     await nextTick()
@@ -275,19 +321,19 @@ async function submitForm() {
   if (!canWriteAssets.value) return
   modalError.value = ''
   if (!form.value.hostname) {
-    modalError.value = 'Hostname wajib diisi.'
+    modalError.value = t('ops_err_hostname')
     return
   }
   if (!form.value.nama_asset) {
-    modalError.value = 'Nama Asset wajib diisi.'
+    modalError.value = t('ops_err_asset_name')
     return
   }
   if (!form.value.kategori) {
-    modalError.value = 'Kategori wajib diisi.'
+    modalError.value = t('ops_err_kategori')
     return
   }
   if (!form.value.lokasi) {
-    modalError.value = 'Lokasi wajib diisi.'
+    modalError.value = t('ops_err_lokasi')
     return
   }
 
@@ -309,7 +355,7 @@ async function submitForm() {
     closeModal()
     await fetchData()
   } catch (err) {
-    modalError.value = err.message || 'Gagal menyimpan data Aset OPS.'
+    modalError.value = err.message || t('ops_error_save')
   } finally {
     isSubmitting.value = false
   }
@@ -325,7 +371,7 @@ async function confirmDelete() {
     closeModal()
     await fetchData()
   } catch (err) {
-    modalError.value = err.message || 'Gagal menghapus Aset OPS.'
+    modalError.value = err.message || t('ops_error_delete')
   } finally {
     isSubmitting.value = false
   }
@@ -334,13 +380,13 @@ async function confirmDelete() {
 function getOpsActions(asset) {
   const actions = [
     {
-      label: 'Lihat Detail',
+      label: t('ops_action_view_detail'),
       icon: 'visibility',
       onClick: () => openDetails(asset),
       handler: () => openDetails(asset),
     },
     {
-      label: 'Cetak Label',
+      label: t('ops_action_print_label'),
       icon: 'print',
       onClick: () => openLabelModal(asset),
       handler: () => openLabelModal(asset),
@@ -348,13 +394,13 @@ function getOpsActions(asset) {
   ]
   if (canWriteAssets.value) {
     actions.push({
-      label: 'Edit Aset',
+      label: t('ops_action_edit'),
       icon: 'edit',
       onClick: () => openEdit(asset),
       handler: () => openEdit(asset),
     })
     actions.push({
-      label: 'Hapus Aset',
+      label: t('ops_action_delete'),
       icon: 'delete',
       danger: true,
       onClick: () => openDelete(asset),
@@ -396,7 +442,7 @@ function formatDate(dateStr) {
   if (!dateStr) return '-'
   const date = new Date(dateStr)
   if (isNaN(date.getTime())) return dateStr
-  return date.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' })
+  return date.toLocaleDateString(currentLang.value === 'en' ? 'en-US' : 'id-ID', { day: '2-digit', month: 'short', year: 'numeric' })
 }
 </script>
 
@@ -407,8 +453,8 @@ function formatDate(dateStr) {
   >
     <!-- ── Page Header (komponen bersama; sama dengan halaman lain) ── -->
     <PageHeader
-      title="Aset Ops"
-      subtitle="Kelola perangkat & mesin operasional outlet / store (POS, KIOSK, Payment, Display)."
+      :title="t('assets_ops_title')"
+      :subtitle="t('assets_ops_subtitle')"
       icon="precision_manufacturing"
     >
       <div class="inventory-actions flex flex-wrap sm:flex-nowrap items-center gap-1.5">
@@ -417,10 +463,10 @@ function formatDate(dateStr) {
           type="button"
           @click="openAdd"
           class="inventory-primary-action inline-flex h-8 items-center justify-center gap-1.5 whitespace-nowrap rounded-[6px] bg-[#0A51B0] px-3 text-[11px] sm:text-[12px] font-semibold text-white shadow-2xs transition-all hover:bg-[#0A4391]"
-          title="Tambah Aset Ops baru"
+          :title="t('ops_add_tooltip')"
         >
           <span aria-hidden="true" class="material-symbols-outlined text-[16px]">add</span>
-          <span>Tambah Aset Ops</span>
+          <span>{{ currentLang === 'en' ? 'Add Ops Asset' : 'Tambah Aset OPS' }}</span>
         </button>
         <div
           class="inventory-action-group flex items-center gap-1 rounded-[6px] border border-[#D7E3F2] dark:border-slate-700 bg-[#F8FAFC] dark:bg-slate-800 p-0.5 h-8"
@@ -430,21 +476,21 @@ function formatDate(dateStr) {
             type="button"
             @click="showImportModal = true"
             class="inventory-action-button inline-flex h-full items-center gap-1 rounded-[4px] px-2 text-[11px] font-semibold text-[#0A51B0] dark:text-blue-400 hover:bg-white dark:hover:bg-slate-700"
-            title="Impor data Aset Ops dari Excel"
+            :title="t('ops_import_tooltip')"
           >
             <span aria-hidden="true" class="material-symbols-outlined text-[15px]"
               >upload_file</span
-            >Import
+            >{{ t('btn_import') }}
           </button>
           <button
             type="button"
             @click="showExportModal = true"
             class="inventory-action-button inline-flex h-full items-center gap-1 rounded-[4px] px-2 text-[11px] font-semibold text-[#0A51B0] dark:text-blue-400 hover:bg-white dark:hover:bg-slate-700"
-            title="Export data Aset Ops"
+            :title="t('ops_export_tooltip')"
           >
             <span aria-hidden="true" class="material-symbols-outlined text-[15px]"
               >download</span
-            >Export
+            >{{ t('btn_export') }}
           </button>
         </div>
       </div>
@@ -460,10 +506,10 @@ function formatDate(dateStr) {
         v-for="stat in assetStats"
         :key="stat.title"
         :title="stat.title"
-        :value="isLoading || pageError ? '—' : stat.value"
+        :value="isLoading || pageError ? '-' : stat.value"
         :icon="stat.icon"
         :color="stat.color"
-        :subtitle="isLoading ? 'Memuat…' : pageError ? 'Tidak tersedia' : 'Seluruh data kategori'"
+        :subtitle="isLoading ? (currentLang === 'en' ? 'Loading…' : 'Memuat…') : pageError ? (currentLang === 'en' ? 'Unavailable' : 'Tidak tersedia') : (currentLang === 'en' ? 'All category records' : 'Seluruh data kategori')"
       />
     </section>
 
@@ -486,8 +532,8 @@ function formatDate(dateStr) {
             <input
               v-model="searchQuery"
               type="text"
-              aria-label="Cari aset Ops"
-              placeholder="Cari hostname, nama asset, PIC, lokasi…"
+              :aria-label="t('ops_search_aria')"
+              :placeholder="t('ops_search_placeholder')"
               class="h-full w-full rounded-[6px] border border-[#E2E8F0] dark:border-slate-800 bg-white dark:bg-slate-800 pl-8 pr-8 text-[12px] text-[#333333] dark:text-white placeholder-[#687281] dark:placeholder-slate-400 focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
             />
             <!-- Inline Clear Button -->
@@ -495,9 +541,9 @@ function formatDate(dateStr) {
               v-if="searchQuery"
               type="button"
               @click="searchQuery = ''"
-              aria-label="Bersihkan pencarian"
+              :aria-label="t('clear_search')"
               class="absolute right-2 top-1/2 -translate-y-1/2 flex h-5 w-5 items-center justify-center rounded-full text-[#687281] hover:bg-[#F1F5F9] hover:text-[#333333] transition-all cursor-pointer touch-manipulation"
-              title="Bersihkan"
+              :title="t('clear_search')"
             >
               <span aria-hidden="true" class="material-symbols-outlined text-[15px]">close</span>
             </button>
@@ -513,7 +559,7 @@ function formatDate(dateStr) {
                 aria-hidden="true"
                 class="material-symbols-outlined mr-1 align-middle text-[16px]"
                 >filter_alt</span
-              >Filter
+              >{{ t('filter') }}
             </button>
           </div>
         </div>
@@ -526,9 +572,9 @@ function formatDate(dateStr) {
         <div class="it-list-heading" aria-live="polite">
           <div>
             <h3>
-              Daftar aset Ops <span>{{ filteredAssets.length }}</span>
+              {{ t('ops_list_title') }} <span>{{ filteredAssets.length }}</span>
             </h3>
-            <p>Inventaris operasional perusahaan</p>
+            <p>{{ t('ops_list_subtitle') }}</p>
           </div>
           <div class="flex shrink-0 items-center gap-3">
             <AppViewToggle v-model="viewMode" />
@@ -544,7 +590,7 @@ function formatDate(dateStr) {
         <span aria-hidden="true" class="material-symbols-outlined text-[18px]">error</span>
         <span class="flex-1 font-semibold">{{ pageError }}</span>
         <button type="button" class="font-bold underline cursor-pointer" @click="fetchData">
-          Coba lagi
+          {{ t('retry') }}
         </button>
       </div>
 
@@ -642,10 +688,9 @@ function formatDate(dateStr) {
               >precision_manufacturing</span
             >
           </span>
-          <h3 class="text-[14px] font-semibold text-[#333333] mt-1">Belum Ada Aset OPS</h3>
+          <h3 class="text-[14px] font-semibold text-[#333333] mt-1">{{ t('ops_empty_title') }}</h3>
           <p class="text-[11px] text-[#5F7089] leading-relaxed">
-            Belum ada perangkat operasional yang terdaftar dalam inventaris atau sesuai dengan kata
-            kunci pencarian.
+            {{ t('ops_empty_desc') }}
           </p>
           <button
             v-if="canWriteAssets"
@@ -654,7 +699,7 @@ function formatDate(dateStr) {
             class="mt-2 h-8 rounded-[6px] bg-[#0A51B0] px-3.5 text-[12px] font-medium text-white shadow-2xs hover:bg-[#0A4391] transition-all flex items-center gap-1.5 cursor-pointer"
           >
             <span aria-hidden="true" class="material-symbols-outlined text-[16px]">add</span>
-            <span>Tambah Aset OPS</span>
+            <span>{{ t('ops_add_asset_caps') }}</span>
           </button>
         </div>
       </div>
@@ -665,7 +710,7 @@ function formatDate(dateStr) {
         <div v-if="viewMode === 'table'" class="ws-data-table-wrap">
           <table class="ws-data-table">
             <caption class="sr-only">
-              Daftar aset Ops
+              {{ t('ops_list_title') }}
             </caption>
             <colgroup>
               <col class="w-[22%]" />
@@ -679,14 +724,14 @@ function formatDate(dateStr) {
             </colgroup>
             <thead>
               <tr>
-                <th scope="col">Nama Aset</th>
-                <th scope="col">Penanggung Jawab</th>
-                <th scope="col">Lokasi</th>
-                <th scope="col">Kategori</th>
-                <th scope="col">Status</th>
-                <th scope="col">Kondisi</th>
-                <th scope="col">Nilai</th>
-                <th scope="col"><span class="sr-only">Aksi</span></th>
+                <th scope="col">{{ t('ops_th_asset_name') }}</th>
+                <th scope="col">{{ t('ops_th_pic') }}</th>
+                <th scope="col">{{ t('ops_th_location') }}</th>
+                <th scope="col">{{ t('th_category') }}</th>
+                <th scope="col">{{ t('status') }}</th>
+                <th scope="col">{{ t('th_condition') }}</th>
+                <th scope="col">{{ t('ops_th_value') }}</th>
+                <th scope="col"><span class="sr-only">{{ t('actions') }}</span></th>
               </tr>
             </thead>
             <tbody>
@@ -694,34 +739,34 @@ function formatDate(dateStr) {
                 v-for="asset in paginatedAssets"
                 :key="asset.id"
                 tabindex="0"
-                :aria-label="'Lihat detail ' + (asset.nama_asset || 'aset')"
+                :aria-label="t('ops_view_detail') + ' ' + (asset.nama_asset || t('ops_asset_word'))"
                 @click="openDetails(asset)"
                 @keydown.enter.self="openDetails(asset)"
                 @keydown.space.prevent.self="openDetails(asset)"
               >
                 <td>
                   <span class="ws-cell-main" :title="asset.nama_asset">{{
-                    asset.nama_asset || '—'
+                    asset.nama_asset || '-'
                   }}</span>
-                  <span class="ws-cell-sub">{{ asset.hostname || '—' }}</span>
+                  <span class="ws-cell-sub">{{ asset.hostname || '-' }}</span>
                 </td>
                 <td>
-                  <span class="ws-cell-main">{{ asset.pic || 'Belum ditetapkan' }}</span>
+                  <span class="ws-cell-main">{{ asset.pic || t('unassigned') }}</span>
                 </td>
                 <td>
-                  <span class="ws-cell-main" :title="asset.lokasi">{{ asset.lokasi || '—' }}</span>
+                  <span class="ws-cell-main" :title="asset.lokasi">{{ asset.lokasi || '-' }}</span>
                   <span v-if="asset.tanggal_beli" class="ws-cell-sub"
-                    >Beli: {{ formatDate(asset.tanggal_beli) }}</span
+                    >{{ t('ops_purchased_label') }}: {{ formatDate(asset.tanggal_beli) }}</span
                   >
                 </td>
                 <td>
-                  <span class="ws-cell-main">{{ asset.kategori || '—' }}</span>
+                  <span class="ws-cell-main">{{ opsKategoriLabel(asset.kategori) || '-' }}</span>
                 </td>
                 <td>
-                  <span class="ws-cell-main">{{ asset.status || '—' }}</span>
+                  <span class="ws-cell-main">{{ opsStatusLabel(asset.status) || '-' }}</span>
                 </td>
                 <td>
-                  <span class="ws-cell-main">{{ asset.kondisi || '—' }}</span>
+                  <span class="ws-cell-main">{{ opsKondisiLabel(asset.kondisi) || '-' }}</span>
                 </td>
                 <td>
                   <span class="ws-cell-main ws-cell-num">{{
@@ -731,7 +776,7 @@ function formatDate(dateStr) {
                 <td @click.stop>
                   <AppRowActions
                     :actions="getOpsActions(asset)"
-                    :label="`Aksi aset Ops ${asset.hostname || ''}`"
+                    :label="`${t('ops_actions_aria')} ${asset.hostname || ''}`"
                   />
                 </td>
               </tr>
@@ -746,7 +791,7 @@ function formatDate(dateStr) {
             :key="asset.id"
             class="laptop-row"
             tabindex="0"
-            :aria-label="'Lihat detail ' + (asset.nama_asset || 'aset')"
+            :aria-label="t('ops_view_detail') + ' ' + (asset.nama_asset || t('ops_asset_word'))"
             @click="openDetails(asset)"
             @keydown.enter.self="openDetails(asset)"
             @keydown.space.prevent.self="openDetails(asset)"
@@ -758,38 +803,38 @@ function formatDate(dateStr) {
                 }}</span>
               </div>
               <div class="laptop-identity-text">
-                <h4 :title="asset.nama_asset">{{ asset.nama_asset || '—' }}</h4>
-                <p :title="asset.kategori">{{ asset.kategori || '—' }}</p>
+                <h4 :title="asset.nama_asset">{{ asset.nama_asset || '-' }}</h4>
+                <p :title="opsKategoriLabel(asset.kategori)">{{ opsKategoriLabel(asset.kategori) || '-' }}</p>
                 <span class="laptop-serial" :title="asset.hostname">{{
-                  asset.hostname || '—'
+                  asset.hostname || '-'
                 }}</span>
               </div>
             </div>
             <div class="laptop-holder laptop-field">
-              <span class="laptop-label">Penanggung jawab</span>
-              <strong>{{ asset.pic || 'Belum ditetapkan' }}</strong>
+              <span class="laptop-label">{{ t('ops_card_pic') }}</span>
+              <strong>{{ asset.pic || t('unassigned') }}</strong>
             </div>
             <div class="laptop-location laptop-field">
-              <span class="laptop-label">Lokasi</span>
-              <strong :title="asset.lokasi">{{ asset.lokasi || '—' }}</strong>
+              <span class="laptop-label">{{ t('ops_th_location') }}</span>
+              <strong :title="asset.lokasi">{{ asset.lokasi || '-' }}</strong>
               <span v-if="asset.tanggal_beli" class="laptop-secondary"
-                >Beli: {{ formatDate(asset.tanggal_beli) }}</span
+                >{{ t('ops_purchased_label') }}: {{ formatDate(asset.tanggal_beli) }}</span
               >
             </div>
             <div class="laptop-state">
-              <span class="laptop-label">Status</span>
-              <span class="laptop-status">{{ asset.status || '—' }}</span>
-              <span class="laptop-condition">{{ asset.kondisi || '—' }}</span>
+              <span class="laptop-label">{{ t('status') }}</span>
+              <span class="laptop-status">{{ opsStatusLabel(asset.status) || '-' }}</span>
+              <span class="laptop-condition">{{ opsKondisiLabel(asset.kondisi) || '-' }}</span>
               <span
                 class="laptop-secondary"
-                :title="'Total nilai: ' + formatCurrency(asset.total_asset_amount)"
+                :title="t('ops_total_value') + ': ' + formatCurrency(asset.total_asset_amount)"
                 >{{ formatCurrency(asset.total_asset_amount) }}</span
               >
             </div>
             <div class="laptop-actions" @click.stop>
               <AppRowActions
                 :actions="getOpsActions(asset)"
-                :label="`Aksi aset Ops ${asset.hostname || ''}`"
+                :label="`${t('ops_actions_aria')} ${asset.hostname || ''}`"
               />
             </div>
           </div>
@@ -810,7 +855,7 @@ function formatDate(dateStr) {
     <FilterModal
       panel-class="inventory-dialog"
       :is-open="showFilterModal"
-      title="Filter Aset OPS"
+      :title="t('ops_filter_title')"
       @close="showFilterModal = false"
       @apply="showFilterModal = false"
       @reset="resetFilters"
@@ -818,21 +863,21 @@ function formatDate(dateStr) {
       <CustomSelect
         v-model="selectedLocation"
         :options="locationFilterOptions"
-        aria-label="Filter lokasi"
+        :aria-label="t('ops_aria_filter_location')"
         :block="true"
         height-class="h-8"
       />
       <CustomSelect
         v-model="selectedKategori"
         :options="kategoriFilterOptions"
-        aria-label="Filter kategori"
+        :aria-label="t('ops_aria_filter_category')"
         :block="true"
         height-class="h-8"
       />
       <CustomSelect
         v-model="selectedStatus"
         :options="statusFilterOptions"
-        aria-label="Filter status"
+        :aria-label="t('ops_aria_filter_status')"
         :block="true"
         height-class="h-8"
       />
@@ -842,8 +887,8 @@ function formatDate(dateStr) {
     <AppModal
       panel-class="inventory-dialog"
       :is-open="showFormModal"
-      :title="modalMode === 'add' ? 'Tambah Aset OPS Baru' : 'Edit Aset OPS'"
-      subtitle="Lengkapi data aset. Kolom bertanda * wajib diisi."
+      :title="modalMode === 'add' ? t('ops_form_add_title') : t('ops_form_edit_title')"
+      :subtitle="t('ops_form_subtitle')"
       icon="precision_manufacturing"
       size="lg"
       @close="closeModal"
@@ -862,18 +907,18 @@ function formatDate(dateStr) {
         </div>
 
         <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <h3 class="asset-form-section-title">Identitas aset</h3>
+          <h3 class="asset-form-section-title">{{ t('ops_section_identity') }}</h3>
           <!-- Hostname -->
           <div>
             <label for="ops-hostname" class="block text-[12px] font-bold text-[#333333] mb-1">
-              Hostname / Kode Aset <span class="text-rose-500">*</span>
+              {{ t('ops_label_hostname') }} <span class="text-rose-500">*</span>
             </label>
             <input
               id="ops-hostname"
               v-model="form.hostname"
               type="text"
               required
-              placeholder="cth: OPS-PL-001"
+              :placeholder="t('ops_ph_hostname')"
               class="w-full h-8 px-3 text-[12px] rounded-[6px] border border-[#E2E8F0] bg-white focus:border-[#0A51B0] focus:outline-none"
             />
           </div>
@@ -881,62 +926,62 @@ function formatDate(dateStr) {
           <!-- Nama Asset -->
           <div>
             <label for="ops-nama-asset" class="block text-[12px] font-bold text-[#333333] mb-1">
-              Nama Asset <span class="text-rose-500">*</span>
+              {{ t('ops_label_asset_name') }} <span class="text-rose-500">*</span>
             </label>
             <input
               id="ops-nama-asset"
               v-model="form.nama_asset"
               type="text"
               required
-              placeholder="cth: KIOSK Self Service Station"
+              :placeholder="t('ops_ph_asset_name')"
               class="w-full h-8 px-3 text-[12px] rounded-[6px] border border-[#E2E8F0] bg-white focus:border-[#0A51B0] focus:outline-none"
             />
           </div>
         </div>
 
         <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <h3 class="asset-form-section-title">Kategori & penempatan</h3>
+          <h3 class="asset-form-section-title">{{ t('ops_section_category_placement') }}</h3>
           <!-- Kategori -->
           <div>
             <label class="block text-[12px] font-bold text-[#333333] mb-1">
-              Kategori <span class="text-rose-500">*</span>
+              {{ t('th_category') }} <span class="text-rose-500">*</span>
             </label>
             <SearchableSelect
               v-model="form.kategori"
               :options="kategoriSelectOptions"
               value-key="value"
               label-key="label"
-              placeholder="Pilih Kategori"
+              :placeholder="t('ops_ph_select_category')"
             />
           </div>
 
           <!-- Lokasi Utama -->
           <div>
             <label class="block text-[12px] font-bold text-[#333333] mb-1">
-              Lokasi Utama <span class="text-rose-500">*</span>
+              {{ t('ops_label_primary_location') }} <span class="text-rose-500">*</span>
             </label>
             <SearchableSelect
               v-model="form.lokasi"
               :options="locationOptions"
               value-key="value"
               label-key="label"
-              placeholder="Pilih lokasi"
+              :placeholder="t('ops_ph_select_location')"
             />
           </div>
         </div>
 
         <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <h3 class="asset-form-section-title">Penanggung jawab & pembelian</h3>
+          <h3 class="asset-form-section-title">{{ t('ops_section_pic_purchase') }}</h3>
           <!-- PIC Penanggung Jawab -->
           <div>
             <label for="ops-pic" class="block text-[12px] font-bold text-[#333333] mb-1"
-              >PIC (Penanggung Jawab)</label
+              >{{ t('ops_label_pic') }}</label
             >
             <input
               id="ops-pic"
               v-model="form.pic"
               type="text"
-              placeholder="cth: Store Manager / Spv Kasir"
+              :placeholder="t('ops_ph_pic')"
               class="w-full h-8 px-3 text-[12px] rounded-[6px] border border-[#E2E8F0] bg-white focus:border-[#0A51B0] focus:outline-none"
             />
           </div>
@@ -944,7 +989,7 @@ function formatDate(dateStr) {
           <!-- Tanggal Beli -->
           <div>
             <label for="ops-tanggal-beli" class="block text-[12px] font-bold text-[#333333] mb-1"
-              >Tanggal Pembelian</label
+              >{{ t('ops_label_purchase_date') }}</label
             >
             <input
               id="ops-tanggal-beli"
@@ -956,7 +1001,7 @@ function formatDate(dateStr) {
         </div>
 
         <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
-          <h3 class="asset-form-section-title">Nilai & kondisi</h3>
+          <h3 class="asset-form-section-title">{{ t('ops_section_value_condition') }}</h3>
           <!-- Total Asset Amount -->
           <div>
             <label for="ops-total-amount" class="block text-[12px] font-bold text-[#333333] mb-1"
@@ -975,12 +1020,12 @@ function formatDate(dateStr) {
 
           <!-- Kondisi -->
           <div>
-            <label class="block text-[12px] font-bold text-[#333333] mb-1">Kondisi</label>
+            <label class="block text-[12px] font-bold text-[#333333] mb-1">{{ t('filter_condition') }}</label>
             <CustomSelect
               v-model="form.kondisi"
-              :options="kondisiOptions"
-              aria-label="Kondisi Ops"
-              placeholder="Pilih kondisi"
+              :options="opsKondisiSelectOptions"
+              :aria-label="t('ops_aria_kondisi')"
+              :placeholder="t('ops_ph_select_kondisi')"
               :block="true"
               height-class="h-8"
             />
@@ -989,13 +1034,13 @@ function formatDate(dateStr) {
           <!-- Status -->
           <div>
             <label class="block text-[12px] font-bold text-[#333333] mb-1"
-              >Status Operasional</label
+              >{{ t('ops_status_operational') }}</label
             >
             <CustomSelect
               v-model="form.status"
-              :options="statusOptions"
-              aria-label="Status Operasional"
-              placeholder="Pilih status"
+              :options="opsStatusSelectOptions"
+              :aria-label="t('ops_status_operational')"
+              :placeholder="t('ops_ph_select_status')"
               :block="true"
               height-class="h-8"
             />
@@ -1013,7 +1058,7 @@ function formatDate(dateStr) {
             @click="closeModal"
             class="h-8 px-4 rounded-[6px] border border-[#E2E8F0] text-[12px] font-semibold text-[#5F7089] hover:bg-[#F8FAFC]"
           >
-            Batal
+            {{ t('cancel') }}
           </button>
           <button
             type="submit"
@@ -1026,7 +1071,7 @@ function formatDate(dateStr) {
               aria-hidden="true"
               class="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"
             ></span>
-            <span>{{ isSubmitting ? 'Menyimpan...' : 'Simpan Aset OPS' }}</span>
+            <span>{{ isSubmitting ? t('ops_saving') : t('ops_save_asset') }}</span>
           </button>
         </div>
       </template>
@@ -1036,13 +1081,13 @@ function formatDate(dateStr) {
     <AppModal
       panel-class="inventory-dialog"
       :is-open="showDeleteModal"
-      title="Hapus Aset OPS"
+      :title="t('ops_delete_title')"
       size="sm"
       @close="closeModal"
     >
       <div class="asset-delete-content space-y-3">
         <p class="text-[12px] text-[#475569]">
-          Apakah Anda yakin ingin menghapus Aset OPS
+          {{ t('ops_delete_confirm') }}
           <strong class="text-[#333333]">{{ selectedAsset?.nama_asset }}</strong> ({{
             selectedAsset?.hostname
           }})?
@@ -1058,7 +1103,7 @@ function formatDate(dateStr) {
             @click="closeModal"
             class="h-8 px-4 rounded-[6px] border border-[#E2E8F0] text-[12px] font-semibold text-[#5F7089] hover:bg-[#F8FAFC]"
           >
-            Batal
+            {{ t('cancel') }}
           </button>
           <button
             type="button"
@@ -1066,7 +1111,7 @@ function formatDate(dateStr) {
             @click="confirmDelete"
             class="h-8 px-4 rounded-[6px] bg-rose-600 text-[12px] font-bold text-white shadow-2xs hover:bg-rose-700 disabled:opacity-50"
           >
-            {{ isSubmitting ? 'Menghapus...' : 'Ya, Hapus' }}
+            {{ isSubmitting ? t('ops_deleting') : t('btn_yes_delete') }}
           </button>
         </div>
       </template>
@@ -1076,7 +1121,7 @@ function formatDate(dateStr) {
     <AppModal
       panel-class="inventory-dialog"
       :is-open="showDetailsModal"
-      title="Detail Aset OPS"
+      :title="t('ops_details_title')"
       size="lg"
       @close="closeModal"
     >
@@ -1099,24 +1144,24 @@ function formatDate(dateStr) {
 
         <div class="asset-detail-fields">
           <div>
-            <span class="text-[#5F7089] block text-[11px] font-medium">Kategori</span>
-            <span class="font-semibold text-[#333333]">{{ selectedAsset.kategori }}</span>
+            <span class="text-[#5F7089] block text-[11px] font-medium">{{ t('th_category') }}</span>
+            <span class="font-semibold text-[#333333]">{{ opsKategoriLabel(selectedAsset.kategori) }}</span>
           </div>
 
           <div>
-            <span class="text-[#5F7089] block text-[11px] font-medium">Lokasi</span>
+            <span class="text-[#5F7089] block text-[11px] font-medium">{{ t('ops_th_location') }}</span>
             <span class="font-semibold text-[#333333]">{{ selectedAsset.lokasi }}</span>
           </div>
 
           <div>
-            <span class="text-[#5F7089] block text-[11px] font-medium">PIC / Penanggung Jawab</span>
+            <span class="text-[#5F7089] block text-[11px] font-medium">{{ t('ops_details_pic') }}</span>
             <span class="text-[#333333] font-medium">{{
-              selectedAsset.pic || 'Belum ditetapkan'
+              selectedAsset.pic || t('ops_pic_not_set')
             }}</span>
           </div>
 
           <div>
-            <span class="text-[#5F7089] block text-[11px] font-medium">Tanggal Pembelian</span>
+            <span class="text-[#5F7089] block text-[11px] font-medium">{{ t('ops_label_purchase_date') }}</span>
             <span class="text-[#333333]">{{ formatDate(selectedAsset.tanggal_beli) }}</span>
           </div>
 
@@ -1128,7 +1173,7 @@ function formatDate(dateStr) {
           </div>
 
           <div>
-            <span class="text-[#5F7089] block text-[11px] font-medium">Status Operasional</span>
+            <span class="text-[#5F7089] block text-[11px] font-medium">{{ t('ops_status_operational') }}</span>
             <span
               class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold mt-0.5"
               :class="[
@@ -1140,15 +1185,15 @@ function formatDate(dateStr) {
                 class="h-1.5 w-1.5 rounded-full"
                 :class="formatStatusPillOps(selectedAsset.status).dot"
               ></span>
-              {{ selectedAsset.status }}
+              {{ opsStatusLabel(selectedAsset.status) }}
             </span>
           </div>
         </div>
 
         <div class="pt-2 border-t border-[#E2E8F0]">
-          <span class="text-[#5F7089] block text-[11px] font-medium">Kondisi Perangkat</span>
+          <span class="text-[#5F7089] block text-[11px] font-medium">{{ t('ops_details_kondisi') }}</span>
           <p class="text-[12px] text-[#333333] font-semibold mt-0.5">
-            {{ selectedAsset.kondisi || 'Baik' }}
+            {{ selectedAsset.kondisi ? opsKondisiLabel(selectedAsset.kondisi) : t('ops_kondisi_baik') }}
           </p>
         </div>
       </div>
@@ -1159,7 +1204,7 @@ function formatDate(dateStr) {
             @click="closeModal"
             class="h-8 px-4 rounded-[6px] bg-[#0A51B0] text-[12px] font-bold text-white shadow-2xs hover:bg-[#0A4391]"
           >
-            Tutup
+            {{ t('close') }}
           </button>
         </div>
       </template>
@@ -1208,7 +1253,7 @@ function formatDate(dateStr) {
 <style src="../assets/inventory-polish.css"></style>
 
 <style scoped>
-/* Header & list heading tidak sticky di modul Inventaris — scroll
+/* Header & list heading tidak sticky di modul Inventaris - scroll
    bersama konten. HARUS setelah import ws-table.css agar menang. */
 .asset-toolbar-sticky,
 .it-list-heading-sticky {

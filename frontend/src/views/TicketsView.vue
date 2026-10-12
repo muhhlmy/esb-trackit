@@ -11,6 +11,7 @@ import { playToneNotification } from '../composables/useNotificationSound.js'
 import AppModal from '../components/ui/AppModal.vue'
 import AppRowActions from '../components/ui/AppRowActions.vue'
 import { useViewMode } from '../composables/useViewMode.js'
+import { useLanguage } from '../composables/useLanguage.js'
 import AppViewToggle from '../components/ui/AppViewToggle.vue'
 import AppPagination from '../components/ui/AppPagination.vue'
 import SearchableSelect from '../components/ui/SearchableSelect.vue'
@@ -32,6 +33,7 @@ const router = useRouter()
 const { get, getAllPages, post, put, del } = useApi()
 const { user, isAuthenticated, isSuperAdmin, isAdmin, hasWritePermission } = useAuth()
 const { viewMode } = useViewMode('tickets', 'table')
+const { currentLang, t } = useLanguage()
 
 const TICKET_PRIORITY_OPTIONS = [
   { value: 'Low', label: 'Low', dot: 'bg-emerald-500' },
@@ -56,7 +58,7 @@ const handleTicketCreated = (data) => {
   if (!data) return
   if (isAdmin.value || isSuperAdmin.value) {
     toast(
-      `🔔 Tiket Baru! ${data.nomor_tiket || ''}: ${data.judul || 'Tanpa Judul'} — oleh ${data.pelapor || 'User'}`,
+      `${t('tickets_toast_new')} ${data.nomor_tiket || ''}: ${data.judul || t('tickets_no_title')} (${t('tickets_by')} ${data.pelapor || 'User'})`,
       'info',
     )
   }
@@ -210,6 +212,11 @@ const searchQuery = ref('')
 const filterStatus = ref('')
 const filterPrioritas = ref('')
 const filterKategori = ref('')
+const filterYear = ref('')
+const filterDateFrom = ref('')
+const filterDateTo = ref('')
+const filterAssignee = ref('') // '' | 'unassigned' | 'mine' | 'assigned'
+const filterAttachment = ref('') // '' | 'with' | 'without'
 const showFilterModal = ref(false)
 const sortOrder = ref('terbaru') // 'terbaru' | 'terlama'
 const pageError = ref('')
@@ -349,17 +356,17 @@ const availableCategories = computed(() => {
       {
         value: 'Request',
         title: 'Request',
-        desc: 'Permintaan Layanan & Surat HR',
+        desc: t('tickets_cat_hr_request'),
       },
       {
         value: 'Support',
         title: 'Support',
-        desc: 'Kendala & Masalah Kepegawaian',
+        desc: t('tickets_cat_hr_support'),
       },
       {
         value: 'QNA',
         title: 'QNA',
-        desc: 'Pertanyaan & Informasi HR',
+        desc: t('tickets_cat_hr_qna'),
       },
     ]
   }
@@ -369,17 +376,17 @@ const availableCategories = computed(() => {
       {
         value: 'Request',
         title: 'Request',
-        desc: 'Permintaan Fasilitas & Perbaikan',
+        desc: t('tickets_cat_ga_request'),
       },
       {
         value: 'Support',
         title: 'Support',
-        desc: 'Kendala Fasilitas, Ruangan & AC',
+        desc: t('tickets_cat_ga_support'),
       },
       {
         value: 'Incident',
         title: 'Incident',
-        desc: 'Kerusakan & Insiden Gedung',
+        desc: t('tickets_cat_ga_incident'),
       },
     ]
   }
@@ -388,17 +395,17 @@ const availableCategories = computed(() => {
     {
       value: 'Request',
       title: 'Request',
-      desc: 'Permintaan Akses & Perangkat',
+      desc: t('tickets_cat_it_request'),
     },
     {
       value: 'Support',
       title: 'Support',
-      desc: 'Kendala PC, Laptop & Wi-Fi',
+      desc: t('tickets_cat_it_support'),
     },
     {
       value: 'Incident',
       title: 'Incident',
-      desc: 'Gangguan Sistem & Jaringan',
+      desc: t('tickets_cat_it_incident'),
     },
   ]
 })
@@ -519,9 +526,9 @@ function getAttachmentIcon(attachment, fileNameHint = '') {
   return 'attach_file'
 }
 
-function downloadAttachment(dataUrl, defaultFilename = 'lampiran-tiket') {
+function downloadAttachment(dataUrl, defaultFilename = null) {
   if (!dataUrl || typeof dataUrl !== 'string') return
-  let filename = defaultFilename
+  let filename = defaultFilename || t('tickets_attachment_default_name')
   if (dataUrl.startsWith('data:')) {
     const mimeHeader = dataUrl.split(';')[0] || ''
     const mime = (mimeHeader.split(':')[1] || '').toLowerCase()
@@ -565,7 +572,69 @@ function removeCommentAttachment() {
   commentAttachmentName.value = null
 }
 
+const availableYears = computed(() => {
+  const years = new Set()
+  const currentYear = new Date().getFullYear()
+  for (let y = currentYear; y >= currentYear - 3; y--) {
+    years.add(String(y))
+  }
+  tickets.value.forEach((t) => {
+    if (t.dibuat_pada) {
+      const y = String(t.dibuat_pada).slice(0, 4)
+      if (y && !isNaN(Number(y))) years.add(y)
+    }
+  })
+  return Array.from(years).sort((a, b) => b.localeCompare(a))
+})
+
+function setDatePreset(preset) {
+  const now = new Date()
+  const pad = (n) => String(n).padStart(2, '0')
+  const toYMD = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`
+  const todayStr = toYMD(now)
+
+  if (preset === 'today') {
+    filterDateFrom.value = todayStr
+    filterDateTo.value = todayStr
+  } else if (preset === '7days') {
+    const d = new Date()
+    d.setDate(d.getDate() - 7)
+    filterDateFrom.value = toYMD(d)
+    filterDateTo.value = todayStr
+  } else if (preset === '30days') {
+    const d = new Date()
+    d.setDate(d.getDate() - 30)
+    filterDateFrom.value = toYMD(d)
+    filterDateTo.value = todayStr
+  } else if (preset === 'thisMonth') {
+    const start = new Date(now.getFullYear(), now.getMonth(), 1)
+    filterDateFrom.value = toYMD(start)
+    filterDateTo.value = todayStr
+  } else if (preset === 'thisYear') {
+    const start = new Date(now.getFullYear(), 0, 1)
+    filterDateFrom.value = toYMD(start)
+    filterDateTo.value = todayStr
+  } else if (preset === 'clear') {
+    filterDateFrom.value = ''
+    filterDateTo.value = ''
+  }
+}
+
+const activeFilterCount = computed(() => {
+  let count = 0
+  if (filterStatus.value) count++
+  if (filterPrioritas.value) count++
+  if (filterQueue.value) count++
+  if (filterKategori.value) count++
+  if (filterYear.value) count++
+  if (filterDateFrom.value || filterDateTo.value) count++
+  if (filterAssignee.value) count++
+  if (filterAttachment.value) count++
+  return count
+})
+
 const filteredTickets = computed(() => {
+  const currentUserId = user.value?.id
   return tickets.value.filter((t) => {
     const matchStatus = !filterStatus.value || t.status_tiket === filterStatus.value
     const matchPrioritas = !filterPrioritas.value || t.prioritas === filterPrioritas.value
@@ -573,7 +642,44 @@ const filteredTickets = computed(() => {
     const matchKategori =
       !filterKategori.value ||
       (t.kategori || '').toLowerCase() === filterKategori.value.toLowerCase()
-    return matchStatus && matchPrioritas && matchQueue && matchKategori
+
+    // Year
+    const tDate = t.dibuat_pada ? String(t.dibuat_pada).slice(0, 10) : ''
+    const matchYear = !filterYear.value || tDate.startsWith(filterYear.value)
+
+    // Date range
+    const matchDateFrom = !filterDateFrom.value || (tDate && tDate >= filterDateFrom.value)
+    const matchDateTo = !filterDateTo.value || (tDate && tDate <= filterDateTo.value)
+
+    // Assignee
+    let matchAssignee = true
+    if (filterAssignee.value === 'unassigned') {
+      matchAssignee = !t.assigned_to_user_id
+    } else if (filterAssignee.value === 'mine') {
+      matchAssignee = Boolean(currentUserId && t.assigned_to_user_id === currentUserId)
+    } else if (filterAssignee.value === 'assigned') {
+      matchAssignee = Boolean(t.assigned_to_user_id)
+    }
+
+    // Attachment
+    let matchAttachment = true
+    if (filterAttachment.value === 'with') {
+      matchAttachment = Boolean(t.has_attachment)
+    } else if (filterAttachment.value === 'without') {
+      matchAttachment = !t.has_attachment
+    }
+
+    return (
+      matchStatus &&
+      matchPrioritas &&
+      matchQueue &&
+      matchKategori &&
+      matchYear &&
+      matchDateFrom &&
+      matchDateTo &&
+      matchAssignee &&
+      matchAttachment
+    )
   })
 })
 
@@ -583,6 +689,11 @@ function resetFilters() {
   filterPrioritas.value = ''
   filterQueue.value = ''
   filterKategori.value = ''
+  filterYear.value = ''
+  filterDateFrom.value = ''
+  filterDateTo.value = ''
+  filterAssignee.value = ''
+  filterAttachment.value = ''
   sortOrder.value = 'terbaru'
   fetchTickets()
 }
@@ -590,9 +701,24 @@ function resetFilters() {
 const currentPage = ref(1)
 const itemsPerPage = ref(10)
 
-watch([searchQuery, filterStatus, filterPrioritas, filterQueue, filterKategori, activeTab], () => {
-  currentPage.value = 1
-})
+watch(
+  [
+    searchQuery,
+    filterStatus,
+    filterPrioritas,
+    filterQueue,
+    filterKategori,
+    filterYear,
+    filterDateFrom,
+    filterDateTo,
+    filterAssignee,
+    filterAttachment,
+    activeTab,
+  ],
+  () => {
+    currentPage.value = 1
+  },
+)
 
 // Live search: fetch ulang ke server saat keyword berubah (debounced singkat).
 // Search dilakukan server-side; saat keyword dikosongkan langsung fetch (dengan
@@ -672,7 +798,7 @@ async function fetchQueues() {
       await fetchQueueAdmins()
     }
   } catch (err) {
-    toast('Gagal memuat antrean tiket: ' + (err.message || 'Kesalahan jaringan'), 'error')
+    toast(t('tickets_load_queues_failed') + ': ' + (err.message || t('tickets_network_error')), 'error')
   } finally {
     isQueuesLoading.value = false
   }
@@ -686,7 +812,7 @@ async function fetchReporters() {
     reporters.value = rows.map((u) => ({ id: Number(u.id), nama: u.nama }))
   } catch (err) {
     reporters.value = []
-    toast('Gagal memuat daftar pelapor: ' + (err.message || 'Kesalahan jaringan'), 'error')
+    toast(t('tickets_load_reporters_failed') + ': ' + (err.message || t('tickets_network_error')), 'error')
   } finally {
     isReportersLoading.value = false
   }
@@ -730,7 +856,7 @@ async function fetchTickets(silent = false) {
     if (requestId !== fetchRequestId) return
     if (!silent) {
       console.error('Gagal memuat tiket:', err)
-      pageError.value = err.message || 'Gagal memuat data tiket.'
+      pageError.value = err.message || t('tickets_load_failed')
     }
   } finally {
     if (requestId === fetchRequestId) {
@@ -815,7 +941,7 @@ async function loadCommentAttachment(comment) {
     if (selectedTicket.value?.id !== ticketId) return
     const currentComment = ticketComments.value.find((item) => item.id === comment.id)
     if (currentComment) {
-      currentComment.attachment_error = err.message || 'Gagal memuat lampiran.'
+      currentComment.attachment_error = err.message || t('tickets_attachment_load_failed')
     }
   } finally {
     const currentComment = ticketComments.value.find((item) => item.id === comment.id)
@@ -850,7 +976,7 @@ async function sendComment() {
   isSubmittingComment.value = true
   try {
     await post(`/api/tickets/${selectedTicket.value.id}/comments`, {
-      pesan: newCommentText.value.trim() || 'Melampirkan file',
+      pesan: newCommentText.value.trim() || t('tickets_attaching_file'),
       attachment: commentAttachment.value,
       attachment_name: commentAttachmentName.value,
     })
@@ -877,7 +1003,7 @@ async function claimTicket(ticket) {
   const oldSelectedTicket =
     selectedTicket.value?.id === ticket.id ? { ...selectedTicket.value } : null
 
-  const currentUserName = user.value?.nama || 'Saya'
+  const currentUserName = user.value?.nama || t('tickets_me')
   const currentUserId = user.value?.id
 
   const updatedFields = {
@@ -904,7 +1030,7 @@ async function claimTicket(ticket) {
 
   try {
     const res = await post(`/api/tickets/${ticket.id}/claim`, {})
-    toast(`Tiket '${ticket.judul}' berhasil diambil!`)
+    toast(`${t('tickets_toast_title_open')}${ticket.judul}${t('tickets_claim_success')}`)
 
     if (selectedTicket.value?.id === ticket.id) {
       selectedTicket.value = {
@@ -928,7 +1054,7 @@ async function claimTicket(ticket) {
     if (selectedTicket.value?.id === ticket.id && oldSelectedTicket) {
       selectedTicket.value = oldSelectedTicket
     }
-    toast(err.message || 'Gagal mengambil tiket.', 'error')
+    toast(err.message || t('tickets_claim_failed'), 'error')
   } finally {
     isClaiming.value = null
   }
@@ -942,7 +1068,7 @@ async function assignTicket(ticket, targetUserId) {
   const oldTicket = idx >= 0 ? { ...tickets.value[idx] } : null
   try {
     await post(`/api/tickets/${ticket.id}/reassign`, { target_user_id: targetUserId })
-    toast(`Tiket '${ticket.judul}' berhasil dialihkan.`)
+    toast(`${t('tickets_toast_title_open')}${ticket.judul}${t('tickets_reassign_success')}`)
     // Optimistic: update assignee di list & detail
     if (idx >= 0) {
       tickets.value[idx] = {
@@ -965,7 +1091,7 @@ async function assignTicket(ticket, targetUserId) {
     scheduleStatsRefresh()
   } catch (err) {
     if (idx >= 0 && oldTicket) tickets.value[idx] = oldTicket
-    toast(err.message || 'Gagal mengalihkan tiket.', 'error')
+    toast(err.message || t('tickets_reassign_failed'), 'error')
   } finally {
     isReassigning.value = false
   }
@@ -1117,7 +1243,7 @@ async function loadSelectedTicketAttachment(ticketId, target) {
       requestVersion === ticketAttachmentRequestVersion &&
       selectedTicket.value?.id === ticketId
     ) {
-      ticketAttachmentError.value = err.message || 'Gagal memuat lampiran tiket.'
+      ticketAttachmentError.value = err.message || t('tickets_attachment_load_ticket_failed')
     }
   } finally {
     if (requestVersion === ticketAttachmentRequestVersion) {
@@ -1194,7 +1320,9 @@ async function updateTicketStatus(ticket, newStatus) {
     // 2. Perform API Mutation
     await put(`/api/tickets/${ticket.id}`, { status_tiket: newStatus })
 
-    toast(`Status tiket ${ticket.nomor_tiket || ''} berhasil diubah menjadi '${newStatus}'.`)
+    toast(
+      `${t('tickets_status_toast_1')}${ticket.nomor_tiket || ''}${t('tickets_status_toast_2')}'${newStatus}'.`,
+    )
 
     // 3. Revalidate ticket list & stats counters without full page reload
     await fetchTickets(true)
@@ -1218,7 +1346,7 @@ async function updateTicketStatus(ticket, newStatus) {
     if (selectedTicket.value?.id === ticket.id) {
       selectedTicket.value = { ...selectedTicket.value, status_tiket: oldStatus }
     }
-    toast(err.message || 'Gagal memperbarui status tiket.', 'error')
+    toast(err.message || t('tickets_status_update_failed'), 'error')
   } finally {
     isUpdatingStatus.value = false
   }
@@ -1226,11 +1354,11 @@ async function updateTicketStatus(ticket, newStatus) {
 
 async function saveTicket() {
   if (!form.value.judul?.trim()) {
-    modalError.value = 'Judul tiket wajib diisi.'
+    modalError.value = t('tickets_title_required')
     return
   }
   if (!form.value.queue_id) {
-    modalError.value = 'Unit tujuan wajib dipilih.'
+    modalError.value = t('tickets_queue_required')
     return
   }
 
@@ -1254,7 +1382,7 @@ async function saveTicket() {
           reporterId === '' || reporterId == null ? null : Number(reporterId)
       }
       await post('/api/tickets', payload)
-      toast('Tiket baru berhasil dibuat.')
+      toast(t('tickets_create_success'))
       // Refetch untuk mendapatkan tiket baru dengan nomor_tiket final
       await fetchTickets()
     } else {
@@ -1277,7 +1405,7 @@ async function saveTicket() {
           ...payload,
           status_tiket: form.value.status_tiket,
         })
-        toast('Tiket berhasil diperbarui.')
+        toast(t('tickets_update_success'))
         scheduleStatsRefresh()
       } catch (err) {
         // Rollback
@@ -1289,7 +1417,7 @@ async function saveTicket() {
     ticketDraftSnapshot = null
     closeModal()
   } catch (err) {
-    modalError.value = err.message || 'Gagal menyimpan tiket.'
+    modalError.value = err.message || t('tickets_save_failed')
   } finally {
     isSubmitting.value = false
   }
@@ -1302,11 +1430,11 @@ async function confirmDeleteTicket() {
 
   try {
     await del(`/api/tickets/${selectedTicket.value.id}`)
-    toast('Tiket berhasil dihapus.')
+    toast(t('tickets_delete_success'))
     closeModal()
     await fetchTickets()
   } catch (err) {
-    modalError.value = err.message || 'Gagal menghapus tiket.'
+    modalError.value = err.message || t('tickets_delete_failed')
   } finally {
     isSubmitting.value = false
   }
@@ -1316,7 +1444,7 @@ function formatDateTime(iso) {
   if (!iso) return '-'
   const date = new Date(iso)
   if (Number.isNaN(date.getTime())) return '-'
-  return date.toLocaleString('id-ID', {
+  return date.toLocaleString(currentLang.value === 'en' ? 'en-GB' : 'id-ID', {
     day: '2-digit',
     month: 'short',
     year: 'numeric',
@@ -1330,20 +1458,23 @@ function formatRelativeTime(iso) {
   const date = new Date(iso)
   if (Number.isNaN(date.getTime())) return '-'
   const diffSec = Math.floor((nowTick.value - date.getTime()) / 1000)
-  if (diffSec < 60) return 'Baru saja'
+  if (diffSec < 60) return t('tickets_just_now')
   const diffMin = Math.floor(diffSec / 60)
-  if (diffMin < 60) return `${diffMin}m lalu`
+  if (diffMin < 60) return `${diffMin}${t('tickets_min_ago')}`
   const diffHours = Math.floor(diffMin / 60)
-  if (diffHours < 24) return `${diffHours}j lalu`
+  if (diffHours < 24) return `${diffHours}${t('tickets_hours_ago')}`
   const diffDays = Math.floor(diffHours / 24)
-  if (diffDays < 7) return `${diffDays}h lalu`
-  return date.toLocaleDateString('id-ID', { day: '2-digit', month: 'short' })
+  if (diffDays < 7) return `${diffDays}${t('tickets_days_ago')}`
+  return date.toLocaleDateString(currentLang.value === 'en' ? 'en-GB' : 'id-ID', {
+    day: '2-digit',
+    month: 'short',
+  })
 }
 
 function getTicketActions(ticket) {
   const actions = [
     {
-      label: 'Lihat Detail Tiket',
+      label: t('tickets_action_view'),
       icon: 'visibility',
       onClick: () => openDetail(ticket),
     },
@@ -1355,7 +1486,7 @@ function getTicketActions(ticket) {
       !['Closed', 'Resolved', 'Cancelled'].includes(ticket.status_tiket)
     ) {
       actions.push({
-        label: 'Ambil Tiket Ini',
+        label: t('tickets_action_claim'),
         icon: 'person_add',
         onClick: () => claimTicket(ticket),
       })
@@ -1363,7 +1494,7 @@ function getTicketActions(ticket) {
 
     if (hasWritePermission('tickets')) {
       actions.push({
-        label: 'Edit & Status Tiket',
+        label: t('tickets_action_edit'),
         icon: 'edit',
         onClick: () => openEdit(ticket),
       })
@@ -1372,7 +1503,7 @@ function getTicketActions(ticket) {
 
   if (isSuperAdmin.value) {
     actions.push({
-      label: 'Hapus Tiket',
+      label: t('tickets_action_delete'),
       icon: 'delete',
       danger: true,
       onClick: () => openDelete(ticket),
@@ -1381,11 +1512,11 @@ function getTicketActions(ticket) {
   return actions
 }
 
-function getAssigneeName(val, fallback = 'Unassigned') {
-  if (!val) return fallback
+function getAssigneeName(val, fallback) {
+  if (!val) return fallback || t('unassigned')
   if (typeof val === 'string') return val
   if (typeof val === 'object' && val !== null) {
-    return val.nama || val.name || val.username || fallback
+    return val.nama || val.name || val.username || fallback || t('unassigned')
   }
   return String(val)
 }
@@ -1404,9 +1535,9 @@ function toast(message, type = 'success') {
 <template>
   <div v-if="!isAuthenticated" class="max-w-2xl mx-auto py-12 px-4">
     <AuthGateCard
-      title="Masuk diperlukan"
-      description="Silakan masuk untuk melihat tiket bantuan dan mengajukan permintaan support."
-      button-text="Masuk untuk Mengakses Tiket"
+      :title="t('tickets_auth_gate_title')"
+      :description="t('tickets_auth_gate_desc')"
+      :button-text="t('tickets_auth_gate_btn')"
     />
   </div>
   <div
@@ -1445,11 +1576,11 @@ function toast(message, type = 'success') {
       <!-- Title Bar -->
       <PageHeader
         class="tickets-header"
-        :title="isAdmin || isSuperAdmin ? 'Tiket Helpdesk' : 'Tiket'"
+        :title="isAdmin || isSuperAdmin ? t('ticket_helpdesk_title') : t('ticket_user_title')"
         :subtitle="
           isAdmin || isSuperAdmin
-            ? 'Mengelola pengajuan dan penanganan kendala IT'
-            : 'Pengajuan dan layanan IT'
+            ? t('ticket_helpdesk_subtitle')
+            : t('ticket_user_subtitle')
         "
         icon="confirmation_number"
       >
@@ -1457,44 +1588,44 @@ function toast(message, type = 'success') {
           type="button"
           @click="openAdd"
           class="h-8 shrink-0 whitespace-nowrap rounded-[6px] bg-[#0A51B0] px-3 text-[11px] sm:text-[12px] font-semibold text-white shadow-2xs hover:bg-[#0A4391] transition-all flex items-center justify-center gap-1.5 cursor-pointer"
-          :title="isAdmin || isSuperAdmin ? 'Buat tiket baru' : 'Ajukan tiket baru'"
+          :title="isAdmin || isSuperAdmin ? t('btn_create_ticket') : t('btn_submit_ticket')"
         >
           <span aria-hidden="true" class="material-symbols-outlined text-[16px]">add</span>
-          <span>{{ isAdmin || isSuperAdmin ? 'Buat Tiket' : 'Ajukan Tiket' }}</span>
+          <span>{{ isAdmin || isSuperAdmin ? t('btn_create_ticket') : t('btn_submit_ticket') }}</span>
         </button>
       </PageHeader>
 
       <!-- Quick KPI Stat Cards (4 Cards) -->
       <div class="tickets-kpis grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-2.5 lg:gap-3">
         <StatCard
-          title="Total tiket"
+          :title="t('stat_total_tickets')"
           :value="stats.totalTickets ?? 0"
           icon="inbox"
           color="primary"
-          subtitle="Total tiket masuk"
+          :subtitle="t('stat_total_tickets_sub')"
         />
         <StatCard
-          :title="isAdmin || isSuperAdmin ? 'Belum diambil' : 'Menunggu respon'"
+          :title="isAdmin || isSuperAdmin ? t('stat_unassigned_tickets') : t('stat_awaiting_response')"
           :value="stats.unassignedTickets ?? 0"
           icon="assignment_late"
           :color="(stats.unassignedTickets || 0) > 0 ? 'warning' : 'neutral'"
           :value-class="(stats.unassignedTickets || 0) > 0 ? 'text-[#B45309] dark:text-amber-400' : 'text-[#333333] dark:text-white'"
-          subtitle="Menunggu penanganan"
+          :subtitle="t('stat_unassigned_sub')"
         />
         <StatCard
-          title="Sedang diproses"
+          :title="t('stat_in_progress')"
           :value="(stats.openTickets || 0) + (stats.pendingTickets || 0)"
           icon="pending_actions"
           color="primary"
-          subtitle="Dalam pengerjaan tim"
+          :subtitle="t('stat_in_progress_sub')"
         />
         <StatCard
-          title="Tiket selesai"
+          :title="t('stat_tickets_resolved')"
           :value="stats.closedTickets ?? 0"
           icon="task_alt"
           color="success"
           value-class="text-emerald-600 dark:text-emerald-400"
-          subtitle="Tiket terselesaikan"
+          :subtitle="t('stat_tickets_resolved_sub')"
         />
       </div>
     </div>
@@ -1512,15 +1643,15 @@ function toast(message, type = 'success') {
             <button
               v-for="tab in !isAdmin && !isSuperAdmin
                 ? [
-                    { key: 'all', label: 'Semua Request' },
-                    { key: 'open', label: 'Sedang Diproses' },
-                    { key: 'closed', label: 'Selesai' },
+                    { key: 'all', label: t('tickets_tab_all_requests') },
+                    { key: 'open', label: t('tickets_tab_in_progress') },
+                    { key: 'closed', label: t('tickets_tab_closed') },
                   ]
                 : [
-                    { key: 'all', label: 'Inbox', count: stats.totalTickets },
-                    { key: 'unassigned', label: 'Belum Diambil', count: stats.unassignedTickets },
-                    { key: 'assigned', label: 'Ditangani Saya', count: stats.assignedTickets },
-                    { key: 'closed', label: 'Selesai', count: stats.closedTickets },
+                    { key: 'all', label: t('tickets_tab_inbox'), count: stats.totalTickets },
+                    { key: 'unassigned', label: t('tickets_tab_unassigned'), count: stats.unassignedTickets },
+                    { key: 'assigned', label: t('tickets_tab_assigned_me'), count: stats.assignedTickets },
+                    { key: 'closed', label: t('tickets_tab_closed'), count: stats.closedTickets },
                   ]"
               :key="tab.key"
               type="button"
@@ -1550,28 +1681,29 @@ function toast(message, type = 'success') {
           </div>
         </div>
 
-        <!-- Bottom Row: Toolbar (Search on Top Row, Filters on Bottom Row) -->
-        <div class="grid w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-2">
-          <!-- Baris Atas: Search Input with Inline Clear (X) -->
-          <div class="tickets-search relative h-8 min-w-0">
+        <!-- Bottom Row: Toolbar (Search & Filter) -->
+        <div class="flex items-center gap-2 w-full">
+          <!-- Search Input with Inline Clear (X) -->
+          <div class="relative flex-1 h-8 min-w-0">
             <span
               aria-hidden="true"
-              class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-[16px] text-[#687281] pointer-events-none"
+              class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-[16px] text-[#5F7089] dark:text-slate-400 pointer-events-none"
               >search</span
             >
             <input
               v-model="searchQuery"
               type="search"
-              aria-label="Cari tiket, judul, nomor, atau pelapor"
-              placeholder="Cari tiket, judul kendala, nomor tiket, atau pelapor…"
-              class="tickets-search-input h-full min-h-0 w-full rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] pl-8 pr-8 text-[11.5px] font-medium text-[#333333] placeholder-[#687281] focus:border-[#0A51B0] focus:bg-white focus:ring-2 focus:ring-[#0A51B0]/10 focus:outline-none transition-all"
+              :aria-label="t('tickets_search_label')"
+              :placeholder="t('tickets_search_placeholder')"
+              class="w-full h-8 pl-8 pr-8 rounded-[6px] border border-[#E2E8F0] dark:border-slate-700 bg-white dark:bg-slate-800 text-xs text-[#333333] dark:text-slate-100 placeholder-[#5F7089] dark:placeholder-slate-400 focus:outline-none focus:border-[#0A51B0] focus:ring-1 focus:ring-[#0A51B0] transition-colors"
             />
             <button
               v-if="searchQuery"
               type="button"
-              aria-label="Hapus pencarian"
+              :aria-label="t('clear_search')"
               @click="searchQuery = ''"
-              class="absolute right-2 top-1/2 -translate-y-1/2 flex h-4.5 w-4.5 items-center justify-center rounded-full text-[#687281] hover:bg-slate-200/60 hover:text-slate-600 transition-colors cursor-pointer"
+              class="absolute right-2 top-1/2 -translate-y-1/2 flex h-5 w-5 items-center justify-center rounded-full bg-[#E2E8F0] dark:bg-slate-700 text-[#5F7089] dark:text-slate-300 hover:bg-[#CBD5E1] dark:hover:bg-slate-600 hover:text-[#333333] transition-colors cursor-pointer"
+              :title="t('clear_search')"
             >
               <span aria-hidden="true" class="material-symbols-outlined text-[13px]">close</span>
             </button>
@@ -1580,11 +1712,16 @@ function toast(message, type = 'success') {
           <button
             type="button"
             @click="showFilterModal = true"
-            class="tickets-filter-button h-8 shrink-0 rounded-lg border border-[#E2E8F0] bg-slate-50 px-2.5 text-[11px] font-semibold text-slate-600 hover:bg-white"
+            class="relative inline-flex items-center gap-1.5 h-8 shrink-0 rounded-[6px] border border-[#E2E8F0] dark:border-slate-700 bg-[#F8FAFC] dark:bg-slate-800 px-3 text-xs font-medium text-[#5F7089] dark:text-slate-300 hover:bg-white dark:hover:bg-slate-700 cursor-pointer"
           >
-            <span aria-hidden="true" class="material-symbols-outlined mr-1 align-middle text-[15px]"
-              >filter_alt</span
-            >Filter
+            <span aria-hidden="true" class="material-symbols-outlined text-[16px]">tune</span>
+            <span>{{ t('filter') }}</span>
+            <span
+              v-if="activeFilterCount > 0"
+              class="ml-0.5 inline-flex items-center justify-center min-w-[16px] h-4 px-1 rounded-full text-[10px] font-bold bg-[#0A51B0] text-white"
+            >
+              {{ activeFilterCount }}
+            </span>
           </button>
         </div>
       </div>
@@ -1593,7 +1730,7 @@ function toast(message, type = 'success') {
     <!-- ── 3. List Heading & Counter (sticky mengikuti scroll) ── -->
     <div class="tck-heading-sticky flex items-center justify-between gap-3 px-1">
       <div class="flex items-center gap-2">
-        <h2 class="text-[14px] font-bold text-[#333333]">Daftar Tiket Kendala</h2>
+        <h2 class="text-[14px] font-bold text-[#333333]">{{ t('tickets_list_title') }}</h2>
         <span
           class="inline-flex items-center justify-center rounded-md bg-[#EDF5FF] px-2 py-0.5 text-[11px] font-bold text-[#333333] tabular-nums"
         >
@@ -1603,11 +1740,11 @@ function toast(message, type = 'success') {
       <div class="flex shrink-0 items-center gap-3">
         <AppViewToggle v-model="viewMode" />
         <span class="hidden sm:inline text-xs font-normal text-[#5F7089] tabular-nums">
-          Menampilkan
+          {{ t('showing_entries') }}
           {{ paginatedTickets.length ? (currentPage - 1) * itemsPerPage + 1 : 0 }}–{{
             Math.min(currentPage * itemsPerPage, filteredTickets.length)
           }}
-          dari {{ filteredTickets.length }} tiket
+          {{ t('of_entries') }} {{ filteredTickets.length }} {{ t('tickets_count') }}
         </span>
       </div>
     </div>
@@ -1712,7 +1849,7 @@ function toast(message, type = 'success') {
         >
           <table class="ws-data-table">
             <caption class="sr-only">
-              Daftar tiket kendala
+              {{ t('tickets_table_caption') }}
             </caption>
             <colgroup>
               <col class="w-[26%]" />
@@ -1725,13 +1862,13 @@ function toast(message, type = 'success') {
             </colgroup>
             <thead>
               <tr>
-                <th scope="col">Tiket</th>
-                <th scope="col">Pelapor</th>
-                <th scope="col">Penanggung Jawab</th>
-                <th scope="col">Status</th>
-                <th scope="col">Prioritas</th>
-                <th scope="col">Diperbarui</th>
-                <th scope="col"><span class="sr-only">Aksi</span></th>
+                <th scope="col">{{ t('tickets_th_ticket') }}</th>
+                <th scope="col">{{ t('tickets_th_reporter') }}</th>
+                <th scope="col">{{ t('tickets_th_assignee') }}</th>
+                <th scope="col">{{ t('status') }}</th>
+                <th scope="col">{{ t('th_priority') }}</th>
+                <th scope="col">{{ t('tickets_th_updated') }}</th>
+                <th scope="col"><span class="sr-only">{{ t('actions') }}</span></th>
               </tr>
             </thead>
             <tbody>
@@ -1739,7 +1876,7 @@ function toast(message, type = 'success') {
                 v-for="ticket in paginatedTickets"
                 :key="ticket.id"
                 tabindex="0"
-                :aria-label="'Lihat tiket ' + ticket.judul"
+                :aria-label="`${t('tickets_view_ticket')} ${ticket.judul}`"
                 @click="openDetail(ticket)"
                 @keydown.enter.self.prevent="openDetail(ticket)"
                 @keydown.space.self.prevent="openDetail(ticket)"
@@ -1756,14 +1893,14 @@ function toast(message, type = 'success') {
                 </td>
                 <td>
                   <span class="ws-cell-main">{{
-                    ticket.pelapor_nama || ticket.pelapor || '—'
+                    ticket.pelapor_nama || ticket.pelapor || '-'
                   }}</span>
                 </td>
                 <td>
                   <span v-if="ticket.assigned_to_nama || ticket.assigned_to" class="ws-cell-main">{{
                     getAssigneeName(ticket.assigned_to_nama || ticket.assigned_to)
                   }}</span>
-                  <span v-else class="ws-cell-main" style="color: #b45309">Belum ditugaskan</span>
+                  <span v-else class="ws-cell-main" style="color: #b45309">{{ t('unassigned') }}</span>
                 </td>
                 <td>
                   <span class="ws-cell-main">{{
@@ -1782,7 +1919,7 @@ function toast(message, type = 'success') {
                   <AppRowActions
                     menu-class="tickets-action-menu"
                     :actions="getTicketActions(ticket)"
-                    :label="`Aksi tiket ${ticket.nomor_tiket || ticket.id || ''}`"
+                    :label="`${t('tickets_actions_for')} ${ticket.nomor_tiket || ticket.id || ''}`"
                   />
                 </td>
               </tr>
@@ -1796,7 +1933,7 @@ function toast(message, type = 'success') {
             :key="ticket.id"
           @click="openDetail(ticket)"
           tabindex="0"
-          :aria-label="'Lihat tiket ' + ticket.judul"
+          :aria-label="`${t('tickets_view_ticket')} ${ticket.judul}`"
           @keydown.enter.self.prevent="openDetail(ticket)"
           @keydown.space.self.prevent="openDetail(ticket)"
           class="tck-list-item group relative bg-white rounded-[6px] border border-[#E2E8F0] hover:border-[#B8D4F5] hover:shadow-[0_2px_8px_rgba(23,43,77,0.05)] p-2.5 sm:p-3 lg:px-3.5 lg:py-2.5 transition-all duration-150 cursor-pointer select-none active:scale-[0.997]"
@@ -1870,13 +2007,13 @@ function toast(message, type = 'success') {
             <!-- 2. Pelapor (Sesuai Kolom Pengguna di Design.md Section 12) -->
             <div class="flex flex-col min-w-0 gap-0.5">
               <span class="text-[10px] font-medium text-[#667283] block leading-none mb-0.5">
-                Pelapor
+                {{ t('tickets_th_reporter') }}
               </span>
               <strong
                 class="text-[11.5px] font-[550] text-[#334155] truncate block"
                 :title="ticket.pelapor_nama || ticket.pelapor || 'User'"
               >
-                {{ ticket.pelapor_nama || ticket.pelapor || '—' }}
+                {{ ticket.pelapor_nama || ticket.pelapor || '-' }}
               </strong>
               <span
                 class="text-[10px] text-[#667283] truncate block"
@@ -1897,7 +2034,7 @@ function toast(message, type = 'success') {
             <!-- 3. Penanggung Jawab / PIC -->
             <div class="flex flex-col min-w-0 gap-0.5">
               <span class="text-[10px] font-medium text-[#667283] block leading-none mb-0.5">
-                Penanggung Jawab
+                {{ t('tickets_th_assignee') }}
               </span>
               <div
                 v-if="ticket.assigned_to_nama || ticket.assigned_to"
@@ -1916,14 +2053,14 @@ function toast(message, type = 'success') {
               <div v-else>
                 <span
                   class="inline-flex items-center gap-1 text-[10px] font-semibold px-1.5 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200/80"
-                  title="Belum ada teknisi yang menangani"
+                  :title="t('tickets_no_technician')"
                 >
                   <span
                     aria-hidden="true"
                     class="material-symbols-outlined text-[11px] text-amber-500"
                     >assignment_late</span
                   >
-                  <span>Belum Ditugaskan</span>
+                  <span>{{ t('unassigned') }}</span>
                 </span>
               </div>
             </div>
@@ -1941,7 +2078,7 @@ function toast(message, type = 'success') {
                 <span
                   class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-bold border"
                   :class="getPriorityInfo(ticket.prioritas).class"
-                  title="Prioritas"
+                  :title="t('th_priority')"
                 >
                   <span aria-hidden="true" class="material-symbols-outlined text-[11px]">{{
                     getPriorityInfo(ticket.prioritas).icon
@@ -1952,7 +2089,7 @@ function toast(message, type = 'success') {
 
               <!-- Time, Comments & Attachments -->
               <div class="flex items-center gap-2 text-[10px] text-[#667283] font-normal">
-                <span class="flex items-center gap-1" title="Waktu pembaruan">
+                <span class="flex items-center gap-1" :title="t('tickets_update_time')">
                   <span aria-hidden="true" class="material-symbols-outlined text-[11px]"
                     >schedule</span
                   >
@@ -1963,7 +2100,7 @@ function toast(message, type = 'success') {
                 <span
                   v-if="ticket.total_komentar > 0"
                   class="flex items-center gap-1 text-[#0A5DBD] font-medium"
-                  title="Komentar"
+                  :title="t('tickets_comments_label')"
                 >
                   <span aria-hidden="true" class="material-symbols-outlined text-[11px]"
                     >chat_bubble_outline</span
@@ -1973,7 +2110,7 @@ function toast(message, type = 'success') {
                 <span
                   v-if="ticket.has_attachment"
                   class="flex items-center gap-0.5 text-slate-400"
-                  title="Lampiran"
+                  :title="t('tickets_attachment_label')"
                 >
                   <span aria-hidden="true" class="material-symbols-outlined text-[11px]"
                     >attach_file</span
@@ -1987,7 +2124,7 @@ function toast(message, type = 'success') {
               <AppRowActions
                 menu-class="tickets-action-menu"
                 :actions="getTicketActions(ticket)"
-                :label="`Aksi tiket ${ticket.nomor_tiket || ticket.id || ''}`"
+                :label="`${t('tickets_actions_for')} ${ticket.nomor_tiket || ticket.id || ''}`"
               />
             </div>
           </div>
@@ -2024,7 +2161,7 @@ function toast(message, type = 'success') {
                 <AppRowActions
                   menu-class="tickets-action-menu"
                   :actions="getTicketActions(ticket)"
-                  :label="`Aksi tiket ${ticket.nomor_tiket || ticket.id || ''}`"
+                  :label="`${t('tickets_actions_for')} ${ticket.nomor_tiket || ticket.id || ''}`"
                 />
               </div>
             </div>
@@ -2051,13 +2188,13 @@ function toast(message, type = 'success') {
               <!-- Kolom Kiri: Pelapor -->
               <div class="flex flex-col min-w-0 gap-0.5">
                 <span class="text-[9.5px] font-bold uppercase text-[#667283] tracking-wider"
-                  >Pelapor</span
+                  >{{ t('tickets_th_reporter') }}</span
                 >
                 <strong
                   class="text-[11px] font-semibold text-[#333333] truncate block"
                   :title="ticket.pelapor_nama || ticket.pelapor || 'User'"
                 >
-                  {{ ticket.pelapor_nama || ticket.pelapor || '—' }}
+                  {{ ticket.pelapor_nama || ticket.pelapor || '-' }}
                 </strong>
                 <span class="text-[10px] text-[#667283] truncate block">
                   {{
@@ -2070,14 +2207,14 @@ function toast(message, type = 'success') {
               <!-- Kolom Kanan: Penanggung Jawab -->
               <div class="flex flex-col min-w-0 gap-0.5">
                 <span class="text-[9.5px] font-bold uppercase text-[#667283] tracking-wider"
-                  >Penanggung Jawab</span
+                  >{{ t('tickets_th_assignee') }}</span
                 >
                 <div v-if="ticket.assigned_to_nama || ticket.assigned_to" class="min-w-0">
                   <strong class="text-[11px] font-semibold text-[#334155] truncate block">
                     {{ getAssigneeName(ticket.assigned_to_nama || ticket.assigned_to) }}
                   </strong>
                   <span class="text-[10px] text-[#667283] truncate block">
-                    {{ ticket.queue_kode ? `${ticket.queue_kode} Support` : 'Petugas' }}
+                    {{ ticket.queue_kode ? `${ticket.queue_kode} Support` : t('tickets_agent') }}
                   </span>
                 </div>
                 <div v-else>
@@ -2089,7 +2226,7 @@ function toast(message, type = 'success') {
                       class="material-symbols-outlined text-[11px] text-amber-500"
                       >assignment_late</span
                     >
-                    <span>Belum Ditugaskan</span>
+                    <span>{{ t('unassigned') }}</span>
                   </span>
                 </div>
               </div>
@@ -2157,31 +2294,31 @@ function toast(message, type = 'success') {
             icon="inbox"
             :title="
               searchQuery || filterStatus || filterPrioritas || filterQueue || filterKategori
-                ? 'Tidak ada tiket yang cocok'
+                ? t('tickets_empty_no_match')
                 : !isAdmin && !isSuperAdmin
-                  ? 'Belum ada request tiket'
+                  ? t('tickets_empty_no_request')
                   : activeTab === 'all'
-                    ? 'Inbox tiket kosong'
-                    : 'Tidak ada tiket pada kategori ini'
+                    ? t('tickets_empty_inbox')
+                    : t('tickets_empty_tab')
             "
             :description="
               searchQuery || filterStatus || filterPrioritas || filterQueue || filterKategori
-                ? 'Coba ubah kata kunci pencarian atau sesuaikan filter Anda.'
+                ? t('tickets_empty_no_match_desc')
                 : !isAdmin && !isSuperAdmin
-                  ? 'Pengajuan kendala atau bantuan IT Anda akan muncul di sini.'
+                  ? t('tickets_empty_no_request_desc')
                   : activeTab === 'all'
-                    ? 'Tidak ada tiket yang menunggu penanganan saat ini.'
-                    : 'Belum ada tiket pada tab yang dipilih.'
+                    ? t('tickets_empty_inbox_desc')
+                    : t('tickets_empty_tab_desc')
             "
             :action-label="
               !searchQuery && !filterStatus && !filterPrioritas && !filterQueue && !filterKategori
-                ? (!isAdmin && !isSuperAdmin ? 'Request Tiket Pertama' : 'Buat Tiket Baru')
+                ? (!isAdmin && !isSuperAdmin
+                    ? t('tickets_empty_action_request')
+                    : t('tickets_empty_action_create'))
                 : ''
             "
             :secondary-label="
-              searchQuery || filterStatus || filterPrioritas || filterQueue || filterKategori
-                ? 'Reset Filter'
-                : ''
+              activeFilterCount > 0 || searchQuery ? t('filter_reset') : ''
             "
             @action="openAdd"
             @secondary-action="resetFilters"
@@ -2203,42 +2340,205 @@ function toast(message, type = 'success') {
     <FilterModal
       panel-class="tickets-dialog tickets-filter-dialog"
       :is-open="showFilterModal"
-      title="Filter Tiket"
+      :title="t('tickets_filter_title')"
+      :subtitle="t('tickets_filter_subtitle')"
+      size="md"
       @close="showFilterModal = false"
       @apply="showFilterModal = false"
       @reset="resetFilters"
     >
-      <CustomSelect
-        v-model="filterStatus"
-        :options="[{ value: '', label: 'Semua Status' }, ...TICKET_STATUS_OPTIONS]"
-        aria-label="Filter status"
-        :block="true"
-      />
-      <CustomSelect
-        v-model="filterPrioritas"
-        :options="[{ value: '', label: 'Semua Prioritas' }, ...TICKET_PRIORITY_OPTIONS]"
-        aria-label="Filter prioritas"
-        :block="true"
-      />
-      <CustomSelect
-        v-model="filterQueue"
-        :options="[
-          { value: '', label: 'Semua Unit' },
-          ...queues.map((q) => ({ value: q.id, label: `${q.kode} — ${q.nama}` })),
-        ]"
-        aria-label="Filter unit"
-        :block="true"
-      />
-      <select
-        v-model="filterKategori"
-        aria-label="Filter kategori"
-        class="h-9 w-full rounded-[6px] border border-slate-200 bg-white px-3 text-xs"
-      >
-        <option value="">Semua Kategori</option>
-        <option value="Incident">Incident</option>
-        <option value="Request">Request</option>
-        <option value="QNA">QNA</option>
-      </select>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <!-- Status -->
+        <div class="space-y-1">
+          <label class="text-[11px] font-semibold text-slate-700 dark:text-slate-300">{{
+            t('tickets_status_label')
+          }}</label>
+          <CustomSelect
+            v-model="filterStatus"
+            :options="[{ value: '', label: t('tickets_all_statuses') }, ...TICKET_STATUS_OPTIONS]"
+            :aria-label="t('tickets_aria_filter_status')"
+            :block="true"
+          />
+        </div>
+
+        <!-- Prioritas -->
+        <div class="space-y-1">
+          <label class="text-[11px] font-semibold text-slate-700 dark:text-slate-300">{{
+            t('th_priority')
+          }}</label>
+          <CustomSelect
+            v-model="filterPrioritas"
+            :options="[{ value: '', label: t('tickets_all_priorities') }, ...TICKET_PRIORITY_OPTIONS]"
+            :aria-label="t('tickets_aria_filter_priority')"
+            :block="true"
+          />
+        </div>
+
+        <!-- Unit Support -->
+        <div class="space-y-1">
+          <label class="text-[11px] font-semibold text-slate-700 dark:text-slate-300">{{
+            t('tickets_unit_support')
+          }}</label>
+          <CustomSelect
+            v-model="filterQueue"
+            :options="[
+              { value: '', label: t('tickets_all_units') },
+              ...queues.map((q) => ({ value: q.id, label: `${q.kode} - ${q.nama}` })),
+            ]"
+            :aria-label="t('tickets_aria_filter_unit')"
+            :block="true"
+          />
+        </div>
+
+        <!-- Kategori -->
+        <div class="space-y-1">
+          <label class="text-[11px] font-semibold text-slate-700 dark:text-slate-300">{{
+            t('filter_category')
+          }}</label>
+          <select
+            v-model="filterKategori"
+            :aria-label="t('tickets_aria_filter_category')"
+            class="h-9 w-full rounded-[6px] border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 text-xs text-slate-700 dark:text-slate-200 focus:outline-none focus:border-[#0A51B0]"
+          >
+            <option value="">{{ t('tickets_all_categories') }}</option>
+            <option value="Incident">Incident</option>
+            <option value="Request">Request</option>
+            <option value="QNA">QNA</option>
+            <option value="Support">Support</option>
+          </select>
+        </div>
+
+        <!-- Penugasan / Assignee -->
+        <div class="space-y-1">
+          <label class="text-[11px] font-semibold text-slate-700 dark:text-slate-300">{{
+            t('tickets_assignee_filter')
+          }}</label>
+          <select
+            v-model="filterAssignee"
+            :aria-label="t('tickets_aria_filter_assignee')"
+            class="h-9 w-full rounded-[6px] border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 text-xs text-slate-700 dark:text-slate-200 focus:outline-none focus:border-[#0A51B0]"
+          >
+            <option value="">{{ t('tickets_all_assignments') }}</option>
+            <option value="unassigned">{{ t('tickets_assignment_unassigned') }}</option>
+            <option value="mine">{{ t('tickets_assignment_mine') }}</option>
+            <option value="assigned">{{ t('tickets_assignment_assigned') }}</option>
+          </select>
+        </div>
+
+        <!-- Lampiran -->
+        <div class="space-y-1">
+          <label class="text-[11px] font-semibold text-slate-700 dark:text-slate-300">{{
+            t('tickets_attachment_filter')
+          }}</label>
+          <select
+            v-model="filterAttachment"
+            :aria-label="t('tickets_aria_filter_attachment')"
+            class="h-9 w-full rounded-[6px] border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 text-xs text-slate-700 dark:text-slate-200 focus:outline-none focus:border-[#0A51B0]"
+          >
+            <option value="">{{ t('tickets_all_tickets') }}</option>
+            <option value="with">{{ t('tickets_with_attachment') }}</option>
+            <option value="without">{{ t('tickets_without_attachment') }}</option>
+          </select>
+        </div>
+
+        <!-- Tahun -->
+        <div class="space-y-1 sm:col-span-2">
+          <label class="text-[11px] font-semibold text-slate-700 dark:text-slate-300">{{
+            t('tickets_year_created')
+          }}</label>
+          <select
+            v-model="filterYear"
+            :aria-label="t('tickets_aria_filter_year')"
+            class="h-9 w-full rounded-[6px] border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 text-xs text-slate-700 dark:text-slate-200 focus:outline-none focus:border-[#0A51B0]"
+          >
+            <option value="">{{ t('tickets_all_years') }}</option>
+            <option v-for="yr in availableYears" :key="yr" :value="yr"
+              >{{ t('tickets_year_label') }} {{ yr }}</option
+            >
+          </select>
+        </div>
+
+        <!-- Rentang Tanggal (Date Range) -->
+        <div class="space-y-1 sm:col-span-2 pt-1 border-t border-slate-100 dark:border-slate-800">
+          <div class="flex items-center justify-between">
+            <label class="text-[11px] font-semibold text-slate-700 dark:text-slate-300">{{
+              t('tickets_date_range_specific')
+            }}</label>
+            <span v-if="filterDateFrom || filterDateTo" class="text-[10px] text-slate-500 font-mono">
+              {{ filterDateFrom || '...' }} {{ t('tickets_date_to') }} {{ filterDateTo || '...' }}
+            </span>
+          </div>
+
+          <!-- Quick presets -->
+          <div class="flex flex-wrap items-center gap-1.5 pt-0.5 pb-1.5">
+            <button
+              type="button"
+              @click="setDatePreset('today')"
+              class="px-2 py-0.5 rounded text-[10.5px] font-medium border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 hover:bg-white dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-colors cursor-pointer"
+            >
+              {{ t('tickets_preset_today') }}
+            </button>
+            <button
+              type="button"
+              @click="setDatePreset('7days')"
+              class="px-2 py-0.5 rounded text-[10.5px] font-medium border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 hover:bg-white dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-colors cursor-pointer"
+            >
+              {{ t('tickets_preset_7days') }}
+            </button>
+            <button
+              type="button"
+              @click="setDatePreset('30days')"
+              class="px-2 py-0.5 rounded text-[10.5px] font-medium border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 hover:bg-white dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-colors cursor-pointer"
+            >
+              {{ t('tickets_preset_30days') }}
+            </button>
+            <button
+              type="button"
+              @click="setDatePreset('thisMonth')"
+              class="px-2 py-0.5 rounded text-[10.5px] font-medium border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 hover:bg-white dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-colors cursor-pointer"
+            >
+              {{ t('tickets_preset_this_month') }}
+            </button>
+            <button
+              type="button"
+              @click="setDatePreset('thisYear')"
+              class="px-2 py-0.5 rounded text-[10.5px] font-medium border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 hover:bg-white dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-colors cursor-pointer"
+            >
+              {{ t('tickets_preset_this_year') }}
+            </button>
+            <button
+              v-if="filterDateFrom || filterDateTo"
+              type="button"
+              @click="setDatePreset('clear')"
+              class="px-2 py-0.5 rounded text-[10.5px] font-medium text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors cursor-pointer"
+            >
+              {{ t('tickets_preset_clear') }}
+            </button>
+          </div>
+
+          <!-- Date input fields -->
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block text-[10px] text-slate-500 mb-0.5">{{ t('from_date') }}</label>
+              <input
+                v-model="filterDateFrom"
+                type="date"
+                :aria-label="t('from_date')"
+                class="h-8.5 w-full rounded-[6px] border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-2.5 text-xs text-slate-700 dark:text-slate-200 focus:outline-none focus:border-[#0A51B0]"
+              />
+            </div>
+            <div>
+              <label class="block text-[10px] text-slate-500 mb-0.5">{{ t('to_date') }}</label>
+              <input
+                v-model="filterDateTo"
+                type="date"
+                :aria-label="t('to_date')"
+                class="h-8.5 w-full rounded-[6px] border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-2.5 text-xs text-slate-700 dark:text-slate-200 focus:outline-none focus:border-[#0A51B0]"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
     </FilterModal>
 
     <!-- ── Create / Edit Ticket Modal (Unified Single Page Form) ─────── -->
@@ -2248,16 +2548,16 @@ function toast(message, type = 'success') {
       :title="
         modalMode === 'add'
           ? isAdmin || isSuperAdmin
-            ? 'Buat Tiket Baru'
-            : 'Request Ticket Baru'
-          : 'Edit Tiket Kendala'
+            ? t('tickets_form_title_create')
+            : t('tickets_form_title_request')
+          : t('tickets_form_title_edit')
       "
       :subtitle="
         modalMode === 'add'
           ? isAdmin || isSuperAdmin
-            ? 'Isi rincian kendala, unit support, dan lampiran di bawah ini'
-            : 'Isi pengajuan permintaan bantuan IT kepada tim support'
-          : 'Perbarui rincian kendala atau status tiket'
+            ? t('tickets_form_subtitle_create')
+            : t('tickets_form_subtitle_request')
+          : t('tickets_form_subtitle_edit')
       "
       icon="confirmation_number"
       size="lg"
@@ -2282,63 +2582,67 @@ function toast(message, type = 'success') {
 
         <!-- Ticket field groups -->
         <div class="ticket-entry-fields space-y-4">
-          <h3 class="ticket-entry-heading">Rincian kendala</h3>
+          <h3 class="ticket-entry-heading">{{ t('tickets_form_section_issue') }}</h3>
           <!-- Pelapor (hanya untuk admin/superadmin saat buat tiket baru) -->
           <label
             v-if="modalMode === 'add' && (isAdmin || isSuperAdmin)"
             class="flex flex-col gap-1.5"
           >
-            <span class="text-[12px] font-semibold text-[#2A3547]">Pelapor</span>
+            <span class="text-[12px] font-semibold text-[#2A3547]">{{
+              t('tickets_th_reporter')
+            }}</span>
             <SearchableSelect
               v-model="form.pelapor_user_id"
               :options="reporters"
               value-key="id"
               label-key="nama"
-              placeholder="Diri sendiri (Kosongkan)"
-              search-placeholder="Cari nama user…"
+              :placeholder="t('tickets_reporter_placeholder')"
+              :search-placeholder="t('tickets_search_user')"
               clearable
-              aria-label="Pilih pelapor tiket"
+              :aria-label="t('tickets_select_reporter')"
               class="w-full"
             />
             <span class="text-[11px] text-[#66728d]"
-              >Kosongkan untuk membuat tiket atas nama sendiri ({{ user?.nama || 'Anda' }}), atau
-              pilih user lain.</span
+              >{{ t('tickets_reporter_helper_1') }}{{ user?.nama || t('tickets_you')
+              }}{{ t('tickets_reporter_helper_2') }}</span
             >
           </label>
 
           <!-- Judul Kendala -->
           <label class="flex flex-col gap-1.5">
             <span class="text-[12px] font-semibold text-[#2A3547]"
-              >Judul Kendala <span class="text-[#FA896B]">*</span></span
+              >{{ t('tickets_title_label') }} <span class="text-[#FA896B]">*</span></span
             >
             <input
               v-model="form.judul"
               type="text"
               required
               maxlength="150"
-              aria-label="Judul Tiket"
-              placeholder="Contoh: Laptop tidak dapat terhubung ke Wi-Fi"
+              :aria-label="t('tickets_title_aria')"
+              :placeholder="t('tickets_title_placeholder')"
               class="h-9 w-full rounded-lg border border-[#E5EAEF] bg-white px-3 text-[12px] font-medium text-[#2A3547] placeholder-[#687281] focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
             />
           </label>
 
           <!-- Deskripsi -->
           <label class="flex flex-col gap-1.5">
-            <span class="text-[12px] font-semibold text-[#2A3547]">Deskripsi Kendala</span>
+            <span class="text-[12px] font-semibold text-[#2A3547]">{{
+              t('tickets_desc_label')
+            }}</span>
             <textarea
               v-model="form.deskripsi"
               rows="3"
-              aria-label="Deskripsi Kendala Tiket"
-              placeholder="Jelaskan kendala secara singkat dan detail agar tim dapat membantu…"
+              :aria-label="t('tickets_desc_aria')"
+              :placeholder="t('tickets_desc_placeholder')"
               class="min-h-[80px] max-h-[140px] w-full rounded-lg border border-[#E5EAEF] bg-white p-2.5 text-[12px] font-medium text-[#2A3547] placeholder-[#687281] focus:border-[#0A51B0] focus:outline-none transition-all resize-y shadow-2xs"
             ></textarea>
           </label>
 
-          <h3 class="ticket-entry-heading">Penanganan tiket</h3>
+          <h3 class="ticket-entry-heading">{{ t('tickets_form_section_handling') }}</h3>
           <!-- Unit Support Target -->
           <div class="flex flex-col gap-1.5">
             <span class="text-[12px] font-semibold text-[#2A3547]"
-              >Unit Support Target <span class="text-[#FA896B]">*</span></span
+              >{{ t('tickets_target_unit') }} <span class="text-[#FA896B]">*</span></span
             >
             <div class="grid grid-cols-3 gap-2 sm:gap-3">
               <button
@@ -2371,7 +2675,7 @@ function toast(message, type = 'success') {
                     IT Support
                   </p>
                   <p class="hidden sm:block text-[11px] text-[#66728d] leading-tight mt-0.5">
-                    Perangkat & Network
+                    {{ t('tickets_it_desc') }}
                   </p>
                 </div>
               </button>
@@ -2406,7 +2710,7 @@ function toast(message, type = 'success') {
                     HR Support
                   </p>
                   <p class="hidden sm:block text-[11px] text-[#66728d] leading-tight mt-0.5">
-                    Kepegawaian & Dokumen
+                    {{ t('tickets_hr_desc') }}
                   </p>
                 </div>
               </button>
@@ -2441,7 +2745,7 @@ function toast(message, type = 'success') {
                     GA Support
                   </p>
                   <p class="hidden sm:block text-[11px] text-[#66728d] leading-tight mt-0.5">
-                    Fasilitas & Gedung
+                    {{ t('tickets_ga_desc') }}
                   </p>
                 </div>
               </button>
@@ -2451,7 +2755,8 @@ function toast(message, type = 'success') {
           <!-- Kategori Tiket -->
           <div class="flex flex-col gap-1.5">
             <span class="text-[12px] font-semibold text-[#2A3547]"
-              >Kategori Tiket {{ selectedSupportUnit }} <span class="text-[#FA896B]">*</span></span
+              >{{ t('tickets_category_label') }} {{ selectedSupportUnit }}
+              <span class="text-[#FA896B]">*</span></span
             >
             <div class="grid grid-cols-3 gap-2 sm:gap-2.5">
               <button
@@ -2490,12 +2795,12 @@ function toast(message, type = 'success') {
           >
             <!-- Prioritas -->
             <div class="flex flex-col gap-1.5 w-full">
-              <span class="text-[12px] font-semibold text-[#2A3547]">Prioritas</span>
+              <span class="text-[12px] font-semibold text-[#2A3547]">{{ t('th_priority') }}</span>
               <CustomSelect
                 v-model="form.prioritas"
                 :options="TICKET_PRIORITY_OPTIONS"
-                aria-label="Prioritas"
-                placeholder="Pilih prioritas"
+                :aria-label="t('th_priority')"
+                :placeholder="t('tickets_select_priority')"
                 :block="true"
                 height-class="h-9"
               />
@@ -2503,12 +2808,14 @@ function toast(message, type = 'success') {
 
             <!-- Status Tiket (Edit Mode Only) -->
             <div v-if="modalMode === 'edit'" class="flex flex-col gap-1.5 w-full">
-              <span class="text-[12px] font-semibold text-[#2A3547]">Status Tiket</span>
+              <span class="text-[12px] font-semibold text-[#2A3547]">{{
+                t('tickets_status_label')
+              }}</span>
               <CustomSelect
                 v-model="form.status_tiket"
                 :options="TICKET_STATUS_OPTIONS"
-                aria-label="Status Tiket"
-                placeholder="Pilih status"
+                :aria-label="t('tickets_status_label')"
+                :placeholder="t('tickets_select_status')"
                 :block="true"
                 height-class="h-9"
               />
@@ -2517,7 +2824,9 @@ function toast(message, type = 'success') {
 
           <!-- Lampiran -->
           <div class="flex flex-col gap-1.5">
-            <span class="text-[12px] font-semibold text-[#2A3547]">Lampiran (Opsional)</span>
+            <span class="text-[12px] font-semibold text-[#2A3547]">{{
+              t('tickets_attachments_optional')
+            }}</span>
             <div class="flex items-center gap-3 flex-wrap">
               <label
                 class="inline-flex h-9 items-center gap-2 rounded-lg border border-[#E5EAEF] bg-white px-3.5 text-[12px] font-bold text-[#2A3547] hover:bg-[#F8FAFC] hover:border-[#0A51B0] transition-all cursor-pointer select-none shadow-2xs"
@@ -2527,7 +2836,7 @@ function toast(message, type = 'success') {
                   class="material-symbols-outlined text-[18px] text-[#333333]"
                   >attach_file</span
                 >
-                <span>Pilih File Lampiran</span>
+                <span>{{ t('tickets_choose_file') }}</span>
                 <input
                   type="file"
                   multiple
@@ -2538,14 +2847,14 @@ function toast(message, type = 'success') {
               </label>
               <label
                 class="inline-flex h-9 items-center gap-2 rounded-lg border border-[#E5EAEF] bg-white px-3 text-[12px] font-bold text-[#2A3547] hover:bg-[#F8FAFC] hover:border-[#0A51B0] transition-all cursor-pointer select-none shadow-2xs"
-                title="Ambil foto langsung dari kamera perangkat"
+                :title="t('tickets_camera_title')"
               >
                 <span
                   aria-hidden="true"
                   class="material-symbols-outlined text-[18px] text-[#0A51B0]"
                   >photo_camera</span
                 >
-                <span>Foto Kamera</span>
+                <span>{{ t('tickets_camera_btn') }}</span>
                 <input
                   type="file"
                   accept="image/*"
@@ -2555,7 +2864,7 @@ function toast(message, type = 'success') {
                 />
               </label>
               <span class="text-[11px] font-normal text-[#66728d]"
-                >PNG, JPG, GIF, WEBP, PDF, Word, Excel, PowerPoint hingga 5 MB per file</span
+                >{{ t('tickets_attachment_formats') }}</span
               >
               <span
                 v-if="isTicketAttachmentLoading"
@@ -2564,7 +2873,7 @@ function toast(message, type = 'success') {
                 <span aria-hidden="true" class="material-symbols-outlined text-[14px] animate-spin"
                   >progress_activity</span
                 >
-                Memuat...
+                {{ t('loading') }}
               </span>
             </div>
 
@@ -2589,10 +2898,10 @@ function toast(message, type = 'success') {
                   </div>
                   <div class="min-w-0">
                     <p class="text-[12px] font-bold text-[#2A3547] truncate">
-                      {{ att.name || 'Lampiran' }}
+                      {{ att.name || t('tickets_attachment_label') }}
                     </p>
                     <p class="text-[11px] text-[#66728d] truncate mt-0.5">
-                      Siap diunggah bersama tiket
+                      {{ t('tickets_ready_upload') }}
                     </p>
                   </div>
                 </div>
@@ -2600,7 +2909,7 @@ function toast(message, type = 'success') {
                   type="button"
                   @click="removeAttachment(i)"
                   class="flex h-7 w-7 items-center justify-center rounded-lg text-[#66728d] hover:bg-rose-50 hover:text-rose-600 transition-colors shrink-0 cursor-pointer"
-                  title="Hapus Lampiran"
+                  :title="t('tickets_delete_attachment')"
                 >
                   <span aria-hidden="true" class="material-symbols-outlined text-[18px]"
                     >close</span
@@ -2620,7 +2929,7 @@ function toast(message, type = 'success') {
             @click="closeModal"
             class="h-9 rounded-lg border border-[#E5EAEF] px-3.5 text-[12px] font-bold text-[#66728d] hover:bg-[#F8FAFC] hover:text-[#2A3547] transition-all cursor-pointer"
           >
-            Batal
+            {{ t('btn_cancel') }}
           </button>
 
           <button
@@ -2637,12 +2946,12 @@ function toast(message, type = 'success') {
             >
             <span>{{
               isSubmitting
-                ? 'Menyimpan...'
+                ? t('tickets_saving')
                 : modalMode === 'add'
                   ? isAdmin || isSuperAdmin
-                    ? 'Buat Tiket'
-                    : 'Submit Request'
-                  : 'Simpan Perubahan'
+                    ? t('btn_create_ticket')
+                    : t('tickets_submit_request')
+                  : t('tickets_save_changes')
             }}</span>
           </button>
         </div>
@@ -2653,7 +2962,7 @@ function toast(message, type = 'success') {
     <AppModal
       :is-open="showDetailModal"
       panel-class="tickets-dialog tickets-detail-dialog"
-      :title="selectedTicket?.nomor_tiket || 'Detail Tiket'"
+      :title="selectedTicket?.nomor_tiket || t('tickets_detail_title')"
       :subtitle="
         selectedTicket?.queue_nama ||
         (selectedTicket?.queue_kode ? `${selectedTicket.queue_kode} Support` : 'Support Ticket')
@@ -2718,7 +3027,7 @@ function toast(message, type = 'success') {
               "
               >info</span
             >
-            <span>Ringkasan</span>
+            <span>{{ t('tickets_tab_summary') }}</span>
           </button>
 
           <button
@@ -2741,7 +3050,7 @@ function toast(message, type = 'success') {
               "
               >history</span
             >
-            <span>Aktivitas</span>
+            <span>{{ t('tickets_tab_activity') }}</span>
             <span
               class="ml-0.5 rounded-full px-1.5 py-0.5 text-[10px] font-medium"
               :class="
@@ -2774,7 +3083,7 @@ function toast(message, type = 'success') {
               "
               >forum</span
             >
-            <span>Diskusi</span>
+            <span>{{ t('tickets_tab_discussion') }}</span>
             <span
               class="ml-0.5 rounded-full px-1.5 py-0.5 text-[10px] font-medium"
               :class="
@@ -2795,24 +3104,26 @@ function toast(message, type = 'success') {
             <!-- Deskripsi Kendala -->
             <div class="space-y-2 rounded-[6px] border border-[#E2E8F0] p-3">
               <h3 class="text-[11px] font-semibold uppercase tracking-wider text-[#687281]">
-                Deskripsi
+                {{ t('tickets_desc_heading') }}
               </h3>
               <p class="text-[13px] text-[#334155] leading-6 whitespace-pre-wrap wrap-anywhere">
-                {{ selectedTicket.deskripsi || 'Tidak ada catatan deskripsi rincian.' }}
+                {{ selectedTicket.deskripsi || t('tickets_no_description') }}
               </p>
             </div>
 
             <!-- Detail Tiket Grid (2-Column Desktop, 1-Column Mobile) -->
             <div class="rounded-[6px] border border-[#E2E8F0] bg-[#F8FAFC]/60 p-3 space-y-3">
               <h3 class="text-[11px] font-semibold uppercase tracking-wider text-[#687281]">
-                Detail Tiket
+                {{ t('tickets_detail_title') }}
               </h3>
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4 text-xs">
                 <!-- Pelapor -->
                 <div class="flex min-w-0 flex-col gap-1">
-                  <span class="text-[11px] font-medium text-[#687281]">Pelapor</span>
+                  <span class="text-[11px] font-medium text-[#687281]">{{
+                    t('tickets_th_reporter')
+                  }}</span>
                   <span class="font-semibold text-[#333333]">{{
-                    selectedTicket.pelapor_nama || selectedTicket.pelapor || '—'
+                    selectedTicket.pelapor_nama || selectedTicket.pelapor || '-'
                   }}</span>
                   <span
                     v-if="selectedTicket.pelapor_jabatan || selectedTicket.pelapor_nik"
@@ -2825,7 +3136,9 @@ function toast(message, type = 'success') {
 
                 <!-- Penanggung Jawab -->
                 <div class="flex min-w-0 flex-col gap-1">
-                  <span class="text-[11px] font-medium text-[#687281]">Penanggung Jawab</span>
+                  <span class="text-[11px] font-medium text-[#687281]">{{
+                    t('tickets_th_assignee')
+                  }}</span>
                   <span
                     class="font-semibold"
                     :class="
@@ -2837,7 +3150,7 @@ function toast(message, type = 'success') {
                     {{
                       getAssigneeName(
                         selectedTicket.assigned_to_nama || selectedTicket.assigned_to,
-                        'Belum ditetapkan',
+                        t('tickets_not_set'),
                       )
                     }}
                   </span>
@@ -2845,7 +3158,9 @@ function toast(message, type = 'success') {
 
                 <!-- Kategori -->
                 <div class="flex min-w-0 flex-col gap-1">
-                  <span class="text-[11px] font-medium text-[#687281]">Kategori</span>
+                  <span class="text-[11px] font-medium text-[#687281]">{{
+                    t('filter_category')
+                  }}</span>
                   <span class="font-medium text-[#333333]">{{
                     selectedTicket.kategori || 'Support'
                   }}</span>
@@ -2853,7 +3168,9 @@ function toast(message, type = 'success') {
 
                 <!-- Priority -->
                 <div class="flex min-w-0 flex-col gap-1">
-                  <span class="text-[11px] font-medium text-[#687281]">Prioritas</span>
+                  <span class="text-[11px] font-medium text-[#687281]">{{
+                    t('th_priority')
+                  }}</span>
                   <span class="font-medium text-[#333333]">
                     {{ getPriorityInfo(selectedTicket.prioritas).label }}
                   </span>
@@ -2861,7 +3178,9 @@ function toast(message, type = 'success') {
 
                 <!-- Unit Tujuan -->
                 <div class="flex min-w-0 flex-col gap-1">
-                  <span class="text-[11px] font-medium text-[#687281]">Unit Tujuan</span>
+                  <span class="text-[11px] font-medium text-[#687281]">{{
+                    t('tickets_destination_unit')
+                  }}</span>
                   <span class="font-medium text-[#333333]">{{
                     selectedTicket.queue_nama || selectedTicket.queue_kode || 'IT Support'
                   }}</span>
@@ -2869,7 +3188,9 @@ function toast(message, type = 'success') {
 
                 <!-- Created At -->
                 <div class="flex min-w-0 flex-col gap-1">
-                  <span class="text-[11px] font-medium text-[#687281]">Dibuat Pada</span>
+                  <span class="text-[11px] font-medium text-[#687281]">{{
+                    t('tickets_created_at')
+                  }}</span>
                   <span class="font-medium text-[#334155]">{{
                     formatDateTime(selectedTicket.dibuat_pada)
                   }}</span>
@@ -2879,7 +3200,7 @@ function toast(message, type = 'success') {
 
             <!-- Attachment Display (Download-only List) -->
             <div v-if="isTicketAttachmentLoading" class="text-xs text-[#687281] py-2">
-              Memuat lampiran tiket...
+              {{ t('tickets_loading_attachments') }}
             </div>
             <div
               v-else-if="selectedTicket.attachments && selectedTicket.attachments.length"
@@ -2891,7 +3212,7 @@ function toast(message, type = 'success') {
                 <span aria-hidden="true" class="material-symbols-outlined text-[15px]"
                   >attach_file</span
                 >
-                Lampiran
+                {{ t('tickets_attachment_label') }}
                 <span class="text-[#CBD5E1] font-normal"
                   >({{ selectedTicket.attachments.length }})</span
                 >
@@ -2912,10 +3233,10 @@ function toast(message, type = 'success') {
                     </div>
                     <div class="min-w-0">
                       <p class="text-[12px] font-bold text-[#2A3547] truncate">
-                        {{ att.name || 'Lampiran' }}
+                        {{ att.name || t('tickets_attachment_label') }}
                       </p>
                       <p class="text-[11px] text-[#66728d] truncate mt-0.5">
-                        {{ att.nama_pengguna || 'Pengguna' }}
+                        {{ att.nama_pengguna || t('tickets_user_label') }}
                         <template v-if="att.dibuat_pada">
                           · {{ formatDateTime(att.dibuat_pada) }}</template
                         >
@@ -2927,7 +3248,11 @@ function toast(message, type = 'success') {
                     @click="
                       downloadAttachment(
                         att.attachment,
-                        att.name || 'lampiran-' + selectedTicket.nomor_tiket + '-' + (i + 1),
+                        att.name ||
+                          t('tickets_attachment_prefix') +
+                            selectedTicket.nomor_tiket +
+                            '-' +
+                            (i + 1),
                       )
                     "
                     class="flex h-8 items-center gap-1.5 rounded-lg border border-[#E2E8F0] bg-white px-3 text-[11px] font-bold text-[#333333] hover:bg-[#EFF6FF] hover:border-[#0A51B0] transition-all cursor-pointer shadow-2xs shrink-0"
@@ -2935,7 +3260,7 @@ function toast(message, type = 'success') {
                     <span aria-hidden="true" class="material-symbols-outlined text-[16px]"
                       >download</span
                     >
-                    <span>Unduh</span>
+                    <span>{{ t('btn_download') }}</span>
                   </button>
                 </li>
               </ul>
@@ -2962,7 +3287,7 @@ function toast(message, type = 'success') {
               v-else-if="ticketHistory.length === 0"
               class="py-8 text-center text-xs text-[#687281]"
             >
-              Belum ada riwayat aktivitas pada tiket ini.
+              {{ t('tickets_history_empty') }}
             </div>
 
             <!-- Activity Timeline -->
@@ -2983,7 +3308,8 @@ function toast(message, type = 'success') {
                   <div class="flex flex-wrap items-center gap-1.5">
                     <span class="font-semibold text-[#333333]">{{ log.aksi }}</span>
                     <span class="text-[11px] text-[#5F7089]"
-                      >oleh <strong>{{ log.oleh_pengguna || 'Sistem' }}</strong></span
+                      >{{ t('tickets_by') }}
+                      <strong>{{ log.oleh_pengguna || t('tickets_system') }}</strong></span
                     >
                   </div>
                   <span class="text-[11px] text-[#687281]">{{
@@ -3018,7 +3344,7 @@ function toast(message, type = 'success') {
                   class="material-symbols-outlined text-[24px] animate-spin text-[#333333]"
                   >progress_activity</span
                 >
-                <span class="text-xs font-medium">Memuat percakapan...</span>
+                <span class="text-xs font-medium">{{ t('tickets_loading_conversation') }}</span>
               </div>
 
               <div
@@ -3031,9 +3357,9 @@ function toast(message, type = 'success') {
                   >chat_bubble_outline</span
                 >
                 <p class="text-xs font-semibold text-[#334155]">
-                  Belum ada diskusi pada tiket ini.
+                  {{ t('tickets_no_comments') }}
                 </p>
-                <p class="text-[11px] text-[#5F7089]">Tulis komentar melalui form di bawah.</p>
+                <p class="text-[11px] text-[#5F7089]">{{ t('tickets_write_comment_hint') }}</p>
               </div>
 
               <!-- Conversation Bubbles -->
@@ -3074,7 +3400,7 @@ function toast(message, type = 'success') {
                     <span aria-hidden="true" class="material-symbols-outlined text-[14px]"
                       >attach_file</span
                     >
-                    {{ c.is_attachment_loading ? 'Memuat...' : 'Muat lampiran' }}
+                    {{ c.is_attachment_loading ? t('loading') : t('tickets_load_attachment') }}
                   </button>
 
                   <div
@@ -3090,7 +3416,7 @@ function toast(message, type = 'success') {
                         }}</span>
                       </div>
                       <span class="text-[11px] font-semibold text-[#334155] truncate">{{
-                        c.attachment_name || 'Lampiran diskusi'
+                        c.attachment_name || t('tickets_discussion_attachment')
                       }}</span>
                     </div>
                     <button
@@ -3098,7 +3424,7 @@ function toast(message, type = 'success') {
                       @click="
                         downloadAttachment(
                           c.attachment,
-                          c.attachment_name || 'lampiran-diskusi-' + c.id,
+                          c.attachment_name || t('tickets_discussion_attachment_prefix') + c.id,
                         )
                       "
                       class="flex h-7 items-center gap-1 rounded-md border border-[#E2E8F0] bg-white px-2 text-[10px] font-bold text-[#333333] hover:bg-[#EFF6FF] hover:border-[#0A51B0] transition-all cursor-pointer shrink-0"
@@ -3106,7 +3432,7 @@ function toast(message, type = 'success') {
                       <span aria-hidden="true" class="material-symbols-outlined text-[14px]"
                         >download</span
                       >
-                      <span>Unduh</span>
+                      <span>{{ t('btn_download') }}</span>
                     </button>
                   </div>
                 </div>
@@ -3122,7 +3448,7 @@ function toast(message, type = 'success') {
                 >lock</span
               >
               <span
-                >Diskusi ditutup karena status tiket sudah {{ selectedTicket.status_tiket }}.</span
+                >{{ t('tickets_discussion_locked') }} {{ selectedTicket.status_tiket }}.</span
               >
             </div>
 
@@ -3143,14 +3469,14 @@ function toast(message, type = 'success') {
                     }}</span>
                   </div>
                   <span class="text-xs font-bold text-[#333333] truncate">{{
-                    commentAttachmentName || 'File lampiran siap dikirim'
+                    commentAttachmentName || t('tickets_attachment_ready')
                   }}</span>
                 </div>
                 <button
                   type="button"
                   @click="removeCommentAttachment"
-                  aria-label="Hapus lampiran"
-                  title="Hapus lampiran"
+                  :aria-label="t('tickets_delete_attachment')"
+                  :title="t('tickets_delete_attachment')"
                   class="text-rose-500 hover:text-rose-700 cursor-pointer"
                 >
                   <span aria-hidden="true" class="material-symbols-outlined text-[16px]"
@@ -3161,8 +3487,8 @@ function toast(message, type = 'success') {
 
               <form class="flex items-center gap-2" @submit.prevent="sendComment">
                 <label
-                  title="Lampirkan file (Gambar / Dokumen)"
-                  aria-label="Lampirkan file"
+                  :title="t('tickets_attach_file')"
+                  :aria-label="t('tickets_attach_file_aria')"
                   class="group/btn flex h-9 w-9 shrink-0 items-center justify-center rounded-[6px] bg-slate-100/80 hover:bg-slate-200/80 text-slate-500 hover:text-blue-600 transition-all cursor-pointer select-none"
                 >
                   <svg
@@ -3191,8 +3517,8 @@ function toast(message, type = 'success') {
                 </label>
 
                 <label
-                  title="Ambil foto langsung dari kamera"
-                  aria-label="Ambil foto dari kamera"
+                  :title="t('tickets_camera_comment_title')"
+                  :aria-label="t('tickets_take_photo_aria')"
                   class="group/btn flex h-9 w-9 shrink-0 items-center justify-center rounded-[6px] bg-slate-100/80 hover:bg-slate-200/80 text-slate-500 hover:text-blue-600 transition-all cursor-pointer select-none"
                 >
                   <span aria-hidden="true" class="material-symbols-outlined text-[18px]">photo_camera</span>
@@ -3208,8 +3534,8 @@ function toast(message, type = 'success') {
                 <input
                   v-model="newCommentText"
                   type="text"
-                  aria-label="Tulis komentar tiket"
-                  placeholder="Tulis komentar atau catatan perbaikan…"
+                  :aria-label="t('tickets_comment_aria')"
+                  :placeholder="t('tickets_comment_placeholder')"
                   class="h-9 flex-1 min-w-0 rounded-[6px] border border-slate-200 bg-slate-50/70 px-3.5 text-xs font-medium text-slate-900 placeholder-[#5F7089] outline-none transition-all focus:bg-white focus:border-[#0A51B0] focus:ring-1 focus:ring-[#0A51B0]/20"
                 />
 
@@ -3219,7 +3545,7 @@ function toast(message, type = 'success') {
                   class="flex h-9 px-3.5 sm:px-4 items-center justify-center gap-1.5 rounded-[6px] bg-[#0A51B0] text-xs font-bold text-white shadow-2xs hover:bg-[#0A4391] disabled:opacity-40 transition-all cursor-pointer shrink-0"
                 >
                   <span aria-hidden="true" class="material-symbols-outlined text-[16px]">send</span>
-                  <span class="hidden sm:inline">Kirim</span>
+                  <span class="hidden sm:inline">{{ t('tickets_send') }}</span>
                 </button>
               </form>
             </div>
@@ -3232,7 +3558,7 @@ function toast(message, type = 'success') {
           class="tickets-management flex flex-col gap-3 rounded-[6px] border border-[#E2E8F0] bg-[#F8FAFC] p-3.5 mt-5"
         >
           <p class="text-[11px] font-semibold uppercase tracking-wider text-[#5F7089]">
-            Kelola tiket
+            {{ t('tickets_manage') }}
           </p>
           <div
             class="grid grid-cols-1 xs:grid-cols-2 sm:flex sm:flex-wrap sm:items-center gap-2 w-full sm:w-auto"
@@ -3246,7 +3572,7 @@ function toast(message, type = 'success') {
                 type="button"
                 :disabled="isUpdatingStatus"
                 @click="toggleStatusDropdown"
-                aria-label="Ubah status tiket"
+                :aria-label="t('tickets_change_status')"
                 aria-haspopup="true"
                 :aria-expanded="showStatusDropdown"
                 class="inline-flex h-9 w-full sm:w-auto items-center justify-between sm:justify-center gap-2 rounded-[6px] border bg-white px-3.5 text-xs font-bold text-[#2A3547] shadow-2xs hover:bg-[#F8FAFC] hover:border-[#0A51B0] transition-all cursor-pointer disabled:opacity-50"
@@ -3325,7 +3651,7 @@ function toast(message, type = 'success') {
                 >person_add</span
               >
               <span>{{
-                isClaiming === selectedTicket.id ? 'Mengambil...' : 'Ambil Tiket Ini'
+                isClaiming === selectedTicket.id ? t('tickets_claiming') : t('tickets_action_claim')
               }}</span>
             </button>
 
@@ -3338,7 +3664,7 @@ function toast(message, type = 'success') {
                   ['Closed', 'Resolved', 'Cancelled'].includes(selectedTicket.status_tiket)
                 "
                 @click="toggleReassignDropdown"
-                aria-label="Assign tiket ke admin unit"
+                :aria-label="t('tickets_assign_admin')"
                 aria-haspopup="true"
                 :aria-expanded="showReassignDropdown"
                 class="inline-flex h-9 w-full sm:w-auto items-center justify-between sm:justify-center gap-1.5 rounded-[6px] border border-[#E5EAEF] bg-white px-3.5 text-xs font-bold text-[#2A3547] shadow-2xs hover:bg-[#F8FAFC] hover:border-[#0A51B0] transition-all cursor-pointer disabled:opacity-50 whitespace-nowrap"
@@ -3349,7 +3675,7 @@ function toast(message, type = 'success') {
                     class="material-symbols-outlined text-[16px] text-[#333333]"
                     >assignment_ind</span
                   >
-                  <span>Assign ke Admin</span>
+                  <span>{{ t('tickets_assign_to_admin') }}</span>
                 </div>
                 <span
                   aria-hidden="true"
@@ -3366,7 +3692,8 @@ function toast(message, type = 'success') {
                   <p
                     class="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-[#687281]"
                   >
-                    Admin unit {{ selectedTicket.queue_nama || selectedTicket.queue_kode || '—' }}
+                    {{ t('tickets_admin_unit') }}
+                    {{ selectedTicket.queue_nama || selectedTicket.queue_kode || '-' }}
                   </p>
                   <button
                     v-for="admin in getAdminsForQueue(selectedTicket.queue_id)"
@@ -3393,7 +3720,7 @@ function toast(message, type = 'success') {
                     v-if="getAdminsForQueue(selectedTicket.queue_id).length === 0"
                     class="px-2 py-3 text-center text-[11px] text-[#687281]"
                   >
-                    Tidak ada admin terdaftar di unit ini.
+                    {{ t('tickets_no_admins') }}
                   </p>
                 </div>
               </Transition>
@@ -3408,7 +3735,7 @@ function toast(message, type = 'success') {
             @click="closeModal"
             class="h-9 w-full sm:w-auto rounded-[6px] bg-[#0A51B0] px-5 text-xs font-semibold text-white hover:bg-[#0A4391] transition-colors cursor-pointer"
           >
-            Tutup
+            {{ t('btn_close') }}
           </button>
         </div>
       </template>
@@ -3418,7 +3745,7 @@ function toast(message, type = 'success') {
     <AppModal
       :is-open="showDeleteModal"
       panel-class="tickets-dialog tickets-delete-dialog"
-      title="Hapus Tiket"
+      :title="t('tickets_delete_title')"
       size="sm"
       @close="closeModal"
     >
@@ -3436,10 +3763,10 @@ function toast(message, type = 'success') {
         </div>
         <div>
           <h4 class="text-[16px] font-extrabold text-[#2A3547]">
-            Hapus Tiket {{ selectedTicket?.nomor_tiket }}?
+            {{ t('tickets_delete_title') }} {{ selectedTicket?.nomor_tiket }}?
           </h4>
           <p class="mt-1 text-[12px] text-[#66728d]">
-            Data tiket akan dihapus permanen dari sistem.
+            {{ t('tickets_delete_warning') }}
           </p>
         </div>
         <div class="flex w-full gap-3 mt-2">
@@ -3449,7 +3776,7 @@ function toast(message, type = 'success') {
             @click="closeModal"
             class="h-9 flex-1 rounded-[6px] border border-[#DFE5EF] text-[12px] font-semibold text-[#2A3547]"
           >
-            Batal
+            {{ t('btn_cancel') }}
           </button>
           <button
             type="button"
@@ -3457,7 +3784,7 @@ function toast(message, type = 'success') {
             @click="confirmDeleteTicket"
             class="h-9 flex-1 rounded-[6px] bg-[#FA896B] text-[12px] font-bold text-white hover:bg-[#E06748]"
           >
-            {{ isSubmitting ? 'Menghapus...' : 'Ya, Hapus' }}
+            {{ isSubmitting ? t('tickets_deleting') : t('btn_yes_delete') }}
           </button>
         </div>
       </div>

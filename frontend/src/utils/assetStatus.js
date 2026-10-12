@@ -59,7 +59,7 @@ export const ASSET_STATUS_MAP = {
  * @returns {string} Indonesian display label ('Digunakan', 'Stok', 'Dalam Perawatan', etc.)
  */
 export function getAssetStatusLabel(status) {
-  if (!status) return '—'
+  if (!status) return '-'
   const s = String(status).trim().toLowerCase()
   const foundKey = Object.keys(ASSET_STATUS_MAP).find(
     (k) =>
@@ -79,7 +79,7 @@ export function getAssetStatusLabel(status) {
 export function formatStatusPill(status) {
   if (!status) {
     return {
-      label: '—',
+      label: '-',
       bg: 'bg-[#F1F5F9]',
       text: 'text-[#475569]',
       dot: 'bg-[#64748B]',

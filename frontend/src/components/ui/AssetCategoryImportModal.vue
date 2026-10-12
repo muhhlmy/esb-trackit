@@ -340,7 +340,7 @@ const validNikSet = computed(() => {
   return set
 })
 
-// Cell NIK & Nama Pemegang yang tidak terdaftar ditampilkan kosong (bukan '—')
+// Cell NIK & Nama Pemegang yang tidak terdaftar ditampilkan kosong (bukan '-')
 // sebagai penanda baris yang harus diperbaiki sebelum import.
 const PEMEGANG_HEADERS = [
   'nik pemegang',
@@ -781,7 +781,7 @@ watch(
                   <template
                     v-if="!item.matched && PEMEGANG_HEADERS.includes(column.trim().toLowerCase())"
                   ></template>
-                  <template v-else>{{ item.row[column] || '—' }}</template>
+                  <template v-else>{{ item.row[column] || '-' }}</template>
                 </td>
               </tr>
             </tbody>

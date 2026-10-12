@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { watch } from 'vue'
 
 import {
   TICKET_ROLES,
@@ -7,6 +8,7 @@ import {
   getTicketEligibility,
 } from '../utils/permissionAccess.js'
 import { getAuthSnapshot, restoreSession } from '../utils/authStorage.js'
+import { useLanguage } from '../composables/useLanguage.js'
 
 export const allowedRouteMap = [
   { key: 'dashboard', name: 'dashboard' },
@@ -23,6 +25,7 @@ export const allowedRouteMap = [
   { key: 'knowledge_base', name: 'admin-cases' },
   { key: 'export', name: 'export' },
   { key: 'database', name: 'database' },
+  { key: 'database', name: 'settings' },
 ]
 
 // Lista semua route aplikasi (Help Center + TrackIT Monitoring)
@@ -35,24 +38,24 @@ const page = (path, name, loader, meta, alias) => {
 const routes = [
   // Public Help Center Routes (Ditampilkan pertama kali saat aplikasi dibuka)
   page('/', 'home', () => import('../views/HomeView.vue'), {
-    title: 'Help Center',
-    subtitle: 'Pusat Bantuan & Artikel Insiden',
+    titleKey: 'route_home_title',
+    subtitleKey: 'route_home_subtitle',
     public: true,
   }),
   page('/cases', 'cases', () => import('../views/CasesView.vue'), {
-    title: 'Cases & Artikel',
-    subtitle: 'Kumpulan Artikel & Playbook Insiden',
+    titleKey: 'route_cases_title',
+    subtitleKey: 'route_cases_subtitle',
     public: true,
   }),
   page('/cases/:id', 'case-detail', () => import('../views/CasesView.vue'), {
-    title: 'Detail Artikel',
-    subtitle: 'Detail Artikel Panduan Insiden',
+    titleKey: 'route_case_detail_title',
+    subtitleKey: 'route_case_detail_subtitle',
     public: true,
   }),
   // Auth Route
   page('/login', 'login', () => import('../views/LoginView.vue'), {
-    title: 'Masuk',
-    subtitle: 'Masuk ke akun Anda',
+    titleKey: 'route_login_title',
+    subtitleKey: 'route_login_subtitle',
     public: true,
   }),
 
@@ -60,94 +63,134 @@ const routes = [
   page('/dashboard', 'dashboard', () => import('../views/DashboardView.vue'), {
     title: 'Dashboard',
     subtitle: 'Overview & analytics',
+    titleKey: 'route_dashboard_title',
+    subtitleKey: 'route_dashboard_subtitle',
     permission: 'dashboard',
   }),
   page('/assets', 'assets', () => import('../views/AssetsView.vue'), {
     title: 'Aset IT',
     subtitle: 'Inventaris & status perangkat',
+    titleKey: 'route_assets_title',
+    subtitleKey: 'route_assets_subtitle',
     permission: 'assets',
   }),
   page('/assets-ga', 'assets-ga', () => import('../views/AssetsGaView.vue'), {
     title: 'Aset GA',
     subtitle: 'Kelola aset GA',
+    titleKey: 'route_assets_ga_title',
+    subtitleKey: 'route_assets_ga_subtitle',
     permission: 'assets_ga',
     alias: '/assets/ga',
   }),
   page('/assets-ops', 'assets-ops', () => import('../views/AssetsOpsView.vue'), {
     title: 'Aset Ops',
     subtitle: 'Kelola aset operasional',
+    titleKey: 'route_assets_ops_title',
+    subtitleKey: 'route_assets_ops_subtitle',
     permission: 'assets_ops',
     alias: '/assets/ops',
   }),
   page('/my-assets', 'my-assets', () => import('../views/MyAssetsView.vue'), {
     title: 'Profil',
     subtitle: 'Detail aset, tiket, riwayat aktivitas, dan profil akun',
+    titleKey: 'route_my_assets_title',
+    subtitleKey: 'route_my_assets_subtitle',
     permission: 'my_assets',
     alias: '/assets/karyawan',
   }),
   page('/karyawan', 'karyawan', () => import('../views/EmployeesView.vue'), {
     title: 'Karyawan',
     subtitle: 'Kelola data karyawan',
+    titleKey: 'route_karyawan_title',
+    subtitleKey: 'route_karyawan_subtitle',
     permission: 'karyawan',
   }),
   page('/tickets', 'tickets', () => import('../views/TicketsView.vue'), {
     title: 'Tiket',
     subtitle: 'Kelola tiket helpdesk',
+    titleKey: 'route_tickets_title',
+    subtitleKey: 'route_tickets_subtitle',
     permission: 'tickets',
   }),
   page('/users', 'users', () => import('../views/UsersView.vue'), {
     title: 'Pengguna',
     subtitle: 'Kelola data pengguna',
+    titleKey: 'route_users_title',
+    subtitleKey: 'route_users_subtitle',
     permission: 'users',
   }),
   page('/faqs', 'faqs', () => import('../views/FaqAdminView.vue'), {
     title: 'FAQ',
     subtitle: 'Pertanyaan umum dan solusi cepat pengguna',
+    titleKey: 'route_faqs_title',
+    subtitleKey: 'route_faqs_subtitle',
     permission: 'knowledge_base',
   }),
   page('/submissions/new', 'submission-new', () => import('../views/SubmissionsView.vue'), {
     title: 'Tambah BAST',
     subtitle: 'Buat berita acara serah terima aset',
+    titleKey: 'route_submission_new_title',
+    subtitleKey: 'route_submission_new_subtitle',
     permission: 'submissions',
   }),
   page('/submissions/:id', 'submission-detail', () => import('../views/SubmissionsView.vue'), {
     title: 'Detail BAST',
     subtitle: 'Detail dokumen serah terima aset',
+    titleKey: 'route_submission_detail_title',
+    subtitleKey: 'route_submission_detail_subtitle',
     permission: 'submissions',
   }),
   page('/submissions', 'submissions', () => import('../views/SubmissionsView.vue'), {
     title: 'Pengajuan',
     subtitle: 'Kelola pengajuan',
+    titleKey: 'route_submissions_title',
+    subtitleKey: 'route_submissions_subtitle',
     permission: 'submissions',
     alias: '/pengajuan',
   }),
   page('/shipments', 'shipments', () => import('../views/ShipmentsView.vue'), {
     title: 'Pengiriman',
     subtitle: 'Tracker pengiriman barang & aset',
+    titleKey: 'route_shipments_title',
+    subtitleKey: 'route_shipments_subtitle',
     permission: 'shipments',
     alias: '/pengiriman',
   }),
   page('/logs', 'logs', () => import('../views/LogsView.vue'), {
     title: 'Log Aktivitas',
     subtitle: 'Riwayat aktivitas sistem',
+    titleKey: 'route_logs_title',
+    subtitleKey: 'route_logs_subtitle',
     permission: 'logs',
   }),
   page('/export', 'export', () => import('../views/ExportView.vue'), {
     title: 'Ekspor Data',
     subtitle: 'Ekspor dan kelola data',
+    titleKey: 'route_export_title',
+    subtitleKey: 'route_export_subtitle',
     permission: 'export',
     superadminOnly: true,
   }),
   page('/database', 'database', () => import('../views/DatabaseView.vue'), {
-    title: 'Database',
-    subtitle: 'Backup & restore database',
+    titleKey: 'route_database_title',
+    subtitleKey: 'route_database_subtitle',
+    superadminOnly: true,
+  }),
+  page('/settings', 'settings', () => import('../views/SettingsView.vue'), {
+    titleKey: 'route_settings_title',
+    subtitleKey: 'route_settings_subtitle',
+    superadminOnly: true,
+  }),
+  page('/api-portal', 'api-portal', () => import('../views/ApiManagementView.vue'), {
+    titleKey: 'route_api_portal_title',
+    subtitleKey: 'route_api_portal_subtitle',
     superadminOnly: true,
   }),
 
   // Help Center Admin CMS Routes
   page('/admin/cases', 'admin-cases', () => import('../views/admin/AdminDashboardView.vue'), {
-    title: 'Admin CMS',
-    subtitle: 'Pusat panduan teknis dan standard operating procedure',
+    titleKey: 'route_admin_cases_title',
+    subtitleKey: 'route_admin_cases_subtitle',
     adminOnly: true,
     permission: 'knowledge_base',
   }),
@@ -156,28 +199,28 @@ const routes = [
     'admin-kb-categories',
     () => import('../views/admin/KbCategoriesView.vue'),
     {
-      title: 'Kategori KB',
-      subtitle: 'Kategori topik dan navigasi pusat bantuan',
+      titleKey: 'route_admin_kb_categories_title',
+      subtitleKey: 'route_admin_kb_categories_subtitle',
       adminOnly: true,
       permission: 'knowledge_base',
     },
   ),
   page('/admin/editor/:id?', 'article-editor', () => import('../views/admin/DocEditorView.vue'), {
-    title: 'Article Editor',
-    subtitle: 'Penyusunan panduan teknis dan dokumentasi sistem',
+    titleKey: 'route_article_editor_title',
+    subtitleKey: 'route_article_editor_subtitle',
     adminOnly: true,
     permission: 'knowledge_base',
     alias: '/admin/article-editor/:id?',
   }),
 
   page('/forbidden', 'forbidden', () => import('../views/AccessDeniedView.vue'), {
-    title: 'Akses Ditolak',
-    subtitle: 'Anda tidak memiliki izin untuk halaman ini',
+    titleKey: 'route_forbidden_title',
+    subtitleKey: 'route_forbidden_subtitle',
     public: true,
   }),
   page('/:pathMatch(.*)*', 'NotFound', () => import('../views/NotFoundView.vue'), {
-    title: 'Halaman Tidak Ditemukan',
-    subtitle: '404',
+    titleKey: 'route_not_found_title',
+    subtitleKey: 'route_not_found_subtitle',
     public: true,
   }),
 ]
@@ -252,11 +295,22 @@ router.beforeEach(async (to) => {
   }
 })
 
-router.afterEach((to) => {
-  document.title = to.meta.title
-    ? `${to.meta.title} | TrackIT & Help Center`
+const { currentLang, t } = useLanguage()
+
+export function syncDocumentTitle(route) {
+  const active = route || router.currentRoute.value
+  const titleKey = active?.meta?.titleKey
+  document.title = titleKey
+    ? `${t(titleKey)} | TrackIT & Help Center`
     : 'TrackIT & Help Center'
+}
+
+router.afterEach((to) => {
+  syncDocumentTitle(to)
 })
+
+// Re-render document title when the language toggle changes
+watch(currentLang, () => syncDocumentTitle())
 
 router.onError((error, to) => {
   console.error('[Vue Router] Navigation error handled gracefully:', error)
@@ -285,3 +339,4 @@ router.onError((error, to) => {
 })
 
 export default router
+

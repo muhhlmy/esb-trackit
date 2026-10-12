@@ -7,6 +7,7 @@ import { ref, computed, onMounted, nextTick } from 'vue'
 import { useRouter, RouterLink } from 'vue-router'
 import { useCases } from '@/composables/useCases'
 import { useAuth } from '@/composables/useAuth'
+import { useLanguage } from '@/composables/useLanguage'
 import { animateIn, isReducedMotion } from '@/composables/useGsap'
 import { useViewMode } from '@/composables/useViewMode.js'
 import CustomSelect from '@/components/ui/CustomSelect.vue'
@@ -26,6 +27,7 @@ import {
 const router = useRouter()
 const { cases, deleteCase, fetchAllCases } = useCases()
 const { hasWritePermission } = useAuth()
+const { t } = useLanguage()
 const canWrite = computed(() => hasWritePermission('knowledge_base'))
 
 const searchQuery = ref('')
@@ -35,15 +37,15 @@ const selectedSeverity = ref('all') // 'all', 'low', 'medium', 'high'
 const showFilterModal = ref(false)
 const { viewMode } = useViewMode('admin-cms', 'table')
 
-const CATEGORY_OPTIONS = [
-  { value: 'all', label: 'Semua Kategori' },
+const CATEGORY_OPTIONS = computed(() => [
+  { value: 'all', label: t('cms_all_categories') },
   { value: 'hardware', label: 'Hardware' },
   { value: 'software', label: 'Software' },
   { value: 'git', label: 'Git' },
   { value: 'workplace', label: 'Workplace' },
   { value: 'environment', label: 'Environment' },
   { value: 'backend', label: 'Backend' },
-]
+])
 
 const deleteConfirmId = ref(null)
 const actionMenu = ref(null) // { id, top, left }
@@ -182,8 +184,8 @@ function getCategoryBadgeClass(category) {
     <!-- ── Page Header (komponen bersama; sama dengan halaman lain) ── -->
     <PageHeader
       class="gsap-admin-el"
-      title="Knowledge Base"
-      subtitle="Kelola panduan teknis dan artikel bantuan pengguna."
+      :title="t('kb_admin_title')"
+      :subtitle="t('kb_admin_subtitle')"
       icon="auto_stories"
     >
       <template #eyebrow>
@@ -209,7 +211,7 @@ function getCategoryBadgeClass(category) {
         class="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 h-8 px-3 rounded-[6px] text-[11px] sm:text-[12px] font-semibold bg-[#0A51B0] hover:bg-[#0A4391] text-white shadow-2xs transition-all cursor-pointer shrink-0"
       >
         <Plus class="w-3.5 h-3.5" />
-        <span>Dokumen Baru</span>
+        <span>{{ t('btn_new_doc') }}</span>
       </button>
     </PageHeader>
 
@@ -227,12 +229,12 @@ function getCategoryBadgeClass(category) {
           </div>
           <div class="min-w-0">
             <div class="text-xs sm:text-[13px] font-semibold text-[#333333] dark:text-white truncate">
-              Kategori Knowledge Base
+              {{ t('kb_categories_quick_title') }}
             </div>
             <div
               class="text-[10.5px] sm:text-[11px] text-[#5F7089] dark:text-slate-400 font-normal truncate"
             >
-              Kelola kategori topik pada pusat bantuan pengguna.
+              {{ t('kb_categories_quick_desc') }}
             </div>
           </div>
         </div>
@@ -245,25 +247,25 @@ function getCategoryBadgeClass(category) {
     <!-- Stats Row (Balanced 3 columns on mobile and desktop) -->
     <div class="grid grid-cols-3 gap-2 sm:gap-2.5 lg:gap-3 gsap-admin-el">
       <StatCard
-        title="Total artikel"
+        :title="t('stat_total_articles')"
         :value="stats.total"
         icon="article"
         color="primary"
-        subtitle="Seluruh data artikel"
+        :subtitle="t('stat_total_articles_sub')"
       />
       <StatCard
-        title="Terbit"
+        :title="t('stat_articles_published')"
         :value="stats.published"
         icon="task_alt"
         color="success"
-        subtitle="Telah dipublikasi"
+        :subtitle="t('stat_articles_published_sub')"
       />
       <StatCard
-        title="Khusus"
+        :title="t('stat_articles_custom')"
         :value="stats.custom"
         icon="edit_note"
         color="primary"
-        subtitle="Artikel kustom"
+        :subtitle="t('stat_articles_custom_sub')"
       />
     </div>
 
@@ -279,15 +281,15 @@ function getCategoryBadgeClass(category) {
         <input
           v-model="searchQuery"
           type="text"
-          aria-label="Cari kasus"
-          placeholder="Cari judul, deskripsi, atau tag…"
+          :aria-label="t('cms_search_cases')"
+          :placeholder="t('cms_search_placeholder')"
           class="w-full bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-700 rounded-[6px] pl-9 pr-9 py-1.5 text-xs font-normal text-[#333333] dark:text-white placeholder-[#687281] dark:placeholder-slate-500 focus:outline-none focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 transition-all shadow-2xs"
         />
         <button
           v-if="searchQuery"
           @click="searchQuery = ''"
           class="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 rounded-md text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors cursor-pointer touch-manipulation"
-          title="Hapus pencarian"
+          :title="t('clear_search')"
         >
           <X class="w-3.5 h-3.5" />
         </button>
@@ -301,9 +303,9 @@ function getCategoryBadgeClass(category) {
         >
           <button
             v-for="st in [
-              { key: 'all', label: 'Semua' },
-              { key: 'PUBLISHED', label: 'Published' },
-              { key: 'DRAFT', label: 'Draft' },
+              { key: 'all', label: t('all') },
+              { key: 'PUBLISHED', label: t('stat_published') },
+              { key: 'DRAFT', label: t('stat_draft') },
             ]"
             :key="st.key"
             @click="selectedStatus = st.key"
@@ -323,8 +325,8 @@ function getCategoryBadgeClass(category) {
           <CustomSelect
             v-model="selectedCategory"
             :options="CATEGORY_OPTIONS"
-            aria-label="Kategori"
-            placeholder="Semua kategori"
+            :aria-label="t('th_category')"
+            :placeholder="t('cms_all_categories')"
             :block="true"
             height-class="h-8"
           />
@@ -335,10 +337,10 @@ function getCategoryBadgeClass(category) {
           type="button"
           @click="showFilterModal = true"
           class="relative inline-flex items-center gap-1.5 h-8 px-3 rounded-[6px] border border-[#E2E8F0] dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-semibold text-[#333333] dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer shadow-2xs"
-          title="Filter lanjutan"
+          :title="t('cms_filter_advanced')"
         >
           <span class="material-symbols-outlined text-[16px] text-[#5F7089]">tune</span>
-          <span>Filter</span>
+          <span>{{ t('filter') }}</span>
           <span
             v-if="activeFilterCount > 0"
             class="ml-0.5 inline-flex items-center justify-center min-w-[16px] h-4 px-1 rounded-full text-[10px] font-bold bg-[#0A51B0] text-white"
@@ -353,7 +355,7 @@ function getCategoryBadgeClass(category) {
           @click="clearFilters"
           class="px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-semibold text-[#5F7089] dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors cursor-pointer shrink-0 touch-manipulation"
         >
-          Reset
+          {{ t('reset') }}
         </button>
 
         <AppViewToggle v-model="viewMode" class="shrink-0" />
@@ -376,15 +378,15 @@ function getCategoryBadgeClass(category) {
           >
             <FolderOpen class="w-5 h-5" />
           </div>
-          <p class="text-sm font-semibold text-[#333333] dark:text-slate-200">Tidak ada dokumen</p>
+          <p class="text-sm font-semibold text-[#333333] dark:text-slate-200">{{ t('cms_no_documents') }}</p>
           <p class="text-xs text-[#5F7089] dark:text-slate-400 font-normal mt-0.5">
-            Tidak ada dokumen yang cocok dengan filter atau pencarian.
+            {{ t('cms_no_documents_sub') }}
           </p>
           <button
             @click="clearFilters"
             class="mt-3 px-4 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-[#333333] dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors cursor-pointer"
           >
-            Reset Filter
+            {{ t('filter_reset') }}
           </button>
         </div>
 
@@ -418,7 +420,7 @@ function getCategoryBadgeClass(category) {
                   class="w-1.5 h-1.5 rounded-full"
                   :class="c.status === 'DRAFT' ? 'bg-amber-500' : 'bg-emerald-500'"
                 ></span>
-                <span>{{ c.status === 'DRAFT' ? 'Draft' : 'Published' }}</span>
+                <span>{{ c.status === 'DRAFT' ? t('stat_draft') : t('stat_published') }}</span>
               </span>
             </div>
 
@@ -427,15 +429,15 @@ function getCategoryBadgeClass(category) {
               <button
                 @click="editDoc(c.id)"
                 class="flex items-center justify-center h-7 px-2.5 gap-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-[#0A51B0] hover:text-white text-[11px] font-semibold transition-all touch-manipulation cursor-pointer"
-                title="Edit Dokumen"
+                :title="t('kb_edit_doc')"
               >
                 <Edit3 class="w-3 h-3" />
-                <span>Edit</span>
+                <span>{{ t('edit') }}</span>
               </button>
               <button
                 @click="confirmDelete(c.id)"
                 class="flex items-center justify-center h-7 w-7 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors touch-manipulation cursor-pointer"
-                title="Hapus Dokumen"
+                :title="t('cms_delete_doc')"
               >
                 <Trash2 class="w-3.5 h-3.5" />
               </button>
@@ -462,7 +464,7 @@ function getCategoryBadgeClass(category) {
           >
             <!-- Severity -->
             <div class="flex items-center gap-1 text-[#5F7089] dark:text-slate-400">
-              <span class="text-[10px] uppercase font-bold text-[#687281]">Severity:</span>
+              <span class="text-[10px] uppercase font-bold text-[#687281]">{{ t('th_severity') }}:</span>
               <span
                 class="inline-flex items-center gap-1 font-medium capitalize"
                 :class="{
@@ -504,12 +506,12 @@ function getCategoryBadgeClass(category) {
             class="border-b border-[#E2E8F0] dark:border-slate-800 text-[#5F7089] dark:text-slate-400 font-medium text-xs"
           >
             <tr>
-              <th class="py-3 px-5 font-medium">Dokumen</th>
-              <th class="py-3 px-4 font-medium">Kategori</th>
-              <th class="py-3 px-4 font-medium">Severity</th>
+              <th class="py-3 px-5 font-medium">{{ t('cms_th_document') }}</th>
+              <th class="py-3 px-4 font-medium">{{ t('th_category') }}</th>
+              <th class="py-3 px-4 font-medium">{{ t('th_severity') }}</th>
               <th class="py-3 px-4 font-medium">Tag</th>
-              <th class="py-3 px-4 font-medium">Status</th>
-              <th v-if="canWrite" class="py-3 px-5 text-right font-medium">Aksi</th>
+              <th class="py-3 px-4 font-medium">{{ t('status') }}</th>
+              <th v-if="canWrite" class="py-3 px-5 text-right font-medium">{{ t('actions') }}</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-[#F1F5F9] dark:divide-slate-800/60">
@@ -523,16 +525,16 @@ function getCategoryBadgeClass(category) {
                     <FolderOpen class="w-5 h-5" />
                   </div>
                   <p class="text-sm font-semibold text-[#333333] dark:text-slate-200">
-                    Tidak ada dokumen
+                    {{ t('cms_no_documents') }}
                   </p>
                   <p class="text-xs text-[#5F7089] dark:text-slate-400 font-normal">
-                    Tidak ada dokumen yang cocok dengan filter atau pencarian.
+                    {{ t('cms_no_documents_sub') }}
                   </p>
                   <button
                     @click="clearFilters"
                     class="mt-3 px-4 py-2 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-[#333333] dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors cursor-pointer"
                   >
-                    Reset Filter
+                    {{ t('filter_reset') }}
                   </button>
                 </div>
               </td>
@@ -612,7 +614,7 @@ function getCategoryBadgeClass(category) {
                     class="w-1.5 h-1.5 rounded-full"
                     :class="c.status === 'DRAFT' ? 'bg-amber-500' : 'bg-emerald-500'"
                   ></span>
-                  <span>{{ c.status === 'DRAFT' ? 'Draft' : 'Published' }}</span>
+                  <span>{{ c.status === 'DRAFT' ? t('stat_draft') : t('stat_published') }}</span>
                 </span>
               </td>
 
@@ -621,8 +623,8 @@ function getCategoryBadgeClass(category) {
                 <button
                   @click="toggleActionMenu(c.id, $event)"
                   class="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0A51B0]"
-                  title="Aksi"
-                  aria-label="Aksi dokumen"
+                  :title="t('actions')"
+                  :aria-label="t('cms_doc_actions')"
                 >
                   <MoreVertical class="w-4 h-4" />
                 </button>
@@ -650,7 +652,7 @@ function getCategoryBadgeClass(category) {
           class="w-full flex items-center gap-2 px-3 py-2 text-xs font-medium text-[#333333] dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-md transition-colors cursor-pointer"
         >
           <Edit3 class="w-3.5 h-3.5 text-[#5F7089] dark:text-slate-400" />
-          <span>Edit</span>
+          <span>{{ t('edit') }}</span>
         </button>
 
         <button
@@ -663,7 +665,7 @@ function getCategoryBadgeClass(category) {
           class="w-full flex items-center gap-2 px-3 py-2 text-xs font-medium text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-md transition-colors cursor-pointer"
         >
           <Trash2 class="w-3.5 h-3.5" />
-          <span>Hapus</span>
+          <span>{{ t('delete') }}</span>
         </button>
       </div>
     </Teleport>
@@ -673,17 +675,19 @@ function getCategoryBadgeClass(category) {
 
     <AppModal
       :is-open="Boolean(deleteConfirmId)"
-      title="Hapus dokumen?"
+      :title="t('cms_delete_doc_title')"
       icon="delete"
       @close="deleteConfirmId = null"
     >
       <p class="text-xs text-slate-500 leading-relaxed">
-        Dokumen ini akan dihapus permanen. Tindakan ini tidak dapat dibatalkan.
+        {{ t('cms_delete_doc_msg') }}
       </p>
       <template #footer
         ><div class="cms-dialog-actions">
-          <button type="button" @click="deleteConfirmId = null">Batal</button
-          ><button type="button" class="cms-danger" @click="executeDelete">Hapus dokumen</button>
+          <button type="button" @click="deleteConfirmId = null">{{ t('cancel') }}</button
+          ><button type="button" class="cms-danger" @click="executeDelete">{{
+            t('cms_delete_doc')
+          }}</button>
         </div></template
       >
     </AppModal>
@@ -691,7 +695,7 @@ function getCategoryBadgeClass(category) {
     <!-- Advance Filter Modal -->
     <FilterModal
       :is-open="showFilterModal"
-      title="Filter Dokumen Knowledge Base"
+      :title="t('cms_filter_docs_title')"
       @close="showFilterModal = false"
       @apply="showFilterModal = false"
       @reset="clearFilters"
@@ -699,43 +703,43 @@ function getCategoryBadgeClass(category) {
       <div class="space-y-3">
         <div>
           <label class="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
-            Kategori
+            {{ t('th_category') }}
           </label>
           <CustomSelect
             v-model="selectedCategory"
             :options="CATEGORY_OPTIONS"
-            placeholder="Semua Kategori"
+            :placeholder="t('cms_all_categories')"
             :block="true"
           />
         </div>
         <div>
           <label class="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
-            Status Publikasi
+            {{ t('cms_publish_status') }}
           </label>
           <CustomSelect
             v-model="selectedStatus"
             :options="[
-              { value: 'all', label: 'Semua Status' },
-              { value: 'PUBLISHED', label: 'Published' },
-              { value: 'DRAFT', label: 'Draft' },
+              { value: 'all', label: t('cms_all_status') },
+              { value: 'PUBLISHED', label: t('stat_published') },
+              { value: 'DRAFT', label: t('stat_draft') },
             ]"
-            placeholder="Semua Status"
+            :placeholder="t('cms_all_status')"
             :block="true"
           />
         </div>
         <div>
           <label class="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
-            Tingkat Keparahan (Severity)
+            {{ t('cms_severity_level') }}
           </label>
           <CustomSelect
             v-model="selectedSeverity"
             :options="[
-              { value: 'all', label: 'Semua Severity' },
+              { value: 'all', label: t('cms_all_severity') },
               { value: 'low', label: 'Low' },
               { value: 'medium', label: 'Medium' },
               { value: 'high', label: 'High' },
             ]"
-            placeholder="Semua Severity"
+            :placeholder="t('cms_all_severity')"
             :block="true"
           />
         </div>

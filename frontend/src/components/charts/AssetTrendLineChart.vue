@@ -38,7 +38,7 @@ const { chartColors, fontStack } = useChartTheme()
 
 const isEmpty = computed(() => !props.data || props.data.length === 0)
 
-// Gradient vertikal lembut di bawah garis — dihitung dari konteks canvas.
+// Gradient vertikal lembut di bawah garis - dihitung dari konteks canvas.
 const gradientFill = (context) => {
   const { ctx, chartArea } = context.chart
   if (!chartArea) return chartColors.primaryLight

@@ -2,6 +2,7 @@
 import { computed, ref, watch, onBeforeUnmount } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
 import { useAuth } from '@/composables/useAuth'
+import { useLanguage } from '@/composables/useLanguage'
 import {
   primaryBottomNav,
   flattenMenu,
@@ -57,7 +58,15 @@ const lucide = {
 
 const route = useRoute()
 const { hasPermission, isSuperAdmin } = useAuth()
+const { currentLang, setLanguage, t } = useLanguage()
 const isLainnyaOpen = ref(false)
+
+function getItemLabel(item) {
+  if (!item) return ''
+  if (item.labelKey) return t(item.labelKey, item.label)
+  const autoKey = 'nav_' + item.label.toLowerCase().replace(/[\s&/]+/g, '_')
+  return t(autoKey, item.label)
+}
 
 // RBAC gate shared with AppSidebar - one rule, one place.
 const gate = computed(() => ({ hasPermission, isSuperAdmin: isSuperAdmin.value }))
@@ -177,7 +186,7 @@ onBeforeUnmount(() => {
           :key="item.to"
           :to="item.to"
           @click="isLainnyaOpen = false"
-          :aria-label="item.label"
+          :aria-label="getItemLabel(item)"
           :aria-current="isItemActive(item.to) ? 'page' : undefined"
           class="flex flex-col items-center justify-center gap-0.5 px-1 py-0.5 rounded-lg transition-colors min-w-[44px] min-h-[34px] touch-manipulation cursor-pointer"
           :class="
@@ -187,12 +196,12 @@ onBeforeUnmount(() => {
           "
         >
           <component :is="lucide[item.lucide] || Circle" class="w-3.5 h-3.5" />
-          <span class="text-[9px] sm:text-[9.5px] leading-tight font-medium">{{ item.label }}</span>
+          <span class="text-[9px] sm:text-[9.5px] leading-tight font-medium">{{ getItemLabel(item) }}</span>
         </RouterLink>
 
         <button
           type="button"
-          aria-label="Menu lainnya"
+          :aria-label="currentLang === 'en' ? 'More menu' : 'Menu lainnya'"
           aria-controls="mobile-more-menu"
           :aria-expanded="isLainnyaOpen"
           @click="isLainnyaOpen = !isLainnyaOpen"
@@ -204,7 +213,7 @@ onBeforeUnmount(() => {
           "
         >
           <MoreHorizontal class="w-3.5 h-3.5" />
-          <span class="text-[9px] sm:text-[9.5px] leading-tight font-medium">Lainnya</span>
+          <span class="text-[9px] sm:text-[9.5px] leading-tight font-medium">{{ currentLang === 'en' ? 'More' : 'Lainnya' }}</span>
         </button>
       </nav>
 
@@ -224,16 +233,38 @@ onBeforeUnmount(() => {
           <div class="flex items-center justify-between px-1.5 pt-0.5 pb-1">
             <span
               class="text-[9.5px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500"
-              >Menu Lainnya</span
+              >{{ currentLang === 'en' ? 'More Menu' : 'Menu Lainnya' }}</span
             >
-            <button
-              type="button"
-              aria-label="Tutup menu"
-              @click="isLainnyaOpen = false"
-              class="p-1 rounded-md text-slate-400 dark:text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-700 dark:hover:text-slate-200 transition-colors cursor-pointer"
-            >
-              <X class="w-3.5 h-3.5" />
-            </button>
+            <div class="flex items-center gap-1.5">
+              <div class="inline-flex items-center rounded border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 p-0.5 text-[9px]">
+                <button
+                  type="button"
+                  :class="currentLang === 'id' ? 'bg-[#0A51B0] text-white font-bold' : 'text-slate-500 hover:text-slate-900'"
+                  class="rounded px-1.5 py-0.5 transition-colors cursor-pointer"
+                  @click="setLanguage('id')"
+                  aria-label="Pilih Bahasa Indonesia"
+                >
+                  ID
+                </button>
+                <button
+                  type="button"
+                  :class="currentLang === 'en' ? 'bg-[#0A51B0] text-white font-bold' : 'text-slate-500 hover:text-slate-900'"
+                  class="rounded px-1.5 py-0.5 transition-colors cursor-pointer"
+                  @click="setLanguage('en')"
+                  aria-label="Select English"
+                >
+                  EN
+                </button>
+              </div>
+              <button
+                type="button"
+                :aria-label="currentLang === 'en' ? 'Close menu' : 'Tutup menu'"
+                @click="isLainnyaOpen = false"
+                class="p-1 rounded-md text-slate-400 dark:text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-700 dark:hover:text-slate-200 transition-colors cursor-pointer"
+              >
+                <X class="w-3.5 h-3.5" />
+              </button>
+            </div>
           </div>
 
           <div class="grid grid-cols-3 gap-1.5">
@@ -242,7 +273,7 @@ onBeforeUnmount(() => {
               :key="item.to"
               :to="item.to"
               @click="isLainnyaOpen = false"
-              :aria-label="item.label"
+              :aria-label="getItemLabel(item)"
               :aria-current="isLainnyaItemActive(item.to) ? 'page' : undefined"
               class="flex flex-col items-center justify-center gap-1 px-1.5 py-2 rounded-lg transition-colors text-center cursor-pointer"
               :class="
@@ -252,7 +283,7 @@ onBeforeUnmount(() => {
               "
             >
               <component :is="lucide[item.lucide] || Circle" class="w-4 h-4" />
-              <span class="text-[9.5px] font-semibold leading-tight">{{ item.label }}</span>
+              <span class="text-[9.5px] font-semibold leading-tight">{{ getItemLabel(item) }}</span>
             </RouterLink>
           </div>
 

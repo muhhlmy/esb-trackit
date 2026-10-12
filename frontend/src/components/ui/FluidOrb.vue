@@ -1,12 +1,12 @@
 <script setup>
 /**
- * FluidOrb.vue — adaptasi lokal "Fluid Orb" (Rare UI) untuk Vue.
+ * FluidOrb.vue - adaptasi lokal "Fluid Orb" (Rare UI) untuk Vue.
  *
  * Alasan adaptasi: komponen asli rare-ui/fluid-orb ditulis untuk React
  * (JSX + framer-motion). Mengadaptasi polanya sebagai CSS murni menghindari
  * dependensi React/framer-motion di aplikasi Vue, tanpa biaya JS runtime.
  *
- * Penggunaan: login page & auth context SAJA — bukan halaman operasional
+ * Penggunaan: login page & auth context SAJA - bukan halaman operasional
  * (tables/dashboard) sesuai kebijakan motion (tidak ada motion kontinu
  * di area kerja padat). Hormati prefers-reduced-motion: global rule di
  * main.css mematikan animasi; gradient statis tetap tampil.

@@ -21,7 +21,25 @@ defineProps({
 
 const emit = defineEmits(['close'])
 
-const { isSoundEnabled, toggleSound, testSound } = useNotificationSound()
+const {
+  isSoundEnabled,
+  toggleSound,
+  testSound,
+  soundStatusMap,
+  soundPresets,
+  setStatusSound,
+  playSoundById,
+} = useNotificationSound()
+
+const showSoundCustomizer = ref(true)
+
+const NOTIFICATION_STATUS_ITEMS = [
+  { key: 'CREATED', label: 'Tiket & Pengajuan Baru', desc: 'Saat tiket kendala atau pengajuan BAST baru dibuat', icon: 'confirmation_number' },
+  { key: 'UPDATED', label: 'Perubahan Status', desc: 'Saat status tiket atau data aset diperbarui', icon: 'sync' },
+  { key: 'COMMENT', label: 'Komentar Baru', desc: 'Saat diskusi atau catatan baru ditambahkan', icon: 'chat' },
+  { key: 'ALERT', label: 'Peringatan & Isu Kritis', desc: 'Notifikasi kendala kritis atau peringatan sistem', icon: 'warning' },
+  { key: 'SUCCESS', label: 'Berhasil & Selesai', desc: 'Saat aksi selesai atau tiket berhasil ditutup', icon: 'check_circle' },
+]
 
 const actionFeedback = ref('')
 const feedbackType = ref('info')
@@ -160,7 +178,7 @@ async function handleRequestClipboard() {
           <div class="shrink-0 flex items-center gap-1 self-end sm:self-center">
             <button
               type="button"
-              @click="testSound"
+              @click="testSound()"
               class="h-6 px-1.5 rounded-[4px] border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-[9px] sm:text-[9.5px] font-medium transition-colors cursor-pointer flex items-center gap-1"
               title="Putar nada uji coba"
             >
@@ -179,6 +197,61 @@ async function handleRequestClipboard() {
               </span>
               <span>{{ isSoundEnabled ? 'On' : 'Mute' }}</span>
             </button>
+          </div>
+        </div>
+
+        <!-- Panel Kustomisasi 15 Suara Notifikasi per Status -->
+        <div v-if="isSoundEnabled" class="p-2 sm:p-2.5 rounded-[5px] border border-indigo-200/70 dark:border-indigo-900/50 bg-indigo-50/30 dark:bg-indigo-950/20 space-y-2">
+          <button
+            type="button"
+            @click="showSoundCustomizer = !showSoundCustomizer"
+            class="w-full flex items-center justify-between text-left cursor-pointer select-none"
+          >
+            <div class="flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-[14px] text-indigo-600 dark:text-indigo-400">tune</span>
+              <span class="font-bold text-[10px] sm:text-[10.5px] text-slate-800 dark:text-white">Pilih 15 Custom Suara Tone.js per Status</span>
+            </div>
+            <span class="material-symbols-outlined text-[14px] text-slate-400 transition-transform duration-200" :class="{ 'rotate-180': showSoundCustomizer }">expand_more</span>
+          </button>
+
+          <div v-if="showSoundCustomizer" class="space-y-1.5 pt-1.5 border-t border-indigo-100 dark:border-indigo-900/40">
+            <div
+              v-for="st in NOTIFICATION_STATUS_ITEMS"
+              :key="st.key"
+              class="p-1.5 sm:p-2 rounded-[4px] bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-1.5"
+            >
+              <div class="min-w-0 flex items-start gap-1.5">
+                <span class="material-symbols-outlined text-[13px] text-indigo-500 shrink-0 mt-0.5">{{ st.icon }}</span>
+                <div>
+                  <div class="font-bold text-[9.5px] sm:text-[10px] text-slate-800 dark:text-slate-100 leading-tight">{{ st.label }}</div>
+                  <div class="text-[8.5px] sm:text-[9px] text-slate-500 dark:text-slate-400 leading-tight">{{ st.desc }}</div>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-1 shrink-0 self-end sm:self-center">
+                <select
+                  :value="soundStatusMap[st.key] || 'chime_ascend'"
+                  @change="setStatusSound(st.key, $event.target.value)"
+                  class="h-5.5 text-[9px] sm:text-[9.5px] px-1 rounded-[3px] border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-medium cursor-pointer"
+                >
+                  <option
+                    v-for="preset in soundPresets"
+                    :key="preset.id"
+                    :value="preset.id"
+                  >
+                    {{ preset.name }} ({{ preset.category }})
+                  </option>
+                </select>
+                <button
+                  type="button"
+                  @click="playSoundById(soundStatusMap[st.key] || 'chime_ascend')"
+                  class="h-5.5 w-5.5 flex items-center justify-center rounded-[3px] bg-indigo-50 dark:bg-indigo-900/40 hover:bg-indigo-100 dark:hover:bg-indigo-900/70 text-indigo-600 dark:text-indigo-300 transition-colors cursor-pointer"
+                  title="Dengarkan suara terpilih"
+                >
+                  <span class="material-symbols-outlined text-[12px]">play_arrow</span>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 

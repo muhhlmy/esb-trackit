@@ -6,6 +6,7 @@ import {
   generateBarcodeSvg,
   printAssetLabel,
 } from '../../utils/assetLabelPrinter.js'
+import { useLanguage } from '../../composables/useLanguage.js'
 
 const props = defineProps({
   isOpen: {
@@ -20,6 +21,7 @@ const props = defineProps({
 
 const emit = defineEmits(['close'])
 
+const { t } = useLanguage()
 const customHostname = ref('')
 const isPrinting = ref(false)
 
@@ -98,8 +100,8 @@ function handlePrint() {
   <AppModal
     panel-class="inventory-dialog"
     :is-open="isOpen"
-    title="Cetak Label Aset"
-    subtitle="Cetak stiker barcode aset (2.17 x 0.98 inch / 55 x 25 mm - Rectangle)"
+    :title="t('assets_it_label_modal_title')"
+    :subtitle="t('assets_it_label_modal_subtitle')"
     icon="print"
     size="md"
     @close="emit('close')"
@@ -128,19 +130,19 @@ function handlePrint() {
           for="asset-label-hostname-input"
           class="block text-xs font-medium text-slate-700 mb-1"
         >
-          Hostname / Nilai Barcode Label
+          {{ t('assets_it_label_hostname_field') }}
         </label>
         <div class="relative">
           <input
             id="asset-label-hostname-input"
             v-model="customHostname"
             type="text"
-            placeholder="Masukkan hostname aset (cth: IT-UPS-052026-01)"
+            :placeholder="t('assets_it_label_hostname_ph')"
             class="w-full rounded-[6px] border border-slate-300 bg-white px-3 py-2 text-xs font-mono font-semibold text-slate-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none transition-colors"
           />
         </div>
         <p class="mt-1 text-[11px] text-slate-500">
-          Nilai ini yang di-encode ke barcode Code 128 dan dicetak di badan label.
+          {{ t('assets_it_label_encode_note') }}
         </p>
       </div>
 
@@ -148,7 +150,7 @@ function handlePrint() {
       <div>
         <div class="flex items-center justify-between mb-1.5">
           <span class="text-xs font-medium text-slate-700"
-            >Preview Label Stiker (2.17" × 0.98" Rectangle)</span
+            >{{ t('assets_it_label_preview') }}</span
           >
           <span
             class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200/60"
@@ -168,7 +170,7 @@ function handlePrint() {
             <div
               class="text-center font-extrabold text-[10px] sm:text-[9.5px] leading-tight tracking-[0.1px] text-black"
             >
-              <div>ASET INI MERUPAKAN PROPERTI MILIK</div>
+              <div>{{ t('assets_it_label_property_line1') }}</div>
               <div>PT ESENSI SOLUSI BUANA.</div>
             </div>
 
@@ -198,12 +200,12 @@ function handlePrint() {
                   v-else
                   class="h-9 w-full flex items-center justify-center text-[10px] text-slate-400 italic bg-slate-50 border border-dashed border-slate-200 rounded"
                 >
-                  (Barcode Kosong)
+                  {{ t('assets_it_label_barcode_empty') }}
                 </div>
                 <div
                   class="mt-0.5 text-[10px] sm:text-[12px] font-extrabold tracking-wide text-black text-center truncate max-w-full"
                 >
-                  {{ activeHostname || 'KODE-LABEL-0' }}
+                  {{ activeHostname || t('assets_it_label_code_placeholder') }}
                 </div>
               </div>
             </div>
@@ -225,7 +227,7 @@ function handlePrint() {
           @click="emit('close')"
           class="rounded-[6px] border border-slate-300 bg-white px-3.5 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 focus:outline-none transition-colors cursor-pointer"
         >
-          Batal
+          {{ t('cancel') }}
         </button>
         <button
           type="button"
@@ -234,7 +236,7 @@ function handlePrint() {
           class="inline-flex items-center gap-1.5 rounded-[6px] bg-blue-600 px-4 py-2 text-xs font-semibold text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
         >
           <span aria-hidden="true" class="material-symbols-outlined text-[16px]">print</span>
-          <span>{{ isPrinting ? 'Membuka Cetak...' : 'Cetak Label' }}</span>
+          <span>{{ isPrinting ? t('assets_it_printing') : t('assets_it_print_label_btn') }}</span>
         </button>
       </div>
     </div>

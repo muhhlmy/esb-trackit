@@ -2,6 +2,7 @@
 import { computed, ref, watch } from 'vue'
 import { useApi } from '@/composables/useApi'
 import { useAuth } from '@/composables/useAuth'
+import { useLanguage } from '@/composables/useLanguage'
 import CsatStars from './CsatStars.vue'
 
 const props = defineProps({
@@ -13,6 +14,7 @@ const emit = defineEmits(['rated'])
 
 const { get, post } = useApi()
 const { user, isAdmin, isSuperAdmin } = useAuth()
+const { t } = useLanguage()
 
 const reason = ref('')
 const existingRating = ref(null)
@@ -25,13 +27,13 @@ const selectedRating = ref(5)
 const hoverRating = ref(0)
 const feedback = ref('')
 
-const ratingLabels = {
-  1: 'Sangat Tidak Puas',
-  2: 'Tidak Puas',
-  3: 'Cukup',
-  4: 'Puas',
-  5: 'Sangat Puas',
-}
+const ratingLabels = computed(() => ({
+  1: t('csat_very_unsatisfied'),
+  2: t('csat_unsatisfied'),
+  3: t('csat_neutral'),
+  4: t('csat_satisfied'),
+  5: t('csat_very_satisfied'),
+}))
 
 // ── Normalize status: "Resolved" and "Closed" (case-insensitive) = finished ──
 function isTicketFinished(status) {
@@ -81,7 +83,7 @@ async function fetchCasp() {
     reason.value = data.reason || ''
     existingRating.value = data.rating || null
   } catch (err) {
-    submitError.value = err.message || 'Gagal memuat status CASP.'
+    submitError.value = err.message || t('tickets_casp_load_failed')
   } finally {
     isLoading.value = false
   }
@@ -99,7 +101,7 @@ async function submitCasp() {
     await fetchCasp()
     emit('rated')
   } catch (err) {
-    submitError.value = err.message || 'Gagal mengirim penilaian CASP.'
+    submitError.value = err.message || t('tickets_casp_submit_failed')
   } finally {
     isSubmitting.value = false
   }
@@ -113,7 +115,7 @@ watch(
 </script>
 
 <template>
-  <div class="rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] p-4 text-xs transition-all">
+  <div class="rounded-[6px] border border-[#E2E8F0] bg-[#F8FAFC] p-3 text-xs transition-all">
     <!-- Loading State -->
     <div v-if="isLoading" class="flex items-center gap-2 py-2 text-[#5F7089]">
       <span
@@ -121,14 +123,18 @@ watch(
         class="material-symbols-outlined text-[16px] animate-spin text-[#333333]"
         >progress_activity</span
       >
-      <span>Memeriksa status penilaian CASP...</span>
+      <span>{{ t('tickets_casp_checking') }}</span>
     </div>
 
     <!-- Rating Sudah Dikirim (Submitted Result) -->
     <div v-else-if="existingRating" class="flex flex-col gap-2">
       <div class="flex items-center justify-between">
         <h4 class="text-xs font-bold text-[#333333]">
-          {{ isUserReporter && !isAdmin && !isSuperAdmin ? 'Penilaian Anda' : 'CASP Assessment' }}
+          {{
+            isUserReporter && !isAdmin && !isSuperAdmin
+              ? t('tickets_casp_your_rating')
+              : t('tickets_casp_assessment')
+          }}
         </h4>
         <span
           class="text-[11px] font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md"
@@ -148,7 +154,7 @@ watch(
         v-if="isUserReporter && !isAdmin && !isSuperAdmin"
         class="text-[12px] font-medium text-[#5F7089]"
       >
-        Terima kasih atas feedback Anda.
+        {{ t('tickets_casp_thank_you') }}
       </p>
 
       <div
@@ -164,17 +170,21 @@ watch(
         "
         class="text-[11px] text-[#687281] flex items-center gap-2 mt-0.5"
       >
-        <span v-if="existingRating.reporterName">Pelapor: {{ existingRating.reporterName }}</span>
-        <span v-if="existingRating.assigneeName">· Petugas: {{ existingRating.assigneeName }}</span>
+        <span v-if="existingRating.reporterName"
+          >{{ t('reporter') }} {{ existingRating.reporterName }}</span
+        >
+        <span v-if="existingRating.assigneeName"
+          >· {{ t('tickets_agent') }}: {{ existingRating.assigneeName }}</span
+        >
       </div>
     </div>
 
     <!-- Form Input Rating (User & Eligible) -->
     <div v-else-if="isEligible" class="flex flex-col gap-3">
       <div>
-        <h4 class="text-xs font-bold text-[#333333]">Penilaian Layanan</h4>
+        <h4 class="text-xs font-bold text-[#333333]">{{ t('tickets_casp_service_rating') }}</h4>
         <p class="text-[12px] font-normal text-[#5F7089] mt-0.5">
-          Bagaimana pengalaman Anda terhadap penanganan ticket ini?
+          {{ t('tickets_casp_experience_question') }}
         </p>
       </div>
 
@@ -185,7 +195,7 @@ watch(
             v-for="star in 5"
             :key="star"
             type="button"
-            :aria-label="`Bintang ${star}: ${ratingLabels[star]}`"
+            :aria-label="`${t('tickets_star_label')} ${star}: ${ratingLabels[star]}`"
             @mouseenter="hoverRating = star"
             @mouseleave="hoverRating = 0"
             @click="selectedRating = star"
@@ -210,8 +220,8 @@ watch(
         <textarea
           v-model="feedback"
           rows="2"
-          placeholder="Tulis feedback atau masukan Anda… (opsional)"
-          class="w-full rounded-xl border border-[#E2E8F0] bg-white p-3 text-xs font-medium text-[#333333] focus:border-[#0A51B0] focus:outline-none transition-all placeholder-[#687281]"
+          :placeholder="t('tickets_casp_feedback_placeholder')"
+          class="w-full rounded-[6px] border border-[#E2E8F0] bg-white p-3 text-xs font-medium text-[#333333] focus:border-[#0A51B0] focus:outline-none transition-all placeholder-[#687281]"
         ></textarea>
       </div>
 
@@ -224,7 +234,7 @@ watch(
           type="button"
           @click="submitCasp"
           :disabled="isSubmitting || !selectedRating"
-          class="inline-flex items-center gap-1.5 rounded-xl bg-[#0A51B0] px-4 py-2 text-xs font-bold text-white shadow-2xs hover:bg-[#0A4391] transition-all cursor-pointer disabled:opacity-50"
+          class="inline-flex items-center gap-1.5 rounded-[6px] bg-[#0A51B0] px-4 py-2 text-xs font-bold text-white shadow-2xs hover:bg-[#0A4391] transition-all cursor-pointer disabled:opacity-50"
         >
           <span
             aria-hidden="true"
@@ -233,17 +243,19 @@ watch(
             >progress_activity</span
           >
           <span aria-hidden="true" v-else class="material-symbols-outlined text-[16px]">send</span>
-          <span>{{ isSubmitting ? 'Mengirim...' : 'Kirim Penilaian' }}</span>
+          <span>{{ isSubmitting ? t('tickets_casp_sending') : t('tickets_casp_submit') }}</span>
         </button>
       </div>
     </div>
 
     <!-- Belum Eligible / Status Belum Selesai -->
     <div v-else class="text-xs font-medium text-[#5F7089]">
-      <span v-if="!isFinished" class="italic">Penilaian tersedia setelah ticket selesai.</span>
-      <span v-else-if="isAdmin || isSuperAdmin" class="italic">Belum ada penilaian dari user.</span>
+      <span v-if="!isFinished" class="italic">{{ t('tickets_casp_available_after_finish') }}</span>
+      <span v-else-if="isAdmin || isSuperAdmin" class="italic">{{
+        t('tickets_casp_no_rating_admin')
+      }}</span>
       <span v-else class="italic">{{
-        reason || 'Penilaian CASP tidak tersedia untuk tiket ini.'
+        reason || t('tickets_casp_not_available')
       }}</span>
     </div>
   </div>

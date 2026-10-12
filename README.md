@@ -1,315 +1,399 @@
 # TrackIT
 
-TrackIT adalah aplikasi web untuk pengelolaan aset IT, aset GA dan OPS, data karyawan, pengajuan, pengiriman, tiket helpdesk, serta Help Center berbasis Knowledge Base. Satu basis kode (monorepo) yang menaungi SPA Vue 3, REST API Express 5, dan basis data PostgreSQL 16.
+TrackIT is an enterprise IT service and asset management platform for IT assets, General Affairs (GA) equipment, Operations (OPS) equipment, employee directories, procurement submissions, logistical shipments, helpdesk ticketing, and a public-facing Knowledge Base Help Center. The project is organized as a monorepo containing a Vue 3 Single Page Application (SPA), an Express 5 REST API, and a PostgreSQL 16 database.
 
+---
 
-TrackIT is a web-based asset and IT service management platform designed to help organizations manage IT assets, requests, approvals, inventory, and operational workflows from a centralized interface.
+## Table of Contents
 
-- [Ringkasan](#ringkasan)
-- [Fitur](#fitur)
-- [Arsitektur](#arsitektur)
-- [Teknologi](#teknologi)
-- [Struktur Direktori](#struktur-direktori)
-- [Menjalankan Secara Lokal](#menjalankan-secara-lokal)
-- [Deployment dengan Docker](#deployment-dengan-docker)
-- [Image Docker dari GHCR](#image-docker-dari-ghcr)
-- [Database dan Migrasi](#database-dan-migrasi)
-- [Environment Variables](#environment-variables)
-- [Skema Database](#skema-database)
-- [API Reference](#api-reference)
-- [Import dan Export XLSX](#import-dan-export-xlsx)
-- [Keamanan](#keamanan)
-- [Pengujian](#pengujian)
-- [CI/CD](#cicd)
-- [Panduan Deployment Production](#panduan-deployment-production)
+- [Visual Tour](#visual-tour)
+- [System Overview](#system-overview)
+- [Feature Modules](#feature-modules)
+  - [Asset Inventory Management](#asset-inventory-management)
+  - [Helpdesk Ticketing and Realtime Updates](#helpdesk-ticketing-and-realtime-updates)
+  - [Help Center and Knowledge Base CMS](#help-center-and-knowledge-base-cms)
+  - [Submissions and Approval Workflows](#submissions-and-approval-workflows)
+  - [Shipments and Logistics Tracking](#shipments-and-logistics-tracking)
+  - [Role-Based Access Control](#role-based-access-control)
+  - [Database Operations and Backup Management](#database-operations-and-backup-management)
+  - [Spreadsheet Import and Export](#spreadsheet-import-and-export)
+  - [System Audit Trails](#system-audit-trails)
+- [Architecture and Topology](#architecture-and-topology)
+- [Technology Stack](#technology-stack)
+- [Directory Structure](#directory-structure)
+- [Prerequisites](#prerequisites)
+- [Quick Start and Local Development](#quick-start-and-local-development)
+  - [1. Clone Repository and Install Dependencies](#1-clone-repository-and-install-dependencies)
+  - [2. Environment Configuration](#2-environment-configuration)
+  - [3. Database Setup and Migration Protocol](#3-database-setup-and-migration-protocol)
+  - [4. Start Application Services](#4-start-application-services)
+- [Docker Deployment](#docker-deployment)
+  - [Docker Compose Local Cluster](#docker-compose-local-cluster)
+  - [Container Images from GitHub Container Registry](#container-images-from-github-container-registry)
+  - [Image Signature Verification with Cosign](#image-signature-verification-with-cosign)
+- [Environment Variables Reference](#environment-variables-reference)
+- [Database Schema and Governance](#database-schema-and-governance)
+- [REST API Reference](#rest-api-reference)
+- [XLSX Import and Export Specifications](#xlsx-import-and-export-specifications)
+- [Security Architecture](#security-architecture)
+- [Testing and Quality Assurance](#testing-and-quality-assurance)
+  - [Unit Testing](#unit-testing)
+  - [End-to-End Testing with Playwright](#end-to-end-testing-with-playwright)
+  - [Automated Accessibility Checks](#automated-accessibility-checks)
+  - [Static Security Analysis](#static-security-analysis)
+- [Production Deployment Runbook](#production-deployment-runbook)
 - [Troubleshooting](#troubleshooting)
-- [Perintah Lainnya](#perintah-lainnya)
-- [Kontribusi](#kontribusi)
-- [Dokumentasi Terkait](#dokumentasi-terkait)
-- [Lisensi](#lisensi)
+- [Changelog](#changelog)
+- [Contributing](#contributing)
+- [License](#license)
 
-## Overview
+---
 
-TrackIT melayani tiga kelompok pengguna dengan kebutuhan berbeda:
+## Visual Tour
 
-1. **Employees** — view assigned assets, open helpdesk tickets, and read published Help Center articles.
-2. **Operations teams (IT, GA, OPS)** — maintain per-domain asset inventories, process submissions and shipments, and work ticket queues.
-3. **Administrators** — manage accounts and feature permissions, review audit logs, run XLSX exports, and perform database backup/restore from the admin UI.
+### Operations Dashboard
+Central overview displaying real-time asset distribution, hardware condition metrics, device type composition, ticket volume, and Customer Satisfaction (CSAT) trends.
 
-Seluruh halaman manajemen berada di balik autentikasi. Hanya Help Center (artikel, FAQ, kategori) yang terbit publik, dan hanya konten berstatus `PUBLISHED` yang tampil.
+![Operations Dashboard](docs/screenshots/dashboard.png)
 
-Design constraints that shape the codebase:
+### IT Asset Inventory
+Multi-domain asset registry supporting assignment tracking, hardware specifications, status transitions, barcode generation, and search filtering.
 
-- Backend layers are explicit: `routes → controllers → services → pg`, with parameterized SQL throughout.
-- The server does not run DDL at startup; schema changes go through versioned migrations only.
-- The backend is the source of truth for roles and permissions. Frontend permission checks only gate navigation.
-- Realtime ticket updates use Server-Sent Events from an in-process event bus (single-instance deployment model).
+![IT Asset Inventory](docs/screenshots/assets-inventory.png)
 
-### Helpdesk
-- Tiket memiliki nomor unik, kategori, prioritas (`Low` hingga `Critical`), dan antrean per tim (IT, HR, GA). Antrean dapat dikelola adminnya masing-masing.
-- Komentar mendukung lampiran; percakapan dan perubahan status terekam sebagai riwayat audit per tiket.
-- Penanganan tiket mencakup claim, reassign, penyelesaian, dan pembatalan, dengan rating kepuasan CSAT 1–5 dari pelapor setelah tiket selesai.
-- Pembaruan tiket masuk secara realtime melalui Server-Sent Events; koneksi SSE difilter per pengguna sesuai hak aksesnya.
+### Helpdesk Ticketing System
+Queue-segregated service desk featuring priority tiers, agent claim workflows, audit timelines, attachment uploads, and live Server-Sent Events updates.
 
-### Help Center
-- Artikel insiden (SOP) dan FAQ yang sudah dipublikasikan dapat dibaca publik tanpa login, lengkap dengan kategori, tingkat keparahan (`low/medium/high`), tag, dan pencarian.
-- CMS admin menyediakan editor rich text (TipTap) dengan struktur baku per artikel.
-- Pengguna terautentikasi dapat menyimpan bookmark artikel.
+![Helpdesk Ticketing](docs/screenshots/tickets-helpdesk.png)
 
-### Operasional dan Administrasi
-- **Pengiriman** mencatat permintaan kirim barang atau aset, penerima, tujuan, nomor resi (AWB), status pelacakan, dan pembatalan.
-- **Dashboard** merangkum tren aset, distribusi kondisi, komposisi tipe perangkat, dan tren CSAT dalam grafik (Chart.js).
-- **Log aktivitas** dan **log audit login** terpusat pada `system_audit_logs`, termasuk nilai sebelum dan sesudah perubahan (before/after JSONB), pelaku, IP, dan user-agent.
-- **Backup dan restore** dijalankan dari UI admin: `pg_dump` dengan checksum SHA-256, backup otomatis sebelum restore, retensi berdasarkan umur dan jumlah file, serta audit trail setiap operasi.
-- **Export data** administratif ke XLSX untuk aset, pengguna, tiket, dan tabel lainnya, khusus superadmin.
+### Public Help Center and Knowledge Base
+Self-service portal presenting published Standard Operating Procedure (SOP) articles, frequently asked questions, categorized topic cards, and popular search discovery.
 
-### Request and Helpdesk Workflows
+![Help Center Portal](docs/screenshots/helpcenter-home.png)
 
-- Tickets with unique numbers, categories, priority levels, and per-team queues
-- Claim, reassign, resolve, and cancel flows; comments with attachments
-- Ticket history and status changes captured for audit
-- CSAT rating (1–5) after completion
-- Realtime updates over SSE (`GET /api/tickets/events`), filtered per user access
-- Shipments module: recipients, destinations, AWB/tracking numbers, status progression, cancel
-- Submissions module for asset requests with approval-style lifecycle
+### Asset Submissions and Approvals
+Employee asset request tracking with status progressions, approval auditing, and specification review.
 
-### Knowledge Base and Help Center
+![Submissions Management](docs/screenshots/submissions.png)
 
-- Published incident articles (SOP-style), FAQs, and category/topic cards served publicly
-- Severity tags, free-text search, and popular-search logging
-- Rich-text CMS editor (TipTap) for authenticated editors with `knowledge_base` permission
-- Per-user article bookmarks for signed-in users
+### Logistics and Shipments
+Hardware dispatch monitoring featuring recipient routing, courier tracking numbers (AWB), and transit progression.
 
-### User Management and Access Control
+![Shipments Tracking](docs/screenshots/shipments.png)
 
-- Session-based authentication with HttpOnly cookies (JWT paired with server-side sessions)
-- Roles: `user`, `admin`, `superadmin`
-- Per-feature permission keys (`none` / `read_only` / `full`) checked on every API request
-- Password change, forgot-password OTP flow, and enrollment credentials that require OTP completion
-- Employee master data and user provisioning from admin screens
+### Database Administration and Backup Control
+Web-based backup creation, verification, on-demand restoration, and SHA-256 integrity inspection.
 
-### Reporting and Administration
+![Database Administration](docs/screenshots/database-admin.png)
 
-- Dashboard charts: asset trends, condition distribution, device-type mix, CSAT trends (Chart.js)
-- Activity and login audit trails (`system_audit_logs`, `log_audit_login`)
-- Admin-initiated PostgreSQL backup and restore with SHA-256 checksums, retention limits, and backup audit log
-- Superadmin-only XLSX exports for assets, users, tickets, and related tables
-- Health endpoint (`GET /health`) including database connectivity
+### User Administration and Granular RBAC
+Account provisioning, role assignment, and granular matrix configuration across 13 feature permission keys.
 
-## Feature Matrix
+![User Management](docs/screenshots/user-management.png)
 
-| Area | Capability | Status |
-| --- | --- | --- |
-| Authentication | Session cookie + server-side session, OTP password reset | Available |
-| Authorization | Global roles + 13 feature permission keys (RBAC) | Available |
-| Assets | IT / GA / OPS inventories, assignment, history, labels | Available |
-| Requests | Submissions workflow | Available |
-| Helpdesk | Tickets, queues, comments, CSAT, SSE realtime | Available |
-| Logistics | Shipments with tracking status | Available |
-| Knowledge base | Public Help Center + authenticated CMS | Available |
-| Import / Export | XLSX import and export with formula-injection guards | Available |
-| Audit | System audit logs and login audit | Available |
-| Backup | Admin UI backup / restore with checksums and retention | Available |
-| Testing | Node unit tests (backend, frontend) | Available |
-| Testing | Playwright E2E (Chromium, Firefox) | Available |
-| Testing | axe-core accessibility suite | Available |
-| CI | GitHub Actions (backend, frontend, dependencies, E2E) | Available |
-| SAST | CodeQL (JavaScript/TypeScript) | Available |
-| Containers | Docker Compose stack (PostgreSQL, migrate, backend, frontend) | Available |
+### Spreadsheet Data Export
+Administrative XLSX export facility with dynamic column filtering and formula injection neutralization.
 
-## Architecture
+![XLSX Export](docs/screenshots/export-xlsx.png)
 
-Local development:
+### Mobile Responsive Layout
+Dense, touch-friendly interface optimized for smartphone and tablet viewports without horizontal clipping.
+
+![Mobile Dashboard](docs/screenshots/mobile-dashboard.png)
+
+---
+
+## System Overview
+
+TrackIT addresses the operational workflows of three primary user groups:
+
+1. **Employees:** Review personally assigned hardware, submit repair or provisioning tickets, track ticket resolutions, rate completed tickets (CSAT), and consult public Help Center documentation.
+2. **Operations Teams (IT, General Affairs, Operations):** Manage hardware lifecycles across designated asset pools, triage ticket queues, process equipment requests, log outgoing logistics shipments, and author Knowledge Base guides.
+3. **System Administrators:** Provision user accounts, configure per-feature permission levels, audit administrative modifications, perform secured XLSX data transfers, and manage database snapshots directly from the web interface.
+
+All management interfaces require authentication. Only published Help Center resources (articles, FAQs, and category definitions) are accessible without active user credentials.
+
+---
+
+## Feature Modules
+
+### Asset Inventory Management
+- **Domain Segregation:** Three distinct asset pools for IT hardware (`aset_ti`), General Affairs facilities (`aset_ga`), and Operations equipment (`aset_ops`).
+- **Hardware Lifecycle:** Status management covering Available, In Use, Maintenance, and Decommissioned states.
+- **Custody Tracking:** Relational linking between individual equipment records and employee profiles (`karyawan`) with historical usage logs (`riwayat_pemakaian_aset`).
+- **Barcode Generation:** Client-side barcode rendering (JsBarcode) for asset tags and equipment labels.
+- **Specification Tracking:** Hostname, serial number, processor, RAM, storage, operating system, vendor, acquisition date, and purchase value.
+
+### Helpdesk Ticketing and Realtime Updates
+- **Queue Segregation:** Independent ticket queues for IT Support, Human Resources, and General Affairs teams.
+- **Workflow Transitions:** Ticket states moving through Open, In Progress, Resolved, and Closed.
+- **Collaboration:** Threaded comments supporting file attachments and timestamped audit logs for every field mutation.
+- **Realtime Dispatch:** Server-Sent Events (SSE) via `GET /api/tickets/events`, delivering instant queue and comment notifications filtered by individual user access privileges.
+- **Satisfaction Measurement:** Automated post-resolution Customer Satisfaction (CSAT) score collection on a 1 to 5 scale.
+
+### Help Center and Knowledge Base CMS
+- **Public Portal:** Searchable incident guides, SOP documents, categorized topic cards, and searchable FAQs.
+- **TipTap Rich Text Editor:** In-browser article composition with typography hierarchy, inline code blocks, tables, and image embedding.
+- **Lifecycle Gating:** Content draft and publication states. Unauthenticated visitors can only view documents marked `PUBLISHED`.
+- **Search Logging:** Capture of visitor search queries to determine frequent documentation requests without tracking personal identifiers.
+- **User Bookmarks:** Authenticated bookmarking for employees to keep frequently referenced procedures accessible.
+
+### Submissions and Approval Workflows
+- **Procurement and Provisioning Requests:** Structured employee requests for new hardware, replacement components, or access credentials.
+- **Review Protocol:** Administrative triage with approval, rejection, and fulfillment statuses.
+- **Audit Association:** Direct linkages between approved submissions and newly assigned asset inventory rows.
+
+### Shipments and Logistics Tracking
+- **Hardware Logistics:** Dispatch recording for remote employees, branch offices, and third-party repair vendors.
+- **Tracking Identifiers:** Air Waybill (AWB) number association, courier identification, origin, and destination addresses.
+- **Transit States:** Tracking from Dispatch to In Transit, Delivered, and Cancelled.
+
+### Role-Based Access Control
+- **Global Roles:** Three platform tiers: `user`, `admin`, and `superadmin`.
+- **Granular Feature Matrix:** Thirteen independent permission keys evaluated on every mutating API request:
+  - `dashboard`
+  - `assets` (IT Inventory)
+  - `assets_ga` (GA Inventory)
+  - `assets_ops` (Operations Inventory)
+  - `my_assets` (Self-service Employee Inventory)
+  - `tickets` (Helpdesk Queues)
+  - `submissions` (Asset Requests)
+  - `shipments` (Logistics)
+  - `users` (Account Management)
+  - `logs` (Audit System)
+  - `karyawan` (Employee Master Data)
+  - `export` (XLSX Data Extraction)
+  - `knowledge_base` (Help Center CMS)
+- **Permission Levels:** Each key can be assigned `none`, `read_only`, or `full` access.
+
+### Database Operations and Backup Management
+- **Administrative Snapshots:** Superadmin-triggered `pg_dump` backups executed through the server runtime.
+- **Cryptographic Verification:** SHA-256 checksum generation and validation for all archive files.
+- **Pre-Restoration Safeguards:** Automatic snapshot creation prior to executing any database restore operation.
+- **Retention Policies:** Configurable limits governing maximum archive count and storage age.
+- **Audit Tracking:** Comprehensive operational logging for all backup creations, downloads, validations, and restorations.
+
+### Spreadsheet Import and Export
+- **Formula Injection Mitigation:** Sanitization of cell strings starting with `=`, `+`, `-`, or `@` to neutralize spreadsheet code execution upon opening files in Microsoft Excel or LibreOffice Calc.
+- **Template Compatibility:** Exported file headers and sheet structures match import requirements, allowing round-trip data adjustments.
+- **Dual Import Modes:**
+  - *Append Mode:* Inserts non-conflicting records alongside existing entries.
+  - *Replace All Mode:* Purges existing target category records prior to batch insertion, guarded by a mandatory confirmation token (`GANTI`) validated both client-side and server-side.
+
+### System Audit Trails
+- **Central Mutation Ledger:** `system_audit_logs` records JSONB state representations before and after modifications.
+- **Context Capture:** Actor identifier, client IP address, user-agent string, affected module, and specific record ID.
+- **Authentication Tracking:** `log_audit_login` stores successful logins, failed attempts, and account lockout events.
+
+---
+
+## Architecture and Topology
+
+TrackIT uses a monorepo structure separating concerns across presentation, routing, business logic, and persistence.
 
 ```text
-Browser
-   │
-   ▼
-Frontend (Vite dev server, :5173)
-   │  proxies /api
-   ▼
-Backend API (Express, :3000)
-   │
-   ▼
-PostgreSQL (:5432)
++--------------------------------------------------------------------+
+|                         CLIENT BROWSER                             |
+|  Vue 3 Single Page Application (Tailwind CSS 4 + Lucide Icons)     |
++--------------------------------------------------------------------+
+                                   |
+                     HTTP / HTTPS (Port 80 / 443)
+                     Same-Origin API Proxy (/api)
+                                   v
++--------------------------------------------------------------------+
+|                    REVERSE PROXY (Nginx / Vite)                    |
+|  - Serves static SPA bundle (dist/)                                |
+|  - Injects Content Security Policy and HTTP security headers       |
+|  - Forwards /api traffic to Node.js backend                        |
+|  - Disables proxy buffering for Server-Sent Events (SSE)           |
++--------------------------------------------------------------------+
+                                   |
+                         HTTP (Internal Port 3000)
+                                   v
++--------------------------------------------------------------------+
+|                     BACKEND REST API (Express 5)                   |
+|  +--------------------------------------------------------------+  |
+|  | Middleware Stack:                                            |  |
+|  | - Security Headers (Helmet, CSP, Permissions-Policy)         |  |
+|  | - CORS Allowlist Enforcement                                 |  |
+|  | - Layered Rate Limiting (Global, Per-User, Auth Endpoints)   |  |
+|  | - Session Validation (HttpOnly Cookie -> Server Verification)|  |
+|  | - Granular RBAC Permission Verification                      |  |
+|  +--------------------------------------------------------------+  |
+|  | Routing and Controllers: Input validation, schema mapping    |  |
+|  | Services: Business logic, in-process EventBus, parameterized |  |
+|  |           PostgreSQL connection pool (pg)                    |  |
+|  +--------------------------------------------------------------+  |
++--------------------------------------------------------------------+
+                                   |
+                      TCP Connection Pool (Port 5432)
+                                   v
++--------------------------------------------------------------------+
+|                      DATABASE (PostgreSQL 16)                      |
+|  - 24 Relational Tables, 3 Analytical Views                        |
+|  - Schema evolution governed by Versioned SQL Migrations           |
+|  - Soft-delete enforcement via database triggers                   |
+|  - Automatic updated_at timestamp triggers                         |
+|  - Partial indices for optimized active-record queries             |
++--------------------------------------------------------------------+
 ```
 
-Docker Compose:
+### Architectural Principles
 
-- Backend berlapis: `routes → controllers → services → pg`. Controller memvalidasi input, service yang memegang SQL, dan seluruh query memakai placeholder parameterized (`$1`).
-- Server tidak pernah menjalankan DDL saat startup. Ia hanya memverifikasi bahwa runtime schema sesuai; perubahan skema hanya lewat migrasi versioned.
-- Backend adalah sumber kebenaran untuk role dan izin. Pemeriksaan izin di frontend hanya mengatur navigasi, bukan keamanan.
-- Realtime memakai EventEmitter in-process yang dirancang untuk deployment single-instance. Roadmap multi-instance telah didokumentasikan di `realtimeService.js` (opsi PostgreSQL `LISTEN/NOTIFY` atau Redis Pub/Sub).
-- Frontend tidak memakai state library. State dikelola lewat composables, dan setiap panggilan HTTP melewati `useApi` yang menangani cookie sesi serta redirect 401 secara global.
+- **Three-Tier Backend Separation:** `routes` handle endpoint mapping and middleware attachment; `controllers` parse and sanitize HTTP payloads; `services` execute domain logic and construct parameterized SQL statements.
+- **Zero Startup DDL:** The API server never executes schema modifications during startup. Startup routines verify schema compatibility against `app_schema_migrations` and exit if migrations are pending.
+- **Server-Side Security Authority:** The backend is the single source of truth for authorization. Frontend permission guards only prevent unnecessary navigation; every API route enforces permissions independently.
+- **Session Architecture:** Authentication relies on an HttpOnly `trackit_session` cookie containing a signed JWT. Active tokens are paired with a revocable `user_sessions` database record, allowing server-side session invalidation upon logout or administrative revocation.
 
-Operational notes (VERIFIED from source and Compose):
-
-- Same-origin deployment is the canonical production model: the reverse proxy serves the SPA and forwards `/api` to the backend.
-- Access tokens are short-lived; the browser holds an HttpOnly session cookie. Tokens are not stored in `localStorage`.
-- Application containers drop Linux capabilities and run with `no-new-privileges`.
-- Realtime is an in-process EventEmitter intended for single-instance deployments.
+---
 
 ## Technology Stack
 
-| Layer | Technology |
-| --- | --- |
-| Frontend | Vue 3.5, Vue Router, Vite, Tailwind CSS 4, TipTap (editor), Chart.js, GSAP, JsBarcode, Lucide, SheetJS (`xlsx`), DOMPurify |
-| Backend | Node.js (ESM), Express 5, `pg`, `jsonwebtoken`, `bcryptjs`, `multer`, `nodemailer`, `isomorphic-dompurify` |
-| Database | PostgreSQL 16 dengan migrasi versioned, view, dan trigger |
-| Pengujian | Node test runner (unit), Playwright dengan axe-core (E2E), CodeQL (SAST) |
-| Infrastruktur | Docker Compose, Nginx, GitHub Actions, GitHub Packages (GHCR) |
-| Tooling | oxlint, ESLint, Prettier, nodemon, pipeline design tokens |
+| Layer | Component | Version / Library | Purpose |
+| --- | --- | --- | --- |
+| **Frontend Framework** | Vue.js | 3.5.x | Reactive UI components with Composition API |
+| **Build Tooling** | Vite | 6.x / 8.x | Frontend build pipeline and local development server |
+| **Styling** | Tailwind CSS | 4.x | Utility-first design tokens and responsive styling |
+| **Typography** | Plus Jakarta Sans | Google Fonts | Unified corporate typography baseline |
+| **Rich Text CMS** | TipTap | 3.30.x | Markdown and rich text editor for Help Center articles |
+| **Data Visualization** | Chart.js & vue-chartjs | 4.5.x | Operations dashboard analytics charts |
+| **Barcode Utilities** | JsBarcode | 3.12.x | Code128 asset tag and inventory label rendering |
+| **Icons** | Lucide Vue Next | 0.475.x | Functional iconography across UI views |
+| **Backend Runtime** | Node.js (ESM) | ^22.18.0 or >=24.12.0 | High-performance asynchronous JavaScript engine |
+| **Web Server Framework**| Express | 5.2.x | HTTP routing, middleware pipeline, and REST APIs |
+| **Database Driver** | pg (node-postgres) | 8.22.x | PostgreSQL client pool with parameterized queries |
+| **Database Engine** | PostgreSQL | 16.x | Relational database with trigger functions and views |
+| **Spreadsheet Engine** | SheetJS (xlsx) | 0.20.x | Workbook parsing, sheet extraction, and XLSX generation |
+| **Sanitization** | DOMPurify | 3.4.x / 4.1.x | Client and server HTML sanitization against XSS |
+| **Authentication** | jsonwebtoken & bcryptjs | 9.0.x / 3.0.x | Salted password hashing and signed session tokens |
+| **End-to-End Testing** | Playwright | 1.50.x | Automated multi-browser integration tests |
+| **Accessibility Testing**| axe-core | 4.13.x | Automated WCAG 2.1 AA compliance validation |
+| **Containers** | Docker & Docker Compose | Compose v2 | Containerized local orchestration and multi-stage builds |
 
-Node.js engines (from `backend/package.json` and `frontend/package.json`): `^22.18.0 || >=24.12.0`.
+---
 
-## Project Structure
+## Directory Structure
 
 ```text
 trackit/
-├── backend/                        REST API Express (ESM)
+├── backend/                        Express 5 REST API application
 │   ├── migrations/
-│   │   ├── versioned/       Canonical migrations (only executed path)
-│   │   └── 0xx_*.sql        Legacy reference files (do not run)
+│   │   ├── versioned/              Canonical version-controlled SQL migrations
+│   │   └── 0xx_*.sql               Archival legacy reference scripts (do not execute)
 │   ├── src/
-│   │   ├── config/                 env, koneksi DB, runner migrasi, verifikasi schema
-│   │   ├── controllers/            Validasi input dan orkestrasi HTTP
-│   │   ├── services/               Logika bisnis dan SQL (auth, backup, SSE, izin, dll.)
-│   │   ├── middleware/             Auth, rate limit, security headers, error handler
-│   │   ├── routes/                 Definisi endpoint dan alias legacy
-│   │   ├── security/               Kebijakan CORS, session token
-│   │   ├── errors/ · utils/ · assets/
-│   │   ├── app.js                  CORS, security headers, rate limit, router
-│   │   └── server.js               Bootstrap dan graceful shutdown
-│   ├── Dockerfile                  Image API (context: ./backend)
-│   └── tests/                      Unit test backend (node --test)
-├── frontend/                       SPA Vue 3
+│   │   ├── assets/                 Static server assets and logos
+│   │   ├── config/                 Database configuration, migration runner, schema checks
+│   │   ├── controllers/            Request parsing, validation, and HTTP dispatch
+│   │   ├── middleware/             Auth, rate limiting, security headers, audit hooks
+│   │   ├── routes/                 API route declarations and legacy aliases
+│   │   ├── security/               CORS allowlists, session token generation
+│   │   ├── services/               Domain business logic, parameterized SQL, event dispatch
+│   │   ├── utils/                  Security helpers, identifiers, sanitizers
+│   │   ├── app.js                  Express application assembly and middleware binding
+│   │   └── server.js               Server initialization and graceful shutdown handlers
+│   ├── tests/                      Node.js test runner unit suites (node --test)
+│   ├── Dockerfile                  Production API container definition
+│   └── package.json                Backend dependencies and scripts
+│
+├── frontend/                       Vue 3 SPA client application
+│   ├── public/                     Static web assets, icons, manifest files
 │   ├── src/
-│   │   ├── views/                  Halaman aplikasi (termasuk views/admin/)
-│   │   ├── components/             UI kit, chart, tiket, cases, layout
-│   │   ├── composables/            State management
-│   │   ├── services/ · utils/ · config/ · styles/
-│   │   └── router/index.js         Routing dan gating izin halaman
-│   ├── Dockerfile                  Image Nginx SPA (context: ./frontend)
-│   ├── nginx.conf                  SPA + reverse proxy /api + header keamanan
-│   └── vite.config.js              Proxy API dan security headers untuk dev/preview
-├── e2e/                            Playwright: tests/, pages/, fixtures/
-├── scripts/                        Inisialisasi DB, QA automation, tokens, deploy
-├── docs/                           Konvensi, keamanan, laporan QA, runbook, manual
-├── design-tokens/                  Sumber design tokens (npm run build:tokens)
-├── .github/workflows/              ci.yml, e2e-tests.yml, codeql.yml, docker-publish.yml
-├── docker-compose.yml              postgres, migrate, backend, frontend
-├── playwright.config.js            Validasi database test loopback *_test
-└── package.json                    Skrip root: E2E, dokumen, tokens, deploy
+│   │   ├── assets/                 Core stylesheets and layout tokens
+│   │   ├── components/
+│   │   │   ├── cases/              Help Center article cards and viewer components
+│   │   │   ├── dashboard/          KPI cards and dashboard metric summaries
+│   │   │   ├── layout/             AppHeader, AppSidebar, AppBottomNav, PageHeader
+│   │   │   ├── tickets/            Ticket queues, detail drawers, comment threads
+│   │   │   └── ui/                 Shared UI kit (AppButton, DataTable, Modal, Toast)
+│   │   ├── composables/            State management composables (useApi, useAuth, useToast)
+│   │   ├── config/                 Navigation routing configs and feature mappings
+│   │   ├── router/                 Vue Router route mappings and permission guards
+│   │   ├── services/               Client-side API service integrations
+│   │   ├── utils/                  Formatters, sanitizers, barcode helpers
+│   │   ├── views/                  Top-level page views (Dashboard, Assets, Tickets, etc.)
+│   │   │   └── admin/              Administrative views (Users, Database, Categories, CMS)
+│   │   ├── App.vue                 Root component mounting layouts, modals, and toasts
+│   │   └── main.js                 Application entry point and plugin registration
+│   ├── tests/                      Frontend unit test specifications
+│   ├── nginx.conf                  Production Nginx configuration (reverse proxy + headers)
+│   ├── vite.config.js              Vite build configuration and dev proxy settings
+│   ├── Dockerfile                  Multi-stage Nginx production container
+│   └── package.json                Frontend dependencies and linting scripts
+│
+├── docs/                           Engineering documentation and audit records
+│   ├── audits/                     Historical UI and UX compliance audit reports
+│   ├── deploy/                     Production deployment manifests and templates
+│   ├── screenshots/                Curated application interface screenshots
+│   ├── CONVENTIONS.md              Code conventions, SQL requirements, testing rules
+│   ├── PRODUCTION_QA_REPORT.md     Production quality assurance sign-off reports
+│   └── database-migration-adoption.md Adoption runbook for existing database instances
+│
+├── e2e/                            Playwright End-to-End test framework
+│   ├── fixtures/                   Disposable test data and database seed helpers
+│   ├── pages/                      Page Object Model (POM) representations
+│   └── tests/                      31 test specifications covering core functional flows
+│
+├── scripts/                        Automation utilities, QA tooling, and seed helpers
+│   ├── build-tokens.js             Design token compiler
+│   ├── initialize-test-database.mjs Automated loopback test database initializer
+│   └── qa/                         Non-production regression and QA verification scripts
+│
+├── design-tokens/                  Source JSON design tokens for typography and colors
+├── .github/workflows/              GitHub Actions CI/CD pipeline definitions
+├── docker-compose.yml              Multi-container development and deployment stack
+├── playwright.config.js            Playwright test runner configuration
+└── package.json                    Root package scripts for testing, tokens, and docs
 ```
 
-## Requirements
+---
 
-- Node.js `^22.18.0` or `>=24.12.0`
-- npm
-- PostgreSQL 16 (local instance, or Docker Compose)
-- Docker and Docker Compose (optional, for the full stack)
-- Playwright browsers (for E2E): installed via `npx playwright install`
+## Prerequisites
 
-## Installation
+- **Node.js:** Supported versions `^22.18.0` or `>=24.12.0`.
+- **Package Manager:** `npm` (bundled with Node.js).
+- **Database:** PostgreSQL 16 server (local installation or container).
+- **Container Engine (Optional):** Docker 24+ and Docker Compose v2.
+- **Browsers for E2E (Optional):** Chromium and Firefox via `npx playwright install`.
+
+---
+
+## Quick Start and Local Development
+
+### 1. Clone Repository and Install Dependencies
 
 ```bash
 git clone https://github.com/muhhlmy/esb-trackit.git
 cd esb-trackit
 
-# Root (Playwright and root scripts)
+# Install root dependencies (Playwright, linters)
 npm ci
 
-# Backend
+# Install backend dependencies
 npm --prefix backend ci
 
-# Frontend
+# Install frontend dependencies
 npm --prefix frontend ci
 ```
 
-Copy environment templates before configuring:
+### 2. Environment Configuration
+
+Create local environment configuration files from provided templates:
 
 ```bash
-cp .env.example .env                 # Docker Compose / root
-cp backend/.env.example backend/.env  # local backend
+# Root and Docker Compose configuration
+cp .env.example .env
+
+# Local backend API configuration
+cp backend/.env.example backend/.env
+
+# Local frontend configuration
 cp frontend/.env.example frontend/.env
-cp .env.e2e.example .env.e2e          # E2E only
+
+# Local End-to-End testing configuration (optional)
+cp .env.e2e.example .env.e2e
 ```
 
-Fill required values in your **local** `.env` files. Never commit `.env`, `.env.e2e`, database dumps, or backup files.
-
-## Configuration
-
-| File | Purpose |
-| --- | --- |
-| `backend/.env.example` | API port, PostgreSQL, JWT secret, CORS, rate limits, SMTP, migration guards, backup paths |
-| `frontend/.env.example` | Vite host/proxy settings (`VITE_API_BASE_URL` stays empty for same-origin cookies) |
-| `.env.example` | Docker Compose inputs (DB password, JWT secret, migration guards, optional SMTP/seed) |
-| `.env.e2e.example` | Playwright base URLs and disposable test accounts |
-
-Rules enforced by the application (VERIFIED):
-
-- `JWT_SECRET` is required at startup (minimum 32 characters) and has no source-code default.
-- `DB_PASSWORD` is required at startup.
-- `CORS_ORIGINS` must be an exact comma-separated allowlist; `*` fails startup.
-- `TRUST_PROXY_CIDRS` accepts only explicit IP/CIDR values (empty if you are not behind a proxy).
-- Frontend `VITE_*` values are public to the browser — never put backend secrets there.
-
-Do not commit `.env` files, credentials, private keys, production configuration, or database dumps.
-
-## Database Setup
-
-TrackIT uses **PostgreSQL 16**. Schema changes are applied only from `backend/migrations/versioned/` via the migration runner (advisory lock, SHA-256 checksums, `app_schema_migrations` ledger).
-
-Legacy `backend/migrations/0xx_*.sql` files are documentation archives — do not execute them.
-
-### Migration commands (backend working directory)
-
-```bash
-npm run db:migrate:plan    # inspect pending migrations (no changes)
-npm run db:migrate:apply   # apply migrations (guarded)
-npm run db:check           # verify runtime schema expectations
-```
-
-`db:migrate:apply` refuses to run unless the guard environment is set, including at least:
-
-| Variable | Role |
-| --- | --- |
-| `ALLOW_DB_MIGRATIONS` | Must be `true` (explicit intent) |
-| `MIGRATION_MODE` | `fresh` or `existing` |
-| `MIGRATION_EXPECTED_HOST` | Must match the target host exactly |
-| `MIGRATION_EXPECTED_DATABASE` | Must match the target database exactly |
-| `MIGRATION_RECOVERY_PROOF_ID` | Proof ID from a verified backup/restore |
-| `MIGRATION_CHANGE_ID` | Change-request identifier (required in production) |
-| `REQUIRE_NON_SUPERUSER` | Optional: require non-superuser DB owner |
-
-For adopting an existing database onto the migration ledger, follow `docs/database-migration-adoption.md`.
-
-Docker Compose runs a dedicated `migrate` one-shot service before the backend starts.
-
-### E2E / test database
-
-Playwright only accepts:
-
-- `DB_HOST` in `localhost`, `127.0.0.1`, or `::1`
-- `DB_NAME` matching `*_test`
-
-Preparation is handled by `npm run test:e2e:prepare` (`scripts/initialize-test-database.mjs --seed-e2e`).
-
-## Running Locally
-
-### Database
-
-Start PostgreSQL 16 on `localhost:5432` (local install or `docker compose up postgres`).
-
-### Backend
-
-```bash
-npm --prefix backend run db:migrate:plan
-npm --prefix backend run db:migrate:apply
-npm --prefix backend run dev
-```
-
-Buat file `backend/.env` dengan isi minimal berikut. File ini tidak pernah masuk git.
+Configure your local `backend/.env` with your PostgreSQL database credentials and a secure JWT secret:
 
 ```env
 PORT=3000
@@ -317,467 +401,402 @@ DB_HOST=localhost
 DB_PORT=5432
 DB_NAME=trackit
 DB_USER=postgres
-DB_PASSWORD=<password-postgres-anda>
-JWT_SECRET=<string-acak-minimal-32-karakter>
+DB_PASSWORD=your_local_postgres_password
+JWT_SECRET=super_secret_key_minimum_32_characters_random_string
+CORS_ORIGINS=http://localhost:5173
 ```
 
-`JWT_SECRET` divalidasi ketat saat startup: wajib diisi, minimal 32 karakter, tanpa nilai bawaan di source code. Aplikasi menolak menyala tanpanya.
+### 3. Database Setup and Migration Protocol
 
-Terapkan migrasi untuk menyiapkan skema:
+Ensure PostgreSQL 16 is running on `localhost:5432` with a database named `trackit`.
+
+Execute schema migrations using the migration runner:
 
 ```bash
-npm run db:migrate:plan    # tinjau rencana tanpa mengubah apa pun
-npm run db:migrate:apply   # terapkan; wajib menyertakan guard env (lihat bagian Database dan Migrasi)
-npm run db:check           # verifikasi runtime schema
+# Review pending migrations without applying changes
+npm --prefix backend run db:migrate:plan
+
+# Apply migrations with required environment guards
+ALLOW_DB_MIGRATIONS=true \
+MIGRATION_MODE=fresh \
+MIGRATION_EXPECTED_HOST=localhost \
+MIGRATION_EXPECTED_DATABASE=trackit \
+MIGRATION_RECOVERY_PROOF_ID=local_dev_init \
+npm --prefix backend run db:migrate:apply
+
+# Verify runtime schema expectations
+npm --prefix backend run db:check
 ```
 
-Jalankan server:
+### 4. Start Application Services
+
+Start the backend API server:
 
 ```bash
-npm run dev      # nodemon, memantau src/ dan .env
-npm start        # produksi sederhana
+npm --prefix backend run dev
 ```
+The API server begins listening on `http://localhost:3000`. You can confirm server and database status at `http://localhost:3000/health`.
 
-API berjalan di `http://localhost:3000`. Cek `GET /health`; respons `{"status":"healthy"}` berarti koneksi database sehat.
-
-### Frontend
+In a separate terminal, launch the frontend development server:
 
 ```bash
 npm --prefix frontend run dev
 ```
+The SPA interface will be available at `http://localhost:5173`. Vite automatically proxies `/api` requests to `http://localhost:3000`.
 
-- App: `http://localhost:5173`
-- Vite proxies `/api` to `http://127.0.0.1:3000` (override with `VITE_API_PROXY_TARGET`)
+---
 
-### First account (non-production)
+## Docker Deployment
 
-When database reset/seeding is enabled (`ENABLE_DB_RESET=true`), the backend can create an initial superadmin from `SEED_SUPERADMIN_NAME`, `SEED_SUPERADMIN_EMAIL`, and `SEED_SUPERADMIN_PASSWORD`. Use unique credentials per environment and never reuse production passwords in development.
+### Docker Compose Local Cluster
 
-## Testing
+The provided `docker-compose.yml` deploys a complete four-service stack:
 
-All commands below are defined in the repository `package.json` files.
+1. `postgres`: PostgreSQL 16 Alpine container with persistent volumes and healthchecks.
+2. `migrate`: Ephemeral runner executing versioned migrations before the API starts.
+3. `backend`: Node.js 22 container running the Express API with `postgresql-client` for backup tasks.
+4. `frontend`: Multi-stage Nginx container serving the compiled SPA and reverse-proxying `/api`.
 
-```bash
-npm run build     # vite build
-npm run preview   # sajikan hasil build dengan security headers
-```
-
-E2E coverage (31 spec files under `e2e/tests/`): smoke, auth, tickets, assets, submissions, dashboard, RBAC, security (auth/authz/input), accessibility (axe-core), negative/error states, public regressions, view mode, and extended QA.
-
-Unit suites include security-focused tests such as session lifecycle, brute-force lockout, rate limiting, CORS, security headers, IDOR authorization, XSS sanitizing, and export formula-injection guards.
-
-See `e2e/README.md` for suite architecture and safety rules.
-
-> This README does not claim a green test run for every environment. Verify with the commands above in CI or locally.
-
-## Production Build
+To start the cluster:
 
 ```bash
-# Frontend
-npm --prefix frontend run build     # vite build → frontend/dist
-npm --prefix frontend run preview   # optional local preview
-
-# Backend syntax preflight (used in CI)
-npm --prefix backend run check
-
-# Lint and format (frontend, used in CI)
-npm --prefix frontend run lint
-npm --prefix frontend run format:check
+# Verify .env has DB_PASSWORD, JWT_SECRET, and migration guards set
+docker compose up --build -d
 ```
 
-Optional root helpers:
+Access the application at `http://localhost` (exposed on standard HTTP port 80).
+
+To view runtime container output:
 
 ```bash
-npm run build:tokens        # build design tokens from design-tokens/
-npm run docs:manual:pdf     # regenerate the user manual PDF
+docker compose logs -f
 ```
 
-## Docker
-
-Verified Compose services:
-
-| Service | Role |
-| --- | --- |
-| `postgres` | PostgreSQL 16 Alpine with `pg_isready` healthcheck |
-| `migrate` | One-shot job: applies versioned migrations, then exits |
-| `backend` | Node 22 Alpine, non-root user, `postgresql-client` for backup/restore |
-| `frontend` | Nginx: serves the SPA, proxies `/api` to the backend, SSE-friendly buffering |
+To stop all services:
 
 ```bash
-cp .env.example .env
-# Set at minimum: DB_PASSWORD, JWT_SECRET,
-# MIGRATION_RECOVERY_PROOF_ID, MIGRATION_CHANGE_ID
-
-docker compose up --build
+docker compose down
 ```
 
-Application UI: `http://localhost` (Compose publishes the frontend on port 80).
+### Container Images from GitHub Container Registry
 
-Notes:
-
-## Image Docker dari GHCR
-
-Setiap push ke `main` dan setiap tag `v*.*.*` mempublikasikan dua image ke GitHub Packages (GHCR) melalui workflow `docker-publish.yml`, lalu image ditandatangani dengan cosign:
-
-```text
-ghcr.io/<owner>/<repo>-backend:latest
-ghcr.io/<owner>/<repo>-frontend:latest
-```
-
-Menarik image untuk deployment tanpa build lokal:
+Automated GitHub Actions workflows publish production-ready container images to the GitHub Packages Container Registry (GHCR) on each release tag:
 
 ```bash
-docker pull ghcr.io/<owner>/<repo>-backend:latest
-docker pull ghcr.io/<owner>/<repo>-frontend:latest
+# Pull backend image
+docker pull ghcr.io/muhhlmy/esb-trackit-backend:latest
+
+# Pull frontend image
+docker pull ghcr.io/muhhlmy/esb-trackit-frontend:latest
 ```
 
-Verifikasi signature cosign:
+### Image Signature Verification with Cosign
+
+Images published to GHCR are cryptographically signed using Cosign via GitHub Actions OIDC tokens. You can verify container provenance before deploying:
 
 ```bash
 cosign verify \
-  --certificate-identity-regexp '^https://github.com/<owner>/<repo>/\.github/workflows/' \
+  --certificate-identity-regexp '^https://github.com/muhhlmy/esb-trackit/\.github/workflows/' \
   --certificate-oidc-issuer https://token.actions.githubusercontent.com \
-  ghcr.io/<owner>/<repo>-backend:latest
+  ghcr.io/muhhlmy/esb-trackit-backend:latest
 ```
 
-Catatan:
+---
 
-- Pull request hanya membuild image tanpa push, sehingga CI tetap memvalidasi Dockerfile.
-- Image `frontend` di-build dari context `./frontend`, image `backend` dari context `./backend`.
-- Package pertama kali mungkin perlu di-set **public** (atau dikonfigurasi aksesnya) di tab *Packages* pada repository settings.
+## Environment Variables Reference
 
-## Database dan Migrasi
+### Backend Configuration (`backend/.env`)
 
-## Security
+| Variable | Requirement | Default | Description |
+| --- | --- | --- | --- |
+| `PORT` | Optional | `3000` | HTTP port for the Express application server |
+| `HOST` | Optional | `0.0.0.0` | Network binding interface |
+| `NODE_ENV` | Optional | `development` | Runtime environment mode (`development`, `production`, `test`) |
+| `DB_HOST` | Required | `localhost` | PostgreSQL database host address |
+| `DB_PORT` | Optional | `5432` | PostgreSQL database service port |
+| `DB_NAME` | Required | None | PostgreSQL database name |
+| `DB_USER` | Required | None | PostgreSQL username |
+| `DB_PASSWORD` | Required | None | PostgreSQL user password |
+| `JWT_SECRET` | Required | None | Cryptographic secret for signing tokens (minimum 32 characters) |
+| `CORS_ORIGINS` | Required | None | Comma-separated list of exact allowed browser origins (wildcards prohibited) |
+| `TRUST_PROXY_CIDRS` | Optional | Empty | Comma-separated trusted upstream proxy CIDR blocks (e.g. `172.28.0.0/16`) |
+| `SESSION_COOKIE_NAME`| Optional | `trackit_session` | Name of the HttpOnly session cookie |
+| `SESSION_COOKIE_SECURE`| Optional | `false` | Sets `Secure` flag on cookies (must be `true` behind HTTPS) |
+| `EMAIL_ENABLED` | Optional | `false` | Enables transactional email dispatch for password resets |
+| `SMTP_HOST` | Optional | Empty | SMTP server hostname |
+| `SMTP_PORT` | Optional | `587` | SMTP service port |
+| `SMTP_SECURE` | Optional | `false` | Enforces TLS for SMTP connections |
+| `SMTP_USER` | Optional | Empty | SMTP authentication username |
+| `SMTP_PASS` | Optional | Empty | SMTP authentication password |
+| `EMAIL_FROM` | Optional | Empty | Sender email address for outgoing messages |
+| `ENABLE_DB_RESET` | Optional | `false` | Enables database purge endpoint (prohibited in production) |
 
-High-level security model as implemented (no exploit-oriented detail):
+### Migration Guard Variables
 
-| Area | Implementation |
-| --- | --- |
-| Authentication | HttpOnly session cookie; JWT validated against server-side sessions (revocable, sliding) |
-| Authorization | Roles `user` / `admin` / `superadmin` plus 13 feature permission keys, enforced in API middleware |
-| Password storage | bcrypt with configurable rounds (default 12, bounded 10–14); non-bcrypt hashes fail closed |
-| Account protection | Login failure lockout state; OTP-based password reset with hashing, expiry, and attempt limits |
-| Session hygiene | Short access-token TTL with server session as source of truth; logout revokes server-side |
-| Rate limiting | Global API limiter, per-user authenticated limiter, dedicated auth endpoint limiter |
-| SQL | Parameterized queries; dynamic export identifiers restricted through an allowlist helper |
-| Input / output | JSON-only body policy for API mutations; DOMPurify sanitizing on client and server paths |
-| Headers | CSP, `X-Frame-Options: DENY`, `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy`, COOP/CORP; HSTS when deployed behind TLS |
-| CORS | Exact origin allowlist; wildcards rejected at startup |
-| XLSX | Formula-injection neutralization on export; template-aligned import validation |
-| Audit | Cross-module system audit (before/after JSONB, actor, IP, user-agent) plus login audit |
-| Secrets | Required via environment with no insecure source defaults; `.env*` gitignored (examples only tracked) |
-| Supply chain | Dependabot, `npm audit --audit-level=high` in CI, CycloneDX SBOM artifacts, CodeQL |
-| Containers | Non-root backend, capability drop, `no-new-privileges` |
+The migration runner enforces mandatory guard variables to prevent accidental schema changes:
 
-### Security disclosure
+| Variable | Requirement | Expected Value | Description |
+| --- | --- | --- | --- |
+| `ALLOW_DB_MIGRATIONS` | Mandatory | `true` | Explicit acknowledgment of intent to modify schema |
+| `MIGRATION_MODE` | Mandatory | `fresh` or `existing` | Context of database target (`fresh` for initial setup) |
+| `MIGRATION_EXPECTED_HOST` | Mandatory | Exact match | Verifies connection host matches command target |
+| `MIGRATION_EXPECTED_DATABASE` | Mandatory | Exact match | Verifies target database name matches command target |
+| `MIGRATION_RECOVERY_PROOF_ID`| Mandatory | String ID | Unique recovery backup proof ID before changes |
+| `MIGRATION_CHANGE_ID` | Production | Change Ticket | Change management reference for production tracking |
 
-To report a vulnerability, open a private GitHub security advisory on this repository, or contact the maintainer through GitHub.
+---
 
-**Do not commit secrets, credentials, private keys, production configuration, or sensitive infrastructure information.**
+## Database Schema and Governance
 
-- Keep real values only in local `.env` files (gitignored) or a secret manager
-- Use GitHub repository secrets for CI/CD values that cannot be dummy data
-- Rotate any credential that may have been exposed
-- Never publish private keys or database dumps
+TrackIT uses PostgreSQL 16. The database structure contains 24 relational tables, 3 analytical views, and trigger-enforced constraints.
 
-## Environment Variables
+### Schema Architecture
 
-Representative placeholders (always prefer the `.env.example` files as the source of truth):
-
-```env
-# backend/.env
-NODE_ENV=development
-HOST=127.0.0.1
-PORT=3000
-FRONTEND_URL=http://localhost:5173
-
-DB_HOST=localhost
-DB_PORT=5432
-DB_NAME=<database-name>
-DB_USER=<database-user>
-DB_PASSWORD=<set-in-environment>
-
-| Variabel | Default | Keterangan |
+| Category | Objects | Purpose |
 | --- | --- | --- |
-| `CORS_ORIGINS` | origin dev lokal | Daftar origin exact dipisah koma; nilai `*` menyebabkan startup gagal |
-| `TRUST_PROXY_CIDRS` | kosong (compose: `172.28.0.0/16`) | IP/CIDR proxy tepercaya, exact, dipisah koma |
-| `EMAIL_ENABLED` | `false` | Mengaktifkan pengiriman email (aktivasi akun, reset password) |
-| `SMTP_HOST` `SMTP_PORT` `SMTP_SECURE` `SMTP_USER` `SMTP_PASS` `EMAIL_FROM` | kosong | Konfigurasi SMTP |
-| `FRONTEND_URL` | `http://localhost` | Origin frontend untuk tautan dalam email |
+| **Authentication & Accounts** | `users`, `karyawan`, `user_sessions`, `account_security_state`, `password_reset_otps` | Identity, session management, brute-force state, password reset |
+| **Asset Inventories** | `aset_ti`, `aset_ga`, `aset_ops`, `asset_submissions`, `riwayat_pemakaian_aset`, `log_riwayat_aset` | Equipment inventory across domains, employee assignment history |
+| **Service Desk** | `ticket_queues`, `tickets`, `komentar_tiket`, `ticket_casp_ratings`, `user_ticket_queues`, `log_riwayat_tiket` | Queues, tickets, threaded commentary, CSAT feedback ratings |
+| **Help Center Portal** | `faq`, `cases`, `kb_categories`, `kb_search_logs`, `case_bookmarks` | SOP documentation, FAQ entries, category taxonomy, user bookmarks |
+| **Logistics** | `asset_shipments` | Courier consignments, AWB tracking, delivery statuses |
+| **System Audit & Backups** | `system_audit_logs`, `log_audit_login`, `backup_metadata`, `backup_audit_log` | Central JSONB audit trail, login logs, backup catalogs |
+| **Analytical Views** | `daftar_aset_ti_lengkap`, `v_ticket_stats_per_queue`, `v_employee_asset_summary` | Denormalized queries for reporting and dashboard widgets |
 
-CORS_ORIGINS=http://localhost:5173
-TRUST_PROXY_CIDRS=
+### Database Integrity Constraints
 
-EMAIL_ENABLED=false
-SMTP_HOST=
-SMTP_PORT=587
-SMTP_SECURE=false
-SMTP_USER=
-SMTP_PASS=
-EMAIL_FROM=<sender@example.com>
+- **Soft Delete Protections:** Tables including `users`, `aset_ti`, and `tickets` utilize soft deletion (`deleted_at`). Trigger functions block manual `DELETE` statements on critical records.
+- **Automated Timestamp Tracking:** An `auto_update_timestamp()` trigger updates the `updated_at` column across all primary tables on each record mutation.
+- **Enum Safeguards:** State columns use explicit SQL `CHECK` constraints, guaranteeing data validity independent of application code.
+- **Partial Indices:** Indices applied conditionally on active records (`WHERE deleted_at IS NULL`) optimize query performance.
 
-### Root dan Docker Compose
+---
 
-`.env.example` di root memuat variabel tambahan untuk compose: kredensial database, guard migrasi (`MIGRATION_*`), seed superadmin, kredensial QA (`QA_SUPERADMIN_EMAIL`, `QA_SUPERADMIN_PASSWORD` untuk skrip QA di `scripts/qa/`), dan konfigurasi SMTP. Kredensial QA hanya untuk environment test.
+## REST API Reference
 
-File `.env`, `.env.e2e`, folder `backend/storage/backups/`, dan berkas `*.dump` semuanya gitignored. Jangan pernah menyimpan kredensial production di repository.
+All application endpoints are served under the `/api` prefix. Mutating HTTP requests (`POST`, `PUT`, `PATCH`, `DELETE`) require the `Content-Type: application/json` header.
 
-## Skema Database
+### Authentication Endpoints
 
-Skema kanonik berisi 24 tabel dan 3 view, dengan constraint yang ditegakkan langsung di database:
-
-| Grup | Objek |
-| --- | --- |
-| Identitas dan auth | `karyawan`, `users`, `user_sessions`, `account_security_state`, `password_reset_otps` |
-| Aset | `aset_ti`, `aset_ga`, `aset_ops`, `asset_submissions`, `riwayat_pemakaian_aset`, `log_riwayat_aset` |
-| Helpdesk | `ticket_queues`, `tickets`, `komentar_tiket`, `ticket_casp_ratings`, `user_ticket_queues`, `log_riwayat_tiket` |
-| Help Center | `faq`, `cases` |
-| Logistik | `asset_shipments` |
-| Audit dan operasi | `system_audit_logs`, `log_audit_login`, `backup_metadata`, `backup_audit_log` |
-| View | `daftar_aset_ti_lengkap`, `v_ticket_stats_per_queue`, `v_employee_asset_summary` |
-
-Poin desain yang perlu diketahui:
-
-- Status enum ditegakkan lewat `CHECK` constraint, bukan hanya di aplikasi.
-- Trigger `auto_update_timestamp()` memelihara kolom `updated_at` pada tabel utama.
-- Trigger `prevent_hard_delete()` melindungi `users`, `aset_ti`, dan `tickets`. DELETE langsung akan gagal; penghapusan harus lewat soft delete (`deleted_at`).
-- Foreign key memakai strategi hapus yang disengaja: `SET NULL` untuk referensi opsional, `RESTRICT` untuk data yang tidak boleh hilang, `CASCADE` untuk data turunan.
-- Index parsial dipasang untuk query panas, misalnya index pada `status` yang hanya mencakup baris `deleted_at IS NULL`.
-
-## API Reference
-
-Basis URL `/api`, format JSON. Permintaan tanpa `Content-Type: application/json` untuk method ber-body akan ditolak. Autentikasi memakai cookie sesi HttpOnly yang didapat setelah login; token tidak disimpan di browser.
-
-### Autentikasi
-
-| Method | Endpoint | Akses | Fungsi |
+| Method | Endpoint | Access Level | Description |
 | --- | --- | --- | --- |
-| POST | `/api/auth/login` | Publik (rate-limited) | Login, menerbitkan cookie sesi |
-| POST | `/api/auth/logout` | JWT | Menghapus sesi di sisi server |
-| GET | `/api/auth/me` | JWT | Profil dan izin pengguna saat ini |
-| POST | `/api/auth/change-password` | JWT | Ganti sandi sendiri |
-| POST | `/api/auth/forgot-password` | Publik (rate-limited) | Memulai reset via OTP |
-| POST | `/api/auth/verify-reset-otp` | Publik (rate-limited) | Verifikasi OTP |
-| POST | `/api/auth/reset-password` | Publik (rate-limited) | Menyetel sandi baru |
+| `POST` | `/api/auth/login` | Public (Rate-limited) | Validates credentials and sets HttpOnly session cookie |
+| `POST` | `/api/auth/logout` | Authenticated | Revokes current session record in database |
+| `GET` | `/api/auth/me` | Authenticated | Retrieves current authenticated user profile and permissions |
+| `POST` | `/api/auth/change-password` | Authenticated | Updates current user password |
+| `POST` | `/api/auth/forgot-password` | Public (Rate-limited) | Initiates password reset procedure and dispatches OTP |
+| `POST` | `/api/auth/verify-reset-otp`| Public (Rate-limited) | Validates OTP hash before password replacement |
+| `POST` | `/api/auth/reset-password` | Public (Rate-limited) | Sets new password following verified OTP confirmation |
 
-### Modul utama
+### Core Operational Endpoints
 
-| Endpoint | Akses minimum | Fungsi |
-| --- | --- | --- |
-| `/api/assets` | Izin `assets` | Aset IT: CRUD, `/my`, `/stats`, `/cycle/:nik` |
-| `/api/ga-assets` | Izin `assets_ga` | Aset GA. Alias: `/api/assets-ga`, `/api/assets_ga` |
-| `/api/ops-assets` | Izin `assets_ops` | Aset OPS. Alias: `/api/assets-ops`, `/api/assets_ops` |
-| `/api/employees` | Admin | Master data karyawan. Alias legacy: `/api/karyawan` |
-| `/api/users` | Admin | Akun, role, dan izin per fitur |
-| `/api/tickets` | Izin `tickets` | CRUD tiket, komentar, lampiran, claim/reassign, riwayat, CSAT, statistik. `GET /events` = SSE |
-| `/api/ticket-queues` | JWT | Antrean tiket; pengelolaan admin antrean oleh superadmin |
-| `/api/shipments` | Izin `shipments` | Pengiriman dan import. Alias: `/api/pengiriman` |
-| `/api/submissions` | Izin `submissions` | Pengajuan aset |
-| `/api/case-bookmarks` | JWT | Bookmark artikel per pengguna |
-| `/api/logs` | Admin | Log aktivitas sistem |
-
-### Help Center
-
-| Method | Endpoint | Akses | Fungsi |
+| Method | Endpoint | Required Permission | Description |
 | --- | --- | --- | --- |
-| GET | `/api/cases/public` | Publik | Artikel berstatus `PUBLISHED` |
-| GET | `/api/faqs/public` | Publik | FAQ berstatus `PUBLISHED` |
-| GET | `/api/kb-categories/public` | Publik | Kategori/topic cards |
-| GET, POST | `/api/kb-search-logs` | Publik | Pencatatan pencarian; `/popular` untuk daftar populer |
-| CRUD | `/api/cases` `/api/faqs` `/api/kb-categories` | Izin `knowledge_base` | CMS draft/publish |
-| GET | `/api/kb-search-logs/stats` | Admin | Statistik pencarian KB |
+| `GET`, `POST` | `/api/assets` | `assets` (Read / Full) | List and create IT asset records |
+| `GET`, `PUT`, `DELETE`| `/api/assets/:id` | `assets` (Read / Full) | Retrieve, modify, or archive specific IT asset |
+| `GET` | `/api/assets/my` | `my_assets` (Read) | Retrieve hardware currently assigned to logged-in employee |
+| `GET` | `/api/assets/stats` | `assets` (Read) | Summary metrics on asset conditions and classifications |
+| `GET`, `POST` | `/api/ga-assets` | `assets_ga` (Read / Full) | List and create General Affairs asset records |
+| `GET`, `POST` | `/api/ops-assets` | `assets_ops` (Read / Full) | List and create Operations asset records |
+| `GET`, `POST` | `/api/tickets` | `tickets` (Read / Full) | List and open helpdesk service tickets |
+| `GET` | `/api/tickets/events` | `tickets` (Read) | Server-Sent Events stream for realtime ticket notifications |
+| `POST` | `/api/tickets/:id/comments` | `tickets` (Full) | Append message or attachment to ticket conversation |
+| `POST` | `/api/tickets/:id/claim` | `tickets` (Full) | Assign ticket to the currently authenticated agent |
+| `POST` | `/api/tickets/:id/csat` | `tickets` (Full) | Record customer satisfaction rating for resolved ticket |
+| `GET`, `POST` | `/api/submissions` | `submissions` (Read / Full) | List and create employee hardware requests |
+| `GET`, `POST` | `/api/shipments` | `shipments` (Read / Full) | List and create courier tracking records |
 
-### Import, export, dan administrasi database
+### Public Help Center Endpoints
 
-| Method | Endpoint | Akses | Fungsi |
+| Method | Endpoint | Access Level | Description |
 | --- | --- | --- | --- |
-| POST | `/api/import/excel` | Admin | Import Karyawan dan/atau Aset IT |
-| POST | `/api/import/excel-assets` | Admin | Import Aset GA, OPS, atau Pengiriman |
-| GET, POST | `/api/export/*` | Superadmin | Metadata tabel, export XLSX aset/pengguna/tiket/data |
-| POST | `/api/export/reset-database` | Superadmin | Reset database (dijaga `ENABLE_DB_RESET`) |
-| GET | `/api/admin/database/status` | Superadmin | Status dan integritas skema |
-| GET, POST, DELETE | `/api/admin/database/backups` | Superadmin | Buat, daftar, hapus, unduh backup |
-| POST | `/api/admin/database/restore[/validate]` | Superadmin | Validasi lalu restore dump (upload maks. 500 MB) |
-| GET | `/api/admin/database/audit-logs` | Superadmin | Audit trail backup/restore |
-| GET | `/health` | Publik | Health check termasuk koneksi database |
+| `GET` | `/api/cases/public` | Public | List published Help Center incident and SOP articles |
+| `GET` | `/api/cases/public/:id` | Public | Retrieve published article content and metadata |
+| `GET` | `/api/faqs/public` | Public | List published frequently asked questions |
+| `GET` | `/api/kb-categories/public` | Public | List active topic categories for Help Center cards |
+| `GET` | `/api/kb-search-logs/popular`| Public | Retrieve aggregate list of frequent search terms |
+| `POST`| `/api/kb-search-logs` | Public | Log a search term query for analytics |
 
-Izin di atas memakai 13 kunci fitur (`dashboard`, `assets`, `assets_ga`, `assets_ops`, `my_assets`, `tickets`, `submissions`, `shipments`, `users`, `logs`, `karyawan`, `export`, `knowledge_base`), masing-masing dengan level `none`, `read_only`, atau `full`. Alias legacy tetap tersedia demi kompatibilitas, dan otorisasi selalu diperiksa ulang di backend.
+### Administrative Endpoints
 
-## Import dan Export XLSX
-
-Dua jaminan pada jalur XLSX:
-
-1. File export bebas formula injection. Nilai berawalan `=`, `+`, `-`, atau `@` dinetralkan sebelum ditulis ke workbook.
-2. Header dan nama sheet pada export identik dengan template import, sehingga file hasil export bisa diedit lalu langsung diimpor kembali.
-
-| Halaman | Sheet | Identitas baris | Catatan |
+| Method | Endpoint | Required Permission | Description |
 | --- | --- | --- | --- |
-| Karyawan | `Table Karyawan` | NIK | Impor karyawan lebih dulu agar relasi pemegang aset terbentuk |
-| Aset IT | `Table Asset` | Kombinasi hostname/serial | Impor biasa hanya aset |
-| Aset IT lengkap | `Table Karyawan` + `Table Asset` | NIK + hostname | Aktifkan opsi "Import lengkap" untuk impor awal dua sheet sekaligus |
-| Aset GA | `Data Aset GA` | hostname | |
-| Aset OPS | `Data Aset OPS` | hostname | |
-| Pengiriman | `Data Pengiriman` | resi | Header template sama dengan export |
+| `GET`, `POST` | `/api/employees` | `karyawan` (Admin) | Manage employee master data directory |
+| `GET`, `POST` | `/api/users` | `users` (Admin) | Manage system user accounts and permission matrices |
+| `GET` | `/api/logs` | `logs` (Admin) | Retrieve system audit logs and login records |
+| `POST` | `/api/import/excel` | Admin | Batch import employee and IT asset data from XLSX |
+| `POST` | `/api/import/excel-assets` | Admin | Batch import GA assets, OPS assets, or shipments |
+| `GET`, `POST` | `/api/export/*` | `export` (Superadmin) | Export system records to sanitized XLSX workbooks |
+| `GET`, `PUT` | `/api/settings/email` | Superadmin | Read or update transactional SMTP configuration and triggers |
+| `POST` | `/api/settings/email/test` | Superadmin | Dispatch test verification email to target address |
+| `GET`, `PUT`, `POST` | `/api/settings/email/templates/*` | Superadmin | Manage dynamic HTML email templates and resets |
+| `GET` | `/api/admin/database/status` | Superadmin | Check database connectivity and migration version |
+| `GET`, `POST` | `/api/admin/database/backups`| Superadmin | List existing backups or trigger new snapshot |
+| `POST` | `/api/admin/database/restore`| Superadmin | Restore database from an existing or uploaded dump file |
+| `GET` | `/health` | Public | Service healthcheck returning database connection state |
 
-Modal import menyediakan dua mode. **Tambah Data** menyisipkan tanpa menyentuh data lama. **Replace All** menghapus data kategori target terlebih dahulu; konfirmasi dengan mengetik `GANTI`, dan validasi konfirmasi yang sama dijalankan ulang di server.
+---
 
-## Keamanan
+## XLSX Import and Export Specifications
 
-**Sesi.** JWT 15 menit dipasangkan dengan tabel `user_sessions` sehingga token dapat dicabut, diperpanji (sliding), dan tidak pernah disimpan di localStorage. Cookie `trackit_session` memakai flag HttpOnly dan SameSite=Lax; Secure diaktifkan di production.
+### Security Safeguards
 
-**Otorisasi.** Tiga role global (`user`, `admin`, `superadmin`) ditambah izin granular 13 kunci fitur per pengguna. Setiap endpoint memeriksa ulang izin; frontend tidak pernah menjadi penentu.
+To prevent Formula Injection attacks, all exported spreadsheet cells beginning with dangerous characters (`=`, `+`, `-`, `@`) have their values prepended with a single quote character (`'`). This prevents spreadsheet calculation engines from executing arbitrary code while preserving readable content.
 
-**Rate limiting.** Tiga tingkat: global untuk semua `/api`, per-pengguna untuk klien terautentikasi, dan khusus endpoint auth. Trafik SSE dikecualikan agar koneksi realtime tidak terputus oleh limiter.
+### Import Mappings and Schemas
 
-**Perlindungan akun.** Percobaan login gagal dilacak per akun di `account_security_state` hingga terkunci sementara. Reset password memakai OTP yang disimpan sebagai hash dengan batas percobaan dan kedaluwarsa.
+| Module | Target Sheet Name | Key Identifiers | Notes |
+| --- | --- | --- | --- |
+| Employee Master | `Table Karyawan` | `NIK` | Import employees first to establish asset custody links |
+| IT Assets | `Table Asset` | `hostname`, `serial_number` | Requires existing employee NIK for assigned equipment |
+| Full IT Registry | `Table Karyawan` + `Table Asset` | `NIK`, `hostname` | Dual-sheet workbook creating employees and assets simultaneously |
+| GA Assets | `Data Aset GA` | `hostname` / `nomor_aset` | General Affairs facility and vehicle registry |
+| OPS Assets | `Data Aset OPS` | `hostname` / `nomor_aset` | Operational field hardware registry |
+| Shipments | `Data Pengiriman` | `resi` (AWB Number) | Logistics tracking with courier names and destinations |
 
-**Header dan transport.** CSP ketat, HSTS saat HTTPS, `X-Frame-Options: DENY`, `Permissions-Policy` yang menutup kamera/mikrofon/geolokasi, COOP dan CORP, serta header `Vary: Origin`. CORS memakai allowlist exact; konfigurasi wildcard membuat aplikasi gagal menyala.
+### Replace All Protocol
 
-**Validasi input.** Seluruh SQL parameterized; identifier dinamis (hanya di export) melewati `quoteAllowedIdentifier()`. Body non-JSON ditolak. Konten HTML disanitasi dengan DOMPurify di kedua sisi. File XLSX hasil export dinetralkan dari formula.
+When performing batch imports using the *Replace All* mode, existing category records are purged before inserting spreadsheet rows. To prevent accidental data loss, the administrative user must confirm the action by typing `GANTI` into the confirmation dialog. The backend re-validates this confirmation string prior to opening a database transaction.
 
-**Audit.** Tabel `system_audit_logs` mencatat modul, aksi, entitas, diff before/after, pelaku, IP, dan user-agent untuk aktivitas lintas modul. Login, backup/restore, tiket, dan aset memiliki jalur audit masing-masing.
+---
 
-**Infrastruktur.** Container aplikasi berjalan non-root tanpa kapabilitas tambahan (`no-new-privileges`, `cap_drop: ALL`), proxy tepercaya didefinisikan eksplisit lewat CIDR, CodeQL berjalan di CI, dan image Docker dipublikasikan bertanda tangan cosign.
+## Security Architecture
 
-## Pengujian
+TrackIT applies defense-in-depth principles across transport, application logic, and storage:
+
+1. **Authentication:** Signed JSON Web Tokens with a 15-minute validity window, delivered via HttpOnly cookies with `SameSite=Lax`. Tokens are validated against database session records on every request, enabling immediate revocation upon logout.
+2. **Access Control:** Every API route verifies both global role requirements and specific feature permission keys (`none`, `read_only`, `full`). Client-side checks only assist navigation rendering.
+3. **Password Security:** Hashes generated using `bcryptjs` with bounded salt rounds (12 rounds standard). Legacy or non-standard hash algorithms fail closed.
+4. **Brute Force Protection:** Account lockout records stored in `account_security_state` temporarily disable accounts exceeding failed attempt thresholds.
+5. **Content Security Policy (CSP):** Express middleware and Nginx configurations enforce strict script, style, and object source restrictions.
+6. **Input Validation and XSS Sanitization:** Incoming HTML bodies for Help Center articles are sanitized using `isomorphic-dompurify` on the backend and re-sanitized using `dompurify` before browser rendering.
+7. **Rate Limiting:** Multi-tiered express rate limiters protecting public endpoints, login routes, and general authenticated APIs. SSE streams are exempted from standard limits to prevent unexpected disconnections.
+8. **Container Hardening:** Docker production containers drop all Linux capabilities (`cap_drop: ALL`), disable privilege escalation (`no-new-privileges: true`), and run under dedicated unprivileged system users.
+
+---
+
+## Testing and Quality Assurance
+
+### Unit Testing
+
+Unit tests for backend business logic, validation routines, and frontend components run using the native Node.js test runner:
 
 ```bash
-# dari root
-npm run test:backend        # unit test backend  (node --test)
-npm run test:frontend       # unit test frontend (node --test)
-npm run test:e2e            # Playwright, termasuk persiapan database otomatis
-npm run test:e2e:smoke      # hanya skenario ber-tag @smoke
-npm run test:e2e:headed     # browser tampil
-npm run test:e2e:ui         # Playwright UI mode
-npm run test:e2e:report     # buka laporan HTML
+# Execute backend unit test suite
+npm run test:backend
+
+# Execute frontend unit test suite
+npm run test:frontend
 ```
 
-Cakupan E2E terdiri atas 31 berkas spec di `e2e/tests/` yang mengelompokkan skenario alami: smoke, auth, tiket, aset (IT/GA/OPS), submissions, dashboard, RBAC, keamanan, aksesibilitas (axe-core), error states, regresi halaman publik, view mode, dan QA extended.
+### End-to-End Testing with Playwright
 
-Aturan yang ditegakkan Playwright: suite E2E hanya boleh dijalankan terhadap database lokal dengan host loopback dan nama berakhiran `_test`. Konfigurasi yang melanggar akan menggagalkan seluruh run sebelum test dimulai. Salin `.env.e2e.example` menjadi `.env.e2e` untuk menyiapkannya; jangan pernah mengarahkan E2E ke database lain.
+TrackIT includes 31 End-to-End specification files covering complete user journeys, authentication lifecycles, ticketing workflows, access control, and edge-case errors.
 
-## CI/CD
+Safety Rule: Playwright is strictly guarded to execute only against local loopback database hosts (`localhost`, `127.0.0.1`) where the target database name ends with `_test`. Tests will immediately abort if pointed toward a shared or production database.
 
-Empat workflow GitHub Actions:
+To execute the End-to-End test suite:
 
-| Workflow | Pemicu | Isi |
-| --- | --- | --- |
-| `ci.yml` | push/PR ke `main`, `master`, `dev` | Backend: preflight sintaks dan unit test dengan service container PostgreSQL 16. Frontend: lint, unit test, build. |
-| `e2e-tests.yml` | push/PR | Suite Playwright penuh dengan database test sekali pakai |
-| `codeql.yml` | push/PR | Analisis keamanan statis |
-| `docker-publish.yml` | push `main`, tag `v*.*.*`, jadwal harian | Build dan push image `backend` + `frontend` ke GHCR, signing cosign (PR: build saja) |
+```bash
+# Prepare disposable test database and execute suite
+npm run test:e2e
 
-Rekomendasi governance repository: lindungi branch `main` dengan required PR, minimal satu approval, required status checks (CI, E2E, CodeQL), nonaktifkan force push, dan pin action ke commit SHA.
+# Run tests with visible browser windows
+npm run test:e2e:headed
 
-## Panduan Deployment Production
+# Run interactive Playwright UI mode
+npm run test:e2e:ui
 
-Checklist minimum sebelum go-live:
+# Execute smoke tests only
+npm run test:e2e:smoke
+```
 
-1. **HTTPS**: terminate TLS di reverse proxy, redirect HTTP → HTTPS, aktifkan HSTS. Gunakan certificate yang valid (mis. Let's Encrypt).
-2. **Secrets**: set `JWT_SECRET` acak ≥32 karakter, `DB_PASSWORD` kuat, dan simpan keduanya di secret manager atau file `.env` mode `600` di luar repository. Rotasi berkala.
-3. **Trusted proxy**: set `TRUST_PROXY_CIDRS` ke CIDR reverse proxy yang sebenarnya. Jangan pernah `*` atau `0.0.0.0/0`.
-4. **CORS**: set `CORS_ORIGINS` ke origin production secara exact.
-5. **Database**: backup terjadwal + uji restore berkala; database tidak pernah exposed ke host publik.
-6. **Migrasi**: setiap perubahan skema lewat `db:migrate:apply` dengan guard env lengkap (`MIGRATION_RECOVERY_PROOF_ID`, `MIGRATION_CHANGE_ID`) setelah backup terverifikasi.
-7. **Monitoring**: pantau `/health`, log aplikasi, dan disk usage untuk volume backup.
-8. **Rollback**: simpan image GHCR per tag versi; rollback = jalankan tag sebelumnya + restore backup terverifikasi.
-9. **Email**: bila `EMAIL_ENABLED=true`, gunakan kredensial SMTP dari secret, bukan dari repository.
-10. **Update**: patch container image dan dependency secara berkala (`npm audit`, rebuild image).
+### Automated Accessibility Checks
+
+Accessibility audits are integrated into Playwright test runs using `@axe-core/playwright`. All public Help Center pages and internal management views are verified for WCAG 2.1 AA compliance, including color contrast thresholds, keyboard navigation, focus indicators, and semantic heading structure.
+
+### Static Security Analysis
+
+- **GitHub CodeQL:** Automated static application security testing (SAST) runs on every pull request targeting the `main` branch to detect injection vulnerabilities and dangerous dependencies.
+- **Dependency Auditing:** Automated vulnerability scanning via `npm audit --audit-level=high`.
+
+---
+
+## Production Deployment Runbook
+
+### Pre-Deployment Verification Checklist
+
+1. **TLS Termination:** Configure your reverse proxy (Nginx, Traefik, or Cloudflare) to terminate TLS. Direct all HTTP requests to HTTPS.
+2. **Secret Management:** Generate a cryptographically secure `JWT_SECRET` (at least 32 random characters). Never commit secrets to version control.
+3. **Database Safeguards:** Verify PostgreSQL 16 is accessible only via private network interfaces. Ensure automated snapshot backups are operational.
+4. **Proxy Trust:** Specify the exact internal CIDR block of your reverse proxy in `TRUST_PROXY_CIDRS`. Do not use wildcard ranges.
+5. **CORS Allowlist:** Set `CORS_ORIGINS` to the exact public domain of the application (e.g. `https://trackit.company.com`).
+6. **Production Migration Execution:**
+   ```bash
+   ALLOW_DB_MIGRATIONS=true \
+   MIGRATION_MODE=existing \
+   MIGRATION_EXPECTED_HOST=db.internal.company.com \
+   MIGRATION_EXPECTED_DATABASE=trackit_prod \
+   MIGRATION_RECOVERY_PROOF_ID=backup_20261010_01 \
+   MIGRATION_CHANGE_ID=RFC-4920 \
+   npm --prefix backend run db:migrate:apply
+   ```
+7. **Health Verification:** Query `https://trackit.company.com/health` to confirm API availability and database connectivity.
+
+---
 
 ## Troubleshooting
 
-| Gejala | Penyebab umum | Tindakan |
+| Symptom | Probable Cause | Corrective Action |
 | --- | --- | --- |
-| Backend gagal start: `JWT_SECRET` invalid | Secret kosong/pendek | Isi ≥32 karakter acak di `backend/.env` |
-| `db:migrate:apply` menolak jalan | Guard env belum lengkap | Set `ALLOW_DB_MIGRATIONS=true`, `MIGRATION_MODE`, `MIGRATION_EXPECTED_HOST/DATABASE`, proof/change ID |
-| `Runtime schema belum siap` saat startup | Skema DB tidak cocok dengan versi migrasi | Jalankan `npm run db:migrate:apply`, lalu `npm run db:check` |
-| Login 401 padahal kredensial benar | Cookie tidak terkirim (Secure di HTTP, path salah) | Akses via HTTPS di production; cek `SESSION_COOKIE_PATH` |
-| Rate limit kena saat development | Global limiter aktif untuk semua `/api` | Restarts reset bucket; turunkan trafik atau sesuaikan env limiter |
-| E2E menolak jalan | Database target tidak loopback / tidak berakhiran `_test` | Perbaiki `.env.e2e`; pelanggaran memang sengaja digagalkan |
-| SSE tidak update | Proxy mem-buffer response | Pastikan `proxy_buffering off` untuk rute `/api` (sudah di `frontend/nginx.conf`) |
+| Backend crashes during startup with `JWT_SECRET is required` | Missing or short secret string | Provide a random string of at least 32 characters in `backend/.env` |
+| Migration runner exits with `MIGRATION_RECOVERY_PROOF_ID required` | Migration safety guard active | Define proof ID variable confirming a backup was created before applying changes |
+| Backend reports `Runtime schema expectation mismatch` | Database schema out of date | Run `npm run db:migrate:apply` followed by `npm run db:check` |
+| User login fails with HTTP 401 despite correct password | Secure cookie transmitted over unencrypted HTTP | Set `SESSION_COOKIE_SECURE=false` for local HTTP, or serve via HTTPS in production |
+| Realtime ticket updates do not appear | Reverse proxy buffering SSE responses | Ensure `proxy_buffering off` is configured for `/api` routes in Nginx |
+| Playwright test suite aborts before execution | Non-test database configured | Update `.env.e2e` to ensure `DB_NAME` ends with `_test` and `DB_HOST` is loopback |
+| Spreadsheet export fails or downloads empty file | Database query timeout or missing superadmin role | Ensure the user has `export` permission and database connection pool has available clients |
 
-## Perintah Lainnya
+---
 
-```bash
-# root
-npm run docs:manual:pdf     # membangun ulang manual pengguna (PDF)
-npm run build:tokens        # membangun design tokens
-npm run deploy:frontend     # skrip deploy frontend (scripts/deploy-frontend.sh)
+## Changelog
 
-# backend
-cd backend
-npm run db:migrate:plan     # tinjau rencana migrasi
-npm run db:migrate:apply    # terapkan migrasi (wajib guard env)
-npm run db:check            # verifikasi runtime schema
-npm run check               # preflight sintaks server/app/config
+### Version 1.2.0 (Recent Updates)
+- **Splashscreen and Mobile Experience:** Added a clean startup splashscreen with responsive loader integration, PWA application icons, and touch-optimized navigation drawers.
+- **Design System and Anti-Slop Typography:** Standardized typography around Plus Jakarta Sans, unified card padding and border radii, and reduced interface spacing density by 30 percent for professional data display.
+- **Submissions and Logistics Expansion:** Implemented KPI summary cards for procurement submissions and advanced filtering across hardware shipment queues.
+- **E2E Test Suite Harmonization:** Updated asset card locator assertions and route meta descriptions to align with all 109 frontend unit tests and Playwright scenarios.
 
-# frontend
-cd frontend
-npm run lint                # oxlint + eslint
-npm run lint:fix            # perbaikan otomatis
-npm run format              # prettier write
-```
+### Version 1.1.0
+- **Realtime Ticketing:** Added Server-Sent Events stream for ticket queues, allowing agents to receive live updates without polling.
+- **Customer Satisfaction Tracking:** Integrated 1 to 5 CSAT rating collection upon ticket closure.
+- **Public Help Center CMS:** Introduced TipTap rich text editing for internal editors and public article viewing for unauthenticated users.
+- **Database Backup Management:** Added web-based database backup creation, verification, and restoration with SHA-256 integrity checks.
 
-## Kontribusi
+### Version 1.0.0
+- **Initial Release:** Monorepo foundation with Vue 3, Express 5, and PostgreSQL 16.
+- **Core Asset Inventories:** IT, GA, and Operations asset tracking with employee custody associations.
+- **Granular RBAC:** 13 feature permission keys with three-level access control.
+- **XLSX Tooling:** Formula-injection-safe spreadsheet import and export utilities.
+- **CI/CD Integration:** Automated testing, Docker publishing to GHCR, and Cosign container signing.
 
-1. Fork atau buat branch dari `main`.
-2. Pastikan `npm run lint`, `npm run test:backend`, `npm run test:frontend`, dan `npm run build` lulus sebelum membuka PR.
-3. Untuk perubahan skema, tambahkan file migrasi versioned baru — jangan mengubah file migrasi yang sudah ada.
-4. Jangan pernah commit file `.env`, kredensial, dump database, atau kunci privat. Scanner secret berjalan di history.
-5. PR di-review sebelum merge; branch `main` sebaiknya dilindungi dengan required checks.
+---
 
-## Dokumentasi Terkait
+## Contributing
 
-## API Overview
+1. Create a descriptive feature branch from `main`.
+2. Maintain project coding standards. Ensure all linters and tests pass:
+   ```bash
+   npm --prefix frontend run lint
+   npm run test:backend
+   npm run test:frontend
+   npm --prefix frontend run build
+   ```
+3. For schema modifications, create a new numbered SQL file in `backend/migrations/versioned/`. Never edit existing migration scripts.
+4. Never commit `.env` files, credentials, private encryption keys, or database dumps.
+5. Submit a pull request with a summary of changes and validation output.
 
-Base path: `/api`. JSON in/out. Mutating requests must send `Content-Type: application/json`. Authentication uses the session cookie established at login.
+---
 
-| Area | Prefix | Access |
-| --- | --- | --- |
-| Authentication | `/api/auth/*` | Public login/reset (rate-limited); session for the rest |
-| Health | `/health` | Public |
-| IT assets | `/api/assets` | Feature permission `assets` |
-| GA assets | `/api/ga-assets` (+ aliases) | Permission `assets_ga` |
-| OPS assets | `/api/ops-assets` (+ aliases) | Permission `assets_ops` |
-| Tickets and queues | `/api/tickets`, `/api/ticket-queues` | Permission `tickets` (SSE: `GET /api/tickets/events`) |
-| Submissions | `/api/submissions` | Permission `submissions` |
-| Shipments | `/api/shipments` (+ alias) | Permission `shipments` |
-| Help Center content | `/api/cases/public`, `/api/faqs/public`, `/api/kb-categories/public` | Public, published only |
-| CMS content | `/api/cases`, `/api/faqs`, `/api/kb-categories` | Permission `knowledge_base` |
-| Bookmarks | `/api/case-bookmarks` | Authenticated session |
-| Employees | `/api/employees` (+ legacy alias) | Admin+ |
-| Users | `/api/users` | Admin+ |
-| Activity logs | `/api/logs` | Admin+ |
-| Excel import | `/api/import/*` | Admin+ |
-| Export | `/api/export/*` | Superadmin |
-| Backup / restore | `/api/admin/database/*` | Superadmin |
+## License
 
-Legacy path aliases remain for compatibility; authorization is always re-checked on the server. There is no OpenAPI document in this repository.
-
-## Development Workflow
-
-1. Clone the repository and install dependencies (`npm ci` per package).
-2. Copy `.env.example` templates; set local secrets only in gitignored files.
-3. Start PostgreSQL 16.
-4. Run `npm run db:migrate:plan`, then `npm run db:migrate:apply` with guards set.
-5. Start backend (`npm --prefix backend run dev`) and frontend (`npm --prefix frontend run dev`).
-6. Run unit tests (`npm run test:backend`, `npm run test:frontend`).
-7. Run E2E when needed (`cp .env.e2e.example .env.e2e`, then `npm run test:e2e`).
-8. Run lint/format checks (`npm --prefix frontend run lint`, `npm --prefix frontend run format:check`).
-9. Open a pull request against `main` and wait for required checks.
-
-## CI and Quality Checks
-
-| Workflow | Purpose |
-| --- | --- |
-| `e2e/README.md` | Panduan menjalankan suite E2E Playwright dan aturan keamanannya |
-| `docs/CONVENTIONS.md` | Konvensi kode, layout, aturan SQL, dan aturan state frontend |
-| `docs/database-migration-adoption.md` | Runbook adopsi ledger migrasi untuk database lama |
-| `docs/PRODUCTION_QA_REPORT.md` | Laporan QA pra-rilis |
-| `docs/user-manual-source.html` | Sumber manual pengguna (dibangun menjadi PDF) |
-| `docs/audits/`, `docs/qa/`, `docs/deploy/` | Arsip audit UI/UX, artefak QA, dan contoh konfigurasi deployment |
-
-Repository automation also includes a pull request template and CODEOWNERS for review routing.
-
-Dirilis di bawah lisensi ISC (lihat kolom `license` pada `package.json`). Tambahkan file `LICENSE` bila Anda memerlukan lisensi lain untuk distribusi Anda.
+This project is licensed under the ISC License. See the `package.json` file for details.

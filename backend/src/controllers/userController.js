@@ -1,5 +1,6 @@
 import { pool, withTransaction } from "../config/database.js";
 import { recordSystemAudit } from "../services/systemAuditService.js";
+import { handleWelcomeUserNotification } from "../services/emailNotificationService.js";
 import {
   USER_MANAGEMENT_ROLES,
   canCreateManagedUser,
@@ -222,6 +223,10 @@ export async function storeUser(req, res) {
     createdUser.queue_ids = qResult.rows.map((q) => Number(q.id)).filter(Number.isSafeInteger);
     await recordSystemAudit(req, { module: "users", action: "CREATE", entityType: "user", entityId: createdUser.id, entityLabel: createdUser.email, summary: `Pengguna ditambahkan: ${createdUser.email}`, after: createdUser }, client);
     return createdUser;
+  });
+
+  setImmediate(() => {
+    handleWelcomeUserNotification(newUser).catch(() => {});
   });
 
   res.status(201).json(newUser);

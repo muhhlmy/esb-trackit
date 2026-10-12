@@ -1,5 +1,5 @@
 import { pool } from "../config/database.js";
-import { sendEmail, renderTicketEmailHtml } from "./emailService.js";
+import { sendEmail, renderTicketEmailHtml, renderEmailTemplate, getActiveEmailConfig } from "./emailService.js";
 
 /**
  * PostgreSQL BIGINT columns return string values in node-postgres (e.g. "5").
@@ -130,7 +130,8 @@ export async function handleTicketEventNotification(
   const changes = Array.isArray(options.changes) ? options.changes : []
   const comment = options.comment || null
 
-  if (process.env.EMAIL_ENABLED !== 'true') return
+  const cfg = await getActiveEmailConfig()
+  if (!cfg.enabled) return
   if (!ticket || !ticket.id) return
 
   try {
@@ -187,50 +188,50 @@ export async function handleTicketEventNotification(
     const nomorTiket = fullTicket.nomor_tiket || `TIC26-${String(ticketId).padStart(4, '0')}`
     const tag = formatTicketTag(nomorTiket)
 
+    const frontendBaseUrl = (
+      process.env.FRONTEND_URL ||
+      process.env.APP_URL ||
+      'http://localhost:5173'
+    ).replace(/\/+$/, '')
+
+    const ticketUrl = `${frontendBaseUrl}/tickets?id=${ticketId}`
+
     // Fetch Reporter and Assignee users if available
     const reporterUser = await fetchReporterUser(queryable, fullTicket)
     const assigneeUser = fullTicket.assigned_to_user_id
       ? await fetchUserById(queryable, fullTicket.assigned_to_user_id)
       : null
 
-    // Normalise all IDs to Number for safe comparison (BIGINT → string fix)
+    // Normalise all IDs to Number for safe comparison
     const reporterId = toNumericId(reporterUser?.id)
     const assigneeId = toNumericId(assigneeUser?.id)
-
-    if (process.env.NODE_ENV !== 'test') {
-      console.log(
-        `[emailNotificationService] Event: ${eventType} | Ticket: ${nomorTiket} (${tag}) | Actor ID: ${actorUserId} | Reporter: ${reporterUser?.email || 'N/A'} (ID: ${reporterId}) | Assignee: ${assigneeUser?.email || 'N/A'} (ID: ${assigneeId})`,
-      )
-    }
 
     // ──────────────────────────────────────────────────────────
     // EVENT 1: TICKET_CREATED
     // ──────────────────────────────────────────────────────────
-    if (eventType === 'TICKET_CREATED') {
-      // 1A. Confirm to Reporter -> format: [#TIC26-0001] Judul Tiket
+    if (eventType === 'TICKET_CREATED' && cfg.notify_ticket_create) {
+      // 1A. Confirm to Reporter
       if (reporterUser && reporterUser.email && reporterId !== actorUserId) {
-        if (process.env.NODE_ENV !== 'test') {
-          console.log(
-            `[emailNotificationService] Dispatching TICKET_CREATED email to Reporter <${reporterUser.email}>`,
-          )
+        const rendered = await renderEmailTemplate('ticket_created', {
+          recipient_name: reporterUser.nama,
+          nomor_tiket: tag,
+          judul_tiket: fullTicket.judul || 'Tiket Dibuat',
+          prioritas_tiket: fullTicket.prioritas || 'Normal',
+          unit_support: fullTicket.queue_nama || fullTicket.kategori || 'IT Support',
+          ticket_url: ticketUrl,
+        })
+
+        if (rendered) {
+          await sendEmail({
+            to: reporterUser.email,
+            subject: rendered.subject,
+            html: rendered.html,
+            text: rendered.text,
+          })
         }
-        const html = renderTicketEmailHtml({
-          recipientName: reporterUser.nama,
-          title: `[${tag}] ${fullTicket.judul || 'Tiket Dibuat'}`,
-          subtitle: `Tiket Anda telah berhasil dibuat dan saat ini sedang menunggu penanganan oleh Tim IT Support.`,
-          ticket: fullTicket,
-          actionText:
-            'Anda dapat memantau status tiket melalui aplikasi IT Monitoring.',
-        })
-        await sendEmail({
-          to: reporterUser.email,
-          subject: `[${tag}] ${fullTicket.judul || 'Tiket Dibuat'}`,
-          html,
-          text: `Tiket Anda (${tag}: ${fullTicket.judul}) telah berhasil dibuat dan akan diproses oleh Tim IT.`,
-        })
       }
 
-      // 1B. Notify Queue Admins & Superadmins -> format: [Tiket Baru] [High] [#TIC26-0001] Judul - oleh Pelapor
+      // 1B. Notify Queue Admins & Superadmins
       const queueAdmins = await fetchQueueAdmins(queryable, fullTicket.queue_id)
       const prioritasLabel = fullTicket.prioritas || 'Normal'
       const pelaporLabel = fullTicket.pelapor || reporterUser?.nama || 'Pengguna'
@@ -238,25 +239,23 @@ export async function handleTicketEventNotification(
       for (const admin of queueAdmins) {
         if (!admin.email || toNumericId(admin.id) === actorUserId) continue
 
-        if (process.env.NODE_ENV !== 'test') {
-          console.log(
-            `[emailNotificationService] Dispatching TICKET_CREATED email to Admin <${admin.email}>`,
-          )
+        const renderedAdmin = await renderEmailTemplate('ticket_created', {
+          recipient_name: admin.nama,
+          nomor_tiket: tag,
+          judul_tiket: `${fullTicket.judul || 'Tiket Baru'} (oleh ${pelaporLabel})`,
+          prioritas_tiket: prioritasLabel,
+          unit_support: fullTicket.queue_nama || fullTicket.kategori || 'IT Support',
+          ticket_url: ticketUrl,
+        })
+
+        if (renderedAdmin) {
+          await sendEmail({
+            to: admin.email,
+            subject: `[Tiket Baru] [${prioritasLabel}] [${tag}] ${fullTicket.judul || ''} - oleh ${pelaporLabel}`,
+            html: renderedAdmin.html,
+            text: renderedAdmin.text,
+          })
         }
-        const html = renderTicketEmailHtml({
-          recipientName: admin.nama,
-          title: `[Tiket Baru] [${prioritasLabel}] [${tag}] ${fullTicket.judul || ''}`,
-          subtitle: `Sebuah tiket baru telah dibuat oleh <strong>${pelaporLabel}</strong>. Harap cek Tiket terbaru pada TrackIT.`,
-          ticket: fullTicket,
-          actionText:
-            'Silakan login ke sistem TrackIT untuk menindaklanjuti tiket ini.',
-        })
-        await sendEmail({
-          to: admin.email,
-          subject: `[Tiket Baru] [${prioritasLabel}] [${tag}] ${fullTicket.judul || ''} - oleh ${pelaporLabel}`,
-          html,
-          text: `Tiket baru (${tag}) telah dibuat oleh ${pelaporLabel}. Judul: ${fullTicket.judul}. Prioritas: ${prioritasLabel}`,
-        })
       }
     }
 
@@ -264,52 +263,55 @@ export async function handleTicketEventNotification(
     // EVENT 2: TICKET_UPDATED
     // ──────────────────────────────────────────────────────────
     else if (eventType === 'TICKET_UPDATED') {
-      // 2A. Notify Reporter - only for the end User, never for an admin/superadmin
+      // 2A. Check for assignment change
+      const isAssignment =
+        (Array.isArray(changes) && changes.some((c) => /ditugaskan|ditangani|reassign|assignment/i.test(String(c)))) ||
+        eventType === 'TICKET_ASSIGNED'
+
+      if (isAssignment && cfg.notify_ticket_assign && assigneeUser && assigneeUser.email && assigneeId !== actorUserId) {
+        const renderedAssignee = await renderEmailTemplate('ticket_assigned', {
+          recipient_name: assigneeUser.nama,
+          nomor_tiket: tag,
+          judul_tiket: fullTicket.judul || 'Penugasan Tiket',
+          prioritas_tiket: fullTicket.prioritas || 'Normal',
+          unit_support: fullTicket.queue_nama || fullTicket.kategori || 'IT Support',
+          ticket_url: ticketUrl,
+        })
+
+        if (renderedAssignee) {
+          await sendEmail({
+            to: assigneeUser.email,
+            subject: renderedAssignee.subject,
+            html: renderedAssignee.html,
+            text: renderedAssignee.text,
+          })
+        }
+      }
+
+      // 2B. Status / Information update to Reporter
       if (
+        cfg.notify_ticket_status &&
         reporterUser &&
         reporterUser.email &&
         reporterId !== actorUserId &&
         !isAdminRole(reporterUser.role)
       ) {
-        if (process.env.NODE_ENV !== 'test') {
-          console.log(
-            `[emailNotificationService] Dispatching TICKET_UPDATED email to Reporter <${reporterUser.email}>`,
-          )
-        }
-
-        const isResolved =
-          String(fullTicket.status_tiket || '').toLowerCase() === 'resolved' ||
-          (Array.isArray(changes) && changes.some((c) => /resolved|selesai/i.test(String(c))))
-
-        const updateSubject = isResolved
-          ? `[${tag}] Tiket Selesai: ${fullTicket.judul || ''}`
-          : `[${tag}] Status Update`
-
-        const updateTitle = isResolved
-          ? `[${tag}] Tiket Selesai`
-          : `[${tag}] Status Update`
-
-        const html = renderTicketEmailHtml({
-          recipientName: reporterUser.nama,
-          title: updateTitle,
-          subtitle: isResolved
-            ? `Tiket Anda telah diselesaikan oleh Tim IT Support.`
-            : `Terdapat pembaruan status / informasi pada tiket Anda.`,
-          ticket: fullTicket,
-          changes,
-          actionText: 'Silakan cek aplikasi untuk informasi selengkapnya.',
+        const rendered = await renderEmailTemplate('ticket_status_changed', {
+          recipient_name: reporterUser.nama,
+          nomor_tiket: tag,
+          judul_tiket: fullTicket.judul || 'Pembaruan Tiket',
+          status_tiket: fullTicket.status_tiket || 'Updated',
+          prioritas_tiket: fullTicket.prioritas || 'Normal',
+          ticket_url: ticketUrl,
         })
-        await sendEmail({
-          to: reporterUser.email,
-          subject: updateSubject,
-          html,
-          text: `Tiket Anda (${tag}) mengalami perubahan status atau informasi: ${updateSubject}`,
-        })
-      } else {
-        if (process.env.NODE_ENV !== 'test') {
-          console.log(
-            `[emailNotificationService] TICKET_UPDATED skipped for Reporter. reporterUser: ${reporterUser?.email || 'None'}, reporterId: ${reporterId}, actorUserId: ${actorUserId}`,
-          )
+
+        if (rendered) {
+          await sendEmail({
+            to: reporterUser.email,
+            subject: rendered.subject,
+            html: rendered.html,
+            text: rendered.text,
+          })
         }
       }
     }
@@ -317,28 +319,30 @@ export async function handleTicketEventNotification(
     // ──────────────────────────────────────────────────────────
     // EVENT 3: COMMENT_CREATED
     // ──────────────────────────────────────────────────────────
-    else if (eventType === 'COMMENT_CREATED') {
-      const commentPesan = comment?.pesan || null
+    else if (eventType === 'COMMENT_CREATED' && cfg.notify_ticket_comment) {
+      const commentPesan = comment?.pesan || ''
       const commentAuthor = comment?.nama_pengguna || 'Seseorang'
+      const commentTicketUrl = `${ticketUrl}&tab=comments`
 
       // 3A. If comment made by Admin/Assignee -> Notify Reporter
       if (reporterUser && reporterUser.email && reporterId !== actorUserId) {
-        const html = renderTicketEmailHtml({
-          recipientName: reporterUser.nama,
-          title: `[${tag}] Komentar Baru Ditambahkan`,
-          subtitle: `<strong>${commentAuthor}</strong> menambahkan pesan baru pada tiket Anda.`,
-          ticket: fullTicket,
-          commentPesan,
-          commentAuthor,
-          actionText:
-            'Silakan balas komentar ini melalui aplikasi IT Monitoring.',
+        const rendered = await renderEmailTemplate('ticket_comment', {
+          recipient_name: reporterUser.nama,
+          nomor_tiket: tag,
+          judul_tiket: fullTicket.judul || '',
+          comment_author: commentAuthor,
+          comment_pesan: commentPesan,
+          ticket_url: commentTicketUrl,
         })
-        await sendEmail({
-          to: reporterUser.email,
-          subject: `[${tag}] Komentar baru telah ditambahkan`,
-          html,
-          text: `Ada komentar baru pada tiket Anda (${tag}) oleh ${commentAuthor}: "${commentPesan}"`,
-        })
+
+        if (rendered) {
+          await sendEmail({
+            to: reporterUser.email,
+            subject: rendered.subject,
+            html: rendered.html,
+            text: rendered.text,
+          })
+        }
       }
 
       // 3B. If comment made by Reporter -> Notify Assignee or Queue Admins
@@ -350,22 +354,23 @@ export async function handleTicketEventNotification(
         for (const admin of targetAdmins) {
           if (!admin.email || toNumericId(admin.id) === actorUserId) continue
 
-          const html = renderTicketEmailHtml({
-            recipientName: admin.nama,
-            title: `[Balasan Pelapor] [${tag}] ${fullTicket.judul || ''}`,
-            subtitle: `Pelapor (<strong>${commentAuthor}</strong>) telah mengirimkan pesan baru pada tiket.`,
-            ticket: fullTicket,
-            commentPesan,
-            commentAuthor,
-            actionText:
-              'Buka aplikasi untuk melihat dan merespon pesan pelapor.',
+          const renderedAdmin = await renderEmailTemplate('ticket_comment', {
+            recipient_name: admin.nama,
+            nomor_tiket: tag,
+            judul_tiket: fullTicket.judul || '',
+            comment_author: commentAuthor,
+            comment_pesan: commentPesan,
+            ticket_url: commentTicketUrl,
           })
-          await sendEmail({
-            to: admin.email,
-            subject: `[Balasan Pelapor] [${tag}] ${fullTicket.judul || ''} - oleh ${commentAuthor}`,
-            html,
-            text: `Pelapor (${commentAuthor}) memberikan balasan di tiket ${tag}: "${commentPesan}"`,
-          })
+
+          if (renderedAdmin) {
+            await sendEmail({
+              to: admin.email,
+              subject: `[Balasan Pelapor] [${tag}] ${fullTicket.judul || ''} - oleh ${commentAuthor}`,
+              html: renderedAdmin.html,
+              text: renderedAdmin.text,
+            })
+          }
         }
       }
     }
@@ -374,5 +379,160 @@ export async function handleTicketEventNotification(
       `[emailNotificationService] Unhandled error dispatching email for ${eventType}:`,
       err.message,
     );
+  }
+}
+
+/**
+ * Dispatch BAST asset handover notification email
+ */
+export async function handleAssetHandoverNotification(submission, options = {}) {
+  try {
+    const cfg = await getActiveEmailConfig()
+    if (!cfg.enabled || !cfg.notify_asset_assign) return
+    if (!submission) return
+
+    const payload = submission.payload || {}
+    const recipientName = payload.penerima_nama || payload.nama_penerima || payload.penerima || 'Karyawan'
+    const recipientEmail = payload.penerima_email || payload.email || null
+
+    if (!recipientEmail) return
+
+    const frontendBaseUrl = (
+      process.env.FRONTEND_URL ||
+      process.env.APP_URL ||
+      'http://localhost:5173'
+    ).replace(/\/+$/, '')
+
+    const portalUrl = `${frontendBaseUrl}/my-assets`
+
+    const rendered = await renderEmailTemplate('asset_assigned', {
+      recipient_name: recipientName,
+      nomor_bast: submission.submission_number || 'BAST-000',
+      nama_aset: payload.nama_aset || payload.asset_name || payload.perangkat || 'Unit Operasional',
+      nomor_seri: payload.nomor_seri || payload.serial_number || payload.sn || '-',
+      tipe_aset: payload.kategori_aset || payload.tipe || 'Aset Kantor',
+      portal_url: portalUrl,
+    })
+
+    if (rendered) {
+      await sendEmail({
+        to: recipientEmail,
+        subject: rendered.subject,
+        html: rendered.html,
+        text: rendered.text,
+      })
+    }
+  } catch (err) {
+    console.error('[emailNotificationService] Error dispatching asset handover email:', err.message)
+  }
+}
+
+/**
+ * Dispatch Shipment / Logistics status update notification email
+ */
+export async function handleShipmentStatusNotification(shipment, options = {}) {
+  try {
+    const cfg = await getActiveEmailConfig()
+    if (!cfg.enabled || !cfg.notify_shipment) return
+    if (!shipment) return
+
+    const recipientName = shipment.recipient_name || 'Penerima Paket'
+    // Coba resolve email penerima jika cocok dengan user / karyawan
+    let recipientEmail = shipment.recipient_email || null
+    if (!recipientEmail && shipment.recipient_name) {
+      try {
+        const resUser = await pool.query(
+          `SELECT email FROM users WHERE LOWER(TRIM(nama)) = LOWER(TRIM($1)) AND email IS NOT NULL AND is_active = true LIMIT 1`,
+          [shipment.recipient_name],
+        )
+        if (resUser.rows[0]) recipientEmail = resUser.rows[0].email
+
+        if (!recipientEmail) {
+          const resKaryawan = await pool.query(
+            `SELECT email_kantor AS email FROM karyawan WHERE LOWER(TRIM(nama_karyawan)) = LOWER(TRIM($1)) AND email_kantor IS NOT NULL LIMIT 1`,
+            [shipment.recipient_name],
+          )
+          if (resKaryawan.rows[0]) recipientEmail = resKaryawan.rows[0].email
+        }
+      } catch (lookupErr) {
+        // silent
+      }
+    }
+
+    if (!recipientEmail) return
+
+    const frontendBaseUrl = (
+      process.env.FRONTEND_URL ||
+      process.env.APP_URL ||
+      'http://localhost:5173'
+    ).replace(/\/+$/, '')
+
+    const portalUrl = `${frontendBaseUrl}/shipments`
+
+    const statusMap = {
+      belum_dikirim: 'Menunggu Pengiriman',
+      pending: 'Pending Ekspedisi',
+      sedang_dikirim: 'Sedang Dalam Pengiriman',
+      diterima: 'Telah Diterima',
+      cancel: 'Dibatalkan',
+    }
+
+    const rendered = await renderEmailTemplate('shipment_status_changed', {
+      recipient_name: recipientName,
+      nomor_resi: shipment.tracking_number || '(Belum terbit)',
+      ekspedisi: shipment.courier || 'Ekspedisi Logistik',
+      status_pengiriman: statusMap[shipment.status] || shipment.status || 'Update Pengiriman',
+      tujuan: shipment.destination || '-',
+      deskripsi_barang: shipment.item_description || 'Perangkat Aset',
+      portal_url: portalUrl,
+    })
+
+    if (rendered) {
+      await sendEmail({
+        to: recipientEmail,
+        subject: rendered.subject,
+        html: rendered.html,
+        text: rendered.text,
+      })
+    }
+  } catch (err) {
+    console.error('[emailNotificationService] Error dispatching shipment status email:', err.message)
+  }
+}
+
+/**
+ * Dispatch Welcome email for newly registered users
+ */
+export async function handleWelcomeUserNotification(newUser, options = {}) {
+  try {
+    const cfg = await getActiveEmailConfig()
+    if (!cfg.enabled || !cfg.notify_user_create) return
+    if (!newUser || !newUser.email) return
+
+    const frontendBaseUrl = (
+      process.env.FRONTEND_URL ||
+      process.env.APP_URL ||
+      'http://localhost:5173'
+    ).replace(/\/+$/, '')
+
+    const loginUrl = `${frontendBaseUrl}/login`
+
+    const rendered = await renderEmailTemplate('user_welcome', {
+      recipient_name: newUser.nama || 'Pengguna Baru',
+      user_email: newUser.email,
+      user_role: newUser.role || 'user',
+      login_url: loginUrl,
+    })
+
+    if (rendered) {
+      await sendEmail({
+        to: newUser.email,
+        subject: rendered.subject,
+        html: rendered.html,
+        text: rendered.text,
+      })
+    }
+  } catch (err) {
+    console.error('[emailNotificationService] Error dispatching welcome user email:', err.message)
   }
 }

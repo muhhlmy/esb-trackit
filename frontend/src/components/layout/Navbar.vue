@@ -176,7 +176,7 @@ onUnmounted(() => {
   align-items: center;
   gap: 11px;
   flex-shrink: 0;
-  min-height: 44px;
+  min-height: 36px;
   border-radius: 6px;
 }
 .brand-logo {

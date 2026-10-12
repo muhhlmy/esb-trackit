@@ -2,6 +2,7 @@
 import { computed, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useAuth } from '@/composables/useAuth'
+import { useLanguage } from '@/composables/useLanguage'
 import { menuGroups as configuredGroups, isNavItemVisible } from '@/config/navigationConfig.js'
 
 const props = defineProps({
@@ -11,6 +12,25 @@ const emit = defineEmits(['toggle-collapse'])
 const route = useRoute()
 
 const { isSuperAdmin, hasPermission } = useAuth()
+const { currentLang, setLanguage, t } = useLanguage()
+
+function getItemLabel(item) {
+  if (!item) return ''
+  if (item.labelKey) return t(item.labelKey, item.label)
+  const autoKey = 'nav_' + item.label.toLowerCase().replace(/[\s&/]+/g, '_')
+  return t(autoKey, item.label)
+}
+
+function getParentLabel(parent) {
+  if (!parent) return ''
+  return t('nav_' + parent.key, parent.label)
+}
+
+function getGroupTitle(group) {
+  if (!group) return ''
+  const autoKey = 'group_' + group.title.toLowerCase().replace(/\s+/g, '_')
+  return t(autoKey, group.title)
+}
 // State Expanded Parent Menu
 const expandedParents = ref({
   knowledge_base: true,
@@ -236,7 +256,7 @@ function closeFlyoutSubmenu() {
           v-if="!isEffectiveCollapsed"
           class="sidebar-group-title px-2 text-[9px] font-semibold uppercase tracking-wider text-[#637288] transition-all"
         >
-          {{ group.title }}
+          {{ getGroupTitle(group) }}
         </p>
 
         <div :class="isEffectiveCollapsed ? 'flex flex-col items-center gap-1' : 'space-y-0.5'">
@@ -280,7 +300,7 @@ function closeFlyoutSubmenu() {
                   v-if="!isEffectiveCollapsed"
                   class="min-w-0 flex-1 leading-none whitespace-nowrap"
                 >
-                  {{ item.label }}
+                  {{ getItemLabel(item) }}
                 </span>
 
                 <span
@@ -319,7 +339,7 @@ function closeFlyoutSubmenu() {
                       : 'false'
                 "
                 :aria-controls="`submenu-${parent.key}`"
-                :aria-label="parent.label"
+                :aria-label="getParentLabel(parent)"
                 class="group flex items-center transition-all duration-150 cursor-pointer select-none"
                 :class="[
                   isEffectiveCollapsed
@@ -354,7 +374,7 @@ function closeFlyoutSubmenu() {
                     v-if="!isEffectiveCollapsed"
                     class="min-w-0 flex-1 leading-none whitespace-nowrap text-left"
                   >
-                    {{ parent.label }}
+                    {{ getParentLabel(parent) }}
                   </span>
                 </div>
 
@@ -402,7 +422,7 @@ function closeFlyoutSubmenu() {
                   </span>
 
                   <span class="min-w-0 flex-1 leading-none whitespace-nowrap">
-                    {{ sub.label }}
+                    {{ getItemLabel(sub) }}
                   </span>
                 </RouterLink>
               </div>
@@ -411,6 +431,38 @@ function closeFlyoutSubmenu() {
         </div>
       </div>
     </nav>
+
+    <!-- Sidebar Footer: Language Toggle & Locale Selector -->
+    <div
+      class="border-t border-[#E5EAEF] px-2 py-1.5 flex items-center transition-all bg-[#F8FAFC]/60 shrink-0"
+      :class="isEffectiveCollapsed ? 'justify-center flex-col gap-1' : 'justify-between'"
+    >
+      <div v-if="!isEffectiveCollapsed" class="flex items-center gap-1.5 text-[10px] font-medium text-[#637288]">
+        <span aria-hidden="true" class="material-symbols-outlined text-[14px]">language</span>
+        <span>{{ t('language', 'Bahasa') }}</span>
+      </div>
+
+      <div class="inline-flex items-center rounded border border-[#D9E2EF] bg-white p-0.5 text-[9.5px]">
+        <button
+          type="button"
+          :class="currentLang === 'id' ? 'bg-[#0A51B0] text-white font-bold shadow-2xs' : 'text-[#637288] hover:text-[#333333] font-medium'"
+          class="rounded px-1.5 py-0.5 transition-colors cursor-pointer"
+          @click="setLanguage('id')"
+          aria-label="Pilih Bahasa Indonesia"
+        >
+          ID
+        </button>
+        <button
+          type="button"
+          :class="currentLang === 'en' ? 'bg-[#0A51B0] text-white font-bold shadow-2xs' : 'text-[#637288] hover:text-[#333333] font-medium'"
+          class="rounded px-1.5 py-0.5 transition-colors cursor-pointer"
+          @click="setLanguage('en')"
+          aria-label="Select English Language"
+        >
+          EN
+        </button>
+      </div>
+    </div>
   </aside>
 
   <!-- Teleport Flyout Popovers & Tooltips for Collapsed Navigation Rail -->
@@ -418,14 +470,14 @@ function closeFlyoutSubmenu() {
     <!-- Parent Menu Flyout Popover -->
     <div
       v-if="isEffectiveCollapsed && activeFlyoutParent"
-      class="fixed z-[9999] w-[185px] rounded-xl border border-[#E2E8F0] bg-white p-1.5 shadow-xl transition-all select-none animate-in fade-in zoom-in-95 duration-150"
+      class="fixed z-[9999] w-[185px] rounded-[6px] border border-[#E2E8F0] bg-white p-1.5 shadow-xl transition-all select-none animate-in fade-in zoom-in-95 duration-150"
       :style="{ top: `${flyoutPos.top}px`, left: `${flyoutPos.left}px` }"
       @mouseenter="cancelCloseFlyout"
       @mouseleave="handleParentMouseLeave"
     >
       <div class="px-2 py-1 border-b border-[#F1F5F9] mb-1">
         <p class="text-[10px] font-extrabold uppercase tracking-wider text-[#637288]">
-          {{ activeFlyoutParent.label }}
+          {{ getParentLabel(activeFlyoutParent) }}
         </p>
       </div>
       <div class="space-y-0.5">
@@ -451,7 +503,7 @@ function closeFlyoutSubmenu() {
           >
             {{ sub.icon }}
           </span>
-          <span class="truncate">{{ sub.label }}</span>
+          <span class="truncate">{{ getItemLabel(sub) }}</span>
         </RouterLink>
       </div>
     </div>

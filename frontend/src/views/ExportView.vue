@@ -7,10 +7,12 @@ import SkeletonCard from '@/components/ui/skeleton/SkeletonCard.vue'
 import AppModal from '@/components/ui/AppModal.vue'
 import PageHeader from '@/components/ui/PageHeader.vue'
 import { useToast } from '@/composables/useToast.js'
+import { useLanguage } from '@/composables/useLanguage.js'
 import CustomSelect from '@/components/ui/CustomSelect.vue'
 
 const api = useApi()
 const { isSuperAdmin } = useAuth()
+const { t } = useLanguage()
 
 // Reset Database State
 const showResetModal = ref(false)
@@ -344,19 +346,19 @@ onMounted(() => {
   >
     <!-- Page Header -->
     <PageHeader
-      title="Pusat Ekspor Data"
-      subtitle="Ekspor dan kelola data sistem dengan cepat ke format CSV, Excel, JSON, atau PDF."
+      :title="t('export_page_title')"
+      :subtitle="t('export_page_subtitle')"
       icon="output"
     >
       <!-- Compact Metrics -->
       <div class="flex items-center gap-4 shrink-0">
         <div class="flex flex-col">
-          <span class="text-[11px] font-medium text-[#687281] dark:text-slate-400 uppercase tracking-wider">Tabel</span>
+          <span class="text-[11px] font-medium text-[#687281] dark:text-slate-400 uppercase tracking-wider">{{ t('th_table_name') }}</span>
           <span class="text-base font-bold text-[#333333] dark:text-white font-mono">{{ tables.length }}</span>
         </div>
         <div class="flex flex-col">
           <span class="text-[11px] font-medium text-[#687281] dark:text-slate-400 uppercase tracking-wider"
-            >Total rekaman</span
+            >{{ t('th_records') }}</span
           >
           <span class="text-base font-bold text-[#333333] dark:text-white font-mono">
             {{ isLoading ? '...' : totalDbRecords.toLocaleString('id-ID') }}
@@ -376,13 +378,11 @@ onMounted(() => {
             class="flex items-center gap-1.5 text-[11px] text-rose-700 dark:text-rose-400 font-semibold tracking-wide uppercase"
           >
             <span aria-hidden="true" class="material-symbols-outlined text-[16px]">warning</span>
-            <span>Tindakan Kritis: Reset Database</span>
+            <span>{{ t('critical_action_reset') }}</span>
           </div>
-          <h3 class="text-[13px] sm:text-[14px] font-semibold text-rose-900 dark:text-rose-200">Reset &amp; Kosongkan Database</h3>
+          <h3 class="text-[13px] sm:text-[14px] font-semibold text-rose-900 dark:text-rose-200">{{ t('btn_reset_database') }}</h3>
           <p class="text-[11px] text-rose-700/90 dark:text-rose-300/80 leading-normal max-w-2xl">
-            Menghapus secara permanen seluruh data aset TI, aset GA, aset OPS, tiket helpdesk,
-            karyawan, dan log aktivitas. Akun Superadmin yang dikonfigurasi administrator pada
-            backend akan diprovisi kembali secara otomatis.
+            {{ t('reset_db_desc') }}
           </p>
         </div>
         <button
@@ -391,7 +391,7 @@ onMounted(() => {
           class="inline-flex items-center justify-center gap-1.5 h-8 rounded-[6px] bg-rose-600 hover:bg-rose-700 text-white font-medium text-xs px-3 transition-all shadow-xs shrink-0 cursor-pointer"
         >
           <span aria-hidden="true" class="material-symbols-outlined text-[16px]">restart_alt</span>
-          <span>Reset Database</span>
+          <span>{{ t('btn_reset_database') }}</span>
         </button>
       </div>
     </div>
@@ -415,7 +415,7 @@ onMounted(() => {
           <span aria-hidden="true" class="material-symbols-outlined text-[16px] text-[#5F7089] dark:text-slate-400"
             >bolt</span
           >
-          <span>Ekspor Cepat per Tabel</span>
+          <span>{{ t('tab_quick_export') }}</span>
         </button>
 
         <button
@@ -432,7 +432,7 @@ onMounted(() => {
           <span aria-hidden="true" class="material-symbols-outlined text-[16px] text-[#5F7089] dark:text-slate-400"
             >tune</span
           >
-          <span>Ekspor Kustom</span>
+          <span>{{ t('tab_custom_export') }}</span>
         </button>
 
         <button
@@ -449,7 +449,7 @@ onMounted(() => {
           <span aria-hidden="true" class="material-symbols-outlined text-[16px] text-[#5F7089] dark:text-slate-400"
             >bookmark</span
           >
-          <span>Template Laporan</span>
+          <span>{{ t('tab_presets_export') }}</span>
         </button>
       </div>
 
@@ -1038,7 +1038,7 @@ onMounted(() => {
                   :key="col.name"
                   class="px-2.5 py-2 text-[#334155] min-w-36 max-w-xs whitespace-normal wrap-anywhere"
                 >
-                  {{ row[col.name] !== null && row[col.name] !== undefined ? row[col.name] : '—' }}
+                  {{ row[col.name] !== null && row[col.name] !== undefined ? row[col.name] : '-' }}
                 </td>
               </tr>
             </tbody>

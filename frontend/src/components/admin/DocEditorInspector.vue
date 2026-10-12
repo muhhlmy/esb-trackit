@@ -2,6 +2,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { Info, Tag as TagIcon, X, ExternalLink, ChevronDown } from 'lucide-vue-next'
 import { useKbCategories } from '@/composables/useKbCategories'
+import { useLanguage } from '@/composables/useLanguage'
 
 const props = defineProps({
   modelValue: {
@@ -19,6 +20,8 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['update:modelValue', 'close', 'viewPortal'])
+
+const { t } = useLanguage()
 
 // Kategori dimuat dari sumber yang sama dengan halaman KB Categories
 // (GET /api/kb-categories), agar pilihan kategori di Meta selalu sinkron.
@@ -86,7 +89,7 @@ function removeTag(tagToRemove) {
   >
     <!-- Inspector Header -->
     <div
-      class="p-4 border-b border-[#E2E8F0] dark:border-slate-800 bg-[#F8FAFC] dark:bg-slate-950/60"
+      class="p-3 border-b border-[#E2E8F0] dark:border-slate-800 bg-[#F8FAFC] dark:bg-slate-950/60"
     >
       <div class="flex items-center justify-between mb-1">
         <h2
@@ -98,7 +101,7 @@ function removeTag(tagToRemove) {
         <button
           @click="$emit('close')"
           class="p-1 rounded-lg hover:bg-[#E2E8F0] dark:hover:bg-slate-800 text-[#5F7089] dark:text-slate-400 transition-colors cursor-pointer"
-          title="Tutup panel"
+          :title="t('cms_close_panel')"
         >
           <X class="w-4 h-4" />
         </button>
@@ -140,15 +143,15 @@ function removeTag(tagToRemove) {
     </nav>
 
     <!-- Tab Content -->
-    <div class="flex-1 p-4 space-y-5 overflow-y-auto text-xs">
+    <div class="flex-1 p-3 space-y-4 overflow-y-auto text-xs">
       <!-- TAB 1: META -->
-      <div v-if="activeTab === 'meta'" class="space-y-4">
+      <div v-if="activeTab === 'meta'" class="space-y-3">
         <!-- Category -->
         <div class="space-y-1.5">
           <label
             class="block text-[11px] font-medium uppercase tracking-wide text-[#5F7089] dark:text-slate-400"
           >
-            Kategori
+            {{ t('th_category') }}
           </label>
           <div class="relative">
             <select
@@ -196,14 +199,10 @@ function removeTag(tagToRemove) {
           class="p-3 rounded-lg bg-[#F8FAFC] dark:bg-slate-800/50 border border-[#E2E8F0] dark:border-slate-700/60 text-xs space-y-1"
         >
           <span class="font-semibold text-[#333333] dark:text-slate-200 block"
-            >Status Artikel:</span
+            >{{ t('cms_article_status') }}:</span
           >
           <p class="text-[11px] text-[#5F7089] dark:text-slate-400 leading-relaxed">
-            {{
-              modelValue.isCustom
-                ? 'Custom — dapat diedit & dihapus admin.'
-                : 'Built-in — template bawaan korporat.'
-            }}
+            {{ modelValue.isCustom ? t('cms_status_custom_desc') : t('cms_status_builtin_desc') }}
           </p>
         </div>
       </div>
@@ -213,7 +212,7 @@ function removeTag(tagToRemove) {
         <label
           class="block text-[11px] font-medium uppercase tracking-wide text-[#5F7089] dark:text-slate-400"
         >
-          Tag Artikel
+          {{ t('cms_article_tags') }}
         </label>
 
         <!-- Tag Chips -->
@@ -238,7 +237,7 @@ function removeTag(tagToRemove) {
             v-if="!modelValue.tags || !modelValue.tags.length"
             class="text-[11px] text-[#687281] italic py-1"
           >
-            Belum ada tag...
+            {{ t('cms_no_tags_yet') }}
           </span>
         </div>
 
@@ -248,14 +247,14 @@ function removeTag(tagToRemove) {
             v-model="newTagInput"
             @keydown.enter.prevent="addTag"
             type="text"
-            placeholder="Tambah tag baru…"
+            :placeholder="t('cms_add_tag_placeholder')"
             class="flex-1 bg-white dark:bg-slate-800 border border-[#E2E8F0] dark:border-slate-700 rounded-lg px-3 py-1.5 text-xs font-medium text-[#333333] dark:text-slate-100 focus:outline-none focus:border-[#0A51B0]"
           />
           <button
             @click="addTag"
             class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-[#0A51B0] text-white hover:bg-[#0A4391] transition-colors cursor-pointer"
           >
-            Tambah
+            {{ t('add') }}
           </button>
         </div>
       </div>
@@ -269,7 +268,7 @@ function removeTag(tagToRemove) {
         @click="$emit('viewPortal')"
         class="w-full bg-white dark:bg-slate-800 border border-[#E2E8F0] dark:border-slate-700 hover:bg-[#F1F5F9] dark:hover:bg-slate-700 text-[#333333] dark:text-slate-200 font-semibold py-2 px-4 rounded-lg transition-colors text-xs flex justify-center items-center gap-2 cursor-pointer"
       >
-        <span>Kembali ke Admin CMS</span>
+        <span>{{ t('cms_back_to_admin') }}</span>
         <ExternalLink class="w-3.5 h-3.5 text-[#333333] dark:text-blue-400" />
       </button>
     </div>

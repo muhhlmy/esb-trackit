@@ -7,10 +7,12 @@ import { useToast } from '../composables/useToast.js'
 import { useAuth } from '../composables/useAuth.js'
 import { useKbCategories } from '../composables/useKbCategories.js'
 import { useViewMode } from '../composables/useViewMode.js'
+import { useLanguage } from '../composables/useLanguage.js'
 import AppModal from '../components/ui/AppModal.vue'
 import AppViewToggle from '../components/ui/AppViewToggle.vue'
 import FilterModal from '../components/ui/FilterModal.vue'
 import CustomSelect from '../components/ui/CustomSelect.vue'
+import SkeletonTable from '../components/ui/skeleton/SkeletonTable.vue'
 import PageHeader from '../components/ui/PageHeader.vue'
 import StatCard from '../components/ui/StatCard.vue'
 import {
@@ -27,6 +29,7 @@ import {
 const { get, post, put, del } = useApi()
 const { showToast } = useToast()
 const { hasWritePermission } = useAuth()
+const { t } = useLanguage()
 const canWrite = computed(() => hasWritePermission('knowledge_base'))
 
 const FAQ_CATEGORIES = [
@@ -273,16 +276,16 @@ onMounted(() => {
   <div class="kb-management admin-workspace max-w-7xl mx-auto space-y-3 select-none font-sans">
     <!-- ── Page Header (komponen bersama; sama dengan halaman lain) ── -->
     <PageHeader
-      title="Atur FAQ"
-      subtitle="Kelola daftar pertanyaan dan jawaban yang tampil di Help Center publik."
+      :title="t('faq_admin_title')"
+      :subtitle="t('faq_admin_subtitle')"
       icon="quiz"
     >
       <template #eyebrow>
         <RouterLink to="/" class="hover:text-[#333333] dark:hover:text-white transition-colors flex items-center gap-1">
-          <span>Help Center</span>
+          <span>{{ t('nav_help_center') }}</span>
         </RouterLink>
         <ChevronRight class="w-3 h-3 text-slate-400" />
-        <span class="text-[#333333] dark:text-white font-semibold">Atur FAQ</span>
+        <span class="text-[#333333] dark:text-white font-semibold">{{ t('faq_admin_title') }}</span>
       </template>
       <template #title-suffix>
         <span
@@ -297,32 +300,32 @@ onMounted(() => {
         class="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 h-8 px-3.5 rounded-[6px] text-xs font-semibold bg-[#0A51B0] hover:bg-[#0A4391] text-white shadow-2xs transition-all cursor-pointer shrink-0"
       >
         <Plus class="w-3.5 h-3.5" />
-        <span>Tambah FAQ</span>
+        <span>{{ t('btn_add_faq') }}</span>
       </button>
     </PageHeader>
 
     <!-- Quick Metrics Grid (3 Columns Balanced) -->
     <div class="grid grid-cols-3 gap-2 sm:gap-2.5 lg:gap-3">
       <StatCard
-        title="Total pertanyaan"
+        :title="t('stat_total_questions')"
         :value="stats.total"
         icon="help"
         color="primary"
-        subtitle="Pertanyaan aktif"
+        :subtitle="t('stat_total_questions')"
       />
       <StatCard
-        title="Terbit"
+        :title="t('stat_published')"
         :value="stats.published"
         icon="task_alt"
         color="success"
-        subtitle="Tampil di portal"
+        :subtitle="t('stat_published')"
       />
       <StatCard
-        title="Draf"
+        :title="t('stat_draft')"
         :value="stats.draft"
         icon="edit_note"
         color="warning"
-        subtitle="Dalam peninjauan"
+        :subtitle="t('stat_draft')"
       />
     </div>
 
@@ -438,13 +441,9 @@ onMounted(() => {
     <div
       class="bg-white dark:bg-slate-900 rounded-[6px] border border-[#E5EAEF] dark:border-slate-800 overflow-hidden shadow-xs"
     >
-      <!-- Loading State -->
-      <div
-        v-if="isLoading"
-        class="py-12 px-6 text-center text-xs font-medium text-[#5F7089] dark:text-slate-400 flex items-center justify-center gap-2"
-      >
-        <RefreshCw class="w-4 h-4 animate-spin text-[#333333]" />
-        <span>Loading FAQ entries...</span>
+      <!-- Loading State Skeleton -->
+      <div v-if="isLoading" aria-busy="true">
+        <SkeletonTable preset="default" :rows="6" />
       </div>
       <!-- Table / Cards Content -->
       <div v-else>

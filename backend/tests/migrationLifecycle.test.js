@@ -10,9 +10,9 @@ test("canonical migrations load PLpgSQL safely and detect applied checksum drift
   const migrations = await loadVersionedMigrations();
   assert.deepEqual(
     migrations.map(({ version }) => version),
-    [1, 2, 3, 4, 5, 6, 7, 8],
+    [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
   );
-  assert.equal(buildMigrationPlan(migrations, []).length, 8);
+  assert.equal(buildMigrationPlan(migrations, []).length, 11);
   assert.equal(buildMigrationPlan(migrations, migrations).length, 0);
   assert.throws(
     () =>

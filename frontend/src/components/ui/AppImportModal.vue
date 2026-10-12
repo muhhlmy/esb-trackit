@@ -640,31 +640,31 @@ async function submitImport() {
                   class="hover:bg-[#F8FAFC]"
                 >
                   <td class="p-2 font-mono font-bold text-[#2A3547]">
-                    {{ row.NIK || row.nik || '—' }}
+                    {{ row.NIK || row.nik || '-' }}
                   </td>
                   <td class="p-2 font-bold text-[#2A3547]">
-                    {{ row['Nama Karyawan'] || row.nama_karyawan || '—' }}
+                    {{ row['Nama Karyawan'] || row.nama_karyawan || '-' }}
                   </td>
                   <td class="p-2 text-[#66728d]">
-                    {{ row['Email Kantor'] || row.email_kantor || '—' }}
+                    {{ row['Email Kantor'] || row.email_kantor || '-' }}
                   </td>
                   <td class="p-2 text-[#2A3547]">
-                    {{ row.Title || row.title || row.jabatan || '—' }}
+                    {{ row.Title || row.title || row.jabatan || '-' }}
                   </td>
-                  <td class="p-2 text-[#2A3547]">{{ row['Job Level'] || row.job_level || '—' }}</td>
-                  <td class="p-2 text-[#2A3547]">{{ row.Departemen || row.departemen || '—' }}</td>
+                  <td class="p-2 text-[#2A3547]">{{ row['Job Level'] || row.job_level || '-' }}</td>
+                  <td class="p-2 text-[#2A3547]">{{ row.Departemen || row.departemen || '-' }}</td>
                   <td class="p-2 text-[#2A3547]">
                     {{
                       row['Employeement Status'] ||
                       row.employeement_status ||
                       row['Status Kepegawaian'] ||
-                      '—'
+                      '-'
                     }}
                   </td>
                   <td class="p-2 text-[#2A3547]">
                     {{
                       normalizeLocation(row['Lokasi Kerja'] || row.lokasi || row.lokasi_kerja) ||
-                      '—'
+                      '-'
                     }}
                   </td>
                 </tr>
@@ -713,7 +713,7 @@ async function submitImport() {
                       row.id ||
                       row['Kode Aset'] ||
                       row['Asset Tag'] ||
-                      '—'
+                      '-'
                     }}
                   </td>
                   <td class="p-2 font-mono font-bold text-[#2A3547]">
@@ -724,7 +724,7 @@ async function submitImport() {
                       row.SN ||
                       row.sn ||
                       row['S/N'] ||
-                      '—'
+                      '-'
                     }}
                   </td>
                   <td class="p-2 text-[#2A3547]">
@@ -738,7 +738,7 @@ async function submitImport() {
                       row['Tipe Perangkat'] ||
                       row.tipe_perangkat ||
                       row.Tipe ||
-                      '—'
+                      '-'
                     }}
                   </td>
                   <td class="p-2 font-mono text-[#66728d]">
@@ -758,11 +758,11 @@ async function submitImport() {
                           row.lokasi_aset ||
                           row['Lokasi Aset'] ||
                           row['Lokasi Kerja'],
-                      ) || '—'
+                      ) || '-'
                     }}
                   </td>
                   <td class="p-2 font-semibold text-[#333333]">
-                    {{ row.Status || row.status || row.status_aset || '—' }}
+                    {{ row.Status || row.status || row.status_aset || '-' }}
                   </td>
                 </tr>
               </tbody>

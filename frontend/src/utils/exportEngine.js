@@ -186,7 +186,7 @@ export function exportToPdf(
       const cells = colKeys
         .map((key) => {
           let val = getNormalizedExportValue(key, row[key])
-          if (val === null || val === undefined) val = '—'
+          if (val === null || val === undefined) val = '-'
           if (typeof val === 'boolean') val = val ? 'Aktif' : 'Non-Aktif'
           return `<td>${escapeHtml(val)}</td>`
         })

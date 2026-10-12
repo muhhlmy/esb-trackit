@@ -9,6 +9,7 @@ import { ref, computed, onMounted, nextTick } from 'vue'
 import { RouterLink } from 'vue-router'
 import { useKbCategories } from '@/composables/useKbCategories'
 import { useAuth } from '@/composables/useAuth'
+import { useLanguage } from '@/composables/useLanguage'
 import { useViewMode } from '@/composables/useViewMode.js'
 import { animateIn, isReducedMotion } from '@/composables/useGsap'
 import {
@@ -34,6 +35,7 @@ import {
 
 const { categories, fetchAllCategories, saveCategory, deleteCategory } = useKbCategories()
 const { hasWritePermission } = useAuth()
+const { t } = useLanguage()
 const canWrite = computed(() => hasWritePermission('knowledge_base'))
 const { viewMode } = useViewMode('admin-kb-categories', 'table')
 
@@ -211,8 +213,8 @@ function clearFilters() {
     <!-- ── Page Header (komponen bersama; sama dengan halaman lain) ── -->
     <PageHeader
       class="gsap-admin-el"
-      title="Kategori Knowledge Base"
-      subtitle="Kelola topic cards yang tampil di halaman Browse Topics Help Center."
+      :title="t('kb_cat_admin_title')"
+      :subtitle="t('kb_cat_admin_subtitle')"
       icon="category"
     >
       <template #eyebrow>
@@ -227,7 +229,9 @@ function clearFilters() {
           <span>Admin CMS</span>
         </RouterLink>
         <ChevronRight class="w-3 h-3 text-slate-400" />
-        <span class="text-[#333333] dark:text-white font-semibold">Kategori</span>
+        <span class="text-[#333333] dark:text-white font-semibold">{{
+          t('kb_cat_breadcrumb_categories')
+        }}</span>
       </template>
       <template #title-suffix>
         <span
@@ -242,32 +246,32 @@ function clearFilters() {
         class="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 h-8 px-3 rounded-[6px] text-xs font-medium bg-[#0A51B0] hover:bg-[#0A4391] text-white shadow-2xs transition-all cursor-pointer shrink-0"
       >
         <Plus class="w-3.5 h-3.5" />
-        <span>Kategori Baru</span>
+        <span>{{ t('btn_new_category') }}</span>
       </button>
     </PageHeader>
 
     <!-- Stats Row (3 Columns Balanced) -->
     <div class="grid grid-cols-3 gap-2 sm:gap-2.5 lg:gap-3 gsap-admin-el">
       <StatCard
-        title="Total kategori"
+        :title="t('stat_total_categories')"
         :value="stats.total"
         icon="category"
         color="primary"
-        subtitle="Seluruh kategori KB"
+        :subtitle="t('stat_total_categories_sub')"
       />
       <StatCard
-        title="Terbit"
+        :title="t('stat_categories_published')"
         :value="stats.published"
         icon="task_alt"
         color="success"
-        subtitle="Kategori aktif"
+        :subtitle="t('stat_categories_published_sub')"
       />
       <StatCard
-        title="Unggulan"
+        :title="t('stat_categories_featured')"
         :value="stats.featured"
         icon="star"
         color="warning"
-        subtitle="Tampil di beranda"
+        :subtitle="t('stat_categories_featured_sub')"
       />
     </div>
 
@@ -283,14 +287,14 @@ function clearFilters() {
         <input
           v-model="searchQuery"
           type="text"
-          placeholder="Cari kategori…"
+          :placeholder="t('search_category_placeholder')"
           class="w-full bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-700 rounded-[6px] pl-9 pr-9 h-8 text-xs font-normal text-[#333333] dark:text-white placeholder-[#687281] dark:placeholder-slate-500 focus:outline-none focus:border-[#0A51B0] focus:ring-1 focus:ring-[#0A51B0]/20 transition-all"
         />
         <button
           v-if="searchQuery"
           @click="searchQuery = ''"
           class="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 rounded text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors cursor-pointer"
-          title="Hapus pencarian"
+          :title="t('clear_search')"
         >
           <X class="w-3.5 h-3.5" />
         </button>
@@ -304,9 +308,9 @@ function clearFilters() {
         >
           <button
             v-for="st in [
-              { key: 'all', label: 'Semua' },
-              { key: 'PUBLISHED', label: 'Published' },
-              { key: 'DRAFT', label: 'Draft' },
+              { key: 'all', label: t('filter_all') },
+              { key: 'PUBLISHED', label: t('stat_published') },
+              { key: 'DRAFT', label: t('stat_draft') },
             ]"
             :key="st.key"
             @click="selectedStatus = st.key"
@@ -326,7 +330,7 @@ function clearFilters() {
           type="button"
           @click="showFilterModal = true"
           class="relative inline-flex items-center gap-1.5 h-8 px-3 rounded-[6px] border border-[#E2E8F0] dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-semibold text-[#333333] dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer shadow-2xs"
-          title="Filter lanjutan"
+          :title="t('kb_cat_filter_advanced')"
         >
           <span class="material-symbols-outlined text-[16px] text-[#5F7089]">tune</span>
           <span>Filter</span>
@@ -363,15 +367,17 @@ function clearFilters() {
         >
           <FolderOpen class="w-5 h-5" />
         </div>
-        <p class="text-xs font-semibold text-[#333333] dark:text-slate-200">Tidak ada kategori</p>
+        <p class="text-xs font-semibold text-[#333333] dark:text-slate-200">{{
+          t('kb_cat_empty_title')
+        }}</p>
         <p class="text-[11px] text-[#5F7089] dark:text-slate-400 font-normal mt-1">
-          Tidak ada kategori yang cocok dengan filter atau pencarian.
+          {{ t('kb_cat_empty_desc') }}
         </p>
         <button
           @click="clearFilters"
           class="mt-3 px-3 py-1.5 rounded-[6px] text-xs font-medium bg-slate-100 dark:bg-slate-800 text-[#333333] dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors cursor-pointer touch-manipulation"
         >
-          Reset Filter
+          {{ t('filter_reset') }}
         </button>
       </div>
 
@@ -414,7 +420,7 @@ function clearFilters() {
                   {{ c.key }}
                 </code>
                 <span>•</span>
-                <span>Urutan: {{ c.sort_order }}</span>
+                <span>{{ t('kb_cat_order_label') }}: {{ c.sort_order }}</span>
               </div>
             </div>
           </div>
@@ -424,7 +430,7 @@ function clearFilters() {
             <button
               @click="openEditDrawer(c.id)"
               class="flex items-center justify-center h-8 px-2.5 gap-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-[#0A51B0] hover:text-white text-xs font-semibold transition-all touch-manipulation cursor-pointer"
-              title="Edit Kategori"
+              :title="t('kb_cat_edit_category')"
             >
               <Edit3 class="w-3.5 h-3.5" />
               <span>Edit</span>
@@ -432,7 +438,7 @@ function clearFilters() {
             <button
               @click="confirmDelete(c.id)"
               class="flex items-center justify-center h-8 w-8 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors touch-manipulation cursor-pointer"
-              title="Hapus Kategori"
+              :title="t('kb_cat_delete_category')"
             >
               <Trash2 class="w-3.5 h-3.5" />
             </button>
@@ -463,7 +469,7 @@ function clearFilters() {
               class="w-1.5 h-1.5 rounded-full"
               :class="c.status === 'DRAFT' ? 'bg-amber-500' : 'bg-emerald-500'"
             ></span>
-            <span>{{ c.status === 'DRAFT' ? 'Draft' : 'Published' }}</span>
+            <span>{{ c.status === 'DRAFT' ? t('stat_draft') : t('stat_published') }}</span>
           </span>
 
           <span
@@ -471,7 +477,7 @@ function clearFilters() {
             class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-300 border border-amber-200/50 dark:border-amber-800/50"
           >
             <Star class="w-3 h-3 fill-amber-500 text-amber-500" />
-            Featured
+            {{ t('stat_categories_featured') }}
           </span>
         </div>
       </div>
@@ -488,12 +494,12 @@ function clearFilters() {
             class="border-b border-[#E2E8F0] dark:border-slate-800 text-[#5F7089] dark:text-slate-400 font-medium text-xs"
           >
             <tr>
-              <th class="py-3 px-5 font-medium">Kategori</th>
+              <th class="py-3 px-5 font-medium">{{ t('th_category') }}</th>
               <th class="py-3 px-4 font-medium">Key</th>
               <th class="py-3 px-4 font-medium">Icon</th>
-              <th class="py-3 px-4 font-medium">Urutan</th>
-              <th class="py-3 px-4 font-medium">Status</th>
-              <th v-if="canWrite" class="py-3 px-5 text-right font-medium">Aksi</th>
+              <th class="py-3 px-4 font-medium">{{ t('kb_cat_order_label') }}</th>
+              <th class="py-3 px-4 font-medium">{{ t('status') }}</th>
+              <th v-if="canWrite" class="py-3 px-5 text-right font-medium">{{ t('actions') }}</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-[#F1F5F9] dark:divide-slate-800/60">
@@ -507,16 +513,16 @@ function clearFilters() {
                     <FolderOpen class="w-5 h-5" />
                   </div>
                   <p class="text-sm font-semibold text-[#333333] dark:text-slate-200">
-                    Tidak ada kategori
+                    {{ t('kb_cat_empty_title') }}
                   </p>
                   <p class="text-xs text-[#5F7089] dark:text-slate-400 font-normal">
-                    Tidak ada kategori yang cocok dengan filter atau pencarian.
+                    {{ t('kb_cat_empty_desc') }}
                   </p>
                   <button
                     @click="clearFilters"
                     class="mt-3 px-4 py-2 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-[#333333] dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors cursor-pointer"
                   >
-                    Reset Filter
+                    {{ t('filter_reset') }}
                   </button>
                 </div>
               </td>
@@ -591,7 +597,7 @@ function clearFilters() {
                     class="w-1.5 h-1.5 rounded-full"
                     :class="c.status === 'DRAFT' ? 'bg-amber-500' : 'bg-emerald-500'"
                   ></span>
-                  <span>{{ c.status === 'DRAFT' ? 'Draft' : 'Published' }}</span>
+                  <span>{{ c.status === 'DRAFT' ? t('stat_draft') : t('stat_published') }}</span>
                 </span>
               </td>
 
@@ -600,8 +606,8 @@ function clearFilters() {
                 <button
                   @click="toggleActionMenu(c.id, $event)"
                   class="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0A51B0]"
-                  title="Aksi"
-                  aria-label="Aksi kategori"
+                  :title="t('actions')"
+                  :aria-label="t('kb_cat_actions_aria')"
                 >
                   <MoreVertical class="w-4 h-4" />
                 </button>
@@ -642,7 +648,7 @@ function clearFilters() {
           class="w-full flex items-center gap-2 px-3 py-2 text-xs font-medium text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-md transition-colors cursor-pointer"
         >
           <Trash2 class="w-3.5 h-3.5" />
-          <span>Hapus</span>
+          <span>{{ t('delete') }}</span>
         </button>
       </div>
     </Teleport>
@@ -656,8 +662,8 @@ function clearFilters() {
 
     <AppModal
       :is-open="isDrawerOpen && Boolean(editingCategory)"
-      :title="drawerMode === 'create' ? 'Kategori Baru' : 'Edit Kategori'"
-      subtitle="Atur identitas dan tampilan kategori di Help Center."
+      :title="drawerMode === 'create' ? t('btn_new_category') : t('kb_cat_edit_category')"
+      :subtitle="t('kb_cat_drawer_subtitle')"
       icon="category"
       size="lg"
       @close="closeDrawer"
@@ -666,18 +672,18 @@ function clearFilters() {
         <!-- Drawer Body Scrollable -->
         <div class="category-form">
           <!-- Title -->
-          <h3 class="category-section-title">Identitas kategori</h3>
+          <h3 class="category-section-title">{{ t('kb_cat_section_identity') }}</h3>
           <div class="space-y-1.5">
             <label class="text-xs font-semibold text-[#475569] dark:text-slate-300"
-              >Judul Kategori</label
+              >{{ t('kb_cat_field_title') }}</label
             >
             <input
               id="category-title"
-              aria-label="Judul kategori"
+              :aria-label="t('kb_cat_field_title')"
               v-model="editingCategory.title"
               @input="handleTitleInput"
               type="text"
-              placeholder="mis. Network & VPN"
+              :placeholder="t('kb_cat_title_placeholder')"
               class="w-full bg-white dark:bg-slate-950 border border-[#E2E8F0] dark:border-slate-700 rounded-lg px-3 py-2 text-xs sm:text-sm text-[#333333] dark:text-white placeholder-[#687281] focus:outline-none focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 transition-all"
             />
           </div>
@@ -689,25 +695,25 @@ function clearFilters() {
             >
             <input
               id="category-key"
-              aria-label="Key kategori"
+              :aria-label="t('kb_cat_key_aria')"
               v-model="editingCategory.key"
               type="text"
-              placeholder="mis. network-vpn"
+              :placeholder="t('kb_cat_key_placeholder')"
               class="w-full bg-white dark:bg-slate-950 border border-[#E2E8F0] dark:border-slate-700 rounded-lg px-3 py-2 text-xs sm:text-sm font-mono text-[#333333] dark:text-white placeholder-[#687281] focus:outline-none focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 transition-all"
             />
             <p class="text-[11px] text-[#687281] dark:text-slate-500">
-              Huruf kecil, angka, dan tanda hubung. Digunakan untuk filter kategori di Help Center.
+              {{ t('kb_cat_key_hint') }}
             </p>
           </div>
 
           <!-- Description -->
           <div class="space-y-1.5">
             <label class="text-xs font-semibold text-[#475569] dark:text-slate-300"
-              >Deskripsi</label
+              >{{ t('kb_cat_field_description') }}</label
             >
             <textarea
               id="category-description"
-              aria-label="Deskripsi kategori"
+              :aria-label="t('kb_cat_description_aria')"
               v-model="editingCategory.description"
               rows="3"
               placeholder="Deskripsi singkat yang tampil pada kartu topik…"

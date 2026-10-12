@@ -1,36 +1,19 @@
 <script setup>
 defineProps({ variant: { type: String, default: 'primary' }, size: { type: String, default: 'md' } })
 </script>
+
 <template>
-  <button class="app-button" :class="[`app-button--${variant}`, `app-button--${size}`]"><slot /></button>
+  <button :class="[
+    'inline-flex items-center justify-center rounded-md font-medium transition-all active:scale-[0.98] cursor-pointer touch-manipulation focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none select-none',
+    variant === 'primary' ? 'bg-primary text-white hover:bg-primary-dark shadow-xs' :
+    variant === 'secondary' ? 'bg-secondary text-white hover:bg-secondary-dark shadow-xs' :
+    variant === 'success' ? 'bg-success text-white hover:bg-success-dark shadow-xs' :
+    variant === 'warning' ? 'bg-warning text-white hover:bg-warning-dark shadow-xs' :
+    variant === 'danger' ? 'bg-danger text-white hover:bg-danger-dark shadow-xs' :
+    variant === 'link' ? 'text-primary hover:text-primary-dark border border-primary hover:border-primary-dark' :
+    'border border-gray-300 dark:border-slate-700 text-gray-700 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-800 bg-white dark:bg-slate-900',
+    size === 'sm' ? 'text-xs px-2.5 py-1.5 min-h-[30px]' :
+    size === 'md' ? 'text-sm px-4 py-2 min-h-[38px]' :
+    size === 'lg' ? 'text-base px-6 py-2.5 min-h-[44px]' : ''
+  ]"><slot /></button>
 </template>
-<style scoped>
-.app-button {
-  font-family: var(--font-family-sans);
-  border-radius: var(--ui-radius-control, 5px);
-  border: 1px solid var(--ui-border, #e2e8f0);
-  background: var(--color-primary, #0a51b0);
-  color: white;
-  padding: 4px 10px;
-  font-size: var(--fs-xs, 10px);
-  font-weight: 550;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  cursor: pointer;
-}
-.app-button--sm {
-  height: 24px;
-  padding: 2px 7px;
-  font-size: 9px;
-}
-.app-button--md {
-  height: 28px;
-}
-.app-button--lg {
-  height: 32px;
-  padding: 5px 12px;
-  font-size: 11px;
-}
-</style>

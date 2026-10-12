@@ -1,6 +1,6 @@
 <script setup>
 // ============================================================
-// CsatDashboardSection.vue — Section CSAT/CASP di dashboard.
+// CsatDashboardSection.vue - Section CSAT/CASP di dashboard.
 // Kartu rata-rata kepuasan + Bar chart distribusi + Line chart CSAT per bulan.
 // ============================================================
 import { computed, onMounted, ref } from 'vue'
@@ -16,6 +16,7 @@ import {
 } from 'chart.js'
 import { useApi } from '@/composables/useApi'
 import { useChartTheme } from '@/composables/useChartTheme'
+import { useLanguage } from '@/composables/useLanguage'
 import CsatStars from '../tickets/CsatStars.vue'
 import CsatTrendLineChart from './CsatTrendLineChart.vue'
 
@@ -23,6 +24,7 @@ ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale)
 
 const { get } = useApi()
 const { chartColors } = useChartTheme()
+const { t } = useLanguage()
 
 const stats = ref({ averageRating: 0, totalRatings: 0, distribution: [] })
 const trendData = ref([])
@@ -36,29 +38,29 @@ const isEmpty = computed(() => stats.value.totalRatings === 0)
 // Label deskriptif untuk rata-rata.
 const ratingLabel = computed(() => {
   const avg = stats.value.averageRating
-  if (avg >= 4.5) return 'Sangat Puas'
-  if (avg >= 3.5) return 'Puas'
-  if (avg >= 2.5) return 'Cukup'
-  if (avg >= 1.5) return 'Tidak Puas'
-  if (avg > 0) return 'Sangat Tidak Puas'
-  return 'Belum ada penilaian'
+  if (avg >= 4.5) return t('csat_very_satisfied')
+  if (avg >= 3.5) return t('csat_satisfied')
+  if (avg >= 2.5) return t('csat_neutral')
+  if (avg >= 1.5) return t('csat_unsatisfied')
+  if (avg > 0) return t('csat_very_unsatisfied')
+  return t('csat_no_ratings')
 })
 
 // Warna tiap bar: gradasi dari merah (rating 1) ke hijau (rating 5).
 const barColors = ['#EF4444', '#FA896B', '#FFAE1F', '#84CC16', '#13DEB9']
-const ratingLabels = {
-  1: 'Sangat Tidak Puas',
-  2: 'Tidak Puas',
-  3: 'Cukup',
-  4: 'Puas',
-  5: 'Sangat Puas',
-}
+const ratingLabels = computed(() => ({
+  1: t('csat_very_unsatisfied'),
+  2: t('csat_unsatisfied'),
+  3: t('csat_neutral'),
+  4: t('csat_satisfied'),
+  5: t('csat_very_satisfied'),
+}))
 
 const chartData = computed(() => ({
   labels: stats.value.distribution.map((d) => `${d.rating}★`),
   datasets: [
     {
-      label: 'Jumlah Penilaian',
+      label: t('tickets_csat_rating_count'),
       data: stats.value.distribution.map((d) => d.count),
       backgroundColor: barColors,
       borderRadius: 8,
@@ -80,9 +82,9 @@ const chartOptions = computed(() => ({
       callbacks: {
         title: (items) => {
           const r = Number(String(items[0].label).replace('★', ''))
-          return `${r} Bintang — ${ratingLabels[r] || ''}`
+          return `${r} ${t('tickets_star_label')}: ${ratingLabels.value[r] || ''}`
         },
-        label: (ctx) => ` ${ctx.parsed.y} penilaian`,
+        label: (ctx) => ` ${ctx.parsed.y} ${t('csat_ratings_count')}`,
       },
     },
   },
@@ -113,7 +115,7 @@ async function fetchStats() {
       distribution: Array.isArray(data?.distribution) ? data.distribution : [],
     }
   } catch (e) {
-    error.value = 'Gagal memuat data CSAT.'
+    error.value = t('tickets_csat_load_failed')
     console.error(e)
   } finally {
     isLoading.value = false
@@ -127,7 +129,7 @@ async function fetchTrend() {
     const data = await get('/api/tickets/casp/trend')
     trendData.value = Array.isArray(data) ? data : []
   } catch (e) {
-    trendError.value = 'Gagal memuat tren CSAT bulanan.'
+    trendError.value = t('tickets_csat_trend_load_failed')
     console.error(e)
   } finally {
     isTrendLoading.value = false
@@ -141,38 +143,38 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="csat-section flex flex-col gap-4">
+  <div class="csat-section flex flex-col gap-3">
     <!-- Header CSAT Section -->
     <div class="csat-heading flex items-center justify-between gap-3">
       <div class="min-w-0">
         <h3 class="text-sm font-bold tracking-tight text-[#1E293B] leading-tight">
-          Kepuasan Penanganan Tiket
+          {{ t('csat_title') }}
         </h3>
         <p class="mt-0.5 text-xs font-medium text-[#5B6B84]">
-          Skor CSAT bulanan dan sebaran ulasan penyelesaian tiket
+          {{ t('csat_subtitle') }}
         </p>
       </div>
       <span
         class="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-[#FEF3C7] px-3 py-1 text-[11px] font-bold text-[#92400E]"
       >
         <span aria-hidden="true" class="material-symbols-outlined text-[15px] fill-1">star</span>
-        CSAT Analytics
+        {{ t('csat_analytics') }}
       </span>
     </div>
 
     <!-- Row 1: Kartu Rata-rata CSAT + Bar Chart Distribusi -->
-    <div class="csat-grid grid grid-cols-1 lg:grid-cols-12 gap-5">
+    <div class="csat-grid grid grid-cols-1 lg:grid-cols-12 gap-3">
       <!-- Kartu Rata-rata CSAT -->
       <div
-        class="csat-panel rounded-xl border border-[#E2E8F0] bg-white p-5 flex flex-col justify-between lg:col-span-5"
+        class="csat-panel rounded-[6px] border border-[#E2E8F0] bg-white p-3 flex flex-col justify-between lg:col-span-5"
       >
         <div class="flex items-center justify-between gap-3 pb-3 border-b border-[#F1F5F9]">
           <div class="min-w-0">
             <h3 class="text-sm font-bold text-[#1E293B] leading-tight">
-              Rata-rata Kepuasan (CSAT)
+              {{ t('csat_average_title') }}
             </h3>
             <p class="mt-0.5 text-[11px] font-medium text-[#5B6B84]">
-              Penilaian pelapor atas tiket yang selesai
+              {{ t('csat_average_desc') }}
             </p>
           </div>
           <span
@@ -192,7 +194,7 @@ onMounted(() => {
           <div
             class="h-8 w-8 animate-spin rounded-full border-[3px] border-[#E5EAEF] border-t-[#FFAE1F]"
           ></div>
-          <span class="text-[12px] font-medium">Memuat data CSAT…</span>
+          <span class="text-[12px] font-medium">{{ t('loading') }}</span>
         </div>
 
         <!-- Error -->
@@ -204,10 +206,10 @@ onMounted(() => {
           <p class="text-[12px] font-semibold">{{ error }}</p>
           <button
             type="button"
-            class="csat-retry mt-1 rounded-lg bg-[#FDEDE8] px-3 py-1.5 text-[11px] font-bold text-[#FA896B] hover:bg-[#FA896B] hover:text-white transition-all"
+            class="csat-retry mt-1 bg-[#FDEDE8] px-3 py-1.5 text-[11px] font-bold text-[#FA896B] hover:bg-[#FA896B] hover:text-white transition-all"
             @click="fetchStats"
           >
-            Coba lagi
+            {{ t('retry') }}
           </button>
         </div>
 
@@ -218,7 +220,7 @@ onMounted(() => {
         >
           <span aria-hidden="true" class="material-symbols-outlined text-[34px]">reviews</span>
           <p class="text-[12px] font-semibold text-center">
-            Belum ada penilaian CSAT.<br />Penilaian muncul setelah tiket di-resolve.
+            {{ t('csat_no_data') }}
           </p>
         </div>
 
@@ -242,7 +244,7 @@ onMounted(() => {
               {{ ratingLabel }}
             </span>
             <span class="text-[11px] font-medium text-[#5B6B84]"
-              >{{ stats.totalRatings }} total ulasan</span
+              >{{ stats.totalRatings }} {{ t('csat_ratings_count') }}</span
             >
           </div>
         </div>
@@ -250,13 +252,13 @@ onMounted(() => {
 
       <!-- Bar Chart Distribusi Rating -->
       <div
-        class="csat-panel flex flex-col rounded-xl border border-[#E2E8F0] bg-white p-5 lg:col-span-7"
+        class="csat-panel flex flex-col rounded-[6px] border border-[#E2E8F0] bg-white p-3 lg:col-span-7"
       >
         <div class="flex items-center justify-between pb-3 border-b border-[#F1F5F9] mb-4">
           <div class="min-w-0">
-            <h3 class="text-sm font-bold text-[#1E293B] leading-tight">Distribusi Penilaian</h3>
+            <h3 class="text-sm font-bold text-[#1E293B] leading-tight">{{ t('csat_rating_distribution') }}</h3>
             <p class="mt-0.5 text-[11px] font-medium text-[#5B6B84]">
-              Sebaran ulasan per tingkat bintang
+              {{ t('csat_dist_desc') }}
             </p>
           </div>
         </div>
@@ -268,13 +270,13 @@ onMounted(() => {
             <div
               class="h-8 w-8 animate-spin rounded-full border-[3px] border-[#E5EAEF] border-t-[#0A51B0]"
             ></div>
-            <span class="text-[12px] font-medium">Memuat data grafik...</span>
+            <span class="text-[12px] font-medium">{{ t('loading_data') }}</span>
           </div>
 
           <!-- Error State -->
           <div
             v-else-if="error"
-            class="flex flex-col items-center gap-2 text-[#FA896B] p-4 text-center"
+            class="flex flex-col items-center gap-2 text-[#FA896B] p-3 text-center"
           >
             <span aria-hidden="true" class="material-symbols-outlined text-[32px]">error</span>
             <p class="text-[12px] font-semibold">{{ error }}</p>
@@ -283,12 +285,12 @@ onMounted(() => {
           <!-- Empty State -->
           <div
             v-else-if="isEmpty"
-            class="flex flex-col items-center gap-2 text-[#687281] p-4 text-center"
+            class="flex flex-col items-center gap-2 text-[#687281] p-3 text-center"
           >
             <span aria-hidden="true" class="material-symbols-outlined text-[36px]"
               >bar_chart_off</span
             >
-            <p class="text-[12px] font-semibold">Belum ada data visualisasi.</p>
+            <p class="text-[12px] font-semibold">{{ t('tickets_csat_no_chart_data') }}</p>
           </div>
 
           <!-- Chart -->
@@ -296,7 +298,7 @@ onMounted(() => {
             <Bar
               :data="chartData"
               :options="chartOptions"
-              aria-label="Bar chart showing CSAT rating distribution"
+              :aria-label="t('tickets_csat_chart_aria')"
             />
           </div>
         </div>

@@ -17,6 +17,7 @@ import SkeletonTable from '../components/ui/skeleton/SkeletonTable.vue'
 import CustomSelect from '../components/ui/CustomSelect.vue'
 import SearchableSelect from '../components/ui/SearchableSelect.vue'
 import { useViewMode } from '../composables/useViewMode.js'
+import { useLanguage } from '../composables/useLanguage.js'
 import AppViewToggle from '../components/ui/AppViewToggle.vue'
 import FilterModal from '../components/ui/FilterModal.vue'
 import PageHeader from '../components/ui/PageHeader.vue'
@@ -26,6 +27,7 @@ const { get, post, put, del } = useApi()
 const { hasWritePermission } = useAuth()
 const canWriteKaryawan = computed(() => hasWritePermission('karyawan'))
 const { viewMode } = useViewMode('karyawan', 'table')
+const { t } = useLanguage()
 
 // ── State Utama ──────────────────────────────────────────────
 const employees = ref([])
@@ -43,7 +45,7 @@ const itemsPerPage = ref(10)
 function onImported() {
   showImportModal.value = false
   fetchData()
-  notification.value = { message: 'Data Excel berhasil diimpor ke database!', type: 'success' }
+  notification.value = { message: t('employees_import_success'), type: 'success' }
 }
 
 // ── Filter & Search ──────────────────────────────────────────
@@ -101,7 +103,7 @@ const statusKepegawaianFormOptions = [
 ]
 
 const atasanOptions = computed(() => [
-  { nik: '', displayLabel: '-- Tanpa Atasan / Tidak Ada --' },
+  { nik: '', displayLabel: t('employees_no_supervisor_option') },
   ...employees.value
     .filter((emp) => emp.nik !== form.value.nik)
     .map((e) => ({
@@ -273,7 +275,7 @@ async function fetchData() {
     }))
     stats.value = statsData
   } catch (err) {
-    pageError.value = err.message || 'Gagal memuat data karyawan.'
+    pageError.value = err.message || t('employees_load_failed')
   } finally {
     isLoading.value = false
     await nextTick()
@@ -283,7 +285,7 @@ async function fetchData() {
 
 function exportEmployees() {
   if (filteredEmployees.value.length === 0) {
-    toast('Tidak ada data karyawan untuk diekspor.', 'error')
+    toast(t('employees_export_empty'), 'error')
     return
   }
 
@@ -291,22 +293,22 @@ function exportEmployees() {
     filteredEmployees.value,
     [
       { name: 'nik', label: 'NIK' },
-      { name: 'nama_karyawan', label: 'Nama Karyawan' },
-      { name: 'status_karyawan', label: 'Status' },
+      { name: 'nama_karyawan', label: t('employees_export_name') },
+      { name: 'status_karyawan', label: t('status') },
       { name: 'jabatan', label: 'Title' },
       { name: 'tingkat_jabatan', label: 'Job Level' },
-      { name: 'departemen', label: 'Departemen' },
-      { name: 'direktorat', label: 'Directorate' },
-      { name: 'tanggal_mulai_bekerja', label: 'Tanggal Mulai Bekerja' },
+      { name: 'departemen', label: t('department') },
+      { name: 'direktorat', label: t('employees_directorate') },
+      { name: 'tanggal_mulai_bekerja', label: t('employees_export_start_date') },
       { name: 'status_kepegawaian', label: 'Employeement Status' },
-      { name: 'nik_atasan_langsung', label: 'NIK Atasan Langsung' },
-      { name: 'email_kantor', label: 'Email Kantor' },
-      { name: 'lokasi_kerja', label: 'Lokasi Kerja' },
+      { name: 'nik_atasan_langsung', label: t('employees_export_supervisor_nik') },
+      { name: 'email_kantor', label: t('employees_export_office_email') },
+      { name: 'lokasi_kerja', label: t('employees_work_location') },
     ],
-    'Table Karyawan',
-    'Karyawan',
+    t('employees_export_sheet'),
+    t('employees_export_filename'),
   )
-  toast('Data karyawan berhasil diekspor ke XLSX.')
+  toast(t('employees_export_success'))
 }
 
 function openAdd() {
@@ -359,7 +361,7 @@ function closeModal() {
 
 async function saveEmployee() {
   if (!canWriteKaryawan.value) {
-    modalError.value = 'Anda hanya memiliki akses baca untuk data karyawan.'
+    modalError.value = t('employees_no_write_access')
     return
   }
 
@@ -386,15 +388,15 @@ async function saveEmployee() {
   }
 
   if (!payload.nik || !payload.nama_karyawan) {
-    modalError.value = 'NIK dan Nama Karyawan wajib diisi.'
+    modalError.value = t('employees_validation_nik_name')
     return
   }
   if (!payload.departemen || !payload.direktorat) {
-    modalError.value = 'Departemen dan Direktorat wajib diisi.'
+    modalError.value = t('employees_validation_dept_directorate')
     return
   }
   if (!payload.tanggal_mulai_bekerja) {
-    modalError.value = 'Tanggal mulai bekerja wajib diisi.'
+    modalError.value = t('employees_validation_start_date')
     return
   }
 
@@ -405,15 +407,15 @@ async function saveEmployee() {
     const targetId = selectedEmployee.value?.id_karyawan || selectedEmployee.value?.id
     if (modalMode.value === 'add') {
       await post('/api/karyawan', payload)
-      toast('Data karyawan berhasil ditambahkan.')
+      toast(t('employees_add_success'))
     } else {
       await put(`/api/karyawan/${targetId}`, payload)
-      toast('Data karyawan berhasil diperbarui.')
+      toast(t('employees_update_success'))
     }
     closeModal()
     await fetchData()
   } catch (err) {
-    modalError.value = err.message || 'Gagal menyimpan data karyawan.'
+    modalError.value = err.message || t('employees_save_failed')
   } finally {
     isSubmitting.value = false
   }
@@ -429,14 +431,14 @@ async function deleteEmployee() {
     const res = await del(`/api/karyawan/${targetId}`)
     const count = res?.affectedAssetsCount || 0
     if (count > 0) {
-      toast(`Data karyawan berhasil dihapus. ${count} unit aset otomatis dialihkan menjadi Stock.`)
+      toast(`${t('employees_delete_success')} ${count} ${t('employees_delete_reassigned_units')}`)
     } else {
-      toast('Data karyawan berhasil dihapus dari tabel.')
+      toast(t('employees_delete_success_table'))
     }
     closeModal()
     await fetchData()
   } catch (err) {
-    modalError.value = err.message || 'Gagal menghapus karyawan.'
+    modalError.value = err.message || t('employees_delete_failed')
   } finally {
     isSubmitting.value = false
   }
@@ -445,12 +447,12 @@ async function deleteEmployee() {
 function getEmployeeActions(emp) {
   return [
     {
-      label: 'Edit Karyawan',
+      label: t('employees_edit_action'),
       icon: 'edit',
       onClick: () => openEdit(emp),
     },
     {
-      label: 'Hapus Karyawan',
+      label: t('employees_delete_action'),
       icon: 'delete',
       danger: true,
       onClick: () => openDelete(emp),
@@ -493,8 +495,8 @@ onMounted(() => {
     </Transition>
     <!-- Page Header -->
     <PageHeader
-      title="Data Karyawan"
-      subtitle="Pengelolaan dan integrasi data karyawan perusahaan"
+      :title="t('employees_title')"
+      :subtitle="t('employees_subtitle')"
       icon="person_search"
     >
       <div class="flex flex-wrap sm:flex-nowrap items-center gap-1.5">
@@ -503,10 +505,10 @@ onMounted(() => {
           type="button"
           @click="openAdd"
           class="h-8 shrink-0 whitespace-nowrap rounded-[6px] bg-[#0A51B0] px-3 text-xs font-medium text-white shadow-2xs hover:bg-[#0A4391] transition-all flex items-center justify-center gap-1.5 cursor-pointer"
-          title="Tambah karyawan baru"
+          :title="t('btn_add_employee')"
         >
           <span aria-hidden="true" class="material-symbols-outlined text-[16px]">person_add</span>
-          <span>Tambah Karyawan</span>
+          <span>{{ currentLang === 'en' ? 'Add Employee' : 'Tambah Karyawan' }}</span>
         </button>
         <div class="flex items-center gap-1 rounded-[6px] border border-[#D7E3F2] dark:border-slate-700 bg-[#F8FAFC] dark:bg-slate-800 p-0.5 h-8">
           <button
@@ -514,19 +516,19 @@ onMounted(() => {
             type="button"
             @click="showImportModal = true"
             class="inline-flex h-full items-center gap-1 rounded-[4px] px-2 text-[11px] font-semibold text-[#0A51B0] dark:text-blue-400 hover:bg-white dark:hover:bg-slate-700"
-            title="Import data karyawan dari Excel"
+            :title="t('employees_import_title')"
           >
             <span aria-hidden="true" class="material-symbols-outlined text-[15px]">upload_file</span
-            >Import
+            >{{ t('btn_import') }}
           </button>
           <button
             type="button"
             @click="exportEmployees"
             class="inline-flex h-full items-center gap-1 rounded-[4px] px-2 text-[11px] font-semibold text-[#0A51B0] dark:text-blue-400 hover:bg-white dark:hover:bg-slate-700"
-            title="Export data karyawan"
+            :title="t('employees_export_title')"
           >
             <span aria-hidden="true" class="material-symbols-outlined text-[15px]">download</span
-            >Export
+            >{{ t('btn_export') }}
           </button>
         </div>
       </div>
@@ -538,40 +540,40 @@ onMounted(() => {
       class="employee-stats grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-2.5 lg:gap-3"
     >
       <StatCard
-        title="Total karyawan"
+        :title="t('stat_total_employees')"
         :value="stats.totalKaryawan"
         icon="groups"
         color="primary"
-        subtitle="Seluruh staf terdaftar"
+        :subtitle="t('employees_stat_total_sub')"
       />
       <StatCard
-        title="Karyawan aktif"
+        :title="t('employees_stat_active')"
         :value="stats.active"
         icon="check_circle"
         color="success"
         :subtitle="
           stats.totalKaryawan
-            ? Math.round((stats.active / stats.totalKaryawan) * 100) + '% dari total'
-            : 'Aktif bekerja'
+            ? Math.round((stats.active / stats.totalKaryawan) * 100) + t('employees_pct_of_total')
+            : t('employees_currently_working')
         "
       />
       <StatCard
-        title="Resigned"
+        :title="t('employees_stat_resigned')"
         :value="stats.resigned"
         icon="person_off"
         color="danger"
         :subtitle="
           stats.totalKaryawan
             ? Math.round((stats.resigned / stats.totalKaryawan) * 100) + '% turnover'
-            : 'Telah berhenti'
+            : t('employees_terminated')
         "
       />
       <StatCard
-        title="Departemen"
+        :title="t('department')"
         :value="stats.totalDepartemen"
         icon="corporate_fare"
         color="neutral"
-        subtitle="Unit kerja organisasi"
+        :subtitle="t('employees_org_units')"
       />
     </div>
 
@@ -585,9 +587,9 @@ onMounted(() => {
         >
         <input
           v-model="searchQuery"
-          aria-label="Cari karyawan"
+          :aria-label="t('employees_search_label')"
           type="text"
-          placeholder="Cari NIK, nama, atau jabatan…"
+          :placeholder="t('employees_search_placeholder')"
           class="h-full min-h-0 w-full rounded-[6px] border border-[#E2E8F0] dark:border-slate-700 bg-white dark:bg-slate-800 pl-9 pr-3 text-xs text-[#333333] dark:text-slate-100 placeholder-[#687281] dark:placeholder-slate-400 focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
         />
       </div>
@@ -598,7 +600,7 @@ onMounted(() => {
         class="relative inline-flex items-center gap-1.5 h-8 shrink-0 rounded-[6px] border border-[#E2E8F0] dark:border-slate-700 bg-[#F8FAFC] dark:bg-slate-800 px-3 text-xs font-medium text-[#5F7089] dark:text-slate-300 hover:bg-white dark:hover:bg-slate-700 cursor-pointer"
       >
         <span aria-hidden="true" class="material-symbols-outlined text-[16px]">tune</span>
-        <span>Filter</span>
+        <span>{{ t('filter') }}</span>
         <span
           v-if="activeFilterCount > 0"
           class="ml-0.5 inline-flex items-center justify-center min-w-[16px] h-4 px-1 rounded-full text-[10px] font-bold bg-[#0A51B0] text-white"
@@ -611,7 +613,7 @@ onMounted(() => {
 
     <FilterModal
       :is-open="showFilterModal"
-      title="Filter Karyawan"
+      :title="t('employees_filter_title')"
       @close="showFilterModal = false"
       @apply="showFilterModal = false"
       @reset="resetFilters"
@@ -620,7 +622,7 @@ onMounted(() => {
         v-model="filterDepartemen"
         class="h-8 w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 px-3 text-xs"
       >
-        <option value="">Semua Departemen</option>
+        <option value="">{{ t('employees_filter_all_departments') }}</option>
         <option v-for="item in availableDepartemenOptions" :key="item" :value="item">
           {{ item }}
         </option>
@@ -629,14 +631,14 @@ onMounted(() => {
         v-model="filterLokasi"
         class="h-8 w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 px-3 text-xs"
       >
-        <option value="">Semua Lokasi</option>
+        <option value="">{{ t('employees_filter_all_locations') }}</option>
         <option v-for="item in availableLokasiOptions" :key="item" :value="item">{{ item }}</option>
       </select>
       <select
         v-model="filterStatus"
         class="h-8 w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 px-3 text-xs"
       >
-        <option value="">Semua Status</option>
+        <option value="">{{ t('employees_filter_all_status') }}</option>
         <option value="Active">Active</option>
         <option value="Outsource">Outsource</option>
         <option value="Resigned">Resigned</option>
@@ -654,13 +656,13 @@ onMounted(() => {
       <div v-else-if="filteredEmployees.length === 0" class="px-4 py-8 sm:p-8">
         <EmptyState
           icon="person_off"
-          title="Tidak Ada Data Karyawan"
-          description="Cobalah untuk mengosongkan filter atau menambah karyawan baru."
+          :title="t('employees_empty_title')"
+          :description="t('employees_empty_desc')"
         />
       </div>
 
       <div v-else class="w-full max-w-full overflow-hidden">
-        <ul v-if="viewMode === 'card'" class="admin-person-cards" aria-label="Daftar karyawan">
+        <ul v-if="viewMode === 'card'" class="admin-person-cards" :aria-label="t('employees_list_label')">
           <li
             v-for="emp in paginatedEmployees"
             :key="emp.id_karyawan || emp.nik"
@@ -688,19 +690,19 @@ onMounted(() => {
                 <dd class="font-mono font-semibold text-[#333333]">{{ emp.nik }}</dd>
               </div>
               <div>
-                <dt class="text-[10px] text-[#5F7089]">Title / Jabatan</dt>
+                <dt class="text-[10px] text-[#5F7089]">{{ t('employees_job_title') }}</dt>
                 <dd class="text-[#333333]">{{ emp.jabatan || emp.title || '-' }}</dd>
               </div>
               <div>
-                <dt class="text-[10px] text-[#5F7089]">Departemen</dt>
+                <dt class="text-[10px] text-[#5F7089]">{{ t('department') }}</dt>
                 <dd class="text-[#333333]">{{ emp.departemen || '-' }}</dd>
               </div>
               <div>
-                <dt class="text-[10px] text-[#5F7089]">Direktorat</dt>
+                <dt class="text-[10px] text-[#5F7089]">{{ t('employees_directorate') }}</dt>
                 <dd class="text-[#333333]">{{ emp.direktorat || emp.directorate || '-' }}</dd>
               </div>
               <div>
-                <dt class="text-[10px] text-[#5F7089]">Lokasi Kerja</dt>
+                <dt class="text-[10px] text-[#5F7089]">{{ t('employees_work_location') }}</dt>
                 <dd class="text-[#333333]">
                   {{ normalizeLocation(emp.lokasi_kerja || emp.work_location) || '-' }}
                 </dd>
@@ -712,21 +714,21 @@ onMounted(() => {
             >
               <button
                 type="button"
-                :aria-label="'Edit ' + emp.nama_karyawan"
+                :aria-label="t('edit') + ' ' + emp.nama_karyawan"
                 class="flex min-h-8 items-center justify-center gap-1.5 rounded-[6px] border border-[#E2E8F0] text-xs font-medium text-[#334155] hover:bg-[#F8FAFC] cursor-pointer"
                 @click="openEdit(emp)"
               >
                 <span aria-hidden="true" class="material-symbols-outlined text-[16px]">edit</span
-                >Edit
+                >{{ t('edit') }}
               </button>
               <button
                 type="button"
-                :aria-label="'Hapus ' + emp.nama_karyawan"
+                :aria-label="t('delete') + ' ' + emp.nama_karyawan"
                 class="flex min-h-8 items-center justify-center gap-1.5 rounded-[6px] border border-[#E2E8F0] text-xs font-medium text-rose-700 hover:bg-rose-50 cursor-pointer"
                 @click="openDelete(emp)"
               >
                 <span aria-hidden="true" class="material-symbols-outlined text-[16px]">delete</span
-                >Hapus
+                >{{ t('delete') }}
               </button>
             </div>
           </li>
@@ -751,7 +753,7 @@ onMounted(() => {
                 scope="col"
                 class="py-1.5 px-2.5 text-[11px] font-semibold uppercase tracking-wider text-[#5F7089] text-left whitespace-nowrap"
               >
-                Karyawan
+                {{ t('employees_th_employee') }}
               </th>
               <th
                 scope="col"
@@ -763,32 +765,32 @@ onMounted(() => {
                 scope="col"
                 class="py-1.5 px-2.5 text-[11px] font-semibold uppercase tracking-wider text-[#5F7089] text-left whitespace-nowrap"
               >
-                Title / Jabatan
+                {{ t('employees_job_title') }}
               </th>
               <th
                 scope="col"
                 class="py-1.5 px-2.5 text-[11px] font-semibold uppercase tracking-wider text-[#5F7089] text-left whitespace-nowrap"
               >
-                Departemen / Direktorat
+                {{ t('employees_th_department') }}
               </th>
               <th
                 scope="col"
                 class="py-1.5 px-2.5 text-[11px] font-semibold uppercase tracking-wider text-[#5F7089] text-left whitespace-nowrap"
               >
-                Status
+                {{ t('status') }}
               </th>
               <th
                 scope="col"
                 class="py-1.5 px-2.5 text-[11px] font-semibold uppercase tracking-wider text-[#5F7089] text-left whitespace-nowrap"
               >
-                Lokasi Kerja
+                {{ t('employees_work_location') }}
               </th>
               <th
                 scope="col"
                 v-if="canWriteKaryawan"
                 class="py-1.5 px-2.5 text-right text-[11px] font-semibold uppercase tracking-wider text-[#5F7089] whitespace-nowrap"
               >
-                Aksi
+                {{ currentLang === 'en' ? 'Actions' : 'Aksi' }}
               </th>
             </tr>
           </thead>
@@ -872,7 +874,7 @@ onMounted(() => {
               >
                 <AppRowActions
                   :actions="getEmployeeActions(emp)"
-                  :label="`Aksi karyawan ${emp.nama_karyawan || ''}`"
+                  :label="t('employees_row_actions_label') + ' ' + (emp.nama_karyawan || '')"
                 />
               </td>
             </tr>
@@ -893,7 +895,7 @@ onMounted(() => {
     <!-- Modal Form Tambah/Edit Karyawan -->
     <AppModal
       :is-open="showFormModal"
-      :title="modalMode === 'add' ? 'Tambah Data Karyawan' : 'Edit Data Karyawan'"
+      :title="modalMode === 'add' ? t('employees_modal_add_title') : t('employees_modal_edit_title')"
       size="lg"
       @close="closeModal"
     >
@@ -921,7 +923,7 @@ onMounted(() => {
               v-model="form.nik"
               type="text"
               required
-              placeholder="cth: 2026001"
+              :placeholder="t('employees_nik_placeholder')"
               class="min-w-0 min-h-11 sm:min-h-0 w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-base sm:text-xs text-[#2A3547] focus:outline-none focus:border-[#0A51B0]"
             />
           </div>
@@ -930,14 +932,14 @@ onMounted(() => {
             <label
               for="employee-nama_karyawan"
               class="block text-xs sm:text-[11px] font-bold uppercase tracking-wider text-[#66728d] mb-1"
-              >Nama Karyawan *</label
+              >{{ t('employees_name_label') }} *</label
             >
             <input
               id="employee-nama_karyawan"
               v-model="form.nama_karyawan"
               type="text"
               required
-              placeholder="Nama lengkap"
+              :placeholder="t('employees_name_placeholder')"
               class="min-w-0 min-h-11 sm:min-h-0 w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-base sm:text-xs text-[#2A3547] focus:outline-none focus:border-[#0A51B0]"
             />
           </div>
@@ -948,7 +950,7 @@ onMounted(() => {
             <label
               for="employee-email_kantor"
               class="block text-xs sm:text-[11px] font-bold uppercase tracking-wider text-[#66728d] mb-1"
-              >Email Kantor *</label
+              >{{ t('employees_email_label') }} *</label
             >
             <input
               id="employee-email_kantor"
@@ -964,14 +966,14 @@ onMounted(() => {
             <label
               for="employee-lokasi_kerja"
               class="block text-xs sm:text-[11px] font-bold uppercase tracking-wider text-[#66728d] mb-1"
-              >Lokasi Kerja *</label
+              >{{ t('employees_work_location') }} *</label
             >
             <input
               id="employee-lokasi_kerja"
               v-model="form.lokasi_kerja"
               type="text"
               required
-              placeholder="cth: JKT, SLO, GS"
+              :placeholder="t('employees_location_placeholder')"
               class="min-w-0 min-h-11 sm:min-h-0 w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-base sm:text-xs text-[#2A3547] focus:outline-none focus:border-[#0A51B0]"
             />
           </div>
@@ -982,14 +984,14 @@ onMounted(() => {
             <label
               for="employee-jabatan"
               class="block text-xs sm:text-[11px] font-bold uppercase tracking-wider text-[#66728d] mb-1"
-              >Title / Jabatan *</label
+              >{{ t('employees_job_title') }} *</label
             >
             <input
               id="employee-jabatan"
               v-model="form.jabatan"
               type="text"
               required
-              placeholder="cth: Software Engineer"
+              :placeholder="t('employees_jabatan_placeholder')"
               class="min-w-0 min-h-11 sm:min-h-0 w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-base sm:text-xs text-[#2A3547] focus:outline-none focus:border-[#0A51B0]"
             />
           </div>
@@ -1003,7 +1005,7 @@ onMounted(() => {
               v-model="form.tingkat_jabatan"
               :options="jobLevelOptions"
               aria-label="Job Level"
-              placeholder="Pilih level"
+              :placeholder="t('employees_select_level')"
               :block="true"
               height-class="h-8"
             />
@@ -1015,14 +1017,14 @@ onMounted(() => {
             <label
               for="employee-departemen"
               class="block text-xs sm:text-[11px] font-bold uppercase tracking-wider text-[#66728d] mb-1"
-              >Departemen *</label
+              >{{ t('department') }} *</label
             >
             <input
               id="employee-departemen"
               v-model="form.departemen"
               type="text"
               required
-              placeholder="cth: Technology"
+              :placeholder="t('employees_departemen_placeholder')"
               class="min-w-0 min-h-11 sm:min-h-0 w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-base sm:text-xs text-[#2A3547] focus:outline-none focus:border-[#0A51B0]"
             />
           </div>
@@ -1031,14 +1033,14 @@ onMounted(() => {
             <label
               for="employee-direktorat"
               class="block text-xs sm:text-[11px] font-bold uppercase tracking-wider text-[#66728d] mb-1"
-              >Directorate *</label
+              >{{ t('employees_directorate') }} *</label
             >
             <input
               id="employee-direktorat"
               v-model="form.direktorat"
               type="text"
               required
-              placeholder="cth: Technology"
+              :placeholder="t('employees_direktorat_placeholder')"
               class="min-w-0 min-h-11 sm:min-h-0 w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] px-3 py-2 text-base sm:text-xs text-[#2A3547] focus:outline-none focus:border-[#0A51B0]"
             />
           </div>
@@ -1048,13 +1050,13 @@ onMounted(() => {
           <div>
             <label
               class="block text-xs sm:text-[11px] font-bold uppercase tracking-wider text-[#66728d] mb-1"
-              >Status Karyawan *</label
+              >{{ t('employees_status_karyawan_label') }} *</label
             >
             <CustomSelect
               v-model="form.status_karyawan"
               :options="statusKaryawanFormOptions"
-              aria-label="Status Karyawan"
-              placeholder="Pilih status"
+              :aria-label="t('employees_status_karyawan_label')"
+              :placeholder="t('employees_select_status')"
               :block="true"
               height-class="h-8"
             />
@@ -1063,13 +1065,13 @@ onMounted(() => {
           <div>
             <label
               class="block text-xs sm:text-[11px] font-bold uppercase tracking-wider text-[#66728d] mb-1"
-              >Status Kepegawaian *</label
+              >{{ t('employees_status_kepegawaian_label') }} *</label
             >
             <CustomSelect
               v-model="form.status_kepegawaian"
               :options="statusKepegawaianFormOptions"
-              aria-label="Status Kepegawaian"
-              placeholder="Pilih status"
+              :aria-label="t('employees_status_kepegawaian_label')"
+              :placeholder="t('employees_select_status')"
               :block="true"
               height-class="h-8"
             />
@@ -1079,7 +1081,7 @@ onMounted(() => {
             <label
               for="employee-tanggal_mulai_bekerja"
               class="block text-xs sm:text-[11px] font-bold uppercase tracking-wider text-[#66728d] mb-1"
-              >Tgl Mulai Bekerja *</label
+              >{{ t('employees_start_date_label') }} *</label
             >
             <input
               id="employee-tanggal_mulai_bekerja"
@@ -1094,16 +1096,16 @@ onMounted(() => {
         <div>
           <label
             class="block text-xs sm:text-[11px] font-bold uppercase tracking-wider text-[#66728d] mb-1"
-            >NIK Atasan Langsung</label
+            >{{ t('employees_supervisor_nik_label') }}</label
           >
           <SearchableSelect
             v-model="form.nik_atasan_langsung"
             :options="atasanOptions"
             value-key="nik"
             label-key="displayLabel"
-            placeholder="Tanpa atasan"
-            search-placeholder="Cari NIK, nama, atau posisi atasan…"
-            aria-label="NIK Atasan Langsung"
+            :placeholder="t('employees_no_supervisor_placeholder')"
+            :search-placeholder="t('employees_supervisor_search_placeholder')"
+            :aria-label="t('employees_supervisor_nik_label')"
             height-class="h-8"
             :clearable="true"
           />
@@ -1118,7 +1120,7 @@ onMounted(() => {
             @click="closeModal"
             class="h-8 rounded-[6px] border border-[#E5EAEF] px-3.5 text-[12px] font-medium text-[#66728d] hover:bg-gray-50 transition-all cursor-pointer"
           >
-            Batal
+            {{ t('cancel') }}
           </button>
           <button
             type="submit"
@@ -1126,14 +1128,14 @@ onMounted(() => {
             :disabled="isSubmitting || !canWriteKaryawan"
             class="h-8 rounded-[6px] bg-[#0A51B0] px-3.5 text-[12px] font-medium text-white shadow-md hover:bg-[#0A4391] transition-all cursor-pointer disabled:opacity-60"
           >
-            {{ isSubmitting ? 'Menyimpan...' : 'Simpan Data' }}
+            {{ isSubmitting ? (currentLang === 'en' ? 'Saving...' : 'Menyimpan...') : (currentLang === 'en' ? 'Save Data' : 'Simpan Data') }}
           </button>
         </div>
       </template>
     </AppModal>
 
     <!-- Modal Hapus Karyawan -->
-    <AppModal :is-open="showDeleteModal" title="Hapus Data Karyawan" @close="closeModal">
+    <AppModal :is-open="showDeleteModal" :title="t('employees_delete_modal_title')" @close="closeModal">
       <div class="employee-modal-content space-y-4 wrap-anywhere">
         <div
           v-if="modalError"
@@ -1143,7 +1145,7 @@ onMounted(() => {
         </div>
 
         <p class="text-xs text-[#2A3547]">
-          Apakah Anda yakin ingin menghapus data karyawan
+          {{ t('employees_delete_confirm') }}
           <strong>{{ selectedEmployee?.nama_karyawan }}</strong> (NIK: {{ selectedEmployee?.nik }})?
         </p>
 
@@ -1156,11 +1158,13 @@ onMounted(() => {
           >
           <div>
             <p>
-              Karyawan ini masih memiliki {{ selectedEmployee?.jumlah_aset }} unit aset ter-assign.
+              {{ t('employees_delete_assets_count') }} {{ selectedEmployee?.jumlah_aset }}
+              {{ t('employees_delete_assets_unit') }}
             </p>
             <p class="font-normal text-[11px] text-amber-800 mt-0.5">
-              Aset milik karyawan ini akan <strong>otomatis dialihkan menjadi Stock</strong> saat
-              karyawan dihapus.
+              {{ t('employees_delete_assets_note_a') }}
+              <strong>{{ t('employees_delete_assets_note_strong') }}</strong>
+              {{ t('employees_delete_assets_note_b') }}
             </p>
           </div>
         </div>
@@ -1174,7 +1178,7 @@ onMounted(() => {
             @click="closeModal"
             class="h-8 rounded-[6px] border border-[#E5EAEF] px-3.5 text-[12px] font-medium text-[#66728d] hover:bg-gray-50 transition-all cursor-pointer"
           >
-            Batal
+            {{ t('cancel') }}
           </button>
           <button
             type="button"
@@ -1182,7 +1186,7 @@ onMounted(() => {
             :disabled="isSubmitting || !canWriteKaryawan"
             class="h-8 rounded-[6px] bg-rose-600 px-3.5 text-[12px] font-medium text-white shadow-md hover:bg-rose-700 transition-all cursor-pointer disabled:opacity-60"
           >
-            {{ isSubmitting ? 'Menghapus...' : 'Ya, Hapus Karyawan' }}
+            {{ isSubmitting ? (currentLang === 'en' ? 'Deleting...' : 'Menghapus...') : (currentLang === 'en' ? 'Yes, Delete Employee' : 'Ya, Hapus Karyawan') }}
           </button>
         </div>
       </template>

@@ -2,16 +2,11 @@
 defineProps({ placeholder:{type:String,default:'Cari...'}, modelValue:{type:String,default:''} })
 const emit = defineEmits(['update:modelValue'])
 </script>
+
 <template>
-  <div class="search-input">
-    <span class="material-symbols-outlined search-input__icon">search</span>
-    <input :placeholder="placeholder" :value="modelValue" @input="e=>emit('update:modelValue', e.target.value)" class="search-input__field" />
-    <button v-if="modelValue" class="search-input__clear" @click="emit('update:modelValue','')">clear</button>
+  <div class="relative flex items-center w-full">
+    <span class="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-gray-400">search</span>
+    <input :placeholder="placeholder" :value="modelValue" @input="e=>emit('update:modelValue', e.target.value)" class="flex-1 pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" />
+    <button v-if="modelValue" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 cursor-pointer" @click="emit('update:modelValue','')">clear</button>
   </div>
 </template>
-<style scoped>
-.search-input { position:relative; display:flex; align-items:center; }
-.search-input__icon { position:absolute; left:7px; font-size:14px; color:#94a3b8; }
-.search-input__field { width:100%; height:28px; padding:0 24px 0 24px; border:1px solid var(--ui-border,#e2e8f0); border-radius:var(--ui-radius-control,5px); font-family:var(--font-family-sans); font-size:var(--fs-xs,10.5px); }
-.search-input__clear { position:absolute; right:5px; background:none; border:none; font-size:14px; color:#94a3b8; cursor:pointer; }
-</style>

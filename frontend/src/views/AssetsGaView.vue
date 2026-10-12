@@ -20,29 +20,32 @@ import AssetCategoryImportModal from '../components/ui/AssetCategoryImportModal.
 import FilterModal from '../components/ui/FilterModal.vue'
 import AssetCategoryExportModal from '../components/ui/AssetCategoryExportModal.vue'
 
+import { useLanguage } from '../composables/useLanguage.js'
+
 const { getAllPages, post, put, del } = useApi()
 const { hasWritePermission } = useAuth()
 const canWriteAssets = computed(() => hasWritePermission('assets_ga'))
 const { viewMode } = useViewMode('assets-ga', 'table')
+const { t } = useLanguage()
 
 const assets = ref([])
 // Count complete category records, independent of table filters and pagination.
 const assetStats = computed(() => [
-  { title: 'Total aset GA', value: assets.value.length, icon: 'inventory_2', color: 'primary' },
+  { title: typeof t === 'function' ? t('ga_stat_total') : 'Total aset GA', value: assets.value.length, icon: 'inventory_2', color: 'primary' },
   {
-    title: 'Baik',
+    title: typeof t === 'function' ? t('ga_stat_good') : 'Baik',
     value: assets.value.filter((asset) => asset.kondisi === 'Baik').length,
     icon: 'check_circle',
     color: 'success',
   },
   {
-    title: 'Rusak ringan',
+    title: typeof t === 'function' ? t('ga_stat_minor') : 'Rusak ringan',
     value: assets.value.filter((asset) => asset.kondisi === 'Rusak Ringan').length,
     icon: 'build',
     color: 'warning',
   },
   {
-    title: 'Rusak berat',
+    title: typeof t === 'function' ? t('ga_stat_severe') : 'Rusak berat',
     value: assets.value.filter((asset) => asset.kondisi === 'Rusak Berat').length,
     icon: 'warning',
     color: 'danger',
@@ -94,6 +97,39 @@ const tipeFasilitasOptions = [
 
 const kondisiOptions = ['Baik', 'Rusak Ringan', 'Rusak Sedang', 'Rusak Berat']
 
+// Label map (reaktif terhadap perubahan bahasa) untuk tampilan kondisi & tipe fasilitas
+const gaKondisiLabels = computed(() => ({
+  Baik: t('ga_kondisi_baik'),
+  'Rusak Ringan': t('ga_kondisi_ringan'),
+  'Rusak Sedang': t('ga_kondisi_sedang'),
+  'Rusak Berat': t('ga_kondisi_berat'),
+}))
+
+function gaKondisiLabel(kondisi) {
+  return gaKondisiLabels.value[kondisi] || kondisi
+}
+
+const gaKondisiSelectOptions = computed(() =>
+  kondisiOptions.map((kondisi) => ({ value: kondisi, label: gaKondisiLabel(kondisi) })),
+)
+
+const gaTipeLabels = computed(() => ({
+  Meja: t('ga_tipe_meja'),
+  Kursi: t('ga_tipe_kursi'),
+  AC: t('ga_tipe_ac'),
+  Lemari: t('ga_tipe_lemari'),
+  Sofa: t('ga_tipe_sofa'),
+  Rak: t('ga_tipe_rak'),
+  Printer: t('ga_tipe_printer'),
+  Dispenser: t('ga_tipe_dispenser'),
+  TV: t('ga_tipe_tv'),
+  Lainnya: t('ga_tipe_lainnya'),
+}))
+
+function gaTipeLabel(tipe) {
+  return gaTipeLabels.value[tipe] || tipe
+}
+
 const defaultLocations = [
   'Solo',
   'Pluit',
@@ -120,24 +156,24 @@ const tipeOptions = computed(() =>
   mergeOptions(tipeFasilitasOptions, [
     ...assets.value.map((a) => a.tipe_fasilitas),
     form.value.tipe_fasilitas,
-  ]).map((t) => ({ value: t, label: t })),
+  ]).map((tipe) => ({ value: tipe, label: gaTipeLabel(tipe) })),
 )
 
 // Filter option lists (include an empty "all" entry for CustomSelect)
 const locationFilterOptions = computed(() => [
-  { value: '', label: 'Semua Lokasi' },
+  { value: '', label: t('ga_filter_all_lokasi') },
   ...locationOptions.value,
 ])
 
 const tipeFilterOptions = computed(() => [
-  { value: '', label: 'Semua Fasilitas' },
+  { value: '', label: t('ga_filter_all_tipe') },
   ...tipeOptions.value,
 ])
 
-const kondisiFilterOptions = [
-  { value: '', label: 'Semua Kondisi' },
-  ...kondisiOptions.map((k) => ({ value: k, label: k })),
-]
+const kondisiFilterOptions = computed(() => [
+  { value: '', label: t('ga_filter_all_kondisi') },
+  ...kondisiOptions.map((k) => ({ value: k, label: gaKondisiLabel(k) })),
+])
 
 // Form State
 const emptyForm = () => ({
@@ -217,7 +253,7 @@ async function fetchData() {
       lokasi: normalizeLocation(a.lokasi),
     }))
   } catch (error) {
-    pageError.value = error.message || 'Gagal memuat data Aset GA.'
+    pageError.value = error.message || t('ga_error_load')
   } finally {
     isLoading.value = false
     await nextTick()
@@ -278,23 +314,23 @@ async function submitForm() {
   if (!canWriteAssets.value) return
   modalError.value = ''
   if (!form.value.hostname) {
-    modalError.value = 'Hostname wajib diisi.'
+    modalError.value = t('ga_err_hostname')
     return
   }
   if (!form.value.nama_asset) {
-    modalError.value = 'Nama Asset wajib diisi.'
+    modalError.value = t('ga_err_asset_name')
     return
   }
   if (!form.value.quantity || form.value.quantity <= 0) {
-    modalError.value = 'Quantity harus berupa angka lebih dari 0.'
+    modalError.value = t('ga_err_quantity')
     return
   }
   if (!form.value.tipe_fasilitas) {
-    modalError.value = 'Tipe Fasilitas wajib diisi.'
+    modalError.value = t('ga_err_tipe')
     return
   }
   if (!form.value.lokasi) {
-    modalError.value = 'Lokasi wajib diisi.'
+    modalError.value = t('ga_err_lokasi')
     return
   }
 
@@ -314,7 +350,7 @@ async function submitForm() {
     closeModal()
     await fetchData()
   } catch (err) {
-    modalError.value = err.message || 'Gagal menyimpan data Aset GA.'
+    modalError.value = err.message || t('ga_error_save')
   } finally {
     isSubmitting.value = false
   }
@@ -330,7 +366,7 @@ async function confirmDelete() {
     closeModal()
     await fetchData()
   } catch (err) {
-    modalError.value = err.message || 'Gagal menghapus Aset GA.'
+    modalError.value = err.message || t('ga_error_delete')
   } finally {
     isSubmitting.value = false
   }
@@ -339,13 +375,13 @@ async function confirmDelete() {
 function getGaActions(asset) {
   const actions = [
     {
-      label: 'Lihat Detail',
+      label: t('ga_action_view_detail'),
       icon: 'visibility',
       onClick: () => openDetails(asset),
       handler: () => openDetails(asset),
     },
     {
-      label: 'Cetak Label',
+      label: t('ga_action_print_label'),
       icon: 'print',
       onClick: () => openLabelModal(asset),
       handler: () => openLabelModal(asset),
@@ -353,13 +389,13 @@ function getGaActions(asset) {
   ]
   if (canWriteAssets.value) {
     actions.push({
-      label: 'Edit Aset',
+      label: t('ga_action_edit'),
       icon: 'edit',
       onClick: () => openEdit(asset),
       handler: () => openEdit(asset),
     })
     actions.push({
-      label: 'Hapus Aset',
+      label: t('ga_action_delete'),
       icon: 'delete',
       danger: true,
       onClick: () => openDelete(asset),
@@ -406,8 +442,8 @@ function formatKondisiPill(kondisi) {
   >
     <!-- ── Page Header (komponen bersama; sama dengan halaman lain) ── -->
     <PageHeader
-      title="Aset GA"
-      subtitle="Kelola inventaris fasilitas General Affair, mebel, AC, dan perlengkapan kantor."
+      :title="t('assets_ga_title')"
+      :subtitle="t('assets_ga_subtitle')"
       icon="domain"
     >
       <div class="inventory-actions flex flex-wrap sm:flex-nowrap items-center gap-1.5">
@@ -416,10 +452,10 @@ function formatKondisiPill(kondisi) {
           type="button"
           @click="openAdd"
           class="inventory-primary-action inline-flex h-8 items-center justify-center gap-1.5 whitespace-nowrap rounded-[6px] bg-[#0A51B0] px-3 text-[11px] sm:text-[12px] font-semibold text-white shadow-2xs transition-all hover:bg-[#0A4391]"
-          title="Tambah Aset GA baru"
+          :title="t('ga_add_tooltip')"
         >
           <span aria-hidden="true" class="material-symbols-outlined text-[16px]">add</span>
-          <span>Tambah Aset GA</span>
+          <span>{{ currentLang === 'en' ? 'Add GA Asset' : 'Tambah Aset GA' }}</span>
         </button>
         <div
           class="inventory-action-group flex items-center gap-1 rounded-[6px] border border-[#D7E3F2] dark:border-slate-700 bg-[#F8FAFC] dark:bg-slate-800 p-0.5 h-8"
@@ -429,21 +465,21 @@ function formatKondisiPill(kondisi) {
             type="button"
             @click="showImportModal = true"
             class="inventory-action-button inline-flex h-full items-center gap-1 rounded-[4px] px-2 text-[11px] font-semibold text-[#0A51B0] dark:text-blue-400 hover:bg-white dark:hover:bg-slate-700"
-            title="Impor data Aset GA dari Excel"
+            :title="t('ga_import_tooltip')"
           >
             <span aria-hidden="true" class="material-symbols-outlined text-[15px]"
               >upload_file</span
-            >Import
+            >{{ t('btn_import') }}
           </button>
           <button
             type="button"
             @click="showExportModal = true"
             class="inventory-action-button inline-flex h-full items-center gap-1 rounded-[4px] px-2 text-[11px] font-semibold text-[#0A51B0] dark:text-blue-400 hover:bg-white dark:hover:bg-slate-700"
-            title="Export data Aset GA"
+            :title="t('ga_export_tooltip')"
           >
             <span aria-hidden="true" class="material-symbols-outlined text-[15px]"
               >download</span
-            >Export
+            >{{ t('btn_export') }}
           </button>
         </div>
       </div>
@@ -459,10 +495,10 @@ function formatKondisiPill(kondisi) {
         v-for="stat in assetStats"
         :key="stat.title"
         :title="stat.title"
-        :value="isLoading || pageError ? '—' : stat.value"
+        :value="isLoading || pageError ? '-' : stat.value"
         :icon="stat.icon"
         :color="stat.color"
-        :subtitle="isLoading ? 'Memuat…' : pageError ? 'Tidak tersedia' : 'Seluruh data kategori'"
+        :subtitle="isLoading ? (currentLang === 'en' ? 'Loading…' : 'Memuat…') : pageError ? (currentLang === 'en' ? 'Unavailable' : 'Tidak tersedia') : (currentLang === 'en' ? 'All category records' : 'Seluruh data kategori')"
       />
     </section>
 
@@ -485,8 +521,8 @@ function formatKondisiPill(kondisi) {
             <input
               v-model="searchQuery"
               type="text"
-              aria-label="Cari aset GA"
-              placeholder="Cari hostname, nama asset, detail, lokasi…"
+              :aria-label="t('ga_search_aria')"
+              :placeholder="t('ga_search_placeholder')"
               class="h-full w-full rounded-[6px] border border-[#E2E8F0] dark:border-slate-800 bg-white dark:bg-slate-800 pl-8 pr-8 text-[12px] text-[#333333] dark:text-white placeholder-[#687281] dark:placeholder-slate-400 focus:border-[#0A51B0] focus:outline-none transition-all shadow-2xs"
             />
             <!-- Inline Clear Button -->
@@ -494,9 +530,9 @@ function formatKondisiPill(kondisi) {
               v-if="searchQuery"
               type="button"
               @click="searchQuery = ''"
-              aria-label="Bersihkan pencarian"
+              :aria-label="t('clear_search')"
               class="absolute right-2 top-1/2 -translate-y-1/2 flex h-5 w-5 items-center justify-center rounded-full text-[#687281] hover:bg-[#F1F5F9] hover:text-[#333333] transition-all cursor-pointer touch-manipulation"
-              title="Bersihkan"
+              :title="t('clear_search')"
             >
               <span aria-hidden="true" class="material-symbols-outlined text-[15px]">close</span>
             </button>
@@ -512,7 +548,7 @@ function formatKondisiPill(kondisi) {
                 aria-hidden="true"
                 class="material-symbols-outlined mr-1 align-middle text-[15px]"
                 >filter_alt</span
-              >Filter
+              >{{ t('filter') }}
             </button>
           </div>
         </div>
@@ -525,9 +561,9 @@ function formatKondisiPill(kondisi) {
         <div class="it-list-heading" aria-live="polite">
           <div>
             <h3>
-              Daftar aset GA <span>{{ filteredAssets.length }}</span>
+              {{ t('ga_list_title') }} <span>{{ filteredAssets.length }}</span>
             </h3>
-            <p>Inventaris fasilitas umum perusahaan</p>
+            <p>{{ t('ga_list_subtitle') }}</p>
           </div>
           <div class="flex shrink-0 items-center gap-3">
             <AppViewToggle v-model="viewMode" />
@@ -543,7 +579,7 @@ function formatKondisiPill(kondisi) {
         <span aria-hidden="true" class="material-symbols-outlined text-[18px]">error</span>
         <span class="flex-1 font-semibold">{{ pageError }}</span>
         <button type="button" class="font-bold underline cursor-pointer" @click="fetchData">
-          Coba lagi
+          {{ t('retry') }}
         </button>
       </div>
 
@@ -641,10 +677,9 @@ function formatKondisiPill(kondisi) {
               >domain_disabled</span
             >
           </span>
-          <h3 class="text-[14px] font-semibold text-[#333333] mt-1">Belum Ada Aset GA</h3>
+          <h3 class="text-[14px] font-semibold text-[#333333] mt-1">{{ t('ga_empty_title') }}</h3>
           <p class="text-[12px] text-[#5F7089] leading-relaxed">
-            Belum ada fasilitas General Affair yang terdaftar dalam inventaris atau sesuai dengan
-            kata kunci pencarian.
+            {{ t('ga_empty_desc') }}
           </p>
           <button
             v-if="canWriteAssets"
@@ -653,7 +688,7 @@ function formatKondisiPill(kondisi) {
             class="mt-2 h-8 rounded-[6px] bg-[#0A51B0] px-4 text-[12px] font-semibold text-white shadow-2xs hover:bg-[#0A4391] transition-all flex items-center gap-1.5 cursor-pointer"
           >
             <span aria-hidden="true" class="material-symbols-outlined text-[16px]">add</span>
-            <span>Tambah Aset GA</span>
+            <span>{{ t('ga_add_asset') }}</span>
           </button>
         </div>
       </div>
@@ -664,7 +699,7 @@ function formatKondisiPill(kondisi) {
         <div v-if="viewMode === 'table'" class="ws-data-table-wrap">
           <table class="ws-data-table">
             <caption class="sr-only">
-              Daftar aset GA
+              {{ t('ga_list_title') }}
             </caption>
             <colgroup>
               <col class="w-[24%]" />
@@ -677,13 +712,13 @@ function formatKondisiPill(kondisi) {
             </colgroup>
             <thead>
               <tr>
-                <th scope="col">Nama Aset</th>
-                <th scope="col">Jumlah</th>
-                <th scope="col">Lokasi</th>
-                <th scope="col">Tipe</th>
+                <th scope="col">{{ t('ga_th_asset_name') }}</th>
+                <th scope="col">{{ t('ga_th_quantity') }}</th>
+                <th scope="col">{{ t('ga_th_location') }}</th>
+                <th scope="col">{{ t('ga_th_type') }}</th>
                 <th scope="col">Hostname</th>
-                <th scope="col">Kondisi</th>
-                <th scope="col"><span class="sr-only">Aksi</span></th>
+                <th scope="col">{{ t('th_condition') }}</th>
+                <th scope="col"><span class="sr-only">{{ t('actions') }}</span></th>
               </tr>
             </thead>
             <tbody>
@@ -691,42 +726,42 @@ function formatKondisiPill(kondisi) {
                 v-for="asset in paginatedAssets"
                 :key="asset.id"
                 tabindex="0"
-                :aria-label="'Lihat detail ' + (asset.nama_asset || 'aset')"
+                :aria-label="t('ga_view_detail') + ' ' + (asset.nama_asset || t('ga_asset_word'))"
                 @click="openDetails(asset)"
                 @keydown.enter.self="openDetails(asset)"
                 @keydown.space.prevent.self="openDetails(asset)"
               >
                 <td>
                   <span class="ws-cell-main" :title="asset.nama_asset">{{
-                    asset.nama_asset || '—'
+                    asset.nama_asset || '-'
                   }}</span>
-                  <span class="ws-cell-sub" :title="asset.tipe_fasilitas">{{
-                    asset.tipe_fasilitas || '—'
+                  <span class="ws-cell-sub" :title="gaTipeLabel(asset.tipe_fasilitas)">{{
+                    gaTipeLabel(asset.tipe_fasilitas) || '-'
                   }}</span>
                 </td>
                 <td>
                   <span class="ws-cell-main ws-cell-num">{{ asset.quantity ?? 1 }} unit</span>
-                  <span class="ws-cell-sub">{{ asset.ukuran || '—' }}</span>
+                  <span class="ws-cell-sub">{{ asset.ukuran || '-' }}</span>
                 </td>
                 <td>
-                  <span class="ws-cell-main" :title="asset.lokasi">{{ asset.lokasi || '—' }}</span>
+                  <span class="ws-cell-main" :title="asset.lokasi">{{ asset.lokasi || '-' }}</span>
                   <span v-if="asset.lokasi_detail" class="ws-cell-sub">{{
                     asset.lokasi_detail
                   }}</span>
                 </td>
                 <td>
-                  <span class="ws-cell-main">{{ asset.tipe_fasilitas || '—' }}</span>
+                  <span class="ws-cell-main">{{ gaTipeLabel(asset.tipe_fasilitas) || '-' }}</span>
                 </td>
                 <td>
-                  <span class="ws-cell-main">{{ asset.hostname || '—' }}</span>
+                  <span class="ws-cell-main">{{ asset.hostname || '-' }}</span>
                 </td>
                 <td>
-                  <span class="ws-cell-main">{{ asset.kondisi || '—' }}</span>
+                  <span class="ws-cell-main">{{ gaKondisiLabel(asset.kondisi) || '-' }}</span>
                 </td>
                 <td @click.stop>
                   <AppRowActions
                     :actions="getGaActions(asset)"
-                    :label="`Aksi aset GA ${asset.hostname || ''}`"
+                    :label="`${t('ga_actions_aria')} ${asset.hostname || ''}`"
                   />
                 </td>
               </tr>
@@ -741,7 +776,7 @@ function formatKondisiPill(kondisi) {
             :key="asset.id"
             class="laptop-row"
             tabindex="0"
-            :aria-label="'Lihat detail ' + (asset.nama_asset || 'aset')"
+            :aria-label="t('ga_view_detail') + ' ' + (asset.nama_asset || t('ga_asset_word'))"
             @click="openDetails(asset)"
             @keydown.enter.self="openDetails(asset)"
             @keydown.space.prevent.self="openDetails(asset)"
@@ -753,21 +788,21 @@ function formatKondisiPill(kondisi) {
                 }}</span>
               </div>
               <div class="laptop-identity-text">
-                <h4 :title="asset.nama_asset">{{ asset.nama_asset || '—' }}</h4>
-                <p :title="asset.tipe_fasilitas">{{ asset.tipe_fasilitas || '—' }}</p>
+                <h4 :title="asset.nama_asset">{{ asset.nama_asset || '-' }}</h4>
+                <p :title="gaTipeLabel(asset.tipe_fasilitas)">{{ gaTipeLabel(asset.tipe_fasilitas) || '-' }}</p>
                 <span class="laptop-serial" :title="asset.hostname">{{
-                  asset.hostname || '—'
+                  asset.hostname || '-'
                 }}</span>
               </div>
             </div>
             <div class="laptop-holder laptop-field">
-              <span class="laptop-label">Jumlah & ukuran</span>
+              <span class="laptop-label">{{ t('ga_card_qty_size') }}</span>
               <strong>{{ asset.quantity ?? 1 }} unit</strong>
-              <span class="laptop-secondary" :title="asset.ukuran">{{ asset.ukuran || '—' }}</span>
+              <span class="laptop-secondary" :title="asset.ukuran">{{ asset.ukuran || '-' }}</span>
             </div>
             <div class="laptop-location laptop-field">
-              <span class="laptop-label">Lokasi</span>
-              <strong :title="asset.lokasi">{{ asset.lokasi || '—' }}</strong>
+              <span class="laptop-label">{{ t('ga_th_location') }}</span>
+              <strong :title="asset.lokasi">{{ asset.lokasi || '-' }}</strong>
               <span
                 v-if="asset.lokasi_detail"
                 class="laptop-secondary"
@@ -776,8 +811,8 @@ function formatKondisiPill(kondisi) {
               >
             </div>
             <div class="laptop-state">
-              <span class="laptop-label">Status</span>
-              <span class="laptop-status">{{ asset.kondisi || '—' }}</span>
+              <span class="laptop-label">{{ t('status') }}</span>
+              <span class="laptop-status">{{ gaKondisiLabel(asset.kondisi) || '-' }}</span>
               <span
                 v-if="asset.detail"
                 class="laptop-secondary asset-row-note"
@@ -788,7 +823,7 @@ function formatKondisiPill(kondisi) {
             <div class="laptop-actions" @click.stop>
               <AppRowActions
                 :actions="getGaActions(asset)"
-                :label="`Aksi aset GA ${asset.hostname || ''}`"
+                :label="`${t('ga_actions_aria')} ${asset.hostname || ''}`"
               />
             </div>
           </div>
@@ -809,7 +844,7 @@ function formatKondisiPill(kondisi) {
     <FilterModal
       panel-class="inventory-dialog"
       :is-open="showFilterModal"
-      title="Filter Aset GA"
+      :title="t('ga_filter_title')"
       @close="showFilterModal = false"
       @apply="showFilterModal = false"
       @reset="resetFilters"
@@ -817,21 +852,21 @@ function formatKondisiPill(kondisi) {
       <CustomSelect
         v-model="selectedLocation"
         :options="locationFilterOptions"
-        aria-label="Filter lokasi"
+        :aria-label="t('ga_aria_filter_location')"
         :block="true"
         height-class="h-8"
       />
       <CustomSelect
         v-model="selectedTipe"
         :options="tipeFilterOptions"
-        aria-label="Filter tipe fasilitas"
+        :aria-label="t('ga_aria_filter_tipe')"
         :block="true"
         height-class="h-8"
       />
       <CustomSelect
         v-model="selectedKondisi"
         :options="kondisiFilterOptions"
-        aria-label="Filter kondisi"
+        :aria-label="t('ga_aria_filter_kondisi')"
         :block="true"
         height-class="h-8"
       />
@@ -841,8 +876,8 @@ function formatKondisiPill(kondisi) {
     <AppModal
       panel-class="inventory-dialog"
       :is-open="showFormModal"
-      :title="modalMode === 'add' ? 'Tambah Aset GA Baru' : 'Edit Aset GA'"
-      subtitle="Lengkapi data aset. Kolom bertanda * wajib diisi."
+      :title="modalMode === 'add' ? t('ga_form_add_title') : t('ga_form_edit_title')"
+      :subtitle="t('ga_form_subtitle')"
       icon="inventory_2"
       size="lg"
       @close="closeModal"
@@ -861,18 +896,18 @@ function formatKondisiPill(kondisi) {
         </div>
 
         <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <h3 class="asset-form-section-title">Identitas aset</h3>
+          <h3 class="asset-form-section-title">{{ t('ga_section_identity') }}</h3>
           <!-- Hostname -->
           <div>
             <label for="ga-hostname" class="block text-[12px] font-bold text-[#333333] mb-1">
-              Hostname / Kode Aset <span class="text-rose-500">*</span>
+              {{ t('ga_label_hostname') }} <span class="text-rose-500">*</span>
             </label>
             <input
               id="ga-hostname"
               v-model="form.hostname"
               type="text"
               required
-              placeholder="cth: GA-PL-001"
+              :placeholder="t('ga_ph_hostname')"
               class="w-full h-8 px-3 text-[12px] rounded-[6px] border border-[#E2E8F0] bg-white focus:border-[#0A51B0] focus:outline-none"
             />
           </div>
@@ -880,21 +915,21 @@ function formatKondisiPill(kondisi) {
           <!-- Nama Asset -->
           <div>
             <label for="ga-nama-asset" class="block text-[12px] font-bold text-[#333333] mb-1">
-              Nama Asset <span class="text-rose-500">*</span>
+              {{ t('ga_label_asset_name') }} <span class="text-rose-500">*</span>
             </label>
             <input
               id="ga-nama-asset"
               v-model="form.nama_asset"
               type="text"
               required
-              placeholder="cth: Meja Kerja Kayu Jati"
+              :placeholder="t('ga_ph_asset_name')"
               class="w-full h-8 px-3 text-[12px] rounded-[6px] border border-[#E2E8F0] bg-white focus:border-[#0A51B0] focus:outline-none"
             />
           </div>
         </div>
 
         <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
-          <h3 class="asset-form-section-title">Jumlah & kondisi</h3>
+          <h3 class="asset-form-section-title">{{ t('ga_section_qty_condition') }}</h3>
           <!-- Quantity -->
           <div>
             <label for="ga-quantity" class="block text-[12px] font-bold text-[#333333] mb-1">
@@ -913,27 +948,27 @@ function formatKondisiPill(kondisi) {
           <!-- Tipe Fasilitas -->
           <div>
             <label class="block text-[12px] font-bold text-[#333333] mb-1">
-              Tipe Fasilitas <span class="text-rose-500">*</span>
+              {{ t('ga_label_tipe') }} <span class="text-rose-500">*</span>
             </label>
             <SearchableSelect
               v-model="form.tipe_fasilitas"
               :options="tipeOptions"
               value-key="value"
               label-key="label"
-              placeholder="Pilih Fasilitas"
+              :placeholder="t('ga_ph_select_tipe')"
             />
           </div>
 
           <!-- Kondisi -->
           <div>
             <label class="block text-[12px] font-bold text-[#333333] mb-1">
-              Kondisi <span class="text-rose-500">*</span>
+              {{ t('filter_condition') }} <span class="text-rose-500">*</span>
             </label>
             <CustomSelect
               v-model="form.kondisi"
-              :options="kondisiOptions"
-              aria-label="Kondisi GA"
-              placeholder="Pilih kondisi"
+              :options="gaKondisiSelectOptions"
+              :aria-label="t('ga_aria_kondisi')"
+              :placeholder="t('ga_ph_select_kondisi')"
               :block="true"
               height-class="h-8"
             />
@@ -941,48 +976,48 @@ function formatKondisiPill(kondisi) {
         </div>
 
         <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <h3 class="asset-form-section-title">Penempatan</h3>
+          <h3 class="asset-form-section-title">{{ t('ga_section_placement') }}</h3>
           <!-- Lokasi Utama -->
           <div>
             <label class="block text-[12px] font-bold text-[#333333] mb-1">
-              Lokasi Utama <span class="text-rose-500">*</span>
+              {{ t('ga_label_primary_location') }} <span class="text-rose-500">*</span>
             </label>
             <SearchableSelect
               v-model="form.lokasi"
               :options="locationOptions"
               value-key="value"
               label-key="label"
-              placeholder="Pilih lokasi"
+              :placeholder="t('ga_ph_select_location')"
             />
           </div>
 
           <!-- Lokasi Detail -->
           <div>
             <label for="ga-lokasi-detail" class="block text-[12px] font-bold text-[#333333] mb-1"
-              >Lokasi Detail</label
+              >{{ t('ga_label_location_detail') }}</label
             >
             <input
               id="ga-lokasi-detail"
               v-model="form.lokasi_detail"
               type="text"
-              placeholder="cth: Lantai 2, Ruang Rapat Utama"
+              :placeholder="t('ga_ph_location_detail')"
               class="w-full h-8 px-3 text-[12px] rounded-[6px] border border-[#E2E8F0] bg-white focus:border-[#0A51B0] focus:outline-none"
             />
           </div>
         </div>
 
         <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <h3 class="asset-form-section-title">Spesifikasi tambahan</h3>
+          <h3 class="asset-form-section-title">{{ t('ga_section_extra_spec') }}</h3>
           <!-- Ukuran -->
           <div>
             <label for="ga-ukuran" class="block text-[12px] font-bold text-[#333333] mb-1"
-              >Ukuran / Dimensi</label
+              >{{ t('ga_label_size') }}</label
             >
             <input
               id="ga-ukuran"
               v-model="form.ukuran"
               type="text"
-              placeholder="cth: 120x60x75 cm"
+              :placeholder="t('ga_ph_size')"
               class="w-full h-8 px-3 text-[12px] rounded-[6px] border border-[#E2E8F0] bg-white focus:border-[#0A51B0] focus:outline-none"
             />
           </div>
@@ -990,13 +1025,13 @@ function formatKondisiPill(kondisi) {
           <!-- Detail Spesifikasi -->
           <div>
             <label for="ga-detail" class="block text-[12px] font-bold text-[#333333] mb-1"
-              >Detail / Catatan</label
+              >{{ t('ga_label_detail_notes') }}</label
             >
             <input
               id="ga-detail"
               v-model="form.detail"
               type="text"
-              placeholder="cth: Warna hitam, Daikin Inverter"
+              :placeholder="t('ga_ph_detail')"
               class="w-full h-8 px-3 text-[12px] rounded-[6px] border border-[#E2E8F0] bg-white focus:border-[#0A51B0] focus:outline-none"
             />
           </div>
@@ -1013,7 +1048,7 @@ function formatKondisiPill(kondisi) {
             @click="closeModal"
             class="h-8 px-4 rounded-[6px] border border-[#E2E8F0] text-[12px] font-semibold text-[#5F7089] hover:bg-[#F8FAFC]"
           >
-            Batal
+            {{ t('cancel') }}
           </button>
           <button
             type="submit"
@@ -1026,7 +1061,7 @@ function formatKondisiPill(kondisi) {
               aria-hidden="true"
               class="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"
             ></span>
-            <span>{{ isSubmitting ? 'Menyimpan...' : 'Simpan Aset GA' }}</span>
+            <span>{{ isSubmitting ? t('ga_saving') : t('ga_save_asset') }}</span>
           </button>
         </div>
       </template>
@@ -1036,13 +1071,13 @@ function formatKondisiPill(kondisi) {
     <AppModal
       panel-class="inventory-dialog"
       :is-open="showDeleteModal"
-      title="Hapus Aset GA"
+      :title="t('ga_delete_title')"
       size="sm"
       @close="closeModal"
     >
       <div class="asset-delete-content space-y-3">
         <p class="text-[12px] text-[#475569]">
-          Apakah Anda yakin ingin menghapus Aset GA
+          {{ t('ga_delete_confirm') }}
           <strong class="text-[#333333]">{{ selectedAsset?.nama_asset }}</strong> ({{
             selectedAsset?.hostname
           }})?
@@ -1058,7 +1093,7 @@ function formatKondisiPill(kondisi) {
             @click="closeModal"
             class="h-8 px-4 rounded-[6px] border border-[#E2E8F0] text-[12px] font-semibold text-[#5F7089] hover:bg-[#F8FAFC]"
           >
-            Batal
+            {{ t('cancel') }}
           </button>
           <button
             type="button"
@@ -1066,7 +1101,7 @@ function formatKondisiPill(kondisi) {
             @click="confirmDelete"
             class="h-8 px-4 rounded-[6px] bg-rose-600 text-[12px] font-bold text-white shadow-2xs hover:bg-rose-700 disabled:opacity-50"
           >
-            {{ isSubmitting ? 'Menghapus...' : 'Ya, Hapus' }}
+            {{ isSubmitting ? t('ga_deleting') : t('btn_yes_delete') }}
           </button>
         </div>
       </template>
@@ -1076,7 +1111,7 @@ function formatKondisiPill(kondisi) {
     <AppModal
       panel-class="inventory-dialog"
       :is-open="showDetailsModal"
-      title="Detail Aset GA"
+      :title="t('ga_details_title')"
       size="lg"
       @close="closeModal"
     >
@@ -1104,27 +1139,27 @@ function formatKondisiPill(kondisi) {
           </div>
 
           <div>
-            <span class="text-[#5F7089] block text-[11px] font-medium">Tipe Fasilitas</span>
-            <span class="font-semibold text-[#333333]">{{ selectedAsset.tipe_fasilitas }}</span>
+            <span class="text-[#5F7089] block text-[11px] font-medium">{{ t('ga_label_tipe') }}</span>
+            <span class="font-semibold text-[#333333]">{{ gaTipeLabel(selectedAsset.tipe_fasilitas) }}</span>
           </div>
 
           <div>
-            <span class="text-[#5F7089] block text-[11px] font-medium">Lokasi</span>
+            <span class="text-[#5F7089] block text-[11px] font-medium">{{ t('ga_th_location') }}</span>
             <span class="font-semibold text-[#333333]">{{ selectedAsset.lokasi }}</span>
           </div>
 
           <div>
-            <span class="text-[#5F7089] block text-[11px] font-medium">Lokasi Detail</span>
-            <span class="text-[#333333]">{{ selectedAsset.lokasi_detail || '—' }}</span>
+            <span class="text-[#5F7089] block text-[11px] font-medium">{{ t('ga_label_location_detail') }}</span>
+            <span class="text-[#333333]">{{ selectedAsset.lokasi_detail || '-' }}</span>
           </div>
 
           <div>
-            <span class="text-[#5F7089] block text-[11px] font-medium">Ukuran / Dimensi</span>
-            <span class="text-[#333333]">{{ selectedAsset.ukuran || '—' }}</span>
+            <span class="text-[#5F7089] block text-[11px] font-medium">{{ t('ga_label_size') }}</span>
+            <span class="text-[#333333]">{{ selectedAsset.ukuran || '-' }}</span>
           </div>
 
           <div>
-            <span class="text-[#5F7089] block text-[11px] font-medium">Kondisi</span>
+            <span class="text-[#5F7089] block text-[11px] font-medium">{{ t('filter_condition') }}</span>
             <span
               class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold mt-0.5"
               :class="[
@@ -1136,19 +1171,19 @@ function formatKondisiPill(kondisi) {
                 class="h-1.5 w-1.5 rounded-full"
                 :class="formatKondisiPill(selectedAsset.kondisi).dot"
               ></span>
-              {{ selectedAsset.kondisi }}
+              {{ gaKondisiLabel(selectedAsset.kondisi) }}
             </span>
           </div>
         </div>
 
         <div class="pt-2 border-t border-[#E2E8F0]">
           <span class="text-[#5F7089] block text-[11px] font-medium"
-            >Detail / Catatan Spesifikasi</span
+            >{{ t('ga_details_spec_notes') }}</span
           >
           <p
             class="text-[12px] text-[#333333] mt-1 p-3 bg-[#F8FAFC] rounded-[6px] border border-[#E2E8F0]"
           >
-            {{ selectedAsset.detail || 'Tidak ada detail tambahan.' }}
+            {{ selectedAsset.detail || t('ga_no_extra_detail') }}
           </p>
         </div>
       </div>
@@ -1159,7 +1194,7 @@ function formatKondisiPill(kondisi) {
             @click="closeModal"
             class="h-8 px-4 rounded-[6px] bg-[#0A51B0] text-[12px] font-bold text-white shadow-2xs hover:bg-[#0A4391]"
           >
-            Tutup
+            {{ t('close') }}
           </button>
         </div>
       </template>
@@ -1208,7 +1243,7 @@ function formatKondisiPill(kondisi) {
 <style src="../assets/inventory-polish.css"></style>
 
 <style scoped>
-/* Header & list heading tidak sticky di modul Inventaris — scroll
+/* Header & list heading tidak sticky di modul Inventaris - scroll
    bersama konten. HARUS setelah import ws-table.css agar menang. */
 .asset-toolbar-sticky,
 .it-list-heading-sticky {

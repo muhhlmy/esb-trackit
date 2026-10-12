@@ -283,7 +283,7 @@ watch(
                   :key="column"
                   class="max-w-40 truncate whitespace-nowrap px-3 py-2 text-slate-700"
                 >
-                  {{ row[column] || '—' }}
+                  {{ row[column] || '-' }}
                 </td>
               </tr>
             </tbody>

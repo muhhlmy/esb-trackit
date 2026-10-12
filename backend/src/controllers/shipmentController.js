@@ -1,5 +1,6 @@
 import { pool, withTransaction } from '../config/database.js'
 import { recordSystemAudit } from '../services/systemAuditService.js'
+import { handleShipmentStatusNotification } from '../services/emailNotificationService.js'
 import {
   assertAllowedFields,
   assertNoActiveMarkup,
@@ -374,6 +375,9 @@ export async function createShipment(req, res) {
 
   const shipment = mapShipmentRow(fetchResult.rows[0])
   await recordSystemAudit(req, { module: 'shipments', action: 'CREATE', entityType: 'shipment', entityId: shipment.id, entityLabel: shipment.tracking_number || shipment.recipient_name, summary: `Pengiriman ditambahkan untuk ${shipment.recipient_name}`, after: shipment })
+  setImmediate(() => {
+    handleShipmentStatusNotification(shipment).catch(() => {})
+  })
   res.status(201).json(shipment)
 }
 
@@ -493,6 +497,9 @@ export async function updateShipment(req, res) {
 
   const shipment = mapShipmentRow(updatedResult.rows[0])
   await recordSystemAudit(req, { module: 'shipments', action: 'UPDATE', entityType: 'shipment', entityId: id, entityLabel: shipment.tracking_number || shipment.recipient_name, summary: `Pengiriman diperbarui untuk ${shipment.recipient_name}`, before: existingResult.rows[0], after: shipment })
+  setImmediate(() => {
+    handleShipmentStatusNotification(shipment).catch(() => {})
+  })
   res.json(shipment)
 }
 

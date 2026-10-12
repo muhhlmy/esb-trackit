@@ -2,6 +2,7 @@
 import { ref, computed } from 'vue'
 import { useCases } from '@/composables/useCases'
 import { useBookmarks } from '@/composables/useBookmarks'
+import { useLanguage } from '@/composables/useLanguage.js'
 import {
   Search,
   ChevronRight,
@@ -27,6 +28,7 @@ defineEmits(['toggleCollapse'])
 const { cases, activeCaseId, selectCase } = useCases()
 
 const { isBookmarked } = useBookmarks()
+const { t } = useLanguage()
 
 const sidebarSearch = ref('')
 const openCategories = ref({
@@ -40,15 +42,20 @@ const openCategories = ref({
   policies: true,
 })
 
-const categoryMeta = {
-  hardware: { label: 'Hardware & Equipment', icon: Laptop, count: 0 },
-  software: { label: 'Software & Apps', icon: AppWindow, count: 0 },
-  git: { label: 'Software & Git', icon: AppWindow, count: 0 },
-  workplace: { label: 'Access & Security', icon: ShieldCheck, count: 0 },
-  environment: { label: 'Network & Connectivity', icon: Wifi, count: 0 },
-  backend: { label: 'Backend & Database', icon: Building2, count: 0 },
-  devops: { label: 'Policies & SLAs', icon: Shield, count: 0 },
-}
+// Label kategori reaktif terhadap perubahan bahasa (peta label = computed t()).
+const categoryMeta = computed(() => ({
+  hardware: { label: t('cases_cat_hardware'), icon: Laptop, count: 0 },
+  software: { label: t('cases_cat_software'), icon: AppWindow, count: 0 },
+  git: { label: t('cases_cat_git'), icon: AppWindow, count: 0 },
+  workplace: { label: t('cases_cat_workplace'), icon: ShieldCheck, count: 0 },
+  environment: { label: t('cases_cat_environment'), icon: Wifi, count: 0 },
+  backend: { label: t('cases_cat_backend'), icon: Building2, count: 0 },
+  devops: { label: t('cases_cat_devops'), icon: Shield, count: 0 },
+}))
+
+const articleCountLabel = computed(() =>
+  cases.value.length === 1 ? t('cases_article_one') : t('cases_article_many'),
+)
 
 function toggleCategory(catKey) {
   openCategories.value[catKey] = !openCategories.value[catKey]
@@ -92,14 +99,14 @@ function handleSelectCase(id) {
     >
       <div class="flex items-center justify-between px-1">
         <span
-          class="text-[11px] font-bold uppercase tracking-wider text-[#575d7a] dark:text-slate-400"
+          class="text-[10.5px] font-bold uppercase tracking-wider text-[#575d7a] dark:text-slate-400"
         >
-          Daftar artikel
+          {{ t('cases_article_list') }}
         </span>
         <span
-          class="text-[10px] px-1.5 py-0.5 rounded bg-[#edeef0] dark:bg-slate-800 text-[#575d7a] dark:text-slate-400 font-mono"
+          class="text-[9.5px] px-1.5 py-0.5 rounded bg-[#edeef0] dark:bg-slate-800 text-[#575d7a] dark:text-slate-400 font-mono"
         >
-          {{ cases.length }} artikel
+          {{ cases.length }} {{ articleCountLabel }}
         </span>
       </div>
 
@@ -110,9 +117,9 @@ function handleSelectCase(id) {
         <input
           v-model="sidebarSearch"
           type="text"
-          class="w-full bg-white dark:bg-slate-900 border border-[#c4c5d9] dark:border-slate-800 rounded-lg pl-8 pr-7 py-1.5 text-xs text-[#1a1c1d] dark:text-slate-100 placeholder-[#5F7089] dark:placeholder-slate-500 focus:outline-none focus:border-[#0A51B0] transition-all shadow-2xs"
-          placeholder="Cari judul atau ringkasan…"
-          aria-label="Cari artikel dalam daftar"
+          class="w-full bg-white dark:bg-slate-900 border border-[#c4c5d9] dark:border-slate-800 rounded-lg pl-8 pr-7 py-1.5 text-[11.5px] text-[#1a1c1d] dark:text-slate-100 placeholder-[#5F7089] dark:placeholder-slate-500 focus:outline-none focus:border-[#0A51B0] transition-all shadow-2xs"
+          :placeholder="t('cases_search_placeholder')"
+          :aria-label="t('cases_search_aria')"
         />
         <kbd
           class="absolute right-2 top-1/2 -translate-y-1/2 px-1 text-[10px] font-mono text-[#575d7a] dark:text-slate-500 bg-[#f3f3f5] dark:bg-slate-800 rounded border border-[#e2e2e4] dark:border-slate-700"
@@ -123,13 +130,13 @@ function handleSelectCase(id) {
     </div>
 
     <!-- Navigation Tree -->
-    <div class="case-tree-list flex-1 overflow-y-auto p-2 space-y-1 text-xs">
+    <div class="case-tree-list flex-1 overflow-y-auto p-2 space-y-0.5 text-[11px]">
       <p
         v-if="!Object.values(groupedCases).some((items) => items.length)"
         class="case-tree-empty text-[#575d7a] dark:text-slate-400"
         role="status"
       >
-        Tidak ada artikel yang ditampilkan.
+        {{ t('cases_tree_empty') }}
       </p>
       <!-- Category Folder Group -->
       <div v-for="(items, catKey) in groupedCases" :key="catKey" class="space-y-0.5">
@@ -137,7 +144,7 @@ function handleSelectCase(id) {
         <button
           @click="toggleCategory(catKey)"
           :aria-expanded="!!openCategories[catKey]"
-          class="case-tree-category w-full flex items-center justify-between px-2 py-1.5 rounded-lg text-[#575d7a] dark:text-slate-400 hover:text-[#1a1c1d] dark:hover:text-slate-200 hover:bg-[#edeef0] dark:hover:bg-slate-900 transition-colors group cursor-pointer"
+          class="case-tree-category w-full flex items-center justify-between px-2 py-1 rounded-md text-[#575d7a] dark:text-slate-400 hover:text-[#1a1c1d] dark:hover:text-slate-200 hover:bg-[#edeef0] dark:hover:bg-slate-900 transition-colors group cursor-pointer"
         >
           <div class="flex items-center gap-1.5 truncate">
             <ChevronRight
@@ -148,13 +155,13 @@ function handleSelectCase(id) {
               :is="categoryMeta[catKey]?.icon || Folder"
               class="w-3.5 h-3.5 text-[#0A51B0] dark:text-blue-400 shrink-0"
             />
-            <span class="font-semibold text-xs truncate">
+            <span class="font-semibold text-[11.5px] truncate">
               {{ categoryMeta[catKey]?.label || catKey }}
             </span>
           </div>
 
           <span
-            class="text-[10px] font-mono text-[#5F7089] px-1 rounded bg-[#e8e8ea] dark:bg-slate-800"
+            class="text-[9.5px] font-mono text-[#5F7089] px-1 rounded bg-[#e8e8ea] dark:bg-slate-800"
           >
             {{ items.length }}
           </span>
@@ -171,7 +178,7 @@ function handleSelectCase(id) {
             @click="handleSelectCase(item.id)"
             data-case-link
             :aria-current="activeCaseId === item.id ? 'page' : undefined"
-            class="case-tree-article w-full flex items-center justify-between px-2.5 py-1.5 rounded-md text-left transition-all cursor-pointer group"
+            class="case-tree-article w-full flex items-center justify-between px-2 py-1 rounded-md text-left transition-all cursor-pointer group"
             :class="
               activeCaseId === item.id
                 ? 'bg-[#eff6ff] dark:bg-blue-950/50 text-[#0A51B0] dark:text-blue-300 font-semibold shadow-2xs'
@@ -187,14 +194,14 @@ function handleSelectCase(id) {
                     : 'text-[#5F7089] group-hover:text-[#1a1c1d]'
                 "
               />
-              <span class="case-tree-title text-xs leading-snug">{{ item.title }}</span>
+              <span class="case-tree-title text-[11px] leading-snug">{{ item.title }}</span>
             </div>
 
             <div class="flex items-center gap-1 shrink-0">
               <span
                 v-if="isBookmarked(item.id)"
                 class="w-1.5 h-1.5 rounded-full bg-[#0A51B0] dark:bg-blue-400"
-                title="Bookmarked"
+                :title="t('cases_bookmarked')"
               ></span>
             </div>
           </button>
@@ -247,7 +254,7 @@ function handleSelectCase(id) {
 .case-tree-search input {
   min-height: var(--control-height-md, 30px);
   padding: 5px 10px 5px 32px;
-  font-size: 12px;
+  font-size: 11.5px;
   border-radius: 6px;
 }
 .case-tree-search svg {
@@ -259,61 +266,64 @@ function handleSelectCase(id) {
   display: none;
 }
 .case-tree-list {
-  padding: 10px;
+  padding: 8px;
 }
 .case-tree-category {
-  min-height: 28px;
-  gap: 8px;
-  padding: 6px 8px;
+  min-height: 26px;
+  gap: 6px;
+  padding: 5px 7px;
   text-align: left;
+  font-size: 11.5px;
 }
 .case-tree-category > div {
   min-width: 0;
-  gap: 8px;
+  gap: 6px;
 }
 .case-tree-category > span {
   flex-shrink: 0;
-  min-width: 20px;
+  min-width: 18px;
   text-align: center;
   font-family: inherit;
+  font-size: 9.5px;
   font-variant-numeric: tabular-nums;
 }
 .case-tree-children {
-  margin: 4px 0 12px;
+  margin: 2px 0 8px;
   padding-left: 0;
   border-left: 0;
   display: grid;
-  gap: 6px;
+  gap: 4px;
 }
 .case-tree-article {
-  min-height: 30px;
-  padding: 8px 10px;
+  min-height: 26px;
+  padding: 5px 8px;
   border-radius: 6px;
+  font-size: 11px;
 }
 .case-tree-article > div:first-child {
   min-width: 0;
   align-items: flex-start;
-  gap: 8px;
+  gap: 6px;
 }
 .case-tree-article svg {
   margin-top: 2px;
-  width: 14px;
-  height: 14px;
+  width: 13px;
+  height: 13px;
 }
 .case-tree-title {
   white-space: normal;
   overflow-wrap: anywhere;
-  font-size: 12px;
-  line-height: 1.5;
+  font-size: 11px;
+  line-height: 1.4;
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
 .case-tree-empty {
-  padding: 12px 8px;
-  font-size: 12px;
-  line-height: 1.6;
+  padding: 10px 8px;
+  font-size: 11px;
+  line-height: 1.5;
 }
 .case-tree button:focus-visible,
 .case-tree input:focus-visible {

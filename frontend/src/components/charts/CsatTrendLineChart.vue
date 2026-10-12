@@ -1,6 +1,6 @@
 <script setup>
 // ============================================================
-// CsatTrendLineChart.vue — Line chart tren rata-rata CSAT per bulan.
+// CsatTrendLineChart.vue - Line chart tren rata-rata CSAT per bulan.
 // Mengikuti pola AssetTrendLineChart.vue (Line + Filler, BaseChartCard).
 // ============================================================
 import { computed } from 'vue'

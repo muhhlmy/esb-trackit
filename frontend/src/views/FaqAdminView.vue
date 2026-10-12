@@ -213,15 +213,15 @@ async function saveFaq() {
 
     if (modalMode.value === 'add') {
       await post('/api/faqs', payload)
-      showToast('FAQ berhasil ditambahkan.', 'success')
+      showToast(t('faq_add_success'), 'success')
     } else {
       await put(`/api/faqs/${selectedFaq.value.id}`, payload)
-      showToast('FAQ berhasil diperbarui.', 'success')
+      showToast(t('faq_update_success'), 'success')
     }
     closeFormModal()
     await fetchFaqs()
   } catch (err) {
-    modalError.value = err.message || 'Gagal menyimpan FAQ.'
+    modalError.value = err.message || t('faq_save_failed')
   } finally {
     isSubmitting.value = false
   }
@@ -232,11 +232,11 @@ async function confirmDelete() {
   isSubmitting.value = true
   try {
     await del(`/api/faqs/${selectedFaq.value.id}`)
-    showToast('FAQ berhasil dihapus.', 'info')
+    showToast(t('faq_delete_success'), 'info')
     closeDeleteModal()
     await fetchFaqs()
   } catch (err) {
-    showToast(err.message || 'Gagal menghapus FAQ.', 'error')
+    showToast(err.message || t('faq_delete_failed'), 'error')
   } finally {
     isSubmitting.value = false
   }

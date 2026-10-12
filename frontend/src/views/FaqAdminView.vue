@@ -29,7 +29,7 @@ import {
 const { get, post, put, del } = useApi()
 const { showToast } = useToast()
 const { hasWritePermission } = useAuth()
-const { t } = useLanguage()
+const { currentLang, t } = useLanguage()
 const canWrite = computed(() => hasWritePermission('knowledge_base'))
 
 const FAQ_CATEGORIES = [
@@ -56,14 +56,14 @@ const categoryOptions = computed(() => {
 })
 
 const categoryFilterOptions = computed(() => [
-  { value: 'all', label: 'All Categories' },
+  { value: 'all', label: t('faq_all_categories') },
   ...categoryOptions.value,
 ])
 
-const faqStatusFormOptions = [
-  { value: 'DRAFT', label: 'Draft', dot: 'bg-amber-500' },
-  { value: 'PUBLISHED', label: 'Published', dot: 'bg-emerald-500' },
-]
+const faqStatusFormOptions = computed(() => [
+  { value: 'DRAFT', label: t('stat_draft'), dot: 'bg-amber-500' },
+  { value: 'PUBLISHED', label: t('stat_published'), dot: 'bg-emerald-500' },
+])
 
 const faqs = ref([])
 const isLoading = ref(true)
@@ -104,7 +104,7 @@ async function fetchFaqs() {
   try {
     faqs.value = await get('/api/faqs')
   } catch (err) {
-    pageError.value = err.message || 'Unable to load FAQs.'
+    pageError.value = err.message || t('faq_load_failed')
   } finally {
     isLoading.value = false
   }
@@ -189,15 +189,15 @@ async function saveFaq() {
   if (!canWrite.value) return
   modalError.value = ''
   if (!form.value.question.trim()) {
-    modalError.value = 'Pertanyaan wajib diisi.'
+    modalError.value = t('faq_question_required')
     return
   }
   if (!form.value.answer.trim()) {
-    modalError.value = 'Jawaban wajib diisi.'
+    modalError.value = t('faq_answer_required')
     return
   }
   if (!form.value.category) {
-    modalError.value = 'Kategori wajib dipilih.'
+    modalError.value = t('faq_category_required')
     return
   }
 

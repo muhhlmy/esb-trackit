@@ -776,12 +776,12 @@ onMounted(() => {
               class="flex h-5 w-5 items-center justify-center rounded-full bg-[#0A51B0] text-white text-[10px]"
               >4</span
             >
-            <span>Format & Unduh File</span>
+            <span>{{ t('export_format_download') }}</span>
           </h2>
 
           <!-- Choose Format -->
           <div class="space-y-2">
-            <label class="block text-xs font-medium text-[#5F7089]">Format File Ekspor</label>
+            <label class="block text-xs font-medium text-[#5F7089]">{{ t('export_file_format') }}</label>
             <div class="grid grid-cols-2 gap-2">
               <label
                 class="flex cursor-pointer items-center justify-between rounded-xl border p-2.5 transition-all"
@@ -857,15 +857,17 @@ onMounted(() => {
           <!-- Summary Box -->
           <div class="rounded-[6px] bg-[#F8FAFC] border border-[#E2E8F0] p-3 space-y-1.5 text-xs">
             <div class="flex flex-wrap justify-between gap-x-3 gap-y-1 text-[#5F7089]">
-              <span>Tabel Terpilih:</span>
+              <span>{{ t('export_selected_table_label') }}</span>
               <strong class="text-[#333333] font-mono">{{ selectedTableKey }}</strong>
             </div>
             <div class="flex flex-wrap justify-between gap-x-3 gap-y-1 text-[#5F7089]">
-              <span>Jumlah Kolom:</span>
-              <strong class="text-[#333333]">{{ selectedColumns.length }} Kolom</strong>
+              <span>{{ t('export_column_count_label') }}</span>
+              <strong class="text-[#333333]"
+                >{{ selectedColumns.length }} {{ t('export_columns_word') }}</strong
+              >
             </div>
             <div class="flex flex-wrap justify-between gap-x-3 gap-y-1 text-[#5F7089]">
-              <span>Batas Baris:</span>
+              <span>{{ t('export_row_limit_label') }}</span>
               <strong class="text-[#333333] capitalize">{{ rowLimit }}</strong>
             </div>
           </div>
@@ -881,7 +883,9 @@ onMounted(() => {
               <span aria-hidden="true" class="material-symbols-outlined text-[16px]"
                 >visibility</span
               >
-              <span>{{ isPreviewing ? 'Memuat Pratinjau...' : 'Pratinjau Data (10 Baris)' }}</span>
+              <span>{{
+                isPreviewing ? t('export_loading_preview') : t('export_preview_data')
+              }}</span>
             </button>
 
             <button
@@ -891,7 +895,7 @@ onMounted(() => {
               class="w-full flex items-center justify-center gap-2 rounded-xl bg-[#0A51B0] hover:bg-[#0A4391] py-3 text-xs font-bold text-white shadow-2xs transition-all cursor-pointer disabled:opacity-50"
             >
               <span aria-hidden="true" class="material-symbols-outlined text-[18px]">download</span>
-              <span>{{ isExporting ? 'Proses Ekspor...' : 'Unduh Berkas Ekspor' }}</span>
+              <span>{{ isExporting ? t('export_processing') : t('export_download_file') }}</span>
             </button>
           </div>
         </div>

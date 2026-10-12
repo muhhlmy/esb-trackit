@@ -213,7 +213,7 @@ function closeFlyoutSubmenu() {
         <div class="flex items-center justify-center gap-1 w-full">
           <RouterLink
             to="/"
-            title="Kembali ke Help Center"
+            :title="t('nav_back_to_help_center')"
             class="flex h-6.5 w-6.5 items-center justify-center rounded-md hover:bg-[#F8FAFC] cursor-pointer shrink-0"
           >
             <img src="/logo.svg" alt="TrackIT logo" class="h-4.5 w-4.5 object-contain shrink-0 block" />
@@ -221,8 +221,8 @@ function closeFlyoutSubmenu() {
 
           <button
             type="button"
-            aria-label="Perluas Sidebar"
-            title="Perluas Sidebar"
+            :aria-label="t('nav_expand_sidebar')"
+            :title="t('nav_expand_sidebar')"
             class="flex h-5.5 w-5.5 items-center justify-center rounded-md text-[#637288] hover:bg-[#ECF2FF] hover:text-[#333333] transition-all cursor-pointer shrink-0"
             @click="emit('toggle-collapse')"
           >

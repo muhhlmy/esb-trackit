@@ -557,12 +557,14 @@ onMounted(() => {
                 class="bg-[#F8FAFC] dark:bg-slate-950/80 border-b border-[#E5EAEF] dark:border-slate-800 text-[#5F7089] dark:text-slate-400 font-extrabold uppercase tracking-wider text-[11px]"
               >
                 <tr>
-                  <th scope="col" class="py-4 px-6">Question &amp; Answer</th>
-                  <th scope="col" class="py-4 px-4">Category</th>
-                  <th scope="col" class="py-4 px-4">Status</th>
-                  <th scope="col" class="py-4 px-4">Sort Order</th>
-                  <th scope="col" class="py-4 px-4">Updated</th>
-                  <th scope="col" v-if="canWrite" class="py-4 px-6 text-right">Actions</th>
+                  <th scope="col" class="py-4 px-6">{{ t('faq_th_question_answer') }}</th>
+                  <th scope="col" class="py-4 px-4">{{ t('th_category') }}</th>
+                  <th scope="col" class="py-4 px-4">{{ t('status') }}</th>
+                  <th scope="col" class="py-4 px-4">{{ t('faq_th_sort_order') }}</th>
+                  <th scope="col" class="py-4 px-4">{{ t('faq_updated_label') }}</th>
+                  <th scope="col" v-if="canWrite" class="py-4 px-6 text-right">{{
+                    t('actions')
+                  }}</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-[#E5EAEF] dark:divide-slate-800">
@@ -657,28 +659,28 @@ onMounted(() => {
     <!-- Add / Edit Form Modal -->
     <AppModal
       :is-open="showFormModal"
-      :title="modalMode === 'add' ? 'Tambah FAQ' : 'Edit FAQ'"
-      subtitle="Tulis pertanyaan dan jawaban yang membantu pengguna Help Center."
+      :title="modalMode === 'add' ? t('btn_add_faq') : 'Edit FAQ'"
+      :subtitle="t('faq_form_subtitle')"
       icon="quiz"
       size="lg"
       @close="closeFormModal"
     >
       <form id="faq-entry" @submit.prevent="saveFaq" class="admin-entry-form faq-content-form">
         <section class="faq-content-section">
-          <h3>Konten FAQ</h3>
-          <p class="faq-section-hint">Kolom bertanda * wajib diisi.</p>
+          <h3>{{ t('faq_content_section') }}</h3>
+          <p class="faq-section-hint">{{ t('faq_required_hint') }}</p>
           <div>
             <label
               for="faq-question"
               class="mb-1.5 block text-xs font-bold text-[#333333] dark:text-slate-200"
-              >Pertanyaan <span class="text-rose-600">*</span></label
+              >{{ t('faq_question_label') }} <span class="text-rose-600">*</span></label
             >
             <input
               id="faq-question"
               v-model="form.question"
               required
               type="text"
-              placeholder="Contoh: Bagaimana cara mereset kata sandi akun?"
+              :placeholder="t('faq_question_placeholder')"
               class="w-full rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] dark:bg-slate-800 px-3.5 py-2.5 text-base sm:text-xs font-semibold text-[#333333] dark:text-slate-100 placeholder-[#687281] focus:border-[#0A51B0] focus:outline-none transition-all"
             />
           </div>
@@ -687,30 +689,30 @@ onMounted(() => {
             <label
               for="faq-answer"
               class="mb-1.5 block text-xs font-bold text-[#333333] dark:text-slate-200"
-              >Jawaban <span class="text-rose-600">*</span></label
+              >{{ t('faq_answer_label') }} <span class="text-rose-600">*</span></label
             >
             <textarea
               id="faq-answer"
               v-model="form.answer"
               required
               rows="5"
-              placeholder="Tuliskan jawaban atau langkah penyelesaian yang mudah diikuti…"
+              :placeholder="t('faq_answer_placeholder')"
               class="w-full min-h-[140px] resize-y rounded-xl border border-[#E5EAEF] bg-[#F8FAFC] dark:bg-slate-800 p-3.5 text-base sm:text-xs font-medium leading-[1.8] text-[#333333] dark:text-slate-100 placeholder-[#687281] focus:border-[#0A51B0] focus:outline-none transition-all"
             ></textarea>
           </div>
         </section>
         <section class="faq-settings-section">
-          <h3>Pengaturan publikasi</h3>
+          <h3>{{ t('kb_cat_section_publishing') }}</h3>
           <div class="faq-settings-grid grid grid-cols-2 sm:grid-cols-3 gap-3">
             <div class="col-span-2 sm:col-span-1">
               <label class="mb-1.5 block text-xs font-bold text-[#333333] dark:text-slate-200"
-                >Kategori <span class="text-rose-600">*</span></label
+                >{{ t('th_category') }} <span class="text-rose-600">*</span></label
               >
               <CustomSelect
                 v-model="form.category"
                 :options="categoryOptions"
-                aria-label="Kategori FAQ"
-                placeholder="Pilih kategori"
+                :aria-label="t('faq_category_aria')"
+                :placeholder="t('faq_select_category_placeholder')"
                 :block="true"
                 height-class="h-8"
               />
@@ -718,13 +720,13 @@ onMounted(() => {
 
             <div class="col-span-1">
               <label class="mb-1.5 block text-xs font-bold text-[#333333] dark:text-slate-200"
-                >Status</label
+                >{{ t('status') }}</label
               >
               <CustomSelect
                 v-model="form.status"
                 :options="faqStatusFormOptions"
-                aria-label="Status FAQ"
-                placeholder="Pilih status"
+                :aria-label="t('faq_status_label')"
+                :placeholder="t('faq_select_status_placeholder')"
                 :block="true"
                 height-class="h-8"
               />
@@ -734,7 +736,7 @@ onMounted(() => {
               <label
                 for="faq-sort-order"
                 class="mb-1.5 block text-xs font-bold text-[#333333] dark:text-slate-200"
-                >Urutan</label
+                >{{ t('kb_cat_order_label') }}</label
               >
               <input
                 id="faq-sort-order"
@@ -764,7 +766,7 @@ onMounted(() => {
             @click="closeFormModal"
             class="w-full sm:w-auto rounded-xl border border-[#E5EAEF] dark:border-slate-700 px-4 py-2.5 sm:py-2 text-xs font-bold text-[#475569] dark:text-slate-300 hover:bg-[#F8FAFC] dark:hover:bg-slate-800 transition-colors cursor-pointer touch-manipulation text-center"
           >
-            Batal
+            {{ t('cancel') }}
           </button>
           <button
             type="submit"
@@ -772,7 +774,7 @@ onMounted(() => {
             :disabled="isSubmitting"
             class="w-full sm:w-auto rounded-xl bg-[#0A51B0] hover:bg-[#0A4391] px-5 py-2.5 sm:py-2 text-xs font-bold text-white shadow-md shadow-[#0A51B0]/20 transition-all disabled:opacity-50 cursor-pointer touch-manipulation text-center"
           >
-            {{ isSubmitting ? 'Menyimpan...' : 'Simpan FAQ' }}
+            {{ isSubmitting ? t('faq_saving') : t('faq_save_button') }}
           </button>
         </div>
       </template>
@@ -781,14 +783,14 @@ onMounted(() => {
     <!-- Delete Confirmation Modal -->
     <AppModal
       :is-open="showDeleteModal"
-      title="Hapus FAQ?"
+      :title="t('faq_delete_confirm_title')"
       icon="delete"
       size="sm"
       @close="closeDeleteModal"
     >
       <div class="space-y-4 pt-1">
         <p class="text-xs font-medium text-[#475569] dark:text-slate-300 leading-relaxed">
-          FAQ ini akan dihapus permanen dari Help Center. Tindakan ini tidak dapat dibatalkan.
+          {{ t('faq_delete_confirm_msg') }}
         </p>
       </div>
       <template #footer>
@@ -797,14 +799,14 @@ onMounted(() => {
             @click="closeDeleteModal"
             class="w-full sm:w-auto rounded-xl border border-[#E5EAEF] dark:border-slate-700 px-4 py-2.5 sm:py-2 text-xs font-bold text-[#475569] dark:text-slate-300 hover:bg-[#F8FAFC] dark:hover:bg-slate-800 transition-colors cursor-pointer touch-manipulation text-center"
           >
-            Batal
+            {{ t('cancel') }}
           </button>
           <button
             @click="confirmDelete"
             :disabled="isSubmitting"
             class="w-full sm:w-auto rounded-xl bg-rose-600 hover:bg-rose-700 px-5 py-2.5 sm:py-2 text-xs font-bold text-white shadow-xs disabled:opacity-50 cursor-pointer touch-manipulation text-center"
           >
-            Hapus
+            {{ t('delete') }}
           </button>
         </div>
       </template>
@@ -813,7 +815,7 @@ onMounted(() => {
     <!-- Advance Filter Modal -->
     <FilterModal
       :is-open="showFilterModal"
-      title="Filter FAQ"
+      :title="t('faq_filter_modal_title')"
       @close="showFilterModal = false"
       @apply="showFilterModal = false"
       @reset="clearFilters"
@@ -821,27 +823,27 @@ onMounted(() => {
       <div class="space-y-3">
         <div>
           <label class="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
-            Kategori
+            {{ t('th_category') }}
           </label>
           <CustomSelect
             v-model="selectedCategory"
             :options="categoryFilterOptions"
-            placeholder="Semua Kategori"
+            :placeholder="t('faq_all_categories')"
             :block="true"
           />
         </div>
         <div>
           <label class="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
-            Status FAQ
+            {{ t('faq_status_label') }}
           </label>
           <CustomSelect
             v-model="selectedStatus"
             :options="[
-              { value: 'all', label: 'Semua Status' },
-              { value: 'PUBLISHED', label: 'Published' },
-              { value: 'DRAFT', label: 'Draft' },
+              { value: 'all', label: t('kb_cat_all_statuses') },
+              { value: 'PUBLISHED', label: t('stat_published') },
+              { value: 'DRAFT', label: t('stat_draft') },
             ]"
-            placeholder="Semua Status"
+            :placeholder="t('kb_cat_all_statuses')"
             :block="true"
           />
         </div>

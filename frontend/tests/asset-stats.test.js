@@ -43,7 +43,10 @@ for (const [view, field, statuses, loader] of cases) {
     )
   })
   test(`${view}: loading and failures cannot show stale or fake zero stats`, () => {
-    assert.match(source, /aria-label="Ringkasan aset"[\s\S]*?:aria-busy="isLoading"/)
+    assert.match(
+      source,
+      /(?:aria-label="Ringkasan aset"|:aria-label="t\('assets_it_stat_summary_aria'\)")[\s\S]*?:aria-busy="isLoading"/,
+    )
     assert.match(
       source,
       /isLoading \? [\s\S]*?: pageError \? [\s\S]*?: [\s\S]*?Seluruh data kategori/,

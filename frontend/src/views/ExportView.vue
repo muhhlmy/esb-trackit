@@ -12,19 +12,22 @@ import CustomSelect from '@/components/ui/CustomSelect.vue'
 
 const api = useApi()
 const { isSuperAdmin } = useAuth()
-const { t } = useLanguage()
+const { currentLang, t } = useLanguage()
+
+// Locale untuk format angka (mengikuti bahasa aktif)
+const numberLocale = computed(() => (currentLang.value === 'en' ? 'en-US' : 'id-ID'))
 
 // Reset Database State
 const showResetModal = ref(false)
 const confirmResetInput = ref('')
 const isResetting = ref(false)
 
-const ROW_LIMIT_OPTIONS = [
-  { value: 50, label: '50 Baris Pertama' },
-  { value: 100, label: '100 Baris Pertama' },
-  { value: 500, label: '500 Baris Pertama' },
-  { value: 1000, label: '1000 Baris Pertama' },
-]
+const ROW_LIMIT_OPTIONS = computed(() => [
+  { value: 50, label: t('export_rows_first_50') },
+  { value: 100, label: t('export_rows_first_100') },
+  { value: 500, label: t('export_rows_first_500') },
+  { value: 1000, label: t('export_rows_first_1000') },
+])
 
 function openResetModal() {
   confirmResetInput.value = ''
@@ -38,7 +41,7 @@ function closeResetModal() {
 
 async function handleConfirmResetDatabase() {
   if (confirmResetInput.value.trim().toUpperCase() !== 'RESET') {
-    showToast('Ketik "RESET" untuk mengonfirmasi tindakan ini.', 'error')
+    showToast(t('export_reset_type_confirm'), 'error')
     return
   }
 
@@ -47,17 +50,17 @@ async function handleConfirmResetDatabase() {
     const res = await api.post('/api/export/reset-database', { confirm: 'RESET' })
     if (res.success) {
       localStorage.removeItem('app_notifications')
-      showToast(res.message || 'Database berhasil di-reset dan dikosongkan!', 'success')
+      showToast(res.message || t('export_reset_success'), 'success')
       showResetModal.value = false
       confirmResetInput.value = ''
       await fetchTablesMetadata()
       // Force reload so notification bell re-reads cleared localStorage
       window.location.reload()
     } else {
-      showToast(res.message || 'Gagal me-reset database.', 'error')
+      showToast(res.message || t('export_reset_failed'), 'error')
     }
   } catch (err) {
-    showToast(err.message || 'Terjadi kesalahan saat me-reset database.', 'error')
+    showToast(err.message || t('export_reset_error'), 'error')
   } finally {
     isResetting.value = false
   }
@@ -155,7 +158,7 @@ async function fetchTablesMetadata() {
       }
     }
   } catch (error) {
-    showToast(error.message || 'Gagal memuat metadata tabel database.', 'error')
+    showToast(error.message || t('export_load_metadata_failed'), 'error')
   } finally {
     isLoading.value = false
   }
@@ -165,7 +168,7 @@ async function fetchTablesMetadata() {
 async function loadPreview() {
   if (!selectedTableKey.value) return
   if (selectedColumns.value.length === 0) {
-    showToast('Pilih setidaknya satu kolom untuk pratinjau.', 'warning')
+    showToast(t('export_select_column_preview'), 'warning')
     return
   }
 
@@ -187,11 +190,11 @@ async function loadPreview() {
       previewColumns.value = res.columns
       showPreviewModal.value = true
       if (res.data.length === 0) {
-        showToast('Tidak ada data yang cocok dengan kriteria filter.', 'info')
+        showToast(t('export_no_match_preview'), 'info')
       }
     }
   } catch (error) {
-    showToast(error.message || 'Gagal mengambil pratinjau data.', 'error')
+    showToast(error.message || t('export_preview_failed'), 'error')
   } finally {
     isPreviewing.value = false
   }
@@ -201,7 +204,7 @@ async function loadPreview() {
 async function handleExecuteCustomExport() {
   if (!selectedTableKey.value) return
   if (selectedColumns.value.length === 0) {
-    showToast('Pilih setidaknya satu kolom untuk diekspor.', 'warning')
+    showToast(t('export_select_column_export'), 'warning')
     return
   }
 
@@ -219,13 +222,13 @@ async function handleExecuteCustomExport() {
 
     const res = await api.post('/api/export/data', payload)
     if (!res.success || !Array.isArray(res.data) || res.data.length === 0) {
-      showToast('Tidak ada data yang dapat diekspor sesuai kriteria.', 'warning')
+      showToast(t('export_no_data_criteria'), 'warning')
       return
     }
 
     const tableSchema = currentTableSchema.value
     const tableNameLabel = tableSchema ? tableSchema.label : selectedTableKey.value
-    const filenamePrefix = `Ekspor_${selectedTableKey.value}`
+    const filenamePrefix = `${t('export_filename_prefix')}_${selectedTableKey.value}`
     const columnsMeta = res.columns
 
     let exportSuccess = false
@@ -236,16 +239,18 @@ async function handleExecuteCustomExport() {
     } else if (exportFormat.value === 'json') {
       exportSuccess = exportToJson(res, filenamePrefix)
     } else if (exportFormat.value === 'pdf') {
-      exportSuccess = exportToPdf(
+      exportToPdf(
         res.data,
         columnsMeta,
         tableNameLabel,
-        'Laporan Kustom Database',
+        t('export_pdf_custom_title'),
         {
-          Tabel: tableNameLabel,
-          'Rentang Tanggal':
-            startDate.value && endDate.value ? `${startDate.value} s/d ${endDate.value}` : 'Semua',
-          Pencarian: searchQuery.value || 'Semua',
+          [t('export_table_word')]: tableNameLabel,
+          [t('export_date_range_label')]:
+            startDate.value && endDate.value
+              ? `${startDate.value} ${t('export_date_range_to')} ${endDate.value}`
+              : t('all'),
+          [t('export_search_word')]: searchQuery.value || t('all'),
         },
       )
     }
@@ -253,17 +258,17 @@ async function handleExecuteCustomExport() {
     if (exportSuccess) {
       if (res.isTruncated) {
         showToast(
-          `Ekspor berhasil (${res.data.length} dari total ${res.totalDbRows} baris data). Hasil dipotong batas limit.`,
+          `${t('export_success_word')} (${res.data.length} ${t('export_truncated_of_total')} ${res.totalDbRows} ${t('export_rows_data_word')}). ${t('export_truncated_note')}`,
           'warning',
         )
       } else {
         showToast(
-          `Berhasil mengekspor ${res.data.length} baris data ke format ${exportFormat.value.toUpperCase()}!`,
+          `${t('export_success_prefix')} ${res.data.length} ${t('export_rows_to_format')} ${exportFormat.value.toUpperCase()}!`,
         )
       }
     }
   } catch (error) {
-    showToast(error.message || 'Gagal mengekspor data.', 'error')
+    showToast(error.message || t('export_failed'), 'error')
   } finally {
     isExporting.value = false
   }
@@ -283,13 +288,13 @@ async function handleQuickExport(tableName, format = 'csv') {
       limit: 1000,
     })
     if (!res.success || !res.data || res.data.length === 0) {
-      showToast('Tabel ini tidak memiliki data untuk diekspor.', 'warning')
+      showToast(t('export_table_no_data'), 'warning')
       return
     }
 
-    const schema = tables.value.find((t) => t.tableName === tableName)
+    const schema = tables.value.find((tb) => tb.tableName === tableName)
     const label = schema ? schema.label : tableName
-    const filenamePrefix = `QuickExport_${tableName}`
+    const filenamePrefix = `${t('export_quick_filename_prefix')}_${tableName}`
     const columnsMeta = res.columns
 
     if (format === 'csv') {
@@ -299,12 +304,14 @@ async function handleQuickExport(tableName, format = 'csv') {
     } else if (format === 'json') {
       exportToJson(res, filenamePrefix)
     } else if (format === 'pdf') {
-      exportToPdf(res.data, columnsMeta, label, `Laporan Ekspor Instant - ${label}`)
+      exportToPdf(res.data, columnsMeta, label, `${t('export_pdf_instant_title')} - ${label}`)
     }
 
-    showToast(`Ekspor cepat ${label} (${res.data.length} baris) berhasil!`)
+    showToast(
+      `${t('export_quick_success_prefix')} ${label} (${res.data.length} ${t('export_rows_label')}) ${t('export_quick_success_suffix')}`,
+    )
   } catch (error) {
-    showToast(error.message || 'Gagal melakukan ekspor cepat.', 'error')
+    showToast(error.message || t('export_quick_failed'), 'error')
   } finally {
     isExporting.value = false
   }
@@ -331,7 +338,7 @@ async function applyPreset(presetKey) {
     selectedTableKey.value = 'log_audit_login'
     searchQuery.value = ''
   }
-  showToast('Preset templat diterapkan pada Ekspor Kustom!', 'info')
+  showToast(t('export_preset_applied'), 'info')
 }
 
 onMounted(() => {
@@ -361,7 +368,7 @@ onMounted(() => {
             >{{ t('th_records') }}</span
           >
           <span class="text-base font-bold text-[#333333] dark:text-white font-mono">
-            {{ isLoading ? '...' : totalDbRecords.toLocaleString('id-ID') }}
+            {{ isLoading ? '...' : totalDbRecords.toLocaleString(numberLocale) }}
           </span>
         </div>
       </div>
@@ -459,7 +466,7 @@ onMounted(() => {
         class="flex items-center justify-center shrink-0 gap-1.5 text-xs font-medium text-[#5F7089] dark:text-slate-400 hover:text-[#333333] dark:hover:text-white transition-colors cursor-pointer"
       >
         <span aria-hidden="true" class="material-symbols-outlined text-[16px]">refresh</span>
-        <span>Refresh Stats</span>
+        <span>{{ t('export_refresh_stats') }}</span>
       </button>
     </div>
 
@@ -491,7 +498,7 @@ onMounted(() => {
               <span
                 class="rounded-full bg-[#F1F5F9] dark:bg-slate-800 px-2 py-0.5 font-mono text-[10px] sm:text-[11px] font-semibold text-[#5F7089] dark:text-slate-400"
               >
-                {{ table.rowCount.toLocaleString('id-ID') }} rekaman
+                {{ table.rowCount.toLocaleString(numberLocale) }} {{ t('export_records_label') }}
               </span>
             </div>
 
@@ -509,13 +516,13 @@ onMounted(() => {
 
           <div class="mt-3 pt-2.5 border-t border-[#F1F5F9] dark:border-slate-800 space-y-1.5">
             <span class="text-[10px] font-medium uppercase tracking-wider text-[#687281] dark:text-slate-400"
-              >Format Didukung</span
+              >{{ t('export_supported_formats') }}</span
             >
             <div class="grid grid-cols-4 gap-1.5">
               <button
                 type="button"
                 @click="handleQuickExport(table.tableName, 'csv')"
-                title="Unduh berkas CSV"
+                :title="t('export_download_csv')"
                 class="flex items-center justify-center rounded-[6px] bg-[#F0FDF4] dark:bg-emerald-950/40 border border-[#DCFCE7] dark:border-emerald-800/60 py-1 text-[11px] font-medium text-[#166534] dark:text-emerald-400 hover:bg-[#166534] hover:text-white hover:border-[#166534] transition-all cursor-pointer focus:outline-none focus:ring-1 focus:ring-emerald-500/20"
               >
                 CSV
@@ -523,7 +530,7 @@ onMounted(() => {
               <button
                 type="button"
                 @click="handleQuickExport(table.tableName, 'excel')"
-                title="Unduh berkas Excel (.xls)"
+                :title="t('export_download_excel')"
                 class="flex items-center justify-center rounded-[6px] bg-[#ECFDF5] border border-[#D1FAE5] py-1 text-[11px] font-medium text-[#047857] hover:bg-[#047857] hover:text-white hover:border-[#047857] transition-all cursor-pointer focus:outline-none focus:ring-1 focus:ring-emerald-500/20"
               >
                 XLS
@@ -531,7 +538,7 @@ onMounted(() => {
               <button
                 type="button"
                 @click="handleQuickExport(table.tableName, 'json')"
-                title="Unduh berkas JSON"
+                :title="t('export_download_json')"
                 class="flex items-center justify-center rounded-[6px] bg-[#FFFBEB] border border-[#FEF3C7] py-1 text-[11px] font-medium text-[#B45309] hover:bg-[#B45309] hover:text-white hover:border-[#B45309] transition-all cursor-pointer focus:outline-none focus:ring-1 focus:ring-amber-500/20"
               >
                 JSON
@@ -539,7 +546,7 @@ onMounted(() => {
               <button
                 type="button"
                 @click="handleQuickExport(table.tableName, 'pdf')"
-                title="Cetak Laporan PDF"
+                :title="t('export_download_pdf')"
                 class="flex items-center justify-center rounded-[6px] bg-[#FEF2F2] border border-[#FEE2E2] py-1 text-[11px] font-medium text-[#B91C1C] hover:bg-[#B91C1C] hover:text-white hover:border-[#B91C1C] transition-all cursor-pointer focus:outline-none focus:ring-1 focus:ring-rose-500/20"
               >
                 PDF
@@ -564,10 +571,10 @@ onMounted(() => {
                 class="flex h-5 w-5 items-center justify-center rounded-full bg-[#0A51B0] text-white text-[10px]"
                 >1</span
               >
-              <span>Pilih Tabel Utama Database</span>
+              <span>{{ t('export_select_table') }}</span>
             </h2>
             <span class="text-[11px] text-[#5F7089] font-medium" v-if="currentTableSchema">
-              {{ currentTableSchema.columns.length }} Kolom Tersedia
+              {{ currentTableSchema.columns.length }} {{ t('export_columns_available') }}
             </span>
           </div>
 
@@ -592,7 +599,9 @@ onMounted(() => {
                 {{ tbl.icon }}
               </span>
               <span class="text-xs font-bold whitespace-normal sm:truncate">{{ tbl.label }}</span>
-              <span class="text-[10px] text-[#5F7089] mt-0.5">{{ tbl.rowCount }} rows</span>
+              <span class="text-[10px] text-[#5F7089] mt-0.5"
+                >{{ tbl.rowCount }} {{ t('export_rows_label') }}</span
+              >
             </button>
           </div>
         </div>
@@ -607,7 +616,7 @@ onMounted(() => {
                 class="flex h-5 w-5 items-center justify-center rounded-full bg-[#0A51B0] text-white text-[10px]"
                 >2</span
               >
-              <span>Pilih Kolom (Field Selector)</span>
+              <span>{{ t('export_select_columns') }}</span>
             </h2>
             <div class="flex items-center gap-2.5">
               <button
@@ -615,7 +624,7 @@ onMounted(() => {
                 @click="selectAllColumns"
                 class="text-xs font-semibold text-[#333333] hover:underline cursor-pointer"
               >
-                Pilih Semua
+                {{ t('select_all') }}
               </button>
               <span class="text-[#E2E8F0]">|</span>
               <button
@@ -623,7 +632,7 @@ onMounted(() => {
                 @click="deselectAllColumns"
                 class="text-xs font-semibold text-[#5F7089] hover:underline cursor-pointer"
               >
-                Kosongkan
+                {{ t('export_clear_selection') }}
               </button>
             </div>
           </div>
@@ -644,7 +653,7 @@ onMounted(() => {
               <input
                 type="checkbox"
                 :value="col.name"
-                :aria-label="`Pilih kolom ${col.label || col.name}`"
+                :aria-label="t('export_aria_select_column') + ' ' + (col.label || col.name)"
                 v-model="selectedColumns"
                 class="h-4 w-4 rounded-md border-[#CBD5E1] text-[#333333] focus:ring-[#0A51B0]"
               />
@@ -659,8 +668,9 @@ onMounted(() => {
             </label>
           </div>
           <p class="text-[11px] text-[#687281]">
-            Terpilih: <strong class="text-[#333333]">{{ selectedColumns.length }}</strong> dari
-            {{ currentTableColumns.length }} kolom.
+            {{ t('export_selected_label') }}
+            <strong class="text-[#333333]">{{ selectedColumns.length }}</strong>
+            {{ t('of_entries') }} {{ currentTableColumns.length }} {{ t('export_columns_word') }}.
           </p>
         </div>
 
@@ -671,7 +681,7 @@ onMounted(() => {
               class="flex h-5 w-5 items-center justify-center rounded-full bg-[#0A51B0] text-white text-[10px]"
               >3</span
             >
-            <span>Filter & Batas Baris Data</span>
+            <span>{{ t('export_filter_row_limit') }}</span>
           </h2>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
@@ -1014,7 +1024,7 @@ onMounted(() => {
           aria-label="Pratinjau tabel ekspor, geser untuk melihat seluruh kolom"
         >
           <div v-if="previewData.length === 0" class="py-8 text-center text-xs text-[#687281]">
-            Tidak ada data untuk ditampilkan.
+            Tidak ada data yang dapat ditampilkan.
           </div>
           <table v-else class="w-full text-left text-xs border-collapse">
             <thead>

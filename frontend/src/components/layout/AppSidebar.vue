@@ -31,6 +31,12 @@ function getGroupTitle(group) {
   const autoKey = 'group_' + group.title.toLowerCase().replace(/\s+/g, '_')
   return t(autoKey, group.title)
 }
+
+function getBadgeLabel(item) {
+  if (!item?.badge) return ''
+  const autoKey = 'nav_badge_' + item.badge.toLowerCase().replace(/[\s&/]+/g, '_')
+  return t(autoKey, item.badge)
+}
 // State Expanded Parent Menu
 const expandedParents = ref({
   knowledge_base: true,
@@ -100,7 +106,7 @@ function handleDirectMouseEnter(item, event) {
     top: rect.top + rect.height / 2,
     left: rect.right + 10,
   }
-  hoveredTooltipLabel.value = item.label
+  hoveredTooltipLabel.value = getItemLabel(item)
 }
 
 function handleDirectMouseLeave() {

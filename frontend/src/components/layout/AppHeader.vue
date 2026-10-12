@@ -9,6 +9,7 @@ import {
   notificationPermission,
   showNativeNotification,
 } from '@/composables/useBrowserPermissions'
+import { useLanguage } from '@/composables/useLanguage'
 import SkeletonList from '../ui/skeleton/SkeletonList.vue'
 import AppModal from '../ui/AppModal.vue'
 import BrowserPermissionsModal from '../ui/BrowserPermissionsModal.vue'
@@ -24,6 +25,7 @@ const { user, logout, hasPermission, isSuperAdmin } = useAuth()
 const { get, post } = useApi()
 const { connect: connectSSE, disconnect: disconnectSSE, on: onSSE, off: offSSE } = useTicketEvents()
 const { isSoundEnabled, toggleSound } = useNotificationSound()
+const { t } = useLanguage()
 const showPermissionsModal = ref(false)
 
 // Search & UI State
@@ -41,9 +43,9 @@ function handleWindowResize() {
   windowWidth.value = window.innerWidth
 }
 const searchPlaceholder = computed(() => {
-  if (windowWidth.value < 640) return 'Cari aset, tiket...'
-  if (windowWidth.value < 1024) return 'Cari aset, tiket, user...'
-  return 'Cari aset, karyawan, tiket, atau user...'
+  if (windowWidth.value < 640) return t('header_search_placeholder_sm')
+  if (windowWidth.value < 1024) return t('header_search_placeholder_md')
+  return t('header_search_placeholder_lg')
 })
 
 const profileMenuButtonRef = ref(null)
@@ -79,15 +81,15 @@ function closePasswordModal() {
 async function submitChangePassword() {
   const { currentPassword, newPassword, confirmPassword } = passwordForm.value
   if (!currentPassword) {
-    passwordModalError.value = 'Password saat ini wajib diisi.'
+    passwordModalError.value = t('header_password_current_required')
     return
   }
   if (!newPassword || newPassword.length < 8) {
-    passwordModalError.value = 'Password baru minimal 8 karakter.'
+    passwordModalError.value = t('header_password_min_length')
     return
   }
   if (newPassword !== confirmPassword) {
-    passwordModalError.value = 'Konfirmasi password baru tidak cocok.'
+    passwordModalError.value = t('header_password_mismatch')
     return
   }
 
@@ -102,7 +104,7 @@ async function submitChangePassword() {
     closePasswordModal()
     await logout()
   } catch (err) {
-    passwordModalError.value = err.message || 'Gagal mengganti password.'
+    passwordModalError.value = err.message || t('header_password_change_failed')
   } finally {
     isSubmittingPassword.value = false
   }
@@ -1374,8 +1376,8 @@ onBeforeUnmount(() => {
                   type="button"
                   @click="showPermissionsModal = true"
                   class="flex h-5.5 w-5.5 items-center justify-center rounded-md hover:bg-[#F8FAFC] text-[#5F7089] transition-colors cursor-pointer"
-                  title="Izin & Akses Browser (Notifikasi, Suara, Kamera, File)"
-                  aria-label="Buka pengaturan izin browser"
+                  :title="t('header_browser_permissions_title')"
+                  :aria-label="t('header_open_permission_settings')"
                 >
                   <span aria-hidden="true" class="material-symbols-outlined text-[14px]">tune</span>
                 </button>
@@ -1456,8 +1458,8 @@ onBeforeUnmount(() => {
                   class="material-symbols-outlined text-[32px] text-[#CBD5E1]"
                   >notifications_off</span
                 >
-                <p class="text-xs font-semibold text-[#333333]">Tidak ada notifikasi</p>
-                <p class="text-[11px] text-[#5F7089]">Belum ada aktivitas baru di kategori ini.</p>
+                <p class="text-xs font-semibold text-[#333333]">{{ t('header_no_notifications') }}</p>
+                <p class="text-[11px] text-[#5F7089]">{{ t('header_no_notifications_hint') }}</p>
               </div>
 
               <!-- Compact Activity Item -->
@@ -1532,7 +1534,7 @@ onBeforeUnmount(() => {
                 @click="goToAllTickets"
                 class="inline-flex items-center gap-1 text-xs font-semibold text-[#333333] hover:text-[#0A4391] hover:underline cursor-pointer transition-colors"
               >
-                <span>Lihat semua aktivitas</span>
+                <span>{{ t('header_view_all_activity') }}</span>
                 <span aria-hidden="true" class="material-symbols-outlined text-[14px]"
                   >arrow_forward</span
                 >
@@ -1552,10 +1554,10 @@ onBeforeUnmount(() => {
           type="button"
           ref="profileMenuButtonRef"
           @click="toggleProfileMenu"
-          aria-label="Menu profil"
+          :aria-label="t('account_menu')"
           :aria-expanded="isProfileOpen"
           aria-controls="header-profile"
-          class="flex items-center gap-1.5 rounded-lg px-1.5 py-0.5 transition-all hover:bg-[#F8FAFC] cursor-pointer select-none"
+          class="header-profile-btn flex items-center gap-1.5 rounded-lg px-1.5 py-0.5 transition-all hover:bg-[#F8FAFC] cursor-pointer select-none"
           :class="isProfileOpen ? 'bg-[#F8FAFC]' : ''"
         >
           <div
@@ -1565,7 +1567,7 @@ onBeforeUnmount(() => {
           </div>
           <div class="hidden text-left lg:block">
             <p class="text-[10.5px] font-bold text-[#333333] dark:text-white leading-tight truncate max-w-[125px]">
-              {{ user ? user.nama : 'Pengguna' }}
+              {{ user ? user.nama : t('header_user') }}
             </p>
             <p
               class="text-[9px] font-normal text-[#5F7089] dark:text-slate-400 leading-tight truncate max-w-[130px] capitalize"
@@ -1591,7 +1593,7 @@ onBeforeUnmount(() => {
             <!-- Account Header -->
             <div class="px-2.5 py-1.5 border-b border-[#F1F5F9] mb-1">
               <p class="text-[11px] font-bold text-[#333333] truncate">
-                {{ user ? user.nama : 'Pengguna' }}
+                {{ user ? user.nama : t('header_user') }}
               </p>
               <p class="text-[9.5px] font-normal text-[#5F7089] truncate capitalize mt-0.5">
                 {{ user?.role || 'Guest' }} {{ user?.nik ? '· ' + user.nik : '' }}
@@ -1613,7 +1615,7 @@ onBeforeUnmount(() => {
                   class="material-symbols-outlined text-[14px] text-[#5F7089]"
                   >badge</span
                 >
-                <span>Profil</span>
+                <span>{{ t('nav_profile') }}</span>
               </button>
 
               <button
@@ -1626,7 +1628,7 @@ onBeforeUnmount(() => {
                   class="material-symbols-outlined text-[14px] text-[#5F7089]"
                   >key</span
                 >
-                <span>Ganti Password</span>
+                <span>{{ t('header_change_password') }}</span>
               </button>
 
               <button
@@ -1644,7 +1646,7 @@ onBeforeUnmount(() => {
                   class="material-symbols-outlined text-[16px] text-[#5F7089]"
                   >tune</span
                 >
-                <span>Izin & Suara Browser</span>
+                <span>{{ t('header_browser_sound_permissions') }}</span>
               </button>
 
               <button
@@ -1661,7 +1663,7 @@ onBeforeUnmount(() => {
                 <span aria-hidden="true" class="material-symbols-outlined text-[16px]"
                   >restart_alt</span
                 >
-                <span>Reset Database</span>
+                <span>{{ t('btn_reset_database') }}</span>
               </button>
 
               <div class="my-1 border-t border-[#F1F5F9]"></div>
@@ -1673,7 +1675,7 @@ onBeforeUnmount(() => {
                 class="w-full flex items-center gap-2 rounded-xl px-2.5 py-1.5 text-xs font-medium text-rose-600 hover:bg-rose-50 transition-colors text-left cursor-pointer"
               >
                 <span aria-hidden="true" class="material-symbols-outlined text-[16px]">logout</span>
-                <span>Keluar</span>
+                <span>{{ t('sign_out') }}</span>
               </button>
             </div>
           </div>
@@ -1742,7 +1744,7 @@ onBeforeUnmount(() => {
             "
             class="h-6 px-2.5 rounded-[4px] bg-[#0A51B0] hover:bg-[#0A4391] text-white text-[11px] font-semibold transition-colors cursor-pointer"
           >
-            Lihat Tiket
+            {{ t('header_view_ticket') }}
           </button>
           <button
             type="button"
@@ -1996,7 +1998,7 @@ onBeforeUnmount(() => {
     right: 0;
     left: auto;
     max-height: min(560px, calc(100dvh - 88px));
-    border-radius: 12px;
+    border-radius: 8px;
     box-shadow: 0 14px 42px #172b4d20;
   }
   .search-filter-tabs {
@@ -2067,18 +2069,23 @@ onBeforeUnmount(() => {
   box-shadow: none;
 }
 .app-header button[aria-label='Menu profil'] {
-  min-height: 28px;
-  height: 28px;
+  min-height: 36px;
 }
 .app-header button[aria-label='Menu profil'] p:first-child {
   font-weight: 600;
 }
 .header-popover {
-  border-radius: 12px;
+  border-radius: 8px;
 }
 @media (min-width: 768px) {
   .app-header #global-main-search {
     height: 28px;
+  }
+}
+@media (max-width: 767px) {
+  /* Target sentuh untuk tombol profil di layar kecil (header 46px). */
+  .app-header button[aria-label='Menu profil'] {
+    min-height: 40px;
   }
 }
 

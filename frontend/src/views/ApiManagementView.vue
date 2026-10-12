@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useApi } from '@/composables/useApi'
 import { useToast } from '@/composables/useToast'
 import { useLanguage } from '@/composables/useLanguage'
@@ -7,7 +7,7 @@ import PageHeader from '@/components/ui/PageHeader.vue'
 
 const api = useApi()
 const { showToast } = useToast()
-const { t } = useLanguage()
+const { t, currentLang } = useLanguage()
 
 const activeTab = ref('clients') // 'clients' | 'webhooks' | 'catalog'
 const isLoading = ref(true)
@@ -36,25 +36,25 @@ const newWebhookForm = ref({
   events: ['ticket.created', 'asset.assigned'],
 })
 
-// Available Scopes and Events
-const availableScopes = [
-  { key: 'assets:read', label: 'Baca Aset & Inventaris (assets:read)' },
-  { key: 'assets:write', label: 'Tulis & Ubah Aset (assets:write)' },
-  { key: 'tickets:read', label: 'Baca Tiket Helpdesk (tickets:read)' },
-  { key: 'tickets:write', label: 'Buat & Ubah Tiket (tickets:write)' },
-  { key: 'reports:read', label: 'Akses BI & Reporting (reports:read)' },
-  { key: 'api_clients:manage', label: 'Kelola API Clients (api_clients:manage)' },
-  { key: 'webhooks:manage', label: 'Kelola Webhooks (webhooks:manage)' },
-]
+// Available Scopes and Events (computed agar label mengikuti bahasa aktif)
+const availableScopes = computed(() => [
+  { key: 'assets:read', label: t('api_portal_scope_assets_read') },
+  { key: 'assets:write', label: t('api_portal_scope_assets_write') },
+  { key: 'tickets:read', label: t('api_portal_scope_tickets_read') },
+  { key: 'tickets:write', label: t('api_portal_scope_tickets_write') },
+  { key: 'reports:read', label: t('api_portal_scope_reports_read') },
+  { key: 'api_clients:manage', label: t('api_portal_scope_clients_manage') },
+  { key: 'webhooks:manage', label: t('api_portal_scope_webhooks_manage') },
+])
 
-const availableEvents = [
-  { key: 'ticket.created', label: 'Tiket Baru Dibuat' },
-  { key: 'ticket.status_changed', label: 'Status Tiket Berubah' },
-  { key: 'asset.created', label: 'Aset Baru Ditambahkan' },
-  { key: 'asset.assigned', label: 'Aset Diserahkan ke Karyawan' },
-  { key: 'submission.created', label: 'Pengajuan BAST Dibuat' },
-  { key: 'shipment.status_changed', label: 'Status Pengiriman Berubah' },
-]
+const availableEvents = computed(() => [
+  { key: 'ticket.created', label: t('webhook_event_ticket_created') },
+  { key: 'ticket.status_changed', label: t('webhook_event_ticket_status') },
+  { key: 'asset.created', label: t('webhook_event_asset_created') },
+  { key: 'asset.assigned', label: t('webhook_event_asset_assigned') },
+  { key: 'submission.created', label: t('webhook_event_submission_created') },
+  { key: 'shipment.status_changed', label: t('webhook_event_shipment_status') },
+])
 
 // System Status
 const systemStatus = ref(null)
@@ -64,7 +64,7 @@ async function fetchClients() {
     const res = await api.get('/api/v1/api-clients')
     clients.value = res.data?.data || []
   } catch (error) {
-    showToast(error.message || 'Gagal memuat API Clients', 'error')
+    showToast(error.message || t('api_portal_err_load_clients'), 'error')
   }
 }
 
@@ -77,7 +77,7 @@ async function fetchWebhooks() {
     subscriptions.value = subRes.data?.data || []
     deliveries.value = delRes.data?.data || []
   } catch (error) {
-    showToast(error.message || 'Gagal memuat Webhooks', 'error')
+    showToast(error.message || t('api_portal_err_load_webhooks'), 'error')
   }
 }
 
@@ -102,7 +102,7 @@ onMounted(() => {
 
 async function handleCreateClient() {
   if (!newClientForm.value.name.trim()) {
-    showToast('Nama API Client wajib diisi', 'error')
+    showToast(t('api_portal_err_name_required'), 'error')
     return
   }
   isSubmittingClient.value = true
@@ -117,40 +117,40 @@ async function handleCreateClient() {
       rateLimit: 120,
     }
     await fetchClients()
-    showToast('API Client berhasil dibuat', 'success')
+    showToast(t('api_portal_client_created'), 'success')
   } catch (error) {
-    showToast(error.message || 'Gagal membuat API Client', 'error')
+    showToast(error.message || t('api_portal_err_create_client'), 'error')
   } finally {
     isSubmittingClient.value = false
   }
 }
 
 async function handleRotateSecret(client) {
-  if (!confirm(`Rotasi secret untuk "${client.client_name}"? API key lama akan langsung tidak berlaku.`)) return
+  if (!confirm(`${t('api_portal_confirm_rotate_p1')}${client.client_name}${t('api_portal_confirm_rotate_p2')}`)) return
   try {
     const res = await api.post(`/api/v1/api-clients/${client.id}/rotate-secret`)
     createdClientResult.value = res.data?.data
     await fetchClients()
-    showToast('Secret berhasil dirotasi', 'success')
+    showToast(t('api_portal_secret_rotated'), 'success')
   } catch (error) {
-    showToast(error.message || 'Gagal rotasi secret', 'error')
+    showToast(error.message || t('api_portal_err_rotate'), 'error')
   }
 }
 
 async function handleRevokeClient(client) {
-  if (!confirm(`Cabut akses untuk "${client.client_name}"? Client tidak dapat lagi memanggil API.`)) return
+  if (!confirm(`${t('api_portal_confirm_revoke_p1')}${client.client_name}${t('api_portal_confirm_revoke_p2')}`)) return
   try {
     await api.post(`/api/v1/api-clients/${client.id}/revoke`)
     await fetchClients()
-    showToast('Akses API Client berhasil dicabut', 'success')
+    showToast(t('api_portal_client_revoked'), 'success')
   } catch (error) {
-    showToast(error.message || 'Gagal mencabut akses', 'error')
+    showToast(error.message || t('api_portal_err_revoke'), 'error')
   }
 }
 
 async function handleCreateWebhook() {
   if (!newWebhookForm.value.targetUrl.trim()) {
-    showToast('Target URL wajib diisi', 'error')
+    showToast(t('webhook_err_target_required'), 'error')
     return
   }
   isSubmittingWebhook.value = true
@@ -162,22 +162,22 @@ async function handleCreateWebhook() {
       events: ['ticket.created', 'asset.assigned'],
     }
     await fetchWebhooks()
-    showToast('Webhook Subscription berhasil didaftarkan', 'success')
+    showToast(t('webhook_registered'), 'success')
   } catch (error) {
-    showToast(error.message || 'Gagal mendaftarkan webhook', 'error')
+    showToast(error.message || t('webhook_err_register'), 'error')
   } finally {
     isSubmittingWebhook.value = false
   }
 }
 
 async function handleDeleteWebhook(id) {
-  if (!confirm('Hapus webhook subscription ini?')) return
+  if (!confirm(t('webhook_confirm_delete'))) return
   try {
     await api.delete(`/api/v1/webhook-subscriptions/${id}`)
     await fetchWebhooks()
-    showToast('Webhook subscription berhasil dihapus', 'success')
+    showToast(t('webhook_deleted'), 'success')
   } catch (error) {
-    showToast(error.message || 'Gagal menghapus webhook', 'error')
+    showToast(error.message || t('webhook_err_delete'), 'error')
   }
 }
 
@@ -185,18 +185,22 @@ async function handleTestWebhookPing() {
   try {
     const res = await api.post('/api/v1/webhook-test', {
       event: 'system.ping',
-      payload: { message: 'Test ping dari TrackIT Developer Portal' },
+      payload: { message: t('webhook_test_payload_message') },
     })
-    showToast(res.data?.message || 'Ping webhook berhasil dikirim', 'success')
+    showToast(res.data?.message || t('webhook_ping_sent'), 'success')
     await fetchWebhooks()
   } catch (error) {
-    showToast(error.message || 'Gagal menguji webhook ping', 'error')
+    showToast(error.message || t('webhook_err_ping'), 'error')
   }
 }
 
 function copyToClipboard(text) {
   navigator.clipboard.writeText(text)
-  showToast('Tersalin ke clipboard!', 'success')
+  showToast(t('copied_clipboard'), 'success')
+}
+
+function copyCurlStatus() {
+  copyToClipboard('curl -H "X-API-Key: YOUR_API_KEY" http://localhost:3000/api/v1/system/status')
 }
 </script>
 
@@ -239,7 +243,7 @@ function copyToClipboard(text) {
             : 'text-slate-600 dark:text-slate-400 hover:text-slate-900',
         ]"
       >
-        API Clients (M2M Keys)
+        {{ t('api_clients_tab') }}
         <span class="ml-1.5 px-2 py-0.5 text-xs rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
           {{ clients.length }}
         </span>
@@ -254,7 +258,7 @@ function copyToClipboard(text) {
             : 'text-slate-600 dark:text-slate-400 hover:text-slate-900',
         ]"
       >
-        Webhook Subscriptions
+        {{ t('webhooks_tab') }}
         <span class="ml-1.5 px-2 py-0.5 text-xs rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
           {{ subscriptions.length }}
         </span>
@@ -269,7 +273,7 @@ function copyToClipboard(text) {
             : 'text-slate-600 dark:text-slate-400 hover:text-slate-900',
         ]"
       >
-        Katalog Endpoint & Panduan
+        {{ t('catalog_tab') }}
       </button>
     </div>
 
@@ -277,14 +281,14 @@ function copyToClipboard(text) {
     <div v-if="activeTab === 'clients'" class="space-y-6">
       <div class="flex justify-between items-center">
         <p class="text-sm text-slate-600 dark:text-slate-400">
-          Kredensial Machine-to-Machine (M2M) untuk integrasi dengan Power BI, Grafana, n8n, dan aplikasi internal lainnya.
+          {{ t('api_portal_clients_desc') }}
         </p>
         <button
           @click="showCreateClientModal = true"
           class="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-sky-600 hover:bg-sky-500 rounded-lg shadow-sm transition"
         >
           <span class="material-symbols-outlined text-base">key</span>
-          Buat API Client Baru
+          {{ t('btn_create_client') }}
         </button>
       </div>
 
@@ -293,19 +297,19 @@ function copyToClipboard(text) {
         <table class="w-full text-left text-sm">
           <thead class="bg-slate-50 dark:bg-slate-800/60 border-b border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400">
             <tr>
-              <th class="py-3 px-4">Nama Client</th>
+              <th class="py-3 px-4">{{ t('th_client_name') }}</th>
               <th class="py-3 px-4">Client ID</th>
-              <th class="py-3 px-4">Organisasi</th>
+              <th class="py-3 px-4">{{ t('th_organization') }}</th>
               <th class="py-3 px-4">Scopes</th>
-              <th class="py-3 px-4">Rate Limit</th>
-              <th class="py-3 px-4">Status</th>
-              <th class="py-3 px-4 text-right">Aksi</th>
+              <th class="py-3 px-4">{{ t('th_rate_limit') }}</th>
+              <th class="py-3 px-4">{{ t('status') }}</th>
+              <th class="py-3 px-4 text-right">{{ t('th_action') }}</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-slate-200 dark:divide-slate-800">
             <tr v-if="clients.length === 0">
               <td colspan="7" class="py-8 text-center text-slate-500">
-                Belum ada API Client terdaftar. Klik tombol di atas untuk membuat.
+                {{ t('api_portal_clients_empty') }}
               </td>
             </tr>
             <tr v-for="client in clients" :key="client.id" class="hover:bg-slate-50/50 dark:hover:bg-slate-800/40">
@@ -341,7 +345,7 @@ function copyToClipboard(text) {
                       : 'bg-rose-50 text-rose-700 dark:bg-rose-950/50 dark:text-rose-300',
                   ]"
                 >
-                  {{ client.is_active ? 'Aktif' : 'Dicabut' }}
+                  {{ client.is_active ? t('badge_active') : t('badge_revoked') }}
                 </span>
               </td>
               <td class="py-3.5 px-4 text-right space-x-2">
@@ -349,17 +353,17 @@ function copyToClipboard(text) {
                   v-if="client.is_active"
                   @click="handleRotateSecret(client)"
                   class="text-xs text-sky-600 hover:text-sky-700 font-medium px-2 py-1 rounded hover:bg-sky-50 dark:hover:bg-sky-950"
-                  title="Rotasi secret dan terbitkan API key baru"
+                  :title="t('api_portal_rotate_hint')"
                 >
-                  Rotasi Key
+                  {{ t('btn_rotate_key') }}
                 </button>
                 <button
                   v-if="client.is_active"
                   @click="handleRevokeClient(client)"
                   class="text-xs text-rose-600 hover:text-rose-700 font-medium px-2 py-1 rounded hover:bg-rose-50 dark:hover:bg-rose-950"
-                  title="Cabut akses client"
+                  :title="t('api_portal_revoke_hint')"
                 >
-                  Cabut
+                  {{ t('btn_revoke') }}
                 </button>
               </td>
             </tr>
@@ -372,7 +376,7 @@ function copyToClipboard(text) {
     <div v-if="activeTab === 'webhooks'" class="space-y-6">
       <div class="flex justify-between items-center">
         <p class="text-sm text-slate-600 dark:text-slate-400">
-          Daftarkan endpoint HTTP POST eksternal yang akan menerima event perubahan data di TrackIT dengan tanda tangan HMAC-SHA256.
+          {{ t('webhook_tab_desc') }}
         </p>
         <div class="flex gap-2">
           <button
@@ -380,14 +384,14 @@ function copyToClipboard(text) {
             class="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 transition"
           >
             <span class="material-symbols-outlined text-base">send</span>
-            Uji Ping
+            {{ t('btn_test_ping') }}
           </button>
           <button
             @click="showCreateWebhookModal = true"
             class="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-sky-600 hover:bg-sky-500 rounded-lg shadow-sm transition"
           >
             <span class="material-symbols-outlined text-base">add_link</span>
-            Tambah Subscription
+            {{ t('btn_create_webhook') }}
           </button>
         </div>
       </div>
@@ -400,15 +404,15 @@ function copyToClipboard(text) {
               <th class="py-3 px-4">Target URL</th>
               <th class="py-3 px-4">Event Subscriptions</th>
               <th class="py-3 px-4">Signing Secret</th>
-              <th class="py-3 px-4">Gagal</th>
-              <th class="py-3 px-4">Status</th>
-              <th class="py-3 px-4 text-right">Aksi</th>
+              <th class="py-3 px-4">{{ t('webhook_th_failed') }}</th>
+              <th class="py-3 px-4">{{ t('status') }}</th>
+              <th class="py-3 px-4 text-right">{{ t('th_action') }}</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-slate-200 dark:divide-slate-800">
             <tr v-if="subscriptions.length === 0">
               <td colspan="6" class="py-8 text-center text-slate-500">
-                Belum ada webhook subscription aktif.
+                {{ t('webhook_empty') }}
               </td>
             </tr>
             <tr v-for="sub in subscriptions" :key="sub.id" class="hover:bg-slate-50/50 dark:hover:bg-slate-800/40">
@@ -441,7 +445,7 @@ function copyToClipboard(text) {
                       : 'bg-rose-50 text-rose-700 dark:bg-rose-950/50 dark:text-rose-300',
                   ]"
                 >
-                  {{ sub.is_active ? 'Aktif' : 'Ditangguhkan' }}
+                  {{ sub.is_active ? t('badge_active') : t('badge_suspended') }}
                 </span>
               </td>
               <td class="py-3.5 px-4 text-right">
@@ -449,7 +453,7 @@ function copyToClipboard(text) {
                   @click="handleDeleteWebhook(sub.id)"
                   class="text-xs text-rose-600 hover:text-rose-700 font-medium px-2 py-1 rounded hover:bg-rose-50 dark:hover:bg-rose-950"
                 >
-                  Hapus
+                  {{ t('delete') }}
                 </button>
               </td>
             </tr>
@@ -460,28 +464,28 @@ function copyToClipboard(text) {
       <!-- Recent Deliveries Section -->
       <div class="space-y-3 pt-4">
         <h3 class="text-base font-semibold text-slate-800 dark:text-slate-100">
-          Riwayat Pengiriman Webhook Terakhir
+          {{ t('recent_deliveries') }}
         </h3>
         <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
           <table class="w-full text-left text-sm">
             <thead class="bg-slate-50 dark:bg-slate-800/60 border-b border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400">
               <tr>
-                <th class="py-3 px-4">Waktu</th>
+                <th class="py-3 px-4">{{ t('th_timestamp') }}</th>
                 <th class="py-3 px-4">Event</th>
                 <th class="py-3 px-4">HTTP Status</th>
                 <th class="py-3 px-4">Target URL</th>
-                <th class="py-3 px-4">Catatan</th>
+                <th class="py-3 px-4">{{ t('webhook_th_notes') }}</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-slate-200 dark:divide-slate-800">
               <tr v-if="deliveries.length === 0">
                 <td colspan="5" class="py-6 text-center text-slate-500">
-                  Belum ada log pengiriman webhook tercatat.
+                  {{ t('webhook_deliveries_empty') }}
                 </td>
               </tr>
               <tr v-for="d in deliveries" :key="d.id">
                 <td class="py-2.5 px-4 text-xs text-slate-500">
-                  {{ new Date(d.created_at).toLocaleString('id-ID') }}
+                  {{ new Date(d.created_at).toLocaleString(currentLang === 'en' ? 'en-US' : 'id-ID') }}
                 </td>
                 <td class="py-2.5 px-4 font-mono text-xs text-purple-600 dark:text-purple-400">
                   {{ d.event }}
@@ -517,23 +521,23 @@ function copyToClipboard(text) {
         <div class="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 space-y-2">
           <div class="flex items-center gap-2 text-sky-600">
             <span class="material-symbols-outlined">hub</span>
-            <span class="font-semibold text-sm">Status Platform</span>
+            <span class="font-semibold text-sm">{{ t('api_portal_card_status_title') }}</span>
           </div>
           <div class="text-2xl font-bold text-slate-800 dark:text-slate-100">
             {{ systemStatus?.status || 'Operational' }}
           </div>
-          <p class="text-xs text-slate-500">Versi: {{ systemStatus?.version || '1.0.0' }}</p>
+          <p class="text-xs text-slate-500">{{ t('api_portal_version_label') }} {{ systemStatus?.version || '1.0.0' }}</p>
         </div>
 
         <div class="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 space-y-2">
           <div class="flex items-center gap-2 text-emerald-600">
             <span class="material-symbols-outlined">verified_user</span>
-            <span class="font-semibold text-sm">Autentikasi M2M</span>
+            <span class="font-semibold text-sm">{{ t('api_portal_card_auth_title') }}</span>
           </div>
           <div class="text-base font-semibold text-slate-800 dark:text-slate-100">
             X-API-Key / Bearer
           </div>
-          <p class="text-xs text-slate-500">Mendukung format key trkit_cli_... dengan hash SHA-256 aman.</p>
+          <p class="text-xs text-slate-500">{{ t('api_portal_card_auth_desc') }}</p>
         </div>
 
         <div class="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 space-y-2">
@@ -544,19 +548,19 @@ function copyToClipboard(text) {
           <div class="text-base font-semibold text-slate-800 dark:text-slate-100">
             HMAC-SHA256 Signatures
           </div>
-          <p class="text-xs text-slate-500">Tanda tangan payload pada header X-TrackIT-Signature.</p>
+          <p class="text-xs text-slate-500">{{ t('api_portal_card_dispatcher_desc') }}</p>
         </div>
       </div>
 
       <!-- cURL Examples -->
       <div class="bg-slate-900 text-slate-200 p-6 rounded-xl border border-slate-800 space-y-4">
         <h4 class="font-semibold text-sm text-slate-100 flex items-center justify-between">
-          <span>Contoh Pemanggilan REST API (cURL)</span>
+          <span>{{ t('api_portal_curl_title') }}</span>
           <button
-            @click="copyToClipboard('curl -H &quot;X-API-Key: YOUR_API_KEY&quot; http://localhost:3000/api/v1/system/status')"
+            @click="copyCurlStatus"
             class="text-xs text-sky-400 hover:text-sky-300"
           >
-            Salin cURL
+            {{ t('api_portal_copy_curl') }}
           </button>
         </h4>
         <pre class="bg-slate-950 p-4 rounded-lg text-xs font-mono overflow-x-auto text-sky-300">
@@ -568,12 +572,12 @@ curl -X GET "http://localhost:3000/api/v1/system/status" \
       <!-- Power BI & Grafana Guidelines -->
       <div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 space-y-3">
         <h4 class="font-semibold text-base text-slate-800 dark:text-slate-100">
-          Panduan Integrasi BI & Otomasi
+          {{ t('api_portal_bi_title') }}
         </h4>
         <ul class="text-sm text-slate-600 dark:text-slate-400 space-y-2 list-disc list-inside">
-          <li><strong>Power BI:</strong> Gunakan konektor <em>Web</em> di Power Query. Tambahkan header HTTP <code>X-API-Key</code> dengan nilai API Key Anda.</li>
-          <li><strong>Grafana:</strong> Gunakan <em>Infinity Datasource</em> untuk REST API atau datasource <em>Prometheus</em> diarahkan ke endpoint <code>/metrics</code>.</li>
-          <li><strong>n8n / Zapier:</strong> Pasang webhook trigger yang mengarah ke URL n8n Anda untuk menerima event realtime tanpa perlu polling.</li>
+          <li><strong>Power BI:</strong> {{ t('api_portal_bi_powerbi_a') }} <em>Web</em> {{ t('api_portal_bi_powerbi_b') }} <code>X-API-Key</code> {{ t('api_portal_bi_powerbi_c') }}</li>
+          <li><strong>Grafana:</strong> {{ t('api_portal_bi_grafana_a') }} <em>Infinity Datasource</em> {{ t('api_portal_bi_grafana_b') }} <em>Prometheus</em> {{ t('api_portal_bi_grafana_c') }} <code>/metrics</code>{{ t('api_portal_bi_grafana_d') }}</li>
+          <li><strong>n8n / Zapier:</strong> {{ t('api_portal_bi_n8n') }}</li>
         </ul>
       </div>
     </div>
@@ -585,37 +589,37 @@ curl -X GET "http://localhost:3000/api/v1/system/status" \
     >
       <div class="bg-white dark:bg-slate-900 w-full max-w-lg rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-xl space-y-5">
         <h3 class="text-lg font-bold text-slate-900 dark:text-slate-100">
-          Registrasi API Client Baru
+          {{ t('api_portal_modal_create_title') }}
         </h3>
 
         <div class="space-y-4">
           <div>
             <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-              Nama Aplikasi / Integrasi *
+              {{ t('api_portal_field_app_name') }}
             </label>
             <input
               v-model="newClientForm.name"
               type="text"
-              placeholder="Contoh: Power BI Executive Dashboard"
+              :placeholder="t('api_portal_placeholder_app_name')"
               class="w-full px-3.5 py-2 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-sky-500"
             />
           </div>
 
           <div>
             <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-              Organisasi / Departemen
+              {{ t('api_portal_field_org') }}
             </label>
             <input
               v-model="newClientForm.organization"
               type="text"
-              placeholder="Contoh: IT Ops / Finance"
+              :placeholder="t('api_portal_placeholder_org')"
               class="w-full px-3.5 py-2 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-sky-500"
             />
           </div>
 
           <div>
             <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-              Izin / Scopes yang Diizinkan
+              {{ t('api_portal_field_scopes') }}
             </label>
             <div class="space-y-2 max-h-40 overflow-y-auto p-2 border border-slate-200 dark:border-slate-700 rounded-lg">
               <label
@@ -636,7 +640,7 @@ curl -X GET "http://localhost:3000/api/v1/system/status" \
 
           <div>
             <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-              Rate Limit (Request per Menit)
+              {{ t('api_portal_field_rate_limit') }}
             </label>
             <input
               v-model.number="newClientForm.rateLimit"
@@ -651,14 +655,14 @@ curl -X GET "http://localhost:3000/api/v1/system/status" \
             @click="showCreateClientModal = false"
             class="px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg"
           >
-            Batal
+            {{ t('cancel') }}
           </button>
           <button
             @click="handleCreateClient"
             :disabled="isSubmittingClient"
             class="px-4 py-2 text-sm font-semibold text-white bg-sky-600 hover:bg-sky-500 rounded-lg disabled:opacity-50"
           >
-            {{ isSubmittingClient ? 'Membuat...' : 'Buat Client' }}
+            {{ isSubmittingClient ? t('api_portal_creating') : t('api_portal_btn_create') }}
           </button>
         </div>
       </div>
@@ -673,17 +677,17 @@ curl -X GET "http://localhost:3000/api/v1/system/status" \
         <div class="flex items-center gap-2 text-emerald-600">
           <span class="material-symbols-outlined text-2xl">check_circle</span>
           <h3 class="text-lg font-bold text-slate-900 dark:text-slate-100">
-            Kredensial API Berhasil Diterbitkan!
+            {{ t('api_portal_reveal_title') }}
           </h3>
         </div>
 
         <div class="p-3 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 rounded-lg text-xs text-amber-800 dark:text-amber-200">
-          <strong>PENTING:</strong> Simpan API Key ini sekarang. Demi keamanan, nilai ini tidak akan pernah ditampilkan lagi.
+          <strong>{{ t('api_portal_reveal_important') }}</strong> {{ t('api_portal_reveal_warning') }}
         </div>
 
         <div class="space-y-1">
           <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400">
-            API Key (Gunakan pada Header X-API-Key)
+            {{ t('api_portal_reveal_key_label') }}
           </label>
           <div class="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 p-2.5 rounded-lg border border-slate-200 dark:border-slate-700">
             <input
@@ -696,7 +700,7 @@ curl -X GET "http://localhost:3000/api/v1/system/status" \
               @click="copyToClipboard(createdClientResult.apiKey)"
               class="px-2.5 py-1 text-xs font-semibold bg-sky-600 text-white rounded hover:bg-sky-500 transition shrink-0"
             >
-              Salin
+              {{ t('api_portal_copy') }}
             </button>
           </div>
         </div>
@@ -706,7 +710,7 @@ curl -X GET "http://localhost:3000/api/v1/system/status" \
             @click="createdClientResult = null"
             class="px-5 py-2 text-sm font-semibold text-white bg-slate-800 hover:bg-slate-700 rounded-lg"
           >
-            Saya Sudah Menyimpannya
+            {{ t('api_portal_reveal_done') }}
           </button>
         </div>
       </div>
@@ -719,7 +723,7 @@ curl -X GET "http://localhost:3000/api/v1/system/status" \
     >
       <div class="bg-white dark:bg-slate-900 w-full max-w-lg rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-xl space-y-5">
         <h3 class="text-lg font-bold text-slate-900 dark:text-slate-100">
-          Tambah Webhook Subscription
+          {{ t('webhook_modal_create_title') }}
         </h3>
 
         <div class="space-y-4">
@@ -737,7 +741,7 @@ curl -X GET "http://localhost:3000/api/v1/system/status" \
 
           <div>
             <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-              Events yang Di-subscribe
+              {{ t('webhook_field_events') }}
             </label>
             <div class="space-y-2 max-h-40 overflow-y-auto p-2 border border-slate-200 dark:border-slate-700 rounded-lg">
               <label
@@ -762,14 +766,14 @@ curl -X GET "http://localhost:3000/api/v1/system/status" \
             @click="showCreateWebhookModal = false"
             class="px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg"
           >
-            Batal
+            {{ t('cancel') }}
           </button>
           <button
             @click="handleCreateWebhook"
             :disabled="isSubmittingWebhook"
             class="px-4 py-2 text-sm font-semibold text-white bg-sky-600 hover:bg-sky-500 rounded-lg disabled:opacity-50"
           >
-            {{ isSubmittingWebhook ? 'Mendaftarkan...' : 'Daftarkan Webhook' }}
+            {{ isSubmittingWebhook ? t('webhook_registering') : t('webhook_btn_register') }}
           </button>
         </div>
       </div>

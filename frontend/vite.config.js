@@ -132,6 +132,11 @@ export default defineConfig(({ mode = 'development' }) => {
       proxy: {
         '/api': {
           target: proxyTarget,
+          onProxyReq: (proxyReq, req) => {
+            if (req.headers.cookie) {
+              proxyReq.setHeader('cookie', req.headers.cookie)
+            }
+          },
           changeOrigin: true,
           ws: true,
           timeout: 60000,
@@ -148,9 +153,8 @@ export default defineConfig(({ mode = 'development' }) => {
     build: {
       // Bundel ditaruh di 'static/', BUKAN 'assets/'.
       // Alasan: route SPA '/assets' (AssetsView) bertabrakan dengan direktori
-      // build di web root. nginx `try_files $uri $uri/ /index.html` menemukan
-      // direktori 'assets/' pada langkah $uri/, jadi fallback /index.html tidak
-      // pernah jalan -> 301 ke /assets/ lalu 403 (tidak ada index, autoindex off).
+      // build di web root. nginx try_files menemukan direktori 'assets/'
+      // pada langkah uri, jadi fallback /index.html tidak pernah jalan.
       // Refresh di /assets gagal sementara navigasi klien berhasil.
       assetsDir: 'static',
       sourcemap: false,

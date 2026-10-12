@@ -5,6 +5,7 @@ import { useCases } from '@/composables/useCases'
 import { useKbCategories } from '@/composables/useKbCategories'
 import { useToast } from '@/composables/useToast'
 import { useAuth } from '@/composables/useAuth'
+import { useLanguage } from '@/composables/useLanguage'
 import DocEditorInspector from '@/components/admin/DocEditorInspector.vue'
 import { sanitizeRichTextHtml } from '@/utils/htmlSanitizer'
 import { useEditor, EditorContent } from '@tiptap/vue-3'
@@ -43,6 +44,7 @@ const { cases, saveCase, fetchAllCases } = useCases()
 const { categories: kbCategoryList, fetchAllCategories } = useKbCategories()
 const { showToast } = useToast()
 const { hasWritePermission } = useAuth()
+const { currentLang, t } = useLanguage()
 const canWrite = computed(() => hasWritePermission('knowledge_base'))
 
 const isMobileInspectorOpen = ref(false)
@@ -81,7 +83,13 @@ const isInspectorActive = computed(() => {
 
 const isPreviewModalOpen = ref(false)
 const isSaving = ref(false)
-const saveStatus = ref('Tersimpan') // 'Tersimpan' | 'Belum disimpan' | 'Menyimpan...'
+const saveStatus = ref('saved') // 'saved' | 'unsaved' | 'saving'
+// Status simpan disimpan sebagai key agar teksnya reaktif terhadap bahasa aktif.
+const saveStatusText = computed(() => {
+  if (saveStatus.value === 'saving') return t('doc_editor_status_saving')
+  if (saveStatus.value === 'unsaved') return t('doc_editor_status_unsaved')
+  return t('doc_editor_status_saved')
+})
 
 // Sanitasi output editor sebelum dirender via v-html (preview) - pertahanan
 // terhadap XSS bila konten DB/editor mengandung payload berbahaya.
@@ -222,7 +230,7 @@ watch(
         actionRedoStack.value = []
       }
     })
-    saveStatus.value = 'Belum disimpan'
+    saveStatus.value = 'unsaved'
   },
 )
 
@@ -237,7 +245,7 @@ watch(
         actionRedoStack.value = []
       }
     })
-    saveStatus.value = 'Belum disimpan'
+    saveStatus.value = 'unsaved'
   },
 )
 
@@ -258,7 +266,9 @@ const editor = useEditor({
       },
     }),
     Placeholder.configure({
-      placeholder: 'Tulis panduan, langkah resolusi, atau catatan teknis di sini...',
+      // Fungsi agar placeholder mengikuti bahasa aktif (dihitung ulang tiap
+      // pembaruan dekorasi editor; lihat watch currentLang di bawah).
+      placeholder: () => t('doc_editor_placeholder'),
     }),
     ImageExtension.configure({
       inline: false,
@@ -280,12 +290,18 @@ const editor = useEditor({
       actionHistoryStack.value.push('editor')
       actionRedoStack.value = []
     }
-    saveStatus.value = 'Belum disimpan'
+    saveStatus.value = 'unsaved'
   },
 })
 
 watch(canWrite, (val) => {
   editor.value?.setEditable(val)
+})
+
+// Saat bahasa berganti, paksa editor menghitung ulang dekorasi placeholder
+// (transaksi tanpa perubahan dokumen; tidak menambah riwayat undo/redo).
+watch(currentLang, () => {
+  editor.value?.view.dispatch(editor.value.state.tr.setMeta('langRefresh', true))
 })
 
 const canUndo = computed(() => {
@@ -471,7 +487,7 @@ function handleImageFileSelect(event) {
   if (!file) return
 
   if (file.size > 5 * 1024 * 1024) {
-    showToast('Ukuran gambar maksimal 5MB.', 'error')
+    showToast(t('doc_editor_image_max_size'), 'error')
     return
   }
 
@@ -486,11 +502,11 @@ function handleDropImage(event) {
   const file = event.dataTransfer?.files?.[0]
   if (!file) return
   if (!file.type.startsWith('image/')) {
-    showToast('Harap upload file berupa gambar (JPG, PNG, WebP, GIF, SVG).', 'error')
+    showToast(t('doc_editor_image_type_invalid'), 'error')
     return
   }
   if (file.size > 5 * 1024 * 1024) {
-    showToast('Ukuran gambar maksimal 5MB.', 'error')
+    showToast(t('doc_editor_image_max_size'), 'error')
     return
   }
   const reader = new FileReader()
@@ -509,7 +525,7 @@ function confirmInsertImage() {
   }
 
   if (!src) {
-    showToast('Harap pilih file gambar atau masukkan URL gambar valid.', 'error')
+    showToast(t('doc_editor_image_required'), 'error')
     return
   }
 
@@ -518,13 +534,13 @@ function confirmInsertImage() {
     .focus()
     .setImage({
       src,
-      alt: imageCaptionInput.value.trim() || 'Gambar Dokumen',
+      alt: imageCaptionInput.value.trim() || t('doc_editor_image_alt_default'),
       title: imageCaptionInput.value.trim() || '',
     })
     .run()
 
   isImageModalOpen.value = false
-  showToast('Gambar berhasil disisipkan!', 'success')
+  showToast(t('doc_editor_image_inserted'), 'success')
 }
 
 const isSelectionMenuOpen = ref(false)
@@ -628,13 +644,13 @@ function confirmLinkDialog() {
   try {
     parsed = new URL(url, window.location.origin)
   } catch {
-    linkDialogError.value = 'URL tidak valid. Contoh: https://portal.example.com'
+    linkDialogError.value = t('doc_editor_link_invalid')
     return
   }
 
   // Blokir skema berbahaya (javascript:, data:, vbscript:).
   if (!['http:', 'https:', 'mailto:'].includes(parsed.protocol)) {
-    linkDialogError.value = 'Hanya URL http(s) atau mailto yang diizinkan.'
+    linkDialogError.value = t('doc_editor_link_scheme_denied')
     return
   }
 
@@ -652,7 +668,7 @@ function insertInfoCallout() {
     .focus()
     .insertContent(
       `
-    <blockquote>ℹ️ <strong>Catatan Penting:</strong> Pastikan Anda terhubung ke jaringan VPN kantor sebelum melakukan sinkronisasi.</blockquote>
+    <blockquote>ℹ️ <strong>${t('doc_editor_callout_info_label')}:</strong> ${t('doc_editor_callout_info_text')}</blockquote>
   `,
     )
     .run()
@@ -664,7 +680,7 @@ function insertWarningCallout() {
     .focus()
     .insertContent(
       `
-    <blockquote>⚠️ <strong>Peringatan Darurat:</strong> Jika perangkat hilang atau dicuri, segera hubungi Security Operations Center (SOC).</blockquote>
+    <blockquote>⚠️ <strong>${t('doc_editor_callout_warning_label')}:</strong> ${t('doc_editor_callout_warning_text')}</blockquote>
   `,
     )
     .run()
@@ -676,7 +692,7 @@ function insertStep() {
     .focus()
     .insertContent(
       `
-    <ol><li><strong>Step Baru:</strong> Lakukan langkah konfigurasi berikut...</li></ol>
+    <ol><li><strong>${t('doc_editor_callout_step_label')}:</strong> ${t('doc_editor_callout_step_text')}</li></ol>
   `,
     )
     .run()
@@ -689,12 +705,12 @@ async function handleSaveDraft() {
     doc.value.contentHtml = editor.value.getHTML()
   }
   if (!doc.value.title?.trim()) {
-    showToast('Judul artikel wajib diisi.', 'error')
+    showToast(t('doc_editor_title_required'), 'error')
     return
   }
 
   isSaving.value = true
-  saveStatus.value = 'Menyimpan...'
+  saveStatus.value = 'saving'
   try {
     const saved = await saveCase({ ...doc.value, status: 'DRAFT' }, { showNotification: false })
     if (saved) {
@@ -703,13 +719,13 @@ async function handleSaveDraft() {
         router.replace(`/admin/editor/${saved.id}`)
       }
       doc.value.status = 'DRAFT'
-      saveStatus.value = 'Tersimpan'
-      showToast('Draft artikel berhasil disimpan!', 'info')
+      saveStatus.value = 'saved'
+      showToast(t('doc_editor_draft_saved'), 'info')
     } else {
-      saveStatus.value = 'Belum disimpan'
+      saveStatus.value = 'unsaved'
     }
   } catch {
-    saveStatus.value = 'Belum disimpan'
+    saveStatus.value = 'unsaved'
   } finally {
     isSaving.value = false
   }
@@ -721,25 +737,25 @@ async function handlePublish() {
     doc.value.contentHtml = editor.value.getHTML()
   }
   if (!doc.value.title?.trim()) {
-    showToast('Judul artikel wajib diisi.', 'error')
+    showToast(t('doc_editor_title_required'), 'error')
     return
   }
 
   isSaving.value = true
-  saveStatus.value = 'Menyimpan...'
+  saveStatus.value = 'saving'
   try {
     const saved = await saveCase({ ...doc.value, status: 'PUBLISHED' }, { showNotification: false })
     if (saved) {
       doc.value.status = 'PUBLISHED'
-      saveStatus.value = 'Tersimpan'
-      showToast('Artikel berhasil dipublikasikan!', 'success')
+      saveStatus.value = 'saved'
+      showToast(t('doc_editor_published'), 'success')
       // Kembali ke daftar artikel Admin CMS setelah publish sukses.
       router.push('/admin/cases')
     } else {
-      saveStatus.value = 'Belum disimpan'
+      saveStatus.value = 'unsaved'
     }
   } catch {
-    saveStatus.value = 'Belum disimpan'
+    saveStatus.value = 'unsaved'
   } finally {
     isSaving.value = false
   }
@@ -764,7 +780,7 @@ function goToAdminCases() {
         <RouterLink
           to="/admin/cases"
           class="p-1.5 rounded-lg text-[#5F7089] hover:text-[#333333] dark:hover:text-white hover:bg-[#F1F5F9] dark:hover:bg-slate-800 transition-colors flex items-center gap-1 text-xs font-semibold shrink-0 touch-manipulation"
-          title="Kembali ke Admin CMS"
+          :title="t('cms_back_to_admin')"
         >
           <ArrowLeft class="w-4 h-4" />
           <span class="hidden sm:inline">Admin CMS</span>
@@ -800,7 +816,7 @@ function goToAdminCases() {
           </span>
 
           <span class="text-[11px] text-[#5F7089] dark:text-slate-400 font-medium">
-            {{ saveStatus }}
+            {{ saveStatusText }}
           </span>
         </div>
       </div>
@@ -811,7 +827,7 @@ function goToAdminCases() {
         <button
           @click="isPreviewModalOpen = true"
           class="flex items-center gap-1.5 text-xs font-semibold px-2 sm:px-3 py-1.5 rounded-lg border border-[#E2E8F0] dark:border-slate-700 bg-white dark:bg-slate-900 text-[#333333] dark:text-slate-200 hover:bg-[#F8FAFC] dark:hover:bg-slate-800 transition-colors cursor-pointer touch-manipulation"
-          title="Preview Tampilan Employee"
+          :title="t('doc_editor_preview_title')"
         >
           <Eye class="w-3.5 h-3.5 text-[#5F7089] dark:text-slate-400" />
           <span class="hidden sm:inline">Preview</span>
@@ -844,7 +860,7 @@ function goToAdminCases() {
           @click="toggleInspector"
           class="p-1.5 sm:p-2 rounded-lg text-[#5F7089] dark:text-slate-400 hover:bg-[#F8FAFC] dark:hover:bg-slate-800 transition-colors cursor-pointer touch-manipulation"
           :class="{ 'text-[#333333] bg-blue-50 dark:bg-blue-950/40': isInspectorActive }"
-          title="Pengaturan Artikel (Metadata Inspector)"
+          :title="t('doc_editor_inspector_toggle')"
         >
           <PanelRight class="w-4 h-4" />
         </button>
@@ -858,8 +874,8 @@ function goToAdminCases() {
     >
       <Info class="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
       <span
-        ><strong>Mode Baca Saja:</strong> Anda memiliki hak akses Read Only untuk Knowledge Base.
-        Anda dapat membaca artikel tetapi tidak dapat menyimpan perubahan atau menerbitkannya.</span
+        ><strong>{{ currentLang === 'en' ? 'Read-Only Mode' : 'Mode Baca Saja' }}:</strong>
+        {{ t('doc_editor_readonly_desc') }}</span
       >
     </div>
 
@@ -1029,7 +1045,7 @@ function goToAdminCases() {
           class="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-1 rounded-lg bg-[#ECF2FF] dark:bg-indigo-950/60 text-[#333333] dark:text-indigo-300 font-bold cursor-pointer hover:bg-[#0A51B0] hover:text-white transition-colors text-[11px] sm:text-[11px] shadow-2xs touch-manipulation shrink-0"
         >
           <ImageIcon class="w-3.5 h-3.5" />
-          <span>+ Gambar</span>
+          <span>{{ t('doc_editor_btn_image') }}</span>
         </button>
 
         <button
@@ -1094,10 +1110,10 @@ function goToAdminCases() {
             @keydown.meta.y.stop.prevent="handleRedo"
             @keydown.ctrl.shift.z.stop.prevent="handleRedo"
             @keydown.meta.shift.z.stop.prevent="handleRedo"
-            aria-label="Judul artikel"
+            :aria-label="t('doc_editor_title_label')"
             type="text"
             class="w-full text-xl sm:text-3xl font-extrabold text-[#333333] dark:text-white bg-transparent border-none focus:outline-none focus:ring-0 p-0 placeholder:text-[#5F7089] tracking-tight"
-            placeholder="Judul artikel…"
+            :placeholder="t('doc_editor_title_placeholder')"
           />
 
           <!-- Summary Box -->
@@ -1107,7 +1123,7 @@ function goToAdminCases() {
             <label
               class="block text-[11px] sm:text-[11px] font-bold uppercase tracking-wide text-[#5F7089] dark:text-slate-400 mb-1"
             >
-              Ringkasan
+              {{ t('doc_editor_summary_label') }}
             </label>
             <textarea
               ref="summaryInputRef"
@@ -1120,10 +1136,10 @@ function goToAdminCases() {
               @keydown.meta.y.stop.prevent="handleRedo"
               @keydown.ctrl.shift.z.stop.prevent="handleRedo"
               @keydown.meta.shift.z.stop.prevent="handleRedo"
-              aria-label="Ringkasan artikel"
+              :aria-label="t('doc_editor_summary_aria')"
               rows="2"
               class="w-full bg-transparent text-xs sm:text-sm text-[#334155] dark:text-slate-300 focus:outline-none resize-none leading-relaxed font-normal"
-              placeholder="Ringkasan singkat artikel ini…"
+              :placeholder="t('doc_editor_summary_placeholder')"
             ></textarea>
           </div>
 
@@ -1184,7 +1200,7 @@ function goToAdminCases() {
             <button
               @click="openImageModal"
               class="p-1 rounded-md hover:bg-[#F1F5F9] dark:hover:bg-slate-800 text-xs"
-              title="Insert Gambar"
+              :title="t('doc_editor_insert_image')"
             >
               <ImageIcon class="w-3.5 h-3.5 text-[#333333]" />
             </button>
@@ -1232,14 +1248,14 @@ function goToAdminCases() {
                 <span
                   class="text-xs font-bold text-[#333333] dark:text-white uppercase tracking-wider"
                 >
-                  Pengaturan Artikel
+                  {{ t('doc_editor_article_settings') }}
                 </span>
               </div>
               <button
                 type="button"
                 @click="isMobileInspectorOpen = false"
                 class="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer touch-manipulation"
-                title="Tutup Panel"
+                :title="t('cms_close_panel')"
               >
                 <X class="w-5 h-5" />
               </button>
@@ -1274,7 +1290,7 @@ function goToAdminCases() {
             class="flex items-center gap-2 text-xs font-semibold text-[#333333] dark:text-blue-400"
           >
             <Eye class="w-4 h-4" />
-            <span>Preview Tampilan Employee</span>
+            <span>{{ t('doc_editor_preview_title') }}</span>
           </div>
           <button
             @click="isPreviewModalOpen = false"
@@ -1318,13 +1334,13 @@ function goToAdminCases() {
           id="link-dialog-title"
           class="text-sm font-bold text-[#333333] dark:text-slate-100 mb-3"
         >
-          Tautan URL
+          {{ t('doc_editor_link_dialog_title') }}
         </h2>
         <label
           for="link-dialog-url"
           class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5"
         >
-          Alamat tautan (kosongkan untuk menghapus tautan)
+          {{ t('doc_editor_link_input_label') }}
         </label>
         <input
           id="link-dialog-url"
@@ -1348,14 +1364,14 @@ function goToAdminCases() {
             @click="cancelLinkDialog"
             class="px-3.5 py-2 rounded-lg text-sm font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
           >
-            Batal
+            {{ t('cancel') }}
           </button>
           <button
             type="button"
             @click="confirmLinkDialog"
             class="px-3.5 py-2 rounded-lg text-sm font-semibold text-white bg-[#0A51B0] hover:bg-[#0A4391] transition-colors"
           >
-            Simpan Tautan
+            {{ t('doc_editor_save_link') }}
           </button>
         </div>
       </div>
@@ -1366,7 +1382,7 @@ function goToAdminCases() {
       v-if="isImageModalOpen"
       role="dialog"
       aria-modal="true"
-      aria-label="Sisipkan Gambar"
+      :aria-label="t('doc_editor_insert_image')"
       class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm animate-in fade-in duration-150"
     >
       <div
@@ -1380,7 +1396,7 @@ function goToAdminCases() {
             class="flex items-center gap-2 text-xs font-extrabold text-[#333333] dark:text-white"
           >
             <ImageIcon class="w-4 h-4 text-[#333333]" />
-            <span>Sisipkan Gambar</span>
+            <span>{{ t('doc_editor_insert_image') }}</span>
           </div>
           <button
             @click="isImageModalOpen = false"
@@ -1416,7 +1432,7 @@ function goToAdminCases() {
                   : 'text-[#5F7089] dark:text-slate-400'
               "
             >
-              URL Gambar Web
+              {{ t('doc_editor_image_url_tab') }}
             </button>
           </div>
 
@@ -1443,7 +1459,7 @@ function goToAdminCases() {
                   class="max-h-36 rounded-lg object-contain shadow-sm border border-slate-200 dark:border-slate-700"
                 />
                 <span class="text-[11px] font-bold text-[#333333] group-hover:underline"
-                  >Klik untuk mengganti gambar</span
+                  >{{ t('doc_editor_image_replace_hint') }}</span
                 >
               </template>
               <template v-else>
@@ -1454,10 +1470,10 @@ function goToAdminCases() {
                 </div>
                 <div>
                   <p class="text-xs font-extrabold text-[#333333] dark:text-white">
-                    Klik atau Tarik File Gambar ke Sini
+                    {{ t('doc_editor_image_drop_hint') }}
                   </p>
                   <p class="text-[10px] text-[#5F7089] dark:text-slate-400 font-medium">
-                    PNG, JPG, WebP, GIF, SVG (Maksimal 5MB)
+                    {{ t('doc_editor_image_formats_hint') }}
                   </p>
                 </div>
               </template>
@@ -1468,7 +1484,7 @@ function goToAdminCases() {
           <div v-else class="space-y-2">
             <label
               class="block text-[11px] font-extrabold uppercase text-[#5F7089] dark:text-slate-400"
-              >URL Gambar (HTTPS):</label
+              >{{ t('doc_editor_image_url_label') }}:</label
             >
             <div class="relative flex items-center">
               <LinkIcon class="absolute left-3 w-4 h-4 text-[#66728d]" />
@@ -1484,7 +1500,7 @@ function goToAdminCases() {
                 :src="imageUrlInput"
                 alt="Preview URL"
                 class="max-h-32 rounded-lg mx-auto object-contain border border-slate-200 dark:border-slate-700 shadow-sm"
-                @error="showToast('URL Gambar tidak valid atau tidak dapat dimuat.', 'error')"
+                @error="showToast(t('doc_editor_image_url_invalid'), 'error')"
               />
             </div>
           </div>
@@ -1493,12 +1509,12 @@ function goToAdminCases() {
           <div class="space-y-1">
             <label
               class="block text-[11px] font-extrabold uppercase text-[#5F7089] dark:text-slate-400"
-              >Keterangan Gambar / Caption (Opsional):</label
+              >{{ t('doc_editor_image_caption_label') }}:</label
             >
             <input
               v-model="imageCaptionInput"
               type="text"
-              placeholder="Contoh: Tangkapan layar menu SSO Portal…"
+              :placeholder="t('doc_editor_image_caption_placeholder')"
               class="w-full h-9 px-3 bg-[#F8FAFC] dark:bg-slate-800 border border-[#E2E8F0] dark:border-slate-700 rounded-xl text-xs font-medium focus:border-[#0A51B0] focus:outline-none"
             />
           </div>
@@ -1512,14 +1528,14 @@ function goToAdminCases() {
             @click="isImageModalOpen = false"
             class="px-4 py-2 rounded-xl text-xs font-extrabold text-[#5F7089] hover:bg-[#F1F5F9] dark:hover:bg-slate-800 transition-colors cursor-pointer"
           >
-            Batal
+            {{ t('cancel') }}
           </button>
           <button
             @click="confirmInsertImage"
             class="px-4 py-2 rounded-xl text-xs font-extrabold bg-[#0A51B0] hover:bg-[#0A4391] text-white shadow-sm transition-all cursor-pointer flex items-center gap-1.5"
           >
             <Plus class="w-4 h-4" />
-            <span>Sisipkan Gambar</span>
+            <span>{{ t('doc_editor_insert_image') }}</span>
           </button>
         </div>
       </div>

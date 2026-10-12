@@ -26,7 +26,7 @@ const { getAllPages, post, put, del } = useApi()
 const { hasWritePermission } = useAuth()
 const canWriteAssets = computed(() => hasWritePermission('assets_ga'))
 const { viewMode } = useViewMode('assets-ga', 'table')
-const { t } = useLanguage()
+const { currentLang, t } = useLanguage()
 
 const assets = ref([])
 // Count complete category records, independent of table filters and pagination.

@@ -27,7 +27,7 @@ const { get, post, put, del } = useApi()
 const { hasWritePermission } = useAuth()
 const canWriteKaryawan = computed(() => hasWritePermission('karyawan'))
 const { viewMode } = useViewMode('karyawan', 'table')
-const { t } = useLanguage()
+const { currentLang, t } = useLanguage()
 
 // ── State Utama ──────────────────────────────────────────────
 const employees = ref([])

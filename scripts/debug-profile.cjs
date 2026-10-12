@@ -12,7 +12,7 @@ function cred(key) {
   await page.waitForSelector('#email')
   await page.locator('#email').fill(cred('E2E_SUPERADMIN_EMAIL'))
   await page.locator('#password').fill(cred('E2E_SUPERADMIN_PASSWORD'))
-  await page.getByRole('button', { name: 'Masuk', exact: true }).click()
+  await page.locator('button.login-submit').click()
   await page.waitForURL((u) => !u.href.includes('/login'))
   await page.goto('http://127.0.0.1:5175/dashboard', { waitUntil: 'domcontentloaded' })
   await page.waitForTimeout(1500)

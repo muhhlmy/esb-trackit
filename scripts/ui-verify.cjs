@@ -68,7 +68,7 @@ function readE2ECredential(key) {
       await page.waitForSelector('#email', { timeout: 10000 })
       await page.locator('#email').fill(readE2ECredential('E2E_SUPERADMIN_EMAIL'))
       await page.locator('#password').fill(readE2ECredential('E2E_SUPERADMIN_PASSWORD'))
-      await page.getByRole('button', { name: 'Masuk', exact: true }).click()
+      await page.locator('button.login-submit').click()
       await page.waitForURL((u) => !u.href.includes('/login'), { timeout: 20000 })
       loggedIn = true
     } catch (e) {

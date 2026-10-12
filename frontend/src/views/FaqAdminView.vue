@@ -29,7 +29,7 @@ import {
 const { get, post, put, del } = useApi()
 const { showToast } = useToast()
 const { hasWritePermission } = useAuth()
-const { t } = useLanguage()
+const { currentLang, t } = useLanguage()
 const canWrite = computed(() => hasWritePermission('knowledge_base'))
 
 const FAQ_CATEGORIES = [
@@ -56,14 +56,14 @@ const categoryOptions = computed(() => {
 })
 
 const categoryFilterOptions = computed(() => [
-  { value: 'all', label: 'All Categories' },
+  { value: 'all', label: t('faq_all_categories') },
   ...categoryOptions.value,
 ])
 
-const faqStatusFormOptions = [
-  { value: 'DRAFT', label: 'Draft', dot: 'bg-amber-500' },
-  { value: 'PUBLISHED', label: 'Published', dot: 'bg-emerald-500' },
-]
+const faqStatusFormOptions = computed(() => [
+  { value: 'DRAFT', label: t('stat_draft'), dot: 'bg-amber-500' },
+  { value: 'PUBLISHED', label: t('stat_published'), dot: 'bg-emerald-500' },
+])
 
 const faqs = ref([])
 const isLoading = ref(true)
@@ -104,7 +104,7 @@ async function fetchFaqs() {
   try {
     faqs.value = await get('/api/faqs')
   } catch (err) {
-    pageError.value = err.message || 'Unable to load FAQs.'
+    pageError.value = err.message || t('faq_load_failed')
   } finally {
     isLoading.value = false
   }
@@ -189,15 +189,15 @@ async function saveFaq() {
   if (!canWrite.value) return
   modalError.value = ''
   if (!form.value.question.trim()) {
-    modalError.value = 'Pertanyaan wajib diisi.'
+    modalError.value = t('faq_question_required')
     return
   }
   if (!form.value.answer.trim()) {
-    modalError.value = 'Jawaban wajib diisi.'
+    modalError.value = t('faq_answer_required')
     return
   }
   if (!form.value.category) {
-    modalError.value = 'Kategori wajib dipilih.'
+    modalError.value = t('faq_category_required')
     return
   }
 
@@ -213,15 +213,15 @@ async function saveFaq() {
 
     if (modalMode.value === 'add') {
       await post('/api/faqs', payload)
-      showToast('FAQ berhasil ditambahkan.', 'success')
+      showToast(t('faq_add_success'), 'success')
     } else {
       await put(`/api/faqs/${selectedFaq.value.id}`, payload)
-      showToast('FAQ berhasil diperbarui.', 'success')
+      showToast(t('faq_update_success'), 'success')
     }
     closeFormModal()
     await fetchFaqs()
   } catch (err) {
-    modalError.value = err.message || 'Gagal menyimpan FAQ.'
+    modalError.value = err.message || t('faq_save_failed')
   } finally {
     isSubmitting.value = false
   }
@@ -232,11 +232,11 @@ async function confirmDelete() {
   isSubmitting.value = true
   try {
     await del(`/api/faqs/${selectedFaq.value.id}`)
-    showToast('FAQ berhasil dihapus.', 'info')
+    showToast(t('faq_delete_success'), 'info')
     closeDeleteModal()
     await fetchFaqs()
   } catch (err) {
-    showToast(err.message || 'Gagal menghapus FAQ.', 'error')
+    showToast(err.message || t('faq_delete_failed'), 'error')
   } finally {
     isSubmitting.value = false
   }
@@ -246,7 +246,11 @@ function formatDate(value) {
   if (!value) return '-'
   const d = new Date(value)
   if (Number.isNaN(d.getTime())) return '-'
-  return d.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' })
+  return d.toLocaleDateString(currentLang.value === 'en' ? 'en-US' : 'id-ID', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+  })
 }
 
 function getCategoryBadgeClass(category) {
@@ -339,7 +343,7 @@ onMounted(() => {
         @click="fetchFaqs"
         class="inline-flex items-center gap-1.5 font-bold underline cursor-pointer"
       >
-        <RefreshCw class="h-3.5 w-3.5" /> Coba lagi
+        <RefreshCw class="h-3.5 w-3.5" /> {{ t('retry') }}
       </button>
     </div>
 
@@ -355,15 +359,15 @@ onMounted(() => {
         <input
           v-model="searchQuery"
           type="text"
-          aria-label="Cari pertanyaan atau jawaban FAQ"
-          placeholder="Cari pertanyaan atau kata kunci jawaban…"
+          :aria-label="t('faq_search_aria')"
+          :placeholder="t('faq_search_placeholder')"
           class="w-full h-8 bg-[#F8FAFC] dark:bg-slate-800/80 border border-[#E2E8F0] dark:border-slate-700 rounded-[6px] pl-9 sm:pl-10 pr-9 text-xs font-normal text-[#333333] dark:text-white placeholder-[#687281] focus:outline-none focus:border-[#0A51B0] focus:bg-white dark:focus:bg-slate-900 transition-all"
         />
         <button
           v-if="searchQuery"
           @click="searchQuery = ''"
           class="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600 dark:hover:text-white transition-colors cursor-pointer"
-          title="Clear search"
+          :title="t('clear_search')"
         >
           <X class="w-3.5 h-3.5" />
         </button>
@@ -377,9 +381,9 @@ onMounted(() => {
         >
           <button
             v-for="st in [
-              { key: 'all', label: 'All' },
-              { key: 'PUBLISHED', label: 'Published' },
-              { key: 'DRAFT', label: 'Draft' },
+              { key: 'all', label: t('filter_all') },
+              { key: 'PUBLISHED', label: t('stat_published') },
+              { key: 'DRAFT', label: t('stat_draft') },
             ]"
             :key="st.key"
             @click="selectedStatus = st.key"
@@ -399,8 +403,8 @@ onMounted(() => {
           <CustomSelect
             v-model="selectedCategory"
             :options="categoryFilterOptions"
-            aria-label="Filter category"
-            placeholder="All Categories"
+            :aria-label="t('faq_filter_category_aria')"
+            :placeholder="t('faq_all_categories')"
             :block="true"
             height-class="h-8"
           />
@@ -411,7 +415,7 @@ onMounted(() => {
           type="button"
           @click="showFilterModal = true"
           class="relative inline-flex items-center gap-1.5 h-8 px-3 rounded-[6px] border border-[#E2E8F0] dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-semibold text-[#333333] dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer shadow-2xs"
-          title="Filter lanjutan"
+          :title="t('kb_cat_filter_advanced')"
         >
           <span class="material-symbols-outlined text-[16px] text-[#5F7089]">tune</span>
           <span>Filter</span>
@@ -428,9 +432,9 @@ onMounted(() => {
           v-if="searchQuery || activeFilterCount > 0"
           @click="clearFilters"
           class="px-2.5 py-1 rounded-[6px] text-xs font-medium text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors cursor-pointer touch-manipulation shrink-0"
-          title="Reset Filters"
+          :title="t('filter_reset')"
         >
-          Clear Filters
+          {{ t('reset_all_filters') }}
         </button>
 
         <AppViewToggle v-model="viewMode" class="shrink-0" />
@@ -456,16 +460,16 @@ onMounted(() => {
               <FolderOpen class="w-5 h-5" />
             </div>
             <p class="text-xs font-semibold text-[#333333] dark:text-white">
-              No FAQ entries found
+              {{ t('faq_empty_title') }}
             </p>
             <p class="text-[11px] text-[#5F7089] dark:text-slate-400">
-              No FAQs match your current search query or active filter settings.
+              {{ t('faq_empty_desc') }}
             </p>
             <button
               @click="clearFilters"
               class="mt-3 px-3.5 py-1.5 rounded-[6px] text-xs font-medium bg-[#ECF2FF] dark:bg-indigo-950 text-[#333333] hover:bg-[#0A51B0] hover:text-white transition-all cursor-pointer touch-manipulation"
             >
-              Reset All Filters
+              {{ t('reset_all_filters') }}
             </button>
           </div>
         </div>
@@ -499,7 +503,7 @@ onMounted(() => {
                       class="w-1.5 h-1.5 rounded-full shrink-0"
                       :class="f.status === 'PUBLISHED' ? 'bg-emerald-500' : 'bg-amber-500'"
                     ></span>
-                    <span>{{ f.status === 'PUBLISHED' ? 'Published' : 'Draft' }}</span>
+                    <span>{{ f.status === 'PUBLISHED' ? t('stat_published') : t('stat_draft') }}</span>
                   </span>
                 </div>
 
@@ -516,7 +520,7 @@ onMounted(() => {
                   <button
                     @click="openDelete(f)"
                     class="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors cursor-pointer touch-manipulation"
-                    title="Delete FAQ"
+                    :title="t('faq_delete_aria')"
                   >
                     <Trash2 class="w-4 h-4" />
                   </button>
@@ -542,10 +546,10 @@ onMounted(() => {
                 class="flex items-center justify-between text-[11px] text-[#5F7089] dark:text-slate-400 pt-1 border-t border-slate-100 dark:border-slate-800/60 font-medium"
               >
                 <span class="font-mono text-slate-500 dark:text-slate-400">
-                  Order:
+                  {{ t('kb_cat_order_label') }}:
                   <strong class="text-[#333333] dark:text-white">#{{ f.sort_order || 0 }}</strong>
                 </span>
-                <span> Updated {{ formatDate(f.updated_at) }} </span>
+                <span> {{ t('faq_updated_label') }} {{ formatDate(f.updated_at) }} </span>
               </div>
             </div>
           </div>
@@ -609,7 +613,7 @@ onMounted(() => {
                         class="w-2 h-2 rounded-full"
                         :class="f.status === 'PUBLISHED' ? 'bg-emerald-500' : 'bg-amber-500'"
                       ></span>
-                      <span>{{ f.status === 'PUBLISHED' ? 'Published' : 'Draft' }}</span>
+                      <span>{{ f.status === 'PUBLISHED' ? t('stat_published') : t('stat_draft') }}</span>
                     </span>
                   </td>
 
@@ -640,7 +644,7 @@ onMounted(() => {
                       <button
                         @click="openDelete(f)"
                         class="p-1.5 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors cursor-pointer"
-                        title="Delete FAQ"
+                        :title="t('faq_delete_aria')"
                       >
                         <Trash2 class="w-4 h-4" />
                       </button>

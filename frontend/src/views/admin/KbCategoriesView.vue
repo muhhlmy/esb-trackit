@@ -716,13 +716,13 @@ function clearFilters() {
               :aria-label="t('kb_cat_description_aria')"
               v-model="editingCategory.description"
               rows="3"
-              placeholder="Deskripsi singkat yang tampil pada kartu topik…"
+              :placeholder="t('kb_cat_description_placeholder')"
               class="w-full bg-white dark:bg-slate-950 border border-[#E2E8F0] dark:border-slate-700 rounded-lg px-3 py-2 text-xs sm:text-sm text-[#333333] dark:text-white placeholder-[#687281] focus:outline-none focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 transition-all resize-none"
             ></textarea>
           </div>
 
           <!-- Icon Picker -->
-          <h3 class="category-section-title">Tampilan kategori</h3>
+          <h3 class="category-section-title">{{ t('kb_cat_section_appearance') }}</h3>
           <div class="space-y-1.5">
             <label class="text-xs font-semibold text-[#475569] dark:text-slate-300">Icon</label>
             <div class="category-icon-grid grid grid-cols-4 gap-1.5 sm:gap-2">
@@ -732,7 +732,7 @@ function clearFilters() {
                 type="button"
                 @click="editingCategory.icon = opt.name"
                 :aria-pressed="editingCategory.icon === opt.name"
-                :aria-label="'Pilih ikon ' + opt.name"
+                :aria-label="t('kb_cat_select_icon_aria') + ' ' + opt.name"
                 class="flex flex-col items-center gap-1.5 p-2 sm:p-2.5 rounded-lg border transition-all cursor-pointer touch-manipulation"
                 :class="
                   editingCategory.icon === opt.name
@@ -749,13 +749,15 @@ function clearFilters() {
           </div>
 
           <!-- Sort Order & Status -->
-          <h3 class="category-section-title">Pengaturan publikasi</h3>
+          <h3 class="category-section-title">{{ t('kb_cat_section_publishing') }}</h3>
           <div class="grid grid-cols-2 gap-2.5 sm:gap-3">
             <div class="space-y-1.5">
-              <label class="text-xs font-semibold text-[#475569] dark:text-slate-300">Urutan</label>
+              <label class="text-xs font-semibold text-[#475569] dark:text-slate-300">{{
+                t('kb_cat_order_label')
+              }}</label>
               <input
                 id="category-sort_order"
-                aria-label="Urutan kategori"
+                :aria-label="t('kb_cat_order_aria')"
                 v-model.number="editingCategory.sort_order"
                 type="number"
                 min="0"
@@ -763,15 +765,17 @@ function clearFilters() {
               />
             </div>
             <div class="space-y-1.5">
-              <label class="text-xs font-semibold text-[#475569] dark:text-slate-300">Status</label>
+              <label class="text-xs font-semibold text-[#475569] dark:text-slate-300">{{
+                t('status')
+              }}</label>
               <select
                 id="category-status"
-                aria-label="Status kategori"
+                :aria-label="t('kb_cat_status_aria')"
                 v-model="editingCategory.status"
                 class="w-full bg-white dark:bg-slate-950 border border-[#E2E8F0] dark:border-slate-700 rounded-lg px-3 py-2 text-xs sm:text-sm text-[#333333] dark:text-white focus:outline-none focus:border-[#0A51B0] focus:ring-2 focus:ring-[#0A51B0]/10 cursor-pointer transition-all"
               >
-                <option value="PUBLISHED">Published</option>
-                <option value="DRAFT">Draft</option>
+                <option value="PUBLISHED">{{ t('stat_published') }}</option>
+                <option value="DRAFT">{{ t('stat_draft') }}</option>
               </select>
             </div>
           </div>
@@ -782,16 +786,16 @@ function clearFilters() {
           >
             <div class="pr-2">
               <div class="text-xs font-semibold text-[#333333] dark:text-white">
-                Kategori unggulan
+                {{ t('kb_cat_featured_toggle') }}
               </div>
               <div class="text-[11px] text-[#687281] dark:text-slate-500 mt-0.5 leading-tight">
-                Tampilkan dengan highlight warna utama di halaman Help Center.
+                {{ t('kb_cat_featured_toggle_desc') }}
               </div>
             </div>
             <button
               type="button"
               role="switch"
-              aria-label="Kategori unggulan"
+              :aria-label="t('kb_cat_featured_toggle')"
               :aria-checked="Boolean(editingCategory.is_featured)"
               @click.prevent="editingCategory.is_featured = !editingCategory.is_featured"
               class="relative w-9 h-5 rounded-full transition-colors shrink-0 cursor-pointer"
@@ -813,14 +817,14 @@ function clearFilters() {
       </template>
       <template #footer>
         <div class="category-footer">
-          <button type="button" :disabled="isSaving" @click="closeDrawer">Batal</button>
+          <button type="button" :disabled="isSaving" @click="closeDrawer">{{ t('cancel') }}</button>
           <button
             type="button"
             class="category-save"
             :disabled="isSaving || !editingCategory?.title || !editingCategory?.key"
             @click="handleSave"
           >
-            {{ isSaving ? 'Menyimpan...' : 'Simpan kategori' }}
+            {{ isSaving ? t('kb_cat_saving') : t('kb_cat_save_button') }}
           </button>
         </div>
       </template>
@@ -842,11 +846,10 @@ function clearFilters() {
           </div>
           <div>
             <h3 class="text-sm font-bold text-[#333333] dark:text-white">
-              Hapus kategori?
+              {{ t('kb_cat_delete_confirm_title') }}
             </h3>
             <p class="text-xs text-[#5F7089] dark:text-slate-400 mt-1 leading-relaxed font-normal">
-              Kategori ini akan dihapus permanen dan tidak lagi tampil di Help Center. Tindakan ini
-              tidak dapat dibatalkan.
+              {{ t('kb_cat_delete_confirm_msg') }}
             </p>
           </div>
           <div class="flex items-center justify-end gap-2 pt-1">
@@ -854,13 +857,13 @@ function clearFilters() {
               @click="deleteConfirmId = null"
               class="h-8 px-3 rounded-[6px] border border-[#CBD5E1] dark:border-slate-700 text-xs font-semibold text-[#333333] dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer touch-manipulation"
             >
-              Batal
+              {{ t('cancel') }}
             </button>
             <button
               @click="executeDelete"
               class="h-8 px-3 rounded-[6px] text-xs font-semibold bg-rose-600 hover:bg-rose-700 text-white shadow-xs transition-colors cursor-pointer touch-manipulation"
             >
-              Hapus
+              {{ t('delete') }}
             </button>
           </div>
         </div>
@@ -870,7 +873,7 @@ function clearFilters() {
     <!-- Advance Filter Modal -->
     <FilterModal
       :is-open="showFilterModal"
-      title="Filter Kategori Knowledge Base"
+      :title="t('kb_cat_filter_modal_title')"
       @close="showFilterModal = false"
       @apply="showFilterModal = false"
       @reset="clearFilters"
@@ -878,31 +881,31 @@ function clearFilters() {
       <div class="space-y-3">
         <div>
           <label class="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
-            Status Kategori
+            {{ t('kb_cat_filter_status_label') }}
           </label>
           <CustomSelect
             v-model="selectedStatus"
             :options="[
-              { value: 'all', label: 'Semua Status' },
-              { value: 'PUBLISHED', label: 'Published' },
-              { value: 'DRAFT', label: 'Draft' },
+              { value: 'all', label: t('kb_cat_all_statuses') },
+              { value: 'PUBLISHED', label: t('stat_published') },
+              { value: 'DRAFT', label: t('stat_draft') },
             ]"
-            placeholder="Semua Status"
+            :placeholder="t('kb_cat_all_statuses')"
             :block="true"
           />
         </div>
         <div>
           <label class="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
-            Status Unggulan (Featured)
+            {{ t('kb_cat_filter_featured_label') }}
           </label>
           <CustomSelect
             v-model="selectedFeatured"
             :options="[
-              { value: 'all', label: 'Semua' },
-              { value: 'featured', label: 'Unggulan Saja (Featured)' },
-              { value: 'standard', label: 'Standar (Non-Featured)' },
+              { value: 'all', label: t('filter_all') },
+              { value: 'featured', label: t('kb_cat_featured_only') },
+              { value: 'standard', label: t('kb_cat_standard_non_featured') },
             ]"
-            placeholder="Semua"
+            :placeholder="t('filter_all')"
             :block="true"
           />
         </div>

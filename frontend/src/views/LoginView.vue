@@ -1,6 +1,6 @@
 <script setup>
-import { ref, onMounted, onUnmounted, nextTick } from 'vue'
-import { RouterLink, useRouter } from 'vue-router'
+import { ref, onMounted, onUnmounted, nextTick, computed } from 'vue'
+import { RouterLink, useRouter, useRoute } from 'vue-router'
 import {
   ArrowRight,
   Laptop,
@@ -22,9 +22,11 @@ import { findFirstAllowedRoute } from '@/utils/permissionAccess.js'
 import { allowedRouteMap } from '@/router/index.js'
 
 const router = useRouter()
+const route = useRoute()
 const { login, user } = useAuth()
 const { post } = useApi()
 const { t } = useLanguage()
+const hideSignIn = computed(() => route.path === '/login')
 
 const email = ref('')
 const password = ref('')
@@ -468,7 +470,8 @@ const finishResetAndLogin = () => {
                 {{ t('login_forgot_password') }}
               </button>
             </div>
-            <button type="submit" class="login-submit" :disabled="isLoading">
+            <button
+         v-show="!hideSignIn" type="submit" class="login-submit" :disabled="isLoading">
               <LoaderCircle
                 v-if="isLoading"
                 :size="18"
@@ -549,6 +552,7 @@ const finishResetAndLogin = () => {
                 </div>
               </div>
               <button
+         v-show="!hideSignIn"
                 @click="closeForgotModal"
                 class="w-8 h-8 sm:w-9 sm:h-9 rounded-lg hover:bg-slate-200/70 text-slate-400 hover:text-slate-600 flex items-center justify-center transition-colors cursor-pointer touch-manipulation"
                 :aria-label="t('close')"
@@ -687,6 +691,7 @@ const finishResetAndLogin = () => {
                   </div>
 
                   <button
+         v-show="!hideSignIn"
                     type="submit"
                     :disabled="forgotLoading"
                     class="w-full h-9 rounded-xl bg-[#0A51B0] hover:bg-[#0A4391] text-white font-semibold text-sm transition-all shadow-xs flex items-center justify-center gap-2 disabled:opacity-60 cursor-pointer active:scale-[0.98] touch-manipulation"
@@ -757,6 +762,7 @@ const finishResetAndLogin = () => {
                 <!-- Action Buttons -->
                 <div class="space-y-3 pt-1">
                   <button
+         v-show="!hideSignIn"
                     type="button"
                     :disabled="
                       forgotLoading || otpDigits.join('').length !== 6 || otpExpirySeconds <= 0
@@ -782,6 +788,7 @@ const finishResetAndLogin = () => {
 
                   <div class="flex items-center justify-between text-xs pt-1">
                     <button
+         v-show="!hideSignIn"
                       type="button"
                       @click="forgotStep = 1"
                       class="text-slate-500 hover:text-slate-800 font-medium transition-colors cursor-pointer py-1 touch-manipulation"
@@ -790,6 +797,7 @@ const finishResetAndLogin = () => {
                     </button>
 
                     <button
+         v-show="!hideSignIn"
                       type="button"
                       :disabled="resendCooldown > 0 || forgotLoading"
                       @click="handleResendOtp"
@@ -831,6 +839,7 @@ const finishResetAndLogin = () => {
                         class="h-9 w-full rounded-xl border border-slate-300 bg-slate-50/50 pl-10 pr-11 text-sm text-slate-900 transition-all placeholder:text-slate-400 focus:border-[#0A51B0] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#0A51B0]/10"
                       />
                       <button
+         v-show="!hideSignIn"
                         type="button"
                         @click="showNewPassword = !showNewPassword"
                         class="absolute right-1.5 top-1/2 -translate-y-1/2 w-8 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors focus:outline-none cursor-pointer touch-manipulation"
@@ -872,6 +881,7 @@ const finishResetAndLogin = () => {
                         class="h-9 w-full rounded-xl border border-slate-300 bg-slate-50/50 pl-10 pr-11 text-sm text-slate-900 transition-all placeholder:text-slate-400 focus:border-[#0A51B0] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#0A51B0]/10"
                       />
                       <button
+         v-show="!hideSignIn"
                         type="button"
                         @click="showConfirmPassword = !showConfirmPassword"
                         class="absolute right-1.5 top-1/2 -translate-y-1/2 w-8 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors focus:outline-none cursor-pointer touch-manipulation"
@@ -922,6 +932,7 @@ const finishResetAndLogin = () => {
                   </div>
 
                   <button
+         v-show="!hideSignIn"
                     type="submit"
                     :disabled="
                       forgotLoading ||
@@ -970,6 +981,7 @@ const finishResetAndLogin = () => {
                 </div>
 
                 <button
+         v-show="!hideSignIn"
                   type="button"
                   @click="finishResetAndLogin"
                   class="w-full h-9 mt-3 rounded-xl bg-[#0A51B0] hover:bg-[#0A4391] text-white font-semibold text-sm transition-all shadow-xs flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98] touch-manipulation"

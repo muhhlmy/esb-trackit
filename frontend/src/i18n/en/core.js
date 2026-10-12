@@ -179,7 +179,6 @@ export const en = {
     dashboard_page_subtitle: 'Asset conditions, utilization status, and recent IT ticket activity.',
     total_assets: 'Total Assets',
     registered_devices: 'Registered devices',
-    status_in_use: 'In Use',
     status_stock: 'In Stock',
     status_maintenance_broken: 'Maintenance & Damaged',
     quick_access: 'Quick Access',
@@ -334,7 +333,7 @@ export const en = {
     entries: 'entries',
     page_prev: 'Previous',
     page_next: 'Next',
-    no_data: 'No data found',
+    no_data_found: 'No data found',
     loading_data: 'Loading data...',
 
     // Form & Actions

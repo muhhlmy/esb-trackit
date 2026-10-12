@@ -13,6 +13,7 @@ import {
   Filler,
 } from 'chart.js'
 import { useChartTheme } from '@/composables/useChartTheme'
+import { useLanguage } from '@/composables/useLanguage'
 import BaseChartCard from './BaseChartCard.vue'
 
 ChartJS.register(
@@ -35,6 +36,7 @@ const props = defineProps({
 })
 
 const { chartColors, fontStack } = useChartTheme()
+const { t } = useLanguage()
 
 const isEmpty = computed(() => !props.data || props.data.length === 0)
 
@@ -53,7 +55,7 @@ const chartData = computed(() => ({
   labels: props.data.map((d) => d.label || d.month || d.period || ''),
   datasets: [
     {
-      label: 'Penambahan Aset IT',
+      label: t('chart_trend_dataset_label', 'Penambahan Aset IT'),
       data: props.data.map((d) => (d.added !== undefined ? d.added : d.count || 0)),
       borderColor: chartColors.primary,
       backgroundColor: gradientFill,
@@ -91,7 +93,7 @@ const chartOptions = computed(() => ({
       titleFont: { family: fontStack, size: 12, weight: '700' },
       bodyFont: { family: fontStack, size: 13, weight: '600' },
       callbacks: {
-        label: (context) => ` +${context.parsed.y} unit baru`,
+        label: (context) => ` +${context.parsed.y} ${t('chart_new_unit_word', 'unit baru')}`,
       },
     },
   },
@@ -123,8 +125,8 @@ const chartOptions = computed(() => ({
 
 <template>
   <BaseChartCard
-    title="Tren Penambahan Aset IT"
-    subtitle="Jumlah unit aset baru terdaftar per bulan (12 bulan terakhir)"
+    :title="t('dashboard_trend_chart_title', 'Tren Penambahan Aset IT')"
+    :subtitle="t('dashboard_trend_chart_subtitle', 'Jumlah unit aset baru terdaftar per bulan (12 bulan terakhir)')"
     :loading="loading"
     :empty="isEmpty"
     :error="error"

@@ -40,8 +40,8 @@ test('Router config defines meta.title and meta.subtitle for all named routes', 
 test('AppHeader reads pageTitle and pageSubtitle dynamically from route.meta', async () => {
   const headerSource = await readFile(headerSourceUrl, 'utf8')
 
-  assert.match(headerSource, /const pageTitle = computed\(\(\) => route\.meta\?\.title \|\|/)
-  assert.match(headerSource, /const pageSubtitle = computed\(\(\) => route\.meta\?\.subtitle \|\|/)
+  assert.match(headerSource, /const pageTitle = computed\(\s*\(\) =>[\s\S]*?route\.meta\?\.(titleKey|title)/)
+  assert.match(headerSource, /const pageSubtitle = computed\(\s*\(\) =>[\s\S]*?route\.meta\?\.(subtitleKey|subtitle)/)
   assert.match(headerSource, /\{\{\s*pageTitle\s*\}\}/)
   assert.match(headerSource, /\{\{\s*pageSubtitle\s*\}\}/)
 })

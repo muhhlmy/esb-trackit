@@ -522,7 +522,7 @@ async function openDetails(asset) {
     const data = await get(`/api/logs/assets/${targetId}`)
     deviceLogs.value = Array.isArray(data) ? data : []
   } catch (error) {
-    console.error('Gagal memuat log perangkat:', error)
+    console.error('Failed to load device logs:', error)
     deviceLogs.value = []
   } finally {
     isLoadingLogs.value = false
@@ -863,6 +863,20 @@ function logFieldDisplay(field) {
   return field
 }
 
+// Nilai lama/baru log untuk field enum (status/kondisi/tipe/merek) dipetakan
+// lewat display helper agar mengikuti bahasa aktif; nilai lain diteruskan.
+function logValueDisplay(field, value) {
+  if (value === null || value === undefined) return value
+  const v = String(value)
+  if (!v.trim()) return value
+  const f = String(field || '').trim().toLowerCase()
+  if (f === 'status') return statusLabel(v)
+  if (f === 'kondisi') return kondisiDisplay(v)
+  if (f === 'tipe' || f === 'tipe perangkat') return tipeDisplay(v)
+  if (f === 'merek' || f === 'brand/merek') return brandDisplay(v)
+  return value
+}
+
 function parsePerubahan(perubahan, aksi) {
   if (!perubahan) return []
 
@@ -893,7 +907,7 @@ function parsePerubahan(perubahan, aksi) {
       const mappedField = logFieldDisplay(label)
       items.push({
         field: mappedField !== label ? mappedField : label.charAt(0).toUpperCase() + label.slice(1),
-        value: m[1].trim(),
+        value: logValueDisplay(label, m[1].trim()),
       })
     }
     return items
@@ -2180,8 +2194,12 @@ onMounted(async () => {
                         <td class="py-1.5 pr-2 font-bold text-[#475569]">{{
                           logFieldDisplay(row.field)
                         }}</td>
-                        <td class="py-1.5 px-2 text-[#DC2626] line-through">{{ row.old }}</td>
-                        <td class="py-1.5 pl-2 font-semibold text-[#059669]">{{ row.new }}</td>
+                        <td class="py-1.5 px-2 text-[#DC2626] line-through">{{
+                          logValueDisplay(row.field, row.old)
+                        }}</td>
+                        <td class="py-1.5 pl-2 font-semibold text-[#059669]">{{
+                          logValueDisplay(row.field, row.new)
+                        }}</td>
                       </tr>
                     </tbody>
                   </table>
@@ -2190,7 +2208,9 @@ onMounted(async () => {
                 <!-- TAMBAH: Key-value detail list -->
                 <div
                   v-else-if="
-                    log.aksi === 'TAMBAH' && parsePerubahan(log.perubahan, log.aksi).length > 1
+                    log.aksi === 'TAMBAH' &&
+                    parsePerubahan(log.perubahan, log.aksi).length &&
+                    parsePerubahan(log.perubahan, log.aksi)[0].field !== null
                   "
                   class="overflow-x-auto w-full -mx-0.5"
                 >

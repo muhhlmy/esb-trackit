@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useApi } from '@/composables/useApi'
 import { useToast } from '@/composables/useToast'
 import { useLanguage } from '@/composables/useLanguage'
@@ -36,25 +36,25 @@ const newWebhookForm = ref({
   events: ['ticket.created', 'asset.assigned'],
 })
 
-// Available Scopes and Events
-const availableScopes = [
-  { key: 'assets:read', label: 'Baca Aset & Inventaris (assets:read)' },
-  { key: 'assets:write', label: 'Tulis & Ubah Aset (assets:write)' },
-  { key: 'tickets:read', label: 'Baca Tiket Helpdesk (tickets:read)' },
-  { key: 'tickets:write', label: 'Buat & Ubah Tiket (tickets:write)' },
-  { key: 'reports:read', label: 'Akses BI & Reporting (reports:read)' },
-  { key: 'api_clients:manage', label: 'Kelola API Clients (api_clients:manage)' },
-  { key: 'webhooks:manage', label: 'Kelola Webhooks (webhooks:manage)' },
-]
+// Available Scopes and Events (computed agar label mengikuti bahasa aktif)
+const availableScopes = computed(() => [
+  { key: 'assets:read', label: t('api_portal_scope_assets_read') },
+  { key: 'assets:write', label: t('api_portal_scope_assets_write') },
+  { key: 'tickets:read', label: t('api_portal_scope_tickets_read') },
+  { key: 'tickets:write', label: t('api_portal_scope_tickets_write') },
+  { key: 'reports:read', label: t('api_portal_scope_reports_read') },
+  { key: 'api_clients:manage', label: t('api_portal_scope_clients_manage') },
+  { key: 'webhooks:manage', label: t('api_portal_scope_webhooks_manage') },
+])
 
-const availableEvents = [
-  { key: 'ticket.created', label: 'Tiket Baru Dibuat' },
-  { key: 'ticket.status_changed', label: 'Status Tiket Berubah' },
-  { key: 'asset.created', label: 'Aset Baru Ditambahkan' },
-  { key: 'asset.assigned', label: 'Aset Diserahkan ke Karyawan' },
-  { key: 'submission.created', label: 'Pengajuan BAST Dibuat' },
-  { key: 'shipment.status_changed', label: 'Status Pengiriman Berubah' },
-]
+const availableEvents = computed(() => [
+  { key: 'ticket.created', label: t('webhook_event_ticket_created') },
+  { key: 'ticket.status_changed', label: t('webhook_event_ticket_status') },
+  { key: 'asset.created', label: t('webhook_event_asset_created') },
+  { key: 'asset.assigned', label: t('webhook_event_asset_assigned') },
+  { key: 'submission.created', label: t('webhook_event_submission_created') },
+  { key: 'shipment.status_changed', label: t('webhook_event_shipment_status') },
+])
 
 // System Status
 const systemStatus = ref(null)
@@ -64,7 +64,7 @@ async function fetchClients() {
     const res = await api.get('/api/v1/api-clients')
     clients.value = res.data?.data || []
   } catch (error) {
-    showToast(error.message || 'Gagal memuat API Clients', 'error')
+    showToast(error.message || t('api_portal_err_load_clients'), 'error')
   }
 }
 
@@ -77,7 +77,7 @@ async function fetchWebhooks() {
     subscriptions.value = subRes.data?.data || []
     deliveries.value = delRes.data?.data || []
   } catch (error) {
-    showToast(error.message || 'Gagal memuat Webhooks', 'error')
+    showToast(error.message || t('api_portal_err_load_webhooks'), 'error')
   }
 }
 
@@ -102,7 +102,7 @@ onMounted(() => {
 
 async function handleCreateClient() {
   if (!newClientForm.value.name.trim()) {
-    showToast('Nama API Client wajib diisi', 'error')
+    showToast(t('api_portal_err_name_required'), 'error')
     return
   }
   isSubmittingClient.value = true
@@ -117,40 +117,40 @@ async function handleCreateClient() {
       rateLimit: 120,
     }
     await fetchClients()
-    showToast('API Client berhasil dibuat', 'success')
+    showToast(t('api_portal_client_created'), 'success')
   } catch (error) {
-    showToast(error.message || 'Gagal membuat API Client', 'error')
+    showToast(error.message || t('api_portal_err_create_client'), 'error')
   } finally {
     isSubmittingClient.value = false
   }
 }
 
 async function handleRotateSecret(client) {
-  if (!confirm(`Rotasi secret untuk "${client.client_name}"? API key lama akan langsung tidak berlaku.`)) return
+  if (!confirm(`${t('api_portal_confirm_rotate_p1')}${client.client_name}${t('api_portal_confirm_rotate_p2')}`)) return
   try {
     const res = await api.post(`/api/v1/api-clients/${client.id}/rotate-secret`)
     createdClientResult.value = res.data?.data
     await fetchClients()
-    showToast('Secret berhasil dirotasi', 'success')
+    showToast(t('api_portal_secret_rotated'), 'success')
   } catch (error) {
-    showToast(error.message || 'Gagal rotasi secret', 'error')
+    showToast(error.message || t('api_portal_err_rotate'), 'error')
   }
 }
 
 async function handleRevokeClient(client) {
-  if (!confirm(`Cabut akses untuk "${client.client_name}"? Client tidak dapat lagi memanggil API.`)) return
+  if (!confirm(`${t('api_portal_confirm_revoke_p1')}${client.client_name}${t('api_portal_confirm_revoke_p2')}`)) return
   try {
     await api.post(`/api/v1/api-clients/${client.id}/revoke`)
     await fetchClients()
-    showToast('Akses API Client berhasil dicabut', 'success')
+    showToast(t('api_portal_client_revoked'), 'success')
   } catch (error) {
-    showToast(error.message || 'Gagal mencabut akses', 'error')
+    showToast(error.message || t('api_portal_err_revoke'), 'error')
   }
 }
 
 async function handleCreateWebhook() {
   if (!newWebhookForm.value.targetUrl.trim()) {
-    showToast('Target URL wajib diisi', 'error')
+    showToast(t('webhook_err_target_required'), 'error')
     return
   }
   isSubmittingWebhook.value = true
@@ -162,22 +162,22 @@ async function handleCreateWebhook() {
       events: ['ticket.created', 'asset.assigned'],
     }
     await fetchWebhooks()
-    showToast('Webhook Subscription berhasil didaftarkan', 'success')
+    showToast(t('webhook_registered'), 'success')
   } catch (error) {
-    showToast(error.message || 'Gagal mendaftarkan webhook', 'error')
+    showToast(error.message || t('webhook_err_register'), 'error')
   } finally {
     isSubmittingWebhook.value = false
   }
 }
 
 async function handleDeleteWebhook(id) {
-  if (!confirm('Hapus webhook subscription ini?')) return
+  if (!confirm(t('webhook_confirm_delete'))) return
   try {
     await api.delete(`/api/v1/webhook-subscriptions/${id}`)
     await fetchWebhooks()
-    showToast('Webhook subscription berhasil dihapus', 'success')
+    showToast(t('webhook_deleted'), 'success')
   } catch (error) {
-    showToast(error.message || 'Gagal menghapus webhook', 'error')
+    showToast(error.message || t('webhook_err_delete'), 'error')
   }
 }
 
@@ -185,18 +185,18 @@ async function handleTestWebhookPing() {
   try {
     const res = await api.post('/api/v1/webhook-test', {
       event: 'system.ping',
-      payload: { message: 'Test ping dari TrackIT Developer Portal' },
+      payload: { message: t('webhook_test_payload_message') },
     })
-    showToast(res.data?.message || 'Ping webhook berhasil dikirim', 'success')
+    showToast(res.data?.message || t('webhook_ping_sent'), 'success')
     await fetchWebhooks()
   } catch (error) {
-    showToast(error.message || 'Gagal menguji webhook ping', 'error')
+    showToast(error.message || t('webhook_err_ping'), 'error')
   }
 }
 
 function copyToClipboard(text) {
   navigator.clipboard.writeText(text)
-  showToast('Tersalin ke clipboard!', 'success')
+  showToast(t('copied_clipboard'), 'success')
 }
 </script>
 

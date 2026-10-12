@@ -107,7 +107,7 @@ function removeTag(tagToRemove) {
         </button>
       </div>
       <p class="text-[11px] font-medium text-[#5F7089] dark:text-slate-400">
-        Metadata &amp; tag artikel
+        {{ t('cms_inspector_subtitle') }}
       </p>
     </div>
 
